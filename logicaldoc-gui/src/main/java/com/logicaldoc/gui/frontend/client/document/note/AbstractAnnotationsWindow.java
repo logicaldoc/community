@@ -156,34 +156,38 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 * modified
 	 */
 	protected void captureNotesPosition() {
-		if (pageDrawingPane != null && pageDrawingPane.getDrawItems() != null) {
-			DrawItem[] items = pageDrawingPane.getDrawItems();
-			if (items != null)
-				for (DrawItem item : items) {
-					GUIDocumentNote note = currentPageItems.get(item);
-					if (note != null) {
-						if (item.getRotationAsDouble() != note.getRotation()) {
-							note.setMovedOrResized(true);
-							note.setRotation(item.getRotationAsDouble());
-						}
+		if (pageDrawingPane == null || pageDrawingPane.getDrawItems() == null)
+			return;
 
-						if (note.isMovedOrResized()) {
-							if (item instanceof DrawLine) {
-								DrawLine line = (DrawLine) item;
-								note.setLeft(line.getStartLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
-								note.setTop(line.getStartTopAsDouble() / (double) pageDrawingPane.getImageHeight());
-								note.setWidth(line.getEndLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
-								note.setHeight(line.getEndTopAsDouble() / (double) pageDrawingPane.getImageHeight());
-							} else {
-								Double[] box = item.getBoundingBoxAsDouble();
-								note.setLeft(box[0] / (double) pageDrawingPane.getImageWidth());
-								note.setTop(box[1] / (double) pageDrawingPane.getImageHeight());
-								note.setWidth((box[2] - box[0]) / (double) pageDrawingPane.getImageWidth());
-								note.setHeight((box[3] - box[1]) / (double) pageDrawingPane.getImageHeight());
-							}
-						}
-					}
+		DrawItem[] items = pageDrawingPane.getDrawItems();
+		if (items == null)
+			return;
+
+		for (DrawItem item : items) {
+			GUIDocumentNote note = currentPageItems.get(item);
+			if (note == null)
+				continue;
+
+			if (item.getRotationAsDouble() != note.getRotation()) {
+				note.setMovedOrResized(true);
+				note.setRotation(item.getRotationAsDouble());
+			}
+
+			if (note.isMovedOrResized()) {
+				if (item instanceof DrawLine) {
+					DrawLine line = (DrawLine) item;
+					note.setLeft(line.getStartLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
+					note.setTop(line.getStartTopAsDouble() / (double) pageDrawingPane.getImageHeight());
+					note.setWidth(line.getEndLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
+					note.setHeight(line.getEndTopAsDouble() / (double) pageDrawingPane.getImageHeight());
+				} else {
+					Double[] box = item.getBoundingBoxAsDouble();
+					note.setLeft(box[0] / (double) pageDrawingPane.getImageWidth());
+					note.setTop(box[1] / (double) pageDrawingPane.getImageHeight());
+					note.setWidth((box[2] - box[0]) / (double) pageDrawingPane.getImageWidth());
+					note.setHeight((box[3] - box[1]) / (double) pageDrawingPane.getImageHeight());
 				}
+			}
 		}
 	}
 

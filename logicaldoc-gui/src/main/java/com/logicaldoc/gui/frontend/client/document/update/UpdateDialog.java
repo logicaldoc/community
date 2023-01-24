@@ -16,7 +16,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -119,6 +118,29 @@ public class UpdateDialog extends StickyWindow {
 		else
 			saveForm.setItems(versionComment);
 
+		Button saveButton = prepareSaveButton(saveForm);
+
+		HLayout savePanel = new HLayout();
+		savePanel.addMember(saveButton);
+		if (!CONTEXT_CHECKIN.equals(context))
+			savePanel.addMember(saveForm);
+		savePanel.addMember(spacer);
+		savePanel.setWidth100();
+		savePanel.setHeight(30);
+		savePanel.setMargin(2);
+		savePanel.setMembersMargin(10);
+
+		VLayout content = new VLayout();
+		content.setTop(10);
+		content.setWidth100();
+		content.setHeight100();
+		content.setMembersMargin(3);
+		content.setMembers(bulkPanel, savePanel);
+
+		addItem(content);
+	}
+
+	private Button prepareSaveButton(final DynamicForm saveForm) {
 		Button saveButton = new Button(
 				CONTEXT_CHECKIN.equals(context) ? I18N.message("checkin") : I18N.message("save"));
 		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
@@ -141,100 +163,90 @@ public class UpdateDialog extends StickyWindow {
 					@Override
 					public void onSuccess(Void arg0) {
 						if (CONTEXT_CHECKIN.equals(context)) {
-							LD.contactingServer();
-							DocumentService.Instance.get().checkin(metadata, majorVersion,
-									new AsyncCallback<GUIDocument>() {
-
-										@Override
-										public void onFailure(Throwable error) {
-											LD.clearPrompt();
-											GuiLog.serverError(error);
-										}
-
-										@Override
-										public void onSuccess(GUIDocument doc) {
-											LD.clearPrompt();
-											DocUtil.markCheckedIn(doc);
-											destroy();
-										}
-									});
+							doCheckin();
 						} else if (ids != null && ids.length > 0)
-							LD.ask(I18N.message("bulkupdate"), I18N.message("bulkwarning"), new BooleanCallback() {
-								@Override
-								public void execute(Boolean value) {
-									if (value) {
-										bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
-										LD.contactingServer();
-										DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
-												"true".equals(saveForm.getValueAsString("ignoreemptyfields")),
-												new AsyncCallback<GUIDocument[]>() {
-													@Override
-													public void onFailure(Throwable error) {
-														LD.clearPrompt();
-														GuiLog.serverError(error);
-													}
-
-													@Override
-													public void onSuccess(GUIDocument[] updatedDocs) {
-														LD.clearPrompt();
-														GuiLog.info(I18N.message("bulkapplied"), null);
-														if (updatedDocs != null && updatedDocs.length > 0)
-															for (GUIDocument updatedDoc : updatedDocs)
-																DocumentController.get().modified(updatedDoc);
-														destroy();
-													}
-												});
-									}
-								}
-							});
+							doBulkUpdate(saveForm);
 						else {
-							bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
-							LD.contactingServer();
-							hide();
-							DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing,
-									bulkPanel.getDocument(), new AsyncCallback<GUIDocument[]>() {
-										@Override
-										public void onFailure(Throwable error) {
-											LD.clearPrompt();
-											GuiLog.serverError(error);
-
-											// We have to refresh the documents
-											// list
-											// because maybe
-											// some documents have been stored.
-											DocumentsPanel.get().refresh();
-										}
-
-										@Override
-										public void onSuccess(GUIDocument[] doc) {
-											DocumentsPanel.get().refresh();
-											LD.clearPrompt();
-										}
-									});
+							doAddDocuments(saveForm);
 						}
 					}
 				});
 			}
 		});
+		return saveButton;
+	}
 
-		HLayout savePanel = new HLayout();
-		savePanel.addMember(saveButton);
-		if (!CONTEXT_CHECKIN.equals(context))
-			savePanel.addMember(saveForm);
-		savePanel.addMember(spacer);
-		savePanel.setWidth100();
-		savePanel.setHeight(30);
-		savePanel.setMargin(2);
-		savePanel.setMembersMargin(10);
+	private void doAddDocuments(final DynamicForm saveForm) {
+		bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
+		LD.contactingServer();
+		hide();
+		DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing, bulkPanel.getDocument(),
+				new AsyncCallback<GUIDocument[]>() {
+					@Override
+					public void onFailure(Throwable error) {
+						LD.clearPrompt();
+						GuiLog.serverError(error);
 
-		VLayout content = new VLayout();
-		content.setTop(10);
-		content.setWidth100();
-		content.setHeight100();
-		content.setMembersMargin(3);
-		content.setMembers(bulkPanel, savePanel);
+						// We have to refresh the documents
+						// list
+						// because maybe
+						// some documents have been stored.
+						DocumentsPanel.get().refresh();
+					}
 
-		addItem(content);
+					@Override
+					public void onSuccess(GUIDocument[] doc) {
+						DocumentsPanel.get().refresh();
+						LD.clearPrompt();
+					}
+				});
+	}
+
+	private void doBulkUpdate(final DynamicForm saveForm) {
+		LD.ask(I18N.message("bulkupdate"), I18N.message("bulkwarning"), (Boolean confirmBulkUpdate) -> {
+			if (confirmBulkUpdate) {
+				bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
+				LD.contactingServer();
+				DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
+						"true".equals(saveForm.getValueAsString("ignoreemptyfields")),
+						new AsyncCallback<GUIDocument[]>() {
+							@Override
+							public void onFailure(Throwable error) {
+								LD.clearPrompt();
+								GuiLog.serverError(error);
+							}
+
+							@Override
+							public void onSuccess(GUIDocument[] updatedDocs) {
+								LD.clearPrompt();
+								GuiLog.info(I18N.message("bulkapplied"), null);
+								if (updatedDocs != null && updatedDocs.length > 0)
+									for (GUIDocument updatedDoc : updatedDocs)
+										DocumentController.get().modified(updatedDoc);
+								destroy();
+							}
+						});
+			}
+		});
+	}
+
+	private void doCheckin() {
+		LD.contactingServer();
+		DocumentService.Instance.get().checkin(metadata, majorVersion, new AsyncCallback<GUIDocument>() {
+
+			@Override
+			public void onFailure(Throwable error) {
+				LD.clearPrompt();
+				GuiLog.serverError(error);
+			}
+
+			@Override
+			public void onSuccess(GUIDocument doc) {
+				LD.clearPrompt();
+				DocUtil.markCheckedIn(doc);
+				destroy();
+			}
+		});
 	}
 
 	public boolean isZip() {

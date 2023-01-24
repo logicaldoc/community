@@ -59,38 +59,30 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		setCanDrag(folder != null && folder.isMove());
 		setWidth100();
 
-		DocumentsDS ds = null;
-		if (folder != null) {
-			int max = loadGridLayout(folder);
-			ds = new DocumentsDS(folder, null, max, 1, null, false, false, null);
-		}
+		prepareDataSource(folder);
+		
+		addThumbnail();
 
-		DetailViewerField thumbnail = new DetailViewerField("thumbnail");
-		thumbnail.setDetailFormatter(new DetailFormatter() {
+		addFilename();
+
+		setFields(fields.toArray(new DetailViewerField[0]));
+
+		addDataArrivedHandler(new com.smartgwt.client.widgets.tile.events.DataArrivedHandler() {
 
 			@Override
-			public String format(Object value, Record record, DetailViewerField field) {
-				int thumbnailSize = 200;
-				if (Session.get().getConfig("gui.thumbnail.size") != null)
-					thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
-
-				try {
-					if ("folder".equals(record.getAttribute("type")))
-						return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
-					else {
-						long docId = Long.parseLong(record.getAttribute("id"));
-						if (!record.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
-							return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
-						else
-							return Util.imageHTML("blank.png", null,
-									"width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
-					}
-				} catch (Throwable e) {
-					return "";
+			public void onDataArrived(DataArrivedEvent event) {
+				if (cursor != null) {
+					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
 				}
+
+				sortByProperty("filename", true);
 			}
 		});
 
+		DocumentController.get().addObserver(this);
+	}
+
+	private void addFilename() {
 		DetailViewerField filename = new DetailViewerField("filename");
 		filename.setDetailFormatter(new DetailFormatter() {
 
@@ -134,11 +126,45 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 				}
 			}
 		});
-
-		fields.add(thumbnail);
 		fields.add(filename);
-		setFields(fields.toArray(new DetailViewerField[0]));
+	}
 
+	private void addThumbnail() {
+		DetailViewerField thumbnail = new DetailViewerField("thumbnail");
+		thumbnail.setDetailFormatter(new DetailFormatter() {
+
+			@Override
+			public String format(Object value, Record record, DetailViewerField field) {
+				int thumbnailSize = 200;
+				if (Session.get().getConfig("gui.thumbnail.size") != null)
+					thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
+
+				try {
+					if ("folder".equals(record.getAttribute("type")))
+						return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
+					else {
+						long docId = Long.parseLong(record.getAttribute("id"));
+						if (!record.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
+							return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
+						else
+							return Util.imageHTML("blank.png", null,
+									"width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
+					}
+				} catch (Throwable e) {
+					return "";
+				}
+			}
+		});
+		fields.add(thumbnail);
+	}
+
+	private void prepareDataSource(GUIFolder folder) {
+		DocumentsDS ds = null;
+		if (folder != null) {
+			int max = loadGridLayout(folder);
+			ds = new DocumentsDS(folder, null, max, 1, null, false, false, null);
+		}
+		
 		if (ds == null) {
 			/*
 			 * We are searching
@@ -147,20 +173,6 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		} else {
 			setDataSource(ds);
 		}
-
-		addDataArrivedHandler(new com.smartgwt.client.widgets.tile.events.DataArrivedHandler() {
-
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				if (cursor != null) {
-					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
-				}
-
-				sortByProperty("filename", true);
-			}
-		});
-
-		DocumentController.get().addObserver(this);
 	}
 
 	@Override

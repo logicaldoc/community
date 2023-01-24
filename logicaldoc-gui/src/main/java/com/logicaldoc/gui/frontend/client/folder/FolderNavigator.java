@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.google.gwt.http.client.RequestTimeoutException;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,26 +43,19 @@ import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.EventHandler;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.DragStartEvent;
-import com.smartgwt.client.widgets.events.DragStartHandler;
 import com.smartgwt.client.widgets.events.DropEvent;
-import com.smartgwt.client.widgets.events.DropHandler;
 import com.smartgwt.client.widgets.events.KeyDownEvent;
-import com.smartgwt.client.widgets.events.KeyDownHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
@@ -71,7 +63,6 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.widgets.tree.events.FolderClosedEvent;
-import com.smartgwt.client.widgets.tree.events.FolderClosedHandler;
 import com.smartgwt.client.widgets.tree.events.FolderOpenedEvent;
 import com.smartgwt.client.widgets.tree.events.FolderOpenedHandler;
 
@@ -121,179 +112,142 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		setSaveLocally(true);
 		setIconSize(1);
 
-		FolderController.get().addObserver(this);
-
-		addDragStartHandler(new DragStartHandler() {
-
-			@Override
-			public void onDragStart(DragStartEvent ev) {
-				if (EventHandler.getDragTarget() instanceof FolderNavigator) {
-					// Workspaces cannot be moved
-					if ("1".equals(getDragData()[0].getAttributeAsString("type"))) {
-						ev.cancel();
-						return;
-					}
-				}
-			}
-
-		});
-
-		addDropHandler(new DropHandler() {
-			public void onDrop(final DropEvent event) {
-				try {
-					if (EventHandler.getDragTarget() instanceof FolderNavigator) {
-						// Workspaces cannot be moved
-						if ("1".equals(getDragData()[0].getAttributeAsString("type"))) {
-							event.cancel();
-							return;
-						}
-
-						final long[] source = getSelectedIds();
-						final long target = Long.parseLong(getDropFolder().getAttributeAsString("folderId"));
-
-						final String sourceName = getDragData()[0].getAttributeAsString("name");
-						final String targetName = getDropFolder().getAttributeAsString("name");
-
-						LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
-								new BooleanCallback() {
-
-									@Override
-									public void execute(Boolean value) {
-										if (value) {
-											for (long id : source) {
-												TreeNode node = getTree().find("folderId", (Object) id);
-												getTree().remove(node);
-											}
-
-											FolderService.Instance.get().move(source, target,
-													new AsyncCallback<Void>() {
-														@Override
-														public void onFailure(Throwable caught) {
-															GuiLog.serverError(caught);
-															GuiLog.warn(I18N.message("operationnotallowed"), null);
-														}
-
-														@Override
-														public void onSuccess(Void ret) {
-															TreeNode targetNode = getTree().find("folderId",
-																	(Object) Long.valueOf(target));
-															if (targetNode != null)
-																getTree().reloadChildren(targetNode);
-														}
-													});
-										}
-									}
-								});
-					} else if (EventHandler.getDragTarget() instanceof DocumentsGrid) {
-						/*
-						 * In this case we are moving a document
-						 */
-						DocumentsGrid grid = (DocumentsGrid) EventHandler.getDragTarget();
-						final GUIDocument[] selection = grid.getSelectedDocuments();
-						if (selection == null || selection.length == 0)
-							return;
-						final long[] ids = new long[selection.length];
-						for (int i = 0; i < selection.length; i++)
-							ids[i] = selection[i].getId();
-
-						final TreeNode selectedNode = getDropFolder();
-						final long folderId = Long.parseLong(selectedNode.getAttribute("folderId"));
-
-						if (FolderController.get().getCurrentFolder().getId() == folderId)
-							return;
-
-						final String sourceName = selection.length == 1 ? selection[0].getFileName()
-								: (selection.length + " " + I18N.message("documents").toLowerCase());
-						final String targetName = selectedNode.getAttributeAsString("name");
-
-						LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
-								new BooleanCallback() {
-
-									@Override
-									public void execute(Boolean value) {
-										if (value) {
-											FolderService.Instance.get().paste(ids, folderId, "cut",
-													new AsyncCallback<Void>() {
-														@Override
-														public void onFailure(Throwable caught) {
-															GuiLog.serverError(caught);
-															GuiLog.warn(I18N.message("operationnotallowed"), null);
-														}
-
-														@Override
-														public void onSuccess(Void result) {
-															DocumentsPanel.get().onFolderSelected(
-																	FolderController.get().getCurrentFolder());
-															GuiLog.debug("Drag&Drop operation completed.");
-														}
-													});
-										}
-
-										TreeNode node = getTree().find("folderId", (Object) Long.valueOf(folderId));
-										if (node != null) {
-											getTree().reloadChildren(node);
-										}
-									}
-								});
-					}
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-			}
-		});
-
 		ListGridField name = new FolderListGridField();
 		setFields(name);
 
-		// Handles the body click on folder name to create the context menu
-		addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				if (getSelectedRecord() != null && getSelectedRecords().length > 1) {
-					Menu contextMenu = prepateContextMenu();
-					contextMenu.showContextMenu();
-				} else {
-					FolderService.Instance.get().getFolder(getSelectedRecord().getAttributeAsLong("folderId"), false,
-							true, false, new AsyncCallback<GUIFolder>() {
+		FolderController.get().addObserver(this);
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(GUIFolder folder) {
-									Menu contextMenu = prepateContextMenu(folder);
-									contextMenu.showContextMenu();
-								}
-							});
-				}
-				if (event != null)
-					event.cancel();
-			}
-		});
-
-		// Handles the click on a folder to show the contained documents
-		addCellClickHandler(new CellClickHandler() {
-			@Override
-			public void onCellClick(CellClickEvent event) {
-				long selectedFolderId = event.getRecord().getAttributeAsLong("folderId");
-
-				selectFolder(selectedFolderId);
-
-				if(Session.get().getConfigAsBoolean("gui.folder.openonselect")) {
-					// Expand the selected node if it is not already expanded
-					TreeNode selectedNode = (TreeNode) getSelectedRecord();
-					openFolder(selectedNode);
+		addDragStartHandler((DragStartEvent ev) -> {
+			if (EventHandler.getDragTarget() instanceof FolderNavigator) {
+				// Workspaces cannot be moved
+				if ("1".equals(getDragData()[0].getAttributeAsString("type"))) {
+					ev.cancel();
+					return;
 				}
 			}
 		});
 
+		addDropHandler();
+
+		addCellContextHandler();
+
+		addCellClickHandler();
+
+		addFolderOpenedHandler();
 
 		/*
-		 * To refresh the folder's decoration and in case of need we add a
-		 * listener that closes all the previously opened branches.
+		 * To refresh the folder's decoration
 		 */
+		addFolderClosedHandler((FolderClosedEvent folderClosedEvent) -> {
+			folderClosedEvent.getNode().setAttribute("opened", false);
+			updateData(folderClosedEvent.getNode());
+		});
+
+		// Used to expand root folder after login or to open in folder
+		addDataArrivedHandler((DataArrivedEvent dataArrivedEvent) -> {
+			FolderNavigator.this.onDataArrived(dataArrivedEvent);
+		});
+
+		FolderCursor.get().registerMaxChangedHandler((ChangedEvent maxChangedEvent) -> {
+			reloadChildren();
+		});
+
+		FolderCursor.get().registerPageChangedHandler((ChangedEvent changedEvent) -> {
+			reloadChildren();
+		});
+
+		/*
+		 * A listener of the keypress to automatically collect a string typed by
+		 * the user to quickly select the folder
+		 */
+		addKeyDownHandler((KeyDownEvent keyDown) -> {
+			String key = EventHandler.getKey();
+			if ("space".equals(key.toLowerCase())) {
+				selectFolder(getSelectedFolderId());
+				typed = null;
+				lastTyped = null;
+			} else {
+				if (typed == null) {
+					typed = key;
+				} else {
+					typed += key;
+				}
+				lastTyped = new Date();
+			}
+		});
+
+		installTimer();
+	}
+
+	private void addDropHandler() {
+		addDropHandler((final DropEvent dropEvent) -> {
+			if (EventHandler.getDragTarget() instanceof FolderNavigator) {
+				// Workspaces cannot be moved
+				if ("1".equals(getDragData()[0].getAttributeAsString("type"))) {
+					dropEvent.cancel();
+					return;
+				}
+
+				doMoveFolderOnDrop();
+			} else if (EventHandler.getDragTarget() instanceof DocumentsGrid) {
+				/*
+				 * In this case we are moving a document
+				 */
+				DocumentsGrid grid = (DocumentsGrid) EventHandler.getDragTarget();
+				final GUIDocument[] selection = grid.getSelectedDocuments();
+				if (selection == null || selection.length == 0)
+					return;
+				final long[] ids = getSelectedDocIDs(selection);
+
+				final TreeNode selectedNode = getDropFolder();
+				final long folderId = Long.parseLong(selectedNode.getAttribute("folderId"));
+
+				if (FolderController.get().getCurrentFolder().getId() == folderId)
+					return;
+
+				doMoveDocumentOnDrop(selection, ids, selectedNode, folderId);
+			}
+		});
+	}
+
+	private long[] getSelectedDocIDs(final GUIDocument[] selection) {
+		final long[] ids = new long[selection.length];
+		for (int i = 0; i < selection.length; i++)
+			ids[i] = selection[i].getId();
+		return ids;
+	}
+
+	/**
+	 * Installs a Timer that selects the typed folder once the user stops typing
+	 */
+	private void installTimer() {
+		Scheduler.get().scheduleFixedDelay(() -> {
+			Date now = new Date();
+			if (lastTyped != null && typed != null) {
+				long dist = now.getTime() - lastTyped.getTime();
+				if (dist > 500) {
+					AdvancedCriteria crit = new AdvancedCriteria("name", OperatorId.ISTARTS_WITH, typed);
+					Record record = find(crit);
+					if (record != null) {
+						final Long folderId = record.getAttributeAsLong("folderId");
+						deselectAllRecords();
+						selectRecord(record);
+						selectFolder(folderId);
+					}
+
+					typed = null;
+					lastTyped = null;
+				}
+			}
+			return true;
+		}, 500);
+	}
+
+	/**
+	 * Refreshes the folder's decoration and in case of need we add a listener
+	 * that closes all the previously opened branches.
+	 */
+	private void addFolderOpenedHandler() {
 		addFolderOpenedHandler(new FolderOpenedHandler() {
 
 			@Override
@@ -320,98 +274,120 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						}
 				}
 			}
-
 		});
+	}
 
-		/*
-		 * To refresh the folder's decoration
-		 */
-		addFolderClosedHandler(new FolderClosedHandler() {
-
+	/**
+	 * Handles the click on a folder to show the contained documents
+	 */
+	private void addCellClickHandler() {
+		addCellClickHandler(new CellClickHandler() {
 			@Override
-			public void onFolderClosed(FolderClosedEvent event) {
-				event.getNode().setAttribute("opened", false);
-				updateData(event.getNode());
-			}
-		});
+			public void onCellClick(CellClickEvent event) {
+				long selectedFolderId = event.getRecord().getAttributeAsLong("folderId");
 
-		// Used to expand root folder after login or to open in folder
-		addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				FolderNavigator.this.onDataArrived(event);
-			}
-		});
+				selectFolder(selectedFolderId);
 
-		FolderController.get().addObserver(this);
-
-		FolderCursor.get().registerMaxChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				reloadChildren();
-			}
-		});
-
-		FolderCursor.get().registerPageChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				reloadChildren();
-			}
-		});
-
-		/*
-		 * A listener of the keypress to automatically collect a string typed by
-		 * the user to quickly select the folder
-		 */
-		addKeyDownHandler(new KeyDownHandler() {
-
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				String key = EventHandler.getKey();
-				if ("space".equals(key.toLowerCase())) {
-					selectFolder(getSelectedFolderId());
-					typed = null;
-					lastTyped = null;
-				} else {
-					if (typed == null) {
-						typed = key;
-					} else {
-						typed += key;
-					}
-					lastTyped = new Date();
+				if (Session.get().getConfigAsBoolean("gui.folder.openonselect")) {
+					// Expand the selected node if it is not already expanded
+					TreeNode selectedNode = (TreeNode) getSelectedRecord();
+					openFolder(selectedNode);
 				}
 			}
 		});
+	}
 
-		/*
-		 * Timer that selects the typed folder once the user stops typing
-		 */
-		Scheduler.get().scheduleFixedDelay(new RepeatingCommand() {
+	/**
+	 * Handles the body click on folder name to create the context menu
+	 */
+	private void addCellContextHandler() {
+		addCellContextClickHandler((CellContextClickEvent contextClickEvent) -> {
+			if (getSelectedRecord() != null && getSelectedRecords().length > 1) {
+				Menu contextMenu = prepateContextMenu();
+				contextMenu.showContextMenu();
+			} else {
+				FolderService.Instance.get().getFolder(getSelectedRecord().getAttributeAsLong("folderId"), false, true,
+						false, new AsyncCallback<GUIFolder>() {
 
-			@Override
-			public boolean execute() {
-				Date now = new Date();
-				if (lastTyped != null && typed != null) {
-					long dist = now.getTime() - lastTyped.getTime();
-					if (dist > 500) {
-						AdvancedCriteria crit = new AdvancedCriteria("name", OperatorId.ISTARTS_WITH, typed);
-						Record record = find(crit);
-						if (record != null) {
-							final Long folderId = record.getAttributeAsLong("folderId");
-							deselectAllRecords();
-							selectRecord(record);
-							selectFolder(folderId);
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIFolder folder) {
+								Menu contextMenu = prepateContextMenu(folder);
+								contextMenu.showContextMenu();
+							}
+						});
+			}
+			if (contextClickEvent != null)
+				contextClickEvent.cancel();
+		});
+	}
+
+	private void doMoveDocumentOnDrop(final GUIDocument[] selection, final long[] ids, final TreeNode selectedNode,
+			final long folderId) {
+		final String sourceName = selection.length == 1 ? selection[0].getFileName()
+				: (selection.length + " " + I18N.message("documents").toLowerCase());
+		final String targetName = selectedNode.getAttributeAsString("name");
+
+		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
+				(Boolean moveConfirmed) -> {
+					if (moveConfirmed) {
+						FolderService.Instance.get().paste(ids, folderId, "cut", new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+								GuiLog.warn(I18N.message("operationnotallowed"), null);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
+								GuiLog.debug("Drag&Drop operation completed.");
+							}
+						});
+					}
+
+					TreeNode node = getTree().find("folderId", (Object) Long.valueOf(folderId));
+					if (node != null) {
+						getTree().reloadChildren(node);
+					}
+				});
+	}
+
+	private void doMoveFolderOnDrop() {
+		final long[] source = getSelectedIds();
+		final long target = Long.parseLong(getDropFolder().getAttributeAsString("folderId"));
+
+		final String sourceName = getDragData()[0].getAttributeAsString("name");
+		final String targetName = getDropFolder().getAttributeAsString("name");
+
+		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
+				(Boolean moveConfirmed) -> {
+					if (moveConfirmed) {
+						for (long id : source) {
+							TreeNode node = getTree().find("folderId", (Object) id);
+							getTree().remove(node);
 						}
 
-						typed = null;
-						lastTyped = null;
+						FolderService.Instance.get().move(source, target, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+								GuiLog.warn(I18N.message("operationnotallowed"), null);
+							}
+
+							@Override
+							public void onSuccess(Void ret) {
+								TreeNode targetNode = getTree().find("folderId", (Object) Long.valueOf(target));
+								if (targetNode != null)
+									getTree().reloadChildren(targetNode);
+							}
+						});
 					}
-				}
-				return true;
-			}
-		}, 500);
+				});
 	}
 
 	protected String getOriginalIcon(Record record, boolean defaultState) {
@@ -507,237 +483,79 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	/**
 	 * Prepares the context menu for single selection
 	 * 
-	 * @param folder the folder to use
+	 * @param selectedFolder the folder to use
 	 */
-	private Menu prepateContextMenu(final GUIFolder folder) {
+	private Menu prepateContextMenu(final GUIFolder selectedFolder) {
 		final TreeNode selectedNode = (TreeNode) getSelectedRecord();
-		final long id = Long.parseLong(selectedNode.getAttribute("folderId"));
-		final String name = selectedNode.getAttribute("name");
 
-		MenuItem search = new MenuItem();
-		search.setTitle(I18N.message("search"));
-		search.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				Search.get().getOptions().setFolder(id);
-				Search.get().getOptions().setFolderName(name);
-				Search.get().getOptions().setSearchInSubPath(false);
-				Search.get().setOptions(Search.get().getOptions());
-				MainPanel.get().selectSearchTab();
-			}
-		});
+		Menu contextMenu = new Menu();
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onDelete();
-			}
-		});
+		MenuItem search = prepareSearchMenuItem(selectedFolder);
 
-		MenuItem create = new MenuItem();
-		create.setTitle(I18N.message("newfolder"));
-		create.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onCreate(folder.getId());
-			}
-		});
+		MenuItem delete = prepareDeleteMenuItem(selectedFolder);
 
-		MenuItem createAlias = new MenuItem();
-		createAlias.setTitle(I18N.message("createalias"));
-		createAlias.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				CreateAliasDialog dialog = new CreateAliasDialog();
-				dialog.show();
-			}
-		});
-		createAlias.setEnabled(getSelectedRecord().getAttributeAsString("foldRef") == null);
+		MenuItem create = prepareCreateMenuItem(selectedFolder);
 
-		MenuItem rename = new MenuItem();
-		rename.setTitle(I18N.message("rename"));
-		rename.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onRename();
-			}
-		});
+		MenuItem createAlias = prepareCreateAliasMenuItem();
+
+		MenuItem rename = prepareRenameMenuItem(selectedFolder);
 
 		MenuItem createWorkspace = new MenuItem();
 		createWorkspace.setTitle(I18N.message("newworkspace"));
-		createWorkspace.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onCreateWorkspace();
-			}
-		});
-
-		MenuItem applyTemplate = new MenuItem();
-		applyTemplate.setTitle(I18N.message("applytemplate"));
-		applyTemplate.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onApplyTemplate();
-			}
-		});
-
-		MenuItem archive = new MenuItem();
-		archive.setTitle(I18N.message("archive"));
-		archive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onArchive(folder.getId());
-			}
+		createWorkspace.addClickHandler((MenuItemClickEvent nwClick) -> {
+			onCreateWorkspace();
 		});
 
 		MenuItem reload = new MenuItem();
 		reload.setTitle(I18N.message("reload"));
-		reload.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				reload();
-			}
+		reload.addClickHandler((MenuItemClickEvent reloadClick) -> {
+			reload();
 		});
 
-		MenuItem move = new MenuItem();
-		move.setTitle(I18N.message("move"));
-		move.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				MoveDialog dialog = new MoveDialog();
-				dialog.show();
-			}
-		});
+		MenuItem move = prepareMoveMenuItem(selectedFolder);
 
-		MenuItem copy = new MenuItem();
-		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				FolderCopyDialog dialog = new FolderCopyDialog();
-				dialog.show();
-			}
-		});
+		MenuItem copy = prepareCopyMenuItem();
 
-		MenuItem merge = new MenuItem();
-		merge.setTitle(I18N.message("merge"));
-		merge.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				MergeDialog dialog = new MergeDialog();
-				dialog.show();
-			}
-		});
+		MenuItem merge = prepareMergeMenuItem(selectedFolder);
 
 		MenuItem paste = new MenuItem();
 		paste.setTitle(I18N.message("paste"));
-		paste.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onPaste();
-			}
+		paste.addClickHandler((MenuItemClickEvent pasteClick) -> {
+			onPaste();
 		});
 
 		MenuItem pasteAsAlias = new MenuItem();
 		pasteAsAlias.setTitle(I18N.message("pasteasalias"));
-		pasteAsAlias.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onPasteAsAlias();
-			}
+		pasteAsAlias.addClickHandler((MenuItemClickEvent pasteAliasClick) -> {
+			onPasteAsAlias();
 		});
 
-		MenuItem exportZip = new MenuItem();
-		exportZip.setTitle(I18N.message("exportzip"));
-		exportZip.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				Window.open(Util.contextPath() + "zip-export?folderId=" + id, "_blank", "");
-			}
-		});
-
-		MenuItem audit = new MenuItem();
-		audit.setTitle(I18N.message("subscribe"));
-		audit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SubscriptionDialog dialog = new SubscriptionDialog(id, null);
-				dialog.show();
-			}
-		});
+		MenuItem exportZip = prepareExportZipMenuItem(selectedFolder);
 
 		MenuItem addBookmark = new MenuItem();
 		addBookmark.setTitle(I18N.message("addbookmark"));
-		addBookmark.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onAddBookmark();
-			}
+		addBookmark.addClickHandler((MenuItemClickEvent bookmarkClick) -> {
+			onAddBookmark();
 		});
 
-		MenuItem sendToExpArchive = new MenuItem();
-		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
-		sendToExpArchive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(new long[] { id }, false);
-							archiveDialog.show();
-						}
-					}
-				});
-			}
-		});
-
-		MenuItem automation = new MenuItem();
-		automation.setTitle(I18N.message("executeautomation"));
-		automation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onAutomation(folder.getId());
-			}
-		});
-
-		MenuItem customActionsItem = prepareCustomActionsMenu(folder.getId());
-
-		if (!folder.hasPermission(Constants.PERMISSION_ADD)) {
-			create.setEnabled(false);
-		}
-
-		if (!folder.hasPermission(Constants.PERMISSION_RENAME)) {
-			rename.setEnabled(false);
-		}
-
-		if (!folder.hasPermission(Constants.PERMISSION_EXPORT)
-				|| !folder.hasPermission(Constants.PERMISSION_DOWNLOAD)) {
-			exportZip.setEnabled(false);
-		}
-
-		// Avoid alterations of the Default workspace and check DELETE
-		// permission
-		if ((folder.isDefaultWorkspace() && GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"))
-				|| !folder.hasPermission(Constants.PERMISSION_DELETE)) {
-			delete.setEnabled(false);
-			merge.setEnabled(false);
-		}
-
-		// Avoid alterations of the Default workspace and check MOVE permission
-		if ((folder.isDefaultWorkspace() && GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"))
-				|| !folder.hasPermission(Constants.PERMISSION_DELETE)) {
-			move.setEnabled(false);
-			merge.setEnabled(false);
-		}
-
-		if (folder.isDefaultWorkspace()) {
-			rename.setEnabled(false);
-		}
-
-		if (!folder.hasPermission(Constants.PERMISSION_WRITE) || Clipboard.getInstance().isEmpty()) {
+		if (!selectedFolder.hasPermission(Constants.PERMISSION_WRITE) || Clipboard.getInstance().isEmpty()) {
 			paste.setEnabled(false);
 			pasteAsAlias.setEnabled(false);
 		}
 
-		if (!folder.hasPermission(Constants.PERMISSION_ADD)) {
+		if (!selectedFolder.hasPermission(Constants.PERMISSION_ADD)) {
 			createAlias.setEnabled(false);
 		}
 
 		if (Clipboard.getInstance().getLastAction().equals(Clipboard.CUT))
 			pasteAsAlias.setEnabled(false);
 
-		Menu contextMenu = new Menu();
-
-		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN) && folder.isWorkspace()
+		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN) && selectedFolder.isWorkspace()
 				&& Feature.visible(Feature.MULTI_WORKSPACE)) {
-			delete.setEnabled(!folder.isDefaultWorkspace());
+			delete.setEnabled(!selectedFolder.isDefaultWorkspace());
 			move.setEnabled(false);
 			merge.setEnabled(false);
-			rename.setEnabled(!folder.isDefaultWorkspace());
+			rename.setEnabled(!selectedFolder.isDefaultWorkspace());
 			createWorkspace.setEnabled(Feature.enabled(Feature.MULTI_WORKSPACE));
 			contextMenu.setItems(reload, search, create, createAlias, rename, createWorkspace, delete, addBookmark,
 					paste, pasteAsAlias, move, copy, merge, exportZip);
@@ -746,43 +564,213 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 					move, copy, merge, exportZip);
 		}
 
-		if (Feature.visible(Feature.AUDIT)) {
-			contextMenu.addItem(audit);
-			audit.setEnabled(Feature.enabled(Feature.AUDIT));
-		}
+		addSubscribeMenuItem(selectedFolder, contextMenu);
 
-		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
-			contextMenu.addItem(applyTemplate);
-			if (!Feature.enabled(Feature.FOLDER_TEMPLATE) || !folder.hasPermission(Constants.PERMISSION_ADD))
-				applyTemplate.setEnabled(false);
-		}
+		addApplyTemplateMenuItem(selectedFolder, contextMenu);
 
-		if (Feature.visible(Feature.ARCHIVING)) {
-			contextMenu.addItem(archive);
-			if (!Feature.enabled(Feature.ARCHIVING) || !folder.hasPermission(Constants.PERMISSION_ARCHIVE))
-				archive.setEnabled(false);
-		}
+		addArchiveMenuItem(selectedFolder, contextMenu);
 
+		addSendToExportArchiveMenuItem(selectedFolder, contextMenu);
+
+		addAutomationMenuItem(selectedFolder, contextMenu);
+
+		addCustomActionsMenuItem(selectedFolder, contextMenu);
+
+		return contextMenu;
+	}
+
+	private void addCustomActionsMenuItem(final GUIFolder selectedFolder, Menu contextMenu) {
+		if (Feature.enabled(Feature.CUSTOM_ACTIONS)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS)
+				&& Session.get().getUser().getCustomActions() != null
+				&& Session.get().getUser().getCustomActions().length > 0) {
+			MenuItem customActionsItem = prepareCustomActionsMenu(selectedFolder.getId());
+			contextMenu.addItem(customActionsItem);
+		}
+	}
+
+	private void addAutomationMenuItem(final GUIFolder selectedFolder, Menu contextMenu) {
+		if (Feature.visible(Feature.AUTOMATION)) {
+			MenuItem automation = new MenuItem();
+			automation.setTitle(I18N.message("executeautomation"));
+			automation.addClickHandler((MenuItemClickEvent eaClick) -> {
+				onAutomation(selectedFolder.getId());
+			});
+			contextMenu.addItem(automation);
+			if (!Feature.enabled(Feature.AUTOMATION)
+					|| !selectedFolder.hasPermission(Constants.PERMISSION_AUTOMATION)) {
+				automation.setEnabled(false);
+			}
+		}
+	}
+
+	private void addSendToExportArchiveMenuItem(final GUIFolder folder, Menu contextMenu) {
 		if (Feature.visible(Feature.IMPEX)) {
+			MenuItem sendToExpArchive = new MenuItem();
+			sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
+			sendToExpArchive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+				public void onClick(MenuItemClickEvent event) {
+					LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"),
+							(Boolean archiveConfirmed) -> {
+								if (archiveConfirmed) {
+									SendToArchiveDialog archiveDialog = new SendToArchiveDialog(
+											new long[] { folder.getId() }, false);
+									archiveDialog.show();
+								}
+							});
+				}
+			});
 			contextMenu.addItem(sendToExpArchive);
 			if (!Feature.enabled(Feature.IMPEX) || !folder.hasPermission(Constants.PERMISSION_EXPORT))
 				sendToExpArchive.setEnabled(false);
 		}
+	}
 
-		if (Feature.visible(Feature.AUTOMATION)) {
-			contextMenu.addItem(automation);
-			if (!Feature.enabled(Feature.AUTOMATION) || !folder.hasPermission(Constants.PERMISSION_AUTOMATION)) {
-				automation.setEnabled(false);
-			}
+	private void addArchiveMenuItem(final GUIFolder folder, Menu contextMenu) {
+		if (Feature.visible(Feature.ARCHIVING)) {
+			MenuItem archive = new MenuItem();
+			archive.setTitle(I18N.message("archive"));
+			archive.addClickHandler((MenuItemClickEvent archiveClick) -> {
+				onArchive(folder.getId());
+			});
+			contextMenu.addItem(archive);
+			if (!Feature.enabled(Feature.ARCHIVING) || !folder.hasPermission(Constants.PERMISSION_ARCHIVE))
+				archive.setEnabled(false);
 		}
+	}
 
-		if (Feature.enabled(Feature.CUSTOM_ACTIONS)
-				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS)
-				&& Session.get().getUser().getCustomActions() != null
-				&& Session.get().getUser().getCustomActions().length > 0)
-			contextMenu.addItem(customActionsItem);
+	private void addApplyTemplateMenuItem(final GUIFolder folder, Menu contextMenu) {
+		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
+			MenuItem applyTemplate = new MenuItem();
+			applyTemplate.setTitle(I18N.message("applytemplate"));
+			applyTemplate.addClickHandler((MenuItemClickEvent applyTemplateClick) -> {
+				onApplyTemplate();
+			});
+			contextMenu.addItem(applyTemplate);
+			if (!Feature.enabled(Feature.FOLDER_TEMPLATE) || !folder.hasPermission(Constants.PERMISSION_ADD))
+				applyTemplate.setEnabled(false);
+		}
+	}
 
-		return contextMenu;
+	private void addSubscribeMenuItem(GUIFolder folder, Menu contextMenu) {
+		if (Feature.visible(Feature.AUDIT)) {
+			MenuItem subscribe = new MenuItem();
+			subscribe.setTitle(I18N.message("subscribe"));
+			subscribe.addClickHandler((MenuItemClickEvent click) -> {
+				SubscriptionDialog dialog = new SubscriptionDialog(folder.getId(), null);
+				dialog.show();
+			});
+			subscribe.setEnabled(Feature.enabled(Feature.AUDIT));
+			contextMenu.addItem(subscribe);
+		}
+	}
+
+	private MenuItem prepareCopyMenuItem() {
+		MenuItem copy = new MenuItem();
+		copy.setTitle(I18N.message("copy"));
+		copy.addClickHandler((MenuItemClickEvent copyClick) -> {
+			FolderCopyDialog dialog = new FolderCopyDialog();
+			dialog.show();
+		});
+		return copy;
+	}
+
+	private MenuItem prepareCreateAliasMenuItem() {
+		MenuItem createAlias = new MenuItem();
+		createAlias.setTitle(I18N.message("createalias"));
+		createAlias.addClickHandler((MenuItemClickEvent caClick) -> {
+			CreateAliasDialog dialog = new CreateAliasDialog();
+			dialog.show();
+		});
+		createAlias.setEnabled(getSelectedRecord().getAttributeAsString("foldRef") == null);
+		return createAlias;
+	}
+
+	private MenuItem prepareExportZipMenuItem(final GUIFolder folder) {
+		MenuItem exportZip = new MenuItem();
+		exportZip.setTitle(I18N.message("exportzip"));
+		exportZip.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				Window.open(Util.contextPath() + "zip-export?folderId=" + folder.getId(), "_blank", "");
+			}
+		});
+		exportZip.setEnabled(folder.hasPermission(Constants.PERMISSION_EXPORT)
+				&& folder.hasPermission(Constants.PERMISSION_DOWNLOAD));
+		return exportZip;
+	}
+
+	private MenuItem prepareMoveMenuItem(final GUIFolder folder) {
+		MenuItem move = new MenuItem();
+		move.setTitle(I18N.message("move"));
+		move.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				MoveDialog dialog = new MoveDialog();
+				dialog.show();
+			}
+		});
+		move.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
+				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
+		return move;
+	}
+
+	private MenuItem prepareMergeMenuItem(final GUIFolder folder) {
+		MenuItem merge = new MenuItem();
+		merge.setTitle(I18N.message("merge"));
+		merge.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				MergeDialog dialog = new MergeDialog();
+				dialog.show();
+			}
+		});
+		merge.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
+				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
+		return merge;
+	}
+
+	private MenuItem prepareDeleteMenuItem(final GUIFolder folder) {
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				onDelete();
+			}
+		});
+		delete.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
+				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
+		return delete;
+	}
+
+	private MenuItem prepareSearchMenuItem(GUIFolder folder) {
+		MenuItem search = new MenuItem();
+		search.setTitle(I18N.message("search"));
+		search.addClickHandler((MenuItemClickEvent event) -> {
+			Search.get().getOptions().setFolder(folder.getId());
+			Search.get().getOptions().setFolderName(folder.getName());
+			Search.get().getOptions().setSearchInSubPath(false);
+			Search.get().setOptions(Search.get().getOptions());
+			MainPanel.get().selectSearchTab();
+		});
+		return search;
+	}
+
+	private MenuItem prepareRenameMenuItem(final GUIFolder folder) {
+		MenuItem rename = new MenuItem();
+		rename.setTitle(I18N.message("rename"));
+		rename.addClickHandler((MenuItemClickEvent event) -> {
+			onRename();
+		});
+		rename.setEnabled(folder.hasPermission(Constants.PERMISSION_RENAME) && !folder.isDefaultWorkspace());
+		return rename;
+	}
+
+	private MenuItem prepareCreateMenuItem(final GUIFolder folder) {
+		MenuItem create = new MenuItem();
+		create.setTitle(I18N.message("newfolder"));
+		create.addClickHandler((MenuItemClickEvent event) -> {
+			onCreate(folder.getId());
+		});
+		create.setEnabled(folder.hasPermission(Constants.PERMISSION_ADD));
+		return create;
 	}
 
 	private void onDelete() {
@@ -803,39 +791,40 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						? (I18N.message(selectedIds.length == 1 ? "confirmdeletefolder" : "confirmdeletefolders"))
 						: (I18N.message(selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
 								: "confirmdeletefoldersarchdocs")),
-						new BooleanCallback() {
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									LD.contactingServer();
-									FolderService.Instance.get().delete(selectedIds, new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											LD.clearPrompt();
-
-											if (caught instanceof RequestTimeoutException) {
-												SC.say("timeout");
-											}
-
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(Void result) {
-											LD.clearPrompt();
-											TreeNode node = getTree().find("folderId",
-													(Object) getSelectedRecord().getAttributeAsString("folderId"));
-											TreeNode parent = getTree().getParent(node);
-
-											if (parent.getAttributeAsString("folderId") != null)
-												selectFolder(Long.parseLong(parent.getAttributeAsString("folderId")));
-
-											reloadParentsOfSelection();
-										}
-									});
-								}
+						(Boolean deleteConfirmed) -> {
+							if (deleteConfirmed) {
+								LD.contactingServer();
+								doDelete(selectedIds);
 							}
 						});
+			}
+		});
+	}
+
+	private void doDelete(final long[] selectedIds) {
+		FolderService.Instance.get().delete(selectedIds, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				LD.clearPrompt();
+
+				if (caught instanceof RequestTimeoutException) {
+					SC.say("timeout");
+				}
+
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				LD.clearPrompt();
+				TreeNode node = getTree().find("folderId",
+						(Object) getSelectedRecord().getAttributeAsString("folderId"));
+				TreeNode parent = getTree().getParent(node);
+
+				if (parent.getAttributeAsString("folderId") != null)
+					selectFolder(Long.parseLong(parent.getAttributeAsString("folderId")));
+
+				reloadParentsOfSelection();
 			}
 		});
 	}
@@ -875,133 +864,43 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	private void onDataArrived(DataArrivedEvent event) {
 		if (isFirstTime()) {
-			/*
-			 * Redirect the user to the correct folder and/or document
-			 */
-			RequestInfo loc = WindowUtils.getRequestInfo();
-			if (loc.getParameter("folderId") != null) {
-				DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter("folderId")), null);
-			} else if (loc.getParameter("docId") != null) {
-				DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter("docId")));
-			} else {
-				if (Session.get().getConfigAsBoolean("gui.folder.opentree")) {
-					long folderId = 0;
-
-					TreeNode rootNode = getTree().getRoot();
-					TreeNode[] children = getTree().getChildren(rootNode);
-					TreeNode nodeToOpen = null;
-
-					if (children != null && children.length > 0) {
-						/*
-						 * Get the first workspace and use it as the node to
-						 * open
-						 */
-						folderId = Long.parseLong(children[0].getAttributeAsString("folderId"));
-						nodeToOpen = children[0];
-
-						/*
-						 * Check if the user has specified a different default
-						 * workspace
-						 */
-						if (Session.get().getUser().getDefaultWorkspace() != null) {
-							folderId = Session.get().getUser().getDefaultWorkspace();
-							for (TreeNode child : children) {
-								long val = Long.parseLong(child.getAttributeAsString("folderId"));
-								if (Session.get().getUser().getDefaultWorkspace() == val) {
-									nodeToOpen = child;
-									break;
-								}
-							}
-						}
-
-						getTree().openFolder(nodeToOpen);
-						selectRecord(nodeToOpen);
-
-						FolderService.Instance.get().getFolder(folderId, true, true, Session.get().isFolderPagination(),
-								new AsyncCallback<GUIFolder>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(GUIFolder folder) {
-										selectFolder(folder.getId());
-									}
-								});
-					}
-				}
-			}
-
-			FolderNavigator.this.firstTime = false;
+			onDataArrivedFirstTime();
 		} else {
-			/*
-			 * A folder has been opened, check if we have to handle an
-			 * openInFolder task
-			 */
-			if (pathToOpen == null)
-				return;
+			onDataArrived();
+		}
+	}
 
-			GUIFolder fld = pathToOpen[currentIndexInPathToOpen];
-			if (isPaginationEnabled())
-				FolderCursor.get().onFolderSelected(fld);
+	private void onDataArrived() {
+		/*
+		 * A folder has been opened, check if we have to handle an openInFolder
+		 * task
+		 */
+		if (pathToOpen == null)
+			return;
 
-			if (fld.getName().equals("/"))
-				fld = pathToOpen[++currentIndexInPathToOpen];
+		GUIFolder fld = pathToOpen[currentIndexInPathToOpen];
+		if (isPaginationEnabled())
+			FolderCursor.get().onFolderSelected(fld);
 
-			while (fld.getName().isEmpty())
-				fld = pathToOpen[++currentIndexInPathToOpen];
+		if (fld.getName().equals("/"))
+			fld = pathToOpen[++currentIndexInPathToOpen];
 
-			TreeNode node = getTree().find("folderId", "" + fld.getId());
+		while (fld.getName().isEmpty())
+			fld = pathToOpen[++currentIndexInPathToOpen];
 
-			// Perhaps the node is in another page
-			if (node == null) {
-				if (isPaginationEnabled()) {
-					GUIFolder parentFolder = pathToOpen[currentIndexInPathToOpen - 1];
-					FolderCursor.get().onFolderSelected(parentFolder);
-					FolderCursor.get().next();
+		TreeNode node = getTree().find("folderId", "" + fld.getId());
 
-					FolderService.Instance.get().setFolderPagination(
-							FolderCursor.get().getCurrentPagination().getFolderId(),
-							FolderCursor.get().getCurrentPagination().getStartRow(),
-							FolderCursor.get().getCurrentPagination().getPageSize(), new AsyncCallback<Void>() {
+		// Perhaps the node is in another page
+		if (node == null) {
+			if (isPaginationEnabled()) {
+				GUIFolder parentFolder = pathToOpen[currentIndexInPathToOpen - 1];
+				FolderCursor.get().onFolderSelected(parentFolder);
+				FolderCursor.get().next();
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void arg) {
-									TreeNode parentNode = getTree().find("folderId",
-											"" + FolderCursor.get().getFolderId());
-									getTree().reloadChildren(parentNode);
-								}
-							});
-				}
-				return;
-			}
-
-			if (!getTree().isOpen(node)) {
-				getTree().openFolder(node);
-				currentIndexInPathToOpen++;
-				getTree().reloadChildren(node);
-			}
-
-			// Open all the parents
-			TreeNode parent = getTree().getParent(node);
-			while (parent != null && !node.equals(parent)) {
-				getTree().openFolder(parent);
-				parent = getTree().getParent(parent);
-			}
-
-			if (fld.getId() == pathToOpen[pathToOpen.length - 1].getId()) {
-				resetPathToOpen(null);
-				scrollToCell(getRowNum(node), 0);
-
-				FolderService.Instance.get().getFolder(fld.getId(), true, true, Session.get().isFolderPagination(),
-						new AsyncCallback<GUIFolder>() {
+				FolderService.Instance.get().setFolderPagination(
+						FolderCursor.get().getCurrentPagination().getFolderId(),
+						FolderCursor.get().getCurrentPagination().getStartRow(),
+						FolderCursor.get().getCurrentPagination().getPageSize(), new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -1009,14 +908,118 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 							}
 
 							@Override
-							public void onSuccess(GUIFolder folder) {
-								getTree().openFolder(node);
-								scrollToCell(getRowNum(node), 0);
-								selectRecord(node);
-								FolderController.get().selected(folder);
+							public void onSuccess(Void arg) {
+								TreeNode parentNode = getTree().find("folderId", "" + FolderCursor.get().getFolderId());
+								getTree().reloadChildren(parentNode);
 							}
 						});
 			}
+			return;
+		}
+
+		if (!getTree().isOpen(node)) {
+			getTree().openFolder(node);
+			currentIndexInPathToOpen++;
+			getTree().reloadChildren(node);
+		}
+
+		// Open all the parents
+		openAllParents(node);
+
+		if (fld.getId() == pathToOpen[pathToOpen.length - 1].getId()) {
+			resetPathToOpen(null);
+			scrollToCell(getRowNum(node), 0);
+
+			FolderService.Instance.get().getFolder(fld.getId(), true, true, Session.get().isFolderPagination(),
+					new AsyncCallback<GUIFolder>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							getTree().openFolder(node);
+							scrollToCell(getRowNum(node), 0);
+							selectRecord(node);
+							FolderController.get().selected(folder);
+						}
+					});
+		}
+	}
+
+	private void openAllParents(TreeNode node) {
+		TreeNode parent = getTree().getParent(node);
+		while (parent != null && !node.equals(parent)) {
+			getTree().openFolder(parent);
+			parent = getTree().getParent(parent);
+		}
+	}
+
+	private void onDataArrivedFirstTime() {
+		/*
+		 * Redirect the user to the correct folder and/or document
+		 */
+		RequestInfo loc = WindowUtils.getRequestInfo();
+		if (loc.getParameter("folderId") != null) {
+			DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter("folderId")), null);
+		} else if (loc.getParameter("docId") != null) {
+			DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter("docId")));
+		} else {
+			openDefaultNode();
+		}
+
+		FolderNavigator.this.firstTime = false;
+	}
+
+	private void openDefaultNode() {
+		if (Session.get().getConfigAsBoolean("gui.folder.opentree")) {
+			long folderId = 0;
+
+			TreeNode rootNode = getTree().getRoot();
+			TreeNode[] children = getTree().getChildren(rootNode);
+			TreeNode nodeToOpen = null;
+
+			if (children == null || children.length < 1)
+				return;
+
+			/*
+			 * Get the first workspace and use it as the node to open
+			 */
+			folderId = Long.parseLong(children[0].getAttributeAsString("folderId"));
+			nodeToOpen = children[0];
+
+			/*
+			 * Check if the user has specified a different default workspace
+			 */
+			if (Session.get().getUser().getDefaultWorkspace() != null) {
+				folderId = Session.get().getUser().getDefaultWorkspace();
+				for (TreeNode child : children) {
+					long val = Long.parseLong(child.getAttributeAsString("folderId"));
+					if (Session.get().getUser().getDefaultWorkspace() == val) {
+						nodeToOpen = child;
+						break;
+					}
+				}
+			}
+
+			getTree().openFolder(nodeToOpen);
+			selectRecord(nodeToOpen);
+
+			FolderService.Instance.get().getFolder(folderId, true, true, Session.get().isFolderPagination(),
+					new AsyncCallback<GUIFolder>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							selectFolder(folder.getId());
+						}
+					});
 		}
 	}
 
@@ -1060,8 +1063,6 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 					@Override
 					public void onSuccess(GUIFolder folder) {
-						TreeNode parent = getTree().getRoot();
-
 						long folderId = folder.getId();
 						Long folderRef = folder.getFoldRef();
 						if (folder.getFoldRef() != null) {
@@ -1069,37 +1070,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 							folderRef = folder.getId();
 						}
 
-						for (GUIFolder fld : folder.getPath()) {
-							if (fld.getId() == Constants.DOCUMENTS_FOLDERID)
-								continue;
-
-							long fldId = fld.getId();
-							Long fldRef = fld.getFoldRef();
-							if (fld.getFoldRef() != null) {
-								fldId = fld.getFoldRef();
-								fldRef = fld.getId();
-							}
-
-							String parentId = parent.getAttributeAsString("id");
-							if ("/".equals(parentId))
-								parentId = "" + Constants.DOCUMENTS_FOLDERID;
-
-							TreeNode node = new TreeNode(fld.getName());
-							node.setAttribute("id", parentId + "-" + Long.toString(fldId));
-							node.setAttribute("folderId", Long.toString(fldId));
-							node.setAttribute("type", Integer.toString(fld.getType()));
-							node.setAttribute("foldRef", fldRef != null ? Long.toString(fldRef) : null);
-							if (fld.getColor() != null)
-								node.setAttribute("color", fld.getColor());
-							node.setAttribute(Constants.PERMISSION_ADD, fld.hasPermission(Constants.PERMISSION_ADD));
-							node.setAttribute(Constants.PERMISSION_DELETE,
-									fld.hasPermission(Constants.PERMISSION_DELETE));
-							node.setAttribute(Constants.PERMISSION_RENAME,
-									fld.hasPermission(Constants.PERMISSION_RENAME));
-
-							getTree().add(node, parent);
-							parent = node;
-						}
+						TreeNode parent = getParentNode(folder);
 
 						TreeNode node = new TreeNode(folder.getName());
 						node.setAttribute("id", parent.getAttributeAsString("id") + "-" + Long.toString(folderId));
@@ -1126,6 +1097,40 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						FolderController.get().selected(folder);
 					}
 				});
+	}
+
+	private TreeNode getParentNode(GUIFolder folder) {
+		TreeNode parent = getTree().getRoot();
+		for (GUIFolder fld : folder.getPath()) {
+			if (fld.getId() == Constants.DOCUMENTS_FOLDERID)
+				continue;
+
+			long fldId = fld.getId();
+			Long fldRef = fld.getFoldRef();
+			if (fld.getFoldRef() != null) {
+				fldId = fld.getFoldRef();
+				fldRef = fld.getId();
+			}
+
+			String parentId = parent.getAttributeAsString("id");
+			if ("/".equals(parentId))
+				parentId = "" + Constants.DOCUMENTS_FOLDERID;
+
+			TreeNode node = new TreeNode(fld.getName());
+			node.setAttribute("id", parentId + "-" + Long.toString(fldId));
+			node.setAttribute("folderId", Long.toString(fldId));
+			node.setAttribute("type", Integer.toString(fld.getType()));
+			node.setAttribute("foldRef", fldRef != null ? Long.toString(fldRef) : null);
+			if (fld.getColor() != null)
+				node.setAttribute("color", fld.getColor());
+			node.setAttribute(Constants.PERMISSION_ADD, fld.hasPermission(Constants.PERMISSION_ADD));
+			node.setAttribute(Constants.PERMISSION_DELETE, fld.hasPermission(Constants.PERMISSION_DELETE));
+			node.setAttribute(Constants.PERMISSION_RENAME, fld.hasPermission(Constants.PERMISSION_RENAME));
+
+			getTree().add(node, parent);
+			parent = node;
+		}
+		return parent;
 	}
 
 	public String getNodePath(TreeNode leafNode) {
@@ -1366,7 +1371,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * 
 	 * @param targetFolderId identifier of the parent folder
 	 * @param foldersOnly to create just the folders
-	 * @param securityOption how to setup the security for the new folder'none', 'inherit' or 'replicate'
+	 * @param securityOption how to setup the security for the new folder'none',
+	 *        'inherit' or 'replicate'
 	 */
 	public void copyTo(long targetFolderId, boolean foldersOnly, String securityOption) {
 		final TreeNode target = getTree().findById(Long.toString(targetFolderId));
@@ -1439,7 +1445,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			folderNode.setTitle(folder.getName());
 			folderNode.setName(folder.getName());
 			folderNode.setAttribute("color", folder.getColor());
-			
+
 			getTree().reloadChildren(folderNode);
 
 			boolean positionChanged = folderNode.getAttributeAsInt("position") != folder.getPosition();
@@ -1609,88 +1615,85 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		if (Session.get().getUser().getCustomActions() != null
 				&& Session.get().getUser().getCustomActions().length > 0) {
 			for (GUIMenu menuAction : Session.get().getUser().getCustomActions()) {
-				MenuItem actionItem = new MenuItem(I18N.message(menuAction.getName()));
-				customActionsMenu.addItem(actionItem);
-
-				actionItem.addClickHandler(new ClickHandler() {
-
-					@Override
-					public void onClick(MenuItemClickEvent event) {
-						/**
-						 * Check on the server if the action has been modified
-						 */
-						SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(),
-								new AsyncCallback<GUIMenu>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(GUIMenu action) {
-										Session.get().getUser().updateCustomAction(action);
-
-										if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
-												&& action.getAutomation() != null
-												&& !action.getAutomation().trim().isEmpty()) {
-											/*
-											 * An automation cript is specified
-											 * directly, so launch it's
-											 * execution
-											 */
-											GUIAutomationRoutine routine = new GUIAutomationRoutine();
-											routine.setAutomation(action.getAutomation());
-											executeRoutine(folderId, null, routine);
-										} else if (action.getRoutineId() != null
-												&& action.getRoutineId().longValue() != 0L) {
-											AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-													new AsyncCallback<GUIAutomationRoutine>() {
-
-														@Override
-														public void onFailure(Throwable caught) {
-															GuiLog.serverError(caught);
-														}
-
-														@Override
-														public void onSuccess(GUIAutomationRoutine routine) {
-															if (routine.getTemplateId() != null
-																	&& routine.getTemplateId().longValue() != 0L) {
-																/*
-																 * A routine
-																 * with
-																 * parameters is
-																 * referenced,
-																 * so open the
-																 * input popup
-																 */
-																FillRoutineParams dialog = new FillRoutineParams(
-																		action.getName(), routine, folderId, null);
-																dialog.show();
-															} else {
-																/*
-																 * A routine
-																 * without
-																 * parameters is
-																 * referenced,
-																 * so launch
-																 * directly
-																 */
-																executeRoutine(folderId, null, routine);
-															}
-														}
-													});
-										}
-									}
-								});
-					}
-				});
+				prepareCustomActionMenuItem(folderId, menuAction, customActionsMenu);
 			}
 		}
 
 		MenuItem customActionsItem = new MenuItem(I18N.message("customactions"));
 		customActionsItem.setSubmenu(customActionsMenu);
 		return customActionsItem;
+	}
+
+	private void prepareCustomActionMenuItem(final long folderId, GUIMenu menuAction, Menu customActionsMenu) {
+		MenuItem actionItem = new MenuItem(I18N.message(menuAction.getName()));
+		customActionsMenu.addItem(actionItem);
+
+		actionItem.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				/**
+				 * Check on the server if the action has been modified
+				 */
+				SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(),
+						new AsyncCallback<GUIMenu>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIMenu action) {
+								Session.get().getUser().updateCustomAction(action);
+
+								if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
+										&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
+									/*
+									 * An automation cript is specified
+									 * directly, so launch it's execution
+									 */
+									GUIAutomationRoutine routine = new GUIAutomationRoutine();
+									routine.setAutomation(action.getAutomation());
+									executeRoutine(folderId, null, routine);
+								} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
+									AutomationService.Instance.get().getRoutine(action.getRoutineId(),
+											new AsyncCallback<GUIAutomationRoutine>() {
+
+												@Override
+												public void onFailure(Throwable caught) {
+													GuiLog.serverError(caught);
+												}
+
+												@Override
+												public void onSuccess(GUIAutomationRoutine routine) {
+													if (routine.getTemplateId() != null
+															&& routine.getTemplateId().longValue() != 0L) {
+														/*
+														 * A routine with
+														 * parameters is
+														 * referenced, so open
+														 * the input popup
+														 */
+														FillRoutineParams dialog = new FillRoutineParams(
+																action.getName(), routine, folderId, null);
+														dialog.show();
+													} else {
+														/*
+														 * A routine without
+														 * parameters is
+														 * referenced, so launch
+														 * directly
+														 */
+														executeRoutine(folderId, null, routine);
+													}
+												}
+											});
+								}
+							}
+						});
+			}
+		});
 	}
 
 	private void executeRoutine(long folderId, long[] docIds, GUIAutomationRoutine routine) {

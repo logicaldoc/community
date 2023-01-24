@@ -137,6 +137,62 @@ public class MetadataDiff extends Window {
 
 		List<DiffRecord> attributeRecords = new ArrayList<DiffRecord>();
 
+		List<String> names = prepareAttributeNames(version1, version2);
+
+		for (String name : names) {
+			addDiffRecord(version1, version2, dateFormat, numberFormat, attributeRecords, name);
+		}
+
+		attributeRecords.sort(null);
+		records.addAll(attributeRecords);
+	}
+
+	private void addDiffRecord(GUIVersion version1, GUIVersion version2, DateTimeFormat dateFormat,
+			NumberFormat numberFormat, List<DiffRecord> attributeRecords, String name) {
+
+		String val1 = "";
+		String label = null;
+		int position = -1;
+
+		GUIAttribute att1 = version1.getAttribute(name);
+		if (att1 != null) {
+			label = att1.getDisplayName();
+			position = att1.getPosition();
+
+			val1 = extractValue(dateFormat, numberFormat, att1);
+		}
+
+		GUIAttribute att2 = version2.getAttribute(name);
+		String val2 = "";
+		if (att2 != null) {
+			if (label == null)
+				label = att2.getDisplayName();
+			if (position == -1)
+				position = att2.getPosition();
+
+			val2 = extractValue(dateFormat, numberFormat, att2);
+		}
+
+		DiffRecord record = new DiffRecord(name, label, val1, val2, position);
+		attributeRecords.add(record);
+	}
+
+	private String extractValue(DateTimeFormat dateFormat, NumberFormat numberFormat, GUIAttribute attribute) {
+		String val = "";
+		if ((attribute.getType() == GUIAttribute.TYPE_STRING || attribute.getType() == GUIAttribute.TYPE_USER)
+				&& attribute.getStringValue() != null) {
+			val = attribute.getStringValue();
+		} else if (attribute.getType() == GUIAttribute.TYPE_INT && attribute.getValue() != null) {
+			val = Long.toString(attribute.getIntValue());
+		} else if (attribute.getType() == GUIAttribute.TYPE_DOUBLE && attribute.getValue() != null) {
+			val = numberFormat.format(attribute.getDoubleValue());
+		} else if (attribute.getType() == GUIAttribute.TYPE_DATE && attribute.getValue() != null) {
+			val = dateFormat.format(attribute.getDateValue());
+		}
+		return val;
+	}
+
+	private List<String> prepareAttributeNames(GUIVersion version1, GUIVersion version2) {
 		List<String> names = new ArrayList<String>();
 
 		// Collect all attribute names from version1
@@ -149,53 +205,7 @@ public class MetadataDiff extends Window {
 			if (!names.contains(att.getName()))
 				names.add(att.getName());
 		}
-
-		for (String name : names) {
-			GUIAttribute att = version1.getAttribute(name);
-			String val1 = "";
-			String label = null;
-			int position = -1;
-			if (att != null) {
-				label = att.getDisplayName();
-				position = att.getPosition();
-				if ((att.getType() == GUIAttribute.TYPE_STRING || att.getType() == GUIAttribute.TYPE_USER)
-						&& att.getStringValue() != null) {
-					val1 = att.getStringValue();
-				} else if (att.getType() == GUIAttribute.TYPE_INT && att.getValue() != null) {
-					val1 = Long.toString(att.getIntValue());
-				} else if (att.getType() == GUIAttribute.TYPE_DOUBLE && att.getValue() != null) {
-					val1 = numberFormat.format(att.getDoubleValue());
-				} else if (att.getType() == GUIAttribute.TYPE_DATE && att.getValue() != null) {
-					val1 = dateFormat.format(att.getDateValue());
-				}
-			}
-
-			att = version2.getAttribute(name);
-			String val2 = "";
-			if (att != null) {
-				if (label == null)
-					label = att.getDisplayName();
-				if (position == -1)
-					position = att.getPosition();
-
-				if ((att.getType() == GUIAttribute.TYPE_STRING || att.getType() == GUIAttribute.TYPE_USER)
-						&& att.getStringValue() != null) {
-					val2 = att.getStringValue();
-				} else if (att.getType() == GUIAttribute.TYPE_INT && att.getValue() != null) {
-					val2 = Long.toString(att.getIntValue());
-				} else if (att.getType() == GUIAttribute.TYPE_DOUBLE && att.getValue() != null) {
-					val2 = numberFormat.format(att.getDoubleValue());
-				} else if (att.getType() == GUIAttribute.TYPE_DATE && att.getValue() != null) {
-					val2 = dateFormat.format(att.getDateValue());
-				}
-			}
-
-			DiffRecord record = new DiffRecord(name, label, val1, val2, position);
-			attributeRecords.add(record);
-		}
-
-		attributeRecords.sort(null);
-		records.addAll(attributeRecords);
+		return names;
 	}
 
 	public class DiffRecord extends ListGridRecord implements Comparable<DiffRecord> {

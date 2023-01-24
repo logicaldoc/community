@@ -10,7 +10,6 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ColorItem;
@@ -46,7 +45,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		try {
 			refresh();
 		} catch (Throwable t) {
-			GuiLog.error(t.getMessage(),null,null);
+			GuiLog.error(t.getMessage(), null, null);
 			SC.warn(t.getMessage());
 		}
 	}
@@ -74,53 +73,9 @@ public class FolderInterfacePanel extends FolderDetailTab {
 				folder.getGrid() != null && !folder.getGrid().isEmpty() ? I18N.message("customized")
 						: I18N.message("notcustomized"));
 
-		FormItemIcon saveCurrentLayout = new FormItemIcon();
-		saveCurrentLayout.setSrc("[SKIN]/paste.gif");
-		saveCurrentLayout.setPrompt(I18N.message("savecurrentfolderlayout"));
-		saveCurrentLayout.setWidth(12);
-		saveCurrentLayout.setHeight(12);
-		saveCurrentLayout.addFormItemClickHandler(new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				String gridState = DocumentsPanel.get().getDocsGridViewState();
-				if (gridState != null) {
-					folder.setGrid(gridState);
-					event.getItem().setValue(I18N.message("customized"));
-					applyToSubFolders.setDisabled(true);
-					if (changedHandler != null)
-						changedHandler.onChanged(null);
-				}
-			}
-		});
+		FormItemIcon saveCurrentLayout = prepareSaveCurrentLayout();
 
-		FormItemIcon editLayout = new FormItemIcon();
-		editLayout.setSrc("[SKIN]/paste.gif");
-		editLayout.setPrompt(I18N.message("editlayout"));
-		editLayout.setWidth(12);
-		editLayout.setHeight(12);
-		editLayout.addFormItemClickHandler(new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"),
-						null);
-				textArea.setHeight(300);
-				LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
-						folder.getGrid() != null ? folder.getGrid() : "", textArea, 400, new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								vm.setValue("grid",
-										(value != null && !value.trim().isEmpty()) ? I18N.message("customized")
-												: I18N.message("notcustomized"));
-
-								folder.setGrid(value);
-								if (changedHandler != null)
-									changedHandler.onChanged(null);
-
-							}
-						});
-				event.cancel();
-			}
-		});
+		FormItemIcon editLayout = prepareEditLayout();
 
 		applyToSubFolders = new FormItemIcon();
 		applyToSubFolders.setSrc("[SKIN]/download.png");
@@ -177,6 +132,49 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 		form.setItems(position, color, docsGrid);
 		addMember(form);
+	}
+
+	private FormItemIcon prepareEditLayout() {
+		FormItemIcon editLayout = new FormItemIcon();
+		editLayout.setSrc("[SKIN]/paste.gif");
+		editLayout.setPrompt(I18N.message("editlayout"));
+		editLayout.setWidth(12);
+		editLayout.setHeight(12);
+		editLayout.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"), null);
+			textArea.setHeight(300);
+			LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
+					folder.getGrid() != null ? folder.getGrid() : "", textArea, 400, (final String value) -> {
+						vm.setValue("grid", (value != null && !value.trim().isEmpty()) ? I18N.message("customized")
+								: I18N.message("notcustomized"));
+
+						folder.setGrid(value);
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+
+					});
+			event.cancel();
+		});
+		return editLayout;
+	}
+
+	private FormItemIcon prepareSaveCurrentLayout() {
+		FormItemIcon saveCurrentLayout = new FormItemIcon();
+		saveCurrentLayout.setSrc("[SKIN]/paste.gif");
+		saveCurrentLayout.setPrompt(I18N.message("savecurrentfolderlayout"));
+		saveCurrentLayout.setWidth(12);
+		saveCurrentLayout.setHeight(12);
+		saveCurrentLayout.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			String gridState = DocumentsPanel.get().getDocsGridViewState();
+			if (gridState != null) {
+				folder.setGrid(gridState);
+				event.getItem().setValue(I18N.message("customized"));
+				applyToSubFolders.setDisabled(true);
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
+		return saveCurrentLayout;
 	}
 
 	public boolean validate() {

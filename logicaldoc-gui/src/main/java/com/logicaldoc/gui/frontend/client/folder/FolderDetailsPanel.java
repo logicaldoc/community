@@ -99,32 +99,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				FolderService.Instance.get().getFolder(getFolder().getId(), false, false, false,
-						new AsyncCallback<GUIFolder>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIFolder folder) {
-								folder.setPathExtended(folder.getPathExtended() != null ? folder.getPathExtended()
-										: FolderNavigator.get().getPath(folder.getId()));
-								setFolder(folder);
-								tabSet.hideSave();
-							}
-						});
-			}
-		});
+		prepareTabSet();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		propertiesTabPanel = new HLayout();
@@ -155,51 +130,11 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		if (Menu.enabled(Menu.HISTORY))
 			tabSet.addTab(historyTab);
 
-		workflowTab = new Tab(I18N.message("workflow"));
-		if (folder.hasPermission(Constants.PERMISSION_WORKFLOW))
-			if (Feature.visible(Feature.WORKFLOW)) {
-				if (Feature.enabled(Feature.WORKFLOW)) {
-					workflowsTabPanel = new HLayout();
-					workflowsTabPanel.setWidth100();
-					workflowsTabPanel.setHeight100();
-				} else {
-					workflowsTabPanel = new FeatureDisabled();
-				}
-				workflowTab.setPane(workflowsTabPanel);
-				tabSet.addTab(workflowTab);
-			}
+		prepareWorkflowTab(folder);
 
-		subscriptionsTab = new Tab(I18N.message("subscriptions"));
-		if (folder.hasPermission(Constants.PERMISSION_SUBSCRIPTION))
-			if (Feature.visible(Feature.AUDIT)) {
-				if (Feature.enabled(Feature.AUDIT)) {
-					subscriptionsTabPanel = new HLayout();
-					subscriptionsTabPanel.setWidth100();
-					subscriptionsTabPanel.setHeight100();
-				} else {
-					subscriptionsTabPanel = new FeatureDisabled();
-				}
-				subscriptionsTab.setPane(subscriptionsTabPanel);
-				tabSet.addTab(subscriptionsTab);
-			}
+		prepareSubscriptionsTab(folder);
 
-		try {
-			quotaTab = new Tab(I18N.message("quota"));
-			if (folder.isWorkspace() && folder.hasPermission(Constants.PERMISSION_WRITE))
-				if (Feature.visible(Feature.QUOTAS)) {
-					if (Feature.enabled(Feature.QUOTAS)) {
-						quotaTabPanel = new HLayout();
-						quotaTabPanel.setWidth100();
-						quotaTabPanel.setHeight100();
-					} else {
-						quotaTabPanel = new FeatureDisabled();
-					}
-					quotaTab.setPane(quotaTabPanel);
-					tabSet.addTab(quotaTab);
-				}
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareQuotaTab(folder);
 
 		Tab aliasesTab = new Tab(I18N.message("aliases"));
 		aliasesTabPanel = new HLayout();
@@ -245,156 +180,272 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		refresh();
 	}
 
+	private void prepareQuotaTab(GUIFolder folder) {
+		try {
+			quotaTab = new Tab(I18N.message("quota"));
+			if (folder.isWorkspace() && folder.hasPermission(Constants.PERMISSION_WRITE))
+				if (Feature.visible(Feature.QUOTAS)) {
+					if (Feature.enabled(Feature.QUOTAS)) {
+						quotaTabPanel = new HLayout();
+						quotaTabPanel.setWidth100();
+						quotaTabPanel.setHeight100();
+					} else {
+						quotaTabPanel = new FeatureDisabled();
+					}
+					quotaTab.setPane(quotaTabPanel);
+					tabSet.addTab(quotaTab);
+				}
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareSubscriptionsTab(GUIFolder folder) {
+		subscriptionsTab = new Tab(I18N.message("subscriptions"));
+		if (folder.hasPermission(Constants.PERMISSION_SUBSCRIPTION))
+			if (Feature.visible(Feature.AUDIT)) {
+				if (Feature.enabled(Feature.AUDIT)) {
+					subscriptionsTabPanel = new HLayout();
+					subscriptionsTabPanel.setWidth100();
+					subscriptionsTabPanel.setHeight100();
+				} else {
+					subscriptionsTabPanel = new FeatureDisabled();
+				}
+				subscriptionsTab.setPane(subscriptionsTabPanel);
+				tabSet.addTab(subscriptionsTab);
+			}
+	}
+
+	private void prepareWorkflowTab(GUIFolder folder) {
+		workflowTab = new Tab(I18N.message("workflow"));
+		if (folder.hasPermission(Constants.PERMISSION_WORKFLOW))
+			if (Feature.visible(Feature.WORKFLOW)) {
+				if (Feature.enabled(Feature.WORKFLOW)) {
+					workflowsTabPanel = new HLayout();
+					workflowsTabPanel.setWidth100();
+					workflowsTabPanel.setHeight100();
+				} else {
+					workflowsTabPanel = new FeatureDisabled();
+				}
+				workflowTab.setPane(workflowsTabPanel);
+				tabSet.addTab(workflowTab);
+			}
+	}
+
+	private void prepareTabSet() {
+		tabSet = new EditingTabSet(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				onSave();
+			}
+		}, (ClickEvent event) -> {
+			FolderService.Instance.get().getFolder(getFolder().getId(), false, false, false,
+					new AsyncCallback<GUIFolder>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							folder.setPathExtended(folder.getPathExtended() != null ? folder.getPathExtended()
+									: FolderNavigator.get().getPath(folder.getId()));
+							setFolder(folder);
+							tabSet.hideSave();
+						}
+					});
+		});
+	}
+
 	private void refresh() {
 		try {
 			disableSave();
 
-			ChangedHandler changeHandler = new ChangedHandler() {
-				@Override
-				public void onChanged(ChangedEvent event) {
-					onModified();
-				}
+			ChangedHandler changeHandler = (ChangedEvent changeEvent) -> {
+				onModified();
 			};
 
 			/*
 			 * Prepare the standard properties tab
 			 */
-			if (propertiesPanel != null) {
-				propertiesPanel.destroy();
-				propertiesTabPanel.removeMember(propertiesPanel);
-			}
-			propertiesPanel = new FolderStandardPropertiesPanel(folder, changeHandler);
-			propertiesTabPanel.addMember(propertiesPanel);
+			prepareStandardPropertiesTab(changeHandler);
 
 			/*
 			 * Prepare the extended properties tab
 			 */
-			if (extendedPropertiesPanel != null) {
-				extendedPropertiesPanel.destroy();
-				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
-			}
-
-			ChangedHandler templateChangedHandler = new ChangedHandler() {
-				@Override
-				public void onChanged(ChangedEvent event) {
-					folder.setOcrTemplateId(null);
-					folder.setBarcodeTemplateId(null);
-					ocrPanel.refresh(folder.getTemplateId());
-				}
-			};
-			extendedPropertiesPanel = new FolderExtendedPropertiesPanel(folder, changeHandler, templateChangedHandler);
-			if (Feature.enabled(Feature.TEMPLATE))
-				extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
+			prepareExtendedPropertiesTab(changeHandler);
 
 			/*
 			 * Prepare the security properties tab
 			 */
-			if (securityPanel != null) {
-				securityPanel.destroy();
-				securityTabPanel.removeMember(securityPanel);
-			}
-			securityPanel = new FolderSecurityPanel(folder);
-			securityTabPanel.addMember(securityPanel);
+			prepareSecurityTab();
 
 			/*
 			 * Prepare the aliases tab
 			 */
-			if (aliasesPanel != null) {
-				aliasesPanel.destroy();
-				aliasesTabPanel.removeMember(aliasesPanel);
-			}
-			aliasesPanel = new AliasesPanel(folder);
-			aliasesTabPanel.addMember(aliasesPanel);
+			prepareAliasesTab();
 
 			/*
 			 * Prepare the history tab
 			 */
-			if (historyPanel != null) {
-				historyPanel.destroy();
-				historyTabPanel.removeMember(historyPanel);
-			}
-			historyPanel = new FolderHistoryPanel(folder);
-			historyTabPanel.addMember(historyPanel);
+			prepareHistoryTab();
 
-			if (Feature.enabled(Feature.WORKFLOW) && folder.hasPermission(Constants.PERMISSION_WORKFLOW)) {
-				/*
-				 * Prepare the workflow tab
-				 */
-				if (workflowsPanel != null) {
-					workflowsPanel.destroy();
-					workflowsTabPanel.removeMember(workflowsPanel);
-				}
+			addWorkflowTab();
 
-				workflowsPanel = new WorkflowTriggersPanel(folder);
-				workflowsTabPanel.addMember(workflowsPanel);
-			}
+			addSubscriptionsTab();
 
-			if (Feature.enabled(Feature.AUDIT) && folder.hasPermission(Constants.PERMISSION_SUBSCRIPTION)) {
-				/*
-				 * Prepare the subscriptions tab
-				 */
-				if (subscriptionsPanel != null) {
-					subscriptionsPanel.destroy();
-					subscriptionsTabPanel.removeMember(subscriptionsPanel);
-				}
+			addQuotaTab(changeHandler);
 
-				subscriptionsPanel = new FolderSubscriptionsPanel(folder);
-				subscriptionsTabPanel.addMember(subscriptionsPanel);
-			}
+			addAutomationTab();
 
-			if (Feature.enabled(Feature.QUOTAS) && folder.isWorkspace()
-					&& folder.hasPermission(Constants.PERMISSION_WRITE)) {
-				/*
-				 * Prepare the subscriptions tab
-				 */
-				if (quotaPanel != null) {
-					quotaPanel.destroy();
-					quotaTabPanel.removeMember(quotaPanel);
-				}
+			addInterfaceTab(changeHandler);
 
-				quotaPanel = new FolderQuotaPanel(folder, changeHandler);
-				quotaTabPanel.addMember(quotaPanel);
-			}
-
-			if (Feature.enabled(Feature.AUTOMATION) && folder.hasPermission(Constants.PERMISSION_AUTOMATION)) {
-				/*
-				 * Prepare the subscriptions tab
-				 */
-				if (automationPanel != null) {
-					automationPanel.destroy();
-					automationTabPanel.removeMember(automationPanel);
-				}
-
-				automationPanel = new FolderAutomationPanel(folder);
-				automationTabPanel.addMember(automationPanel);
-			}
-
-			if (Menu.enabled(Menu.FOLDER_INTERFACE)) {
-				/*
-				 * Prepare the User Interface tab
-				 */
-				if (interfacePanel != null) {
-					interfacePanel.destroy();
-					interfaceTabPanel.removeMember(interfacePanel);
-				}
-				interfacePanel = new FolderInterfacePanel(folder, changeHandler);
-				interfaceTabPanel.addMember(interfacePanel);
-			}
-
-			if (Menu.enabled(Menu.CAPTURE)) {
-				/*
-				 * Prepare the OCR tab
-				 */
-				if (ocrPanel != null) {
-					ocrPanel.destroy();
-					captureTabPanel.removeMember(ocrPanel);
-				}
-				ocrPanel = new FolderCapturePanel(folder, changeHandler);
-				captureTabPanel.addMember(ocrPanel);
-			}
+			addCapturePanel(changeHandler);
 		} catch (Throwable r) {
 			GuiLog.error(r.getMessage(), null, r);
 		}
+	}
+
+	private void addCapturePanel(ChangedHandler changeHandler) {
+		if (Menu.enabled(Menu.CAPTURE)) {
+			/*
+			 * Prepare the OCR tab
+			 */
+			if (ocrPanel != null) {
+				ocrPanel.destroy();
+				captureTabPanel.removeMember(ocrPanel);
+			}
+			ocrPanel = new FolderCapturePanel(folder, changeHandler);
+			captureTabPanel.addMember(ocrPanel);
+		}
+	}
+
+	private void addInterfaceTab(ChangedHandler changeHandler) {
+		if (Menu.enabled(Menu.FOLDER_INTERFACE)) {
+			/*
+			 * Prepare the User Interface tab
+			 */
+			if (interfacePanel != null) {
+				interfacePanel.destroy();
+				interfaceTabPanel.removeMember(interfacePanel);
+			}
+			interfacePanel = new FolderInterfacePanel(folder, changeHandler);
+			interfaceTabPanel.addMember(interfacePanel);
+		}
+	}
+
+	private void addAutomationTab() {
+		if (Feature.enabled(Feature.AUTOMATION) && folder.hasPermission(Constants.PERMISSION_AUTOMATION)) {
+			/*
+			 * Prepare the subscriptions tab
+			 */
+			if (automationPanel != null) {
+				automationPanel.destroy();
+				automationTabPanel.removeMember(automationPanel);
+			}
+
+			automationPanel = new FolderAutomationPanel(folder);
+			automationTabPanel.addMember(automationPanel);
+		}
+	}
+
+	private void addQuotaTab(ChangedHandler changeHandler) {
+		if (Feature.enabled(Feature.QUOTAS) && folder.isWorkspace()
+				&& folder.hasPermission(Constants.PERMISSION_WRITE)) {
+			/*
+			 * Prepare the subscriptions tab
+			 */
+			if (quotaPanel != null) {
+				quotaPanel.destroy();
+				quotaTabPanel.removeMember(quotaPanel);
+			}
+
+			quotaPanel = new FolderQuotaPanel(folder, changeHandler);
+			quotaTabPanel.addMember(quotaPanel);
+		}
+	}
+
+	private void addSubscriptionsTab() {
+		if (Feature.enabled(Feature.AUDIT) && folder.hasPermission(Constants.PERMISSION_SUBSCRIPTION)) {
+			/*
+			 * Prepare the subscriptions tab
+			 */
+			if (subscriptionsPanel != null) {
+				subscriptionsPanel.destroy();
+				subscriptionsTabPanel.removeMember(subscriptionsPanel);
+			}
+
+			subscriptionsPanel = new FolderSubscriptionsPanel(folder);
+			subscriptionsTabPanel.addMember(subscriptionsPanel);
+		}
+	}
+
+	private void addWorkflowTab() {
+		if (Feature.enabled(Feature.WORKFLOW) && folder.hasPermission(Constants.PERMISSION_WORKFLOW)) {
+			/*
+			 * Prepare the workflow tab
+			 */
+			if (workflowsPanel != null) {
+				workflowsPanel.destroy();
+				workflowsTabPanel.removeMember(workflowsPanel);
+			}
+
+			workflowsPanel = new WorkflowTriggersPanel(folder);
+			workflowsTabPanel.addMember(workflowsPanel);
+		}
+	}
+
+	private void prepareHistoryTab() {
+		if (historyPanel != null) {
+			historyPanel.destroy();
+			historyTabPanel.removeMember(historyPanel);
+		}
+		historyPanel = new FolderHistoryPanel(folder);
+		historyTabPanel.addMember(historyPanel);
+	}
+
+	private void prepareAliasesTab() {
+		if (aliasesPanel != null) {
+			aliasesPanel.destroy();
+			aliasesTabPanel.removeMember(aliasesPanel);
+		}
+		aliasesPanel = new AliasesPanel(folder);
+		aliasesTabPanel.addMember(aliasesPanel);
+	}
+
+	private void prepareSecurityTab() {
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			securityTabPanel.removeMember(securityPanel);
+		}
+		securityPanel = new FolderSecurityPanel(folder);
+		securityTabPanel.addMember(securityPanel);
+	}
+
+	private void prepareExtendedPropertiesTab(ChangedHandler changeHandler) {
+		if (extendedPropertiesPanel != null) {
+			extendedPropertiesPanel.destroy();
+			extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
+		}
+
+		ChangedHandler templateChangedHandler = (ChangedEvent templateChangeEvent) -> {
+			folder.setOcrTemplateId(null);
+			folder.setBarcodeTemplateId(null);
+			ocrPanel.refresh(folder.getTemplateId());
+		};
+		extendedPropertiesPanel = new FolderExtendedPropertiesPanel(folder, changeHandler, templateChangedHandler);
+		if (Feature.enabled(Feature.TEMPLATE))
+			extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
+	}
+
+	private void prepareStandardPropertiesTab(ChangedHandler changeHandler) {
+		if (propertiesPanel != null) {
+			propertiesPanel.destroy();
+			propertiesTabPanel.removeMember(propertiesPanel);
+		}
+		propertiesPanel = new FolderStandardPropertiesPanel(folder, changeHandler);
+		propertiesTabPanel.addMember(propertiesPanel);
 	}
 
 	public GUIFolder getFolder() {
@@ -415,17 +466,9 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		if (!valid)
 			tabSet.selectTab(0);
 
-		if (valid && Feature.enabled(Feature.TEMPLATE)) {
-			valid = extendedPropertiesPanel.validate();
-			if (!valid)
-				tabSet.selectTab(1);
-		}
+		valid = validateExtendedAttributes(valid);
 
-		if (valid && quotaPanel != null && folder.isWorkspace() && Feature.enabled(Feature.QUOTAS)) {
-			valid = quotaPanel.validate();
-			if (!valid)
-				tabSet.selectTab(quotaTab);
-		}
+		valid = validateQuota(valid);
 
 		if (valid && interfacePanel != null) {
 			valid = interfacePanel.validate();
@@ -439,6 +482,24 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				tabSet.selectTab(captureTab);
 		}
 
+		return valid;
+	}
+
+	private boolean validateQuota(boolean valid) {
+		if (valid && quotaPanel != null && folder.isWorkspace() && Feature.enabled(Feature.QUOTAS)) {
+			valid = quotaPanel.validate();
+			if (!valid)
+				tabSet.selectTab(quotaTab);
+		}
+		return valid;
+	}
+
+	private boolean validateExtendedAttributes(boolean valid) {
+		if (valid && Feature.enabled(Feature.TEMPLATE)) {
+			valid = extendedPropertiesPanel.validate();
+			if (!valid)
+				tabSet.selectTab(1);
+		}
 		return valid;
 	}
 

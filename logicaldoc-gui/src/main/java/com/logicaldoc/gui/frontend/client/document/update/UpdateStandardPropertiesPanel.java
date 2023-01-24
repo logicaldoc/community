@@ -24,10 +24,8 @@ import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -106,56 +104,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			tagItem.setDisplayField("word");
 			tagItem.setDisabled(!updateEnabled);
 
-			final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
-			newTagItem.setRequired(false);
-			newTagItem.addKeyPressHandler(new KeyPressHandler() {
-				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
-							&& "enter".equals(event.getKeyName().toLowerCase())) {
-						String input = newTagItem.getValueAsString().trim();
-						newTagItem.clearValue();
-
-						if (!"".equals(input)) {
-							String[] tokens = input.split("\\,");
-
-							int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
-							int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
-							boolean containsInvalid = false;
-							List<String> tags = new ArrayList<String>();
-							for (String token : tokens) {
-								String t = token.trim();
-
-								if (t.length() < min || t.length() > max) {
-									containsInvalid = true;
-									continue;
-								}
-
-								tags.add(t);
-
-								// Put the new tag in the options
-								Record record = new Record();
-								record.setAttribute("index", t);
-								record.setAttribute("word", t);
-								ds.addData(record);
-
-								// Add the old tags to the new ones
-								String[] oldVal = tagItem.getValues();
-								for (int i = 0; i < oldVal.length; i++)
-									if (!tags.contains(oldVal[i]))
-										tags.add(oldVal[i]);
-
-								// Update the tag item and trigger the change
-								tagItem.setValues((Object[]) tags.toArray(new String[0]));
-								changedHandler.onChanged(null);
-							}
-
-							if (containsInvalid)
-								SC.warn(I18N.message("sometagaddedbecauseinvalid"));
-						}
-					}
-				}
-			});
+			final TextItem newTagItem = prepareNewTagItem(ds);
 
 			final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
 					Util.getTagsHTML(document.getTags()));
@@ -166,17 +115,15 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			editTags.setSrc("[SKIN]/actions/edit.png");
 			editTags.setWidth(16);
 			editTags.setHeight(16);
-			editTags.addFormItemClickHandler(new FormItemClickHandler() {
-				public void onFormItemClick(final FormItemIconClickEvent event) {
-					tagsString.setVisible(false);
-					tagItem.setVisible(true);
-					tagItem.setEndRow(true);
-					if (items.contains(newTagItem)) {
-						newTagItem.setVisible(true);
-						newTagItem.setEndRow(true);
-					}
-					form.redraw();
+			editTags.addFormItemClickHandler((final FormItemIconClickEvent editTagsClick) -> {
+				tagsString.setVisible(false);
+				tagItem.setVisible(true);
+				tagItem.setEndRow(true);
+				if (items.contains(newTagItem)) {
+					newTagItem.setVisible(true);
+					newTagItem.setEndRow(true);
 				}
+				form.redraw();
 			});
 			tagsString.setIcons(editTags);
 
@@ -191,6 +138,62 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		}
 
 		form.setItems(items.toArray(new FormItem[0]));
+	}
+
+	private TextItem prepareNewTagItem(final DataSource ds) {
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		newTagItem.setRequired(false);
+		newTagItem.addKeyPressHandler((KeyPressEvent newTagKeyPress) -> {
+			if (!newTagItem.validate() || newTagItem.getValue() == null || newTagKeyPress.getKeyName() == null
+					|| !"enter".equals(newTagKeyPress.getKeyName().toLowerCase()))
+				return;
+
+			String input = newTagItem.getValueAsString().trim();
+			newTagItem.clearValue();
+
+			if ("".equals(input))
+				return;
+
+			addTagsFromInput(input, ds);
+		});
+		return newTagItem;
+	}
+
+	private void addTagsFromInput(String input, final DataSource ds) {
+		String[] tokens = input.split("\\,");
+		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
+		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
+		boolean containsInvalid = false;
+		List<String> tags = new ArrayList<String>();
+		for (String token : tokens) {
+			String t = token.trim();
+
+			if (t.length() < min || t.length() > max) {
+				containsInvalid = true;
+				continue;
+			}
+
+			tags.add(t);
+
+			// Put the new tag in the options
+			Record record = new Record();
+			record.setAttribute("index", t);
+			record.setAttribute("word", t);
+			ds.addData(record);
+
+			// Add the old tags to the new ones
+			String[] oldVal = tagItem.getValues();
+			for (int i = 0; i < oldVal.length; i++)
+				if (!tags.contains(oldVal[i]))
+					tags.add(oldVal[i]);
+
+			// Update the tag item and trigger the change
+			tagItem.setValues((Object[]) tags.toArray(new String[0]));
+			changedHandler.onChanged(null);
+		}
+		
+		if (containsInvalid)
+			SC.warn(I18N.message("sometagaddedbecauseinvalid"));
 	}
 
 	@SuppressWarnings("unchecked")

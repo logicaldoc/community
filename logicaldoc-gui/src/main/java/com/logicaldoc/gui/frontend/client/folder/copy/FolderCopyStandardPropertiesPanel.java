@@ -105,108 +105,115 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		form2.setAutoWidth();
 		form2.setValuesManager(vm);
 
+		if (Feature.enabled(Feature.TAGS))
+			fillTagsForm();
+		
+		rows.addMember(form2);
+	}
+
+	private void fillTagsForm() {
 		List<FormItem> items = new ArrayList<FormItem>();
+		
+		String mode = Session.get().getConfig("tag.mode");
+		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
 
-		if (Feature.enabled(Feature.TAGS)) {
-			String mode = Session.get().getConfig("tag.mode");
-			final TagsDS ds = new TagsDS(null, true, null, folder.getId());
+		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) folder.getTags());
+		tagItem.setEndRow(true);
+		tagItem.setDisabled(!folder.isWrite());
 
-			tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) folder.getTags());
-			tagItem.setEndRow(true);
-			tagItem.setDisabled(!folder.isWrite());
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		newTagItem.setRequired(false);
+		newTagItem.setEndRow(true);
+		newTagItem.addKeyPressHandler(new KeyPressHandler() {
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
+						&& "enter".equals(event.getKeyName().toLowerCase())) {
+					String input = newTagItem.getValueAsString().trim();
+					newTagItem.clearValue();
 
-			final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
-			newTagItem.setRequired(false);
-			newTagItem.setEndRow(true);
-			newTagItem.addKeyPressHandler(new KeyPressHandler() {
-				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
-							&& "enter".equals(event.getKeyName().toLowerCase())) {
-						String input = newTagItem.getValueAsString().trim();
-						newTagItem.clearValue();
-
-						if (!"".equals(input)) {
-							// replace the escapes \, with a string so the
-							// tokenizer will work propertly
-							input = input.replace("\\,", "__comma__");
-
-							String[] tokens = input.split("\\,");
-
-							int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
-							int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
-							boolean containsInvalid = false;
-							List<String> tags = new ArrayList<String>();
-							for (String token : tokens) {
-								String t = token.trim();
-
-								// Restore the commas inside the tag
-								t = t.replace("__comma__", ",");
-
-								if (t.length() < min || t.length() > max) {
-									containsInvalid = true;
-									continue;
-								}
-
-								tags.add(t);
-
-								// Add the old tags to the new ones
-								String[] oldVal = tagItem.getValues();
-								for (int i = 0; i < oldVal.length; i++)
-									if (!tags.contains(oldVal[i]))
-										tags.add(oldVal[i]);
-
-								// Put the new tag in the options
-								Record record = new Record();
-								record.setAttribute("index", t);
-								record.setAttribute("word", t);
-								ds.addData(record);
-							}
-
-							// Update the tag item and trigger the change
-							tagItem.setValues((Object[]) tags.toArray(new String[0]));
-							changedHandler.onChanged(null);
-
-							if (containsInvalid)
-								SC.warn(I18N.message("sometagaddedbecauseinvalid"));
-						}
-					}
+					if (!"".equals(input))
+						addTagFromInput(ds, input);
 				}
-			});
+			}
+		});
 
-			final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
-					Util.getTagsHTML(folder.getTags()));
-			tagsString.setEndRow(true);
-			FormItemIcon editTags = new FormItemIcon();
-			editTags.setPrompt(I18N.message("edittags"));
-			editTags.setSrc("[SKIN]/actions/edit.png");
-			editTags.setWidth(16);
-			editTags.setHeight(16);
-			editTags.addFormItemClickHandler(new FormItemClickHandler() {
-				public void onFormItemClick(final FormItemIconClickEvent event) {
-					tagsString.setVisible(false);
-					tagItem.setVisible(true);
-					tagItem.setEndRow(true);
-					if (items.contains(newTagItem)) {
-						newTagItem.setVisible(true);
-						newTagItem.setEndRow(true);
-					}
-					form2.redraw();
+		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
+				Util.getTagsHTML(folder.getTags()));
+		tagsString.setEndRow(true);
+		FormItemIcon editTags = new FormItemIcon();
+		editTags.setPrompt(I18N.message("edittags"));
+		editTags.setSrc("[SKIN]/actions/edit.png");
+		editTags.setWidth(16);
+		editTags.setHeight(16);
+		editTags.addFormItemClickHandler(new FormItemClickHandler() {
+			public void onFormItemClick(final FormItemIconClickEvent event) {
+				tagsString.setVisible(false);
+				tagItem.setVisible(true);
+				tagItem.setEndRow(true);
+				if (items.contains(newTagItem)) {
+					newTagItem.setVisible(true);
+					newTagItem.setEndRow(true);
 				}
-			});
+				form2.redraw();
+			}
+		});
 
-			tagsString.setIcons(editTags);
+		tagsString.setIcons(editTags);
 
-			items.add(tagsString);
-			items.add(tagItem);
-			tagItem.setVisible(false);
-			newTagItem.setVisible(false);
-			if ("free".equals(mode) && folder.isWrite())
-				items.add(newTagItem);
+		items.add(tagsString);
+		items.add(tagItem);
+		tagItem.setVisible(false);
+		newTagItem.setVisible(false);
+		if ("free".equals(mode) && folder.isWrite())
+			items.add(newTagItem);
+		
+		form2.setItems(items.toArray(new FormItem[0]));
+	}
+	
+	private void addTagFromInput(final TagsDS ds, String input) {
+		// replace the escapes \, with a string so the
+		// tokenizer will work propertly
+		input = input.replace("\\,", "__comma__");
+
+		String[] tokens = input.split("\\,");
+
+		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
+		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
+		boolean containsInvalid = false;
+		List<String> tags = new ArrayList<String>();
+		for (String token : tokens) {
+			String t = token.trim();
+
+			// Restore the commas inside the tag
+			t = t.replace("__comma__", ",");
+
+			if (t.length() < min || t.length() > max) {
+				containsInvalid = true;
+				continue;
+			}
+
+			tags.add(t);
+
+			// Add the old tags to the new ones
+			String[] oldVal = tagItem.getValues();
+			for (int i = 0; i < oldVal.length; i++)
+				if (!tags.contains(oldVal[i]))
+					tags.add(oldVal[i]);
+
+			// Put the new tag in the options
+			Record record = new Record();
+			record.setAttribute("index", t);
+			record.setAttribute("word", t);
+			ds.addData(record);
 		}
 
-		form2.setItems(items.toArray(new FormItem[0]));
-		rows.addMember(form2);
+		// Update the tag item and trigger the change
+		tagItem.setValues((Object[]) tags.toArray(new String[0]));
+		changedHandler.onChanged(null);
+
+		if (containsInvalid)
+			SC.warn(I18N.message("sometagaddedbecauseinvalid"));
 	}
 
 	public boolean validate() {

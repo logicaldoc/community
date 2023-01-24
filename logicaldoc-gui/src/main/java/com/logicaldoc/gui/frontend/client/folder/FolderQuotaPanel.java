@@ -106,28 +106,30 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
 		vm.validate();
-		if (!vm.hasErrors()) {
-			if (values.get("documentsquota") == null)
-				folder.setQuotaDocs(null);
-			else
-				folder.setQuotaDocs(Long.parseLong(values.get("documentsquota").toString()));
+		if (vm.hasErrors())
+			return false;
 
-			if (values.get("sizequota") == null)
-				folder.setQuotaSize(null);
-			else
-				folder.setQuotaSize(Long.parseLong(values.get("sizequota").toString()));
+		if (values.get("documentsquota") == null)
+			folder.setQuotaDocs(null);
+		else
+			folder.setQuotaDocs(Long.parseLong(values.get("documentsquota").toString()));
 
-			if (values.get("quotaThreshold") == null)
-				folder.setQuotaThreshold(null);
-			else
-				folder.setQuotaThreshold(Integer.parseInt(values.get("quotaThreshold").toString()));
+		if (values.get("sizequota") == null)
+			folder.setQuotaSize(null);
+		else
+			folder.setQuotaSize(Long.parseLong(values.get("sizequota").toString()));
 
-			folder.clearQuotaAlertRecipients();
-			String[] usernames = recipients.getValues();
-			if (usernames != null && usernames.length > 0)
-				for (int i = 0; i < usernames.length; i++)
-					folder.addQuotaAlertRecipient(usernames[i]);
-		}
+		if (values.get("quotaThreshold") == null)
+			folder.setQuotaThreshold(null);
+		else
+			folder.setQuotaThreshold(Integer.parseInt(values.get("quotaThreshold").toString()));
+
+		folder.clearQuotaAlertRecipients();
+		String[] usernames = recipients.getValues();
+		if (usernames != null && usernames.length > 0)
+			for (int i = 0; i < usernames.length; i++)
+				folder.addQuotaAlertRecipient(usernames[i]);
+
 		return !vm.hasErrors();
 	}
 }

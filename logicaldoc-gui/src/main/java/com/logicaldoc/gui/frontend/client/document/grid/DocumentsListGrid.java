@@ -48,20 +48,14 @@ import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.events.KeyDownEvent;
-import com.smartgwt.client.widgets.events.KeyDownHandler;
 import com.smartgwt.client.widgets.events.KeyPressEvent;
-import com.smartgwt.client.widgets.events.KeyPressHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
@@ -112,58 +106,60 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		prepareFieldsMap();
 
-		addCellClickHandler(new CellClickHandler() {
-			@Override
-			public void onCellClick(CellClickEvent event) {
-				if ("rating".equals(getFieldName(event.getColNum()))) {
-					long id = Long.parseLong(getSelectedRecord().getAttribute("id"));
-					String ratingImageName = getSelectedRecord().getAttribute("rating");
-					final int docRating = Integer.parseInt(ratingImageName.replace("rating", ""));
-					DocumentService.Instance.get().getRating(id, new AsyncCallback<GUIRating>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUIRating rating) {
-							if (rating != null) {
-								RatingDialog dialog = new RatingDialog(docRating, rating);
-								dialog.show();
-							}
-						}
-					});
-					event.cancel();
-				}
-			}
+		addCellClickHandler((CellClickEvent cellClick) -> {
+			onCellClick(cellClick);
 		});
 
-		addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				if (cursor != null)
-					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
-
-				if (Session.get().getHiliteDocId() != null) {
-					// Add the sorting by order first
-					SortSpecifier specifier = getSortSpecifier("order");
-					if (specifier == null) {
-						SortSpecifier[] sortSpecs = getSort();
-						SortSpecifier[] newSpecs = new SortSpecifier[sortSpecs != null ? sortSpecs.length + 1 : 1];
-						newSpecs[0] = new SortSpecifier("order", SortDirection.DESCENDING);
-						if (sortSpecs != null)
-							for (int i = 1; i < newSpecs.length; i++)
-								newSpecs[i] = sortSpecs[i - 1];
-						setSort(newSpecs);
-					}
-					selectDocument(Session.get().getHiliteDocId());
-				} else if (groupField != null) {
-					groupBy(groupField);
-				}
-			}
+		addDataArrivedHandler((DataArrivedEvent dataArrived) -> {
+			onDtaArrved();
 		});
 
 		DocumentController.get().addObserver(this);
+	}
+
+	private void onDtaArrved() {
+		if (cursor != null)
+			cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
+
+		if (Session.get().getHiliteDocId() != null) {
+			// Add the sorting by order first
+			SortSpecifier specifier = getSortSpecifier("order");
+			if (specifier == null) {
+				SortSpecifier[] sortSpecs = getSort();
+				SortSpecifier[] newSpecs = new SortSpecifier[sortSpecs != null ? sortSpecs.length + 1 : 1];
+				newSpecs[0] = new SortSpecifier("order", SortDirection.DESCENDING);
+				if (sortSpecs != null)
+					for (int i = 1; i < newSpecs.length; i++)
+						newSpecs[i] = sortSpecs[i - 1];
+				setSort(newSpecs);
+			}
+			selectDocument(Session.get().getHiliteDocId());
+		} else if (groupField != null) {
+			groupBy(groupField);
+		}
+	}
+
+	private void onCellClick(CellClickEvent cellClick) {
+		if ("rating".equals(getFieldName(cellClick.getColNum()))) {
+			long id = Long.parseLong(getSelectedRecord().getAttribute("id"));
+			String ratingImageName = getSelectedRecord().getAttribute("rating");
+			final int docRating = Integer.parseInt(ratingImageName.replace("rating", ""));
+			DocumentService.Instance.get().getRating(id, new AsyncCallback<GUIRating>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIRating rating) {
+					if (rating != null) {
+						RatingDialog dialog = new RatingDialog(docRating, rating);
+						dialog.show();
+					}
+				}
+			});
+			cellClick.cancel();
+		}
 	}
 
 	public DocumentsListGrid(GUIFolder folder) {
@@ -243,117 +239,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		type.setAlign(Alignment.CENTER);
 		fieldsMap.put(type.getName(), type);
 
-		ListGridField statusIcons = new ColoredListGridField("statusIcons", " ");
-		statusIcons.setWidth(110);
-		statusIcons.setCanFilter(false);
-		statusIcons.setCanSort(false);
-		fieldsMap.put(statusIcons.getName(), statusIcons);
-		statusIcons.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String color = record.getAttributeAsString("color");
-
-				String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-
-				// Put the bookmark icon
-				{
-					if (record.getAttribute("bookmarked") != null) {
-						Boolean bookmarked = record.getAttributeAsBoolean("bookmarked");
-						if (bookmarked != null && bookmarked)
-							content += AwesomeFactory.getIconButtonHTML("bookmark", null, "bookmarked", color, null);
-					}
-				}
-
-				// Put the indexing icon
-				{
-					if (record.getAttribute("indexed") != null) {
-						Integer indexed = record.getAttributeAsInt("indexed");
-						if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
-								&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
-							Long id = record.getAttributeAsLong("id");
-							content += AwesomeFactory.getIndexedIconButtonHTML(id,
-									FolderController.get().getCurrentFolder().isDownload(), indexed, color);
-						}
-					}
-				}
-
-				// Put the status icon
-				{
-					if (record.getAttribute("status") != null) {
-						Integer status = record.getAttributeAsInt("status");
-						if (status != null && status.intValue() > 0)
-							content += AwesomeFactory.getLockedButtonHTML(status,
-									record.getAttributeAsString("lockUser"), color);
-					}
-				}
-
-				// Put the immutable icon
-				{
-					if (record.getAttribute("immutable") != null) {
-						Integer immutable = record.getAttributeAsInt("immutable");
-						if (immutable != null && immutable.intValue() == 1)
-							content += AwesomeFactory.getIconButtonHTML("hand-paper", null, "immutable", color, null);
-					}
-				}
-
-				// Put the password protection icon
-				{
-					if (record.getAttribute("password") != null) {
-						Boolean password = record.getAttributeAsBoolean("password");
-						if (password != null && password.booleanValue())
-							content += AwesomeFactory.getIconButtonHTML("key", null, "passwordprotected", color, null);
-					}
-				}
-
-				// Put the signed icon
-				{
-					if (record.getAttribute("signed") != null) {
-						Integer signed = record.getAttributeAsInt("signed");
-						if (signed != null && signed.intValue() == 1) {
-							Long docId = record.getAttributeAsLong("id");
-							if (FolderController.get().getCurrentFolder().isDownload())
-								content += AwesomeFactory.getIconButtonHTML("badge-check", null, "signed", color,
-										(record.getAttributeAsString("filename") != null && record
-												.getAttributeAsString("filename").toLowerCase().endsWith(".pdf")
-														? Util.downloadURL(docId, null)
-														: Util.downloadPdfURL(docId, null)));
-							else
-								content += AwesomeFactory.getIconButtonHTML("badge-check", null, "signed", color, null);
-						}
-					}
-				}
-
-				// Put the stamped icon
-				{
-					if (record.getAttribute("stamped") != null) {
-						Integer stamped = record.getAttributeAsInt("stamped");
-						if (stamped != null && stamped.intValue() == 1) {
-							Long docId = record.getAttributeAsLong("id");
-							String fileVersion = record.getAttribute("fileVersion");
-							if (FolderController.get().getCurrentFolder().isDownload())
-								content += AwesomeFactory.getIconButtonHTML("tint", null, "stamped", color,
-										(Feature.enabled(Feature.STAMP) ? Util.downloadPdfURL(docId, fileVersion)
-												: null));
-							else
-								content += AwesomeFactory.getIconButtonHTML("tint", null, "stamped", color, null);
-						}
-					}
-				}
-
-				// Put the links icon
-				{
-					if (record.getAttribute("links") != null) {
-						Integer links = record.getAttributeAsInt("links");
-						if (links != null && links.intValue() > 0)
-							content += AwesomeFactory.getIconButtonHTML("link", null, "withlinks", color, null);
-					}
-				}
-
-				content += "</div>";
-				return content;
-			}
-		});
+		prepareStatusIcons();
 
 		ListGridField indexed = new ColoredListGridField("indexed", " ", 20);
 		indexed.setType(ListGridFieldType.IMAGE);
@@ -386,12 +272,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		language.setCanFilter(false);
 		language.setAlign(Alignment.CENTER);
 		language.setHidden(true);
-		language.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return languages.get(record.getAttribute("language"));
-			}
+		language.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			return languages.get(record.getAttribute("language"));
 		});
 		fieldsMap.put(language.getName(), language);
 
@@ -480,22 +362,161 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		ListGridField score = new ColoredListGridField("score", I18N.message("score"), 120);
 		score.setCanFilter(false);
 		score.setHidden(true);
-		score.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					int score = record.getAttributeAsInt("score");
-					int red = 100 - score > 0 ? 100 - score : 0;
-					return "<img src='" + Util.imageUrl("dotblue.gif") + "' style='width: " + score
-							+ "px; height: 8px' title='" + score + "%'/>" + "<img src='" + Util.imageUrl("dotgrey.gif")
-							+ "' style='width: " + red + "px; height: 8px' title='" + score + "%'/>";
-				} catch (Throwable e) {
-					return "";
-				}
+		score.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			try {
+				int scoreValue = record.getAttributeAsInt("score");
+				int red = 100 - scoreValue > 0 ? 100 - scoreValue : 0;
+				return "<img src='" + Util.imageUrl("dotblue.gif") + "' style='width: " + score
+						+ "px; height: 8px' title='" + score + "%'/>" + "<img src='" + Util.imageUrl("dotgrey.gif")
+						+ "' style='width: " + red + "px; height: 8px' title='" + score + "%'/>";
+			} catch (Throwable e) {
+				return "";
 			}
 		});
 		fieldsMap.put(score.getName(), score);
 
+		addExtendedAttributesFields();
+
+		addKeyPressHandler((KeyPressEvent keyPress) -> {
+			if (keyPress.isCtrlKeyDown()) {
+				if ("C".equals(keyPress.getKeyName())) {
+					// we could thake the action to copy (CTRL + C) into the
+					// clipboard
+				} else if ("X".equals(keyPress.getKeyName())) {
+					// we could thake the action to cut (CTRL + V)
+				}
+			}
+		});
+	}
+
+	private void prepareStatusIcons() {
+		ListGridField statusIcons = new ColoredListGridField("statusIcons", " ");
+		statusIcons.setWidth(110);
+		statusIcons.setCanFilter(false);
+		statusIcons.setCanSort(false);
+		fieldsMap.put(statusIcons.getName(), statusIcons);
+		statusIcons.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			return formatStatusIconCell(record);
+		});
+	}
+
+	private String formatStatusIconCell(ListGridRecord record) {
+		String color = record.getAttributeAsString("color");
+
+		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
+
+		// Put the bookmark icon
+		content = putBookmarkStatusIcon(record, color, content);
+
+		// Put the indexing icon
+		content = putIndexedStatusIcon(record, color, content);
+
+		// Put the status icon
+		if (record.getAttribute("status") != null) {
+			Integer status = record.getAttributeAsInt("status");
+			if (status != null && status.intValue() > 0)
+				content += AwesomeFactory.getLockedButtonHTML(status, record.getAttributeAsString("lockUser"),
+						color);
+		}
+
+		// Put the immutable icon
+		content = putImmutableStatusIcon(record, color, content);
+
+		// Put the password protection icon
+		if (record.getAttribute("password") != null) {
+			Boolean password = record.getAttributeAsBoolean("password");
+			if (password != null && password.booleanValue())
+				content += AwesomeFactory.getIconButtonHTML("key", null, "passwordprotected", color, null);
+		}
+
+		// Put the signed icon
+		content = putSignedStatusIcon(record, color, content);
+
+		// Put the stamped icon
+		content = putStampedStatusIcon(record, color, content);
+
+		// Put the links icon
+		content = putLinksStatusIcon(record, color, content);
+
+		content += "</div>";
+		return content;
+	}
+
+	private String putLinksStatusIcon(ListGridRecord record, String color, String content) {
+		if (record.getAttribute("links") != null) {
+			Integer links = record.getAttributeAsInt("links");
+			if (links != null && links.intValue() > 0)
+				content += AwesomeFactory.getIconButtonHTML("link", null, "withlinks", color, null);
+		}
+		return content;
+	}
+
+	private String putImmutableStatusIcon(ListGridRecord record, String color, String content) {
+		if (record.getAttribute("immutable") != null) {
+			Integer immutable = record.getAttributeAsInt("immutable");
+			if (immutable != null && immutable.intValue() == 1)
+				content += AwesomeFactory.getIconButtonHTML("hand-paper", null, "immutable", color, null);
+		}
+		return content;
+	}
+
+	private String putBookmarkStatusIcon(ListGridRecord record, String color, String content) {
+		if (record.getAttribute("bookmarked") != null) {
+			Boolean bookmarked = record.getAttributeAsBoolean("bookmarked");
+			if (bookmarked != null && bookmarked)
+				content += AwesomeFactory.getIconButtonHTML("bookmark", null, "bookmarked", color, null);
+		}
+		return content;
+	}
+
+	private String putIndexedStatusIcon(ListGridRecord record, String color, String content) {
+		if (record.getAttribute("indexed") != null) {
+			Integer indexed = record.getAttributeAsInt("indexed");
+			if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
+					&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
+				Long idValue = record.getAttributeAsLong("id");
+				content += AwesomeFactory.getIndexedIconButtonHTML(idValue,
+						FolderController.get().getCurrentFolder().isDownload(), indexed, color);
+			}
+		}
+		return content;
+	}
+
+	private String putStampedStatusIcon(ListGridRecord record, String color, String content) {
+		if (record.getAttribute("stamped") != null) {
+			Integer stamped = record.getAttributeAsInt("stamped");
+			if (stamped != null && stamped.intValue() == 1) {
+				Long docId = record.getAttributeAsLong("id");
+				String fileVersion = record.getAttribute("fileVersion");
+				if (FolderController.get().getCurrentFolder().isDownload())
+					content += AwesomeFactory.getIconButtonHTML("tint", null, "stamped", color,
+							(Feature.enabled(Feature.STAMP) ? Util.downloadPdfURL(docId, fileVersion) : null));
+				else
+					content += AwesomeFactory.getIconButtonHTML("tint", null, "stamped", color, null);
+			}
+		}
+		return content;
+	}
+
+	private String putSignedStatusIcon(ListGridRecord record, String color, String content) {
+		if (record.getAttribute("signed") != null) {
+			Integer signed = record.getAttributeAsInt("signed");
+			if (signed != null && signed.intValue() == 1) {
+				Long docId = record.getAttributeAsLong("id");
+				if (FolderController.get().getCurrentFolder().isDownload())
+					content += AwesomeFactory.getIconButtonHTML("badge-check", null, "signed", color,
+							(record.getAttributeAsString("filename") != null
+									&& record.getAttributeAsString("filename").toLowerCase().endsWith(".pdf")
+											? Util.downloadURL(docId, null)
+											: Util.downloadPdfURL(docId, null)));
+				else
+					content += AwesomeFactory.getIconButtonHTML("badge-check", null, "signed", color, null);
+			}
+		}
+		return content;
+	}
+
+	private void addExtendedAttributesFields() {
 		for (String name : extendedAttributes) {
 			if (name != null && !"".equals(name)) {
 				ListGridField ext = new ColoredListGridField("ext_" + name,
@@ -527,46 +548,23 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				fieldsMap.put(ext.getName(), ext);
 			}
 		}
-		
-		addKeyPressHandler(new KeyPressHandler() {
-			
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if(event.isCtrlKeyDown()) {
-					if("C".equals(event.getKeyName())) {
-      				   // we could thake the action to copy (CTRL + C) into the clipboard 
-					} else if("X".equals(event.getKeyName())) {
-						// we could thake the action to cut (CTRL + V)
-					}
-				}
-			}
-		});
 	}
-	
-	
+
 	/**
 	 * Merges the given list of fields with the legacy ones.
 	 * 
 	 * @param fields The fields as you already filled
 	 */
 	public void mergeFields(List<ListGridField> fields) {
-		if(!fields.contains(fieldsMap.get("icon")))
-			fields.add(0, fieldsMap.get("icon"));
-		
-		if(!fields.contains(fieldsMap.get("statusIcons")))
-			fields.add(0, fieldsMap.get("statusIcons"));
-		
-		if(!fields.contains(fieldsMap.get("thumbnail")))
-			fields.add(0, fieldsMap.get("thumbnail"));
-		
+		mergeIconFields(fields);
+
 		if (!fields.contains(fieldsMap.get("filename"))) {
 			fieldsMap.get("filename").setHidden(true);
 			fields.add(fieldsMap.get("filename"));
 		}
-		if (!fields.contains(fieldsMap.get("lastModified"))) {
-			fieldsMap.get("lastModified").setHidden(true);
-			fields.add(fieldsMap.get("lastModified"));
-		}
+		
+		mergeDateFields(fields);
+		
 		if (!fields.contains(fieldsMap.get("type"))) {
 			fieldsMap.get("type").setHidden(true);
 			fields.add(fieldsMap.get("type"));
@@ -579,30 +577,11 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			fieldsMap.get("pages").setHidden(true);
 			fields.add(fieldsMap.get("pages"));
 		}
-		if (!fields.contains(fieldsMap.get("fileVersion"))) {
-			fieldsMap.get("fileVersion").setHidden(true);
-			fields.add(fieldsMap.get("fileVersion"));
-		}
-		if (!fields.contains(fieldsMap.get("version"))) {
-			fieldsMap.get("version").setHidden(true);
-			fields.add(fieldsMap.get("version"));
-		}
-		if (!fields.contains(fieldsMap.get("publisher"))) {
-			fieldsMap.get("publisher").setHidden(true);
-			fields.add(fieldsMap.get("publisher"));
-		}
-		if (!fields.contains(fieldsMap.get("published"))) {
-			fieldsMap.get("published").setHidden(true);
-			fields.add(fieldsMap.get("published"));
-		}
-		if (!fields.contains(fieldsMap.get("creator"))) {
-			fieldsMap.get("creator").setHidden(true);
-			fields.add(fieldsMap.get("creator"));
-		}
-		if (!fields.contains(fieldsMap.get("created"))) {
-			fieldsMap.get("created").setHidden(true);
-			fields.add(fieldsMap.get("created"));
-		}
+		
+		mergeVersionFields(fields);
+		
+		mergeUserFields(fields);
+
 		if (!fields.contains(fieldsMap.get("customId"))) {
 			fieldsMap.get("customId").setHidden(true);
 			fields.add(fieldsMap.get("customId"));
@@ -623,18 +602,75 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			fieldsMap.get("template").setHidden(true);
 			fields.add(fieldsMap.get("template"));
 		}
-		if (!fields.contains(fieldsMap.get("startPublishing"))) {
-			fieldsMap.get("startPublishing").setHidden(true);
-			fields.add(fieldsMap.get("startPublishing"));
-		}
-		if (!fields.contains(fieldsMap.get("stopPublishing"))) {
-			fieldsMap.get("stopPublishing").setHidden(true);
-			fields.add(fieldsMap.get("stopPublishing"));
-		}
+		
+		mergePublishingFields(fields);
+		
 		if (!fields.contains(fieldsMap.get("language"))) {
 			fieldsMap.get("language").setHidden(true);
 			fields.add(fieldsMap.get("language"));
 		}
+	}
+
+	private void mergePublishingFields(List<ListGridField> fields) {
+		if (!fields.contains(fieldsMap.get("startPublishing"))) {
+			fieldsMap.get("startPublishing").setHidden(true);
+			fields.add(fieldsMap.get("startPublishing"));
+		}
+		
+		if (!fields.contains(fieldsMap.get("stopPublishing"))) {
+			fieldsMap.get("stopPublishing").setHidden(true);
+			fields.add(fieldsMap.get("stopPublishing"));
+		}
+	}
+
+	private void mergeUserFields(List<ListGridField> fields) {
+		if (!fields.contains(fieldsMap.get("publisher"))) {
+			fieldsMap.get("publisher").setHidden(true);
+			fields.add(fieldsMap.get("publisher"));
+		}
+		if (!fields.contains(fieldsMap.get("creator"))) {
+			fieldsMap.get("creator").setHidden(true);
+			fields.add(fieldsMap.get("creator"));
+		}
+	}
+
+	private void mergeVersionFields(List<ListGridField> fields) {
+		if (!fields.contains(fieldsMap.get("fileVersion"))) {
+			fieldsMap.get("fileVersion").setHidden(true);
+			fields.add(fieldsMap.get("fileVersion"));
+		}
+		if (!fields.contains(fieldsMap.get("version"))) {
+			fieldsMap.get("version").setHidden(true);
+			fields.add(fieldsMap.get("version"));
+		}
+	}
+
+	private void mergeDateFields(List<ListGridField> fields) {
+		if (!fields.contains(fieldsMap.get("lastModified"))) {
+			fieldsMap.get("lastModified").setHidden(true);
+			fields.add(fieldsMap.get("lastModified"));
+		}
+		
+		if (!fields.contains(fieldsMap.get("created"))) {
+			fieldsMap.get("created").setHidden(true);
+			fields.add(fieldsMap.get("created"));
+		}
+		
+		if (!fields.contains(fieldsMap.get("published"))) {
+			fieldsMap.get("published").setHidden(true);
+			fields.add(fieldsMap.get("published"));
+		}
+	}
+
+	private void mergeIconFields(List<ListGridField> fields) {
+		if (!fields.contains(fieldsMap.get("icon")))
+			fields.add(0, fieldsMap.get("icon"));
+
+		if (!fields.contains(fieldsMap.get("statusIcons")))
+			fields.add(0, fieldsMap.get("statusIcons"));
+		
+		if (!fields.contains(fieldsMap.get("thumbnail")))
+			fields.add(0, fieldsMap.get("thumbnail"));
 	}
 
 	@Override
@@ -666,13 +702,13 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			DocumentGridUtil.updateRecord(document, record);
 			refreshRow(record);
 		}
-		
+
 		// Now consider the aliases
-		if(document.getDocRef()!=null) {
+		if (document.getDocRef() != null) {
 			record = findRecord(document.getDocRef());
 			if (record != null) {
 				DocumentGridUtil.updateRecord(document, record);
-				refreshRow(record);	
+				refreshRow(record);
 			}
 		}
 	}

@@ -397,63 +397,71 @@ public class FormDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (vm.validate()) {
-			form.setName(vm.getValueAsString("name"));
-			if (vm.getValueAsString("template") != null)
-				form.setTemplateId(Long.parseLong(vm.getValueAsString("template")));
-			else
-				form.setTemplateId(null);
-			form.setCss(vm.getValueAsString("css"));
-			form.setWebCss(vm.getValueAsString("webCss"));
-			form.setContent(vm.getValueAsString("content"));
-
-			if (Feature.enabled(Feature.WEB_FORM)) {
-				form.setTitle(vm.getValueAsString("title"));
-				form.setDescription(vm.getValueAsString("description"));
-				form.setFooter(vm.getValueAsString("footer"));
-				form.setConfirmation(vm.getValueAsString("confirmation"));
-				form.setWebEnabled("yes".equals(vm.getValueAsString("webEnabled")));
-				form.setCollectEmails("yes".equals(vm.getValueAsString("collectEmails")));
-				form.setEditAfterSubmit("yes".equals(vm.getValueAsString("editAfterSubmit")));
-				form.setBackgroundColor(vm.getValueAsString("backgroundColor"));
-				form.setWidth(Integer.parseInt(vm.getValueAsString("width")));
-				form.setColumns(Integer.parseInt(vm.getValueAsString("columns")));
-				form.setTargetFolder(targetFolder.getFolder());
-				form.setNotifyResponses("true".equals(vm.getValueAsString("notifyResponses")));
-
-				String[] ids = recipients.getValues();
-				GUIUser[] recipients = new GUIUser[ids != null ? ids.length : 0];
-
-				if (ids != null && ids.length > 0)
-					for (int i = 0; i < ids.length; i++) {
-						GUIUser user = new GUIUser();
-						user.setId(Long.parseLong(ids[i]));
-						recipients[i] = user;
-					}
-				form.setRecipients(recipients);
-			}
-
-			FormService.Instance.get().save(form, new AsyncCallback<GUIForm>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
-				@Override
-				public void onSuccess(GUIForm newForm) {
-					tabSet.hideSave();
-					if (form.getId() == 0L)
-						formsPanel.refresh();
-					else if (newForm != null) {
-						formsPanel.updateRecord(newForm);
-						formsPanel.showFormDetails(newForm);
-					}
-				}
-			});
+			collectValuesAndSave();
 		} else {
 			if (!form1.validate() || !form2.validate())
 				tabSet.selectTab(0);
 			else
 				tabSet.selectTab(1);
 		}
+	}
+
+	private void collectValuesAndSave() {
+		form.setName(vm.getValueAsString("name"));
+		if (vm.getValueAsString("template") != null)
+			form.setTemplateId(Long.parseLong(vm.getValueAsString("template")));
+		else
+			form.setTemplateId(null);
+		form.setCss(vm.getValueAsString("css"));
+		form.setWebCss(vm.getValueAsString("webCss"));
+		form.setContent(vm.getValueAsString("content"));
+
+		if (Feature.enabled(Feature.WEB_FORM)) {
+			form.setTitle(vm.getValueAsString("title"));
+			form.setDescription(vm.getValueAsString("description"));
+			form.setFooter(vm.getValueAsString("footer"));
+			form.setConfirmation(vm.getValueAsString("confirmation"));
+			form.setWebEnabled("yes".equals(vm.getValueAsString("webEnabled")));
+			form.setCollectEmails("yes".equals(vm.getValueAsString("collectEmails")));
+			form.setEditAfterSubmit("yes".equals(vm.getValueAsString("editAfterSubmit")));
+			form.setBackgroundColor(vm.getValueAsString("backgroundColor"));
+			form.setWidth(Integer.parseInt(vm.getValueAsString("width")));
+			form.setColumns(Integer.parseInt(vm.getValueAsString("columns")));
+			form.setTargetFolder(targetFolder.getFolder());
+			form.setNotifyResponses("true".equals(vm.getValueAsString("notifyResponses")));
+
+			String[] ids = recipients.getValues();
+			GUIUser[] recipients = new GUIUser[ids != null ? ids.length : 0];
+
+			if (ids != null && ids.length > 0)
+				for (int i = 0; i < ids.length; i++) {
+					GUIUser user = new GUIUser();
+					user.setId(Long.parseLong(ids[i]));
+					recipients[i] = user;
+				}
+			form.setRecipients(recipients);
+		}
+
+		saveForm();
+	}
+
+	private void saveForm() {
+		FormService.Instance.get().save(form, new AsyncCallback<GUIForm>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUIForm newForm) {
+				tabSet.hideSave();
+				if (form.getId() == 0L)
+					formsPanel.refresh();
+				else if (newForm != null) {
+					formsPanel.updateRecord(newForm);
+					formsPanel.showFormDetails(newForm);
+				}
+			}
+		});
 	}
 }

@@ -85,7 +85,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 			}
 		};
 		template.addChangedHandler(changeTemplateHandler);
-		
+
 		SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, importFolder.getTemplateId(),
 				importFolder.getOcrTemplateId());
 		ocrTemplate.addChangedHandler(changedHandler);
@@ -163,42 +163,57 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
-			if (values.get("sizemax") == null)
-				importFolder.setMaxSize(null);
-			else if (values.get("sizemax") instanceof Integer)
-				importFolder.setMaxSize((Integer) form.getValue("sizemax"));
-			else
-				importFolder.setMaxSize(Integer.parseInt((String) values.get("sizemax")));
+		if (form.hasErrors())
+			return false;
 
-			importFolder.setDepth(Integer.parseInt(values.get("depth").toString()));
-			importFolder.setUpdatePolicy(Integer.parseInt(values.get("updatePolicy").toString()));
+		collectSizeMax(values);
 
-			if (values.get("template") == null || "".equals((String) values.get("template")))
-				importFolder.setTemplateId(null);
-			else
-				importFolder.setTemplateId(Long.parseLong((String) values.get("template")));
-			
-			if (values.get("ocrtemplate") == null || "".equals((String) values.get("ocrtemplate")))
-				importFolder.setOcrTemplateId(null);
-			else
-				importFolder.setOcrTemplateId(Long.parseLong((String) values.get("ocrtemplate")));
-			
-			if (values.get("barcodetemplate") == null || "".equals((String) values.get("barcodetemplate")))
-				importFolder.setBarcodeTemplateId(null);
-			else
-				importFolder.setBarcodeTemplateId(Long.parseLong((String) values.get("barcodetemplate")));
-			
-			importFolder.setDelImport((Boolean) values.get("delImport"));
-			importFolder.setInheritRights((Boolean) values.get("inheritRights"));
-			importFolder.setImportEmpty((Boolean) values.get("importEmpty"));
-			if (values.get("tags") != null || !"".equals((String) values.get("tags")))
-				importFolder.setTags((String) values.get("tags"));
-			else
-				importFolder.setTags(null);
-			importFolder.setStartDate((Date) values.get("startdate"));
+		importFolder.setDepth(Integer.parseInt(values.get("depth").toString()));
+		importFolder.setUpdatePolicy(Integer.parseInt(values.get("updatePolicy").toString()));
 
-		}
+		collectTemplates(values);
+
+		importFolder.setDelImport((Boolean) values.get("delImport"));
+		importFolder.setInheritRights((Boolean) values.get("inheritRights"));
+		importFolder.setImportEmpty((Boolean) values.get("importEmpty"));
+		
+		collectTags(values);
+		
+		importFolder.setStartDate((Date) values.get("startdate"));
+
 		return !form.hasErrors();
+	}
+
+	private void collectTags(Map<String, Object> values) {
+		if (values.get("tags") != null || !"".equals((String) values.get("tags")))
+			importFolder.setTags((String) values.get("tags"));
+		else
+			importFolder.setTags(null);
+	}
+
+	private void collectTemplates(Map<String, Object> values) {
+		if (values.get("template") == null || "".equals((String) values.get("template")))
+			importFolder.setTemplateId(null);
+		else
+			importFolder.setTemplateId(Long.parseLong((String) values.get("template")));
+
+		if (values.get("ocrtemplate") == null || "".equals((String) values.get("ocrtemplate")))
+			importFolder.setOcrTemplateId(null);
+		else
+			importFolder.setOcrTemplateId(Long.parseLong((String) values.get("ocrtemplate")));
+
+		if (values.get("barcodetemplate") == null || "".equals((String) values.get("barcodetemplate")))
+			importFolder.setBarcodeTemplateId(null);
+		else
+			importFolder.setBarcodeTemplateId(Long.parseLong((String) values.get("barcodetemplate")));
+	}
+
+	private void collectSizeMax(Map<String, Object> values) {
+		if (values.get("sizemax") == null)
+			importFolder.setMaxSize(null);
+		else if (values.get("sizemax") instanceof Integer)
+			importFolder.setMaxSize((Integer) form.getValue("sizemax"));
+		else
+			importFolder.setMaxSize(Integer.parseInt((String) values.get("sizemax")));
 	}
 }

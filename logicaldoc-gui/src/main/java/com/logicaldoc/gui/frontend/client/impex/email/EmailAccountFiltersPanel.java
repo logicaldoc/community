@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.SelectionStyle;
@@ -18,14 +17,12 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DropMoveEvent;
 import com.smartgwt.client.widgets.events.DropMoveHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -56,65 +53,13 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 	@Override
 	public void onDraw() {
-		IButton addRule = new IButton(I18N.message("addrule"));
-		addRule.setHeight(25);
-		addRule.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("field", "0");
-				record.setAttribute("condition", "0");
-				record.setAttribute("expression", "");
-				record.setAttribute("targetId", "5");
-				record.setAttribute("targetName", "/");
-				list.addData(record);
-				EmailAccountFiltersPanel.this.changedHandler.onChanged(null);
-			}
-		});
+		IButton addRule = prepareAddRuleButton();
 
 		HLayout formsContainer = new HLayout();
 
-		ListGridField field = new ListGridField("field", I18N.message("field"));
-		field.setWidth(120);
-		SelectItem fieldSelect = ItemFactory.newEmailFields("field", "field");
-		field.setEditorType(fieldSelect);
-		fieldSelect.addChangedHandler(changedHandler);
-		field.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if ("0".equals(value))
-					return I18N.message("subject");
-				else if ("1".equals(value))
-					return I18N.message("sender");
-				else if ("2".equals(value))
-					return I18N.message("content");
-				else
-					return I18N.message("recipient");
-			}
-		});
+		ListGridField field = prepareFieldField();
 
-		ListGridField condition = new ListGridField("condition", I18N.message("condition"));
-		condition.setWidth(120);
-		SelectItem conditionSelect = new SelectItem();
-		LinkedHashMap<String, String> map2 = new LinkedHashMap<String, String>();
-		map2.put("0", I18N.message("contains"));
-		map2.put("1", I18N.message("notcontains"));
-		map2.put("2", I18N.message("matches"));
-		conditionSelect.setValueMap(map2);
-		condition.setEditorType(conditionSelect);
-		conditionSelect.addChangedHandler(changedHandler);
-		condition.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if ("0".equals(value))
-					return I18N.message("contains");
-				else if ("1".equals(value))
-					return I18N.message("notcontains");
-				else
-					return I18N.message("matches");
-			}
-		});
+		ListGridField condition = prepareConditionField();
 
 		ListGridField expression = new ListGridField("expression", I18N.message("expression"));
 		expression.setWidth(150);
@@ -122,64 +67,9 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		expression.setEditorType(conditionEdit);
 		conditionEdit.addChangedHandler(changedHandler);
 
-		final ListGridField target = new ListGridField("targetName", I18N.message("targetfolder"));
-		target.setWidth(150);
-		target.setCanEdit(false);
-		target.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return "";
-			}
-		});
+		final ListGridField target = prepareTargetField();
 
-		list = new ListGrid() {
-			@Override
-			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
-				String fieldName = this.getFieldName(colNum);
-				if (fieldName.equals("targetName")) {
-					final FolderSelector folderSelector = new FolderSelector("target", true);
-					folderSelector.setShowTitle(false);
-					folderSelector.setFolder(Long.parseLong(record.getAttributeAsString("targetId")),
-							record.getAttributeAsString("targetName"));
-					folderSelector.addFolderChangeListener(new FolderChangeListener() {
-
-						@Override
-						public void onChanged(GUIFolder folder) {
-							if (folderSelector.getFolderId() != null) {
-								record.setAttribute("targetId", Long.toString(folderSelector.getFolderId()));
-								record.setAttribute("targetName", folderSelector.getFolderName());
-							} else {
-								record.setAttribute("targetId", (Long) null);
-								record.setAttribute("targetName", "");
-							}
-
-							changedHandler.onChanged(null);
-						}
-					});
-
-					DynamicForm l = new DynamicForm();
-					l.setFields(folderSelector);
-					return l;
-				} else {
-					return super.createRecordComponent(record, colNum);
-				}
-			}
-		};
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setShowAllRecords(true);
-		list.setCanEdit(true);
-		list.setWidth100();
-		list.setHeight100();
-		list.setFields(field);
-		list.setSelectionType(SelectionStyle.MULTIPLE);
-		list.setShowAllRecords(true);
-		list.setCanReorderRecords(true);
-		list.setCanDragRecordsOut(true);
-		list.setCanAcceptDroppedRecords(true);
-		list.setDragDataAction(DragDataAction.MOVE);
-		list.setModalEditing(true);
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
+		prepareList(field);
 
 		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
 		if (account.getRules() != null)
@@ -220,6 +110,120 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 		formsContainer.setMembers(list);
 		setMembers(formsContainer, addRule);
+	}
+
+	private void prepareList(ListGridField field) {
+		list = new ListGrid() {
+			@Override
+			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
+				String fieldName = this.getFieldName(colNum);
+				if (fieldName.equals("targetName")) {
+					final FolderSelector folderSelector = new FolderSelector("target", true);
+					folderSelector.setShowTitle(false);
+					folderSelector.setFolder(Long.parseLong(record.getAttributeAsString("targetId")),
+							record.getAttributeAsString("targetName"));
+					folderSelector.addFolderChangeListener((GUIFolder folder) -> {
+						if (folderSelector.getFolderId() != null) {
+							record.setAttribute("targetId", Long.toString(folderSelector.getFolderId()));
+							record.setAttribute("targetName", folderSelector.getFolderName());
+						} else {
+							record.setAttribute("targetId", (Long) null);
+							record.setAttribute("targetName", "");
+						}
+
+						changedHandler.onChanged(null);
+					});
+
+					DynamicForm l = new DynamicForm();
+					l.setFields(folderSelector);
+					return l;
+				} else {
+					return super.createRecordComponent(record, colNum);
+				}
+			}
+		};
+		list.setEmptyMessage(I18N.message("notitemstoshow"));
+		list.setShowAllRecords(true);
+		list.setCanEdit(true);
+		list.setWidth100();
+		list.setHeight100();
+		list.setFields(field);
+		list.setSelectionType(SelectionStyle.MULTIPLE);
+		list.setShowAllRecords(true);
+		list.setCanReorderRecords(true);
+		list.setCanDragRecordsOut(true);
+		list.setCanAcceptDroppedRecords(true);
+		list.setDragDataAction(DragDataAction.MOVE);
+		list.setModalEditing(true);
+		list.setShowRecordComponents(true);
+		list.setShowRecordComponentsByCell(true);
+	}
+
+	private ListGridField prepareTargetField() {
+		final ListGridField target = new ListGridField("targetName", I18N.message("targetfolder"));
+		target.setWidth(150);
+		target.setCanEdit(false);
+		target.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			return "";
+		});
+		return target;
+	}
+
+	private ListGridField prepareConditionField() {
+		ListGridField condition = new ListGridField("condition", I18N.message("condition"));
+		condition.setWidth(120);
+		SelectItem conditionSelect = new SelectItem();
+		LinkedHashMap<String, String> map2 = new LinkedHashMap<String, String>();
+		map2.put("0", I18N.message("contains"));
+		map2.put("1", I18N.message("notcontains"));
+		map2.put("2", I18N.message("matches"));
+		conditionSelect.setValueMap(map2);
+		condition.setEditorType(conditionSelect);
+		conditionSelect.addChangedHandler(changedHandler);
+		condition.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			if ("0".equals(value))
+				return I18N.message("contains");
+			else if ("1".equals(value))
+				return I18N.message("notcontains");
+			else
+				return I18N.message("matches");
+		});
+		return condition;
+	}
+
+	private ListGridField prepareFieldField() {
+		ListGridField field = new ListGridField("field", I18N.message("field"));
+		field.setWidth(120);
+		SelectItem fieldSelect = ItemFactory.newEmailFields("field", "field");
+		field.setEditorType(fieldSelect);
+		fieldSelect.addChangedHandler(changedHandler);
+		field.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			if ("0".equals(value))
+				return I18N.message("subject");
+			else if ("1".equals(value))
+				return I18N.message("sender");
+			else if ("2".equals(value))
+				return I18N.message("content");
+			else
+				return I18N.message("recipient");
+		});
+		return field;
+	}
+
+	private IButton prepareAddRuleButton() {
+		IButton addRule = new IButton(I18N.message("addrule"));
+		addRule.setHeight(25);
+		addRule.addClickHandler((ClickEvent addRuleClick) -> {
+			ListGridRecord record = new ListGridRecord();
+			record.setAttribute("field", "0");
+			record.setAttribute("condition", "0");
+			record.setAttribute("expression", "");
+			record.setAttribute("targetId", "5");
+			record.setAttribute("targetName", "/");
+			list.addData(record);
+			EmailAccountFiltersPanel.this.changedHandler.onChanged(null);
+		});
+		return addRule;
 	}
 
 	boolean validate() {

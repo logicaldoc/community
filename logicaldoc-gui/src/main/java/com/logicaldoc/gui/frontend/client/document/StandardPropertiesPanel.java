@@ -38,11 +38,8 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -86,25 +83,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private void refresh() {
-		vm.clearErrors(false);
-
-		if (form1 != null)
-			form1.destroy();
-
-		if (thumbnail != null)
-			thumbnail.destroy();
-
-		if (columns.contains(form1))
-			columns.removeMember(form1);
-
-		if (columns.contains(thumbnail))
-			columns.removeChild(thumbnail);
-
-		form1 = new DynamicForm();
-		form1.setNumCols(2);
-		form1.setValuesManager(vm);
-		form1.setTitleOrientation(TitleOrientation.LEFT);
-		form1.setWidth(DEFAULT_ITEM_WIDTH);
+		prepareForm1();
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(document.getId()));
 		if (!Long.toString(document.getId()).equals(document.getCustomId())) {
@@ -128,37 +107,9 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
 
 		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size",
-				Util.formatSizeW7(document.getFileSize()) + " ("
-						+ Util.formatSizeBytes(document.getFileSize()) + ")");
+				Util.formatSizeW7(document.getFileSize()) + " (" + Util.formatSizeBytes(document.getFileSize()) + ")");
 
-		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", "pages", Util.formatInt(document.getPages()));
-		pages.setIconHSpace(2);
-		pages.setIconWidth(16);
-		pages.setIconHeight(16);
-		pages.setWidth("1%");
-		PickerIcon countPages = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {
-			public void onFormItemClick(final FormItemIconClickEvent event) {
-				event.getItem().setValue(I18N.message("computing") + "...");
-				DocumentService.Instance.get().updatePages(document.getId(), new AsyncCallback<Integer>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Integer docPages) {
-						if (docPages != null) {
-							document.setPages(docPages.intValue());
-							pages.setValue(Util.formatInt(document.getPages()));
-						}
-					}
-				});
-			}
-		});
-		countPages.setPrompt(I18N.message("countpages"));
-		if (document.getId() != 0)
-			pages.setIcons(countPages);
+		StaticTextItem pages = preparePagesItem();
 
 		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", document.getFileName());
 		fileName.addChangedHandler(changedHandler);
@@ -166,45 +117,11 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		fileName.setWidth(DEFAULT_ITEM_WIDTH);
 		fileName.setDisabled(!updateEnabled || !document.getFolder().isRename());
 
-		StaticTextItem wfStatus = ItemFactory.newStaticTextItem("wfStatus", "workflowstatus",
-				document.getWorkflowStatus());
-		if (document.getWorkflowStatusDisplay() != null)
-			wfStatus.setValue("<span style='color:" + document.getWorkflowStatusDisplay() + "'>"
-					+ document.getWorkflowStatus() + "</span>");
+		StaticTextItem wfStatus = prepareWorkflowItem();
 
-		StaticTextItem version = ItemFactory.newStaticTextItem("version", "fileversion",
-				document.getFileVersion() + " (" + document.getVersion() + ")");
-		version.setValue(version.getValue());
-		String comment = document.getComment();
-		if (comment != null && !"".equals(comment))
-			version.setTooltip(comment);
+		StaticTextItem version = prepareVersionItem();
 
-		String path = document.getPathExtended();
-
-		FormItemIcon copyPath = new FormItemIcon();
-		copyPath.setPrompt(I18N.message("copypath"));
-		copyPath.setSrc("[SKIN]/page_white_paste.png");
-		copyPath.setWidth(16);
-		copyPath.setHeight(16);
-		copyPath.addFormItemClickHandler(new FormItemClickHandler() {
-			public void onFormItemClick(final FormItemIconClickEvent event) {
-				LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
-					@Override
-					public void execute(final String value) {
-						// Nothing to do
-					}
-				});
-				event.cancel();
-			}
-		});
-
-		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40));
-		folder.setTitle(I18N.message("folder"));
-		folder.setValue(Util.displayURL(null, document.getFolder().getId()));
-		folder.setTooltip(document.getPathExtended());
-		folder.setWrap(false);
-		folder.setWidth(DEFAULT_ITEM_WIDTH);
-		folder.setIcons(copyPath);
+		LinkItem folder = prepareFolderItem();
 
 		ColorItem color = ItemFactory.newColorItemPicker("color", "color", document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
@@ -237,6 +154,105 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		}
 	}
 
+	private StaticTextItem prepareWorkflowItem() {
+		StaticTextItem wfStatus = ItemFactory.newStaticTextItem("wfStatus", "workflowstatus",
+				document.getWorkflowStatus());
+		if (document.getWorkflowStatusDisplay() != null)
+			wfStatus.setValue("<span style='color:" + document.getWorkflowStatusDisplay() + "'>"
+					+ document.getWorkflowStatus() + "</span>");
+		return wfStatus;
+	}
+
+	private StaticTextItem prepareVersionItem() {
+		StaticTextItem version = ItemFactory.newStaticTextItem("version", "fileversion",
+				document.getFileVersion() + " (" + document.getVersion() + ")");
+		version.setValue(version.getValue());
+		String comment = document.getComment();
+		if (comment != null && !"".equals(comment))
+			version.setTooltip(comment);
+		return version;
+	}
+
+	private void prepareForm1() {
+		vm.clearErrors(false);
+
+		if (form1 != null)
+			form1.destroy();
+
+		if (thumbnail != null)
+			thumbnail.destroy();
+
+		if (columns.contains(form1))
+			columns.removeMember(form1);
+
+		if (columns.contains(thumbnail))
+			columns.removeChild(thumbnail);
+
+		form1 = new DynamicForm();
+		form1.setNumCols(2);
+		form1.setValuesManager(vm);
+		form1.setTitleOrientation(TitleOrientation.LEFT);
+		form1.setWidth(DEFAULT_ITEM_WIDTH);
+	}
+
+	private LinkItem prepareFolderItem() {
+		String path = document.getPathExtended();
+
+		FormItemIcon copyPath = new FormItemIcon();
+		copyPath.setPrompt(I18N.message("copypath"));
+		copyPath.setSrc("[SKIN]/page_white_paste.png");
+		copyPath.setWidth(16);
+		copyPath.setHeight(16);
+		copyPath.addFormItemClickHandler((final FormItemIconClickEvent event) -> {
+			LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
+				@Override
+				public void execute(final String value) {
+					// Nothing to do
+				}
+			});
+			event.cancel();
+		});
+
+		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40));
+		folder.setTitle(I18N.message("folder"));
+		folder.setValue(Util.displayURL(null, document.getFolder().getId()));
+		folder.setTooltip(document.getPathExtended());
+		folder.setWrap(false);
+		folder.setWidth(DEFAULT_ITEM_WIDTH);
+		folder.setIcons(copyPath);
+		return folder;
+	}
+
+	private StaticTextItem preparePagesItem() {
+		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", "pages", Util.formatInt(document.getPages()));
+		pages.setIconHSpace(2);
+		pages.setIconWidth(16);
+		pages.setIconHeight(16);
+		pages.setWidth("1%");
+		PickerIcon countPages = new PickerIcon(PickerIconName.REFRESH, (final FormItemIconClickEvent event) -> {
+			event.getItem().setValue(I18N.message("computing") + "...");
+			DocumentService.Instance.get().updatePages(document.getId(), new AsyncCallback<Integer>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Integer docPages) {
+					if (docPages != null) {
+						document.setPages(docPages.intValue());
+						pages.setValue(Util.formatInt(document.getPages()));
+					}
+				}
+			});
+		});
+		countPages.setPrompt(I18N.message("countpages"));
+		if (document.getId() != 0)
+			pages.setIcons(countPages);
+		return pages;
+	}
+
 	private void prepareRightForm() {
 		if (columns.contains(form2)) {
 			columns.removeMember(form2);
@@ -248,34 +264,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		List<FormItem> items = new ArrayList<FormItem>();
 
-		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "rating",
-				document.getRating() > 0 ? DocUtil.getRatingIcon(document.getRating())
-						: I18N.message("ratethisdocument"));
-		rating.setEndRow(true);
-		if (updateEnabled)
-			rating.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<GUIRating>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUIRating rating) {
-							if (rating != null) {
-								RatingDialog dialog = new RatingDialog(document.getRating(), rating);
-								dialog.show();
-							}
-						}
-					});
-				}
-			});
-		rating.setDisabled(!updateEnabled);
-		if (Menu.enabled(Menu.BRANDING))
-			items.add(rating);
+		addRating(items);
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);
 		language.setEndRow(true);
@@ -285,108 +274,143 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		items.add(language);
 
 		if (Feature.enabled(Feature.TAGS)) {
-			String mode = Session.get().getConfig("tag.mode");
-			final TagsDS ds = new TagsDS(null, true, document.getId(), null);
-
-			tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) document.getTags());
-			tagItem.setEndRow(true);
-			tagItem.setDisabled(!updateEnabled);
-			tagItem.addChangedHandler(changedHandler);
-
-			final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
-			newTagItem.setEndRow(true);
-			newTagItem.setRequired(false);
-			newTagItem.addKeyPressHandler(new KeyPressHandler() {
-				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
-							&& "enter".equals(event.getKeyName().toLowerCase())) {
-						String input = newTagItem.getValueAsString().trim();
-						newTagItem.clearValue();
-
-						if (!"".equals(input)) {
-							// replace the escapes \, with a string so the
-							// tokenizer will work propertly
-							input = input.replace("\\,", "__comma__");
-
-							String[] tokens = input.split("\\,");
-
-							int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
-							int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
-							boolean containsInvalid = false;
-							List<String> tags = new ArrayList<String>();
-							for (String token : tokens) {
-								String t = token.trim();
-
-								// Restore the commas inside the tag
-								t = t.replace("__comma__", ",");
-
-								if (t.length() < min || t.length() > max) {
-									containsInvalid = true;
-									continue;
-								}
-
-								tags.add(t);
-
-								// Add the old tags to the new ones
-								String[] oldVal = tagItem.getValues();
-								for (int i = 0; i < oldVal.length; i++)
-									if (!tags.contains(oldVal[i]))
-										tags.add(oldVal[i]);
-
-								// Put the new tag in the options
-								Record record = new Record();
-								record.setAttribute("index", t);
-								record.setAttribute("word", t);
-								ds.addData(record);
-							}
-
-							// Update the tag item and trigger the change
-							tagItem.setValues((Object[]) tags.toArray(new String[0]));
-							changedHandler.onChanged(null);
-
-							if (containsInvalid)
-								SC.warn(I18N.message("sometagaddedbecauseinvalid", "" + min, "" + max));
-						}
-					}
-				}
-			});
-
-			final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
-					Util.getTagsHTML(document.getTags()));
-			tagsString.setEndRow(true);
-
-			FormItemIcon editTags = new FormItemIcon();
-			editTags.setPrompt(I18N.message("edittags"));
-			editTags.setSrc("[SKIN]/actions/edit.png");
-			editTags.setWidth(16);
-			editTags.setHeight(16);
-			editTags.addFormItemClickHandler(new FormItemClickHandler() {
-				public void onFormItemClick(final FormItemIconClickEvent event) {
-					tagsString.setVisible(false);
-					tagItem.setVisible(true);
-					tagItem.setEndRow(true);
-					if (items.contains(newTagItem)) {
-						newTagItem.setVisible(true);
-						newTagItem.setEndRow(true);
-					}
-					form2.redraw();
-				}
-			});
-
-			if (updateEnabled)
-				tagsString.setIcons(editTags);
-
-			items.add(tagsString);
-			items.add(tagItem);
-			tagItem.setVisible(false);
-			newTagItem.setVisible(false);
-			if ("free".equals(mode) && updateEnabled)
-				items.add(newTagItem);
+			addTags(items);
 		}
 
 		form2.setItems(items.toArray(new FormItem[0]));
 		columns.addMember(form2);
+	}
+
+	private void addTags(List<FormItem> items) {
+		String mode = Session.get().getConfig("tag.mode");
+		final TagsDS ds = new TagsDS(null, true, document.getId(), null);
+
+		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) document.getTags());
+		tagItem.setEndRow(true);
+		tagItem.setDisabled(!updateEnabled);
+		tagItem.addChangedHandler(changedHandler);
+
+		final TextItem newTagItem = prepareNewTagItem(ds);
+
+		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
+				Util.getTagsHTML(document.getTags()));
+		tagsString.setEndRow(true);
+
+		FormItemIcon editTags = new FormItemIcon();
+		editTags.setPrompt(I18N.message("edittags"));
+		editTags.setSrc("[SKIN]/actions/edit.png");
+		editTags.setWidth(16);
+		editTags.setHeight(16);
+		editTags.addFormItemClickHandler((final FormItemIconClickEvent event) -> {
+			tagsString.setVisible(false);
+			tagItem.setVisible(true);
+			tagItem.setEndRow(true);
+			if (items.contains(newTagItem)) {
+				newTagItem.setVisible(true);
+				newTagItem.setEndRow(true);
+			}
+			form2.redraw();
+		});
+
+		if (updateEnabled)
+			tagsString.setIcons(editTags);
+
+		items.add(tagsString);
+		items.add(tagItem);
+		tagItem.setVisible(false);
+		newTagItem.setVisible(false);
+		if ("free".equals(mode) && updateEnabled)
+			items.add(newTagItem);
+	}
+
+	private TextItem prepareNewTagItem(final TagsDS ds) {
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		newTagItem.setEndRow(true);
+		newTagItem.setRequired(false);
+		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
+			if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
+					&& "enter".equals(event.getKeyName().toLowerCase())) {
+				String input = newTagItem.getValueAsString().trim();
+				newTagItem.clearValue();
+
+				if (!"".equals(input)) {
+					onAddNewTag(ds, input);
+				}
+			}
+		});
+		return newTagItem;
+	}
+
+	private void onAddNewTag(final TagsDS ds, String input) {
+		// replace the escapes \, with a string so the
+		// tokenizer will work propertly
+		input = input.replace("\\,", "__comma__");
+
+		String[] tokens = input.split("\\,");
+
+		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
+		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
+		boolean containsInvalid = false;
+		List<String> tags = new ArrayList<String>();
+		for (String token : tokens) {
+			String t = token.trim();
+
+			// Restore the commas inside the tag
+			t = t.replace("__comma__", ",");
+
+			if (t.length() < min || t.length() > max) {
+				containsInvalid = true;
+				continue;
+			}
+
+			tags.add(t);
+
+			// Add the old tags to the new ones
+			String[] oldVal = tagItem.getValues();
+			for (int i = 0; i < oldVal.length; i++)
+				if (!tags.contains(oldVal[i]))
+					tags.add(oldVal[i]);
+
+			// Put the new tag in the options
+			Record record = new Record();
+			record.setAttribute("index", t);
+			record.setAttribute("word", t);
+			ds.addData(record);
+		}
+
+		// Update the tag item and trigger the change
+		tagItem.setValues((Object[]) tags.toArray(new String[0]));
+		changedHandler.onChanged(null);
+
+		if (containsInvalid)
+			SC.warn(I18N.message("sometagaddedbecauseinvalid", "" + min, "" + max));
+	}
+
+	private void addRating(List<FormItem> items) {
+		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "rating",
+				document.getRating() > 0 ? DocUtil.getRatingIcon(document.getRating())
+						: I18N.message("ratethisdocument"));
+		rating.setEndRow(true);
+		if (updateEnabled)
+			rating.addClickHandler((ClickEvent event) -> {
+				DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<GUIRating>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIRating rating) {
+						if (rating != null) {
+							RatingDialog dialog = new RatingDialog(document.getRating(), rating);
+							dialog.show();
+						}
+					}
+				});
+			});
+		rating.setDisabled(!updateEnabled);
+		if (Menu.enabled(Menu.BRANDING))
+			items.add(rating);
 	}
 
 	@SuppressWarnings("unchecked")
