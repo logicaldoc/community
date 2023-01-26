@@ -72,26 +72,44 @@ public class UserInterfacePanel extends HLayout {
 
 		layout.addMember(form1, 1);
 
-		SelectItem welcomeScreen = ItemFactory.newWelcomeScreenSelector(user.getWelcomeScreen());
-		welcomeScreen.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
-		if (!readonly)
-			welcomeScreen.addChangedHandler(changedHandler);
+		SelectItem welcomeScreen = prepareWelcomeScreenSelector(readonly);
+
+		SelectItem defaultWorkspace = prepareDefaultWorkspaceSelectot(readonly);
+
+		PickerIcon clearIcon = prepareClearPickerIcon(readonly);
+
+		StaticTextItem docsGrid = prepreDocsGridLayoutItem(readonly, clearIcon);
+
+		StaticTextItem hitsGrid = prepareHitsGridLayoutItem(readonly, clearIcon);
+
+		TextItem dateFormat = ItemFactory.newTextItem("dateFormat", "dateformat", user.getDateFormat());
+		TextItem dateFormatShort = ItemFactory.newTextItem("dateFormatShort", "dateformatshort",
+				user.getDateFormatShort());
+		TextItem dateFormatLong = ItemFactory.newTextItem("dateFormatLong", "dateformatlong", user.getDateFormatLong());
+
+		form1.setItems(welcomeScreen, defaultWorkspace, docsGrid, hitsGrid, dateFormat, dateFormatShort,
+				dateFormatLong);
+
+		addMember(layout);
+	}
+
+	private SelectItem prepareDefaultWorkspaceSelectot(boolean readonly) {
 		SelectItem defaultWorkspace = ItemFactory.newWorkspaceSelector(user.getDefaultWorkspace());
 		defaultWorkspace.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
 		if (!readonly)
 			defaultWorkspace.addChangedHandler(changedHandler);
+		return defaultWorkspace;
+	}
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				event.getItem().setValue(I18N.message("notcustomized"));
-				changedHandler.onChanged(null);
-			}
-		});
-		clear.setWidth(12);
-		clear.setHeight(12);
-		clear.setDisabled(readonly);
+	private SelectItem prepareWelcomeScreenSelector(boolean readonly) {
+		SelectItem welcomeScreen = ItemFactory.newWelcomeScreenSelector(user.getWelcomeScreen());
+		welcomeScreen.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
+		if (!readonly)
+			welcomeScreen.addChangedHandler(changedHandler);
+		return welcomeScreen;
+	}
 
+	private StaticTextItem prepreDocsGridLayoutItem(boolean readonly, PickerIcon clearIcon) {
 		StaticTextItem docsGrid = ItemFactory.newStaticTextItem("docsgrid", "docsgridlayout",
 				user.getDocsGrid() != null && !user.getDocsGrid().isEmpty() ? I18N.message("customized")
 						: I18N.message("notcustomized"));
@@ -100,28 +118,28 @@ public class UserInterfacePanel extends HLayout {
 		editDocsLayout.setPrompt(I18N.message("editlayout"));
 		editDocsLayout.setWidth(12);
 		editDocsLayout.setHeight(12);
-		editDocsLayout.addFormItemClickHandler(new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"),
-						null);
-				textArea.setHeight(300);
-				LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
-						user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								if (!readonly) {
-									user.setDocsGrid(value);
-									changedHandler.onChanged(null);
-									docsGrid.setValue(value != null && !value.isEmpty() ? I18N.message("customized")
-											: I18N.message("notcustomized"));
-								}
+		editDocsLayout.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"), null);
+			textArea.setHeight(300);
+			LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
+					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, new ValueCallback() {
+						@Override
+						public void execute(final String value) {
+							if (!readonly) {
+								user.setDocsGrid(value);
+								changedHandler.onChanged(null);
+								docsGrid.setValue(value != null && !value.isEmpty() ? I18N.message("customized")
+										: I18N.message("notcustomized"));
 							}
-						});
-				event.cancel();
-			}
+						}
+					});
+			event.cancel();
 		});
+		docsGrid.setIcons(editDocsLayout, clearIcon);
+		return docsGrid;
+	}
 
+	private StaticTextItem prepareHitsGridLayoutItem(boolean readonly, PickerIcon clearIcon) {
 		StaticTextItem hitsGrid = ItemFactory.newStaticTextItem("hitsgrid", "hitsgridlayout",
 				user.getHitsGrid() != null && !user.getHitsGrid().isEmpty() ? I18N.message("customized")
 						: I18N.message("notcustomized"));
@@ -137,63 +155,67 @@ public class UserInterfacePanel extends HLayout {
 						null);
 				textArea.setHeight(300);
 				LD.askForValue(I18N.message("hitsgridlayout"), I18N.message("hitsgridlayout"),
-						user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400, new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								if (!readonly) {
-									user.setHitsGrid(value);
-									changedHandler.onChanged(null);
-									hitsGrid.setValue(value != null && !value.isEmpty() ? I18N.message("customized")
-											: I18N.message("notcustomized"));
-								}
+						user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400, (final String value) -> {
+							if (!readonly) {
+								user.setHitsGrid(value);
+								changedHandler.onChanged(null);
+								hitsGrid.setValue(value != null && !value.isEmpty() ? I18N.message("customized")
+										: I18N.message("notcustomized"));
 							}
 						});
 				event.cancel();
 			}
 		});
+		hitsGrid.setIcons(editHitsLayout, clearIcon);
+		return hitsGrid;
+	}
 
-		docsGrid.setIcons(editDocsLayout, clear);
-		hitsGrid.setIcons(editHitsLayout, clear);
-		
-		TextItem dateFormat = ItemFactory.newTextItem("dateFormat", "dateformat", user.getDateFormat());
-		TextItem dateFormatShort = ItemFactory.newTextItem("dateFormatShort", "dateformatshort", user.getDateFormatShort());
-		TextItem dateFormatLong = ItemFactory.newTextItem("dateFormatLong", "dateformatlong", user.getDateFormatLong());
-
-		form1.setItems(welcomeScreen, defaultWorkspace, docsGrid, hitsGrid, dateFormat, dateFormatShort, dateFormatLong);
-
-		addMember(layout);
+	private PickerIcon prepareClearPickerIcon(boolean readonly) {
+		PickerIcon clearIcon = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			event.getItem().setValue(I18N.message("notcustomized"));
+			changedHandler.onChanged(null);
+		});
+		clearIcon.setWidth(12);
+		clearIcon.setHeight(12);
+		clearIcon.setDisabled(readonly);
+		return clearIcon;
 	}
 
 	boolean validate() {
-		vm.validate();
-		if (!vm.hasErrors()) {
-			user.setWelcomeScreen(Integer.parseInt(vm.getValueAsString("welcomescreen")));
-			String str = vm.getValueAsString("workspace");
-			if (str != null && !str.isEmpty())
-				user.setDefaultWorkspace(Long.parseLong(str));
+		if (!vm.validate())
+			return false;
 
-			if (vm.getValueAsString("docsgrid") == null || vm.getValueAsString("docsgrid").isEmpty()
-					|| I18N.message("notcustomized").equals(vm.getValueAsString("docsgrid")))
-				user.setDocsGrid(null);
-			if (vm.getValueAsString("hitsgrid") == null || vm.getValueAsString("hitsgrid").isEmpty()
-					|| I18N.message("notcustomized").equals(vm.getValueAsString("hitsgrid")))
-				user.setHitsGrid(null);
-			
-			if (vm.getValueAsString("dateFormat") == null || vm.getValueAsString("dateFormat").isEmpty())
-				user.setDateFormat(null);
-			else
-				user.setDateFormat(vm.getValueAsString("dateFormat"));
-			
-			if (vm.getValueAsString("dateFormatShort") == null || vm.getValueAsString("dateFormatShort").isEmpty())
-				user.setDateFormatShort(null);
-			else
-				user.setDateFormatShort(vm.getValueAsString("dateFormatShort"));
-			
-			if (vm.getValueAsString("dateFormatLong") == null || vm.getValueAsString("dateFormatLong").isEmpty())
-				user.setDateFormatLong(null);
-			else
-				user.setDateFormatLong(vm.getValueAsString("dateFormatLong"));
-		}
+		collectValues();
+
 		return !vm.hasErrors();
+	}
+
+	private void collectValues() {
+		user.setWelcomeScreen(Integer.parseInt(vm.getValueAsString("welcomescreen")));
+		String str = vm.getValueAsString("workspace");
+		if (str != null && !str.isEmpty())
+			user.setDefaultWorkspace(Long.parseLong(str));
+
+		if (vm.getValueAsString("docsgrid") == null || vm.getValueAsString("docsgrid").isEmpty()
+				|| I18N.message("notcustomized").equals(vm.getValueAsString("docsgrid")))
+			user.setDocsGrid(null);
+		if (vm.getValueAsString("hitsgrid") == null || vm.getValueAsString("hitsgrid").isEmpty()
+				|| I18N.message("notcustomized").equals(vm.getValueAsString("hitsgrid")))
+			user.setHitsGrid(null);
+
+		if (vm.getValueAsString("dateFormat") == null || vm.getValueAsString("dateFormat").isEmpty())
+			user.setDateFormat(null);
+		else
+			user.setDateFormat(vm.getValueAsString("dateFormat"));
+
+		if (vm.getValueAsString("dateFormatShort") == null || vm.getValueAsString("dateFormatShort").isEmpty())
+			user.setDateFormatShort(null);
+		else
+			user.setDateFormatShort(vm.getValueAsString("dateFormatShort"));
+
+		if (vm.getValueAsString("dateFormatLong") == null || vm.getValueAsString("dateFormatLong").isEmpty())
+			user.setDateFormatLong(null);
+		else
+			user.setDateFormatLong(vm.getValueAsString("dateFormatLong"));
 	}
 }

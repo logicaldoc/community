@@ -12,7 +12,6 @@ import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridComponent;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -67,69 +66,7 @@ public class FolderCopyDialog extends Dialog {
 		CheckboxItem foldersOnly = ItemFactory.newCheckbox("foldersOnly", "copyfoldersonly");
 		foldersOnly.setValue(false);
 
-		ButtonItem copy = new ButtonItem(I18N.message("copy"));
-		copy.setAutoFit(true);
-		copy.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if (!form.validate())
-					return;
-
-				if (folders.getSelectedRecord() == null
-						|| folders.getSelectedRecord().getAttributeAsString("folderId") == null) {
-					GuiLog.warn(I18N.message("choosetargetfolder"), null);
-					return;
-				}
-
-				long tagetFolderId = Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId"));
-
-				if (selectedSourceIds.length == 1) {
-					FolderService.Instance.get().getFolder(selectedSourceIds[0], false, false, false,
-							new AsyncCallback<GUIFolder>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(GUIFolder sourceFolder) {
-									sourceFolder.setName(form.getValueAsString("name"));
-									sourceFolder.setPermissions(new String[] { "read", "write" });
-
-									FolderCopyDetailsDialog dialog = new FolderCopyDetailsDialog(sourceFolder,
-											tagetFolderId, form.getValueAsString("security"),
-											"true".equals(form.getValueAsString("foldersOnly")));
-									dialog.show();
-									hide();
-									destroy();
-								}
-							});
-				} else {
-					String label = FolderNavigator.get().getSelectedRecord().getAttributeAsString("name");
-					label = selectedSourceIds.length + " " + I18N.message("folders").toLowerCase();
-
-					LD.ask(I18N.message("copy"),
-							I18N.message("copyask",
-									new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
-							new BooleanCallback() {
-
-								@Override
-								public void execute(Boolean value) {
-									if (value) {
-										FolderNavigator.get().copyTo(tagetFolderId,
-												"true".equals(form.getValueAsString("foldersOnly")),
-												!securityOptionEnabled ? "inheritparentsec"
-														: form.getValueAsString("security"));
-										hide();
-										destroy();
-									}
-								}
-							});
-				}
-			}
-		});
+		ButtonItem copy = prepareCopyButton(folders, selectedSourceIds, securityOptionEnabled, form);
 
 		if (securityOptionEnabled)
 			form.setItems(name, foldersOnly, securityOption, copy);
@@ -149,5 +86,74 @@ public class FolderCopyDialog extends Dialog {
 		stack.setSections(section);
 
 		addItem(stack);
+	}
+
+	private ButtonItem prepareCopyButton(TreeGrid folders, long[] selectedSourceIds,
+			final boolean securityOptionEnabled, final DynamicForm form) {
+		ButtonItem copy = new ButtonItem(I18N.message("copy"));
+		copy.setAutoFit(true);
+		copy.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			if (!form.validate())
+				return;
+
+			if (folders.getSelectedRecord() == null
+					|| folders.getSelectedRecord().getAttributeAsString("folderId") == null) {
+				GuiLog.warn(I18N.message("choosetargetfolder"), null);
+				return;
+			}
+
+			long tagetFolderId = Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId"));
+
+			if (selectedSourceIds.length == 1) {
+				copySingleFolder(selectedSourceIds[0], form, tagetFolderId);
+			} else {
+				copyMultipleFolders(folders, selectedSourceIds, securityOptionEnabled, form, tagetFolderId);
+			}
+		});
+		return copy;
+	}
+
+	private void copyMultipleFolders(TreeGrid folders, long[] selectedSourceIds, final boolean securityOptionEnabled,
+			final DynamicForm form, long tagetFolderId) {
+		String label = FolderNavigator.get().getSelectedRecord().getAttributeAsString("name");
+		label = selectedSourceIds.length + " " + I18N.message("folders").toLowerCase();
+
+		LD.ask(I18N.message("copy"),
+				I18N.message("copyask",
+						new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
+				(Boolean yes) -> {
+					if (yes) {
+						FolderNavigator.get().copyTo(tagetFolderId,
+								"true".equals(form.getValueAsString("foldersOnly")),
+								!securityOptionEnabled ? "inheritparentsec"
+										: form.getValueAsString("security"));
+						hide();
+						destroy();
+					}
+				});
+	}
+
+	private void copySingleFolder(long selectedSourceId, final DynamicForm form, long tagetFolderId) {
+		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false,
+				new AsyncCallback<GUIFolder>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIFolder sourceFolder) {
+						sourceFolder.setName(form.getValueAsString("name"));
+						sourceFolder.setPermissions(new String[] { "read", "write" });
+
+						FolderCopyDetailsDialog dialog = new FolderCopyDetailsDialog(sourceFolder,
+								tagetFolderId, form.getValueAsString("security"),
+								"true".equals(form.getValueAsString("foldersOnly")));
+						dialog.show();
+						hide();
+						destroy();
+					}
+				});
 	}
 }

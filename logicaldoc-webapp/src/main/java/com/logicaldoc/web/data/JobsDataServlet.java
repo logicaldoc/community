@@ -35,12 +35,14 @@ import com.logicaldoc.util.Context;
 public class JobsDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	protected static Logger logger = LoggerFactory.getLogger(JobsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
+
+		int maxRecords = max != null ? max : 100;
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -76,7 +78,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 			try {
 				for (Trigger trigger : jobManager.getTriggers(group,
 						session.getTenantId() == Tenant.DEFAULT_ID ? null : session.getTenantId())) {
-					if (count++ >= max)
+					if (count++ >= maxRecords)
 						break;
 
 					writer.print("<job>");
@@ -84,7 +86,8 @@ public class JobsDataServlet extends AbstractDataServlet {
 					writer.print("<group><![CDATA[" + trigger.getJobKey().getGroup() + "]]></group>");
 					writer.print("<trigger><![CDATA[" + trigger.getKey().getName() + "]]></trigger>");
 					if (trigger.getJobDataMap() != null && trigger.getJobDataMap().containsKey(JobManager.TENANT_ID)) {
-						writer.print("<tenantId>" + trigger.getJobDataMap().getLong(JobManager.TENANT_ID) + "</tenantId>");
+						writer.print(
+								"<tenantId>" + trigger.getJobDataMap().getLong(JobManager.TENANT_ID) + "</tenantId>");
 						writer.print("<tenant><![CDATA["
 								+ tenants.get(trigger.getJobDataMap().getLong(JobManager.TENANT_ID)) + "]]></tenant>");
 					}

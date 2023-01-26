@@ -144,75 +144,34 @@ public class TrashPanel extends VLayout {
 
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
+		restore.addClickHandler((MenuItemClickEvent event) -> {
 
-				if ("document".equals(records[0].getAttribute("type")))
-					restoreDocument(Long.parseLong(records[0].getAttribute("id")));
-				else
-					restoreFolder(Long.parseLong(records[0].getAttribute("id")));
-			}
+			if ("document".equals(records[0].getAttribute("type")))
+				restoreDocument(Long.parseLong(records[0].getAttribute("id")));
+			else
+				restoreFolder(Long.parseLong(records[0].getAttribute("id")));
 		});
 
-		MenuItem remove = new MenuItem();
-		remove.setTitle(I18N.message("remove"));
-		remove.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final List<Long> docIds = new ArrayList<Long>();
-				final List<Long> folderIds = new ArrayList<Long>();
-				for (ListGridRecord record : records) {
-					if ("document".equals(record.getAttribute("type")))
-						docIds.add(Long.parseLong(record.getAttribute("id")));
-					else
-						folderIds.add(Long.parseLong(record.getAttribute("id")));
-				}
+		MenuItem remove = prepareRemoveItem(records);
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							if (!docIds.isEmpty())
-								DocumentService.Instance.get().deleteFromTrash(docIds.toArray(new Long[0]),
-										new AsyncCallback<Void>() {
+		MenuItem emptyTrash = prepareEmptyTrashItem();
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+		restore.setEnabled(records.length == 1);
 
-											@Override
-											public void onSuccess(Void arg) {
-												refresh();
-											}
-										});
-							if (!folderIds.isEmpty())
-								FolderService.Instance.get().deleteFromTrash(folderIds.toArray(new Long[0]),
-										new AsyncCallback<Void>() {
+		contextMenu.setItems(restore, remove, emptyTrash);
+		contextMenu.showContextMenu();
+	}
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void arg) {
-												refresh();
-											}
-										});
-						}
-					}
-				});
-			}
-		});
-
+	private MenuItem prepareEmptyTrashItem() {
 		MenuItem emptyTrash = new MenuItem();
 		emptyTrash.setTitle(I18N.message("emptytrash"));
 		emptyTrash.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), new BooleanCallback() {
 					@Override
-					public void execute(Boolean value) {
-						if (value) {
+					public void execute(Boolean response) {
+						if (response) {
 							DocumentService.Instance.get().emptyTrash(new AsyncCallback<Void>() {
 
 								@Override
@@ -230,10 +189,59 @@ public class TrashPanel extends VLayout {
 				});
 			}
 		});
+		return emptyTrash;
+	}
 
-		restore.setEnabled(records.length == 1);
+	private MenuItem prepareRemoveItem(final ListGridRecord[] records) {
+		MenuItem remove = new MenuItem();
+		remove.setTitle(I18N.message("remove"));
+		remove.addClickHandler((MenuItemClickEvent clickEvent) -> {
+				deleteSelectedElements(records);
+		});
+		return remove;
+	}
 
-		contextMenu.setItems(restore, remove, emptyTrash);
-		contextMenu.showContextMenu();
+	private void deleteSelectedElements(final ListGridRecord[] records) {
+		final List<Long> docIds = new ArrayList<Long>();
+		final List<Long> folderIds = new ArrayList<Long>();
+		for (ListGridRecord record : records) {
+			if ("document".equals(record.getAttribute("type")))
+				docIds.add(Long.parseLong(record.getAttribute("id")));
+			else
+				folderIds.add(Long.parseLong(record.getAttribute("id")));
+		}
+
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean response) -> {
+			if (response) {
+				if (!docIds.isEmpty())
+					DocumentService.Instance.get().deleteFromTrash(docIds.toArray(new Long[0]),
+							new AsyncCallback<Void>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(Void arg) {
+									refresh();
+								}
+							});
+				if (!folderIds.isEmpty())
+					FolderService.Instance.get().deleteFromTrash(folderIds.toArray(new Long[0]),
+							new AsyncCallback<Void>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(Void arg) {
+									refresh();
+								}
+							});
+			}
+		});
 	}
 }

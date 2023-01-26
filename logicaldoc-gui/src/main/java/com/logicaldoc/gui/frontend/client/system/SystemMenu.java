@@ -43,63 +43,20 @@ public class SystemMenu extends VLayout {
 		setMembersMargin(5);
 		setOverflow(Overflow.AUTO);
 
-		Button general = new Button(I18N.message("general"));
-		general.setWidth100();
-		general.setHeight(25);
+		addGeneralButton();
 
-		if (Menu.enabled(Menu.GENERAL))
-			addMember(general);
+		addTasksButton();
 
-		Button tasks = new Button(I18N.message("scheduledtasks"));
-		tasks.setWidth100();
-		tasks.setHeight(25);
-		addMember(tasks);
+		addBrandingButton();
 
-		Button branding = new Button(I18N.message("branding"));
-		branding.setWidth100();
-		branding.setHeight(25);
-		if (Feature.visible(Feature.BRANDING_STANDARD) && Menu.enabled(Menu.BRANDING)) {
-			addMember(branding);
-			if (!Feature.enabled(Feature.BRANDING_STANDARD)) {
-				branding.setDisabled(true);
-				branding.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
+		addClusteringButton();
 
-		Button clustering = new Button(I18N.message("clustering"));
-		clustering.setWidth100();
-		clustering.setHeight(25);
-		if (Feature.visible(Feature.CLUSTERING) && Menu.enabled(Menu.CLUSTERING) && Session.get().isDefaultTenant()) {
-			addMember(clustering);
-			if (!Feature.enabled(Feature.CLUSTERING)) {
-				clustering.setDisabled(true);
-				clustering.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
+		addTenantsButton();
 
-		Button tenants = new Button(I18N.message("tenants"));
-		tenants.setWidth100();
-		tenants.setHeight(25);
-		if (Feature.visible(Feature.MULTI_TENANT) && Menu.enabled(Menu.TENANTS) && Session.get().isDefaultTenant()) {
-			addMember(tenants);
-			if (!Feature.enabled(Feature.MULTI_TENANT)) {
-				tenants.setDisabled(true);
-				tenants.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
+		Button updates = addUpdatesButton();
+		
 
-		final Button updates = new Button(I18N.message("updatesandpatches"));
-		updates.setWidth100();
-		updates.setHeight(25);
-		updates.setVisible(false);
-		addMember(updates);
-
-		final Button confirmUpdate = new Button(
-				"<span style='color:red;'><b>" + I18N.message("confirmupdate") + "</b></span>");
-		confirmUpdate.setWidth100();
-		confirmUpdate.setHeight(25);
-		confirmUpdate.setVisible(false);
-		addMember(confirmUpdate);
+		Button confirmUpdate = addConfirmUpdate(updates);
 
 		if ((Feature.enabled(Feature.UPDATES) || Feature.enabled(Feature.PATCHES))
 				&& Menu.enabled(Menu.UPDATES_AND_PATCHES) && Session.get().isDefaultTenant()) {
@@ -111,99 +68,22 @@ public class SystemMenu extends VLayout {
 			}
 		}
 
-		final Button license = new Button(I18N.message("license"));
-		license.setWidth100();
-		license.setHeight(25);
-		if (Session.get().isDefaultTenant() && "admin".equals(Session.get().getUser().getUsername())
-				&& !Session.get().isDemo() && Feature.enabled(Feature.LICENSE)) {
-			addMember(license);
-		}
+		addLicenseButton();
+		
+		addRestartButton();
 
+		addInformations();
+	}
+
+	private void addRestartButton() {
 		final Button restart = new Button(I18N.message("restart"));
 		restart.setWidth100();
 		restart.setHeight(25);
-		if (Menu.enabled(Menu.RESTART) && Session.get().isDefaultTenant()) {
-			addMember(restart);
-		}
-
-		if (Session.get().isDemo()) {
-			clustering.setDisabled(true);
-			tenants.setDisabled(true);
-			updates.setDisabled(true);
-			branding.setDisabled(true);
-			restart.setDisabled(true);
-			license.setDisabled(true);
-		}
-
-		if (!Session.get().isDefaultTenant()) {
-			clustering.setVisible(false);
-			tenants.setVisible(false);
-			updates.setVisible(false);
-			confirmUpdate.setVisible(false);
-			restart.setVisible(false);
-			license.setVisible(false);
-		}
-
-		addInformations();
-
-		general.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new GeneralPanel());
-			}
-		});
-
-		tasks.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new TasksPanel());
-			}
-		});
-
-		updates.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new UpdateAndPatchPanel());
-			}
-		});
-
-		license.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				WindowUtils.openUrlInNewTab(Util.licenseUrl());
-			}
-		});
-
-		confirmUpdate.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void arg) {
-						Session.get().getInfo().setConfig("runlevel", "default");
-						confirmUpdate.setVisible(false);
-						updates.setVisible(true);
-
-						SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
-					}
-				});
-			}
-		});
-
 		restart.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				SC.ask(I18N.message("restartalert"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean choice) {
-						if (choice) {
+				SC.ask(I18N.message("restartalert"), (Boolean yes) -> {
+						if (yes) {
 							SystemService.Instance.get().restart(new AsyncCallback<Void>() {
 
 								@Override
@@ -229,31 +109,147 @@ public class SystemMenu extends VLayout {
 								}
 							});
 						}
-					}
 				});
 			}
 		});
+		if (Menu.enabled(Menu.RESTART) && Session.get().isDefaultTenant()) {
+			addMember(restart);
+		}
+		restart.setDisabled(Session.get().isDemo());
+		restart.setVisible(Session.get().isDefaultTenant());
+	}
 
-		clustering.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new ClusteringPanel());
-			}
+	private void addLicenseButton() {
+		final Button license = new Button(I18N.message("license"));
+		license.setWidth100();
+		license.setHeight(25);
+		license.addClickHandler((ClickEvent event) ->  {
+				WindowUtils.openUrlInNewTab(Util.licenseUrl());
 		});
+		if (Session.get().isDefaultTenant() && "admin".equals(Session.get().getUser().getUsername())
+				&& !Session.get().isDemo() && Feature.enabled(Feature.LICENSE)) {
+			addMember(license);
+		}
+		license.setDisabled(Session.get().isDemo());
+		license.setVisible(Session.get().isDefaultTenant());
+	}
 
+	private Button addConfirmUpdate(Button updates) {
+		Button confirmUpdate = new Button(
+				"<span style='color:red;'><b>" + I18N.message("confirmupdate") + "</b></span>");
+		confirmUpdate.setWidth100();
+		confirmUpdate.setHeight(25);
+		confirmUpdate.addClickHandler((ClickEvent event) -> {
+				SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void arg) {
+						Session.get().getInfo().setConfig("runlevel", "default");
+						confirmUpdate.setVisible(false);
+						updates.setVisible(true);
+
+						SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
+					}
+				});
+		});
+		addMember(confirmUpdate);
+		confirmUpdate.setVisible(Session.get().isDefaultTenant());
+		return confirmUpdate;
+	}
+
+	private Button addUpdatesButton() {
+		Button updates = new Button(I18N.message("updatesandpatches"));
+		updates.setWidth100();
+		updates.setHeight(25);
+		updates.addClickHandler((ClickEvent event) -> {
+				AdminScreen.get().setContent(new UpdateAndPatchPanel());
+		});
+		addMember(updates);
+		updates.setDisabled(Session.get().isDemo());
+		updates.setVisible(Session.get().isDefaultTenant());
+		return updates;
+	}
+
+	private void addTenantsButton() {
+		Button tenants = new Button(I18N.message("tenants"));
+		tenants.setWidth100();
+		tenants.setHeight(25);
 		tenants.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new TenantsPanel());
 			}
 		});
-
-		branding.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId()));
+		if (Feature.visible(Feature.MULTI_TENANT) && Menu.enabled(Menu.TENANTS) && Session.get().isDefaultTenant()) {
+			addMember(tenants);
+			if (!Feature.enabled(Feature.MULTI_TENANT)) {
+				tenants.setDisabled(true);
+				tenants.setTooltip(I18N.message("featuredisabled"));
 			}
+		}
+		tenants.setDisabled(Session.get().isDemo());
+		tenants.setVisible(Session.get().isDefaultTenant());
+	}
+
+	private void addClusteringButton() {
+		Button clustering = new Button(I18N.message("clustering"));
+		clustering.setWidth100();
+		clustering.setHeight(25);
+		clustering.addClickHandler((ClickEvent event) -> {
+				AdminScreen.get().setContent(new ClusteringPanel());
 		});
+		if (Feature.visible(Feature.CLUSTERING) && Menu.enabled(Menu.CLUSTERING) && Session.get().isDefaultTenant()) {
+			addMember(clustering);
+			if (!Feature.enabled(Feature.CLUSTERING)) {
+				clustering.setDisabled(true);
+				clustering.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+		clustering.setDisabled(Session.get().isDemo());
+		clustering.setVisible(Session.get().isDefaultTenant());
+	}
+
+	private void addBrandingButton() {
+		Button branding = new Button(I18N.message("branding"));
+		branding.setWidth100();
+		branding.setHeight(25);
+		branding.addClickHandler((ClickEvent event) -> {
+				AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId()));
+		});
+		if (Feature.visible(Feature.BRANDING_STANDARD) && Menu.enabled(Menu.BRANDING)) {
+			addMember(branding);
+			if (!Feature.enabled(Feature.BRANDING_STANDARD)) {
+				branding.setDisabled(true);
+				branding.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+		branding.setDisabled(Session.get().isDemo());
+	}
+
+	private void addTasksButton() {
+		Button tasks = new Button(I18N.message("scheduledtasks"));
+		tasks.setWidth100();
+		tasks.setHeight(25);
+		tasks.addClickHandler((ClickEvent event) -> {
+				AdminScreen.get().setContent(new TasksPanel());
+		});
+		addMember(tasks);
+	}
+
+	private void addGeneralButton() {
+		Button general = new Button(I18N.message("general"));
+		general.setWidth100();
+		general.setHeight(25);
+		general.addClickHandler((ClickEvent event) -> {
+				AdminScreen.get().setContent(new GeneralPanel());
+		});
+		if (Menu.enabled(Menu.GENERAL))
+			addMember(general);
 	}
 
 	private void addInformations() {

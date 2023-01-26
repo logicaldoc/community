@@ -22,10 +22,7 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -53,34 +50,20 @@ public class DocumentsListPanel extends VLayout {
 	public DocumentsListPanel(GUIFolder folder, int visualizationMode) {
 		this.visualizationMode = visualizationMode;
 
+		addCursor(folder);
+
 		if (visualizationMode == DocumentsGrid.MODE_LIST)
 			grid = new NavigatorDocumentsGrid(folder);
 		else if (visualizationMode == DocumentsGrid.MODE_GALLERY) {
 			grid = new DocumentsTileGrid(folder);
 		}
-
-		// Prepare a panel containing a title and the documents list
-		cursor = new Cursor(true, false);
-		cursor.setTotalRecords(folder.getDocumentCount());
-
-		cursor.registerPageSizeChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				DocumentsPanel.get().changePageSize(cursor.getPageSize());
-			}
-		});
-		cursor.registerPageChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				DocumentsPanel.get().changePageSize(cursor.getPageSize());
-			}
-		});
-
-		addMember(cursor);
 		addMember((Canvas) grid);
-
 		grid.setGridCursor(cursor);
 
+		registerGridHandlers();
+	}
+
+	private void registerGridHandlers() {
 		grid.registerDoubleClickHandler(new DoubleClickHandler() {
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {
@@ -113,36 +96,43 @@ public class DocumentsListPanel extends VLayout {
 			}
 		});
 
-		grid.registerSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				// Avoid server load in case of multiple selections
-				if (grid.getSelectedCount() != 1)
-					return;
-				DocumentService.Instance.get().getById(grid.getSelectedDocument().getId(),
-						new AsyncCallback<GUIDocument>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		grid.registerSelectionChangedHandler((SelectionEvent event) -> {
+			// Avoid server load in case of multiple selections
+			if (grid.getSelectedCount() != 1)
+				return;
+			DocumentService.Instance.get().getById(grid.getSelectedDocument().getId(),
+					new AsyncCallback<GUIDocument>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIDocument doc) {
-								DocumentController.get().setCurrentDocument(doc);
-							}
-						});
-			}
+						@Override
+						public void onSuccess(GUIDocument doc) {
+							DocumentController.get().setCurrentDocument(doc);
+						}
+					});
 		});
 
-		grid.registerCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new ContextMenu(FolderController.get().getCurrentFolder(), grid);
-				contextMenu.showContextMenu();
-				if (event != null)
-					event.cancel();
-			}
+		grid.registerCellContextClickHandler((CellContextClickEvent event) -> {
+			Menu contextMenu = new ContextMenu(FolderController.get().getCurrentFolder(), grid);
+			contextMenu.showContextMenu();
+			if (event != null)
+				event.cancel();
 		});
+	}
+
+	private void addCursor(GUIFolder folder) {
+		// Prepare a panel containing a title and the documents list
+		cursor = new Cursor(true, false);
+		cursor.setTotalRecords(folder.getDocumentCount());
+		cursor.registerPageSizeChangedHandler((ChangedEvent event) -> {
+			DocumentsPanel.get().changePageSize(cursor.getPageSize());
+		});
+		cursor.registerPageChangedHandler((ChangedEvent event) -> {
+			DocumentsPanel.get().changePageSize(cursor.getPageSize());
+		});
+		addMember(cursor);
 	}
 
 	/**

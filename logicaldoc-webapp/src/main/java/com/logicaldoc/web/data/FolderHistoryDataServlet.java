@@ -28,7 +28,7 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
 		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
@@ -47,7 +47,8 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, max);
+		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null,
+				max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document

@@ -267,109 +267,135 @@ public abstract class FolderSearchForm extends VLayout {
 
 		options.setType(GUISearchOptions.TYPE_FOLDERS);
 
-		if (values.containsKey("template") && values.get("template") != null
-				&& !((String) values.get("template")).isEmpty())
-			options.setTemplate(Long.parseLong((String) values.get("template")));
+		setTemplateOption(values, options);
 
 		options.setTopOperator((String) values.get("match"));
 
-		if (folder != null) {
-			options.setFolder(folder.getFolderId());
-			options.setFolderName(folder.getFolderName());
-		}
-
 		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
 
-		List<GUICriterion> list = new ArrayList<GUICriterion>();
+		List<GUICriterion> criteria = new ArrayList<GUICriterion>();
 		if (conditionsLayout.getMembers() != null)
 			for (Canvas canvas : conditionsLayout.getMembers()) {
 				ParameterConditionRow condition = (ParameterConditionRow) canvas;
-				String fieldName = condition.getAttributeFieldItem().getValueAsString();
-				fieldName = fieldName.replace(Constants.BLANK_PLACEHOLDER, " ");
-				if (fieldName.startsWith("_"))
-					fieldName = fieldName.substring(1);
-				String fieldOperator = condition.getOperatorsFieldItem().getValueAsString();
-				Object fieldValue = condition.getValueFieldItem().getValue();
-
-				// This lines are necessary to avoid error for GWT values type.
-				if (condition.getValueFieldItem() instanceof IntegerItem)
-					fieldValue = Long.parseLong(fieldValue.toString());
-				if (condition.getValueFieldItem() instanceof UserSelector)
-					fieldValue = ((UserSelector) condition.getValueFieldItem()).getUser().getId();
-				if (condition.getValueFieldItem() instanceof FolderSelector)
-					fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
-
-				if (fieldName.endsWith("type:" + GUIAttribute.TYPE_INT)
-						|| fieldName.endsWith("type:" + GUIAttribute.TYPE_USER)
-						|| fieldName.endsWith("type:" + GUIAttribute.TYPE_FOLDER))
-					fieldValue = Long.parseLong(fieldValue.toString());
-				else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DOUBLE))
-					fieldValue = Double.parseDouble(fieldValue.toString());
-				else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN))
-					fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
-				else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DATE))
-					fieldValue = (Date) fieldValue;
-				else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
-					fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_PRESET,
-							"type:" + GUIAttribute.TYPE_STRING);
-				} else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_TEXTAREA)) {
-					fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_TEXTAREA,
-							"type:" + GUIAttribute.TYPE_STRING);
-				}
-
-				GUICriterion criterion = new GUICriterion();
-				criterion.setField(fieldName);
-
-				if (fieldValue instanceof Date)
-					criterion.setDateValue((Date) fieldValue);
-				else if (fieldValue instanceof Integer)
-					criterion.setLongValue(((Integer) fieldValue).longValue());
-				else if (fieldValue instanceof Long)
-					criterion.setLongValue((Long) fieldValue);
-				else if (fieldValue instanceof Float)
-					criterion.setDoubleValue(((Float) fieldValue).doubleValue());
-				else if (fieldValue instanceof Double)
-					criterion.setDoubleValue((Double) fieldValue);
-				else if (fieldValue instanceof String)
-					criterion.setStringValue((String) fieldValue);
-				else if (fieldValue instanceof JavaScriptObject) {
-					JSOHelper.convertToMap((JavaScriptObject) fieldValue);
-				}
-
-				criterion.setOperator(fieldOperator.toLowerCase());
-
-				if (!fieldName.equals("tags")) {
-					list.add(criterion);
-				} else {
-					// In case of tags, we will have to create a criterion per
-					// tag
-					if (fieldName.equals("tags")) {
-						String[] tgs = ((SelectItem) condition.getValueFieldItem()).getValues();
-						for (String tag : tgs) {
-							GUICriterion c = new GUICriterion();
-							c.setField(fieldName);
-							c.setOperator(fieldOperator.toLowerCase());
-							c.setStringValue(tag);
-							list.add(c);
-						}
-					}
-				}
+				addCriterion(condition, criteria);
 			}
 
-		if (options.getFolder() != null) {
+		addFolderCriterion(options, criteria);
+
+		options.setCriteria(criteria.toArray(new GUICriterion[0]));
+
+		return options;
+	}
+
+	private void addCriterion(ParameterConditionRow condition, List<GUICriterion> criteria) {
+		GUICriterion criterion = new GUICriterion();
+		
+		String fieldName = condition.getAttributeFieldItem().getValueAsString();
+		fieldName = fieldName.replace(Constants.BLANK_PLACEHOLDER, " ");
+		
+		String fieldOperator = condition.getOperatorsFieldItem().getValueAsString();
+		Object fieldValue = getFieldValue(condition);
+
+		if (fieldName.startsWith("_"))
+			fieldName = fieldName.substring(1);
+		if (fieldName.endsWith("type:" + GUIAttribute.TYPE_INT)
+				|| fieldName.endsWith("type:" + GUIAttribute.TYPE_USER)
+				|| fieldName.endsWith("type:" + GUIAttribute.TYPE_FOLDER))
+			fieldValue = Long.parseLong(fieldValue.toString());
+		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DOUBLE))
+			fieldValue = Double.parseDouble(fieldValue.toString());
+		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN))
+			fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
+		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DATE))
+			fieldValue = (Date) fieldValue;
+		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
+			fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_PRESET,
+					"type:" + GUIAttribute.TYPE_STRING);
+		} else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_TEXTAREA)) {
+			fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_TEXTAREA,
+					"type:" + GUIAttribute.TYPE_STRING);
+		}
+		criterion.setField(fieldName);
+
+		setCriterionValue(criterion, fieldValue);
+
+		criterion.setOperator(fieldOperator.toLowerCase());
+
+		addCriterion(condition, criteria, criterion, fieldOperator);
+	}
+
+	private void setCriterionValue(GUICriterion criterion, Object fieldValue) {
+		if (fieldValue instanceof Date)
+			criterion.setDateValue((Date) fieldValue);
+		else if (fieldValue instanceof Integer)
+			criterion.setLongValue(((Integer) fieldValue).longValue());
+		else if (fieldValue instanceof Long)
+			criterion.setLongValue((Long) fieldValue);
+		else if (fieldValue instanceof Float)
+			criterion.setDoubleValue(((Float) fieldValue).doubleValue());
+		else if (fieldValue instanceof Double)
+			criterion.setDoubleValue((Double) fieldValue);
+		else if (fieldValue instanceof String)
+			criterion.setStringValue((String) fieldValue);
+		else if (fieldValue instanceof JavaScriptObject) {
+			JSOHelper.convertToMap((JavaScriptObject) fieldValue);
+		}
+	}
+
+	private Object getFieldValue(ParameterConditionRow condition) {
+		Object fieldValue = condition.getValueFieldItem().getValue();
+
+		// This lines are necessary to avoid error for GWT values type.
+		if (condition.getValueFieldItem() instanceof IntegerItem)
+			fieldValue = Long.parseLong(fieldValue.toString());
+		if (condition.getValueFieldItem() instanceof UserSelector)
+			fieldValue = ((UserSelector) condition.getValueFieldItem()).getUser().getId();
+		if (condition.getValueFieldItem() instanceof FolderSelector)
+			fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
+		return fieldValue;
+	}
+
+	private void addCriterion(ParameterConditionRow conditionRow, List<GUICriterion> criteria, GUICriterion criterion,
+			String fieldOperator) {
+		if (!criterion.getField().equals("tags")) {
+			criteria.add(criterion);
+		} else {
+			// In case of tags, we will have to create a criterion per
+			// tag
+			if (criterion.getField().equals("tags")) {
+				String[] tgs = ((SelectItem) conditionRow.getValueFieldItem()).getValues();
+				for (String tag : tgs) {
+					GUICriterion c = new GUICriterion();
+					c.setField(criterion.getField());
+					c.setOperator(fieldOperator.toLowerCase());
+					c.setStringValue(tag);
+					criteria.add(c);
+				}
+			}
+		}
+	}
+
+	private void addFolderCriterion(GUISearchOptions options, List<GUICriterion> criteria) {
+		if (folder != null) {
+			options.setFolder(folder.getFolderId());
+			options.setFolderName(folder.getFolderName());
+
 			GUICriterion criterion = new GUICriterion();
 			criterion.setField("folder");
 			criterion.setOperator("in");
 			criterion.setLongValue(options.getFolder());
 			if (options.isSearchInSubPath())
 				criterion.setOperator("inorsubfolders");
-			list.add(criterion);
+			criteria.add(criterion);
 		}
-
-		options.setCriteria(list.toArray(new GUICriterion[0]));
-
-		return options;
 	}
+
+	private void setTemplateOption(Map<String, Object> values, GUISearchOptions options) {
+		if (values.containsKey("template") && values.get("template") != null
+				&& !((String) values.get("template")).isEmpty())
+			options.setTemplate(Long.parseLong((String) values.get("template")));
+	}
+
 
 	/**
 	 * Implementations must put here the search logic

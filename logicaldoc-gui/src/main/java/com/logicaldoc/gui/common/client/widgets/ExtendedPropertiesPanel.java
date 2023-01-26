@@ -21,7 +21,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ResizedEvent;
 import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -38,7 +37,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -141,41 +139,19 @@ public class ExtendedPropertiesPanel extends HLayout {
 		templateForm.setNumCols(1);
 		standardItems.clear();
 
-		if (isDocument()) {
-			TextItem customId = ItemFactory.newTextItem("customid", "customid", ((GUIDocument) object).getCustomId());
-			if (changedHandler != null)
-				customId.addChangedHandler(changedHandler);
-			customId.setDisabled(!updateEnabled);
-			standardItems.add(customId);
-		}
+		putCustomIdField();
 
 		templateItem = ItemFactory.newTemplateSelector(true, object.getTemplateId());
 		if (changedHandler != null)
 			templateItem.addChangedHandler(changedHandler);
 		templateItem.setMultiple(false);
-		try {
-			templateItem.setDisabled(!updateEnabled || (isDocument() && ((GUIDocument) object).getFolder() != null
-					&& ((GUIDocument) object).getFolder().getTemplateLocked() == 1));
-		} catch (Throwable t) {
-			SC.warn(t.getMessage());
-		}
+		templateItem.setDisabled(!updateEnabled || (isDocument() && ((GUIDocument) object).getFolder() != null
+				&& ((GUIDocument) object).getFolder().getTemplateLocked() == 1));
 		if (object.getTemplateId() != null)
 			templateItem.setValue(object.getTemplateId().toString());
 
-		templateItem.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (templateItem.getValue() != null && !"".equals(templateItem.getValue().toString())) {
-					object.setAttributes(new GUIAttribute[0]);
-					long templateId = Long.parseLong(event.getValue().toString());
-					prepareExtendedAttributes(templateId);
-					object.setTemplateId(templateId);
-				} else {
-					object.setAttributes(new GUIAttribute[0]);
-					prepareExtendedAttributes(null);
-					object.setTemplateId(null);
-				}
-			}
+		templateItem.addChangedHandler((ChangedEvent event) -> {
+			handleTemplateChangedSelection(event);
 		});
 
 		if (templateChangedHandler != null)
@@ -197,6 +173,30 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		if (Feature.enabled(Feature.TEMPLATE))
 			prepareExtendedAttributes(object.getTemplateId());
+	}
+
+	private void putCustomIdField() {
+		if (isDocument()) {
+			TextItem customId = ItemFactory.newTextItem("customid", "customid", ((GUIDocument) object).getCustomId());
+			if (changedHandler != null)
+				customId.addChangedHandler(changedHandler);
+			customId.setDisabled(!updateEnabled);
+			standardItems.add(customId);
+		}
+	}
+
+	private void handleTemplateChangedSelection(ChangedEvent event) {
+		Object templateValue = templateItem.getValue();
+		if (templateValue != null && !"".equals(templateValue.toString())) {
+			object.setAttributes(new GUIAttribute[0]);
+			long templateId = Long.parseLong(event.getValue().toString());
+			prepareExtendedAttributes(templateId);
+			object.setTemplateId(templateId);
+		} else {
+			object.setAttributes(new GUIAttribute[0]);
+			prepareExtendedAttributes(null);
+			object.setTemplateId(null);
+		}
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	/*
-	 * Prepare the second form for the extended attributes
+	 * Prepares the second form with the extended attributes
 	 * 
 	 * @param templateId identifier of the template
 	 */
@@ -247,57 +247,65 @@ public class ExtendedPropertiesPanel extends HLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIAttribute[] result) {
+			public void onSuccess(GUIAttribute[] templateAttributes) {
 				// Update the object's attributes
-				if (result != null)
-					for (GUIAttribute templAttr : result) {
-						GUIAttribute objAttr = object.getAttribute(templAttr.getName());
-						if (objAttr != null) {
-							objAttr.setEditor(templAttr.getEditor());
-							objAttr.setHidden(templAttr.isHidden());
-							objAttr.setReadonly(templAttr.isReadonly());
-							objAttr.setLabel(templAttr.getLabel());
-							objAttr.setMandatory(templAttr.isMandatory());
-							objAttr.setMultiple(templAttr.isMultiple());
-							objAttr.setOptions(templAttr.getOptions());
-							objAttr.setSet(templAttr.getSet());
-							objAttr.setSetId(templAttr.getSetId());
-							objAttr.setParent(templAttr.getParent());
-							objAttr.setStringValues(templAttr.getStringValues());
-							objAttr.setPosition(templAttr.getPosition());
-							objAttr.setType(templAttr.getType());
+				if (templateAttributes != null)
+					updateAttributesFromTemplateDefinition(templateAttributes);
 
-							if (object.getId() == 0L) {
-								objAttr.setStringValue(templAttr.getStringValue());
-								objAttr.setIntValue(templAttr.getIntValue());
-								objAttr.setDateValue(templAttr.getDateValue());
-								objAttr.setBooleanValue(templAttr.getBooleanValue());
-								objAttr.setDoubleValue(templAttr.getDoubleValue());
-							}
-						} else {
-							object.addAttribute(templAttr);
-						}
-					}
-
-				if (object.getAttributes() != null) {
-					for (GUIAttribute docAttr : object.getAttributes()) {
-						if (docAttr.isMultiple()) {
-							List<GUIAttribute> attrValues = object.getValues(docAttr.getName());
-							if (attrValues != null)
-								for (GUIAttribute val : attrValues) {
-									val.setPosition(docAttr.getPosition());
-									val.setHidden(docAttr.isHidden());
-									val.setReadonly(docAttr.isReadonly());
-									val.setMandatory(docAttr.isMandatory());
-								}
-						}
-					}
-					object.sortAttributes();
-				}
+				adjustMultipleValueAttribues();
 
 				displayAttributeItems();
 			}
 		});
+	}
+
+	private void updateAttributesFromTemplateDefinition(GUIAttribute[] templateAttributes) {
+		for (GUIAttribute templAttr : templateAttributes) {
+			GUIAttribute objAttr = object.getAttribute(templAttr.getName());
+			if (objAttr != null) {
+				objAttr.setEditor(templAttr.getEditor());
+				objAttr.setHidden(templAttr.isHidden());
+				objAttr.setReadonly(templAttr.isReadonly());
+				objAttr.setLabel(templAttr.getLabel());
+				objAttr.setMandatory(templAttr.isMandatory());
+				objAttr.setMultiple(templAttr.isMultiple());
+				objAttr.setOptions(templAttr.getOptions());
+				objAttr.setSet(templAttr.getSet());
+				objAttr.setSetId(templAttr.getSetId());
+				objAttr.setParent(templAttr.getParent());
+				objAttr.setStringValues(templAttr.getStringValues());
+				objAttr.setPosition(templAttr.getPosition());
+				objAttr.setType(templAttr.getType());
+
+				if (object.getId() == 0L) {
+					objAttr.setStringValue(templAttr.getStringValue());
+					objAttr.setIntValue(templAttr.getIntValue());
+					objAttr.setDateValue(templAttr.getDateValue());
+					objAttr.setBooleanValue(templAttr.getBooleanValue());
+					objAttr.setDoubleValue(templAttr.getDoubleValue());
+				}
+			} else {
+				object.addAttribute(templAttr);
+			}
+		}
+	}
+
+	private void adjustMultipleValueAttribues() {
+		if (object.getAttributes() != null) {
+			for (GUIAttribute docAttr : object.getAttributes()) {
+				if (docAttr.isMultiple()) {
+					List<GUIAttribute> attrValues = object.getValues(docAttr.getName());
+					if (attrValues != null)
+						for (GUIAttribute val : attrValues) {
+							val.setPosition(docAttr.getPosition());
+							val.setHidden(docAttr.isHidden());
+							val.setReadonly(docAttr.isReadonly());
+							val.setMandatory(docAttr.isMandatory());
+						}
+				}
+			}
+			object.sortAttributes();
+		}
 	}
 
 	private void displayAttributeItems() {
@@ -309,7 +317,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 			FormItem item = prepareAttributeItem(att);
 			if (item != null) {
-				if(!updateEnabled)
+				if (!updateEnabled)
 					item.setDisabled(true);
 				if (changedHandler != null)
 					item.addChangedHandler(changedHandler);
@@ -333,66 +341,85 @@ public class ExtendedPropertiesPanel extends HLayout {
 			if (object.getValue(att.getName()) != null)
 				item.setValue((Long) object.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
-			item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getLabel(),
-					checkMandatory ? !att.isMandatory() : true);
-			if (object.getValue(att.getName()) != null)
-				item.setValue(((Boolean) object.getValue(att.getName())).booleanValue() ? "1" : "0");
+			item = prepareBooleanItem(att);
 		} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
 			item = ItemFactory.newFloatItemForAttribute(att.getName(), att.getLabel(), null);
 			item.setValue((Double) object.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_DATE) {
-			item = ItemFactory.newDateItemForAttribute(att.getName(), att.getLabel());
-			if (object.getValue(att.getName()) != null)
-				item.setValue((Date) object.getValue(att.getName()));
-			item.addKeyPressHandler(new KeyPressHandler() {
-				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					if ("backspace".equals(event.getKeyName().toLowerCase())
-							|| "delete".equals(event.getKeyName().toLowerCase())) {
-						item.clearValue();
-						item.setValue((Date) null);
-						changedHandler.onChanged(null);
-					} else {
-						changedHandler.onChanged(null);
-					}
-				}
-			});
+			item = prepareDateItem(att);
 		} else if (att.getType() == GUIAttribute.TYPE_USER) {
-			item = ItemFactory.newUserSelectorForAttribute(att.getName(), att.getLabel(),
-					(att.getOptions() != null && att.getOptions().length > 0) ? att.getOptions()[0] : null,
-					multiValIcons);
-			if (object.getValue(att.getName()) != null)
-				item.setValue((object.getValue(att.getName()).toString()));
+			item = prepareUserItem(att, multiValIcons);
 		} else if (att.getType() == GUIAttribute.TYPE_FOLDER) {
-			item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getLabel(),
-					checkMandatory ? !att.isMandatory() : true, multiValIcons);
-			FolderSelector selector = (FolderSelector) item;
-			if (object.getValue(att.getName()) != null) {
-				selector.setFolder(att.getIntValue(), att.getStringValue());
-				item.setValue(att.getStringValue());
-			}
-			selector.addFolderChangeListener(new FolderChangeListener() {
-
-				@Override
-				public void onChanged(GUIFolder folder) {
-					if (changedHandler != null)
-						changedHandler.onChanged(null);
-				}
-			});
+			item = prepareFolderItem(att, multiValIcons);
 		} else {
 			item = null;
 		}
 
+		prepareItemIconsAndVisibility(att, multiValIcons, item);
+
+		return item;
+	}
+
+	private void prepareItemIconsAndVisibility(GUIAttribute att, List<FormItemIcon> multiValIcons, FormItem item) {
 		if (item != null) {
 			if ((att.isMultiple() || att.getParent() != null) && att.getType() != GUIAttribute.TYPE_USER
 					&& att.getType() != GUIAttribute.TYPE_FOLDER)
 				item.setIcons(multiValIcons.toArray(new FormItemIcon[0]));
 			item.setRequired(checkMandatory ? att.isMandatory() : false);
-			if(att.isReadonly())
+			if (att.isReadonly())
 				item.setDisabled(true);
 		}
-		
+	}
 
+	protected FormItem prepareUserItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
+		FormItem item;
+		item = ItemFactory.newUserSelectorForAttribute(att.getName(), att.getLabel(),
+				(att.getOptions() != null && att.getOptions().length > 0) ? att.getOptions()[0] : null, multiValIcons);
+		if (object.getValue(att.getName()) != null)
+			item.setValue((object.getValue(att.getName()).toString()));
+		return item;
+	}
+
+	protected FormItem prepareFolderItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
+		FormItem item;
+		item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getLabel(),
+				checkMandatory ? !att.isMandatory() : true, multiValIcons);
+		FolderSelector selector = (FolderSelector) item;
+		if (object.getValue(att.getName()) != null) {
+			selector.setFolder(att.getIntValue(), att.getStringValue());
+			item.setValue(att.getStringValue());
+		}
+		selector.addFolderChangeListener((GUIFolder folder) -> {
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+		});
+		return item;
+	}
+
+	protected FormItem prepareDateItem(GUIAttribute att) {
+		FormItem item;
+		item = ItemFactory.newDateItemForAttribute(att.getName(), att.getLabel());
+		if (object.getValue(att.getName()) != null)
+			item.setValue((Date) object.getValue(att.getName()));
+		item.addKeyPressHandler((KeyPressEvent event) -> {
+			if ("backspace".equals(event.getKeyName().toLowerCase())
+					|| "delete".equals(event.getKeyName().toLowerCase())) {
+				item.clearValue();
+				item.setValue((Date) null);
+				changedHandler.onChanged(null);
+			} else {
+				changedHandler.onChanged(null);
+			}
+		});
+		return item;
+	}
+
+	protected FormItem prepareBooleanItem(GUIAttribute att) {
+		FormItem item;
+		item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getLabel(),
+				checkMandatory ? !att.isMandatory() : true);
+		if (object.getValue(att.getName()) != null)
+			item.setValue(((Boolean) object.getValue(att.getName())).booleanValue() ? "1" : "0");
 		return item;
 	}
 
@@ -485,138 +512,176 @@ public class ExtendedPropertiesPanel extends HLayout {
 		return multiValIcons;
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean validate() {
+		@SuppressWarnings("unchecked")
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
 
-		if (!vm.hasErrors()) {
-			if (isDocument() && allowTemplateSelection)
-				((GUIDocument) object).setCustomId((String) values.get("customid"));
+		if (vm.hasErrors())
+			return false;
 
-			if (Feature.enabled(Feature.TEMPLATE)) {
-				if (allowTemplateSelection) {
-					if (values.get("template") == null || values.get("template").toString().isEmpty())
-						object.setTemplateId(null);
-					else {
-						object.setTemplateId(Long.parseLong(values.get("template").toString()));
-					}
-				}
+		if (isDocument() && allowTemplateSelection)
+			((GUIDocument) object).setCustomId((String) values.get("customid"));
 
-				for (String name : values.keySet()) {
-					try {
-						if (name.startsWith("_")) {
-							Object val = values.get(name);
-							String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
+		validateExtendedAttributes();
 
-							GUIAttribute att = object.getAttribute(nm);
-							if (att == null || att.isHidden())
-								continue;
+		return !vm.hasErrors();
+	}
 
-							if (val != null) {
-								if (att.getType() == GUIAttribute.TYPE_USER) {
-									SelectItem userItem = (SelectItem) attributesForm.getItem(name);
-									if (userItem.getValue() != null && !"".equals(userItem.getValue())) {
-										ListGridRecord sel = userItem.getSelectedRecord();
+	private void validateExtendedAttributes() {
+		@SuppressWarnings("unchecked")
+		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-										// Prepare a dummy user to set as
-										// attribute value
-										GUIUser dummy = new GUIUser();
-										dummy.setId(Long.parseLong(val.toString()));
-										dummy.setUsername(sel.getAttributeAsString("username"));
-										dummy.setFirstName(sel.getAttributeAsString("firstName"));
-										dummy.setName(sel.getAttributeAsString("name"));
-										object.setValue(nm, dummy);
+		if (!Feature.enabled(Feature.TEMPLATE))
+			return;
 
-										GUIAttribute at = object.getAttribute(nm);
-										at.setStringValue(dummy.getUsername());
-										at.setUsername(dummy.getUsername());
-									} else {
-										GUIAttribute at = object.getAttribute(nm);
-										at.setIntValue(null);
-										at.setStringValue(null);
-										at.setType(GUIAttribute.TYPE_USER);
-									}
-								} else if (att.getType() == GUIAttribute.TYPE_FOLDER) {
-									FolderSelector folderItem = (FolderSelector) attributesForm.getItem(name);
-									GUIFolder selectedFolder = folderItem.getFolder();
-									if (selectedFolder != null) {
-										object.setValue(nm, selectedFolder);
-									} else {
-										GUIAttribute at = object.getAttribute(nm);
-										at.setIntValue(null);
-										at.setStringValue(null);
-										at.setType(GUIAttribute.TYPE_FOLDER);
-									}
-								} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
-									if (!(val == null || "".equals(val.toString().trim())))
-										object.setValue(nm, "1".equals(val.toString().trim()) ? true : false);
-									else if (object.getAttribute(nm) != null) {
-										GUIAttribute at = object.getAttribute(nm);
-										at.setBooleanValue(null);
-										at.setType(GUIAttribute.TYPE_BOOLEAN);
-									}
-								} else {
-									object.setValue(nm, val);
-									InputValues.saveInput(name, val);
-								}
-							} else {
-								if (att != null) {
-									if (att.getType() == GUIAttribute.TYPE_INT) {
-										object.getAttribute(nm).setIntValue(null);
-									} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
-										object.getAttribute(nm).setBooleanValue(null);
-									} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
-										object.getAttribute(nm).setDoubleValue(null);
-									} else if (att.getType() == GUIAttribute.TYPE_DATE) {
-										object.getAttribute(nm).setDateValue(null);
-										att.setDateValue(null);
-									} else if (att.getType() == GUIAttribute.TYPE_USER
-											|| att.getType() == GUIAttribute.TYPE_FOLDER) {
-										GUIAttribute at = object.getAttribute(nm);
-										at.setIntValue(null);
-										at.setStringValue(null);
-										at.setType(att.getType());
-									} else {
-										object.setValue(nm, (String) null);
-									}
-								}
-							}
-						}
-					} catch (Throwable t) {
-						// Nothing to do
-					}
-				}
-
-				/*
-				 * Sometimes empty fields are not included in the value map, so
-				 * we should assign null value.
-				 */
-				if (object.getAttributes() != null)
-					// Check the current doc's values
-					for (GUIAttribute att : object.getAttributes()) {
-						if (att.isHidden())
-							continue;
-
-						boolean found = false;
-						// For each one check if it was included in the form
-						// values
-						for (String name : values.keySet()) {
-							// Get back the name of the attribute from the form
-							// item's name
-							String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
-							if (nm.equals(att.getName())) {
-								found = true;
-								break;
-							}
-						}
-						if (!found) {
-							att.setValue(null);
-						}
-					}
+		if (allowTemplateSelection) {
+			if (values.get("template") == null || values.get("template").toString().isEmpty())
+				object.setTemplateId(null);
+			else {
+				object.setTemplateId(Long.parseLong(values.get("template").toString()));
 			}
 		}
-		return !vm.hasErrors();
+
+		for (String itemName : values.keySet()) {
+			if (itemName.startsWith("_")) {
+				Object value = values.get(itemName);
+				String attributeName = itemName.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
+
+				GUIAttribute attribute = object.getAttribute(attributeName);
+				if (attribute == null || attribute.isHidden())
+					continue;
+
+				validateExtendedAttribute(itemName, value, attributeName, attribute);
+			}
+		}
+
+		if (object.getAttributes() != null)
+			fixNullValues();
+	}
+
+	/*
+	 * Sometimes empty fields are not included in the value map, so we should
+	 * assign null value.
+	 */
+	private void fixNullValues() {
+		@SuppressWarnings("unchecked")
+		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+
+		// Check the current doc's values
+		for (GUIAttribute att : object.getAttributes()) {
+			if (att.isHidden())
+				continue;
+
+			boolean found = false;
+			// For each one check if it was included in the form
+			// values
+			for (String name : values.keySet()) {
+				// Get back the name of the attribute from the form
+				// item's name
+				String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
+				if (nm.equals(att.getName())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				att.setValue(null);
+			}
+		}
+	}
+
+	private void validateExtendedAttribute(String itemName, Object value, String attributeName,
+			GUIAttribute attribute) {
+		if (value != null) {
+			validateNotNulItem(itemName, value, attributeName, attribute);
+		} else {
+			validateNullItem(attributeName, attribute);
+		}
+	}
+
+	private void validateNullItem(String attributeName, GUIAttribute attribute) {
+		if (attribute != null) {
+			if (attribute.getType() == GUIAttribute.TYPE_INT) {
+				object.getAttribute(attributeName).setIntValue(null);
+			} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
+				object.getAttribute(attributeName).setBooleanValue(null);
+			} else if (attribute.getType() == GUIAttribute.TYPE_DOUBLE) {
+				object.getAttribute(attributeName).setDoubleValue(null);
+			} else if (attribute.getType() == GUIAttribute.TYPE_DATE) {
+				object.getAttribute(attributeName).setDateValue(null);
+				attribute.setDateValue(null);
+			} else if (attribute.getType() == GUIAttribute.TYPE_USER
+					|| attribute.getType() == GUIAttribute.TYPE_FOLDER) {
+				GUIAttribute at = object.getAttribute(attributeName);
+				at.setIntValue(null);
+				at.setStringValue(null);
+				at.setType(attribute.getType());
+			} else {
+				object.setValue(attributeName, (String) null);
+			}
+		}
+	}
+
+	private void validateNotNulItem(String itemName, Object value, String attributeName, GUIAttribute attribute) {
+		if (attribute.getType() == GUIAttribute.TYPE_USER) {
+			validateUser(itemName, value, attributeName);
+		} else if (attribute.getType() == GUIAttribute.TYPE_FOLDER) {
+			validateFolder(itemName, attributeName);
+		} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
+			validateBoolean(value, attributeName);
+		} else {
+			object.setValue(attributeName, value);
+			InputValues.saveInput(itemName, value);
+		}
+	}
+
+	private void validateBoolean(Object value, String attributeName) {
+		if (!(value == null || "".equals(value.toString().trim())))
+			object.setValue(attributeName, "1".equals(value.toString().trim()) ? true : false);
+		else if (object.getAttribute(attributeName) != null) {
+			GUIAttribute at = object.getAttribute(attributeName);
+			at.setBooleanValue(null);
+			at.setType(GUIAttribute.TYPE_BOOLEAN);
+		}
+	}
+
+	private void validateFolder(String itemName, String attributeName) {
+		FolderSelector folderItem = (FolderSelector) attributesForm.getItem(itemName);
+		GUIFolder selectedFolder = folderItem.getFolder();
+		if (selectedFolder != null) {
+			object.setValue(attributeName, selectedFolder);
+		} else {
+			GUIAttribute at = object.getAttribute(attributeName);
+			at.setIntValue(null);
+			at.setStringValue(null);
+			at.setType(GUIAttribute.TYPE_FOLDER);
+		}
+	}
+
+	private void validateUser(String itemName, Object value, String attributeName) {
+		SelectItem userItem = (SelectItem) attributesForm.getItem(itemName);
+		if (userItem.getValue() != null && !"".equals(userItem.getValue())) {
+			ListGridRecord sel = userItem.getSelectedRecord();
+
+			// Prepare a dummy user to set as
+			// attribute value
+			GUIUser dummy = new GUIUser();
+			dummy.setId(Long.parseLong(value.toString()));
+			dummy.setUsername(sel.getAttributeAsString("username"));
+			dummy.setFirstName(sel.getAttributeAsString("firstName"));
+			dummy.setName(sel.getAttributeAsString("name"));
+			object.setValue(attributeName, dummy);
+
+			GUIAttribute at = object.getAttribute(attributeName);
+			at.setStringValue(dummy.getUsername());
+			at.setUsername(dummy.getUsername());
+		} else {
+			GUIAttribute at = object.getAttribute(attributeName);
+			at.setIntValue(null);
+			at.setStringValue(null);
+			at.setType(GUIAttribute.TYPE_USER);
+		}
 	}
 
 	private void onValueDelete(GUIAttribute att) {
@@ -657,25 +722,9 @@ public class ExtendedPropertiesPanel extends HLayout {
 				int originalType = attribute.getType();
 
 				if (item instanceof UserSelector) {
-					UserSelector userSelector = (UserSelector) item;
-					GUIUser user = userSelector.getUser();
-					if (user != null) {
-						attribute.setIntValue(user.getId());
-						attribute.setStringValue(user.getUsername());
-					} else {
-						attribute.setIntValue(null);
-						attribute.setStringValue(null);
-					}
+					copyUserValue(item, attribute);
 				} else if (item instanceof FolderSelector) {
-					FolderSelector userSelector = (FolderSelector) item;
-					GUIFolder folder = userSelector.getFolder();
-					if (folder != null) {
-						attribute.setIntValue(folder.getId());
-						attribute.setStringValue(folder.getName());
-					} else {
-						attribute.setIntValue(null);
-						attribute.setStringValue(null);
-					}
+					copyFolderValue(item, attribute);
 				} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
 					object.setValue(nm, val != null && ("1".equals(val.toString()) || "yes".equals(val.toString())));
 				} else {
@@ -684,6 +733,30 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 				attribute.setType(originalType);
 			}
+		}
+	}
+
+	private void copyFolderValue(FormItem item, GUIAttribute attribute) {
+		FolderSelector userSelector = (FolderSelector) item;
+		GUIFolder folder = userSelector.getFolder();
+		if (folder != null) {
+			attribute.setIntValue(folder.getId());
+			attribute.setStringValue(folder.getName());
+		} else {
+			attribute.setIntValue(null);
+			attribute.setStringValue(null);
+		}
+	}
+
+	private void copyUserValue(FormItem item, GUIAttribute attribute) {
+		UserSelector userSelector = (UserSelector) item;
+		GUIUser user = userSelector.getUser();
+		if (user != null) {
+			attribute.setIntValue(user.getId());
+			attribute.setStringValue(user.getUsername());
+		} else {
+			attribute.setIntValue(null);
+			attribute.setStringValue(null);
 		}
 	}
 
@@ -752,8 +825,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 				if (dependsOn != null && !dependsOn.isEmpty()) {
 					FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));
 					FormItem editedItem = event.getItem();
-					String editedAttributeName = editedItem.getName().substring(1)
-							.replace(Constants.BLANK_PLACEHOLDER, " ");
+					String editedAttributeName = editedItem.getName().substring(1).replace(Constants.BLANK_PLACEHOLDER,
+							" ");
 
 					if (dependsOn.equals(editedAttributeName)) {
 						if (event.getItem() != null && !event.getItem().equals(item)) {

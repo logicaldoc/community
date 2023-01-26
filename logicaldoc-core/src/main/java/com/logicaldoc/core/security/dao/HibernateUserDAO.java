@@ -283,8 +283,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		saveHistory(user, transaction, newUser);
 
 		// If the admin password may have been changed and the 'adminpasswd'
-		// also has to
-		// be updated
+		// also has to be updated
 		updateAdminPasswordSetting(user);
 
 		enforceReadOnlyUserPermissions(user);
@@ -493,6 +492,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private boolean processPasswordChanged(User user) throws PersistenceException {
+		// Do not implement password change logic in case of users imported from
+		// another system
+		if (user.getSource() != User.SOURCE_DEFAULT)
+			return false;
+
 		boolean passwordChanged;
 		String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
 		passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
@@ -594,7 +598,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private boolean isPasswordExpired(User user) {
-		if (user == null)
+		// Never consider changed the password of a user imported from another system
+		if (user == null || user.getSource() != User.SOURCE_DEFAULT)
 			return false;
 
 		if (user.getPasswordExpired() == 1)

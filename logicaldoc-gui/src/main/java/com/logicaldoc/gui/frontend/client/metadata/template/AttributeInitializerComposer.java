@@ -101,39 +101,43 @@ public class AttributeInitializerComposer extends Window {
 	}
 
 	protected String composeAutomation() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 
 		if (attributeType == GUIAttribute.TYPE_DATE) {
-			Date date = (Date) vm.getValue("date");
-			boolean currentdate = vm.getValue("currentdate") != null ? (Boolean) vm.getValue("currentdate") : false;
-			if (currentdate) {
-				sb.append("#set($dt = $CURRENT_DATE)\n");
-			} else {
-				String dateStr = date != null ? DateUtil.format(date, "yyyy-MM-dd") : null;
-				sb.append("#set($dt = $DateTool.parse('" + dateStr + "', 'yyyy-MM-dd'))\n");
-			}
-
-			int offset = vm.getValue("offset") != null ? (Integer) vm.getValue("offset") : 0;
-			if (offset != 0)
-				sb.append("#set($dt = $DateTool.addDays($dt, " + offset + "))\n");
-
-			sb.append("$attribute.setDateValue($dt);");
+			initializeDate(stringBuilder);
 		} else if (attributeType == GUIAttribute.TYPE_INT) {
 			Long number = Long.valueOf(vm.getValueAsString("number"));
-			sb.append("#set($number = " + number + ")\n");
-			sb.append("$attribute.setIntValue($number);");
+			stringBuilder.append("#set($number = " + number + ")\n");
+			stringBuilder.append("$attribute.setIntValue($number);");
 
 		} else if (attributeType == GUIAttribute.TYPE_DOUBLE) {
 			Double number = Double.valueOf(vm.getValueAsString("number"));
-			sb.append("#set($number = " + number + ")\n");
-			sb.append("$attribute.setDoubleValue($number);");
+			stringBuilder.append("#set($number = " + number + ")\n");
+			stringBuilder.append("$attribute.setDoubleValue($number);");
 		} else if (attributeType == GUIAttribute.TYPE_STRING || attributeType == GUIAttribute.TYPE_STRING_PRESET
 				|| attributeType == GUIAttribute.TYPE_STRING_TEXTAREA) {
 			String text = vm.getValueAsString("value");
-			sb.append("$attribute.setStringValue('" + text + "');");
+			stringBuilder.append("$attribute.setStringValue('" + text + "');");
 		}
 
-		return sb.toString();
+		return stringBuilder.toString();
+	}
+
+	private void initializeDate(StringBuilder stringBuilder) {
+		Date date = (Date) vm.getValue("date");
+		boolean currentdate = vm.getValue("currentdate") != null ? (Boolean) vm.getValue("currentdate") : false;
+		if (currentdate) {
+			stringBuilder.append("#set($dt = $CURRENT_DATE)\n");
+		} else {
+			String dateStr = date != null ? DateUtil.format(date, "yyyy-MM-dd") : null;
+			stringBuilder.append("#set($dt = $DateTool.parse('" + dateStr + "', 'yyyy-MM-dd'))\n");
+		}
+
+		int offset = vm.getValue("offset") != null ? (Integer) vm.getValue("offset") : 0;
+		if (offset != 0)
+			stringBuilder.append("#set($dt = $DateTool.addDays($dt, " + offset + "))\n");
+
+		stringBuilder.append("$attribute.setDateValue($dt);");
 	}
 
 	private DynamicForm prepareFloatForm() {

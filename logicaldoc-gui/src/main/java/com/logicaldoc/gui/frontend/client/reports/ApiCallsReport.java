@@ -273,86 +273,99 @@ public class ApiCallsReport extends AdminPanel {
 
 		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-		if (vm.validate()) {
-			Long userId = null;
-			if (values.get("user") != null) {
-				if (values.get("user") instanceof Long)
-					userId = (Long) values.get("user");
-				else
-					userId = Long.parseLong(values.get("user").toString());
-			}
+		if (!vm.validate())
+			return;
 
-			Date fromValue = null;
-			if (values.get("fromDate") != null)
-				fromValue = (Date) values.get("fromDate");
-			Date tillValue = null;
-			if (values.get("tillDate") != null)
-				tillValue = (Date) values.get("tillDate");
+		Long userId = getUserId(values);
 
-			String sid = null;
-			if (values.get("sid") != null)
-				sid = (String) values.get("sid");
+		Date fromValue = null;
+		if (values.get("fromDate") != null)
+			fromValue = (Date) values.get("fromDate");
 
-			String protocol = null;
-			if (values.get("protocol") != null)
-				protocol = (String) values.get("protocol");
+		Date tillValue = null;
+		if (values.get("tillDate") != null)
+			tillValue = (Date) values.get("tillDate");
 
-			String uri = null;
-			if (values.get("uri") != null)
-				uri = (String) values.get("uri");
+		String sid = null;
+		if (values.get("sid") != null)
+			sid = (String) values.get("sid");
 
-			int displayMaxValue = 0;
-			try {
-				if (values.get("displayMax") != null) {
-					if (values.get("displayMax") instanceof Integer)
-						displayMaxValue = (Integer) values.get("displayMax");
-					else
-						displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
-				}
-			} catch (Throwable t) {
-				// Nothing to do
-			}
+		String protocol = null;
+		if (values.get("protocol") != null)
+			protocol = (String) values.get("protocol");
 
-			LD.contactingServer();
-			SystemService.Instance.get().searchApiCalls(userId, fromValue, tillValue, sid, protocol, uri,
-					displayMaxValue, new AsyncCallback<GUIHistory[]>() {
+		String uri = null;
+		if (values.get("uri") != null)
+			uri = (String) values.get("uri");
 
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+		int displayMaxValue = getDisplayMaxValue(values);
 
-						@Override
-						public void onSuccess(GUIHistory[] result) {
-							LD.clearPrompt();
+		doSearch(userId, fromValue, tillValue, sid, protocol, uri, displayMaxValue);
+	}
 
-							if (result != null && result.length > 0) {
-								ListGridRecord[] records = new ListGridRecord[result.length];
-								for (int i = 0; i < result.length; i++) {
-									ListGridRecord record = new ListGridRecord();
-									record.setAttribute("date", result[i].getDate());
-									record.setAttribute("user", result[i].getUsername());
-									record.setAttribute("sid", result[i].getSessionId());
-									record.setAttribute("userId", result[i].getUserId());
-									record.setAttribute("ip", result[i].getIp());
-									record.setAttribute("device", result[i].getDevice());
-									record.setAttribute("geolocation", result[i].getGeolocation());
-									record.setAttribute("username", result[i].getUserLogin());
-									record.setAttribute("payload", result[i].getComment());
-									record.setAttribute("uri", result[i].getPath());
-									record.setAttribute("protocol", result[i].getProtocol());
-									record.setAttribute("tenant", result[i].getTenant());
-									records[i] = record;
-								}
-								calls.setData(records);
-							}
-							callsLayout.removeMember(infoPanel);
-							infoPanel = new InfoPanel("");
-							infoPanel.setMessage(I18N.message("showelements", Integer.toString(calls.getTotalRows())));
-							callsLayout.addMember(infoPanel, 1);
-						}
-					});
+	private int getDisplayMaxValue(final Map<String, Object> values) {
+		int displayMaxValue = 0;
+		if (values.get("displayMax") != null) {
+			if (values.get("displayMax") instanceof Integer)
+				displayMaxValue = (Integer) values.get("displayMax");
+			else
+				displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
 		}
+		return displayMaxValue;
+	}
+
+	private Long getUserId(final Map<String, Object> values) {
+		Long userId = null;
+		if (values.get("user") != null) {
+			if (values.get("user") instanceof Long)
+				userId = (Long) values.get("user");
+			else
+				userId = Long.parseLong(values.get("user").toString());
+		}
+		return userId;
+	}
+
+	private void doSearch(Long userId, Date fromValue, Date tillValue, String sid, String protocol, String uri,
+			int displayMaxValue) {
+		LD.contactingServer();
+		SystemService.Instance.get().searchApiCalls(userId, fromValue, tillValue, sid, protocol, uri, displayMaxValue,
+				new AsyncCallback<GUIHistory[]>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIHistory[] result) {
+						LD.clearPrompt();
+
+						if (result != null && result.length > 0) {
+							ListGridRecord[] records = new ListGridRecord[result.length];
+							for (int i = 0; i < result.length; i++) {
+								ListGridRecord record = new ListGridRecord();
+								record.setAttribute("date", result[i].getDate());
+								record.setAttribute("user", result[i].getUsername());
+								record.setAttribute("sid", result[i].getSessionId());
+								record.setAttribute("userId", result[i].getUserId());
+								record.setAttribute("ip", result[i].getIp());
+								record.setAttribute("device", result[i].getDevice());
+								record.setAttribute("geolocation", result[i].getGeolocation());
+								record.setAttribute("username", result[i].getUserLogin());
+								record.setAttribute("payload", result[i].getComment());
+								record.setAttribute("uri", result[i].getPath());
+								record.setAttribute("protocol", result[i].getProtocol());
+								record.setAttribute("tenant", result[i].getTenant());
+								records[i] = record;
+							}
+							calls.setData(records);
+						}
+						callsLayout.removeMember(infoPanel);
+						infoPanel = new InfoPanel("");
+						infoPanel.setMessage(I18N.message("showelements", Integer.toString(calls.getTotalRows())));
+						callsLayout.addMember(infoPanel, 1);
+					}
+				});
 	}
 }

@@ -218,11 +218,23 @@ public class UserUtil {
 			}
 		}
 
-		// If the image is bigger, then get the central square
+		avatarImage = getImageCentralSquare(size, avatarImage);
+
+		return avatarImage;
+	}
+
+	/**
+	 * If the image is bigger, then gets the central square
+	 * 
+	 * @param size Wanted size of the output image
+	 * @param avatarImage the avatar image
+	 * 
+	 * @return the central square
+	 */
+	private static BufferedImage getImageCentralSquare(int size, BufferedImage avatarImage) {
 		if (avatarImage != null && (avatarImage.getWidth() > size || avatarImage.getHeight() > size)) {
 			avatarImage = ImageUtil.cropCenterSquare(avatarImage, size);
 		}
-
 		return avatarImage;
 	}
 

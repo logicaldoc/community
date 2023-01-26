@@ -20,7 +20,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
-import com.smartgwt.client.widgets.events.DropCompleteHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -35,7 +34,6 @@ import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -43,8 +41,6 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellSavedEvent;
-import com.smartgwt.client.widgets.grid.events.CellSavedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
@@ -139,31 +135,23 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		ListGridField label = new ListGridField("label", I18N.message("label"));
 		label.setCanEdit(true);
 		label.setCanSort(false);
-		label.addCellSavedHandler(new CellSavedHandler() {
-
-			@Override
-			public void onCellSaved(CellSavedEvent event) {
-				AttributeSetPropertiesPanel.this.attributeSet.getAttribute(event.getRecord().getAttribute("name"))
-						.setLabel((String) event.getNewValue());
-				AttributeSetPropertiesPanel.this.changedHandler.onChanged(null);
-			}
+		label.addCellSavedHandler((CellSavedEvent labelSaved) -> {
+			AttributeSetPropertiesPanel.this.attributeSet.getAttribute(labelSaved.getRecord().getAttribute("name"))
+					.setLabel((String) labelSaved.getNewValue());
+			AttributeSetPropertiesPanel.this.changedHandler.onChanged(null);
 		});
 
 		attributesList.setFields(name, label);
 
-		attributesList.addDropCompleteHandler(new DropCompleteHandler() {
-
-			@Override
-			public void onDropComplete(DropCompleteEvent event) {
-				List<String> attributes = new ArrayList<String>();
-				for (int i = 0; i < attributesList.getTotalRows(); i++) {
-					ListGridRecord record = attributesList.getRecord(i);
-					attributes.add(record.getAttributeAsString("name"));
-				}
-
-				AttributeSetPropertiesPanel.this.attributeSet.reorderAttributes(attributes);
-				changedHandler.onChanged(null);
+		attributesList.addDropCompleteHandler((DropCompleteEvent attributesListDropCompleted) -> {
+			List<String> attributes = new ArrayList<String>();
+			for (int i = 0; i < attributesList.getTotalRows(); i++) {
+				ListGridRecord record = attributesList.getRecord(i);
+				attributes.add(record.getAttributeAsString("name"));
 			}
+
+			AttributeSetPropertiesPanel.this.attributeSet.reorderAttributes(attributes);
+			changedHandler.onChanged(null);
 		});
 
 		attributesStack = new SectionStack();
@@ -194,6 +182,306 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	protected void refresh() {
+		VLayout attributesLayout = prepareForms();
+
+		final TextItem attributeName = addAttributeNameItem();
+
+		// Attribute Label
+		final TextItem label = ItemFactory.newTextItem("label", "label", null);
+		label.setWidth(400);
+
+		// Mandatory
+		final CheckboxItem mandatory = new CheckboxItem();
+		mandatory.setName("mandatory");
+		mandatory.setTitle(I18N.message("mandatory"));
+		mandatory.setRedrawOnChange(true);
+		mandatory.setWidth(50);
+		mandatory.setDefaultValue(false);
+		mandatory.setDisabled(attributeSet.isReadonly());
+
+		// Hidden
+		final CheckboxItem hidden = new CheckboxItem();
+		hidden.setName("hidden");
+		hidden.setTitle(I18N.message("hidden"));
+		hidden.setRedrawOnChange(true);
+		hidden.setWidth(50);
+		hidden.setDefaultValue(false);
+		hidden.setDisabled(attributeSet.isReadonly());
+
+		// Readonly
+		final CheckboxItem readonly = new CheckboxItem();
+		readonly.setName("readonly");
+		readonly.setTitle(I18N.message("readonly"));
+		readonly.setRedrawOnChange(true);
+		readonly.setWidth(50);
+		readonly.setDefaultValue(false);
+		readonly.setDisabled(attributeSet.isReadonly());
+
+		// Multiple
+		final CheckboxItem multiple = new CheckboxItem();
+		multiple.setName("multiple");
+		multiple.setTitle(I18N.message("multiplevalues"));
+		multiple.setRedrawOnChange(true);
+		multiple.setWidth(50);
+		multiple.setDefaultValue(false);
+		multiple.setDisabled(attributeSet.isReadonly());
+		multiple.setEndRow(true);
+
+		// Editor
+		addEditorItem();
+
+		// Type
+		addTypeSelector();
+
+		// Values (for preset editor)
+		group = ItemFactory.newTextItem("group", "group", null);
+		group.setHint(I18N.message("groupname"));
+		group.setDisabled(attributeSet.isReadonly());
+
+		// Options (for preset editor)
+		addOptionsItem(attributeName);
+
+		TextAreaItem validation = prepareValidationItem();
+
+		TextAreaItem initialization = prepareInitializationItem();
+
+		ButtonItem save = new ButtonItem();
+		save.setTitle(I18N.message("save"));
+		save.setAutoFit(true);
+		save.setEndRow(false);
+		save.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent saveClick) -> {
+			onSaveClicked(attributeName, label, mandatory, hidden, readonly, multiple, validation, initialization);
+		});
+
+		ButtonItem clean = prepareCleanButton();
+
+		attributeSettingsForm1.setItems(attributeName, new SpacerItem(), mandatory, readonly, hidden, multiple);
+		attributeSettingsForm2.setItems(label, type, editor, group, options, initialization, validation);
+		attributeButtonsForm.setItems(save, clean);
+
+		attributesLayout.setMembers(attributeSettingsForm1, attributeSettingsForm2, attributeButtonsForm);
+		attributesLayout.setMembersMargin(10);
+		attributesLayout.setWidth100();
+		addMember(attributesLayout);
+
+		refreshFieldForm();
+	}
+
+	private void onSaveClicked(final TextItem attributeName, final TextItem label, final CheckboxItem mandatory,
+			final CheckboxItem hidden, final CheckboxItem readonly, final CheckboxItem multiple,
+			TextAreaItem validation, TextAreaItem initialization) {
+		if (!attributeSettingsForm1.validate()) {
+			return;
+		} else {
+			String name = (String) attributeName.getValue();
+			if (GUIAttribute.isForbidden(name.trim())) {
+				final String message = I18N.message("attributenameforbidden",
+						Arrays.asList(GUIAttribute.FORBIDDEN_NAMES).toString().substring(1).replace("]", ""));
+				SC.warn(I18N.message("error"), message);
+				return;
+			}
+		}
+
+		if (attributeName.getValue() != null && !((String) attributeName.getValue()).trim().isEmpty()) {
+			collectValuesForAttribute(attributeName, label, mandatory, hidden, readonly, multiple, validation,
+					initialization);
+		}
+	}
+
+	private void collectValuesForAttribute(final TextItem attributeName, final TextItem label,
+			final CheckboxItem mandatory, final CheckboxItem hidden, final CheckboxItem readonly,
+			final CheckboxItem multiple, TextAreaItem validation, TextAreaItem initialization) {
+		if (updatingAttributeName.trim().isEmpty()) {
+			GUIAttribute att = new GUIAttribute();
+			att.setName(attributeName.getValueAsString());
+			att.setLabel(label.getValueAsString());
+			att.setMandatory((Boolean) mandatory.getValue());
+			att.setHidden((Boolean) hidden.getValue());
+			att.setReadonly((Boolean) readonly.getValue());
+			att.setMultiple((Boolean) multiple.getValue());
+			att.setType(Integer.parseInt((String) type.getValueAsString()));
+			att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
+			att.setValidation(validation.getValueAsString());
+			att.setInitialization(initialization.getValueAsString());
+
+			if (att.getType() == GUIAttribute.TYPE_USER)
+				att.setStringValue(group.getValueAsString());
+
+			if (attributeSettingsForm1.validate()) {
+				changedHandler.onChanged(null);
+				addAttribute(att);
+			}
+		} else {
+			GUIAttribute att = attributeSet.getAttribute(updatingAttributeName.trim());
+			att.setName(attributeName.getValueAsString());
+			att.setLabel(label.getValueAsString());
+			att.setMandatory((Boolean) mandatory.getValue());
+			att.setHidden((Boolean) hidden.getValue());
+			att.setReadonly((Boolean) readonly.getValue());
+			att.setMultiple((Boolean) multiple.getValue());
+			att.setType(Integer.parseInt(type.getValueAsString()));
+			att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
+
+			if (att.getType() == GUIAttribute.TYPE_USER)
+				att.setStringValue(group.getValueAsString());
+			else
+				att.setStringValue(null);
+			att.setValidation(validation.getValueAsString());
+			att.setInitialization(initialization.getValueAsString());
+
+			ListGridRecord record = attributesList.getSelectedRecord();
+			record.setAttribute("name", att.getName());
+			record.setAttribute("label", att.getLabel());
+			record.setAttribute("validation", att.getValidation());
+			record.setAttribute("initialization", att.getInitialization());
+
+			changedHandler.onChanged(null);
+		}
+	}
+
+	private ButtonItem prepareCleanButton() {
+		ButtonItem clean = new ButtonItem();
+		clean.setTitle(I18N.message("clean"));
+		clean.setAutoFit(true);
+		clean.setStartRow(false);
+		clean.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent cleanClick) -> {
+			clean();
+		});
+		return clean;
+	}
+
+	private TextAreaItem prepareInitializationItem() {
+		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation("initialization", "initialization", null,
+				null, false);
+		initialization.setWidth("*");
+		initialization.setDisabled(attributeSet.isReadonly());
+		initialization.setStartRow(true);
+		initialization.setColSpan(6);
+
+		FormItemIcon initializationComposer = new FormItemIcon();
+		initializationComposer.setName("composer");
+		initializationComposer.setWidth(16);
+		initializationComposer.setHeight(16);
+		initializationComposer.setSrc("[SKIN]/cog.png");
+		initializationComposer.setPrompt(I18N.message("openinitializatorcomposer"));
+		initializationComposer.addFormItemClickHandler((FormItemIconClickEvent initializationComposerClick) -> {
+			AttributeInitializerComposer composer = new AttributeInitializerComposer(initialization,
+					type.getValue() != null && !type.getValue().toString().isEmpty()
+							? Integer.parseInt(type.getValueAsString())
+							: GUIAttribute.TYPE_STRING);
+			composer.show();
+		});
+		List<FormItemIcon> initializationIcons = new ArrayList<FormItemIcon>();
+		initializationIcons.addAll(Arrays.asList(initialization.getIcons()));
+		initializationIcons.add(initializationComposer);
+		initialization.setIcons(initializationIcons.toArray(new FormItemIcon[0]));
+		return initialization;
+	}
+
+	private TextAreaItem prepareValidationItem() {
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", "validation", null, null,
+				false);
+		validation.setWidth("*");
+		validation.setDisabled(attributeSet.isReadonly());
+		validation.setStartRow(true);
+		validation.setColSpan(7);
+
+		FormItemIcon validationComposer = new FormItemIcon();
+		validationComposer.setName("composer");
+		validationComposer.setWidth(16);
+		validationComposer.setHeight(16);
+		validationComposer.setSrc("[SKIN]/cog.png");
+		validationComposer.setPrompt(I18N.message("openvalidatorcomposer"));
+		validationComposer.addFormItemClickHandler((FormItemIconClickEvent validationComposerClick) -> {
+			AttributeValidatorComposer composer = new AttributeValidatorComposer(validation,
+					type.getValue() != null && !type.getValue().toString().isEmpty()
+							? Integer.parseInt(type.getValueAsString())
+							: GUIAttribute.TYPE_STRING);
+			composer.show();
+		});
+		List<FormItemIcon> validationIcons = new ArrayList<FormItemIcon>();
+		validationIcons.addAll(Arrays.asList(validation.getIcons()));
+		validationIcons.add(validationComposer);
+		validation.setIcons(validationIcons.toArray(new FormItemIcon[0]));
+		return validation;
+	}
+
+	private void addOptionsItem(final TextItem attributeName) {
+		options = ItemFactory.newLinkItem("options", I18N.message("options"));
+		options.setLinkTitle(I18N.message("attributeoptions"));
+		options.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent optionsClick) -> {
+			if (attributeSet.getId() == 0L) {
+				SC.say(I18N.message("saveattributesetfirst"));
+			} else {
+				Options options = new Options(attributeSet.getId(), attributeName.getValueAsString(),
+						attributeSet.isReadonly());
+				options.show();
+			}
+		});
+	}
+
+	private void addTypeSelector() {
+		type = new SelectItem("type", I18N.message("type"));
+		LinkedHashMap<String, String> types = new LinkedHashMap<String, String>();
+		types.put("" + GUIAttribute.TYPE_STRING, I18N.message("string"));
+		types.put("" + GUIAttribute.TYPE_INT, I18N.message("integer"));
+		types.put("" + GUIAttribute.TYPE_DOUBLE, I18N.message("decimal"));
+		types.put("" + GUIAttribute.TYPE_DATE, I18N.message("date"));
+		types.put("" + GUIAttribute.TYPE_BOOLEAN, I18N.message("boolean"));
+		types.put("" + GUIAttribute.TYPE_USER, I18N.message("user"));
+		types.put("" + GUIAttribute.TYPE_FOLDER, I18N.message("folder"));
+		type.setValueMap(types);
+		type.setWrapTitle(false);
+		type.setDefaultValue("" + GUIAttribute.TYPE_STRING);
+		type.setValue("" + GUIAttribute.TYPE_STRING);
+		type.setDisabled(attributeSet.isReadonly());
+		type.addChangedHandler((ChangedEvent typeChanged) -> {
+			refreshFieldForm();
+		});
+	}
+
+	private void addEditorItem() {
+		editor = new SelectItem("editor", I18N.message("inputmode"));
+		LinkedHashMap<String, String> editors = new LinkedHashMap<String, String>();
+		editors.put("" + GUIAttribute.EDITOR_DEFAULT, I18N.message("free"));
+		editors.put("" + GUIAttribute.EDITOR_TEXTAREA, I18N.message("freetextarea"));
+		editors.put("" + GUIAttribute.EDITOR_LISTBOX, I18N.message("preset"));
+		editor.setValueMap(editors);
+		editor.setWrapTitle(false);
+		editor.setDefaultValue("" + GUIAttribute.EDITOR_DEFAULT);
+		editor.setDisabled(attributeSet.isReadonly());
+		editor.addChangedHandler((ChangedEvent editorChanged) -> {
+			refreshFieldForm();
+		});
+	}
+
+	private TextItem addAttributeNameItem() {
+		// Attribute Name
+		final TextItem attributeName = ItemFactory.newSimpleTextItem("attributeName", "attributename", null);
+		attributeName.setRequired(true);
+		attributeName.setWidth(180);
+		PickerIcon cleanPicker = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent attributeNameClick) -> {
+			clean();
+			attributeSettingsForm1.getField("mandatory").setDisabled(false);
+			attributeSettingsForm1.getField("hidden").setDisabled(false);
+			attributeSettingsForm1.getField("readonly").setDisabled(false);
+			attributeSettingsForm1.getField("multiple").setDisabled(false);
+			attributeSettingsForm2.getField("type").setDisabled(false);
+			attributeSettingsForm2.getField("editor").setDisabled(false);
+			attributeSettingsForm2.getField("group").setDisabled(true);
+			attributeSettingsForm2.getField("validation").setDisabled(false);
+			attributeSettingsForm2.getField("initialization").setDisabled(false);
+			refreshFieldForm();
+		});
+		if (!attributeSet.isReadonly()) {
+			cleanPicker.setNeverDisable(true);
+			attributeName.setIcons(cleanPicker);
+		} else
+			attributeName.setDisabled(true);
+		return attributeName;
+	}
+
+	private VLayout prepareForms() {
 		vm.clearValues();
 		vm.clearErrors(false);
 
@@ -205,12 +493,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		addMetadata();
 		addMember(setPropertiesForm);
 
-		attributesList.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record record = attributesList.getSelectedRecord();
-				onChangeSelectedAttribute(record);
-			}
+		attributesList.addSelectionChangedHandler((SelectionEvent attributesListSelected) -> {
+			Record record = attributesList.getSelectedRecord();
+			onChangeSelectedAttribute(record);
 		});
 
 		HLayout setInfo = new HLayout();
@@ -253,284 +538,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeButtonsForm.setTitleOrientation(TitleOrientation.TOP);
 		attributeButtonsForm.setNumCols(2);
 		attributeButtonsForm.setWidth(1);
-
-		// Attribute Name
-		final TextItem attributeName = ItemFactory.newSimpleTextItem("attributeName", "attributename", null);
-		attributeName.setRequired(true);
-		attributeName.setWidth(180);
-		PickerIcon cleanPicker = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				clean();
-				attributeSettingsForm1.getField("mandatory").setDisabled(false);
-				attributeSettingsForm1.getField("hidden").setDisabled(false);
-				attributeSettingsForm1.getField("readonly").setDisabled(false);
-				attributeSettingsForm1.getField("multiple").setDisabled(false);
-				attributeSettingsForm2.getField("type").setDisabled(false);
-				attributeSettingsForm2.getField("editor").setDisabled(false);
-				attributeSettingsForm2.getField("group").setDisabled(true);
-				attributeSettingsForm2.getField("validation").setDisabled(false);
-				attributeSettingsForm2.getField("initialization").setDisabled(false);
-				refreshFieldForm();
-			}
-		});
-		if (!attributeSet.isReadonly()) {
-			cleanPicker.setNeverDisable(true);
-			attributeName.setIcons(cleanPicker);
-		} else
-			attributeName.setDisabled(true);
-
-		// Attribute Label
-		final TextItem label = ItemFactory.newTextItem("label", "label", null);
-		label.setWidth(400);
-
-		// Mandatory
-		final CheckboxItem mandatory = new CheckboxItem();
-		mandatory.setName("mandatory");
-		mandatory.setTitle(I18N.message("mandatory"));
-		mandatory.setRedrawOnChange(true);
-		mandatory.setWidth(50);
-		mandatory.setDefaultValue(false);
-		mandatory.setDisabled(attributeSet.isReadonly());
-
-		// Hidden
-		final CheckboxItem hidden = new CheckboxItem();
-		hidden.setName("hidden");
-		hidden.setTitle(I18N.message("hidden"));
-		hidden.setRedrawOnChange(true);
-		hidden.setWidth(50);
-		hidden.setDefaultValue(false);
-		hidden.setDisabled(attributeSet.isReadonly());
-		
-		// Readonly
-		final CheckboxItem readonly = new CheckboxItem();
-		readonly.setName("readonly");
-		readonly.setTitle(I18N.message("readonly"));
-		readonly.setRedrawOnChange(true);
-		readonly.setWidth(50);
-		readonly.setDefaultValue(false);
-		readonly.setDisabled(attributeSet.isReadonly());
-		
-		// Multiple
-		final CheckboxItem multiple = new CheckboxItem();
-		multiple.setName("multiple");
-		multiple.setTitle(I18N.message("multiplevalues"));
-		multiple.setRedrawOnChange(true);
-		multiple.setWidth(50);
-		multiple.setDefaultValue(false);
-		multiple.setDisabled(attributeSet.isReadonly());
-		multiple.setEndRow(true);
-
-		// Editor
-		editor = new SelectItem("editor", I18N.message("inputmode"));
-		LinkedHashMap<String, String> editors = new LinkedHashMap<String, String>();
-		editors.put("" + GUIAttribute.EDITOR_DEFAULT, I18N.message("free"));
-		editors.put("" + GUIAttribute.EDITOR_TEXTAREA, I18N.message("freetextarea"));
-		editors.put("" + GUIAttribute.EDITOR_LISTBOX, I18N.message("preset"));
-		editor.setValueMap(editors);
-		editor.setWrapTitle(false);
-		editor.setDefaultValue("" + GUIAttribute.EDITOR_DEFAULT);
-		editor.setDisabled(attributeSet.isReadonly());
-		editor.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refreshFieldForm();
-			}
-		});
-
-		// Type
-		type = new SelectItem("type", I18N.message("type"));
-		LinkedHashMap<String, String> types = new LinkedHashMap<String, String>();
-		types.put("" + GUIAttribute.TYPE_STRING, I18N.message("string"));
-		types.put("" + GUIAttribute.TYPE_INT, I18N.message("integer"));
-		types.put("" + GUIAttribute.TYPE_DOUBLE, I18N.message("decimal"));
-		types.put("" + GUIAttribute.TYPE_DATE, I18N.message("date"));
-		types.put("" + GUIAttribute.TYPE_BOOLEAN, I18N.message("boolean"));
-		types.put("" + GUIAttribute.TYPE_USER, I18N.message("user"));
-		types.put("" + GUIAttribute.TYPE_FOLDER, I18N.message("folder"));
-		type.setValueMap(types);
-		type.setWrapTitle(false);
-		type.setDefaultValue("" + GUIAttribute.TYPE_STRING);
-		type.setValue("" + GUIAttribute.TYPE_STRING);
-		type.setDisabled(attributeSet.isReadonly());
-		type.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refreshFieldForm();
-			}
-		});
-
-		// Values (for preset editor)
-		group = ItemFactory.newTextItem("group", "group", null);
-		group.setHint(I18N.message("groupname"));
-		group.setDisabled(attributeSet.isReadonly());
-
-		// Options (for preset editor)
-		options = ItemFactory.newLinkItem("options", I18N.message("options"));
-		options.setLinkTitle(I18N.message("attributeoptions"));
-		options.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if (attributeSet.getId() == 0L) {
-					SC.say(I18N.message("saveattributesetfirst"));
-				} else {
-					Options options = new Options(attributeSet.getId(), attributeName.getValueAsString(),
-							attributeSet.isReadonly());
-					options.show();
-				}
-			}
-		});
-
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", "validation", null, null,
-				false);
-		validation.setWidth("*");
-		validation.setDisabled(attributeSet.isReadonly());
-		validation.setStartRow(true);
-		validation.setColSpan(7);
-
-		FormItemIcon validationComposer = new FormItemIcon();
-		validationComposer.setName("composer");
-		validationComposer.setWidth(16);
-		validationComposer.setHeight(16);
-		validationComposer.setSrc("[SKIN]/cog.png");
-		validationComposer.setPrompt(I18N.message("openvalidatorcomposer"));
-		validationComposer.addFormItemClickHandler(new FormItemClickHandler() {
-
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				AttributeValidatorComposer composer = new AttributeValidatorComposer(validation,
-						type.getValue() != null && !type.getValue().toString().isEmpty()
-								? Integer.parseInt(type.getValueAsString())
-								: GUIAttribute.TYPE_STRING);
-				composer.show();
-			}
-		});
-		List<FormItemIcon> validationIcons = new ArrayList<FormItemIcon>();
-		validationIcons.addAll(Arrays.asList(validation.getIcons()));
-		validationIcons.add(validationComposer);
-		validation.setIcons(validationIcons.toArray(new FormItemIcon[0]));
-
-		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation("initialization", "initialization", null,
-				null, false);
-		initialization.setWidth("*");
-		initialization.setDisabled(attributeSet.isReadonly());
-		initialization.setStartRow(true);
-		initialization.setColSpan(6);
-
-		FormItemIcon initializationComposer = new FormItemIcon();
-		initializationComposer.setName("composer");
-		initializationComposer.setWidth(16);
-		initializationComposer.setHeight(16);
-		initializationComposer.setSrc("[SKIN]/cog.png");
-		initializationComposer.setPrompt(I18N.message("openinitializatorcomposer"));
-		initializationComposer.addFormItemClickHandler(new FormItemClickHandler() {
-
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				AttributeInitializerComposer composer = new AttributeInitializerComposer(initialization,
-						type.getValue() != null && !type.getValue().toString().isEmpty()
-								? Integer.parseInt(type.getValueAsString())
-								: GUIAttribute.TYPE_STRING);
-				composer.show();
-			}
-		});
-		List<FormItemIcon> initializationIcons = new ArrayList<FormItemIcon>();
-		initializationIcons.addAll(Arrays.asList(initialization.getIcons()));
-		initializationIcons.add(initializationComposer);
-		initialization.setIcons(initializationIcons.toArray(new FormItemIcon[0]));
-
-		ButtonItem save = new ButtonItem();
-		save.setTitle(I18N.message("save"));
-		save.setAutoFit(true);
-		save.setEndRow(false);
-		save.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if (!attributeSettingsForm1.validate()) {
-					return;
-				} else {
-					String name = (String) attributeName.getValue();
-					if (GUIAttribute.isForbidden(name.trim())) {
-						final String message = I18N.message("attributenameforbidden",
-								Arrays.asList(GUIAttribute.FORBIDDEN_NAMES).toString().substring(1).replace("]", ""));
-						SC.warn(I18N.message("error"), message);
-						return;
-					}
-				}
-
-				if (attributeName.getValue() != null && !((String) attributeName.getValue()).trim().isEmpty()) {
-					if (updatingAttributeName.trim().isEmpty()) {
-						GUIAttribute att = new GUIAttribute();
-						att.setName(attributeName.getValueAsString());
-						att.setLabel(label.getValueAsString());
-						att.setMandatory((Boolean) mandatory.getValue());
-						att.setHidden((Boolean) hidden.getValue());
-						att.setReadonly((Boolean) readonly.getValue());
-						att.setMultiple((Boolean) multiple.getValue());
-						att.setType(Integer.parseInt((String) type.getValueAsString()));
-						att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
-						att.setValidation(validation.getValueAsString());
-						att.setInitialization(initialization.getValueAsString());
-
-						if (att.getType() == GUIAttribute.TYPE_USER)
-							att.setStringValue(group.getValueAsString());
-
-						if (attributeSettingsForm1.validate()) {
-							changedHandler.onChanged(null);
-							addAttribute(att);
-						}
-					} else {
-						GUIAttribute att = attributeSet.getAttribute(updatingAttributeName.trim());
-						if (att != null) {
-							att.setName(attributeName.getValueAsString());
-							att.setLabel(label.getValueAsString());
-							att.setMandatory((Boolean) mandatory.getValue());
-							att.setHidden((Boolean) hidden.getValue());
-							att.setReadonly((Boolean) readonly.getValue());
-							att.setMultiple((Boolean) multiple.getValue());
-							att.setType(Integer.parseInt(type.getValueAsString()));
-							att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
-
-							if (att.getType() == GUIAttribute.TYPE_USER)
-								att.setStringValue(group.getValueAsString());
-							else
-								att.setStringValue(null);
-							att.setValidation(validation.getValueAsString());
-							att.setInitialization(initialization.getValueAsString());
-
-							ListGridRecord record = attributesList.getSelectedRecord();
-							record.setAttribute("name", att.getName());
-							record.setAttribute("label", att.getLabel());
-							record.setAttribute("validation", att.getValidation());
-							record.setAttribute("initialization", att.getInitialization());
-
-							changedHandler.onChanged(null);
-						}
-					}
-				}
-			}
-		});
-
-		ButtonItem clean = new ButtonItem();
-		clean.setTitle(I18N.message("clean"));
-		clean.setAutoFit(true);
-		clean.setStartRow(false);
-		clean.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				clean();
-			}
-		});
-
-		attributeSettingsForm1.setItems(attributeName, new SpacerItem(), mandatory, readonly, hidden, multiple);
-		attributeSettingsForm2.setItems(label, type, editor, group, options, initialization, validation);
-		attributeButtonsForm.setItems(save, clean);
-
-		attributesLayout.setMembers(attributeSettingsForm1, attributeSettingsForm2, attributeButtonsForm);
-		attributesLayout.setMembersMargin(10);
-		attributesLayout.setWidth100();
-		addMember(attributesLayout);
-
-		refreshFieldForm();
+		return attributesLayout;
 	}
 
 	protected void addMetadata() {
@@ -606,100 +614,105 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	protected void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = attributesList.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttribute("name");
-				}
+		MenuItem delete = prepareDeleteContextMenuItem();
 
-				LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							for (String attrName : names)
-								attributeSet.removeAttribute(attrName);
-							attributesList.removeSelectedData();
-							clean();
-							detailsPanel.enableSave();
-						}
-					}
-				});
-			}
-		});
+		MenuItem applyValidationToTemplates = prepareApplyValidationToTemplatesContextMenuItem();
 
-		MenuItem applyValidationToTemplates = new MenuItem();
-		applyValidationToTemplates.setTitle(I18N.message("applyvalidationtotemplates"));
-		applyValidationToTemplates.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord selection = attributesList.getSelectedRecord();
-
-				LD.ask(I18N.message("applyvalidationtotemplates"), I18N.message("applyvalidationtotemplatesquestion"),
-						new BooleanCallback() {
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									LD.contactingServer();
-									AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
-											selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
-												@Override
-												public void onFailure(Throwable caught) {
-													GuiLog.serverError(caught);
-													LD.clearPrompt();
-												}
-
-												@Override
-												public void onSuccess(Void arg0) {
-													LD.clearPrompt();
-												}
-											});
-								}
-							}
-						});
-			}
-		});
-		applyValidationToTemplates.setEnabled(attributeSet.getId() != 0L);
-
-		MenuItem applyInitializationToTemplates = new MenuItem();
-		applyInitializationToTemplates.setTitle(I18N.message("applyinitializationtotemplates"));
-		applyInitializationToTemplates.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord selection = attributesList.getSelectedRecord();
-
-				LD.ask(I18N.message("applyinitializationtotemplates"),
-						I18N.message("applyinitializationtotemplatesquestion"), new BooleanCallback() {
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									LD.contactingServer();
-									AttributeSetService.Instance.get().applyInitializationToTemplates(
-											attributeSet.getId(), selection.getAttributeAsString("name"),
-											new AsyncCallback<Void>() {
-												@Override
-												public void onFailure(Throwable caught) {
-													GuiLog.serverError(caught);
-													LD.clearPrompt();
-												}
-
-												@Override
-												public void onSuccess(Void arg0) {
-													LD.clearPrompt();
-												}
-											});
-								}
-							}
-						});
-			}
-		});
-		applyInitializationToTemplates.setEnabled(attributeSet.getId() != 0L);
+		MenuItem applyInitializationToTemplates = prepareApplyInitializationToTemplatesContextMenuItem();
 
 		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, delete);
 		contextMenu.showContextMenu();
+	}
+
+	private MenuItem prepareApplyInitializationToTemplatesContextMenuItem() {
+		MenuItem applyInitializationToTemplates = new MenuItem();
+		applyInitializationToTemplates.setTitle(I18N.message("applyinitializationtotemplates"));
+		applyInitializationToTemplates.addClickHandler((MenuItemClickEvent applyInitializationToTemplatesClick) -> {
+			final ListGridRecord selection = attributesList.getSelectedRecord();
+
+			LD.ask(I18N.message("applyinitializationtotemplates"),
+					I18N.message("applyinitializationtotemplatesquestion"), (Boolean yes) -> {
+						if (yes) {
+							LD.contactingServer();
+							AttributeSetService.Instance.get().applyInitializationToTemplates(attributeSet.getId(),
+									selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+											LD.clearPrompt();
+										}
+
+										@Override
+										public void onSuccess(Void arg0) {
+											LD.clearPrompt();
+										}
+									});
+						}
+					});
+		});
+		applyInitializationToTemplates.setEnabled(attributeSet.getId() != 0L);
+		return applyInitializationToTemplates;
+	}
+
+	private MenuItem prepareApplyValidationToTemplatesContextMenuItem() {
+		MenuItem applyValidationToTemplates = new MenuItem();
+		applyValidationToTemplates.setTitle(I18N.message("applyvalidationtotemplates"));
+		applyValidationToTemplates.addClickHandler((MenuItemClickEvent applyValidationToTemplatesClick) -> {
+			final ListGridRecord selection = attributesList.getSelectedRecord();
+
+			LD.ask(I18N.message("applyvalidationtotemplates"), I18N.message("applyvalidationtotemplatesquestion"),
+					new BooleanCallback() {
+						@Override
+						public void execute(Boolean value) {
+							if (value) {
+								LD.contactingServer();
+								AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
+										selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
+											@Override
+											public void onFailure(Throwable caught) {
+												GuiLog.serverError(caught);
+												LD.clearPrompt();
+											}
+
+											@Override
+											public void onSuccess(Void arg0) {
+												LD.clearPrompt();
+											}
+										});
+							}
+						}
+					});
+		});
+		applyValidationToTemplates.setEnabled(attributeSet.getId() != 0L);
+		return applyValidationToTemplates;
+	}
+
+	private MenuItem prepareDeleteContextMenuItem() {
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler((MenuItemClickEvent deleteClick) -> {
+			final ListGridRecord[] selection = attributesList.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttribute("name");
+			}
+
+			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), new BooleanCallback() {
+				@Override
+				public void execute(Boolean value) {
+					if (value) {
+						for (String attrName : names)
+							attributeSet.removeAttribute(attrName);
+						attributesList.removeSelectedData();
+						clean();
+						detailsPanel.enableSave();
+					}
+				}
+			});
+		});
+		return delete;
 	}
 
 	protected void onChangeSelectedAttribute(Record record) {

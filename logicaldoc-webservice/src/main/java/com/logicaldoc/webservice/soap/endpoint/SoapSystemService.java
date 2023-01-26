@@ -38,92 +38,41 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	public WSParameter[] getStatistics(String sid) throws Exception {
 		validateSession(sid);
 
-		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
 		WSParameter[] parameters = new WSParameter[15];
 		try {
 			/*
 			 * Repository statistics
 			 */
-			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "docdir", null, Tenant.DEFAULT_ID);
-			WSParameter docDirSize = new WSParameter();
-			docDirSize.setName("repo_docs");
-			if (gen != null)
-				docDirSize.setValue(gen.getString1());
-			else
-				docDirSize.setValue("0");
+			WSParameter docDirSize = getDocDirSize();
 			parameters[0] = docDirSize;
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "userdir", null, Tenant.DEFAULT_ID);
-			WSParameter userDirSize = new WSParameter();
-			userDirSize.setName("repo_users");
-			if (gen != null)
-				userDirSize.setValue(gen.getString1());
-			else
-				userDirSize.setValue("0");
+			WSParameter userDirSize = getUserDirSize();
 			parameters[1] = userDirSize;
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexdir", null, Tenant.DEFAULT_ID);
-			WSParameter indexDirSize = new WSParameter();
-			indexDirSize.setName("repo_fulltextindex");
-			if (gen != null)
-				indexDirSize.setValue(gen.getString1());
-			else
-				indexDirSize.setValue("0");
-
+			WSParameter indexDirSize = getIndexDirSize();
 			parameters[2] = indexDirSize;
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "importdir", null, Tenant.DEFAULT_ID);
-			WSParameter importDirSize = new WSParameter();
-			importDirSize.setName("repo_import");
-			if (gen != null)
-				importDirSize.setValue(gen.getString1());
-			else
-				importDirSize.setValue("0");
+			WSParameter importDirSize = getImportDirSize();
 			parameters[3] = importDirSize;
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "exportdir", null, Tenant.DEFAULT_ID);
-			WSParameter exportDirSize = new WSParameter();
-			exportDirSize.setName("repo_export");
-			if (gen != null)
-				exportDirSize.setValue(gen.getString1());
-			else
-				exportDirSize.setValue("0");
+			WSParameter exportDirSize = getExportDirSize();
 			parameters[4] = exportDirSize;
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "plugindir", null, Tenant.DEFAULT_ID);
-			WSParameter pluginsDirSize = new WSParameter();
-			pluginsDirSize.setName("repo_plugins");
-			if (gen != null)
-				pluginsDirSize.setValue(gen.getString1());
-			else
-				pluginsDirSize.setValue("0");
+			WSParameter pluginsDirSize = getPluginsDirSize();
 			parameters[5] = pluginsDirSize;
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "dbdir", null, Tenant.DEFAULT_ID);
-			WSParameter dbDirSize = new WSParameter();
-			dbDirSize.setName("repo_database");
-			if (gen != null)
-				dbDirSize.setValue(gen.getString1());
-			else
-				dbDirSize.setValue("0");
-
+			WSParameter dbDirSize = getDbDirSize();
 			parameters[6] = dbDirSize;
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "logdir", null, Tenant.DEFAULT_ID);
-			WSParameter logsDirSize = new WSParameter();
-			logsDirSize.setName("repo_logs");
-			if (gen != null)
-				logsDirSize.setValue(gen.getString1());
-			else
-				logsDirSize.setValue("0");
-
+			WSParameter logsDirSize = getLogsDirSize();
 			parameters[7] = logsDirSize;
 
 			/*
 			 * Document statistics
 			 */
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexeddocs", null, Tenant.DEFAULT_ID);
+			GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexeddocs", null, Tenant.DEFAULT_ID);
 			WSParameter notIndexed = new WSParameter();
 			notIndexed.setName("docs_notindexed");
 			notIndexed.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
@@ -181,6 +130,50 @@ public class SoapSystemService extends AbstractService implements SystemService 
 		}
 
 		return parameters;
+	}
+
+	private WSParameter getStat(String statSubtype, String paramName) {
+		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, statSubtype, null, Tenant.DEFAULT_ID);
+		WSParameter logsDirSize = new WSParameter();
+		logsDirSize.setName(paramName);
+		if (gen != null)
+			logsDirSize.setValue(gen.getString1());
+		else
+			logsDirSize.setValue("0");
+		return logsDirSize;
+	}
+	
+	private WSParameter getLogsDirSize() {
+		return getStat("logdir", "repo_logs");
+	}
+
+	private WSParameter getDbDirSize() {
+		return getStat("dbdir", "repo_database");
+	}
+
+	private WSParameter getPluginsDirSize() {
+		return getStat("plugindir", "repo_plugins");
+	}
+
+	private WSParameter getExportDirSize() {
+		return getStat("exportdir", "repo_export");
+	}
+
+	private WSParameter getImportDirSize() {
+		return getStat("importdir", "repo_import");
+	}
+
+	private WSParameter getIndexDirSize() {
+		return getStat("indexdir", "repo_fulltextindex");
+	}
+
+	private WSParameter getUserDirSize() {
+		return getStat("userdir", "repo_users");
+	}
+
+	private WSParameter getDocDirSize() {
+		return getStat("docdir", "repo_docs");
 	}
 
 	@Override

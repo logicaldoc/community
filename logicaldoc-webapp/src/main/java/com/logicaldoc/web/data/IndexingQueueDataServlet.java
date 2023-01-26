@@ -38,7 +38,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
 		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -90,7 +90,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 				rec[19] = rs.getString(20);
 				return rec;
 			}
-		}, max);
+		}, max != null ? max : 100);
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));

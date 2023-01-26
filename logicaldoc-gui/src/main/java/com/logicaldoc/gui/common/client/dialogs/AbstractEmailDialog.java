@@ -15,7 +15,6 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -24,17 +23,12 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.grid.events.EditorExitEvent;
-import com.smartgwt.client.widgets.grid.events.EditorExitHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -111,60 +105,33 @@ public abstract class AbstractEmailDialog extends Window {
 		sendButton.setTitle(I18N.message("send"));
 		sendButton.setMargin(3);
 		sendButton.setHeight(30);
-		sendButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (!vm.hasErrors()) {
-					GUIEmail mail = new GUIEmail();
-					mail.setFrom(new GUIContact(from.getValueAsString()));
-					mail.setMessage(message.getValue().toString());
+		sendButton.addClickHandler((ClickEvent event) -> {
+			vm.validate();
+			if (vm.hasErrors())
+				return;
 
-					prepareEmail(mail);
+			GUIEmail mail = new GUIEmail();
+			mail.setFrom(new GUIContact(from.getValueAsString()));
+			mail.setMessage(message.getValue().toString());
 
-					List<String> to = new ArrayList<String>();
-					List<String> cc = new ArrayList<String>();
-					List<String> bcc = new ArrayList<String>();
-					ListGridRecord[] records = recipientsGrid.getRecords();
-					for (int i = 0; i < records.length; i++) {
-						if (!recipientsGrid.validateCell(i, "email"))
-							continue;
+			prepareEmail(mail);
 
-						ListGridRecord record = records[i];
-						if (record.getAttribute("email") == null || record.getAttribute("type").trim().equals(""))
-							continue;
-						if ("to".equals(record.getAttribute("type")))
-							to.add(record.getAttribute("email").trim());
-						else if ("cc".equals(record.getAttribute("type")))
-							cc.add(record.getAttribute("email").trim());
-						else
-							bcc.add(record.getAttribute("email").trim());
-					}
+			List<String> to = new ArrayList<String>();
+			List<String> cc = new ArrayList<String>();
+			List<String> bcc = new ArrayList<String>();
+			ListGridRecord[] records = recipientsGrid.getRecords();
+			fillRecipients(to, cc, bcc, records);
 
-					if (to.isEmpty() && cc.isEmpty()) {
-						SC.warn(I18N.message("leastvalidrecipient"));
-						return;
-					}
-
-					sendButton.disable();
-
-					List<GUIContact> tos = new ArrayList<GUIContact>();
-					for (String email : to)
-						tos.add(new GUIContact(email));
-					mail.setTos(tos.toArray(new GUIContact[0]));
-
-					List<GUIContact> ccs = new ArrayList<GUIContact>();
-					for (String email : cc)
-						ccs.add(new GUIContact(email));
-					mail.setCcs(ccs.toArray(new GUIContact[0]));
-
-					List<GUIContact> bccs = new ArrayList<GUIContact>();
-					for (String email : bcc)
-						bccs.add(new GUIContact(email));
-					mail.setBccs(bccs.toArray(new GUIContact[0]));
-
-					onSend(mail);
-				}
+			if (to.isEmpty() && cc.isEmpty()) {
+				SC.warn(I18N.message("leastvalidrecipient"));
+				return;
 			}
+
+			sendButton.disable();
+
+			setRecipients(mail, to, cc, bcc);
+
+			onSend(mail);
 		});
 
 		HLayout buttons = new HLayout();
@@ -177,6 +144,40 @@ public abstract class AbstractEmailDialog extends Window {
 
 		List<FormItem> items = prepareFormItems();
 		form.setFields(items.toArray(new FormItem[0]));
+	}
+
+	private void fillRecipients(List<String> to, List<String> cc, List<String> bcc, ListGridRecord[] records) {
+		for (int i = 0; i < records.length; i++) {
+			if (!recipientsGrid.validateCell(i, "email"))
+				continue;
+
+			ListGridRecord record = records[i];
+			if (record.getAttribute("email") == null || record.getAttribute("type").trim().equals(""))
+				continue;
+			if ("to".equals(record.getAttribute("type")))
+				to.add(record.getAttribute("email").trim());
+			else if ("cc".equals(record.getAttribute("type")))
+				cc.add(record.getAttribute("email").trim());
+			else
+				bcc.add(record.getAttribute("email").trim());
+		}
+	}
+
+	private void setRecipients(GUIEmail mail, List<String> to, List<String> cc, List<String> bcc) {
+		List<GUIContact> tos = new ArrayList<GUIContact>();
+		for (String email : to)
+			tos.add(new GUIContact(email));
+		mail.setTos(tos.toArray(new GUIContact[0]));
+
+		List<GUIContact> ccs = new ArrayList<GUIContact>();
+		for (String email : cc)
+			ccs.add(new GUIContact(email));
+		mail.setCcs(ccs.toArray(new GUIContact[0]));
+
+		List<GUIContact> bccs = new ArrayList<GUIContact>();
+		for (String email : bcc)
+			bccs.add(new GUIContact(email));
+		mail.setBccs(bccs.toArray(new GUIContact[0]));
 	}
 
 	protected abstract void onSend(GUIEmail mail);
@@ -197,20 +198,9 @@ public abstract class AbstractEmailDialog extends Window {
 		FormItem emailItem = ItemFactory.newEmailComboSelector("email", "email");
 		emailItem.setRequired(true);
 		emailItem.setWidth("*");
-		emailItem.addKeyPressHandler(new KeyPressHandler() {
-
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				// Delete the row
-				if (event.getKeyName().equals("Backspace")) {
-					ListGridRecord selection = recipientsGrid.getSelectedRecord();
-					if (selection.getAttribute("email") == null
-							|| selection.getAttribute("email").toString().equals(""))
-						if (recipientsGrid.getDataAsRecordList().getLength() > 1)
-							recipientsGrid.removeSelectedData();
-				}
-
-			}
+		emailItem.addKeyPressHandler((KeyPressEvent event) -> {
+			// Delete the row
+			handleBackspace(event);
 		});
 		email.setEditorType(emailItem);
 		email.setValidators(new EmailValidator());
@@ -231,32 +221,21 @@ public abstract class AbstractEmailDialog extends Window {
 		recipientsGrid.setEditEvent(ListGridEditEvent.CLICK);
 		recipientsGrid.setFields(type, email);
 
-		recipientsGrid.addEditCompleteHandler(new EditCompleteHandler() {
-
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
-				addEmptyRow();
-			}
+		recipientsGrid.addEditCompleteHandler((EditCompleteEvent event) -> {
+			addEmptyRow();
 		});
 
-		recipientsGrid.addEditorExitHandler(new EditorExitHandler() {
-
-			@Override
-			public void onEditorExit(EditorExitEvent event) {
-				addEmptyRow();
-			}
+		recipientsGrid.addEditorExitHandler((EditorExitEvent event) -> {
+			addEmptyRow();
 		});
 
-		recipientsGrid.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if (value == null)
-					return null;
-				if (colNum == 0)
-					return I18N.message(value.toString());
-				else
-					return value.toString();
-			}
+		recipientsGrid.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			if (value == null)
+				return null;
+			if (colNum == 0)
+				return I18N.message(value.toString());
+			else
+				return value.toString();
 		});
 
 		ListGridRecord record = new ListGridRecord();
@@ -266,48 +245,12 @@ public abstract class AbstractEmailDialog extends Window {
 
 		final SelectItem contactsSelector = ItemFactory.newEmailSelector("contacts", "contacts");
 		contactsSelector.setWidth(200);
-		contactsSelector.addChangedHandler(new ChangedHandler() {
+		contactsSelector.addChangedHandler((ChangedEvent event) -> {
+			ListGridRecord[] newSelection = contactsSelector.getSelectedRecords();
+			if (newSelection == null || newSelection.length < 1)
+				return;
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord[] newSelection = contactsSelector.getSelectedRecords();
-				if (newSelection == null || newSelection.length < 1)
-					return;
-
-				for (int i = 0; i < newSelection.length; i++) {
-					ListGridRecord newRec = new ListGridRecord();
-					newRec.setAttribute("email", newSelection[i].getAttributeAsString("email"));
-					newRec.setAttribute("type", "to");
-
-					// Iterate over the current recipients avoiding duplicates
-					boolean duplicate = false;
-					ListGridRecord[] currentRecipients = recipientsGrid.getRecords();
-					for (int j = 0; j < currentRecipients.length; j++) {
-						ListGridRecord rec = currentRecipients[j];
-						if (rec.getAttributeAsString("email").contains(newRec.getAttributeAsString("email"))) {
-							duplicate = true;
-							break;
-						}
-					}
-
-					if (!duplicate) {
-						// Iterate over the current recipients finding an empty
-						// slot
-						boolean empty = false;
-						for (int j = 0; j < currentRecipients.length; j++) {
-							if (currentRecipients[j].getAttributeAsString("email").isEmpty()) {
-								empty = true;
-								currentRecipients[j].setAttribute("email", newRec.getAttributeAsString("email"));
-								recipientsGrid.refreshRow(j);
-								break;
-							}
-						}
-
-						if (!empty)
-							recipientsGrid.addData(newRec);
-					}
-				}
-			}
+			addSelectedRecipients(newSelection);
 		});
 
 		DynamicForm addressbook = new DynamicForm();
@@ -317,6 +260,55 @@ public abstract class AbstractEmailDialog extends Window {
 		sectionStack.setSections(section);
 
 		return sectionStack;
+	}
+
+	private void addSelectedRecipients(ListGridRecord[] newSelection) {
+		for (int i = 0; i < newSelection.length; i++) {
+			ListGridRecord newRec = new ListGridRecord();
+			newRec.setAttribute("email", newSelection[i].getAttributeAsString("email"));
+			newRec.setAttribute("type", "to");
+
+			addSelectedRecipient(newRec);
+		}
+	}
+
+	private void addSelectedRecipient(ListGridRecord newRec) {
+		// Iterate over the current recipients avoiding duplicates
+		boolean duplicate = false;
+		ListGridRecord[] currentRecipients = recipientsGrid.getRecords();
+		for (int j = 0; j < currentRecipients.length; j++) {
+			ListGridRecord rec = currentRecipients[j];
+			if (rec.getAttributeAsString("email").contains(newRec.getAttributeAsString("email"))) {
+				duplicate = true;
+				break;
+			}
+		}
+
+		if (!duplicate) {
+			// Iterate over the current recipients finding an empty
+			// slot
+			boolean empty = false;
+			for (int j = 0; j < currentRecipients.length; j++) {
+				if (currentRecipients[j].getAttributeAsString("email").isEmpty()) {
+					empty = true;
+					currentRecipients[j].setAttribute("email", newRec.getAttributeAsString("email"));
+					recipientsGrid.refreshRow(j);
+					break;
+				}
+			}
+
+			if (!empty)
+				recipientsGrid.addData(newRec);
+		}
+	}
+
+	private void handleBackspace(KeyPressEvent event) {
+		if (event.getKeyName().equals("Backspace")) {
+			ListGridRecord selection = recipientsGrid.getSelectedRecord();
+			if (selection.getAttribute("email") == null || selection.getAttribute("email").toString().equals(""))
+				if (recipientsGrid.getDataAsRecordList().getLength() > 1)
+					recipientsGrid.removeSelectedData();
+		}
 	}
 
 	private void addEmptyRow() {

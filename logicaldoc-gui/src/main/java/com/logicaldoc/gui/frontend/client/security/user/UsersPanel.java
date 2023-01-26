@@ -30,7 +30,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -167,7 +166,7 @@ public class UsersPanel extends AdminPanel {
 		ListGridField email = new ListGridField("email", I18N.message("email"), 200);
 		email.setCanFilter(true);
 		email.setCellFormatter(new UserCellFormatter());
-		
+
 		DateListGridField expire = new DateListGridField("expire", "expireson",
 				DateListGridField.DateCellFormatter.FORMAT_SHORT);
 		expire.setCellFormatter(new UserDateCellFormatter());
@@ -196,7 +195,7 @@ public class UsersPanel extends AdminPanel {
 		ListGridField timeZone = new ListGridField("timeZone", I18N.message("timezone"), 120);
 		timeZone.setHidden(true);
 		timeZone.setCanFilter(true);
-		
+
 		UserListGridField avatar = new UserListGridField(true);
 
 		list = new RefreshableListGrid();
@@ -245,21 +244,20 @@ public class UsersPanel extends AdminPanel {
 	}
 
 	private void onSelectUser(long userId) {
-		SecurityService.Instance.get().getUser(userId,
-				new AsyncCallback<GUIUser>() {
+		SecurityService.Instance.get().getUser(userId, new AsyncCallback<GUIUser>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIUser user) {
-						showUserDetails(user);
-					}
-				});
+			@Override
+			public void onSuccess(GUIUser user) {
+				showUserDetails(user);
+			}
+		});
 	}
-	
+
 	/**
 	 * Updates the selected record with new data
 	 * 
@@ -318,123 +316,20 @@ public class UsersPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord[] records = list.getSelectedRecords();
-		final long id = Long.parseLong(records[0].getAttributeAsString("id"));
+		final ListGridRecord[] selectedUsers = list.getSelectedRecords();
+		final long selectedUserId = Long.parseLong(selectedUsers[0].getAttributeAsString("id"));
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SecurityService.Instance.get().deleteUser(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		MenuItem delete = prepareDeleteMenuItem(selectedUserId);
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									details = SELECT_USER;
-									detailsContainer.setMembers(details);
-								}
-							});
-						}
-					}
-				});
-			}
-		});
+		MenuItem password = preparePasswordMenuItem(selectedUsers);
 
-		MenuItem password = new MenuItem();
-		password.setTitle(I18N.message("changepassword"));
-		password.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SetPassword dialog = new SetPassword(Long.parseLong(records[0].getAttributeAsString("id")));
-				dialog.show();
-			}
-		});
+		MenuItem replicate = prepareReplicateMenuItem(selectedUsers);
 
-		MenuItem replicate = new MenuItem();
-		replicate.setTitle(I18N.message("replicatesettings"));
-		replicate.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				List<Long> selectedIds = new ArrayList<Long>();
-				for (ListGridRecord record : records)
-					selectedIds.add(record.getAttributeAsLong("id"));
-				ReplicateUserSettings dialog = new ReplicateUserSettings(selectedIds, UsersPanel.this);
-				dialog.show();
-			}
-		});
+		MenuItem twoTactorsAuth = prepareTwoFactorsAuth(selectedUsers);
 
-		MenuItem twoTactorsAuth = new MenuItem();
-		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
-		twoTactorsAuth.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SecurityService.Instance.get().getUser(records[0].getAttributeAsLong("id"),
-						new AsyncCallback<GUIUser>() {
+		MenuItem enableUser = prepareEnableUserMenuItem();
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIUser user) {
-								TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
-								dialog.show();
-							}
-						});
-			}
-		});
-
-		MenuItem enableUser = new MenuItem();
-		enableUser.setTitle(I18N.message("enable"));
-		enableUser.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true,
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.getSelectedRecord().setAttribute("enabledIcon", "0");
-								list.getSelectedRecord().setAttribute("eenabled", true);
-								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
-								onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));					
-							}
-						});
-			}
-		});
-
-		MenuItem disableUser = new MenuItem();
-		disableUser.setTitle(I18N.message("disable"));
-		disableUser.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false,
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.getSelectedRecord().setAttribute("enabledIcon", "2");
-								list.getSelectedRecord().setAttribute("eenabled", false);
-								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
-								onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));	
-							}
-						});
-
-			}
-		});
+		MenuItem disableUser = prepareDisableUserMenuItem();
 
 		List<MenuItem> items = new ArrayList<MenuItem>();
 		if (!Session.get().isAdmin()) {
@@ -459,14 +354,14 @@ public class UsersPanel extends AdminPanel {
 
 		contextMenu.setItems(items.toArray(new MenuItem[0]));
 
-		password.setEnabled(records.length == 1 && !Session.get().isDemo());
-		twoTactorsAuth.setEnabled(records.length == 1 && !Session.get().isDemo());
-		delete.setEnabled(records.length == 1 && !Session.get().isDemo());
-		enableUser.setEnabled(records.length == 1);
-		disableUser.setEnabled(records.length == 1);
+		password.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
+		twoTactorsAuth.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
+		delete.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
+		enableUser.setEnabled(selectedUsers.length == 1);
+		disableUser.setEnabled(selectedUsers.length == 1);
 		replicate.setEnabled(!Session.get().isDemo());
 
-		if ("admin".equals(records[0].getAttributeAsString("username"))) {
+		if ("admin".equals(selectedUsers[0].getAttributeAsString("username"))) {
 			delete.setEnabled(false);
 			if (!Session.get().getUser().getUsername().equalsIgnoreCase("admin")) {
 				password.setEnabled(false);
@@ -474,6 +369,122 @@ public class UsersPanel extends AdminPanel {
 		}
 
 		contextMenu.showContextMenu();
+	}
+
+	private MenuItem prepareDisableUserMenuItem() {
+		MenuItem disableUser = new MenuItem();
+		disableUser.setTitle(I18N.message("disable"));
+		disableUser.addClickHandler((MenuItemClickEvent event) -> {
+			SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false,
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.getSelectedRecord().setAttribute("enabledIcon", "2");
+							list.getSelectedRecord().setAttribute("eenabled", false);
+							list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+							onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
+						}
+					});
+		});
+		return disableUser;
+	}
+
+	private MenuItem prepareEnableUserMenuItem() {
+		MenuItem enableUser = new MenuItem();
+		enableUser.setTitle(I18N.message("enable"));
+		enableUser.addClickHandler((MenuItemClickEvent event) -> {
+			SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true,
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.getSelectedRecord().setAttribute("enabledIcon", "0");
+							list.getSelectedRecord().setAttribute("eenabled", true);
+							list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+							onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
+						}
+					});
+		});
+		return enableUser;
+	}
+
+	private MenuItem prepareTwoFactorsAuth(final ListGridRecord[] selectedUsers) {
+		MenuItem twoTactorsAuth = new MenuItem();
+		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
+		twoTactorsAuth.addClickHandler((MenuItemClickEvent event) -> {
+			SecurityService.Instance.get().getUser(selectedUsers[0].getAttributeAsLong("id"), new AsyncCallback<GUIUser>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIUser user) {
+					TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
+					dialog.show();
+				}
+			});
+		});
+		return twoTactorsAuth;
+	}
+
+	private MenuItem prepareReplicateMenuItem(final ListGridRecord[] selectedUsers) {
+		MenuItem replicate = new MenuItem();
+		replicate.setTitle(I18N.message("replicatesettings"));
+		replicate.addClickHandler((MenuItemClickEvent event) -> {
+			List<Long> selectedIds = new ArrayList<Long>();
+			for (ListGridRecord record : selectedUsers)
+				selectedIds.add(record.getAttributeAsLong("id"));
+			ReplicateUserSettings dialog = new ReplicateUserSettings(selectedIds, UsersPanel.this);
+			dialog.show();
+		});
+		return replicate;
+	}
+
+	private MenuItem preparePasswordMenuItem(final ListGridRecord[] selectedUsers) {
+		MenuItem password = new MenuItem();
+		password.setTitle(I18N.message("changepassword"));
+		password.addClickHandler((MenuItemClickEvent event) -> {
+			SetPassword dialog = new SetPassword(Long.parseLong(selectedUsers[0].getAttributeAsString("id")));
+			dialog.show();
+		});
+		return password;
+	}
+
+	private MenuItem prepareDeleteMenuItem(final long selectedUserId) {
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler((MenuItemClickEvent event) -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
+				if (yes) {
+					SecurityService.Instance.get().deleteUser(selectedUserId, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+							details = SELECT_USER;
+							detailsContainer.setMembers(details);
+						}
+					});
+				}
+			});
+		});
+		return delete;
 	}
 
 	void refresh() {

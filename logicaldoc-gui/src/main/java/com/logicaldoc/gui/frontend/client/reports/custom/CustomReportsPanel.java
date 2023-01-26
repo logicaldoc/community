@@ -211,42 +211,45 @@ public class CustomReportsPanel extends AdminPanel {
 
 			@Override
 			public void onSuccess(GUIReport[] reports) {
-				for (GUIReport report : reports) {
-					for (ListGridRecord record : list.getRecords()) {
-						if (Long.parseLong(record.getAttributeAsString("id")) != report.getId())
-							continue;
-
-						long oldVersion = record.getAttributeAsLong("recordVersion");
-
-						record.setAttribute("runningIcon", record.getAttribute("name").equals(report.getName())
-								&& report.getStatus() != GUIReport.STATUS_IDLE ? "running_task" : "idle_task");
-						record.setAttribute("status", report.getStatus());
-						record.setAttribute("lastRun", report.getLastRun());
-						record.setAttribute("lastModified", report.getLastModified());
-						record.setAttribute("recordVersion", report.getRecordVersion());
-
-						if (report.getOutputDocId() != null)
-							record.setAttribute("outputDocId", "" + report.getOutputDocId());
-						else
-							record.setAttribute("outputDocId", (String) null);
-						list.refreshRow(list.getRecordIndex(record));
-
-						boolean selected = list.getSelectedRecord() != null ? record.equals(list.getSelectedRecord())
-								: false;
-
-						// Decide if we have to refresh the properties
-						// panel
-						if (selected && report.getRecordVersion() != oldVersion) {
-							onSelectedReport();
-						}
-
-						break;
-					}
-				}
+				for (GUIReport report : reports)
+					updateReportRecord(report);
 			}
 		});
 	}
 
+	private void updateReportRecord(GUIReport report) {
+		for (ListGridRecord record : list.getRecords()) {
+			if (Long.parseLong(record.getAttributeAsString("id")) != report.getId())
+				continue;
+
+			long oldVersion = record.getAttributeAsLong("recordVersion");
+
+			record.setAttribute("runningIcon", record.getAttribute("name").equals(report.getName())
+					&& report.getStatus() != GUIReport.STATUS_IDLE ? "running_task" : "idle_task");
+			record.setAttribute("status", report.getStatus());
+			record.setAttribute("lastRun", report.getLastRun());
+			record.setAttribute("lastModified", report.getLastModified());
+			record.setAttribute("recordVersion", report.getRecordVersion());
+
+			if (report.getOutputDocId() != null)
+				record.setAttribute("outputDocId", "" + report.getOutputDocId());
+			else
+				record.setAttribute("outputDocId", (String) null);
+			list.refreshRow(list.getRecordIndex(record));
+
+			boolean selected = list.getSelectedRecord() != null ? record.equals(list.getSelectedRecord())
+					: false;
+
+			// Decide if we have to refresh the properties
+			// panel
+			if (selected && report.getRecordVersion() != oldVersion) {
+				onSelectedReport();
+			}
+
+			break;
+		}
+	}
+	
 	private boolean canUploadDesign() {
 		return Session.get().getUser().getTenant().isDefault() && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 	}

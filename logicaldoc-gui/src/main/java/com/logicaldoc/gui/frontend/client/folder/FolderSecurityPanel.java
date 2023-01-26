@@ -33,12 +33,10 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -78,57 +76,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		container.removeMembers(container.getMembers());
 
 		if (folder.getSecurityRef() != null) {
-			FolderService.Instance.get().getFolder(folder.getSecurityRef().getId(), true, false, false,
-					new AsyncCallback<GUIFolder>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(final GUIFolder refFolder) {
-							inheritInfoPanel = new HLayout();
-							inheritInfoPanel.setMembersMargin(5);
-							inheritInfoPanel.setStyleName("warn");
-							inheritInfoPanel.setWidth100();
-							inheritInfoPanel.setHeight(20);
-
-							Label label = new Label(I18N.message("rightsinheritedfrom"));
-							label.setWrap(false);
-
-							Label path = new Label("<b><span style='text-decoration: underline'>"
-									+ refFolder.getPathExtended() + "</span></b>");
-							path.setWrap(false);
-							path.addClickHandler(new ClickHandler() {
-								@Override
-								public void onClick(ClickEvent event) {
-									FolderNavigator.get().openFolder(refFolder.getId());
-								}
-							});
-
-							HTMLPane spacer = new HTMLPane();
-							spacer.setContents("<div>&nbsp;</div>");
-							spacer.setWidth("*");
-							spacer.setOverflow(Overflow.HIDDEN);
-
-							Img closeImage = ItemFactory.newImgIcon("delete.png");
-							closeImage.setHeight("16px");
-							closeImage.addClickHandler(new ClickHandler() {
-								@Override
-								public void onClick(ClickEvent event) {
-									inheritInfoPanel.setVisible(false);
-								}
-							});
-							closeImage.setCursor(Cursor.HAND);
-							closeImage.setTooltip(I18N.message("close"));
-							closeImage.setLayoutAlign(Alignment.RIGHT);
-							closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-							inheritInfoPanel.setMembers(label, path, spacer, closeImage);
-							container.addMember(inheritInfoPanel, 0);
-						}
-					});
+			displayInheritingPanel(folder);
 		}
 
 		ListGridField entityId = new ListGridField("entityId", "entityId");
@@ -196,31 +144,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		export.setCanEdit(true);
 		export.setAutoFitWidth(true);
 
-		ListGridField sign = new ListGridField("sign", I18N.message("sign"));
-		sign.setType(ListGridFieldType.BOOLEAN);
-		sign.setCanEdit(true);
-		sign.setAutoFitWidth(true);
-
-		ListGridField archive = new ListGridField("archive", I18N.message("archive"));
-		archive.setType(ListGridFieldType.BOOLEAN);
-		archive.setCanEdit(true);
-		archive.setAutoFitWidth(true);
-
-		ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"));
-		workflow.setType(ListGridFieldType.BOOLEAN);
-		workflow.setCanEdit(true);
-		workflow.setAutoFitWidth(true);
-
-		ListGridField calendar = new ListGridField("calendar", I18N.message("calendar"));
-		calendar.setType(ListGridFieldType.BOOLEAN);
-		calendar.setCanEdit(true);
-		calendar.setAutoFitWidth(true);
-
-		ListGridField subscription = new ListGridField("subscription", I18N.message("subscription"));
-		subscription.setType(ListGridFieldType.BOOLEAN);
-		subscription.setCanEdit(true);
-		subscription.setAutoFitWidth(true);
-
 		ListGridField password = new ListGridField("password", I18N.message("password"));
 		password.setType(ListGridFieldType.BOOLEAN);
 		password.setCanEdit(true);
@@ -235,16 +158,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		email.setType(ListGridFieldType.BOOLEAN);
 		email.setCanEdit(true);
 		email.setAutoFitWidth(true);
-
-		ListGridField automation = new ListGridField("automation", I18N.message("automation"));
-		automation.setType(ListGridFieldType.BOOLEAN);
-		automation.setCanEdit(true);
-		automation.setAutoFitWidth(true);
-
-		ListGridField storage = new ListGridField("storage", I18N.message("storage"));
-		storage.setType(ListGridFieldType.BOOLEAN);
-		storage.setCanEdit(true);
-		storage.setAutoFitWidth(true);
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -273,38 +186,108 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		fields.add(password);
 		fields.add(_import);
 		fields.add(export);
-		if (Feature.enabled(Feature.DIGITAL_SIGNATURE))
-			fields.add(sign);
-		if (Feature.enabled(Feature.ARCHIVING) || Feature.enabled(Feature.IMPEX))
-			fields.add(archive);
-		if (Feature.enabled(Feature.WORKFLOW))
-			fields.add(workflow);
-		if (Feature.enabled(Feature.CALENDAR))
-			fields.add(calendar);
-		if (Feature.enabled(Feature.AUDIT))
-			fields.add(subscription);
-		if (Feature.enabled(Feature.AUTOMATION))
-			fields.add(automation);
-		if (Feature.enabled(Feature.MULTI_STORAGE))
-			fields.add(storage);
+		addSign(fields);
+		addArchive(fields);
+		addWorkflow(fields);
+		addCalendar(fields);
+		addSubscription(fields);
+		addAutomation(fields);
+		addStorage(fields);
 
 		list.setFields(fields.toArray(new ListGridField[0]));
 
 		container.addMember(list);
 
-		if (folder != null && folder.hasPermission(Constants.PERMISSION_SECURITY)) {
-			list.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
-					if (event.getColNum() == 0) {
-						Menu contextMenu = setupContextMenu();
-						contextMenu.showContextMenu();
-					}
-					event.cancel();
-				}
-			});
-		}
+		addCellContextClickHandler(folder);
 
+		addButtons(folder);
+	}
+
+	private void displayInheritingPanel(GUIFolder folder) {
+		FolderService.Instance.get().getFolder(folder.getSecurityRef().getId(), true, false, false,
+				new AsyncCallback<GUIFolder>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(final GUIFolder refFolder) {
+						inheritInfoPanel = new HLayout();
+						inheritInfoPanel.setMembersMargin(5);
+						inheritInfoPanel.setStyleName("warn");
+						inheritInfoPanel.setWidth100();
+						inheritInfoPanel.setHeight(20);
+
+						Label label = new Label(I18N.message("rightsinheritedfrom"));
+						label.setWrap(false);
+
+						Label path = new Label("<b><span style='text-decoration: underline'>"
+								+ refFolder.getPathExtended() + "</span></b>");
+						path.setWrap(false);
+						path.addClickHandler(new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								FolderNavigator.get().openFolder(refFolder.getId());
+							}
+						});
+
+						HTMLPane spacer = new HTMLPane();
+						spacer.setContents("<div>&nbsp;</div>");
+						spacer.setWidth("*");
+						spacer.setOverflow(Overflow.HIDDEN);
+
+						Img closeImage = ItemFactory.newImgIcon("delete.png");
+						closeImage.setHeight("16px");
+						closeImage.addClickHandler(new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								inheritInfoPanel.setVisible(false);
+							}
+						});
+						closeImage.setCursor(Cursor.HAND);
+						closeImage.setTooltip(I18N.message("close"));
+						closeImage.setLayoutAlign(Alignment.RIGHT);
+						closeImage.setLayoutAlign(VerticalAlignment.CENTER);
+
+						inheritInfoPanel.setMembers(label, path, spacer, closeImage);
+						container.addMember(inheritInfoPanel, 0);
+					}
+				});
+	}
+
+	private void addStorage(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.MULTI_STORAGE)) {
+			ListGridField storage = new ListGridField("storage", I18N.message("storage"));
+			storage.setType(ListGridFieldType.BOOLEAN);
+			storage.setCanEdit(true);
+			storage.setAutoFitWidth(true);
+			fields.add(storage);
+		}
+	}
+
+	private void addAutomation(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.AUTOMATION)) {
+			ListGridField automation = new ListGridField("automation", I18N.message("automation"));
+			automation.setType(ListGridFieldType.BOOLEAN);
+			automation.setCanEdit(true);
+			automation.setAutoFitWidth(true);
+			fields.add(automation);
+		}
+	}
+
+	private void addSubscription(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.AUDIT)) {
+			ListGridField subscription = new ListGridField("subscription", I18N.message("subscription"));
+			subscription.setType(ListGridFieldType.BOOLEAN);
+			subscription.setCanEdit(true);
+			subscription.setAutoFitWidth(true);
+			fields.add(subscription);
+		}
+	}
+
+	private void addButtons(GUIFolder folder) {
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(4);
 		buttons.setWidth100();
@@ -319,18 +302,12 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		applyRightsSubfolders.setAutoFit(true);
 		buttons.addMember(applyRightsSubfolders);
 
-		applyRights.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave(false);
-			}
+		applyRights.addClickHandler((ClickEvent applyClick) -> {
+			onSave(false);
 		});
 
-		applyRightsSubfolders.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave(true);
-			}
+		applyRightsSubfolders.addClickHandler((ClickEvent rightsClick) -> {
+			onSave(true);
 		});
 
 		Button inheritFromParent = new Button(I18N.message("inheritfromparent"));
@@ -352,25 +329,21 @@ public class FolderSecurityPanel extends FolderDetailTab {
 								LD.ask(I18N.message("inheritrights"),
 										I18N.message("inheritrightsask",
 												new String[] { folder.getName(), parent.getName() }),
-										new BooleanCallback() {
+										(Boolean interitConfirmed) -> {
+											if (interitConfirmed) {
+												FolderService.Instance.get().inheritRights(folder.getId(),
+														folder.getParentId(), new AsyncCallback<GUIFolder>() {
 
-											@Override
-											public void execute(Boolean value) {
-												if (value) {
-													FolderService.Instance.get().inheritRights(folder.getId(),
-															folder.getParentId(), new AsyncCallback<GUIFolder>() {
+															@Override
+															public void onFailure(Throwable caught) {
+																GuiLog.serverError(caught);
+															}
 
-																@Override
-																public void onFailure(Throwable caught) {
-																	GuiLog.serverError(caught);
-																}
-
-																@Override
-																public void onSuccess(GUIFolder arg) {
-																	FolderSecurityPanel.this.refresh(arg);
-																}
-															});
-												}
+															@Override
+															public void onSuccess(GUIFolder arg) {
+																FolderSecurityPanel.this.refresh(arg);
+															}
+														});
 											}
 										});
 							}
@@ -382,104 +355,151 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		Button inheritRights = new Button(I18N.message("inheritrights"));
 		inheritRights.setAutoFit(true);
 		buttons.addMember(inheritRights);
-		inheritRights.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				InheritRightsDialog dialog = new InheritRightsDialog(FolderSecurityPanel.this);
-				dialog.show();
-			}
+		inheritRights.addClickHandler((ClickEvent InheritClick) -> {
+			InheritRightsDialog dialog = new InheritRightsDialog(FolderSecurityPanel.this);
+			dialog.show();
 		});
 
-		// Prepare the combo and button for adding a new Group
-		final DynamicForm groupForm = new DynamicForm();
-		final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
-		groupForm.setItems(group);
-		buttons.addMember(groupForm);
+		addGroupSelector(buttons);
 
-		group.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord selectedRecord = group.getSelectedRecord();
-				if (selectedRecord == null)
-					return;
+		addUserSelector(buttons);
 
-				// Check if the selected user is already present in the rights
-				// table
-				ListGridRecord[] records = list.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
-						group.clearValue();
-						return;
-					}
-				}
+		addExportAndPrintButtons(buttons);
+	}
 
-				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-				record.setAttribute("avatar", "group");
-				record.setAttribute("entity", selectedRecord.getAttribute("name"));
-				record.setAttribute("read", true);
-				list.addData(record);
-				group.clearValue();
-			}
-		});
-
+	private void addUserSelector(HLayout buttons) {
 		final DynamicForm userForm = new DynamicForm();
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
-		user.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord selectedRecord = user.getSelectedRecord();
-				if (selectedRecord == null)
+		user.addChangedHandler((ChangedEvent userChangedEvent) -> {
+			ListGridRecord selectedRecord = user.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
+
+			/*
+			 * Check if the selected user is already present in the rights table
+			 */
+			ListGridRecord[] records = list.getRecords();
+			for (ListGridRecord test : records) {
+				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
+					user.clearValue();
 					return;
-
-				/*
-				 * Check if the selected user is already present in the rights
-				 * table
-				 */
-				ListGridRecord[] records = list.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
-						user.clearValue();
-						return;
-					}
 				}
-
-				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-				record.setAttribute("avatar", selectedRecord.getAttribute("id"));
-				record.setAttribute("entity",
-						selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-				record.setAttribute("read", true);
-
-				list.addData(record);
-				user.clearValue();
 			}
+
+			// Update the rights table
+			ListGridRecord record = new ListGridRecord();
+			record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
+			record.setAttribute("avatar", selectedRecord.getAttribute("id"));
+			record.setAttribute("entity",
+					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
+			record.setAttribute("read", true);
+
+			list.addData(record);
+			user.clearValue();
 		});
 		buttons.addMember(userForm);
+	}
 
+	private void addGroupSelector(HLayout buttons) {
+		// Prepare the combo and button for adding a new Group
+		final DynamicForm groupForm = new DynamicForm();
+		final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
+		groupForm.setItems(group);
+		group.addChangedHandler((ChangedEvent changedEvent) -> {
+			ListGridRecord selectedRecord = group.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
+
+			// Check if the selected user is already present in the rights
+			// table
+			ListGridRecord[] records = list.getRecords();
+			for (ListGridRecord test : records) {
+				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
+					group.clearValue();
+					return;
+				}
+			}
+
+			// Update the rights table
+			ListGridRecord record = new ListGridRecord();
+			record.setAttribute("entityId", selectedRecord.getAttribute("id"));
+			record.setAttribute("avatar", "group");
+			record.setAttribute("entity", selectedRecord.getAttribute("name"));
+			record.setAttribute("read", true);
+			list.addData(record);
+			group.clearValue();
+		});
+		buttons.addMember(groupForm);
+	}
+
+	private void addExportAndPrintButtons(HLayout buttons) {
 		Button exportButton = new Button(I18N.message("export"));
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
-		exportButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
+		exportButton.addClickHandler((ClickEvent exportClick) -> {
+			GridUtil.exportCSV(list, true);
 		});
 
 		Button printButton = new Button(I18N.message("print"));
 		printButton.setAutoFit(true);
 		buttons.addMember(printButton);
-		printButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
+		printButton.addClickHandler((ClickEvent printClick) -> {
+			GridUtil.print(list);
 		});
+	}
+
+	private void addCellContextClickHandler(GUIFolder folder) {
+		if (folder != null && folder.hasPermission(Constants.PERMISSION_SECURITY)) {
+			list.addCellContextClickHandler((CellContextClickEvent contextClick) -> {
+				if (contextClick.getColNum() == 0) {
+					Menu contextMenu = setupContextMenu();
+					contextMenu.showContextMenu();
+				}
+				contextClick.cancel();
+			});
+		}
+	}
+
+	private void addCalendar(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.CALENDAR)) {
+			ListGridField calendar = new ListGridField("calendar", I18N.message("calendar"));
+			calendar.setType(ListGridFieldType.BOOLEAN);
+			calendar.setCanEdit(true);
+			calendar.setAutoFitWidth(true);
+			fields.add(calendar);
+		}
+	}
+
+	private void addWorkflow(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.WORKFLOW)) {
+			ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"));
+			workflow.setType(ListGridFieldType.BOOLEAN);
+			workflow.setCanEdit(true);
+			workflow.setAutoFitWidth(true);
+			fields.add(workflow);
+		}
+	}
+
+	private void addArchive(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.ARCHIVING) || Feature.enabled(Feature.IMPEX)) {
+			ListGridField archive = new ListGridField("archive", I18N.message("archive"));
+			archive.setType(ListGridFieldType.BOOLEAN);
+			archive.setCanEdit(true);
+			archive.setAutoFitWidth(true);
+			fields.add(archive);
+		}
+	}
+
+	private void addSign(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.DIGITAL_SIGNATURE)) {
+			ListGridField sign = new ListGridField("sign", I18N.message("sign"));
+			sign.setType(ListGridFieldType.BOOLEAN);
+			sign.setCanEdit(true);
+			sign.setAutoFitWidth(true);
+			fields.add(sign);
+		}
 	}
 
 	/**

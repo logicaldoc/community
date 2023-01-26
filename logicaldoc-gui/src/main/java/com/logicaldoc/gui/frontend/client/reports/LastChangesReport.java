@@ -308,93 +308,109 @@ public class LastChangesReport extends AdminPanel {
 
 		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-		if (vm.validate()) {
-			String[] eventValues = new String[0];
-			if (values.get("event") != null) {
-				String buf = values.get("event").toString().trim().toLowerCase();
-				buf = buf.replace('[', ' ');
-				buf = buf.replace(']', ' ');
-				buf = buf.replace(" ", "");
-				eventValues = buf.split(",");
-			}
+		if (!vm.validate())
+			return;
 
-			Long userId = null;
-			if (values.get("user") != null) {
-				if (values.get("user") instanceof Long)
-					userId = (Long) values.get("user");
-				else
-					userId = Long.parseLong(values.get("user").toString());
-			}
+		String[] eventValues = getEvents(values);
 
-			Date fromValue = null;
-			if (values.get("fromDate") != null)
-				fromValue = (Date) values.get("fromDate");
-			Date tillValue = null;
-			if (values.get("tillDate") != null)
-				tillValue = (Date) values.get("tillDate");
+		Long userId = getUserId(values);
 
-			String sid = null;
-			if (values.get("sid") != null)
-				sid = (String) values.get("sid");
+		Date fromValue = null;
+		if (values.get("fromDate") != null)
+			fromValue = (Date) values.get("fromDate");
+		Date tillValue = null;
+		if (values.get("tillDate") != null)
+			tillValue = (Date) values.get("tillDate");
 
-			int displayMaxValue = 0;
-			try {
-				if (values.get("displayMax") != null) {
-					if (values.get("displayMax") instanceof Integer)
-						displayMaxValue = (Integer) values.get("displayMax");
-					else
-						displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
-				}
-			} catch (Throwable t) {
-				// Nothing to do
-			}
+		String sid = null;
+		if (values.get("sid") != null)
+			sid = (String) values.get("sid");
 
-			LD.contactingServer();
-			SystemService.Instance.get().search(userId, fromValue, tillValue, displayMaxValue, sid, eventValues,
-					folder.getFolderId(), new AsyncCallback<GUIHistory[]>() {
+		int displayMaxValue = getDisplayMax(values);
 
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+		doSearch(eventValues, userId, fromValue, tillValue, sid, displayMaxValue);
+	}
 
-						@Override
-						public void onSuccess(GUIHistory[] result) {
-							LD.clearPrompt();
-
-							if (result != null && result.length > 0) {
-								ListGridRecord[] records = new ListGridRecord[result.length];
-								for (int i = 0; i < result.length; i++) {
-									ListGridRecord record = new ListGridRecord();
-									record.setAttribute("event", I18N.message(result[i].getEvent()));
-									record.setAttribute("date", result[i].getDate());
-									record.setAttribute("user", result[i].getUsername());
-									record.setAttribute("name", result[i].getFileName());
-									record.setAttribute("folder", result[i].getPath());
-									record.setAttribute("sid", result[i].getSessionId());
-									record.setAttribute("docId", result[i].getDocId());
-									record.setAttribute("folderId", result[i].getFolderId());
-									record.setAttribute("userId", result[i].getUserId());
-									record.setAttribute("ip", result[i].getIp());
-									record.setAttribute("device", result[i].getDevice());
-									record.setAttribute("geolocation", result[i].getGeolocation());
-									record.setAttribute("username", result[i].getUserLogin());
-									record.setAttribute("comment", result[i].getComment());
-									record.setAttribute("reason", result[i].getReason());
-									record.setAttribute("icon", result[i].getIcon());
-									records[i] = record;
-								}
-								histories.setData(records);
-							}
-							lastchanges.removeMember(infoPanel);
-							infoPanel = new InfoPanel("");
-							infoPanel.setMessage(
-									I18N.message("showelements", Integer.toString(histories.getTotalRows())));
-							lastchanges.addMember(infoPanel, 1);
-						}
-					});
+	private String[] getEvents(final Map<String, Object> values) {
+		String[] eventValues = new String[0];
+		if (values.get("event") != null) {
+			String buf = values.get("event").toString().trim().toLowerCase();
+			buf = buf.replace('[', ' ');
+			buf = buf.replace(']', ' ');
+			buf = buf.replace(" ", "");
+			eventValues = buf.split(",");
 		}
+		return eventValues;
+	}
+
+	private Long getUserId(final Map<String, Object> values) {
+		Long userId = null;
+		if (values.get("user") != null) {
+			if (values.get("user") instanceof Long)
+				userId = (Long) values.get("user");
+			else
+				userId = Long.parseLong(values.get("user").toString());
+		}
+		return userId;
+	}
+
+	private int getDisplayMax(final Map<String, Object> values) {
+		int displayMaxValue = 0;
+		if (values.get("displayMax") != null) {
+			if (values.get("displayMax") instanceof Integer)
+				displayMaxValue = (Integer) values.get("displayMax");
+			else
+				displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
+		}
+		return displayMaxValue;
+	}
+
+	private void doSearch(String[] eventValues, Long userId, Date fromValue, Date tillValue, String sid,
+			int displayMaxValue) {
+		LD.contactingServer();
+		SystemService.Instance.get().search(userId, fromValue, tillValue, displayMaxValue, sid, eventValues,
+				folder.getFolderId(), new AsyncCallback<GUIHistory[]>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIHistory[] result) {
+						LD.clearPrompt();
+
+						if (result != null && result.length > 0) {
+							ListGridRecord[] records = new ListGridRecord[result.length];
+							for (int i = 0; i < result.length; i++) {
+								ListGridRecord record = new ListGridRecord();
+								record.setAttribute("event", I18N.message(result[i].getEvent()));
+								record.setAttribute("date", result[i].getDate());
+								record.setAttribute("user", result[i].getUsername());
+								record.setAttribute("name", result[i].getFileName());
+								record.setAttribute("folder", result[i].getPath());
+								record.setAttribute("sid", result[i].getSessionId());
+								record.setAttribute("docId", result[i].getDocId());
+								record.setAttribute("folderId", result[i].getFolderId());
+								record.setAttribute("userId", result[i].getUserId());
+								record.setAttribute("ip", result[i].getIp());
+								record.setAttribute("device", result[i].getDevice());
+								record.setAttribute("geolocation", result[i].getGeolocation());
+								record.setAttribute("username", result[i].getUserLogin());
+								record.setAttribute("comment", result[i].getComment());
+								record.setAttribute("reason", result[i].getReason());
+								record.setAttribute("icon", result[i].getIcon());
+								records[i] = record;
+							}
+							histories.setData(records);
+						}
+						lastchanges.removeMember(infoPanel);
+						infoPanel = new InfoPanel("");
+						infoPanel.setMessage(I18N.message("showelements", Integer.toString(histories.getTotalRows())));
+						lastchanges.addMember(infoPanel, 1);
+					}
+				});
 	}
 
 	private void showContextMenu() {

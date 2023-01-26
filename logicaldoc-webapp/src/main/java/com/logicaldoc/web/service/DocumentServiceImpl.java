@@ -239,7 +239,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (executeLongRunningOperation("Add Documents", () -> {
 			try {
 				addDocuments(importZip, charset, immediateIndexing, metadata, session, createdDocs);
-			} catch (ServerException | PersistenceException | ParseException e) {
+			} catch (ServerException | PersistenceException | ParseException | IOException e) {
 				log.error(e.getMessage(), e);
 			}
 		}, session)) {
@@ -251,7 +251,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private void addDocuments(boolean importZip, String charset, boolean immediateIndexing, final GUIDocument metadata,
 			final Session session, List<GUIDocument> createdDocs)
-			throws PersistenceException, ServerException, ParseException {
+			throws PersistenceException, ServerException, ParseException, IOException {
 
 		checkWritePermission(metadata, session);
 
@@ -270,8 +270,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			File file = entry.getValue();
 			try {
 				if (filename.toLowerCase().endsWith(".zip") && importZip) {
+					// Make a copy of the zip file in order to avoid it's deletion during import
+					File tempZip = FileUtil.createTempFile("upload-", ".zip");
+					FileUtils.copyFile(file, tempZip);
+					
 					// Prepare the import thread
-					Thread zipImporter = new Thread(() -> importZip(charset, metadata, session, parent, file));
+					Thread zipImporter = new Thread(() -> importZip(charset, metadata, session, parent, tempZip));
 
 					// And launch it
 					zipImporter.start();
@@ -328,28 +332,25 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private void importZip(String charset, final GUIDocument metadata, final Session session, Folder parent,
-			final File uploadedFile) {
+			final File zipFile) {
 		/*
 		 * Prepare the Master document used to create the new one
 		 */
-		File tempZip = null;
 		try {
-			log.debug("zip file = {}", uploadedFile);
-
-			// copy the zip into a temporary file
-			tempZip = FileUtil.createTempFile("upload-", ".zip");
-			FileUtils.copyFile(uploadedFile, tempZip);
-
+			log.debug("zip file = {}", zipFile);
+			
 			Document doc = toDocument(metadata);
 			doc.setTenantId(session.getTenantId());
 			doc.setCreation(new Date());
-
+			
+			System.out.println("doc tanant: "+doc.getTenantId());
+			
 			InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
-			importer.process(tempZip, parent, session.getUserId(), session.getSid());
-		} catch (PersistenceException | IOException e) {
+			importer.process(zipFile, parent, session.getUserId(), session.getSid());
+		} catch (PersistenceException e) {
 			log.error("Unable to delete temporary file", e);
 		} finally {
-			FileUtil.strongDelete(tempZip);
+			FileUtil.strongDelete(zipFile);
 		}
 	}
 

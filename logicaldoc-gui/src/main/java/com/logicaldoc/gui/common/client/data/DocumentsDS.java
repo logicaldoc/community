@@ -53,15 +53,23 @@ public class DocumentsDS extends DataSource {
 
 		if (!barcoded && !ocrd) {
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
-					+ (folderId != null ? folderId : "") + "&filename=" + (fileFilter != null ? fileFilter : "")
-					+ "&max=" + (max != null ? max : DEFAULT_MAX) + "&indexed="
-					+ (indexed != null ? indexed.toString() : "") + "&page=" + page
+					+ defaultValue(folderId) + "&filename=" + defaultValue(fileFilter)
+					+ "&max=" + max(max) + "&indexed="
+					+ defaultValue(indexed) + "&page=" + page
 					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : "")
-					+ (Session.get().getHiliteDocId() != null ? "&hiliteDocId=" + Session.get().getHiliteDocId() : ""));
+					+ defaultValue(Session.get().getHiliteDocId()));
 		} else if (barcoded)
-			setDataURL("data/barcodequeue.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
+			setDataURL("data/barcodequeue.xml?max=" + max(max) + "&page=" + page);
 		else
-			setDataURL("data/zonalocrqueue.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
+			setDataURL("data/zonalocrqueue.xml?max=" + max(max) + "&page=" + page);
+	}
+
+	private Integer max(Integer max) {
+		return max != null ? max : DEFAULT_MAX;
+	}
+
+	private Object defaultValue(Object value) {
+		return value != null ? value.toString() : "";
 	}
 
 	public DocumentsDS(String docIds) {
@@ -193,30 +201,34 @@ public class DocumentsDS extends DataSource {
 		}
 
 		for (String name : extendedAttributes) {
-			DataSourceTextField ext = new DataSourceTextField("ext_" + name, name);
-			ext.setHidden(true);
-			ext.setCanFilter(true);
-
-			GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
-
-			if (attDef != null) {
-				if (attDef.getType() == GUIAttribute.TYPE_DATE) {
-					ext.setType(FieldType.DATE);
-					ext.setCanFilter(false);
-				} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
-					ext.setType(FieldType.INTEGER);
-					ext.setCanFilter(false);
-				} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
-					ext.setType(FieldType.FLOAT);
-					ext.setCanFilter(false);
-				}
-			}
-
-			fields.add(ext);
+			addExtendedAtrributeField(fields, name);
 		}
 
 		setFields(fields.toArray(new DataSourceField[0]));
 		setClientOnly(true);
+	}
+
+	private void addExtendedAtrributeField(List<DataSourceField> fields, String extAttributeName) {
+		DataSourceTextField ext = new DataSourceTextField("ext_" + extAttributeName, extAttributeName);
+		ext.setHidden(true);
+		ext.setCanFilter(true);
+
+		GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(extAttributeName);
+
+		if (attDef != null) {
+			if (attDef.getType() == GUIAttribute.TYPE_DATE) {
+				ext.setType(FieldType.DATE);
+				ext.setCanFilter(false);
+			} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
+				ext.setType(FieldType.INTEGER);
+				ext.setCanFilter(false);
+			} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
+				ext.setType(FieldType.FLOAT);
+				ext.setCanFilter(false);
+			}
+		}
+
+		fields.add(ext);
 	}
 
 	public GUIFolder getFolder() {

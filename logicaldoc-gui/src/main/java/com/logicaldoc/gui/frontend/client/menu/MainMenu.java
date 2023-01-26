@@ -27,37 +27,28 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
-import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.docusign.DocuSignSettings;
 import com.logicaldoc.gui.frontend.client.docusign.EnvelopeDetails;
 import com.logicaldoc.gui.frontend.client.docusign.Envelopes;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorizationWizard;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
-import com.logicaldoc.gui.frontend.client.gdrive.GDriveAuthorization;
-import com.logicaldoc.gui.frontend.client.gdrive.GDriveCreate;
-import com.logicaldoc.gui.frontend.client.gdrive.GDriveEditor;
-import com.logicaldoc.gui.frontend.client.gdrive.GDriveImport;
+import com.logicaldoc.gui.frontend.client.gdrive.GDriveMenuItem;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.Search;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
-import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.gui.frontend.client.services.ShareFileService;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
-import com.logicaldoc.gui.frontend.client.services.ZohoService;
 import com.logicaldoc.gui.frontend.client.sharefile.ShareFileDialog;
 import com.logicaldoc.gui.frontend.client.sharefile.ShareFileSettings;
 import com.logicaldoc.gui.frontend.client.textcontent.TextContentCreate;
 import com.logicaldoc.gui.frontend.client.textcontent.TextContentEditor;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentCreate;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentEditor;
-import com.logicaldoc.gui.frontend.client.zoho.ZohoAuthorization;
-import com.logicaldoc.gui.frontend.client.zoho.ZohoDialog;
-import com.logicaldoc.gui.frontend.client.zoho.ZohoEditor;
+import com.logicaldoc.gui.frontend.client.zoho.ZohoMenuItem;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Img;
@@ -156,14 +147,13 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		addSeparator();
 		addSupportButton();
 		addLogoutButton();
-		
+
 		addFill();
-		
+
 		addSearchBox();
 
 		onFolderSelected(FolderController.get().getCurrentFolder());
-	}	
-
+	}
 
 	/**
 	 * Adds the logo image into the main menu
@@ -192,7 +182,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 // Uncomment to show the avatar		
 //		account.setTitle("<div><img class='accountIcon' src='" + Util.avatarUrl(Session.get().getUser().getId()) + "' />"
 //				+ I18N.message("account") + "</div>");
-		
+
 		addButton(account, 1);
 	}
 
@@ -237,7 +227,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void addSearchBox() {
-		
+
 		searchBox.setShowTitle(false);
 		searchBox.setDefaultValue(I18N.message("search") + "...");
 		searchBox.setWidth(160);
@@ -645,233 +635,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		return docuSignItem;
 	}
 
-	private MenuItem getGDriveMenuItem(GUIFolder folder, final GUIDocument document) {
-		Menu menu = new Menu();
-		menu.setShowShadow(true);
-		menu.setShadowDepth(3);
-
-		final MenuItem importDocs = new MenuItem(I18N.message("importfromgdrive"));
-		importDocs.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				GDriveImport popup = new GDriveImport();
-				popup.show();
-			}
-		});
-		final MenuItem exportDocs = new MenuItem(I18N.message("exporttogdrive"));
-		exportDocs.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				final long[] ids = grid.getSelectedIds();
-
-				LD.contactingServer();
-				GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<String[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						LD.clearPrompt();
-					}
-
-					@Override
-					public void onSuccess(String[] settings) {
-						LD.clearPrompt();
-						GuiLog.info(I18N.message("gdriveexportok"), null);
-					}
-				});
-			}
-		});
-		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				new GDriveAuthorization().show();
-			}
-		});
-
-		final MenuItem edit = new MenuItem(I18N.message("editdoc"));
-		edit.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				if (document == null)
-					return;
-
-				if (document.getStatus() == 0) {
-					// Need to checkout first
-					DocumentService.Instance.get().checkout(new long[] { document.getId() }, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void result) {
-							document.setStatus(Constants.DOC_CHECKED_OUT);
-							document.setLockUserId(Session.get().getUser().getId());
-							document.setLockUser(Session.get().getUser().getFullName());
-							DocumentController.get().modified(document);
-
-							Session.get().getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() + 1);
-							GuiLog.info(I18N.message("documentcheckedout"), null);
-
-							LD.contactingServer();
-							GDriveService.Instance.get().upload(document.getId(), new AsyncCallback<String>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(String resourceId) {
-									LD.clearPrompt();
-									if (resourceId == null) {
-										GuiLog.error(I18N.message("gdriveerror"), null, null);
-										return;
-									}
-									document.setExtResId(resourceId);
-									DocumentController.get().modified(document);
-									GDriveEditor popup = new GDriveEditor(document);
-									popup.show();
-								}
-							});
-						}
-					});
-				} else {
-					if (document.getStatus() == 1 && document.getExtResId() != null) {
-						GDriveEditor popup = new GDriveEditor(document);
-						popup.show();
-					} else {
-						SC.warn(I18N.message("event.locked"));
-					}
-				}
-			}
-		});
-
-		final MenuItem create = new MenuItem(I18N.message("createdoc"));
-		create.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				GDriveCreate popup = new GDriveCreate();
-				popup.show();
-			}
-		});
-
-		menu.setItems(authorize, importDocs, exportDocs, edit, create);
-
-		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite()
-				&& Feature.enabled(Feature.GDRIVE) && MainPanel.get().isOnDocumentsTab());
-		exportDocs.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.GDRIVE));
-		authorize.setEnabled(Feature.enabled(Feature.GDRIVE));
-		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
-				&& folder.isWrite() && Feature.enabled(Feature.GDRIVE));
-		create.setEnabled(folder != null && folder.isWrite() && Feature.enabled(Feature.GDRIVE)
-				&& MainPanel.get().isOnDocumentsTab());
-
-		MenuItem gdocsItem = new MenuItem(I18N.message("googledrive"));
-		gdocsItem.setSubmenu(menu);
-
-		return gdocsItem;
-	}
-
-	private MenuItem getZohoMenuItem(GUIFolder folder, final GUIDocument document) {
-		Menu menu = new Menu();
-		menu.setShowShadow(true);
-		menu.setShadowDepth(3);
-
-		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				new ZohoAuthorization().show();
-			}
-		});
-		
-		final MenuItem importDocs = new MenuItem(I18N.message("importfromzoho"));
-		importDocs.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				ZohoDialog dialog = new ZohoDialog(false);
-				dialog.show();
-			}
-		});
-		final MenuItem exportDocs = new MenuItem(I18N.message("exporttozoho"));
-		exportDocs.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				ZohoDialog dialog = new ZohoDialog(true);
-				dialog.show();
-			}
-		});
-
-		final MenuItem edit = new MenuItem(I18N.message("editdoc"));
-		edit.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				if (document == null)
-					return;
-
-				if (document.getStatus() == 0) {
-					// Need to checkout first
-					DocumentService.Instance.get().checkout(new long[] { document.getId() }, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void result) {
-							DocUtil.markCheckedOut(document);
-
-							LD.contactingServer();
-							ZohoService.Instance.get().upload(document.getId(), new AsyncCallback<String>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(String resourceId) {
-									LD.clearPrompt();
-									if (resourceId == null) {
-										GuiLog.error(I18N.message("zohoerror"), null, null);
-										return;
-									}
-									document.setExtResId(resourceId);
-									DocumentController.get().modified(document);
-									ZohoEditor popup = new ZohoEditor(document);
-									popup.show();
-								}
-							});
-						}
-					});
-				} else {
-					if (document.getStatus() == 1 && document.getExtResId() != null) {
-						ZohoEditor popup = new ZohoEditor(document);
-						popup.show();
-					} else {
-						SC.warn(I18N.message("event.locked"));
-					}
-				}
-			}
-		});
-
-		menu.setItems(authorize, importDocs, exportDocs, edit);
-
-		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite() && Feature.enabled(Feature.ZOHO)
-				&& MainPanel.get().isOnDocumentsTab());
-		exportDocs.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.ZOHO));
-		authorize.setEnabled(Feature.enabled(Feature.ZOHO));
-		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
-				&& folder.isWrite() && Feature.enabled(Feature.ZOHO));
-
-		MenuItem zohoItem = new MenuItem(I18N.message("zoho"));
-		zohoItem.setSubmenu(menu);
-
-		return zohoItem;
-	}
-
 	private MenuItem getOfficeMenuItem(GUIFolder folder, final GUIDocument document) {
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
@@ -910,7 +673,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				menu.showContextMenu();
 			}
 		});
-		
+
 		addButton(tools, 2);
 	}
 
@@ -930,59 +693,64 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		});
 
-		if (document != null || folder != null) {
-			if (Feature.enabled(Feature.DROPBOX)
-					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DROPBOX))
-				menu.addItem(getDropboxMenuItem(folder, document));
-			if (Feature.enabled(Feature.SHAREFILE)
-					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHAREFILE))
-				menu.addItem(getShareFileMenuItem(folder, document));
-			if (Feature.enabled(Feature.GDRIVE)
-					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.GDOCS))
-				menu.addItem(getGDriveMenuItem(folder, document));
-			if (Feature.enabled(Feature.ZOHO)
-					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ZOHO))
-				menu.addItem(getZohoMenuItem(folder, document));
-			if (Feature.enabled(Feature.DOCUSIGN)
-					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUSIGN))
-				menu.addItem(getDocuSignMenuItem(folder, document));
-			if (Feature.enabled(Feature.OFFICE)
-					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
-				menu.addItem(getOfficeMenuItem(folder, document));
-			if (Feature.enabled(Feature.WEBCONTENT)
-					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.WEBCONTENT))
-				menu.addItem(getWebContentMenuItem(folder, document));
-			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TEXTCONTENT))
-				menu.addItem(getTextContentMenuItem(folder, document));
-		}
+		if (document != null || folder != null)
+			addItemsWhenFolderOrDocumentSelected(folder, document, menu);
 
 		menu.addItem(getSupportMenuItem());
 
+		addRegistration(menu, develConsole);
+		return menu;
+	}
+
+	private void addItemsWhenFolderOrDocumentSelected(GUIFolder folder, GUIDocument document, Menu menu) {
+		if (Feature.enabled(Feature.DROPBOX)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DROPBOX))
+			menu.addItem(getDropboxMenuItem(folder, document));
+		if (Feature.enabled(Feature.SHAREFILE)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHAREFILE))
+			menu.addItem(getShareFileMenuItem(folder, document));
+		if (Feature.enabled(Feature.GDRIVE)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.GDOCS))
+			menu.addItem(new GDriveMenuItem(folder, document));
+		if (Feature.enabled(Feature.ZOHO)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ZOHO))
+			menu.addItem(new ZohoMenuItem(folder, document));
+		if (Feature.enabled(Feature.DOCUSIGN)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUSIGN))
+			menu.addItem(getDocuSignMenuItem(folder, document));
+		if (Feature.enabled(Feature.OFFICE)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
+			menu.addItem(getOfficeMenuItem(folder, document));
+		if (Feature.enabled(Feature.WEBCONTENT)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.WEBCONTENT))
+			menu.addItem(getWebContentMenuItem(folder, document));
+		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TEXTCONTENT))
+			menu.addItem(getTextContentMenuItem(folder, document));
+	}
+
+	private void addRegistration(Menu menu, MenuItem develConsole) {
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			MenuItem registration = new MenuItem(I18N.message("registration"));
-			registration.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(MenuItemClickEvent event) {
-					SettingService.Instance.get().loadSettingsByNames(
-							new String[] { "reg.name", "reg.email", "reg.organization", "reg.website" },
-							new AsyncCallback<GUIParameter[]>() {
+			registration.addClickHandler((MenuItemClickEvent registrationClick) -> {
+				SettingService.Instance.get().loadSettingsByNames(
+						new String[] { "reg.name", "reg.email", "reg.organization", "reg.website" },
+						new AsyncCallback<GUIParameter[]>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIParameter[] reg) {
-									String[] values = new String[reg.length];
-									for (int j = 0; j < reg.length; j++) {
-										values[j] = reg[j].getValue();
-									}
-									Registration r = new Registration(values);
-									r.show();
+							@Override
+							public void onSuccess(GUIParameter[] reg) {
+								String[] values = new String[reg.length];
+								for (int j = 0; j < reg.length; j++) {
+									values[j] = reg[j].getValue();
 								}
-							});
-				}
+								Registration r = new Registration(values);
+								r.show();
+							}
+						});
 			});
 			menu.addItem(registration);
 
@@ -990,7 +758,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				menu.addItem(develConsole);
 			}
 		}
-		return menu;
 	}
 
 	private SelectItem getDensitySelector() {
@@ -1153,7 +920,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	public void onFolderCancelEditing(GUIFolder folder) {
 		// Nothing to do
 	}
-	
+
 	@Override
 	public void onDocumentsDeleted(GUIDocument[] documents) {
 		// Nothing to do
@@ -1198,7 +965,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	public void onDocumentCancelEditing(GUIDocument document) {
 		// Nothing to do
 	}
-	
+
 	/**
 	 * Invoked when a tab of the main panel is selected
 	 * 

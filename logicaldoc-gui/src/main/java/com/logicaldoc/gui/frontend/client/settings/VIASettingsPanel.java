@@ -13,11 +13,9 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.EmailAccountService;
 import com.logicaldoc.gui.frontend.client.services.VIAService;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -142,7 +140,8 @@ public class VIASettingsPanel extends AdminPanel {
 		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", account.getUsername());
 		username.setWidth(180);
 
-		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", account.getPassword());
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password",
+				account.getPassword());
 		password.setWidth(180);
 
 		TextItem server = ItemFactory.newTextItem("server", "server", account.getHost());
@@ -159,67 +158,9 @@ public class VIASettingsPanel extends AdminPanel {
 
 		TextItem folder = ItemFactory.newTextItem("mailfolder", "mailfolder", account.getMailFolder());
 
-		ButtonItem resetCache = new ButtonItem("resetcache", I18N.message("resetcache"));
-		resetCache.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
-									new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+		ButtonItem resetCache = prepareResetCacheButton();
 
-										@Override
-										public void onSuccess(Void result) {
-											GuiLog.info(I18N.message("cachedeleted"), null);
-										}
-									});
-						}
-					}
-				});
-			}
-		});
-
-		ButtonItem testEmail = new ButtonItem("testconnection", I18N.message("testconnection"));
-		testEmail.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if (validate()) {
-					VIAService.Instance.get().save(settings, new AsyncCallback<GUIVIASettings>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUIVIASettings settings) {
-							GuiLog.info(I18N.message("settingssaved"), null);
-							VIASettingsPanel.this.settings = settings;
-							EmailAccountService.Instance.get().test(settings.getEmailAccount().getId(),
-									new AsyncCallback<Boolean>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(Boolean result) {
-											if (result.booleanValue())
-												SC.say(I18N.message("connectionestablished"));
-											else
-												SC.warn(I18N.message("connectionfailed"));
-										}
-									});
-						}
-					});
-				}
-			}
-		});
+		ButtonItem testEmail = prepareTestEmailButton();
 
 		/*
 		 * Two invisible fields to 'mask' the real credentials to the browser
@@ -238,13 +179,7 @@ public class VIASettingsPanel extends AdminPanel {
 		buttons.setMembersMargin(5);
 		buttons.setMargin(3);
 
-		IButton save = new IButton(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		IButton save = prepareSaveButton();
 		buttons.setMembers(save);
 
 		VLayout separator = new VLayout();
@@ -254,6 +189,76 @@ public class VIASettingsPanel extends AdminPanel {
 		layout.setMembers(settingsForm, separator, emailForm, separator, buttons);
 
 		body.addMember(layout);
+	}
+
+	private IButton prepareSaveButton() {
+		IButton save = new IButton(I18N.message("save"));
+		save.addClickHandler((ClickEvent event) -> {
+			onSave();
+		});
+		return save;
+	}
+
+	private ButtonItem prepareResetCacheButton() {
+		ButtonItem resetCache = new ButtonItem("resetcache", I18N.message("resetcache"));
+		resetCache.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+			@Override
+			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean yes) -> {
+					if (yes) {
+						EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
+								new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
+
+									@Override
+									public void onSuccess(Void result) {
+										GuiLog.info(I18N.message("cachedeleted"), null);
+									}
+								});
+					}
+				});
+			}
+		});
+		return resetCache;
+	}
+
+	private ButtonItem prepareTestEmailButton() {
+		ButtonItem testEmail = new ButtonItem("testconnection", I18N.message("testconnection"));
+		testEmail.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			if (validate()) {
+				VIAService.Instance.get().save(settings, new AsyncCallback<GUIVIASettings>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIVIASettings settings) {
+						GuiLog.info(I18N.message("settingssaved"), null);
+						VIASettingsPanel.this.settings = settings;
+						EmailAccountService.Instance.get().test(settings.getEmailAccount().getId(),
+								new AsyncCallback<Boolean>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
+
+									@Override
+									public void onSuccess(Boolean result) {
+										if (result.booleanValue())
+											SC.say(I18N.message("connectionestablished"));
+										else
+											SC.warn(I18N.message("connectionfailed"));
+									}
+								});
+					}
+				});
+			}
+		});
+		return testEmail;
 	}
 
 	private void onSave() {

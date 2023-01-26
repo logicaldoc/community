@@ -161,51 +161,10 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		TextItem duoApiHostname = ItemFactory.newTextItem("duoApiHostname", I18N.message("apihostname"),
 				settings.get(Constants.TWOFA_DUO + ".apihost"));
 		duoApiHostname.setWidth(350);
-		
+
 		duoForm.setFields(enableDuo, duoIntegrationKey, duoSecretKey, duoApiHostname);
 
-		IButton save = new IButton();
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (vm.validate()) {
-					String tenant = Session.get().getTenantName();
-					final List<GUIParameter> params = new ArrayList<GUIParameter>();
-					params.add(new GUIParameter(tenant + ".2fa.enabled",
-							vm.getValueAsString("enable2fa").equals("yes") ? "true" : "false"));
-					params.add(new GUIParameter(tenant + ".2fa.allowtrusted",
-							vm.getValueAsString("allowtrusted").equals("yes") ? "true" : "false"));
-					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled",
-							vm.getValueAsString("enableGoolge").equals("yes") ? "true" : "false"));
-					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_YUBIKEY + ".enabled",
-							vm.getValueAsString("enableYubikey").equals("yes") ? "true" : "false"));
-					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + ".enabled",
-							vm.getValueAsString("enableEmail").equals("yes") ? "true" : "false"));
-					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".enabled",
-							vm.getValueAsString("enableDuo").equals("yes") ? "true" : "false"));
-					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".integrationkey",
-							vm.getValueAsString("duoIntegrationKey")));
-					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".secretkey",
-							vm.getValueAsString("duoSecretKey")));
-					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".apihost",
-							vm.getValueAsString("duoApiHostname")));
-					SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]),
-							new AsyncCallback<Void>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void arg) {
-									Session.get().updateConfig(params);
-									GuiLog.info(I18N.message("settingssaved"), null);
-								}
-							});
-				}
-			}
-		});
+		IButton save = prepareSaveButton();
 
 		VLayout panel = new VLayout();
 		panel.setWidth100();
@@ -214,5 +173,55 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
 		body.setMembers(panel);
 		addMember(save);
+	}
+
+	private IButton prepareSaveButton() {
+		IButton save = new IButton();
+		save.setTitle(I18N.message("save"));
+		save.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				if (!vm.validate())
+					return;
+
+				String tenant = Session.get().getTenantName();
+				final List<GUIParameter> params = new ArrayList<GUIParameter>();
+				params.add(new GUIParameter(tenant + ".2fa.enabled",
+						vm.getValueAsString("enable2fa").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter(tenant + ".2fa.allowtrusted",
+						vm.getValueAsString("allowtrusted").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled",
+						vm.getValueAsString("enableGoolge").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_YUBIKEY + ".enabled",
+						vm.getValueAsString("enableYubikey").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + ".enabled",
+						vm.getValueAsString("enableEmail").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".enabled",
+						vm.getValueAsString("enableDuo").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".integrationkey",
+						vm.getValueAsString("duoIntegrationKey")));
+				params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".secretkey",
+						vm.getValueAsString("duoSecretKey")));
+				params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".apihost",
+						vm.getValueAsString("duoApiHostname")));
+				doSaveSettings(params);
+			}
+		});
+		return save;
+	}
+
+	private void doSaveSettings(final List<GUIParameter> params) {
+		SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void arg) {
+				Session.get().updateConfig(params);
+				GuiLog.info(I18N.message("settingssaved"), null);
+			}
+		});
 	}
 }

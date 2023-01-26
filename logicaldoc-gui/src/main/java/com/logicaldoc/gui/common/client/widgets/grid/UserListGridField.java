@@ -87,31 +87,42 @@ public class UserListGridField extends ColoredListGridField {
 			if (value == null)
 				return "";
 
-			String val = super.format(value, record, rowNum, colNum);
+			Object avatarId = getAvatarId(value, record);
 
-			Object avatarId = value;
-			if (avatarFieldName != null)
-				avatarId = record.getAttributeAsObject(avatarFieldName);
-
+			String formattedValue = super.format(value, record, rowNum, colNum);
 			if (avatarId == null || !UserListGridField.this.displayAvatar)
-				return val != null ? val.toString() : "";
+				return formattedValue != null ? formattedValue.toString() : "";
 
 			String text = null;
 			if (avatarFieldName != null)
-				text = val != null ? val.toString() : null;
+				text = formattedValue != null ? formattedValue.toString() : null;
 
+			return format(avatarId, formattedValue, text);
+		}
+
+		protected String format(Object avatarId, String formattedValue, String text) {
 			if ("group".equals(avatarId)) {
 				return AwesomeFactory.getIconHtml("user-friends") + (text != null && !text.isEmpty() ? " " + text : "");
 			} else if ("attribute".equals(avatarId)) {
 				return AwesomeFactory.getIconHtml("font") + (text != null && !text.isEmpty() ? " " + text : "");
 			} else {
-				if (text != null && !text.isEmpty())
-					return Util.avatarWithText(avatarId.toString(), val);
-				else {
-					String url = Util.avatarUrl(avatarId.toString(), avoidCaching);
-					return "<img src='" + url + "' style='border: 0px height: " + size + "px; width: " + size
-							+ "px' />";
-				}
+				return avatarContent(formattedValue, avatarId, text);
+			}
+		}
+
+		private Object getAvatarId(Object value, ListGridRecord record) {
+			Object avatarId = value;
+			if (avatarFieldName != null)
+				avatarId = record.getAttributeAsObject(avatarFieldName);
+			return avatarId;
+		}
+
+		private String avatarContent(String formattedValue, Object avatarId, String text) {
+			if (text != null && !text.isEmpty())
+				return Util.avatarWithText(avatarId.toString(), formattedValue);
+			else {
+				String url = Util.avatarUrl(avatarId.toString(), avoidCaching);
+				return "<img src='" + url + "' style='border: 0px height: " + size + "px; width: " + size + "px' />";
 			}
 		}
 	}

@@ -37,7 +37,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
 		Long folderId = request.getParameter("folderId") != null ? Long.parseLong(request.getParameter("folderId"))
@@ -113,7 +113,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 
 				return doc;
 			}
-		}, max);
+		}, max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -125,9 +125,9 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 				writer.print("<customId><![CDATA[" + doc.getCustomId() + "]]></customId>");
 			else
 				writer.print("<customId> </customId>");
-			writer.print("<icon>"
-					+ FileUtil.getBaseName(IconSelector.selectIcon(doc.getType(), doc.getDocRef() != null))
-					+ "</icon>");
+			writer.print(
+					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(doc.getType(), doc.getDocRef() != null))
+							+ "</icon>");
 			writer.print("<version>" + doc.getVersion() + "</version>");
 			writer.print("<fileVersion>" + doc.getFileVersion() + "</fileVersion>");
 			writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");

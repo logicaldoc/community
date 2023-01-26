@@ -26,7 +26,6 @@ import com.logicaldoc.gui.frontend.client.search.SearchPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -109,19 +108,44 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 	@Override
 	public void onUserLoggedIn(final GUIUser user) {
-		incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(), new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				MainPanel.this.getIncomingMessage().setVisible(false);
-			}
-		});
-
-		incomingMessage.setVisible(
-				Session.get().getIncomingMessage() != null && !Session.get().getIncomingMessage().isEmpty());
+		prepareIncomingMessage();
 
 		setMembers(new TopPanel(), incomingMessage, MainMenu.get(), tabSet, new StatusBar(true));
 
+		prepareMainTabs(user);
+
+		/*
+		 * Check if there are alerts
+		 */
+		if (user.isMemberOf(Constants.GROUP_ADMIN) && !Session.get().isDemo())
+			retrieveAlerts();
+	}
+
+	private void retrieveAlerts() {
+		InfoService.Instance.get().getInfo(I18N.getLocale(), Session.get().getTenantName(), false,
+				new AsyncCallback<GUIInfo>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						// Nothing to do
+					}
+
+					@Override
+					public void onSuccess(GUIInfo info) {
+						String alerts = "";
+						for (GUIMessage warning : info.getAlerts()) {
+							if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()) {
+								if (!"".equals(alerts))
+									alerts += " -- ";
+								alerts += warning.getMessage();
+							}
+						}
+						if (!"".equals(alerts))
+							SC.warn(alerts);
+					}
+				});
+	}
+
+	private void prepareMainTabs(final GUIUser user) {
 		long welcomeScreen = Menu.DASHBOARD;
 		if (user.getWelcomeScreen() != null)
 			welcomeScreen = user.getWelcomeScreen().intValue();
@@ -146,6 +170,10 @@ public class MainPanel extends VLayout implements SessionObserver {
 			tabSet.addTab(administrationTab);
 		}
 
+		openDefaultTab(welcomeScreen);
+	}
+
+	private void openDefaultTab(long welcomeScreen) {
 		RequestInfo loc = WindowUtils.getRequestInfo();
 		if ((loc.getParameter("folderId") != null || loc.getParameter("docId") != null)
 				&& Menu.enabled(Menu.DOCUMENTS)) {
@@ -162,33 +190,14 @@ public class MainPanel extends VLayout implements SessionObserver {
 			else if (welcomeScreen == Menu.DASHBOARD && Menu.enabled(Menu.DASHBOARD))
 				tabSet.selectTab(dashboardTab);
 		}
+	}
 
-		/*
-		 * Check if there are alerts
-		 */
-		if (user.isMemberOf(Constants.GROUP_ADMIN) && !Session.get().isDemo()) {
-			InfoService.Instance.get().getInfo(I18N.getLocale(), Session.get().getTenantName(), false,
-					new AsyncCallback<GUIInfo>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							// Nothing to do
-						}
-
-						@Override
-						public void onSuccess(GUIInfo info) {
-							String alerts = "";
-							for (GUIMessage warning : info.getAlerts()) {
-								if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()) {
-									if (!"".equals(alerts))
-										alerts += " -- ";
-									alerts += warning.getMessage();
-								}
-							}
-							if (!"".equals(alerts))
-								SC.warn(alerts);
-						}
-					});
-		}
+	private void prepareIncomingMessage() {
+		incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(), (ClickEvent event) -> {
+			MainPanel.this.getIncomingMessage().setVisible(false);
+		});
+		incomingMessage.setVisible(
+				Session.get().getIncomingMessage() != null && !Session.get().getIncomingMessage().isEmpty());
 	}
 
 	public void selectSearchTab() {

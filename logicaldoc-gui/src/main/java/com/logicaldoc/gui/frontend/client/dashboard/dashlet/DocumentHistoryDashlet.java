@@ -26,7 +26,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 
 /**
  * Dashlet specialized in listing document's history records
@@ -41,18 +40,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 	public DocumentHistoryDashlet(GUIDashlet guiDashlet) {
 		super(guiDashlet);
 
-		if (guiDashlet.getName().equals("checkout"))
-			event = Constants.EVENT_CHECKEDOUT;
-		else if (guiDashlet.getName().equals("checkin"))
-			event = Constants.EVENT_CHECKEDIN;
-		else if (guiDashlet.getName().equals("locked"))
-			event = Constants.EVENT_LOCKED;
-		else if (guiDashlet.getName().equals("download"))
-			event = Constants.EVENT_DOWNLOADED;
-		else if (guiDashlet.getName().equals("change"))
-			event = Constants.EVENT_CHANGED;
-		else if ("lastaccessed".equals(guiDashlet.getName()))
-			setTitle(AwesomeFactory.getIconHtml("eye", I18N.message(guiDashlet.getTitle())));
+		setEvent(guiDashlet);
 
 		HeaderControl markAsRead = new HeaderControl(HeaderControl.TRASH, new ClickHandler() {
 			@Override
@@ -87,6 +75,21 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 		else
 			setHeaderControls(HeaderControls.HEADER_LABEL, refreshControl, exportControl, printControl,
 					HeaderControls.MINIMIZE_BUTTON, HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
+	}
+
+	private void setEvent(GUIDashlet guiDashlet) {
+		if (guiDashlet.getName().equals("checkout"))
+			event = Constants.EVENT_CHECKEDOUT;
+		else if (guiDashlet.getName().equals("checkin"))
+			event = Constants.EVENT_CHECKEDIN;
+		else if (guiDashlet.getName().equals("locked"))
+			event = Constants.EVENT_LOCKED;
+		else if (guiDashlet.getName().equals("download"))
+			event = Constants.EVENT_DOWNLOADED;
+		else if (guiDashlet.getName().equals("change"))
+			event = Constants.EVENT_CHANGED;
+		else if ("lastaccessed".equals(guiDashlet.getName()))
+			setTitle(AwesomeFactory.getIconHtml("eye", I18N.message(guiDashlet.getTitle())));
 	}
 
 	@Override
@@ -170,49 +173,54 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 		}
 
 		// Count the total of events and the total of unchecked events
-		grid.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent e) {
-				String title = I18N.message(guiDashlet.getTitle());
-				String icn = "file";
-				if ("lastaccessed".equals(guiDashlet.getName()))
-					icn = "eye";
-
-				if (event != null) {
-					Record[] records = grid.getRecordList().toArray();
-					int unread = 0;
-					for (Record record : records) {
-						if ("true".equals(record.getAttributeAsString("new")))
-							unread++;
-					}
-
-					int total = grid.getTotalRows();
-					title = I18N.message(event + "docs", Integer.toString(total));
-					if (unread > 0)
-						title = "<b>" + title + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + I18N.message("newitems")
-								+ ": " + unread + "</b>";
-
-					if (event.equals(Constants.EVENT_CHECKEDOUT))
-						icn = "edit";
-					else if (event.equals(Constants.EVENT_LOCKED))
-						icn = "lock-alt";
-					else if (event.equals(Constants.EVENT_DOWNLOADED))
-						icn = "download";
-					else if (event.equals(Constants.EVENT_CHECKEDIN))
-						icn = "check-square";
-					else if (event.equals(Constants.EVENT_CHANGED))
-						icn = "edit";
-
-					if (Constants.EVENT_LOCKED.equals(event))
-						Session.get().getUser().setLockedDocs(total);
-					else if (Constants.EVENT_CHECKEDOUT.equals(event))
-						Session.get().getUser().setCheckedOutDocs(total);
-				}
-
-				setTitle(AwesomeFactory.getIconHtml(icn, title));
-			}
+		grid.addDataArrivedHandler((DataArrivedEvent e) -> {
+			onDataArrived(grid);
 		});
 
 		return fields;
+	}
+
+	private void onDataArrived(RefreshableListGrid grid) {
+		String title = I18N.message(guiDashlet.getTitle());
+		String icn = "file";
+		if ("lastaccessed".equals(guiDashlet.getName()))
+			icn = "eye";
+
+		if (event != null) {
+			Record[] records = grid.getRecordList().toArray();
+			int unread = 0;
+			for (Record record : records) {
+				if ("true".equals(record.getAttributeAsString("new")))
+					unread++;
+			}
+
+			int total = grid.getTotalRows();
+			title = I18N.message(event + "docs", Integer.toString(total));
+			if (unread > 0)
+				title = "<b>" + title + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + I18N.message("newitems") + ": "
+						+ unread + "</b>";
+
+			if (event.equals(Constants.EVENT_CHECKEDOUT))
+				icn = "edit";
+			else if (event.equals(Constants.EVENT_LOCKED))
+				icn = "lock-alt";
+			else if (event.equals(Constants.EVENT_DOWNLOADED))
+				icn = "download";
+			else if (event.equals(Constants.EVENT_CHECKEDIN))
+				icn = "check-square";
+			else if (event.equals(Constants.EVENT_CHANGED))
+				icn = "edit";
+
+			updateStatusIconCounters(total);
+		}
+
+		setTitle(AwesomeFactory.getIconHtml(icn, title));
+	}
+
+	private void updateStatusIconCounters(int total) {
+		if (Constants.EVENT_LOCKED.equals(event))
+			Session.get().getUser().setLockedDocs(total);
+		else if (Constants.EVENT_CHECKEDOUT.equals(event))
+			Session.get().getUser().setCheckedOutDocs(total);
 	}
 }

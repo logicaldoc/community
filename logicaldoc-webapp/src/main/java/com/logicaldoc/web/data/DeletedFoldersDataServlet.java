@@ -34,8 +34,8 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max, Locale locale)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+			Locale locale) throws PersistenceException, IOException {
 
 		Long parentId = request.getParameter("parentId") != null ? Long.parseLong(request.getParameter("parentId"))
 				: null;
@@ -86,7 +86,7 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 				folder.setColor(rs.getString(8));
 				return folder;
 			}
-		}, max);
+		}, max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document

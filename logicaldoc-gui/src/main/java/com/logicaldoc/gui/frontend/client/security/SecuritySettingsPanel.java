@@ -22,7 +22,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -136,25 +135,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdOccurrence.setMin(1);
 		pwdOccurrence.setStep(1);
 
-		final ButtonItem generatePassword = new ButtonItem(I18N.message("generate"));
-		generatePassword.setStartRow(false);
-		generatePassword.setColSpan(2);
-		generatePassword.setAlign(Alignment.RIGHT);
-		generatePassword.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if (passwordForm.validate()) {
-					@SuppressWarnings("unchecked")
-					final Map<String, Object> values = (Map<String, Object>) vm.getValues();
-					PasswordGenerator generator = new PasswordGenerator((Integer) values.get("pwdSize"),
-							(Integer) values.get("pwdUpperCase"), (Integer) values.get("pwdLowerCase"),
-							(Integer) values.get("pwdDigit"), (Integer) values.get("pwdSpecial"),
-							(Integer) values.get("pwdSequence"), (Integer) values.get("pwdOccurrence"));
-					generator.show();
-				}
-			}
-		});
+		final ButtonItem generatePassword = prepareGeneratePasswordButton(passwordForm);
 
 		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence,
 				pwdExp, pwdEnforce, generatePassword);
@@ -234,83 +215,113 @@ public class SecuritySettingsPanel extends AdminPanel {
 			tabs.addTab(geolocation);
 		}
 
+		addSaveButton();
+	}
+
+	private void addSaveButton() {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@SuppressWarnings("unchecked")
-			public void onClick(ClickEvent event) {
-				if (vm.validate()) {
-					final Map<String, Object> values = (Map<String, Object>) vm.getValues();
-					SecuritySettingsPanel.this.settings.setPwdExpiration((Integer) values.get("pwdExp"));
-					SecuritySettingsPanel.this.settings.setPwdSize((Integer) values.get("pwdSize"));
-					SecuritySettingsPanel.this.settings.setPwdUpperCase((Integer) values.get("pwdUpperCase"));
-					SecuritySettingsPanel.this.settings.setPwdLowerCase((Integer) values.get("pwdLowerCase"));
-					SecuritySettingsPanel.this.settings.setPwdDigit((Integer) values.get("pwdDigit"));
-					SecuritySettingsPanel.this.settings.setPwdSpecial((Integer) values.get("pwdSpecial"));
-					SecuritySettingsPanel.this.settings.setPwdSequence((Integer) values.get("pwdSequence"));
-					SecuritySettingsPanel.this.settings.setPwdOccurrence((Integer) values.get("pwdOccurrence"));
-					SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
-					SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
-					SecuritySettingsPanel.this.settings
-							.setSaveLogin(values.get("savelogin").equals("yes") ? true : false);
-					SecuritySettingsPanel.this.settings
-							.setEnableAnonymousLogin(values.get("enableanonymous").equals("yes") ? true : false);
-					SecuritySettingsPanel.this.settings
-							.setAlertNewDevice(values.get("alertnewdevice").equals("yes") ? true : false);
+		save.addClickHandler((ClickEvent event) -> {
+			if (!vm.validate())
+				return;
 
-					SecuritySettingsPanel.this.settings.setAnonymousKey((String) values.get("anonymousKey"));
+			onSave();
+		});
+		addMember(save);
+	}
 
-					if (!SecuritySettingsPanel.this.settings.isEnableAnonymousLogin()) {
-						SecuritySettingsPanel.this.settings.setAnonymousUser(null);
-						anonymousUser.setValue((Long) null);
-					} else if (SecuritySettingsPanel.this.settings.getAnonymousUser() == null) {
-						SC.warn(I18N.message("selectanonymoususer"));
-						return;
+	private void onSave() {
+		@SuppressWarnings("unchecked")
+		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		SecuritySettingsPanel.this.settings.setPwdExpiration((Integer) values.get("pwdExp"));
+		SecuritySettingsPanel.this.settings.setPwdSize((Integer) values.get("pwdSize"));
+		SecuritySettingsPanel.this.settings.setPwdUpperCase((Integer) values.get("pwdUpperCase"));
+		SecuritySettingsPanel.this.settings.setPwdLowerCase((Integer) values.get("pwdLowerCase"));
+		SecuritySettingsPanel.this.settings.setPwdDigit((Integer) values.get("pwdDigit"));
+		SecuritySettingsPanel.this.settings.setPwdSpecial((Integer) values.get("pwdSpecial"));
+		SecuritySettingsPanel.this.settings.setPwdSequence((Integer) values.get("pwdSequence"));
+		SecuritySettingsPanel.this.settings.setPwdOccurrence((Integer) values.get("pwdOccurrence"));
+		SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
+		SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
+		SecuritySettingsPanel.this.settings.setSaveLogin(values.get("savelogin").equals("yes") ? true : false);
+		SecuritySettingsPanel.this.settings
+				.setEnableAnonymousLogin(values.get("enableanonymous").equals("yes") ? true : false);
+		SecuritySettingsPanel.this.settings
+				.setAlertNewDevice(values.get("alertnewdevice").equals("yes") ? true : false);
+
+		SecuritySettingsPanel.this.settings.setAnonymousKey((String) values.get("anonymousKey"));
+
+		if (!SecuritySettingsPanel.this.settings.isEnableAnonymousLogin()) {
+			SecuritySettingsPanel.this.settings.setAnonymousUser(null);
+			anonymousUser.setValue((Long) null);
+		} else if (SecuritySettingsPanel.this.settings.getAnonymousUser() == null) {
+			SC.warn(I18N.message("selectanonymoususer"));
+			return;
+		}
+
+		collectDefaultTenantSettings(values);
+
+		doSaveSettings();
+	}
+
+	private void collectDefaultTenantSettings(final Map<String, Object> values) {
+		if (Session.get().isDefaultTenant()) {
+			SecuritySettingsPanel.this.settings
+					.setAllowSidInRequest(values.get("allowsid").equals("yes") ? true : false);
+
+			SecuritySettingsPanel.this.settings
+					.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings
+					.setCookiesSecure(values.get("secureCookies").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setContentSecurityPolicy(
+					values.get("contentsecuritypolicy") != null ? values.get("contentsecuritypolicy").toString()
+							: null);
+
+			SecuritySettingsPanel.this.settings
+					.setGeolocationEnabled(values.get("geoEnabled").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings
+					.setGeolocationCache(values.get("geoCache").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setGeolocationKey((String) values.get("geoKey"));
+		}
+	}
+
+	private void doSaveSettings() {
+		SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings,
+				new AsyncCallback<Boolean>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
 					}
 
-					if (Session.get().isDefaultTenant()) {
-						SecuritySettingsPanel.this.settings
-								.setAllowSidInRequest(values.get("allowsid").equals("yes") ? true : false);
+					@Override
+					public void onSuccess(Boolean restartRequired) {
+						GuiLog.info(I18N.message("settingssaved"), null);
 
-						SecuritySettingsPanel.this.settings
-								.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes") ? true : false);
-						SecuritySettingsPanel.this.settings
-								.setCookiesSecure(values.get("secureCookies").equals("yes") ? true : false);
-						SecuritySettingsPanel.this.settings
-								.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
-						SecuritySettingsPanel.this.settings
-								.setContentSecurityPolicy(values.get("contentsecuritypolicy") != null
-										? values.get("contentsecuritypolicy").toString()
-										: null);
-
-						SecuritySettingsPanel.this.settings
-								.setGeolocationEnabled(values.get("geoEnabled").equals("yes") ? true : false);
-						SecuritySettingsPanel.this.settings
-								.setGeolocationCache(values.get("geoCache").equals("yes") ? true : false);
-						SecuritySettingsPanel.this.settings.setGeolocationKey((String) values.get("geoKey"));
+						if (restartRequired.booleanValue())
+							SC.warn(I18N.message("needrestart"));
 					}
+				});
+	}
 
-					SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings,
-							new AsyncCallback<Boolean>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Boolean restartRequired) {
-									GuiLog.info(I18N.message("settingssaved"), null);
-
-									if (restartRequired.booleanValue())
-										SC.warn(I18N.message("needrestart"));
-								}
-							});
-				}
+	private ButtonItem prepareGeneratePasswordButton(DynamicForm passwordForm) {
+		final ButtonItem generatePassword = new ButtonItem(I18N.message("generate"));
+		generatePassword.setStartRow(false);
+		generatePassword.setColSpan(2);
+		generatePassword.setAlign(Alignment.RIGHT);
+		generatePassword.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			if (passwordForm.validate()) {
+				@SuppressWarnings("unchecked")
+				final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+				PasswordGenerator generator = new PasswordGenerator((Integer) values.get("pwdSize"),
+						(Integer) values.get("pwdUpperCase"), (Integer) values.get("pwdLowerCase"),
+						(Integer) values.get("pwdDigit"), (Integer) values.get("pwdSpecial"),
+						(Integer) values.get("pwdSequence"), (Integer) values.get("pwdOccurrence"));
+				generator.show();
 			}
 		});
-
-		addMember(save);
+		return generatePassword;
 	}
 
 	private Tab prepareGeolocationTab(GUISecuritySettings settings) {

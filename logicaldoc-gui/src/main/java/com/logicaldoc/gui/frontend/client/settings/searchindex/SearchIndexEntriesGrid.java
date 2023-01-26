@@ -34,55 +34,35 @@ public class SearchIndexEntriesGrid extends DocumentsListGrid {
 		fields.add(fieldsMap.get("statusIcons"));
 		fields.add(fieldsMap.get("icon"));
 
-		if (!fields.contains(fieldsMap.get("filename")))
-			fields.add(fieldsMap.get("filename"));
-		if (!fields.contains(fieldsMap.get("lastModified")))
-			fields.add(fieldsMap.get("lastModified"));
-		if (!fields.contains(fieldsMap.get("type")))
-			fields.add(fieldsMap.get("type"));
-		if (!fields.contains(fieldsMap.get("size")))
-			fields.add(fieldsMap.get("size"));
-		if (!fields.contains(fieldsMap.get("pages")))
-			fields.add(fieldsMap.get("pages"));
-		if (!fields.contains(fieldsMap.get("fileVersion")))
-			fields.add(fieldsMap.get("fileVersion"));
-		if (!fields.contains(fieldsMap.get("version")))
-			fields.add(fieldsMap.get("version"));
-		if (!fields.contains(fieldsMap.get("publisher")))
-			fields.add(fieldsMap.get("publisher"));
-		if (!fields.contains(fieldsMap.get("published")))
-			fields.add(fieldsMap.get("published"));
-		if (!fields.contains(fieldsMap.get("creator")))
-			fields.add(fieldsMap.get("creator"));
-		if (!fields.contains(fieldsMap.get("created")))
-			fields.add(fieldsMap.get("created"));
-		if (!fields.contains(fieldsMap.get("customId")))
-			fields.add(fieldsMap.get("customId"));
-		if (!fields.contains(fieldsMap.get("folder")))
-			fields.add(fieldsMap.get("folder"));
-		if (!fields.contains(fieldsMap.get("folderId")))
-			fields.add(fieldsMap.get("folderId"));
-		if (!fields.contains(fieldsMap.get("rating")))
-			fields.add(fieldsMap.get("rating"));
-		if (!fields.contains(fieldsMap.get("rating")))
-			fields.add(fieldsMap.get("rating"));
-		if (!fields.contains(fieldsMap.get("comment")))
-			fields.add(fieldsMap.get("comment"));
-		if (!fields.contains(fieldsMap.get("workflowStatus")))
-			fields.add(fieldsMap.get("workflowStatus"));
-		if (!fields.contains(fieldsMap.get("workflowStatusDisp")))
-			fields.add(fieldsMap.get("workflowStatusDisp"));
-		if (!fields.contains(fieldsMap.get("startPublishing")))
-			fields.add(fieldsMap.get("startPublishing"));
-		if (!fields.contains(fieldsMap.get("stopPublishing")))
-			fields.add(fieldsMap.get("stopPublishing"));
-		if (!fields.contains(fieldsMap.get("template")))
-			fields.add(fieldsMap.get("template"));
-		if (!fields.contains(fieldsMap.get("language")))
-			fields.add(fieldsMap.get("language"));
-		if (!fields.contains(fieldsMap.get("tenantId")))
-			fields.add(fieldsMap.get("tenantId"));
+		addField("filename", fields);
+		addField("lastModified", fields);
+		addField("type", fields);
+		addField("size", fields);
+		addField("pages", fields);
+		addField("fileVersion", fields);
+		addField("version", fields);
+		addField("publisher", fields);
+		addField("published", fields);
+		addField("creator", fields);
+		addField("created", fields);
+		addField("customId", fields);
+		addField("folder", fields);
+		addField("folderId", fields);
+		addField("rating", fields);
+		addField("comment", fields);
+		addField("workflowStatus", fields);
+		addField("workflowStatusDisp", fields);
+		addField("startPublishing", fields);
+		addField("stopPublishing", fields);
+		addField("template", fields);
+		addField("language", fields);
+		addField("tenantId", fields);
 
 		setFields(fields.toArray(new ListGridField[0]));
+	}
+
+	private void addField(String name, List<ListGridField> fields) {
+		if (!fields.contains(fieldsMap.get(name)))
+			fields.add(fieldsMap.get(name));
 	}
 }

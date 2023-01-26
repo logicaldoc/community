@@ -301,6 +301,98 @@ public class Profile extends Window {
 
 	private void onSave(final GUIUser user, final DynamicForm detailsForm, final DynamicForm guiForm,
 			final DynamicForm emailForm, final DynamicForm emailForm2, final TabSet tabs) {
+		if (!validate(detailsForm, guiForm, emailForm, emailForm2, tabs))
+			return;
+
+		GUIUser u = new GUIUser();
+		u.setId(user.getId());
+		u.setFirstName(vm.getValueAsString("firstname"));
+		u.setName(vm.getValueAsString("lastname"));
+		u.setEmail(vm.getValueAsString("email"));
+		u.setEmail2(vm.getValueAsString("email2"));
+		u.setLanguage(vm.getValueAsString("language"));
+		u.setAddress(vm.getValueAsString("address"));
+		u.setPostalCode(vm.getValueAsString("postalcode"));
+		u.setCity(vm.getValueAsString("city"));
+		u.setCountry(vm.getValueAsString("country"));
+		u.setState(vm.getValueAsString("state"));
+		u.setPhone(vm.getValueAsString("phone"));
+		u.setCell(vm.getValueAsString("cell"));
+		u.setWelcomeScreen(Integer.parseInt(vm.getValueAsString("welcomescreen")));
+		String str = vm.getValueAsString("workspace");
+		if (str != null && !str.isEmpty())
+			u.setDefaultWorkspace(Long.parseLong(str));
+		u.setEmailSignature(vm.getValueAsString("signature"));
+		u.setEmailSignature2(vm.getValueAsString("signature2"));
+		u.setDocsGrid(user.getDocsGrid());
+		u.setHitsGrid(user.getHitsGrid());
+		u.setTimeZone(vm.getValueAsString("timezone"));
+
+		if (vm.getValueAsString("dateFormat") == null || vm.getValueAsString("dateFormat").isEmpty())
+			u.setDateFormat(null);
+		else
+			u.setDateFormat(vm.getValueAsString("dateFormat"));
+
+		if (vm.getValueAsString("dateFormatShort") == null || vm.getValueAsString("dateFormatShort").isEmpty())
+			u.setDateFormatShort(null);
+		else
+			u.setDateFormatShort(vm.getValueAsString("dateFormatShort"));
+
+		if (vm.getValueAsString("dateFormatLong") == null || vm.getValueAsString("dateFormatLong").isEmpty())
+			u.setDateFormatLong(null);
+		else
+			u.setDateFormatLong(vm.getValueAsString("dateFormatLong"));
+
+		ListGridRecord[] records = searchesList.getRecords();
+		List<String> searches = new ArrayList<String>();
+		for (ListGridRecord record : records)
+			searches.add(record.getAttributeAsString("search"));
+		u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));
+
+		SecurityService.Instance.get().saveProfile(u, new AsyncCallback<GUIUser>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUIUser ret) {
+				// Update the currently logged user bean
+				user.setFirstName(ret.getFirstName());
+				user.setName(ret.getName());
+				user.setEmail(ret.getEmail());
+				user.setEmailSignature(ret.getEmailSignature());
+				user.setEmail2(ret.getEmail2());
+				user.setEmailSignature2(ret.getEmailSignature2());
+				user.setLanguage(ret.getLanguage());
+				user.setAddress(ret.getAddress());
+				user.setPostalCode(ret.getPostalCode());
+				user.setCity(ret.getCity());
+				user.setCountry(ret.getCountry());
+				user.setState(ret.getState());
+				user.setPhone(ret.getPhone());
+				user.setCell(ret.getCell());
+				user.setWelcomeScreen(ret.getWelcomeScreen());
+				user.setDefaultWorkspace(ret.getDefaultWorkspace());
+				user.setDocsGrid(ret.getDocsGrid());
+				user.setHitsGrid(ret.getHitsGrid());
+				user.setDateFormat(ret.getDateFormat());
+				user.setDateFormatShort(ret.getDateFormatShort());
+				user.setDateFormatLong(ret.getDateFormatLong());
+				user.setSearchPref(ret.getSearchPref());
+				user.setTimeZone(ret.getTimeZone());
+
+				Session.get().setUser(user);
+
+				Profile.this.destroy();
+
+				GuiLog.info(I18N.message("settingssaved"), null);
+			}
+		});
+	}
+
+	private boolean validate(final DynamicForm detailsForm, final DynamicForm guiForm, final DynamicForm emailForm,
+			final DynamicForm emailForm2, final TabSet tabs) {
 		vm.validate();
 
 		if (!detailsForm.validate())
@@ -312,92 +404,6 @@ public class Profile extends Window {
 		else if (!emailForm2.validate())
 			tabs.selectTab(3);
 
-		if (!vm.hasErrors()) {
-			GUIUser u = new GUIUser();
-			u.setId(user.getId());
-			u.setFirstName(vm.getValueAsString("firstname"));
-			u.setName(vm.getValueAsString("lastname"));
-			u.setEmail(vm.getValueAsString("email"));
-			u.setEmail2(vm.getValueAsString("email2"));
-			u.setLanguage(vm.getValueAsString("language"));
-			u.setAddress(vm.getValueAsString("address"));
-			u.setPostalCode(vm.getValueAsString("postalcode"));
-			u.setCity(vm.getValueAsString("city"));
-			u.setCountry(vm.getValueAsString("country"));
-			u.setState(vm.getValueAsString("state"));
-			u.setPhone(vm.getValueAsString("phone"));
-			u.setCell(vm.getValueAsString("cell"));
-			u.setWelcomeScreen(Integer.parseInt(vm.getValueAsString("welcomescreen")));
-			String str = vm.getValueAsString("workspace");
-			if (str != null && !str.isEmpty())
-				u.setDefaultWorkspace(Long.parseLong(str));
-			u.setEmailSignature(vm.getValueAsString("signature"));
-			u.setEmailSignature2(vm.getValueAsString("signature2"));
-			u.setDocsGrid(user.getDocsGrid());
-			u.setHitsGrid(user.getHitsGrid());
-			u.setTimeZone(vm.getValueAsString("timezone"));
-			
-			if (vm.getValueAsString("dateFormat") == null || vm.getValueAsString("dateFormat").isEmpty())
-				u.setDateFormat(null);
-			else
-				u.setDateFormat(vm.getValueAsString("dateFormat"));
-
-			if (vm.getValueAsString("dateFormatShort") == null || vm.getValueAsString("dateFormatShort").isEmpty())
-				u.setDateFormatShort(null);
-			else
-				u.setDateFormatShort(vm.getValueAsString("dateFormatShort"));
-
-			if (vm.getValueAsString("dateFormatLong") == null || vm.getValueAsString("dateFormatLong").isEmpty())
-				u.setDateFormatLong(null);
-			else
-				u.setDateFormatLong(vm.getValueAsString("dateFormatLong"));
-
-			ListGridRecord[] records = searchesList.getRecords();
-			List<String> searches = new ArrayList<String>();
-			for (ListGridRecord record : records)
-				searches.add(record.getAttributeAsString("search"));
-			u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));
-
-			SecurityService.Instance.get().saveProfile(u, new AsyncCallback<GUIUser>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
-				@Override
-				public void onSuccess(GUIUser ret) {
-					// Update the currently logged user bean
-					user.setFirstName(ret.getFirstName());
-					user.setName(ret.getName());
-					user.setEmail(ret.getEmail());
-					user.setEmailSignature(ret.getEmailSignature());
-					user.setEmail2(ret.getEmail2());
-					user.setEmailSignature2(ret.getEmailSignature2());
-					user.setLanguage(ret.getLanguage());
-					user.setAddress(ret.getAddress());
-					user.setPostalCode(ret.getPostalCode());
-					user.setCity(ret.getCity());
-					user.setCountry(ret.getCountry());
-					user.setState(ret.getState());
-					user.setPhone(ret.getPhone());
-					user.setCell(ret.getCell());
-					user.setWelcomeScreen(ret.getWelcomeScreen());
-					user.setDefaultWorkspace(ret.getDefaultWorkspace());
-					user.setDocsGrid(ret.getDocsGrid());
-					user.setHitsGrid(ret.getHitsGrid());
-					user.setDateFormat(ret.getDateFormat());
-					user.setDateFormatShort(ret.getDateFormatShort());
-					user.setDateFormatLong(ret.getDateFormatLong());
-					user.setSearchPref(ret.getSearchPref());
-					user.setTimeZone(ret.getTimeZone());
-
-					Session.get().setUser(user);
-
-					Profile.this.destroy();
-
-					GuiLog.info(I18N.message("settingssaved"), null);
-				}
-			});
-		}
+		return !vm.hasErrors();
 	}
 }

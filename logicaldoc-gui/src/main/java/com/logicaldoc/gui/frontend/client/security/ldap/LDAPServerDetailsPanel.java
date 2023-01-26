@@ -13,10 +13,8 @@ import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.services.LDAPService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -218,155 +216,159 @@ public class LDAPServerDetailsPanel extends VLayout {
 			}
 		}
 
-		IButton test = new IButton();
-		test.setAutoFit(true);
-		test.setTitle(I18N.message("testconnection"));
-		test.setDisabled(server.getId() == 0L);
-		test.addClickHandler(new ClickHandler() {
-			@SuppressWarnings("unchecked")
-			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		IButton test = prepareTestButton(listing, server);
 
-				if (vm.validate()) {
-					LDAPServerDetailsPanel.this.server.setEnabled(values.get("eenabled").equals("yes") ? true : false);
-					LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes") ? true : false);
-					LDAPServerDetailsPanel.this.server
-							.setKeepLocalMemberships(values.get("keepmembership").equals("yes") ? true : false);
-					LDAPServerDetailsPanel.this.server.setUrl((String) values.get("url"));
-					LDAPServerDetailsPanel.this.server.setUsername((String) values.get("username"));
-					LDAPServerDetailsPanel.this.server.setRealm((String) values.get("realm"));
-					LDAPServerDetailsPanel.this.server.setUserIdentifierAttr((String) values.get("useridentifierattr"));
-					LDAPServerDetailsPanel.this.server.setGroupIdentifierAttr((String) values.get("grpidentifierattr"));
-					LDAPServerDetailsPanel.this.server.setLogonAttr((String) values.get("logonattr"));
-					LDAPServerDetailsPanel.this.server.setUserClass((String) values.get("userclass"));
-					LDAPServerDetailsPanel.this.server.setGroupClass((String) values.get("grpclass"));
-					LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get("usersbasenode"));
-					LDAPServerDetailsPanel.this.server.setUserIncludes((String) values.get("userinclude"));
-					LDAPServerDetailsPanel.this.server.setUserExcludes((String) values.get("userexclude"));
-					LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get("grpsbasenode"));
-					LDAPServerDetailsPanel.this.server.setGroupIncludes((String) values.get("groupinclude"));
-					LDAPServerDetailsPanel.this.server.setGroupExcludes((String) values.get("groupexclude"));
-					LDAPServerDetailsPanel.this.server.setLanguage((String) values.get("language"));
-					LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
+		IButton activedir = prepareActiveDirButton();
 
-					LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password_hidden"));
-					
-					if (browser != null && browser instanceof LDAPBrowser)
-						browser.setServer(LDAPServerDetailsPanel.this.server);
-
-					listing.updateRecord(LDAPServerDetailsPanel.this.server);
-
-
-
-					LDAPService.Instance.get().testConnection(LDAPServerDetailsPanel.this.server,
-							new AsyncCallback<Boolean>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Boolean ret) {
-									if (ret)
-										SC.say(I18N.message("connectionestablished"));
-									else
-										SC.warn(I18N.message("connectionfailed"));
-								}
-							});
-				}
-			}
-		});
-
-		IButton activedir = new IButton();
-		activedir.setAutoFit(true);
-		activedir.setTitle(I18N.message("activedirectory"));
-		activedir.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				LD.askForValue(I18N.message("activedirectory"), I18N.message("addomain"), "", new ValueCallback() {
-					@Override
-					public void execute(String value) {
-						if (value == null)
-							return;
-						String node = value.replace("\\.", ",DC=");
-						node = "DC=" + node;
-						vm.setValue("url", "ldap://AD_SERVER:389");
-						vm.setValue("username", "CN=Administrator,CN=Users," + node);
-						vm.setValue("useridentifierattr", "CN");
-						vm.setValue("grpidentifierattr", "CN");
-						vm.setValue("logonattr", "sAMAccountName");
-						vm.setValue("userclass", "person");
-						vm.setValue("grpclass", "group");
-						vm.setValue("userclass", "person");
-						vm.setValue("usersbasenode", "CN=Users," + node);
-						vm.setValue("grpsbasenode", "CN=Builtin," + node);
-						vm.setValue("anon", "no");
-					}
-				});
-			}
-		});
-
-		IButton save = new IButton();
-		save.setAutoFit(true);
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@SuppressWarnings("unchecked")
-			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
-
-				if (vm.validate()) {
-					LDAPServerDetailsPanel.this.server.setEnabled(values.get("eenabled").equals("yes") ? true : false);
-					LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes") ? true : false);
-					LDAPServerDetailsPanel.this.server
-							.setKeepLocalMemberships(values.get("keepmembership").equals("yes") ? true : false);
-					LDAPServerDetailsPanel.this.server.setUrl((String) values.get("url"));
-					LDAPServerDetailsPanel.this.server.setUsername((String) values.get("username"));
-					LDAPServerDetailsPanel.this.server.setRealm((String) values.get("realm"));
-					LDAPServerDetailsPanel.this.server.setUserIdentifierAttr((String) values.get("useridentifierattr"));
-					LDAPServerDetailsPanel.this.server.setGroupIdentifierAttr((String) values.get("grpidentifierattr"));
-					LDAPServerDetailsPanel.this.server.setLogonAttr((String) values.get("logonattr"));
-					LDAPServerDetailsPanel.this.server.setUserClass((String) values.get("userclass"));
-					LDAPServerDetailsPanel.this.server.setGroupClass((String) values.get("grpclass"));
-					LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get("usersbasenode"));
-					LDAPServerDetailsPanel.this.server.setUserIncludes((String) values.get("userinclude"));
-					LDAPServerDetailsPanel.this.server.setUserExcludes((String) values.get("userexclude"));
-					LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get("grpsbasenode"));
-					LDAPServerDetailsPanel.this.server.setGroupIncludes((String) values.get("groupinclude"));
-					LDAPServerDetailsPanel.this.server.setGroupExcludes((String) values.get("groupexclude"));
-					LDAPServerDetailsPanel.this.server.setPageSize(Integer.parseInt(values.get("pagesize").toString()));
-					LDAPServerDetailsPanel.this.server.setSyncTtl(Integer.parseInt(values.get("syncttl").toString()));
-					LDAPServerDetailsPanel.this.server.setLanguage((String) values.get("language"));
-					LDAPServerDetailsPanel.this.server.setUserType(Integer.parseInt(values.get("usertype").toString()));
-					LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
-					LDAPServerDetailsPanel.this.server.setTimeout(Integer.parseInt(values.get("timeout").toString()));
-
-					LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password_hidden"));
-					
-					LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server,
-							new AsyncCallback<GUILDAPServer>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(GUILDAPServer server) {
-									LDAPServerDetailsPanel.this.server = server;
-									if (browser != null && browser instanceof LDAPBrowser)
-										browser.setServer(LDAPServerDetailsPanel.this.server);
-									listing.updateRecord(LDAPServerDetailsPanel.this.server);
-									test.setDisabled(false);
-									GuiLog.info(I18N.message("settingssaved"), null);
-								}
-							});
-				}
-			}
-		});
+		IButton save = prepareSaveButton(listing, test);
 
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(3);
 		buttons.setMembers(save, activedir, test);
 		setMembers(tabs, buttons);
+	}
+
+	private IButton prepareSaveButton(LDAPServersPanel listing, IButton test) {
+		IButton save = new IButton();
+		save.setAutoFit(true);
+		save.setTitle(I18N.message("save"));
+		save.addClickHandler((ClickEvent event) -> {
+
+			if (!vm.validate())
+				return;
+			
+			@SuppressWarnings("unchecked")
+			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+
+			LDAPServerDetailsPanel.this.server.setEnabled(values.get("eenabled").equals("yes") ? true : false);
+			LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes") ? true : false);
+			LDAPServerDetailsPanel.this.server
+					.setKeepLocalMemberships(values.get("keepmembership").equals("yes") ? true : false);
+			LDAPServerDetailsPanel.this.server.setUrl((String) values.get("url"));
+			LDAPServerDetailsPanel.this.server.setUsername((String) values.get("username"));
+			LDAPServerDetailsPanel.this.server.setRealm((String) values.get("realm"));
+			LDAPServerDetailsPanel.this.server.setUserIdentifierAttr((String) values.get("useridentifierattr"));
+			LDAPServerDetailsPanel.this.server.setGroupIdentifierAttr((String) values.get("grpidentifierattr"));
+			LDAPServerDetailsPanel.this.server.setLogonAttr((String) values.get("logonattr"));
+			LDAPServerDetailsPanel.this.server.setUserClass((String) values.get("userclass"));
+			LDAPServerDetailsPanel.this.server.setGroupClass((String) values.get("grpclass"));
+			LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get("usersbasenode"));
+			LDAPServerDetailsPanel.this.server.setUserIncludes((String) values.get("userinclude"));
+			LDAPServerDetailsPanel.this.server.setUserExcludes((String) values.get("userexclude"));
+			LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get("grpsbasenode"));
+			LDAPServerDetailsPanel.this.server.setGroupIncludes((String) values.get("groupinclude"));
+			LDAPServerDetailsPanel.this.server.setGroupExcludes((String) values.get("groupexclude"));
+			LDAPServerDetailsPanel.this.server.setPageSize(Integer.parseInt(values.get("pagesize").toString()));
+			LDAPServerDetailsPanel.this.server.setSyncTtl(Integer.parseInt(values.get("syncttl").toString()));
+			LDAPServerDetailsPanel.this.server.setLanguage((String) values.get("language"));
+			LDAPServerDetailsPanel.this.server.setUserType(Integer.parseInt(values.get("usertype").toString()));
+			LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
+			LDAPServerDetailsPanel.this.server.setTimeout(Integer.parseInt(values.get("timeout").toString()));
+
+			LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password_hidden"));
+
+			LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server, new AsyncCallback<GUILDAPServer>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUILDAPServer server) {
+					LDAPServerDetailsPanel.this.server = server;
+					if (browser != null && browser instanceof LDAPBrowser)
+						browser.setServer(LDAPServerDetailsPanel.this.server);
+					listing.updateRecord(LDAPServerDetailsPanel.this.server);
+					test.setDisabled(false);
+					GuiLog.info(I18N.message("settingssaved"), null);
+				}
+			});
+		});
+		return save;
+	}
+
+	private IButton prepareActiveDirButton() {
+		IButton activedir = new IButton();
+		activedir.setAutoFit(true);
+		activedir.setTitle(I18N.message("activedirectory"));
+		activedir.addClickHandler((ClickEvent event) -> {
+			LD.askForValue(I18N.message("activedirectory"), I18N.message("addomain"), "", (String value) -> {
+				if (value == null)
+					return;
+				String node = value.replace("\\.", ",DC=");
+				node = "DC=" + node;
+				vm.setValue("url", "ldap://AD_SERVER:389");
+				vm.setValue("username", "CN=Administrator,CN=Users," + node);
+				vm.setValue("useridentifierattr", "CN");
+				vm.setValue("grpidentifierattr", "CN");
+				vm.setValue("logonattr", "sAMAccountName");
+				vm.setValue("userclass", "person");
+				vm.setValue("grpclass", "group");
+				vm.setValue("userclass", "person");
+				vm.setValue("usersbasenode", "CN=Users," + node);
+				vm.setValue("grpsbasenode", "CN=Builtin," + node);
+				vm.setValue("anon", "no");
+			});
+		});
+		return activedir;
+	}
+
+	private IButton prepareTestButton(LDAPServersPanel listing, GUILDAPServer server) {
+		IButton test = new IButton();
+		test.setAutoFit(true);
+		test.setTitle(I18N.message("testconnection"));
+		test.setDisabled(server.getId() == 0L);
+		test.addClickHandler((ClickEvent event) -> {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+			if (!vm.validate())
+				return;
+
+			LDAPServerDetailsPanel.this.server.setEnabled(values.get("eenabled").equals("yes") ? true : false);
+			LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes") ? true : false);
+			LDAPServerDetailsPanel.this.server
+					.setKeepLocalMemberships(values.get("keepmembership").equals("yes") ? true : false);
+			LDAPServerDetailsPanel.this.server.setUrl((String) values.get("url"));
+			LDAPServerDetailsPanel.this.server.setUsername((String) values.get("username"));
+			LDAPServerDetailsPanel.this.server.setRealm((String) values.get("realm"));
+			LDAPServerDetailsPanel.this.server.setUserIdentifierAttr((String) values.get("useridentifierattr"));
+			LDAPServerDetailsPanel.this.server.setGroupIdentifierAttr((String) values.get("grpidentifierattr"));
+			LDAPServerDetailsPanel.this.server.setLogonAttr((String) values.get("logonattr"));
+			LDAPServerDetailsPanel.this.server.setUserClass((String) values.get("userclass"));
+			LDAPServerDetailsPanel.this.server.setGroupClass((String) values.get("grpclass"));
+			LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get("usersbasenode"));
+			LDAPServerDetailsPanel.this.server.setUserIncludes((String) values.get("userinclude"));
+			LDAPServerDetailsPanel.this.server.setUserExcludes((String) values.get("userexclude"));
+			LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get("grpsbasenode"));
+			LDAPServerDetailsPanel.this.server.setGroupIncludes((String) values.get("groupinclude"));
+			LDAPServerDetailsPanel.this.server.setGroupExcludes((String) values.get("groupexclude"));
+			LDAPServerDetailsPanel.this.server.setLanguage((String) values.get("language"));
+			LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
+
+			LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password_hidden"));
+
+			if (browser != null && browser instanceof LDAPBrowser)
+				browser.setServer(LDAPServerDetailsPanel.this.server);
+
+			listing.updateRecord(LDAPServerDetailsPanel.this.server);
+
+			LDAPService.Instance.get().testConnection(LDAPServerDetailsPanel.this.server, new AsyncCallback<Boolean>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Boolean ret) {
+					if (ret)
+						SC.say(I18N.message("connectionestablished"));
+					else
+						SC.warn(I18N.message("connectionfailed"));
+				}
+			});
+		});
+		return test;
 	}
 }

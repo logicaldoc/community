@@ -17,7 +17,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -69,49 +68,33 @@ public class UserSecurityPanel extends VLayout {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
 
-		CheckboxItem passwordExpires = new CheckboxItem("passwordExpires", I18N.message("passwordexpires"));
-		passwordExpires.setValue(user.isPasswordExpires());
-		passwordExpires.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
+		CheckboxItem passwordExpires = preparePasswordExpiresSwitch(readonly);
+
+		CheckboxItem enabled = prepareEnabledSwitch(readonly);
+
+		CheckboxItem enforceWorkingTime = prepareEnforceWorkingTImeSwitch(readonly);
+
+		DateItem expire = prepareExpireItem(readonly);
+
+		SpinnerItem maxInactivity = prepareMaxInactivitySpinner(readonly);
+
+		SelectItem tfa = prepareTwoFactorAuthSelector(readonly);
+
+		form.setItems(enabled, passwordExpires, enforceWorkingTime, maxInactivity, expire, tfa);
+
+		addMember(form);
+	}
+
+	private SelectItem prepareTwoFactorAuthSelector(boolean readonly) {
+		SelectItem tfa = ItemFactory.new2AFMethodSelector("2fa", user.getSecondFactor(), false);
+		tfa.setTitle(I18N.message("twofactorsauth"));
+		tfa.setDisabled(readonly || (Session.get().isDemo()));
 		if (!readonly)
-			passwordExpires.addChangedHandler(changedHandler);
+			tfa.addChangedHandler(changedHandler);
+		return tfa;
+	}
 
-		CheckboxItem enabled = new CheckboxItem("eenabled", I18N.message("enabled"));
-		enabled.setValue(user.isEnabled());
-		if (readonly || "admin".equals(user.getUsername())) {
-			enabled.setDisabled(true);
-		} else {
-			enabled.addChangedHandler(changedHandler);
-		}
-
-		CheckboxItem enforceWorkingTime = new CheckboxItem("enforceworkingtime", I18N.message("enforceworkingtime"));
-		enforceWorkingTime.setValue(user.isEnforceWorkingTime());
-		if (readonly || "admin".equals(user.getUsername())) {
-			enforceWorkingTime.setDisabled(true);
-		} else {
-			enforceWorkingTime.addChangedHandler(changedHandler);
-		}
-
-		DateItem expire = ItemFactory.newDateItem("expireson", "expireson");
-		expire.setValue(user.getExpire());
-		if (readonly || "admin".equals(user.getUsername())) {
-			expire.setDisabled(true);
-		} else {
-			expire.addChangedHandler(changedHandler);
-			expire.addKeyPressHandler(new KeyPressHandler() {
-				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					if ("backspace".equals(event.getKeyName().toLowerCase())
-							|| "delete".equals(event.getKeyName().toLowerCase())) {
-						expire.clearValue();
-						expire.setValue((Date) null);
-						changedHandler.onChanged(null);
-					} else {
-						changedHandler.onChanged(null);
-					}
-				}
-			});
-		}
-
+	private SpinnerItem prepareMaxInactivitySpinner(boolean readonly) {
 		SpinnerItem maxInactivity = ItemFactory.newSpinnerItem("maxinactivity", "maxinactivity",
 				user.getMaxInactivity());
 		maxInactivity.setRequired(false);
@@ -123,30 +106,70 @@ public class UserSecurityPanel extends VLayout {
 			maxInactivity.setDisabled(true);
 		} else {
 			maxInactivity.addChangedHandler(changedHandler);
-			maxInactivity.addKeyPressHandler(new KeyPressHandler() {
-				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					if ("backspace".equals(event.getKeyName().toLowerCase())
-							|| "delete".equals(event.getKeyName().toLowerCase())) {
-						maxInactivity.clearValue();
-						maxInactivity.setValue((Date) null);
-						changedHandler.onChanged(null);
-					} else {
-						changedHandler.onChanged(null);
-					}
+			maxInactivity.addKeyPressHandler((KeyPressEvent event) -> {
+				if ("backspace".equals(event.getKeyName().toLowerCase())
+						|| "delete".equals(event.getKeyName().toLowerCase())) {
+					maxInactivity.clearValue();
+					maxInactivity.setValue((Date) null);
+					changedHandler.onChanged(null);
+				} else {
+					changedHandler.onChanged(null);
 				}
 			});
 		}
+		return maxInactivity;
+	}
 
-		SelectItem tfa = ItemFactory.new2AFMethodSelector("2fa", user.getSecondFactor(), false);
-		tfa.setTitle(I18N.message("twofactorsauth"));
-		tfa.setDisabled(readonly || (Session.get().isDemo()));
+	private DateItem prepareExpireItem(boolean readonly) {
+		DateItem expire = ItemFactory.newDateItem("expireson", "expireson");
+		expire.setValue(user.getExpire());
+		if (readonly || "admin".equals(user.getUsername())) {
+			expire.setDisabled(true);
+		} else {
+			expire.addChangedHandler(changedHandler);
+			expire.addKeyPressHandler((KeyPressEvent event) -> {
+				if ("backspace".equals(event.getKeyName().toLowerCase())
+						|| "delete".equals(event.getKeyName().toLowerCase())) {
+					expire.clearValue();
+					expire.setValue((Date) null);
+					changedHandler.onChanged(null);
+				} else {
+					changedHandler.onChanged(null);
+				}
+			});
+		}
+		return expire;
+	}
+
+	private CheckboxItem prepareEnforceWorkingTImeSwitch(boolean readonly) {
+		CheckboxItem enforceWorkingTime = new CheckboxItem("enforceworkingtime", I18N.message("enforceworkingtime"));
+		enforceWorkingTime.setValue(user.isEnforceWorkingTime());
+		if (readonly || "admin".equals(user.getUsername())) {
+			enforceWorkingTime.setDisabled(true);
+		} else {
+			enforceWorkingTime.addChangedHandler(changedHandler);
+		}
+		return enforceWorkingTime;
+	}
+
+	private CheckboxItem prepareEnabledSwitch(boolean readonly) {
+		CheckboxItem enabled = new CheckboxItem("eenabled", I18N.message("enabled"));
+		enabled.setValue(user.isEnabled());
+		if (readonly || "admin".equals(user.getUsername())) {
+			enabled.setDisabled(true);
+		} else {
+			enabled.addChangedHandler(changedHandler);
+		}
+		return enabled;
+	}
+
+	private CheckboxItem preparePasswordExpiresSwitch(boolean readonly) {
+		CheckboxItem passwordExpires = new CheckboxItem("passwordExpires", I18N.message("passwordexpires"));
+		passwordExpires.setValue(user.isPasswordExpires());
+		passwordExpires.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
 		if (!readonly)
-			tfa.addChangedHandler(changedHandler);
-		
-		form.setItems(enabled, passwordExpires, enforceWorkingTime, maxInactivity, expire, tfa);
-
-		addMember(form);
+			passwordExpires.addChangedHandler(changedHandler);
+		return passwordExpires;
 	}
 
 	@SuppressWarnings("unchecked")

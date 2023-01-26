@@ -35,6 +35,8 @@ public class SystemLoadMonitor {
 
 	private List<SystemLoadListener> listeners = new ArrayList<>();
 
+	private boolean lastCheckOverloaded = false;
+
 	public void addListener(SystemLoadListener listener) {
 		if (!listeners.contains(listener))
 			listeners.add(listener);
@@ -96,7 +98,6 @@ public class SystemLoadMonitor {
 			exec.setOutPrefix(null);
 			exec.exec("wmic cpu get loadpercentage", null, null, sb, 5);
 		} catch (IOException e1) {
-			e1.printStackTrace();
 			log.warn(e1.getMessage(), e1);
 			return 0;
 		}
@@ -104,7 +105,7 @@ public class SystemLoadMonitor {
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			// do not worry
+			Thread.currentThread().interrupt();
 		}
 
 		/*
@@ -141,7 +142,7 @@ public class SystemLoadMonitor {
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			// do not worry
+			Thread.currentThread().interrupt();
 		}
 
 		/*
@@ -248,12 +249,18 @@ public class SystemLoadMonitor {
 
 		private void checkOverloadOrUnderload() {
 			if (isAverageCpuOverLoaded()) {
-				log.warn("The system is overloaded (" + averageCpuLoad + "%)");
+				if(!lastCheckOverloaded)
+					log.warn("The system is overloaded (" + averageCpuLoad + "%)");
+				lastCheckOverloaded=true;
+				
 				for (SystemLoadListener listener : listeners) {
 					listener.onOverload(averageCpuLoad, averageCpuLoad);
 				}
 			} else {
-				log.warn("The system is underloaded (" + averageCpuLoad + "%)");
+				if(lastCheckOverloaded)
+					log.warn("The system is underloaded (" + averageCpuLoad + "%)");
+				lastCheckOverloaded=false;
+				
 				for (SystemLoadListener listener : listeners) {
 					listener.onUnderload(averageCpuLoad, averageCpuLoad);
 				}
@@ -264,6 +271,7 @@ public class SystemLoadMonitor {
 			try {
 				Thread.sleep(ms);
 			} catch (InterruptedException e) {
+				end();
 				Thread.currentThread().interrupt();
 			}
 		}

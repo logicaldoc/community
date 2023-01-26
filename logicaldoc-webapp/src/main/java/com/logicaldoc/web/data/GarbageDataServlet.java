@@ -31,7 +31,7 @@ public class GarbageDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max, Locale locale)
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
 			throws PersistenceException, IOException {
 
 		DocumentDAO documentDAO = (DocumentDAO) Context.get().getBean(DocumentDAO.class);

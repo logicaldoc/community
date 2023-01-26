@@ -95,8 +95,7 @@ public class GhostUtil {
 		} catch (TimeoutException e) {
 			log.error("Rendering timed out");
 		} catch (InterruptedException ex) {
-			if (worker != null)
-				worker.interrupt();
+			worker.interrupt();
 			Thread.currentThread().interrupt();
 		} finally {
 			if (process != null)

@@ -11,7 +11,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 
 /**
  * Utility class for handling passwords on documents.
@@ -44,69 +43,82 @@ public class DocumentProtectionManager {
 
 			@Override
 			public void onSuccess(final GUIDocument result) {
-				if (result.isPasswordProtected()) {
-					if (unprotectedDocs.containsKey(docId)) {
-						// The document was already unlocked
-						if (handler != null)
-							handler.onUnprotected(result);
-					} else {
-						LD.askForDocumentPassword(I18N.message("security"), I18N.message("enterprotpassword"), null,
-								new ValueCallback() {
+				if (!result.isPasswordProtected()) {
+					notifyUnprotected(handler, result);
+					return;
+				}
 
-									@Override
-									public void execute(final String password) {
-										if (password == null)
-											SC.warn(I18N.message("accesdenied"));
-										if ("--unset--".equals(password)
-												&& Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-											DocumentService.Instance.get().unsetPassword(result.getId(), password,
-													new AsyncCallback<Void>() {
+				if (unprotectedDocs.containsKey(docId)) {
+					notifyUnprotected(handler, result);
+				} else {
+					LD.askForDocumentPassword(I18N.message("security"), I18N.message("enterprotpassword"), null,
+							(final String password) -> {
+								if (password == null) {
+									SC.warn(I18N.message("accesdenied"));
+									return;
+								}
 
-														@Override
-														public void onFailure(Throwable caught) {
-															GuiLog.serverError(caught);
-														}
-
-														@Override
-														public void onSuccess(Void res) {
-															unprotectedDocs.put(docId, password);
-															if (handler != null)
-																handler.onUnprotected(result);
-														}
-													});
-										} else {
-											DocumentService.Instance.get().unprotect(result.getId(), password,
-													new AsyncCallback<Boolean>() {
-
-														@Override
-														public void onFailure(Throwable caught) {
-															GuiLog.serverError(caught);
-														}
-
-														@Override
-														public void onSuccess(Boolean granted) {
-															if (granted) {
-																// Save the
-																// password for
-																// further
-																// reference
-																unprotectedDocs.put(docId, password);
-																if (handler != null)
-																	handler.onUnprotected(result);
-															} else if (handler != null) {
-																SC.warn(I18N.message("accesdenied"));
-															}
-														}
-													});
-										}
-									}
-								});
-					}
-				} else if (handler != null) {
-					handler.onUnprotected(result);
+								if ("--unset--".equals(password)
+										&& Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
+									unsetPassword(docId, handler, result, password);
+								} else {
+									unprotect(docId, handler, result, password);
+								}
+							});
 				}
 			}
 		});
+	}
+	
+	private static void unsetPassword(final Long docId, final DocumentProtectionHandler handler,
+			final GUIDocument result, final String password) {
+		DocumentService.Instance.get().unsetPassword(result.getId(), password,
+				new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void res) {
+						saveProtectionPasswordAndNotify(docId, handler, result, password);
+					}
+				});
+	}
+	
+	private static void unprotect(final Long docId, final DocumentProtectionHandler handler, final GUIDocument result,
+			final String password) {
+		DocumentService.Instance.get().unprotect(result.getId(), password,
+				new AsyncCallback<Boolean>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Boolean granted) {
+						if (granted) {
+							saveProtectionPasswordAndNotify(docId, handler, result,
+									password);
+						} else if (handler != null) {
+							SC.warn(I18N.message("accesdenied"));
+						}
+					}
+				});
+	}
+
+	private static void notifyUnprotected(final DocumentProtectionHandler handler, final GUIDocument document) {
+		if (handler != null)
+			handler.onUnprotected(document);
+	}
+	
+	private static void saveProtectionPasswordAndNotify(final Long docId, final DocumentProtectionHandler handler,
+			final GUIDocument document, final String password) {
+		// Save the password for further reference
+		unprotectedDocs.put(docId, password);
+		notifyUnprotected(handler, document);
 	}
 
 	public static abstract class DocumentProtectionHandler {

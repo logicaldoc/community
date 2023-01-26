@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.Metadata;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -280,32 +281,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 					continue;
 
 				Metadata entry = dbox.get(path);
-				if (entry instanceof FileMetadata) {
-					importDocument(root, (FileMetadata) entry, dbox, session);
-					imported.add(entry.getPathDisplay());
-				} else {
-					String rootPath = entry.getPathDisplay();
-					if (!rootPath.endsWith("/"))
-						rootPath += "/";
-
-					List<FileMetadata> files = dbox.listFilesInTree(rootPath);
-					for (FileMetadata file : files) {
-						if (imported.contains(file.getPathDisplay()))
-							continue;
-
-						FolderHistory transaction = new FolderHistory();
-						transaction.setSession(session);
-
-						String folderPath = file.getPathDisplay().substring(rootPath.length());
-						folderPath = FileUtil.getPath(file.getPathDisplay());
-						folderPath = folderPath.replace("\\\\", "/");
-
-						Folder folder = fdao.createPath(root, folderPath, true, transaction);
-
-						importDocument(folder, file, dbox, session);
-						imported.add(file.getPathDisplay());
-					}
-				}
+				importEntry(session, dbox, root, imported, entry);
 			}
 
 			count = imported.size();
@@ -314,6 +290,37 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		}
 
 		return count;
+	}
+
+	private void importEntry(Session session, Dropbox dbox, Folder root, Set<String> imported,
+			Metadata entry) throws Exception, DbxException, PersistenceException {
+		if (entry instanceof FileMetadata) {
+			importDocument(root, (FileMetadata) entry, dbox, session);
+			imported.add(entry.getPathDisplay());
+		} else {
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			String rootPath = entry.getPathDisplay();
+			if (!rootPath.endsWith("/"))
+				rootPath += "/";
+
+			List<FileMetadata> files = dbox.listFilesInTree(rootPath);
+			for (FileMetadata file : files) {
+				if (imported.contains(file.getPathDisplay()))
+					continue;
+
+				FolderHistory transaction = new FolderHistory();
+				transaction.setSession(session);
+
+				String folderPath = file.getPathDisplay().substring(rootPath.length());
+				folderPath = FileUtil.getPath(file.getPathDisplay());
+				folderPath = folderPath.replace("\\\\", "/");
+
+				Folder folder = fdao.createPath(root, folderPath, true, transaction);
+
+				importDocument(folder, file, dbox, session);
+				imported.add(file.getPathDisplay());
+			}
+		}
 	}
 
 	private void importDocument(Folder root, FileMetadata src, Dropbox dbox, Session session) throws Exception {

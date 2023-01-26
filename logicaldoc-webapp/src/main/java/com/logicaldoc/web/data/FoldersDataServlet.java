@@ -40,8 +40,13 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
+
+		int maxChildren = (int) Context.get().getProperties()
+				.getLong(session.getTenantName() + ".gui.folder.maxchildren", 2000L);
+		if (max != null)
+			maxChildren = max;
 
 		if (request.getParameter("parent") != null
 				&& (request.getParameter("parent").startsWith("d-") || request.getParameter("parent").equals("null"))) {
@@ -126,7 +131,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 				endRecord = startRecord + pagination[1] - 1;
 			}
 		} else {
-			endRecord = (long) max;
+			endRecord = (long) maxChildren;
 		}
 
 		PrintWriter writer = response.getWriter();

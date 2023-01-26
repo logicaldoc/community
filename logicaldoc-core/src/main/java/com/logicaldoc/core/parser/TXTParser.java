@@ -13,11 +13,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
-import com.logicaldoc.util.charset.CharsetDetector;
-import com.logicaldoc.util.charset.CharsetMatch;
 import com.logicaldoc.util.io.IOUtil;
 
 /**

@@ -46,8 +46,6 @@ public class WebservicesPanel extends VLayout {
 
 	private DynamicForm webServiceForm;
 
-	private GUIParameter[] settings;
-
 	private Img chartImg;
 
 	private StaticTextItem apicalls;
@@ -55,22 +53,12 @@ public class WebservicesPanel extends VLayout {
 	private StaticTextItem apicallsCurrent;
 
 	public WebservicesPanel(GUIParameter[] settings, ValuesManager vm) {
-		this.settings = settings;
-
 		webServiceForm = new DynamicForm();
 		webServiceForm.setValuesManager(vm);
-		webServiceForm.setTitleOrientation(TitleOrientation.LEFT); 
+		webServiceForm.setTitleOrientation(TitleOrientation.LEFT);
 		webServiceForm.setNumCols(4);
 		webServiceForm.setWidth(1);
 		webServiceForm.setPadding(5);
-	}
-
-	@Override
-	protected void onDraw() {
-		if (!Feature.enabled(Feature.WEBSERVICE)) {
-			setMembers(new FeatureDisabled());
-			return;
-		}
 
 		for (GUIParameter parameter : settings) {
 			if (parameter.getName().equals("webservice.enabled"))
@@ -81,6 +69,14 @@ public class WebservicesPanel extends VLayout {
 				recCallsPayload = parameter;
 			if (parameter.getName().equals("webservice.call.ttl"))
 				callsTtl = parameter;
+		}
+	}
+
+	@Override
+	protected void onDraw() {
+		if (!Feature.enabled(Feature.WEBSERVICE)) {
+			setMembers(new FeatureDisabled());
+			return;
 		}
 
 		// SOAP Url
@@ -94,11 +90,7 @@ public class WebservicesPanel extends VLayout {
 		restUrl.setColSpan(4);
 
 		// Web Service Enabled
-		RadioGroupItem wsEnabled = ItemFactory.newBooleanSelector("wsEnabled", "enabled");
-		wsEnabled.setRequired(true);
-		wsEnabled.setValue(enabled.getValue().equals("true") ? "yes" : "no");
-		wsEnabled.setColSpan(4);
-		wsEnabled.setDisabled(!Session.get().isDefaultTenant());
+		RadioGroupItem wsEnabled = prepareEnabledItem();
 
 		SpinnerItem ttl = ItemFactory.newSpinnerItem("wsTtl", "timetolive", Integer.parseInt(callsTtl.getValue()));
 		ttl.setHint(I18N.message("days"));
@@ -107,11 +99,7 @@ public class WebservicesPanel extends VLayout {
 		ttl.setDisabled(recCalls.getValue().equals("false"));
 
 		// Flag to record webservice calls payload
-		RadioGroupItem recordCallsPayload = ItemFactory.newBooleanSelector("wsRecordCallsPayload",
-				"recordcallspayload");
-		recordCallsPayload.setWrapTitle(false);
-		recordCallsPayload.setRequired(true);
-		recordCallsPayload.setValue(recCallsPayload.getValue().equals("true") ? "yes" : "no");
+		RadioGroupItem recordCallsPayload = prepareRecordCallsPayloadItem();
 
 		// Flag to record webservice calls
 		RadioGroupItem recordCalls = ItemFactory.newBooleanSelector("wsRecordCalls", "recordcalls");
@@ -129,19 +117,7 @@ public class WebservicesPanel extends VLayout {
 		apicalls = ItemFactory.newStaticTextItem("apicalls", I18N.message("totalcalls"), "0");
 		apicallsCurrent = ItemFactory.newStaticTextItem("apicallsCurrent", I18N.message("currentmonthcalls"), "0");
 
-		SelectItem tenantStat = ItemFactory.newTenantSelector();
-		tenantStat.setName("tenantStat");
-		tenantStat.setTitle(I18N.message("statsfromtenant"));
-		tenantStat.setColSpan(4);
-		tenantStat.setWidth("*");
-		tenantStat.setAllowEmptyValue(true);
-		tenantStat.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refreshStats(event.getValue() != null ? Long.parseLong(event.getValue().toString()) : null);
-			}
-		});
+		SelectItem tenantStat = prepareTenantStatItem();
 
 		if (Session.get().isDefaultTenant())
 			webServiceForm.setItems(soapUrl, restUrl, wsEnabled, recordCalls, recordCallsPayload, ttl, tenantStat,
@@ -154,6 +130,38 @@ public class WebservicesPanel extends VLayout {
 			refreshStats(null);
 		else
 			refreshStats(Session.get().getTenantId());
+	}
+
+	private RadioGroupItem prepareRecordCallsPayloadItem() {
+		RadioGroupItem recordCallsPayload = ItemFactory.newBooleanSelector("wsRecordCallsPayload",
+				"recordcallspayload");
+		recordCallsPayload.setWrapTitle(false);
+		recordCallsPayload.setRequired(true);
+		recordCallsPayload.setValue(recCallsPayload.getValue().equals("true") ? "yes" : "no");
+		return recordCallsPayload;
+	}
+
+	private SelectItem prepareTenantStatItem() {
+		SelectItem tenantStat = ItemFactory.newTenantSelector();
+		tenantStat.setName("tenantStat");
+		tenantStat.setTitle(I18N.message("statsfromtenant"));
+		tenantStat.setColSpan(4);
+		tenantStat.setWidth("*");
+		tenantStat.setAllowEmptyValue(true);
+		tenantStat.addChangedHandler((ChangedEvent tenantStatChanged) -> {
+			refreshStats(tenantStatChanged.getValue() != null ? Long.parseLong(tenantStatChanged.getValue().toString())
+					: null);
+		});
+		return tenantStat;
+	}
+
+	private RadioGroupItem prepareEnabledItem() {
+		RadioGroupItem wsEnabled = ItemFactory.newBooleanSelector("wsEnabled", "enabled");
+		wsEnabled.setRequired(true);
+		wsEnabled.setValue(enabled.getValue().equals("true") ? "yes" : "no");
+		wsEnabled.setColSpan(4);
+		wsEnabled.setDisabled(!Session.get().isDefaultTenant());
+		return wsEnabled;
 	}
 
 	private void refreshStats(Long tenantId) {

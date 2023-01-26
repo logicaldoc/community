@@ -47,101 +47,32 @@ public class MailPreviewPanel extends VLayout {
 		form.setTitleAlign(Alignment.LEFT);
 		form.setAlign(Alignment.LEFT);
 
-		StaticTextItem from = ItemFactory.newStaticTextItem("from", "from",
-				mail.getFrom() != null ? mail.getFrom().displayLink() : "");
+		StaticTextItem from = prepareFromItem(mail);
 		from.setEndRow(true);
 
 		StaticTextItem subject = ItemFactory.newStaticTextItem("subject", "subject", mail.getSubject());
 		subject.setEndRow(true);
 
-		String replyToString = "";
-		if (mail.getReplyTo() != null && mail.getReplyTo().length > 0)
-			for (GUIContact contact : mail.getReplyTo()) {
-				if (!replyToString.isEmpty())
-					replyToString += ", ";
-				replyToString += contact.displayLink();
-			}
-		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", "replyto", replyToString);
+		StaticTextItem replyto = prepareReplyToItem(mail);
 		replyto.setEndRow(true);
-		replyto.setVisible(!replyToString.isEmpty() && !replyToString.equals(mail.getFrom().getEmail()));
 
-		StaticTextItem sent = ItemFactory.newStaticTextItem("sentdate", "sentdate",
-				mail.getSent() != null ? I18N.formatDate(mail.getSent()) : null);
-		sent.setVisible(mail.getSent() != null);
+		StaticTextItem sent = prepareSentItem(mail);
 
-		StaticTextItem received = ItemFactory.newStaticTextItem("receiveddate", "receiveddate",
-				mail.getReceived() != null ? I18N.formatDate(mail.getReceived()) : null);
-		received.setVisible(mail.getReceived() != null);
+		StaticTextItem received = prepareReceivedItem(mail);
 
-		String toString = "";
-		if (mail.getTos() != null && mail.getTos().length > 0)
-			for (GUIContact contact : mail.getTos()) {
-				if (!toString.isEmpty())
-					toString += ", ";
-				toString += contact.displayLink();
-			}
-		StaticTextItem to = ItemFactory.newStaticTextItem("to", "to", toString);
+		StaticTextItem to = prepareToItem(mail);
 		to.setEndRow(true);
-		to.setVisible(!toString.isEmpty());
 
-		String ccString = "";
-		if (mail.getCcs() != null && mail.getCcs().length > 0)
-			for (GUIContact contact : mail.getCcs()) {
-				if (!ccString.isEmpty())
-					ccString += ", ";
-				ccString += contact.displayLink();
-			}
-		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", "cc", ccString);
+		StaticTextItem cc = prepareCcItem(mail);
 		cc.setEndRow(true);
-		cc.setVisible(!ccString.isEmpty());
 
-		String bccString = "";
-		if (mail.getBccs() != null && mail.getBccs().length > 0)
-			for (GUIContact contact : mail.getBccs()) {
-				if (!bccString.isEmpty())
-					bccString += ", ";
-				bccString += contact.displayLink();
-			}
-		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", "bcc", bccString);
+		StaticTextItem bcc = prepareBccItem(mail);
 		bcc.setEndRow(true);
-		bcc.setVisible(!bccString.isEmpty());
 
 		form.setItems(from, subject, replyto, to, cc, bcc, sent, received);
 
-		FlowLayout attachmentsFlow = new FlowLayout();
-		attachmentsFlow.setWidth100();
-		attachmentsFlow.setHeight(75);
-
-		GUIDocument[] docs = mail.getAttachments();
-		if (docs != null)
-			for (final GUIDocument doc : docs) {
-				IButton button = new IButton(
-						doc.getFileName() + " (" + Util.formatSizeCompact(doc.getFileSize()) + ")");
-				button.setAutoFit(true);
-				button.setIcon("[SKIN]/" + doc.getIcon());
-				if (doc.getFolder().isDownload())
-					button.addClickHandler(new ClickHandler() {
-
-						@Override
-						public void onClick(ClickEvent event) {
-							String url = Util.downloadAttachmentURL(document.getId(), document.getFileVersion(),
-									doc.getFileName());
-							Util.download(url);
-						}
-					});
-				button.setContextMenu(prepareButtonMenu(document, doc));
-				attachmentsFlow.addTile(button);
-			}
-
-		VLayout header = new VLayout();
-		header.setWidth100();
-		header.setBackgroundColor("#efefef;");
-
-		if (docs != null && docs.length > 0)
-			header.setMembers(form, attachmentsFlow);
-		else
-			header.setMembers(form);
-
+		VLayout header = preparePreviewHeader(mail, document, form);
+		
 		Canvas body = null;
 		if (mail.getMessage().toLowerCase().startsWith("<html")
 				|| mail.getMessage().toLowerCase().startsWith("<body")) {
@@ -187,6 +118,129 @@ public class MailPreviewPanel extends VLayout {
 			}
 		}
 		setMembers(header, body);
+	}
+
+	/**
+	 * Prepares the header that shows the most important informations about the email and the attachment buttons
+	 * 
+	 * @param mail The email 
+	 * @param document The document that represents the emil
+	 * @param form the form
+	 * 
+	 * @return the header layout
+	 */
+	private VLayout preparePreviewHeader(final GUIEmail mail, final GUIDocument document, DynamicForm form) {
+		FlowLayout attachmentsPanel = new FlowLayout();
+		attachmentsPanel.setWidth100();
+		attachmentsPanel.setHeight(75);
+
+		GUIDocument[] docs = prepareAttachments(mail, document, attachmentsPanel);
+
+		VLayout header = new VLayout();
+		header.setWidth100();
+		header.setBackgroundColor("#efefef;");
+		if (docs != null && docs.length > 0)
+			header.setMembers(form, attachmentsPanel);
+		else
+			header.setMembers(form);
+		return header;
+	}
+
+	private GUIDocument[] prepareAttachments(final GUIEmail mail, final GUIDocument document,
+			FlowLayout attachmentsPanel) {
+		GUIDocument[] docs = mail.getAttachments();
+		if (docs != null)
+			for (final GUIDocument doc : docs) {
+				IButton button = new IButton(
+						doc.getFileName() + " (" + Util.formatSizeCompact(doc.getFileSize()) + ")");
+				button.setAutoFit(true);
+				button.setIcon("[SKIN]/" + doc.getIcon());
+				if (doc.getFolder().isDownload())
+					button.addClickHandler(new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent event) {
+							String url = Util.downloadAttachmentURL(document.getId(), document.getFileVersion(),
+									doc.getFileName());
+							Util.download(url);
+						}
+					});
+				button.setContextMenu(prepareButtonMenu(document, doc));
+				attachmentsPanel.addTile(button);
+			}
+		return docs;
+	}
+
+	private StaticTextItem prepareBccItem(final GUIEmail mail) {
+		String bccString = "";
+		if (mail.getBccs() != null && mail.getBccs().length > 0)
+			for (GUIContact contact : mail.getBccs()) {
+				if (!bccString.isEmpty())
+					bccString += ", ";
+				bccString += contact.displayLink();
+			}
+		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", "bcc", bccString);
+		bcc.setVisible(!bccString.isEmpty());
+		return bcc;
+	}
+
+	private StaticTextItem prepareCcItem(final GUIEmail mail) {
+		String ccString = "";
+		if (mail.getCcs() != null && mail.getCcs().length > 0)
+			for (GUIContact contact : mail.getCcs()) {
+				if (!ccString.isEmpty())
+					ccString += ", ";
+				ccString += contact.displayLink();
+			}
+		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", "cc", ccString);
+		cc.setVisible(!ccString.isEmpty());
+		return cc;
+	}
+
+	private StaticTextItem prepareToItem(final GUIEmail mail) {
+		String toString = "";
+		if (mail.getTos() != null && mail.getTos().length > 0)
+			for (GUIContact contact : mail.getTos()) {
+				if (!toString.isEmpty())
+					toString += ", ";
+				toString += contact.displayLink();
+			}
+		StaticTextItem to = ItemFactory.newStaticTextItem("to", "to", toString);
+		to.setVisible(!toString.isEmpty());
+		return to;
+	}
+
+	private StaticTextItem prepareReceivedItem(final GUIEmail mail) {
+		StaticTextItem received = ItemFactory.newStaticTextItem("receiveddate", "receiveddate",
+				mail.getReceived() != null ? I18N.formatDate(mail.getReceived()) : null);
+		received.setVisible(mail.getReceived() != null);
+		return received;
+	}
+
+	private StaticTextItem prepareSentItem(final GUIEmail mail) {
+		StaticTextItem sent = ItemFactory.newStaticTextItem("sentdate", "sentdate",
+				mail.getSent() != null ? I18N.formatDate(mail.getSent()) : null);
+		sent.setVisible(mail.getSent() != null);
+		return sent;
+	}
+
+	private StaticTextItem prepareFromItem(final GUIEmail mail) {
+		StaticTextItem from = ItemFactory.newStaticTextItem("from", "from",
+				mail.getFrom() != null ? mail.getFrom().displayLink() : "");
+		return from;
+	}
+
+	private StaticTextItem prepareReplyToItem(final GUIEmail mail) {
+		String replyToString = "";
+		if (mail.getReplyTo() != null && mail.getReplyTo().length > 0)
+			for (GUIContact contact : mail.getReplyTo()) {
+				if (!replyToString.isEmpty())
+					replyToString += ", ";
+				replyToString += contact.displayLink();
+			}
+		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", "replyto", replyToString);
+		replyto.setVisible(!replyToString.isEmpty() && !replyToString.equals(mail.getFrom().getEmail()));
+		return replyto;
 	}
 
 	private Menu prepareButtonMenu(final GUIDocument doc, final GUIDocument attachment) {

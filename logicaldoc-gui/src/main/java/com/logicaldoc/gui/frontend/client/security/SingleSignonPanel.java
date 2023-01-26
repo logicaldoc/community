@@ -13,7 +13,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -97,6 +96,26 @@ public class SingleSignonPanel extends VLayout {
 		userType.setWrapTitle(false);
 		userType.setRequired(true);
 
+		initValues(settings, enabled, id, appUrl, casUrl, casLoginUrl, group, language, userType);
+
+		IButton save = prepareSaveButton(form);
+
+		form.setFields(enabled, id, appUrl, casUrl, casLoginUrl, group, language, userType);
+
+		Tab tab = new Tab();
+		tab.setTitle(I18N.message("singlesignon"));
+		tab.setPane(form);
+
+		TabSet tabs = new TabSet();
+		tabs.setWidth100();
+		tabs.setHeight100();
+		tabs.setTabs(tab);
+
+		setMembers(tabs, save);
+	}
+
+	private void initValues(GUIParameter[] settings, RadioGroupItem enabled, TextItem id, TextItem appUrl,
+			TextItem casUrl, TextItem casLoginUrl, SelectItem group, SelectItem language, SelectItem userType) {
 		for (GUIParameter setting : settings) {
 			if ("cas.enabled".equals(setting.getName()))
 				enabled.setValue("true".equals(setting.getValue()) ? "yes" : "no");
@@ -115,54 +134,43 @@ public class SingleSignonPanel extends VLayout {
 			else if ("cas.userType".equals(setting.getName()))
 				userType.setValue(setting.getValue());
 		}
+	}
 
+	private IButton prepareSaveButton(final DynamicForm form) {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (form.validate()) {
-					GUIParameter[] params = new GUIParameter[8];
-					params[0] = new GUIParameter("cas.enabled", "" + ("yes".equals(form.getValueAsString("enabled"))));
-					params[1] = new GUIParameter("cas.id", form.getValueAsString("id").trim());
-					params[2] = new GUIParameter("cas.url", form.getValueAsString("casurl").trim());
-					params[3] = new GUIParameter("cas.appurl", form.getValueAsString("appurl").trim());
-					params[4] = new GUIParameter("cas.loginurl", form.getValueAsString("loginurl").trim());
-					params[5] = new GUIParameter("cas.group", form.getValueAsString("group").trim());
-					params[6] = new GUIParameter("cas.lang", form.getValueAsString("language").trim());
-					params[7] = new GUIParameter("cas.userType", form.getValueAsString("usertype").trim());
+		save.addClickHandler((ClickEvent event) -> {
+			if (!form.validate())
+				return;
 
-					for (GUIParameter param : params)
-						Session.get().setConfig(param.getName(), param.getValue());
+			GUIParameter[] params = new GUIParameter[8];
+			params[0] = new GUIParameter("cas.enabled", "" + ("yes".equals(form.getValueAsString("enabled"))));
+			params[1] = new GUIParameter("cas.id", form.getValueAsString("id").trim());
+			params[2] = new GUIParameter("cas.url", form.getValueAsString("casurl").trim());
+			params[3] = new GUIParameter("cas.appurl", form.getValueAsString("appurl").trim());
+			params[4] = new GUIParameter("cas.loginurl", form.getValueAsString("loginurl").trim());
+			params[5] = new GUIParameter("cas.group", form.getValueAsString("group").trim());
+			params[6] = new GUIParameter("cas.lang", form.getValueAsString("language").trim());
+			params[7] = new GUIParameter("cas.userType", form.getValueAsString("usertype").trim());
 
-					SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
+			for (GUIParameter param : params)
+				Session.get().setConfig(param.getName(), param.getValue());
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
 
-						@Override
-						public void onSuccess(Void ret) {
-							GuiLog.info(I18N.message("settingssaved"), null);
-							if ("yes".equals(form.getValueAsString("enabled")))
-								SC.say(I18N.message("settingssaved") + "\n" + I18N.message("suggestedtorestart"));
-						}
-					});
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
 				}
-			}
+
+				@Override
+				public void onSuccess(Void ret) {
+					GuiLog.info(I18N.message("settingssaved"), null);
+					if ("yes".equals(form.getValueAsString("enabled")))
+						SC.say(I18N.message("settingssaved") + "\n" + I18N.message("suggestedtorestart"));
+				}
+			});
 		});
-
-		form.setFields(enabled, id, appUrl, casUrl, casLoginUrl, group, language, userType);
-
-		Tab tab = new Tab();
-		tab.setTitle(I18N.message("singlesignon"));
-		tab.setPane(form);
-
-		TabSet tabs = new TabSet();
-		tabs.setWidth100();
-		tabs.setHeight100();
-		tabs.setTabs(tab);
-
-		setMembers(tabs, save);
+		return save;
 	}
 }

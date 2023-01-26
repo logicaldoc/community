@@ -97,113 +97,39 @@ public class UserPropertiesPanel extends HLayout {
 
 		layout.addMember(form1, 1);
 
-		final CheckboxItem guest = new CheckboxItem("readonly", I18N.message("readonly"));
-		guest.setValue(user.isReadOnly());
-		if (readonly || "admin".equals(user.getUsername())) {
-			guest.setDisabled(true);
-		} else {
-			guest.addChangedHandler(changedHandler);
-			guest.addChangedHandler(new ChangedHandler() {
-
-				@Override
-				public void onChanged(ChangedEvent event) {
-					if (guest.getValueAsBoolean()) {
-						groupsItem.clearValue();
-						Record[] records = groupsItem.getOptionDataSource().getCacheData();
-						if (records != null)
-							for (Record record : records) {
-								if (record.getAttributeAsString("name").equals(Constants.GROUP_GUEST)) {
-									groupsItem.setValues(record.getAttributeAsString("id"));
-								}
-							}
-					}
-				}
-			});
-		}
+		final CheckboxItem guest = prepareGuestItem(readonly);
 
 		CheckboxItem notifyCredentials = new CheckboxItem("notifyCredentials", I18N.message("notifycredentials"));
 		notifyCredentials.setValue(true);
 		notifyCredentials.setVisible(user.getId() == 0);
 
-		TextItem username = ItemFactory.newTextItem("username", "username", user.getUsername());
-		username.setRequired(true);
-		username.setSelectOnFocus(true);
-		username.setDisabled(readonly || user.getId() != 0);
-		if (!readonly)
-			username.addChangedHandler(changedHandler);
+		TextItem username = prepareUsername(readonly);
 
-		TextItem firstname = ItemFactory.newTextItem("firstname", "firstname", user.getFirstName());
-		firstname.setRequired(true);
-		firstname.setDisabled(readonly);
-		if (!readonly)
-			firstname.addChangedHandler(changedHandler);
+		TextItem firstname = prepareFirstname(readonly);
 
-		TextItem name = ItemFactory.newTextItem("name", "lastname", user.getName());
-		name.setRequired(true);
-		name.setDisabled(readonly);
-		if (!readonly)
-			name.addChangedHandler(changedHandler);
+		TextItem name = prepareName(readonly);
 
-		TextItem address = ItemFactory.newTextItem("address", "address", user.getAddress());
-		address.setDisabled(readonly);
-		if (!readonly)
-			address.addChangedHandler(changedHandler);
+		TextItem address = prepareAddress(readonly);
 
-		TextItem postalcode = ItemFactory.newTextItem("postalcode", "postalcode", user.getPostalCode());
-		postalcode.setDisabled(readonly);
-		if (!readonly)
-			postalcode.addChangedHandler(changedHandler);
+		TextItem postalcode = preparePostalcode(readonly);
 
-		TextItem city = ItemFactory.newTextItem("city", "city", user.getCity());
-		city.setDisabled(readonly);
-		if (!readonly)
-			city.addChangedHandler(changedHandler);
+		TextItem city = prepareCity(readonly);
 
-		TextItem country = ItemFactory.newTextItem("country", "country", user.getCountry());
-		country.setDisabled(readonly);
-		if (!readonly)
-			country.addChangedHandler(changedHandler);
+		TextItem country = prepareCountry(readonly);
 
-		SelectItem language = ItemFactory.newLanguageSelector("language", false, true);
-		language.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
-		language.setValue(user.getLanguage());
-		if (!readonly)
-			language.addChangedHandler(changedHandler);
+		SelectItem language = prepareLanguageSelector(readonly);
 
-		TextItem state = ItemFactory.newTextItem("state", "state", user.getState());
-		state.setDisabled(readonly);
-		if (!readonly)
-			state.addChangedHandler(changedHandler);
+		TextItem state = prepareStateItem(readonly);
 
-		TextItem phone = ItemFactory.newTextItem("phone", "phone", user.getPhone());
-		phone.setDisabled(readonly);
-		if (!readonly)
-			phone.addChangedHandler(changedHandler);
+		TextItem phone = preparePhoneItem(readonly);
 
-		TextItem cell = ItemFactory.newTextItem("cell", "cell", user.getCell());
-		cell.setDisabled(readonly);
-		if (!readonly)
-			cell.addChangedHandler(changedHandler);
+		TextItem cell = prepareCellItem(readonly);
 
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
-		email.setRequired(true);
-		email.setDisabled(readonly);
-		email.setValue(user.getEmail());
-		if (!readonly)
-			email.addChangedHandler(changedHandler);
+		TextItem email = prepareEmailItem(readonly);
 
-		TextItem email2 = ItemFactory.newEmailItem("email2", "secondaryemail", false);
-		email2.setRequired(false);
-		email2.setDisabled(readonly);
-		email2.setValue(user.getEmail2());
-		if (!readonly)
-			email2.addChangedHandler(changedHandler);
+		TextItem email2 = prepareEmail2Item(readonly);
 
-		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", "timezone", user.getTimeZone());
-		timeZone.setRequired(false);
-		timeZone.setDisabled(readonly);
-		if (!readonly)
-			timeZone.addChangedHandler(changedHandler);
+		ComboBoxItem timeZone = prepareTimeZoneSelector(readonly);
 
 		if (user.getId() == 0L)
 			form1.setItems(notifyCredentials, guest, username, email, firstname, name, email2, language, address,
@@ -215,6 +141,10 @@ public class UserPropertiesPanel extends HLayout {
 
 		prepareGroupsForm(readonly);
 
+		addAvatar();
+	}
+
+	private void addAvatar() {
 		if (user.getId() != 0L) {
 			Avatar avatar = new Avatar(user.getId(), new AsyncCallback<Void>() {
 
@@ -231,6 +161,155 @@ public class UserPropertiesPanel extends HLayout {
 			});
 			addMember(avatar);
 		}
+	}
+
+	private ComboBoxItem prepareTimeZoneSelector(boolean readonly) {
+		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", "timezone", user.getTimeZone());
+		timeZone.setRequired(false);
+		timeZone.setDisabled(readonly);
+		if (!readonly)
+			timeZone.addChangedHandler(changedHandler);
+		return timeZone;
+	}
+
+	private TextItem prepareEmail2Item(boolean readonly) {
+		TextItem email2 = ItemFactory.newEmailItem("email2", "secondaryemail", false);
+		email2.setRequired(false);
+		email2.setDisabled(readonly);
+		email2.setValue(user.getEmail2());
+		if (!readonly)
+			email2.addChangedHandler(changedHandler);
+		return email2;
+	}
+
+	private TextItem prepareEmailItem(boolean readonly) {
+		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		email.setRequired(true);
+		email.setDisabled(readonly);
+		email.setValue(user.getEmail());
+		if (!readonly)
+			email.addChangedHandler(changedHandler);
+		return email;
+	}
+
+	private TextItem prepareCellItem(boolean readonly) {
+		TextItem cell = ItemFactory.newTextItem("cell", "cell", user.getCell());
+		cell.setDisabled(readonly);
+		if (!readonly)
+			cell.addChangedHandler(changedHandler);
+		return cell;
+	}
+
+	private TextItem preparePhoneItem(boolean readonly) {
+		TextItem phone = ItemFactory.newTextItem("phone", "phone", user.getPhone());
+		phone.setDisabled(readonly);
+		if (!readonly)
+			phone.addChangedHandler(changedHandler);
+		return phone;
+	}
+
+	private TextItem prepareStateItem(boolean readonly) {
+		TextItem state = ItemFactory.newTextItem("state", "state", user.getState());
+		state.setDisabled(readonly);
+		if (!readonly)
+			state.addChangedHandler(changedHandler);
+		return state;
+	}
+
+	private SelectItem prepareLanguageSelector(boolean readonly) {
+		SelectItem language = ItemFactory.newLanguageSelector("language", false, true);
+		language.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
+		language.setValue(user.getLanguage());
+		if (!readonly)
+			language.addChangedHandler(changedHandler);
+		return language;
+	}
+
+	private TextItem prepareCountry(boolean readonly) {
+		TextItem country = ItemFactory.newTextItem("country", "country", user.getCountry());
+		country.setDisabled(readonly);
+		if (!readonly)
+			country.addChangedHandler(changedHandler);
+		return country;
+	}
+
+	private TextItem prepareCity(boolean readonly) {
+		TextItem city = ItemFactory.newTextItem("city", "city", user.getCity());
+		city.setDisabled(readonly);
+		if (!readonly)
+			city.addChangedHandler(changedHandler);
+		return city;
+	}
+
+	private TextItem preparePostalcode(boolean readonly) {
+		TextItem postalcode = ItemFactory.newTextItem("postalcode", "postalcode", user.getPostalCode());
+		postalcode.setDisabled(readonly);
+		if (!readonly)
+			postalcode.addChangedHandler(changedHandler);
+		return postalcode;
+	}
+
+	private TextItem prepareAddress(boolean readonly) {
+		TextItem address = ItemFactory.newTextItem("address", "address", user.getAddress());
+		address.setDisabled(readonly);
+		if (!readonly)
+			address.addChangedHandler(changedHandler);
+		return address;
+	}
+
+	private TextItem prepareName(boolean readonly) {
+		TextItem name = ItemFactory.newTextItem("name", "lastname", user.getName());
+		name.setRequired(true);
+		name.setDisabled(readonly);
+		if (!readonly)
+			name.addChangedHandler(changedHandler);
+		return name;
+	}
+
+	private TextItem prepareFirstname(boolean readonly) {
+		TextItem firstname = ItemFactory.newTextItem("firstname", "firstname", user.getFirstName());
+		firstname.setRequired(true);
+		firstname.setDisabled(readonly);
+		if (!readonly)
+			firstname.addChangedHandler(changedHandler);
+		return firstname;
+	}
+
+	private TextItem prepareUsername(boolean readonly) {
+		TextItem username = ItemFactory.newTextItem("username", "username", user.getUsername());
+		username.setRequired(true);
+		username.setSelectOnFocus(true);
+		username.setDisabled(readonly || user.getId() != 0);
+		if (!readonly)
+			username.addChangedHandler(changedHandler);
+		return username;
+	}
+
+	private CheckboxItem prepareGuestItem(boolean readonly) {
+		final CheckboxItem guest = new CheckboxItem("readonly", I18N.message("readonly"));
+		guest.setValue(user.isReadOnly());
+		if (readonly || "admin".equals(user.getUsername())) {
+			guest.setDisabled(true);
+		} else {
+			addGuestChangeHandlers(guest);
+		}
+		return guest;
+	}
+
+	private void addGuestChangeHandlers(final CheckboxItem guest) {
+		guest.addChangedHandler(changedHandler);
+		guest.addChangedHandler((ChangedEvent event) -> {
+				if (guest.getValueAsBoolean()) {
+					groupsItem.clearValue();
+					Record[] records = groupsItem.getOptionDataSource().getCacheData();
+					if (records != null)
+						for (Record record : records) {
+							if (record.getAttributeAsString("name").equals(Constants.GROUP_GUEST)) {
+								groupsItem.setValues(record.getAttributeAsString("id"));
+							}
+						}
+				}
+		});
 	}
 
 	private void prepareGroupsForm(boolean readOnly) {

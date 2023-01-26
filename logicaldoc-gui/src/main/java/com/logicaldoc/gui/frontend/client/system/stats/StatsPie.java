@@ -125,20 +125,8 @@ public class StatsPie extends HLayout {
 	}
 
 	private DynamicForm prepareLegend(GUIParameter[] parameters, int type) {
-		NumberFormat fmt = NumberFormat.getFormat("#############");
-
 		// Calculate the total value
-		long count = 0;
-		for (GUIParameter parameter : parameters) {
-			if (parameter == null)
-				break;
-
-			try {
-				count += fmt.parse(parameter.getValue());
-			} catch (Throwable t) {
-				GuiLog.info("error in " + parameter + " " + parameter.getValue(), null);
-			}
-		}
+		long count = sumTotal(parameters);
 
 		DynamicForm systemForm = new DynamicForm();
 		systemForm.setWidth("90%");
@@ -159,30 +147,7 @@ public class StatsPie extends HLayout {
 			if (parameter == null)
 				break;
 
-			StaticTextItem item = ItemFactory.newStaticTextItem(parameter.getName(), parameter.toString(), null);
-			if (count > 0) {
-				if (type == STATS_REPOSITORY) {
-					item.setValue(Util.formatSize((long) fmt.parse(parameter.getValue())) + " ( "
-							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-				} else if (type == STATS_DOCUMENTS) {
-					item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
-							+ I18N.message("documents").toLowerCase() + " " + "( "
-							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-				} else if (type == STATS_PAGES) {
-					item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
-							+ I18N.message("pages").toLowerCase() + " " + "( "
-							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-				} else if (type == STATS_FOLDERS) {
-					item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
-							+ I18N.message("folders").toLowerCase() + " " + " ( "
-							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-				}
-			}
-
-			item.setRequired(true);
-			item.setShouldSaveValue(false);
-			item.setWrap(false);
-			item.setWrapTitle(false);
+			StaticTextItem item = preparePieLegend(type, count, parameter);
 			items[i] = item;
 			i++;
 		}
@@ -209,5 +174,50 @@ public class StatsPie extends HLayout {
 
 		systemForm.setItems(items);
 		return systemForm;
+	}
+
+	private StaticTextItem preparePieLegend(int type, long count, GUIParameter parameter) {
+		NumberFormat fmt = NumberFormat.getFormat("#############");
+		StaticTextItem item = ItemFactory.newStaticTextItem(parameter.getName(), parameter.toString(), null);
+		if (count > 0) {
+			if (type == STATS_REPOSITORY) {
+				item.setValue(Util.formatSize((long) fmt.parse(parameter.getValue())) + " ( "
+						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+			} else if (type == STATS_DOCUMENTS) {
+				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+						+ I18N.message("documents").toLowerCase() + " " + "( "
+						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+			} else if (type == STATS_PAGES) {
+				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+						+ I18N.message("pages").toLowerCase() + " " + "( "
+						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+			} else if (type == STATS_FOLDERS) {
+				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+						+ I18N.message("folders").toLowerCase() + " " + " ( "
+						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+			}
+		}
+
+		item.setRequired(true);
+		item.setShouldSaveValue(false);
+		item.setWrap(false);
+		item.setWrapTitle(false);
+		return item;
+	}
+
+	private long sumTotal(GUIParameter[] parameters) {
+		long count = 0;
+		NumberFormat fmt1 = NumberFormat.getFormat("#############");
+		for (GUIParameter parameter : parameters) {
+			if (parameter == null)
+				break;
+
+			try {
+				count += fmt1.parse(parameter.getValue());
+			} catch (Throwable t) {
+				GuiLog.info("error in " + parameter + " " + parameter.getValue(), null);
+			}
+		}
+		return count;
 	}
 }

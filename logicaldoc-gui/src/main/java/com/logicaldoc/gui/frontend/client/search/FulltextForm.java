@@ -62,7 +62,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	private MultiComboBoxItem searchinItem = null;
 
 	private FolderSelector folder;
-	
+
 	private TextItem expression;
 
 	public FulltextForm() {
@@ -72,7 +72,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		setAlign(Alignment.LEFT);
 		Search.get().addObserver(this);
 	}
-	
+
 	private void initGUI() {
 		vm.clearValues();
 		if (getMembers() != null)
@@ -190,57 +190,21 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setType(GUISearchOptions.TYPE_FULLTEXT);
 		options.setExpression(vm.getValueAsString("expression"));
-		if (NO_LANGUAGE.equals(vm.getValueAsString("language")) || vm.getValue("language") == null) {
-			options.setLanguage(null);
-			options.setExpressionLanguage(I18N.getLocale());
-		} else {
-			options.setLanguage(vm.getValueAsString("language"));
-			options.setExpressionLanguage(options.getLanguage());
-		}
 
-		Long size = vm.getValueAsString("size") != null ? Long.parseLong(vm.getValueAsString("size")) : null;
-		if (size != null) {
-			if (LESSTHAN.equals(vm.getValueAsString("sizeOperator")))
-				options.setSizeMax(size * 1024);
-			else
-				options.setSizeMin(size * 1024);
-		}
+		setLanguageCondition(options);
+		setSizeCondition(options);
 
 		/*
 		 * Check the creation date
 		 */
-		Map range = (Map) values.get(CREATION_DATE_RANGE);
-		if (range != null) {
-			Date start = (Date) range.get("start");
-			if (start != null)
-				options.setCreationFrom(start);
-
-			Date end = (Date) range.get("end");
-			if (end != null)
-				options.setCreationTo(end);
-		}
+		setCreationDateCondition(values, options);
 
 		/*
 		 * Check the publication date
 		 */
-		range = (Map) values.get(PUBLICATION_DATE_RANGE);
-		if (range != null) {
-			Date start = (Date) range.get("start");
-			if (start != null)
-				options.setDateFrom(start);
+		setPublicationDateCondition(values, options);
 
-			Date end = (Date) range.get("end");
-			if (end != null)
-				options.setDateTo(end);
-		}
-
-		try {
-			if (values.containsKey("template") && values.get("template") != null
-					&& !((String) values.get("template")).isEmpty())
-				options.setTemplate(Long.parseLong((String) values.get("template")));
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		setTemplateCondition(values, options);
 
 		List<String> fields = new ArrayList<String>();
 		if (searchinItem.getValues() != null && searchinItem.getValues().length > 0)
@@ -258,6 +222,14 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
 
+		setSubfolderCondition(options);
+
+		options.setType(0);
+		Search.get().setOptions(options);
+		Search.get().search();
+	}
+
+	private void setSubfolderCondition(GUISearchOptions options) {
 		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
 		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS))) {
 			GUIDocument[] docs = Search.get().getLastResult();
@@ -270,10 +242,58 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			options.setFilterIds(ids);
 		} else
 			options.setFilterIds(null);
+	}
 
-		options.setType(0);
-		Search.get().setOptions(options);
-		Search.get().search();
+	private void setTemplateCondition(Map<String, Object> values, GUISearchOptions options) {
+		if (values.containsKey("template") && values.get("template") != null
+				&& !((String) values.get("template")).isEmpty())
+			options.setTemplate(Long.parseLong((String) values.get("template")));
+	}
+
+	private void setPublicationDateCondition(Map<String, Object> values, GUISearchOptions options) {
+		Map range = (Map) values.get(PUBLICATION_DATE_RANGE);
+		if (range != null) {
+			Date start = (Date) range.get("start");
+			if (start != null)
+				options.setDateFrom(start);
+
+			Date end = (Date) range.get("end");
+			if (end != null)
+				options.setDateTo(end);
+		}
+	}
+
+	private void setCreationDateCondition(Map<String, Object> values, GUISearchOptions options) {
+		Map range = (Map) values.get(CREATION_DATE_RANGE);
+		if (range != null) {
+			Date start = (Date) range.get("start");
+			if (start != null)
+				options.setCreationFrom(start);
+
+			Date end = (Date) range.get("end");
+			if (end != null)
+				options.setCreationTo(end);
+		}
+	}
+
+	private void setSizeCondition(GUISearchOptions options) {
+		Long size = vm.getValueAsString("size") != null ? Long.parseLong(vm.getValueAsString("size")) : null;
+		if (size != null) {
+			if (LESSTHAN.equals(vm.getValueAsString("sizeOperator")))
+				options.setSizeMax(size * 1024);
+			else
+				options.setSizeMin(size * 1024);
+		}
+	}
+
+	private void setLanguageCondition(GUISearchOptions options) {
+		if (NO_LANGUAGE.equals(vm.getValueAsString("language")) || vm.getValue("language") == null) {
+			options.setLanguage(null);
+			options.setExpressionLanguage(I18N.getLocale());
+		} else {
+			options.setLanguage(vm.getValueAsString("language"));
+			options.setExpressionLanguage(options.getLanguage());
+		}
 	}
 
 	/*

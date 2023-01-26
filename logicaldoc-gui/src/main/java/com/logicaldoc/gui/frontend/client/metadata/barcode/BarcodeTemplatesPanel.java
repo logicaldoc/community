@@ -23,14 +23,11 @@ import com.logicaldoc.gui.frontend.client.panels.zone.ZoneTemplatePanel;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -133,210 +130,36 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		hint = new HTMLFlow(I18N.message("barcodepatternhint"));
 		hint.setMargin(3);
 
-		templateSelector = ItemFactory.newTemplateSelector(true, documentTemplateId);
-		templateSelector.setWrapTitle(false);
-		templateSelector.setMultiple(false);
-		templateSelector.setEndRow(false);
-		templateSelector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				selectedOcrTemplate = null;
-
-				ListGridRecord record = templateSelector.getSelectedRecord();
-				if (record == null || record.getAttributeAsLong("id") == null
-						|| record.getAttributeAsLong("id").longValue() == 0L) {
-					selectedDocumentTemplate = null;
-					refresh(null, null);
-				} else {
-					selectedDocumentTemplate = new GUITemplate();
-					selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
-					selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
-					selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
-					refresh(selectedDocumentTemplate.getId(), null);
-				}
-			}
-		});
-
-		barcodeTemplateSelector = ItemFactory.newBarcodeTemplateSelector(false, documentTemplateId, barcodeTemplateId);
-		barcodeTemplateSelector.setWrapTitle(false);
-		barcodeTemplateSelector.setMultiple(false);
-		barcodeTemplateSelector.setEndRow(false);
-		barcodeTemplateSelector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord record = barcodeTemplateSelector.getSelectedRecord();
-				BarcodeService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
-						new AsyncCallback<GUIBarcodeTemplate>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIBarcodeTemplate tmpl) {
-								setSelectedOcrTemplate(tmpl);
-							}
-						});
-			}
-		});
-
-		save = new ToolStripButton();
-		save.setAutoFit(true);
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
-
-		append = new ToolStripButton();
-		append.setAutoFit(true);
-		append.setTitle(selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()
-				? I18N.message("addzone")
-				: I18N.message("appendpattern"));
-		append.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				event.cancel();
-
-				if (selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
-					GUIBarcodeZone zone = new GUIBarcodeZone();
-					zone.setTemplateId(selectedOcrTemplate.getId());
-					zone.setPatterns("<customId>");
-					((GUIBarcodeTemplate) selectedOcrTemplate).appendBarcodeZone(zone);
-					Canvas zoneCanvas = new BarcodeZoneCanvas(zone, BarcodeTemplatesPanel.this);
-					sample.addCanvas(zoneCanvas);
-				} else {
-					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("pattern", "");
-					positionalGrid.getRecordList().add(record);
-				}
-			}
-		});
-
-		settings = new ToolStripButton();
-		settings.setTitle(I18N.message("settings"));
-		settings.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this,
-						((GUIBarcodeTemplate) selectedOcrTemplate));
-				editor.show();
-			}
-		});
-
-		newTemplate = new ToolStripButton();
-		newTemplate.setTitle(I18N.message("new"));
-		newTemplate.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GUIBarcodeTemplate newTemplate = new GUIBarcodeTemplate();
-				newTemplate.setTemplate(selectedDocumentTemplate);
-				BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newTemplate);
-				editor.show();
-			}
-		});
-
-		delete = new ToolStripButton();
-		delete.setAutoFit(true);
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdeletebarcodetemplate"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean value) {
-						if (value)
-							BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(),
-									new AsyncCallback<Void>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(Void arg0) {
-											selectedOcrTemplate = null;
-											refresh(selectedDocumentTemplate.getId(), null);
-										}
-									});
-					}
-				});
-			}
-		});
-
-		close = new ToolStripButton();
-		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				selectedOcrTemplate = null;
-				refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null, null);
-			}
-		});
-
-		print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (((GUIBarcodeTemplate) selectedOcrTemplate).isZonal())
-					PrintUtil.printScreenShot(sample.getID(),
-							I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName());
-				else
-					GridUtil.print(positionalGrid);
-
-			}
-		});
-
-		zoomIn = new ToolStripButton();
-		zoomIn.setTitle(I18N.message("zoomin"));
-		zoomIn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(+100);
-					showZones();
-				}
-			}
-		});
-
-		zoomOut = new ToolStripButton();
-		zoomOut.setTitle(I18N.message("zoomout"));
-		zoomOut.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(-100);
-					showZones();
-				}
-			}
-		});
-
 		toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
+		
+		addTemplateSelector(documentTemplateId);
 
-		toolStrip.addFormItem(templateSelector);
-		toolStrip.addFormItem(barcodeTemplateSelector);
-		toolStrip.addButton(newTemplate);
-		toolStrip.addButton(settings);
-		toolStrip.addButton(save);
-		toolStrip.addButton(append);
-		toolStrip.addButton(delete);
+		addBarcodeTemplateSelector(documentTemplateId, barcodeTemplateId);
+
+		addNewTemplateButton();
+		
+		addSettingsButton();
+		
+		addSaveButton();
+
+		addAppendButton();
+		
+		addDeleteButton();
+
 		toolStrip.addSeparator();
-		toolStrip.addButton(zoomIn);
-		toolStrip.addButton(zoomOut);
-		toolStrip.addButton(print);
+		
+		addZoomInButton();
+		
+		addZoomOutButton();
+		
+		addPrintButton();
+		
 		toolStrip.addSeparator();
-		toolStrip.addButton(close);
+		
+		addCloseButton();
+		
 		toolStrip.addFill();
 
 		editorPanel = new HLayout();
@@ -362,6 +185,185 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		}
 
 		updateSample();
+	}
+
+	private void addCloseButton() {
+		close = new ToolStripButton();
+		close.setTitle(I18N.message("close"));
+		close.addClickHandler((ClickEvent closeClick) -> {
+			selectedOcrTemplate = null;
+			refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null, null);
+		});
+		toolStrip.addButton(close);
+	}
+
+	private void addPrintButton() {
+		print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler((ClickEvent printClick) -> {
+			if (((GUIBarcodeTemplate) selectedOcrTemplate).isZonal())
+				PrintUtil.printScreenShot(sample.getID(),
+						I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName());
+			else
+				GridUtil.print(positionalGrid);
+		});
+		toolStrip.addButton(print);
+	}
+
+	private void addZoomOutButton() {
+		zoomOut = new ToolStripButton();
+		zoomOut.setTitle(I18N.message("zoomout"));
+		zoomOut.addClickHandler((ClickEvent zoomOutClick) -> {
+				if (sample != null) {
+					sample.clearCanvases();
+					sample.resize(-100);
+					showZones();
+				}
+		});
+		toolStrip.addButton(zoomOut);
+	}
+
+	private void addZoomInButton() {
+		zoomIn = new ToolStripButton();
+		zoomIn.setTitle(I18N.message("zoomin"));
+		zoomIn.addClickHandler((ClickEvent zoomInClick) -> {
+				if (sample != null) {
+					sample.clearCanvases();
+					sample.resize(+100);
+					showZones();
+				}
+		});
+		toolStrip.addButton(zoomIn);
+	}
+
+	private void addDeleteButton() {
+		delete = new ToolStripButton();
+		delete.setAutoFit(true);
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler((ClickEvent deleteClick) -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdeletebarcodetemplate"), (Boolean yes) -> {
+				if (yes)
+					BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void arg0) {
+							selectedOcrTemplate = null;
+							refresh(selectedDocumentTemplate.getId(), null);
+						}
+					});
+			});
+		});
+		toolStrip.addButton(delete);
+	}
+
+	private void addAppendButton() {
+		append = new ToolStripButton();
+		append.setAutoFit(true);
+		append.setTitle(selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()
+				? I18N.message("addzone")
+				: I18N.message("appendpattern"));
+		append.addClickHandler((ClickEvent appendClick) -> {
+			appendClick.cancel();
+
+			if (selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
+				GUIBarcodeZone zone = new GUIBarcodeZone();
+				zone.setTemplateId(selectedOcrTemplate.getId());
+				zone.setPatterns("<customId>");
+				((GUIBarcodeTemplate) selectedOcrTemplate).appendBarcodeZone(zone);
+				Canvas zoneCanvas = new BarcodeZoneCanvas(zone, BarcodeTemplatesPanel.this);
+				sample.addCanvas(zoneCanvas);
+			} else {
+				ListGridRecord record = new ListGridRecord();
+				record.setAttribute("pattern", "");
+				positionalGrid.getRecordList().add(record);
+			}
+		});
+		toolStrip.addButton(append);
+	}
+
+	private void addSaveButton() {
+		save = new ToolStripButton();
+		save.setAutoFit(true);
+		save.setTitle(I18N.message("save"));
+		save.addClickHandler((ClickEvent saveClick) -> {
+			onSave();
+		});
+		toolStrip.addButton(save);
+	}
+
+	private void addSettingsButton() {
+		settings = new ToolStripButton();
+		settings.setTitle(I18N.message("settings"));
+		settings.addClickHandler((ClickEvent settingsClick) -> {
+			BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this,
+					((GUIBarcodeTemplate) selectedOcrTemplate));
+			editor.show();
+		});
+		toolStrip.addButton(settings);
+	}
+
+	private void addNewTemplateButton() {
+		newTemplate = new ToolStripButton();
+		newTemplate.setTitle(I18N.message("new"));
+		newTemplate.addClickHandler((ClickEvent newTemplateClick) -> {
+			GUIBarcodeTemplate newTemplate = new GUIBarcodeTemplate();
+			newTemplate.setTemplate(selectedDocumentTemplate);
+			BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newTemplate);
+			editor.show();
+		});
+		toolStrip.addButton(newTemplate);
+	}
+
+	private void addBarcodeTemplateSelector(Long documentTemplateId, Long barcodeTemplateId) {
+		barcodeTemplateSelector = ItemFactory.newBarcodeTemplateSelector(false, documentTemplateId, barcodeTemplateId);
+		barcodeTemplateSelector.setWrapTitle(false);
+		barcodeTemplateSelector.setMultiple(false);
+		barcodeTemplateSelector.setEndRow(false);
+		barcodeTemplateSelector.addChangedHandler((ChangedEvent barcodeTemplateSelectorChanged) -> {
+			ListGridRecord record = barcodeTemplateSelector.getSelectedRecord();
+			BarcodeService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
+					new AsyncCallback<GUIBarcodeTemplate>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIBarcodeTemplate tmpl) {
+							setSelectedOcrTemplate(tmpl);
+						}
+					});
+		});
+		toolStrip.addFormItem(barcodeTemplateSelector);
+	}
+
+	private void addTemplateSelector(Long documentTemplateId) {
+		templateSelector = ItemFactory.newTemplateSelector(true, documentTemplateId);
+		templateSelector.setWrapTitle(false);
+		templateSelector.setMultiple(false);
+		templateSelector.setEndRow(false);
+		templateSelector.addChangedHandler((ChangedEvent templateSelectorChanged) -> {
+			selectedOcrTemplate = null;
+
+			ListGridRecord record = templateSelector.getSelectedRecord();
+			if (record == null || record.getAttributeAsLong("id") == null
+					|| record.getAttributeAsLong("id").longValue() == 0L) {
+				selectedDocumentTemplate = null;
+				refresh(null, null);
+			} else {
+				selectedDocumentTemplate = new GUITemplate();
+				selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
+				selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
+				selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
+				refresh(selectedDocumentTemplate.getId(), null);
+			}
+		});
+		toolStrip.addFormItem(templateSelector);
 	}
 
 	/**

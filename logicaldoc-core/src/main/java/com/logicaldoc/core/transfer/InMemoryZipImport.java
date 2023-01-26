@@ -52,6 +52,7 @@ public class InMemoryZipImport extends ZipImport {
 			ZipUtil zipUtil = new ZipUtil();
 			zipUtil.setFileNameCharset(fileNameCharset);
 			List<String> entries = zipUtil.listEntries(zipsource);
+
 			for (String entry : entries) {
 				String relativePath = FileUtil.getPath(entry);
 				if (relativePath.startsWith("/"))

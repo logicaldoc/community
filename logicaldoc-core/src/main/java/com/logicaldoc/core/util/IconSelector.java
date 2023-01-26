@@ -1,5 +1,7 @@
 package com.logicaldoc.core.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -29,66 +31,149 @@ public class IconSelector {
 	 * @return the icon file name
 	 */
 	public static String selectIcon(String ext, boolean shortcut) {
-		String icon = "";
-		if (ext != null)
-			ext = ext.contains(".") ? FileUtil.getExtension(ext).toLowerCase() : ext.toLowerCase();
+		ext = normalizeExtension(ext);
 
-		if (ext == null || ext.equalsIgnoreCase(""))
+		String icon = checkOffice(ext);
+		if(StringUtils.isNotEmpty(icon))
+			return icon;
+		
+		icon = checkMultimedia(ext);
+		if(StringUtils.isNotEmpty(icon))
+			return icon;
+		
+		if (StringUtils.isEmpty(ext))
 			icon = "generic.png";
 		else if (ext.equals("pdf"))
 			icon = "pdf.png";
-		else if (ext.equals("txt") || ext.equals("properties") || ext.equals("log") || ext.equals("csv")
-				|| ext.equals("json"))
+		else if (isText(ext))
 			icon = "text.png";
-		else if (ext.equals("doc") || ext.equals("docm") || ext.equals("docx") || ext.equals("docxm")
-				|| ext.equals("dotm") || ext.equals("odt") || ext.equals("rtf") || ext.equals("ott")
-				|| ext.equals("sxw") || ext.equals("wpd") || ext.equals("kwd") || ext.equals("dot"))
-			icon = "word.png";
-		else if (ext.equals("xls") || ext.equals("xlsm") || ext.equals("xlsb") || ext.equals("xlsx")
-				|| ext.equals("xlsxm") || ext.equals("ods") || ext.equals("xlt") || ext.equals("ots")
-				|| ext.equals("sxc") || ext.equals("dbf") || ext.equals("ksp") || ext.equals("odb"))
-			icon = "excel.png";
-		else if (ext.equals("ppt") || ext.equals("pptm") || ext.equals("pptx") || ext.equals("pptxm")
-				|| ext.equals("odp") || ext.equals("pps") || ext.equals("otp") || ext.equals("pot") || ext.equals("sxi")
-				|| ext.equals("kpr"))
-			icon = "powerpoint.png";
-		else if (ext.equals("mpp"))
-			icon = "project.png";
-		else if (ext.equals("vsd") || ext.equals("vsdx"))
-			icon = "visio.png";
-		else if (isPicture(ext))
-			icon = "picture.png";
-		else if (ext.equals("htm") || ext.equals("html") || ext.equals("xml") || ext.equals("xhtml"))
+		else if (isHtml(ext))
 			icon = "html.png";
-		else if (ext.equals("eml") || ext.equals("msg") || ext.equals("mail"))
+		else if (isEmail(ext))
 			icon = "email.png";
-		else if (ext.equals("zip") || ext.equals("rar") || ext.equals("gz") || ext.equals("tar") || ext.equals("tgz")
-				|| ext.equals("jar") || ext.equals("7z"))
+		else if (isZip(ext))
 			icon = "zip.png";
-		else if (ext.equals("p7m") || ext.equals("m7m"))
+		else if (isP7M(ext))
 			icon = "p7m.png";
-		else if (ext.equals("dwg") || ext.equals("dxf") || ext.equals("dwt"))
+		else if (isAutoCad(ext))
 			icon = "dwg.png";
-		else if (isVideo(ext))
-			icon = "film.png";
-		else if (ext.equals("mp3") || ext.equals("m4p") || ext.equals("m4a") || ext.equals("wav") || ext.equals("wma")
-				|| ext.equals("cda") || ext.equals("wave"))
-			icon = "music.png";
-		else if (ext.equals("pub") || ext.equals("pubx") || ext.equals("ai") || ext.equals("odg"))
+		else if (isVector(ext))
 			icon = "vector.png";
-		else if (ext.equals("dcm") || ext.equals("dicom"))
+		else if (isDicom(ext))
 			icon = "dcm.png";
 		else if (ext.equals("java"))
 			icon = "java.png";
-		else if (ext.equals("epub") || ext.equals("azw") || ext.equals("azw3") || ext.equals("mobi"))
+		else if (isBook(ext))
 			icon = "book.png";
 		else
 			icon = "generic.png";
 
-		if (shortcut)
-			icon = FileUtil.getBaseName(icon) + "-sc." + FileUtil.getExtension(icon);
+		icon = adaptIfShortcut(shortcut, icon);
 
 		return icon;
+	}
+	
+	private static String checkOffice(String ext) {
+		String icon = "";
+		if (isWord(ext))
+			icon = "word.png";
+		else if (isExcel(ext))
+			icon = "excel.png";
+		else if (isPowerPoint(ext))
+			icon = "powerpoint.png";
+		else if (isVisio(ext))
+			icon = "visio.png";
+		else if (ext.equals("mpp"))
+			icon = "project.png";
+		return icon;
+	}
+	
+	private static String checkMultimedia(String ext) {
+		String icon = "";
+		if (isPicture(ext))
+			icon = "picture.png";
+		else if (isVideo(ext))
+			icon = "film.png";
+		else if (isMusic(ext))
+			icon = "music.png";
+		return icon;
+	}
+
+	private static String adaptIfShortcut(boolean shortcut, String icon) {
+		if (shortcut)
+			icon = FileUtil.getBaseName(icon) + "-sc." + FileUtil.getExtension(icon);
+		return icon;
+	}
+
+	private static boolean isDicom(String ext) {
+		return ext.equals("dcm") || ext.equals("dicom");
+	}
+
+	private static boolean isP7M(String ext) {
+		return ext.equals("p7m") || ext.equals("m7m");
+	}
+
+	private static String normalizeExtension(String ext) {
+		if (ext != null)
+			ext = ext.contains(".") ? FileUtil.getExtension(ext).toLowerCase() : ext.toLowerCase();
+		return ext;
+	}
+
+	private static boolean isBook(String ext) {
+		return ext.equals("epub") || ext.equals("azw") || ext.equals("azw3") || ext.equals("mobi");
+	}
+
+	private static boolean isVisio(String ext) {
+		return ext.equals("vsd") || ext.equals("vsdx");
+	}
+
+	private static boolean isVector(String ext) {
+		return ext.equals("pub") || ext.equals("pubx") || ext.equals("ai") || ext.equals("odg");
+	}
+
+	private static boolean isAutoCad(String ext) {
+		return ext.equals("dwg") || ext.equals("dxf") || ext.equals("dwt");
+	}
+
+	private static boolean isEmail(String ext) {
+		return ext.equals("eml") || ext.equals("msg") || ext.equals("mail");
+	}
+
+	private static boolean isHtml(String ext) {
+		return ext.equals("htm") || ext.equals("html") || ext.equals("xml") || ext.equals("xhtml");
+	}
+
+	private static boolean isMusic(String ext) {
+		return ext.equals("mp3") || ext.equals("m4p") || ext.equals("m4a") || ext.equals("wav") || ext.equals("wma")
+				|| ext.equals("cda") || ext.equals("wave");
+	}
+
+	private static boolean isZip(String ext) {
+		return ext.equals("zip") || ext.equals("rar") || ext.equals("gz") || ext.equals("tar") || ext.equals("tgz")
+				|| ext.equals("jar") || ext.equals("7z");
+	}
+
+	private static boolean isText(String ext) {
+		return ext.equals("txt") || ext.equals("properties") || ext.equals("log") || ext.equals("csv")
+				|| ext.equals("json");
+	}
+
+	private static boolean isWord(String ext) {
+		return ext.equals("doc") || ext.equals("docm") || ext.equals("docx") || ext.equals("docxm")
+				|| ext.equals("dotm") || ext.equals("odt") || ext.equals("rtf") || ext.equals("ott")
+				|| ext.equals("sxw") || ext.equals("wpd") || ext.equals("kwd") || ext.equals("dot");
+	}
+
+	private static boolean isPowerPoint(String ext) {
+		return ext.equals("ppt") || ext.equals("pptm") || ext.equals("pptx") || ext.equals("pptxm")
+				|| ext.equals("odp") || ext.equals("pps") || ext.equals("otp") || ext.equals("pot") || ext.equals("sxi")
+				|| ext.equals("kpr");
+	}
+
+	private static boolean isExcel(String ext) {
+		return ext.equals("xls") || ext.equals("xlsm") || ext.equals("xlsb") || ext.equals("xlsx")
+				|| ext.equals("xlsxm") || ext.equals("ods") || ext.equals("xlt") || ext.equals("ots")
+				|| ext.equals("sxc") || ext.equals("dbf") || ext.equals("ksp") || ext.equals("odb");
 	}
 
 	/**
@@ -99,7 +184,6 @@ public class IconSelector {
 	 * @return if ext is a video
 	 */
 	private static boolean isVideo(String ext) {
-
 		return (ext.equals("avi") || ext.equals("mpg") || ext.equals("mp4") || ext.equals("mov") || ext.equals("wmv")
 				|| ext.equals("mkv") || ext.equals("mpeg") || ext.equals("m4v") || ext.equals("divx")
 				|| ext.equals("flv") || ext.equals("m2v") || ext.equals("m2ts"));
@@ -113,12 +197,6 @@ public class IconSelector {
 	 * @return if ext is an image
 	 */
 	public static boolean isPicture(String ext) {
-		if (ext == null)
-			return false;
-
-		if (ext != null)
-			ext = ext.toLowerCase();
-
 		return (ext.equals("jpg") || ext.equals("jpeg") || ext.equals("gif") || ext.equals("png") || ext.equals("bmp")
 				|| ext.equals("tif") || ext.equals("tiff") || ext.equals("psd") || ext.equals("svg")
 				|| ext.equals("jfif") || ext.equals("webp"));

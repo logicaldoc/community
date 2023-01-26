@@ -194,68 +194,65 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 		/*
 		 * Prepare the change handler
 		 */
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
-
-		// Admin only can change the 'admin' user
-		if (user.getUsername().equalsIgnoreCase("admin")
-				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
-			changeHandler = null;
+		ChangedHandler changeHandler = prepareChangeHandler();
 
 		/*
 		 * Prepare the standard properties tab
 		 */
-		if (propertiesPanel != null) {
-			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
-				propertiesTabPanel.removeMember(propertiesPanel);
-		}
-		propertiesPanel = new UserPropertiesPanel(user, changeHandler, usersPanel);
-		propertiesTabPanel.addMember(propertiesPanel);
+		addPropertiesTab(changeHandler);
 
 		/*
 		 * Prepare the security tab
 		 */
-		if (securityPanel != null) {
-			securityPanel.destroy();
-			if (securityTabPanel.contains(securityPanel))
-				securityTabPanel.removeMember(securityPanel);
-		}
-		securityPanel = new UserSecurityPanel(user, changeHandler);
-		securityTabPanel.addMember(securityPanel);
+		addSecurityTab(changeHandler);
 
 		/*
 		 * Prepare the working time tab
 		 */
-		if (workingTimePanel != null) {
-			workingTimePanel.destroy();
-			if (workingTimeTabPanel.contains(workingTimePanel))
-				workingTimeTabPanel.removeMember(workingTimePanel);
-		}
-		workingTimePanel = new WorkingTimePanel(user, changeHandler);
-		workingTimeTabPanel.addMember(workingTimePanel);
-		workingTimePanel.setDisabled("admin".equals(user.getUsername()));
+		addWorkingTimeTab(changeHandler);
 
 		/*
 		 * Prepare the quota tab
 		 */
-		if (Feature.enabled(Feature.QUOTAS)) {
-			if (quotaPanel != null) {
-				quotaPanel.destroy();
-				if (quotaTabPanel.contains(quotaPanel))
-					quotaTabPanel.removeMember(quotaPanel);
-			}
-			quotaPanel = new UserQuotaPanel(user, changeHandler);
-			quotaTabPanel.addMember(quotaPanel);
-		}
+		addQuotaTab(changeHandler);
 
 		/*
 		 * Prepare the firewall tab
 		 */
+		addFirewallTab(changeHandler);
+
+		/*
+		 * Prepare the user interface tab
+		 */
+		addGuiTab(changeHandler);
+
+		/*
+		 * Prepare the history tab
+		 */
+		addHistoryTab();
+	}
+
+	private void addHistoryTab() {
+		if (historyPanel != null) {
+			historyPanel.destroy();
+			if (historyTabPanel.contains(historyPanel))
+				historyTabPanel.removeMember(historyPanel);
+		}
+		historyPanel = new UserHistoryPanel(user.getId());
+		historyTabPanel.addMember(historyPanel);
+	}
+
+	private void addGuiTab(ChangedHandler changeHandler) {
+		if (guiPanel != null) {
+			guiPanel.destroy();
+			if (guiTabPanel.contains(guiPanel))
+				guiTabPanel.removeMember(guiPanel);
+		}
+		guiPanel = new UserInterfacePanel(user, changeHandler);
+		guiTabPanel.addMember(guiPanel);
+	}
+
+	private void addFirewallTab(ChangedHandler changeHandler) {
 		if (Feature.enabled(Feature.FIREWALL)) {
 			if (firewallPanel != null) {
 				firewallPanel.destroy();
@@ -265,28 +262,60 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 			firewallPanel = new FirewallPanel(user, changeHandler);
 			firewallTabPanel.addMember(firewallPanel);
 		}
+	}
 
-		/*
-		 * Prepare the user interface tab
-		 */
-		if (guiPanel != null) {
-			guiPanel.destroy();
-			if (guiTabPanel.contains(guiPanel))
-				guiTabPanel.removeMember(guiPanel);
+	private void addQuotaTab(ChangedHandler changeHandler) {
+		if (Feature.enabled(Feature.QUOTAS)) {
+			if (quotaPanel != null) {
+				quotaPanel.destroy();
+				if (quotaTabPanel.contains(quotaPanel))
+					quotaTabPanel.removeMember(quotaPanel);
+			}
+			quotaPanel = new UserQuotaPanel(user, changeHandler);
+			quotaTabPanel.addMember(quotaPanel);
 		}
-		guiPanel = new UserInterfacePanel(user, changeHandler);
-		guiTabPanel.addMember(guiPanel);
+	}
 
-		/*
-		 * Prepare the history tab
-		 */
-		if (historyPanel != null) {
-			historyPanel.destroy();
-			if (historyTabPanel.contains(historyPanel))
-				historyTabPanel.removeMember(historyPanel);
+	private void addWorkingTimeTab(ChangedHandler changeHandler) {
+		if (workingTimePanel != null) {
+			workingTimePanel.destroy();
+			if (workingTimeTabPanel.contains(workingTimePanel))
+				workingTimeTabPanel.removeMember(workingTimePanel);
 		}
-		historyPanel = new UserHistoryPanel(user.getId());
-		historyTabPanel.addMember(historyPanel);
+		workingTimePanel = new WorkingTimePanel(user, changeHandler);
+		workingTimeTabPanel.addMember(workingTimePanel);
+		workingTimePanel.setDisabled("admin".equals(user.getUsername()));
+	}
+
+	private void addSecurityTab(ChangedHandler changeHandler) {
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			if (securityTabPanel.contains(securityPanel))
+				securityTabPanel.removeMember(securityPanel);
+		}
+		securityPanel = new UserSecurityPanel(user, changeHandler);
+		securityTabPanel.addMember(securityPanel);
+	}
+
+	private void addPropertiesTab(ChangedHandler changeHandler) {
+		if (propertiesPanel != null) {
+			propertiesPanel.destroy();
+			if (propertiesTabPanel.contains(propertiesPanel))
+				propertiesTabPanel.removeMember(propertiesPanel);
+		}
+		propertiesPanel = new UserPropertiesPanel(user, changeHandler, usersPanel);
+		propertiesTabPanel.addMember(propertiesPanel);
+	}
+
+	private ChangedHandler prepareChangeHandler() {
+		ChangedHandler changeHandler = (ChangedEvent event) -> {
+			onModified();
+		};
+		// Admin only can change the 'admin' user
+		if (user.getUsername().equalsIgnoreCase("admin")
+				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
+			changeHandler = null;
+		return changeHandler;
 	}
 
 	public GUIUser getUser() {

@@ -17,7 +17,6 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 
@@ -29,6 +28,7 @@ import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
  * @since 6.0
  */
 public class SetPassword extends Window {
+
 	private static final String NOTIFY = "notify";
 
 	private static final String NEWPASSWORDAGAIN = "newpasswordagain";
@@ -67,60 +67,65 @@ public class SetPassword extends Window {
 		newPass.setWrapTitle(false);
 		newPass.setValidators(equalsValidator, sizeValidator);
 
-		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN, null);
+		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN,
+				null);
 		newPassAgain.setRequired(true);
 		newPassAgain.setAutoComplete(AutoComplete.NONE);
-		newPassAgain.setWrapTitle(false);		
+		newPassAgain.setWrapTitle(false);
 
-		final CheckboxItem notify = ItemFactory.newCheckbox(NOTIFY, "notifycredentials");
+		CheckboxItem notify = ItemFactory.newCheckbox(NOTIFY, "notifycredentials");
 		notify.setValue(false);
 
-		final ButtonItem apply = new ButtonItem();
-		apply.setTitle(I18N.message("apply"));
-		apply.setAutoFit(true);
-		apply.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (!vm.hasErrors()) {
-					apply.setDisabled(true);
-					SecurityService.Instance.get().changePassword(Session.get().getUser().getId(), userId, null,
-							vm.getValueAsString(NEWPASSWORD), notify.getValueAsBoolean(),
-							new AsyncCallback<GUIValue>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									SC.warn(caught.getMessage());
-									apply.setDisabled(false);
-								}
-
-								@Override
-								public void onSuccess(GUIValue val) {
-									apply.setDisabled(false);
-									int ret = Integer.parseInt(val.getCode());
-									if (ret > 0) {
-										// Alert the user
-										if (ret == 1)
-											GuiLog.warn(I18N.message("wrongpassword"), null);
-										else if (ret == 2)
-											GuiLog.warn(I18N.message("passwdnotnotified"), null);
-										else if (ret == 3) {
-											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
-											newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
-										} else if (ret == 4) {
-											GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
-											newPass.setErrors(val.getValue());
-										} else
-											GuiLog.warn(I18N.message("genericerror"), null);
-									} else
-										destroy();
-								}
-							});
-				}
-			}
-		});
+		ButtonItem apply = prepareApplyButton(userId, vm, newPass, notify);
 
 		form.setFields(newPass, newPassAgain, notify, apply);
 
 		addItem(form);
+	}
+
+	private ButtonItem prepareApplyButton(final long userId, final ValuesManager vm, PasswordItem newPass,
+			CheckboxItem notify) {
+		ButtonItem apply = new ButtonItem();
+		apply.setTitle(I18N.message("apply"));
+		apply.setAutoFit(true);
+		apply.addClickHandler((ClickEvent event) -> {
+			vm.validate();
+			if (vm.hasErrors())
+				return;
+
+			apply.setDisabled(true);
+			SecurityService.Instance.get().changePassword(Session.get().getUser().getId(), userId, null,
+					vm.getValueAsString(NEWPASSWORD), notify.getValueAsBoolean(), new AsyncCallback<GUIValue>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							SC.warn(caught.getMessage());
+							apply.setDisabled(false);
+						}
+
+						@Override
+						public void onSuccess(GUIValue val) {
+							apply.setDisabled(false);
+							int ret = Integer.parseInt(val.getCode());
+							if (ret > 0) {
+								// Alert the user
+								if (ret == 1)
+									GuiLog.warn(I18N.message("wrongpassword"), null);
+								else if (ret == 2)
+									GuiLog.warn(I18N.message("passwdnotnotified"), null);
+								else if (ret == 3) {
+									GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
+									newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
+								} else if (ret == 4) {
+									GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
+									newPass.setErrors(val.getValue());
+								} else
+									GuiLog.warn(I18N.message("genericerror"), null);
+							} else
+								destroy();
+						}
+					});
+		});
+		return apply;
 	}
 }

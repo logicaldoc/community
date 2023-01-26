@@ -11,7 +11,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -26,6 +25,8 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 7.1
  */
 public class AntivirusPanel extends VLayout {
+
+	private DynamicForm form = new DynamicForm();
 
 	public AntivirusPanel() {
 		setWidth100();
@@ -54,7 +55,53 @@ public class AntivirusPanel extends VLayout {
 	}
 
 	private void initGUI(GUIParameter[] settings) {
-		final DynamicForm form = new DynamicForm();
+		prepareForm(settings);
+
+		IButton save = new IButton();
+		save.setTitle(I18N.message("save"));
+		save.addClickHandler((ClickEvent event) -> {
+			if (form.validate()) {
+				GUIParameter[] params = new GUIParameter[Session.get().isDefaultTenant() ? 4 : 3];
+				params[0] = new GUIParameter(Session.get().getTenantName() + ".antivirus.enabled",
+						"" + ("yes".equals(form.getValueAsString("enabled"))));
+				params[1] = new GUIParameter(Session.get().getTenantName() + ".antivirus.excludes",
+						form.getValueAsString("excludes").trim());
+				params[2] = new GUIParameter(Session.get().getTenantName() + ".antivirus.includes",
+						form.getValueAsString("includes").trim());
+				params[3] = new GUIParameter(Session.get().getTenantName() + ".antivirus.timeout",
+						form.getValueAsString("timeout").trim());
+
+				if (Session.get().isDefaultTenant())
+					params[4] = new GUIParameter("antivirus.command", form.getValueAsString("command").trim());
+
+				SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void ret) {
+						GuiLog.info(I18N.message("settingssaved"), null);
+					}
+				});
+			}
+		});
+
+		Tab tab = new Tab();
+		tab.setTitle(I18N.message("antivirus"));
+		tab.setPane(form);
+
+		TabSet tabs = new TabSet();
+		tabs.setWidth100();
+		tabs.setHeight100();
+		tabs.setTabs(tab);
+
+		setMembers(tabs, save);
+	}
+
+	private void prepareForm(GUIParameter[] settings) {
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setAlign(Alignment.LEFT);
 
@@ -87,53 +134,9 @@ public class AntivirusPanel extends VLayout {
 				timeout.setValue(Integer.parseInt(setting.getValue()));
 		}
 
-		IButton save = new IButton();
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (form.validate()) {
-					GUIParameter[] params = new GUIParameter[Session.get().isDefaultTenant() ? 4 : 3];
-					params[0] = new GUIParameter(Session.get().getTenantName() + ".antivirus.enabled",
-							"" + ("yes".equals(form.getValueAsString("enabled"))));
-					params[1] = new GUIParameter(Session.get().getTenantName() + ".antivirus.excludes",
-							form.getValueAsString("excludes").trim());
-					params[2] = new GUIParameter(Session.get().getTenantName() + ".antivirus.includes",
-							form.getValueAsString("includes").trim());
-					params[3] = new GUIParameter(Session.get().getTenantName() + ".antivirus.timeout",
-							form.getValueAsString("timeout").trim());
-
-					if (Session.get().isDefaultTenant())
-						params[4] = new GUIParameter("antivirus.command", form.getValueAsString("command").trim());
-
-					SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void ret) {
-							GuiLog.info(I18N.message("settingssaved"), null);
-						}
-					});
-				}
-			}
-		});
 		if (Session.get().isDefaultTenant())
 			form.setFields(enabled, command, includes, excludes, timeout);
 		else
 			form.setFields(enabled, includes, excludes, timeout);
-
-		Tab tab = new Tab();
-		tab.setTitle(I18N.message("antivirus"));
-		tab.setPane(form);
-
-		TabSet tabs = new TabSet();
-		tabs.setWidth100();
-		tabs.setHeight100();
-		tabs.setTabs(tab);
-
-		setMembers(tabs, save);
 	}
 }

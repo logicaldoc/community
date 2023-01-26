@@ -35,7 +35,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
 		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
@@ -43,7 +43,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 
 		long userId = Long.parseLong(request.getParameter("id"));
 		String event = request.getParameter("event");
-		
+
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
@@ -62,7 +62,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		}
 		query.append(" order by A.date desc ");
 
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max);
+		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
 
 		/*
 		 * Iterate over the collection of user histories

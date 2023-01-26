@@ -23,15 +23,11 @@ import com.logicaldoc.gui.frontend.client.panels.zone.ZoneCanvas;
 import com.logicaldoc.gui.frontend.client.panels.zone.ZoneTemplatePanel;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -93,246 +89,40 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		if (toolStrip != null)
 			removeMember(toolStrip);
 
-		templateSelector = ItemFactory.newTemplateSelector(true, templateId);
-		templateSelector.setWrapTitle(false);
-		templateSelector.setMultiple(false);
-		templateSelector.setEndRow(false);
-		templateSelector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				selectedOcrTemplate = null;
-
-				ListGridRecord record = templateSelector.getSelectedRecord();
-				if (record == null || record.getAttributeAsLong("id") == null
-						|| record.getAttributeAsLong("id").longValue() == 0L) {
-					selectedDocumentTemplate = null;
-					refresh(null, null);
-				} else {
-					selectedDocumentTemplate = new GUITemplate();
-					selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
-					selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
-					selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
-					refresh(selectedDocumentTemplate.getId(), null);
-				}
-			}
-		});
-
-		ocrTemplateSelector = ItemFactory.newOCRTemplateSelector(false, templateId, barcodeTemplateId);
-		ocrTemplateSelector.setWrapTitle(false);
-		ocrTemplateSelector.setMultiple(false);
-		ocrTemplateSelector.setEndRow(false);
-		ocrTemplateSelector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord record = ocrTemplateSelector.getSelectedRecord();
-				ZonalOCRService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
-						new AsyncCallback<GUIOCRTemplate>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIOCRTemplate tmpl) {
-								setSelectedOcrTemplate(tmpl);
-							}
-						});
-			}
-		});
-
-		settings = new ToolStripButton();
-		settings.setTitle(I18N.message("settings"));
-		settings.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L) {
-					ZonalOCRTemplateSettings editor = new ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel.this);
-					editor.show();
-				}
-			}
-		});
-
-		add = new ToolStripButton();
-		add.setTitle(I18N.message("new"));
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				selectedOcrTemplate = new GUIOCRTemplate();
-				selectedOcrTemplate.setTemplate(selectedDocumentTemplate);
-				ZonalOCRTemplateSettings editor = new ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel.this);
-				editor.show();
-			}
-		});
-
-		delete = new ToolStripButton();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L)
-					LD.ask(I18N.message("question"), I18N.message("confirmdeleteocrtemplate"), new BooleanCallback() {
-						@Override
-						public void execute(Boolean value) {
-							if (value) {
-								ZonalOCRService.Instance.get().delete(selectedOcrTemplate.getId(),
-										new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void result) {
-												selectedOcrTemplate = null;
-												AdminScreen.get()
-														.setContent(new ZonalOCRPanel(selectedDocumentTemplate, null));
-											}
-										});
-							}
-						}
-					});
-			}
-		});
-
-		print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				PrintUtil.printScreenShot(sample.getID(),
-						I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName());
-			}
-		});
-
-		close = new ToolStripButton();
-		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setSelectedOcrTemplate(null);
-			}
-		});
-
-		save = new ToolStripButton();
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<GUIOCRTemplate>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIOCRTemplate template) {
-						ZonalOCRTemplatesPanel.this.selectedOcrTemplate = template;
-						setSelectedOcrTemplate(template);
-					}
-				});
-			}
-		});
-
-		zoomIn = new ToolStripButton();
-		zoomIn.setTitle(I18N.message("zoomin"));
-		zoomIn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(+100);
-					showZones();
-				}
-			}
-		});
-
-		zoomOut = new ToolStripButton();
-		zoomOut.setTitle(I18N.message("zoomout"));
-		zoomOut.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(-100);
-					showZones();
-				}
-			}
-		});
-
-		addZone = new ToolStripButton();
-		addZone.setTitle(I18N.message("addzone"));
-		addZone.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				FormItem select = new SelectItem("zone", I18N.message("zone"));
-
-				LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-				for (GUIAttribute att : selectedOcrTemplate.getTemplate().getAttributes()) {
-					if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null)
-						map.put(att.getName(),
-								att.getName() + " (" + AttributeTypeFormatter.format(att.getType()) + ")");
-				}
-				select.setValueMap(map);
-
-				LD.askForValue(I18N.message("addzone"), "zone", "", select, 300, new ValueCallback() {
-
-					@Override
-					public void execute(String value) {
-						GUIZone zone = new GUIZone(value,
-								selectedOcrTemplate.getTemplate().getAttribute(value).getType());
-						zone.setTemplateId(selectedOcrTemplate.getId());
-						if (zone.getType() == GUIAttribute.TYPE_DATE)
-							zone.setFormat(I18N.message("format_dateshort"));
-						else if (zone.getType() == GUIAttribute.TYPE_DOUBLE)
-							zone.setFormat("#,###.00");
-
-						selectedOcrTemplate.appendZone(zone);
-						Canvas zoneCanvas = new ZonalOCRZoneCanvas(zone, ZonalOCRTemplatesPanel.this);
-						sample.addCanvas(zoneCanvas);
-					}
-				});
-			}
-		});
-
-		deleteZones = new ToolStripButton();
-		deleteZones.setTitle(I18N.message("deletezones"));
-		deleteZones.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							selectedOcrTemplate.setZones(new GUIZone[0]);
-							setSelectedOcrTemplate(selectedOcrTemplate);
-						}
-					}
-				});
-			}
-		});
-
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		toolStrip.addFormItem(templateSelector);
-		toolStrip.addFormItem(ocrTemplateSelector);
-		toolStrip.addButton(add);
-		toolStrip.addButton(settings);
-		toolStrip.addButton(save);
-		toolStrip.addButton(delete);
+		addTemplateSelector(templateId, toolStrip);
+
+		addOcrTemplateSelector(templateId, barcodeTemplateId, toolStrip);
+
+		addNewButton(toolStrip);
+
+		addSettingsButton(toolStrip);
+
+		addDeleteButton(toolStrip);
+
+		addSaveButton(toolStrip);
+
 		toolStrip.addSeparator();
-		toolStrip.addButton(addZone);
-		toolStrip.addButton(deleteZones);
+
+		addAddZoneButton(toolStrip);
+
+		addDeleteZonesButton(toolStrip);
+
 		toolStrip.addSeparator();
-		toolStrip.addButton(zoomIn);
-		toolStrip.addButton(zoomOut);
-		toolStrip.addButton(print);
+
+		addZoomInButton(toolStrip);
+
+		addZoomOutButton(toolStrip);
+
+		addPrintButton(toolStrip);
+
 		toolStrip.addSeparator();
-		toolStrip.addButton(close);
+
+		addCloseButton(toolStrip);
+
 		toolStrip.addFill();
 
 		editorPanel.setWidth100();
@@ -340,19 +130,221 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		editorPanel.setOverflow(Overflow.AUTO);
 		setMembers(toolStrip, editorPanel);
 
-		add.setDisabled(selectedDocumentTemplate == null);
-		settings.setDisabled(selectedOcrTemplate == null);
-		save.setDisabled(selectedOcrTemplate == null);
-		zoomIn.setDisabled(selectedOcrTemplate == null);
-		zoomOut.setDisabled(selectedOcrTemplate == null);
-		addZone.setDisabled(selectedOcrTemplate == null);
-		deleteZones.setDisabled(selectedOcrTemplate == null);
-		delete.setDisabled(selectedOcrTemplate == null || selectedOcrTemplate.getId() == 0L);
-		close.setDisabled(selectedOcrTemplate == null);
-		print.setDisabled(selectedOcrTemplate == null);
-		ocrTemplateSelector.setDisabled(selectedDocumentTemplate == null);
-
 		updateSample();
+	}
+
+	private void addCloseButton(ToolStrip toolStrip) {
+		close = new ToolStripButton();
+		close.setTitle(I18N.message("close"));
+		close.addClickHandler((ClickEvent event) -> {
+			setSelectedOcrTemplate(null);
+		});
+		close.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(close);
+	}
+
+	private void addPrintButton(ToolStrip toolStrip) {
+		print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler((ClickEvent event) -> {
+			PrintUtil.printScreenShot(sample.getID(), I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName());
+		});
+		print.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(print);
+	}
+
+	private void addZoomOutButton(ToolStrip toolStrip) {
+		zoomOut = new ToolStripButton();
+		zoomOut.setTitle(I18N.message("zoomout"));
+		zoomOut.addClickHandler((ClickEvent event) -> {
+			if (sample != null) {
+				sample.clearCanvases();
+				sample.resize(-100);
+				showZones();
+			}
+		});
+		zoomOut.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(zoomOut);
+	}
+
+	private void addZoomInButton(ToolStrip toolStrip) {
+		zoomIn = new ToolStripButton();
+		zoomIn.setTitle(I18N.message("zoomin"));
+		zoomIn.addClickHandler((ClickEvent event) -> {
+			if (sample != null) {
+				sample.clearCanvases();
+				sample.resize(+100);
+				showZones();
+			}
+		});
+		zoomIn.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(zoomIn);
+	}
+
+	private void addDeleteZonesButton(ToolStrip toolStrip) {
+		deleteZones = new ToolStripButton();
+		deleteZones.setTitle(I18N.message("deletezones"));
+		deleteZones.addClickHandler((ClickEvent event) -> {
+			LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), (Boolean yes) -> {
+				if (yes) {
+					selectedOcrTemplate.setZones(new GUIZone[0]);
+					setSelectedOcrTemplate(selectedOcrTemplate);
+				}
+			});
+		});
+		deleteZones.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(deleteZones);
+	}
+
+	private void addAddZoneButton(ToolStrip toolStrip) {
+		addZone = new ToolStripButton();
+		addZone.setTitle(I18N.message("addzone"));
+		addZone.addClickHandler((ClickEvent event) -> {
+			FormItem select = new SelectItem("zone", I18N.message("zone"));
+
+			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+			for (GUIAttribute att : selectedOcrTemplate.getTemplate().getAttributes()) {
+				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null)
+					map.put(att.getName(), att.getName() + " (" + AttributeTypeFormatter.format(att.getType()) + ")");
+			}
+			select.setValueMap(map);
+
+			LD.askForValue(I18N.message("addzone"), "zone", "", select, 300, (String value) -> {
+				GUIZone zone = new GUIZone(value, selectedOcrTemplate.getTemplate().getAttribute(value).getType());
+				zone.setTemplateId(selectedOcrTemplate.getId());
+				if (zone.getType() == GUIAttribute.TYPE_DATE)
+					zone.setFormat(I18N.message("format_dateshort"));
+				else if (zone.getType() == GUIAttribute.TYPE_DOUBLE)
+					zone.setFormat("#,###.00");
+
+				selectedOcrTemplate.appendZone(zone);
+				Canvas zoneCanvas = new ZonalOCRZoneCanvas(zone, ZonalOCRTemplatesPanel.this);
+				sample.addCanvas(zoneCanvas);
+			});
+		});
+		addZone.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(addZone);
+	}
+
+	private void addSaveButton(ToolStrip toolStrip) {
+		save = new ToolStripButton();
+		save.setTitle(I18N.message("save"));
+		save.addClickHandler((ClickEvent event) -> {
+			ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<GUIOCRTemplate>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIOCRTemplate template) {
+					ZonalOCRTemplatesPanel.this.selectedOcrTemplate = template;
+					setSelectedOcrTemplate(template);
+				}
+			});
+		});
+		save.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(save);
+	}
+
+	private void addDeleteButton(ToolStrip toolStrip) {
+		delete = new ToolStripButton();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler((ClickEvent event) -> {
+			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L)
+				LD.ask(I18N.message("question"), I18N.message("confirmdeleteocrtemplate"), (Boolean yes) -> {
+					if (yes) {
+						ZonalOCRService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								selectedOcrTemplate = null;
+								AdminScreen.get().setContent(new ZonalOCRPanel(selectedDocumentTemplate, null));
+							}
+						});
+					}
+				});
+		});
+		delete.setDisabled(selectedOcrTemplate == null || selectedOcrTemplate.getId() == 0L);
+		toolStrip.addButton(delete);
+	}
+
+	private void addSettingsButton(ToolStrip toolStrip) {
+		settings = new ToolStripButton();
+		settings.setTitle(I18N.message("settings"));
+		settings.addClickHandler((ClickEvent event) -> {
+			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L) {
+				ZonalOCRTemplateSettings editor = new ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel.this);
+				editor.show();
+			}
+		});
+		settings.setDisabled(selectedOcrTemplate == null);
+		toolStrip.addButton(settings);
+	}
+
+	private void addNewButton(ToolStrip toolStrip) {
+		add = new ToolStripButton();
+		add.setTitle(I18N.message("new"));
+		add.addClickHandler((ClickEvent event) -> {
+			selectedOcrTemplate = new GUIOCRTemplate();
+			selectedOcrTemplate.setTemplate(selectedDocumentTemplate);
+			ZonalOCRTemplateSettings editor = new ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel.this);
+			editor.show();
+		});
+		add.setDisabled(selectedDocumentTemplate == null);
+		toolStrip.addButton(add);
+	}
+
+	private void addOcrTemplateSelector(Long templateId, Long barcodeTemplateId, ToolStrip toolStrip) {
+		ocrTemplateSelector = ItemFactory.newOCRTemplateSelector(false, templateId, barcodeTemplateId);
+		ocrTemplateSelector.setWrapTitle(false);
+		ocrTemplateSelector.setMultiple(false);
+		ocrTemplateSelector.setEndRow(false);
+		ocrTemplateSelector.addChangedHandler((ChangedEvent event) -> {
+			ListGridRecord record = ocrTemplateSelector.getSelectedRecord();
+			ZonalOCRService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
+					new AsyncCallback<GUIOCRTemplate>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIOCRTemplate tmpl) {
+							setSelectedOcrTemplate(tmpl);
+						}
+					});
+		});
+		ocrTemplateSelector.setDisabled(selectedDocumentTemplate == null);
+		toolStrip.addFormItem(ocrTemplateSelector);
+	}
+
+	private void addTemplateSelector(Long templateId, ToolStrip toolStrip) {
+		templateSelector = ItemFactory.newTemplateSelector(true, templateId);
+		templateSelector.setWrapTitle(false);
+		templateSelector.setMultiple(false);
+		templateSelector.setEndRow(false);
+		templateSelector.addChangedHandler((ChangedEvent event) -> {
+			selectedOcrTemplate = null;
+
+			ListGridRecord record = templateSelector.getSelectedRecord();
+			if (record == null || record.getAttributeAsLong("id") == null
+					|| record.getAttributeAsLong("id").longValue() == 0L) {
+				selectedDocumentTemplate = null;
+				refresh(null, null);
+			} else {
+				selectedDocumentTemplate = new GUITemplate();
+				selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
+				selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
+				selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
+				refresh(selectedDocumentTemplate.getId(), null);
+			}
+		});
+		toolStrip.addFormItem(templateSelector);
 	}
 
 	/**

@@ -15,7 +15,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This is the form used to save and update the current search
@@ -24,6 +23,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 6.0
  */
 public class SaveDialog extends Window {
+
+	private ValuesManager vm = new ValuesManager();
 
 	public SaveDialog() {
 		super();
@@ -39,7 +40,6 @@ public class SaveDialog extends Window {
 		setPadding(5);
 		setAutoSize(true);
 
-		final ValuesManager vm = new ValuesManager();
 		final DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setWidth(350);
@@ -57,44 +57,46 @@ public class SaveDialog extends Window {
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (!vm.hasErrors()) {
-					final GUISearchOptions options = Search.get().getOptions();
-					options.setName(vm.getValueAsString("name"));
-					options.setDescription(vm.getValueAsString("description"));
-					SearchService.Instance.get().save(Search.get().getOptions(), new AsyncCallback<Boolean>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Boolean b) {
-							if (!b)
-								SC.warn(I18N.message("duplicateelement"));
-							else {
-								try {
-									if (SavedSearchesPanel.get() != null)
-										SavedSearchesPanel.get().addEntry(vm.getValueAsString("name"),
-												vm.getValueAsString("description"),
-												options.getType() == GUISearchOptions.TYPE_FULLTEXT
-														? I18N.message("fulltext")
-														: I18N.message("parametric"));
-								} catch (Throwable t) {
-									// Nothing to do
-								}
-								destroy();
-							}
-						}
-					});
-				}
-			}
+		save.addClickHandler((ClickEvent event) -> {
+			onSave();
 		});
 
 		form.setFields(name, description, save);
 		addItem(form);
+	}
+
+	private void onSave() {
+		vm.validate();
+		if (vm.hasErrors())
+			return;
+
+		final GUISearchOptions options = Search.get().getOptions();
+		options.setName(vm.getValueAsString("name"));
+		options.setDescription(vm.getValueAsString("description"));
+		SearchService.Instance.get().save(Search.get().getOptions(), new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Boolean b) {
+				if (!b)
+					SC.warn(I18N.message("duplicateelement"));
+				else {
+					try {
+						if (SavedSearchesPanel.get() != null)
+							SavedSearchesPanel.get().addEntry(vm.getValueAsString("name"),
+									vm.getValueAsString("description"),
+									options.getType() == GUISearchOptions.TYPE_FULLTEXT ? I18N.message("fulltext")
+											: I18N.message("parametric"));
+					} catch (Throwable t) {
+						// Nothing to do
+					}
+					destroy();
+				}
+			}
+		});
 	}
 }

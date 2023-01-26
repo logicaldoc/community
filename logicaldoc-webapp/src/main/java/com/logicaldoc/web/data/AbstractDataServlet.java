@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -33,6 +32,10 @@ public abstract class AbstractDataServlet extends HttpServlet {
 
 	}
 
+	protected boolean isSessionRequired() {
+		return true;
+	}
+	
 	/**
 	 * Standard implementation of the service method that perform the session
 	 * checks. It does not throws exception++ to avoid DoS.
@@ -52,7 +55,7 @@ public abstract class AbstractDataServlet extends HttpServlet {
 			response.setHeader("Cache-Control", "no-store");
 			response.setDateHeader("Expires", 0);
 
-			int max = 100;
+			Integer max = null;
 			if (StringUtils.isNotEmpty(request.getParameter("max")))
 				max = Integer.parseInt(request.getParameter("max"));
 
@@ -60,7 +63,7 @@ public abstract class AbstractDataServlet extends HttpServlet {
 			if (StringUtils.isNotEmpty(request.getParameter("locale")))
 				locale = LocaleUtil.toLocale(request.getParameter("locale"));
 
-			Session session = ServletUtil.validateSession(request);
+			Session session = isSessionRequired() ? ServletUtil.validateSession(request) : null;
 
 			service(request, response, session, max, locale);
 		} catch (NumberFormatException | PersistenceException | IOException e) {
@@ -76,12 +79,12 @@ public abstract class AbstractDataServlet extends HttpServlet {
 	 * @param request the servlet request
 	 * @param response the servlet response
 	 * @param session the current session
-	 * @param max the maximum number of entries to return
+	 * @param max optional maximum number of entries to return
 	 * @param locale an optional locale specification
 	 * 
 	 * @throws IOException generic error
 	 * @throws PersistenceException an error on the database
 	 */
-	protected abstract void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
-			Locale locale) throws PersistenceException, IOException;
+	protected abstract void service(HttpServletRequest request, HttpServletResponse response, Session session,
+			Integer max, Locale locale) throws PersistenceException, IOException;
 }

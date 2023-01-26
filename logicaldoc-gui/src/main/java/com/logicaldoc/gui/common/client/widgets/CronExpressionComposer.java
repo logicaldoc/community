@@ -536,86 +536,22 @@ public class CronExpressionComposer extends Window {
 			vm.getItem("expression").setValue("0 0/" + vm.getValue("minutes-minute") + " * 1/1 * ? *");
 			break;
 		case 1:
-			String hour = vm.getValueAsString("hourly-hour");
-			if (hour != null && !"".equals(hour))
-				vm.getItem("expression").setValue("0 0 0/" + hour + " 1/1 * ? *");
-			else {
-				TimeItem timeItem = (TimeItem) vm.getItem("hourly-time");
-				String m = timeItem.getMinuteItem().getValueAsString();
-				if (m.length() > 1 && m.startsWith("0"))
-					m = m.substring(1);
-				String h = timeItem.getHourItem().getValueAsString();
-				if (h.length() > 1 && h.startsWith("0"))
-					h = h.substring(1);
-				vm.getItem("expression").setValue("0 " + m + " " + h + " 1/1 * ? *");
-			}
+			generateHourly();
 			break;
 		case 2: {
-			TimeItem timeItem = (TimeItem) vm.getItem("daily-time");
-			String m = timeItem.getMinuteItem().getValueAsString();
-			if (m.length() > 1 && m.startsWith("0"))
-				m = m.substring(1);
-			String h = timeItem.getHourItem().getValueAsString();
-			if (h.length() > 1 && h.startsWith("0"))
-				h = h.substring(1);
-
-			if ("everyday".equals(vm.getValueAsString("daily-frequency")))
-				vm.getItem("expression").setValue("0 " + m + " " + h + " 1/1 * ? *");
-			else {
-
-				vm.getItem("expression").setValue("0 " + m + " " + h + " ? * MON-FRI *");
-			}
+			generateDaily();
 			break;
 		}
 		case 3: {
-			TimeItem timeItem = (TimeItem) vm.getItem("weekly-time");
-			String m = timeItem.getMinuteItem().getValueAsString();
-			if (m.length() > 1 && m.startsWith("0"))
-				m = m.substring(1);
-			String h = timeItem.getHourItem().getValueAsString();
-			if (h.length() > 1 && h.startsWith("0"))
-				h = h.substring(1);
-			vm.getItem("expression").setValue("0 " + m + " " + h + " ? * " + vm.getValueAsString("weekly-days") + " *");
+			generateWeekly();
 			break;
 		}
 		case 4: {
-			TimeItem timeItem = (TimeItem) vm.getItem("monthly-time");
-			String m = timeItem.getMinuteItem().getValueAsString();
-			if (m.length() > 1 && m.startsWith("0"))
-				m = m.substring(1);
-			String h = timeItem.getHourItem().getValueAsString();
-			if (h.length() > 1 && h.startsWith("0"))
-				h = h.substring(1);
-
-			String day = vm.getValueAsString("monthly-day");
-			if (day != null && !"".equals(day)) {
-				vm.getItem("expression").setValue(
-						"0 " + m + " " + h + " " + day + " 1/" + vm.getValueAsString("monthly-day-months") + " ? *");
-			} else
-				vm.getItem("expression")
-						.setValue("0 " + m + " " + h + " ? 1/" + vm.getValueAsString("monthly-day-name-months") + " "
-								+ vm.getValueAsString("monthly-day-name") + "#"
-								+ vm.getValueAsString("monthly-day-position") + " *");
+			generateMonthly();
 			break;
 		}
 		case 5: {
-			TimeItem timeItem = (TimeItem) vm.getItem("yearly-time");
-			String m = timeItem.getMinuteItem().getValueAsString();
-			if (m.length() > 1 && m.startsWith("0"))
-				m = m.substring(1);
-			String h = timeItem.getHourItem().getValueAsString();
-			if (h.length() > 1 && h.startsWith("0"))
-				h = h.substring(1);
-
-			String month = vm.getValueAsString("yearly-month");
-			if (month != null && !"".equals(month)) {
-				vm.getItem("expression")
-						.setValue("0 " + m + " " + h + " " + vm.getValueAsString("yearly-day") + " " + month + " ? *");
-			} else
-				vm.getItem("expression")
-						.setValue("0 " + m + " " + h + " ? " + vm.getValueAsString("yearly-day-name-month") + " "
-								+ vm.getValueAsString("yearly-day-name") + "#"
-								+ vm.getValueAsString("yearly-day-position") + " *");
+			generateYearly();
 			break;
 		}
 		default:
@@ -635,5 +571,89 @@ public class CronExpressionComposer extends Window {
 						vm.getItem("description").setValue(description);
 					}
 				});
+	}
+
+	private void generateYearly() {
+		TimeItem timeItem = (TimeItem) vm.getItem("yearly-time");
+		String m = timeItem.getMinuteItem().getValueAsString();
+		if (m.length() > 1 && m.startsWith("0"))
+			m = m.substring(1);
+		String h = timeItem.getHourItem().getValueAsString();
+		if (h.length() > 1 && h.startsWith("0"))
+			h = h.substring(1);
+
+		String month = vm.getValueAsString("yearly-month");
+		if (month != null && !"".equals(month)) {
+			vm.getItem("expression")
+					.setValue("0 " + m + " " + h + " " + vm.getValueAsString("yearly-day") + " " + month + " ? *");
+		} else
+			vm.getItem("expression")
+					.setValue("0 " + m + " " + h + " ? " + vm.getValueAsString("yearly-day-name-month") + " "
+							+ vm.getValueAsString("yearly-day-name") + "#" + vm.getValueAsString("yearly-day-position")
+							+ " *");
+	}
+
+	private void generateMonthly() {
+		TimeItem timeItem = (TimeItem) vm.getItem("monthly-time");
+		String m = timeItem.getMinuteItem().getValueAsString();
+		if (m.length() > 1 && m.startsWith("0"))
+			m = m.substring(1);
+		String h = timeItem.getHourItem().getValueAsString();
+		if (h.length() > 1 && h.startsWith("0"))
+			h = h.substring(1);
+
+		String day = vm.getValueAsString("monthly-day");
+		if (day != null && !"".equals(day)) {
+			vm.getItem("expression").setValue(
+					"0 " + m + " " + h + " " + day + " 1/" + vm.getValueAsString("monthly-day-months") + " ? *");
+		} else
+			vm.getItem("expression")
+					.setValue("0 " + m + " " + h + " ? 1/" + vm.getValueAsString("monthly-day-name-months") + " "
+							+ vm.getValueAsString("monthly-day-name") + "#"
+							+ vm.getValueAsString("monthly-day-position") + " *");
+	}
+
+	private void generateWeekly() {
+		TimeItem timeItem = (TimeItem) vm.getItem("weekly-time");
+		String m = timeItem.getMinuteItem().getValueAsString();
+		if (m.length() > 1 && m.startsWith("0"))
+			m = m.substring(1);
+		String h = timeItem.getHourItem().getValueAsString();
+		if (h.length() > 1 && h.startsWith("0"))
+			h = h.substring(1);
+		vm.getItem("expression").setValue("0 " + m + " " + h + " ? * " + vm.getValueAsString("weekly-days") + " *");
+	}
+
+	private void generateDaily() {
+		TimeItem timeItem = (TimeItem) vm.getItem("daily-time");
+		String m = timeItem.getMinuteItem().getValueAsString();
+		if (m.length() > 1 && m.startsWith("0"))
+			m = m.substring(1);
+		String h = timeItem.getHourItem().getValueAsString();
+		if (h.length() > 1 && h.startsWith("0"))
+			h = h.substring(1);
+
+		if ("everyday".equals(vm.getValueAsString("daily-frequency")))
+			vm.getItem("expression").setValue("0 " + m + " " + h + " 1/1 * ? *");
+		else {
+
+			vm.getItem("expression").setValue("0 " + m + " " + h + " ? * MON-FRI *");
+		}
+	}
+
+	private void generateHourly() {
+		String hour = vm.getValueAsString("hourly-hour");
+		if (hour != null && !"".equals(hour))
+			vm.getItem("expression").setValue("0 0 0/" + hour + " 1/1 * ? *");
+		else {
+			TimeItem timeItem = (TimeItem) vm.getItem("hourly-time");
+			String m = timeItem.getMinuteItem().getValueAsString();
+			if (m.length() > 1 && m.startsWith("0"))
+				m = m.substring(1);
+			String h = timeItem.getHourItem().getValueAsString();
+			if (h.length() > 1 && h.startsWith("0"))
+				h = h.substring(1);
+			vm.getItem("expression").setValue("0 " + m + " " + h + " 1/1 * ? *");
+		}
 	}
 }

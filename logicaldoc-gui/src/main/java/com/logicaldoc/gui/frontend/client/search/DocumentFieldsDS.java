@@ -54,9 +54,8 @@ public class DocumentFieldsDS extends DataSource {
 				OperatorId.NOT_EQUAL);
 
 		DataSourceIntegerField pages = new DataSourceIntegerField("pages", I18N.message("pages"));
-		pages.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
-				OperatorId.NOT_EQUAL);
-		
+		pages.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS, OperatorId.NOT_EQUAL);
+
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified",
 				I18N.message("lastmodified"));
 		lastModified.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN);
@@ -106,59 +105,68 @@ public class DocumentFieldsDS extends DataSource {
 		DataSourceTextField tmplt = new DataSourceTextField("template", I18N.message("template"));
 		tmplt.setValidOperators(OperatorId.IS_NULL);
 
-		setFields(id, filename, fileSize, pages, publisher, version, lastModified, published, created, creator, customId,
-				extension, rating, tags, comment, notes, wfStatus, publishedStatus, startPublishing, stopPublishing,
-				indexed, tmplt);
+		setFields(id, filename, fileSize, pages, publisher, version, lastModified, published, created, creator,
+				customId, extension, rating, tags, comment, notes, wfStatus, publishedStatus, startPublishing,
+				stopPublishing, indexed, tmplt);
 
 		/*
 		 * Define extended attributes
 		 */
 		if (template != null && template.getAttributes() != null)
-			for (GUIAttribute att : template.getAttributes()) {
-				if (att.isHidden())
-					continue;
+			defineExtendedAttributes(template);
+	}
 
-				DataSourceField field = null;
-				String name = "_" + att.getName().replace(" ", Constants.BLANK_PLACEHOLDER);
-				String titl = att.getLabel() + " (" + template.getName() + ")";
-				if (att.getType() == GUIAttribute.TYPE_DATE) {
-					field = new DataSourceDateTimeField();
-					field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN);
-					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DATE;
-				} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
-					field = new DataSourceFloatField();
-					field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
-							OperatorId.NOT_EQUAL);
-					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DOUBLE;
-				} else if (att.getType() == GUIAttribute.TYPE_INT) {
-					field = new DataSourceIntegerField();
-					field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
-							OperatorId.NOT_EQUAL);
-					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_INT;
-				} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
-					field = new DataSourceIntegerField();
-					field.setValidOperators(OperatorId.EQUALS, OperatorId.IS_NULL, OperatorId.NOT_NULL);
-					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_BOOLEAN;
-				} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER) {
-					field = new DataSourceIntegerField();
-					field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL,
-							OperatorId.NOT_NULL);
-					name = name + Constants.BLANK_PLACEHOLDER + "type:" + att.getType();
-				} else {
-					field = new DataSourceTextField();
-					field.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,
-							OperatorId.NOT_EQUAL);
-					if (att.getEditor() == GUIAttribute.EDITOR_DEFAULT)
-						name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING;
-					else if (att.getEditor() == GUIAttribute.EDITOR_TEXTAREA)
-						name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING_TEXTAREA;
-					else
-						name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING_PRESET;
-				}
+	private void defineExtendedAttributes(GUITemplate template) {
+		for (GUIAttribute attribute : template.getAttributes()) {
+			if (attribute.isHidden())
+				continue;
 
-				field.setName(name);
-				field.setTitle(titl);
-				addField(field);
-			}
+			DataSourceField field = prepareField(template, attribute);
+
+			addField(field);
+		}
+	}
+
+	private DataSourceField prepareField(GUITemplate template, GUIAttribute att) {
+		DataSourceField field = null;
+		String name = "_" + att.getName().replace(" ", Constants.BLANK_PLACEHOLDER);
+		String titl = att.getLabel() + " (" + template.getName() + ")";
+		if (att.getType() == GUIAttribute.TYPE_DATE) {
+			field = new DataSourceDateTimeField();
+			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN);
+			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DATE;
+		} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
+			field = new DataSourceFloatField();
+			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
+					OperatorId.NOT_EQUAL);
+			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DOUBLE;
+		} else if (att.getType() == GUIAttribute.TYPE_INT) {
+			field = new DataSourceIntegerField();
+			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
+					OperatorId.NOT_EQUAL);
+			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_INT;
+		} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
+			field = new DataSourceIntegerField();
+			field.setValidOperators(OperatorId.EQUALS, OperatorId.IS_NULL, OperatorId.NOT_NULL);
+			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_BOOLEAN;
+		} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER) {
+			field = new DataSourceIntegerField();
+			field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL, OperatorId.NOT_NULL);
+			name = name + Constants.BLANK_PLACEHOLDER + "type:" + att.getType();
+		} else {
+			field = new DataSourceTextField();
+			field.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,
+					OperatorId.NOT_EQUAL);
+			if (att.getEditor() == GUIAttribute.EDITOR_DEFAULT)
+				name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING;
+			else if (att.getEditor() == GUIAttribute.EDITOR_TEXTAREA)
+				name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING_TEXTAREA;
+			else
+				name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING_PRESET;
+		}
+		field.setName(name);
+		field.setTitle(titl);
+
+		return field;
 	}
 }

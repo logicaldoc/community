@@ -2,8 +2,11 @@ package com.logicaldoc.core.automation;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
- * Utility functions for manipulating classes and resources.
+ * Utility functions for manipulating classes and resources and for other
+ * programming language aspects
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5.1
@@ -46,5 +49,27 @@ public class ClassTool {
 			// package
 			return Class.forName("com.logicaldoc." + className).getDeclaredConstructor().newInstance();
 		}
+	}
+
+	/**
+	 * Checks if a given instance is null
+	 * 
+	 * @param instance the object to evaluate
+	 * 
+	 * @return true only if the passed instance is null
+	 */
+	public boolean isNull(Object instance) {
+		return instance == null;
+	}
+	
+	/**
+	 * Checks if a given string is null
+	 * 
+	 * @param str the string to evaluate
+	 * 
+	 * @return true only if the passed string is null
+	 */
+	public boolean isEmptyStrin(String str) {
+		return StringUtils.isEmpty(str);
 	}
 }

@@ -48,40 +48,11 @@ public class DocumentsMenu extends SectionStack {
 
 		setShowResizeBar(true);
 
-		browser = new SectionStackSection(I18N.message("browser") + "   ");
-		browser.setName("browser");
-		browser.setCanCollapse(true);
-		if (Session.get().isFolderPagination()) {
-			browser.setControls(FolderCursor.get());
-		}
+		addBrowser(showBrowser);
 
-		browser.setItems(FolderNavigatorPanel.get());
-		if (showBrowser)
-			addSection(browser);
+		addBookmarks(showBookmarks);
 
-		if (showBookmarks && Feature.visible(Feature.BOOKMARKS)) {
-			bookmarksSection = new SectionStackSection(I18N.message("bookmarks"));
-			bookmarksSection.setName("bookmarks");
-			bookmarksSection.setCanCollapse(true);
-
-			if (Feature.enabled(Feature.BOOKMARKS))
-				bookmarksSection.setItems(BookmarksPanel.get());
-			else
-				bookmarksSection.addItem(new FeatureDisabled());
-			addSection(bookmarksSection);
-		}
-
-		if (showTrash && Feature.visible(Feature.TRASH)
-				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TRASH)) {
-			trashSection = new SectionStackSection(I18N.message("trash"));
-			trashSection.setName("trash");
-			trashSection.setCanCollapse(true);
-			if (Feature.enabled(Feature.TRASH))
-				trashSection.setItems(TrashPanel.get());
-			else
-				trashSection.addItem(new FeatureDisabled());
-			addSection(trashSection);
-		}
+		addTrash(showTrash);
 
 		addSectionHeaderClickHandler(new SectionHeaderClickHandler() {
 			@Override
@@ -102,6 +73,47 @@ public class DocumentsMenu extends SectionStack {
 					initialized = true;
 			}
 		});
+	}
+
+	private void addTrash(boolean showTrash) {
+		if (showTrash && Feature.visible(Feature.TRASH)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TRASH)) {
+			trashSection = new SectionStackSection(I18N.message("trash"));
+			trashSection.setName("trash");
+			trashSection.setCanCollapse(true);
+			if (Feature.enabled(Feature.TRASH))
+				trashSection.setItems(TrashPanel.get());
+			else
+				trashSection.addItem(new FeatureDisabled());
+			addSection(trashSection);
+		}
+	}
+
+	private void addBookmarks(boolean showBookmarks) {
+		if (showBookmarks && Feature.visible(Feature.BOOKMARKS)) {
+			bookmarksSection = new SectionStackSection(I18N.message("bookmarks"));
+			bookmarksSection.setName("bookmarks");
+			bookmarksSection.setCanCollapse(true);
+
+			if (Feature.enabled(Feature.BOOKMARKS))
+				bookmarksSection.setItems(BookmarksPanel.get());
+			else
+				bookmarksSection.addItem(new FeatureDisabled());
+			addSection(bookmarksSection);
+		}
+	}
+
+	private void addBrowser(boolean showBrowser) {
+		browser = new SectionStackSection(I18N.message("browser") + "   ");
+		browser.setName("browser");
+		browser.setCanCollapse(true);
+		if (Session.get().isFolderPagination()) {
+			browser.setControls(FolderCursor.get());
+		}
+
+		browser.setItems(FolderNavigatorPanel.get());
+		if (showBrowser)
+			addSection(browser);
 	}
 
 	public void refresh(String sectionNameToExpand) {

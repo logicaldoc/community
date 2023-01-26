@@ -20,7 +20,6 @@ import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.events.DropCompleteHandler;
@@ -185,7 +184,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		multiple.setCanSort(false);
 		multiple.setAutoFitWidth(true);
 		multiple.setMinWidth(70);
-		
+
 		ListGridField readonly = new ListGridField("readonly", I18N.message("readonly"));
 		readonly.setCanEdit(false);
 		readonly.setCanSort(false);
@@ -263,322 +262,294 @@ public class TemplatePropertiesPanel extends HLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = attributesList.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttribute("name");
-				}
+		MenuItem delete = prepareDeleteItem();
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							for (String attrName : names)
-								template.removeAttribute(attrName);
-							attributesList.removeSelectedData();
-							if (TemplatePropertiesPanel.this.changedHandler != null)
-								TemplatePropertiesPanel.this.changedHandler.onChanged(null);
-						}
-					}
-				});
-			}
-		});
+		MenuItem makeMandatory = pepareMakeMandatoryItem();
 
-		MenuItem makeMandatory = new MenuItem();
-		makeMandatory.setTitle(I18N.message("makemandatory"));
-		makeMandatory.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = attributesList.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttribute("name");
-					template.getAttribute(names[i]).setMandatory(true);
-				}
+		MenuItem makeOptional = prepareMakeOptionalItem();
 
-				fillAttributesList();
+		MenuItem makeHidden = prepareMakeHiddenItem();
 
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
-		});
+		MenuItem makeReadonly = prepareMakeRedonlyItem();
 
-		MenuItem makeOptional = new MenuItem();
-		makeOptional.setTitle(I18N.message("makeoptional"));
-		makeOptional.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = attributesList.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttribute("name");
-					template.getAttribute(names[i]).setMandatory(false);
-				}
+		MenuItem makeVisible = prepareMakeVisibleItem();
 
-				fillAttributesList();
+		MenuItem validation = prepareValidationItem();
 
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
-		});
+		MenuItem resetValidation = prepareResetValidationItem();
 
-		MenuItem makeHidden = new MenuItem();
-		makeHidden.setTitle(I18N.message("makehidden"));
-		makeHidden.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = attributesList.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttribute("name");
-					template.getAttribute(names[i]).setHidden(true);
-				}
+		MenuItem initialization = prepareInitializationItem();
 
-				fillAttributesList();
+		MenuItem resetInitialization = prepareResetInitializationItem();
 
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
-		});
-		
-		MenuItem makeReadonly = new MenuItem();
-		makeReadonly.setTitle(I18N.message("makereadonly"));
-		makeReadonly.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = attributesList.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttribute("name");
-					template.getAttribute(names[i]).setReadonly(true);
-				}
+		MenuItem dependsOn = prepareDependsOnItem();
 
-				fillAttributesList();
+		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeReadonly, makeHidden, dependsOn,
+				initialization, resetInitialization, validation, resetValidation, delete);
+		contextMenu.showContextMenu();
+	}
 
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
-		});
-
-		MenuItem makeVisible = new MenuItem();
-		makeVisible.setTitle(I18N.message("makevisible"));
-		makeVisible.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = attributesList.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttribute("name");
-					template.getAttribute(names[i]).setHidden(false);
-				}
-
-				fillAttributesList();
-
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
-		});
-
-		MenuItem validation = new MenuItem();
-		validation.setTitle(I18N.message("validation"));
-		validation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = attributesList.getSelectedRecord();
-				TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation("validation", "validation", null,
-						null, false);
-				validationItem.setWidth(600);
-				validationItem.setHeight(400);
-
-				GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
-
-				LD.askForValue(I18N.message("validation"), I18N.message("validation"), attribute.getValidation(),
-						validationItem, 600, new ValueCallback() {
-
-							@Override
-							public void execute(String validationScript) {
-								attribute.setValidation(validationScript);
-								fillAttributesList();
-								if (changedHandler != null)
-									changedHandler.onChanged(null);
-							}
-						});
-			}
-		});
-
-		MenuItem resetValidation = new MenuItem();
-		resetValidation.setTitle(I18N.message("resetvalidation"));
-		resetValidation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] selection = attributesList.getSelectedRecords();
-
-				LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							LD.contactingServer();
-							AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(GUIAttributeSet[] sets) {
-									LD.clearPrompt();
-									Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
-									for (GUIAttributeSet set : sets)
-										setsMap.put(set.getId(), set);
-
-									for (ListGridRecord record : selection) {
-										GUIAttribute setAttribute = null;
-										GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
-										if (set != null)
-											setAttribute = set.getAttribute(record.getAttributeAsString("name"));
-
-										if (setAttribute != null) {
-											template.getAttribute(record.getAttributeAsString("name"))
-													.setValidation(setAttribute.getValidation());
-											record.setAttribute("validation", setAttribute.getValidation());
-										} else {
-											template.getAttribute(record.getAttributeAsString("name"))
-													.setValidation(null);
-											record.setAttribute("validation", (String) null);
-										}
-									}
-
-									if (changedHandler != null)
-										changedHandler.onChanged(null);
-								}
-							});
-						}
-					}
-				});
-			}
-		});
-
-		MenuItem initialization = new MenuItem();
-		initialization.setTitle(I18N.message("initialization"));
-		initialization.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = attributesList.getSelectedRecord();
-				TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation("initialization",
-						"initialization", null, null, false);
-				initializationItem.setWidth(600);
-				initializationItem.setHeight(400);
-
-				GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
-
-				LD.askForValue(I18N.message("initialization"), I18N.message("initialization"),
-						attribute.getInitialization(), initializationItem, 600, new ValueCallback() {
-
-							@Override
-							public void execute(String initializationScript) {
-								attribute.setInitialization(initializationScript);
-								fillAttributesList();
-								if (changedHandler != null)
-									changedHandler.onChanged(null);
-							}
-						});
-			}
-		});
-
-		MenuItem resetInitialization = new MenuItem();
-		resetInitialization.setTitle(I18N.message("resetinitialization"));
-		resetInitialization.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] selection = attributesList.getSelectedRecords();
-
-				LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"),
-						new BooleanCallback() {
-
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									LD.contactingServer();
-									AttributeSetService.Instance.get()
-											.getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
-
-												@Override
-												public void onFailure(Throwable caught) {
-													LD.clearPrompt();
-													GuiLog.serverError(caught);
-												}
-
-												@Override
-												public void onSuccess(GUIAttributeSet[] sets) {
-													LD.clearPrompt();
-													Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
-													for (GUIAttributeSet set : sets)
-														setsMap.put(set.getId(), set);
-
-													for (ListGridRecord record : selection) {
-														GUIAttribute setAttribute = null;
-														GUIAttributeSet set = setsMap
-																.get(record.getAttributeAsLong("setId"));
-														if (set != null)
-															setAttribute = set
-																	.getAttribute(record.getAttributeAsString("name"));
-
-														if (setAttribute != null) {
-															template.getAttribute(record.getAttributeAsString("name"))
-																	.setInitialization(
-																			setAttribute.getInitialization());
-															record.setAttribute("initialization",
-																	setAttribute.getInitialization());
-														} else {
-															template.getAttribute(record.getAttributeAsString("name"))
-																	.setInitialization(null);
-															record.setAttribute("initialization", (String) null);
-														}
-													}
-
-													if (changedHandler != null)
-														changedHandler.onChanged(null);
-												}
-											});
-								}
-							}
-						});
-			}
-		});
-
+	private MenuItem prepareDependsOnItem() {
 		MenuItem dependsOn = new MenuItem();
 		dependsOn.setTitle(I18N.message("dependson"));
 		dependsOn.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				ListGridRecord selection = attributesList.getSelectedRecord();
 				LD.askForString("dependson", "attributename", selection.getAttributeAsString("dependsOn"),
-						new ValueCallback() {
-
-							@Override
-							public void execute(String value) {
-								ListGridRecord selection = attributesList.getSelectedRecord();
-								selection.setAttribute("dependsOn", value);
-								if (changedHandler != null)
-									changedHandler.onChanged(null);
-							}
+						(String value) -> {
+							ListGridRecord selectedRecord = attributesList.getSelectedRecord();
+							selectedRecord.setAttribute("dependsOn", value);
+							if (changedHandler != null)
+								changedHandler.onChanged(null);
 						});
 			}
 		});
 		dependsOn.setEnabled(attributesList.getSelectedRecord().getAttributeAsBoolean("preset"));
+		return dependsOn;
+	}
 
-		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeReadonly, makeHidden, dependsOn, initialization,
-				resetInitialization, validation, resetValidation, delete);
-		contextMenu.showContextMenu();
+	private MenuItem prepareResetInitializationItem() {
+		MenuItem resetInitialization = new MenuItem();
+		resetInitialization.setTitle(I18N.message("resetinitialization"));
+		resetInitialization.addClickHandler((MenuItemClickEvent event) -> {
+			LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"), (Boolean yes) -> {
+				if (yes) 
+					resetInitialization();
+			});
+		});
+		return resetInitialization;
+	}
+
+	private void resetInitialization() {
+		ListGridRecord[] selection = attributesList.getSelectedRecords();
+		
+		LD.contactingServer();
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				LD.clearPrompt();
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUIAttributeSet[] sets) {
+				LD.clearPrompt();
+				Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
+				for (GUIAttributeSet set : sets)
+					setsMap.put(set.getId(), set);
+
+				for (ListGridRecord record : selection) {
+					GUIAttribute setAttribute = null;
+					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
+					if (set != null)
+						setAttribute = set.getAttribute(record.getAttributeAsString("name"));
+
+					if (setAttribute != null) {
+						template.getAttribute(record.getAttributeAsString("name"))
+								.setInitialization(setAttribute.getInitialization());
+						record.setAttribute("initialization", setAttribute.getInitialization());
+					} else {
+						template.getAttribute(record.getAttributeAsString("name")).setInitialization(null);
+						record.setAttribute("initialization", (String) null);
+					}
+				}
+
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
+	}
+
+	private MenuItem prepareInitializationItem() {
+		MenuItem initialization = new MenuItem();
+		initialization.setTitle(I18N.message("initialization"));
+		initialization.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord selection = attributesList.getSelectedRecord();
+			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation("initialization",
+					"initialization", null, null, false);
+			initializationItem.setWidth(600);
+			initializationItem.setHeight(400);
+
+			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+
+			LD.askForValue(I18N.message("initialization"), I18N.message("initialization"),
+					attribute.getInitialization(), initializationItem, 600, (String initializationScript) -> {
+						attribute.setInitialization(initializationScript);
+						fillAttributesList();
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		return initialization;
+	}
+
+	private MenuItem prepareResetValidationItem() {
+		MenuItem resetValidation = new MenuItem();
+		resetValidation.setTitle(I18N.message("resetvalidation"));
+		resetValidation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), (Boolean yes) -> {
+					if (yes)
+						resetValidation();
+				});
+			}
+		});
+		return resetValidation;
+	}
+
+	private MenuItem prepareValidationItem() {
+		MenuItem validation = new MenuItem();
+		validation.setTitle(I18N.message("validation"));
+		validation.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord selection = attributesList.getSelectedRecord();
+			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation("validation", "validation", null,
+					null, false);
+			validationItem.setWidth(600);
+			validationItem.setHeight(400);
+
+			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+
+			LD.askForValue(I18N.message("validation"), I18N.message("validation"), attribute.getValidation(),
+					validationItem, 600, (String validationScript) -> {
+						attribute.setValidation(validationScript);
+						fillAttributesList();
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		return validation;
+	}
+
+	private MenuItem prepareMakeVisibleItem() {
+		MenuItem makeVisible = new MenuItem();
+		makeVisible.setTitle(I18N.message("makevisible"));
+		makeVisible.addClickHandler((MenuItemClickEvent event) -> {
+			final ListGridRecord[] selection = attributesList.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttribute("name");
+				template.getAttribute(names[i]).setHidden(false);
+			}
+
+			fillAttributesList();
+
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+		});
+		return makeVisible;
+	}
+
+	private MenuItem prepareMakeRedonlyItem() {
+		MenuItem makeReadonly = new MenuItem();
+		makeReadonly.setTitle(I18N.message("makereadonly"));
+		makeReadonly.addClickHandler((MenuItemClickEvent event) -> {
+			final ListGridRecord[] selection = attributesList.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttribute("name");
+				template.getAttribute(names[i]).setReadonly(true);
+			}
+
+			fillAttributesList();
+
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+		});
+		return makeReadonly;
+	}
+
+	private MenuItem prepareMakeHiddenItem() {
+		MenuItem makeHidden = new MenuItem();
+		makeHidden.setTitle(I18N.message("makehidden"));
+		makeHidden.addClickHandler((MenuItemClickEvent event) -> {
+			final ListGridRecord[] selection = attributesList.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttribute("name");
+				template.getAttribute(names[i]).setHidden(true);
+			}
+
+			fillAttributesList();
+
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+		});
+		return makeHidden;
+	}
+
+	private MenuItem prepareMakeOptionalItem() {
+		MenuItem makeOptional = new MenuItem();
+		makeOptional.setTitle(I18N.message("makeoptional"));
+		makeOptional.addClickHandler((MenuItemClickEvent event) -> {
+			final ListGridRecord[] selection = attributesList.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttribute("name");
+				template.getAttribute(names[i]).setMandatory(false);
+			}
+
+			fillAttributesList();
+
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+		});
+		return makeOptional;
+	}
+
+	private MenuItem pepareMakeMandatoryItem() {
+		MenuItem makeMandatory = new MenuItem();
+		makeMandatory.setTitle(I18N.message("makemandatory"));
+		makeMandatory.addClickHandler((MenuItemClickEvent makeMandatoryClicked) -> {
+			final ListGridRecord[] selection = attributesList.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttribute("name");
+				template.getAttribute(names[i]).setMandatory(true);
+			}
+
+			fillAttributesList();
+
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+		});
+		return makeMandatory;
+	}
+
+	private MenuItem prepareDeleteItem() {
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler((MenuItemClickEvent deleteClick) -> {
+			final ListGridRecord[] selection = attributesList.getSelectedRecords();
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttribute("name");
+			}
+
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
+				@Override
+				public void execute(Boolean yes) {
+					if (yes) {
+						for (String attrName : names)
+							template.removeAttribute(attrName);
+						attributesList.removeSelectedData();
+						if (TemplatePropertiesPanel.this.changedHandler != null)
+							TemplatePropertiesPanel.this.changedHandler.onChanged(null);
+					}
+				}
+			});
+		});
+		return delete;
 	}
 
 	private void fillAttributesList() {
@@ -728,5 +699,45 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	public GUITemplate getTemplate() {
 		return template;
+	}
+
+	private void resetValidation() {
+		ListGridRecord[] selection = attributesList.getSelectedRecords();
+		LD.contactingServer();
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				LD.clearPrompt();
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUIAttributeSet[] sets) {
+				LD.clearPrompt();
+				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
+				for (GUIAttributeSet set : sets)
+					setsMap.put(set.getId(), set);
+
+				for (ListGridRecord record : selection) {
+					GUIAttribute setAttribute = null;
+					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
+					if (set != null)
+						setAttribute = set.getAttribute(record.getAttributeAsString("name"));
+
+					if (setAttribute != null) {
+						template.getAttribute(record.getAttributeAsString("name"))
+								.setValidation(setAttribute.getValidation());
+						record.setAttribute("validation", setAttribute.getValidation());
+					} else {
+						template.getAttribute(record.getAttributeAsString("name")).setValidation(null);
+						record.setAttribute("validation", (String) null);
+					}
+				}
+
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
 	}
 }

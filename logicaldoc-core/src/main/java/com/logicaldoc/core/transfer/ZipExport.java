@@ -146,10 +146,9 @@ public class ZipExport {
 
 				// Check if the current user has the download permission in the
 				// document's folder
-				if (transaction != null && transaction.getUserId() != 0L) {
-					if (!fdao.isDownloadEnabled(doc.getFolder().getId(), transaction.getUserId()))
-						continue;
-				}
+				if (transaction != null && transaction.getUserId() != 0L
+						&& !fdao.isDownloadEnabled(doc.getFolder().getId(), transaction.getUserId()))
+					continue;
 
 				boolean convertToPdf = pdfConversion;
 				if (doc.getDocRef() != null) {
@@ -160,15 +159,7 @@ public class ZipExport {
 				}
 				addDocument("", doc, convertToPdf, transaction.getSessionId());
 
-				if (transaction != null) {
-					DocumentHistory t = new DocumentHistory(transaction);
-					transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
-					try {
-						ddao.saveDocumentHistory(doc, t);
-					} catch (PersistenceException e) {
-						log.warn(e.getMessage(), e);
-					}
-				}
+				saveHistory(transaction, doc);
 			}
 		} finally {
 			try {
@@ -178,6 +169,19 @@ public class ZipExport {
 				log.warn(e.getMessage());
 			}
 
+		}
+	}
+
+	private void saveHistory(DocumentHistory transaction, Document doc) {
+		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		if (transaction != null) {
+			DocumentHistory t = new DocumentHistory(transaction);
+			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
+			try {
+				ddao.saveDocumentHistory(doc, t);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 		}
 	}
 

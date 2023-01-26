@@ -94,24 +94,7 @@ public class TemplateSecurityPanel extends VLayout {
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
 
-		list = new ListGrid();
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setCanFreezeFields(true);
-		list.setSelectionType(SelectionStyle.MULTIPLE);
-		list.setAutoFetchData(true);
-		list.setWidth100();
-		list.setHeight100();
-		list.setMinHeight(200);
-		list.setMinWidth(300);
-		dataSource = new TemplateRightsDS(template.getId());
-		list.setDataSource(dataSource);
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				rightsInitialized = true;
-			}
-		});
+		prepareList(template);
 
 		List<ListGridField> fields = new ArrayList<ListGridField>();
 		fields.add(entityId);
@@ -124,31 +107,28 @@ public class TemplateSecurityPanel extends VLayout {
 		addMember(list);
 
 		if (template.isWrite()) {
-			list.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
+			list.addCellContextClickHandler((CellContextClickEvent event) -> {
 					if (event.getColNum() == 0) {
 						Menu contextMenu = setupContextMenu();
 						contextMenu.showContextMenu();
 					}
 					event.cancel();
-				}
 			});
-			list.addEditCompleteHandler(new EditCompleteHandler() {
-
-				@Override
-				public void onEditComplete(EditCompleteEvent event) {
+			list.addEditCompleteHandler((EditCompleteEvent event) -> {
 					changedHandler.onChanged(null);
-				}
 			});
 		}
 
+		addButons(template);
+	}
+
+	private void addButons(GUITemplate template) {
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(4);
 		buttons.setWidth100();
 		buttons.setHeight(20);
 		addMember(buttons);
-
+		
 		// Prepare the combo and button for adding a new Group
 		final DynamicForm groupForm = new DynamicForm();
 		final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
@@ -160,8 +140,6 @@ public class TemplateSecurityPanel extends VLayout {
 			@Override
 			public void onChanged(ChangedEvent event) {
 				ListGridRecord selectedRecord = group.getSelectedRecord();
-				if (selectedRecord == null)
-					return;
 
 				// Check if the selected user is already present in the rights
 				// table
@@ -189,9 +167,7 @@ public class TemplateSecurityPanel extends VLayout {
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
-		user.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
+		user.addChangedHandler((ChangedEvent event) -> {
 				ListGridRecord selectedRecord = user.getSelectedRecord();
 				if (selectedRecord == null)
 					return;
@@ -219,7 +195,6 @@ public class TemplateSecurityPanel extends VLayout {
 				list.addData(record);
 				changedHandler.onChanged(null);
 				user.clearValue();
-			}
 		});
 		if (template.isWrite())
 			buttons.addMember(userForm);
@@ -227,21 +202,32 @@ public class TemplateSecurityPanel extends VLayout {
 		Button exportButton = new Button(I18N.message("export"));
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
-		exportButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		exportButton.addClickHandler((ClickEvent event) -> {
 				GridUtil.exportCSV(list, true);
-			}
 		});
 
 		Button printButton = new Button(I18N.message("print"));
 		printButton.setAutoFit(true);
 		buttons.addMember(printButton);
-		printButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		printButton.addClickHandler((ClickEvent event) -> {
 				GridUtil.print(list);
-			}
+		});
+	}
+
+	private void prepareList(GUITemplate template) {
+		list = new ListGrid();
+		list.setEmptyMessage(I18N.message("notitemstoshow"));
+		list.setCanFreezeFields(true);
+		list.setSelectionType(SelectionStyle.MULTIPLE);
+		list.setAutoFetchData(true);
+		list.setWidth100();
+		list.setHeight100();
+		list.setMinHeight(200);
+		list.setMinWidth(300);
+		dataSource = new TemplateRightsDS(template.getId());
+		list.setDataSource(dataSource);
+		list.addDataArrivedHandler((DataArrivedEvent event) -> {
+				rightsInitialized = true;
 		});
 	}
 

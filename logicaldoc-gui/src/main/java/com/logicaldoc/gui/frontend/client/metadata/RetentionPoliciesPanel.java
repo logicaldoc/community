@@ -24,16 +24,11 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
-import com.smartgwt.client.widgets.events.DropCompleteHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -91,42 +86,12 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		ListGridField days = new ListGridField("days", I18N.message("ddays"), 60);
 		days.setCanFilter(false);
 
-		ListGridField dateOption = new ListGridField("dateOption", I18N.message("dateoption"), 100);
-		dateOption.setCanFilter(false);
-		dateOption.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				int val = Integer.parseInt(value.toString());
-				if (val == GUIRetentionPolicy.DATE_OPT_ARCHIVED)
-					return I18N.message("archiveds");
-				else if (val == GUIRetentionPolicy.DATE_OPT_CREATION)
-					return I18N.message("created");
-				else if (val == GUIRetentionPolicy.DATE_OPT_PUBLISHED)
-					return I18N.message("published");
-				else
-					return I18N.message("stoppublishing");
-			}
-		});
+		ListGridField dateOption = prepareDateOptionField();
 
 		ListGridField template = new ListGridField("template", I18N.message("template"), 150);
 		template.setCanFilter(false);
 
-		ListGridField action = new ListGridField("action", I18N.message("action"), 150);
-		action.setCanFilter(false);
-		action.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				int val = Integer.parseInt(value.toString());
-				if (val == GUIRetentionPolicy.ACTION_ARCHIVE)
-					return I18N.message("archive");
-				else if (val == GUIRetentionPolicy.ACTION_DELETE)
-					return I18N.message("ddelete");
-				else
-					return I18N.message("unpublish");
-			}
-		});
+		ListGridField action = prepareActionField();
 
 		ListGridField enabled = new ListGridField("eenabled", " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
@@ -175,78 +140,98 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		ToolStripButton addPolicy = new ToolStripButton();
 		addPolicy.setTitle(I18N.message("addpolicy"));
 		toolStrip.addButton(addPolicy);
-		addPolicy.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				GUIRetentionPolicy policy = new GUIRetentionPolicy();
-				showPolicyDetails(policy);
-			}
+		addPolicy.addClickHandler((ClickEvent addPolicyClick) -> {
+			list.deselectAllRecords();
+			GUIRetentionPolicy policy = new GUIRetentionPolicy();
+			showPolicyDetails(policy);
 		});
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
-		});
-
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					RetentionPoliciesService.Instance.get().getPolicy(
-							Long.parseLong(record.getAttributeAsString("id")), new AsyncCallback<GUIRetentionPolicy>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(GUIRetentionPolicy policy) {
-									showPolicyDetails(policy);
-								}
-							});
-			}
-		});
-
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows())));
-			}
-		});
-
-		list.addDropCompleteHandler(new DropCompleteHandler() {
-
-			@Override
-			public void onDropComplete(DropCompleteEvent event) {
-				ListGridRecord[] records = list.getRecords();
-				long[] ids = new long[records.length];
-				for (int i = 0; i < ids.length; i++)
-					ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
-				RetentionPoliciesService.Instance.get().reorder(ids, new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void arg) {
-						// Nothing to do
-					}
-				});
-			}
-		});
+		addListHandlers(infoPanel);
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
 
 		body.setMembers(toolStrip, listing, detailsContainer);
+	}
+
+	private void addListHandlers(final InfoPanel infoPanel) {
+		list.addCellContextClickHandler((CellContextClickEvent listClick) -> {
+			showContextMenu();
+			listClick.cancel();
+		});
+
+		list.addSelectionChangedHandler((SelectionEvent listChanged) -> {
+			Record record = list.getSelectedRecord();
+			if (record != null)
+				RetentionPoliciesService.Instance.get().getPolicy(Long.parseLong(record.getAttributeAsString("id")),
+						new AsyncCallback<GUIRetentionPolicy>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIRetentionPolicy policy) {
+								showPolicyDetails(policy);
+							}
+						});
+		});
+
+		list.addDataArrivedHandler((DataArrivedEvent listArrived) -> {
+			infoPanel.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows())));
+		});
+
+		list.addDropCompleteHandler((DropCompleteEvent listDropCompleted) -> {
+			ListGridRecord[] records = list.getRecords();
+			long[] ids = new long[records.length];
+			for (int i = 0; i < ids.length; i++)
+				ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
+			RetentionPoliciesService.Instance.get().reorder(ids, new AsyncCallback<Void>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void arg) {
+					// Nothing to do
+				}
+			});
+		});
+	}
+
+	private ListGridField prepareActionField() {
+		ListGridField action = new ListGridField("action", I18N.message("action"), 150);
+		action.setCanFilter(false);
+		action.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			int val = Integer.parseInt(value.toString());
+			if (val == GUIRetentionPolicy.ACTION_ARCHIVE)
+				return I18N.message("archive");
+			else if (val == GUIRetentionPolicy.ACTION_DELETE)
+				return I18N.message("ddelete");
+			else
+				return I18N.message("unpublish");
+		});
+		return action;
+	}
+
+	private ListGridField prepareDateOptionField() {
+		ListGridField dateOption = new ListGridField("dateOption", I18N.message("dateoption"), 100);
+		dateOption.setCanFilter(false);
+		dateOption.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			int val = Integer.parseInt(value.toString());
+			if (val == GUIRetentionPolicy.DATE_OPT_ARCHIVED)
+				return I18N.message("archiveds");
+			else if (val == GUIRetentionPolicy.DATE_OPT_CREATION)
+				return I18N.message("created");
+			else if (val == GUIRetentionPolicy.DATE_OPT_PUBLISHED)
+				return I18N.message("published");
+			else
+				return I18N.message("stoppublishing");
+		});
+		return dateOption;
 	}
 
 	private void showContextMenu() {

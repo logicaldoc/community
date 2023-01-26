@@ -37,191 +37,25 @@ public class MetadataMenu extends VLayout {
 		setMembersMargin(5);
 		setOverflow(Overflow.AUTO);
 
-		Button tags = new Button(I18N.message("tags"));
-		tags.setWidth100();
-		tags.setHeight(25);
-		if (Feature.visible(Feature.TAGS_ADMIN)) {
-			addMember(tags);
-			if (!Feature.enabled(Feature.TAGS_ADMIN)) {
-				tags.setDisabled(true);
-				tags.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		tags.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				TagService.Instance.get().getSettings(new AsyncCallback<GUIParameter[]>() {
+		addTagsButton();
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		addTemplatesButton();
 
-					@Override
-					public void onSuccess(GUIParameter[] parameters) {
-						AdminScreen.get().setContent(new TagsPanel(parameters));
-					}
-				});
-			}
-		});
+		addCustomidAndAutonamingButton();
 
-		Button templates = new Button(I18N.message("templates"));
-		templates.setWidth100();
-		templates.setHeight(25);
+		addWorkflowButton();
 
-		if (Feature.visible(Feature.TEMPLATE)) {
-			addMember(templates);
-			if (!Feature.enabled(Feature.TEMPLATE)) {
-				templates.setDisabled(true);
-				templates.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		templates.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new TemplatesAndAttributesPanel());
-			}
-		});
 
-		Button customidAndAutonaming = new Button(I18N.message("customidandnaming"));
-		customidAndAutonaming.setWidth100();
-		customidAndAutonaming.setHeight(25);
+		addFolderTemplateButton();
 
-		if (Menu.enabled(Menu.CUSTOM_ID) && (Feature.visible(Feature.CUSTOMID) || Feature.visible(Feature.AUTO_NAMING)
-				|| Feature.visible(Feature.AUTO_FOLDING))) {
-			addMember(customidAndAutonaming);
-			if (!Feature.enabled(Feature.CUSTOMID) && !Feature.enabled(Feature.AUTO_NAMING)
-					&& !Feature.enabled(Feature.AUTO_FOLDING)) {
-				customidAndAutonaming.setDisabled(true);
-				customidAndAutonaming.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
+		addRetentionPoliciesButton();
 
-		customidAndAutonaming.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SchemeService.Instance.get().load(new AsyncCallback<GUIScheme[]>() {
+		addStampsButton();
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		addFormsButton();
 
-					@Override
-					public void onSuccess(final GUIScheme[] schemas) {
-						AdminScreen.get().setContent(new CustomIdPanel(schemas));
-					}
-				});
-			}
-		});
+		addBarcodeButton();
 
-		Button workflow = new Button(I18N.message("workflow"));
-		workflow.setWidth100();
-		workflow.setHeight(25);
-
-		if (Feature.visible(Feature.WORKFLOW) && Menu.enabled(Menu.WORKFLOW)) {
-			addMember(workflow);
-			if (!Feature.enabled(Feature.WORKFLOW)) {
-				workflow.setDisabled(true);
-				workflow.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		workflow.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new WorkflowDesigner(new GUIWorkflow()));
-			}
-		});
-
-		Button folderTemplates = new Button(I18N.message("foldertemplates"));
-		folderTemplates.setWidth100();
-		folderTemplates.setHeight(25);
-		folderTemplates.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new FolderTemplatesPanel());
-			}
-		});
-
-		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
-			addMember(folderTemplates);
-			if (!Feature.enabled(Feature.FOLDER_TEMPLATE)) {
-				folderTemplates.setDisabled(true);
-				folderTemplates.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		Button retentionPolicies = new Button(I18N.message("retentionpolicies"));
-		retentionPolicies.setWidth100();
-		retentionPolicies.setHeight(25);
-
-		if (Feature.visible(Feature.RETENTION_POLICIES) && Menu.enabled(Menu.RETENTION_POLICIES)) {
-			addMember(retentionPolicies);
-			if (!Feature.enabled(Feature.RETENTION_POLICIES)) {
-				retentionPolicies.setDisabled(true);
-				retentionPolicies.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		retentionPolicies.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new RetentionPoliciesPanel());
-			}
-		});
-
-		Button stamps = new Button(I18N.message("stamps"));
-		stamps.setWidth100();
-		stamps.setHeight(25);
-
-		if (Feature.visible(Feature.STAMP) && Menu.enabled(Menu.STAMPS)) {
-			addMember(stamps);
-			if (!Feature.enabled(Feature.STAMP)) {
-				stamps.setDisabled(true);
-				stamps.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		stamps.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new StampsPanel());
-			}
-		});
-
-		Button forms = new Button(I18N.message("forms"));
-		forms.setWidth100();
-		forms.setHeight(25);
-
-		if (Feature.visible(Feature.FORM) && Menu.enabled(Menu.FORMS)) {
-			addMember(forms);
-			if (!Feature.enabled(Feature.FORM)) {
-				forms.setDisabled(true);
-				forms.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		forms.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new FormsPanel());
-			}
-		});
-
-		Button barcode = new Button(I18N.message("barcodes"));
-		barcode.setWidth100();
-		barcode.setHeight(25);
-
-		if (Feature.visible(Feature.BARCODES) && Menu.enabled(Menu.BARCODES)) {
-			addMember(barcode);
-			if (!Feature.enabled(Feature.BARCODES)) {
-				barcode.setDisabled(true);
-				barcode.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		barcode.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new BarcodesPanel());
-			}
-		});
 
 		Button zonalOcr = new Button(I18N.message("zonalocr"));
 		zonalOcr.setWidth100();
@@ -239,6 +73,180 @@ public class MetadataMenu extends VLayout {
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new ZonalOCRPanel(null, null));
 			}
+		});
+	}
+
+	private void addBarcodeButton() {
+		Button barcode = new Button(I18N.message("barcodes"));
+		barcode.setWidth100();
+		barcode.setHeight(25);
+		barcode.addClickHandler((ClickEvent barcodeClick) -> {
+				AdminScreen.get().setContent(new BarcodesPanel());
+		});
+		if (Feature.visible(Feature.BARCODES) && Menu.enabled(Menu.BARCODES)) {
+			addMember(barcode);
+			if (!Feature.enabled(Feature.BARCODES)) {
+				barcode.setDisabled(true);
+				barcode.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addFormsButton() {
+		Button forms = new Button(I18N.message("forms"));
+		forms.setWidth100();
+		forms.setHeight(25);
+		forms.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent formsClick) {
+				AdminScreen.get().setContent(new FormsPanel());
+			}
+		});
+		if (Feature.visible(Feature.FORM) && Menu.enabled(Menu.FORMS)) {
+			addMember(forms);
+			if (!Feature.enabled(Feature.FORM)) {
+				forms.setDisabled(true);
+				forms.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addStampsButton() {
+		Button stamps = new Button(I18N.message("stamps"));
+		stamps.setWidth100();
+		stamps.setHeight(25);
+		stamps.addClickHandler((ClickEvent stampsClick) -> {
+				AdminScreen.get().setContent(new StampsPanel());
+		});
+		if (Feature.visible(Feature.STAMP) && Menu.enabled(Menu.STAMPS)) {
+			addMember(stamps);
+			if (!Feature.enabled(Feature.STAMP)) {
+				stamps.setDisabled(true);
+				stamps.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addRetentionPoliciesButton() {
+		Button retentionPolicies = new Button(I18N.message("retentionpolicies"));
+		retentionPolicies.setWidth100();
+		retentionPolicies.setHeight(25);
+		retentionPolicies.addClickHandler((ClickEvent retentionPoliciesClick) -> {
+				AdminScreen.get().setContent(new RetentionPoliciesPanel());
+		});
+		if (Feature.visible(Feature.RETENTION_POLICIES) && Menu.enabled(Menu.RETENTION_POLICIES)) {
+			addMember(retentionPolicies);
+			if (!Feature.enabled(Feature.RETENTION_POLICIES)) {
+				retentionPolicies.setDisabled(true);
+				retentionPolicies.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addFolderTemplateButton() {
+		Button folderTemplates = new Button(I18N.message("foldertemplates"));
+		folderTemplates.setWidth100();
+		folderTemplates.setHeight(25);
+		folderTemplates.addClickHandler((ClickEvent folderTemplatesClick) -> {
+				AdminScreen.get().setContent(new FolderTemplatesPanel());
+		});
+		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
+			addMember(folderTemplates);
+			if (!Feature.enabled(Feature.FOLDER_TEMPLATE)) {
+				folderTemplates.setDisabled(true);
+				folderTemplates.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addWorkflowButton() {
+		Button workflow = new Button(I18N.message("workflow"));
+		workflow.setWidth100();
+		workflow.setHeight(25);
+		workflow.addClickHandler((ClickEvent workflowClick) -> {
+				AdminScreen.get().setContent(new WorkflowDesigner(new GUIWorkflow()));
+		});
+		if (Feature.visible(Feature.WORKFLOW) && Menu.enabled(Menu.WORKFLOW)) {
+			addMember(workflow);
+			if (!Feature.enabled(Feature.WORKFLOW)) {
+				workflow.setDisabled(true);
+				workflow.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addCustomidAndAutonamingButton() {
+		Button customidAndAutonaming = new Button(I18N.message("customidandnaming"));
+		customidAndAutonaming.setWidth100();
+		customidAndAutonaming.setHeight(25);
+		customidAndAutonaming.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent customidAndAutonamingClick) {
+				SchemeService.Instance.get().load(new AsyncCallback<GUIScheme[]>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(final GUIScheme[] schemas) {
+						AdminScreen.get().setContent(new CustomIdPanel(schemas));
+					}
+				});
+			}
+		});
+		if (Menu.enabled(Menu.CUSTOM_ID) && (Feature.visible(Feature.CUSTOMID) || Feature.visible(Feature.AUTO_NAMING)
+				|| Feature.visible(Feature.AUTO_FOLDING))) {
+			addMember(customidAndAutonaming);
+			if (!Feature.enabled(Feature.CUSTOMID) && !Feature.enabled(Feature.AUTO_NAMING)
+					&& !Feature.enabled(Feature.AUTO_FOLDING)) {
+				customidAndAutonaming.setDisabled(true);
+				customidAndAutonaming.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addTemplatesButton() {
+		Button templates = new Button(I18N.message("templates"));
+		templates.setWidth100();
+		templates.setHeight(25);
+		templates.addClickHandler((ClickEvent templatesClick) -> {
+			AdminScreen.get().setContent(new TemplatesAndAttributesPanel());
+		});
+		if (Feature.visible(Feature.TEMPLATE)) {
+			addMember(templates);
+			if (!Feature.enabled(Feature.TEMPLATE)) {
+				templates.setDisabled(true);
+				templates.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addTagsButton() {
+		Button tags = new Button(I18N.message("tags"));
+		tags.setWidth100();
+		tags.setHeight(25);
+		if (Feature.visible(Feature.TAGS_ADMIN)) {
+			addMember(tags);
+			if (!Feature.enabled(Feature.TAGS_ADMIN)) {
+				tags.setDisabled(true);
+				tags.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+		tags.addClickHandler((ClickEvent tagsClick) -> {
+			TagService.Instance.get().getSettings(new AsyncCallback<GUIParameter[]>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIParameter[] parameters) {
+					AdminScreen.get().setContent(new TagsPanel(parameters));
+				}
+			});
 		});
 	}
 }

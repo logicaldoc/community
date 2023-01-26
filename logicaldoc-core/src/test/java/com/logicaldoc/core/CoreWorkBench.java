@@ -33,19 +33,14 @@ import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ZipUtil;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
 
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		double load = 0.8;
-		while (true) {
-            // Every 100ms, sleep for the percentage of unladen time
-            if (System.currentTimeMillis() % 100 == 0) {
-                Thread.sleep((long) Math.floor((1 - load) * 100));
-            }
-        }
+		
 //		StringBuilder sb = new StringBuilder();
 //		Exec.exec("wmic cpu get loadpercentage", null, null, sb, 20);
 //		
