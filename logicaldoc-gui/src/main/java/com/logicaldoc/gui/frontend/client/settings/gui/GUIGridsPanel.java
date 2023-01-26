@@ -272,63 +272,29 @@ public class GUIGridsPanel extends VLayout {
 
 	private void onSave() {
 		List<String> extendedAttributes = new ArrayList<String>();
-
+		List<GUIParameter> parameters = new ArrayList<GUIParameter>();
+		
 		/*
 		 * Prepare the list of columns for the documents screen
 		 */
-		StringBuilder value = new StringBuilder();
-		ListGridRecord[] attrs = documentsFieldsGrid.getRecords();
-		for (ListGridRecord att : attrs) {
-			if (value.length() > 0)
-				value.append(",");
-			String name = att.getAttributeAsString("name").trim();
-			value.append(name);
-
-			// Meanwhile collect the extended attributes
-			if (name.startsWith("ext_")) {
-				String n = name.substring(4);
-				if (!extendedAttributes.contains(n))
-					extendedAttributes.add(n);
-			}
-		}
-		List<GUIParameter> parameters = new ArrayList<GUIParameter>();
-		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.document.columns", value.toString());
-		parameters.add(param);
-		Session.get().setConfig(param.getName(), param.getValue());
+		collectDocumentsColumns(extendedAttributes, parameters);
 		
 		/*
 		 * Prepare the list of columns for the search screen
 		 */
-		value = new StringBuilder();
-		attrs = searchGrid.getRecords();
-		for (ListGridRecord att : attrs) {
-			if (value.length() > 0)
-				value.append(",");
-			String name = att.getAttributeAsString("name").trim();
-			value.append(name);
-
-			// Meanwhile collect the extended attributes
-			if (name.startsWith("ext_")) {
-				String n = name.substring(4);
-				if (!extendedAttributes.contains(n))
-					extendedAttributes.add(n);
-			}
-		}
-		param = new GUIParameter(Session.get().getTenantName() + ".gui.search.columns", value.toString());
-		parameters.add(param);
-		Session.get().setConfig(param.getName(), param.getValue());
+		collectSearchColumns(extendedAttributes, parameters);
 
 		/*
 		 * Now taking care of defining what extended attributes have to be
 		 * retrieved when searching for the documents
 		 */
-		value = new StringBuilder();
+		StringBuilder value = new StringBuilder();
 		for (String att : extendedAttributes) {
 			if (value.length() > 0)
 				value.append(",");
 			value.append(att);
 		}
-		param = new GUIParameter(Session.get().getTenantName() + ".search.extattr", value.toString());
+		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".search.extattr", value.toString());
 		parameters.add(param);
 		Session.get().setConfig(param.getName(), param.getValue());
 
@@ -353,5 +319,49 @@ public class GUIGridsPanel extends VLayout {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
+	}
+
+	private void collectSearchColumns(List<String> extendedAttributes, List<GUIParameter> parameters) {
+		StringBuilder value = new StringBuilder();
+		ListGridRecord[] attrs = searchGrid.getRecords();
+		for (ListGridRecord att : attrs) {
+			if (value.length() > 0)
+				value.append(",");
+			String name = att.getAttributeAsString("name").trim();
+			value.append(name);
+
+			// Meanwhile collect the extended attributes
+			if (name.startsWith("ext_")) {
+				String n = name.substring(4);
+				if (!extendedAttributes.contains(n))
+					extendedAttributes.add(n);
+			}
+		}
+		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.search.columns", value.toString());
+		parameters.add(param);
+		Session.get().setConfig(param.getName(), param.getValue());
+	}
+
+	private List<GUIParameter> collectDocumentsColumns(List<String> extendedAttributes, List<GUIParameter> parameters) {
+		StringBuilder value = new StringBuilder();
+		ListGridRecord[] attrs = documentsFieldsGrid.getRecords();
+		for (ListGridRecord att : attrs) {
+			if (value.length() > 0)
+				value.append(",");
+			String name = att.getAttributeAsString("name").trim();
+			value.append(name);
+
+			// Meanwhile collect the extended attributes
+			if (name.startsWith("ext_")) {
+				String n = name.substring(4);
+				if (!extendedAttributes.contains(n))
+					extendedAttributes.add(n);
+			}
+		}
+		
+		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.document.columns", value.toString());
+		parameters.add(param);
+		Session.get().setConfig(param.getName(), param.getValue());
+		return parameters;
 	}
 }

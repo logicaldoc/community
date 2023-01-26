@@ -96,7 +96,7 @@ public class CalendarReport extends AdminPanel {
 		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector("status", "status");
 
 		// Max results
-		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", (Integer)null);
+		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", (Integer) null);
 		displayMax.setValue(100);
 		displayMax.setDefaultValue(100);
 		displayMax.setStep(10);
@@ -270,89 +270,97 @@ public class CalendarReport extends AdminPanel {
 		list.setData(new ListGridRecord[0]);
 
 		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		
+		if (!vm.validate())
+			return;
 
-		if (vm.validate()) {
-			Date fromValue = null;
-			if (values.get("fromDate") != null)
-				fromValue = (Date) values.get("fromDate");
-			Date toValue = null;
-			if (values.get("toDate") != null)
-				toValue = (Date) values.get("toDate");
-			Date endDateFrom = null;
-			if (values.get("endFrom") != null)
-				endDateFrom = (Date) values.get("endFrom");
-			Date endDateTo = null;
-			if (values.get("endTo") != null)
-				endDateTo = (Date) values.get("endTo");
+		Date fromValue = null;
+		if (values.get("fromDate") != null)
+			fromValue = (Date) values.get("fromDate");
+		Date toValue = null;
+		if (values.get("toDate") != null)
+			toValue = (Date) values.get("toDate");
+		Date endDateFrom = null;
+		if (values.get("endFrom") != null)
+			endDateFrom = (Date) values.get("endFrom");
+		Date endDateTo = null;
+		if (values.get("endTo") != null)
+			endDateTo = (Date) values.get("endTo");
 
-			Integer frequencyValue = null;
-			if (values.get("frequency") != null)
-				frequencyValue = Integer.parseInt(values.get("frequency").toString());
+		Integer frequencyValue = null;
+		if (values.get("frequency") != null)
+			frequencyValue = Integer.parseInt(values.get("frequency").toString());
 
-			Integer statusValue = null;
-			if (values.get("status") != null)
-				statusValue = Integer.parseInt(values.get("status").toString());
+		Integer statusValue = null;
+		if (values.get("status") != null)
+			statusValue = Integer.parseInt(values.get("status").toString());
 
-			String titleValue = values.get("title") != null ? values.get("title").toString() : null;
+		String titleValue = values.get("title") != null ? values.get("title").toString() : null;
 
-			String typeValue = values.get("type") != null ? values.get("type").toString() : null;
+		String typeValue = values.get("type") != null ? values.get("type").toString() : null;
 
-			String subtypeValue = values.get("subtype") != null ? values.get("subtype").toString() : null;
+		String subtypeValue = values.get("subtype") != null ? values.get("subtype").toString() : null;
 
-			int maxRecords = 0;
-			try {
-				if (values.get("displayMax") != null) {
-					if (values.get("displayMax") instanceof Integer)
-						maxRecords = (Integer) values.get("displayMax");
-					else
-						maxRecords = Integer.parseInt((String) values.get("displayMax"));
-				}
-			} catch (Throwable t) {
-				// Nothing to do
-			}
+		int maxRecords = getMaxRecords(values);
 
-			CalendarService.Instance.get().find(fromValue, toValue, endDateFrom, endDateTo, frequencyValue, titleValue,
-					typeValue, subtypeValue, statusValue, maxRecords, new AsyncCallback<GUICalendarEvent[]>() {
+		doSearch(fromValue, toValue, endDateFrom, endDateTo, frequencyValue, statusValue, titleValue, typeValue,
+				subtypeValue, maxRecords);
+	}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUICalendarEvent[] result) {
-							if (result != null && result.length > 0) {
-								ListGridRecord[] records = new ListGridRecord[result.length];
-								for (int i = 0; i < result.length; i++) {
-									ListGridRecord record = new ListGridRecord();
-									record.setAttribute("date", result[i].getStartDate());
-									record.setAttribute("title", result[i].getTitle());
-									record.setAttribute("type", result[i].getType());
-									record.setAttribute("subtype", result[i].getSubType());
-									record.setAttribute("frequency", result[i].getFrequency());
-									record.setAttribute("status", result[i].getStatus());
-									record.setAttribute("description", result[i].getDescription());
-									record.setAttribute("endDate", result[i].getDeadline());
-
-									StringBuilder participants = new StringBuilder();
-									GUIUser[] users = result[i].getParticipants();
-									for (GUIUser user : users) {
-										if (participants.length() > 0)
-											participants.append(", ");
-										participants.append(user.toString());
-									}
-									record.setAttribute("participants", participants.toString());
-
-									records[i] = record;
-								}
-								list.setData(records);
-							}
-							layout.removeMember(infoPanel);
-							infoPanel = new InfoPanel("");
-							infoPanel.setMessage(I18N.message("showelements", Integer.toString(list.getTotalRows())));
-							layout.addMember(infoPanel, 2);
-						}
-					});
+	private int getMaxRecords(final Map<String, Object> values) {
+		int maxRecords = 0;
+		if (values.get("displayMax") != null) {
+			if (values.get("displayMax") instanceof Integer)
+				maxRecords = (Integer) values.get("displayMax");
+			else
+				maxRecords = Integer.parseInt((String) values.get("displayMax"));
 		}
+		return maxRecords;
+	}
+
+	private void doSearch(Date fromValue, Date toValue, Date endDateFrom, Date endDateTo, Integer frequencyValue,
+			Integer statusValue, String titleValue, String typeValue, String subtypeValue, int maxRecords) {
+		CalendarService.Instance.get().find(fromValue, toValue, endDateFrom, endDateTo, frequencyValue, titleValue,
+				typeValue, subtypeValue, statusValue, maxRecords, new AsyncCallback<GUICalendarEvent[]>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUICalendarEvent[] result) {
+						if (result != null && result.length > 0) {
+							ListGridRecord[] records = new ListGridRecord[result.length];
+							for (int i = 0; i < result.length; i++) {
+								ListGridRecord record = new ListGridRecord();
+								record.setAttribute("date", result[i].getStartDate());
+								record.setAttribute("title", result[i].getTitle());
+								record.setAttribute("type", result[i].getType());
+								record.setAttribute("subtype", result[i].getSubType());
+								record.setAttribute("frequency", result[i].getFrequency());
+								record.setAttribute("status", result[i].getStatus());
+								record.setAttribute("description", result[i].getDescription());
+								record.setAttribute("endDate", result[i].getDeadline());
+
+								StringBuilder participants = new StringBuilder();
+								GUIUser[] users = result[i].getParticipants();
+								for (GUIUser user : users) {
+									if (participants.length() > 0)
+										participants.append(", ");
+									participants.append(user.toString());
+								}
+								record.setAttribute("participants", participants.toString());
+
+								records[i] = record;
+							}
+							list.setData(records);
+						}
+						layout.removeMember(infoPanel);
+						infoPanel = new InfoPanel("");
+						infoPanel.setMessage(I18N.message("showelements", Integer.toString(list.getTotalRows())));
+						layout.addMember(infoPanel, 2);
+					}
+				});
 	}
 }

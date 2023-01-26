@@ -19,7 +19,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
@@ -86,32 +85,7 @@ public class ProtocolsPanel extends AdminPanel {
 	}
 
 	private void init(GUIParameter[] settings) {
-		for (GUIParameter parameter : settings) {
-			if (parameter.getName().equals("cmis.enabled"))
-				cmisEnabled = parameter;
-			else if (parameter.getName().equals("cmis.changelog"))
-				cmisChangelog = parameter;
-			else if (parameter.getName().equals("cmis.maxitems"))
-				cmisMaxItems = parameter;
-			else if (parameter.getName().equals("webdav.enabled"))
-				wdEnabled = parameter;
-			else if (parameter.getName().equals("webdav.depth"))
-				wdDepth = parameter;
-			else if (parameter.getName().equals("ftp.enabled"))
-				ftpEnabled = parameter;
-			else if (parameter.getName().equals("ftp.port"))
-				ftpPort = parameter;
-			else if (parameter.getName().equals("ftp.ssl"))
-				ftpSsl = parameter;
-			else if (parameter.getName().equals("ftp.keystore.file"))
-				ftpKeystoreFile = parameter;
-			else if (parameter.getName().equals("ftp.keystore.alias"))
-				ftpKeystoreAlias = parameter;
-			else if (parameter.getName().equals("ftp.keystore.alias.password"))
-				ftpKeystoreAliasPassword = parameter;
-			else if (parameter.getName().equals("ftp.keystore.password"))
-				ftpKeystorePassword = parameter;
-		}
+		collectParameters(settings);
 
 		webservicesPanel = new WebservicesPanel(settings, vm);
 		body.setMembers(webservicesPanel);
@@ -198,9 +172,9 @@ public class ProtocolsPanel extends AdminPanel {
 		RadioGroupItem ftpEnabledItem = ItemFactory.newBooleanSelector("ftpEnabled", "enabled");
 		ftpEnabledItem.setRequired(true);
 		ftpEnabledItem.setWrapTitle(false);
-		ftpEnabledItem.setValue( ftpEnabled.getValue().equals("true") ? "yes" : "no");
+		ftpEnabledItem.setValue(ftpEnabled.getValue().equals("true") ? "yes" : "no");
 		ftpEnabledItem.setDisabled(!Session.get().isDefaultTenant());
-		
+
 		// FTP port
 		IntegerItem ftpPortItem = ItemFactory.newIntegerItem("ftpPort", "port", 21);
 		ftpPortItem.setRequired(true);
@@ -208,7 +182,7 @@ public class ProtocolsPanel extends AdminPanel {
 		ftpPortItem.setWidth(80);
 		ftpPortItem.setValue(Integer.parseInt(ftpPort.getValue()));
 		ftpPortItem.setDisabled(!Session.get().isDefaultTenant());
-		
+
 		// FTP security
 		RadioGroupItem ftpSslItem = ItemFactory.newBooleanSelector("ftpSsl", "encryptionftps");
 		ftpSslItem.setRequired(true);
@@ -249,108 +223,151 @@ public class ProtocolsPanel extends AdminPanel {
 		ftpForm.setNumCols(2);
 		ftpForm.setColWidths(1, "*");
 		ftpForm.setPadding(5);
-		
+
 		if (Session.get().isDefaultTenant())
 			ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem, ftpKeystoreFileItem, ftpKeystorePasswordItem,
 					ftpKeystoreAliasItem, ftpKeystoreAliasPasswordItem);
 		else {
 			ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem);
 		}
-		
+
 		ftp.setPane(ftpForm);
 
-		if (Feature.visible(Feature.CMIS)) {
-			tabs.addTab(cmis);
-			if (!Feature.enabled(Feature.CMIS))
-				cmis.setPane(new FeatureDisabled());
+		addCMIS(cmis);
+
+		addWebDAV(webDav);
+
+		addFtp(ftp);
+
+		addSaveButton();
+	}
+
+	private void addSaveButton() {
+		IButton save = new IButton();
+		save.setTitle(I18N.message("save"));
+		save.addClickHandler((ClickEvent event) -> {
+			onSave();
+		});
+
+
+		addMember(save);
+		if (Session.get().isDemo()) {
+			// In demo mode you cannot alter the client configurations
+			save.setDisabled(true);
+		}
+	}
+
+	private void onSave() {
+		if (!vm.validate()) {
+			SC.warn(I18N.message("invalidsettings"));
+			return;
 		}
 
-		if (Feature.visible(Feature.WEBDAV)) {
-			tabs.addTab(webDav);
-			if (!Feature.enabled(Feature.WEBDAV))
-				webDav.setPane(new FeatureDisabled());
+		@SuppressWarnings("unchecked")
+		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		if (Session.get().isDefaultTenant()) {
+			webservicesPanel.save();
+
+			ProtocolsPanel.this.cmisEnabled.setValue(values.get("cmisEnabled").equals("yes") ? "true" : "false");
+
+			ProtocolsPanel.this.cmisChangelog
+					.setValue(values.get("cmisChangelog").equals("yes") ? "true" : "false");
+
+			ProtocolsPanel.this.cmisMaxItems.setValue(values.get("cmisMaxItems").toString());
+
+			ProtocolsPanel.this.wdEnabled.setValue(values.get("wdEnabled").equals("yes") ? "true" : "false");
+
+			ProtocolsPanel.this.wdDepth.setValue(values.get("wdDepth").toString());
+
+			ProtocolsPanel.this.ftpEnabled.setValue(values.get("ftpEnabled").equals("yes") ? "true" : "false");
+			ProtocolsPanel.this.ftpPort.setValue(values.get("ftpPort").toString());
+			ProtocolsPanel.this.ftpSsl.setValue(values.get("ftpSsl").equals("yes") ? "true" : "false");
+			ProtocolsPanel.this.ftpKeystoreFile.setValue(values.get("ftpKeystoreFile").toString());
+			ProtocolsPanel.this.ftpKeystoreAlias.setValue(values.get("ftpKeystoreAlias").toString());
+			ProtocolsPanel.this.ftpKeystoreAliasPassword
+					.setValue(values.get("ftpKeystoreAliasPassword").toString());
+			ProtocolsPanel.this.ftpKeystorePassword.setValue(values.get("ftpKeystorePassword").toString());
 		}
 
+		List<GUIParameter> params = new ArrayList<GUIParameter>();
+		params.addAll(webservicesPanel.getSettings());
+		params.add(ProtocolsPanel.this.wdEnabled);
+		params.add(ProtocolsPanel.this.wdDepth);
+		params.add(ProtocolsPanel.this.cmisEnabled);
+		params.add(ProtocolsPanel.this.cmisChangelog);
+		params.add(ProtocolsPanel.this.cmisMaxItems);
+		params.add(ProtocolsPanel.this.ftpEnabled);
+		params.add(ProtocolsPanel.this.ftpPort);
+		params.add(ProtocolsPanel.this.ftpSsl);
+		params.add(ProtocolsPanel.this.ftpKeystoreFile);
+		params.add(ProtocolsPanel.this.ftpKeystorePassword);
+		params.add(ProtocolsPanel.this.ftpKeystoreAlias);
+		params.add(ProtocolsPanel.this.ftpKeystoreAliasPassword);
+
+		SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void ret) {
+				GuiLog.info(I18N.message("settingssaved"), null);
+				GuiLog.info(I18N.message("needrestart"), null);
+			}
+		});
+	}
+
+	private void addFtp(Tab ftp) {
 		if (Feature.visible(Feature.FTP)) {
 			tabs.addTab(ftp);
 			if (!Feature.enabled(Feature.FTP))
 				ftp.setPane(new FeatureDisabled());
 		}
+	}
 
-		IButton save = new IButton();
-		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@SuppressWarnings("unchecked")
-			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
+	private void addWebDAV(Tab webDav) {
+		if (Feature.visible(Feature.WEBDAV)) {
+			tabs.addTab(webDav);
+			if (!Feature.enabled(Feature.WEBDAV))
+				webDav.setPane(new FeatureDisabled());
+		}
+	}
 
-				if (vm.validate()) {
-					if (Session.get().isDefaultTenant()) {
-						webservicesPanel.save();
+	private void addCMIS(Tab cmis) {
+		if (Feature.visible(Feature.CMIS)) {
+			tabs.addTab(cmis);
+			if (!Feature.enabled(Feature.CMIS))
+				cmis.setPane(new FeatureDisabled());
+		}
+	}
 
-						ProtocolsPanel.this.cmisEnabled
-								.setValue(values.get("cmisEnabled").equals("yes") ? "true" : "false");
-
-						ProtocolsPanel.this.cmisChangelog
-								.setValue(values.get("cmisChangelog").equals("yes") ? "true" : "false");
-
-						ProtocolsPanel.this.cmisMaxItems.setValue(values.get("cmisMaxItems").toString());
-
-						ProtocolsPanel.this.wdEnabled
-								.setValue(values.get("wdEnabled").equals("yes") ? "true" : "false");
-
-						ProtocolsPanel.this.wdDepth.setValue(values.get("wdDepth").toString());
-
-						ProtocolsPanel.this.ftpEnabled
-								.setValue(values.get("ftpEnabled").equals("yes") ? "true" : "false");
-						ProtocolsPanel.this.ftpPort.setValue(values.get("ftpPort").toString());
-						ProtocolsPanel.this.ftpSsl.setValue(values.get("ftpSsl").equals("yes") ? "true" : "false");
-						ProtocolsPanel.this.ftpKeystoreFile.setValue(values.get("ftpKeystoreFile").toString());
-						ProtocolsPanel.this.ftpKeystoreAlias.setValue(values.get("ftpKeystoreAlias").toString());
-						ProtocolsPanel.this.ftpKeystoreAliasPassword
-								.setValue(values.get("ftpKeystoreAliasPassword").toString());
-						ProtocolsPanel.this.ftpKeystorePassword.setValue(values.get("ftpKeystorePassword").toString());
-					}
-
-					List<GUIParameter> params = new ArrayList<GUIParameter>();
-					params.addAll(webservicesPanel.getSettings());
-					params.add(ProtocolsPanel.this.wdEnabled);
-					params.add(ProtocolsPanel.this.wdDepth);
-					params.add(ProtocolsPanel.this.cmisEnabled);
-					params.add(ProtocolsPanel.this.cmisChangelog);
-					params.add(ProtocolsPanel.this.cmisMaxItems);
-					params.add(ProtocolsPanel.this.ftpEnabled);
-					params.add(ProtocolsPanel.this.ftpPort);
-					params.add(ProtocolsPanel.this.ftpSsl);
-					params.add(ProtocolsPanel.this.ftpKeystoreFile);
-					params.add(ProtocolsPanel.this.ftpKeystorePassword);
-					params.add(ProtocolsPanel.this.ftpKeystoreAlias);
-					params.add(ProtocolsPanel.this.ftpKeystoreAliasPassword);
-
-					SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]),
-							new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void ret) {
-									GuiLog.info(I18N.message("settingssaved"), null);
-									GuiLog.info(I18N.message("needrestart"), null);
-								}
-							});
-				} else {
-					SC.warn(I18N.message("invalidsettings"));
-				}
-			}
-		});
-
-		addMember(save);
-
-		if (Session.get().isDemo()) {
-			// In demo mode you cannot alter the client configurations
-			save.setDisabled(true);
+	private void collectParameters(GUIParameter[] settings) {
+		for (GUIParameter parameter : settings) {
+			if (parameter.getName().equals("cmis.enabled"))
+				cmisEnabled = parameter;
+			else if (parameter.getName().equals("cmis.changelog"))
+				cmisChangelog = parameter;
+			else if (parameter.getName().equals("cmis.maxitems"))
+				cmisMaxItems = parameter;
+			else if (parameter.getName().equals("webdav.enabled"))
+				wdEnabled = parameter;
+			else if (parameter.getName().equals("webdav.depth"))
+				wdDepth = parameter;
+			else if (parameter.getName().equals("ftp.enabled"))
+				ftpEnabled = parameter;
+			else if (parameter.getName().equals("ftp.port"))
+				ftpPort = parameter;
+			else if (parameter.getName().equals("ftp.ssl"))
+				ftpSsl = parameter;
+			else if (parameter.getName().equals("ftp.keystore.file"))
+				ftpKeystoreFile = parameter;
+			else if (parameter.getName().equals("ftp.keystore.alias"))
+				ftpKeystoreAlias = parameter;
+			else if (parameter.getName().equals("ftp.keystore.alias.password"))
+				ftpKeystoreAliasPassword = parameter;
+			else if (parameter.getName().equals("ftp.keystore.password"))
+				ftpKeystorePassword = parameter;
 		}
 	}
 }

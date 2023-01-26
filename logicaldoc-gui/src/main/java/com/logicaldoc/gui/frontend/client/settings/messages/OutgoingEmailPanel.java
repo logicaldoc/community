@@ -15,7 +15,6 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -63,12 +62,14 @@ public class OutgoingEmailPanel extends AdminPanel {
 		port.setRequired(true);
 
 		// Username
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", this.emailSettings.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username",
+				this.emailSettings.getUsername());
 		username.setWidth(350);
 		username.setWrapTitle(false);
 
 		// Password
-		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", this.emailSettings.getPwd());
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password",
+				this.emailSettings.getPwd());
 		password.setWrapTitle(false);
 
 		// Connection Security
@@ -121,86 +122,9 @@ public class OutgoingEmailPanel extends AdminPanel {
 		foldering.setRequired(false);
 		foldering.setValue("" + emailSettings.getFoldering());
 
-		ButtonItem save = new ButtonItem("save", I18N.message("save"));
-		save.setStartRow(true);
-		save.setEndRow(false);
-		save.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		ButtonItem save = prepareSaveButton();
 
-				if (vm.validate()) {
-					OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpServer"));
-					if (values.get("port") instanceof Integer)
-						OutgoingEmailPanel.this.emailSettings.setPort((Integer) values.get("port"));
-					else
-						OutgoingEmailPanel.this.emailSettings.setPort(Integer.parseInt(values.get("port").toString()));
-
-					OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get("username"));
-					OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get("password"));
-					OutgoingEmailPanel.this.emailSettings.setConnSecurity((String) values.get("connSecurity"));
-					OutgoingEmailPanel.this.emailSettings
-							.setSecureAuth(values.get("secureAuth").toString().equals("true") ? true : false);
-					OutgoingEmailPanel.this.emailSettings.setSenderEmail((String) values.get("senderEmail"));
-					OutgoingEmailPanel.this.emailSettings
-							.setUserAsFrom(values.get("userasfrom").toString().equals("true") ? true : false);
-					OutgoingEmailPanel.this.emailSettings
-							.setFoldering(Integer.parseInt(values.get("foldering").toString()));
-					OutgoingEmailPanel.this.emailSettings.setTargetFolder(targetSelector.getFolder());
-
-					SettingService.Instance.get().saveEmailSettings(OutgoingEmailPanel.this.emailSettings,
-							new AsyncCallback<Void>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void ret) {
-									Session.get().getInfo().setConfig(
-											Session.get().getTenantName() + ".smtp.userasfrom",
-											"" + OutgoingEmailPanel.this.emailSettings.isUserAsFrom());
-									GuiLog.info(I18N.message("settingssaved"), null);
-								}
-							});
-				}
-			}
-		});
-
-		ButtonItem test = new ButtonItem("test", I18N.message("testconnection"));
-		test.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if (vm.validate()) {
-					LD.askForValue(I18N.message("email"), I18N.message("email"),
-							(String) vm.getValueAsString("senderEmail"), new ValueCallback() {
-
-								@Override
-								public void execute(String value) {
-									LD.contactingServer();
-									SettingService.Instance.get().testEmail(value, new AsyncCallback<Boolean>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-											LD.clearPrompt();
-										}
-
-										@Override
-										public void onSuccess(Boolean result) {
-											LD.clearPrompt();
-											if (result.booleanValue())
-												SC.say(I18N.message("connectionestablished"));
-											else
-												SC.warn(I18N.message("connectionfailed"));
-										}
-									});
-								}
-							});
-				}
-			}
-		});
+		ButtonItem test = prepareTestButton();
 
 		/*
 		 * Two invisible fields to 'mask' the real credentials to the browser
@@ -220,5 +144,82 @@ public class OutgoingEmailPanel extends AdminPanel {
 		body.setMembers(emailForm);
 
 		tabs.addTab(templates);
+	}
+
+	private ButtonItem prepareTestButton() {
+		ButtonItem test = new ButtonItem("test", I18N.message("testconnection"));
+		test.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			if (!vm.validate())
+				return;
+
+			LD.askForValue(I18N.message("email"), I18N.message("email"), (String) vm.getValueAsString("senderEmail"),
+					(String value) -> {
+						LD.contactingServer();
+						SettingService.Instance.get().testEmail(value, new AsyncCallback<Boolean>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+								LD.clearPrompt();
+							}
+
+							@Override
+							public void onSuccess(Boolean result) {
+								LD.clearPrompt();
+								if (result.booleanValue())
+									SC.say(I18N.message("connectionestablished"));
+								else
+									SC.warn(I18N.message("connectionfailed"));
+							}
+						});
+					});
+		});
+		return test;
+	}
+
+	private ButtonItem prepareSaveButton() {
+		ButtonItem save = new ButtonItem("save", I18N.message("save"));
+		save.setStartRow(true);
+		save.setEndRow(false);
+		save.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			if (!vm.validate())
+				return;
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+
+			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpServer"));
+			if (values.get("port") instanceof Integer)
+				OutgoingEmailPanel.this.emailSettings.setPort((Integer) values.get("port"));
+			else
+				OutgoingEmailPanel.this.emailSettings.setPort(Integer.parseInt(values.get("port").toString()));
+
+			OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get("username"));
+			OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get("password"));
+			OutgoingEmailPanel.this.emailSettings.setConnSecurity((String) values.get("connSecurity"));
+			OutgoingEmailPanel.this.emailSettings
+					.setSecureAuth(values.get("secureAuth").toString().equals("true") ? true : false);
+			OutgoingEmailPanel.this.emailSettings.setSenderEmail((String) values.get("senderEmail"));
+			OutgoingEmailPanel.this.emailSettings
+					.setUserAsFrom(values.get("userasfrom").toString().equals("true") ? true : false);
+			OutgoingEmailPanel.this.emailSettings.setFoldering(Integer.parseInt(values.get("foldering").toString()));
+			OutgoingEmailPanel.this.emailSettings.setTargetFolder(targetSelector.getFolder());
+
+			SettingService.Instance.get().saveEmailSettings(OutgoingEmailPanel.this.emailSettings,
+					new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void ret) {
+							Session.get().getInfo().setConfig(Session.get().getTenantName() + ".smtp.userasfrom",
+									"" + OutgoingEmailPanel.this.emailSettings.isUserAsFrom());
+							GuiLog.info(I18N.message("settingssaved"), null);
+						}
+					});
+		});
+		return save;
 	}
 }

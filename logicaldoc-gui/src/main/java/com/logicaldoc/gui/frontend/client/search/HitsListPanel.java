@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.util.DocUtil;
-import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
@@ -26,12 +25,8 @@ import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -73,9 +68,6 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		if (grid != null)
 			removeMember((Canvas) grid);
 
-		ListGridField id = new ColoredListGridField("id", "id", 60);
-		id.setHidden(true);
-
 		if (visualizationMode == DocumentsGrid.MODE_GALLERY)
 			grid = new DocumentsTileGrid(null);
 		else
@@ -88,27 +80,24 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		});
 
-		grid.registerCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				GUIDocument doc = grid.getSelectedDocument();
-				final String type = doc.getType();
-				long id = doc.getFolder().getId();
+		setContextClickHandler();
 
-				if (Session.get().isAdmin() || grid.getSelectedCount() == 1) {
-					/*
-					 * Context menu cannot be displayed for normal users in case
-					 * of multiple selection
-					 */
-					if (type == null
-							|| (!type.contains("folder") && DocumentController.get().getCurrentDocument() != null
-									&& DocumentController.get().getCurrentDocument().getId() == id)) {
-						showContextMenu(DocumentController.get().getCurrentDocument().getFolder(), true);
-					} else {
-						/*
-						 * We need to retrieve the folder from the server
-						 */
-						FolderService.Instance.get().getFolder(id, false, false, false, new AsyncCallback<GUIFolder>() {
+		setDoubleClickHandler();
+
+		prepareSearchCursor();
+
+		setMembers(searchCursor, (Canvas) grid);
+
+		onSearchArrived();
+	}
+
+	private void setDoubleClickHandler() {
+		grid.registerDoubleClickHandler((DoubleClickEvent event) -> {
+			if (Search.get().getOptions().getType() != GUISearchOptions.TYPE_FOLDERS) {
+				final GUIDocument doc = grid.getSelectedDocument();
+
+				FolderService.Instance.get().getFolder(doc.getFolder().getId(), false, false, false,
+						new AsyncCallback<GUIFolder>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -117,46 +106,58 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 							@Override
 							public void onSuccess(GUIFolder folder) {
-								showContextMenu(folder, !type.contains("folder"));
+								if (folder.isDownload()
+										&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
+									DocUtil.download(doc.getId(), null);
+								else {
+									PreviewPopup iv = new PreviewPopup(doc);
+									iv.show();
+								}
 							}
 						});
-					}
-				}
-
-				event.cancel();
 			}
+			event.cancel();
 		});
+	}
 
-		grid.registerDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				if (Search.get().getOptions().getType() != GUISearchOptions.TYPE_FOLDERS) {
-					final GUIDocument doc = grid.getSelectedDocument();
+	private void setContextClickHandler() {
+		grid.registerCellContextClickHandler((CellContextClickEvent event) -> {
+			GUIDocument doc = grid.getSelectedDocument();
+			final String type = doc.getType();
+			long id = doc.getFolder().getId();
 
-					FolderService.Instance.get().getFolder(doc.getFolder().getId(), false, false, false,
-							new AsyncCallback<GUIFolder>() {
+			if (Session.get().isAdmin() || grid.getSelectedCount() == 1) {
+				/*
+				 * Context menu cannot be displayed for normal users in case of
+				 * multiple selection
+				 */
+				if (type == null || (!type.contains("folder") && DocumentController.get().getCurrentDocument() != null
+						&& DocumentController.get().getCurrentDocument().getId() == id)) {
+					showContextMenu(DocumentController.get().getCurrentDocument().getFolder(), true);
+				} else {
+					/*
+					 * We need to retrieve the folder from the server
+					 */
+					FolderService.Instance.get().getFolder(id, false, false, false, new AsyncCallback<GUIFolder>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(GUIFolder folder) {
-									if (folder.isDownload()
-											&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-										DocUtil.download(doc.getId(), null);
-									else {
-										PreviewPopup iv = new PreviewPopup(doc);
-										iv.show();
-									}
-								}
-							});
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							showContextMenu(folder, !type.contains("folder"));
+						}
+					});
 				}
-				event.cancel();
 			}
-		});
 
+			event.cancel();
+		});
+	}
+
+	private void prepareSearchCursor() {
 		if (searchCursor != null)
 			removeMember(searchCursor);
 
@@ -165,20 +166,12 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		if (pageSize == null)
 			pageSize = Session.get().getConfigAsInt("search.hits");
 		searchCursor.setPageSize(pageSize);
-		searchCursor.registerPageSizeChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				GUISearchOptions opt = Search.get().getOptions();
-				opt.setMaxHits(searchCursor.getPageSize());
-				Search.get().setMaxHits(searchCursor.getPageSize());
-				Search.get().search();
-			}
+		searchCursor.registerPageSizeChangedHandler((ChangedEvent event) -> {
+			GUISearchOptions opt = Search.get().getOptions();
+			opt.setMaxHits(searchCursor.getPageSize());
+			Search.get().setMaxHits(searchCursor.getPageSize());
+			Search.get().search();
 		});
-
-		setMembers(searchCursor, (Canvas) grid);
-
-		onSearchArrived();
 	}
 
 	@Override

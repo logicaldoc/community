@@ -25,22 +25,16 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridEditorContext;
-import com.smartgwt.client.widgets.grid.ListGridEditorCustomizer;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellSavedEvent;
 import com.smartgwt.client.widgets.grid.events.CellSavedHandler;
 import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.grid.events.EditorExitEvent;
-import com.smartgwt.client.widgets.grid.events.EditorExitHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -61,32 +55,30 @@ public class ComparatorsPanel extends AdminPanel {
 
 	protected String gridAttributeName = "comparator";
 
-
 	protected String settingsPrefix = gridAttributeName + ".";
 
 	protected String listGridAttributeLabel = I18N.message(gridAttributeName);
-	
-	
+
 	// Associations between file formats and a comparator
 	protected ListGrid associationsGrid;
-	
+
 	// Settings for the different comparators
 	protected ListGrid settingsGrid;
 
 	protected String settingsGridTitle = I18N.message("comparators");
-	
+
 	public ComparatorsPanel(String title) {
 		super(title);
 	}
-	
+
 	public ComparatorsPanel() {
 		super("comparators");
-	}	
-	
+	}
+
 	@Override
 	protected void onDraw() {
 		ToolStrip toolStrip = prepareToolStrip();
-		
+
 		toolStrip.addFill();
 
 		body.addMember(toolStrip);
@@ -103,11 +95,9 @@ public class ComparatorsPanel extends AdminPanel {
 		configButton.setShowFocused(false);
 		configButton.setShowRollOver(false);
 		configButton.setShowDown(false);
-		configButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				ComparatorAssociationsDialog dialog = getAssociationsDialog();
-				dialog.show();
-			}
+		configButton.addClickHandler((ClickEvent event) -> {
+			ComparatorAssociationsDialog dialog = getAssociationsDialog();
+			dialog.show();
 		});
 		if (!Session.get().isDemo())
 			associationsSection.setControls(configButton);
@@ -139,7 +129,7 @@ public class ComparatorsPanel extends AdminPanel {
 	protected ComparatorAssociationsDialog getAssociationsDialog() {
 		return new ComparatorAssociationsDialog(associationsGrid);
 	}
-	
+
 	protected ToolStrip prepareToolStrip() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -167,47 +157,37 @@ public class ComparatorsPanel extends AdminPanel {
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
 		comparator.setCanEdit(!Session.get().isDemo());
-		comparator.setCellFormatter(new CellFormatter() {
+		comparator.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			String label = getComparatorShortName(value != null ? value.toString() : null);
+			boolean enabled = record.getAttributeAsBoolean("eenabled");
+			if (!enabled)
+				label = "<span style='color:red;'>" + label + "</span>";
 
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String label = getComparatorShortName(value != null ? value.toString() : null);
-				boolean enabled = record.getAttributeAsBoolean("eenabled");
-				if (!enabled)
-					label = "<span style='color:red;'>" + label + "</span>";
-
-				return label;
-			}
+			return label;
 		});
 		comparator.setFilterEditorProperties(ItemFactory.newFormatConverterSelector());
 
 		associationsGrid.setFields(in, comparator);
 
-		associationsGrid.setEditorCustomizer(new ListGridEditorCustomizer() {
-			public FormItem getEditor(ListGridEditorContext context) {
-				ListGridField field = context.getEditField();
+		associationsGrid.setEditorCustomizer((ListGridEditorContext context) -> {
+			ListGridField field = context.getEditField();
 
-				if (field.getName().equals(gridAttributeName)) {
-					final ListGridRecord selectedRecord = associationsGrid.getSelectedRecord();
-					final SelectItem editorItem = ItemFactory
-							.newComparatorSelector(selectedRecord.getAttributeAsString("in"));
-					editorItem.setWidth("*");
-					return editorItem;
-				} else
-					return context.getDefaultProperties();
-			}
+			if (field.getName().equals(gridAttributeName)) {
+				final ListGridRecord selectedRecord = associationsGrid.getSelectedRecord();
+				final SelectItem editorItem = ItemFactory
+						.newComparatorSelector(selectedRecord.getAttributeAsString("in"));
+				editorItem.setWidth("*");
+				return editorItem;
+			} else
+				return context.getDefaultProperties();
 		});
 
-		associationsGrid.addEditCompleteHandler(new EditCompleteHandler() {
-
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
-				Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
-						associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
-				if (converterRecord != null)
-					associationsGrid.getSelectedRecord().setAttribute("eenabled",
-							converterRecord.getAttributeAsBoolean("eenabled"));
-			}
+		associationsGrid.addEditCompleteHandler((EditCompleteEvent event) -> {
+			Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
+					associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
+			if (converterRecord != null)
+				associationsGrid.getSelectedRecord().setAttribute("eenabled",
+						converterRecord.getAttributeAsBoolean("eenabled"));
 		});
 	}
 
@@ -231,60 +211,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 			@Override
 			protected Canvas getExpansionComponent(final ListGridRecord record) {
-				VLayout layout = new VLayout(5);
-				layout.setPadding(5);
-
-				final ListGrid parametersGrid = new ListGrid();
-				parametersGrid.setHeight(150);
-				parametersGrid.setCanEdit(!Session.get().isDemo());
-				parametersGrid.setModalEditing(true);
-				parametersGrid.setAutoSaveEdits(true);
-				parametersGrid.setAutoFetchData(true);
-
-				ListGridField name = new ListGridField("name", I18N.message("parameter"), 150);
-				name.setCanEdit(false);
-				ListGridField value = new ListGridField("value", I18N.message("value"));
-				value.setWidth("*");
-				value.setCanEdit(true);
-				parametersGrid.setFields(name, value);
-
-				parametersGrid.addCellSavedHandler(new CellSavedHandler() {
-					@Override
-					public void onCellSaved(CellSavedEvent event) {
-						ListGridRecord paramRecord = event.getRecord();
-						record.setAttribute(paramRecord.getAttributeAsString("name"),
-								event.getNewValue() != null ? event.getNewValue().toString() : "");
-					}
-				});
-
-				String[] attrs = record.getAttributes();
-				if (attrs != null && attrs.length > 0) {
-					List<ListGridRecord> records = new ArrayList<ListGridRecord>();
-					for (String attr : attrs) {
-						if (!isParameterAttribute(attr))
-							continue;
-						ListGridRecord rec = new ListGridRecord();
-						rec.setAttribute("name", attr);
-						rec.setAttribute("value", record.getAttributeAsString(attr));
-						records.add(rec);
-					}
-					parametersGrid.setRecords(records.toArray(new ListGridRecord[0]));
-				}
-
-				// When the parameter's editing ends, update the same parameters
-				// in all the records
-				value.addEditorExitHandler(new EditorExitHandler() {
-
-					@Override
-					public void onEditorExit(EditorExitEvent event) {
-						String parameterName = event.getRecord().getAttributeAsString("name");
-						String parameterValue = event.getNewValue() != null ? event.getNewValue().toString() : "";
-						record.setAttribute(parameterName, parameterValue);
-					}
-				});
-
-				layout.addMember(parametersGrid);
-				return layout;
+				return buildSettingsGridExpansionComponent(record);
 			}
 		};
 		settingsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -299,38 +226,79 @@ public class ComparatorsPanel extends AdminPanel {
 		ListGridField enabled = new ListGridField("eenabled", " ", 20);
 		enabled.setCanSort(false);
 		enabled.setCanFilter(false);
-		enabled.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if (value == null)
-					return "";
-				else if ("true".equals(value.toString()))
-					return Util.imageHTML("bullet_green.png");
-				else
-					return Util.imageHTML("bullet_red.png");
-			}
+		enabled.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			if (value == null)
+				return "";
+			else if ("true".equals(value.toString()))
+				return Util.imageHTML("bullet_green.png");
+			else
+				return Util.imageHTML("bullet_red.png");
 		});
 
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
-		comparator.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return getComparatorShortName(value != null ? value.toString() : null);
-			}
+		comparator.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			return getComparatorShortName(value != null ? value.toString() : null);
 		});
 
 		settingsGrid.setFields(enabled, comparator);
-		settingsGrid.addCellContextClickHandler(new CellContextClickHandler() {
+		settingsGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+			event.cancel();
+			showContextMenu();
+		});
+	}
 
+	private Canvas buildSettingsGridExpansionComponent(final ListGridRecord record) {
+		VLayout layout = new VLayout(5);
+		layout.setPadding(5);
+
+		final ListGrid parametersGrid = new ListGrid();
+		parametersGrid.setHeight(150);
+		parametersGrid.setCanEdit(!Session.get().isDemo());
+		parametersGrid.setModalEditing(true);
+		parametersGrid.setAutoSaveEdits(true);
+		parametersGrid.setAutoFetchData(true);
+
+		ListGridField name = new ListGridField("name", I18N.message("parameter"), 150);
+		name.setCanEdit(false);
+		ListGridField value = new ListGridField("value", I18N.message("value"));
+		value.setWidth("*");
+		value.setCanEdit(true);
+		parametersGrid.setFields(name, value);
+
+		parametersGrid.addCellSavedHandler(new CellSavedHandler() {
 			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				event.cancel();
-				showContextMenu();
+			public void onCellSaved(CellSavedEvent event) {
+				ListGridRecord paramRecord = event.getRecord();
+				record.setAttribute(paramRecord.getAttributeAsString("name"),
+						event.getNewValue() != null ? event.getNewValue().toString() : "");
 			}
 		});
+
+		String[] attrs = record.getAttributes();
+		if (attrs != null && attrs.length > 0) {
+			List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+			for (String attr : attrs) {
+				if (!isParameterAttribute(attr))
+					continue;
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("name", attr);
+				rec.setAttribute("value", record.getAttributeAsString(attr));
+				records.add(rec);
+			}
+			parametersGrid.setRecords(records.toArray(new ListGridRecord[0]));
+		}
+
+		// When the parameter's editing ends, update the same parameters
+		// in all the records
+		value.addEditorExitHandler((EditorExitEvent event) -> {
+			String parameterName = event.getRecord().getAttributeAsString("name");
+			String parameterValue = event.getNewValue() != null ? event.getNewValue().toString() : "";
+			record.setAttribute(parameterName, parameterValue);
+		});
+
+		layout.addMember(parametersGrid);
+		return layout;
 	}
 
 	protected DataSource getSettingsDataSource() {
@@ -340,7 +308,7 @@ public class ComparatorsPanel extends AdminPanel {
 	protected DataSource getAssociationsDataSource() {
 		return new ComparatorsDS(null);
 	}
-	
+
 	protected boolean isParameterAttribute(String name) {
 		if ("id".equals(name) || gridAttributeName.equals(name) || "in".equals(name) || "label".equals(name)
 				|| "eenabled".equals(name) || name.startsWith("_"))
@@ -350,34 +318,7 @@ public class ComparatorsPanel extends AdminPanel {
 	}
 
 	private void onSave() {
-		final List<GUIParameter> settings = new ArrayList<GUIParameter>();
-
-		final Set<String> settingNames = new TreeSet<String>();
-
-		for (Record rec : associationsGrid.getRecordList().toArray()) {
-			String in = rec.getAttributeAsString("in").trim();
-			String comparator = rec.getAttributeAsString(gridAttributeName).trim();
-			settings.add(new GUIParameter(settingsPrefix + in, comparator));
-		}
-
-		for (Record rec : settingsGrid.getRecordList().toArray()) {
-			String comparator = rec.getAttributeAsString(gridAttributeName).trim();
-			String comparatorShort = getComparatorShortName(comparator);
-
-			String[] attrs = rec.getAttributes();
-			if (attrs != null && attrs.length > 0) {
-				for (String attr : attrs) {
-					String attributeValue = rec.getAttributeAsString(attr);
-					if (!isParameterAttribute(attr))
-						continue;
-					String settingName = settingsPrefix + comparatorShort + "." + attr;
-					if (settingNames.contains(settingName))
-						continue;
-					settingNames.add(settingName);
-					settings.add(new GUIParameter(settingName, attributeValue));
-				}
-			}
-		}
+		List<GUIParameter> settings = collectSettings();
 
 		SettingService.Instance.get().saveSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
 
@@ -397,6 +338,41 @@ public class ComparatorsPanel extends AdminPanel {
 		});
 	}
 
+	private List<GUIParameter> collectSettings() {
+		List<GUIParameter> settings = new ArrayList<GUIParameter>();
+
+		for (Record rec : associationsGrid.getRecordList().toArray()) {
+			String in = rec.getAttributeAsString("in").trim();
+			String comparator = rec.getAttributeAsString(gridAttributeName).trim();
+			settings.add(new GUIParameter(settingsPrefix + in, comparator));
+		}
+
+		for (Record comparatorRecord : settingsGrid.getRecordList().toArray()) {
+			collectComparatorAttributes(settings, comparatorRecord);
+		}
+		return settings;
+	}
+
+	private void collectComparatorAttributes(List<GUIParameter> settings, Record comparatorRecord) {
+		Set<String> settingNames = new TreeSet<String>();
+		String comparator = comparatorRecord.getAttributeAsString(gridAttributeName).trim();
+		String comparatorShort = getComparatorShortName(comparator);
+
+		String[] attrs = comparatorRecord.getAttributes();
+		if (attrs != null && attrs.length > 0) {
+			for (String attr : attrs) {
+				String attributeValue = comparatorRecord.getAttributeAsString(attr);
+				if (!isParameterAttribute(attr))
+					continue;
+				String settingName = settingsPrefix + comparatorShort + "." + attr;
+				if (settingNames.contains(settingName))
+					continue;
+				settingNames.add(settingName);
+				settings.add(new GUIParameter(settingName, attributeValue));
+			}
+		}
+	}
+
 	private String getComparatorShortName(String value) {
 		if (value == null)
 			return null;
@@ -409,95 +385,101 @@ public class ComparatorsPanel extends AdminPanel {
 	protected void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		MenuItem enable = new MenuItem();
-		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SettingService.Instance.get()
-						.saveSettings(new GUIParameter[] { new GUIParameter(
-								settingsPrefix + settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled",
-								"true") }, new AsyncCallback<Void>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(Void arg0) {
-										settingsGrid.getSelectedRecord().setAttribute("eenabled", true);
-										settingsGrid.refreshRow(
-												settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
-
-										// Update the associations table
-										Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
-												gridAttributeName, OperatorId.EQUALS,
-												settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
-										if (associations != null)
-											for (Record record : associations)
-												record.setAttribute("eenabled", true);
-
-										// Refresh the visualization
-										associationsGrid.invalidateRecordComponents();
-										ListGridRecord[] recs = associationsGrid.getRecords();
-										for (ListGridRecord rec : recs) {
-											associationsGrid
-													.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
-										}
-										associationsGrid.refreshFields();
-									}
-								});
-			}
-		});
+		MenuItem enable = prepareEnableMenuItem();
 
 		if (settingsGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
 			enable.setEnabled(false);
 
-		MenuItem disable = new MenuItem();
-		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SettingService.Instance.get()
-						.saveSettings(new GUIParameter[] { new GUIParameter(
-								settingsPrefix + settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled",
-								"false") }, new AsyncCallback<Void>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(Void arg0) {
-										settingsGrid.getSelectedRecord().setAttribute("eenabled", false);
-										settingsGrid.refreshRow(
-												settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
-
-										// Update the associations table
-										Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
-												gridAttributeName, OperatorId.EQUALS,
-												settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
-										if (associations != null)
-											for (Record record : associations)
-												record.setAttribute("eenabled", false);
-
-										// Refresh the visualization
-										associationsGrid.invalidateRecordComponents();
-										ListGridRecord[] recs = associationsGrid.getRecords();
-										for (ListGridRecord rec : recs) {
-											associationsGrid
-													.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
-										}
-										associationsGrid.refreshFields();
-									}
-								});
-			}
-		});
+		MenuItem disable = prepareDisableMenuItem();
 
 		if (!settingsGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
 			disable.setEnabled(false);
 
 		contextMenu.setItems(enable, disable);
 		contextMenu.showContextMenu();
+	}
+
+	private MenuItem prepareDisableMenuItem() {
+		MenuItem disable = new MenuItem();
+		disable.setTitle(I18N.message("disable"));
+		disable.addClickHandler((MenuItemClickEvent event) -> {
+			SettingService.Instance.get()
+					.saveSettings(
+							new GUIParameter[] { new GUIParameter(settingsPrefix
+									+ settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled", "false") },
+							new AsyncCallback<Void>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(Void arg0) {
+									settingsGrid.getSelectedRecord().setAttribute("eenabled", false);
+									settingsGrid
+											.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
+
+									// Update the associations table
+									Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
+											gridAttributeName, OperatorId.EQUALS,
+											settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
+									if (associations != null)
+										for (Record record : associations)
+											record.setAttribute("eenabled", false);
+
+									// Refresh the visualization
+									associationsGrid.invalidateRecordComponents();
+									ListGridRecord[] recs = associationsGrid.getRecords();
+									for (ListGridRecord rec : recs) {
+										associationsGrid.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
+									}
+									associationsGrid.refreshFields();
+								}
+							});
+		});
+		return disable;
+	}
+
+	private MenuItem prepareEnableMenuItem() {
+		MenuItem enable = new MenuItem();
+		enable.setTitle(I18N.message("enable"));
+		enable.addClickHandler((MenuItemClickEvent event) -> {
+			SettingService.Instance.get()
+					.saveSettings(
+							new GUIParameter[] { new GUIParameter(settingsPrefix
+									+ settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled", "true") },
+							new AsyncCallback<Void>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(Void arg0) {
+									settingsGrid.getSelectedRecord().setAttribute("eenabled", true);
+									settingsGrid
+											.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
+
+									// Update the associations table
+									Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
+											gridAttributeName, OperatorId.EQUALS,
+											settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
+									if (associations != null)
+										for (Record record : associations)
+											record.setAttribute("eenabled", true);
+
+									// Refresh the visualization
+									associationsGrid.invalidateRecordComponents();
+									ListGridRecord[] recs = associationsGrid.getRecords();
+									for (ListGridRecord rec : recs) {
+										associationsGrid.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
+									}
+									associationsGrid.refreshFields();
+								}
+							});
+		});
+		return enable;
 	}
 }

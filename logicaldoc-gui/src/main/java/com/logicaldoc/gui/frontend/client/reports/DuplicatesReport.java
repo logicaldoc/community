@@ -28,7 +28,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -258,80 +257,23 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		Menu contextMenu = new Menu();
 		final ListGridRecord[] selection = list.getSelectedRecords();
 
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null || selection.length == 0)
-					return;
-				final long[] ids = new long[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-				}
+		MenuItem delete = prepareDeleteContextMenuItem(selection);
 
-				if (ids.length > 0)
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-						@Override
-						public void execute(Boolean value) {
-							if (value) {
-								DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(Void result) {
-										list.removeSelectedData();
-										DocumentsPanel.get().getDocumentsMenu().refresh("trash");
-									}
-								});
-							}
-						}
-					});
-			}
-		});
-
-		MenuItem preview = new MenuItem();
-		preview.setTitle(I18N.message("preview"));
-		preview.setEnabled(
-				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
-		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
-				DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIDocument doc) {
-						PreviewPopup iv = new PreviewPopup(doc);
-						iv.show();
-					}
-				});
-			}
-		});
+		MenuItem preview = preparePreviewContextMenuItem();
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				Long id = list.getSelectedRecord().getAttributeAsLong("id");
-				WindowUtils.openUrl(Util.downloadURL(id));
-			}
+		download.addClickHandler((MenuItemClickEvent event) -> {
+			Long id = list.getSelectedRecord().getAttributeAsLong("id");
+			WindowUtils.openUrl(Util.downloadURL(id));
 		});
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-						Long.parseLong(record.getAttributeAsString("id")));
-			}
+		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord record = list.getSelectedRecord();
+			DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
+					Long.parseLong(record.getAttributeAsString("id")));
 		});
 
 		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {
@@ -348,6 +290,62 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 
 		contextMenu.setItems(download, preview, delete, openInFolder);
 		contextMenu.showContextMenu();
+	}
+
+	private MenuItem preparePreviewContextMenuItem() {
+		MenuItem preview = new MenuItem();
+		preview.setTitle(I18N.message("preview"));
+		preview.setEnabled(
+				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+		preview.addClickHandler((MenuItemClickEvent event) -> {
+			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
+			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					PreviewPopup iv = new PreviewPopup(doc);
+					iv.show();
+				}
+			});
+		});
+		return preview;
+	}
+
+	private MenuItem prepareDeleteContextMenuItem(final ListGridRecord[] selection) {
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler((MenuItemClickEvent event) -> {
+			if (selection == null || selection.length == 0)
+				return;
+			final long[] ids = new long[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
+			}
+
+			if (ids.length > 0)
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
+					if (yes) {
+						DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								DocumentsPanel.get().getDocumentsMenu().refresh("trash");
+							}
+						});
+					}
+				});
+		});
+		return delete;
 	}
 
 	@Override

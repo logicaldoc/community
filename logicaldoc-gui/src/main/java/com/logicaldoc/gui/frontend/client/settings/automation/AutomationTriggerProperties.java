@@ -8,9 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -53,11 +51,8 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		folderSelector.setTitle(I18N.message("folder"));
 		if (trigger.getFolder() != null)
 			folderSelector.setFolder(trigger.getFolder());
-		folderSelector.addFolderChangeListener(new FolderChangeListener() {
-			@Override
-			public void onChanged(GUIFolder folder) {
-				changedHandler.onChanged(null);
-			}
+		folderSelector.addFolderChangeListener((GUIFolder folder) -> {
+			changedHandler.onChanged(null);
 		});
 
 		refresh();
@@ -88,144 +83,20 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		form1.setValuesManager(vm);
 		form1.setHeight100();
 
-		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeronevents"),
-				new ChangedHandler() {
-
-					@Override
-					public void onChanged(ChangedEvent event) {
-						SelectItem item = (SelectItem) vm.getItem("events");
-						if (item.getValues() != null && item.getValues().length > 0) {
-							vm.getItem("date").setDisabled(true);
-							vm.getItem("date").clearValue();
-							vm.getItem("time").setDisabled(true);
-							vm.getItem("time").clearValue();
-							vm.getItem("cron").setDisabled(true);
-							vm.getItem("cron").clearValue();
-						} else {
-							vm.getItem("folder").setDisabled(false);
-							vm.getItem("date").setDisabled(false);
-							vm.getItem("time").setDisabled(false);
-							vm.getItem("cron").setDisabled(false);
-						}
-
-						if (changedHandler != null)
-							changedHandler.onChanged(event);
-					}
-				}, true, true, true, true);
-		events.setRowSpan(2);
-		events.setColSpan(4);
-		events.setValues(trigger.getEventsArray());
-		events.setDisabled(trigger.getDate() != null || (trigger.getCron() != null && !trigger.getCron().isEmpty()));
+		SelectItem events = prepareEventsSelector();
 
 		folderSelector.setDisabled(events.isDisabled());
-		
-		DateItem date = ItemFactory.newDateItem("date", I18N.message("triggerondate"));
-		date.setValue(trigger.getDate());
-		date.addChangedHandler(new ChangedHandler() {
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				FormItem time = (FormItem) vm.getItem("time");
-				FormItem date = (FormItem) vm.getItem("date");
-				if (time.getValue() != null || date.getValue() != null) {
-					vm.getItem("events").setDisabled(true);
-					vm.getItem("events").clearValue();
-					vm.getItem("folder").setDisabled(true);
-					vm.getItem("folder").clearValue();
-					vm.getItem("cron").setDisabled(true);
-					vm.getItem("cron").clearValue();
-				} else {
-					vm.getItem("events").setDisabled(false);
-					vm.getItem("folder").setDisabled(false);
-					vm.getItem("cron").setDisabled(false);
-				}
+		DateItem date = prepareDateItem();
 
-				if (changedHandler != null)
-					changedHandler.onChanged(event);
-			}
-		});
-		date.setDisabled((trigger.getEvents() != null && !trigger.getEvents().isEmpty())
-				|| (trigger.getCron() != null && !trigger.getCron().isEmpty()));
+		TimeItem time = prepareTimeItem();
 
-		TimeItem time = ItemFactory.newTimeItem("time", "time");
-		time.setColSpan(4);
-		if (trigger.getDate() != null) {
-			DateTimeFormat df = DateTimeFormat.getFormat("HH:mm");
-			time.setValue(df.format(trigger.getDate()));
-		}
-		time.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				FormItem time = (FormItem) vm.getItem("time");
-				FormItem date = (FormItem) vm.getItem("date");
-				if (time.getValue() != null || date.getValue() != null) {
-					vm.getItem("events").setDisabled(true);
-					vm.getItem("events").clearValue();
-					vm.getItem("folder").setDisabled(true);
-					vm.getItem("folder").clearValue();
-					vm.getItem("cron").setDisabled(true);
-					vm.getItem("cron").clearValue();
-				} else {
-					vm.getItem("events").setDisabled(false);
-					vm.getItem("folder").setDisabled(true);
-					vm.getItem("cron").setDisabled(false);
-				}
-
-				if (changedHandler != null)
-					changedHandler.onChanged(event);
-			}
-		});
-		time.setDisabled((trigger.getEvents() != null && !trigger.getEvents().isEmpty())
-				|| (trigger.getCron() != null && !trigger.getCron().isEmpty()));
-
-		TextItem cron = ItemFactory.newCronExpressionItem("cron", I18N.message("triggeroncron"), trigger.getCron(),
-				new ChangedHandler() {
-
-					@Override
-					public void onChanged(ChangedEvent event) {
-						FormItem cron = (FormItem) vm.getItem("cron");
-						if (cron.getValue() != null) {
-							vm.getItem("events").setDisabled(true);
-							vm.getItem("events").clearValue();
-							vm.getItem("folder").setDisabled(true);
-							vm.getItem("folder").clearValue();
-							vm.getItem("date").setDisabled(true);
-							vm.getItem("date").clearValue();
-							vm.getItem("time").setDisabled(true);
-							vm.getItem("time").clearValue();
-						} else {
-							vm.getItem("events").setDisabled(false);
-							vm.getItem("folder").setDisabled(false);
-							vm.getItem("date").setDisabled(false);
-							vm.getItem("time").setDisabled(false);
-						}
-
-						if (changedHandler != null)
-							changedHandler.onChanged(event);
-					}
-				});
-		cron.setColSpan(5);
-		cron.setDisabled((trigger.getEvents() != null && !trigger.getEvents().isEmpty()) || trigger.getDate() != null);
+		TextItem cron = prepareCronItem();
 
 		SpacerItem spacer = new SpacerItem();
 		spacer.setHeight(100);
 
-		SelectItem routine = ItemFactory.newAutomationRoutineSelector("routine",
-				trigger.getRoutine() != null ? trigger.getRoutine().getId() : null, changedHandler, true);
-		routine.setEndRow(true);
-		routine.addChangedHandler(changedHandler);
-		ChangedHandler cngHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event == null) {
-					automation.setDisabled(false);
-				} else {
-					automation.setDisabled(event.getValue() != null && !event.getValue().toString().isEmpty());
-				}
-			}
-		};
-		routine.addChangedHandler(cngHandler);
+		SelectItem routine = prepareRoutineSelector(automation);
 
 		CustomValidator atLeastOneValidator = new CustomValidator() {
 
@@ -246,59 +117,186 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		formsContainer.setMembers(form1, form2);
 	}
 
+	private SelectItem prepareRoutineSelector(final TextAreaItem automation) {
+		SelectItem routine = ItemFactory.newAutomationRoutineSelector("routine",
+				trigger.getRoutine() != null ? trigger.getRoutine().getId() : null, changedHandler, true);
+		routine.setEndRow(true);
+		routine.addChangedHandler(changedHandler);
+		ChangedHandler cngHandler = (ChangedEvent event) -> {
+			if (event == null) {
+				automation.setDisabled(false);
+			} else {
+				automation.setDisabled(event.getValue() != null && !event.getValue().toString().isEmpty());
+			}
+		};
+		routine.addChangedHandler(cngHandler);
+		return routine;
+	}
+
+	private SelectItem prepareEventsSelector() {
+		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeronevents"),
+				(ChangedEvent event) -> {
+					SelectItem item = (SelectItem) vm.getItem("events");
+					if (item.getValues() != null && item.getValues().length > 0) {
+						vm.getItem("date").setDisabled(true);
+						vm.getItem("date").clearValue();
+						vm.getItem("time").setDisabled(true);
+						vm.getItem("time").clearValue();
+						vm.getItem("cron").setDisabled(true);
+						vm.getItem("cron").clearValue();
+					} else {
+						vm.getItem("folder").setDisabled(false);
+						vm.getItem("date").setDisabled(false);
+						vm.getItem("time").setDisabled(false);
+						vm.getItem("cron").setDisabled(false);
+					}
+
+					if (changedHandler != null)
+						changedHandler.onChanged(event);
+				}, true, true, true, true);
+		events.setRowSpan(2);
+		events.setColSpan(4);
+		events.setValues(trigger.getEventsArray());
+		events.setDisabled(trigger.getDate() != null || (trigger.getCron() != null && !trigger.getCron().isEmpty()));
+		return events;
+	}
+
+	private TextItem prepareCronItem() {
+		TextItem cronItem = ItemFactory.newCronExpressionItem("cron", I18N.message("triggeroncron"), trigger.getCron(),
+				(ChangedEvent event) -> {
+					FormItem cron = (FormItem) vm.getItem("cron");
+					if (cron.getValue() != null) {
+						vm.getItem("events").setDisabled(true);
+						vm.getItem("events").clearValue();
+						vm.getItem("folder").setDisabled(true);
+						vm.getItem("folder").clearValue();
+						vm.getItem("date").setDisabled(true);
+						vm.getItem("date").clearValue();
+						vm.getItem("time").setDisabled(true);
+						vm.getItem("time").clearValue();
+					} else {
+						vm.getItem("events").setDisabled(false);
+						vm.getItem("folder").setDisabled(false);
+						vm.getItem("date").setDisabled(false);
+						vm.getItem("time").setDisabled(false);
+					}
+
+					if (changedHandler != null)
+						changedHandler.onChanged(event);
+				});
+		cronItem.setColSpan(5);
+		cronItem.setDisabled(
+				(trigger.getEvents() != null && !trigger.getEvents().isEmpty()) || trigger.getDate() != null);
+		return cronItem;
+	}
+
+	private TimeItem prepareTimeItem() {
+		TimeItem timeItem = ItemFactory.newTimeItem("time", "time");
+		timeItem.setColSpan(4);
+		if (trigger.getDate() != null) {
+			DateTimeFormat df = DateTimeFormat.getFormat("HH:mm");
+			timeItem.setValue(df.format(trigger.getDate()));
+		}
+		timeItem.addChangedHandler((ChangedEvent event) -> {
+			FormItem time = (FormItem) vm.getItem("time");
+			FormItem date = (FormItem) vm.getItem("date");
+			if (time.getValue() != null || date.getValue() != null) {
+				vm.getItem("events").setDisabled(true);
+				vm.getItem("events").clearValue();
+				vm.getItem("folder").setDisabled(true);
+				vm.getItem("folder").clearValue();
+				vm.getItem("cron").setDisabled(true);
+				vm.getItem("cron").clearValue();
+			} else {
+				vm.getItem("events").setDisabled(false);
+				vm.getItem("folder").setDisabled(true);
+				vm.getItem("cron").setDisabled(false);
+			}
+
+			if (changedHandler != null)
+				changedHandler.onChanged(event);
+		});
+		timeItem.setDisabled((trigger.getEvents() != null && !trigger.getEvents().isEmpty())
+				|| (trigger.getCron() != null && !trigger.getCron().isEmpty()));
+		return timeItem;
+	}
+
+	private DateItem prepareDateItem() {
+		DateItem dateItem = ItemFactory.newDateItem("date", I18N.message("triggerondate"));
+		dateItem.setValue(trigger.getDate());
+		dateItem.addChangedHandler((ChangedEvent event) -> {
+			FormItem time = (FormItem) vm.getItem("time");
+			FormItem date = (FormItem) vm.getItem("date");
+			if (time.getValue() != null || date.getValue() != null) {
+				vm.getItem("events").setDisabled(true);
+				vm.getItem("events").clearValue();
+				vm.getItem("folder").setDisabled(true);
+				vm.getItem("folder").clearValue();
+				vm.getItem("cron").setDisabled(true);
+				vm.getItem("cron").clearValue();
+			} else {
+				vm.getItem("events").setDisabled(false);
+				vm.getItem("folder").setDisabled(false);
+				vm.getItem("cron").setDisabled(false);
+			}
+
+			if (changedHandler != null)
+				changedHandler.onChanged(event);
+		});
+		dateItem.setDisabled((trigger.getEvents() != null && !trigger.getEvents().isEmpty())
+				|| (trigger.getCron() != null && !trigger.getCron().isEmpty()));
+		return dateItem;
+	}
+
 	@SuppressWarnings("unchecked")
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		vm.validate();
-		if (!vm.hasErrors()) {
-			try {
-				if (values.get("routine") != null) {
-					SelectItem item = (SelectItem) vm.getItem("routine");
-					GUIAutomationRoutine routine = new GUIAutomationRoutine(
-							Long.parseLong(values.get("routine").toString()));
-					routine.setName(item.getSelectedRecord().getAttributeAsString("name"));
-					trigger.setRoutine(routine);
-				} else
-					trigger.setRoutine(null);
+		if (!vm.validate())
+			return false;
 
-				if (folderSelector.getFolderId() != null)
-					trigger.setFolder(folderSelector.getFolder());
-				else
-					trigger.setFolder(null);
+		if (values.get("routine") != null) {
+			SelectItem item = (SelectItem) vm.getItem("routine");
+			GUIAutomationRoutine routine = new GUIAutomationRoutine(Long.parseLong(values.get("routine").toString()));
+			routine.setName(item.getSelectedRecord().getAttributeAsString("name"));
+			trigger.setRoutine(routine);
+		} else
+			trigger.setRoutine(null);
 
-				trigger.setAutomation((String) values.get("automation"));
+		if (folderSelector.getFolderId() != null)
+			trigger.setFolder(folderSelector.getFolder());
+		else
+			trigger.setFolder(null);
 
-				String eventsStr = null;
-				if (vm.getValueAsString("events") != null && !vm.getValueAsString("events").isEmpty()) {
-					String buf = vm.getValueAsString("events").toString().trim().toLowerCase();
-					buf = buf.replace('[', ' ');
-					buf = buf.replace(']', ' ');
-					eventsStr = buf.replace(" ", "");
-				}
-				trigger.setEvents(eventsStr);
+		trigger.setAutomation((String) values.get("automation"));
 
-				trigger.setCron(vm.getValueAsString("cron"));
-
-				DateTimeFormat dfDate = DateTimeFormat.getFormat("yyyy-MM-dd");
-				DateTimeFormat dfTime = DateTimeFormat.getFormat("HH:mm");
-				DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm");
-
-				if (vm.getValue("date") != null) {
-					String str = dfDate.format((Date) vm.getValue("date"));
-					if (vm.getValue("time") != null)
-						try {
-							trigger.setDate(df.parse(str + " " + vm.getValue("time").toString()));
-						} catch (Throwable t) {
-							trigger.setDate(df.parse(str + " " + dfTime.format((Date) vm.getValue("time"))));
-						}
-					else
-						trigger.setDate(df.parse(str));
-				} else
-					trigger.setDate(null);
-			} catch (Throwable t) {
-				GuiLog.error(t.getMessage(), null, t);
-			}
+		String eventsStr = null;
+		if (vm.getValueAsString("events") != null && !vm.getValueAsString("events").isEmpty()) {
+			String buf = vm.getValueAsString("events").toString().trim().toLowerCase();
+			buf = buf.replace('[', ' ');
+			buf = buf.replace(']', ' ');
+			eventsStr = buf.replace(" ", "");
 		}
+		trigger.setEvents(eventsStr);
+
+		trigger.setCron(vm.getValueAsString("cron"));
+
+		DateTimeFormat dfDate = DateTimeFormat.getFormat("yyyy-MM-dd");
+		DateTimeFormat dfTime = DateTimeFormat.getFormat("HH:mm");
+		DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm");
+
+		if (vm.getValue("date") != null) {
+			String str = dfDate.format((Date) vm.getValue("date"));
+			if (vm.getValue("time") != null)
+				try {
+					trigger.setDate(df.parse(str + " " + vm.getValue("time").toString()));
+				} catch (Throwable t) {
+					trigger.setDate(df.parse(str + " " + dfTime.format((Date) vm.getValue("time"))));
+				}
+			else
+				trigger.setDate(df.parse(str));
+		} else
+			trigger.setDate(null);
+
 		return !vm.hasErrors();
 	}
 

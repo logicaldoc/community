@@ -34,145 +34,49 @@ public class SettingsMenu extends VLayout {
 		setMembersMargin(5);
 		setOverflow(Overflow.AUTO);
 
-		Button searchAndIndexing = new Button(I18N.message("searchandindexing"));
-		searchAndIndexing.setWidth100();
-		searchAndIndexing.setHeight(25);
-		if (Menu.enabled(Menu.SEARCH_AND_INDEXING))
-			addMember(searchAndIndexing);
+		addSearchAndIndexing();
 
-		Button repositories = new Button(I18N.message("repositories"));
-		repositories.setWidth100();
-		repositories.setHeight(25);
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.REPOSITORIES))
-			addMember(repositories);
+		addRepositories();
 
-		Button guiSettings = new Button(I18N.message("guisettings"));
-		guiSettings.setWidth100();
-		guiSettings.setHeight(25);
-		if (Menu.enabled(Menu.GUI_SETTINGS))
-			addMember(guiSettings);
+		addGuiSettings();
 
-		Button quota = new Button(I18N.message("quota"));
-		quota.setWidth100();
-		quota.setHeight(25);
+		addOcr();
 
-		Button keystore = new Button(I18N.message("keystore"));
-		keystore.setWidth100();
-		keystore.setHeight(25);
+		addProtocols();
 
-		Button ocr = new Button(I18N.message("ocr"));
-		ocr.setWidth100();
-		ocr.setHeight(25);
-		if (Feature.visible(Feature.OCR) && Menu.enabled(Menu.OCR)) {
-			addMember(ocr);
-			if (!Feature.enabled(Feature.OCR)) {
-				ocr.setDisabled(true);
-				ocr.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
+		addOutgoingEmail();
 
-		Button protocols = new Button(I18N.message("protocols"));
-		protocols.setWidth100();
-		protocols.setHeight(25);
+		addQuota();
 
-		Button via = new Button(I18N.message("via"));
-		via.setWidth100();
-		via.setHeight(25);
+		addKeystore();
 
-		Button automation = new Button(I18N.message("automation"));
-		automation.setWidth100();
-		automation.setHeight(25);
+		addVia();
 
-		Button comparators = new Button(I18N.message("comparators"));
-		comparators.setWidth100();
-		comparators.setHeight(25);
+		addAutomation();
 
+		addComparators();
+
+		addParameters();
+	}
+
+	private void addParameters() {
 		Button parameters = new Button(I18N.message("parameters"));
 		parameters.setWidth100();
 		parameters.setHeight(25);
-
-		if (Feature.visible(Feature.PROTOCOLS) && Menu.enabled(Menu.CLIENTS)) {
-			addMember(protocols);
-			if (!Feature.enabled(Feature.PROTOCOLS)) {
-				protocols.setDisabled(true);
-				protocols.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		protocols.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new ProtocolsPanel());
-			}
+		parameters.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new ParametersPanel());
 		});
+		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
+			addMember(parameters);
+	}
 
-		quota.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId()));
-			}
+	private void addComparators() {
+		Button comparators = new Button(I18N.message("comparators"));
+		comparators.setWidth100();
+		comparators.setHeight(25);
+		comparators.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new ComparatorsPanel());
 		});
-
-		keystore.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new KeystorePanel());
-			}
-		});
-
-		via.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new VIASettingsPanel());
-			}
-		});
-
-		comparators.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new ComparatorsPanel());
-			}
-		});
-
-		automation.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new AutomationSettingsPanel());
-			}
-		});
-
-		Button smtp = new Button(I18N.message("outgoingemail"));
-		smtp.setWidth100();
-		smtp.setHeight(25);
-		if (Session.get().isDemo()) {
-			smtp.setDisabled(true);
-			smtp.setTooltip(I18N.message("featuredisabled"));
-		}
-		if (Menu.enabled(Menu.OUTGOING_EMAIL))
-			addMember(smtp);
-
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.QUOTA))
-			addMember(quota);
-
-		if (Feature.enabled(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.KEYSTORE))
-			addMember(keystore);
-
-		if (Feature.visible(Feature.VIA) && Menu.enabled(Menu.VIA)) {
-			addMember(via);
-			if (!Feature.enabled(Feature.VIA)) {
-				via.setDisabled(true);
-				via.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.AUTOMATION) && Menu.enabled(Menu.AUTOMATION)) {
-			addMember(automation);
-			if (!Feature.enabled(Feature.AUTOMATION)) {
-				automation.setDisabled(true);
-				automation.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
 		if (Feature.visible(Feature.COMPARISON) && Menu.enabled(Menu.COMPARATORS)) {
 			addMember(comparators);
 			if (!Feature.enabled(Feature.COMPARISON)) {
@@ -180,62 +84,154 @@ public class SettingsMenu extends VLayout {
 				comparators.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
+	}
 
-		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
-			addMember(parameters);
-
-		searchAndIndexing.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new SearchIndexingPanel());
-			}
+	private void addAutomation() {
+		Button automation = new Button(I18N.message("automation"));
+		automation.setWidth100();
+		automation.setHeight(25);
+		automation.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new AutomationSettingsPanel());
 		});
-
-		guiSettings.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new GUISettingsPanel());
+		if (Feature.visible(Feature.AUTOMATION) && Menu.enabled(Menu.AUTOMATION)) {
+			addMember(automation);
+			if (!Feature.enabled(Feature.AUTOMATION)) {
+				automation.setDisabled(true);
+				automation.setTooltip(I18N.message("featuredisabled"));
 			}
-		});
+		}
+	}
 
-		ocr.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new OCRSettingsPanel());
+	private void addVia() {
+		Button via = new Button(I18N.message("via"));
+		via.setWidth100();
+		via.setHeight(25);
+		via.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new VIASettingsPanel());
+		});
+		if (Feature.visible(Feature.VIA) && Menu.enabled(Menu.VIA)) {
+			addMember(via);
+			if (!Feature.enabled(Feature.VIA)) {
+				via.setDisabled(true);
+				via.setTooltip(I18N.message("featuredisabled"));
 			}
-		});
+		}
+	}
 
-		parameters.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new ParametersPanel());
+	private void addKeystore() {
+		Button keystore = new Button(I18N.message("keystore"));
+		keystore.setWidth100();
+		keystore.setHeight(25);
+		keystore.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new KeystorePanel());
+		});
+		if (Feature.enabled(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.KEYSTORE))
+			addMember(keystore);
+	}
+
+	private void addQuota() {
+		Button quota = new Button(I18N.message("quota"));
+		quota.setWidth100();
+		quota.setHeight(25);
+		quota.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId()));
+		});
+		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.QUOTA))
+			addMember(quota);
+	}
+
+	private void addOutgoingEmail() {
+		Button smtp = new Button(I18N.message("outgoingemail"));
+		smtp.setWidth100();
+		smtp.setHeight(25);
+		smtp.addClickHandler((ClickEvent event) -> {
+			SettingService.Instance.get().loadEmailSettings(new AsyncCallback<GUIEmailSettings>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIEmailSettings settings) {
+					AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
+				}
+
+			});
+		});
+		if (Session.get().isDemo()) {
+			smtp.setDisabled(true);
+			smtp.setTooltip(I18N.message("featuredisabled"));
+		}
+		if (Menu.enabled(Menu.OUTGOING_EMAIL))
+			addMember(smtp);
+	}
+
+	private void addProtocols() {
+		Button protocols = new Button(I18N.message("protocols"));
+		protocols.setWidth100();
+		protocols.setHeight(25);
+		protocols.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new ProtocolsPanel());
+		});
+		if (Feature.visible(Feature.PROTOCOLS) && Menu.enabled(Menu.CLIENTS)) {
+			addMember(protocols);
+			if (!Feature.enabled(Feature.PROTOCOLS)) {
+				protocols.setDisabled(true);
+				protocols.setTooltip(I18N.message("featuredisabled"));
 			}
+		}
+	}
+
+	private void addOcr() {
+		Button ocr = new Button(I18N.message("ocr"));
+		ocr.setWidth100();
+		ocr.setHeight(25);
+		ocr.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new OCRSettingsPanel());
 		});
-
-		smtp.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SettingService.Instance.get().loadEmailSettings(new AsyncCallback<GUIEmailSettings>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIEmailSettings settings) {
-						AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
-					}
-
-				});
+		if (Feature.visible(Feature.OCR) && Menu.enabled(Menu.OCR)) {
+			addMember(ocr);
+			if (!Feature.enabled(Feature.OCR)) {
+				ocr.setDisabled(true);
+				ocr.setTooltip(I18N.message("featuredisabled"));
 			}
-		});
+		}
+	}
 
+	private void addGuiSettings() {
+		Button guiSettings = new Button(I18N.message("guisettings"));
+		guiSettings.setWidth100();
+		guiSettings.setHeight(25);
+		guiSettings.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new GUISettingsPanel());
+		});
+		if (Menu.enabled(Menu.GUI_SETTINGS))
+			addMember(guiSettings);
+	}
+
+	private void addRepositories() {
+		Button repositories = new Button(I18N.message("repositories"));
+		repositories.setWidth100();
+		repositories.setHeight(25);
 		repositories.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new RepositoriesPanel());
 			}
 		});
+		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.REPOSITORIES))
+			addMember(repositories);
+	}
+
+	private void addSearchAndIndexing() {
+		Button searchAndIndexing = new Button(I18N.message("searchandindexing"));
+		searchAndIndexing.setWidth100();
+		searchAndIndexing.setHeight(25);
+		searchAndIndexing.addClickHandler((ClickEvent event) -> {
+			AdminScreen.get().setContent(new SearchIndexingPanel());
+		});
+		if (Menu.enabled(Menu.SEARCH_AND_INDEXING))
+			addMember(searchAndIndexing);
 	}
 }

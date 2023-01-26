@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ClusterService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
@@ -109,70 +108,72 @@ public class ScopedPropertiesPanel extends VLayout {
 		ListGridRecord[] selection = list.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final String[] ids = new String[selection.length];
+		final String[] selectedSettings = new String[selection.length];
 		for (int i = 0; i < selection.length; i++) {
-			ids[i] = selection[i].getAttribute("name");
+			selectedSettings[i] = selection[i].getAttribute("name");
 		}
 
-		MenuItem makeglobal = new MenuItem();
-		makeglobal.setTitle(I18N.message("makeglobal"));
-		makeglobal.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmmakeglobal"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ClusterService.Instance.get().makeGlobal(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		MenuItem makeglobal = prepareMakeGlobalMenuItem(selectedSettings);
 
-								@Override
-								public void onSuccess(Void result) {
-									ListGridRecord[] selection = list.getSelectedRecords();
-									for (int i = 0; i < ids.length; i++) {
-										selection[i].setAttribute("scope", "global");
-										list.refreshRow(list.getRecordIndex(selection[i]));
-									}
-								}
-							});
-						}
-					}
-				});
-			}
-		});
+		MenuItem makelocal = prepareMakeLocalMenuItem(selectedSettings);
 
+		contextMenu.setItems(makeglobal, makelocal);
+		contextMenu.showContextMenu();
+	}
+
+	private MenuItem prepareMakeLocalMenuItem(final String[] selectedSettings) {
 		MenuItem makelocal = new MenuItem();
 		makelocal.setTitle(I18N.message("makelocal"));
 		makelocal.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmmakelocal"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ClusterService.Instance.get().makeLocal(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmmakelocal"), (Boolean yes) -> {
+					if (yes) {
+						ClusterService.Instance.get().makeLocal(selectedSettings, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									ListGridRecord[] selection = list.getSelectedRecords();
-									for (int i = 0; i < ids.length; i++) {
-										selection[i].setAttribute("scope", "local");
-										list.refreshRow(list.getRecordIndex(selection[i]));
-									}
+							@Override
+							public void onSuccess(Void result) {
+								ListGridRecord[] selection = list.getSelectedRecords();
+								for (int i = 0; i < selectedSettings.length; i++) {
+									selection[i].setAttribute("scope", "local");
+									list.refreshRow(list.getRecordIndex(selection[i]));
 								}
-							});
-						}
+							}
+						});
 					}
 				});
 			}
 		});
+		return makelocal;
+	}
 
-		contextMenu.setItems(makeglobal, makelocal);
-		contextMenu.showContextMenu();
+	private MenuItem prepareMakeGlobalMenuItem(final String[] selectedSettings) {
+		MenuItem makeglobal = new MenuItem();
+		makeglobal.setTitle(I18N.message("makeglobal"));
+		makeglobal.addClickHandler((MenuItemClickEvent event) -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmmakeglobal"), (Boolean yes) -> {
+				if (yes) {
+					ClusterService.Instance.get().makeGlobal(selectedSettings, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							ListGridRecord[] selection = list.getSelectedRecords();
+							for (int i = 0; i < selectedSettings.length; i++) {
+								selection[i].setAttribute("scope", "global");
+								list.refreshRow(list.getRecordIndex(selection[i]));
+							}
+						}
+					});
+				}
+			});
+		});
+		return makeglobal;
 	}
 }

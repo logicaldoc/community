@@ -119,11 +119,8 @@ public class ReportParametersForm extends Window {
 		IButton execute = new IButton();
 		execute.setTitle(I18N.message("execute"));
 		execute.setAutoFit(true);
-		execute.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onExecute();
-			}
+		execute.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			onExecute();
 		});
 
 		HLayout buttonsBar = new HLayout();
@@ -174,50 +171,46 @@ public class ReportParametersForm extends Window {
 		ArrayList<GUIAttribute> parameters = new ArrayList<GUIAttribute>();
 
 		for (String name : values.keySet()) {
-			if (name.startsWith("_")) {
-				Object val = values.get(name);
-				String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
-				GUIAttribute attribute = getParameter(nm);
-				if (attribute == null)
-					continue;
+			if (!name.startsWith("_"))
+				continue;
 
-				if (val != null) {
-					if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
-						if (!(val == null || "".equals(val.toString().trim())))
-							attribute.setValue("1".equals(val.toString().trim()) ? true : false);
-						else if (getParameter(nm) != null) {
-							GUIAttribute at = getParameter(nm);
-							if (at != null) {
-								at.setBooleanValue(null);
-								at.setType(GUIAttribute.TYPE_BOOLEAN);
-							}
-						}
-					} else
-						attribute.setValue(val);
-				} else {
-					if (attribute != null) {
-						if (attribute.getType() == GUIAttribute.TYPE_INT) {
-							attribute.setIntValue(null);
-							break;
-						} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
-							attribute.setBooleanValue(null);
-							break;
-						} else if (attribute.getType() == GUIAttribute.TYPE_DOUBLE) {
-							attribute.setDoubleValue(null);
-							break;
-						} else if (attribute.getType() == GUIAttribute.TYPE_DATE) {
-							attribute.setDateValue(null);
-							break;
-						} else {
-							attribute.setValue("");
-							break;
-						}
-					}
-				}
+			Object value = values.get(name);
+			String parameterName = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
+			GUIAttribute attribute = getParameter(parameterName);
+			if (attribute == null)
+				continue;
+
+			if (value != null) {
+				setAttributeValue(value, parameterName, attribute);
 				parameters.add(attribute);
+			} else if (attribute != null) {
+				attribute.setIntValue(null);
+				attribute.setBooleanValue(null);
+				attribute.setDoubleValue(null);
+				attribute.setDateValue(null);
+				attribute.setStringValue("");
 			}
 		}
 
+		doExecute(parameters);
+	}
+
+	private void setAttributeValue(Object value, String parameterName, GUIAttribute attribute) {
+		if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
+			if (!(value == null || "".equals(value.toString().trim())))
+				attribute.setValue("1".equals(value.toString().trim()) ? true : false);
+			else if (getParameter(parameterName) != null) {
+				GUIAttribute at = getParameter(parameterName);
+				if (at != null) {
+					at.setBooleanValue(null);
+					at.setType(GUIAttribute.TYPE_BOOLEAN);
+				}
+			}
+		} else
+			attribute.setValue(value);
+	}
+
+	private void doExecute(ArrayList<GUIAttribute> parameters) {
 		ReportService.Instance.get().execute(report.getId(), parameters.toArray(new GUIAttribute[0]),
 				new AsyncCallback<Void>() {
 

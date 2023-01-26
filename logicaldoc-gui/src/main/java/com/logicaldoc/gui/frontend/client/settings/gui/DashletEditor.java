@@ -45,7 +45,7 @@ public class DashletEditor extends Window {
 	private TextAreaItem content;
 
 	private RadioGroupItem unique;
-	
+
 	private SpinnerItem max;
 
 	private TextAreaItem query;
@@ -75,20 +75,14 @@ public class DashletEditor extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
+		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			onSave();
 		});
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
+		close.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			destroy();
 		});
 
 		ToolStrip toolStrip = new ToolStrip();
@@ -266,15 +260,13 @@ public class DashletEditor extends Window {
 				dashlet.setTitle(form.getValueAsString("title"));
 			}
 
-			if (columnsGrid != null) {
-				dashlet.setColumns("");
-				ListGridRecord[] records = columnsGrid.getRecords();
-				if (records != null && records.length > 0) {
-					for (ListGridRecord record : records) {
-						if (!dashlet.getColumns().isEmpty())
-							dashlet.setColumns(dashlet.getColumns() + ",");
-						dashlet.setColumns(dashlet.getColumns() + record.getAttributeAsString("name"));
-					}
+			dashlet.setColumns("");
+			ListGridRecord[] records = columnsGrid.getRecords();
+			if (records != null && records.length > 0) {
+				for (ListGridRecord record : records) {
+					if (!dashlet.getColumns().isEmpty())
+						dashlet.setColumns(dashlet.getColumns() + ",");
+					dashlet.setColumns(dashlet.getColumns() + record.getAttributeAsString("name"));
 				}
 			}
 

@@ -100,6 +100,8 @@ public class SearchIndexingPanel extends AdminPanel {
 	private RefreshableListGrid docsList;
 
 	private ListGrid langsList;
+	
+	private ListGrid filtersGrid;
 
 	public SearchIndexingPanel() {
 		super("searchandindexing");
@@ -204,9 +206,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		parsersList.setFilterOnKeypress(true);
 		parsersList.setModalEditing(true);
 
-		parsersList.addEditCompleteHandler(new EditCompleteHandler() {
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
+		parsersList.addEditCompleteHandler((EditCompleteEvent event) -> {
 				ListGridRecord record = parsersList.getRecord(event.getRowNum());
 
 				SearchEngineService.Instance.get().setAliases(record.getAttributeAsString("extension"),
@@ -223,7 +223,6 @@ public class SearchIndexingPanel extends AdminPanel {
 								parsersList.redraw();
 							}
 						});
-			}
 		});
 
 		parsersInfoTabPanel.addMember(parsersList);
@@ -267,12 +266,9 @@ public class SearchIndexingPanel extends AdminPanel {
 		languagesTab.setPane(languagesTabPanel);
 
 		if (Feature.enabled(Feature.INDEX_LANGUAGES))
-			langsList.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
+			langsList.addCellContextClickHandler((CellContextClickEvent event) -> {
 					showLanguagesMenu();
 					event.cancel();
-				}
 			});
 
 		return languagesTab;
@@ -292,74 +288,10 @@ public class SearchIndexingPanel extends AdminPanel {
 		name.setWidth("*");
 		name.setCanEdit(false);
 
-		final ListGrid filtersGrid = new ListGrid() {
+		filtersGrid = new ListGrid() {
 			@Override
 			protected Canvas getExpansionComponent(final ListGridRecord record) {
-				final String filter = record.getAttributeAsString("name");
-				final ListGrid grid = this;
-
-				VLayout layout = new VLayout(5);
-				layout.setPadding(5);
-
-				final ListGrid configsGrid = new ListGrid();
-				configsGrid.setHeight(150);
-				configsGrid.setDataSource(new TokenFiltersDS(filter));
-				configsGrid.setCanEdit(true);
-				configsGrid.setModalEditing(true);
-				configsGrid.setAutoSaveEdits(true);
-				configsGrid.setAutoFetchData(true);
-
-				ListGridField name = new ListGridField("name", I18N.message("parameter"), 150);
-				name.setCanEdit(false);
-				ListGridField value = new ListGridField("value", I18N.message("value"));
-				value.setWidth("*");
-				value.setCanEdit(true);
-				configsGrid.setFields(name, value);
-
-				layout.addMember(configsGrid);
-
-				HLayout hLayout = new HLayout(10);
-				hLayout.setAlign(Alignment.CENTER);
-
-				IButton saveButton = new IButton(I18N.message("save"));
-				saveButton.setTop(250);
-				saveButton.addClickHandler(new ClickHandler() {
-					public void onClick(ClickEvent event) {
-						final List<GUIParameter> params = new ArrayList<GUIParameter>();
-						ListGridRecord[] records = configsGrid.getRecords();
-						for (ListGridRecord rec : records) {
-							params.add(new GUIParameter(rec.getAttributeAsString("name"),
-									rec.getAttributeAsString("value")));
-						}
-
-						SearchEngineService.Instance.get().saveTokenFilterSettings(filter,
-								params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(Void arg) {
-										// Nothing to do
-									}
-								});
-					}
-				});
-				hLayout.addMember(saveButton);
-
-				IButton closeButton = new IButton(I18N.message("close"));
-				closeButton.addClickHandler(new ClickHandler() {
-					public void onClick(ClickEvent event) {
-						grid.collapseRecord(record);
-					}
-				});
-				hLayout.addMember(closeButton);
-
-				layout.addMember(hLayout);
-
-				return layout;
+				return buildFiltersGridExpansionComponent(record);
 			}
 		};
 
@@ -415,6 +347,69 @@ public class SearchIndexingPanel extends AdminPanel {
 			}
 		});
 		return filtersTab;
+	}
+	
+	private Canvas buildFiltersGridExpansionComponent(ListGridRecord record) {
+		String filter = record.getAttributeAsString("name");
+
+		VLayout layout = new VLayout(5);
+		layout.setPadding(5);
+
+		final ListGrid configsGrid = new ListGrid();
+		configsGrid.setHeight(150);
+		configsGrid.setDataSource(new TokenFiltersDS(filter));
+		configsGrid.setCanEdit(true);
+		configsGrid.setModalEditing(true);
+		configsGrid.setAutoSaveEdits(true);
+		configsGrid.setAutoFetchData(true);
+
+		ListGridField name = new ListGridField("name", I18N.message("parameter"), 150);
+		name.setCanEdit(false);
+		ListGridField value = new ListGridField("value", I18N.message("value"));
+		value.setWidth("*");
+		value.setCanEdit(true);
+		configsGrid.setFields(name, value);
+
+		layout.addMember(configsGrid);
+
+		HLayout hLayout = new HLayout(10);
+		hLayout.setAlign(Alignment.CENTER);
+
+		IButton saveButton = new IButton(I18N.message("save"));
+		saveButton.setTop(250);
+		saveButton.addClickHandler((ClickEvent event) -> {
+				final List<GUIParameter> params = new ArrayList<GUIParameter>();
+				ListGridRecord[] records = configsGrid.getRecords();
+				for (ListGridRecord rec : records) {
+					params.add(new GUIParameter(rec.getAttributeAsString("name"),
+							rec.getAttributeAsString("value")));
+				}
+
+				SearchEngineService.Instance.get().saveTokenFilterSettings(filter,
+						params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void arg) {
+								// Nothing to do
+							}
+						});
+		});
+		hLayout.addMember(saveButton);
+
+		IButton closeButton = new IButton(I18N.message("close"));
+		closeButton.addClickHandler((ClickEvent event) -> {
+				filtersGrid.collapseRecord(record);
+		});
+		hLayout.addMember(closeButton);
+
+		layout.addMember(hLayout);
+
+		return layout;
 	}
 
 	private void fillSearchEngineTab() {
@@ -573,87 +568,106 @@ public class SearchIndexingPanel extends AdminPanel {
 	private HLayout prepareButtons() {
 		HLayout buttons = new HLayout();
 
-		IButton save = new IButton(I18N.message("save"));
-		save.setAutoFit(true);
-		save.addClickHandler((ClickEvent saveClick) -> {
-			@SuppressWarnings("unchecked")
-			final Map<String, Object> values = vm.getValues();
+		IButton save = prepareSaveButton();
 
-			if (vm.validate()) {
-				SearchIndexingPanel.this.searchEngine.setIncludePatterns((String) values.get("includePatterns"));
-				SearchIndexingPanel.this.searchEngine.setExcludePatterns((String) values.get("excludePatterns"));
-				SearchIndexingPanel.this.searchEngine
-						.setIncludePatternsMetadata((String) values.get("includePatternsMetadata"));
-				SearchIndexingPanel.this.searchEngine
-						.setExcludePatternsMetadata((String) values.get("excludePatternsMetadata"));
-				SearchIndexingPanel.this.searchEngine.setDir((String) values.get("repository"));
-				SearchIndexingPanel.this.searchEngine.setSorting((String) values.get("sorting"));
-				SearchIndexingPanel.this.searchEngine.setCustomSorting((String) values.get("customsorting"));
+		IButton unlock = prepareUnlockButton();
 
-				String btch = vm.getValueAsString("batch");
-				if (btch == null || "".equals(btch.trim()))
-					SearchIndexingPanel.this.searchEngine.setBatch(0);
-				else
-					SearchIndexingPanel.this.searchEngine.setBatch(Integer.parseInt(btch));
+		IButton rescheduleAll = prepareRescheduleAllButton();
 
-				String thrds = vm.getValueAsString("threads");
-				if (thrds == null || "".equals(thrds.trim()))
-					SearchIndexingPanel.this.searchEngine.setThreads(1);
-				else
-					SearchIndexingPanel.this.searchEngine.setThreads(Integer.parseInt(thrds));
+		IButton dropIndex = prepareDropIndexButton(rescheduleAll);
 
-				String timeoutValue = vm.getValueAsString("timeout");
-				if (timeoutValue == null || "".equals(timeoutValue.trim()))
-					SearchIndexingPanel.this.searchEngine.setParsingTimeout(0);
-				else
-					SearchIndexingPanel.this.searchEngine.setParsingTimeout(Integer.parseInt(timeoutValue));
+		IButton check = prepareCheckButton();
 
-				String maxtext = vm.getValueAsString("maxtext");
-				if (maxtext == null || "".equals(maxtext.trim()))
-					SearchIndexingPanel.this.searchEngine.setMaxText(0);
-				else
-					SearchIndexingPanel.this.searchEngine.setMaxText(Integer.parseInt(maxtext));
+		IButton purge = preparePurgeButton();
 
-				String maxTextFileSizeValue = vm.getValueAsString("maxtextfilesize");
-				if (maxtext == null || "".equals(maxtext.trim()))
-					SearchIndexingPanel.this.searchEngine.setMaxTextFileSize(0);
-				else
-					SearchIndexingPanel.this.searchEngine.setMaxTextFileSize(Integer.parseInt(maxTextFileSizeValue));
+		if (Session.get().isDefaultTenant()) {
+			buttons.setMembers(save, unlock, purge, rescheduleAll, dropIndex, check);
+		} else {
+			buttons.setMembers(save, rescheduleAll);
+		}
+		return buttons;
+	}
 
-				SearchEngineService.Instance.get().save(SearchIndexingPanel.this.searchEngine,
-						new AsyncCallback<Void>() {
-
+	private IButton preparePurgeButton() {
+		IButton purge = new IButton(I18N.message("purge"));
+		purge.setAutoFit(true);
+		purge.addClickHandler((ClickEvent purgeClick) -> {
+			SC.ask(I18N.message("purgeconfirmation"), (Boolean yes) -> {
+					if (yes) {
+						LD.contactingServer();
+						SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
 								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void ret) {
-								AdminScreen.get().setContent(new SearchIndexingPanel());
+								LD.clearPrompt();
 							}
 						});
-			}
+					}
+			});
 		});
+		return purge;
+	}
 
-		IButton unlock = new IButton(I18N.message("unlock"));
-		unlock.setAutoFit(true);
-		unlock.addClickHandler((ClickEvent unlockClick) -> {
-			SearchEngineService.Instance.get().unlock(new AsyncCallback<Void>() {
-
+	private IButton prepareCheckButton() {
+		IButton check = new IButton(I18N.message("check"));
+		check.setAutoFit(true);
+		check.addClickHandler((ClickEvent checkClick) -> {
+			LD.contactingServer();
+			SearchEngineService.Instance.get().check(new AsyncCallback<String>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
+					LD.clearPrompt();
 				}
 
 				@Override
-				public void onSuccess(Void ret) {
-					GuiLog.info(I18N.message("indexunlocked"), null);
-					AdminScreen.get().setContent(new SearchIndexingPanel());
+				public void onSuccess(String ret) {
+					LD.clearPrompt();
+					SearchIndexCheckStatus sc = new SearchIndexCheckStatus(ret);
+					sc.show();
 				}
 			});
 		});
+		return check;
+	}
 
+	private IButton prepareDropIndexButton(IButton rescheduleAll) {
+		IButton dropIndex = new IButton(I18N.message("dropindex"));
+		dropIndex.setAutoFit(true);
+		dropIndex.addClickHandler((ClickEvent dropIndexClick) -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdropindex"), (Boolean yes) -> {
+				if (yes) {
+					LD.contactingServer();
+					rescheduleAll.setDisabled(true);
+					SearchEngineService.Instance.get().rescheduleAll(true, new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
+							dropIndex.setDisabled(false);
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void ret) {
+							GuiLog.info(I18N.message("docsreindex"), null);
+							dropIndex.setDisabled(false);
+							LD.clearPrompt();
+							AdminScreen.get().setContent(new SearchIndexingPanel());
+						}
+					});
+				}
+			});
+		});
+		return dropIndex;
+	}
+
+	private IButton prepareRescheduleAllButton() {
 		final IButton rescheduleAll = new IButton(I18N.message("rescheduleall"));
 		rescheduleAll.setAutoFit(true);
 		rescheduleAll.addClickHandler((ClickEvent rescheduleAllClick) -> {
@@ -684,88 +698,98 @@ public class SearchIndexingPanel extends AdminPanel {
 				}
 			});
 		});
+		return rescheduleAll;
+	}
 
-		final IButton dropIndex = new IButton(I18N.message("dropindex"));
-		dropIndex.setAutoFit(true);
-		dropIndex.addClickHandler((ClickEvent dropIndexClick) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdropindex"), new BooleanCallback() {
-				@Override
-				public void execute(Boolean value) {
-					if (value) {
-						LD.contactingServer();
-						rescheduleAll.setDisabled(true);
-						SearchEngineService.Instance.get().rescheduleAll(true, new AsyncCallback<Void>() {
+	private IButton prepareUnlockButton() {
+		IButton unlock = new IButton(I18N.message("unlock"));
+		unlock.setAutoFit(true);
+		unlock.addClickHandler((ClickEvent unlockClick) -> {
+			SearchEngineService.Instance.get().unlock(new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								dropIndex.setDisabled(false);
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void ret) {
-								GuiLog.info(I18N.message("docsreindex"), null);
-								dropIndex.setDisabled(false);
-								LD.clearPrompt();
-								AdminScreen.get().setContent(new SearchIndexingPanel());
-							}
-						});
-					}
-				}
-			});
-		});
-
-		IButton check = new IButton(I18N.message("check"));
-		check.setAutoFit(true);
-		check.addClickHandler((ClickEvent checkClick) -> {
-			LD.contactingServer();
-			SearchEngineService.Instance.get().check(new AsyncCallback<String>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
-					LD.clearPrompt();
 				}
 
 				@Override
-				public void onSuccess(String ret) {
-					LD.clearPrompt();
-					SearchIndexCheckStatus sc = new SearchIndexCheckStatus(ret);
-					sc.show();
+				public void onSuccess(Void ret) {
+					GuiLog.info(I18N.message("indexunlocked"), null);
+					AdminScreen.get().setContent(new SearchIndexingPanel());
 				}
 			});
 		});
+		return unlock;
+	}
 
-		IButton purge = new IButton(I18N.message("purge"));
-		purge.setAutoFit(true);
-		purge.addClickHandler((ClickEvent purgeClick) -> {
-			SC.ask(I18N.message("purgeconfirmation"), new BooleanCallback() {
+	private IButton prepareSaveButton() {
+		IButton save = new IButton(I18N.message("save"));
+		save.setAutoFit(true);
+		save.addClickHandler((ClickEvent saveClick) -> {
+			if (!vm.validate())
+				return;
+
+			collectValues();
+
+			SearchEngineService.Instance.get().save(SearchIndexingPanel.this.searchEngine, new AsyncCallback<Void>() {
 
 				@Override
-				public void execute(Boolean value) {
-					LD.contactingServer();
-					SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(Void ret) {
-							LD.clearPrompt();
-						}
-					});
+				@Override
+				public void onSuccess(Void ret) {
+					AdminScreen.get().setContent(new SearchIndexingPanel());
 				}
 			});
 		});
+		return save;
+	}
 
-		if (Session.get().isDefaultTenant()) {
-			buttons.setMembers(save, unlock, purge, rescheduleAll, dropIndex, check);
-		} else {
-			buttons.setMembers(save, rescheduleAll);
-		}
-		return buttons;
+	private void collectValues() {
+		@SuppressWarnings("unchecked")
+		final Map<String, Object> values = vm.getValues();
+
+		SearchIndexingPanel.this.searchEngine.setIncludePatterns((String) values.get("includePatterns"));
+		SearchIndexingPanel.this.searchEngine.setExcludePatterns((String) values.get("excludePatterns"));
+		SearchIndexingPanel.this.searchEngine
+				.setIncludePatternsMetadata((String) values.get("includePatternsMetadata"));
+		SearchIndexingPanel.this.searchEngine
+				.setExcludePatternsMetadata((String) values.get("excludePatternsMetadata"));
+		SearchIndexingPanel.this.searchEngine.setDir((String) values.get("repository"));
+		SearchIndexingPanel.this.searchEngine.setSorting((String) values.get("sorting"));
+		SearchIndexingPanel.this.searchEngine.setCustomSorting((String) values.get("customsorting"));
+
+		String btch = vm.getValueAsString("batch");
+		if (btch == null || "".equals(btch.trim()))
+			SearchIndexingPanel.this.searchEngine.setBatch(0);
+		else
+			SearchIndexingPanel.this.searchEngine.setBatch(Integer.parseInt(btch));
+
+		String thrds = vm.getValueAsString("threads");
+		if (thrds == null || "".equals(thrds.trim()))
+			SearchIndexingPanel.this.searchEngine.setThreads(1);
+		else
+			SearchIndexingPanel.this.searchEngine.setThreads(Integer.parseInt(thrds));
+
+		String timeoutValue = vm.getValueAsString("timeout");
+		if (timeoutValue == null || "".equals(timeoutValue.trim()))
+			SearchIndexingPanel.this.searchEngine.setParsingTimeout(0);
+		else
+			SearchIndexingPanel.this.searchEngine.setParsingTimeout(Integer.parseInt(timeoutValue));
+
+		String maxtext = vm.getValueAsString("maxtext");
+		if (maxtext == null || "".equals(maxtext.trim()))
+			SearchIndexingPanel.this.searchEngine.setMaxText(0);
+		else
+			SearchIndexingPanel.this.searchEngine.setMaxText(Integer.parseInt(maxtext));
+
+		String maxTextFileSizeValue = vm.getValueAsString("maxtextfilesize");
+		if (maxtext == null || "".equals(maxtext.trim()))
+			SearchIndexingPanel.this.searchEngine.setMaxTextFileSize(0);
+		else
+			SearchIndexingPanel.this.searchEngine.setMaxTextFileSize(Integer.parseInt(maxTextFileSizeValue));
 	}
 
 	private void prepareIndexingQueuePanel(Integer maxValue) {

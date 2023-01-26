@@ -21,7 +21,6 @@ import com.logicaldoc.gui.frontend.client.document.update.UpdateDialog;
 import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -40,25 +39,56 @@ public class SearchToolbar extends ToolStrip {
 		setWidth100();
 		addSpacer(2);
 
+		addShowSnippetsButton(hitsPanel);
+
+		addSaveButton();
+
+		addSeparator();
+
+		addPrintButton(hitsPanel);
+
+		addExportButton(hitsPanel);
+
+		addSaveLayoutButton();
+
+		addSeparator();
+
+		addDownloadButton();
+
+		addBulkUpdateButton(hitsPanel);
+
+		addSeparator();
+
+		addToggleLeftPanelButton();
+
+		addSeparator();
+
+		addListButton(hitsPanel);
+
+		addGalleryButton(hitsPanel);
+
+		addSeparator();
+
+		addTogglePreviewButton(hitsPanel);
+
+		addFill();
+	}
+
+	private void addShowSnippetsButton(final HitsListPanel hitsPanel) {
 		ToolStripButton showSnippets = AwesomeFactory.newToolStripButton("file", "showsnippets");
 		showSnippets.setDisabled(Search.get().getOptions().getType() != GUISearchOptions.TYPE_FULLTEXT);
 		addButton(showSnippets);
-		showSnippets.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				hitsPanel.getGrid().expandVisibleRows();
-			}
+		showSnippets.addClickHandler((ClickEvent event) -> {
+			hitsPanel.getGrid().expandVisibleRows();
 		});
+	}
 
+	private void addSaveButton() {
 		ToolStripButton save = AwesomeFactory.newToolStripButton("save", "savesearch");
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SaveDialog dialog = new SaveDialog();
-				dialog.show();
-			}
+		save.addClickHandler((ClickEvent event) -> {
+			SaveDialog dialog = new SaveDialog();
+			dialog.show();
 		});
-
 		if (Feature.visible(Feature.SAVED_SEARCHES)) {
 			addSeparator();
 			addButton(save);
@@ -67,66 +97,61 @@ public class SearchToolbar extends ToolStrip {
 				save.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
+	}
 
+	private void addPrintButton(final HitsListPanel hitsPanel) {
 		ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
-		print.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (hitsPanel.getGrid() instanceof ListGrid)
-					GridUtil.print((ListGrid) hitsPanel.getGrid());
-				else
-					Canvas.printComponents(new Object[] { hitsPanel.getGrid() });
-			}
+		print.addClickHandler((ClickEvent event) -> {
+			if (hitsPanel.getGrid() instanceof ListGrid)
+				GridUtil.print((ListGrid) hitsPanel.getGrid());
+			else
+				Canvas.printComponents(new Object[] { hitsPanel.getGrid() });
 		});
-		addSeparator();
 		addButton(print);
+	}
 
+	private void addExportButton(final HitsListPanel hitsPanel) {
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
 			addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false);
-				}
+			export.addClickHandler((ClickEvent event) -> {
+				GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false);
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
 				export.setDisabled(true);
 				export.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
+	}
 
+	private void addSaveLayoutButton() {
 		ToolStripButton saveLayout = AwesomeFactory.newToolStripButton("save", "savelayoutinuserprofile");
-		saveLayout.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				saveGridState();
-			}
+		saveLayout.addClickHandler((ClickEvent event) -> {
+			saveGridState();
 		});
 		addButton(saveLayout);
+	}
 
-		addSeparator();
+	private void addDownloadButton() {
 		ToolStripButton download = AwesomeFactory.newToolStripButton("download", "download");
 		addButton(download);
-		download.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
-						|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
-					return;
+		download.addClickHandler((ClickEvent event) -> {
+			if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
+					|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
+				return;
 
-				String url = GWT.getHostPageBaseURL() + "zip-export?1=1";
-				for (GUIDocument record : Search.get().getLastResult()) {
-					url += "&docId=" + record.getId();
-				}
-
-				Util.download(url);
+			String url = GWT.getHostPageBaseURL() + "zip-export?1=1";
+			for (GUIDocument record : Search.get().getLastResult()) {
+				url += "&docId=" + record.getId();
 			}
+
+			Util.download(url);
 		});
+	}
 
-		if (Feature.visible(Feature.BULK_UPDATE))
-			addSeparator();
-
+	private void addBulkUpdateButton(final HitsListPanel hitsPanel) {
 		if (Feature.visible(Feature.BULK_UPDATE)) {
+			addSeparator();
 			ToolStripButton bulkUpdate = AwesomeFactory.newToolStripButton("edit", "bulkupdate");
 			addButton(bulkUpdate);
 			if (!Feature.enabled(Feature.BULK_UPDATE)) {
@@ -134,33 +159,31 @@ public class SearchToolbar extends ToolStrip {
 				bulkUpdate.setTooltip(I18N.message("featuredisabled"));
 			}
 
-			bulkUpdate.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
-							|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
-						return;
+			bulkUpdate.addClickHandler((ClickEvent event) -> {
+				if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
+						|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
+					return;
 
-					if (hitsPanel.getGrid().getSelectedIds().length > 1) {
-						GUIDocument metadata = new GUIDocument();
-						metadata.setBulkUpdate(true);
-						metadata.setStartPublishing(null);
-						metadata.setPublished(-1);
-						metadata.setLockUserId(Session.get().getUser().getId());
-						GUIFolder fld = new GUIFolder();
-						fld.setPermissions(new String[] { "read", "write" });
-						metadata.setFolder(fld);
+				if (hitsPanel.getGrid().getSelectedIds().length > 1) {
+					GUIDocument metadata = new GUIDocument();
+					metadata.setBulkUpdate(true);
+					metadata.setStartPublishing(null);
+					metadata.setPublished(-1);
+					metadata.setLockUserId(Session.get().getUser().getId());
+					GUIFolder fld = new GUIFolder();
+					fld.setPermissions(new String[] { "read", "write" });
+					metadata.setFolder(fld);
 
-						UpdateDialog dialog = new UpdateDialog(hitsPanel.getGrid().getSelectedIds(), metadata,
-								UpdateDialog.CONTEXT_UPDATE, false);
-						dialog.show();
-					}
+					UpdateDialog dialog = new UpdateDialog(hitsPanel.getGrid().getSelectedIds(), metadata,
+							UpdateDialog.CONTEXT_UPDATE, false);
+					dialog.show();
 				}
 			});
-
 		}
+	}
 
-		final ToolStripButton toggle = AwesomeFactory.newToolStripButton("toggle-on", "closeseleftpanel");
+	private void addToggleLeftPanelButton() {
+		ToolStripButton toggle = AwesomeFactory.newToolStripButton("toggle-on", "closeseleftpanel");
 		if (SearchMenu.get().getWidth() > 0) {
 			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
 			toggle.setTooltip(I18N.message("closeseleftpanel"));
@@ -168,94 +191,73 @@ public class SearchToolbar extends ToolStrip {
 			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 			toggle.setTooltip(I18N.message("openleftpanel"));
 		}
-		toggle.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				SearchPanel.get().toggleMenu();
-				if (SearchPanel.get().isMenuOpened()) {
-					toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-					toggle.setTooltip(I18N.message("closeseleftpanel"));
-				} else {
-					toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
-					toggle.setTooltip(I18N.message("openleftpanel"));
-				}
+		toggle.addClickHandler((ClickEvent event) -> {
+			SearchPanel.get().toggleMenu();
+			if (SearchPanel.get().isMenuOpened()) {
+				toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
+				toggle.setTooltip(I18N.message("closeseleftpanel"));
+			} else {
+				toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
+				toggle.setTooltip(I18N.message("openleftpanel"));
 			}
 		});
-		addSeparator();
+
 		addButton(toggle);
+	}
 
-		final ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
-		list.setRadioGroup("mode");
-		list.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_LIST);
-				hitsPanel.setVisualizationMode(DocumentsGrid.MODE_LIST);
-				hitsPanel.initialize();
-			}
-		});
-
-		final ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
-		gallery.setActionType(SelectionType.RADIO);
-		gallery.setRadioGroup("mode");
-		gallery.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (FolderController.get().getCurrentFolder() != null)
-					CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_GALLERY);
-				hitsPanel.setVisualizationMode(DocumentsGrid.MODE_GALLERY);
-				hitsPanel.initialize();
-			}
-		});
-		gallery.setVisible(Session.get().getConfigAsBoolean("gui.galleryenabled"));
-
-		final ToolStripButton togglePreview = AwesomeFactory.newToolStripButton("toggle-on", "closepreview");
-		try {
-			// Retrieve the saved preview width
-			String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
-			if (Integer.parseInt(w) <= 0) {
+	private void addTogglePreviewButton(HitsListPanel hitsPanel) {
+		ToolStripButton togglePreview = AwesomeFactory.newToolStripButton("toggle-on", "closepreview");
+		// Retrieve the saved preview width
+		String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
+		if (Integer.parseInt(w) <= 0) {
+			togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
+			togglePreview.setTooltip(I18N.message("openpreview"));
+		}
+		togglePreview.addClickHandler((ClickEvent event) -> {
+			if (SearchPanel.get().getPreviewPanel().isVisible() && SearchPanel.get().getPreviewPanel().getWidth() > 1) {
+				SearchPanel.get().getPreviewPanel().setWidth(0);
 				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 				togglePreview.setTooltip(I18N.message("openpreview"));
-			}
-		} catch (Throwable t) {
-			// Nothing to do
-		}
-		
-		togglePreview.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (SearchPanel.get().getPreviewPanel().isVisible()
-						&& SearchPanel.get().getPreviewPanel().getWidth() > 1) {
-					SearchPanel.get().getPreviewPanel().setWidth(0);
-					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
-					togglePreview.setTooltip(I18N.message("openpreview"));
-				} else {
-					try {
-						String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
-						SearchPanel.get().getPreviewPanel().setWidth(Integer.parseInt(w));
-					} catch (Throwable t) {
-						SearchPanel.get().getPreviewPanel().setWidth(350);
-					}
-					SearchPanel.get().getPreviewPanel().setDocument(hitsPanel.getGrid().getSelectedDocument());
-					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-					togglePreview.setTooltip(I18N.message("closepreview"));
+			} else {
+				try {
+					String width = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
+					SearchPanel.get().getPreviewPanel().setWidth(Integer.parseInt(width));
+				} catch (Throwable t) {
+					SearchPanel.get().getPreviewPanel().setWidth(350);
 				}
+				SearchPanel.get().getPreviewPanel().setDocument(hitsPanel.getGrid().getSelectedDocument());
+				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
+				togglePreview.setTooltip(I18N.message("closepreview"));
 			}
 		});
-
-		if (hitsPanel.getVisualizationMode() == DocumentsGrid.MODE_LIST)
-			list.setSelected(true);
-		else
-			gallery.setSelected(true);
-
-		addSeparator();
-		addButton(list);
-		addButton(gallery);
-		addSeparator();
 		addButton(togglePreview);
+	}
 
-		addFill();
+	private void addGalleryButton(HitsListPanel hitsPanel) {
+		ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
+		gallery.setActionType(SelectionType.RADIO);
+		gallery.setRadioGroup("mode");
+		gallery.addClickHandler((ClickEvent event) -> {
+			if (FolderController.get().getCurrentFolder() != null)
+				CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_GALLERY);
+			hitsPanel.setVisualizationMode(DocumentsGrid.MODE_GALLERY);
+			hitsPanel.initialize();
+		});
+		gallery.setVisible(Session.get().getConfigAsBoolean("gui.galleryenabled"));
+		gallery.setSelected(hitsPanel.getVisualizationMode() != DocumentsGrid.MODE_LIST);
+		addButton(gallery);
+	}
+
+	private void addListButton(HitsListPanel hitsPanel) {
+		ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
+		list.setRadioGroup("mode");
+		list.addClickHandler((ClickEvent event) -> {
+			CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_LIST);
+			hitsPanel.setVisualizationMode(DocumentsGrid.MODE_LIST);
+			hitsPanel.initialize();
+		});
+		list.setSelected(hitsPanel.getVisualizationMode() == DocumentsGrid.MODE_LIST);
+		addButton(list);
 	}
 
 	private void saveGridState() {

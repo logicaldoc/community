@@ -1164,6 +1164,16 @@ public abstract class Util {
 		}
 	}
 
+	public static String getParameterValue(GUIParameter[] params, String name) {
+		for (GUIParameter param : params) {
+			if (param.getName().equals(Session.get().getTenantName() + "." + name))
+				return param.getValue();
+			else if (param.getName().equals(name))
+				return param.getValue();
+		}
+		return null;
+	}
+
 	public static native String getJavascriptVariable(String jsVar)/*-{
 		return eval('$wnd.' + jsVar);
 	}-*/;

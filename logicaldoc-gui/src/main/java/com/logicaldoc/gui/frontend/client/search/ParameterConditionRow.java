@@ -11,16 +11,13 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.DataSourceField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -62,14 +59,7 @@ public class ParameterConditionRow extends HLayout {
 	}
 
 	public void reload() {
-		if (removeImg != null)
-			removeMember(removeImg);
-		if (form != null) {
-			attribute.clearValue();
-			operator.clearValue();
-			value.clearValue();
-			removeMember(form);
-		}
+		prepareForm();
 
 		removeImg = new ImgButton();
 		removeImg.setShowDown(false);
@@ -78,31 +68,17 @@ public class ParameterConditionRow extends HLayout {
 		removeImg.setSrc("[SKIN]/headerIcons/close.gif");
 		removeImg.setHeight(18);
 		removeImg.setWidth(18);
-		removeImg.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				ParameterConditionRow.this.getParentCanvas().removeChild(ParameterConditionRow.this);
-			}
+		removeImg.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			ParameterConditionRow.this.getParentCanvas().removeChild(ParameterConditionRow.this);
 		});
-
-		form = new DynamicForm();
-		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setNumCols(4);
-		form.setWidth(300);
-		form.setHeight(20);
 
 		attribute = new SelectItem("fields", "fields");
 		attribute.setShowTitle(false);
 		attribute.setPickListWidth(120);
 		attribute.setWidth(120);
 		attribute.setMultiple(false);
-		DataSource ds = null;
 
-		if (forDocument)
-			ds = new DocumentFieldsDS(template);
-		else
-			ds = new FolderFieldsDS(template);
+		DataSource ds = prepareDataSource();
 
 		LinkedHashMap<String, String> fieldsMap = new LinkedHashMap<String, String>();
 		fieldsMap.put("", " ");
@@ -121,28 +97,18 @@ public class ParameterConditionRow extends HLayout {
 		operator.setColSpan(1);
 
 		LinkedHashMap<String, String> operatorsMap = null;
-
-		try {
-			if (fieldSelected != null && !fieldSelected.trim().isEmpty())
-				operatorsMap = operatorsFor(fieldSelected);
-			else
-				operatorsMap = operatorsFor(null);
-		} catch (Throwable t) {
-			SC.warn(t.getMessage());
-		}
-
+		if (fieldSelected != null && !fieldSelected.trim().isEmpty())
+			operatorsMap = operatorsFor(fieldSelected);
+		else
+			operatorsMap = operatorsFor(null);
 		operator.setValueMap(operatorsMap);
 		if (operatorsMap != null && !operatorsMap.isEmpty())
 			operator.setValue(operatorsMap.keySet().iterator().next());
 
-		attribute.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue() != null) {
-					fieldSelected = (String) event.getValue();
-					reload();
-				}
+		attribute.addChangedHandler((ChangedEvent event) -> {
+			if (event.getValue() != null) {
+				fieldSelected = (String) event.getValue();
+				reload();
 			}
 		});
 
@@ -163,28 +129,51 @@ public class ParameterConditionRow extends HLayout {
 
 		setMembers(removeImg, form);
 
-		addResizedHandler(new ResizedHandler() {
+		addResizeHandler();
 
-			@Override
-			public void onResized(ResizedEvent event) {
-				if (value instanceof DateItem)
-					return;
-
-				int padSize = ParameterConditionRow.this.getWidth() - 230;
-				if (padSize < 100)
-					padSize = 100;
-				value.setWidth(padSize);
-			}
-		});
-
-		operator.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onOperatorChanged(event != null ? event.getValue().toString() : null);
-			}
+		operator.addChangedHandler((ChangedEvent event) -> {
+			onOperatorChanged(event != null ? event.getValue().toString() : null);
 		});
 
 		onOperatorChanged(operator.getValue() != null ? operator.getValue().toString() : null);
+	}
+
+	private void addResizeHandler() {
+		addResizedHandler((ResizedEvent event) -> {
+			if (value instanceof DateItem)
+				return;
+
+			int padSize = ParameterConditionRow.this.getWidth() - 230;
+			if (padSize < 100)
+				padSize = 100;
+			value.setWidth(padSize);
+		});
+	}
+
+	private DataSource prepareDataSource() {
+		DataSource ds = null;
+		if (forDocument)
+			ds = new DocumentFieldsDS(template);
+		else
+			ds = new FolderFieldsDS(template);
+		return ds;
+	}
+
+	private void prepareForm() {
+		if (removeImg != null)
+			removeMember(removeImg);
+		if (form != null) {
+			attribute.clearValue();
+			operator.clearValue();
+			value.clearValue();
+			removeMember(form);
+		}
+
+		form = new DynamicForm();
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setNumCols(4);
+		form.setWidth(300);
+		form.setHeight(20);
 	}
 
 	private void onOperatorChanged(String valueOperator) {
