@@ -154,91 +154,108 @@ public class GridUtil {
 			StringBuilder stringBuilder = new StringBuilder(); // csv data in
 																// here
 
-			// column names
-			ListGridField[] fields = listGrid.getFields();
-			if (allFields)
-				fields = listGrid.getAllFields();
-			for (int i = 0; i < fields.length; i++) {
-				ListGridField listGridField = fields[i];
-				if (listGridField.getType().equals(ListGridFieldType.ICON)
-						|| listGridField.getType().equals(ListGridFieldType.IMAGE)
-						|| listGridField.getType().equals(ListGridFieldType.IMAGEFILE)
-						|| listGridField.getType().equals(ListGridFieldType.BINARY)
-						|| "".equals(listGridField.getTitle()) || "&nbsp;".equals(listGridField.getTitle()))
-					continue;
+			// Headers
+			ListGridField[] fields = printColumnHeadersRow(listGrid, allFields, stringBuilder);
 
-				stringBuilder.append("\"");
-				stringBuilder.append(Util.encodeUTF8(listGridField.getTitle()));
-				stringBuilder.append("\";");
-			}
-			stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove
-																	// last
-																	// ";"
-			stringBuilder.append("\n");
-
-			// column data
-			Record[] records = new Record[0];
-			try {
-				records = listGrid.getRecords();
-			} catch (Throwable t) {
-				// Nothing to do
-			}
-
-			if (records == null || records.length < 1) {
-				/*
-				 * In case of data bound grid, we need to call the original
-				 * records list
-				 */
-				RecordList buf = listGrid.getOriginalRecordList();
-				if (buf != null) {
-					records = new Record[buf.getLength()];
-					for (int i = 0; i < records.length; i++)
-						records[i] = buf.get(i);
-				}
-			}
+			// Data
+			Record[] records = getData(listGrid);
 
 			for (int i = 0; i < records.length; i++) {
 				Record record = records[i];
-
-				for (int j = 0; j < fields.length; j++) {
-					try {
-						ListGridField listGridField = fields[j];
-						if (listGridField.getType().equals(ListGridFieldType.ICON)
-								|| listGridField.getType().equals(ListGridFieldType.IMAGE)
-								|| listGridField.getType().equals(ListGridFieldType.IMAGEFILE)
-								|| listGridField.getType().equals(ListGridFieldType.BINARY)
-								|| "".equals(listGridField.getTitle()) || "&nbsp;".equals(listGridField.getTitle()))
-							continue;
-
-						stringBuilder.append("\"");
-						if (listGridField.getType().equals(ListGridFieldType.DATE)
-								|| listGridField.getType().equals(ListGridFieldType.DATETIME)) {
-							Date val = record.getAttributeAsDate(listGridField.getName());
-							stringBuilder.append(val == null ? "" : I18N.formatDateLong(val));
-						} else {
-							Object val = record.getAttribute(listGridField.getName());
-							stringBuilder.append(val == null || "null".equals(val.toString()) ? ""
-									: Util.encodeUTF8(val.toString()));
-						}
-						stringBuilder.append("\";");
-					} catch (Throwable t) {
-						/*
-						 * May be that not all the rows are available, since we
-						 * can count just on the rows that were rendered.
-						 */
-					}
-				}
-				stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove
-																		// last
-																		// ";"
-				stringBuilder.append("\n");
+				printRecord(stringBuilder, fields, record);
 			}
+
 			String content = stringBuilder.toString();
 
 			GridUtil.exportAsCSV(content);
 		} finally {
 			LD.clearPrompt();
 		}
+	}
+
+	private static void printRecord(StringBuilder stringBuilder, ListGridField[] fields, Record record) {
+		for (int j = 0; j < fields.length; j++) {
+			try {
+				ListGridField listGridField = fields[j];
+				if (isImageOrIcon(listGridField))
+					continue;
+
+				printRecordColumn(stringBuilder, record, listGridField);
+			} catch (Throwable t) {
+				/*
+				 * May be that not all the rows are available, since we can
+				 * count just on the rows that were rendered.
+				 */
+			}
+		}
+		stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove
+																// last
+																// ";"
+		stringBuilder.append("\n");
+	}
+
+	private static void printRecordColumn(StringBuilder stringBuilder, Record record, ListGridField listGridField) {
+		stringBuilder.append("\"");
+		if (listGridField.getType().equals(ListGridFieldType.DATE)
+				|| listGridField.getType().equals(ListGridFieldType.DATETIME)) {
+			Date val = record.getAttributeAsDate(listGridField.getName());
+			stringBuilder.append(val == null ? "" : I18N.formatDateLong(val));
+		} else {
+			Object val = record.getAttribute(listGridField.getName());
+			stringBuilder.append(val == null || "null".equals(val.toString()) ? "" : Util.encodeUTF8(val.toString()));
+		}
+		stringBuilder.append("\";");
+	}
+
+	private static boolean isImageOrIcon(ListGridField listGridField) {
+		return listGridField.getType().equals(ListGridFieldType.ICON)
+				|| listGridField.getType().equals(ListGridFieldType.IMAGE)
+				|| listGridField.getType().equals(ListGridFieldType.IMAGEFILE)
+				|| listGridField.getType().equals(ListGridFieldType.BINARY) || "".equals(listGridField.getTitle())
+				|| "&nbsp;".equals(listGridField.getTitle());
+	}
+
+	private static Record[] getData(ListGrid listGrid) {
+		Record[] records = listGrid.getRecords();
+		if (records == null || records.length < 1) {
+			/*
+			 * In case of data bound grid, we need to call the original records
+			 * list
+			 */
+			RecordList buf = listGrid.getOriginalRecordList();
+			if (buf != null) {
+				records = new Record[buf.getLength()];
+				for (int i = 0; i < records.length; i++)
+					records[i] = buf.get(i);
+			}
+		}
+
+		if (records == null)
+			records = new Record[0];
+
+		return records;
+	}
+
+	private static ListGridField[] printColumnHeadersRow(ListGrid listGrid, boolean allFields,
+			StringBuilder stringBuilder) {
+		// column names
+		ListGridField[] fields = listGrid.getFields();
+		if (allFields)
+			fields = listGrid.getAllFields();
+		for (int i = 0; i < fields.length; i++) {
+			ListGridField listGridField = fields[i];
+			if (isImageOrIcon(listGridField))
+				continue;
+
+			stringBuilder.append("\"");
+			stringBuilder.append(Util.encodeUTF8(listGridField.getTitle()));
+			stringBuilder.append("\";");
+		}
+		stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove
+																// last
+																// ";"
+		stringBuilder.append("\n");
+		return fields;
 	}
 
 	/**
