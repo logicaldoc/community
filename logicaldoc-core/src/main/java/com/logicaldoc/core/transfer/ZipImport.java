@@ -116,7 +116,11 @@ public class ZipImport {
 		}
 
 		if (notifyUser)
-			sendNotificationMessage();
+			try {
+				sendNotificationMessage();
+			} catch (Exception e) {
+				log.warn("Cannot notify zip import", e);
+			}
 	}
 
 	public void process(String zipsource, Locale locale, Folder parent, long userId, Long templateId, String sessionId)
@@ -199,7 +203,7 @@ public class ZipImport {
 		ResourceBundle bundle = ResourceBundle.getBundle("i18n.messages", user.getLocale());
 		sysmess.setSubject(bundle.getString("zip.import.subject"));
 		String message = bundle.getString("zip.import.body");
-		String body = MessageFormat.format(message, new Object[] { zipFile.getName() });
+		String body = MessageFormat.format(message, new Object[] { zipFile != null ? zipFile.getName() : "" });
 		sysmess.setMessageText(body);
 		sysmess.setSentDate(now);
 		sysmess.setConfirmation(0);

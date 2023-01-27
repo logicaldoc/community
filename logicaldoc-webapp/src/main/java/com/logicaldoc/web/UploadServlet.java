@@ -41,7 +41,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 	public static final String receivedFiles = "receivedFiles";
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID =  1L;
 
 	protected static Logger log = LoggerFactory.getLogger(UploadServlet.class);
 

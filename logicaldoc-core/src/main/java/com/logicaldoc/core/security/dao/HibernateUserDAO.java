@@ -231,6 +231,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
 		passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
 
+		// Do not implement password change logic in case of users imported from
+		// another system
+		if (user.getSource() != User.SOURCE_DEFAULT)
+			passwordChanged=false;
+		
 		if (passwordChanged) {
 			checkAlreadyUsedPassword(user);
 			checkPasswordStrength(user);
@@ -476,7 +481,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private boolean isPasswordExpired(User user) {
-		if (user == null)
+		if (user == null || user.getSource() != User.SOURCE_DEFAULT)
 			return false;
 
 		if (user.getPasswordExpired() == 1)

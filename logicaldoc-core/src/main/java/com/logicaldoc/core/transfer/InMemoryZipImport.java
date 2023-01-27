@@ -94,6 +94,10 @@ public class InMemoryZipImport extends ZipImport {
 		}
 
 		if (isNotifyUser())
-			sendNotificationMessage();
+			try {
+				sendNotificationMessage();
+			} catch (Exception e) {
+				log.warn("Cannot notify zip import", e);
+			}
 	}
 }
