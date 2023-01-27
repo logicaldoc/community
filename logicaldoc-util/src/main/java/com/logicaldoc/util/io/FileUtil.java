@@ -303,8 +303,8 @@ public class FileUtil {
 	 * @return the base name
 	 */
 	public static String getBaseName(String fileName) {
-		String name=getName(fileName);
-		
+		String name = getName(fileName);
+
 		try {
 			return FilenameUtils.getBaseName(name);
 		} catch (Exception e) {
@@ -334,7 +334,7 @@ public class FileUtil {
 				return fileName;
 		}
 	}
-	
+
 	/**
 	 * Gets the path part
 	 * 
@@ -438,21 +438,27 @@ public class FileUtil {
 	 */
 	public static boolean matches(String filename, String[] includes, String[] excludes) {
 		// First of all check if the filename must be excluded
-		if (excludes != null && excludes.length > 0)
-			for (String s : excludes)
-				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, filename, false))
-					return false;
+		boolean matchesEcludes = matchesFilters(filename, excludes);
+		if (matchesEcludes)
+			return false;
 
 		// Then check if the filename must can be included
-		if (includes != null && includes.length > 0)
-			for (String s : includes)
-				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, filename, false))
-					return true;
+		boolean matchesIncludes = matchesFilters(filename, includes);
+		if (matchesIncludes)
+			return true;
 
 		if (includes == null || includes.length == 0)
 			return true;
 		else
 			return false;
+	}
+
+	private static boolean matchesFilters(String str, String[] filters) {
+		if (filters != null && filters.length > 0)
+			for (String s : filters)
+				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, str, false))
+					return true;
+		return false;
 	}
 
 	/**
@@ -655,18 +661,22 @@ public class FileUtil {
 		}
 
 		if (file != null && file.exists())
-			try {
-				log.debug("Delete file {} using OS command", file.getAbsolutePath());
-				if (SystemUtil.isWindows()) {
-					if (file.isDirectory())
-						java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
-					else
-						java.lang.Runtime.getRuntime().exec("cmd /C rmdir /S /Q \"" + file.getAbsolutePath() + "\"");
-				} else
-					java.lang.Runtime.getRuntime().exec("rm -rf \"" + file.getAbsolutePath() + "\"");
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
+			deleteUsingOSCommand(file);
+	}
+
+	private static void deleteUsingOSCommand(File file) {
+		try {
+			log.debug("Delete file {} using OS command", file.getAbsolutePath());
+			if (SystemUtil.isWindows()) {
+				if (file.isDirectory())
+					java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
+				else
+					java.lang.Runtime.getRuntime().exec("cmd /C rmdir /S /Q \"" + file.getAbsolutePath() + "\"");
+			} else
+				java.lang.Runtime.getRuntime().exec("rm -rf \"" + file.getAbsolutePath() + "\"");
+		} catch (IOException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	public static boolean isDirEmpty(final Path directory) throws IOException {

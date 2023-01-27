@@ -7,7 +7,6 @@ import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -151,42 +150,39 @@ public class TaskSchedulingPanel extends VLayout {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		try {
-			Map<String, Object> values = (Map<String, Object>) vm.getValues();
-			vm.validate();
-			if (!vm.hasErrors()) {
-				if (((String) values.get("simple")).equals("true"))
-					task.getScheduling().setSimple(true);
-				else
-					task.getScheduling().setSimple(false);
+		if (!vm.validate())
+			return false;
 
-				long max = Long.parseLong(values.get("maxDuration").toString());
-				if (max <= 0)
-					max = -1L;
-				else
-					max = max * 60L;
-				task.getScheduling().setMaxLength(max);
+		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		if (((String) values.get("simple")).equals("true"))
+			task.getScheduling().setSimple(true);
+		else
+			task.getScheduling().setSimple(false);
 
-				if (task.getScheduling().isSimple() || ((String) values.get("simple")).equals("true")) {
-					long longValue = 0;
-					if (values.get("initialDelay") instanceof String)
-						longValue = Long.parseLong((String) values.get("initialDelay"));
-					else
-						longValue = ((Integer) values.get("initialDelay")).longValue();
-					task.getScheduling().setDelay(longValue);
+		long max = Long.parseLong(values.get("maxDuration").toString());
+		if (max <= 0)
+			max = -1L;
+		else
+			max = max * 60L;
+		task.getScheduling().setMaxLength(max);
 
-					if (values.get("repeatInterval") instanceof String)
-						longValue = Long.parseLong((String) values.get("repeatInterval"));
-					else
-						longValue = ((Integer) values.get("repeatInterval")).longValue();
-					task.getScheduling().setInterval(longValue);
-				} else {
-					task.getScheduling().setCronExpression((String) values.get("cron"));
-				}
-			}
-		} catch (Throwable t) {
-			SC.warn(t.getMessage());
+		if (task.getScheduling().isSimple() || ((String) values.get("simple")).equals("true")) {
+			long longValue = 0;
+			if (values.get("initialDelay") instanceof String)
+				longValue = Long.parseLong((String) values.get("initialDelay"));
+			else
+				longValue = ((Integer) values.get("initialDelay")).longValue();
+			task.getScheduling().setDelay(longValue);
+
+			if (values.get("repeatInterval") instanceof String)
+				longValue = Long.parseLong((String) values.get("repeatInterval"));
+			else
+				longValue = ((Integer) values.get("repeatInterval")).longValue();
+			task.getScheduling().setInterval(longValue);
+		} else {
+			task.getScheduling().setCronExpression((String) values.get("cron"));
 		}
+
 		return !vm.hasErrors();
 	}
 }

@@ -31,7 +31,6 @@ import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DrawEvent;
-import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -39,13 +38,9 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.ViewStateChangedEvent;
-import com.smartgwt.client.widgets.grid.events.ViewStateChangedHandler;
 import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -176,18 +171,69 @@ public class WorkflowDashlet extends Portlet {
 		list.sort("startdate", SortDirection.ASCENDING);
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ALL
 				|| type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
-			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, name, id, processId, documents,
-					lastnote, documentIds, pooledAssignees);
+			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, name, id,
+					processId, documents, lastnote, documentIds, pooledAssignees);
 		else
-			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, id, processId, name, documents,
-					lastnote, documentIds);
+			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, id, processId,
+					name, documents, lastnote, documentIds);
 
-		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				Record record = event.getRecord();
-				WorkflowService.Instance.get().getWorkflowDetailsByTask(record.getAttributeAsString("id"),
-						new AsyncCallback<GUIWorkflow>() {
+		list.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
+			Record record = event.getRecord();
+			WorkflowService.Instance.get().getWorkflowDetailsByTask(record.getAttributeAsString("id"),
+					new AsyncCallback<GUIWorkflow>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIWorkflow result) {
+							if (result != null) {
+								TaskDetailsDialog workflowDetailsDialog = new TaskDetailsDialog(workflowDashboard,
+										result, type == WorkflowDashboard.TASKS_INVOLVED);
+								workflowDetailsDialog.show();
+							}
+						}
+					});
+		});
+
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
+		});
+
+		/*
+		 * Save the layout of the grid at every change
+		 */
+		list.addViewStateChangedHandler((ViewStateChangedEvent event) -> {
+			gridState = list.getViewState();
+		});
+
+		/*
+		 * Restore any previously saved view state for this grid
+		 */
+		list.addDrawHandler((DrawEvent event) -> {
+			if (gridState != null)
+				list.setViewState(gridState);
+		});
+
+		if (type == WorkflowDashboard.TASKS_ASSIGNED)
+			countTotalAssignedTasksToCurrentUser();
+		
+		addItem(list);
+	}
+
+	private void countTotalAssignedTasksToCurrentUser() {
+		// Count the total of user tasks
+		list.addDataArrivedHandler((DataArrivedEvent event) -> {
+			int total = list.getTotalRows();
+
+			// If the returned entries are a different total,
+			// recalculate the total assigned tasks
+			if (total != Session.get().getUser().getAssignedTasks()) {
+				WorkflowService.Instance.get().countAssignedTasks(Session.get().getUser().getUsername(),
+						new AsyncCallback<Integer>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -195,76 +241,14 @@ public class WorkflowDashlet extends Portlet {
 							}
 
 							@Override
-							public void onSuccess(GUIWorkflow result) {
-								if (result != null) {
-									TaskDetailsDialog workflowDetailsDialog = new TaskDetailsDialog(workflowDashboard,
-											result, type == WorkflowDashboard.TASKS_INVOLVED);
-									workflowDetailsDialog.show();
-								}
+							public void onSuccess(Integer total) {
+								Session.get().getUser().setAssignedTasks(total != null ? total.intValue() : 0);
+								UserController.get().changed(Session.get().getUser());
 							}
 						});
+
 			}
 		});
-
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
-		});
-
-		if (type == WorkflowDashboard.TASKS_ASSIGNED)
-			// Count the total of user tasks
-			list.addDataArrivedHandler(new DataArrivedHandler() {
-				@Override
-				public void onDataArrived(DataArrivedEvent event) {
-					int total = list.getTotalRows();
-
-					// If the returned entries are a different total,
-					// recalculate the total assigned tasks
-					if (total != Session.get().getUser().getAssignedTasks()) {
-						WorkflowService.Instance.get().countAssignedTasks(Session.get().getUser().getUsername(),
-								new AsyncCallback<Integer>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(Integer total) {
-										Session.get().getUser().setAssignedTasks(total != null ? total.intValue() : 0);
-										UserController.get().changed(Session.get().getUser());
-									}
-								});
-
-					}
-				}
-			});
-
-		/*
-		 * Save the layout of the grid at every change
-		 */
-		list.addViewStateChangedHandler(new ViewStateChangedHandler() {
-			@Override
-			public void onViewStateChanged(ViewStateChangedEvent event) {
-				gridState = list.getViewState();
-			}
-		});
-
-		/*
-		 * Restore any previously saved view state for this grid
-		 */
-		list.addDrawHandler(new DrawHandler() {
-			@Override
-			public void onDraw(DrawEvent event) {
-				if (gridState != null)
-					list.setViewState(gridState);
-			}
-		});
-
-		addItem(list);
 	}
 
 	public void refresh(String processId) {

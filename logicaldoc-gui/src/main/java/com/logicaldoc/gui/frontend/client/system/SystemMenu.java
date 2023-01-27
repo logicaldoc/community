@@ -20,7 +20,6 @@ import com.logicaldoc.gui.frontend.client.tenant.TenantsPanel;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -54,7 +53,6 @@ public class SystemMenu extends VLayout {
 		addTenantsButton();
 
 		Button updates = addUpdatesButton();
-		
 
 		Button confirmUpdate = addConfirmUpdate(updates);
 
@@ -63,13 +61,15 @@ public class SystemMenu extends VLayout {
 			String runlevel = Session.get().getConfig("runlevel");
 			if ("updated".equals(runlevel)) {
 				confirmUpdate.setVisible(true);
+				updates.setVisible(false);
 			} else {
 				updates.setVisible(true);
+				confirmUpdate.setVisible(false);
 			}
 		}
 
 		addLicenseButton();
-		
+
 		addRestartButton();
 
 		addInformations();
@@ -83,32 +83,32 @@ public class SystemMenu extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				SC.ask(I18N.message("restartalert"), (Boolean yes) -> {
-						if (yes) {
-							SystemService.Instance.get().restart(new AsyncCallback<Void>() {
+					if (yes) {
+						SystemService.Instance.get().restart(new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void arg) {
-									ApplicationRestarting.get().show();
+							@Override
+							public void onSuccess(Void arg) {
+								ApplicationRestarting.get().show();
 
-									restart.setDisabled(true);
-									final String tenant = Session.get().getUser().getTenant().getName();
-									Session.get().close();
-									CookiesManager.removeSid();
+								restart.setDisabled(true);
+								final String tenant = Session.get().getUser().getTenant().getName();
+								Session.get().close();
+								CookiesManager.removeSid();
 
-									Timer timer = new Timer() {
-										public void run() {
-											Util.waitForUpAndRunning(tenant, I18N.getLocale());
-										}
-									};
-									timer.schedule(6000);
-								}
-							});
-						}
+								Timer timer = new Timer() {
+									public void run() {
+										Util.waitForUpAndRunning(tenant, I18N.getLocale());
+									}
+								};
+								timer.schedule(6000);
+							}
+						});
+					}
 				});
 			}
 		});
@@ -123,8 +123,8 @@ public class SystemMenu extends VLayout {
 		final Button license = new Button(I18N.message("license"));
 		license.setWidth100();
 		license.setHeight(25);
-		license.addClickHandler((ClickEvent event) ->  {
-				WindowUtils.openUrlInNewTab(Util.licenseUrl());
+		license.addClickHandler((ClickEvent event) -> {
+			WindowUtils.openUrlInNewTab(Util.licenseUrl());
 		});
 		if (Session.get().isDefaultTenant() && "admin".equals(Session.get().getUser().getUsername())
 				&& !Session.get().isDemo() && Feature.enabled(Feature.LICENSE)) {
@@ -140,22 +140,22 @@ public class SystemMenu extends VLayout {
 		confirmUpdate.setWidth100();
 		confirmUpdate.setHeight(25);
 		confirmUpdate.addClickHandler((ClickEvent event) -> {
-				SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
+			SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg) {
-						Session.get().getInfo().setConfig("runlevel", "default");
-						confirmUpdate.setVisible(false);
-						updates.setVisible(true);
+				@Override
+				public void onSuccess(Void arg) {
+					Session.get().getInfo().setConfig("runlevel", "default");
+					confirmUpdate.setVisible(false);
+					updates.setVisible(true);
 
-						SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
-					}
-				});
+					SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
+				}
+			});
 		});
 		addMember(confirmUpdate);
 		confirmUpdate.setVisible(Session.get().isDefaultTenant());
@@ -167,7 +167,7 @@ public class SystemMenu extends VLayout {
 		updates.setWidth100();
 		updates.setHeight(25);
 		updates.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new UpdateAndPatchPanel());
+			AdminScreen.get().setContent(new UpdateAndPatchPanel());
 		});
 		addMember(updates);
 		updates.setDisabled(Session.get().isDemo());
@@ -201,7 +201,7 @@ public class SystemMenu extends VLayout {
 		clustering.setWidth100();
 		clustering.setHeight(25);
 		clustering.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new ClusteringPanel());
+			AdminScreen.get().setContent(new ClusteringPanel());
 		});
 		if (Feature.visible(Feature.CLUSTERING) && Menu.enabled(Menu.CLUSTERING) && Session.get().isDefaultTenant()) {
 			addMember(clustering);
@@ -219,7 +219,7 @@ public class SystemMenu extends VLayout {
 		branding.setWidth100();
 		branding.setHeight(25);
 		branding.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId()));
+			AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId()));
 		});
 		if (Feature.visible(Feature.BRANDING_STANDARD) && Menu.enabled(Menu.BRANDING)) {
 			addMember(branding);
@@ -236,7 +236,7 @@ public class SystemMenu extends VLayout {
 		tasks.setWidth100();
 		tasks.setHeight(25);
 		tasks.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new TasksPanel());
+			AdminScreen.get().setContent(new TasksPanel());
 		});
 		addMember(tasks);
 	}
@@ -246,7 +246,7 @@ public class SystemMenu extends VLayout {
 		general.setWidth100();
 		general.setHeight(25);
 		general.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new GeneralPanel());
+			AdminScreen.get().setContent(new GeneralPanel());
 		});
 		if (Menu.enabled(Menu.GENERAL))
 			addMember(general);

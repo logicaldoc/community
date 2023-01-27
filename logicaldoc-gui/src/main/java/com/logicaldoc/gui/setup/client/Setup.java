@@ -20,7 +20,6 @@ import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.setup.client.services.SetupService;
 import com.logicaldoc.gui.setup.client.services.SetupServiceAsync;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -386,74 +385,71 @@ public class Setup implements EntryPoint {
 
 	private void onSubmit(final GUIInfo info) {
 		try {
-			vm.validate();
 			Tab tab = tabs.getSelectedTab();
 			int tabIndex = tabs.getSelectedTabNumber();
+
 			DynamicForm form = (DynamicForm) tab.getPane();
-			if (!form.hasErrors()) {
-				if (step == tabs.getTabs().length - 1) {
-					if (!vm.validate())
-						SC.warn("invalidfields");
+			if (!vm.validate() || form.hasErrors())
+				return;
 
-					SetupInfo data = new SetupInfo();
-					data.setDbDriver(vm.getValueAsString(DB_DRIVER));
-					data.setDbUrl(vm.getValueAsString(DB_URL));
-					data.setDbUsername(vm.getValueAsString(DB_USERNAME));
-					data.setDbPassword(vm.getValueAsString(DB_PASSWORD));
-					data.setDbEngine(vm.getValueAsString(DB_ENGINE));
-					data.setDbType(vm.getValueAsString(DB_TYPE));
-					data.setLanguage(vm.getValueAsString(LANGUAGE));
-					data.setRepositoryFolder(vm.getValueAsString(REPOSITORY_FOLDER));
-					data.setRegEmail(vm.getValueAsString(REG_EMAIL));
-					data.setRegName(vm.getValueAsString(REG_NAME));
-					data.setRegOrganization(vm.getValueAsString(REG_ORGANIZATION));
-					data.setRegWebsite(vm.getValueAsString(REG_WEBSITE));
+			if (step == tabs.getTabs().length - 1) {
+				if (!vm.validate())
+					SC.warn("invalidfields");
 
-					if (I18N.message(EMBEDDED).equals(data.getDbType())) {
-						data.setDbEngine("hsqldb");
-						data.setDbDriver("org.hsqldb.jdbcDriver");
-						data.setDbUrl(("jdbc:hsqldb:" + data.getRepositoryFolder() + "/db/db").replace("//", "/"));
-						data.setDbUsername("sa");
-						data.setDbPassword("");
-						data.setDbDialect("org.hibernate.dialect.HSQLDialect");
-						data.setDbValidationQuery("SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS");
-					} else {
-						data.setDbDialect(engines.get(data.getDbEngine())[3]);
-						data.setDbValidationQuery(engines.get(data.getDbEngine())[4]);
+				SetupInfo data = new SetupInfo();
+				data.setDbDriver(vm.getValueAsString(DB_DRIVER));
+				data.setDbUrl(vm.getValueAsString(DB_URL));
+				data.setDbUsername(vm.getValueAsString(DB_USERNAME));
+				data.setDbPassword(vm.getValueAsString(DB_PASSWORD));
+				data.setDbEngine(vm.getValueAsString(DB_ENGINE));
+				data.setDbType(vm.getValueAsString(DB_TYPE));
+				data.setLanguage(vm.getValueAsString(LANGUAGE));
+				data.setRepositoryFolder(vm.getValueAsString(REPOSITORY_FOLDER));
+				data.setRegEmail(vm.getValueAsString(REG_EMAIL));
+				data.setRegName(vm.getValueAsString(REG_NAME));
+				data.setRegOrganization(vm.getValueAsString(REG_ORGANIZATION));
+				data.setRegWebsite(vm.getValueAsString(REG_WEBSITE));
+
+				if (I18N.message(EMBEDDED).equals(data.getDbType())) {
+					data.setDbEngine("hsqldb");
+					data.setDbDriver("org.hsqldb.jdbcDriver");
+					data.setDbUrl(("jdbc:hsqldb:" + data.getRepositoryFolder() + "/db/db").replace("//", "/"));
+					data.setDbUsername("sa");
+					data.setDbPassword("");
+					data.setDbDialect("org.hibernate.dialect.HSQLDialect");
+					data.setDbValidationQuery("SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS");
+				} else {
+					data.setDbDialect(engines.get(data.getDbEngine())[3]);
+					data.setDbValidationQuery(engines.get(data.getDbEngine())[4]);
+				}
+
+				LD.contactingServer();
+				setupService.setup(data, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						SC.warn(caught.getMessage());
+						submit.setDisabled(false);
 					}
 
-					LD.contactingServer();
-					setupService.setup(data, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							SC.warn(caught.getMessage());
-							submit.setDisabled(false);
-						}
-
-						@Override
-						public void onSuccess(Void arg) {
-							LD.clearPrompt();
-							SC.say(I18N.message("installationperformed"),
-									I18N.message("installationend", info.getBranding().getProduct()),
-									new BooleanCallback() {
-										@Override
-										public void execute(Boolean value) {
-											Util.redirect(Util.contextPath());
-										}
-									});
-						}
-					});
-					submit.setDisabled(true);
-				} else {
-					// Go to the next tab and enable the contained panel
-					tabs.selectTab(tabIndex + 1);
-					tabs.getSelectedTab().getPane().setDisabled(false);
-					if (step < tabs.getSelectedTabNumber())
-						step++;
-					if (step == tabs.getTabs().length - 1)
-						submit.setTitle(I18N.message("setup"));
-				}
+					@Override
+					public void onSuccess(Void arg) {
+						LD.clearPrompt();
+						SC.say(I18N.message("installationperformed"),
+								I18N.message("installationend", info.getBranding().getProduct()), (Boolean value) -> {
+									Util.redirect(Util.contextPath());
+								});
+					}
+				});
+				submit.setDisabled(true);
+			} else {
+				// Go to the next tab and enable the contained panel
+				tabs.selectTab(tabIndex + 1);
+				tabs.getSelectedTab().getPane().setDisabled(false);
+				if (step < tabs.getSelectedTabNumber())
+					step++;
+				if (step == tabs.getTabs().length - 1)
+					submit.setTitle(I18N.message("setup"));
 			}
 		} catch (Throwable e) {
 			SC.warn("Error: " + e.getMessage());

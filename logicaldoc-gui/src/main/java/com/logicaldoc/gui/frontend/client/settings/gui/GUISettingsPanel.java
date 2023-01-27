@@ -361,12 +361,12 @@ public class GUISettingsPanel extends AdminPanel {
 
 		RadioGroupItem securityOption = ItemFactory.newBooleanSelector("securityoption", "securityoption");
 		securityOption.setWrapTitle(false);
-		securityOption.setValue(yesNo(settings, "security.inheritoption"));
+		securityOption.setValue(yesNo(settings, "gui.security.inheritoption"));
 
 		SelectItem securitySecurityOptionDefault = ItemFactory.newFolderSecurityOption("securityoptiondef",
 				"securityoptiondef");
 		securitySecurityOptionDefault.setWrapTitle(false);
-		securitySecurityOptionDefault.setValue(Util.getParameterValue(settings, "security.inheritoption.default"));
+		securitySecurityOptionDefault.setValue(Util.getParameterValue(settings, "gui.security.inheritoption.default"));
 
 		TextItem webcontentFolders = ItemFactory.newTextItem("webcontentfolders", "webcontentfolders",
 				Util.getParameterValue(settings, "gui.webcontent.folders"));
@@ -552,26 +552,25 @@ public class GUISettingsPanel extends AdminPanel {
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.wf.dashlet.rows",
 				values.get("wfDashletRows").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".charset", values.get("charset").toString()));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption.default",
+				values.get("securityoptiondef").toString()));
 		return params;
 	}
 
 	private void collectBooleanSwitches(List<GUIParameter> params) {
-			params.add(new GUIParameter(Session.get().getTenantName() + ".gui.banner",
-					trueFalse("banner")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.savelogin",
-				trueFalse("savelogin")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.banner", trueFalse("banner")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.savelogin", trueFalse("savelogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.preview.openpanel",
 				trueFalse("openpreviewpanel")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.opentree",
-				trueFalse("foldopentree")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.opentree", trueFalse("foldopentree")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.openonselect",
 				trueFalse("foldopenselect")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.pagination",
 				trueFalse("foldpagination")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.autoclose",
 				trueFalse("autoclosefoldernodes")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.serverpush",
-				trueFalse("reacttoremoteevents")));
+		params.add(
+				new GUIParameter(Session.get().getTenantName() + ".gui.serverpush", trueFalse("reacttoremoteevents")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.license.showloginalerts",
 				trueFalse("showlicensealertsinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.quota.showloginalerts",
@@ -584,28 +583,25 @@ public class GUISettingsPanel extends AdminPanel {
 				trueFalse("showpatchalertsinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption",
 				trueFalse("securityoption")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption.default",
-				trueFalse("securityoptiondef").toString()));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.login.lang",
-				trueFalse("showlanguageinlogin")));
+		params.add(
+				new GUIParameter(Session.get().getTenantName() + ".gui.login.lang", trueFalse("showlanguageinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.lostpassword.show",
 				trueFalse("showlostpassword")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onsave.askversioncomment",
 				trueFalse("askversioncommentonsave")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onedit.lock",
-				trueFalse("lockonediting")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.galleryenabled",
-				trueFalse("galleryenabled")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onedit.lock", trueFalse("lockonediting")));
+		params.add(
+				new GUIParameter(Session.get().getTenantName() + ".gui.galleryenabled", trueFalse("galleryenabled")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.notes.allowedit",
 				trueFalse("allownotesediting")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.avatar.showingrids",
 				trueFalse("showavatarsingrids")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.saveinputs",
-				trueFalse("saveinputs")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.saveinputs", trueFalse("saveinputs")));
 	}
 
 	private String yesNo(GUIParameter[] settings, String name) {
-		return Util.getParameterValue(settings, name).equals("true") ? "yes" : "no";
+		String parameterValue = Util.getParameterValue(settings, name);
+		return parameterValue != null && parameterValue.equals("true") ? "yes" : "no";
 	}
 
 	private String trueFalse(String name) {

@@ -72,7 +72,7 @@ public class TenantQuotaPanel extends HLayout {
 		SpinnerItem usersQuota = ItemFactory.newSpinnerItem("usersquota", "usersquota", tenant.getMaxUsers());
 		usersQuota.setDisabled(readonly);
 		usersQuota.setRequired(false);
-		usersQuota.setMin((double)tenant.getUsers());
+		usersQuota.setMin((double) tenant.getUsers());
 		usersQuota.setStep(1);
 		usersQuota.setWidth(80);
 		if (!readonly)
@@ -82,7 +82,7 @@ public class TenantQuotaPanel extends HLayout {
 				tenant.getMaxGuests());
 		guestsQuota.setDisabled(readonly);
 		guestsQuota.setRequired(false);
-		guestsQuota.setMin((double)tenant.getGuests());
+		guestsQuota.setMin((double) tenant.getGuests());
 		guestsQuota.setStep(1);
 		guestsQuota.setWidth(80);
 		if (!readonly)
@@ -154,45 +154,49 @@ public class TenantQuotaPanel extends HLayout {
 	@SuppressWarnings("unchecked")
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		vm.validate();
-		if (!vm.hasErrors()) {
-			if (values.get("documentsquota") == null)
-				tenant.setMaxRepoDocs(null);
-			else
-				tenant.setMaxRepoDocs(Long.parseLong(values.get("documentsquota").toString()));
+		if (!vm.validate())
+			return false;
 
-			if (values.get("sizequota") == null)
-				tenant.setMaxRepoSize(null);
-			else
-				tenant.setMaxRepoSize(Long.parseLong(values.get("sizequota").toString()));
+		if (values.get("documentsquota") == null)
+			tenant.setMaxRepoDocs(null);
+		else
+			tenant.setMaxRepoDocs(Long.parseLong(values.get("documentsquota").toString()));
 
-			if (values.get("usersquota") == null)
-				tenant.setMaxUsers(null);
-			else
-				tenant.setMaxUsers(Integer.parseInt(values.get("usersquota").toString()));
+		if (values.get("sizequota") == null)
+			tenant.setMaxRepoSize(null);
+		else
+			tenant.setMaxRepoSize(Long.parseLong(values.get("sizequota").toString()));
 
-			if (values.get("guestsquota") == null)
-				tenant.setMaxGuests(null);
-			else
-				tenant.setMaxGuests(Integer.parseInt(values.get("guestsquota").toString()));
+		if (values.get("usersquota") == null)
+			tenant.setMaxUsers(null);
+		else
+			tenant.setMaxUsers(Integer.parseInt(values.get("usersquota").toString()));
 
-			if (values.get("sessionsquota") == null)
-				tenant.setMaxSessions(null);
-			else
-				tenant.setMaxSessions(Integer.parseInt(values.get("sessionsquota").toString()));
+		if (values.get("guestsquota") == null)
+			tenant.setMaxGuests(null);
+		else
+			tenant.setMaxGuests(Integer.parseInt(values.get("guestsquota").toString()));
 
-			if (values.get("quotaThreshold") == null)
-				tenant.setQuotaThreshold(null);
-			else
-				tenant.setQuotaThreshold(Integer.parseInt(values.get("quotaThreshold").toString()));
+		if (values.get("sessionsquota") == null)
+			tenant.setMaxSessions(null);
+		else
+			tenant.setMaxSessions(Integer.parseInt(values.get("sessionsquota").toString()));
 
-			tenant.clearQuotaAlertRecipients();
-			String[] usernames = recipients.getValues();
-			if (usernames != null && usernames.length > 0)
-				for (int i = 0; i < usernames.length; i++)
-					tenant.addQuotaAlertRecipient(usernames[i]);
-		}
+		if (values.get("quotaThreshold") == null)
+			tenant.setQuotaThreshold(null);
+		else
+			tenant.setQuotaThreshold(Integer.parseInt(values.get("quotaThreshold").toString()));
+
+		setQuotaAlertRecipients();
 
 		return !vm.hasErrors();
+	}
+
+	private void setQuotaAlertRecipients() {
+		tenant.clearQuotaAlertRecipients();
+		String[] usernames = recipients.getValues();
+		if (usernames != null && usernames.length > 0)
+			for (int i = 0; i < usernames.length; i++)
+				tenant.addQuotaAlertRecipient(usernames[i]);
 	}
 }

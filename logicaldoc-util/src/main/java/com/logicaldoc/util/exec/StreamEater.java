@@ -39,16 +39,7 @@ public class StreamEater implements Runnable {
 			String line = br.readLine();
 			boolean firstLine = true;
 			while (line != null) {
-				if (prefix != null)
-					System.out.println(prefix + ": " + line);
-
-				if (output != null && line != null) {
-					if (!firstLine)
-						output.write("\n");
-					output.write(line);
-					output.flush();
-
-				}
+				writeLine(line, firstLine);
 
 				if (buffer != null && line != null) {
 					if (!firstLine)
@@ -61,6 +52,18 @@ public class StreamEater implements Runnable {
 			}
 		} catch (IOException e) {
 			// nothing to do
+		}
+	}
+
+	private void writeLine(String line, boolean firstLine) throws IOException {
+		if (prefix != null)
+			System.out.println(prefix + ": " + line);
+
+		if (output != null && line != null) {
+			if (!firstLine)
+				output.write("\n");
+			output.write(line);
+			output.flush();
 		}
 	}
 }

@@ -217,7 +217,6 @@ public class GridUtil {
 
 	private static Record[] getData(ListGrid listGrid) {
 		Record[] records = listGrid.getRecords();
-
 		if (records == null || records.length < 1) {
 			/*
 			 * In case of data bound grid, we need to call the original records
@@ -229,9 +228,11 @@ public class GridUtil {
 				for (int i = 0; i < records.length; i++)
 					records[i] = buf.get(i);
 			}
-		} else
+		}
+
+		if (records == null)
 			records = new Record[0];
-		
+
 		return records;
 	}
 

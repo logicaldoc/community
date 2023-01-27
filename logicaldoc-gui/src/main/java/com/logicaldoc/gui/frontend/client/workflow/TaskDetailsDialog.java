@@ -55,7 +55,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -174,76 +173,107 @@ public class TaskDetailsDialog extends Window {
 	private void reload(final GUIWorkflow wfl) {
 		this.workflow = wfl;
 
-		Canvas[] members = sxLayout.getMembers();
-		for (Canvas canvas : members) {
-			sxLayout.removeMember(canvas);
-		}
-
-		members = buttonsPanel.getMembers();
-		for (Canvas canvas : members) {
-			buttonsPanel.removeMember(canvas);
-		}
-
-		members = form.getMembers();
-		for (Canvas canvas : members) {
-			form.removeMember(canvas);
-		}
-
-		members = appendedDocsPanel.getMembers();
-		for (Canvas canvas : members) {
-			appendedDocsPanel.removeMember(canvas);
-		}
-
-		members = notesPanel.getMembers();
-		for (Canvas canvas : members) {
-			notesPanel.removeMember(canvas);
-		}
+		cleanPanels();
 
 		// Workflow section
-		workflowForm = new DynamicForm();
-		workflowForm.setColWidths(60, "*");
-
-		StaticTextItem workflowTitle = ItemFactory.newStaticTextItem("workflowTitle", "",
-				"<b>" + I18N.message("workflow") + "</b>");
-		workflowTitle.setShouldSaveValue(false);
-		workflowTitle.setWrapTitle(false);
-		workflowTitle.setShowTitle(false);
-
-		StaticTextItem workflowInstanceId = ItemFactory.newStaticTextItem("workflowInstanceId", I18N.message("id"),
-				workflow.getId());
-		workflowInstanceId.setShouldSaveValue(false);
-
-		StaticTextItem workflowLabel = ItemFactory.newStaticTextItem("workflowLabel", I18N.message("name"),
-				workflow.getLabel());
-		workflowLabel.setShouldSaveValue(false);
-		
-		StaticTextItem workflowName = ItemFactory.newStaticTextItem("workflowName", I18N.message("workflowname"),
-				workflow.getName());
-		workflowName.setShouldSaveValue(false);
-
-		StaticTextItem version = ItemFactory.newStaticTextItem("version", I18N.message("version"),
-				"" + workflow.getVersion());
-		version.setShouldSaveValue(false);
-
-		StaticTextItem workflowTag = ItemFactory.newStaticTextItem("tag", I18N.message("tag"),
-				workflow.getTag() != null ? workflow.getTag() : "");
-
-		StaticTextItem workflowDescription = ItemFactory.newStaticTextItem("workflowDescription",
-				I18N.message("description"), workflow.getDescription());
-
-		StaticTextItem startDate = ItemFactory.newStaticTextItem("startdate", "startdate", null);
-		if (workflow.getStartDate() != null)
-			startDate.setValue(I18N.formatDate((Date) workflow.getStartDate()));
-
-		StaticTextItem endDate = ItemFactory.newStaticTextItem("enddate", "enddate", null);
-		if (workflow.getEndDate() != null)
-			endDate.setValue(I18N.formatDate((Date) workflow.getEndDate()));
-
-		workflowForm.setItems(workflowTitle, workflowInstanceId, workflowLabel, workflowName, version, workflowTag,
-				workflowDescription, startDate, endDate);
-		sxLayout.addMember(workflowForm);
+		prepareWorkflowSection();
 
 		// Task section
+		prepareTaskSection();
+
+		HLayout spacer = new HLayout();
+		spacer.setHeight(5);
+
+		IButton reassignButton = prepareReassignButton();
+
+		IButton takeButton = prepareTakeButton();
+
+		IButton turnBackButton = prepareTurnBackButton();
+
+		IButton completionDiagram = prepareCompletionDiagramButton(wfl);
+
+		if (workflow.getSelectedTask().getEndDate() == null) {
+			buttonsPanel.addMember(spacer);
+			if (readOnly) {
+				buttonsPanel.addMember(completionDiagram);
+			} else {
+				buttonsPanel.addMember(reassignButton);
+				buttonsPanel.addMember(takeButton);
+				buttonsPanel.addMember(turnBackButton);
+				buttonsPanel.addMember(spacer);
+				buttonsPanel.addMember(completionDiagram);
+			}
+
+			if (workflow.getSelectedTask().getTaskState().equals("started")
+					&& workflow.getSelectedTask().getOwner() != null) {
+				addTransitionButtons();
+			}
+		} else {
+			DynamicForm taskEndedForm = new DynamicForm();
+			taskEndedForm.setWidth(180);
+			taskEndedForm.setColWidths(1, "*");
+
+			StaticTextItem taskEndedTitle = ItemFactory.newStaticTextItem("taskEndedTitle", "",
+					"<b>" + I18N.message("workflowtaskended") + "</b>");
+			taskEndedTitle.setShouldSaveValue(false);
+			taskEndedTitle.setWrapTitle(false);
+
+			taskEndedForm.setItems(taskEndedTitle);
+
+			buttonsPanel.addMember(spacer);
+			buttonsPanel.addMember(taskEndedForm);
+
+			buttonsPanel.addMember(spacer);
+			buttonsPanel.addMember(completionDiagram);
+		}
+
+		form.addMember(sxLayout);
+
+		workflowTab.setPane(form);
+
+		refreshAppendedDocsTab();
+
+		refreshNotesTab();
+
+		refreshHistoryTab();
+	}
+
+	private void addTransitionButtons() {
+		DynamicForm transitionsForm = new DynamicForm();
+		transitionsForm.setWidth(150);
+		transitionsForm.setIsGroup(true);
+		transitionsForm.setGroupTitle(I18N.message("actions"));
+
+		List<FormItem> items = new ArrayList<FormItem>();
+		// Add Transitions buttons
+		if (workflow.getSelectedTask().getTransitions() != null)
+			for (GUITransition transition : workflow.getSelectedTask().getTransitions()) {
+				final String transitionName = transition.getText();
+				if (transitionName == null || transitionName.trim().isEmpty())
+					continue;
+
+				ButtonItem transitionButton = new ButtonItem(transition.getText());
+				transitionButton.setAutoFit(true);
+				transitionButton.addClickHandler((ClickEvent event) -> {
+					if (workflow.getSelectedTask().isRequiresNote()) {
+						/*
+						 * This task requires a note at completion, so
+						 * we collect the input from the user
+						 */
+						collectNoteAndEndTask(getWorkflow().getSelectedTask(), transitionName);
+					} else {
+						onEndTask(getWorkflow().getSelectedTask(), transitionName);
+					}
+				});
+				items.add(transitionButton);
+			}
+		transitionsForm.setItems(items.toArray(new FormItem[0]));
+
+		if (!readOnly)
+			buttonsPanel.addMember(transitionsForm);
+	}
+
+	private void prepareTaskSection() {
 		taskForm = new DynamicForm();
 		taskForm.setColWidths(60, "*");
 		taskForm.setValuesManager(vm);
@@ -290,10 +320,143 @@ public class TaskDetailsDialog extends Window {
 				taskEndDate);
 
 		sxLayout.addMember(taskForm);
+	}
 
-		HLayout spacer = new HLayout();
-		spacer.setHeight(5);
+	private void prepareWorkflowSection() {
+		workflowForm = new DynamicForm();
+		workflowForm.setColWidths(60, "*");
 
+		StaticTextItem workflowTitle = ItemFactory.newStaticTextItem("workflowTitle", "",
+				"<b>" + I18N.message("workflow") + "</b>");
+		workflowTitle.setShouldSaveValue(false);
+		workflowTitle.setWrapTitle(false);
+		workflowTitle.setShowTitle(false);
+
+		StaticTextItem workflowInstanceId = ItemFactory.newStaticTextItem("workflowInstanceId", I18N.message("id"),
+				workflow.getId());
+		workflowInstanceId.setShouldSaveValue(false);
+
+		StaticTextItem workflowLabel = ItemFactory.newStaticTextItem("workflowLabel", I18N.message("name"),
+				workflow.getLabel());
+		workflowLabel.setShouldSaveValue(false);
+
+		StaticTextItem workflowName = ItemFactory.newStaticTextItem("workflowName", I18N.message("workflowname"),
+				workflow.getName());
+		workflowName.setShouldSaveValue(false);
+
+		StaticTextItem version = ItemFactory.newStaticTextItem("version", I18N.message("version"),
+				"" + workflow.getVersion());
+		version.setShouldSaveValue(false);
+
+		StaticTextItem workflowTag = ItemFactory.newStaticTextItem("tag", I18N.message("tag"),
+				workflow.getTag() != null ? workflow.getTag() : "");
+
+		StaticTextItem workflowDescription = ItemFactory.newStaticTextItem("workflowDescription",
+				I18N.message("description"), workflow.getDescription());
+
+		StaticTextItem startDate = ItemFactory.newStaticTextItem("startdate", "startdate", null);
+		if (workflow.getStartDate() != null)
+			startDate.setValue(I18N.formatDate((Date) workflow.getStartDate()));
+
+		StaticTextItem endDate = ItemFactory.newStaticTextItem("enddate", "enddate", null);
+		if (workflow.getEndDate() != null)
+			endDate.setValue(I18N.formatDate((Date) workflow.getEndDate()));
+
+		workflowForm.setItems(workflowTitle, workflowInstanceId, workflowLabel, workflowName, version, workflowTag,
+				workflowDescription, startDate, endDate);
+		sxLayout.addMember(workflowForm);
+	}
+
+	private IButton prepareCompletionDiagramButton(final GUIWorkflow wfl) {
+		IButton completionDiagram = new IButton(I18N.message("completiondiagram"));
+		completionDiagram.setAutoFit(true);
+		completionDiagram.setMargin(2);
+		completionDiagram.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			WorkflowService.Instance.get().getCompletionDiagram(wfl.getName(), wfl.getVersion(), wfl.getId(),
+					new AsyncCallback<GUIWorkflow>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIWorkflow workflow) {
+							WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
+							diagramWindow.show();
+						}
+					});
+		});
+		return completionDiagram;
+	}
+
+	private IButton prepareTurnBackButton() {
+		IButton turnBackButton = new IButton(I18N.message("workflowtaskturnback"));
+		turnBackButton.setAutoFit(true);
+		turnBackButton.setMargin(2);
+		turnBackButton.setVisible(!(workflow.getSelectedTask().getPooledActors() == null
+				|| workflow.getSelectedTask().getPooledActors().isEmpty())
+				&& !(workflow.getSelectedTask().getOwner() == null
+						|| workflow.getSelectedTask().getOwner().trim().isEmpty()));
+		turnBackButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+
+			WorkflowService.Instance.get().turnBackTaskToPool(workflow.getSelectedTask().getId(),
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							WorkflowService.Instance.get().getWorkflowDetailsByTask(workflow.getSelectedTask().getId(),
+									new AsyncCallback<GUIWorkflow>() {
+
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
+
+										@Override
+										public void onSuccess(GUIWorkflow result) {
+											destroy();
+											TaskDetailsDialog.this.workflowDashboard.refresh(workflow.getId());
+										}
+									});
+						}
+					});
+		});
+		return turnBackButton;
+	}
+
+	private IButton prepareTakeButton() {
+		IButton takeButton = new IButton(I18N.message("workflowtasktake"));
+		takeButton.setAutoFit(true);
+		takeButton.setMargin(2);
+		takeButton.setVisible(!(workflow.getSelectedTask().getPooledActors() == null
+				|| workflow.getSelectedTask().getPooledActors().isEmpty())
+				&& (workflow.getSelectedTask().getOwner() == null
+						|| workflow.getSelectedTask().getOwner().trim().isEmpty()));
+		takeButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			WorkflowService.Instance.get().claimTask(workflow.getSelectedTask().getId(),
+					Long.toString(Session.get().getUser().getId()), new AsyncCallback<GUIWorkflow>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIWorkflow result) {
+							workflow = result;
+							result.getSelectedTask().setOwner(Session.get().getUser().getUsername());
+							reload(workflow);
+							TaskDetailsDialog.this.workflowDashboard.refresh(workflow.getId());
+						}
+					});
+		});
+		return takeButton;
+	}
+
+	private IButton prepareReassignButton() {
 		IButton reassignButton = new IButton(I18N.message("workflowtaskreassign"));
 		reassignButton.setAutoFit(true);
 		reassignButton.setMargin(2);
@@ -320,33 +483,29 @@ public class TaskDetailsDialog extends Window {
 
 				SubmitItem saveButton = new SubmitItem("save", I18N.message("save"));
 				saveButton.setAlign(Alignment.LEFT);
-				saveButton.addClickHandler(new ClickHandler() {
+				saveButton.addClickHandler((ClickEvent saveClick) -> {
+					if (user.getSelectedRecord() == null)
+						return;
+					setUser(user.getSelectedRecord().getAttribute("id"));
 
-					@Override
-					public void onClick(ClickEvent event) {
-						if (user.getSelectedRecord() == null)
-							return;
-						setUser(user.getSelectedRecord().getAttribute("id"));
+					WorkflowService.Instance.get().reassignTask(workflow.getSelectedTask().getId(),
+							user.getSelectedRecord().getAttribute("id"), new AsyncCallback<GUIWorkflow>() {
 
-						WorkflowService.Instance.get().reassignTask(workflow.getSelectedTask().getId(),
-								user.getSelectedRecord().getAttribute("id"), new AsyncCallback<GUIWorkflow>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
+								@Override
+								public void onSuccess(GUIWorkflow result) {
+									if (result != null) {
+										window.destroy();
+										workflow = result;
+										reload(workflow);
+										workflowDashboard.refresh(workflow.getId());
 									}
-
-									@Override
-									public void onSuccess(GUIWorkflow result) {
-										if (result != null) {
-											window.destroy();
-											workflow = result;
-											reload(workflow);
-											workflowDashboard.refresh(workflow.getId());
-										}
-									}
-								});
-					}
+								}
+							});
 				});
 
 				reassignUserForm.setItems(user, saveButton);
@@ -355,178 +514,34 @@ public class TaskDetailsDialog extends Window {
 				window.show();
 			}
 		});
+		return reassignButton;
+	}
 
-		IButton takeButton = new IButton(I18N.message("workflowtasktake"));
-		takeButton.setAutoFit(true);
-		takeButton.setMargin(2);
-		takeButton.setVisible(!(workflow.getSelectedTask().getPooledActors() == null
-				|| workflow.getSelectedTask().getPooledActors().isEmpty())
-				&& (workflow.getSelectedTask().getOwner() == null
-						|| workflow.getSelectedTask().getOwner().trim().isEmpty()));
-		takeButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				WorkflowService.Instance.get().claimTask(workflow.getSelectedTask().getId(),
-						Long.toString(Session.get().getUser().getId()), new AsyncCallback<GUIWorkflow>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIWorkflow result) {
-								workflow = result;
-								result.getSelectedTask().setOwner(Session.get().getUser().getUsername());
-								reload(workflow);
-								TaskDetailsDialog.this.workflowDashboard.refresh(workflow.getId());
-							}
-						});
-			}
-		});
-
-		IButton turnBackButton = new IButton(I18N.message("workflowtaskturnback"));
-		turnBackButton.setAutoFit(true);
-		turnBackButton.setMargin(2);
-		turnBackButton.setVisible(!(workflow.getSelectedTask().getPooledActors() == null
-				|| workflow.getSelectedTask().getPooledActors().isEmpty())
-				&& !(workflow.getSelectedTask().getOwner() == null
-						|| workflow.getSelectedTask().getOwner().trim().isEmpty()));
-		turnBackButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-
-				WorkflowService.Instance.get().turnBackTaskToPool(workflow.getSelectedTask().getId(),
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								WorkflowService.Instance.get().getWorkflowDetailsByTask(
-										workflow.getSelectedTask().getId(), new AsyncCallback<GUIWorkflow>() {
-
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(GUIWorkflow result) {
-												destroy();
-												TaskDetailsDialog.this.workflowDashboard.refresh(workflow.getId());
-											}
-										});
-							}
-						});
-			}
-		});
-
-		IButton completionDiagram = new IButton(I18N.message("completiondiagram"));
-		completionDiagram.setAutoFit(true);
-		completionDiagram.setMargin(2);
-		completionDiagram.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				WorkflowService.Instance.get().getCompletionDiagram(wfl.getName(), wfl.getVersion(), wfl.getId(),
-						new AsyncCallback<GUIWorkflow>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIWorkflow workflow) {
-								WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
-								diagramWindow.show();
-							}
-						});
-
-			}
-		});
-
-		if (workflow.getSelectedTask().getEndDate() == null) {
-			buttonsPanel.addMember(spacer);
-			if (readOnly) {
-				buttonsPanel.addMember(completionDiagram);
-			} else {
-				buttonsPanel.addMember(reassignButton);
-				buttonsPanel.addMember(takeButton);
-				buttonsPanel.addMember(turnBackButton);
-				buttonsPanel.addMember(spacer);
-				buttonsPanel.addMember(completionDiagram);
-			}
-
-			if (workflow.getSelectedTask().getTaskState().equals("started")
-					&& workflow.getSelectedTask().getOwner() != null) {
-				DynamicForm transitionsForm = new DynamicForm();
-				transitionsForm.setWidth(150);
-				transitionsForm.setIsGroup(true);
-				transitionsForm.setGroupTitle(I18N.message("actions"));
-
-				List<FormItem> items = new ArrayList<FormItem>();
-				// Add Transitions buttons
-				if (workflow.getSelectedTask().getTransitions() != null)
-					for (GUITransition transition : workflow.getSelectedTask().getTransitions()) {
-						final String transitionName = transition.getText();
-						if (transitionName == null || transitionName.trim().isEmpty())
-							continue;
-
-						ButtonItem transitionButton = new ButtonItem(transition.getText());
-						transitionButton.setAutoFit(true);
-						transitionButton.addClickHandler(new ClickHandler() {
-
-							@Override
-							public void onClick(ClickEvent event) {
-								if (workflow.getSelectedTask().isRequiresNote()) {
-									/*
-									 * This task requires a note at completion,
-									 * so we collect the input from the user
-									 */
-									collectNoteAndEndTask(getWorkflow().getSelectedTask(), transitionName);
-								} else {
-									onEndTask(getWorkflow().getSelectedTask(), transitionName);
-								}
-							}
-
-						});
-						items.add(transitionButton);
-					}
-				transitionsForm.setItems(items.toArray(new FormItem[0]));
-
-				if (!readOnly)
-					buttonsPanel.addMember(transitionsForm);
-			}
-		} else {
-			DynamicForm taskEndedForm = new DynamicForm();
-			taskEndedForm.setWidth(180);
-			taskEndedForm.setColWidths(1, "*");
-
-			StaticTextItem taskEndedTitle = ItemFactory.newStaticTextItem("taskEndedTitle", "",
-					"<b>" + I18N.message("workflowtaskended") + "</b>");
-			taskEndedTitle.setShouldSaveValue(false);
-			taskEndedTitle.setWrapTitle(false);
-
-			taskEndedForm.setItems(taskEndedTitle);
-
-			buttonsPanel.addMember(spacer);
-			buttonsPanel.addMember(taskEndedForm);
-
-			buttonsPanel.addMember(spacer);
-			buttonsPanel.addMember(completionDiagram);
+	private void cleanPanels() {
+		Canvas[] members = sxLayout.getMembers();
+		for (Canvas canvas : members) {
+			sxLayout.removeMember(canvas);
 		}
 
-		form.addMember(sxLayout);
+		members = buttonsPanel.getMembers();
+		for (Canvas canvas : members) {
+			buttonsPanel.removeMember(canvas);
+		}
 
-		workflowTab.setPane(form);
+		members = form.getMembers();
+		for (Canvas canvas : members) {
+			form.removeMember(canvas);
+		}
 
-		refreshAppendedDocsTab();
+		members = appendedDocsPanel.getMembers();
+		for (Canvas canvas : members) {
+			appendedDocsPanel.removeMember(canvas);
+		}
 
-		refreshNotesTab();
-
-		refreshHistoryTab();
+		members = notesPanel.getMembers();
+		for (Canvas canvas : members) {
+			notesPanel.removeMember(canvas);
+		}
 	}
 
 	private void refreshHistoryTab() {
@@ -565,7 +580,7 @@ public class TaskDetailsDialog extends Window {
 		refreshAndSelectNotesTab();
 		workflowDashboard.refresh(workflow.getId());
 	}
-	
+
 	private void prepareNotesPanel() {
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
@@ -830,135 +845,19 @@ public class TaskDetailsDialog extends Window {
 					public void onSuccess(GUIFolder folder) {
 						final Menu contextMenu = new Menu();
 
-						final MenuItem preview = new MenuItem();
-						preview.setTitle(I18N.message("preview"));
-						preview.setEnabled(false);
-						preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								DocumentService.Instance.get().getById(selectedDocument.getId(),
-										new AsyncCallback<GUIDocument>() {
+						final MenuItem preview = preparePreviewContextMenuItem(selectedDocument);
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+						final MenuItem download = prepareDownloadContextMenuItem(selectedDocument);
 
-											@Override
-											public void onSuccess(GUIDocument doc) {
-												PreviewPopup iv = new PreviewPopup(doc);
-												iv.show();
-											}
-										});
-							}
-						});
+						final MenuItem open = prepareOpenInFolderContextMenuItem(selectedDocument);
 
-						final MenuItem download = new MenuItem();
-						download.setTitle(I18N.message("download"));
-						download.setEnabled(false);
-						download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								DocUtil.download(selectedDocument.getId(), null);
-							}
-						});
+						final MenuItem remove = prepareRemoveContextMenuItem(selectedDocument);
 
-						final MenuItem open = new MenuItem();
-						open.setTitle(I18N.message("openinfolder"));
-						open.setEnabled(false);
-						open.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								destroy();
+						final MenuItem checkout = prepareCheckoutContextMenuItem(selectedDocument);
 
-								if (com.logicaldoc.gui.common.client.Menu
-										.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
-									DocumentsPanel.get().openInFolder(selectedDocument.getFolder().getId(),
-											selectedDocument.getId());
-							}
-						});
+						final MenuItem unlock = prepareUnlockContextMenuItem(selectedDocument);
 
-						final MenuItem remove = new MenuItem();
-						remove.setTitle(I18N.message("remove"));
-						remove.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								WorkflowService.Instance.get().removeDocument(workflow.getSelectedTask().getId(),
-										selectedDocument.getId(), new AsyncCallback<Void>() {
-
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void arg) {
-												appendedDocs.removeSelectedData();
-											}
-										});
-							}
-						});
-
-						final MenuItem checkout = new MenuItem();
-						checkout.setTitle(I18N.message("checkout"));
-						checkout.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								DocumentService.Instance.get().checkout(new long[] { selectedDocument.getId() },
-										new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void result) {
-												GUIDocument doc = appendedDocs.getSelectedDocument();
-												DocUtil.markCheckedOut(doc);
-												GuiLog.info(I18N.message("documentcheckedout"), null);
-
-												WindowUtils.openUrl(Util.downloadURL(selectedDocument.getId()));
-											}
-										});
-							}
-						});
-
-						final MenuItem unlock = new MenuItem();
-						unlock.setTitle(I18N.message("unlock"));
-						unlock.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								DocumentService.Instance.get().unlock(new long[] { selectedDocument.getId() },
-										new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void result) {
-												GUIDocument doc = appendedDocs.getSelectedDocument();
-												DocUtil.markUnlocked(doc);
-											}
-										});
-							}
-						});
-
-						final MenuItem checkin = new MenuItem();
-						checkin.setTitle(I18N.message("checkin"));
-						checkin.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								DocumentService.Instance.get().getById(selectedDocument.getId(),
-										new AsyncCallback<GUIDocument>() {
-
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(GUIDocument document) {
-												DocumentCheckin checkin = new DocumentCheckin(document,
-														document.getFileName());
-												checkin.show();
-											}
-										});
-							}
-						});
+						final MenuItem checkin = prepareCheckinContextMenuItem(selectedDocument);
 
 						if (readOnly)
 							contextMenu.setItems(preview, download, open);
@@ -996,6 +895,136 @@ public class TaskDetailsDialog extends Window {
 					}
 				});
 
+	}
+
+	private MenuItem prepareCheckinContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem checkin = new MenuItem();
+		checkin.setTitle(I18N.message("checkin"));
+		checkin.addClickHandler((MenuItemClickEvent event) -> {
+			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIDocument document) {
+					DocumentCheckin checkin = new DocumentCheckin(document, document.getFileName());
+					checkin.show();
+				}
+			});
+		});
+		return checkin;
+	}
+
+	private MenuItem prepareUnlockContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem unlock = new MenuItem();
+		unlock.setTitle(I18N.message("unlock"));
+		unlock.addClickHandler((MenuItemClickEvent event) -> {
+			DocumentService.Instance.get().unlock(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void result) {
+					GUIDocument doc = appendedDocs.getSelectedDocument();
+					DocUtil.markUnlocked(doc);
+				}
+			});
+		});
+		return unlock;
+	}
+
+	private MenuItem prepareCheckoutContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem checkout = new MenuItem();
+		checkout.setTitle(I18N.message("checkout"));
+		checkout.addClickHandler((MenuItemClickEvent event) -> {
+			DocumentService.Instance.get().checkout(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void result) {
+					GUIDocument doc = appendedDocs.getSelectedDocument();
+					DocUtil.markCheckedOut(doc);
+					GuiLog.info(I18N.message("documentcheckedout"), null);
+
+					WindowUtils.openUrl(Util.downloadURL(selectedDocument.getId()));
+				}
+			});
+		});
+		return checkout;
+	}
+
+	private MenuItem prepareRemoveContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem remove = new MenuItem();
+		remove.setTitle(I18N.message("remove"));
+		remove.addClickHandler((MenuItemClickEvent event) -> {
+			WorkflowService.Instance.get().removeDocument(workflow.getSelectedTask().getId(), selectedDocument.getId(),
+					new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void arg) {
+							appendedDocs.removeSelectedData();
+						}
+					});
+		});
+		return remove;
+	}
+
+	private MenuItem prepareOpenInFolderContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem open = new MenuItem();
+		open.setTitle(I18N.message("openinfolder"));
+		open.setEnabled(false);
+		open.addClickHandler((MenuItemClickEvent event) -> {
+			destroy();
+
+			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
+				DocumentsPanel.get().openInFolder(selectedDocument.getFolder().getId(), selectedDocument.getId());
+		});
+		return open;
+	}
+
+	private MenuItem prepareDownloadContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem download = new MenuItem();
+		download.setTitle(I18N.message("download"));
+		download.setEnabled(false);
+		download.addClickHandler((MenuItemClickEvent event) -> {
+			DocUtil.download(selectedDocument.getId(), null);
+		});
+		return download;
+	}
+
+	private MenuItem preparePreviewContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem preview = new MenuItem();
+		preview.setTitle(I18N.message("preview"));
+		preview.setEnabled(false);
+		preview.addClickHandler((MenuItemClickEvent event) -> {
+			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					PreviewPopup iv = new PreviewPopup(doc);
+					iv.show();
+				}
+			});
+		});
+		return preview;
 	}
 
 	/**

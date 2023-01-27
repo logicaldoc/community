@@ -82,44 +82,57 @@ public class WorkflowDrawingPanel extends VStack {
 			workflow = workflowDesigner.getWorkflow();
 
 		try {
-			// Put all the states
-			widgets.clear();
-			for (GUIWFState state : workflow.getStates()) {
-				StateWidget widget = new StateWidget(this, state);
-				controller.addWidget(widget, state.getLeft(), state.getTop());
-				widgets.put(state.getId(), widget);
-			}
-
-			for (StateWidget widget : widgets.values()) {
-				controller.makeDraggable(widget);
-			}
-
-			// Draw the transitions
-			for (GUIWFState state : workflow.getStates()) {
-				if (state.getTransitions() != null)
-					for (GUITransition trans : state.getTransitions()) {
-						StateWidget src = widgets.get(state.getId());
-						StateWidget dst = widgets.get(trans.getTargetState().getId());
-						Connection c = controller.drawStraightArrowConnection(src, dst, trans);
-						c.setSynchronized(true);
-						c.setAllowSynchronized(true);
-
-						String points = trans.getPoints();
-						if (points != null) {
-							String[] tokens = points.split(";");
-							for (String token : tokens) {
-								if (token == null || token.equals(""))
-									continue;
-								String coords[] = token.split(",");
-								c.addMovablePoint(new Point(Integer.parseInt(coords[0]), Integer.parseInt(coords[1])));
-							}
-						}
-					}
-			}
-
-			controller.unsynchronizedShapes();
+			drawAll(workflow);
 		} catch (Throwable t) {
 			GuiLog.error(t.getMessage(), null, t);
+		}
+	}
+
+	private void drawAll(GUIWorkflow workflow) {
+		clearAll(workflow);
+
+		for (StateWidget widget : widgets.values()) {
+			controller.makeDraggable(widget);
+		}
+
+		// Draw the transitions
+		for (GUIWFState state : workflow.getStates()) {
+			drawTransitions(state);
+		}
+
+		controller.unsynchronizedShapes();
+	}
+
+	private void drawTransitions(GUIWFState state) {
+		if (state.getTransitions() == null)
+			return;
+
+		for (GUITransition trans : state.getTransitions()) {
+			StateWidget src = widgets.get(state.getId());
+			StateWidget dst = widgets.get(trans.getTargetState().getId());
+			Connection c = controller.drawStraightArrowConnection(src, dst, trans);
+			c.setSynchronized(true);
+			c.setAllowSynchronized(true);
+
+			String points = trans.getPoints();
+			if (points != null) {
+				String[] tokens = points.split(";");
+				for (String token : tokens) {
+					if (token == null || token.equals(""))
+						continue;
+					String coords[] = token.split(",");
+					c.addMovablePoint(new Point(Integer.parseInt(coords[0]), Integer.parseInt(coords[1])));
+				}
+			}
+		}
+	}
+
+	private void clearAll(GUIWorkflow workflow) {
+		widgets.clear();
+		for (GUIWFState state : workflow.getStates()) {
+			StateWidget widget = new StateWidget(this, state);
+			controller.addWidget(widget, state.getLeft(), state.getTop());
+			widgets.put(state.getId(), widget);
 		}
 	}
 

@@ -59,33 +59,12 @@ public class TenantPropertiesPanel extends HLayout {
 	}
 
 	public void refresh() {
-		boolean readonly = (changedHandler == null);
-		vm.clearValues();
-		vm.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
-
-		if (contains(form))
-			removeChild(form);
-
-		form = new DynamicForm();
-		form.setValuesManager(vm);
-		form.setWrapItemTitles(false);
-		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setNumCols(3);
-
-		layout.addMember(form, 1);
+		boolean readonly = prepareForm();
 
 		CheckboxItem enabled = new CheckboxItem("eenabled", I18N.message("enabled"));
 		enabled.setValue(tenant.isEnabled());
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", tenant.getName());
-		name.setRequired(true);
-		name.setSelectOnFocus(true);
-		name.setDisabled(readonly || (tenant.getId() != 0 && Constants.TENANT_DEFAULTNAME.equals(tenant.getName())));
-		if (!readonly)
-			name.addChangedHandler(changedHandler);
+		TextItem name = prepareNameItem(readonly);
 
 		TextItem displayName = ItemFactory.newTextItem("displayname", "displayname", tenant.getDisplayName());
 		displayName.setRequired(true);
@@ -135,7 +114,7 @@ public class TenantPropertiesPanel extends HLayout {
 		if (!readonly)
 			email.addChangedHandler(changedHandler);
 
-		if (readonly || "default".equals(tenant.getName())) {
+		if (readonly || tenant.isDefault()) {
 			enabled.setDisabled(true);
 			expire.setDisabled(true);
 		} else {
@@ -145,6 +124,37 @@ public class TenantPropertiesPanel extends HLayout {
 
 		form.setItems(name, enabled, expire, displayName, email, address, postalcode, city, country, state, phone);
 		addMember(layout);
+	}
+
+	private TextItem prepareNameItem(boolean readonly) {
+		TextItem name = ItemFactory.newSimpleTextItem("name", "name", tenant.getName());
+		name.setRequired(true);
+		name.setSelectOnFocus(true);
+		name.setDisabled(readonly || (tenant.getId() != 0 && Constants.TENANT_DEFAULTNAME.equals(tenant.getName())));
+		if (!readonly)
+			name.addChangedHandler(changedHandler);
+		return name;
+	}
+
+	private boolean prepareForm() {
+		boolean readonly = (changedHandler == null);
+		vm.clearValues();
+		vm.clearErrors(false);
+
+		if (form != null)
+			form.destroy();
+
+		if (contains(form))
+			removeChild(form);
+
+		form = new DynamicForm();
+		form.setValuesManager(vm);
+		form.setWrapItemTitles(false);
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setNumCols(3);
+
+		layout.addMember(form, 1);
+		return readonly;
 	}
 
 	@SuppressWarnings("unchecked")

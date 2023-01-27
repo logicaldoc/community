@@ -31,9 +31,7 @@ public class ContextConfigurator {
 
 	public void setProperty(String id, String propertyName, String value) {
 		Element element = xml.getChild("bean", "id", id);
-		List poperties = element.getChildren("property", element.getNamespace());
-		for (Iterator iter = poperties.iterator(); iter.hasNext();) {
-			Element property = (Element) iter.next();
+		for (Element property : element.getChildren("property", element.getNamespace())) {
 			if (propertyName.equals(property.getAttribute("name").getValue())) {
 				property.getChild("value").setText(value);
 				break;
@@ -45,9 +43,7 @@ public class ContextConfigurator {
 		Element element = xml.getChild("bean", "id", id);
 		if (element == null)
 			return;
-		List poperties = element.getChildren("property", element.getNamespace());
-		for (Iterator iter = poperties.iterator(); iter.hasNext();) {
-			Element property = (Element) iter.next();
+		for (Element property : element.getChildren("property", element.getNamespace())) {
 			if (propertyName.equals(property.getAttribute("name").getValue())) {
 				property.removeContent();
 				return;
@@ -59,36 +55,37 @@ public class ContextConfigurator {
 		Element element = xml.getChild("bean", "id", id);
 		if (element == null)
 			return;
-		List poperties = element.getChildren("property", element.getNamespace());
-		for (Iterator iter = poperties.iterator(); iter.hasNext();) {
-			Element property = (Element) iter.next();
 
+		for (Element property : element.getChildren("property", element.getNamespace())) {
 			if (propertyName.equals(property.getAttribute("name").getValue())) {
-				Collection<Element> beanRefChildren = new LinkedList<Element>();
-				Element listElement = property.getChild("list", property.getNamespace());
-				if (listElement != null) {
-					List<Element> elms = listElement.getChildren();
-					for (Element elm : elms) {
-						if (elm.getName().equals("ref"))
-							beanRefChildren.add(elm);
-
-					}
-				} else {
-					listElement = new Element("list");
-				}
-
-				for (String value : values) {
-					Element refBeanElement = new Element("ref");
-					refBeanElement.setAttribute(new Attribute("bean", value));
-					beanRefChildren.add(refBeanElement);
-				}
-				listElement.removeContent();
-				listElement.setContent(beanRefChildren);
-				property.setContent(listElement);
-
+				addPropertyListValues(property, values);
 				break;
 			}
 		}
+	}
+
+	private void addPropertyListValues(Element property, List<? extends String> values) {
+		Collection<Element> beanRefChildren = new LinkedList<Element>();
+		Element listElement = property.getChild("list", property.getNamespace());
+		if (listElement != null) {
+			List<Element> elms = listElement.getChildren();
+			for (Element elm : elms) {
+				if (elm.getName().equals("ref"))
+					beanRefChildren.add(elm);
+
+			}
+		} else {
+			listElement = new Element("list");
+		}
+
+		for (String value : values) {
+			Element refBeanElement = new Element("ref");
+			refBeanElement.setAttribute(new Attribute("bean", value));
+			beanRefChildren.add(refBeanElement);
+		}
+		listElement.removeContent();
+		listElement.setContent(beanRefChildren);
+		property.setContent(listElement);
 	}
 
 	public String getProperty(String id, String propertyName) {
@@ -103,7 +100,8 @@ public class ContextConfigurator {
 	 * the &lt;props&gt; tag:
 	 * <p>
 	 * 
-	 * &lt;property&gt;&lt;props&gt;&lt;prop key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
+	 * &lt;property&gt;&lt;props&gt;&lt;prop
+	 * key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
 	 * 
 	 * @param id The bean id
 	 * @param propertyName The property name
@@ -123,7 +121,8 @@ public class ContextConfigurator {
 	 * the &lt;props&gt; tag:
 	 * <p>
 	 * 
-	 * &lt;property&gt;&lt;props&gt;&lt;prop key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
+	 * &lt;property&gt;&lt;props&gt;&lt;prop
+	 * key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
 	 * 
 	 * @param id The bean id
 	 * @param propertyName The property name
@@ -142,11 +141,12 @@ public class ContextConfigurator {
 	}
 
 	/**
-	 * Sets the prop value of the specified property, that is one inside
-	 * the &lt;props&gt; tag:
+	 * Sets the prop value of the specified property, that is one inside the
+	 * &lt;props&gt; tag:
 	 * <p>
 	 * 
-	 * &lt;property&gt;&lt;props&gt;&lt;prop key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
+	 * &lt;property&gt;&lt;props&gt;&lt;prop
+	 * key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
 	 * 
 	 * @param id The bean id
 	 * @param propertyName The property name

@@ -132,23 +132,28 @@ public class WorkflowDashboard extends VLayout {
 
 			@Override
 			public void onSuccess(Void result) {
-				for (String id : instanceIds) {
-					if (assignedTasks != null)
-						assignedTasks.onDeletedWorkflow(id);
-					if (canOwnTasks != null)
-						canOwnTasks.onDeletedWorkflow(id);
-					if (adminTasks != null)
-						adminTasks.onDeletedWorkflow(id);
-					if (supervisorTasks != null)
-						supervisorTasks.onDeletedWorkflow(id);
-					if (involvedTasks != null)
-						involvedTasks.onDeletedWorkflow(id);
-				}
+				refreshGridsAfterWorkflowsKilled(instanceIds);
 				LD.clearPrompt();
 			}
 		});
 	}
 
+	
+	private void refreshGridsAfterWorkflowsKilled(ArrayList<String> instanceIds) {
+		for (String id : instanceIds) {
+			if (assignedTasks != null)
+				assignedTasks.onDeletedWorkflow(id);
+			if (canOwnTasks != null)
+				canOwnTasks.onDeletedWorkflow(id);
+			if (adminTasks != null)
+				adminTasks.onDeletedWorkflow(id);
+			if (supervisorTasks != null)
+				supervisorTasks.onDeletedWorkflow(id);
+			if (involvedTasks != null)
+				involvedTasks.onDeletedWorkflow(id);
+		}
+	}
+	
 	/**
 	 * Refreshes all the dashlets related to the given workflow instance
 	 * 
