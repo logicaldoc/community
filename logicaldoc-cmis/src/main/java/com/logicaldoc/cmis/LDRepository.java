@@ -394,8 +394,7 @@ public class LDRepository {
 	 * CMIS getRepositoryInfo
 	 * 
 	 * @param context call context
-	 * @param latestChangeLogToken a token that indicates the time stamp of the
-	 *        last update
+	 * @param latestChangeLogToken a token that indicates the time stamp of the last update
 	 * 
 	 * @return the repository representation
 	 */
@@ -847,9 +846,9 @@ public class LDRepository {
 				throw new CmisInvalidArgumentException("Object Id must be set.");
 
 			ObjectInfoImpl info = new ObjectInfoImpl();
-			PersistentObject object = getObject(objectId);
-			compileProperties(object, null, info);
-			ObjectData data = compileObjectType(null, object, null, true, true, handler);
+			PersistentObject object = getObject(objectId);			
+			compileProperties(object, null, info);						
+			ObjectData data = compileObjectType(null, object, null, true, true, handler);						
 			info.setObject(data);
 			return info;
 		} catch (Exception t) {
@@ -975,8 +974,7 @@ public class LDRepository {
 			validatePermission(objectId, context, null);
 
 			if (objectId == null) {
-				// this works only because there are no versions in a file
-				// system
+				// this works only because there are no versions in a file system
 				// and the object id and version series id are the same
 				objectId = versionServicesId;
 			}
@@ -1203,6 +1201,7 @@ public class LDRepository {
 	public ObjectInFolderList getChildren(CallContext context, String folderId, String filter,
 			boolean includeAllowableActions, boolean includePathSegment, int maxItems, int skipCount,
 			ObjectInfoHandler objectInfos) throws PersistenceException {
+		log.debug("getChildren folderId: {}", folderId);
 		validatePermission(folderId, context, null);
 
 		// split filter
@@ -1212,8 +1211,9 @@ public class LDRepository {
 		Folder folder = getFolder(folderId);
 
 		// set object info of the the folder
-		if (context.isObjectInfoRequired())
+		if (context.isObjectInfoRequired()) {
 			compileObjectType(context, folder, null, false, false, objectInfos);
+		}
 
 		// prepare result
 		ObjectInFolderListImpl result = new ObjectInFolderListImpl();
@@ -1642,7 +1642,7 @@ public class LDRepository {
 	 */
 	private ObjectData compileObjectType(CallContext context, PersistentObject object, Set<String> filter,
 			boolean includeAllowableActions, boolean includeAcl, ObjectInfoHandler objectInfos) {
-
+        debug("compileObjectType");
 		ObjectDataImpl result = new ObjectDataImpl();
 		ObjectInfoImpl objectInfo = new ObjectInfoImpl();
 
@@ -1675,6 +1675,7 @@ public class LDRepository {
 	 * @return the compiled properties
 	 */
 	private Properties compileProperties(PersistentObject object, Set<String> orgfilter, ObjectInfoImpl objectInfo) {
+		debug("compileProperties");
 		assert object != null : "Object must not be null!";
 
 		// copy filter
@@ -2200,6 +2201,8 @@ public class LDRepository {
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
+			
+			// TODO if the folder has been renamed the right event could be FolderEvent.RENAMED for the LDSynch
 			transaction.setEvent(FolderEvent.CHANGED.toString());
 			folderDao.store(folder, transaction);
 		}
@@ -2556,35 +2559,43 @@ public class LDRepository {
 	}
 
 	/**
-	 * Splits a filter statement into a collection of properties. If
-	 * <code>filter</code> is <code>null</code>, empty or one of the properties
-	 * is '*' , an empty collection will be returned.
+	 * Splits a filter statement into a collection of properties. 
+	 * If <code>filter</code> is <code>null</code>, empty or one of the properties is '*' a null is returned.
+	 * Otherwise it will return a collection of filters. 
 	 */
 	private static Set<String> splitFilter(String filter) {
-		Set<String> result = new HashSet<>();
+		
+		/**
+		 * NOTE: pay very attention modifying this method, returning an empty HashSet<String>() instead of a null 
+		 * invalidates completely the working of the cmis module - Alex 2023-01-26 
+		 */
+		if (filter == null) {
+			return null;
+		}
 
-		if (filter == null)
-			return result;
+		if (filter.trim().length() == 0) {
+			return null;
+		}
 
-		if (filter.trim().length() == 0)
-			return result;
-
+		Set<String> result = new HashSet<String>();
 		for (String s : filter.split(",")) {
 			s = s.trim();
 			if (s.equals("*")) {
-				return new HashSet<>();
+				return null;
 			} else if (s.length() > 0) {
 				result.add(s);
 			}
 		}
 
 		// set a few base properties
+		// query name == id (for base type properties)
 		result.add(PropertyIds.OBJECT_ID);
 		result.add(PropertyIds.OBJECT_TYPE_ID);
 		result.add(PropertyIds.BASE_TYPE_ID);
 
 		return result;
 	}
+
 
 	/**
 	 * Gets the type id from a set of properties.
