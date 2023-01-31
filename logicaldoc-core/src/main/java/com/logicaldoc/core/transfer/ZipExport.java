@@ -158,7 +158,6 @@ public class ZipExport {
 				}
 				addDocument("", doc, convertToPdf, transaction.getSessionId());
 
-				System.out.println("added document " + doc);
 				try {
 					zos.flush();
 				} catch (Throwable e) {
