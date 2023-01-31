@@ -3,7 +3,6 @@ package com.logicaldoc.core.transfer;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -159,6 +158,12 @@ public class ZipExport {
 				}
 				addDocument("", doc, convertToPdf, transaction.getSessionId());
 
+				System.out.println("added document " + doc);
+				try {
+					zos.flush();
+				} catch (Throwable e) {
+					log.warn(e.getMessage());
+				}
 				saveHistory(transaction, doc);
 			}
 		} finally {
@@ -168,7 +173,6 @@ public class ZipExport {
 			} catch (Throwable e) {
 				log.warn(e.getMessage());
 			}
-
 		}
 	}
 
@@ -290,9 +294,7 @@ public class ZipExport {
 			resource = storer.getResourceName(document, null, FormatConverterManager.PDF_CONVERSION_SUFFIX);
 		}
 
-		try (InputStream is = storer.getStream(document.getId(), resource);
-				BufferedInputStream bis = new BufferedInputStream(is);) {
-
+		try (BufferedInputStream bis = new BufferedInputStream(storer.getStream(document.getId(), resource))) {
 			String fileName = document.getFileName();
 			if (pdfConversion)
 				fileName = FileUtil.getBaseName(fileName) + ".pdf";
@@ -308,6 +310,12 @@ public class ZipExport {
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
+		} finally {
+			try {
+				zos.closeArchiveEntry();
+			} catch (IOException e) {
+				log.warn(e.getMessage());
+			}
 		}
 	}
 
