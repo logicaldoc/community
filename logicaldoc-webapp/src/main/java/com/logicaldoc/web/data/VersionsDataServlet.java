@@ -38,40 +38,17 @@ public class VersionsDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
-
-		VersionDAO dao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-
-		Map<String, Object> params = new HashMap<String, Object>();
-
-		StringBuilder query = new StringBuilder(
-				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
-						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
-		if (request.getParameter("docId") != null) {
-			long docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			Document doc = ddao.findDocument(docId);
-			if (doc != null)
-				docId = doc.getId();
-
-			query.append(" from Version A where A.deleted = 0 and A.docId = :docId ");
-			params.put("docId", docId);
-		} else {
-			query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
-			query.append(" and B.id = :archiveId");
-			params.put("archiveId", Long.parseLong(request.getParameter("archiveId")));
-		}
-		query.append(" order by A.versionDate desc ");
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		List<Object> records = executeQuery(request, max);
 
 		/*
 		 * Iterate over records composing the response XML document
 		 */
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		
+		PrintWriter writer = response.getWriter();
+		writer.write("<list>");
+		
 		for (Object record : records) {
 			Object[] cols = (Object[]) record;
 
@@ -104,5 +81,33 @@ public class VersionsDataServlet extends AbstractDataServlet {
 		}
 
 		writer.write("</list>");
+	}
+
+	private List<Object> executeQuery(HttpServletRequest request, Integer max) throws PersistenceException {
+		VersionDAO dao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+
+		Map<String, Object> params = new HashMap<String, Object>();
+
+		StringBuilder query = new StringBuilder(
+				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
+						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
+		if (request.getParameter("docId") != null) {
+			long docId = Long.parseLong(request.getParameter("docId"));
+			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = ddao.findDocument(docId);
+			if (doc != null)
+				docId = doc.getId();
+
+			query.append(" from Version A where A.deleted = 0 and A.docId = :docId ");
+			params.put("docId", docId);
+		} else {
+			query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
+			query.append(" and B.id = :archiveId");
+			params.put("archiveId", Long.parseLong(request.getParameter("archiveId")));
+		}
+		query.append(" order by A.versionDate desc ");
+
+		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		return records;
 	}
 }

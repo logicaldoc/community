@@ -229,6 +229,10 @@ public class WSAttribute implements Serializable {
 			return;
 		}
 
+		setNonUserValue(attribute, value);
+	}
+
+	private static void setNonUserValue(WSAttribute attribute, Object value) {
 		if (value instanceof String) {
 			attribute.type = TYPE_STRING;
 			attribute.setStringValue((String) value);
@@ -257,17 +261,21 @@ public class WSAttribute implements Serializable {
 			attribute.intValue = ((WSFolder) value).getId();
 			attribute.type = TYPE_FOLDER;
 		} else {
-			attribute.type = TYPE_DATE;
-			if (value != null && value instanceof XMLGregorianCalendar) {
-				XMLGregorianCalendar theXGCal = (XMLGregorianCalendar) value;
-				GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
-				Date theDate = theGCal.getTime();
-				attribute.setDateValue(DateUtil.format((Date) theDate));
-			} else if (value != null && value instanceof Date) {
-				attribute.setDateValue(DateUtil.format((Date) value));
-			} else
-				attribute.setDateValue(null);
+			setDateValue(attribute, value);
 		}
+	}
+
+	private static void setDateValue(WSAttribute attribute, Object value) {
+		attribute.type = TYPE_DATE;
+		if (value != null && value instanceof XMLGregorianCalendar) {
+			XMLGregorianCalendar theXGCal = (XMLGregorianCalendar) value;
+			GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
+			Date theDate = theGCal.getTime();
+			attribute.setDateValue(DateUtil.format((Date) theDate));
+		} else if (value != null && value instanceof Date) {
+			attribute.setDateValue(DateUtil.format((Date) value));
+		} else
+			attribute.setDateValue(null);
 	}
 
 	public int getEditor() {

@@ -27,27 +27,11 @@ public class LinksDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		Long docId = null;
-		if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
-			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			Document doc = ddao.findDocument(docId);
-			if (doc != null)
-				docId = doc.getId();
-		}
+		Long docId = getDocId(request);
 
-		if (docId == null)
-			throw new IOException("No document ID");
+		String parent = getParent(request);
 
-		String parent = request.getParameter("parent");
-		if (StringUtils.isEmpty(parent))
-			parent = "/";
-
-		Long parentDocId = docId;
-		if (parent.contains("-"))
-			parentDocId = Long.parseLong(parent.substring(parent.lastIndexOf('-') + 1));
-		else if (!"/".equals(parent))
-			parentDocId = Long.parseLong(parent);
+		Long parentDocId = getParentDocId(docId, parent);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -73,34 +57,69 @@ public class LinksDataServlet extends AbstractDataServlet {
 		for (Object record : records) {
 			Object[] cols = (Object[]) record;
 
-			writer.print("<link>");
-			writer.print("<linkId>" + cols[0] + "</linkId>");
-			writer.print("<folderId>" + cols[1] + "</folderId>");
-			writer.print("<type>" + cols[2] + "</type>");
-			writer.print("<parent>" + parent + "</parent>");
-			writer.print("<folderId1>" + cols[9] + "</folderId1>");
-			writer.print("<folderId2>" + cols[10] + "</folderId2>");
-			if (parentDocId.longValue() == (Long) cols[3]) {
-				writer.print("<documentId>" + parent + "-" + cols[6] + "</documentId>");
-				writer.print("<filename><![CDATA[" + (String) cols[7] + "]]></filename>");
-				writer.print(
-						"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[8])) + "</icon>");
-				writer.print("<direction>out</direction>");
-				if (cols[12] != null)
-					writer.print("<color><![CDATA[" + cols[12] + "]]></color>");
-			} else {
-				writer.print("<documentId>" + parent + "-" + cols[3] + "</documentId>");
-				writer.print("<filename><![CDATA[" + (String) cols[4] + "]]></filename>");
-				writer.print(
-						"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[5])) + "</icon>");
-				if (cols[11] != null)
-					writer.print("<color><![CDATA[" + cols[11] + "]]></color>");
-				writer.print("<direction>in</direction>");
-			}
-
-			writer.print("</link>");
+			printLink(writer, cols, parent, parentDocId);
 		}
 
 		writer.write("</list>");
+	}
+
+	private void printLink(PrintWriter writer, Object[] cols, String parent, Long parentDocId) {
+		writer.print("<link>");
+		writer.print("<linkId>" + cols[0] + "</linkId>");
+		writer.print("<folderId>" + cols[1] + "</folderId>");
+		writer.print("<type>" + cols[2] + "</type>");
+		writer.print("<parent>" + parent + "</parent>");
+		writer.print("<folderId1>" + cols[9] + "</folderId1>");
+		writer.print("<folderId2>" + cols[10] + "</folderId2>");
+		if (parentDocId.longValue() == (Long) cols[3]) {
+			writer.print("<documentId>" + parent + "-" + cols[6] + "</documentId>");
+			writer.print("<filename><![CDATA[" + (String) cols[7] + "]]></filename>");
+			writer.print(
+					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[8])) + "</icon>");
+			writer.print("<direction>out</direction>");
+			if (cols[12] != null)
+				writer.print("<color><![CDATA[" + cols[12] + "]]></color>");
+		} else {
+			writer.print("<documentId>" + parent + "-" + cols[3] + "</documentId>");
+			writer.print("<filename><![CDATA[" + (String) cols[4] + "]]></filename>");
+			writer.print(
+					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[5])) + "</icon>");
+			if (cols[11] != null)
+				writer.print("<color><![CDATA[" + cols[11] + "]]></color>");
+			writer.print("<direction>in</direction>");
+		}
+
+		writer.print("</link>");
+	}
+
+	private Long getParentDocId(Long docId, String parent) {
+		Long parentDocId = docId;
+		if (parent.contains("-"))
+			parentDocId = Long.parseLong(parent.substring(parent.lastIndexOf('-') + 1));
+		else if (!"/".equals(parent))
+			parentDocId = Long.parseLong(parent);
+		return parentDocId;
+	}
+
+	private String getParent(HttpServletRequest request) {
+		String parent = request.getParameter("parent");
+		if (StringUtils.isEmpty(parent))
+			parent = "/";
+		return parent;
+	}
+
+	private Long getDocId(HttpServletRequest request) throws PersistenceException, IOException {
+		Long docId = null;
+		if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
+			docId = Long.parseLong(request.getParameter("docId"));
+			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = ddao.findDocument(docId);
+			if (doc != null)
+				docId = doc.getId();
+		}
+
+		if (docId == null)
+			throw new IOException("No document ID");
+		return docId;
 	}
 }

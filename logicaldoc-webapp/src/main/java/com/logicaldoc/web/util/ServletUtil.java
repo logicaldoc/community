@@ -50,7 +50,6 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
@@ -215,143 +214,43 @@ public class ServletUtil {
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
 			long docId, String fileVersion, String fileName, String suffix, User user)
 			throws FileNotFoundException, IOException, ServletException, PersistenceException {
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
-		ContextProperties config = Context.get().getProperties();
 
-		Session session = null;
-		if (sid != null)
-			try {
-				session = validateSession(sid);
-			} catch (InvalidSessionException e) {
-				throw new ServletException(e.getMessage(), e);
-			}
-		else
-			try {
-				session = validateSession(request);
-			} catch (InvalidSessionException e1) {
-				// Nothing to do
-			}
+		Session session = getSession(request, sid);
 
-		if (user != null)
-			try {
-				udao.initialize(user);
-			} catch (Exception e) {
-				// Nothing to do
-			}
+		initUser(user);
 
-		Document doc = dao.findById(docId);
+		Document document = getDocument(docId, user);
 
-		if (doc != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
-				&& !doc.isPublishing())
-			throw new FileNotFoundException("Document not published");
+		String filename = getFilename(fileName, suffix, document);
 
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(doc, fileVersion, null);
-
-		String filename = fileName;
-		if (filename == null)
-			filename = doc.getFileName();
-
-		if (StringUtils.isNotEmpty(suffix) && !suffix.endsWith(".p7m") && !suffix.endsWith(".m7m"))
-			filename = FileUtil.getBaseName(filename);
-
-		if (!storer.exists(doc.getId(), resource)) {
+		String resource = storer.getResourceName(document, fileVersion, null);
+		if (!storer.exists(document.getId(), resource)) {
 			throw new FileNotFoundException(resource);
 		}
 
 		if (StringUtils.isNotEmpty(suffix)) {
-			resource = storer.getResourceName(doc, fileVersion, suffix);
+			resource = storer.getResourceName(document, fileVersion, suffix);
 			filename = filename + "." + suffix.substring(suffix.lastIndexOf('.') + 1);
 		}
 
-		long length = storer.size(doc.getId(), resource);
+		long length = storer.size(document.getId(), resource);
 		String contentType = MimeType.getByFilename(filename);
-		long lastModified = doc.getDate().getTime();
-		String eTag = doc.getId() + "_" + doc.getVersion() + "_" + lastModified;
+		long lastModified = document.getDate().getTime();
+		String eTag = document.getId() + "_" + document.getVersion() + "_" + lastModified;
 		boolean acceptsGzip = false;
 
-		String acceptEncoding = request.getHeader("Accept-Encoding");
-		acceptsGzip = acceptEncoding != null && accepts(acceptEncoding, "gzip");
-		acceptsGzip = acceptsGzip && "true".equals(config.getProperty("download.gzip"));
-
-		// Don't compress if we have to serve a thumbnail
-		acceptsGzip = acceptsGzip
-				&& (StringUtil.isEmpty(suffix) || (!"thumb.jpg".endsWith(suffix) && !"tile.jpg".endsWith(suffix)));
+		acceptsGzip = getAcceptEncoding(request, suffix);
 
 		response.setContentType(contentType);
 		setContentDisposition(request, response, filename);
 
 		// Prepare some variables. The full Range represents the complete file.
-		Range full = new Range(0, length - 1, length);
-		List<Range> ranges = new ArrayList<Range>();
-
-		// Validate and process Range and If-Range headers.
-		String range = request.getHeader("Range");
-		if (range != null) {
-
-			// Range header should match format "bytes=n-n,n-n,n-n...". If not,
-			// then return 416.
-			if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
-				response.setHeader("Content-Range", "bytes */" + length); // Required
-																			// in
-																			// 416.
-				response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-				return;
-			}
-
-			// If-Range header should either match ETag or be greater then
-			// LastModified. If not,
-			// then return full file.
-			String ifRange = request.getHeader("If-Range");
-			if (ifRange != null && !ifRange.equals(eTag)) {
-				try {
-					long ifRangeTime = request.getDateHeader("If-Range"); // Throws
-																			// IAE
-																			// if
-																			// invalid.
-					if (ifRangeTime != -1 && ifRangeTime + 1000 < lastModified) {
-						ranges.add(full);
-					}
-				} catch (IllegalArgumentException ignore) {
-					ranges.add(full);
-				}
-			}
-
-			// If any valid If-Range header, then process each part of byte
-			// range.
-			if (ranges.isEmpty()) {
-				for (String part : range.substring(6).split(",")) {
-					// Assuming a file with length of 100, the following
-					// examples returns bytes at:
-					// 50-80 (50 to 80), 40- (40 to length=100), -20
-					// (length-20=80 to length=100).
-					long start = sublong(part, 0, part.indexOf("-"));
-					long end = sublong(part, part.indexOf("-") + 1, part.length());
-
-					if (start == -1) {
-						start = length - end;
-						end = length - 1;
-					} else if (end == -1 || end > length - 1) {
-						end = length - 1;
-					}
-
-					// Check if Range is syntactically valid. If not, then
-					// return 416.
-					if (start > end) {
-						response.setHeader("Content-Range", "bytes */" + length); // Required
-																					// in
-																					// 416.
-						response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-						return;
-					}
-
-					// Add range.
-					ranges.add(new Range(start, end, length));
-				}
-			}
-		} else {
-			ranges.add(full);
+		Range rangeFull = new Range(0, length - 1, length);
+		List<Range> ranges = getRanges(request, response, length, lastModified, eTag, rangeFull);
+		if (ranges == null) {
+			response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+			return;
 		}
 
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
@@ -367,7 +266,7 @@ public class ServletUtil {
 		// ------------------------------------------------
 
 		// Prepare streams.
-		boolean gstreamRequired = (ranges.isEmpty() || ranges.get(0) == full || ranges.get(0).length == length)
+		boolean gstreamRequired = (ranges.isEmpty() || ranges.get(0) == rangeFull || ranges.get(0).length == length)
 				&& acceptsGzip;
 
 		try (OutputStream output = gstreamRequired
@@ -421,6 +320,156 @@ public class ServletUtil {
 		/*
 		 * Save an history only if it is requested the first fragment
 		 */
+		saveHistory(request, sid, suffix, user, session, document, ranges);
+	}
+
+	private static void initUser(User user) {
+		if (user != null)
+			try {
+				UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
+				udao.initialize(user);
+			} catch (Exception e) {
+				// Nothing to do
+			}
+	}
+
+	private static List<Range> getRanges(HttpServletRequest request, HttpServletResponse response, long length,
+			long lastModified, String eTag, Range rangeFull) throws IOException {
+		// Validate and process Range and If-Range headers.
+		String range = request.getHeader("Range");
+		if (range == null) {
+			List<Range> ranges = new ArrayList<Range>();
+			ranges.add(rangeFull);
+			return ranges;
+		}
+
+		// Range header should match format "bytes=n-n,n-n,n-n...". If not,
+		// then return 416.
+		if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
+			response.setHeader("Content-Range", "bytes */" + length); // Required
+																		// in
+																		// 416.
+			// response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+			return null;
+		}
+
+		// If-Range header should either match ETag or be greater then
+		// LastModified. If not,
+		// then return full file.
+		List<Range> ranges = getRangesAsSpecifiedInIfRangeHeader(request, lastModified, eTag, rangeFull);
+		if (!ranges.isEmpty())
+			return ranges;
+
+		// If any valid If-Range header, then process each part of byte
+		// range.
+		for (String part : range.substring(6).split(",")) {
+			// Assuming a file with length of 100, the following
+			// examples returns bytes at:
+			// 50-80 (50 to 80), 40- (40 to length=100), -20
+			// (length-20=80 to length=100).
+			long start = sublong(part, 0, part.indexOf("-"));
+			long end = sublong(part, part.indexOf("-") + 1, part.length());
+
+			if (start == -1) {
+				start = length - end;
+				end = length - 1;
+			} else if (end == -1 || end > length - 1) {
+				end = length - 1;
+			}
+
+			// Check if Range is syntactically valid. If not, then
+			// return 416.
+			if (start > end) {
+				response.setHeader("Content-Range", "bytes */" + length); // Required
+																			// in
+																			// 416.
+				// response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+				return null;
+			}
+
+			// Add range.
+			ranges.add(new Range(start, end, length));
+		}
+
+		return ranges;
+	}
+
+	private static List<Range> getRangesAsSpecifiedInIfRangeHeader(HttpServletRequest request, long lastModified,
+			String eTag, Range rangeFull) {
+		List<Range> ranges = new ArrayList<Range>();
+		String ifRange = request.getHeader("If-Range");
+		if (ifRange != null && !ifRange.equals(eTag)) {
+			try {
+				long ifRangeTime = request.getDateHeader("If-Range"); // Throws
+																		// IAE
+																		// if
+																		// invalid.
+				if (ifRangeTime != -1 && ifRangeTime + 1000 < lastModified) {
+					ranges.add(rangeFull);
+				}
+			} catch (IllegalArgumentException ignore) {
+				ranges.add(rangeFull);
+			}
+		}
+		return ranges;
+	}
+
+	private static void saveHistory(HttpServletRequest request, String sid, String suffix, User user, Session session,
+			Document document, List<Range> ranges) throws PersistenceException {
+		boolean saveHistory = isSaveHistory(request, suffix, user, ranges);
+		if (!saveHistory)
+			return;
+
+		// Add an history entry to track the download of the document
+		DocumentHistory history = new DocumentHistory();
+		history.setDocument(document);
+		history.setUser(user);
+		if (session != null) {
+			history.setSession(session);
+		} else {
+			history.setSessionId(sid);
+		}
+
+		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
+		if ("preview".equals(request.getParameter("control")))
+			history.setEvent(DocumentEvent.VIEWED.toString());
+		else
+			history.setEvent(DocumentEvent.DOWNLOADED.toString());
+
+		/*
+		 * Avoid to save frequent views of this document in the same session. So
+		 * we will not save if there is another view in the same session asked
+		 * since 30 seconds.
+		 */
+		DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		List<DocumentHistory> oldHistories = hdao.findByUserIdAndEvent(user.getId(), history.getEvent(),
+				session != null ? session.getSid() : sid);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(history.getDate());
+		cal.add(Calendar.SECOND, -30);
+		Date oldestDate = cal.getTime();
+
+		DocumentHistory latestHistory = null;
+		Date latestDate = null;
+		if (!oldHistories.isEmpty()) {
+			latestHistory = oldHistories.get(oldHistories.size() - 1);
+			cal.setTime(latestHistory.getDate());
+			latestDate = cal.getTime();
+		}
+
+		if (latestHistory == null || oldestDate.getTime() > latestDate.getTime()
+				|| !latestHistory.getDocId().equals(history.getDocId())) {
+			try {
+				hdao.store(history);
+			} catch (PersistenceException e) {
+				Log.warn(e.getMessage(), e);
+			}
+		}
+
+	}
+
+	private static boolean isSaveHistory(HttpServletRequest request, String suffix, User user, List<Range> ranges) {
 		boolean saveHistory = StringUtils.isEmpty(suffix)
 				|| ("conversion.pdf".equals(suffix) && "preview".equals(request.getParameter("control")));
 		if (!ranges.isEmpty() && saveHistory) {
@@ -432,55 +481,55 @@ public class ServletUtil {
 				}
 		}
 		saveHistory = saveHistory && (user != null);
+		return saveHistory;
+	}
 
-		if (saveHistory) {
-			// Add an history entry to track the download of the document
-			DocumentHistory history = new DocumentHistory();
-			history.setDocument(doc);
-			history.setUser(user);
-			if (session != null) {
-				history.setSession(session);
-			} else {
-				history.setSessionId(sid);
+	private static boolean getAcceptEncoding(HttpServletRequest request, String suffix) {
+		boolean acceptsGzip;
+		String acceptEncoding = request.getHeader("Accept-Encoding");
+		acceptsGzip = acceptEncoding != null && accepts(acceptEncoding, "gzip");
+		acceptsGzip = acceptsGzip && "true".equals(Context.get().getProperties().getProperty("download.gzip"));
+
+		// Don't compress if we have to serve a thumbnail
+		acceptsGzip = acceptsGzip
+				&& (StringUtil.isEmpty(suffix) || (!"thumb.jpg".endsWith(suffix) && !"tile.jpg".endsWith(suffix)));
+		return acceptsGzip;
+	}
+
+	private static Document getDocument(long docId, User user) throws PersistenceException, FileNotFoundException {
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document doc = dao.findById(docId);
+		if (doc != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
+				&& !doc.isPublishing())
+			throw new FileNotFoundException("Document not published");
+		return doc;
+	}
+
+	private static String getFilename(String fileName, String suffix, Document doc) {
+		String filename = fileName;
+		if (filename == null)
+			filename = doc.getFileName();
+
+		if (StringUtils.isNotEmpty(suffix) && !suffix.endsWith(".p7m") && !suffix.endsWith(".m7m"))
+			filename = FileUtil.getBaseName(filename);
+		return filename;
+	}
+
+	private static Session getSession(HttpServletRequest request, String sid) throws ServletException {
+		Session session = null;
+		if (sid != null)
+			try {
+				session = validateSession(sid);
+			} catch (InvalidSessionException e) {
+				throw new ServletException(e.getMessage(), e);
 			}
-
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
-			if ("preview".equals(request.getParameter("control")))
-				history.setEvent(DocumentEvent.VIEWED.toString());
-			else
-				history.setEvent(DocumentEvent.DOWNLOADED.toString());
-
-			/*
-			 * Avoid to save frequent views of this document in the same
-			 * session. So we will not save if there is another view in the same
-			 * session asked since 30 seconds.
-			 */
-			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-			List<DocumentHistory> oldHistories = hdao.findByUserIdAndEvent(user.getId(), history.getEvent(),
-					session != null ? session.getSid() : sid);
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(history.getDate());
-			cal.add(Calendar.SECOND, -30);
-			Date oldestDate = cal.getTime();
-
-			DocumentHistory latestHistory = null;
-			Date latestDate = null;
-			if (!oldHistories.isEmpty()) {
-				latestHistory = oldHistories.get(oldHistories.size() - 1);
-				cal.setTime(latestHistory.getDate());
-				latestDate = cal.getTime();
+		else
+			try {
+				session = validateSession(request);
+			} catch (InvalidSessionException e1) {
+				// Nothing to do
 			}
-
-			if (latestHistory == null || oldestDate.getTime() > latestDate.getTime()
-					|| !latestHistory.getDocId().equals(history.getDocId())) {
-				try {
-					hdao.store(history);
-				} catch (PersistenceException e) {
-					Log.warn(e.getMessage(), e);
-				}
-			}
-		}
+		return session;
 	}
 
 	/**

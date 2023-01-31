@@ -40,7 +40,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale) throws PersistenceException, IOException {
+			Locale locale) throws IOException, PersistenceException {
 
 		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
@@ -48,16 +48,77 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
+		StringBuilder query = new StringBuilder(
+				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion from DocumentHistory A where 1=1 and A.deleted = 0 ");
+		Map<String, Object> params = prepareQueryParams(request, query);
+		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+
 		// Used only to cache the already encountered documents when the
 		// history
 		// is related to a single user (for dashboard visualization)
 		Set<Long> docIds = new HashSet<Long>();
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		/*
+		 * Iterate over records composing the response XML document
+		 */
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		for (Object record : records) {
+			Object[] cols = (Object[]) record;
+			if (request.getParameter("userId") != null) {
+				/*
+				 * If the request contains the user specification, we report
+				 * just the latest event per each document
+				 */
+				if (docIds.contains(cols[8]))
+					continue;
+				else
+					docIds.add((Long) cols[8]);
+			}
 
-		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion from DocumentHistory A where 1=1 and A.deleted = 0 ");
+			printHistory(writer, cols, locale, showSid);
+		}
+		writer.write("</list>");
+	}
+
+	private void printHistory(PrintWriter writer, Object[] historyRecord, Locale locale, boolean showSid) {
+
+		writer.print("<history>");
+		writer.print("<user><![CDATA[" + historyRecord[0] + "]]></user>");
+		writer.print("<event><![CDATA[" + I18N.message((String) historyRecord[1], locale) + "]]></event>");
+		writer.print("<version>" + historyRecord[2] + "</version>");
+
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		writer.print("<date>" + df.format((Date) historyRecord[3]) + "</date>");
+
+		writer.print("<comment><![CDATA[" + (historyRecord[4] == null ? "" : historyRecord[4]) + "]]></comment>");
+		writer.print("<filename><![CDATA[" + (historyRecord[5] == null ? "" : historyRecord[5]) + "]]></filename>");
+		writer.print("<icon>"
+				+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) historyRecord[5])))
+				+ "</icon>");
+		writer.print("<new>" + (1 == (Integer) historyRecord[6]) + "</new>");
+		writer.print("<folderId>" + historyRecord[7] + "</folderId>");
+		writer.print("<docId>" + historyRecord[8] + "</docId>");
+		writer.print("<path><![CDATA[" + (historyRecord[9] == null ? "" : historyRecord[9]) + "]]></path>");
+		if (showSid)
+			writer.print("<sid><![CDATA[" + (historyRecord[10] == null ? "" : historyRecord[10]) + "]]></sid>");
+		writer.print("<userId>" + historyRecord[11] + "</userId>");
+		writer.print("<reason><![CDATA[" + (historyRecord[12] == null ? "" : historyRecord[12]) + "]]></reason>");
+		writer.print("<ip><![CDATA[" + (historyRecord[13] == null ? "" : historyRecord[13]) + "]]></ip>");
+		writer.print("<device><![CDATA[" + (historyRecord[14] == null ? "" : historyRecord[14]) + "]]></device>");
+		writer.print(
+				"<geolocation><![CDATA[" + (historyRecord[15] == null ? "" : historyRecord[15]) + "]]></geolocation>");
+		if (historyRecord[16] != null)
+			writer.write("<color><![CDATA[" + historyRecord[16] + "]]></color>");
+		writer.print("<fileVersion>" + (historyRecord[17] == null ? "" : historyRecord[17]) + "</fileVersion>");
+		writer.print("</history>");
+	}
+
+	private Map<String, Object> prepareQueryParams(HttpServletRequest request, StringBuilder query)
+			throws PersistenceException {
+		Map<String, Object> params = new HashMap<String, Object>();
 		if (request.getParameter("docId") != null) {
 			Long docId = Long.parseLong(request.getParameter("docId"));
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -76,54 +137,6 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			params.put("event", request.getParameter("event"));
 		}
 		query.append(" order by A.date desc ");
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
-
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
-			if (request.getParameter("userId") != null) {
-				/*
-				 * If the request contains the user specification, we report
-				 * just the latest event per each document
-				 */
-				if (docIds.contains(cols[8]))
-					continue;
-				else
-					docIds.add((Long) cols[8]);
-			}
-
-			writer.print("<history>");
-			writer.print("<user><![CDATA[" + cols[0] + "]]></user>");
-			writer.print("<event><![CDATA[" + I18N.message((String) cols[1], locale) + "]]></event>");
-			writer.print("<version>" + cols[2] + "</version>");
-			writer.print("<date>" + df.format((Date) cols[3]) + "</date>");
-			writer.print("<comment><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></comment>");
-			writer.print("<filename><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></filename>");
-			writer.print(
-					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[5])))
-							+ "</icon>");
-			writer.print("<new>" + (1 == (Integer) cols[6]) + "</new>");
-			writer.print("<folderId>" + cols[7] + "</folderId>");
-			writer.print("<docId>" + cols[8] + "</docId>");
-			writer.print("<path><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></path>");
-			if (showSid)
-				writer.print("<sid><![CDATA[" + (cols[10] == null ? "" : cols[10]) + "]]></sid>");
-			writer.print("<userId>" + cols[11] + "</userId>");
-			writer.print("<reason><![CDATA[" + (cols[12] == null ? "" : cols[12]) + "]]></reason>");
-			writer.print("<ip><![CDATA[" + (cols[13] == null ? "" : cols[13]) + "]]></ip>");
-			writer.print("<device><![CDATA[" + (cols[14] == null ? "" : cols[14]) + "]]></device>");
-			writer.print("<geolocation><![CDATA[" + (cols[15] == null ? "" : cols[15]) + "]]></geolocation>");
-			if (cols[16] != null)
-				writer.write("<color><![CDATA[" + cols[16] + "]]></color>");
-			writer.print("<fileVersion>" + (cols[17] == null ? "" : cols[17]) + "</fileVersion>");
-			writer.print("</history>");
-		}
-		writer.write("</list>");
+		return params;
 	}
 }

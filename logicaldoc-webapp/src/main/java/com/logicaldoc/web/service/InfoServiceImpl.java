@@ -61,28 +61,15 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 	@Override
 	public GUIInfo getInfo(String locale, String tenantName, boolean login) {
-		ContextProperties config = Context.get().getProperties();
-
 		GUIInfo info = null;
+
 		try {
 			info = getInfo(tenantName);
 			info.setBundle(getBundle(locale, tenantName));
 
 			Locale withLocale = LocaleUtil.toLocale(locale);
-			ArrayList<GUIValue> supportedLanguages = new ArrayList<GUIValue>();
 
-			List<String> installedLocales = I18N.getLocales();
-			for (String loc : installedLocales) {
-				if ("enabled".equals(config.getProperty(tenantName + ".lang." + loc + ".gui"))) {
-					Locale lc = LocaleUtil.toLocale(loc);
-					GUIValue l = new GUIValue();
-					l.setCode(loc);
-					l.setValue(lc.getDisplayName(withLocale));
-					supportedLanguages.add(l);
-				}
-			}
-
-			info.setSupportedGUILanguages(supportedLanguages.toArray(new GUIValue[0]));
+			ArrayList<GUIValue> supportedLanguages = setSupportedLocales(tenantName, info, withLocale);
 
 			LanguageManager manager = LanguageManager.getInstance();
 			Collection<Language> languages = manager.getActiveLanguages(tenantName);
@@ -99,6 +86,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			List<GUIMessage> alerts = new ArrayList<GUIMessage>();
 
 			// Checks if LogicalDOC has been initialized
+			ContextProperties config = Context.get().getProperties();
 			boolean needSetup = config.getProperty("jdbc.url").startsWith("jdbc:hsqldb:mem:");
 			if (!needSetup)
 				needSetup = "false".equals(config.getProperty("initialized", "true"));
@@ -115,64 +103,89 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				alerts.add(setupReminder);
 			} else {
 				// Check if the application needs to be restarted
-				if (ApplicationListener.isRestartRequired()) {
-					GUIMessage restartReminder = new GUIMessage();
-					restartReminder.setMessage(getValue(info, "needrestart"));
-					alerts.add(restartReminder);
-				} else {
-					// Check if the database is connected
-					UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-					int test = -1;
-					try {
-						test = dao.queryForInt("select count(*) from ld_user");
-					} catch (Throwable t) {
-						test = -1;
-					}
-					if (test < 1) {
-						info.setDatabaseConnected(false);
-						GUIMessage m = new GUIMessage();
-						m.setMessage(I18N.message("databasenotconnected", locale));
-						alerts.add(m);
-					}
-				}
+				checkRestrartRequired(info, locale, alerts);
 			}
 
 			info.setAlerts(alerts.toArray(new GUIMessage[0]));
 
-			TenantDAO tDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
-			AttributeSetDAO aDAO = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
-			try {
-				Map<String, Attribute> attributes = aDAO.findAttributes(tDAO.findByName(tenantName).getId(), null);
-				List<GUIAttribute> guiAttributes = new ArrayList<GUIAttribute>();
-				for (String name : attributes.keySet()) {
-					Attribute att = attributes.get(name);
-					GUIAttribute guiAtt = new GUIAttribute();
-					guiAtt.setName(name);
-					guiAtt.setStringValue(att.getStringValue());
-					guiAtt.setBooleanValue(att.getBooleanValue());
-					guiAtt.setDoubleValue(att.getDoubleValue());
-					guiAtt.setEditor(att.getEditor());
-					guiAtt.setHidden(att.getHidden() == 1);
-					guiAtt.setReadonly(att.getReadonly() == 1);
-					guiAtt.setIntValue(att.getIntValue());
-					guiAtt.setLabel(att.getLabel());
-					guiAtt.setMandatory(att.getMandatory() == 1);
-					guiAtt.setMultiple(att.getMultiple() == 1);
-					guiAtt.setPosition(att.getPosition());
-					guiAtt.setSetId(att.getSetId());
-					guiAtt.setType(att.getType());
-					guiAttributes.add(guiAtt);
-				}
-				info.setAttributeDefinitions(guiAttributes.toArray(new GUIAttribute[0]));
-			} catch (Throwable t) {
-				log.error(t.getMessage(), t);
-			}
+			setAttributes(info, tenantName);
 
 			return info;
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new RuntimeException(t.getMessage(), t);
 		}
+	}
+
+	private void setAttributes(GUIInfo info, String tenantName) {
+		TenantDAO tDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		AttributeSetDAO aDAO = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+		try {
+			Map<String, Attribute> attributes = aDAO.findAttributes(tDAO.findByName(tenantName).getId(), null);
+			List<GUIAttribute> guiAttributes = new ArrayList<>();
+			for (String name : attributes.keySet()) {
+				Attribute att = attributes.get(name);
+				GUIAttribute guiAtt = new GUIAttribute();
+				guiAtt.setName(name);
+				guiAtt.setStringValue(att.getStringValue());
+				guiAtt.setBooleanValue(att.getBooleanValue());
+				guiAtt.setDoubleValue(att.getDoubleValue());
+				guiAtt.setEditor(att.getEditor());
+				guiAtt.setHidden(att.getHidden() == 1);
+				guiAtt.setReadonly(att.getReadonly() == 1);
+				guiAtt.setIntValue(att.getIntValue());
+				guiAtt.setLabel(att.getLabel());
+				guiAtt.setMandatory(att.getMandatory() == 1);
+				guiAtt.setMultiple(att.getMultiple() == 1);
+				guiAtt.setPosition(att.getPosition());
+				guiAtt.setSetId(att.getSetId());
+				guiAtt.setType(att.getType());
+				guiAttributes.add(guiAtt);
+			}
+			info.setAttributeDefinitions(guiAttributes.toArray(new GUIAttribute[0]));
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+		}
+	}
+
+	private void checkRestrartRequired(GUIInfo info, String locale, List<GUIMessage> alerts) {
+		if (ApplicationListener.isRestartRequired()) {
+			GUIMessage restartReminder = new GUIMessage();
+			restartReminder.setMessage(getValue(info, "needrestart"));
+			alerts.add(restartReminder);
+		} else {
+			// Check if the database is connected
+			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
+			int test = -1;
+			try {
+				test = dao.queryForInt("select count(*) from ld_user");
+			} catch (Throwable t) {
+				test = -1;
+			}
+			if (test < 1) {
+				info.setDatabaseConnected(false);
+				GUIMessage m = new GUIMessage();
+				m.setMessage(I18N.message("databasenotconnected", locale));
+				alerts.add(m);
+			}
+		}
+	}
+
+	private ArrayList<GUIValue> setSupportedLocales(String tenantName, GUIInfo info, Locale withLocale) {
+		ArrayList<GUIValue> supportedLanguages = new ArrayList<GUIValue>();
+		List<String> installedLocales = I18N.getLocales();
+		for (String loc : installedLocales) {
+			if ("enabled".equals(Context.get().getProperties().getProperty(tenantName + ".lang." + loc + ".gui"))) {
+				Locale lc = LocaleUtil.toLocale(loc);
+				GUIValue l = new GUIValue();
+				l.setCode(loc);
+				l.setValue(lc.getDisplayName(withLocale));
+				supportedLanguages.add(l);
+			}
+		}
+
+		info.setSupportedGUILanguages(supportedLanguages.toArray(new GUIValue[0]));
+		return supportedLanguages;
 	}
 
 	/**
@@ -273,38 +286,8 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	}
 
 	static protected GUIValue[] getBundle(String locale, String tenantName) {
-		Locale l = null;
-		Locale test = LocaleUtil.toLocale(locale);
 
-		ContextProperties config = Context.get().getProperties();
-
-		/*
-		 * Check if the given locale is active and if the case peek an active
-		 * locale
-		 */
-		List<String> installedLocales = I18N.getLocales();
-
-		for (String loc : installedLocales) {
-			if ("enabled".equals(config.getProperty(tenantName + ".lang." + loc + ".gui")))
-				if (loc.equals(test.toString())) {
-					l = LocaleUtil.toLocale(loc);
-					break;
-				}
-		}
-
-		if (l == null)
-			for (String loc : installedLocales) {
-				if ("enabled".equals(config.getProperty(tenantName + ".lang." + loc + ".gui"))) {
-					Locale x = LocaleUtil.toLocale(loc);
-					if (test.getLanguage().equals(x.getLanguage())) {
-						l = LocaleUtil.toLocale(loc);
-						break;
-					}
-				}
-			}
-
-		if (l == null)
-			l = Locale.ENGLISH;
+		Locale l = getLocaleForBundle(tenantName, LocaleUtil.toLocale(locale));
 
 		ResourceBundle rb = ResourceBundle.getBundle("i18n.messages", l);
 		GUIValue[] buf = new GUIValue[rb.keySet().size()];
@@ -316,6 +299,41 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			buf[i++] = entry;
 		}
 		return buf;
+	}
+
+	private static Locale getLocaleForBundle(String tenantName, Locale proposedLocale) {
+
+		/*
+		 * Check if the given locale is active and if the case peek an active
+		 * locale
+		 */
+		List<String> installedLocales = I18N.getLocales();
+
+		ContextProperties config = Context.get().getProperties();
+
+		Locale locale = null;
+		for (String loc : installedLocales) {
+			if ("enabled".equals(config.getProperty(tenantName + ".lang." + loc + ".gui"))
+					&& loc.equals(proposedLocale.toString())) {
+				locale = LocaleUtil.toLocale(loc);
+				break;
+			}
+		}
+
+		if (locale == null)
+			for (String loc : installedLocales) {
+				if ("enabled".equals(config.getProperty(tenantName + ".lang." + loc + ".gui"))) {
+					Locale x = LocaleUtil.toLocale(loc);
+					if (proposedLocale.getLanguage().equals(x.getLanguage())) {
+						locale = LocaleUtil.toLocale(loc);
+						break;
+					}
+				}
+			}
+
+		if (locale == null)
+			locale = Locale.ENGLISH;
+		return locale;
 	}
 
 	protected String getValue(GUIInfo info, String message) {

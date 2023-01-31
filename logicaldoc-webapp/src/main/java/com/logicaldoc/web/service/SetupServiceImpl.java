@@ -254,6 +254,10 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 				}
 		}
 
+		doInit(info);
+	}
+
+	private void doInit(SetupInfo info) {
 		PluginDbInit init = new PluginDbInit();
 		init.setDbms(info.getDbEngine());
 		init.setDriver(info.getDbDriver());

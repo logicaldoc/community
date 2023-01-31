@@ -99,7 +99,6 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	private Resource marshallDocument(Document document, WebdavSession session) {
-
 		Resource resource = new ResourceImpl();
 		resource.setID(String.valueOf(document.getId()));
 		resource.setName(document.getFileName());
@@ -131,25 +130,11 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Override
 	public List<Resource> getChildResources(Resource parentResource) throws DavException {
-		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Resource> resourceList = new LinkedList<Resource>();
 		final Long folderID = Long.parseLong(parentResource.getID());
 
 		try {
-			boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
-
-			if (hasAccess == false) {
-				// Check if the folder is a root and in that case we mark it as
-				// readable.
-				Folder folder = null;
-				try {
-					folder = folderDAO.findFolder(folderID);
-				} catch (PersistenceException e) {
-					log.error(e.getMessage(), e);
-				}
-				if (folder != null && folder.equals(folderDAO.findRoot(folder.getTenantId())))
-					hasAccess = true;
-			}
+			boolean hasAccess = isFolderAccessible(parentResource, folderID);
 
 			if (hasAccess == false)
 				return resourceList;
@@ -185,11 +170,31 @@ public class ResourceServiceImpl implements ResourceService {
 		return resourceList;
 	}
 
+	private boolean isFolderAccessible(Resource parentResource, final Long folderID)
+			throws PersistenceException {
+		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
+
+		if (hasAccess == false) {
+			// Check if the folder is a root and in that case we mark it as
+			// readable.
+			Folder folder = null;
+			try {
+				folder = folderDAO.findFolder(folderID);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+			if (folder != null && folder.equals(folderDAO.findRoot(folder.getTenantId())))
+				hasAccess = true;
+		}
+		return hasAccess;
+	}
+
 	public Resource getResource(String requestPath, WebdavSession session) throws DavException {
 		log.trace("Find DAV resource: {}", requestPath);
 
-		if (session == null)
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No WebDAV session");
+		validateSession(session);
 
 		long userId = 0;
 		String currentStablePath = "";
@@ -316,25 +321,13 @@ public class ResourceServiceImpl implements ResourceService {
 	public Resource createResource(Resource parentResource, String name, boolean isCollection, ImportContext context,
 			WebdavSession session) throws DavException {
 
-		if (session == null)
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No WebDAV session");
+		validateSession(session);
 
-		Folder parentFolder;
-		try {
-			parentFolder = folderDAO.findById(Long.parseLong(parentResource.getID()));
-		} catch (PersistenceException e) {
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
-		}
-		String sid = null;
-		if (session != null)
-			sid = (String) session.getObject("sid");
+		String sid = getSid(session);
 
-		long rootId = 0;
-		try {
-			rootId = folderDAO.findRoot(parentFolder.getTenantId()).getId();
-		} catch (PersistenceException e) {
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
-		}
+		Folder parentFolder = getParentFolder(parentResource);
+
+		long rootId = getRootId(parentFolder);
 
 		if (parentFolder.getId() == rootId)
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot write in the root.");
@@ -411,11 +404,44 @@ public class ResourceServiceImpl implements ResourceService {
 		return null;
 	}
 
+	private long getRootId(Folder parentFolder) throws DavException {
+		long rootId = 0;
+		try {
+			rootId = folderDAO.findRoot(parentFolder.getTenantId()).getId();
+		} catch (PersistenceException e) {
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
+		}
+		return rootId;
+	}
+
+	private Folder getParentFolder(Resource parentResource) throws DavException {
+		Folder parentFolder;
+		try {
+			parentFolder = folderDAO.findById(Long.parseLong(parentResource.getID()));
+		} catch (PersistenceException e) {
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
+		}
+		return parentFolder;
+	}
+
+	private String getSid(WebdavSession session) {
+		String sid = null;
+		if (session != null)
+			sid = (String) session.getObject("sid");
+		return sid;
+	}
+
+	private void validateSession(WebdavSession session) throws DavException {
+		if (session == null)
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No WebDAV session");
+	}
+
 	public void updateResource(Resource resource, ImportContext context, WebdavSession session) throws DavException {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 			Document document = documentDAO.findById(Long.parseLong(resource.getID()));
-			String sid = (String) session.getObject("sid");
+			String sid = getSid(session);
+
 			// verify the write permission on the parent folder
 			Resource parent = getParentResource(resource);
 			if (!parent.isWriteEnabled())
@@ -427,8 +453,7 @@ public class ResourceServiceImpl implements ResourceService {
 				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Current user didn't locked the document");
 			}
 
-			if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
+			assertDocumentIsNotImmutable(user, document);
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
@@ -476,7 +501,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource move(Resource source, Resource destination, WebdavSession session) throws DavException {
-		String sid = (String) session.getObject("sid");
+		String sid = getSid(session);
 		if (source.isWorkspace()) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot move a workspace");
 		} else if (source.isFolder()) {
@@ -492,8 +517,7 @@ public class ResourceServiceImpl implements ResourceService {
 		// rename/file move
 
 		// if the destination is null we can't do anything
-		if (destination == null)
-			throw new UnsupportedOperationException();
+		assertNotNullDestination(destination);
 
 		// verify the write permission on source folders
 		Resource parentFolder = getParentResource(source);
@@ -507,8 +531,7 @@ public class ResourceServiceImpl implements ResourceService {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
 
-		if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
+		assertDocumentIsNotImmutable(user, document);
 
 		documentDAO.initialize(document);
 
@@ -553,22 +576,17 @@ public class ResourceServiceImpl implements ResourceService {
 		return this.marshallDocument(document, session);
 	}
 
+	private void assertNotNullDestination(Resource destination) {
+		if (destination == null)
+			throw new UnsupportedOperationException();
+	}
+
 	private Resource folderRenameOrMove(Resource source, Resource destination, WebdavSession session, String sid)
 			throws DavException {
 
 //		log.info("Rename or Move folder {} to {}", source.getPath(), destination.getPath());
 
-		Folder currentFolder;
-		try {
-			currentFolder = folderDAO.findById(Long.parseLong(source.getID()));
-		} catch (PersistenceException e) {
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
-		}
-
-		if (currentFolder.getType() == Folder.TYPE_WORKSPACE)
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot move nor rename a workspace");
-
-		folderDAO.initialize(currentFolder);
+		Folder currentFolder = getFolder(source);
 
 		long currentParentFolder = currentFolder.getParentId();
 		long destinationParentFolder = Long.parseLong(destination.getID());
@@ -583,10 +601,7 @@ public class ResourceServiceImpl implements ResourceService {
 					throw new DavException(HttpServletResponse.SC_FORBIDDEN,
 							"AddChild Rights not granted to this user");
 
-				// check the delete permission on the parent of the source to
-				// move
-				if (!source.isDeleteEnabled())
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to delete resource.");
+				assertResourceIsDeletable(source);
 
 				User user = (User) session.getObject("user");
 				// Add a folder history entry
@@ -640,20 +655,29 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 	}
 
-	public void deleteResource(Resource resource, WebdavSession session) throws DavException {
-		String sid = (String) session.getObject("sid");
-		Folder folder = null;
-		User user = null;
-
+	private Folder getFolder(Resource source) throws DavException {
+		Folder currentFolder;
 		try {
-			folder = folderDAO.findById(Long.parseLong(resource.getID()));
-			user = userDAO.findById(resource.getRequestedPerson());
+			currentFolder = folderDAO.findById(Long.parseLong(source.getID()));
+		} catch (PersistenceException e) {
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
+		}
 
-			if (resource.isFolder() && folder != null && (folder.getType() == Folder.TYPE_WORKSPACE)) {
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot delete a workspace.");
-			} else if (resource.isFolder()) {
-				if (!resource.isDeleteEnabled())
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to delete resource.");
+		if (currentFolder.getType() == Folder.TYPE_WORKSPACE)
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot move nor rename a workspace");
+
+		folderDAO.initialize(currentFolder);
+		return currentFolder;
+	}
+
+	public void deleteResource(Resource resource, WebdavSession session) throws DavException {
+		String sid = getSid(session);
+		try {
+			Folder folder = assertResourceIsNotWorkspace(resource);
+			
+			User user = userDAO.findById(resource.getRequestedPerson());
+			if (resource.isFolder()) {
+				assertResourceIsDeletable(resource);
 
 				FolderHistory transaction = new FolderHistory();
 				transaction.setUser(user);
@@ -663,9 +687,8 @@ public class ResourceServiceImpl implements ResourceService {
 				List<Folder> notDeletableFolders = folderDAO.deleteTree(folder, PersistentObject.DELETED_CODE_DEFAULT,
 						transaction);
 
-				if (notDeletableFolders.size() > 0) {
+				if (notDeletableFolders.size() > 0)
 					throw new RuntimeException("Unable to delete some subfolders.");
-				}
 			} else if (!resource.isFolder()) {
 				// verify the write permission on the parent folder
 				Resource parent = getParentResource(resource);
@@ -678,9 +701,9 @@ public class ResourceServiceImpl implements ResourceService {
 				transaction.setUser(user);
 				transaction.setEvent(DocumentEvent.DELETED.toString());
 
-				if (documentDAO.findById(Long.parseLong(resource.getID())).getImmutable() == 1
-						&& !user.isMemberOf(Group.GROUP_ADMIN))
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
+				
+				Document document = documentDAO.findById(Long.parseLong(resource.getID()));
+				assertDocumentIsNotImmutable(user, document);
 
 				// Check if there are some shortcuts associated to the
 				// deleting document. All the shortcuts must be deleted.
@@ -697,9 +720,22 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 	}
 
+	private Folder assertResourceIsNotWorkspace(Resource resource) throws PersistenceException, DavException {
+		Folder folder = folderDAO.findById(Long.parseLong(resource.getID()));
+		if (resource.isFolder() && folder != null && (folder.getType() == Folder.TYPE_WORKSPACE))
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot delete a workspace.");
+		return folder;
+	}
+
+	private void assertResourceIsDeletable(Resource resource) throws DavException {
+		if (!resource.isDeleteEnabled())
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to delete resource.");
+	}
+
 	public void copyResource(Resource destinationResource, Resource resource, WebdavSession session)
 			throws DavException {
-		String sid = (String) session.getObject("sid");
+		String sid = getSid(session);
+
 		long rootId = 0L;
 		User user = null;
 		try {
@@ -726,8 +762,7 @@ public class ResourceServiceImpl implements ResourceService {
 				Document document = documentDAO.findById(Long.parseLong(resource.getID()));
 				Folder folder = folderDAO.findById(Long.parseLong(destinationResource.getID()));
 
-				if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
+				assertDocumentIsNotImmutable(user, document);
 
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
@@ -750,6 +785,11 @@ public class ResourceServiceImpl implements ResourceService {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+
+	private void assertDocumentIsNotImmutable(User user, Document document) throws DavException {
+		if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
 	}
 
 	@Override
@@ -808,7 +848,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Override
 	public void checkout(Resource resource, WebdavSession session) throws DavException {
-		String sid = (String) session.getObject("sid");
+		String sid = getSid(session);
 
 		User user = null;
 		try {
@@ -890,7 +930,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public void uncheckout(Resource resource, WebdavSession session) {
-		String sid = (String) session.getObject("sid");
+		String sid = getSid(session);
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 			// Create the document history event

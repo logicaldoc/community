@@ -357,7 +357,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			result.setEstimatedHits(hits.getEstimatedCount());
 			result.setTime(hits.getElapsedTime());
 
-			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			
 			List<GUIDocument> guiResults = new ArrayList<GUIDocument>();
 
 			Map<Long, Hit> hitsMap = new HashMap<Long, Hit>();
@@ -366,56 +366,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				hitsMap.put(hit.getId(), hit);
 			}
 
-			StringBuilder richQuery = new StringBuilder();
-			// Find real documents
-			richQuery = new StringBuilder(
-					"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
-			richQuery
-					.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
-			richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
-			richQuery.append(
-					" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
-			richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
-			richQuery.append(
-					" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-			richQuery.append(
-					" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color ");
-			richQuery.append(" from ld_document A ");
-			richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
-			richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
-			richQuery.append(" where A.ld_deleted=0 and A.ld_folderid=FOLD.ld_id  ");
-
-			Set<Long> hitsIds = hitsMap.keySet();
-			StringBuilder hitsIdsCondition = new StringBuilder();
-			if (!hitsIds.isEmpty()) {
-				hitsIdsCondition.append(" and (");
-
-				if (dao.isOracle()) {
-					/*
-					 * In Oracle The limit of 1000 elements applies to sets of
-					 * single items: (x) IN ((1), (2), (3), ...). There is no
-					 * limit if the sets contain two or more items: (x, 0) IN
-					 * ((1,0), (2,0), (3,0), ...):
-					 */
-					hitsIdsCondition.append(" (A.ld_id,0) in ( ");
-					hitsIdsCondition
-							.append(hitsIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-					hitsIdsCondition.append(" )");
-				} else {
-					hitsIdsCondition.append(" A.ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
-				}
-
-				hitsIdsCondition.append(")");
-			}
-			richQuery.append(hitsIdsCondition.toString());
-
-			log.debug("Execute query {}", richQuery.toString());
-
-			try {
-				dao.query(richQuery.toString(), null, new HitMapper(hitsMap), null);
-			} catch (PersistenceException e) {
-				throw new SearchException(e);
-			}
+			executeEnrichingQuery(hitsMap);
 
 			// Now sort the hits by score desc
 			List<Hit> sortedHitsList = new ArrayList<Hit>(hitsMap.values());
@@ -496,6 +447,61 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			return result;
 		} catch (Throwable t) {
 			return (GUIResult) throwServerException(session, log, t);
+		}
+	}
+
+	private void executeEnrichingQuery(Map<Long, Hit> hitsMap) throws SearchException {
+		StringBuilder richQuery = new StringBuilder();
+		// Find real documents
+		richQuery = new StringBuilder(
+				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
+		richQuery
+				.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
+		richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
+		richQuery.append(
+				" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
+		richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
+		richQuery.append(
+				" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
+		richQuery.append(
+				" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color ");
+		richQuery.append(" from ld_document A ");
+		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
+		richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
+		richQuery.append(" where A.ld_deleted=0 and A.ld_folderid=FOLD.ld_id  ");
+
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		
+		Set<Long> hitsIds = hitsMap.keySet();
+		StringBuilder hitsIdsCondition = new StringBuilder();
+		if (!hitsIds.isEmpty()) {
+			hitsIdsCondition.append(" and (");
+
+			if (dao.isOracle()) {
+				/*
+				 * In Oracle The limit of 1000 elements applies to sets of
+				 * single items: (x) IN ((1), (2), (3), ...). There is no
+				 * limit if the sets contain two or more items: (x, 0) IN
+				 * ((1,0), (2,0), (3,0), ...):
+				 */
+				hitsIdsCondition.append(" (A.ld_id,0) in ( ");
+				hitsIdsCondition
+						.append(hitsIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+				hitsIdsCondition.append(" )");
+			} else {
+				hitsIdsCondition.append(" A.ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
+			}
+
+			hitsIdsCondition.append(")");
+		}
+		richQuery.append(hitsIdsCondition.toString());
+
+		log.debug("Execute query {}", richQuery.toString());
+
+		try {
+			dao.query(richQuery.toString(), null, new HitMapper(hitsMap), null);
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
 		}
 	}
 

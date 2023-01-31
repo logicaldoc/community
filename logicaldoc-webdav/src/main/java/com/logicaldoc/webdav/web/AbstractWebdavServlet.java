@@ -120,9 +120,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			log.debug("method {} {}", request.getMethod(), methodCode);
 
-			boolean noCache = DavMethods.isDeltaVMethod(webdavRequest)
-					&& !(DavMethods.DAV_VERSION_CONTROL == methodCode || DavMethods.DAV_REPORT == methodCode);
-			WebdavResponse webdavResponse = new WebdavResponseImpl(response, noCache);
+			WebdavResponse webdavResponse = getDavResponse(response, webdavRequest, methodCode);
 
 			try {
 				Session session = SessionManager.get().getSession(request);
@@ -142,9 +140,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 				webdavRequest.setDavSession(davSession);
 
-				String path = webdavRequest.getRequestLocator().getResourcePath();
-				if (path.startsWith("/store") == false && path.startsWith("/vstore") == false)
-					throw new DavException(HttpServletResponse.SC_NOT_FOUND);
+				getPath(webdavRequest);
 
 				// check matching if=header for lock-token relevant operations
 				DavResource resource = getResourceFactory().createResource(webdavRequest.getRequestLocator(),
@@ -158,34 +154,56 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 					}
 					return;
 				}
+
 				if (!execute(webdavRequest, webdavResponse, methodCode, resource)) {
 					super.service(request, response);
 				}
 
 			} catch (DavException e) {
-				log.error(e.getMessage(), e);
-				if (e.getErrorCode() != HttpServletResponse.SC_UNAUTHORIZED) {
-					try {
-						webdavResponse.sendError(e);
-					} catch (Throwable t) {
-						// Nothing to do
-					}
-				}
+				handleDavException(webdavResponse, e);
 			} catch (Throwable e) {
-				if (e instanceof UnsupportedOperationException) {
-					log.warn("{}: {} {}", e.getClass().getName(), request.getMethod(), methodCode);
-				} else if (e.getClass().getName().contains("ClientAbortException")) {
-					log.warn("{}: {} {} {}", e.getClass().getName(), e.getMessage(), request.getMethod(), methodCode);
-				} else {
-					log.error(e.getMessage(), e);
-					throw new RuntimeException(e);
-				}
+				handleException(request, methodCode, e);
 			}
 
 			response.getOutputStream().flush();
 			response.getOutputStream().close();
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
+		}
+	}
+
+	private void getPath(WebdavRequest webdavRequest) throws DavException {
+		String path = webdavRequest.getRequestLocator().getResourcePath();
+		if (path.startsWith("/store") == false && path.startsWith("/vstore") == false)
+			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
+	}
+
+	private WebdavResponse getDavResponse(HttpServletResponse response, WebdavRequest webdavRequest, int methodCode) {
+		boolean noCache = DavMethods.isDeltaVMethod(webdavRequest)
+				&& !(DavMethods.DAV_VERSION_CONTROL == methodCode || DavMethods.DAV_REPORT == methodCode);
+		WebdavResponse webdavResponse = new WebdavResponseImpl(response, noCache);
+		return webdavResponse;
+	}
+
+	private void handleException(HttpServletRequest request, int methodCode, Throwable e) {
+		if (e instanceof UnsupportedOperationException) {
+			log.warn("{}: {} {}", e.getClass().getName(), request.getMethod(), methodCode);
+		} else if (e.getClass().getName().contains("ClientAbortException")) {
+			log.warn("{}: {} {} {}", e.getClass().getName(), e.getMessage(), request.getMethod(), methodCode);
+		} else {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void handleDavException(WebdavResponse webdavResponse, DavException e) {
+		log.error(e.getMessage(), e);
+		if (e.getErrorCode() != HttpServletResponse.SC_UNAUTHORIZED) {
+			try {
+				webdavResponse.sendError(e);
+			} catch (Throwable t) {
+				// Nothing to do
+			}
 		}
 	}
 
@@ -346,41 +364,37 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		OutputStream outX = (sendContent) ? response.getOutputStream() : null;
 		OutputContext oc = getOutputContext(response, outX);
 
-		if (!resource.isCollection()) {
+		if (!resource.isCollection() && (resource instanceof DavResourceImpl)) {
 
-			if (resource instanceof DavResourceImpl) {
-				log.debug("resource instanceof DavResourceImpl");
-				DavResourceImpl dri = (DavResourceImpl) resource;
+			log.debug("resource instanceof DavResourceImpl");
+			DavResourceImpl dri = (DavResourceImpl) resource;
 
-				// Enforce download permission
-				ExportContext exportCtx = dri.getExportContext(oc);
-				if (!exportCtx.getResource().isDownloadEnabled()) {
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN,
-							"Download permission not granted to this user");
-				}
-
-				// Deals with ranges
-				String rangeHeader = request.getHeader(HttpHeaders.RANGE);
-				if (rangeHeader != null) {
-
-					Pair<String, String> parsedRange = null;
-					try {
-						parsedRange = parseRangeRequestHeader(rangeHeader);
-						log.debug("parsedRange {}", parsedRange);
-					} catch (DavException e) {
-						log.error(e.getMessage());
-					}
-
-					WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
-					resource = getResourceFactory().createRangeResource(dri.getLocator(), session, parsedRange);
-
-					log.debug("Create RangeResourceImpl {}", resource);
-
-					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-					response.setHeader(HttpHeaders.PRAGMA, "no-cache");
-				}
+			// Enforce download permission
+			ExportContext exportCtx = dri.getExportContext(oc);
+			if (!exportCtx.getResource().isDownloadEnabled()) {
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
+						"Download permission not granted to this user");
 			}
 
+			// Deals with ranges
+			String rangeHeader = request.getHeader(HttpHeaders.RANGE);
+			if (rangeHeader != null) {
+				Pair<String, String> parsedRange = null;
+				try {
+					parsedRange = parseRangeRequestHeader(rangeHeader);
+					log.debug("parsedRange {}", parsedRange);
+				} catch (DavException e) {
+					log.error(e.getMessage());
+				}
+
+				WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
+				resource = getResourceFactory().createRangeResource(dri.getLocator(), session, parsedRange);
+
+				log.debug("Create RangeResourceImpl {}", resource);
+
+				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+				response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+			}
 		}
 
 		resource.spool(oc);

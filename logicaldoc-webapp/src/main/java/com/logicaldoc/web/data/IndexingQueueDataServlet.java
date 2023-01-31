@@ -92,9 +92,11 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 			}
 		}, max != null ? max : 100);
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		printDocuments(response, session, records);
+	}
 
+	private void printDocuments(HttpServletResponse response, Session session, List<Object[]> records)
+			throws IOException {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
@@ -108,58 +110,65 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 					config.getProperty(session.getTenantName() + ".barcode.excludes")))
 				continue;
 
-			writer.print("<document>");
-			writer.print("<id>" + cols[0] + "</id>");
-			if (cols[1] != null)
-				writer.print("<customId><![CDATA[" + cols[1] + "]]></customId>");
-			else
-				writer.print("<customId> </customId>");
-			writer.print("<docref>" + (cols[2] != null ? cols[2] : "") + "</docref>");
-			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[3])) + "</icon>");
-
-			writer.print("<version>" + cols[4] + "</version>");
-			writer.print("<lastModified>" + df.format(cols[5]) + "</lastModified>");
-			writer.print("<published>" + df.format(cols[6]) + "</published>");
-			writer.print("<publisher><![CDATA[" + cols[7] + "]]></publisher>");
-			writer.print("<created>" + df.format(cols[8]) + "</created>");
-			writer.print("<creator><![CDATA[" + cols[9] + "]]></creator>");
-			writer.print("<size>" + cols[10] + "</size>");
-			if (Integer.parseInt(cols[11].toString()) == 0)
-				writer.print("<immutable>blank</immutable>");
-			else if (Integer.parseInt(cols[11].toString()) == 1)
-				writer.print("<immutable>stop</immutable>");
-			if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_TO_INDEX)
-				writer.print("<indexed>blank</indexed>");
-			else if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_INDEXED)
-				writer.print("<indexed>indexed</indexed>");
-			else if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_SKIP)
-				writer.print("<indexed>unindexable</indexed>");
-			if (Integer.parseInt(cols[15].toString()) == Constants.DOC_LOCKED)
-				writer.print("<locked>lock</locked>");
-			else if (Integer.parseInt(cols[15].toString()) == Constants.DOC_CHECKED_OUT)
-				writer.print("<locked>page_edit</locked>");
-			else
-				writer.print("<locked>blank</locked>");
-			if (cols[14] != null)
-				writer.print("<lockUserId>" + cols[13] + "</lockUserId>");
-			writer.print("<filename><![CDATA[" + cols[14] + "]]></filename>");
-			writer.print("<status>" + cols[15] + "</status>");
-
-			if (Integer.parseInt(cols[16].toString()) == 0)
-				writer.print("<signed>blank</signed>");
-			else if (Integer.parseInt(cols[16].toString()) == 1)
-				writer.print("<signed>rosette</signed>");
-
-			writer.print("<type>" + cols[17] + "</type>");
-
-			writer.print("<fileVersion><![CDATA[" + cols[18] + "]]></fileVersion>");
-
-			if (cols[19] != null)
-				writer.print("<color><![CDATA[" + cols[19] + "]]></color>");
-
-			writer.print("</document>");
+			printDocument(writer, cols);
 		}
 		writer.write("</list>");
+	}
+
+	private void printDocument(PrintWriter writer, Object[] cols) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		writer.print("<document>");
+		writer.print("<id>" + cols[0] + "</id>");
+		if (cols[1] != null)
+			writer.print("<customId><![CDATA[" + cols[1] + "]]></customId>");
+		else
+			writer.print("<customId> </customId>");
+		writer.print("<docref>" + (cols[2] != null ? cols[2] : "") + "</docref>");
+		writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[3])) + "</icon>");
+
+		writer.print("<version>" + cols[4] + "</version>");
+		writer.print("<lastModified>" + df.format(cols[5]) + "</lastModified>");
+		writer.print("<published>" + df.format(cols[6]) + "</published>");
+		writer.print("<publisher><![CDATA[" + cols[7] + "]]></publisher>");
+		writer.print("<created>" + df.format(cols[8]) + "</created>");
+		writer.print("<creator><![CDATA[" + cols[9] + "]]></creator>");
+		writer.print("<size>" + cols[10] + "</size>");
+		if (Integer.parseInt(cols[11].toString()) == 0)
+			writer.print("<immutable>blank</immutable>");
+		else if (Integer.parseInt(cols[11].toString()) == 1)
+			writer.print("<immutable>stop</immutable>");
+		if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_TO_INDEX)
+			writer.print("<indexed>blank</indexed>");
+		else if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_INDEXED)
+			writer.print("<indexed>indexed</indexed>");
+		else if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_SKIP)
+			writer.print("<indexed>unindexable</indexed>");
+		if (Integer.parseInt(cols[15].toString()) == Constants.DOC_LOCKED)
+			writer.print("<locked>lock</locked>");
+		else if (Integer.parseInt(cols[15].toString()) == Constants.DOC_CHECKED_OUT)
+			writer.print("<locked>page_edit</locked>");
+		else
+			writer.print("<locked>blank</locked>");
+		if (cols[14] != null)
+			writer.print("<lockUserId>" + cols[13] + "</lockUserId>");
+		writer.print("<filename><![CDATA[" + cols[14] + "]]></filename>");
+		writer.print("<status>" + cols[15] + "</status>");
+
+		if (Integer.parseInt(cols[16].toString()) == 0)
+			writer.print("<signed>blank</signed>");
+		else if (Integer.parseInt(cols[16].toString()) == 1)
+			writer.print("<signed>rosette</signed>");
+
+		writer.print("<type>" + cols[17] + "</type>");
+
+		writer.print("<fileVersion><![CDATA[" + cols[18] + "]]></fileVersion>");
+
+		if (cols[19] != null)
+			writer.print("<color><![CDATA[" + cols[19] + "]]></color>");
+
+		writer.print("</document>");
 	}
 
 	/**

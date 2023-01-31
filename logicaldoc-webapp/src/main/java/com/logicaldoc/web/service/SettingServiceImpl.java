@@ -203,37 +203,15 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
-			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			GenericDAO genericDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 			int counter = 0;
 			ContextProperties conf = Context.get().getProperties();
 			for (int i = 0; i < settings.length; i++) {
 				if (settings[i] == null || StringUtils.isEmpty(settings[i].getName()))
 					continue;
 
-				if (settings[i].getName().endsWith("gui.welcome")) {
-					/*
-					 * This is a setting we save into the database
-					 */
-					Generic setting = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, session.getTenantId());
-					if (setting == null)
-						setting = new Generic("guisetting", "gui.welcome", 0L, session.getTenantId());
-					setting.setString1(settings[i].getValue());
-					gDao.store(setting);
-				} else if (settings[i].getName().endsWith("gui.tag.vocabulary")) {
-					/*
-					 * This is a setting we save into the database
-					 */
-					Generic setting = gDao.findByAlternateKey("guisetting", "gui.tag.vocabulary", 0L,
-							session.getTenantId());
-					if (setting == null)
-						setting = new Generic("guisetting", "gui.tag.vocabulary", 0L, session.getTenantId());
-					setting.setString1(settings[i].getValue());
-					gDao.store(setting);
-				} else {
-					conf.setProperty(settings[i].getName(),
-							settings[i].getValue() != null ? settings[i].getValue() : "");
-					counter++;
-				}
+				extracted(settings, i, session, genericDao, conf);
+				counter++;
 			}
 
 			conf.write();
@@ -241,6 +219,33 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			log.info("Successfully saved {} parameters", counter);
 		} catch (Throwable e) {
 			throwServerException(session, log, e);
+		}
+	}
+
+	private void extracted(GUIParameter[] settings, int settingIndex, Session session, GenericDAO genericDao,
+			ContextProperties conf) throws PersistenceException {
+		if (settings[settingIndex].getName().endsWith("gui.welcome")) {
+			/*
+			 * This is a setting we save into the database
+			 */
+			Generic setting = genericDao.findByAlternateKey("guisetting", "gui.welcome", 0L, session.getTenantId());
+			if (setting == null)
+				setting = new Generic("guisetting", "gui.welcome", 0L, session.getTenantId());
+			setting.setString1(settings[settingIndex].getValue());
+			genericDao.store(setting);
+		} else if (settings[settingIndex].getName().endsWith("gui.tag.vocabulary")) {
+			/*
+			 * This is a setting we save into the database
+			 */
+			Generic setting = genericDao.findByAlternateKey("guisetting", "gui.tag.vocabulary", 0L,
+					session.getTenantId());
+			if (setting == null)
+				setting = new Generic("guisetting", "gui.tag.vocabulary", 0L, session.getTenantId());
+			setting.setString1(settings[settingIndex].getValue());
+			genericDao.store(setting);
+		} else {
+			conf.setProperty(settings[settingIndex].getName(),
+					settings[settingIndex].getValue() != null ? settings[settingIndex].getValue() : "");
 		}
 	}
 

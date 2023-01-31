@@ -56,56 +56,12 @@ public class StatChartServlet extends HttpServlet {
 
 			String chart = request.getParameter("chart");
 			SystemServiceImpl service = new SystemServiceImpl();
+
 			GUIParameter[][] parameters = service.getStatistics(user.getLanguage());
-			int index = 0;
-			if ("repository".equals(chart))
-				index = 0;
-			else if ("documents".equals(chart))
-				index = 1;
-			else if ("pages".equals(chart))
-				index = 2;
-			if ("folders".equals(chart))
-				index = 3;
 
-			DefaultPieDataset dataset = new DefaultPieDataset();
-			long total = 0;
-			for (GUIParameter param : parameters[index]) {
-				if (param == null)
-					continue;
-				total += Long.parseLong(param.getValue() != null ? param.getValue() : "0");
-			}
-			for (int i = 0; i < parameters[index].length; i++) {
-				GUIParameter param = parameters[index][i];
-				if (param != null) {
-					double val = param.getValue() != null ? Long.parseLong(param.getValue()) : 0L;
-					if (total > 0) {
-						val = val * 100 / total;
-						if (val >= 1)
-							dataset.setValue(I18N.message(param.getName(), user.getLocale()), val);
-					}
-				}
-			}
+			DefaultPieDataset dataset = prepareDataSet(parameters, chart, user);
 
-			Font font = null;
-			try {
-				GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-				if (ge != null) {
-					String[] fontNames = ge.getAvailableFontFamilyNames();
-
-					for (String name : fontNames)
-						if ("arial".equalsIgnoreCase(name))
-							font = new Font("Arial", Font.PLAIN, 12);
-						else if ("helvetica".equalsIgnoreCase(name))
-							font = new Font("Helvetica", Font.PLAIN, 12);
-						else if ("Times New Roman".equalsIgnoreCase(name))
-							font = new Font("Times New Roman", Font.PLAIN, 12);
-
-					if (font == null && fontNames != null && fontNames.length > 0)
-						font = new Font(fontNames[0], Font.PLAIN, 12);
-				}
-			} catch (Throwable t) {
-				log.warn(t.getMessage());
-			}
+			Font font = prepareFont();
 
 			JFreeChart chrt = ChartFactory.createPieChart(font != null ? I18N.message(chart, user.getLocale()) : null,
 					dataset, font != null ? true : false, false, false);
@@ -145,5 +101,70 @@ public class StatChartServlet extends HttpServlet {
 		} finally {
 			FileUtil.strongDelete(chartFile);
 		}
+	}
+
+	private Font prepareFont() {
+		Font font = null;
+		try {
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			if (ge != null) {
+				String[] fontNames = ge.getAvailableFontFamilyNames();
+
+				for (String name : fontNames)
+					if ("arial".equalsIgnoreCase(name))
+						font = new Font("Arial", Font.PLAIN, 12);
+					else if ("helvetica".equalsIgnoreCase(name))
+						font = new Font("Helvetica", Font.PLAIN, 12);
+					else if ("Times New Roman".equalsIgnoreCase(name))
+						font = new Font("Times New Roman", Font.PLAIN, 12);
+
+				if (font == null && fontNames != null && fontNames.length > 0)
+					font = new Font(fontNames[0], Font.PLAIN, 12);
+			}
+		} catch (Throwable t) {
+			log.warn(t.getMessage());
+		}
+		return font;
+	}
+
+	private DefaultPieDataset prepareDataSet(GUIParameter[][] parameters, String chart, User user) {
+		int index = getIndex(chart);
+
+		DefaultPieDataset dataset = new DefaultPieDataset();
+		long total = 0;
+		for (GUIParameter param : parameters[index]) {
+			if (param == null)
+				continue;
+			total += parseLong(param);
+		}
+		for (int i = 0; i < parameters[index].length; i++) {
+			GUIParameter param = parameters[index][i];
+			if (param != null) {
+				double val = (double) parseLong(param);
+				if (total > 0) {
+					val = val * 100 / total;
+					if (val >= 1)
+						dataset.setValue(I18N.message(param.getName(), user.getLocale()), val);
+				}
+			}
+		}
+		return dataset;
+	}
+
+	private long parseLong(GUIParameter param) {
+		return Long.parseLong(param.getValue() != null ? param.getValue() : "0");
+	}
+
+	private int getIndex(String chart) {
+		int index = 0;
+		if ("repository".equals(chart))
+			index = 0;
+		else if ("documents".equals(chart))
+			index = 1;
+		else if ("pages".equals(chart))
+			index = 2;
+		if ("folders".equals(chart))
+			index = 3;
+		return index;
 	}
 }
