@@ -80,7 +80,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		} catch (Throwable caught) {
 			System.err.println(caught.getMessage());
 			log.error(caught.getMessage(), caught);
-			throw new RuntimeException(caught.getMessage(), caught);
+			throw new ServerException(caught.getMessage(), caught);
 		}
 	}
 
@@ -257,7 +257,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		doInit(info);
 	}
 
-	private void doInit(SetupInfo info) {
+	private void doInit(SetupInfo info) throws Exception {
 		PluginDbInit init = new PluginDbInit();
 		init.setDbms(info.getDbEngine());
 		init.setDriver(info.getDbDriver());
@@ -276,7 +276,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		} else {
 			// connection failure
 			log.debug("connection failure");
-			throw new RuntimeException("Database Connection failure.");
+			throw new Exception("Database Connection failure.");
 		}
 	}
 

@@ -3,11 +3,9 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -112,8 +110,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 	}
 
 	private void printSessionCsv(PrintWriter writer, Session session, Locale locale, boolean showSid) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 		
 		writer.print(showSid ? session.getSid() : "--");
 		writer.print(",");
@@ -147,8 +144,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 	}
 
 	private void printSessionXml(PrintWriter writer, Session session, Locale locale, boolean showSid) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 		
 		writer.print("<session>");
 		writer.print("<sid><![CDATA[" + (showSid ? session.getSid() : "--") + "]]></sid>");

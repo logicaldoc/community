@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,8 +89,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 	}
 
 	private void printPost(PrintWriter writer, SqlRowSet set) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 		
 		writer.print("<post>");
 		writer.print("<id>" + set.getLong(1) + "</id>");

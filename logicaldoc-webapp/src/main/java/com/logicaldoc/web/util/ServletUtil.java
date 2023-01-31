@@ -344,8 +344,8 @@ public class ServletUtil {
 		}
 
 		// Range header should match format "bytes=n-n,n-n,n-n...". If not,
-		// then return 416.
-		if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
+		// then return 416. Impose a max range size in order avoid stack overflow of the Java regex 
+		if (!StringUtils.left(range, 500).matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
 			response.setHeader("Content-Range", "bytes */" + length); // Required
 																		// in
 																		// 416.
@@ -499,8 +499,8 @@ public class ServletUtil {
 	private static Document getDocument(long docId, User user) throws PersistenceException, FileNotFoundException {
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = dao.findById(docId);
-		if (doc != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
-				&& !doc.isPublishing())
+		if (doc == null || (user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
+				&& !doc.isPublishing()))
 			throw new FileNotFoundException("Document not published");
 		return doc;
 	}

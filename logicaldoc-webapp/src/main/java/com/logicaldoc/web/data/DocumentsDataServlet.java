@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -45,8 +44,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 6.0
  */
 public class DocumentsDataServlet extends AbstractDataServlet {
-
-	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
 	private final class ExtendedAttributeRowMapper implements RowMapper<Long> {
 		private final Map<String, Object> extAttributesValues;
@@ -228,7 +225,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private void printExtendedAttributes(PrintWriter writer, Document document, List<String> extendedAttributes,
 			final Map<String, Object> extendedAttributesValues) {
-		DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+		DateFormat df = getDateFormat();
 		if (!extendedAttributesValues.isEmpty())
 			for (String name : extendedAttributes) {
 				Object val = document.getValue(name);
@@ -250,7 +247,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 	}
 
 	private void printDates(PrintWriter writer, Document document) {
-		DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+		DateFormat df = getDateFormat();
 		writer.print(
 				"<lastModified>" + (document.getLastModified() != null ? df.format(document.getLastModified()) : "")
 						+ "</lastModified>");

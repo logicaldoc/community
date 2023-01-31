@@ -3,9 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,9 +42,7 @@ public class TasksDataServlet extends AbstractDataServlet {
 	}
 
 	private void printTask(PrintWriter writer, Locale locale, Task task) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
+		DateFormat df = getDateFormat();
 		writer.print("<task>");
 		writer.print("<name><![CDATA[" + task.getName() + "]]></name>");
 		writer.print("<label><![CDATA[" + I18N.message("task.name." + task.getName(), locale) + "]]></label>");

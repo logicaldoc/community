@@ -3,11 +3,9 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -99,8 +97,7 @@ public class DevicesDataServlet extends AbstractDataServlet {
 	}
 
 	private void printDates(Device device, PrintWriter writer) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 		if (device.getCreation() != null)
 			writer.print("<creation>" + df.format(device.getCreation()) + "</creation>");
 		if (device.getLastLogin() != null)

@@ -5,10 +5,8 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -116,8 +114,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 	}
 
 	private void printDocument(PrintWriter writer, Object[] cols) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 
 		writer.print("<document>");
 		writer.print("<id>" + cols[0] + "</id>");

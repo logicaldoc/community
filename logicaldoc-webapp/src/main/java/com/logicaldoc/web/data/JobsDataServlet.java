@@ -3,10 +3,8 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,8 +75,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 	}
 
 	private void writeJobs(PrintWriter writer, Session session, int maxRecords, String group) throws SchedulerException {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 		
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Map<Long, String> tenants = tDao.findAll().stream()

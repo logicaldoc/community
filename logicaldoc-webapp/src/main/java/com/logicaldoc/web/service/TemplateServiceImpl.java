@@ -561,12 +561,12 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			if (extensibleObject instanceof Document) {
 				transaction = new DocumentHistory();
 				transaction.setDocument((Document) extensibleObject);
+				transaction.setUser(sessionUser);
 			} else if (extensibleObject instanceof Folder) {
 				transaction = new FolderHistory();
 				transaction.setFolder((Folder) extensibleObject);
+				transaction.setUser(sessionUser);
 			}
-
-			transaction.setUser(sessionUser);
 
 			Initializer initializer = new Initializer();
 			initializer.initialize(extensibleObject, template, transaction);

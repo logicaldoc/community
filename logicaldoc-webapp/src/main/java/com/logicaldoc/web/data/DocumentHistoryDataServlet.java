@@ -3,7 +3,6 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,8 +60,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 		for (Object record : records) {
 			Object[] cols = (Object[]) record;
 			if (request.getParameter("userId") != null) {
@@ -83,14 +80,12 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 	}
 
 	private void printHistory(PrintWriter writer, Object[] historyRecord, Locale locale, boolean showSid) {
-
 		writer.print("<history>");
 		writer.print("<user><![CDATA[" + historyRecord[0] + "]]></user>");
 		writer.print("<event><![CDATA[" + I18N.message((String) historyRecord[1], locale) + "]]></event>");
 		writer.print("<version>" + historyRecord[2] + "</version>");
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 		writer.print("<date>" + df.format((Date) historyRecord[3]) + "</date>");
 
 		writer.print("<comment><![CDATA[" + (historyRecord[4] == null ? "" : historyRecord[4]) + "]]></comment>");
