@@ -73,21 +73,21 @@ public class Profile extends Window {
 		detailsForm.setNumCols(3);
 		detailsForm.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem firstName = ItemFactory.newTextItem("firstname", "firstname", user.getFirstName());
+		TextItem firstName = ItemFactory.newTextItem("firstname", user.getFirstName());
 		firstName.setRequired(true);
-		TextItem lastName = ItemFactory.newTextItem("lastname", "lastname", user.getName());
+		TextItem lastName = ItemFactory.newTextItem("lastname", user.getName());
 		lastName.setRequired(true);
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, true);
 		language.setValue(user.getLanguage());
 		language.setDisabled(Session.get().isDemo() && Session.get().getUser().getId() == 1);
 
-		TextItem address = ItemFactory.newTextItem("address", "address", user.getAddress());
-		TextItem postalCode = ItemFactory.newTextItem("postalcode", "postalcode", user.getPostalCode());
-		TextItem city = ItemFactory.newTextItem("city", "city", user.getCity());
-		TextItem country = ItemFactory.newTextItem("country", "country", user.getCountry());
-		TextItem state = ItemFactory.newTextItem("state", "state", user.getState());
-		TextItem phone = ItemFactory.newTextItem("phone", "phone", user.getPhone());
-		TextItem cell = ItemFactory.newTextItem("cell", "cell", user.getCell());
+		TextItem address = ItemFactory.newTextItem("address", user.getAddress());
+		TextItem postalCode = ItemFactory.newTextItem("postalcode", user.getPostalCode());
+		TextItem city = ItemFactory.newTextItem("city", user.getCity());
+		TextItem country = ItemFactory.newTextItem("country", user.getCountry());
+		TextItem state = ItemFactory.newTextItem("state", user.getState());
+		TextItem phone = ItemFactory.newTextItem("phone", user.getPhone());
+		TextItem cell = ItemFactory.newTextItem("cell", user.getCell());
 		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", "timezone", user.getTimeZone());
 		timeZone.setEndRow(true);
 
@@ -222,12 +222,11 @@ public class Profile extends Window {
 						: I18N.message("notcustomized"));
 		hitsGrid.setIcons(showHitsDefinition, clearHitsGrid);
 
-		TextItem dateFormat = ItemFactory.newTextItem("dateFormat", "dateformat", user.getDateFormat());
+		TextItem dateFormat = ItemFactory.newTextItem("dateformat", user.getDateFormat());
 		dateFormat.setWidth(180);
-		TextItem dateFormatShort = ItemFactory.newTextItem("dateFormatShort", "dateformatshort",
-				user.getDateFormatShort());
+		TextItem dateFormatShort = ItemFactory.newTextItem("dateformatshort", user.getDateFormatShort());
 		dateFormatShort.setWidth(180);
-		TextItem dateFormatLong = ItemFactory.newTextItem("dateFormatLong", "dateformatlong", user.getDateFormatLong());
+		TextItem dateFormatLong = ItemFactory.newTextItem("dateformatlong", user.getDateFormatLong());
 		dateFormatLong.setWidth(180);
 
 		final DynamicForm guiForm = new DynamicForm();
@@ -328,20 +327,20 @@ public class Profile extends Window {
 		u.setHitsGrid(user.getHitsGrid());
 		u.setTimeZone(vm.getValueAsString("timezone"));
 
-		if (vm.getValueAsString("dateFormat") == null || vm.getValueAsString("dateFormat").isEmpty())
+		if (vm.getValueAsString("dateformat") == null || vm.getValueAsString("dateformat").isEmpty())
 			u.setDateFormat(null);
 		else
-			u.setDateFormat(vm.getValueAsString("dateFormat"));
+			u.setDateFormat(vm.getValueAsString("dateformat"));
 
-		if (vm.getValueAsString("dateFormatShort") == null || vm.getValueAsString("dateFormatShort").isEmpty())
+		if (vm.getValueAsString("dateformatshort") == null || vm.getValueAsString("dateformatshort").isEmpty())
 			u.setDateFormatShort(null);
 		else
-			u.setDateFormatShort(vm.getValueAsString("dateFormatShort"));
+			u.setDateFormatShort(vm.getValueAsString("dateformatshort"));
 
-		if (vm.getValueAsString("dateFormatLong") == null || vm.getValueAsString("dateFormatLong").isEmpty())
+		if (vm.getValueAsString("dateformatlong") == null || vm.getValueAsString("dateformatlong").isEmpty())
 			u.setDateFormatLong(null);
 		else
-			u.setDateFormatLong(vm.getValueAsString("dateFormatLong"));
+			u.setDateFormatLong(vm.getValueAsString("dateformatlong"));
 
 		ListGridRecord[] records = searchesList.getRecords();
 		List<String> searches = new ArrayList<String>();

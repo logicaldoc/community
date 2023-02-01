@@ -1287,6 +1287,18 @@ public class ItemFactory {
 		item.setRequiredMessage(I18N.message("fieldrequired"));
 		return item;
 	}
+	
+	/**
+	 * Creates a new TextItem.
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param value The item value (optional)
+	 * 
+	 * @return the text item
+	 */
+	public static TextItem newTextItem(String name, String value) {
+		return newTextItem(name, name, value);
+	}
 
 	public static TextItem newTextItemPreventAutocomplete(String name, String title, String value) {
 		TextItem item = newTextItem(name, title, value);

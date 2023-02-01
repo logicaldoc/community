@@ -46,7 +46,7 @@ public class UserSearchDialog extends Window {
 		setWidth(500);
 		setHeight(300);
 
-		final TextItem username = ItemFactory.newTextItem("username", "username", null);
+		final TextItem username = ItemFactory.newTextItem("username", null);
 		final SelectItem group = ItemFactory.newGroupSelector("group", "group");
 
 		ToolStripButton search = new ToolStripButton(I18N.message("search"));

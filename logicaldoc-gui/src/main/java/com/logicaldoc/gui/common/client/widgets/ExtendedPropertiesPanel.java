@@ -177,7 +177,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	private void putCustomIdField() {
 		if (isDocument()) {
-			TextItem customId = ItemFactory.newTextItem("customid", "customid", ((GUIDocument) object).getCustomId());
+			TextItem customId = ItemFactory.newTextItem("customid", ((GUIDocument) object).getCustomId());
 			if (changedHandler != null)
 				customId.addChangedHandler(changedHandler);
 			customId.setDisabled(!updateEnabled);
