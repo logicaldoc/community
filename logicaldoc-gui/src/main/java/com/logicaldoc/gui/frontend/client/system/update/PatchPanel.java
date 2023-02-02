@@ -184,7 +184,7 @@ public class PatchPanel extends VLayout {
 		form.setColWidths("1px", "*");
 		form.setTitleOrientation(TitleOrientation.LEFT);
 
-		StaticTextItem name = ItemFactory.newStaticTextItem("name", "name", patch.getName());
+		StaticTextItem name = ItemFactory.newStaticTextItem("name", patch.getName());
 		name.setRequired(true);
 		name.setWrapTitle(false);
 
@@ -193,11 +193,11 @@ public class PatchPanel extends VLayout {
 		rating.setRequired(true);
 		rating.setWrapTitle(false);
 
-		StaticTextItem date = ItemFactory.newStaticTextItem("date", "date", I18N.formatDateShort(patch.getDate()));
+		StaticTextItem date = ItemFactory.newStaticTextItem("date", I18N.formatDateShort(patch.getDate()));
 		date.setRequired(true);
 		date.setWrapTitle(false);
 
-		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size", Util.formatSize(patch.getSize()));
+		StaticTextItem size = ItemFactory.newStaticTextItem("size", Util.formatSize(patch.getSize()));
 		size.setRequired(true);
 		size.setWrapTitle(false);
 
@@ -206,8 +206,7 @@ public class PatchPanel extends VLayout {
 		restart.setRequired(true);
 		restart.setWrapTitle(false);
 
-		StaticTextItem description = ItemFactory.newStaticTextItem("description", "description",
-				patch.getDescription());
+		StaticTextItem description = ItemFactory.newStaticTextItem("description", patch.getDescription());
 		description.setWidth(500);
 		description.setRequired(true);
 		description.setWrapTitle(false);
@@ -309,8 +308,7 @@ public class PatchPanel extends VLayout {
 												.get(I18N.message("patchrunning", path.replace("\\\\", "/"))).show();
 									} else {
 										ApplicationRestarting
-												.get(I18N.message("patchrunning1", path.replace("\\\\", "/")))
-												.show();
+												.get(I18N.message("patchrunning1", path.replace("\\\\", "/"))).show();
 
 										final String tenant = Session.get().getUser().getTenant().getName();
 										Session.get().close();

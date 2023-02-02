@@ -72,7 +72,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		StaticTextItem size = ItemFactory.newStaticTextItem("ssize", "size", Util.formatSizeW7(folder.getSizeTotal()));
 		size.setWrap(false);
 
-		StaticTextItem documents = ItemFactory.newStaticTextItem("documents", "documents",
+		StaticTextItem documents = ItemFactory.newStaticTextItem("documents",
 				Util.formatLong(folder.getDocumentsTotal()));
 
 		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("quotaThreshold", "alertthreshold",

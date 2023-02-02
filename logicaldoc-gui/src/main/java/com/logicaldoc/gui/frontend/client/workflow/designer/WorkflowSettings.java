@@ -62,9 +62,8 @@ public class WorkflowSettings extends Window {
 
 		TextItem workflowLabel = ItemFactory.newTextItem("workflowLabel", "label", workflow.getLabel());
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id",
-				this.workflow != null ? this.workflow.getId() : "");
-		StaticTextItem version = ItemFactory.newStaticTextItem("version", "version",
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", this.workflow != null ? this.workflow.getId() : "");
+		StaticTextItem version = ItemFactory.newStaticTextItem("version",
 				this.workflow != null ? "" + this.workflow.getVersion() : "");
 
 		TextAreaItem workflowDescr = ItemFactory.newTextAreaItem("workflowDescr", "workflowdescr",

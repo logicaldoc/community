@@ -302,22 +302,21 @@ public class SystemMenu extends VLayout {
 		support.setRequired(true);
 		support.setShouldSaveValue(false);
 
-		StaticTextItem installationID = ItemFactory.newStaticTextItem("installid", "installid", installationId);
+		StaticTextItem installationID = ItemFactory.newStaticTextItem("installid", installationId);
 		installationID.setWidth(250);
 		installationID.setRequired(true);
 		installationID.setShouldSaveValue(false);
 		installationID.setWrap(true);
 		installationID.setWrapTitle(false);
 
-		StaticTextItem usernoItem = ItemFactory.newStaticTextItem("userno", "userno", userno);
+		StaticTextItem usernoItem = ItemFactory.newStaticTextItem("userno", userno);
 		usernoItem.setWidth(250);
 		usernoItem.setRequired(true);
 		usernoItem.setShouldSaveValue(false);
 		usernoItem.setWrap(true);
 		usernoItem.setWrapTitle(false);
 
-		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", "hostname",
-				Session.get().getInfo().getHostName());
+		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", Session.get().getInfo().getHostName());
 		hostName.setWidth(250);
 		hostName.setRequired(true);
 		hostName.setShouldSaveValue(false);

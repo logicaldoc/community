@@ -92,10 +92,10 @@ public class ZoneEditor extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		StaticTextItem type = ItemFactory.newStaticTextItem("type", "type",
+		StaticTextItem type = ItemFactory.newStaticTextItem("type", 
 				AttributeTypeFormatter.format(zone.getType()));
 
-		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", "sample", zone.getSampleText());
+		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", zone.getSampleText());
 		sample.setVisible(zone.getSampleText() != null && !zone.getSampleText().isEmpty());
 
 		TextItem format = ItemFactory.newTextItem("format", zone.getFormat());

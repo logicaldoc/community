@@ -76,10 +76,10 @@ public class RatingDialog extends Window {
 		ratingForm.setNumCols(1);
 		ratingForm.setValuesManager(vm);
 
-		StaticTextItem actualRating = ItemFactory.newStaticTextItem("actualrating", "actualrating",
+		StaticTextItem actualRating = ItemFactory.newStaticTextItem("actualrating",
 				DocUtil.getRatingIcon(documentRating));
 
-		final StaticTextItem totalVotes = ItemFactory.newStaticTextItem("totalvotes", "totalvotes",
+		final StaticTextItem totalVotes = ItemFactory.newStaticTextItem("totalvotes",
 				this.rating.getCount().toString() + "&nbsp;&nbsp;" + AwesomeFactory.getIconHtml("eye"));
 		totalVotes.setWrapTitle(false);
 		totalVotes.setWrap(false);

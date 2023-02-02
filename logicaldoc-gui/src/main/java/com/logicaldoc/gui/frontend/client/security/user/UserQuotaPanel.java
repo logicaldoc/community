@@ -60,7 +60,7 @@ public class UserQuotaPanel extends HLayout {
 		if (!readonly)
 			quota.addChangedHandler(changedHandler);
 
-		StaticTextItem quotaCount = ItemFactory.newStaticTextItem("quotaCount", "quotacount",
+		StaticTextItem quotaCount = ItemFactory.newStaticTextItem("quotaCount",
 				Util.formatSizeW7(user.getQuotaCount()));
 		quotaCount.setWrap(false);
 

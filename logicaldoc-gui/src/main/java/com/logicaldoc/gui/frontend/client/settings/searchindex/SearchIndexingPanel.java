@@ -450,7 +450,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		entries.setWidth("1%");
 
 		// Locked
-		StaticTextItem status = ItemFactory.newStaticTextItem("status", "status",
+		StaticTextItem status = ItemFactory.newStaticTextItem("status", 
 				this.searchEngine.isLocked() ? ("<span style='color:red'>" + I18N.message("locked") + "</span>")
 						: I18N.message("unlocked"));
 		status.setRedrawOnChange(true);

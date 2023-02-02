@@ -130,7 +130,7 @@ public class ZonalOCRTemplateSettings extends Window {
 		name.setRequired(true);
 		name.setDisabled(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", I18N.message("id"),
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", 
 				"" + ocrPanel.getSelectedOcrTemplate().getId());
 		id.setVisible(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 

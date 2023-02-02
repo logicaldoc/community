@@ -278,7 +278,7 @@ public class TenantKeystorePanel extends VLayout {
 	}
 
 	private StaticTextItem prepareDetailsItem() {
-		StaticTextItem details = ItemFactory.newStaticTextItem("details", "details",
+		StaticTextItem details = ItemFactory.newStaticTextItem("details",
 				(keystore != null && keystore.getOrganizationDN() != null)
 						? (keystore.getOrganizationDN() + " " + I18N.message("validtill") + ": "
 								+ I18N.formatDate(keystore.getOrganizationExpire()))

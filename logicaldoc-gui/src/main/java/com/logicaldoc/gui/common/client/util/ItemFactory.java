@@ -1541,6 +1541,19 @@ public class ItemFactory {
 		item.setValidators(new SimpleTextValidator());
 		return item;
 	}
+	
+	/**
+	 * Creates a new TextItem that validates a simple text
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param title The item title (mandatory)
+	 * @param value The item value (optional)
+	 * 
+	 * @return the new item
+	 */
+	public static TextItem newSimpleTextItem(String name, String value) {
+		return newSimpleTextItem(name, name, value);
+	}
 
 	public static TextItem newSimpleTextItemPreventAutocomplete(String name, String title, String value) {
 		TextItem item = newSimpleTextItem(name, title, value);
@@ -1548,6 +1561,18 @@ public class ItemFactory {
 		return item;
 	}
 
+	/**
+	 * Creates a new StaticTextItem
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param value The item value (optional)
+	 * 
+	 * @return the new item
+	 */
+	public static StaticTextItem newStaticTextItem(String name, String value) {
+		return newStaticTextItem(name, name, value);
+	}
+	
 	/**
 	 * Creates a new StaticTextItem
 	 * 

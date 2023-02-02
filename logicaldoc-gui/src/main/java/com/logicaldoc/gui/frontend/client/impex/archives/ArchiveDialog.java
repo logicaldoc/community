@@ -65,7 +65,7 @@ public class ArchiveDialog extends Window {
 		TextItem description = ItemFactory.newTextItem("description", null);
 		description.setWidth(300);
 
-		StaticTextItem creator = ItemFactory.newStaticTextItem("creator", "creator", Session.get().getUser()
+		StaticTextItem creator = ItemFactory.newStaticTextItem("creator", Session.get().getUser()
 				.getFullName());
 
 		ButtonItem save = new ButtonItem();

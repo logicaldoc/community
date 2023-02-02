@@ -152,7 +152,7 @@ public class StatsPie extends HLayout {
 			i++;
 		}
 
-		StaticTextItem total = ItemFactory.newStaticTextItem("total", "total", null);
+		StaticTextItem total = ItemFactory.newStaticTextItem("total", null);
 		if (type == STATS_REPOSITORY)
 			total.setValue(Util.formatSize(count));
 		else if (type == STATS_DOCUMENTS)

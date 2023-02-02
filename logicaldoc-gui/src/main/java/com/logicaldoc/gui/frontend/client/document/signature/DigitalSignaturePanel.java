@@ -81,7 +81,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		visualPositioning.setDisabled(true);
 
 		String url = Util.contextPath() + "export-keystore?cert=true&tenantId=" + Session.get().getTenantId();
-		StaticTextItem rootCert = ItemFactory.newStaticTextItem("rootcertificate", "rootcertificate",
+		StaticTextItem rootCert = ItemFactory.newStaticTextItem("rootcertificate",
 				"<a href='" + url + "' target='_blank'>" + I18N.message("downloadrootcert") + "</a>");
 		rootCert.setRequired(true);
 		rootCert.setWrap(false);

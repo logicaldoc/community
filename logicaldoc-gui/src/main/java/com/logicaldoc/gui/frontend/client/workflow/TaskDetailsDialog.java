@@ -257,8 +257,8 @@ public class TaskDetailsDialog extends Window {
 				transitionButton.addClickHandler((ClickEvent event) -> {
 					if (workflow.getSelectedTask().isRequiresNote()) {
 						/*
-						 * This task requires a note at completion, so
-						 * we collect the input from the user
+						 * This task requires a note at completion, so we
+						 * collect the input from the user
 						 */
 						collectNoteAndEndTask(getWorkflow().getSelectedTask(), transitionName);
 					} else {
@@ -344,21 +344,20 @@ public class TaskDetailsDialog extends Window {
 				workflow.getName());
 		workflowName.setShouldSaveValue(false);
 
-		StaticTextItem version = ItemFactory.newStaticTextItem("version", I18N.message("version"),
-				"" + workflow.getVersion());
+		StaticTextItem version = ItemFactory.newStaticTextItem("version", "" + workflow.getVersion());
 		version.setShouldSaveValue(false);
 
-		StaticTextItem workflowTag = ItemFactory.newStaticTextItem("tag", I18N.message("tag"),
+		StaticTextItem workflowTag = ItemFactory.newStaticTextItem("tag",
 				workflow.getTag() != null ? workflow.getTag() : "");
 
 		StaticTextItem workflowDescription = ItemFactory.newStaticTextItem("workflowDescription",
 				I18N.message("description"), workflow.getDescription());
 
-		StaticTextItem startDate = ItemFactory.newStaticTextItem("startdate", "startdate", null);
+		StaticTextItem startDate = ItemFactory.newStaticTextItem("startdate", null);
 		if (workflow.getStartDate() != null)
 			startDate.setValue(I18N.formatDate((Date) workflow.getStartDate()));
 
-		StaticTextItem endDate = ItemFactory.newStaticTextItem("enddate", "enddate", null);
+		StaticTextItem endDate = ItemFactory.newStaticTextItem("enddate", null);
 		if (workflow.getEndDate() != null)
 			endDate.setValue(I18N.formatDate((Date) workflow.getEndDate()));
 

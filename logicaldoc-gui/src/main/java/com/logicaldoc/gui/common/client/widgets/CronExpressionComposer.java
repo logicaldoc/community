@@ -87,11 +87,11 @@ public class CronExpressionComposer extends Window {
 		topTabSet.addTab(monthlyTab);
 		topTabSet.addTab(yearlyTab);
 
-		StaticTextItem expression = ItemFactory.newStaticTextItem("expression", "expression", null);
+		StaticTextItem expression = ItemFactory.newStaticTextItem("expression", null);
 		expression.setWidth(300);
 		expression.setWrap(false);
 
-		StaticTextItem description = ItemFactory.newStaticTextItem("description", "description", null);
+		StaticTextItem description = ItemFactory.newStaticTextItem("description", null);
 		description.setWidth(400);
 		description.setWrap(false);
 

@@ -81,7 +81,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		prepareForm1();
 
-		StaticTextItem idItem = ItemFactory.newStaticTextItem("id", "id", Long.toString(folder.getId()));
+		StaticTextItem idItem = ItemFactory.newStaticTextItem("id", Long.toString(folder.getId()));
 		if (folder.getFoldRef() != null)
 			idItem.setTooltip(I18N.message("thisisalias") + ": " + folder.getFoldRef());
 
@@ -123,14 +123,14 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		barcode.setTitle(I18N.message("barcode"));
 		barcode.setValue(GWT.getHostPageBaseURL() + "barcode?code=" + folder.getId() + "&width=400&height=150");
 
-		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents", "documents",
+		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents", 
 				folder.getDocumentCount() > 0 ? Integer.toString(folder.getDocumentCount()) : "-");
 		documents.setIconHSpace(2);
 		documents.setIconWidth(16);
 		documents.setIconHeight(16);
 		documents.setWidth("1%");
 
-		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders", "folders",
+		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders", 
 				folder.getSubfolderCount() > 0 ? Integer.toString(folder.getSubfolderCount()) : "-");
 		subfolders.setIconHSpace(2);
 		subfolders.setIconWidth(16);

@@ -128,7 +128,7 @@ public class BarcodeTemplateSettings extends Window {
 		name.setRequired(true);
 		name.setDisabled(template.getId() != 0L);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", I18N.message("id"), "" + template.getId());
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + template.getId());
 		id.setVisible(template != null && template.getId() != 0L);
 
 		SelectItem type = ItemFactory.newSelectItem("type");

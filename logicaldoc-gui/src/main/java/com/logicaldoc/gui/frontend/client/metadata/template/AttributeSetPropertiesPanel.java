@@ -547,7 +547,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		setPropertiesForm.setValuesManager(vm);
 		setPropertiesForm.setTitleOrientation(TitleOrientation.LEFT);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(attributeSet.getId()));
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(attributeSet.getId()));
 		id.setDisabled(true);
 
 		TextItem name = ItemFactory.newSimpleTextItem("name", I18N.message("name"), attributeSet.getName());

@@ -76,9 +76,9 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(report.getId()));
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(report.getId()));
 
-		StaticTextItem name = ItemFactory.newStaticTextItem("name", "name", report.getName());
+		StaticTextItem name = ItemFactory.newStaticTextItem("name", report.getName());
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", report.getDescription());
 		description.setWidth(250);
@@ -106,7 +106,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		if (report.getOutputDocId() != null)
 			downloadUrl = Util.downloadURL(report.getOutputDocId());
 		String perma = "<a href='" + downloadUrl + "'>" + I18N.message("download") + "</a>";
-		StaticTextItem outputLink = ItemFactory.newStaticTextItem("output", "output", perma);
+		StaticTextItem outputLink = ItemFactory.newStaticTextItem("output", perma);
 
 		if (report.getOutputDocId() != null)
 			form.setItems(id, outputLink, name, outputFolderSelector, format, updatePolicy, description);

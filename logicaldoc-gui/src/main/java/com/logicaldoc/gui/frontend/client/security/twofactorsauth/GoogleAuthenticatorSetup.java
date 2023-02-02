@@ -40,11 +40,11 @@ public class GoogleAuthenticatorSetup extends TwoFactorsAuthenticationSetup {
 
 	private void init(String account, String key, String qrUrl) {
 		// Prepare the form with account informations
-		StaticTextItem accountItem = ItemFactory.newStaticTextItem("account", I18N.message("account"), account);
+		StaticTextItem accountItem = ItemFactory.newStaticTextItem("account", account);
 		accountItem.setWrap(false);
 		accountItem.setWrapTitle(false);
 
-		StaticTextItem keyItem = ItemFactory.newStaticTextItem("key", I18N.message("key"), key);
+		StaticTextItem keyItem = ItemFactory.newStaticTextItem("key", key);
 		keyItem.setWrap(false);
 		keyItem.setWrapTitle(false);
 

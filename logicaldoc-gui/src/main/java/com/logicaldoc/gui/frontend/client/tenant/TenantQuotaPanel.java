@@ -137,11 +137,9 @@ public class TenantQuotaPanel extends HLayout {
 		StaticTextItem size = ItemFactory.newStaticTextItem("ssize", "size", Util.formatSizeW7(tenant.getSize()));
 		size.setWrap(false);
 
-		StaticTextItem documents = ItemFactory.newStaticTextItem("documents", "documents",
-				Util.formatLong(tenant.getDocuments()));
-		StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", "sessions",
-				Util.formatLong(tenant.getSessions()));
-		StaticTextItem users = ItemFactory.newStaticTextItem("users", "users", Util.formatLong(tenant.getUsers()));
+		StaticTextItem documents = ItemFactory.newStaticTextItem("documents", Util.formatLong(tenant.getDocuments()));
+		StaticTextItem sessions = ItemFactory.newStaticTextItem("sessions", Util.formatLong(tenant.getSessions()));
+		StaticTextItem users = ItemFactory.newStaticTextItem("users", Util.formatLong(tenant.getUsers()));
 		StaticTextItem guests = ItemFactory.newStaticTextItem("guests", "readonlyusers",
 				Util.formatLong(tenant.getGuests()));
 

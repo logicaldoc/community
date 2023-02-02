@@ -89,7 +89,7 @@ public class ZoneEditor extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", "sample", zone.getSampleText());
+		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", zone.getSampleText());
 		sample.setVisible(zone.getSampleText() != null && !zone.getSampleText().isEmpty());
 
 		TextItem patterns = ItemFactory.newTextItem("patterns", zone.getPatterns());

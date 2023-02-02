@@ -70,7 +70,7 @@ public class CertificateDialog extends Window {
 		form.setNumCols(2);
 		form.setMinWidth(450);
 
-		StaticTextItem details = ItemFactory.newStaticTextItem("details", "details", Session.get().getUser().getCertDN()
+		StaticTextItem details = ItemFactory.newStaticTextItem("details", Session.get().getUser().getCertDN()
 				+ " " + I18N.message("validtill") + ": " + I18N.formatDate(Session.get().getUser().getCertExpire()));
 		details.setColSpan(2);
 		details.setWrap(true);

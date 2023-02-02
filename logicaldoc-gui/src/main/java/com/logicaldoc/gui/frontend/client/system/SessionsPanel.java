@@ -53,7 +53,7 @@ public class SessionsPanel extends VLayout {
 			}
 		});
 
-		activeSessions = ItemFactory.newStaticTextItem("activesessions", "activesessions", "");
+		activeSessions = ItemFactory.newStaticTextItem("activesessions", "");
 
 		toolStrip.addButton(refresh);
 		toolStrip.addSeparator();

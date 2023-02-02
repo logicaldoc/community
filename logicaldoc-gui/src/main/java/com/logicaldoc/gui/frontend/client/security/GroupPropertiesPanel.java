@@ -55,7 +55,7 @@ public class GroupPropertiesPanel extends HLayout {
 		form1.setValuesManager(vm);
 		form1.setTitleOrientation(TitleOrientation.TOP);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(group.getId()));
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(group.getId()));
 
 		TextItem name = ItemFactory.newSimpleTextItem("name", "name", group.getName());
 		if (readonly || group.getId() != 0) {

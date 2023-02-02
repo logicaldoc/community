@@ -85,7 +85,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	private void refresh() {
 		prepareForm1();
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(document.getId()));
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(document.getId()));
 		if (!Long.toString(document.getId()).equals(document.getCustomId())) {
 			id.setTooltip(Long.toString(document.getId()) + " (" + document.getCustomId() + ")");
 			id.setValue(Util.padLeft(Long.toString(document.getId()) + " (" + document.getCustomId() + ")", 35));
@@ -106,7 +106,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		published.setTooltip(
 				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
 
-		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size",
+		StaticTextItem size = ItemFactory.newStaticTextItem("size", 
 				Util.formatSizeW7(document.getFileSize()) + " (" + Util.formatSizeBytes(document.getFileSize()) + ")");
 
 		StaticTextItem pages = preparePagesItem();
@@ -131,7 +131,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message("download") + "</a> | "
 				+ "<a href='" + displayUrl + "' target='_blank'>" + I18N.message("details") + "</a>";
 
-		StaticTextItem permaLink = ItemFactory.newStaticTextItem("permalink", "permalink", perma);
+		StaticTextItem permaLink = ItemFactory.newStaticTextItem("permalink", perma);
 
 		if (Feature.enabled(Feature.WORKFLOW))
 			form1.setItems(id, fileName, folder, size, pages, version, creation, published, wfStatus, color, permaLink);
@@ -224,7 +224,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private StaticTextItem preparePagesItem() {
-		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", "pages", Util.formatInt(document.getPages()));
+		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", Util.formatInt(document.getPages()));
 		pages.setIconHSpace(2);
 		pages.setIconWidth(16);
 		pages.setIconHeight(16);
@@ -387,7 +387,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private void addRating(List<FormItem> items) {
-		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "rating",
+		StaticTextItem rating = ItemFactory.newStaticTextItem("rating",
 				document.getRating() > 0 ? DocUtil.getRatingIcon(document.getRating())
 						: I18N.message("ratethisdocument"));
 		rating.setEndRow(true);
