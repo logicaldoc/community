@@ -109,18 +109,18 @@ public class TenantKeystorePanel extends VLayout {
 
 		SpinnerItem validity = prepareValiditySpinner();
 
-		TextItem countryCode = ItemFactory.newTextItem("countryCode", "countrycode", null);
+		TextItem countryCode = ItemFactory.newTextItem("countrycode", null);
 		countryCode.setLength(2);
 		countryCode.setHint("C");
 		countryCode.setRequired(true);
 		countryCode.setWrapTitle(false);
 
-		TextItem organization = ItemFactory.newTextItem("organization", "organization", null);
+		TextItem organization = ItemFactory.newTextItem("organization", null);
 		organization.setHint("O");
 		organization.setRequired(true);
 		organization.setWrapTitle(false);
 
-		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalUnit", "organizationalunit", null);
+		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalunit", null);
 		organizationalUnit.setHint("OU");
 		organizationalUnit.setRequired(true);
 		organizationalUnit.setWrapTitle(false);
@@ -137,13 +137,13 @@ public class TenantKeystorePanel extends VLayout {
 		signatureForm.setAlign(Alignment.LEFT);
 		signatureForm.setGroupTitle(I18N.message("signature"));
 
-		TextItem exprx = ItemFactory.newTextItem("exprx", "exprx", keystore != null ? keystore.getSignX() : "");
+		TextItem exprx = ItemFactory.newTextItem("exprx", keystore != null ? keystore.getSignX() : "");
 		exprx.setWidth(300);
 
-		TextItem expry = ItemFactory.newTextItem("expry", "expry", keystore != null ? keystore.getSignY() : "");
+		TextItem expry = ItemFactory.newTextItem("expry", keystore != null ? keystore.getSignY() : "");
 		expry.setWidth(300);
 
-		TextItem width = ItemFactory.newTextItem("width", "width", keystore != null ? keystore.getSignWidth() : "");
+		TextItem width = ItemFactory.newTextItem("width", keystore != null ? keystore.getSignWidth() : "");
 		width.setWidth(300);
 
 		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual", "visual");
@@ -177,7 +177,7 @@ public class TenantKeystorePanel extends VLayout {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", "xyz");
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "xyz");
 		fakeUsername.setCellStyle("nodisplay");
 		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake", "xyz");
 		fakePassword.setCellStyle("nodisplay");
@@ -405,8 +405,8 @@ public class TenantKeystorePanel extends VLayout {
 			keystore.setKeytoolPath((String) values.get("keytoolCommand"));
 			keystore.setOpenSSLPath((String) values.get("opensslCommand"));
 			try {
-				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalUnit")
-						+ ",C=" + values.get("countryCode").toString().toUpperCase());
+				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalunit")
+						+ ",C=" + values.get("countrycode").toString().toUpperCase());
 			} catch (Throwable t) {
 				// Nothing to do
 			}

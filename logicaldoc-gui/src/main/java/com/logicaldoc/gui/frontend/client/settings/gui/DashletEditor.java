@@ -186,7 +186,7 @@ public class DashletEditor extends Window {
 	}
 
 	private VLayout preparePropertiesPanel() {
-		TextItem title = ItemFactory.newTextItem("title", "title", dashlet.getTitle());
+		TextItem title = ItemFactory.newTextItem("title", dashlet.getTitle());
 		title.setRequired(true);
 		title.setDisabled(dashlet.isSystemDashlet());
 

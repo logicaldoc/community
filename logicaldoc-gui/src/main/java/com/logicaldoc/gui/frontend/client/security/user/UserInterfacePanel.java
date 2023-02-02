@@ -82,10 +82,9 @@ public class UserInterfacePanel extends HLayout {
 
 		StaticTextItem hitsGrid = prepareHitsGridLayoutItem(readonly, clearIcon);
 
-		TextItem dateFormat = ItemFactory.newTextItem("dateFormat", "dateformat", user.getDateFormat());
-		TextItem dateFormatShort = ItemFactory.newTextItem("dateFormatShort", "dateformatshort",
-				user.getDateFormatShort());
-		TextItem dateFormatLong = ItemFactory.newTextItem("dateFormatLong", "dateformatlong", user.getDateFormatLong());
+		TextItem dateFormat = ItemFactory.newTextItem("dateformat", user.getDateFormat());
+		TextItem dateFormatShort = ItemFactory.newTextItem("dateformatshort", user.getDateFormatShort());
+		TextItem dateFormatLong = ItemFactory.newTextItem("dateformatlong", user.getDateFormatLong());
 
 		form1.setItems(welcomeScreen, defaultWorkspace, docsGrid, hitsGrid, dateFormat, dateFormatShort,
 				dateFormatLong);
@@ -203,19 +202,19 @@ public class UserInterfacePanel extends HLayout {
 				|| I18N.message("notcustomized").equals(vm.getValueAsString("hitsgrid")))
 			user.setHitsGrid(null);
 
-		if (vm.getValueAsString("dateFormat") == null || vm.getValueAsString("dateFormat").isEmpty())
+		if (vm.getValueAsString("dateformat") == null || vm.getValueAsString("dateformat").isEmpty())
 			user.setDateFormat(null);
 		else
-			user.setDateFormat(vm.getValueAsString("dateFormat"));
+			user.setDateFormat(vm.getValueAsString("dateformat"));
 
-		if (vm.getValueAsString("dateFormatShort") == null || vm.getValueAsString("dateFormatShort").isEmpty())
+		if (vm.getValueAsString("dateformatshort") == null || vm.getValueAsString("dateformatshort").isEmpty())
 			user.setDateFormatShort(null);
 		else
-			user.setDateFormatShort(vm.getValueAsString("dateFormatShort"));
+			user.setDateFormatShort(vm.getValueAsString("dateformatshort"));
 
-		if (vm.getValueAsString("dateFormatLong") == null || vm.getValueAsString("dateFormatLong").isEmpty())
+		if (vm.getValueAsString("dateformatlong") == null || vm.getValueAsString("dateformatlong").isEmpty())
 			user.setDateFormatLong(null);
 		else
-			user.setDateFormatLong(vm.getValueAsString("dateFormatLong"));
+			user.setDateFormatLong(vm.getValueAsString("dateformatlong"));
 	}
 }

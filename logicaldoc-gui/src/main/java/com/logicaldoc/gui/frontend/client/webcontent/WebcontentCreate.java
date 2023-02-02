@@ -48,7 +48,7 @@ public class WebcontentCreate extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem title = ItemFactory.newTextItem("title", "title", null);
+		TextItem title = ItemFactory.newTextItem("title", null);
 		title.setRequired(true);
 		title.setWidth(200);
 

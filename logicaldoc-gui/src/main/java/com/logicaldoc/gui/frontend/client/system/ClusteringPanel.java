@@ -66,15 +66,14 @@ public class ClusteringPanel extends AdminPanel {
 		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "enabled");
 		enabled.setValue("true".equals(parameters[0].getValue()) ? "yes" : "no");
 
-		TextItem name = ItemFactory.newTextItem("name", I18N.message("name"), parameters[1].getValue());
+		TextItem name = ItemFactory.newTextItem("name", parameters[1].getValue());
 		name.setRequired(true);
 
 		IntegerItem baseport = ItemFactory.newIntegerItem("baseport", I18N.message("baseport"),
 				Integer.parseInt(parameters[2].getValue()));
 		baseport.setRequired(true);
 
-		TextItem multicastip = ItemFactory.newTextItem("multicastip", I18N.message("multicastip"),
-				parameters[3].getValue());
+		TextItem multicastip = ItemFactory.newTextItem("multicastip", parameters[3].getValue());
 
 		RadioGroupItem cacheResources = ItemFactory.newBooleanSelector("cacheResources", "cache");
 		cacheResources.setHint(I18N.message("cachesresources"));
@@ -108,8 +107,8 @@ public class ClusteringPanel extends AdminPanel {
 					settings[3] = new GUIParameter("cluster.multicastip", vm.getValueAsString("multicastip"));
 					settings[4] = new GUIParameter("cluster.cache.resources",
 							values.get("cacheResources").equals("yes") ? "true" : "false");
-					settings[5] = new GUIParameter("cluster.chunk.size",vm.getValueAsString("chunkSize"));
-					
+					settings[5] = new GUIParameter("cluster.chunk.size", vm.getValueAsString("chunkSize"));
+
 					SettingService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

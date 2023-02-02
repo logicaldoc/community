@@ -46,7 +46,7 @@ public class StatusDialog extends Window {
 		form.setNumCols(1);
 		form.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", widget.getTransition().getText());
+		TextItem name = ItemFactory.newTextItem("name", widget.getTransition().getText());
 		name.setRequired(true);
 
 		ButtonItem save = new ButtonItem("save", I18N.message("save"));

@@ -80,7 +80,7 @@ public class SearchIndexEntriesPanel extends VLayout {
 			}
 		});
 
-		query = ItemFactory.newTextItem("query", "query", "*:*");
+		query = ItemFactory.newTextItem("query", "*:*");
 		query.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {

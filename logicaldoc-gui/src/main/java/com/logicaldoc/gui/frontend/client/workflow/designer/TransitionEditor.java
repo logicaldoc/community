@@ -61,7 +61,7 @@ public class TransitionEditor extends Window {
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		final TextItem name = ItemFactory.newTextItem("name", "name", widget.getTransition().getText());
+		final TextItem name = ItemFactory.newTextItem("name", widget.getTransition().getText());
 		name.setRequired(true);
 
 		ToolStripButton save = new ToolStripButton();

@@ -305,7 +305,7 @@ public class GUISettingsPanel extends AdminPanel {
 		uploadDisallow.setRequired(false);
 		uploadDisallow.setWrapTitle(false);
 
-		TextItem textExtensions = ItemFactory.newTextItem("textextensions", "textextensions",
+		TextItem textExtensions = ItemFactory.newTextItem("textextensions",
 				Util.getParameterValue(settings, "gui.text.extensions"));
 		textExtensions.setHint(I18N.message("separatedcomma"));
 		textExtensions.setWidth(350);
@@ -368,7 +368,7 @@ public class GUISettingsPanel extends AdminPanel {
 		securitySecurityOptionDefault.setWrapTitle(false);
 		securitySecurityOptionDefault.setValue(Util.getParameterValue(settings, "gui.security.inheritoption.default"));
 
-		TextItem webcontentFolders = ItemFactory.newTextItem("webcontentfolders", "webcontentfolders",
+		TextItem webcontentFolders = ItemFactory.newTextItem("webcontentfolders",
 				Util.getParameterValue(settings, "gui.webcontent.folders"));
 		webcontentFolders.setHint(I18N.message("commaseplistofids"));
 		webcontentFolders.setWidth(350);

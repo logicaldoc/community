@@ -33,7 +33,7 @@ public class DuoSetup extends TwoFactorsAuthenticationSetup {
 			settings = user.getKey().split("\\|");
 
 		// Prepare the form with account informations
-		TextItem username = ItemFactory.newTextItem("username", I18N.message("username"), settings[0]);
+		TextItem username = ItemFactory.newTextItem("username", settings[0]);
 		username.setWidth(300);
 		username.setRequired(true);
 
@@ -46,7 +46,7 @@ public class DuoSetup extends TwoFactorsAuthenticationSetup {
 		factor.setRequired(true);
 		factor.setValue(settings[1]);
 
-		TextItem device = ItemFactory.newTextItem("device", I18N.message("device"), settings[2]);
+		TextItem device = ItemFactory.newTextItem("device", settings[2]);
 		device.setWidth(300);
 
 		form = new DynamicForm();

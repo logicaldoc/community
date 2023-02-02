@@ -71,7 +71,7 @@ public class SingleSignonPanel extends VLayout {
 		appUrl.setWrapTitle(false);
 		appUrl.setRequired(true);
 
-		TextItem casUrl = ItemFactory.newTextItem("casurl", "casurl", null);
+		TextItem casUrl = ItemFactory.newTextItem("casurl", null);
 		casUrl.setWidth(400);
 		casUrl.setWrapTitle(false);
 		casUrl.setRequired(true);

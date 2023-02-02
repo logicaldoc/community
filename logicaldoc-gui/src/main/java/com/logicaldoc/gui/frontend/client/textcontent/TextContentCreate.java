@@ -43,7 +43,7 @@ public class TextContentCreate extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem filename = ItemFactory.newTextItem("filename", "filename", null);
+		TextItem filename = ItemFactory.newTextItem("filename", null);
 		filename.setRequired(true);
 		filename.setWidth(200);
 

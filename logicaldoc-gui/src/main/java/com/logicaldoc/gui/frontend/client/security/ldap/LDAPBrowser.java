@@ -74,7 +74,7 @@ public class LDAPBrowser extends VLayout {
 		form.setWrapItemTitles(false);
 
 		// Username
-		TextItem username = ItemFactory.newTextItem("username", "username", null);
+		TextItem username = ItemFactory.newTextItem("username", null);
 
 		searchButton = new ButtonItem();
 		searchButton.setTitle(I18N.message("search"));

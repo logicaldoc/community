@@ -66,38 +66,38 @@ public class TenantPropertiesPanel extends HLayout {
 
 		TextItem name = prepareNameItem(readonly);
 
-		TextItem displayName = ItemFactory.newTextItem("displayname", "displayname", tenant.getDisplayName());
+		TextItem displayName = ItemFactory.newTextItem("displayname", tenant.getDisplayName());
 		displayName.setRequired(true);
 		displayName.setDisabled(readonly);
 		if (!readonly)
 			displayName.addChangedHandler(changedHandler);
 
-		TextItem address = ItemFactory.newTextItem("address", "address", tenant.getStreet());
+		TextItem address = ItemFactory.newTextItem("address", tenant.getStreet());
 		address.setDisabled(readonly);
 		if (!readonly)
 			address.addChangedHandler(changedHandler);
 
-		TextItem postalcode = ItemFactory.newTextItem("postalcode", "postalcode", tenant.getPostalCode());
+		TextItem postalcode = ItemFactory.newTextItem("postalcode", tenant.getPostalCode());
 		postalcode.setDisabled(readonly);
 		if (!readonly)
 			postalcode.addChangedHandler(changedHandler);
 
-		TextItem city = ItemFactory.newTextItem("city", "city", tenant.getCity());
+		TextItem city = ItemFactory.newTextItem("city", tenant.getCity());
 		city.setDisabled(readonly);
 		if (!readonly)
 			city.addChangedHandler(changedHandler);
 
-		TextItem country = ItemFactory.newTextItem("country", "country", tenant.getCountry());
+		TextItem country = ItemFactory.newTextItem("country", tenant.getCountry());
 		country.setDisabled(readonly);
 		if (!readonly)
 			country.addChangedHandler(changedHandler);
 
-		TextItem state = ItemFactory.newTextItem("state", "state", tenant.getState());
+		TextItem state = ItemFactory.newTextItem("state", tenant.getState());
 		state.setDisabled(readonly);
 		if (!readonly)
 			state.addChangedHandler(changedHandler);
 
-		TextItem phone = ItemFactory.newTextItem("phone", "phone", tenant.getTelephone());
+		TextItem phone = ItemFactory.newTextItem("phone", tenant.getTelephone());
 		phone.setDisabled(readonly);
 		if (!readonly)
 			phone.addChangedHandler(changedHandler);

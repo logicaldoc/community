@@ -255,38 +255,37 @@ public class TenantBrandingPanel extends HLayout {
 
 		boolean readonlyOrNotFullBranding = readonly || !fullBranding;
 
-		TextItem product = ItemFactory.newTextItem("product", "product", tenant.getBranding().getProduct());
+		TextItem product = ItemFactory.newTextItem("product", tenant.getBranding().getProduct());
 		product.setWidth(180);
 		product.setDisabled(readonlyOrNotFullBranding);
 		product.addChangedHandler(changedHandler);
 
-		TextItem productName = ItemFactory.newTextItem("productName", "productname",
-				tenant.getBranding().getProductName());
+		TextItem productName = ItemFactory.newTextItem("productname", tenant.getBranding().getProductName());
 		productName.setWidth(180);
 		productName.setDisabled(readonlyOrNotFullBranding);
 		productName.addChangedHandler(changedHandler);
 
-		TextItem vendor = ItemFactory.newTextItem("vendor", "vendor", tenant.getBranding().getVendor());
+		TextItem vendor = ItemFactory.newTextItem("vendor", tenant.getBranding().getVendor());
 		vendor.setWidth(180);
 		vendor.setDisabled(readonlyOrNotFullBranding);
 		vendor.addChangedHandler(changedHandler);
 
-		TextItem address = ItemFactory.newTextItem("address", "address", tenant.getBranding().getVendorAddress());
+		TextItem address = ItemFactory.newTextItem("address", tenant.getBranding().getVendorAddress());
 		address.setWidth(180);
 		address.setDisabled(readonlyOrNotFullBranding);
 		address.addChangedHandler(changedHandler);
 
-		TextItem postalCode = ItemFactory.newTextItem("postalCode", "postalcode", tenant.getBranding().getVendorCap());
+		TextItem postalCode = ItemFactory.newTextItem("postalcode", tenant.getBranding().getVendorCap());
 		postalCode.setWidth(180);
 		postalCode.setDisabled(readonlyOrNotFullBranding);
 		postalCode.addChangedHandler(changedHandler);
 
-		TextItem city = ItemFactory.newTextItem("city", "city", tenant.getBranding().getVendorCity());
+		TextItem city = ItemFactory.newTextItem("city", tenant.getBranding().getVendorCity());
 		city.setWidth(180);
 		city.setDisabled(readonlyOrNotFullBranding);
 		city.addChangedHandler(changedHandler);
 
-		TextItem country = ItemFactory.newTextItem("country", "country", tenant.getBranding().getVendorCountry());
+		TextItem country = ItemFactory.newTextItem("country", tenant.getBranding().getVendorCountry());
 		country.setWidth(180);
 		country.setDisabled(readonlyOrNotFullBranding);
 		country.addChangedHandler(changedHandler);
@@ -302,25 +301,25 @@ public class TenantBrandingPanel extends HLayout {
 		sales.setDisabled(readonlyOrNotFullBranding);
 		sales.addChangedHandler(changedHandler);
 
-		TextItem webSite = ItemFactory.newTextItem("website", "website", tenant.getBranding().getUrl());
+		TextItem webSite = ItemFactory.newTextItem("website", tenant.getBranding().getUrl());
 		webSite.setDisabled(readonlyOrNotFullBranding);
 		webSite.setColSpan(2);
 		webSite.setWidth(360);
 		webSite.addChangedHandler(changedHandler);
 
-		TextItem help = ItemFactory.newTextItem("help", "help", tenant.getBranding().getHelp());
+		TextItem help = ItemFactory.newTextItem("help", tenant.getBranding().getHelp());
 		help.setDisabled(readonlyOrNotFullBranding);
 		help.setColSpan(2);
 		help.setWidth(360);
 		help.addChangedHandler(changedHandler);
 
-		TextItem bugs = ItemFactory.newTextItem("bugs", "bugs", tenant.getBranding().getBugs());
+		TextItem bugs = ItemFactory.newTextItem("bugs", tenant.getBranding().getBugs());
 		bugs.setDisabled(readonlyOrNotFullBranding);
 		bugs.setColSpan(2);
 		bugs.setWidth(360);
 		bugs.addChangedHandler(changedHandler);
 
-		TextItem forum = ItemFactory.newTextItem("forum", "forum", tenant.getBranding().getForum());
+		TextItem forum = ItemFactory.newTextItem("forum", tenant.getBranding().getForum());
 		forum.setDisabled(readonlyOrNotFullBranding);
 		forum.setColSpan(2);
 		forum.setWidth(360);
@@ -481,8 +480,7 @@ public class TenantBrandingPanel extends HLayout {
 		upload.setTitle(I18N.message("uploadnewimage"));
 		upload.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ImageUploader uploader = new ImageUploader(rec.getAttributeAsString("name"),
-						TenantBrandingPanel.this);
+				ImageUploader uploader = new ImageUploader(rec.getAttributeAsString("name"), TenantBrandingPanel.this);
 				uploader.show();
 			}
 		});
@@ -536,10 +534,10 @@ public class TenantBrandingPanel extends HLayout {
 			if (Feature.enabled(Feature.BRANDING_FULL)) {
 				tenant.getBranding().setSkin(skin.getValueAsString());
 				tenant.getBranding().setProduct(vm.getValueAsString("product"));
-				tenant.getBranding().setProductName(vm.getValueAsString("productName"));
+				tenant.getBranding().setProductName(vm.getValueAsString("productname"));
 				tenant.getBranding().setVendor(vm.getValueAsString("vendor"));
 				tenant.getBranding().setVendorAddress(vm.getValueAsString("address"));
-				tenant.getBranding().setVendorCap(vm.getValueAsString("postalCode"));
+				tenant.getBranding().setVendorCap(vm.getValueAsString("postalcode"));
 				tenant.getBranding().setVendorCity(vm.getValueAsString("city"));
 				tenant.getBranding().setVendorCountry(vm.getValueAsString("country"));
 				tenant.getBranding().setUrl(vm.getValueAsString("website"));

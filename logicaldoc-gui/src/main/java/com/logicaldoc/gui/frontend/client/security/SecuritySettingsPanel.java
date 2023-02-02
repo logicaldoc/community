@@ -189,7 +189,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		forceSsl.setRequired(true);
 		forceSsl.setDisabled(Session.get().isDemo());
 
-		final TextItem contentSecurityPolicy = ItemFactory.newTextItem("contentsecuritypolicy", "contentsecuritypolicy",
+		final TextItem contentSecurityPolicy = ItemFactory.newTextItem("contentsecuritypolicy",
 				settings.getContentSecurityPolicy());
 		contentSecurityPolicy.setHint(I18N.message("contentsecuritypolicyhint"));
 		contentSecurityPolicy.setWidth(400);
@@ -287,22 +287,21 @@ public class SecuritySettingsPanel extends AdminPanel {
 	}
 
 	private void doSaveSettings() {
-		SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings,
-				new AsyncCallback<Boolean>() {
+		SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings, new AsyncCallback<Boolean>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Boolean restartRequired) {
-						GuiLog.info(I18N.message("settingssaved"), null);
+			@Override
+			public void onSuccess(Boolean restartRequired) {
+				GuiLog.info(I18N.message("settingssaved"), null);
 
-						if (restartRequired.booleanValue())
-							SC.warn(I18N.message("needrestart"));
-					}
-				});
+				if (restartRequired.booleanValue())
+					SC.warn(I18N.message("needrestart"));
+			}
+		});
 	}
 
 	private ButtonItem prepareGeneratePasswordButton(DynamicForm passwordForm) {

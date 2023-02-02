@@ -144,7 +144,7 @@ public class VIASettingsPanel extends AdminPanel {
 				account.getPassword());
 		password.setWidth(180);
 
-		TextItem server = ItemFactory.newTextItem("server", "server", account.getHost());
+		TextItem server = ItemFactory.newTextItem("server", account.getHost());
 		server.setWidth(180);
 
 		IntegerItem port = ItemFactory.newIntegerItem("port", "port", account.getPort());
@@ -156,7 +156,7 @@ public class VIASettingsPanel extends AdminPanel {
 		SelectItem protocol = ItemFactory.newEmailProtocolSelector("protocol", "protocol");
 		protocol.setValue(account.getProvider());
 
-		TextItem folder = ItemFactory.newTextItem("mailfolder", "mailfolder", account.getMailFolder());
+		TextItem folder = ItemFactory.newTextItem("mailfolder", account.getMailFolder());
 
 		ButtonItem resetCache = prepareResetCacheButton();
 
@@ -166,7 +166,7 @@ public class VIASettingsPanel extends AdminPanel {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", account.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", account.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
 		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
 				account.getPassword());

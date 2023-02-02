@@ -61,14 +61,14 @@ public class GroupPropertiesPanel extends HLayout {
 		if (readonly || group.getId() != 0) {
 			// In case of already existing group we do not need to enforce any
 			// validation
-			name = ItemFactory.newTextItem("name", "name", group.getName());
+			name = ItemFactory.newTextItem("name", group.getName());
 			name.setDisabled(true);
 		}
 		name.setRequired(true);
 		if (!readonly)
 			name.addChangedHandler(changedHandler);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", group.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", group.getDescription());
 		description.setDisabled(readonly);
 		if (!readonly)
 			description.addChangedHandler(changedHandler);

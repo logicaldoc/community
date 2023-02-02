@@ -62,8 +62,7 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 		name.addChangedHandler(changedHandler);
 		name.setDisabled(routine.getId() != 0L);
 
-		TextItem description = ItemFactory.newTextItem("description", I18N.message("description"),
-				routine.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", routine.getDescription());
 		description.addChangedHandler(changedHandler);
 		description.setWidth(200);
 

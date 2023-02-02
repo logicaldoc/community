@@ -50,7 +50,7 @@ public class ResetPassword extends Window {
 		DynamicForm form = new DynamicForm();
 		form.setMargin(5);
 		form.setValuesManager(vm);
-		TextItem username = ItemFactory.newTextItem("username", "username", "");
+		TextItem username = ItemFactory.newTextItem("username", "");
 		username.setRequired(true);
 		TextItem email = ItemFactory.newEmailItem("email", "email", false);
 		email.setRequired(true);

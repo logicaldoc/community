@@ -50,7 +50,7 @@ public class ZohoCheckin extends Window {
 		versionItem.setName("majorversion");
 		versionItem.setTitle(I18N.message("majorversion"));
 
-		TextItem commentItem = ItemFactory.newTextItem("comment", "comment", null);
+		TextItem commentItem = ItemFactory.newTextItem("comment", null);
 		commentItem.setRequired(true);
 		commentItem.setWidth(240);
 

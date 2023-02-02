@@ -371,7 +371,7 @@ public class Setup implements EntryPoint {
 		regEmail.setWidth(300);
 
 		SelectItem languageItem = ItemFactory.newLanguageSelector(LANGUAGE, false, true);
-		languageItem.setTitle(I18N.message("language"));
+		languageItem.setTitle(I18N.message(LANGUAGE));
 		languageItem.setRequired(true);
 
 		final DynamicForm regForm = new DynamicForm();

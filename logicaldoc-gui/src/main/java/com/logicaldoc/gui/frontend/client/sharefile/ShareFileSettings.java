@@ -49,20 +49,20 @@ public class ShareFileSettings extends Window {
 	}
 
 	private void initGUI(String[] settings) {
-		TextItem clientId = ItemFactory.newTextItem("clientId", "clientid", settings[0]);
+		TextItem clientId = ItemFactory.newTextItem("clientid", settings[0]);
 		clientId.setRequired(true);
 		clientId.setWidth(300);
 
-		TextItem clientSecret = ItemFactory.newTextItem("clientSecret", "clientsecret", settings[1]);
+		TextItem clientSecret = ItemFactory.newTextItem("clientsecret", settings[1]);
 		clientSecret.setRequired(true);
 		clientSecret.setWidth(300);
 
-		TextItem authBaseUrl = ItemFactory.newTextItem("authBaseUrl", "authbaseurl", settings[2]);
+		TextItem authBaseUrl = ItemFactory.newTextItem("authbaseurl", settings[2]);
 		authBaseUrl.setRequired(true);
 		authBaseUrl.setDisabled(true);
 		authBaseUrl.setWidth(300);
 
-		TextItem callbackUrl = ItemFactory.newTextItem("callbackUrl", "callbackurl", settings[3]);
+		TextItem callbackUrl = ItemFactory.newTextItem("callbackurl", settings[3]);
 		callbackUrl.setRequired(false);
 		callbackUrl.setDisabled(true);
 		callbackUrl.setWidth(300);
@@ -88,8 +88,8 @@ public class ShareFileSettings extends Window {
 		if (!form.validate())
 			return;
 
-		ShareFileService.Instance.get().authorize(form.getValueAsString("clientId"),
-				form.getValueAsString("clientSecret"), new AsyncCallback<String>() {
+		ShareFileService.Instance.get().authorize(form.getValueAsString("clientid"),
+				form.getValueAsString("clientsecret"), new AsyncCallback<String>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

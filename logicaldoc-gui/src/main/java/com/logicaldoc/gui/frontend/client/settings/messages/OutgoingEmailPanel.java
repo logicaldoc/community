@@ -52,7 +52,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		emailForm.setTitleOrientation(TitleOrientation.LEFT);
 
 		// SMTP Server
-		TextItem smtpServer = ItemFactory.newTextItem("smtpServer", "smtpserver", this.emailSettings.getSmtpServer());
+		TextItem smtpServer = ItemFactory.newTextItem("smtpserver", this.emailSettings.getSmtpServer());
 		smtpServer.setRequired(true);
 		smtpServer.setWidth(350);
 		smtpServer.setWrapTitle(false);
@@ -74,7 +74,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 
 		// Connection Security
 		SelectItem connSecurity = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put(GUIEmailSettings.SECURITY_NONE, I18N.message("none"));
 		opts.put(GUIEmailSettings.SECURITY_STARTTLS, I18N.message("starttls"));
 		opts.put(GUIEmailSettings.SECURITY_TLS, I18N.message("tls"));
@@ -130,8 +130,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
-				this.emailSettings.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", this.emailSettings.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
 		fakeUsername.setTitleStyle("nodisplay");
 		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
@@ -163,9 +162,9 @@ public class OutgoingEmailPanel extends AdminPanel {
 							}
 
 							@Override
-							public void onSuccess(Boolean result) {
+							public void onSuccess(Boolean yes) {
 								LD.clearPrompt();
-								if (result.booleanValue())
+								if (yes.booleanValue())
 									SC.say(I18N.message("connectionestablished"));
 								else
 									SC.warn(I18N.message("connectionfailed"));
@@ -187,7 +186,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpServer"));
+			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpserver"));
 			if (values.get("port") instanceof Integer)
 				OutgoingEmailPanel.this.emailSettings.setPort((Integer) values.get("port"));
 			else

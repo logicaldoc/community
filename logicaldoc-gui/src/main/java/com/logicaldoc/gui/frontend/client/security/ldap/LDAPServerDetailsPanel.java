@@ -92,33 +92,32 @@ public class LDAPServerDetailsPanel extends VLayout {
 		SelectItem userType = ItemFactory.newUserTypeSelector("usertype", this.server.getUserType());
 
 		// Realm
-		TextItem realm = ItemFactory.newTextItem("realm", "realm", this.server.getRealm());
+		TextItem realm = ItemFactory.newTextItem("realm", this.server.getRealm());
 		realm.setWidth(300);
 
 		// User identifier attr.
-		TextItem userIdentifierAttr = ItemFactory.newTextItem("useridentifierattr", "useridentifierattr",
+		TextItem userIdentifierAttr = ItemFactory.newTextItem("useridentifierattr",
 				this.server.getUserIdentifierAttr());
 		userIdentifierAttr.setWidth(300);
 
 		// Group identifier attr.
-		TextItem grpIdentifierAttr = ItemFactory.newTextItem("grpidentifierattr", "grpidentifierattr",
-				this.server.getGroupIdentifierAttr());
+		TextItem grpIdentifierAttr = ItemFactory.newTextItem("grpidentifierattr", this.server.getGroupIdentifierAttr());
 		grpIdentifierAttr.setWidth(300);
 
 		// Logon attr.
-		TextItem logonAttr = ItemFactory.newTextItem("logonattr", "logonattr", this.server.getLogonAttr());
+		TextItem logonAttr = ItemFactory.newTextItem("logonattr", this.server.getLogonAttr());
 		logonAttr.setWidth(300);
 
 		// User class
-		TextItem userClass = ItemFactory.newTextItem("userclass", "userclass", this.server.getUserClass());
+		TextItem userClass = ItemFactory.newTextItem("userclass", this.server.getUserClass());
 		userClass.setWidth(300);
 
 		// Group class
-		TextItem groupClass = ItemFactory.newTextItem("grpclass", "grpclass", this.server.getGroupClass());
+		TextItem groupClass = ItemFactory.newTextItem("grpclass", this.server.getGroupClass());
 		groupClass.setWidth(300);
 
 		// Users base node
-		TextItem usersBaseNode = ItemFactory.newTextItem("usersbasenode", "usersbasenode", this.server.getUserNodes());
+		TextItem usersBaseNode = ItemFactory.newTextItem("usersbasenode", this.server.getUserNodes());
 		usersBaseNode.setWidth(300);
 
 		// User filters
@@ -130,7 +129,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		userExclude.setWidth(300);
 
 		// Groups base node
-		TextItem groupsBaseNode = ItemFactory.newTextItem("grpsbasenode", "grpsbasenode", this.server.getGroupNodes());
+		TextItem groupsBaseNode = ItemFactory.newTextItem("grpsbasenode", this.server.getGroupNodes());
 		groupsBaseNode.setWidth(300);
 
 		// Group filters
@@ -184,8 +183,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
-				this.server.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", this.server.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
 		PasswordItem hiddenPassword = ItemFactory.newPasswordItem("password_hidden", "password_hidden",
 				this.server.getPassword());
@@ -236,7 +234,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 			if (!vm.validate())
 				return;
-			
+
 			@SuppressWarnings("unchecked")
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 

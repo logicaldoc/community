@@ -64,7 +64,6 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -100,7 +99,7 @@ public class SearchIndexingPanel extends AdminPanel {
 	private RefreshableListGrid docsList;
 
 	private ListGrid langsList;
-	
+
 	private ListGrid filtersGrid;
 
 	public SearchIndexingPanel() {
@@ -207,22 +206,22 @@ public class SearchIndexingPanel extends AdminPanel {
 		parsersList.setModalEditing(true);
 
 		parsersList.addEditCompleteHandler((EditCompleteEvent event) -> {
-				ListGridRecord rec = parsersList.getRecord(event.getRowNum());
+			ListGridRecord rec = parsersList.getRecord(event.getRowNum());
 
-				SearchEngineService.Instance.get().setAliases(rec.getAttributeAsString("extension"),
-						(String) event.getNewValues().get("aliases"), new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+			SearchEngineService.Instance.get().setAliases(rec.getAttributeAsString("extension"),
+					(String) event.getNewValues().get("aliases"), new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void ret) {
-								parsersList.invalidateCache();
-								parsersList.getDataSource().invalidateCache();
-								parsersList.redraw();
-							}
-						});
+						@Override
+						public void onSuccess(Void ret) {
+							parsersList.invalidateCache();
+							parsersList.getDataSource().invalidateCache();
+							parsersList.redraw();
+						}
+					});
 		});
 
 		parsersInfoTabPanel.addMember(parsersList);
@@ -267,8 +266,8 @@ public class SearchIndexingPanel extends AdminPanel {
 
 		if (Feature.enabled(Feature.INDEX_LANGUAGES))
 			langsList.addCellContextClickHandler((CellContextClickEvent event) -> {
-					showLanguagesMenu();
-					event.cancel();
+				showLanguagesMenu();
+				event.cancel();
 			});
 
 		return languagesTab;
@@ -348,7 +347,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		});
 		return filtersTab;
 	}
-	
+
 	private Canvas buildFiltersGridExpansionComponent(ListGridRecord rec) {
 		String filter = rec.getAttributeAsString("name");
 
@@ -378,32 +377,31 @@ public class SearchIndexingPanel extends AdminPanel {
 		IButton saveButton = new IButton(I18N.message("save"));
 		saveButton.setTop(250);
 		saveButton.addClickHandler((ClickEvent event) -> {
-				final List<GUIParameter> params = new ArrayList<GUIParameter>();
-				ListGridRecord[] records = configsGrid.getRecords();
-				for (ListGridRecord recd : records) {
-					params.add(new GUIParameter(recd.getAttributeAsString("name"),
-							recd.getAttributeAsString("value")));
-				}
+			final List<GUIParameter> params = new ArrayList<GUIParameter>();
+			ListGridRecord[] records = configsGrid.getRecords();
+			for (ListGridRecord recd : records) {
+				params.add(new GUIParameter(recd.getAttributeAsString("name"), recd.getAttributeAsString("value")));
+			}
 
-				SearchEngineService.Instance.get().saveTokenFilterSettings(filter,
-						params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+			SearchEngineService.Instance.get().saveTokenFilterSettings(filter, params.toArray(new GUIParameter[0]),
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void arg) {
-								// Nothing to do
-							}
-						});
+						@Override
+						public void onSuccess(Void arg) {
+							// Nothing to do
+						}
+					});
 		});
 		hLayout.addMember(saveButton);
 
 		IButton closeButton = new IButton(I18N.message("close"));
 		closeButton.addClickHandler((ClickEvent event) -> {
-				filtersGrid.collapseRecord(rec);
+			filtersGrid.collapseRecord(rec);
 		});
 		hLayout.addMember(closeButton);
 
@@ -458,36 +456,34 @@ public class SearchIndexingPanel extends AdminPanel {
 		status.setRedrawOnChange(true);
 
 		// Include Patters
-		TextItem includePatterns = ItemFactory.newTextItem("includePatterns", "includepatterns", null);
+		TextItem includePatterns = ItemFactory.newTextItem("includepatterns", null);
 		includePatterns.setValue(this.searchEngine.getIncludePatters());
 		includePatterns.setHint(I18N.message("separatedcomma"));
 		includePatterns.setHintStyle("hint");
 		includePatterns.setWidth(300);
 
 		// Exclude Patters
-		TextItem excludePatterns = ItemFactory.newTextItem("excludePatterns", "excludepatterns", null);
+		TextItem excludePatterns = ItemFactory.newTextItem("excludepatterns", null);
 		excludePatterns.setValue(this.searchEngine.getExcludePatters());
 		excludePatterns.setHint(I18N.message("separatedcomma"));
 		excludePatterns.setHintStyle("hint");
 		excludePatterns.setWidth(300);
 
 		// Include Patters
-		TextItem includePatternsMetadata = ItemFactory.newTextItem("includePatternsMetadata", "includepatternsmetadata",
-				null);
+		TextItem includePatternsMetadata = ItemFactory.newTextItem("includepatternsmetadata", null);
 		includePatternsMetadata.setValue(this.searchEngine.getIncludePattersMetadata());
 		includePatternsMetadata.setHint(I18N.message("separatedcomma"));
 		includePatternsMetadata.setHintStyle("hint");
 		includePatternsMetadata.setWidth(300);
 
 		// Exclude Patters
-		TextItem excludePatternsMetadata = ItemFactory.newTextItem("excludePatternsMetadata", "excludepatternsmetadata",
-				null);
+		TextItem excludePatternsMetadata = ItemFactory.newTextItem("excludepatternsmetadata", null);
 		excludePatternsMetadata.setValue(this.searchEngine.getExcludePatternsMetadata());
 		excludePatternsMetadata.setHint(I18N.message("separatedcomma"));
 		excludePatternsMetadata.setHintStyle("hint");
 		excludePatternsMetadata.setWidth(300);
 
-		SelectItem sorting = ItemFactory.newSelectItem("sorting", "sorting");
+		SelectItem sorting = ItemFactory.newSelectItem("sorting");
 		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
 		opts.put("", I18N.message("none").toLowerCase());
 		opts.put("oldestfirst", I18N.message("oldestfirst"));
@@ -500,8 +496,7 @@ public class SearchIndexingPanel extends AdminPanel {
 				this.searchEngine.getCustomSorting() != null && !this.searchEngine.getCustomSorting().isEmpty());
 		sorting.setVisible(Session.get().isDefaultTenant());
 
-		TextItem customSorting = ItemFactory.newTextItem("customsorting", "customsorting",
-				this.searchEngine.getCustomSorting());
+		TextItem customSorting = ItemFactory.newTextItem("customsorting", this.searchEngine.getCustomSorting());
 		customSorting.setWidth(300);
 		customSorting.addChangeHandler((ChangeEvent changeEvent) -> {
 			sorting.setDisabled(changeEvent.getValue() != null && !changeEvent.getValue().toString().isEmpty());
@@ -546,7 +541,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		maxTextFileSize.setStep(1048);
 
 		// Repository
-		TextItem repository = ItemFactory.newTextItem("repository", "repository", null);
+		TextItem repository = ItemFactory.newTextItem("repository", null);
 		repository.setValue(this.searchEngine.getDir());
 		repository.setWidth(300);
 		repository.setVisible(Session.get().isDefaultTenant());
@@ -593,21 +588,21 @@ public class SearchIndexingPanel extends AdminPanel {
 		purge.setAutoFit(true);
 		purge.addClickHandler((ClickEvent purgeClick) -> {
 			SC.ask(I18N.message("purgeconfirmation"), (Boolean yes) -> {
-					if (yes) {
-						LD.contactingServer();
-						SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								GuiLog.serverError(caught);
-							}
+				if (yes) {
+					LD.contactingServer();
+					SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void ret) {
-								LD.clearPrompt();
-							}
-						});
-					}
+						@Override
+						public void onSuccess(Void ret) {
+							LD.clearPrompt();
+						}
+					});
+				}
 			});
 		});
 		return purge;
@@ -751,12 +746,12 @@ public class SearchIndexingPanel extends AdminPanel {
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> values = vm.getValues();
 
-		SearchIndexingPanel.this.searchEngine.setIncludePatterns((String) values.get("includePatterns"));
-		SearchIndexingPanel.this.searchEngine.setExcludePatterns((String) values.get("excludePatterns"));
+		SearchIndexingPanel.this.searchEngine.setIncludePatterns((String) values.get("includepatterns"));
+		SearchIndexingPanel.this.searchEngine.setExcludePatterns((String) values.get("excludepatterns"));
 		SearchIndexingPanel.this.searchEngine
-				.setIncludePatternsMetadata((String) values.get("includePatternsMetadata"));
+				.setIncludePatternsMetadata((String) values.get("includepatternsmetadata"));
 		SearchIndexingPanel.this.searchEngine
-				.setExcludePatternsMetadata((String) values.get("excludePatternsMetadata"));
+				.setExcludePatternsMetadata((String) values.get("excludepatternsmetadata"));
 		SearchIndexingPanel.this.searchEngine.setDir((String) values.get("repository"));
 		SearchIndexingPanel.this.searchEngine.setSorting((String) values.get("sorting"));
 		SearchIndexingPanel.this.searchEngine.setCustomSorting((String) values.get("customsorting"));

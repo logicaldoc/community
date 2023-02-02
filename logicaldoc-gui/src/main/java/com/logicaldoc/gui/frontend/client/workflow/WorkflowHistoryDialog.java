@@ -74,7 +74,7 @@ public class WorkflowHistoryDialog extends Window {
 		if (selectedWorkflow != null)
 			workflow.setValue(selectedWorkflow.getName());
 
-		final TextItem tagItem = ItemFactory.newTextItem("tag", "tag", null);
+		final TextItem tagItem = ItemFactory.newTextItem("tag", null);
 
 		max = ItemFactory.newSpinnerItem("max", "display", 50);
 		max.setMin(0);
