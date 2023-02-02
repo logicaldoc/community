@@ -170,7 +170,7 @@ public class AccountMenu extends Menu {
 				cp.show();
 			}
 		});
-		changePswd.setEnabled(!Session.get().isDemo());
+		changePswd.setEnabled(!Session.get().isDemo() && Session.get().getUser().getSource() == 0);
 
 		MenuItem lastLogins = new MenuItem(I18N.message("lastlogins"));
 		lastLogins.addClickHandler(new ClickHandler() {

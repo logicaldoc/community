@@ -274,6 +274,9 @@ public class ItemFactory {
 		RichTextItem.setDefaultProperties(richTextItem);
 	}
 
+	private ItemFactory() {
+	}
+
 	public static ColorPickerItem newColorItemPicker(String name, String title, String value, boolean clearOption,
 			ChangedHandler changedHandler) {
 		ColorPickerItem item = new ColorPickerItem(filterItemName(name));
@@ -1287,7 +1290,7 @@ public class ItemFactory {
 		item.setRequiredMessage(I18N.message("fieldrequired"));
 		return item;
 	}
-	
+
 	/**
 	 * Creates a new TextItem.
 	 * 

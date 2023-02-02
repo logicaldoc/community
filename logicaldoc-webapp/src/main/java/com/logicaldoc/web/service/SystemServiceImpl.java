@@ -88,6 +88,8 @@ import com.logicaldoc.web.websockets.WebsocketTool;
  */
 public class SystemServiceImpl extends AbstractRemoteService implements SystemService {
 
+	private static final String AND = " and ";
+
 	private static final String SECONDS = "seconds";
 
 	private static final String TRASH = "trash";
@@ -674,21 +676,21 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	private void appendDatesCondition(String tableAlias, Date from, Date till, StringBuilder query) {
 		if (from != null) {
-			query.append(" and " + tableAlias + ".ld_date > '" + new Timestamp(from.getTime()) + "' ");
+			query.append(AND + tableAlias + ".ld_date > '" + new Timestamp(from.getTime()) + "' ");
 		}
 		if (till != null) {
-			query.append(" and " + tableAlias + ".ld_date < '" + new Timestamp(till.getTime()) + "' ");
+			query.append(AND + tableAlias + ".ld_date < '" + new Timestamp(till.getTime()) + "' ");
 		}
 	}
 
 	private void appendSessionCondition(String tableAlias, String historySid, StringBuilder query) {
 		if (historySid != null && StringUtils.isNotEmpty(historySid))
-			query.append(" and " + tableAlias + ".ld_sessionid='" + historySid + "' ");
+			query.append(AND + tableAlias + ".ld_sessionid='" + historySid + "' ");
 	}
 
 	private void appendUserCondition(String tableAlias, Long userId, StringBuilder query) {
 		if (userId != null)
-			query.append(" and " + tableAlias + ".ld_userid = " + userId);
+			query.append(AND + tableAlias + ".ld_userid = " + userId);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -751,7 +753,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 					.append(tree.stream().map(id -> "(" + Long.toString(id) + ",0)").collect(Collectors.joining(",")));
 			folderPredicate.append(" )");
 		} else {
-			folderPredicate.append(" and " + tableAlias + ".ld_folderid in ( ");
+			folderPredicate.append(AND + tableAlias + ".ld_folderid in ( ");
 			folderPredicate.append(tree.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
 			folderPredicate.append(" )");
 		}

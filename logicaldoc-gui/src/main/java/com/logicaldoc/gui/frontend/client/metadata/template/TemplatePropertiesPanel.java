@@ -22,7 +22,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
-import com.smartgwt.client.widgets.events.DropCompleteHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
@@ -36,7 +35,6 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -52,6 +50,26 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class TemplatePropertiesPanel extends HLayout {
 
+	private static final String DEPENDS_ON = "dependsOn";
+
+	private static final String INITIALIZATION = "initialization";
+
+	private static final String VALIDATION = "validation";
+
+	private static final String EDITOR = "editor";
+
+	private static final String SET_ID = "setId";
+
+	private static final String MULTIPLE = "multiple";
+
+	private static final String READONLY = "readonly";
+
+	private static final String HIDDEN = "hidden";
+
+	private static final String MANDATORY = "mandatory";
+
+	private static final String LABEL = "label";
+
 	protected DynamicForm templateForm = new DynamicForm();
 
 	protected ValuesManager vm = new ValuesManager();
@@ -66,8 +84,7 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	private HLayout container = new HLayout();
 
-	public TemplatePropertiesPanel(GUITemplate template, ChangedHandler changedHandler,
-			TemplateDetailsPanel detailsPanel) {
+	public TemplatePropertiesPanel(GUITemplate template, ChangedHandler changedHandler) {
 		if (template == null) {
 			setMembers(TemplatesPanel.SELECT_TEMPLATE);
 			return;
@@ -92,18 +109,18 @@ public class TemplatePropertiesPanel extends HLayout {
 
 			GUIAttribute att = new GUIAttribute();
 			att.setName(rec.getAttributeAsString("name"));
-			att.setLabel(rec.getAttributeAsString("label"));
+			att.setLabel(rec.getAttributeAsString(LABEL));
 			att.setType(Integer.parseInt(rec.getAttributeAsString("type")));
 			att.setSet(rec.getAttributeAsString("set"));
-			att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
-			att.setHidden(rec.getAttributeAsBoolean("hidden"));
-			att.setReadonly(rec.getAttributeAsBoolean("readonly"));
-			att.setMultiple(rec.getAttributeAsBoolean("multiple"));
-			att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
-			att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
-			att.setValidation(rec.getAttributeAsString("validation"));
-			att.setInitialization(rec.getAttributeAsString("initialization"));
-			att.setDependsOn(rec.getAttributeAsString("dependsOn"));
+			att.setMandatory(rec.getAttributeAsBoolean(MANDATORY));
+			att.setHidden(rec.getAttributeAsBoolean(HIDDEN));
+			att.setReadonly(rec.getAttributeAsBoolean(READONLY));
+			att.setMultiple(rec.getAttributeAsBoolean(MULTIPLE));
+			att.setSetId(Long.parseLong(rec.getAttributeAsString(SET_ID)));
+			att.setEditor(Integer.parseInt(rec.getAttributeAsString(EDITOR)));
+			att.setValidation(rec.getAttributeAsString(VALIDATION));
+			att.setInitialization(rec.getAttributeAsString(INITIALIZATION));
+			att.setDependsOn(rec.getAttributeAsString(DEPENDS_ON));
 
 			template.appendAttribute(att);
 
@@ -139,14 +156,10 @@ public class TemplatePropertiesPanel extends HLayout {
 		attributesList.setShowRecordComponents(true);
 		attributesList.setShowRecordComponentsByCell(true);
 
-		attributesList.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				if (!TemplatePropertiesPanel.this.template.isReadonly()
-						&& TemplatePropertiesPanel.this.template.isWrite())
-					showContextMenu();
-				event.cancel();
-			}
+		attributesList.addCellContextClickHandler((CellContextClickEvent event) -> {
+			if (!TemplatePropertiesPanel.this.template.isReadonly() && TemplatePropertiesPanel.this.template.isWrite())
+				showContextMenu();
+			event.cancel();
 		});
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
@@ -155,7 +168,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		name.setAutoFitWidth(true);
 		name.setMinWidth(80);
 
-		ListGridField label = new ListGridField("label", I18N.message("label"));
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL));
 		label.setCanEdit(false);
 		label.setCanSort(false);
 		label.setAutoFitWidth(true);
@@ -167,25 +180,25 @@ public class TemplatePropertiesPanel extends HLayout {
 		set.setHidden(true);
 		set.setWidth("*");
 
-		ListGridField mandatory = new ListGridField("mandatory", I18N.message("mandatory"));
+		ListGridField mandatory = new ListGridField(MANDATORY, I18N.message(MANDATORY));
 		mandatory.setCanEdit(false);
 		mandatory.setCanSort(false);
 		mandatory.setAutoFitWidth(true);
 		mandatory.setMinWidth(70);
 
-		ListGridField hidden = new ListGridField("hidden", I18N.message("hidden"));
+		ListGridField hidden = new ListGridField(HIDDEN, I18N.message(HIDDEN));
 		hidden.setCanEdit(false);
 		hidden.setCanSort(false);
 		hidden.setAutoFitWidth(true);
 		hidden.setMinWidth(70);
 
-		ListGridField multiple = new ListGridField("multiple", I18N.message("multiple"));
+		ListGridField multiple = new ListGridField(MULTIPLE, I18N.message(MULTIPLE));
 		multiple.setCanEdit(false);
 		multiple.setCanSort(false);
 		multiple.setAutoFitWidth(true);
 		multiple.setMinWidth(70);
 
-		ListGridField readonly = new ListGridField("readonly", I18N.message("readonly"));
+		ListGridField readonly = new ListGridField(READONLY, I18N.message(READONLY));
 		readonly.setCanEdit(false);
 		readonly.setCanSort(false);
 		readonly.setAutoFitWidth(true);
@@ -204,25 +217,21 @@ public class TemplatePropertiesPanel extends HLayout {
 		preset.setAutoFitWidth(true);
 		preset.setMinWidth(70);
 
-		ListGridField dependsOn = new ListGridField("dependsOn", I18N.message("dependson"));
+		ListGridField dependsOn = new ListGridField(DEPENDS_ON, I18N.message("dependson"));
 		dependsOn.setCanEdit(false);
 		dependsOn.setCanSort(false);
 		dependsOn.setAutoFitWidth(true);
 		dependsOn.setMinWidth(70);
 
-		attributesList.addDropCompleteHandler(new DropCompleteHandler() {
-
-			@Override
-			public void onDropComplete(DropCompleteEvent event) {
-				List<String> attributes = new ArrayList<String>();
-				for (int i = 0; i < attributesList.getTotalRows(); i++) {
-					ListGridRecord record = attributesList.getRecord(i);
-					attributes.add(record.getAttributeAsString("name"));
-				}
-
-				TemplatePropertiesPanel.this.template.reorderAttributes(attributes);
-				changedHandler.onChanged(null);
+		attributesList.addDropCompleteHandler((DropCompleteEvent event) -> {
+			List<String> attributes = new ArrayList<String>();
+			for (int i = 0; i < attributesList.getTotalRows(); i++) {
+				ListGridRecord record = attributesList.getRecord(i);
+				attributes.add(record.getAttributeAsString("name"));
 			}
+
+			TemplatePropertiesPanel.this.template.reorderAttributes(attributes);
+			changedHandler.onChanged(null);
 		});
 
 		attributesList.setFields(name, label, type, mandatory, hidden, readonly, multiple, preset, dependsOn, set);
@@ -230,13 +239,9 @@ public class TemplatePropertiesPanel extends HLayout {
 		Button addAttributes = new Button(I18N.message("addattributes"));
 		addAttributes.setMargin(2);
 		addAttributes.setHeight(30);
-		addAttributes.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				AddTemplateAttributeDialog dialog = new AddTemplateAttributeDialog(TemplatePropertiesPanel.this);
-				dialog.show();
-			}
+		addAttributes.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			AddTemplateAttributeDialog dialog = new AddTemplateAttributeDialog(TemplatePropertiesPanel.this);
+			dialog.show();
 		});
 
 		SectionStack attributesStack = new SectionStack();
@@ -292,17 +297,15 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareDependsOnItem() {
 		MenuItem dependsOn = new MenuItem();
 		dependsOn.setTitle(I18N.message("dependson"));
-		dependsOn.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
+		dependsOn.addClickHandler((MenuItemClickEvent event) -> {
 				ListGridRecord selection = attributesList.getSelectedRecord();
-				LD.askForString("dependson", "attributename", selection.getAttributeAsString("dependsOn"),
+				LD.askForString("dependson", "attributename", selection.getAttributeAsString(DEPENDS_ON),
 						(String value) -> {
 							ListGridRecord selectedRecord = attributesList.getSelectedRecord();
-							selectedRecord.setAttribute("dependsOn", value);
+							selectedRecord.setAttribute(DEPENDS_ON, value);
 							if (changedHandler != null)
 								changedHandler.onChanged(null);
 						});
-			}
 		});
 		dependsOn.setEnabled(attributesList.getSelectedRecord().getAttributeAsBoolean("preset"));
 		return dependsOn;
@@ -313,7 +316,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		resetInitialization.setTitle(I18N.message("resetinitialization"));
 		resetInitialization.addClickHandler((MenuItemClickEvent event) -> {
 			LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"), (Boolean yes) -> {
-				if (yes) 
+				if (yes)
 					resetInitialization();
 			});
 		});
@@ -322,7 +325,7 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	private void resetInitialization() {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
-		
+
 		LD.contactingServer();
 		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
 
@@ -341,17 +344,17 @@ public class TemplatePropertiesPanel extends HLayout {
 
 				for (ListGridRecord record : selection) {
 					GUIAttribute setAttribute = null;
-					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
+					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong(SET_ID));
 					if (set != null)
 						setAttribute = set.getAttribute(record.getAttributeAsString("name"));
 
 					if (setAttribute != null) {
 						template.getAttribute(record.getAttributeAsString("name"))
 								.setInitialization(setAttribute.getInitialization());
-						record.setAttribute("initialization", setAttribute.getInitialization());
+						record.setAttribute(INITIALIZATION, setAttribute.getInitialization());
 					} else {
 						template.getAttribute(record.getAttributeAsString("name")).setInitialization(null);
-						record.setAttribute("initialization", (String) null);
+						record.setAttribute(INITIALIZATION, (String) null);
 					}
 				}
 
@@ -363,18 +366,18 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	private MenuItem prepareInitializationItem() {
 		MenuItem initialization = new MenuItem();
-		initialization.setTitle(I18N.message("initialization"));
+		initialization.setTitle(I18N.message(INITIALIZATION));
 		initialization.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
-			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation("initialization",
-					"initialization", null, null, false);
+			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation(INITIALIZATION, INITIALIZATION,
+					null, null, false);
 			initializationItem.setWidth(600);
 			initializationItem.setHeight(400);
 
 			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
 
-			LD.askForValue(I18N.message("initialization"), I18N.message("initialization"),
-					attribute.getInitialization(), initializationItem, 600, (String initializationScript) -> {
+			LD.askForValue(I18N.message(INITIALIZATION), I18N.message(INITIALIZATION), attribute.getInitialization(),
+					initializationItem, 600, (String initializationScript) -> {
 						attribute.setInitialization(initializationScript);
 						fillAttributesList();
 						if (changedHandler != null)
@@ -400,17 +403,17 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	private MenuItem prepareValidationItem() {
 		MenuItem validation = new MenuItem();
-		validation.setTitle(I18N.message("validation"));
+		validation.setTitle(I18N.message(VALIDATION));
 		validation.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
-			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation("validation", "validation", null,
-					null, false);
+			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation(VALIDATION, VALIDATION, null, null,
+					false);
 			validationItem.setWidth(600);
 			validationItem.setHeight(400);
 
 			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
 
-			LD.askForValue(I18N.message("validation"), I18N.message("validation"), attribute.getValidation(),
+			LD.askForValue(I18N.message(VALIDATION), I18N.message(VALIDATION), attribute.getValidation(),
 					validationItem, 600, (String validationScript) -> {
 						attribute.setValidation(validationScript);
 						fillAttributesList();
@@ -536,9 +539,7 @@ public class TemplatePropertiesPanel extends HLayout {
 				names[i] = selection[i].getAttribute("name");
 			}
 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-				@Override
-				public void execute(Boolean yes) {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
 					if (yes) {
 						for (String attrName : names)
 							template.removeAttribute(attrName);
@@ -546,7 +547,6 @@ public class TemplatePropertiesPanel extends HLayout {
 						if (TemplatePropertiesPanel.this.changedHandler != null)
 							TemplatePropertiesPanel.this.changedHandler.onChanged(null);
 					}
-				}
 			});
 		});
 		return delete;
@@ -567,19 +567,19 @@ public class TemplatePropertiesPanel extends HLayout {
 			GUIAttribute att = attributes[i];
 			ListGridRecord record = new ListGridRecord();
 			record.setAttribute("name", att.getName());
-			record.setAttribute("label", att.getLabel());
+			record.setAttribute(LABEL, att.getLabel());
 			record.setAttribute("set", att.getSet());
-			record.setAttribute("setId", att.getSetId());
+			record.setAttribute(SET_ID, att.getSetId());
 			record.setAttribute("type", att.getType());
-			record.setAttribute("editor", att.getEditor());
-			record.setAttribute("mandatory", att.isMandatory());
-			record.setAttribute("hidden", att.isHidden());
-			record.setAttribute("readonly", att.isReadonly());
-			record.setAttribute("multiple", att.isMultiple());
-			record.setAttribute("validation", att.getValidation());
-			record.setAttribute("initialization", att.getInitialization());
+			record.setAttribute(EDITOR, att.getEditor());
+			record.setAttribute(MANDATORY, att.isMandatory());
+			record.setAttribute(HIDDEN, att.isHidden());
+			record.setAttribute(READONLY, att.isReadonly());
+			record.setAttribute(MULTIPLE, att.isMultiple());
+			record.setAttribute(VALIDATION, att.getValidation());
+			record.setAttribute(INITIALIZATION, att.getInitialization());
 			record.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
-			record.setAttribute("dependsOn", att.getDependsOn());
+			record.setAttribute(DEPENDS_ON, att.getDependsOn());
 			attributesList.getRecordList().add(record);
 		}
 	}
@@ -677,18 +677,18 @@ public class TemplatePropertiesPanel extends HLayout {
 					GUIAttribute att = new GUIAttribute();
 					att.setPosition(position++);
 					att.setName(rec.getAttributeAsString("name"));
-					att.setLabel(rec.getAttributeAsString("label"));
+					att.setLabel(rec.getAttributeAsString(LABEL));
 					att.setType(Integer.parseInt(rec.getAttributeAsString("type")));
 					att.setSet(rec.getAttributeAsString("set"));
-					att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
-					att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
-					att.setDependsOn(rec.getAttributeAsString("dependsOn"));
-					att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
-					att.setHidden(rec.getAttributeAsBoolean("hidden"));
-					att.setReadonly(rec.getAttributeAsBoolean("readonly"));
-					att.setMultiple(rec.getAttributeAsBoolean("multiple"));
-					att.setValidation(rec.getAttributeAsString("validation"));
-					att.setInitialization(rec.getAttributeAsString("initialization"));
+					att.setSetId(Long.parseLong(rec.getAttributeAsString(SET_ID)));
+					att.setEditor(Integer.parseInt(rec.getAttributeAsString(EDITOR)));
+					att.setDependsOn(rec.getAttributeAsString(DEPENDS_ON));
+					att.setMandatory(rec.getAttributeAsBoolean(MANDATORY));
+					att.setHidden(rec.getAttributeAsBoolean(HIDDEN));
+					att.setReadonly(rec.getAttributeAsBoolean(READONLY));
+					att.setMultiple(rec.getAttributeAsBoolean(MULTIPLE));
+					att.setValidation(rec.getAttributeAsString(VALIDATION));
+					att.setInitialization(rec.getAttributeAsString(INITIALIZATION));
 					template.appendAttribute(att);
 				}
 			}
@@ -721,17 +721,17 @@ public class TemplatePropertiesPanel extends HLayout {
 
 				for (ListGridRecord record : selection) {
 					GUIAttribute setAttribute = null;
-					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
+					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong(SET_ID));
 					if (set != null)
 						setAttribute = set.getAttribute(record.getAttributeAsString("name"));
 
 					if (setAttribute != null) {
 						template.getAttribute(record.getAttributeAsString("name"))
 								.setValidation(setAttribute.getValidation());
-						record.setAttribute("validation", setAttribute.getValidation());
+						record.setAttribute(VALIDATION, setAttribute.getValidation());
 					} else {
 						template.getAttribute(record.getAttributeAsString("name")).setValidation(null);
-						record.setAttribute("validation", (String) null);
+						record.setAttribute(VALIDATION, (String) null);
 					}
 				}
 

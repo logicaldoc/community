@@ -61,8 +61,8 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		 * Iterate over records composing the response XML document
 		 */
 		DateFormat df = getDateFormat();
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
+		for (Object gridRecord : records) {
+			Object[] cols = (Object[]) gridRecord;
 			if (request.getParameter("userId") != null) {
 				/*
 				 * If the request contains the user specification, we report

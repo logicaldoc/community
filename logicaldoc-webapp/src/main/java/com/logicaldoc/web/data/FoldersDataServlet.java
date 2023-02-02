@@ -35,7 +35,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	public static String FOLDER_PAGE_SIZE = "ld-folder-page-size";
 
-	public static String FOLDER_START_RECORD = "ld-folder-start-record";
+	public static String FOLDER_START_RECORD = "ld-folder-start-gridRecord";
 
 	private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 		/*
 		 * Check if we have to paginate and what should be the start and end
-		 * record numbers
+		 * gridRecord numbers
 		 */
 		Long[] indexes = getCurrentPageExtents(session, maxChildren, nopagination, parentFolderId, parentFolder);
 		Long startRecord = indexes[0];
@@ -231,7 +231,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			query.append(" ) ");
 		} else {
 			// no folders are accessible so we do not have to return any
-			// record
+			// gridRecord
 			query.append(" and 1 = 2");
 		}
 	}

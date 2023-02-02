@@ -52,8 +52,8 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over the collection of user histories
 		 */
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
+		for (Object gridRecord : records) {
+			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<history>");
 			writer.print("<id>" + cols[0] + "</id>");

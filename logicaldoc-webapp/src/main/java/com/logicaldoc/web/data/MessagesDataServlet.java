@@ -46,30 +46,30 @@ public class MessagesDataServlet extends AbstractDataServlet {
 		 * Iterate over records composing the response XML document
 		 */
 		List<SystemMessage> unread = dao.findByRecipient(session.getUsername(), Message.TYPE_SYSTEM, 0);
-		for (SystemMessage record : unread) {
+		for (SystemMessage message : unread) {
 			writer.print("<message>");
-			writer.print("<id>" + record.getId() + "</id>");
-			writer.print("<subject><![CDATA[" + record.getSubject() + "]]></subject>");
-			writer.print("<priority>" + record.getPrio() + "</priority>");
-			writer.print("<from><![CDATA[" + record.getAuthor() + "]]></from>");
-			writer.print("<avatar><![CDATA[" + record.getAuthor() + "]]></avatar>");
-			writer.print("<sent>" + df.format(record.getSentDate()) + "</sent>");
+			writer.print("<id>" + message.getId() + "</id>");
+			writer.print("<subject><![CDATA[" + message.getSubject() + "]]></subject>");
+			writer.print("<priority>" + message.getPrio() + "</priority>");
+			writer.print("<from><![CDATA[" + message.getAuthor() + "]]></from>");
+			writer.print("<avatar><![CDATA[" + message.getAuthor() + "]]></avatar>");
+			writer.print("<sent>" + df.format(message.getSentDate()) + "</sent>");
 			writer.print("<read>false</read>");
-			writer.print("<text><![CDATA[" + record.getMessageText() + "]]></text>");
+			writer.print("<text><![CDATA[" + message.getMessageText() + "]]></text>");
 			writer.print("</message>");
 		}
 
 		List<SystemMessage> read = dao.findByRecipient(session.getUsername(), Message.TYPE_SYSTEM, 1);
-		for (SystemMessage record : read) {
+		for (SystemMessage message : read) {
 			writer.print("<message>");
-			writer.print("<id>" + record.getId() + "</id>");
-			writer.print("<subject><![CDATA[" + record.getSubject() + "]]></subject>");
-			writer.print("<priority>" + record.getPrio() + "</priority>");
-			writer.print("<from><![CDATA[" + record.getAuthor() + "]]></from>");
-			writer.print("<avatar><![CDATA[" + record.getAuthor() + "]]></avatar>");
-			writer.print("<sent>" + df.format(record.getSentDate()) + "</sent>");
+			writer.print("<id>" + message.getId() + "</id>");
+			writer.print("<subject><![CDATA[" + message.getSubject() + "]]></subject>");
+			writer.print("<priority>" + message.getPrio() + "</priority>");
+			writer.print("<from><![CDATA[" + message.getAuthor() + "]]></from>");
+			writer.print("<avatar><![CDATA[" + message.getAuthor() + "]]></avatar>");
+			writer.print("<sent>" + df.format(message.getSentDate()) + "</sent>");
 			writer.print("<read>true</read>");
-			writer.print("<text><![CDATA[" + record.getMessageText() + "]]></text>");
+			writer.print("<text><![CDATA[" + message.getMessageText() + "]]></text>");
 			writer.print("</message>");
 		}
 

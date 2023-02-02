@@ -56,23 +56,23 @@ public class SignaturePanel extends StampProperties {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setValuesManager(vm);
 
-		TextItem exprx = ItemFactory.newTextItem("exprx", "exprx", stamp.getExprX());
+		TextItem exprx = ItemFactory.newTextItem("exprx", stamp.getExprX());
 		if (changedHandler != null)
 			exprx.addChangedHandler(changedHandler);
 		exprx.setWidth(300);
 
-		TextItem exprw = ItemFactory.newTextItem("exprw", "exprw", stamp.getExprW());
+		TextItem exprw = ItemFactory.newTextItem("exprw", stamp.getExprW());
 		if (changedHandler != null)
 			exprw.addChangedHandler(changedHandler);
 		exprw.setWidth(300);
 
-		TextItem expry = ItemFactory.newTextItem("expry", "expry", stamp.getExprY());
+		TextItem expry = ItemFactory.newTextItem("expry", stamp.getExprY());
 		if (changedHandler != null)
 			expry.addChangedHandler(changedHandler);
 		expry.setWidth(300);
 		expry.setColSpan(4);
 
-		TextItem exprh = ItemFactory.newTextItem("exprh", "exprh", stamp.getExprH());
+		TextItem exprh = ItemFactory.newTextItem("exprh", stamp.getExprH());
 		if (changedHandler != null)
 			exprh.addChangedHandler(changedHandler);
 		exprh.setWidth(300);

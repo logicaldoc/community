@@ -194,9 +194,17 @@ public class UsersPanel extends AdminPanel {
 
 		ListGridField timeZone = new ListGridField("timeZone", I18N.message("timezone"), 120);
 		timeZone.setHidden(true);
+		timeZone.setAlign(Alignment.CENTER);
 		timeZone.setCanFilter(true);
 
 		UserListGridField avatar = new UserListGridField(true);
+
+		ListGridField source = new ListGridField("source", I18N.message("source"), 60);
+		source.setCanFilter(true);
+		source.setHidden(true);
+		source.setAlign(Alignment.CENTER);
+		source.setCellFormatter((Object value, ListGridRecord record, int rowNum,
+				int colNum) -> "0".equals(value.toString()) ? "" : I18N.message("ldap"));
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -207,7 +215,7 @@ public class UsersPanel extends AdminPanel {
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
 		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, expire, phone, cell, groups, enabled,
-				guest, timeZone);
+				guest, timeZone, source);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -287,6 +295,7 @@ public class UsersPanel extends AdminPanel {
 		else
 			record.setAttribute("enabledIcon", "2");
 		record.setAttribute("guest", user.isReadOnly());
+		record.setAttribute("source", user.getSource());
 
 		GUIGroup[] groups = user.getGroups();
 		String gnames = "";
@@ -354,7 +363,8 @@ public class UsersPanel extends AdminPanel {
 
 		contextMenu.setItems(items.toArray(new MenuItem[0]));
 
-		password.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
+		password.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo()
+				&& selectedUsers[0].getAttributeAsInt("source") == 0);
 		twoTactorsAuth.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
 		delete.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
 		enableUser.setEnabled(selectedUsers.length == 1);
@@ -421,19 +431,20 @@ public class UsersPanel extends AdminPanel {
 		MenuItem twoTactorsAuth = new MenuItem();
 		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
 		twoTactorsAuth.addClickHandler((MenuItemClickEvent event) -> {
-			SecurityService.Instance.get().getUser(selectedUsers[0].getAttributeAsLong("id"), new AsyncCallback<GUIUser>() {
+			SecurityService.Instance.get().getUser(selectedUsers[0].getAttributeAsLong("id"),
+					new AsyncCallback<GUIUser>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-				@Override
-				public void onSuccess(GUIUser user) {
-					TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
-					dialog.show();
-				}
-			});
+						@Override
+						public void onSuccess(GUIUser user) {
+							TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
+							dialog.show();
+						}
+					});
 		});
 		return twoTactorsAuth;
 	}

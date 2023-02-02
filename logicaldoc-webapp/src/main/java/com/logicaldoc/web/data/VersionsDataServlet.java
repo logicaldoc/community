@@ -46,8 +46,8 @@ public class VersionsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 		
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
+		for (Object gridRecord : records) {
+			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<version>");
 			writer.print("<id>" + cols[0] + "</id>");

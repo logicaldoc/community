@@ -142,7 +142,7 @@ public class TemplateDetailsPanel extends VLayout {
 			if (propertiesTabPanel.contains(propertiesPanel))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
-		propertiesPanel = new TemplatePropertiesPanel(template, changeHandler, this);
+		propertiesPanel = new TemplatePropertiesPanel(template, changeHandler);
 		propertiesTabPanel.addMember(propertiesPanel);
 
 		/*

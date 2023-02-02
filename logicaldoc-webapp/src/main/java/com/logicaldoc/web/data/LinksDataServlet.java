@@ -54,8 +54,8 @@ public class LinksDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
+		for (Object gridRecord : records) {
+			Object[] cols = (Object[]) gridRecord;
 
 			printLink(writer, cols, parent, parentDocId);
 		}
