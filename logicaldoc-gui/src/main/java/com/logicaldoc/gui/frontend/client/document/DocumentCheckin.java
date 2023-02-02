@@ -68,7 +68,7 @@ public class DocumentCheckin extends Window {
 			}
 		});
 
-		TextItem commentItem = ItemFactory.newTextItem("comment", "comment", null);
+		TextItem commentItem = ItemFactory.newTextItem("comment", null);
 		commentItem.setRequired(true);
 		commentItem.setBrowserSpellCheck(true);
 		commentItem.setWidth(250);

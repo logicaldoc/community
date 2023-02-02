@@ -81,7 +81,7 @@ public class MessageDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(formColumns);
 
-		TextItem subject = ItemFactory.newTextItem("subject", "subject", "");
+		TextItem subject = ItemFactory.newTextItem("subject", "");
 		subject.setRequired(true);
 		subject.setBrowserSpellCheck(true);
 		subject.setWidth("*");

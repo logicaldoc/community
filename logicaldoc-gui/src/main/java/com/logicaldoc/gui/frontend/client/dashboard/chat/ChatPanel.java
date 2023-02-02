@@ -43,7 +43,7 @@ public class ChatPanel extends VLayout {
 		body.setWidth100();
 		body.setMembers(messages, onlineUsers);
 
-		TextItem postMessage = ItemFactory.newTextItem("post", "post", null);
+		TextItem postMessage = ItemFactory.newTextItem("post", null);
 		postMessage.setShowTitle(false);
 		postMessage.setBrowserSpellCheck(true);
 		postMessage.setWidth("100%");

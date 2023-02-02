@@ -53,10 +53,10 @@ public class BookmarkDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", bookmark.getName());
+		TextItem name = ItemFactory.newTextItem("name", bookmark.getName());
 		name.setRequired(true);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", bookmark.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", bookmark.getDescription());
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));

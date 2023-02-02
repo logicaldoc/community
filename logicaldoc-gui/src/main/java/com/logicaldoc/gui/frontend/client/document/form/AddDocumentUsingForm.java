@@ -40,7 +40,7 @@ public class AddDocumentUsingForm extends Window {
 		formSelector.setWrapTitle(false);
 		formSelector.setRequired(true);
 
-		TextItem title = ItemFactory.newTextItem("title", "title", null);
+		TextItem title = ItemFactory.newTextItem("title", null);
 		title.setRequired(true);
 
 		ButtonItem save = new ButtonItem();

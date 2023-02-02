@@ -58,7 +58,7 @@ public class DigitalSignatureDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
 
-		TextItem reason = ItemFactory.newTextItem("reason", "reason", null);
+		TextItem reason = ItemFactory.newTextItem("reason", null);
 		reason.setRequired(true);
 		reason.setWrapTitle(false);
 		reason.setWidth(250);

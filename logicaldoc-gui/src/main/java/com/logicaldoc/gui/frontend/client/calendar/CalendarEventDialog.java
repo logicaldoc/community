@@ -538,7 +538,7 @@ public class CalendarEventDialog extends Window {
 		detailsForm.setNumCols(formColumns);
 		detailsForm.setValuesManager(vm);
 
-		TextItem title = ItemFactory.newTextItem("title", "title", calendarEvent.getTitle());
+		TextItem title = ItemFactory.newTextItem("title", calendarEvent.getTitle());
 		title.setRequired(true);
 		title.setEndRow(true);
 		title.setWrapTitle(false);
@@ -548,7 +548,7 @@ public class CalendarEventDialog extends Window {
 		title.setLength(255);
 		title.setCanEdit(!readOnly);
 
-		TextItem type = ItemFactory.newTextItem("type", "type", calendarEvent.getType());
+		TextItem type = ItemFactory.newTextItem("type", calendarEvent.getType());
 		type.setRequired(false);
 		type.setEndRow(true);
 		type.setWrapTitle(false);
@@ -558,7 +558,7 @@ public class CalendarEventDialog extends Window {
 		type.setLength(255);
 		type.setCanEdit(!readOnly);
 
-		TextItem subType = ItemFactory.newTextItem("subType", "subtype", calendarEvent.getSubType());
+		TextItem subType = ItemFactory.newTextItem("subtype", calendarEvent.getSubType());
 		subType.setRequired(false);
 		subType.setEndRow(true);
 		subType.setWrapTitle(false);
@@ -685,7 +685,7 @@ public class CalendarEventDialog extends Window {
 		if (vm.validate()) {
 			calendarEvent.setTitle(vm.getValueAsString("title"));
 			calendarEvent.setType(vm.getValueAsString("type"));
-			calendarEvent.setSubType(vm.getValueAsString("subType"));
+			calendarEvent.setSubType(vm.getValueAsString("subtype"));
 			calendarEvent.setDescription(vm.getValueAsString("description"));
 			calendarEvent.setAutomation(vm.getValueAsString("automation"));
 

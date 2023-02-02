@@ -111,7 +111,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		StaticTextItem pages = preparePagesItem();
 
-		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", document.getFileName());
+		TextItem fileName = ItemFactory.newTextItem("filename", document.getFileName());
 		fileName.addChangedHandler(changedHandler);
 		fileName.setRequired(true);
 		fileName.setWidth(DEFAULT_ITEM_WIDTH);
@@ -324,7 +324,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private TextItem prepareNewTagItem(final TagsDS ds) {
-		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", null);
 		newTagItem.setEndRow(true);
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
@@ -419,7 +419,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
 		if (!vm.hasErrors()) {
-			document.setFileName((String) values.get("fileName"));
+			document.setFileName((String) values.get("filename"));
 			document.setLanguage((String) values.get("language"));
 			document.setColor((String) values.get("color"));
 			document.setTags(tagItem.getValues());

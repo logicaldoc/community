@@ -70,7 +70,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		list.setDataSource(new DocumentHistoryDS(null, document.getId(), "event.signed", null));
 		list.setFields(date, signedBy, reasonColumn);
 
-		TextItem reason = ItemFactory.newTextItem("reason", "reason", null);
+		TextItem reason = ItemFactory.newTextItem("reason", null);
 		reason.setWidth(400);
 		reason.setRequired(true);
 		reason.setWrapTitle(false);

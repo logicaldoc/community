@@ -102,7 +102,7 @@ public class UpdateDialog extends StickyWindow {
 		spacer.setWidth("60%");
 		spacer.setOverflow(Overflow.HIDDEN);
 
-		TextItem versionComment = ItemFactory.newTextItem("versionComment", "versioncomment", null);
+		TextItem versionComment = ItemFactory.newTextItem("versioncomment", null);
 		versionComment.setWidth(350);
 
 		CheckboxItem ignoreEmptyFields = ItemFactory.newCheckbox("ignoreemptyfields", "ignoreemptyfields");
@@ -177,7 +177,7 @@ public class UpdateDialog extends StickyWindow {
 	}
 
 	private void doAddDocuments(final DynamicForm saveForm) {
-		bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
+		bulkPanel.getDocument().setComment(saveForm.getValueAsString("versioncomment"));
 		LD.contactingServer();
 		hide();
 		DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing, bulkPanel.getDocument(),
@@ -205,7 +205,7 @@ public class UpdateDialog extends StickyWindow {
 	private void doBulkUpdate(final DynamicForm saveForm) {
 		LD.ask(I18N.message("bulkupdate"), I18N.message("bulkwarning"), (Boolean confirmBulkUpdate) -> {
 			if (confirmBulkUpdate) {
-				bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
+				bulkPanel.getDocument().setComment(saveForm.getValueAsString("versioncomment"));
 				LD.contactingServer();
 				DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
 						"true".equals(saveForm.getValueAsString("ignoreemptyfields")),

@@ -72,7 +72,7 @@ public class DocuSignNewTabDialog extends Window {
 		SelectItem type = ItemFactory.newDocuSignTabType("esig-signhere");
 		type.setRequired(true);
 
-		final TextItem recipient = ItemFactory.newTextItem("recipient", "recipient", null);
+		final TextItem recipient = ItemFactory.newTextItem("recipient", null);
 		recipient.setRequired(true);
 		recipient.setWidth(300);
 

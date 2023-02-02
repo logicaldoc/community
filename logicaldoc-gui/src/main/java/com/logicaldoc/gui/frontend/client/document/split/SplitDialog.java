@@ -60,7 +60,7 @@ public class SplitDialog extends Window {
 		SelectItem separator = ItemFactory.newSplitSeparatorHandlingSelector();
 		separator.setDisabled(true);
 		
-		TextItem expression = ItemFactory.newTextItem("expression", I18N.message("expression"), null);
+		TextItem expression = ItemFactory.newTextItem("expression", null);
 		expression.setDisabled(true);
 
 		SelectItem policy = ItemFactory.newSplittingPolicySelector();
