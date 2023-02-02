@@ -22,6 +22,10 @@ public class ColoredListGridField extends ListGridField {
 		this.colorFieldName = colorFieldName;
 	}
 
+	public ColoredListGridField(String name, int width) {
+		this(name, name, width);
+	}
+	
 	public ColoredListGridField(String name, String title, int width) {
 		this(name, "color", I18N.message(title), width);
 	}

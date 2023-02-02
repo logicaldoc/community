@@ -118,6 +118,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ItemFactory {
 
+	private static final String CHARSET = "charset";
+
 	private static final String FIELDREQUIRED = "fieldrequired";
 
 	private static final String SHOWDATECHOOSER = "showdatechooser";
@@ -596,7 +598,7 @@ public class ItemFactory {
 	public static SelectItem newCharsetSelector(String name) {
 		SelectItem item = new SelectItem();
 		item.setName(originalItemName(name));
-		item.setTitle(I18N.message("charset"));
+		item.setTitle(I18N.message(CHARSET));
 		item.setWrapTitle(false);
 		item.setDefaultValue("UTF-8");
 		item.setDisplayField("name");

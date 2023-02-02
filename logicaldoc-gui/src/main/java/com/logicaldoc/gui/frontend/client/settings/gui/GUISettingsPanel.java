@@ -24,7 +24,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -35,6 +34,8 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 6.0
  */
 public class GUISettingsPanel extends AdminPanel {
+
+	private static final String CHARSET = "charset";
 
 	private static final String DOWNLOAD = "download";
 
@@ -425,18 +426,15 @@ public class GUISettingsPanel extends AdminPanel {
 		showAvatarsInGrids.setWrapTitle(false);
 		showAvatarsInGrids.setValue(yesNo(settings, "gui.avatar.showingrids"));
 
-		SelectItem charset = ItemFactory.newCharsetSelector("charset");
-		charset.setValue(Util.getParameterValue(settings, "charset"));
+		SelectItem charset = ItemFactory.newCharsetSelector(CHARSET);
+		charset.setValue(Util.getParameterValue(settings, CHARSET));
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (!vm.validate())
-					return;
-
-				onSave();
-			}
+		save.addClickHandler((ClickEvent event) -> {
+			if (Boolean.FALSE.equals(vm.validate()))
+				return;
+			onSave();
 		});
 
 		parametersForm.setItems(welcome, density, banner, previewSize, previewTimeout, previewMaxFileSize, uploadMax,
@@ -474,12 +472,12 @@ public class GUISettingsPanel extends AdminPanel {
 
 	private List<GUIParameter> collectSettings() {
 
-		List<GUIParameter> params = new ArrayList<GUIParameter>();
+		List<GUIParameter> params = new ArrayList<>();
 
 		collectBooleanSwitches(params);
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.welcome", (String) values.get("welcome")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.density", (String) values.get("density")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.preview.size",
@@ -542,7 +540,7 @@ public class GUISettingsPanel extends AdminPanel {
 				values.get("avatarsize").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.wf.dashlet.rows",
 				values.get("wfdashletrows").toString()));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".charset", values.get("charset").toString()));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".charset", values.get(CHARSET).toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption.default",
 				values.get("securityoptiondef").toString()));
 		return params;
@@ -596,8 +594,11 @@ public class GUISettingsPanel extends AdminPanel {
 	}
 
 	private String trueFalse(String name) {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		return "yes".equals(values.get(name)) ? "true" : "false";
+		return "yes".equals(vm.getValues().get(name)) ? "true" : "false";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || this.getClass().equals(obj.getClass());
 	}
 }

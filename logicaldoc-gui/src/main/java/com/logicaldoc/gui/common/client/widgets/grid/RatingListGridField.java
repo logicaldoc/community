@@ -14,8 +14,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class RatingListGridField extends ColoredListGridField {
 
-	public RatingListGridField(String name, String title) {
-		super(name, I18N.message(title), 95);
+	public RatingListGridField() {
+		super("rating", I18N.message("rating"), 95);
 		setType(ListGridFieldType.IMAGE);
 		setCanSort(true);
 		setCanFilter(true);

@@ -275,4 +275,20 @@ public class GUIExtensibleObject implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+
+		if (this.getClass() != obj.getClass())
+			return false;
+
+		return getId() == ((GUIExtensibleObject) obj).getId();
+	}
+	
+	@Override
+	public int hashCode() {
+		return Long.valueOf(getId()).hashCode();
+	}
 }
