@@ -67,8 +67,8 @@ public class SavedSearchesPanel extends VLayout {
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord record = event.getRecord();
-				SearchService.Instance.get().load(record.getAttributeAsString("name"),
+				ListGridRecord rec = event.getRecord();
+				SearchService.Instance.get().load(rec.getAttributeAsString("name"),
 						new AsyncCallback<GUISearchOptions>() {
 
 							@Override
@@ -202,10 +202,10 @@ public class SavedSearchesPanel extends VLayout {
 		// Incredible!!! Without this line we have a duplicated save search
 		// entry when the user saves the first search.
 		System.out.println("");
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("name", name);
-		record.setAttribute("description", description);
-		record.setAttribute("type", type);
-		list.addData(record);
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("name", name);
+		rec.setAttribute("description", description);
+		rec.setAttribute("type", type);
+		list.addData(rec);
 	}
 }

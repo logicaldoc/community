@@ -182,17 +182,17 @@ public class BarcodeQueuePanel extends VLayout {
 
 		list = new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (record == null)
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				if (rec == null)
 					return "";
 				if (getFieldName(colNum).equals("filename")) {
-					if ("stop".equals(record.getAttribute("immutable"))) {
+					if ("stop".equals(rec.getAttribute("immutable"))) {
 						return "color: #888888; font-style: italic;";
 					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
+						return super.getCellCSSText(rec, rowNum, colNum);
 					}
 				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rec, rowNum, colNum);
 				}
 			}
 		};
@@ -236,11 +236,11 @@ public class BarcodeQueuePanel extends VLayout {
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				if (record == null)
+				ListGridRecord rec = list.getSelectedRecord();
+				if (rec == null)
 					return;
 
-				DocumentsPanel.get().openInFolder(record.getAttributeAsLong("id"));
+				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
 			}
 		});
 
@@ -263,8 +263,8 @@ public class BarcodeQueuePanel extends VLayout {
 
 					@Override
 					public void onSuccess(Void result) {
-						for (ListGridRecord record : selection) {
-							list.removeData(record);
+						for (ListGridRecord rec : selection) {
+							list.removeData(rec);
 						}
 					}
 				});

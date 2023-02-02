@@ -211,9 +211,9 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				String type = record.getAttribute("type");
-				String id = record.getAttribute("objectid");
+				ListGridRecord rec = list.getSelectedRecord();
+				String type = rec.getAttribute("type");
+				String id = rec.getAttribute("objectid");
 				if ("folder".equals(type))
 					DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
 				else {

@@ -74,9 +74,9 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		converter.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				String label = getConverterShortName(value != null ? value.toString() : null);
-				boolean enabled = record.getAttributeAsBoolean("eenabled");
+				boolean enabled = rec.getAttributeAsBoolean("eenabled");
 				if (!enabled)
 					label = "<span style='color:red;'>" + label + "</span>";
 

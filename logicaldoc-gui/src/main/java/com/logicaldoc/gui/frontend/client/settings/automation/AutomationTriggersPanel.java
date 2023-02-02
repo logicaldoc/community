@@ -161,9 +161,9 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					AutomationService.Instance.get().getTrigger(record.getAttributeAsLong("id"),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					AutomationService.Instance.get().getTrigger(rec.getAttributeAsLong("id"),
 							new AsyncCallback<GUIAutomationTrigger>() {
 
 								@Override
@@ -204,8 +204,8 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -253,44 +253,44 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param trigger the trigger to update
 	 */
 	public void updateRecord(GUIAutomationTrigger trigger) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, trigger.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", trigger.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, trigger.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", trigger.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : null);
-		record.setAttribute("date", trigger.getDate() != null ? trigger.getDate() : null);
-		record.setAttribute("cron",
+		rec.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : null);
+		rec.setAttribute("date", trigger.getDate() != null ? trigger.getDate() : null);
+		rec.setAttribute("cron",
 				trigger.getCron() != null && !trigger.getCron().isEmpty() ? trigger.getCron() : null);
 
-		record.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
+		rec.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
 
 		if (trigger.getRoutine() != null) {
-			record.setAttribute("routine", trigger.getRoutine().getName());
-			record.setAttribute("routineId", trigger.getRoutine().getId());
+			rec.setAttribute("routine", trigger.getRoutine().getName());
+			rec.setAttribute("routineId", trigger.getRoutine().getId());
 		} else {
-			record.setAttribute("routine", (String) null);
-			record.setAttribute("routineId", (Long) null);
+			rec.setAttribute("routine", (String) null);
+			rec.setAttribute("routineId", (Long) null);
 		}
 
 		if (trigger.getFolder() != null) {
-			record.setAttribute("folder", trigger.getFolder().getName());
-			record.setAttribute("folderId", trigger.getFolder().getId());
+			rec.setAttribute("folder", trigger.getFolder().getName());
+			rec.setAttribute("folderId", trigger.getFolder().getId());
 		} else {
-			record.setAttribute("folder", (String) null);
-			record.setAttribute("folderId", (Long) null);
+			rec.setAttribute("folder", (String) null);
+			rec.setAttribute("folderId", (Long) null);
 		}
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	@Override

@@ -141,9 +141,9 @@ public class ImportArchivesList extends VLayout {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
+				ListGridRecord rec = list.getSelectedRecord();
 				try {
-					showDetails(Long.parseLong(record.getAttribute("id")));
+					showDetails(Long.parseLong(rec.getAttribute("id")));
 				} catch (Throwable t) {
 					// Nothing to do
 				}
@@ -166,8 +166,8 @@ public class ImportArchivesList extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -229,8 +229,8 @@ public class ImportArchivesList extends VLayout {
 	}
 
 	public void updateRecord(GUIArchive result) {
-		ListGridRecord record = list.getSelectedRecord();
-		record.setAttribute("description", result.getDescription());
-		list.refreshRow(list.getRecordIndex(record));
+		ListGridRecord rec = list.getSelectedRecord();
+		rec.setAttribute("description", result.getDescription());
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

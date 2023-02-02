@@ -219,9 +219,9 @@ public class WorkflowHistoryDialog extends Window {
 	}
 
 	private void onInstanceSelected() {
-		Record record = instancesGrid.getSelectedRecord();
-		historiesPanel.setWfInstanceId(record.getAttributeAsLong("id"));
-		historiesPanel.setWfTemplateId(record.getAttributeAsLong("templateId"));
+		Record rec = instancesGrid.getSelectedRecord();
+		historiesPanel.setWfInstanceId(rec.getAttributeAsLong("id"));
+		historiesPanel.setWfTemplateId(rec.getAttributeAsLong("templateId"));
 		historiesPanel.refresh();
 	}
 

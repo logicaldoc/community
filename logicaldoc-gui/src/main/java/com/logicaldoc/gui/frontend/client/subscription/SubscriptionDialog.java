@@ -151,11 +151,11 @@ public class SubscriptionDialog extends Window {
 					@Override
 					public void onSuccess(Void ret) {
 						GuiLog.info(I18N.message("settingssaved"), null);
-						for (ListGridRecord record : grid.getSelectedRecords()) {
-							record.setAttribute("events", eventsStr);
+						for (ListGridRecord rec : grid.getSelectedRecords()) {
+							rec.setAttribute("events", eventsStr);
 							if (folderOption != null && !folderOption.isEmpty())
-								record.setAttribute("folderOption", folderOption.equals("current") ? "0" : "1");
-							grid.refreshRow(grid.getRecordIndex(record));
+								rec.setAttribute("folderOption", folderOption.equals("current") ? "0" : "1");
+							grid.refreshRow(grid.getRecordIndex(rec));
 						}
 					}
 				});

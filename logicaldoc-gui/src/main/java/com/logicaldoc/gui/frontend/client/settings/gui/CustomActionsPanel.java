@@ -241,8 +241,8 @@ public class CustomActionsPanel extends VLayout {
 		int i = 1;
 		ListGridRecord[] records = grid.getRecords();
 		if (records != null)
-			for (ListGridRecord record : records) {
-				GUIMenu action = getAction(record.getAttributeAsLong("id"));
+			for (ListGridRecord rec : records) {
+				GUIMenu action = getAction(rec.getAttributeAsLong("id"));
 				if (action != null)
 					action.setPosition(i++);
 			}
@@ -271,27 +271,27 @@ public class CustomActionsPanel extends VLayout {
 		ListGridRecord[] records = new ListGridRecord[actions.size()];
 		int i = 0;
 		for (GUIMenu menu : actions) {
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("id", menu.getId());
-			record.setAttribute("name", menu.getName());
-			record.setAttribute("description", menu.getDescription());
-			record.setAttribute("eenabled", menu.isEnabled() ? "0" : "2");
-			record.setAttribute("allowed", Util.toString(menu.getRights()));
-			records[i++] = record;
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", menu.getId());
+			rec.setAttribute("name", menu.getName());
+			rec.setAttribute("description", menu.getDescription());
+			rec.setAttribute("eenabled", menu.isEnabled() ? "0" : "2");
+			rec.setAttribute("allowed", Util.toString(menu.getRights()));
+			records[i++] = rec;
 		}
 		grid.setData(records);
 	}
 
 	public void update(GUIMenu action) {
-		Record record = grid.find(new AdvancedCriteria("id", OperatorId.EQUALS, action.getId()));
-		if (record != null) {
-			record.setAttribute("name", action.getName());
-			record.setAttribute("description", action.getDescription());
-			record.setAttribute("eenabled", action.isEnabled() ? "0" : "2");
-			record.setAttribute("allowed", Util.toString(action.getRights()));
+		Record rec = grid.find(new AdvancedCriteria("id", OperatorId.EQUALS, action.getId()));
+		if (rec != null) {
+			rec.setAttribute("name", action.getName());
+			rec.setAttribute("description", action.getDescription());
+			rec.setAttribute("eenabled", action.isEnabled() ? "0" : "2");
+			rec.setAttribute("allowed", Util.toString(action.getRights()));
 
 			grid.invalidateRecordComponents();
-			grid.refreshRecordComponent(grid.getRecordIndex(record));
+			grid.refreshRecordComponent(grid.getRecordIndex(rec));
 			grid.refreshFields();
 		}
 	}

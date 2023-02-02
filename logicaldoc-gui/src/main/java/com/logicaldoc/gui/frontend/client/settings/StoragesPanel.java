@@ -127,8 +127,8 @@ public class StoragesPanel extends VLayout {
 		storagesGrid = new RefreshableListGrid() {
 
 			@Override
-			protected Canvas getExpansionComponent(final ListGridRecord record) {
-				return buildExpansionComponent(record);
+			protected Canvas getExpansionComponent(final ListGridRecord rec) {
+				return buildExpansionComponent(rec);
 			}
 		};
 		storagesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -178,7 +178,7 @@ public class StoragesPanel extends VLayout {
 		});
 	}
 
-	private Canvas buildExpansionComponent(final ListGridRecord record) {
+	private Canvas buildExpansionComponent(final ListGridRecord rec) {
 		VLayout layout = new VLayout(5);
 		layout.setPadding(5);
 
@@ -198,20 +198,20 @@ public class StoragesPanel extends VLayout {
 
 		parametersGrid.addCellSavedHandler((CellSavedEvent event) -> {
 			ListGridRecord paramRecord = event.getRecord();
-			record.setAttribute(paramRecord.getAttributeAsString("name"),
+			rec.setAttribute(paramRecord.getAttributeAsString("name"),
 					event.getNewValue() != null ? event.getNewValue().toString() : "");
 		});
 
-		String[] attrs = record.getAttributes();
+		String[] attrs = rec.getAttributes();
 		if (attrs != null && attrs.length > 0) {
 			List<ListGridRecord> records = new ArrayList<ListGridRecord>();
 			for (String attr : attrs) {
 				if (!StoragesPanel.isParameterAttribute(attr))
 					continue;
-				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute("name", attr);
-				rec.setAttribute("value", record.getAttributeAsString(attr));
-				records.add(rec);
+				ListGridRecord recd = new ListGridRecord();
+				recd.setAttribute("name", attr);
+				recd.setAttribute("value", rec.getAttributeAsString(attr));
+				records.add(recd);
 			}
 			parametersGrid.setRecords(records.toArray(new ListGridRecord[0]));
 		}
@@ -223,7 +223,7 @@ public class StoragesPanel extends VLayout {
 	private ListGridField prepareTypeField() {
 		ListGridField type = new ListGridField("type", I18N.message("type"), 150);
 		type.setCanEdit(true);
-		type.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		type.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			if (value == null)
 				return "";
 			String label = I18N.message("storer." + value);
@@ -426,8 +426,8 @@ public class StoragesPanel extends VLayout {
 
 	private void onAddStorage() {
 		for (int i = 1; i < 99; i++) {
-			Record record = storagesGrid.getRecordList().find("id", Integer.toString(i));
-			if (record == null) {
+			Record rec = storagesGrid.getRecordList().find("id", Integer.toString(i));
+			if (rec == null) {
 				ListGridRecord newStore = new ListGridRecord();
 				newStore.setAttribute("id", Integer.toString(i));
 				newStore.setAttribute("name", "Storage " + i);

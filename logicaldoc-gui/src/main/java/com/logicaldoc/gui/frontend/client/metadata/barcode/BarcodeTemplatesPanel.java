@@ -93,12 +93,12 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 			Record[] records = positionalGrid.getRecords();
 			GUIBarcodeZone[] patterns = new GUIBarcodeZone[records.length];
 			int i = 0;
-			for (Record record : records) {
+			for (Record rec : records) {
 				GUIBarcodeZone patt = new GUIBarcodeZone();
-				patt.setPatterns(record.getAttributeAsString("pattern"));
-				patt.setInclude(record.getAttributeAsString("include"));
-				patt.setExclude(record.getAttributeAsString("exclude"));
-				patt.setFormats(record.getAttributeAsString("formats"));
+				patt.setPatterns(rec.getAttributeAsString("pattern"));
+				patt.setInclude(rec.getAttributeAsString("include"));
+				patt.setExclude(rec.getAttributeAsString("exclude"));
+				patt.setFormats(rec.getAttributeAsString("formats"));
 				patterns[i++] = patt;
 				patt.setIndex(i);
 			}
@@ -277,9 +277,9 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 				Canvas zoneCanvas = new BarcodeZoneCanvas(zone, BarcodeTemplatesPanel.this);
 				sample.addCanvas(zoneCanvas);
 			} else {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("pattern", "");
-				positionalGrid.getRecordList().add(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("pattern", "");
+				positionalGrid.getRecordList().add(rec);
 			}
 		});
 		toolStrip.addButton(append);
@@ -324,8 +324,8 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		barcodeTemplateSelector.setMultiple(false);
 		barcodeTemplateSelector.setEndRow(false);
 		barcodeTemplateSelector.addChangedHandler((ChangedEvent barcodeTemplateSelectorChanged) -> {
-			ListGridRecord record = barcodeTemplateSelector.getSelectedRecord();
-			BarcodeService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
+			ListGridRecord rec = barcodeTemplateSelector.getSelectedRecord();
+			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
 					new AsyncCallback<GUIBarcodeTemplate>() {
 
 						@Override
@@ -350,16 +350,16 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		templateSelector.addChangedHandler((ChangedEvent templateSelectorChanged) -> {
 			selectedOcrTemplate = null;
 
-			ListGridRecord record = templateSelector.getSelectedRecord();
-			if (record == null || record.getAttributeAsLong("id") == null
-					|| record.getAttributeAsLong("id").longValue() == 0L) {
+			ListGridRecord rec = templateSelector.getSelectedRecord();
+			if (rec == null || rec.getAttributeAsLong("id") == null
+					|| rec.getAttributeAsLong("id").longValue() == 0L) {
 				selectedDocumentTemplate = null;
 				refresh(null, null);
 			} else {
 				selectedDocumentTemplate = new GUITemplate();
-				selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
-				selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
-				selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
+				selectedDocumentTemplate.setId(rec.getAttributeAsLong("id"));
+				selectedDocumentTemplate.setName(rec.getAttributeAsString("name"));
+				selectedDocumentTemplate.setDescription(rec.getAttributeAsString("description"));
 				refresh(selectedDocumentTemplate.getId(), null);
 			}
 		});

@@ -116,15 +116,15 @@ public class CustomIdPanel extends AdminPanel {
 			for (GUIScheme cid : data) {
 				if (!type.equals(cid.getType()))
 					continue;
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("templateId", Long.toString(cid.getTemplateId()));
-				record.setAttribute("templateName", cid.getTemplateName());
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("templateId", Long.toString(cid.getTemplateId()));
+				rec.setAttribute("templateName", cid.getTemplateName());
 				if (cid.getScheme() != null)
-					record.setAttribute("scheme", cid.getScheme());
-				record.setAttribute("evaluateAtCheckin", cid.isEvaluateAtCheckin());
-				record.setAttribute("evaluateAtUpdate", cid.isEvaluateAtUpdate());
-				record.setAttribute("type", cid.getType());
-				records.add(record);
+					rec.setAttribute("scheme", cid.getScheme());
+				rec.setAttribute("evaluateAtCheckin", cid.isEvaluateAtCheckin());
+				rec.setAttribute("evaluateAtUpdate", cid.isEvaluateAtUpdate());
+				rec.setAttribute("type", cid.getType());
+				records.add(rec);
 			}
 		customIds.setData(records.toArray(new ListGridRecord[0]));
 
@@ -145,12 +145,12 @@ public class CustomIdPanel extends AdminPanel {
 			@Override
 			public void onEditComplete(EditCompleteEvent event) {
 				GUIScheme cid = new GUIScheme();
-				ListGridRecord record = customIds.getRecord(event.getRowNum());
-				cid.setTemplateId(Long.parseLong(record.getAttribute("templateId")));
-				cid.setEvaluateAtCheckin(record.getAttributeAsBoolean("evaluateAtCheckin"));
-				cid.setEvaluateAtUpdate(record.getAttributeAsBoolean("evaluateAtUpdate"));
-				cid.setScheme(record.getAttributeAsString("scheme"));
-				cid.setType(record.getAttributeAsString("type"));
+				ListGridRecord rec = customIds.getRecord(event.getRowNum());
+				cid.setTemplateId(Long.parseLong(rec.getAttribute("templateId")));
+				cid.setEvaluateAtCheckin(rec.getAttributeAsBoolean("evaluateAtCheckin"));
+				cid.setEvaluateAtUpdate(rec.getAttributeAsBoolean("evaluateAtUpdate"));
+				cid.setScheme(rec.getAttributeAsString("scheme"));
+				cid.setType(rec.getAttributeAsString("type"));
 
 				SchemeService.Instance.get().save(cid, new AsyncCallback<Void>() {
 
@@ -225,9 +225,9 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.addEditCompleteHandler(new EditCompleteHandler() {
 			@Override
 			public void onEditComplete(EditCompleteEvent event) {
-				ListGridRecord record = sequences.getRecord(event.getRowNum());
-				SchemeService.Instance.get().resetSequence(Long.parseLong(record.getAttribute("id")),
-						(Integer) record.getAttributeAsInt("value"), new AsyncCallback<Void>() {
+				ListGridRecord rec = sequences.getRecord(event.getRowNum());
+				SchemeService.Instance.get().resetSequence(Long.parseLong(rec.getAttribute("id")),
+						(Integer) rec.getAttributeAsInt("value"), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -268,15 +268,15 @@ public class CustomIdPanel extends AdminPanel {
 				List<ListGridRecord> records = new ArrayList<ListGridRecord>();
 				if (data != null)
 					for (GUISequence cid : data) {
-						ListGridRecord record = new ListGridRecord();
-						record.setAttribute("template", cid.getTemplate());
-						record.setAttribute("frequency", I18N.message(cid.getFrequency()));
-						record.setAttribute("year", cid.getYear());
-						record.setAttribute("month", cid.getMonth());
-						record.setAttribute("folder", cid.getFolder());
-						record.setAttribute("id", cid.getId());
-						record.setAttribute("value", cid.getValue());
-						records.add(record);
+						ListGridRecord rec = new ListGridRecord();
+						rec.setAttribute("template", cid.getTemplate());
+						rec.setAttribute("frequency", I18N.message(cid.getFrequency()));
+						rec.setAttribute("year", cid.getYear());
+						rec.setAttribute("month", cid.getMonth());
+						rec.setAttribute("folder", cid.getFolder());
+						rec.setAttribute("id", cid.getId());
+						rec.setAttribute("value", cid.getValue());
+						records.add(rec);
 					}
 				sequences.setData(records.toArray(new ListGridRecord[0]));
 			}
@@ -294,10 +294,10 @@ public class CustomIdPanel extends AdminPanel {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
-							final ListGridRecord record = schemes.getSelectedRecord();
+							final ListGridRecord rec = schemes.getSelectedRecord();
 							SchemeService.Instance.get().delete(
-									Long.parseLong(record.getAttributeAsString("templateId")),
-									record.getAttributeAsString("type"), new AsyncCallback<Void>() {
+									Long.parseLong(rec.getAttributeAsString("templateId")),
+									rec.getAttributeAsString("type"), new AsyncCallback<Void>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
@@ -309,7 +309,7 @@ public class CustomIdPanel extends AdminPanel {
 											schemes.getSelectedRecord().setAttribute("scheme", (String) null);
 											schemes.getSelectedRecord().setAttribute("evaluateAtCheckin", false);
 											schemes.getSelectedRecord().setAttribute("evaluateAtUpdate", false);
-											schemes.refreshRow(schemes.getRecordIndex(record));
+											schemes.refreshRow(schemes.getRecordIndex(rec));
 										}
 									});
 						}
@@ -325,8 +325,8 @@ public class CustomIdPanel extends AdminPanel {
 	private void showSequencesContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = sequences.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = sequences.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));

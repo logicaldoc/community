@@ -77,19 +77,19 @@ public class PositionalBarcodesGrid extends ListGrid {
 			if (barcodeTemplate.getZones() != null)
 				for (GUIZone pat : barcodeTemplate.getZones()) {
 					GUIBarcodeZone brcPat = (GUIBarcodeZone) pat;
-					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("pattern", brcPat.getPatterns());
-					record.setAttribute("include", brcPat.getInclude());
-					record.setAttribute("exclude", brcPat.getExclude());
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("pattern", brcPat.getPatterns());
+					rec.setAttribute("include", brcPat.getInclude());
+					rec.setAttribute("exclude", brcPat.getExclude());
 
 					String frmts = brcPat.getFormats();
 					if (frmts == null || frmts.trim().isEmpty())
-						record.setAttribute("formats", (String) null);
+						rec.setAttribute("formats", (String) null);
 					else if (!frmts.trim().contains(","))
-						record.setAttribute("formats", frmts.trim());
+						rec.setAttribute("formats", frmts.trim());
 					else
-						record.setAttribute("formats", brcPat.getFormats().replace(" ", "").split(","));
-					records.add(record);
+						rec.setAttribute("formats", brcPat.getFormats().replace(" ", "").split(","));
+					records.add(rec);
 				}
 			setRecords(records.toArray(new ListGridRecord[0]));
 		}

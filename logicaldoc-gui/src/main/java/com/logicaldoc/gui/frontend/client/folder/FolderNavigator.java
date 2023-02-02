@@ -227,11 +227,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				long dist = now.getTime() - lastTyped.getTime();
 				if (dist > 500) {
 					AdvancedCriteria crit = new AdvancedCriteria("name", OperatorId.ISTARTS_WITH, typed);
-					Record record = find(crit);
-					if (record != null) {
-						final Long folderId = record.getAttributeAsLong("folderId");
+					Record rec = find(crit);
+					if (rec != null) {
+						final Long folderId = rec.getAttributeAsLong("folderId");
 						deselectAllRecords();
-						selectRecord(record);
+						selectRecord(rec);
 						selectFolder(folderId);
 					}
 
@@ -390,8 +390,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				});
 	}
 
-	protected String getOriginalIcon(Record record, boolean defaultState) {
-		return super.getIcon(record, defaultState);
+	protected String getOriginalIcon(Record rec, boolean defaultState) {
+		return super.getIcon(rec, defaultState);
 	}
 
 	/**
@@ -1294,8 +1294,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	public long[] getSelectedIds() {
 		ListGridRecord[] selection = getSelectedRecords();
 		List<Long> ids = new ArrayList<Long>();
-		for (ListGridRecord record : selection)
-			ids.add(Long.parseLong(record.getAttributeAsString("folderId")));
+		for (ListGridRecord rec : selection)
+			ids.add(Long.parseLong(rec.getAttributeAsString("folderId")));
 		long[] idsArray = new long[ids.size()];
 		for (int i = 0; i < idsArray.length; i++) {
 			idsArray[i] = ids.get(i);
@@ -1425,15 +1425,15 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	@Override
-	protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-		if ("1".equals(record.getAttribute("type"))) {
+	protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+		if ("1".equals(rec.getAttribute("type"))) {
 			return "font-weight:bold;";
 		} else
-			return super.getCellCSSText(record, rowNum, colNum);
+			return super.getCellCSSText(rec, rowNum, colNum);
 	}
 
 	@Override
-	protected String getIcon(Record record, boolean defaultState) {
+	protected String getIcon(Record rec, boolean defaultState) {
 		return "blank.gif";
 	}
 
@@ -1578,9 +1578,9 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	private void reloadParentsOfSelection() {
 		ListGridRecord[] selection = getSelectedRecords();
-		for (ListGridRecord record : selection) {
+		for (ListGridRecord rec : selection) {
 			try {
-				TreeNode node = getTree().find("id", record.getAttributeAsString("id"));
+				TreeNode node = getTree().find("id", rec.getAttributeAsString("id"));
 				TreeNode parentNode = getTree().getParent(node);
 				if (parentNode != null) {
 					getTree().reloadChildren(parentNode);

@@ -384,24 +384,24 @@ public class LastChangesReport extends AdminPanel {
 						if (result != null && result.length > 0) {
 							ListGridRecord[] records = new ListGridRecord[result.length];
 							for (int i = 0; i < result.length; i++) {
-								ListGridRecord record = new ListGridRecord();
-								record.setAttribute("event", I18N.message(result[i].getEvent()));
-								record.setAttribute("date", result[i].getDate());
-								record.setAttribute("user", result[i].getUsername());
-								record.setAttribute("name", result[i].getFileName());
-								record.setAttribute("folder", result[i].getPath());
-								record.setAttribute("sid", result[i].getSessionId());
-								record.setAttribute("docId", result[i].getDocId());
-								record.setAttribute("folderId", result[i].getFolderId());
-								record.setAttribute("userId", result[i].getUserId());
-								record.setAttribute("ip", result[i].getIp());
-								record.setAttribute("device", result[i].getDevice());
-								record.setAttribute("geolocation", result[i].getGeolocation());
-								record.setAttribute("username", result[i].getUserLogin());
-								record.setAttribute("comment", result[i].getComment());
-								record.setAttribute("reason", result[i].getReason());
-								record.setAttribute("icon", result[i].getIcon());
-								records[i] = record;
+								ListGridRecord rec = new ListGridRecord();
+								rec.setAttribute("event", I18N.message(result[i].getEvent()));
+								rec.setAttribute("date", result[i].getDate());
+								rec.setAttribute("user", result[i].getUsername());
+								rec.setAttribute("name", result[i].getFileName());
+								rec.setAttribute("folder", result[i].getPath());
+								rec.setAttribute("sid", result[i].getSessionId());
+								rec.setAttribute("docId", result[i].getDocId());
+								rec.setAttribute("folderId", result[i].getFolderId());
+								rec.setAttribute("userId", result[i].getUserId());
+								rec.setAttribute("ip", result[i].getIp());
+								rec.setAttribute("device", result[i].getDevice());
+								rec.setAttribute("geolocation", result[i].getGeolocation());
+								rec.setAttribute("username", result[i].getUserLogin());
+								rec.setAttribute("comment", result[i].getComment());
+								rec.setAttribute("reason", result[i].getReason());
+								rec.setAttribute("icon", result[i].getIcon());
+								records[i] = rec;
 							}
 							histories.setData(records);
 						}

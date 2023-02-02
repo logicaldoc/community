@@ -240,10 +240,10 @@ public class Profile extends Window {
 
 		ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
 		for (String search : user.orderedSearches()) {
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("search", search);
-			record.setAttribute("label", I18N.message(search));
-			records.add(record);
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("search", search);
+			rec.setAttribute("label", I18N.message(search));
+			records.add(rec);
 		}
 
 		ListGridField label = new ListGridField("label", I18N.message("searchpreference"));
@@ -344,8 +344,8 @@ public class Profile extends Window {
 
 		ListGridRecord[] records = searchesList.getRecords();
 		List<String> searches = new ArrayList<String>();
-		for (ListGridRecord record : records)
-			searches.add(record.getAttributeAsString("search"));
+		for (ListGridRecord rec : records)
+			searches.add(rec.getAttributeAsString("search"));
 		u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));
 
 		SecurityService.Instance.get().saveProfile(u, new AsyncCallback<GUIUser>() {

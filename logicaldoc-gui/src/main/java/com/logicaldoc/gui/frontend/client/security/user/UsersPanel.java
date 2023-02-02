@@ -203,7 +203,7 @@ public class UsersPanel extends AdminPanel {
 		source.setCanFilter(true);
 		source.setHidden(true);
 		source.setAlign(Alignment.CENTER);
-		source.setCellFormatter((Object value, ListGridRecord record, int rowNum,
+		source.setCellFormatter((Object value, ListGridRecord rec, int rowNum,
 				int colNum) -> "0".equals(value.toString()) ? "" : I18N.message("ldap"));
 
 		list = new RefreshableListGrid();
@@ -235,9 +235,9 @@ public class UsersPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					onSelectUser(record.getAttributeAsLong("id"));
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					onSelectUser(rec.getAttributeAsLong("id"));
 			}
 		});
 
@@ -267,35 +267,35 @@ public class UsersPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param user the suer to update
 	 */
 	public void updateRecord(GUIUser user) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, user.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", user.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, user.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", user.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("avatar", user.getId());
-		record.setAttribute("username", user.getUsername());
-		record.setAttribute("name", user.getName());
-		record.setAttribute("firstName", user.getFirstName());
-		record.setAttribute("email", user.getEmail());
-		record.setAttribute("cell", user.getCell());
-		record.setAttribute("phone", user.getPhone());
-		record.setAttribute("expire", user.getExpire());
-		record.setAttribute("eenabled", user.isEnabled());
+		rec.setAttribute("avatar", user.getId());
+		rec.setAttribute("username", user.getUsername());
+		rec.setAttribute("name", user.getName());
+		rec.setAttribute("firstName", user.getFirstName());
+		rec.setAttribute("email", user.getEmail());
+		rec.setAttribute("cell", user.getCell());
+		rec.setAttribute("phone", user.getPhone());
+		rec.setAttribute("expire", user.getExpire());
+		rec.setAttribute("eenabled", user.isEnabled());
 		if (user.isEnabled())
-			record.setAttribute("enabledIcon", "0");
+			rec.setAttribute("enabledIcon", "0");
 		else
-			record.setAttribute("enabledIcon", "2");
-		record.setAttribute("guest", user.isReadOnly());
-		record.setAttribute("source", user.getSource());
+			rec.setAttribute("enabledIcon", "2");
+		rec.setAttribute("guest", user.isReadOnly());
+		rec.setAttribute("source", user.getSource());
 
 		GUIGroup[] groups = user.getGroups();
 		String gnames = "";
@@ -307,9 +307,9 @@ public class UsersPanel extends AdminPanel {
 					gnames += group.getName();
 			}
 		}
-		record.setAttribute("groups", gnames);
+		rec.setAttribute("groups", gnames);
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 		list.redraw();
 	}
 
@@ -454,8 +454,8 @@ public class UsersPanel extends AdminPanel {
 		replicate.setTitle(I18N.message("replicatesettings"));
 		replicate.addClickHandler((MenuItemClickEvent event) -> {
 			List<Long> selectedIds = new ArrayList<Long>();
-			for (ListGridRecord record : selectedUsers)
-				selectedIds.add(record.getAttributeAsLong("id"));
+			for (ListGridRecord rec : selectedUsers)
+				selectedIds.add(rec.getAttributeAsLong("id"));
 			ReplicateUserSettings dialog = new ReplicateUserSettings(selectedIds, UsersPanel.this);
 			dialog.show();
 		});

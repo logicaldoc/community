@@ -133,11 +133,11 @@ public class DownloadTicketsReport extends ReportPanel {
 	protected RefreshableListGrid createListGrid() {
 		return new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (!record.getAttributeAsBoolean("valid"))
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				if (!rec.getAttributeAsBoolean("valid"))
 					return "color: #888888; font-style: italic;";
 				else
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rec, rowNum, colNum);
 			}
 		};
 	}
@@ -150,14 +150,14 @@ public class DownloadTicketsReport extends ReportPanel {
 
 	@Override
 	protected void showContextMenu() {
-		final ListGridRecord record = list.getSelectedRecord();
+		final ListGridRecord rec = list.getSelectedRecord();
 
 		Menu contextMenu = new Menu();
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				long id = Long.parseLong(record.getAttribute("docId"));
+				long id = Long.parseLong(rec.getAttribute("docId"));
 				DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
 
 					@Override
@@ -180,7 +180,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				String id = record.getAttribute("docId");
+				String id = rec.getAttribute("docId");
 				WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + id);
 			}
 		});
@@ -189,7 +189,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		ticketURL.setTitle(I18N.message("ticketurl"));
 		ticketURL.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				String ticketId = record.getAttributeAsString("ticketId");
+				String ticketId = rec.getAttributeAsString("ticketId");
 
 				String url = Session.get().getConfig("server.url");
 				if (!url.endsWith("/"))
@@ -205,8 +205,8 @@ public class DownloadTicketsReport extends ReportPanel {
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-						Long.parseLong(record.getAttributeAsString("docId")));
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+						Long.parseLong(rec.getAttributeAsString("docId")));
 			}
 		});
 
@@ -214,7 +214,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				DocumentService.Instance.get().enableTicket(record.getAttributeAsLong("id"), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"), new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -223,9 +223,9 @@ public class DownloadTicketsReport extends ReportPanel {
 
 					@Override
 					public void onSuccess(Void result) {
-						record.setAttribute("eenabled", "0");
-						record.setAttribute("valid", true);
-						list.refreshRow(list.getRecordIndex(record));
+						rec.setAttribute("eenabled", "0");
+						rec.setAttribute("valid", true);
+						list.refreshRow(list.getRecordIndex(rec));
 					}
 				});
 			}
@@ -235,7 +235,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				DocumentService.Instance.get().disableTicket(record.getAttributeAsLong("id"),
+				DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -245,9 +245,9 @@ public class DownloadTicketsReport extends ReportPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								record.setAttribute("valid", false);
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "2");
+								rec.setAttribute("valid", false);
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -261,7 +261,7 @@ public class DownloadTicketsReport extends ReportPanel {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
-							DocumentService.Instance.get().deleteTicket(record.getAttributeAsLong("id"),
+							DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"),
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
@@ -290,7 +290,7 @@ public class DownloadTicketsReport extends ReportPanel {
 			delete.setEnabled(false);
 		}
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString("eenabled")))
 			contextMenu.setItems(disable, ticketURL, download, preview, openInFolder, delete);
 		else
 			contextMenu.setItems(enable, ticketURL, download, preview, openInFolder, delete);

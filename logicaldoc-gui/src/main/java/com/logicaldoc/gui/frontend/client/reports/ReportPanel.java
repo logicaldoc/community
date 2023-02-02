@@ -82,15 +82,15 @@ abstract class ReportPanel extends AdminPanel {
 	protected RefreshableListGrid createListGrid() {
 		return new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
 				if (getFieldName(colNum).equals("filename")) {
-					if ("stop".equals(record.getAttribute("immutable"))) {
+					if ("stop".equals(rec.getAttribute("immutable"))) {
 						return "color: #888888; font-style: italic;";
 					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
+						return super.getCellCSSText(rec, rowNum, colNum);
 					}
 				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rec, rowNum, colNum);
 				}
 			}
 		};

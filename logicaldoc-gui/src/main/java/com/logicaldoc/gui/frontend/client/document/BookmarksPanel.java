@@ -82,13 +82,13 @@ public class BookmarksPanel extends VLayout {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				final ListGridRecord record = list.getSelectedRecord();
-				FolderService.Instance.get().getFolder(Long.parseLong(record.getAttributeAsString("folderId")), false,
+				final ListGridRecord rec = list.getSelectedRecord();
+				FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false,
 						false, false, new AsyncCallback<GUIFolder>() {
 
 							@Override
 							public void onSuccess(GUIFolder folder) {
-								showContextMenu(folder, record.getAttributeAsString("type").equals("0"));
+								showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
 							}
 
 							@Override
@@ -115,11 +115,11 @@ public class BookmarksPanel extends VLayout {
 		edit.setTitle(I18N.message("edit"));
 		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
+				ListGridRecord rec = list.getSelectedRecord();
 				GUIBookmark bookmark = new GUIBookmark();
-				bookmark.setId(Long.parseLong(record.getAttributeAsString("id")));
-				bookmark.setName(record.getAttributeAsString("name"));
-				bookmark.setDescription(record.getAttributeAsString("description"));
+				bookmark.setId(Long.parseLong(rec.getAttributeAsString("id")));
+				bookmark.setName(rec.getAttributeAsString("name"));
+				bookmark.setDescription(rec.getAttributeAsString("description"));
 				BookmarkDialog dialog = new BookmarkDialog(bookmark);
 				dialog.show();
 			}
@@ -204,11 +204,11 @@ public class BookmarksPanel extends VLayout {
 	}
 
 	private void onBookmarkSelected() {
-		ListGridRecord record = list.getSelectedRecord();
-		if (record.getAttributeAsString("type").equals("0"))
-			DocumentsPanel.get().openInFolder(record.getAttributeAsLong("folderId"),
-					record.getAttributeAsLong("targetId"));
+		ListGridRecord rec = list.getSelectedRecord();
+		if (rec.getAttributeAsString("type").equals("0"))
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"),
+					rec.getAttributeAsLong("targetId"));
 		else
-			DocumentsPanel.get().openInFolder(record.getAttributeAsLong("targetId"), null);
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("targetId"), null);
 	}
 }

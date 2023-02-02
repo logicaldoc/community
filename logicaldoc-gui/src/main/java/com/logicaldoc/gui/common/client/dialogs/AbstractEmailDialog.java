@@ -151,15 +151,15 @@ public abstract class AbstractEmailDialog extends Window {
 			if (!recipientsGrid.validateCell(i, "email"))
 				continue;
 
-			ListGridRecord record = records[i];
-			if (record.getAttribute("email") == null || record.getAttribute("type").trim().equals(""))
+			ListGridRecord rec = records[i];
+			if (rec.getAttribute("email") == null || rec.getAttribute("type").trim().equals(""))
 				continue;
-			if ("to".equals(record.getAttribute("type")))
-				to.add(record.getAttribute("email").trim());
-			else if ("cc".equals(record.getAttribute("type")))
-				cc.add(record.getAttribute("email").trim());
+			if ("to".equals(rec.getAttribute("type")))
+				to.add(rec.getAttribute("email").trim());
+			else if ("cc".equals(rec.getAttribute("type")))
+				cc.add(rec.getAttribute("email").trim());
 			else
-				bcc.add(record.getAttribute("email").trim());
+				bcc.add(rec.getAttribute("email").trim());
 		}
 	}
 
@@ -229,7 +229,7 @@ public abstract class AbstractEmailDialog extends Window {
 			addEmptyRow();
 		});
 
-		recipientsGrid.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		recipientsGrid.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			if (value == null)
 				return null;
 			if (colNum == 0)
@@ -238,10 +238,10 @@ public abstract class AbstractEmailDialog extends Window {
 				return value.toString();
 		});
 
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("type", "to");
-		record.setAttribute("email", "");
-		recipientsGrid.setRecords(new ListGridRecord[] { record });
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("type", "to");
+		rec.setAttribute("email", "");
+		recipientsGrid.setRecords(new ListGridRecord[] { rec });
 
 		final SelectItem contactsSelector = ItemFactory.newEmailSelector("contacts", "contacts");
 		contactsSelector.setWidth(200);
@@ -313,7 +313,7 @@ public abstract class AbstractEmailDialog extends Window {
 
 	private void addEmptyRow() {
 		ListGridRecord[] records = recipientsGrid.getRecords();
-		// Search for an empty record
+		// Search for an empty rec
 		for (ListGridRecord rec : records) {
 			if (rec.getAttribute("email") == null || rec.getAttribute("email").trim().equals(""))
 				return;

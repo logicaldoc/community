@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class AttributeTypeFormatter implements CellFormatter {
 	@Override
-	public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+	public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 		if (value == null)
 			return "";
 		int intValue = Integer.parseInt(value.toString());

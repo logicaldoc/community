@@ -83,14 +83,14 @@ public class TasksPanel extends AdminPanel {
 
 											@Override
 											public void onSuccess(Boolean result) {
-												final ListGridRecord record = tasksGrid.getSelectedRecord();
-												record.setAttribute("status", GUITask.STATUS_RUNNING);
-												record.setAttribute("runningIcon", "running_task");
+												final ListGridRecord rec = tasksGrid.getSelectedRecord();
+												rec.setAttribute("status", GUITask.STATUS_RUNNING);
+												rec.setAttribute("runningIcon", "running_task");
 												Date now = new Date();
-												record.setAttribute("lastStart", now);
-												record.setAttribute("nextStart", new Date(now.getTime()
+												rec.setAttribute("lastStart", now);
+												rec.setAttribute("nextStart", new Date(now.getTime()
 														+ (currentTask.getScheduling().getInterval() * 1000)));
-												tasksGrid.refreshRow(tasksGrid.getRecordIndex(record));
+												tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 											}
 										});
 							}
@@ -187,13 +187,13 @@ public class TasksPanel extends AdminPanel {
 	private void prepareTasksGrid() {
 		tasksGrid = new ListGrid() {
 			@Override
-			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
+			protected Canvas createRecordComponent(final ListGridRecord rec, Integer colNum) {
 				String fieldName = this.getFieldName(colNum);
 				if (fieldName.equals("progressbar")) {
 					Progressbar prgBar = new Progressbar();
 					prgBar.setLength(100);
 					prgBar.setBreadth(15);
-					progresses.put(record.getAttribute("name"), prgBar);
+					progresses.put(rec.getAttribute("name"), prgBar);
 
 					return prgBar;
 				} else {
@@ -240,7 +240,7 @@ public class TasksPanel extends AdminPanel {
 		progressbar.setCanFilter(false);
 		progressbar.setCanSort(false);
 		progressbar.setAlign(Alignment.LEFT);
-		progressbar.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		progressbar.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			return "";
 		});
 
@@ -248,7 +248,7 @@ public class TasksPanel extends AdminPanel {
 		completion.setCanFilter(false);
 		completion.setCanSort(false);
 		completion.setAlign(Alignment.LEFT);
-		completion.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		completion.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			if (value != null)
 				return value + "%";
 			else
@@ -275,9 +275,9 @@ public class TasksPanel extends AdminPanel {
 
 	private void addGridSelectionHandler() {
 		tasksGrid.addSelectionChangedHandler((SelectionEvent event) -> {
-			ListGridRecord record = tasksGrid.getSelectedRecord();
-			if (record != null)
-				SystemService.Instance.get().getTaskByName(record.getAttribute("name"), I18N.getLocale(),
+			ListGridRecord rec = tasksGrid.getSelectedRecord();
+			if (rec != null)
+				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
 						new AsyncCallback<GUITask>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -298,9 +298,9 @@ public class TasksPanel extends AdminPanel {
 				if (!Session.get().isDefaultTenant())
 					return;
 
-				final ListGridRecord record = tasksGrid.getSelectedRecord();
-				if (record != null)
-					SystemService.Instance.get().getTaskByName(record.getAttribute("name"), I18N.getLocale(),
+				final ListGridRecord rec = tasksGrid.getSelectedRecord();
+				if (rec != null)
+					SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
 							new AsyncCallback<GUITask>() {
 								@Override
 								public void onFailure(Throwable caught) {
@@ -309,14 +309,14 @@ public class TasksPanel extends AdminPanel {
 
 								@Override
 								public void onSuccess(GUITask task) {
-									record.setAttribute("status", task.getStatus());
-									record.setAttribute("eenabled", task.getScheduling().isEnabled());
+									rec.setAttribute("status", task.getStatus());
+									rec.setAttribute("eenabled", task.getScheduling().isEnabled());
 									if (task.getStatus() != GUITask.STATUS_IDLE) {
-										record.setAttribute("runningIcon", "running_task");
+										rec.setAttribute("runningIcon", "running_task");
 									} else {
-										record.setAttribute("runningIcon", "idle_task");
+										rec.setAttribute("runningIcon", "idle_task");
 									}
-									tasksGrid.refreshRow(tasksGrid.getRecordIndex(record));
+									tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 									showContextMenu();
 								}
 							});
@@ -379,7 +379,7 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with the new task data
+	 * Updates the selected rec with the new task data
 	 * 
 	 * @param task the task to update
 	 */
@@ -416,18 +416,18 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	private void updateRecords(GUITask guiTask) {
-		for (ListGridRecord record : tasksGrid.getRecords()) {
-			if (record.getAttribute("name").equals(guiTask.getName())
+		for (ListGridRecord rec : tasksGrid.getRecords()) {
+			if (rec.getAttribute("name").equals(guiTask.getName())
 					&& guiTask.getStatus() != GUITask.STATUS_IDLE) {
-				record.setAttribute("runningIcon", "running_task");
-				record.setAttribute("completion", guiTask.getCompletionPercentage());
-				tasksGrid.refreshRow(tasksGrid.getRecordIndex(record));
+				rec.setAttribute("runningIcon", "running_task");
+				rec.setAttribute("completion", guiTask.getCompletionPercentage());
+				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 				break;
-			} else if (record.getAttribute("name").equals(guiTask.getName())
+			} else if (rec.getAttribute("name").equals(guiTask.getName())
 					&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
-				record.setAttribute("runningIcon", "idle_task");
-				record.setAttribute("completion", guiTask.getCompletionPercentage());
-				tasksGrid.refreshRow(tasksGrid.getRecordIndex(record));
+				rec.setAttribute("runningIcon", "idle_task");
+				rec.setAttribute("completion", guiTask.getCompletionPercentage());
+				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 				break;
 			}
 		}

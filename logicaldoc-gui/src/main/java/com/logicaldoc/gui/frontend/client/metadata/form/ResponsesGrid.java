@@ -93,8 +93,8 @@ public class ResponsesGrid extends RefreshableListGrid {
 		language.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return languages.get(record.getAttribute("language"));
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
+				return languages.get(rec.getAttribute("language"));
 			}
 		});
 
@@ -157,11 +157,11 @@ public class ResponsesGrid extends RefreshableListGrid {
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = getSelectedRecord();
-				if (record == null)
+				ListGridRecord rec = getSelectedRecord();
+				if (rec == null)
 					return;
 
-				DocumentsPanel.get().openInFolder(record.getAttributeAsLong("id"));
+				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
 			}
 		});
 

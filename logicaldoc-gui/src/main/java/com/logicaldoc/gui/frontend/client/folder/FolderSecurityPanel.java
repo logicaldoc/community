@@ -389,14 +389,14 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			}
 
 			// Update the rights table
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-			record.setAttribute("avatar", selectedRecord.getAttribute("id"));
-			record.setAttribute("entity",
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
+			rec.setAttribute("avatar", selectedRecord.getAttribute("id"));
+			rec.setAttribute("entity",
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-			record.setAttribute("read", true);
+			rec.setAttribute("read", true);
 
-			list.addData(record);
+			list.addData(rec);
 			user.clearValue();
 		});
 		buttons.addMember(userForm);
@@ -423,12 +423,12 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			}
 
 			// Update the rights table
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-			record.setAttribute("avatar", "group");
-			record.setAttribute("entity", selectedRecord.getAttribute("name"));
-			record.setAttribute("read", true);
-			list.addData(record);
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("entityId", selectedRecord.getAttribute("id"));
+			rec.setAttribute("avatar", "group");
+			rec.setAttribute("entity", selectedRecord.getAttribute("name"));
+			rec.setAttribute("read", true);
+			list.addData(rec);
 			group.clearValue();
 		});
 		buttons.addMember(groupForm);
@@ -512,34 +512,34 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		List<GUIRight> tmp = new ArrayList<GUIRight>();
 
 		for (int i = 0; i < totalRecords; i++) {
-			Record record = list.getRecordList().get(i);
-			if (!record.getAttributeAsBoolean("read"))
+			Record rec = list.getRecordList().get(i);
+			if (!rec.getAttributeAsBoolean("read"))
 				continue;
 
 			GUIRight right = new GUIRight();
 
-			right.setName(record.getAttributeAsString("entity"));
-			right.setEntityId(Long.parseLong(record.getAttribute("entityId")));
-			right.setPrint("true".equals(record.getAttributeAsString("print")));
-			right.setWrite("true".equals(record.getAttributeAsString("write")));
-			right.setDelete("true".equals(record.getAttributeAsString("delete")));
-			right.setAdd("true".equals(record.getAttributeAsString("add")));
-			right.setWorkflow("true".equals(record.getAttributeAsString("workflow")));
-			right.setSign("true".equals(record.getAttributeAsString("sign")));
-			right.setImport("true".equals(record.getAttributeAsString("import")));
-			right.setExport("true".equals(record.getAttributeAsString("export")));
-			right.setImmutable("true".equals(record.getAttributeAsString("immutable")));
-			right.setRename("true".equals(record.getAttributeAsString("rename")));
-			right.setSecurity("true".equals(record.getAttributeAsString("security")));
-			right.setArchive("true".equals(record.getAttributeAsString("archive")));
-			right.setDownload("true".equals(record.getAttributeAsString("download")));
-			right.setCalendar("true".equals(record.getAttributeAsString("calendar")));
-			right.setSubscription("true".equals(record.getAttributeAsString("subscription")));
-			right.setPassword("true".equals(record.getAttributeAsString("password")));
-			right.setMove("true".equals(record.getAttributeAsString("move")));
-			right.setEmail("true".equals(record.getAttributeAsString("email")));
-			right.setAutomation("true".equals(record.getAttributeAsString("automation")));
-			right.setStorage("true".equals(record.getAttributeAsString("storage")));
+			right.setName(rec.getAttributeAsString("entity"));
+			right.setEntityId(Long.parseLong(rec.getAttribute("entityId")));
+			right.setPrint("true".equals(rec.getAttributeAsString("print")));
+			right.setWrite("true".equals(rec.getAttributeAsString("write")));
+			right.setDelete("true".equals(rec.getAttributeAsString("delete")));
+			right.setAdd("true".equals(rec.getAttributeAsString("add")));
+			right.setWorkflow("true".equals(rec.getAttributeAsString("workflow")));
+			right.setSign("true".equals(rec.getAttributeAsString("sign")));
+			right.setImport("true".equals(rec.getAttributeAsString("import")));
+			right.setExport("true".equals(rec.getAttributeAsString("export")));
+			right.setImmutable("true".equals(rec.getAttributeAsString("immutable")));
+			right.setRename("true".equals(rec.getAttributeAsString("rename")));
+			right.setSecurity("true".equals(rec.getAttributeAsString("security")));
+			right.setArchive("true".equals(rec.getAttributeAsString("archive")));
+			right.setDownload("true".equals(rec.getAttributeAsString("download")));
+			right.setCalendar("true".equals(rec.getAttributeAsString("calendar")));
+			right.setSubscription("true".equals(rec.getAttributeAsString("subscription")));
+			right.setPassword("true".equals(rec.getAttributeAsString("password")));
+			right.setMove("true".equals(rec.getAttributeAsString("move")));
+			right.setEmail("true".equals(rec.getAttributeAsString("email")));
+			right.setAutomation("true".equals(rec.getAttributeAsString("automation")));
+			right.setStorage("true".equals(rec.getAttributeAsString("storage")));
 
 			tmp.add(right);
 		}

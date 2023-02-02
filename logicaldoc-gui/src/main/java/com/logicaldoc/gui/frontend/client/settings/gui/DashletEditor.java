@@ -156,8 +156,8 @@ public class DashletEditor extends Window {
 							|| sel.getAttributeAsString("name").equals("score"))
 						continue;
 
-					Record record = columnsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (record == null) {
+					Record rec = columnsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+					if (rec == null) {
 						ListGridRecord newRec = new ListGridRecord();
 						newRec.setAttribute("name", sel.getAttributeAsString("name"));
 						newRec.setAttribute("label", sel.getAttributeAsString("label"));
@@ -173,11 +173,11 @@ public class DashletEditor extends Window {
 		columnsGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
 
 		for (String column : dashlet.getColumnsList()) {
-			ListGridRecord record = new ListGridRecord();
+			ListGridRecord rec = new ListGridRecord();
 			String n = column.trim();
-			record.setAttribute("name", n);
-			record.setAttribute("label", Session.get().getInfo().getAttributeLabel(n));
-			columnsGrid.addData(record);
+			rec.setAttribute("name", n);
+			rec.setAttribute("label", Session.get().getInfo().getAttributeLabel(n));
+			columnsGrid.addData(rec);
 		}
 
 		VLayout columnsPanel = new VLayout();
@@ -263,10 +263,10 @@ public class DashletEditor extends Window {
 			dashlet.setColumns("");
 			ListGridRecord[] records = columnsGrid.getRecords();
 			if (records != null && records.length > 0) {
-				for (ListGridRecord record : records) {
+				for (ListGridRecord rec : records) {
 					if (!dashlet.getColumns().isEmpty())
 						dashlet.setColumns(dashlet.getColumns() + ",");
-					dashlet.setColumns(dashlet.getColumns() + record.getAttributeAsString("name"));
+					dashlet.setColumns(dashlet.getColumns() + rec.getAttributeAsString("name"));
 				}
 			}
 

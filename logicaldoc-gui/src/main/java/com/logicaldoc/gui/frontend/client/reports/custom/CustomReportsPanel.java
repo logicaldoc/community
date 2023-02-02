@@ -218,26 +218,26 @@ public class CustomReportsPanel extends AdminPanel {
 	}
 
 	private void updateReportRecord(GUIReport report) {
-		for (ListGridRecord record : list.getRecords()) {
-			if (Long.parseLong(record.getAttributeAsString("id")) != report.getId())
+		for (ListGridRecord rec : list.getRecords()) {
+			if (Long.parseLong(rec.getAttributeAsString("id")) != report.getId())
 				continue;
 
-			long oldVersion = record.getAttributeAsLong("recordVersion");
+			long oldVersion = rec.getAttributeAsLong("recordVersion");
 
-			record.setAttribute("runningIcon", record.getAttribute("name").equals(report.getName())
+			rec.setAttribute("runningIcon", rec.getAttribute("name").equals(report.getName())
 					&& report.getStatus() != GUIReport.STATUS_IDLE ? "running_task" : "idle_task");
-			record.setAttribute("status", report.getStatus());
-			record.setAttribute("lastRun", report.getLastRun());
-			record.setAttribute("lastModified", report.getLastModified());
-			record.setAttribute("recordVersion", report.getRecordVersion());
+			rec.setAttribute("status", report.getStatus());
+			rec.setAttribute("lastRun", report.getLastRun());
+			rec.setAttribute("lastModified", report.getLastModified());
+			rec.setAttribute("recordVersion", report.getRecordVersion());
 
 			if (report.getOutputDocId() != null)
-				record.setAttribute("outputDocId", "" + report.getOutputDocId());
+				rec.setAttribute("outputDocId", "" + report.getOutputDocId());
 			else
-				record.setAttribute("outputDocId", (String) null);
-			list.refreshRow(list.getRecordIndex(record));
+				rec.setAttribute("outputDocId", (String) null);
+			list.refreshRow(list.getRecordIndex(rec));
 
-			boolean selected = list.getSelectedRecord() != null ? record.equals(list.getSelectedRecord())
+			boolean selected = list.getSelectedRecord() != null ? rec.equals(list.getSelectedRecord())
 					: false;
 
 			// Decide if we have to refresh the properties
@@ -257,12 +257,12 @@ public class CustomReportsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long selectedId = Long.parseLong(record.getAttributeAsString("id"));
-		final Long outputDocId = record.getAttribute("outputDocId") != null
-				? Long.parseLong(record.getAttributeAsString("outputDocId"))
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long selectedId = Long.parseLong(rec.getAttributeAsString("id"));
+		final Long outputDocId = rec.getAttribute("outputDocId") != null
+				? Long.parseLong(rec.getAttributeAsString("outputDocId"))
 				: null;
-		final long outputFolderId = Long.parseLong(record.getAttributeAsString("outputFolderId"));
+		final long outputFolderId = Long.parseLong(rec.getAttributeAsString("outputFolderId"));
 
 		MenuItem execute = new MenuItem();
 		execute.setTitle(I18N.message("execute"));
@@ -293,7 +293,7 @@ public class CustomReportsPanel extends AdminPanel {
 			public void onClick(MenuItemClickEvent event) {
 				GUIReport report = new GUIReport();
 				report.setId(selectedId);
-				report.setName(record.getAttributeAsString("name"));
+				report.setName(rec.getAttributeAsString("name"));
 				ReportUploader uploader = new ReportUploader(CustomReportsPanel.this, report);
 				uploader.show();
 			}
@@ -331,7 +331,7 @@ public class CustomReportsPanel extends AdminPanel {
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ReportService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), true,
+				ReportService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -341,9 +341,9 @@ public class CustomReportsPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", true);
-								record.setAttribute("enabledIcon", "bullet_green");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", true);
+								rec.setAttribute("enabledIcon", "bullet_green");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -354,7 +354,7 @@ public class CustomReportsPanel extends AdminPanel {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ReportService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), false,
+				ReportService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -364,9 +364,9 @@ public class CustomReportsPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", false);
-								record.setAttribute("enabledIcon", "bullet_red");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", false);
+								rec.setAttribute("enabledIcon", "bullet_red");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -414,7 +414,7 @@ public class CustomReportsPanel extends AdminPanel {
 		export.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				Util.download(Util.contextPath() + "report/controller?command=export&reportId="
-						+ record.getAttributeAsString("id"));
+						+ rec.getAttributeAsString("id"));
 			}
 		});
 
@@ -439,35 +439,35 @@ public class CustomReportsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param report the report to update
 	 */
 	public void updateRecord(GUIReport report) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, report.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", report.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, report.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", report.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", report.getName());
-		record.setAttribute("eenabled", report.getEnabled() == 1 ? "0" : "2");
-		record.setAttribute("outputFormat", report.getOutputFormat());
+		rec.setAttribute("name", report.getName());
+		rec.setAttribute("eenabled", report.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute("outputFormat", report.getOutputFormat());
 		if (report.getOutputFolder() != null) {
-			record.setAttribute("outputFolder", report.getOutputFolder().getName());
-			record.setAttribute("outputFolderId", report.getOutputFolder().getId());
+			rec.setAttribute("outputFolder", report.getOutputFolder().getName());
+			rec.setAttribute("outputFolderId", report.getOutputFolder().getId());
 		}
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	private void onSelectedReport() {
-		Record record = list.getSelectedRecord();
-		if (record != null)
-			ReportService.Instance.get().getReport(Long.parseLong(record.getAttributeAsString("id")), true,
+		Record rec = list.getSelectedRecord();
+		if (rec != null)
+			ReportService.Instance.get().getReport(Long.parseLong(rec.getAttributeAsString("id")), true,
 					new AsyncCallback<GUIReport>() {
 
 						@Override

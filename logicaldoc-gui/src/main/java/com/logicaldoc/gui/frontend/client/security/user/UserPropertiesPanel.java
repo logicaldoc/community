@@ -303,9 +303,9 @@ public class UserPropertiesPanel extends HLayout {
 					groupsItem.clearValue();
 					Record[] records = groupsItem.getOptionDataSource().getCacheData();
 					if (records != null)
-						for (Record record : records) {
-							if (record.getAttributeAsString("name").equals(Constants.GROUP_GUEST)) {
-								groupsItem.setValues(record.getAttributeAsString("id"));
+						for (Record rec : records) {
+							if (rec.getAttributeAsString("name").equals(Constants.GROUP_GUEST)) {
+								groupsItem.setValues(rec.getAttributeAsString("id"));
 							}
 						}
 				}

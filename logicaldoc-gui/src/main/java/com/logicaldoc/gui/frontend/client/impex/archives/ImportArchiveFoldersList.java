@@ -113,8 +113,8 @@ public class ImportArchiveFoldersList extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final String name = record.getAttributeAsString("name");
+		final ListGridRecord rec = list.getSelectedRecord();
+		final String name = rec.getAttributeAsString("name");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));

@@ -178,8 +178,8 @@ public class WorkflowDashlet extends Portlet {
 					name, documents, lastnote, documentIds);
 
 		list.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
-			Record record = event.getRecord();
-			WorkflowService.Instance.get().getWorkflowDetailsByTask(record.getAttributeAsString("id"),
+			Record rec = event.getRecord();
+			WorkflowService.Instance.get().getWorkflowDetailsByTask(rec.getAttributeAsString("id"),
 					new AsyncCallback<GUIWorkflow>() {
 
 						@Override
@@ -259,8 +259,8 @@ public class WorkflowDashlet extends Portlet {
 
 	public void onDeletedWorkflow(String processId) {
 		Record[] records = list.findAll(new AdvancedCriteria("processId", OperatorId.EQUALS, processId));
-		for (Record record : records)
-			list.removeData(record);
+		for (Record rec : records)
+			list.removeData(rec);
 	}
 
 	private void showContextMenu() {
@@ -284,8 +284,8 @@ public class WorkflowDashlet extends Portlet {
 						if (value) {
 							ArrayList<String> ids = new ArrayList<String>();
 							ListGridRecord[] selectedRecords = list.getSelectedRecords();
-							for (ListGridRecord record : selectedRecords)
-								ids.add(record.getAttributeAsString("processId"));
+							for (ListGridRecord rec : selectedRecords)
+								ids.add(rec.getAttributeAsString("processId"));
 							workflowDashboard.killWorkflows(ids);
 						}
 					}

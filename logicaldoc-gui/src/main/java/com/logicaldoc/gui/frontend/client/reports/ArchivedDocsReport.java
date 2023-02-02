@@ -204,9 +204,9 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		openFolder.setTitle(I18N.message("openfolder"));
 		openFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-						Long.parseLong(record.getAttributeAsString("id")));
+				ListGridRecord rec = list.getSelectedRecord();
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+						Long.parseLong(rec.getAttributeAsString("id")));
 			}
 		});
 

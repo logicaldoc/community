@@ -204,11 +204,11 @@ public class TrashPanel extends VLayout {
 	private void deleteSelectedElements(final ListGridRecord[] records) {
 		final List<Long> docIds = new ArrayList<Long>();
 		final List<Long> folderIds = new ArrayList<Long>();
-		for (ListGridRecord record : records) {
-			if ("document".equals(record.getAttribute("type")))
-				docIds.add(Long.parseLong(record.getAttribute("id")));
+		for (ListGridRecord rec : records) {
+			if ("document".equals(rec.getAttribute("type")))
+				docIds.add(Long.parseLong(rec.getAttribute("id")));
 			else
-				folderIds.add(Long.parseLong(record.getAttribute("id")));
+				folderIds.add(Long.parseLong(rec.getAttribute("id")));
 		}
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean response) -> {

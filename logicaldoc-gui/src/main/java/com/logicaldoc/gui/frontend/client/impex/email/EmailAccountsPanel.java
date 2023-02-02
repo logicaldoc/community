@@ -149,9 +149,9 @@ public class EmailAccountsPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					EmailAccountService.Instance.get().get(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					EmailAccountService.Instance.get().get(Long.parseLong(rec.getAttributeAsString("id")),
 							new AsyncCallback<GUIEmailAccount>() {
 
 								@Override
@@ -183,8 +183,8 @@ public class EmailAccountsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -217,7 +217,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		test.setTitle(I18N.message("testconnection"));
 		test.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				EmailAccountService.Instance.get().test(Long.parseLong(record.getAttributeAsString("id")),
+				EmailAccountService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -240,7 +240,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				EmailAccountService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")),
+				EmailAccountService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
 						true, new AsyncCallback<Void>() {
 
 							@Override
@@ -250,8 +250,8 @@ public class EmailAccountsPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "0");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -261,7 +261,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				EmailAccountService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")),
+				EmailAccountService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
 						false, new AsyncCallback<Void>() {
 
 							@Override
@@ -271,8 +271,8 @@ public class EmailAccountsPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "2");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -320,8 +320,8 @@ public class EmailAccountsPanel extends AdminPanel {
 								@Override
 								public void onSuccess(Void result) {
 									GuiLog.info(I18N.message("counterreseted"), null);
-									record.setAttribute("emails", "0");
-									list.refreshRow(list.getRecordIndex(record));
+									rec.setAttribute("emails", "0");
+									list.refreshRow(list.getRecordIndex(rec));
 								}
 							});
 						}
@@ -330,7 +330,7 @@ public class EmailAccountsPanel extends AdminPanel {
 			}
 		});
 		
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString("eenabled")))
 			contextMenu.setItems(test, disable, delete, resetCache, resetCounter);
 		else
 			contextMenu.setItems(test, enable, delete, resetCache, resetCounter);
@@ -351,22 +351,22 @@ public class EmailAccountsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param account the email account to update
 	 */
 	public void updateRecord(GUIEmailAccount account) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, account.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", account.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, account.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", account.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("email", account.getMailAddress());
-		record.setAttribute("eenabled", account.getEnabled() == 1 ? "0" : "2");
-		list.refreshRow(list.getRecordIndex(record));
+		rec.setAttribute("email", account.getMailAddress());
+		rec.setAttribute("eenabled", account.getEnabled() == 1 ? "0" : "2");
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

@@ -36,9 +36,9 @@ public class ClipboardWindow extends Window {
 				if (selection == null || selection.length == 0) {
 					Clipboard.getInstance().clear();
 				} else {
-					for (ListGridRecord record : selection) {
+					for (ListGridRecord rec : selection) {
 						GUIDocument doc = new GUIDocument();
-						doc.setId(Long.parseLong(record.getAttribute("id")));
+						doc.setId(Long.parseLong(rec.getAttribute("id")));
 						Clipboard.getInstance().remove(doc);
 					}
 				}

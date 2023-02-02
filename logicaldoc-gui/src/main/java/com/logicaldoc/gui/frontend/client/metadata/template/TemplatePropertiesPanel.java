@@ -126,8 +126,8 @@ public class TemplatePropertiesPanel extends HLayout {
 
 			ListGridRecord[] records = attributesList.getRecords();
 			if (records != null)
-				for (ListGridRecord record : records)
-					attributesList.removeData(record);
+				for (ListGridRecord recd : records)
+					attributesList.removeData(recd);
 
 			fillAttributesList();
 		}
@@ -226,8 +226,8 @@ public class TemplatePropertiesPanel extends HLayout {
 		attributesList.addDropCompleteHandler((DropCompleteEvent event) -> {
 			List<String> attributes = new ArrayList<String>();
 			for (int i = 0; i < attributesList.getTotalRows(); i++) {
-				ListGridRecord record = attributesList.getRecord(i);
-				attributes.add(record.getAttributeAsString("name"));
+				ListGridRecord rec = attributesList.getRecord(i);
+				attributes.add(rec.getAttributeAsString("name"));
 			}
 
 			TemplatePropertiesPanel.this.template.reorderAttributes(attributes);
@@ -342,19 +342,19 @@ public class TemplatePropertiesPanel extends HLayout {
 				for (GUIAttributeSet set : sets)
 					setsMap.put(set.getId(), set);
 
-				for (ListGridRecord record : selection) {
+				for (ListGridRecord rec : selection) {
 					GUIAttribute setAttribute = null;
-					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong(SET_ID));
+					GUIAttributeSet set = setsMap.get(rec.getAttributeAsLong(SET_ID));
 					if (set != null)
-						setAttribute = set.getAttribute(record.getAttributeAsString("name"));
+						setAttribute = set.getAttribute(rec.getAttributeAsString("name"));
 
 					if (setAttribute != null) {
-						template.getAttribute(record.getAttributeAsString("name"))
+						template.getAttribute(rec.getAttributeAsString("name"))
 								.setInitialization(setAttribute.getInitialization());
-						record.setAttribute(INITIALIZATION, setAttribute.getInitialization());
+						rec.setAttribute(INITIALIZATION, setAttribute.getInitialization());
 					} else {
-						template.getAttribute(record.getAttributeAsString("name")).setInitialization(null);
-						record.setAttribute(INITIALIZATION, (String) null);
+						template.getAttribute(rec.getAttributeAsString("name")).setInitialization(null);
+						rec.setAttribute(INITIALIZATION, (String) null);
 					}
 				}
 
@@ -565,22 +565,22 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		for (int i = 0; i < attributes.length; i++) {
 			GUIAttribute att = attributes[i];
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("name", att.getName());
-			record.setAttribute(LABEL, att.getLabel());
-			record.setAttribute("set", att.getSet());
-			record.setAttribute(SET_ID, att.getSetId());
-			record.setAttribute("type", att.getType());
-			record.setAttribute(EDITOR, att.getEditor());
-			record.setAttribute(MANDATORY, att.isMandatory());
-			record.setAttribute(HIDDEN, att.isHidden());
-			record.setAttribute(READONLY, att.isReadonly());
-			record.setAttribute(MULTIPLE, att.isMultiple());
-			record.setAttribute(VALIDATION, att.getValidation());
-			record.setAttribute(INITIALIZATION, att.getInitialization());
-			record.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
-			record.setAttribute(DEPENDS_ON, att.getDependsOn());
-			attributesList.getRecordList().add(record);
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("name", att.getName());
+			rec.setAttribute(LABEL, att.getLabel());
+			rec.setAttribute("set", att.getSet());
+			rec.setAttribute(SET_ID, att.getSetId());
+			rec.setAttribute("type", att.getType());
+			rec.setAttribute(EDITOR, att.getEditor());
+			rec.setAttribute(MANDATORY, att.isMandatory());
+			rec.setAttribute(HIDDEN, att.isHidden());
+			rec.setAttribute(READONLY, att.isReadonly());
+			rec.setAttribute(MULTIPLE, att.isMultiple());
+			rec.setAttribute(VALIDATION, att.getValidation());
+			rec.setAttribute(INITIALIZATION, att.getInitialization());
+			rec.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
+			rec.setAttribute(DEPENDS_ON, att.getDependsOn());
+			attributesList.getRecordList().add(rec);
 		}
 	}
 
@@ -719,19 +719,19 @@ public class TemplatePropertiesPanel extends HLayout {
 				for (GUIAttributeSet set : sets)
 					setsMap.put(set.getId(), set);
 
-				for (ListGridRecord record : selection) {
+				for (ListGridRecord rec : selection) {
 					GUIAttribute setAttribute = null;
-					GUIAttributeSet set = setsMap.get(record.getAttributeAsLong(SET_ID));
+					GUIAttributeSet set = setsMap.get(rec.getAttributeAsLong(SET_ID));
 					if (set != null)
-						setAttribute = set.getAttribute(record.getAttributeAsString("name"));
+						setAttribute = set.getAttribute(rec.getAttributeAsString("name"));
 
 					if (setAttribute != null) {
-						template.getAttribute(record.getAttributeAsString("name"))
+						template.getAttribute(rec.getAttributeAsString("name"))
 								.setValidation(setAttribute.getValidation());
-						record.setAttribute(VALIDATION, setAttribute.getValidation());
+						rec.setAttribute(VALIDATION, setAttribute.getValidation());
 					} else {
-						template.getAttribute(record.getAttributeAsString("name")).setValidation(null);
-						record.setAttribute(VALIDATION, (String) null);
+						template.getAttribute(rec.getAttributeAsString("name")).setValidation(null);
+						rec.setAttribute(VALIDATION, (String) null);
 					}
 				}
 

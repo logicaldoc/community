@@ -150,7 +150,7 @@ public class CalendarReport extends AdminPanel {
 		frequency.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				String v = value.toString();
 
 				if ("1".equals(v)) {
@@ -178,7 +178,7 @@ public class CalendarReport extends AdminPanel {
 		status.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				String v = value.toString();
 
 				if ("1".equals(v)) {
@@ -333,15 +333,15 @@ public class CalendarReport extends AdminPanel {
 						if (result != null && result.length > 0) {
 							ListGridRecord[] records = new ListGridRecord[result.length];
 							for (int i = 0; i < result.length; i++) {
-								ListGridRecord record = new ListGridRecord();
-								record.setAttribute("date", result[i].getStartDate());
-								record.setAttribute("title", result[i].getTitle());
-								record.setAttribute("type", result[i].getType());
-								record.setAttribute("subtype", result[i].getSubType());
-								record.setAttribute("frequency", result[i].getFrequency());
-								record.setAttribute("status", result[i].getStatus());
-								record.setAttribute("description", result[i].getDescription());
-								record.setAttribute("endDate", result[i].getDeadline());
+								ListGridRecord rec = new ListGridRecord();
+								rec.setAttribute("date", result[i].getStartDate());
+								rec.setAttribute("title", result[i].getTitle());
+								rec.setAttribute("type", result[i].getType());
+								rec.setAttribute("subtype", result[i].getSubType());
+								rec.setAttribute("frequency", result[i].getFrequency());
+								rec.setAttribute("status", result[i].getStatus());
+								rec.setAttribute("description", result[i].getDescription());
+								rec.setAttribute("endDate", result[i].getDeadline());
 
 								StringBuilder participants = new StringBuilder();
 								GUIUser[] users = result[i].getParticipants();
@@ -350,9 +350,9 @@ public class CalendarReport extends AdminPanel {
 										participants.append(", ");
 									participants.append(user.toString());
 								}
-								record.setAttribute("participants", participants.toString());
+								rec.setAttribute("participants", participants.toString());
 
-								records[i] = record;
+								records[i] = rec;
 							}
 							list.setData(records);
 						}

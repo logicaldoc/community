@@ -115,10 +115,10 @@ public class FolderTemplatesPanel extends AdminPanel {
 		GUIValue[] templates = new GUIValue[records != null ? records.length : 0];
 		int i = 0;
 		if (records != null)
-			for (Record record : records) {
+			for (Record rec : records) {
 				templates[i] = new GUIValue();
-				templates[i].setCode(record.getAttributeAsString("name"));
-				templates[i++].setValue(record.getAttributeAsString("folders"));
+				templates[i].setCode(rec.getAttributeAsString("name"));
+				templates[i++].setValue(rec.getAttributeAsString("folders"));
 			}
 
 		FolderService.Instance.get().saveTemplates(templates, new AsyncCallback<Void>() {
@@ -169,10 +169,10 @@ public class FolderTemplatesPanel extends AdminPanel {
 		ListGridRecord[] records = new ListGridRecord[templates.length];
 		int i = 0;
 		for (GUIValue template : templates) {
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("name", template.getCode());
-			record.setAttribute("folders", template.getValue());
-			records[i++] = record;
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("name", template.getCode());
+			rec.setAttribute("folders", template.getValue());
+			records[i++] = rec;
 		}
 		grid.setData(records);
 

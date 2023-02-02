@@ -161,7 +161,7 @@ public class BruteForcePanel extends AdminPanel {
 		entity.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				String name = ((String) value).substring(((String) value).lastIndexOf('-') + 1);
 				return name;
 			}
@@ -183,12 +183,12 @@ public class BruteForcePanel extends AdminPanel {
 		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
 		if (data != null)
 			for (GUISequence cid : data) {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("id", cid.getId());
-				record.setAttribute("entity", cid.getName());
-				record.setAttribute("attempts", cid.getValue());
-				record.setAttribute("lastmodified", cid.getLastModified());
-				records.add(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("id", cid.getId());
+				rec.setAttribute("entity", cid.getName());
+				rec.setAttribute("attempts", cid.getValue());
+				rec.setAttribute("lastmodified", cid.getLastModified());
+				records.add(rec);
 			}
 		blockedEntities.setData(records.toArray(new ListGridRecord[0]));
 

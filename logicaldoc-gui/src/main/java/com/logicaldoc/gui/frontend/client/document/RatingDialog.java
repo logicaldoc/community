@@ -95,7 +95,7 @@ public class RatingDialog extends Window {
 				vote.setCellFormatter(new CellFormatter() {
 
 					@Override
-					public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+					public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 						return DocUtil.getRatingIcon((Integer) value);
 					}
 				});

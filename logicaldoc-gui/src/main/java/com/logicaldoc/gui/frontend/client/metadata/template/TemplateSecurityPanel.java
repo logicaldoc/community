@@ -152,12 +152,12 @@ public class TemplateSecurityPanel extends VLayout {
 				}
 
 				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-				record.setAttribute("avatar", "group");
-				record.setAttribute("entity", selectedRecord.getAttribute("name"));
-				record.setAttribute("read", true);
-				list.addData(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("entityId", selectedRecord.getAttribute("id"));
+				rec.setAttribute("avatar", "group");
+				rec.setAttribute("entity", selectedRecord.getAttribute("name"));
+				rec.setAttribute("read", true);
+				list.addData(rec);
 				changedHandler.onChanged(null);
 				group.clearValue();
 			}
@@ -185,14 +185,14 @@ public class TemplateSecurityPanel extends VLayout {
 				}
 
 				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-				record.setAttribute("avatar", selectedRecord.getAttribute("id"));
-				record.setAttribute("entity",
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
+				rec.setAttribute("avatar", selectedRecord.getAttribute("id"));
+				rec.setAttribute("entity",
 						selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-				record.setAttribute("read", true);
+				rec.setAttribute("read", true);
 
-				list.addData(record);
+				list.addData(rec);
 				changedHandler.onChanged(null);
 				user.clearValue();
 		});
@@ -241,15 +241,15 @@ public class TemplateSecurityPanel extends VLayout {
 		List<GUIRight> tmp = new ArrayList<GUIRight>();
 
 		for (int i = 0; i < totalRecords; i++) {
-			Record record = list.getRecordList().get(i);
-			if (!record.getAttributeAsBoolean("read"))
+			Record rec = list.getRecordList().get(i);
+			if (!rec.getAttributeAsBoolean("read"))
 				continue;
 
 			GUIRight right = new GUIRight();
 
-			right.setName(record.getAttributeAsString("entity"));
-			right.setEntityId(Long.parseLong(record.getAttribute("entityId")));
-			right.setWrite("true".equals(record.getAttributeAsString("write")));
+			right.setName(rec.getAttributeAsString("entity"));
+			right.setEntityId(Long.parseLong(rec.getAttribute("entityId")));
+			right.setWrite("true".equals(rec.getAttributeAsString("write")));
 
 			tmp.add(right);
 		}

@@ -127,8 +127,8 @@ public class GUIGridsPanel extends VLayout {
 							|| sel.getAttributeAsString("name").equals("score"))
 						continue;
 
-					Record record = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (record == null) {
+					Record rec = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+					if (rec == null) {
 						ListGridRecord newRec = new ListGridRecord();
 						newRec.setAttribute("name", sel.getAttributeAsString("name"));
 						newRec.setAttribute("label", sel.getAttributeAsString("label"));
@@ -148,11 +148,11 @@ public class GUIGridsPanel extends VLayout {
 		if (columns != null) {
 			String[] attributes = columns.split("\\,");
 			for (String att : attributes) {
-				ListGridRecord record = new ListGridRecord();
+				ListGridRecord rec = new ListGridRecord();
 				String n = att.trim();
-				record.setAttribute("name", n);
-				record.setAttribute("label", Session.get().getInfo().getAttributeLabel(n));
-				documentsFieldsGrid.addData(record);
+				rec.setAttribute("name", n);
+				rec.setAttribute("label", Session.get().getInfo().getAttributeLabel(n));
+				documentsFieldsGrid.addData(rec);
 			}
 		}
 
@@ -219,8 +219,8 @@ public class GUIGridsPanel extends VLayout {
 			public void onChanged(ChangedEvent event) {
 				ListGridRecord[] seletion = selector.getSelectedRecords();
 				for (ListGridRecord sel : seletion) {
-					Record record = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (record == null) {
+					Record rec = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+					if (rec == null) {
 						ListGridRecord newRec = new ListGridRecord();
 						newRec.setAttribute("name", sel.getAttributeAsString("name"));
 						newRec.setAttribute("label", sel.getAttributeAsString("label"));
@@ -247,11 +247,11 @@ public class GUIGridsPanel extends VLayout {
 		if (columns != null) {
 			String[] attributes = columns.split("\\,");
 			for (String att : attributes) {
-				ListGridRecord record = new ListGridRecord();
+				ListGridRecord rec = new ListGridRecord();
 				String n = att.trim();
-				record.setAttribute("name", n);
-				record.setAttribute("label", I18N.message(Session.get().getInfo().getAttributeLabel(n)));
-				searchGrid.addData(record);
+				rec.setAttribute("name", n);
+				rec.setAttribute("label", I18N.message(Session.get().getInfo().getAttributeLabel(n)));
+				searchGrid.addData(rec);
 			}
 		}
 

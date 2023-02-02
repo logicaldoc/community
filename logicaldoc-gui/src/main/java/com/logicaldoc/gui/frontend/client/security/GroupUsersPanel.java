@@ -137,16 +137,16 @@ public class GroupUsersPanel extends VLayout {
 							@Override
 							public void onSuccess(Void ret) {
 								// Update the users table
-								ListGridRecord record = new ListGridRecord();
-								record.setAttribute("id", selectedRecord.getAttribute("id"));
-								record.setAttribute("username", selectedRecord.getAttribute("username"));
-								record.setAttribute("name", selectedRecord.getAttribute("name"));
-								record.setAttribute("firstName", selectedRecord.getAttribute("firstName"));
-								record.setAttribute("email", selectedRecord.getAttribute("email"));
-								record.setAttribute("phone", selectedRecord.getAttribute("phone"));
-								record.setAttribute("cell", selectedRecord.getAttribute("cell"));
-								record.setAttribute("eenabled", selectedRecord.getAttribute("eenabled"));
-								list.addData(record);
+								ListGridRecord rec = new ListGridRecord();
+								rec.setAttribute("id", selectedRecord.getAttribute("id"));
+								rec.setAttribute("username", selectedRecord.getAttribute("username"));
+								rec.setAttribute("name", selectedRecord.getAttribute("name"));
+								rec.setAttribute("firstName", selectedRecord.getAttribute("firstName"));
+								rec.setAttribute("email", selectedRecord.getAttribute("email"));
+								rec.setAttribute("phone", selectedRecord.getAttribute("phone"));
+								rec.setAttribute("cell", selectedRecord.getAttribute("cell"));
+								rec.setAttribute("eenabled", selectedRecord.getAttribute("eenabled"));
+								list.addData(rec);
 								user.clearValue();
 							}
 						});

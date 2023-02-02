@@ -108,7 +108,7 @@ public class ResponsesStatsPanel extends VLayout {
 		chart.setDetailFormatter(new DetailFormatter() {
 
 			@Override
-			public String format(Object value, Record record, DetailViewerField field) {
+			public String format(Object value, Record rec, DetailViewerField field) {
 				if (value == null)
 					return "";
 

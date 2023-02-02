@@ -132,9 +132,9 @@ public class AutomationRoutinesPanel extends VLayout {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					AutomationService.Instance.get().getRoutine(record.getAttributeAsLong("id"),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					AutomationService.Instance.get().getRoutine(rec.getAttributeAsLong("id"),
 							new AsyncCallback<GUIAutomationRoutine>() {
 
 								@Override
@@ -173,8 +173,8 @@ public class AutomationRoutinesPanel extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -222,24 +222,24 @@ public class AutomationRoutinesPanel extends VLayout {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param routine the routine to update
 	 */
 	public void updateRecord(GUIAutomationRoutine routine) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, routine.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", routine.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, routine.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", routine.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", routine.getName());
-		record.setAttribute("description", routine.getDescription());
-		record.setAttribute("automation", routine.getAutomation());
+		rec.setAttribute("name", routine.getName());
+		rec.setAttribute("description", routine.getDescription());
+		rec.setAttribute("automation", routine.getAutomation());
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

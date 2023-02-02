@@ -89,11 +89,11 @@ public class MessageTemplatesPanel extends VLayout {
 						new ValueCallback() {
 							@Override
 							public void execute(String value) {
-								ListGridRecord record = new ListGridRecord();
-								record.setAttribute("id", "-1");
-								record.setAttribute("type", "user");
-								record.setAttribute("name", value);
-								list.getRecordList().addAt(record, 0);
+								ListGridRecord rec = new ListGridRecord();
+								rec.setAttribute("id", "-1");
+								rec.setAttribute("type", "user");
+								rec.setAttribute("name", value);
+								list.getRecordList().addAt(rec, 0);
 								list.startEditing(0);
 							}
 						});
@@ -222,14 +222,14 @@ public class MessageTemplatesPanel extends VLayout {
 		Record[] records = list.getRecords();
 		GUIMessageTemplate[] templates = new GUIMessageTemplate[records.length];
 		int i = 0;
-		for (Record record : records) {
+		for (Record rec : records) {
 			GUIMessageTemplate t = new GUIMessageTemplate();
-			t.setId(new Long(record.getAttributeAsString("id")));
+			t.setId(new Long(rec.getAttributeAsString("id")));
 			t.setLanguage(lang);
-			t.setName(record.getAttributeAsString("name"));
-			t.setSubject(record.getAttributeAsString("subject"));
-			t.setBody(record.getAttributeAsString("body"));
-			t.setType(record.getAttributeAsString("type"));
+			t.setName(rec.getAttributeAsString("name"));
+			t.setSubject(rec.getAttributeAsString("subject"));
+			t.setBody(rec.getAttributeAsString("body"));
+			t.setType(rec.getAttributeAsString("type"));
 
 			templates[i++] = t;
 		}
@@ -316,14 +316,14 @@ public class MessageTemplatesPanel extends VLayout {
 				ListGridRecord[] records = new ListGridRecord[templates.length];
 				int i = 0;
 				for (GUIMessageTemplate pat : templates) {
-					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("id", pat.getId());
-					record.setAttribute("name", pat.getName());
-					record.setAttribute("language", pat.getName());
-					record.setAttribute("subject", pat.getSubject());
-					record.setAttribute("body", pat.getBody());
-					record.setAttribute("type", pat.getType());
-					records[i++] = record;
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("id", pat.getId());
+					rec.setAttribute("name", pat.getName());
+					rec.setAttribute("language", pat.getName());
+					rec.setAttribute("subject", pat.getSubject());
+					rec.setAttribute("body", pat.getBody());
+					rec.setAttribute("type", pat.getType());
+					records[i++] = rec;
 				}
 				list.setData(records);
 			}

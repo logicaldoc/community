@@ -127,15 +127,15 @@ public class GDriveImport extends Window {
 						ListGridRecord[] records = new ListGridRecord[hits.length];
 						int i = 0;
 						for (GUIDocument hit : hits) {
-							ListGridRecord record = new ListGridRecord();
-							record.setAttribute("resourceId", hit.getExtResId());
-							record.setAttribute("icon", hit.getIcon());
-							record.setAttribute("filename", hit.getFileName());
-							record.setAttribute("version", hit.getVersion());
-							record.setAttribute("size", hit.getFileSize());
-							record.setAttribute("editor", hit.getPublisher());
-							record.setAttribute("lastModified", hit.getLastModified());
-							records[i++] = record;
+							ListGridRecord rec = new ListGridRecord();
+							rec.setAttribute("resourceId", hit.getExtResId());
+							rec.setAttribute("icon", hit.getIcon());
+							rec.setAttribute("filename", hit.getFileName());
+							rec.setAttribute("version", hit.getVersion());
+							rec.setAttribute("size", hit.getFileSize());
+							rec.setAttribute("editor", hit.getPublisher());
+							rec.setAttribute("lastModified", hit.getLastModified());
+							records[i++] = rec;
 						}
 						grid.setData(records);
 					}

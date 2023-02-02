@@ -264,7 +264,7 @@ public interface FolderService extends RemoteService {
 	 * tree
 	 * 
 	 * @param folderId ID of the folder
-	 * @param startRecord Start record index
+	 * @param startRecord Start rec index
 	 * @param pageSize Current page size
 	 * 
 	 * @throws ServerException an error happened in the server application

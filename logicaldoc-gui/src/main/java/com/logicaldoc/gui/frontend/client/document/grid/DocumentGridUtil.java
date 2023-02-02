@@ -38,207 +38,207 @@ public class DocumentGridUtil {
 	static public GUIDocument[] toDocuments(Record[] records) {
 		ArrayList<GUIDocument> docs = new ArrayList<GUIDocument>();
 		if (records != null)
-			for (Record record : records)
-				docs.add(DocumentGridUtil.toDocument(record));
+			for (Record rec : records)
+				docs.add(DocumentGridUtil.toDocument(rec));
 		return docs.toArray(new GUIDocument[0]);
 	}
 
-	static public GUIDocument toDocument(Record record) {
+	static public GUIDocument toDocument(Record rec) {
 		try {
-			return prepareDocument(record);
+			return prepareDocument(rec);
 		} catch (Throwable t) {
 			GuiLog.warn(t.getMessage(), null);
 			return null;
 		}
 	}
 
-	private static GUIDocument prepareDocument(Record record) {
+	private static GUIDocument prepareDocument(Record rec) {
 		GUIDocument document = null;
-		if (record != null) {
+		if (rec != null) {
 			document = new GUIDocument();
-			setId(record, document);
+			setId(rec, document);
 
-			document.setIcon(record.getAttribute("icon"));
-			document.setExtResId(record.getAttributeAsString("extResId"));
-			document.setCustomId(record.getAttributeAsString("customId"));
-			document.setType(record.getAttribute("type"));
-			document.setFileName(record.getAttribute("filename"));
-			document.setTemplate(record.getAttribute("template"));
-			document.setVersion(record.getAttribute("version"));
-			document.setFileVersion(record.getAttribute("fileVersion"));
-			document.setLanguage(record.getAttribute("language"));
-			document.setPublisher(record.getAttributeAsString("publisher"));
+			document.setIcon(rec.getAttribute("icon"));
+			document.setExtResId(rec.getAttributeAsString("extResId"));
+			document.setCustomId(rec.getAttributeAsString("customId"));
+			document.setType(rec.getAttribute("type"));
+			document.setFileName(rec.getAttribute("filename"));
+			document.setTemplate(rec.getAttribute("template"));
+			document.setVersion(rec.getAttribute("version"));
+			document.setFileVersion(rec.getAttribute("fileVersion"));
+			document.setLanguage(rec.getAttribute("language"));
+			document.setPublisher(rec.getAttributeAsString("publisher"));
 
-			if (record.getAttribute("tenantId") != null)
-				document.setTenantId(record.getAttributeAsLong("tenantId"));
+			if (rec.getAttribute("tenantId") != null)
+				document.setTenantId(rec.getAttributeAsLong("tenantId"));
 
-			if (record.getAttributeAsFloat("size") != null)
-				document.setFileSize(record.getAttributeAsLong("size"));
+			if (rec.getAttributeAsFloat("size") != null)
+				document.setFileSize(rec.getAttributeAsLong("size"));
 
-			if (record.getAttributeAsFloat("pages") != null)
-				document.setPages(record.getAttributeAsInt("pages"));
+			if (rec.getAttributeAsFloat("pages") != null)
+				document.setPages(rec.getAttributeAsInt("pages"));
 
-			if (record.getAttributeAsInt("indexed") != null)
-				document.setIndexed(record.getAttributeAsInt("indexed"));
+			if (rec.getAttributeAsInt("indexed") != null)
+				document.setIndexed(rec.getAttributeAsInt("indexed"));
 
-			if (record.getAttributeAsInt("status") != null)
-				document.setStatus(record.getAttributeAsInt("status"));
+			if (rec.getAttributeAsInt("status") != null)
+				document.setStatus(rec.getAttributeAsInt("status"));
 
-			setFlags(record, document);
+			setFlags(rec, document);
 
-			setUsers(record, document);
+			setUsers(rec, document);
 
-			setWorkflow(record, document);
+			setWorkflow(rec, document);
 
-			setDates(record, document);
+			setDates(rec, document);
 
-			setFolder(record, document);
+			setFolder(rec, document);
 		}
 		return document;
 	}
 
-	private static void setUsers(Record record, GUIDocument document) {
-		if (record.getAttribute("lockUserId") != null)
-			document.setLockUserId(record.getAttributeAsLong("lockUserId"));
+	private static void setUsers(Record rec, GUIDocument document) {
+		if (rec.getAttribute("lockUserId") != null)
+			document.setLockUserId(rec.getAttributeAsLong("lockUserId"));
 
-		if (record.getAttribute("lockUser") != null)
-			document.setLockUser(record.getAttribute("lockUser"));
+		if (rec.getAttribute("lockUser") != null)
+			document.setLockUser(rec.getAttribute("lockUser"));
 
-		if (record.getAttribute("publisherId") != null)
-			document.setPublisherId(record.getAttributeAsLong("publisherId"));
+		if (rec.getAttribute("publisherId") != null)
+			document.setPublisherId(rec.getAttributeAsLong("publisherId"));
 
-		if (record.getAttribute("creatorId") != null)
-			document.setCreatorId(record.getAttributeAsLong("creatorId"));
+		if (rec.getAttribute("creatorId") != null)
+			document.setCreatorId(rec.getAttributeAsLong("creatorId"));
 	}
 
-	private static void setFlags(Record record, GUIDocument document) {
-		if (record.getAttributeAsInt("immutable") != null)
-			document.setImmutable(record.getAttributeAsInt("immutable"));
+	private static void setFlags(Record rec, GUIDocument document) {
+		if (rec.getAttributeAsInt("immutable") != null)
+			document.setImmutable(rec.getAttributeAsInt("immutable"));
 
-		if (record.getAttributeAsInt("password") != null)
-			document.setPasswordProtected(record.getAttributeAsBoolean("password"));
+		if (rec.getAttributeAsInt("password") != null)
+			document.setPasswordProtected(rec.getAttributeAsBoolean("password"));
 
-		if (record.getAttributeAsInt("signed") != null)
-			document.setSigned(record.getAttributeAsInt("signed"));
+		if (rec.getAttributeAsInt("signed") != null)
+			document.setSigned(rec.getAttributeAsInt("signed"));
 
-		if (record.getAttributeAsInt("stamped") != null)
-			document.setStamped(record.getAttributeAsInt("stamped"));
+		if (rec.getAttributeAsInt("stamped") != null)
+			document.setStamped(rec.getAttributeAsInt("stamped"));
 
-		if (record.getAttributeAsInt("bookmarked") != null)
-			document.setBookmarked(record.getAttributeAsBoolean("bookmarked"));
+		if (rec.getAttributeAsInt("bookmarked") != null)
+			document.setBookmarked(rec.getAttributeAsBoolean("bookmarked"));
 	}
 
-	private static void setDates(Record record, GUIDocument document) {
-		if (record.getAttributeAsDate("lastModified") != null)
-			document.setLastModified(record.getAttributeAsDate("lastModified"));
-		if (record.getAttributeAsDate("published") != null)
-			document.setDate(record.getAttributeAsDate("published"));
-		if (record.getAttributeAsDate("created") != null)
-			document.setCreation(record.getAttributeAsDate("created"));
+	private static void setDates(Record rec, GUIDocument document) {
+		if (rec.getAttributeAsDate("lastModified") != null)
+			document.setLastModified(rec.getAttributeAsDate("lastModified"));
+		if (rec.getAttributeAsDate("published") != null)
+			document.setDate(rec.getAttributeAsDate("published"));
+		if (rec.getAttributeAsDate("created") != null)
+			document.setCreation(rec.getAttributeAsDate("created"));
 	}
 
-	private static void setWorkflow(Record record, GUIDocument document) {
-		if (record.getAttributeAsInt("workflowStatus") != null)
-			document.setWorkflowStatus(record.getAttributeAsString("workflowStatus"));
+	private static void setWorkflow(Record rec, GUIDocument document) {
+		if (rec.getAttributeAsInt("workflowStatus") != null)
+			document.setWorkflowStatus(rec.getAttributeAsString("workflowStatus"));
 
-		if (record.getAttributeAsString("workflowStatusDisplay") != null)
-			document.setWorkflowStatusDisplay(record.getAttributeAsString("workflowStatusDisplay"));
+		if (rec.getAttributeAsString("workflowStatusDisplay") != null)
+			document.setWorkflowStatusDisplay(rec.getAttributeAsString("workflowStatusDisplay"));
 	}
 
-	private static void setId(Record record, GUIDocument document) {
-		document.setId(record.getAttributeAsLong("id"));
-		if (record.getAttribute("docref") != null) {
-			document.setDocRef(Long.parseLong(record.getAttribute("docref")));
-			document.setDocRefType(record.getAttribute("docrefType"));
+	private static void setId(Record rec, GUIDocument document) {
+		document.setId(rec.getAttributeAsLong("id"));
+		if (rec.getAttribute("docref") != null) {
+			document.setDocRef(Long.parseLong(rec.getAttribute("docref")));
+			document.setDocRefType(rec.getAttribute("docrefType"));
 		}
 	}
 
-	private static void setFolder(Record record, GUIDocument document) {
+	private static void setFolder(Record rec, GUIDocument document) {
 		GUIFolder folder = new GUIFolder();
 		if ("folder".equals(document.getType())) {
-			folder.setId(Long.parseLong(record.getAttributeAsString("id")));
-		} else if (record.getAttributeAsLong("folderId") != null)
-			folder.setId(record.getAttributeAsLong("folderId"));
+			folder.setId(Long.parseLong(rec.getAttributeAsString("id")));
+		} else if (rec.getAttributeAsLong("folderId") != null)
+			folder.setId(rec.getAttributeAsLong("folderId"));
 		else
 			folder.setId(FolderController.get().getCurrentFolder().getFoldRef() != null
 					? FolderController.get().getCurrentFolder().getFoldRef()
 					: FolderController.get().getCurrentFolder().getId());
-		folder.setName(record.getAttribute("filename"));
-		folder.setDescription(record.getAttribute("comment"));
+		folder.setName(rec.getAttribute("filename"));
+		folder.setDescription(rec.getAttribute("comment"));
 
 		document.setFolder(folder);
 	}
 
 	static public ListGridRecord fromDocument(GUIDocument doc) {
-		ListGridRecord record = new ListGridRecord();
-		updateRecord(doc, record);
-		return record;
+		ListGridRecord rec = new ListGridRecord();
+		updateRecord(doc, rec);
+		return rec;
 	}
 
-	static public void updateRecord(GUIDocument doc, Record record) {
-		if (record == null || doc == null)
+	static public void updateRecord(GUIDocument doc, Record rec) {
+		if (rec == null || doc == null)
 			return;
 
-		if ("folder".equals(record.getAttribute("type"))) {
-			record.setAttribute("filename", doc.getFolder().getName());
-			record.setAttribute("comment", doc.getFolder().getDescription());
-			record.setAttribute("folderId", doc.getId());
-			record.setAttribute("tenantId", doc.getTenantId());
+		if ("folder".equals(rec.getAttribute("type"))) {
+			rec.setAttribute("filename", doc.getFolder().getName());
+			rec.setAttribute("comment", doc.getFolder().getDescription());
+			rec.setAttribute("folderId", doc.getId());
+			rec.setAttribute("tenantId", doc.getTenantId());
 		} else {
-			record.setAttribute("summary", record.getAttribute("summary"));
+			rec.setAttribute("summary", rec.getAttribute("summary"));
 
-			updateDocRef(doc, record);
+			updateDocRef(doc, rec);
 
-			record.setAttribute("filename", doc.getFileName());
-			record.setAttribute("size", doc.getFileSize());
-			record.setAttribute("pages", doc.getPages());
-			record.setAttribute("tenantId", doc.getTenantId());
+			rec.setAttribute("filename", doc.getFileName());
+			rec.setAttribute("size", doc.getFileSize());
+			rec.setAttribute("pages", doc.getPages());
+			rec.setAttribute("tenantId", doc.getTenantId());
 
-			updateIcon(doc, record);
+			updateIcon(doc, rec);
 
-			record.setAttribute("lastModified", doc.getLastModified());
-			record.setAttribute("published", doc.getDate());
-			record.setAttribute("publisher", doc.getPublisher());
-			record.setAttribute("publisherId", doc.getPublisherId());
-			record.setAttribute("creator", doc.getCreator());
-			record.setAttribute("creatorId", doc.getCreatorId());
-			record.setAttribute("created", doc.getCreation());
-			record.setAttribute("customId", doc.getCustomId());
-			record.setAttribute("type", doc.getType());
-			record.setAttribute("immutable", doc.getImmutable());
-			record.setAttribute("password", doc.isPasswordProtected());
-			record.setAttribute("signed", doc.getSigned());
-			record.setAttribute("stamped", doc.getStamped());
-			record.setAttribute("fileVersion", doc.getFileVersion());
-			record.setAttribute("version", doc.getVersion());
-			record.setAttribute("comment", doc.getComment());
-			record.setAttribute("workflowStatus", doc.getWorkflowStatus());
-			record.setAttribute("workflowStatusDisplay", doc.getWorkflowStatusDisplay());
-			record.setAttribute("color", doc.getColor());
-			record.setAttribute("startPublishing", doc.getStartPublishing());
-			record.setAttribute("stopPublishing", doc.getStopPublishing());
-			record.setAttribute("publishedStatus", doc.getPublished() == 1 ? "yes" : "no");
-			record.setAttribute("score", doc.getScore());
-			record.setAttribute("summary", doc.getSummary());
-			record.setAttribute("rating", doc.getRating());
-			record.setAttribute("template", doc.getTemplate());
-			record.setAttribute("lockUserId", doc.getLockUserId());
-			record.setAttribute("lockUser", doc.getLockUser());
-			record.setAttribute("indexed", doc.getIndexed());
-			record.setAttribute("status", doc.getStatus());
-			record.setAttribute("bookmarked", doc.isBookmarked());
-			record.setAttribute("extResId", doc.getExtResId());
-			record.setAttribute("language", doc.getLanguage());
-			record.setAttribute("links", doc.getLinks());
-			record.setAttribute("tags", doc.getTgs());
+			rec.setAttribute("lastModified", doc.getLastModified());
+			rec.setAttribute("published", doc.getDate());
+			rec.setAttribute("publisher", doc.getPublisher());
+			rec.setAttribute("publisherId", doc.getPublisherId());
+			rec.setAttribute("creator", doc.getCreator());
+			rec.setAttribute("creatorId", doc.getCreatorId());
+			rec.setAttribute("created", doc.getCreation());
+			rec.setAttribute("customId", doc.getCustomId());
+			rec.setAttribute("type", doc.getType());
+			rec.setAttribute("immutable", doc.getImmutable());
+			rec.setAttribute("password", doc.isPasswordProtected());
+			rec.setAttribute("signed", doc.getSigned());
+			rec.setAttribute("stamped", doc.getStamped());
+			rec.setAttribute("fileVersion", doc.getFileVersion());
+			rec.setAttribute("version", doc.getVersion());
+			rec.setAttribute("comment", doc.getComment());
+			rec.setAttribute("workflowStatus", doc.getWorkflowStatus());
+			rec.setAttribute("workflowStatusDisplay", doc.getWorkflowStatusDisplay());
+			rec.setAttribute("color", doc.getColor());
+			rec.setAttribute("startPublishing", doc.getStartPublishing());
+			rec.setAttribute("stopPublishing", doc.getStopPublishing());
+			rec.setAttribute("publishedStatus", doc.getPublished() == 1 ? "yes" : "no");
+			rec.setAttribute("score", doc.getScore());
+			rec.setAttribute("summary", doc.getSummary());
+			rec.setAttribute("rating", doc.getRating());
+			rec.setAttribute("template", doc.getTemplate());
+			rec.setAttribute("lockUserId", doc.getLockUserId());
+			rec.setAttribute("lockUser", doc.getLockUser());
+			rec.setAttribute("indexed", doc.getIndexed());
+			rec.setAttribute("status", doc.getStatus());
+			rec.setAttribute("bookmarked", doc.isBookmarked());
+			rec.setAttribute("extResId", doc.getExtResId());
+			rec.setAttribute("language", doc.getLanguage());
+			rec.setAttribute("links", doc.getLinks());
+			rec.setAttribute("tags", doc.getTgs());
 
-			updateFolder(doc, record);
+			updateFolder(doc, rec);
 
-			updateExtendedAttributes(doc, record);
+			updateExtendedAttributes(doc, rec);
 		}
 	}
 
-	private static void updateExtendedAttributes(GUIDocument doc, Record record) {
+	private static void updateExtendedAttributes(GUIDocument doc, Record rec) {
 		String[] extNames = Session.get().getInfo().getConfig("search.extattr") != null
 				? Session.get().getInfo().getConfig("search.extattr").split(",")
 				: null;
@@ -254,33 +254,33 @@ public class DocumentGridUtil {
 				value = att.getUsername();
 			else if (att.getType() == GUIAttribute.TYPE_FOLDER && att.getStringValues() == null)
 				value = att.getStringValue();
-			record.setAttribute("ext_" + name, value);
+			rec.setAttribute("ext_" + name, value);
 		}
 	}
 
-	private static void updateFolder(GUIDocument doc, Record record) {
+	private static void updateFolder(GUIDocument doc, Record rec) {
 		if (doc.getFolder() != null) {
-			record.setAttribute("folderId", doc.getFolder().getId());
-			record.setAttribute("folder", doc.getFolder().getName());
+			rec.setAttribute("folderId", doc.getFolder().getId());
+			rec.setAttribute("folder", doc.getFolder().getName());
 		}
 	}
 
-	private static void updateIcon(GUIDocument doc, Record record) {
-		record.setAttribute("icon", doc.getIcon());
-		if (record.getAttribute("docref") != null && !record.getAttribute("docref").isEmpty() && doc.getIcon() != null
+	private static void updateIcon(GUIDocument doc, Record rec) {
+		rec.setAttribute("icon", doc.getIcon());
+		if (rec.getAttribute("docref") != null && !rec.getAttribute("docref").isEmpty() && doc.getIcon() != null
 				&& !doc.getIcon().endsWith("-sc"))
-			record.setAttribute("icon", doc.getIcon() + "-sc");
+			rec.setAttribute("icon", doc.getIcon() + "-sc");
 	}
 
-	private static void updateDocRef(GUIDocument doc, Record record) {
-		if (record.getAttribute("docref") == null || record.getAttribute("docref").isEmpty()) {
-			record.setAttribute("docref", doc.getDocRef());
-			record.setAttribute("id", doc.getId());
+	private static void updateDocRef(GUIDocument doc, Record rec) {
+		if (rec.getAttribute("docref") == null || rec.getAttribute("docref").isEmpty()) {
+			rec.setAttribute("docref", doc.getDocRef());
+			rec.setAttribute("id", doc.getId());
 		} else {
-			record.setAttribute("id", doc.getDocRef());
-			record.setAttribute("docref", doc.getId());
+			rec.setAttribute("id", doc.getDocRef());
+			rec.setAttribute("docref", doc.getId());
 		}
-		record.setAttribute("docrefType", doc.getDocRefType());
+		rec.setAttribute("docrefType", doc.getDocRefType());
 	}
 
 	/**

@@ -140,8 +140,8 @@ public class TemplatesPanel extends VLayout {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				if (!"true".equals(record.getAttributeAsString("readonly"))) {
+				ListGridRecord rec = list.getSelectedRecord();
+				if (!"true".equals(rec.getAttributeAsString("readonly"))) {
 					showContextMenu();
 				}
 				event.cancel();
@@ -151,9 +151,9 @@ public class TemplatesPanel extends VLayout {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					TemplateService.Instance.get().getTemplate(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					TemplateService.Instance.get().getTemplate(Long.parseLong(rec.getAttributeAsString("id")),
 							new AsyncCallback<GUITemplate>() {
 
 								@Override
@@ -185,8 +185,8 @@ public class TemplatesPanel extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -233,24 +233,24 @@ public class TemplatesPanel extends VLayout {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param template the template to update
 	 */
 	public void updateRecord(GUITemplate template) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, template.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", template.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, template.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", template.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("readonly", "" + template.isReadonly());
-		record.setAttribute("name", template.getName());
-		record.setAttribute("description", template.getDescription());
-		list.refreshRow(list.getRecordIndex(record));
+		rec.setAttribute("readonly", "" + template.isReadonly());
+		rec.setAttribute("name", template.getName());
+		rec.setAttribute("description", template.getDescription());
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	protected void onAddingTemplate() {

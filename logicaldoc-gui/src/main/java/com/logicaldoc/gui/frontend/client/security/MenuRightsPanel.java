@@ -126,13 +126,13 @@ public class MenuRightsPanel extends VLayout {
 			}
 
 				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-				record.setAttribute("entity", selectedRecord.getAttribute("label") + " ("
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
+				rec.setAttribute("entity", selectedRecord.getAttribute("label") + " ("
 						+ selectedRecord.getAttribute("username") + ")");
-				record.setAttribute("avatar", selectedRecord.getAttribute("id"));
-				record.setAttribute("read", true);
-				rightsGrid.addData(record);
+				rec.setAttribute("avatar", selectedRecord.getAttribute("id"));
+				rec.setAttribute("read", true);
+				rightsGrid.addData(rec);
 				user.clearValue();
 		});
 		buttons.addMember(userForm);
@@ -161,12 +161,12 @@ public class MenuRightsPanel extends VLayout {
 				}
 
 				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-				record.setAttribute("entity", selectedRecord.getAttribute("name"));
-				record.setAttribute("avatar", "group");
-				record.setAttribute("read", true);
-				rightsGrid.addData(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("entityId", selectedRecord.getAttribute("id"));
+				rec.setAttribute("entity", selectedRecord.getAttribute("name"));
+				rec.setAttribute("avatar", "group");
+				rec.setAttribute("read", true);
+				rightsGrid.addData(rec);
 				group.clearValue();
 		});
 	}
@@ -181,11 +181,11 @@ public class MenuRightsPanel extends VLayout {
 		GUIRight[] tmp = new GUIRight[records.length];
 
 		int i = 0;
-		for (ListGridRecord record : records) {
+		for (ListGridRecord rec : records) {
 			GUIRight right = new GUIRight();
 
-			right.setName(record.getAttributeAsString("entity"));
-			right.setEntityId(Long.parseLong(record.getAttribute("entityId")));
+			right.setName(rec.getAttributeAsString("entity"));
+			right.setEntityId(Long.parseLong(rec.getAttribute("entityId")));
 
 			tmp[i] = right;
 			i++;

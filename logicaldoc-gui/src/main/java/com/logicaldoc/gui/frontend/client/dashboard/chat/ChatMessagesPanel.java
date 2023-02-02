@@ -107,14 +107,14 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 
 	@Override
 	public void onMessage(long id, Date date, String username, String message) {
-		Record record = messages.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
-		if (record == null) {
-			List<ListGridRecord> rec = new ArrayList<ListGridRecord>();
+		Record rec = messages.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
+		if (rec == null) {
+			List<ListGridRecord> recd = new ArrayList<ListGridRecord>();
 
 			Record[] records = messages.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
 				for (Record r : records)
-					rec.add(new ListGridRecord(r));
+					recd.add(new ListGridRecord(r));
 			}
 
 			ListGridRecord r = new ListGridRecord();
@@ -122,10 +122,10 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 			r.setAttribute("username", username);
 			r.setAttribute("date", date);
 			r.setAttribute("message", message);
-			rec.add(r);
+			recd.add(r);
 
-			messages.setRecords(rec.toArray(new ListGridRecord[0]));
-			messages.scrollToRow(rec.size() - 1);
+			messages.setRecords(recd.toArray(new ListGridRecord[0]));
+			messages.scrollToRow(recd.size() - 1);
 		}
 	}
 

@@ -344,20 +344,20 @@ public class ApiCallsReport extends AdminPanel {
 						if (result != null && result.length > 0) {
 							ListGridRecord[] records = new ListGridRecord[result.length];
 							for (int i = 0; i < result.length; i++) {
-								ListGridRecord record = new ListGridRecord();
-								record.setAttribute("date", result[i].getDate());
-								record.setAttribute("user", result[i].getUsername());
-								record.setAttribute("sid", result[i].getSessionId());
-								record.setAttribute("userId", result[i].getUserId());
-								record.setAttribute("ip", result[i].getIp());
-								record.setAttribute("device", result[i].getDevice());
-								record.setAttribute("geolocation", result[i].getGeolocation());
-								record.setAttribute("username", result[i].getUserLogin());
-								record.setAttribute("payload", result[i].getComment());
-								record.setAttribute("uri", result[i].getPath());
-								record.setAttribute("protocol", result[i].getProtocol());
-								record.setAttribute("tenant", result[i].getTenant());
-								records[i] = record;
+								ListGridRecord rec = new ListGridRecord();
+								rec.setAttribute("date", result[i].getDate());
+								rec.setAttribute("user", result[i].getUsername());
+								rec.setAttribute("sid", result[i].getSessionId());
+								rec.setAttribute("userId", result[i].getUserId());
+								rec.setAttribute("ip", result[i].getIp());
+								rec.setAttribute("device", result[i].getDevice());
+								rec.setAttribute("geolocation", result[i].getGeolocation());
+								rec.setAttribute("username", result[i].getUserLogin());
+								rec.setAttribute("payload", result[i].getComment());
+								rec.setAttribute("uri", result[i].getPath());
+								rec.setAttribute("protocol", result[i].getProtocol());
+								rec.setAttribute("tenant", result[i].getTenant());
+								records[i] = rec;
 							}
 							calls.setData(records);
 						}

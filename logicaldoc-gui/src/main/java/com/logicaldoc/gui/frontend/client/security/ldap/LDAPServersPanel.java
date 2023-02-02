@@ -162,9 +162,9 @@ public class LDAPServersPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					LDAPService.Instance.get().get(record.getAttributeAsLong("id"), new AsyncCallback<GUILDAPServer>() {
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new AsyncCallback<GUILDAPServer>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -192,8 +192,8 @@ public class LDAPServersPanel extends AdminPanel {
 			public void onDropComplete(DropCompleteEvent event) {
 				List<Long> ids = new ArrayList<Long>();
 				if (list.getRecords() != null && list.getRecords().length > 0) {
-					for (ListGridRecord record : list.getRecords())
-						ids.add(record.getAttributeAsLong("id"));
+					for (ListGridRecord rec : list.getRecords())
+						ids.add(rec.getAttributeAsLong("id"));
 					LDAPService.Instance.get().reorder(ids.toArray(new Long[0]), new AsyncCallback<Void>() {
 
 						@Override
@@ -221,8 +221,8 @@ public class LDAPServersPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -264,24 +264,24 @@ public class LDAPServersPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param server the LDAP server to updates
 	 */
 	public void updateRecord(GUILDAPServer server) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, server.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", server.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, server.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", server.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("url", server.getUrl());
+		rec.setAttribute("url", server.getUrl());
 
-		record.setAttribute("eenabled", server.isEnabled() ? "0" : "2");
+		rec.setAttribute("eenabled", server.isEnabled() ? "0" : "2");
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

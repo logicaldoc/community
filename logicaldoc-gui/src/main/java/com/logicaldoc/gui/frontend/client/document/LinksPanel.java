@@ -84,9 +84,9 @@ public class LinksPanel extends DocumentDetailTab {
 				treeGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 					@Override
 					public void onCellDoubleClick(CellDoubleClickEvent event) {
-						final ListGridRecord record = event.getRecord();
+						final ListGridRecord rec = event.getRecord();
 
-						FolderService.Instance.get().getFolder(record.getAttributeAsLong("folderId"), false, false,
+						FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false,
 								false, new AsyncCallback<GUIFolder>() {
 
 									@Override
@@ -98,9 +98,9 @@ public class LinksPanel extends DocumentDetailTab {
 									public void onSuccess(GUIFolder fld) {
 										if (fld.isDownload() && "download"
 												.equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-											onDownload(record);
+											onDownload(rec);
 										else
-											onPreview(record);
+											onPreview(rec);
 									}
 								});
 					}
@@ -249,8 +249,8 @@ public class LinksPanel extends DocumentDetailTab {
 		}
 	}
 
-	protected void onOpenInFolder(ListGridRecord record) {
-		String documentId = record.getAttributeAsString("documentId");
+	protected void onOpenInFolder(ListGridRecord rec) {
+		String documentId = rec.getAttributeAsString("documentId");
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
 
@@ -266,9 +266,9 @@ public class LinksPanel extends DocumentDetailTab {
 		});
 	}
 
-	protected void onDownload(ListGridRecord record) {
+	protected void onDownload(ListGridRecord rec) {
 		if (document.getFolder().isDownload()) {
-			String documentId = record.getAttributeAsString("documentId");
+			String documentId = rec.getAttributeAsString("documentId");
 			long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 			DocUtil.download(docId, null);
 		}
@@ -281,13 +281,13 @@ public class LinksPanel extends DocumentDetailTab {
 
 			treeGrid.getRecords();
 
-			for (ListGridRecord record : treeGrid.getRecords()) {
-				if (record.getAttributeAsBoolean("password")) {
+			for (ListGridRecord rec : treeGrid.getRecords()) {
+				if (rec.getAttributeAsBoolean("password")) {
 					SC.warn(I18N.message("somedocsprotected"));
 					break;
 				}
 
-				String docId = record.getAttribute("documentId");
+				String docId = rec.getAttribute("documentId");
 				docId = docId.substring(docId.indexOf('-') + 1);
 				url += "&docId=" + docId;
 			}
@@ -295,8 +295,8 @@ public class LinksPanel extends DocumentDetailTab {
 		}
 	}
 
-	protected void onPreview(ListGridRecord record) {
-		String documentId = record.getAttributeAsString("documentId");
+	protected void onPreview(ListGridRecord rec) {
+		String documentId = rec.getAttributeAsString("documentId");
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
 

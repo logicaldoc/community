@@ -118,21 +118,21 @@ public class SessionsPanel extends VLayout {
 
 		sessionsGrid = new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
 				if (getFieldName(colNum).equals("sid")) {
-					if (Session.get().getSid() != null && Session.get().getSid().equals(record.getAttribute("sid"))) {
+					if (Session.get().getSid() != null && Session.get().getSid().equals(rec.getAttribute("sid"))) {
 						return "font-weight: bold;";
 					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
+						return super.getCellCSSText(rec, rowNum, colNum);
 					}
 				} else if (getFieldName(colNum).equals("statusLabel")) {
-					if (!"0".equals(record.getAttribute("status"))) {
+					if (!"0".equals(rec.getAttribute("status"))) {
 						return "color: red;";
 					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
+						return super.getCellCSSText(rec, rowNum, colNum);
 					}
 				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rec, rowNum, colNum);
 				}
 			}
 		};
@@ -156,8 +156,8 @@ public class SessionsPanel extends VLayout {
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmkill"), (Boolean yes) -> {
 					if (yes) {
-						ListGridRecord record = sessionsGrid.getSelectedRecord();
-						SecurityService.Instance.get().kill(record.getAttributeAsString("sid"),
+						ListGridRecord rec = sessionsGrid.getSelectedRecord();
+						SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"),
 								new AsyncCallback<Void>() {
 									@Override
 									public void onFailure(Throwable caught) {

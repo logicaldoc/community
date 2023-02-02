@@ -131,11 +131,11 @@ public class ZohoDialog extends Dialog {
 
 		final List<String> docIds = new ArrayList<String>();
 		final List<String> folderCompositeIds = new ArrayList<String>();
-		for (Record record : selection) {
-			if ("folder".equals(record.getAttributeAsString("type")))
-				folderCompositeIds.add(record.getAttributeAsString("name") + ":" + record.getAttributeAsString("id"));
+		for (Record rec : selection) {
+			if ("folder".equals(rec.getAttributeAsString("type")))
+				folderCompositeIds.add(rec.getAttributeAsString("name") + ":" + rec.getAttributeAsString("id"));
 			else
-				docIds.add(record.getAttributeAsString("id"));
+				docIds.add(rec.getAttributeAsString("id"));
 		}
 		SC.ask(I18N.message("importfromzoho", FolderController.get().getCurrentFolder().getName()), new BooleanCallback() {
 

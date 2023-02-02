@@ -518,8 +518,8 @@ public class TaskEditor extends Window {
 					if (part.getCode() == null || part.getValue() == null)
 						continue;
 
-					ListGridRecord record = createParticipantRecord(part.getCode(), part.getValue());
-					records.add(record);
+					ListGridRecord rec = createParticipantRecord(part.getCode(), part.getValue());
+					records.add(rec);
 				}
 
 				if (!records.isEmpty())
@@ -531,16 +531,16 @@ public class TaskEditor extends Window {
 	}
 
 	private ListGridRecord createParticipantRecord(String name, String label) {
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("name", name);
-		record.setAttribute("label", label);
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("name", name);
+		rec.setAttribute("label", label);
 		if (name.startsWith("g."))
-			record.setAttribute("avatar", "group");
+			rec.setAttribute("avatar", "group");
 		else if (name.startsWith("att."))
-			record.setAttribute("avatar", "attribute");
+			rec.setAttribute("avatar", "attribute");
 		else
-			record.setAttribute("avatar", name);
-		return record;
+			rec.setAttribute("avatar", name);
+		return rec;
 	}
 
 	/**
@@ -588,8 +588,8 @@ public class TaskEditor extends Window {
 		}
 
 		ArrayList<GUIValue> participants = new ArrayList<GUIValue>();
-		for (ListGridRecord record : participantsGrid.getRecords())
-			participants.add(new GUIValue(record.getAttributeAsString("name"), record.getAttributeAsString("label")));
+		for (ListGridRecord rec : participantsGrid.getRecords())
+			participants.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString("label")));
 		TaskEditor.this.state.setParticipants(participants.toArray(new GUIValue[0]));
 
 		if (humanInteraction && state.getType() == GUIWFState.TYPE_TASK

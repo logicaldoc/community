@@ -111,40 +111,40 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 
 	@Override
 	public void onUserLogin(String username) {
-		Record record = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
-		if (record == null) {
-			List<ListGridRecord> rec = new ArrayList<ListGridRecord>();
+		Record rec = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
+		if (rec == null) {
+			List<ListGridRecord> recds = new ArrayList<ListGridRecord>();
 
 			Record[] records = onlineUsers.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
 				for (Record r : records)
-					rec.add(new ListGridRecord(r));
+					recds.add(new ListGridRecord(r));
 			}
 
 			ListGridRecord r = new ListGridRecord();
 			r.setAttribute("username", username);
-			rec.add(r);
+			recds.add(r);
 
-			onlineUsers.setRecords(rec.toArray(new ListGridRecord[0]));
+			onlineUsers.setRecords(recds.toArray(new ListGridRecord[0]));
 		}
 	}
 
 	@Override
 	public void onUserLogout(String username) {
-		Record record = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
-		if (record != null) {
-			List<ListGridRecord> rec = new ArrayList<ListGridRecord>();
+		Record rec = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
+		if (rec != null) {
+			List<ListGridRecord> recds = new ArrayList<ListGridRecord>();
 
 			Record[] records = onlineUsers.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
 				for (Record r : records) {
 					if (r.getAttributeAsString("username").equals(username))
 						continue;
-					rec.add(new ListGridRecord(r));
+					recds.add(new ListGridRecord(r));
 				}
 			}
 
-			onlineUsers.setRecords(rec.toArray(new ListGridRecord[0]));
+			onlineUsers.setRecords(recds.toArray(new ListGridRecord[0]));
 		}
 	}
 

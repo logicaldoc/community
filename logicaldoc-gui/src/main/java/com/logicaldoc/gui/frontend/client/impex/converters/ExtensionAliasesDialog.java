@@ -61,9 +61,9 @@ public class ExtensionAliasesDialog extends Window {
 		extensionsGrid.addEditCompleteHandler(new EditCompleteHandler() {
 			@Override
 			public void onEditComplete(EditCompleteEvent event) {
-				ListGridRecord record = extensionsGrid.getRecord(event.getRowNum());
+				ListGridRecord rec = extensionsGrid.getRecord(event.getRowNum());
 
-				String extension = record.getAttributeAsString("extension");
+				String extension = rec.getAttributeAsString("extension");
 				String aliases = (String) event.getNewValues().get("aliases");
 				aliases = aliases.trim().toLowerCase().replace(" ", "");
 

@@ -75,14 +75,14 @@ public class GUILanguagesPanel extends VLayout {
 	}
 
 	private void showContextMenu() {
-		final ListGridRecord record = list.getSelectedRecord();
+		final ListGridRecord rec = list.getSelectedRecord();
 
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().setGUILanguageStatus(record.getAttributeAsString("code"), true,
+				SystemService.Instance.get().setGUILanguageStatus(rec.getAttributeAsString("code"), true,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -92,8 +92,8 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "0");
+								list.refreshRow(list.getRecordIndex(rec));
 								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
@@ -104,7 +104,7 @@ public class GUILanguagesPanel extends VLayout {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().setGUILanguageStatus(record.getAttributeAsString("code"), false,
+				SystemService.Instance.get().setGUILanguageStatus(rec.getAttributeAsString("code"), false,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -114,15 +114,15 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "2");
+								list.refreshRow(list.getRecordIndex(rec));
 								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
 			}
 		});
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString("eenabled")))
 			contextMenu.setItems(disable);
 		else
 			contextMenu.setItems(enable);

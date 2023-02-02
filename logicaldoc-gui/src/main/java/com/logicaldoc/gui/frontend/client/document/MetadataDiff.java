@@ -173,8 +173,8 @@ public class MetadataDiff extends Window {
 			val2 = extractValue(dateFormat, numberFormat, att2);
 		}
 
-		DiffRecord record = new DiffRecord(name, label, val1, val2, position);
-		attributeRecords.add(record);
+		DiffRecord rec = new DiffRecord(name, label, val1, val2, position);
+		attributeRecords.add(rec);
 	}
 
 	private String extractValue(DateTimeFormat dateFormat, NumberFormat numberFormat, GUIAttribute attribute) {

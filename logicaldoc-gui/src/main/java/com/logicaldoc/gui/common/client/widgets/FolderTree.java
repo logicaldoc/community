@@ -54,7 +54,7 @@ public class FolderTree extends TreeGrid {
 	}
 
 	@Override
-	protected String getIcon(Record record, boolean defaultState) {
+	protected String getIcon(Record rec, boolean defaultState) {
 		return "blank.gif";
 	}
 }

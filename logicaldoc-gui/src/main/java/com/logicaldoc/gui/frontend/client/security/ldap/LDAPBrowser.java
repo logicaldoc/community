@@ -180,12 +180,12 @@ public class LDAPBrowser extends VLayout {
 					if (result != null && result.length > 0) {
 						ListGridRecord[] records = new ListGridRecord[result.length];
 						for (int i = 0; i < result.length; i++) {
-							ListGridRecord record = new ListGridRecord();
-							record.setAttribute("name", result[i].getFullName());
-							record.setAttribute("dn", result[i].getAddress());
-							record.setAttribute("username", result[i].getUsername());
-							record.setAttribute("email", result[i].getEmail());
-							records[i] = record;
+							ListGridRecord rec = new ListGridRecord();
+							rec.setAttribute("name", result[i].getFullName());
+							rec.setAttribute("dn", result[i].getAddress());
+							rec.setAttribute("username", result[i].getUsername());
+							rec.setAttribute("email", result[i].getEmail());
+							records[i] = rec;
 						}
 						users.setData(records);
 					}

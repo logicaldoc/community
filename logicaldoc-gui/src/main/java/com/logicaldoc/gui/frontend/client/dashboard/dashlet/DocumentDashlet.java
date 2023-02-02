@@ -106,8 +106,8 @@ public class DocumentDashlet extends Dashlet {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
 				event.cancel();
-				Record record = event.getRecord();
-				DocumentService.Instance.get().getById(Long.parseLong(record.getAttributeAsString(docIdAttribute)),
+				Record rec = event.getRecord();
+				DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
 						new AsyncCallback<GUIDocument>() {
 
 							@Override
@@ -127,12 +127,12 @@ public class DocumentDashlet extends Dashlet {
 		ret.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				Record record = event.getRecord();
-				if (record.getAttribute("folderId") != null)
-					DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-							Long.parseLong(record.getAttributeAsString(docIdAttribute)));
+				Record rec = event.getRecord();
+				if (rec.getAttribute("folderId") != null)
+					DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+							Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
 				else
-					DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString(docIdAttribute)));
+					DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
 			}
 		});
 	}

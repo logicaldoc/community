@@ -98,7 +98,7 @@ public class UserSelector extends SelectItem {
 
 //	private class AvatarFormItemValueFormatter implements FormItemValueFormatter {
 //		@Override
-//		public String formatValue(Object value, Record record, DynamicForm form, FormItem item) {
+//		public String formatValue(Object value, Record rec, DynamicForm form, FormItem item) {
 //			if (value == null)
 //				return "";
 //			else

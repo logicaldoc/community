@@ -146,8 +146,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributesList.addDropCompleteHandler((DropCompleteEvent attributesListDropCompleted) -> {
 			List<String> attributes = new ArrayList<String>();
 			for (int i = 0; i < attributesList.getTotalRows(); i++) {
-				ListGridRecord record = attributesList.getRecord(i);
-				attributes.add(record.getAttributeAsString("name"));
+				ListGridRecord rec = attributesList.getRecord(i);
+				attributes.add(rec.getAttributeAsString("name"));
 			}
 
 			AttributeSetPropertiesPanel.this.attributeSet.reorderAttributes(attributes);
@@ -173,10 +173,10 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	protected void fillAttributesList() {
 		if (attributeSet != null && attributeSet.getAttributes() != null) {
 			for (GUIAttribute att : attributeSet.getAttributesOrderedByPosition()) {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("name", att.getName());
-				record.setAttribute("label", att.getLabel());
-				attributesList.addData(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("name", att.getName());
+				rec.setAttribute("label", att.getLabel());
+				attributesList.addData(rec);
 			}
 		}
 	}
@@ -329,11 +329,11 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			att.setValidation(validation.getValueAsString());
 			att.setInitialization(initialization.getValueAsString());
 
-			ListGridRecord record = attributesList.getSelectedRecord();
-			record.setAttribute("name", att.getName());
-			record.setAttribute("label", att.getLabel());
-			record.setAttribute("validation", att.getValidation());
-			record.setAttribute("initialization", att.getInitialization());
+			ListGridRecord rec = attributesList.getSelectedRecord();
+			rec.setAttribute("name", att.getName());
+			rec.setAttribute("label", att.getLabel());
+			rec.setAttribute("validation", att.getValidation());
+			rec.setAttribute("initialization", att.getInitialization());
 
 			changedHandler.onChanged(null);
 		}
@@ -494,8 +494,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		addMember(setPropertiesForm);
 
 		attributesList.addSelectionChangedHandler((SelectionEvent attributesListSelected) -> {
-			Record record = attributesList.getSelectedRecord();
-			onChangeSelectedAttribute(record);
+			Record rec = attributesList.getSelectedRecord();
+			onChangeSelectedAttribute(rec);
 		});
 
 		HLayout setInfo = new HLayout();
@@ -580,14 +580,14 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	private void addAttribute(GUIAttribute att) {
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("name", att.getName());
-		record.setAttribute("label", att.getLabel());
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("name", att.getName());
+		rec.setAttribute("label", att.getLabel());
 		updatingAttributeName = att.getName();
-		attributesList.getDataAsRecordList().add(record);
+		attributesList.getDataAsRecordList().add(rec);
 		attributeSet.appendAttribute(att);
 		detailsPanel.enableSave();
-		attributesList.selectRecord(record);
+		attributesList.selectRecord(rec);
 
 	}
 
@@ -715,9 +715,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		return delete;
 	}
 
-	protected void onChangeSelectedAttribute(Record record) {
-		if (record != null) {
-			String selectedAttributeName = record.getAttributeAsString("name");
+	protected void onChangeSelectedAttribute(Record rec) {
+		if (rec != null) {
+			String selectedAttributeName = rec.getAttributeAsString("name");
 			GUIAttribute extAttr = attributeSet.getAttribute(selectedAttributeName);
 			attributeSettingsForm1.setValue("attributeName", extAttr.getName());
 			attributeSettingsForm1.setValue("mandatory", extAttr.isMandatory());

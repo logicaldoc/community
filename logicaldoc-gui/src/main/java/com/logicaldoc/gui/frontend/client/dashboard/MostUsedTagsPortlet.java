@@ -81,8 +81,8 @@ public class MostUsedTagsPortlet extends Portlet {
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord record = event.getRecord();
-				TagsForm.searchTag(record.getAttributeAsString("word"), false);
+				ListGridRecord rec = event.getRecord();
+				TagsForm.searchTag(rec.getAttributeAsString("word"), false);
 			}
 		});
 

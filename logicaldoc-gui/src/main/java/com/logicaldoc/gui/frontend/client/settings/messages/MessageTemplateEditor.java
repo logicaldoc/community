@@ -23,16 +23,16 @@ public class MessageTemplateEditor extends Window {
 
 	private ListGrid grid;
 
-	private ListGridRecord record;
+	private ListGridRecord rec;
 
 	private DynamicForm form = new DynamicForm();
 
-	public MessageTemplateEditor(ListGrid grid, ListGridRecord record) {
-		this.record = record;
+	public MessageTemplateEditor(ListGrid grid, ListGridRecord rec) {
+		this.rec = rec;
 		this.grid = grid;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("messagetemplate") + " - " + record.getAttributeAsString("name"));
+		setTitle(I18N.message("messagetemplate") + " - " + rec.getAttributeAsString("name"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -71,13 +71,13 @@ public class MessageTemplateEditor extends Window {
 		addItem(toolStrip);
 
 		TextAreaItem subject = ItemFactory.newTextAreaItemForAutomation("subject", "subject",
-				record.getAttributeAsString("subject"), null, false);
+				rec.getAttributeAsString("subject"), null, false);
 		subject.setRequired(true);
 		subject.setWidth("*");
 		subject.setHeight(30);
 
 		RichTextItem body = ItemFactory.newRichTextItemForAutomation("body", "body",
-				record.getAttributeAsString("body"), null);
+				rec.getAttributeAsString("body"), null);
 		body.setRequired(true);
 		body.setWidth("*");
 		body.setHeight("*");
@@ -92,8 +92,8 @@ public class MessageTemplateEditor extends Window {
 	}
 
 	private void onSave() {
-		record.setAttribute("subject", form.getValueAsString("subject"));
-		record.setAttribute("body", form.getValueAsString("body"));
-		grid.refreshRow(grid.getRowNum(record));
+		rec.setAttribute("subject", form.getValueAsString("subject"));
+		rec.setAttribute("body", form.getValueAsString("body"));
+		grid.refreshRow(grid.getRowNum(rec));
 	}
 }

@@ -165,9 +165,9 @@ public class GroupsPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					SecurityService.Instance.get().getGroup(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					SecurityService.Instance.get().getGroup(Long.parseLong(rec.getAttributeAsString("id")),
 							new AsyncCallback<GUIGroup>() {
 
 								@Override
@@ -197,23 +197,23 @@ public class GroupsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param group the group to update
 	 */
 	public void updateRecord(GUIGroup group) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, group.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", group.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, group.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", group.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("description", group.getDescription());
-		record.setAttribute("name", group.getName());
-		list.refreshRow(list.getRecordIndex(record));
+		rec.setAttribute("description", group.getDescription());
+		rec.setAttribute("name", group.getName());
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	public void showGroupDetails(GUIGroup group) {
@@ -228,8 +228,8 @@ public class GroupsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -259,9 +259,9 @@ public class GroupsPanel extends AdminPanel {
 			}
 		});
 
-		if (Constants.GROUP_ADMIN.equals(record.getAttributeAsString("name"))
-				|| Constants.GROUP_PUBLISHER.equals(record.getAttributeAsString("name"))
-				|| Constants.GROUP_GUEST.equals(record.getAttributeAsString("name"))) {
+		if (Constants.GROUP_ADMIN.equals(rec.getAttributeAsString("name"))
+				|| Constants.GROUP_PUBLISHER.equals(rec.getAttributeAsString("name"))
+				|| Constants.GROUP_GUEST.equals(rec.getAttributeAsString("name"))) {
 			delete.setEnabled(false);
 		}
 

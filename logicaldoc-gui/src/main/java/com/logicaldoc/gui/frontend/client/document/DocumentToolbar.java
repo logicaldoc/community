@@ -671,12 +671,12 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				} else {
 					String url = GWT.getHostPageBaseURL() + "zip-export?folderId="
 							+ FolderController.get().getCurrentFolder().getId();
-					for (GUIDocument record : selection) {
-						if (record.isPasswordProtected()) {
+					for (GUIDocument rec : selection) {
+						if (rec.isPasswordProtected()) {
 							SC.warn(I18N.message("somedocsprotected"));
 							break;
 						}
-						url += "&docId=" + record.getId();
+						url += "&docId=" + rec.getId();
 					}
 					Util.download(url);
 				}

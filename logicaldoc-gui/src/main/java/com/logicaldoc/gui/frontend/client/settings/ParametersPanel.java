@@ -92,9 +92,9 @@ public class ParametersPanel extends AdminPanel {
 			public void onClick(ClickEvent event) {
 				ArrayList<GUIParameter> params = new ArrayList<GUIParameter>();
 				ListGridRecord[] records = parametersGrid.getRecords();
-				for (ListGridRecord record : records) {
-					GUIParameter param = new GUIParameter(record.getAttributeAsString("parameter"),
-							record.getAttributeAsString("value"));
+				for (ListGridRecord rec : records) {
+					GUIParameter param = new GUIParameter(rec.getAttributeAsString("parameter"),
+							rec.getAttributeAsString("value"));
 					Session.get().getInfo().setConfig(param.getName(), param.getValue());
 					params.add(param);
 				}

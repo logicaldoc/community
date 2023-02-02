@@ -121,7 +121,7 @@ public class DashletsPanel extends VLayout {
 		title.setWidth(120);
 		title.setCellFormatter(new CellFormatter() {
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				return value != null ? I18N.message(value.toString()) : "";
 			}
 		});
@@ -130,7 +130,7 @@ public class DashletsPanel extends VLayout {
 		type.setWidth(125);
 		type.setCellFormatter(new CellFormatter() {
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				return I18N.message("dashlet.type." + value);
 			}
 		});
@@ -235,15 +235,15 @@ public class DashletsPanel extends VLayout {
 		ListGridRecord[] records = new ListGridRecord[dashlets.size()];
 		int i = 0;
 		for (GUIDashlet dashlet : dashlets) {
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("id", dashlet.getId());
-			record.setAttribute("name", dashlet.getName());
-			record.setAttribute("type", dashlet.getType());
-			record.setAttribute("title", dashlet.getTitle());
-			record.setAttribute("max", dashlet.getMax());
-			record.setAttribute("query", dashlet.getQuery());
-			record.setAttribute("content", dashlet.getContent());
-			records[i++] = record;
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", dashlet.getId());
+			rec.setAttribute("name", dashlet.getName());
+			rec.setAttribute("type", dashlet.getType());
+			rec.setAttribute("title", dashlet.getTitle());
+			rec.setAttribute("max", dashlet.getMax());
+			rec.setAttribute("query", dashlet.getQuery());
+			rec.setAttribute("content", dashlet.getContent());
+			records[i++] = rec;
 		}
 		grid.setData(records);
 	}

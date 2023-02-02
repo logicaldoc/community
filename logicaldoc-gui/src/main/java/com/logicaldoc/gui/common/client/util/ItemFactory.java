@@ -67,7 +67,6 @@ import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.DateChooser;
 import com.smartgwt.client.widgets.DateRangeDialog;
 import com.smartgwt.client.widgets.HeaderControl.HeaderIcon;
@@ -102,10 +101,7 @@ import com.smartgwt.client.widgets.form.fields.TimeItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.EditorEnterEvent;
-import com.smartgwt.client.widgets.form.fields.events.EditorEnterHandler;
 import com.smartgwt.client.widgets.form.fields.events.EditorExitEvent;
-import com.smartgwt.client.widgets.form.fields.events.EditorExitHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
@@ -121,6 +117,28 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @since 6.0
  */
 public class ItemFactory {
+
+	private static final String FIELDREQUIRED = "fieldrequired";
+
+	private static final String SHOWDATECHOOSER = "showdatechooser";
+
+	private static final String RUNLEVEL = "runlevel";
+
+	private static final String MINUTE = "minute";
+
+	private static final String EDITHTML = "edithtml";
+
+	private static final String DOT_ENABLED = ".enabled";
+
+	private static final String GROUP = "group";
+
+	private static final String WORKFLOW = "workflow";
+
+	private static final String VALUE = "value";
+
+	private static final String WHOLENUMBER = "wholenumber";
+
+	private static final String EMAIL = "email";
 
 	private static final String EAN_8 = "EAN_8";
 
@@ -167,9 +185,9 @@ public class ItemFactory {
 		dateRangeItem.setFromTitle(I18N.message("from"));
 		dateRangeItem.setToTitle(I18N.message("to"));
 		dateRangeItem.setDateFormatter(I18N.getDateDisplayFormat(false));
-		dateRangeItem.setPickerIconPrompt(I18N.message("showdatechooser"));
+		dateRangeItem.setPickerIconPrompt(I18N.message(SHOWDATECHOOSER));
 		dateRangeItem.setHintStyle("hint");
-		dateRangeItem.setRequiredMessage(I18N.message("fieldrequired"));
+		dateRangeItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		dateRangeItem.setBrowserSpellCheck(false);
 		DateRangeItem.setDefaultProperties(dateRangeItem);
 
@@ -182,8 +200,8 @@ public class ItemFactory {
 		miniDateRangeItem.setDateDisplayFormat(I18N.getDateDisplayFormat(false));
 		miniDateRangeItem.setToDateOnlyPrefix(I18N.message("bbefore"));
 		miniDateRangeItem.setFromDateOnlyPrefix(I18N.message("ssince"));
-		miniDateRangeItem.setPickerIconPrompt(I18N.message("showdatechooser"));
-		miniDateRangeItem.setRequiredMessage(I18N.message("fieldrequired"));
+		miniDateRangeItem.setPickerIconPrompt(I18N.message(SHOWDATECHOOSER));
+		miniDateRangeItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		miniDateRangeItem.setBrowserSpellCheck(false);
 		MiniDateRangeItem.setDefaultProperties(miniDateRangeItem);
 
@@ -194,8 +212,8 @@ public class ItemFactory {
 		dateItem.setHintStyle("hint");
 		dateItem.setWidth(150);
 		dateItem.setDateFormatter(I18N.getDateDisplayFormat(false));
-		dateItem.setPickerIconPrompt(I18N.message("showdatechooser"));
-		dateItem.setRequiredMessage(I18N.message("fieldrequired"));
+		dateItem.setPickerIconPrompt(I18N.message(SHOWDATECHOOSER));
+		dateItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		dateItem.setEndDate(new Date(new Date().getTime() + 2208992400000L));
 		dateItem.setStartDate(new Date(-2208992400000L));
 		dateItem.setBrowserSpellCheck(false);
@@ -209,75 +227,75 @@ public class ItemFactory {
 		SelectItem selectItem = new SelectItem();
 		selectItem.setWidth(150);
 		selectItem.setHintStyle("hint");
-		selectItem.setRequiredMessage(I18N.message("fieldrequired"));
+		selectItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		selectItem.setBrowserSpellCheck(false);
 		SelectItem.setDefaultProperties(selectItem);
 
 		TextItem textItem = new TextItem();
 		textItem.setHintStyle("hint");
 		textItem.setWidth(150);
-		textItem.setRequiredMessage(I18N.message("fieldrequired"));
+		textItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		textItem.setBrowserSpellCheck(false);
 		TextItem.setDefaultProperties(textItem);
 
 		RadioGroupItem radioGroupItem = new RadioGroupItem();
 		radioGroupItem.setHintStyle("hint");
-		radioGroupItem.setRequiredMessage(I18N.message("fieldrequired"));
+		radioGroupItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		radioGroupItem.setBrowserSpellCheck(false);
 		RadioGroupItem.setDefaultProperties(radioGroupItem);
 
 		CheckboxItem checkboxItem = new CheckboxItem();
 		checkboxItem.setHintStyle("hint");
-		checkboxItem.setRequiredMessage(I18N.message("fieldrequired"));
+		checkboxItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		checkboxItem.setBrowserSpellCheck(false);
 		CheckboxItem.setDefaultProperties(checkboxItem);
 
 		MultiComboBoxItem multiComboBoxItem = new MultiComboBoxItem();
 		multiComboBoxItem.setHintStyle("hint");
-		multiComboBoxItem.setRequiredMessage(I18N.message("fieldrequired"));
+		multiComboBoxItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		multiComboBoxItem.setBrowserSpellCheck(false);
 		MultiComboBoxItem.setDefaultProperties(multiComboBoxItem);
 
 		SpinnerItem spinnerItem = new SpinnerItem();
 		spinnerItem.setHintStyle("hint");
 		spinnerItem.setWidth(60);
-		spinnerItem.setRequiredMessage(I18N.message("fieldrequired"));
+		spinnerItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		spinnerItem.setBrowserSpellCheck(false);
 		SpinnerItem.setDefaultProperties(spinnerItem);
 
 		PasswordItem passwordItem = new PasswordItem();
 		passwordItem.setHintStyle("hint");
-		passwordItem.setRequiredMessage(I18N.message("fieldrequired"));
+		passwordItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		TextItem.setDefaultProperties(passwordItem);
 
 		StaticTextItem staticTextItem = new StaticTextItem();
 		staticTextItem.setWidth(150);
 		staticTextItem.setHintStyle("hint");
-		staticTextItem.setRequiredMessage(I18N.message("fieldrequired"));
+		staticTextItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		staticTextItem.setBrowserSpellCheck(false);
 		StaticTextItem.setDefaultProperties(staticTextItem);
 
 		IntegerItem integerItem = new IntegerItem();
-		integerItem.setRequiredMessage(I18N.message("fieldrequired"));
+		integerItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		integerItem.setHintStyle("hint");
 		integerItem.setBrowserSpellCheck(false);
 		IntegerItem.setDefaultProperties(integerItem);
 
 		ColorPickerItem colorPickerItem = new ColorPickerItem();
 		colorPickerItem.setWidth(200);
-		colorPickerItem.setRequiredMessage(I18N.message("fieldrequired"));
+		colorPickerItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		colorPickerItem.setHintStyle("hint");
 		colorPickerItem.setBrowserSpellCheck(false);
 		ColorPickerItem.setDefaultProperties(colorPickerItem);
 
 		LinkItem linkItem = new LinkItem();
-		linkItem.setRequiredMessage(I18N.message("fieldrequired"));
+		linkItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		linkItem.setHintStyle("hint");
 		linkItem.setBrowserSpellCheck(false);
 		LinkItem.setDefaultProperties(linkItem);
 
 		TextAreaItem textAreaItem = new TextAreaItem();
-		textAreaItem.setRequiredMessage(I18N.message("fieldrequired"));
+		textAreaItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		textAreaItem.setHintStyle("hint");
 		textAreaItem.setBrowserSpellCheck(false);
 		TextAreaItem.setDefaultProperties(textAreaItem);
@@ -746,12 +764,12 @@ public class ItemFactory {
 		final ComboBoxItem selector = new ComboBoxItem(originalItemName(name));
 		selector.setTitle(I18N.message(title));
 		selector.setWrapTitle(false);
-		selector.setValueField("email");
-		selector.setDisplayField("email");
+		selector.setValueField(EMAIL);
+		selector.setDisplayField(EMAIL);
 		selector.setPickListWidth(350);
 		selector.setFetchDelay(2000);
 		selector.setHideEmptyPickList(true);
-		ListGridField email = new ListGridField("email", I18N.message("email"));
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
 		email.setWidth("*");
 		ListGridField firstName = new ListGridField("firstName", I18N.message("firstname"));
 		firstName.setWidth(90);
@@ -766,12 +784,12 @@ public class ItemFactory {
 		final SelectItem selector = new SelectItem(originalItemName(name));
 		selector.setTitle(I18N.message(title));
 		selector.setWrapTitle(false);
-		selector.setValueField("email");
-		selector.setDisplayField("email");
+		selector.setValueField(EMAIL);
+		selector.setDisplayField(EMAIL);
 		selector.setPickListWidth(350);
 		selector.setMultiple(true);
 		selector.setHideEmptyPickList(true);
-		ListGridField email = new ListGridField("email", I18N.message("email"));
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
 		email.setWidth("*");
 		ListGridField firstName = new ListGridField("firstName", I18N.message("firstname"));
 		firstName.setWidth(90);
@@ -790,8 +808,8 @@ public class ItemFactory {
 			selector.setTitle(I18N.message("from"));
 		selector.setWidth(300);
 		selector.setWrapTitle(false);
-		selector.setValueField("email");
-		selector.setDisplayField("email");
+		selector.setValueField(EMAIL);
+		selector.setDisplayField(EMAIL);
 		selector.setHideEmptyPickList(true);
 
 		if (Session.get().getUser().getEmail2() != null && !Session.get().getUser().getEmail2().isEmpty())
@@ -820,8 +838,7 @@ public class ItemFactory {
 
 	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required,
 			boolean skipDisabled) {
-		final SelectItem item = new UserSelector(name, title, groupIdOrName, !required, skipDisabled, null);
-		return item;
+		return new UserSelector(name, title, groupIdOrName, !required, skipDisabled, null);
 	}
 
 	public static SelectItem newTenantSelector() {
@@ -830,15 +847,15 @@ public class ItemFactory {
 		tenant.setWrapTitle(false);
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setHidden(true);
-		ListGridField _name = new ListGridField("name", I18N.message("name"));
-		_name.setAutoFitWidth(true);
+		ListGridField nname = new ListGridField("name", I18N.message("name"));
+		nname.setAutoFitWidth(true);
 		ListGridField displayName = new ListGridField("displayName", I18N.message("displayname"));
 		displayName.setWidth("*");
 		tenant.setValueField("id");
 		tenant.setDisplayField("displayName");
 		tenant.setPickListWidth(300);
 		tenant.setWidth(150);
-		tenant.setPickListFields(id, _name, displayName);
+		tenant.setPickListFields(id, nname, displayName);
 		tenant.setOptionDataSource(new TenantsDS());
 		tenant.setEmptyDisplayValue(" ");
 		return tenant;
@@ -853,21 +870,17 @@ public class ItemFactory {
 
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setHidden(true);
-		ListGridField _name = new ListGridField("name", I18N.message("name"));
+		ListGridField nname = new ListGridField("name", I18N.message("name"));
 		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
-		select.setPickListFields(id, _name, description);
+		select.setPickListFields(id, nname, description);
 		select.setPickListWidth(250);
 		select.setOptionDataSource(new AutomationRoutinesDS(showEmpty));
 		select.setValue(value);
 
-		ChangedHandler setNullOnEmpty = new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event != null && event.getValue().equals("")) {
-					select.setValue((String) null);
-					select.clearValue();
-				}
+		ChangedHandler setNullOnEmpty = (ChangedEvent event) -> {
+			if (event != null && event.getValue().equals("")) {
+				select.setValue((String) null);
+				select.clearValue();
 			}
 		};
 		select.addChangedHandler(setNullOnEmpty);
@@ -1077,14 +1090,11 @@ public class ItemFactory {
 		if (handler != null)
 			select.addChangedHandler(handler);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				select.clearValue();
-				select.setValue((String) null);
-				if (handler != null)
-					handler.onChanged(null);
-			}
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			select.clearValue();
+			select.setValue((String) null);
+			if (handler != null)
+				handler.onChanged(null);
 		});
 		clear.setWidth(12);
 		clear.setHeight(12);
@@ -1104,14 +1114,11 @@ public class ItemFactory {
 		if (handler != null)
 			select.addChangedHandler(handler);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				select.clearValue();
-				select.setValue((String) null);
-				if (handler != null)
-					handler.onChanged(null);
-			}
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			select.clearValue();
+			select.setValue((String) null);
+			if (handler != null)
+				handler.onChanged(null);
 		});
 		clear.setWidth(12);
 		clear.setHeight(12);
@@ -1186,8 +1193,7 @@ public class ItemFactory {
 	}
 
 	public static Img newImg(String name) {
-		Img img = new Img("[SKIN]/" + name);
-		return img;
+		return new Img("[SKIN]/" + name);
 	}
 
 	public static Img newBrandImg(String name, GUIInfo info) {
@@ -1217,8 +1223,7 @@ public class ItemFactory {
 	}
 
 	public static HeaderIcon newHeaderIcon(String image) {
-		HeaderIcon icon = new HeaderIcon(ItemFactory.newImgIcon(image).getSrc());
-		return icon;
+		return new HeaderIcon(ItemFactory.newImgIcon(image).getSrc());
 	}
 
 	public static TextItem newCronExpressionItem(String name, String title, String value, ChangedHandler handler) {
@@ -1233,12 +1238,10 @@ public class ItemFactory {
 		composer.setSrc("[SKIN]/DynamicForm/date_control.png");
 		composer.setWidth(16);
 		composer.setHeight(16);
-		composer.addFormItemClickHandler(new FormItemClickHandler() {
-			public void onFormItemClick(final FormItemIconClickEvent event) {
-				CronExpressionComposer comp = new CronExpressionComposer(cron, handler);
-				comp.show();
-				event.cancel();
-			}
+		composer.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			CronExpressionComposer comp = new CronExpressionComposer(cron, handler);
+			comp.show();
+			event.cancel();
 		});
 
 		FormItemIcon validate = new FormItemIcon();
@@ -1246,35 +1249,28 @@ public class ItemFactory {
 		validate.setSrc("[SKIN]/actions/approve.png");
 		validate.setWidth(16);
 		validate.setHeight(16);
-		validate.addFormItemClickHandler(new FormItemClickHandler() {
-			public void onFormItemClick(final FormItemIconClickEvent event) {
-				InfoService.Instance.get().getCronDescription(cron.getValueAsString(), I18N.getLocale(),
-						new AsyncCallback<String>() {
+		validate.addFormItemClickHandler((FormItemIconClickEvent event) -> InfoService.Instance.get()
+				.getCronDescription(cron.getValueAsString(), I18N.getLocale(), new AsyncCallback<String>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								cron.setErrors(caught.getMessage());
-								cron.getForm().getValuesManager().showErrors();
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						cron.setErrors(caught.getMessage());
+						cron.getForm().getValuesManager().showErrors();
+					}
 
-							@Override
-							public void onSuccess(String description) {
-								GuiLog.info(I18N.message("conexprcorrect", description));
-								cron.clearErrors();
-								cron.getForm().getValuesManager().showErrors();
-							}
-						});
-			}
-		});
+					@Override
+					public void onSuccess(String description) {
+						GuiLog.info(I18N.message("conexprcorrect", description));
+						cron.clearErrors();
+						cron.getForm().getValuesManager().showErrors();
+					}
+				}));
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				cron.setValue((String) null);
-				cron.clearErrors();
-				if (handler != null)
-					handler.onChanged(null);
-			}
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			cron.setValue((String) null);
+			cron.clearErrors();
+			if (handler != null)
+				handler.onChanged(null);
 		});
 		clear.setWidth(16);
 		clear.setHeight(16);
@@ -1301,7 +1297,7 @@ public class ItemFactory {
 		else
 			item.setValue("");
 		item.setWrapTitle(false);
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		return item;
 	}
 
@@ -1401,41 +1397,31 @@ public class ItemFactory {
 				att.getParent() != null ? att.getParent() : att.getName(), null, !att.isMandatory());
 		options.setCacheAllData(true);
 		item.setOptionDataSource(options);
-		item.setValueField("value");
-		item.setDisplayField("value");
+		item.setValueField(VALUE);
+		item.setDisplayField(VALUE);
 		item.setFetchMissingValues(true);
 		item.setAlwaysFetchMissingValues(true);
 		item.setValue(initialValue);
 
 		// When the user clicks on the item, preemptively load all the
 		// options to correctly do text completion
-		item.addEditorEnterHandler(new EditorEnterHandler() {
-
-			@Override
-			public void onEditorEnter(EditorEnterEvent event) {
-				options.fetchData(new Criteria());
-			}
-		});
+		item.addEditorEnterHandler((EditorEnterEvent event) -> options.fetchData(new Criteria()));
 
 		// When the user ends the editing, restore the initial value if
 		// he does not select an existing option
-		item.addEditorExitHandler(new EditorExitHandler() {
-
-			@Override
-			public void onEditorExit(EditorExitEvent event) {
-				String val = event.getValue() != null ? event.getValue().toString() : null;
-				Record[] records = options.getCacheData();
-				boolean found = false;
-				if (records != null)
-					for (Record rec : records) {
-						if (rec.getAttributeAsString("value").equals(val)) {
-							found = true;
-							break;
-						}
+		item.addEditorExitHandler((EditorExitEvent event) -> {
+			String val = event.getValue() != null ? event.getValue().toString() : null;
+			Record[] records = options.getCacheData();
+			boolean found = false;
+			if (records != null)
+				for (Record rec : records) {
+					if (rec.getAttributeAsString(VALUE).equals(val)) {
+						found = true;
+						break;
 					}
-				if (!found)
-					event.getItem().setValue(initialValue);
-			}
+				}
+			if (!found)
+				event.getItem().setValue(initialValue);
 		});
 
 		if (!att.isMandatory())
@@ -1469,14 +1455,7 @@ public class ItemFactory {
 		if (withGeneratorTool) {
 			generator.setSrc("[SKIN]/key.png");
 			generator.setPrompt(I18N.message("passwordgenerator"));
-			generator.addFormItemClickHandler(new FormItemClickHandler() {
-
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					PasswordGenerator generator = new PasswordGenerator();
-					generator.show();
-				}
-			});
+			generator.addFormItemClickHandler((FormItemIconClickEvent event) -> new PasswordGenerator().show());
 		}
 
 		password.setIcons(generator);
@@ -1501,17 +1480,13 @@ public class ItemFactory {
 	 */
 	public static StaticTextItem newSafePasswordItem(String name, String title, String value,
 			FormItem hiddenPasswordItem, ChangedHandler changedHandler) {
-		StaticTextItem item = newStaticTextItem(name, title,
-				value == null || value.toString().isEmpty() ? "" : "*****");
+		StaticTextItem item = newStaticTextItem(name, title, value == null || value.isEmpty() ? "" : "*****");
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				item.setValue((String) null);
-				hiddenPasswordItem.setValue((String) null);
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			item.setValue((String) null);
+			hiddenPasswordItem.setValue((String) null);
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
 		});
 
 		FormItemIcon edit = new FormItemIcon();
@@ -1520,24 +1495,16 @@ public class ItemFactory {
 		edit.setHeight(16);
 		edit.setSrc("[SKIN]/edit.png");
 		edit.setPrompt(I18N.message("changepassword"));
-		edit.addFormItemClickHandler(new FormItemClickHandler() {
-
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				PasswordItem password = newPasswordItem("psw", title, null);
-				password.setAutoCompleteKeywords("new-password");
-				password.setShowTitle(false);
-				LD.askForValue(title, "password", null, password, new ValueCallback() {
-
-					@Override
-					public void execute(String value) {
-						item.setValue("*****");
-						hiddenPasswordItem.setValue(value);
-						if (changedHandler != null)
-							changedHandler.onChanged(null);
-					}
-				});
-			}
+		edit.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			PasswordItem password = newPasswordItem("psw", title, null);
+			password.setAutoCompleteKeywords("new-password");
+			password.setShowTitle(false);
+			LD.askForValue(title, "password", null, password, (String val) -> {
+				item.setValue("*****");
+				hiddenPasswordItem.setValue(val);
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			});
 		});
 
 		item.setIcons(edit, clear);
@@ -1606,7 +1573,7 @@ public class ItemFactory {
 		if (value != null)
 			item.setValue(value);
 		IsIntegerValidator iv = new IsIntegerValidator();
-		iv.setErrorMessage(I18N.message("wholenumber"));
+		iv.setErrorMessage(I18N.message(WHOLENUMBER));
 		item.setValidators(iv);
 		return item;
 	}
@@ -1627,7 +1594,7 @@ public class ItemFactory {
 		if (value != null)
 			item.setValue(value);
 		IsIntegerValidator iv = new IsIntegerValidator();
-		iv.setErrorMessage(I18N.message("wholenumber"));
+		iv.setErrorMessage(I18N.message(WHOLENUMBER));
 		item.setValidators(iv);
 		return item;
 	}
@@ -1648,7 +1615,7 @@ public class ItemFactory {
 		if (!InputValues.getInputs(item.getName()).isEmpty()) {
 			item = formItemWithSuggestions(item);
 			IsIntegerValidator iv = new IsIntegerValidator();
-			iv.setErrorMessage(I18N.message("wholenumber"));
+			iv.setErrorMessage(I18N.message(WHOLENUMBER));
 			item.setValidators(iv);
 		}
 		return item;
@@ -1704,7 +1671,7 @@ public class ItemFactory {
 				rv.setMax(max);
 		}
 		IsIntegerValidator iv = new IsIntegerValidator();
-		iv.setErrorMessage(I18N.message("wholenumber"));
+		iv.setErrorMessage(I18N.message(WHOLENUMBER));
 		if (rv == null)
 			item.setValidators(iv);
 		else
@@ -1806,14 +1773,8 @@ public class ItemFactory {
 		editAutomation.setHeight(16);
 		editAutomation.setSrc("[SKIN]/java.png");
 		editAutomation.setPrompt(I18N.message("openautomationeditor"));
-		editAutomation.addFormItemClickHandler(new FormItemClickHandler() {
-
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				AutomationItemEditor editor = new AutomationItemEditor(item, handler);
-				editor.show();
-			}
-		});
+		editAutomation.addFormItemClickHandler(
+				(FormItemIconClickEvent event) -> new AutomationItemEditor(item, handler).show());
 
 		if (withHtmlEditor)
 			item.setIcons(editAutomation, prepareEditHtmlIcon(item, handler));
@@ -1824,19 +1785,12 @@ public class ItemFactory {
 
 	private static FormItemIcon prepareEditHtmlIcon(FormItem item, ChangedHandler handler) {
 		FormItemIcon editHtml = new FormItemIcon();
-		editHtml.setName("edithtml");
+		editHtml.setName(EDITHTML);
 		editHtml.setWidth(16);
 		editHtml.setHeight(16);
 		editHtml.setSrc("[SKIN]/html.png");
 		editHtml.setPrompt(I18N.message("openhtmleditor"));
-		editHtml.addFormItemClickHandler(new FormItemClickHandler() {
-
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				HtmlItemEditor editor = new HtmlItemEditor(item, handler);
-				editor.show();
-			}
-		});
+		editHtml.addFormItemClickHandler((FormItemIconClickEvent event) -> new HtmlItemEditor(item, handler).show());
 		return editHtml;
 	}
 
@@ -1855,24 +1809,23 @@ public class ItemFactory {
 		select.setShowTitle(false);
 
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-		map.put("minute", I18N.message("minutes"));
+		map.put(MINUTE, I18N.message("minutes"));
 		map.put("hour", I18N.message("hours"));
 		map.put("day", I18N.message("ddays"));
 		select.setValueMap(map);
-		select.setValue("minute");
+		select.setValue(MINUTE);
 		return select;
 	}
 
 	public static TimeItem newTimeItem(String name, String title) {
-		TimeItem item = new TimeItem(name, I18N.message(title));
-		return item;
+		return new TimeItem(name, I18N.message(title));
 	}
 
 	public static TimeItem newTimeItemPicklist(String name, String title) {
 		TimeItem item = newTimeItem(name, title);
 		item.setUseTextField(false);
 		item.setHourItemTitle(I18N.message("hour"));
-		item.setMinuteItemTitle(I18N.message("minute"));
+		item.setMinuteItemTitle(I18N.message(MINUTE));
 		item.setSecondItemTitle(I18N.message("second"));
 		item.setShowSecondItem(false);
 		return item;
@@ -2072,7 +2025,7 @@ public class ItemFactory {
 	public static SelectItem newArchiveSelector(int mode, Integer status) {
 		SelectItem item = new SelectItem("archive");
 		item.setTitle("");
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		item.setValueField("id");
@@ -2102,11 +2055,11 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newWorkflowSelector(Long userId, boolean deployedOnly) {
-		SelectItem item = new SelectItem("workflow", I18N.message("workflow"));
+		SelectItem item = new SelectItem(WORKFLOW, I18N.message(WORKFLOW));
 		item.setShowHintInField(true);
 		item.setHint(I18N.message("workflowselect") + "...");
-		item.setRequiredMessage(I18N.message("fieldrequired"));
-		ListGridField label = new ListGridField(LABEL, I18N.message("workflow"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
+		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
@@ -2129,13 +2082,13 @@ public class ItemFactory {
 	}
 
 	public static ComboBoxItem newWorkflowCombo(Long userId) {
-		ComboBoxItem item = new ComboBoxItem("workflow", I18N.message("workflow"));
+		ComboBoxItem item = new ComboBoxItem(WORKFLOW, I18N.message(WORKFLOW));
 		item.setShowHintInField(true);
 		item.setHint(I18N.message("workflowselect") + "...");
 		item.setWidth(200);
 		item.setWrapTitle(false);
 		ListGridField name = new ListGridField("name");
-		ListGridField label = new ListGridField(LABEL, I18N.message("workflow"));
+		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
 		item.setDisplayField(LABEL);
 		item.setValueField("id");
 		item.setPickListWidth(300);
@@ -2145,15 +2098,15 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newJobGroupSelector() {
-		SelectItem item = new SelectItem("group", I18N.message("group"));
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		SelectItem item = new SelectItem(GROUP, I18N.message(GROUP));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		item.setShowHintInField(true);
 		item.setHint(I18N.message("groupselect") + "...");
-		ListGridField group = new ListGridField("group", I18N.message("group"));
+		ListGridField group = new ListGridField(GROUP, I18N.message(GROUP));
 		item.setWidth(200);
 		item.setPickListFields(group);
-		item.setDisplayField("group");
-		item.setValueField("group");
+		item.setDisplayField(GROUP);
+		item.setValueField(GROUP);
 		item.setWrapTitle(false);
 		item.setOptionDataSource(new JobsDS());
 		return item;
@@ -2161,7 +2114,7 @@ public class ItemFactory {
 
 	public static SelectItem newFormSelector() {
 		SelectItem item = new SelectItem("form", I18N.message("form"));
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		item.setPickListFields(name);
 		item.setDisplayField("name");
@@ -2175,7 +2128,7 @@ public class ItemFactory {
 
 	public static SelectItem newStampSelector() {
 		SelectItem item = new SelectItem("stamp", I18N.message("stamp"));
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		item.setWidth(200);
 		item.setPickListWidth(200);
@@ -2213,7 +2166,7 @@ public class ItemFactory {
 		if (value != null)
 			item.setValue(value);
 		IsFloatValidator iv = new IsFloatValidator();
-		iv.setErrorMessage(I18N.message("wholenumber"));
+		iv.setErrorMessage(I18N.message(WHOLENUMBER));
 		item.setValidators(iv);
 		return item;
 	}
@@ -2234,7 +2187,7 @@ public class ItemFactory {
 		if (!InputValues.getInputs(item.getName()).isEmpty()) {
 			item = formItemWithSuggestions(item);
 			IsFloatValidator iv = new IsFloatValidator();
-			iv.setErrorMessage(I18N.message("wholenumber"));
+			iv.setErrorMessage(I18N.message(WHOLENUMBER));
 			item.setValidators(iv);
 		}
 		return item;
@@ -2293,7 +2246,7 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newRunlevelSelector() {
-		SelectItem item = new SelectItem("runlevel", I18N.message("currentrunlevel"));
+		SelectItem item = new SelectItem(RUNLEVEL, I18N.message("currentrunlevel"));
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put(DEFAULT, I18N.message(DEFAULT));
 		opts.put("bulkload", I18N.message("bulkload"));
@@ -2301,17 +2254,17 @@ public class ItemFactory {
 		opts.put("devel", I18N.message("devel"));
 		item.setValueMap(opts);
 		item.setWrapTitle(false);
-		item.setValue(Session.get().getConfig("runlevel"));
+		item.setValue(Session.get().getConfig(RUNLEVEL));
 		item.setRequired(true);
 		item.setWidth(150);
-		item.setDisabled("demo".equals(Session.get().getConfig("runlevel")));
+		item.setDisabled("demo".equals(Session.get().getConfig(RUNLEVEL)));
 		return item;
 	}
 
 	public static SelectItem newFolderTemplateSelector() {
 		SelectItem item = new SelectItem("foldertemplate");
 		item.setTitle(I18N.message("foldertemplate"));
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		item.setValueField("id");
 		item.setDisplayField("name");
 		item.setWrapTitle(false);
@@ -2324,7 +2277,7 @@ public class ItemFactory {
 	public static SelectItem newWorkspaceSelector(Long value) {
 		SelectItem item = new SelectItem("workspace");
 		item.setTitle(I18N.message("workspace"));
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		item.setValueField("folderId");
 		item.setDisplayField("name");
 		item.setWrapTitle(false);
@@ -2422,18 +2375,18 @@ public class ItemFactory {
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("", I18N.message("disable2fa"));
 		if (!enabledOnly
-				|| Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled"))
+				|| Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + DOT_ENABLED))
 			map.put(Constants.TWOFA_GOOGLE_AUTHENTICATOR, "Google Authenticator");
-		if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_YUBIKEY + ".enabled"))
+		if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_YUBIKEY + DOT_ENABLED))
 			map.put(Constants.TWOFA_YUBIKEY, "Yubikey");
 		if (!enabledOnly
-				|| Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + ".enabled"))
+				|| Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + DOT_ENABLED))
 			map.put(Constants.TWOFA_EMAIL_AUTHENTICATOR, "Email");
-		if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_DUO + ".enabled"))
+		if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_DUO + DOT_ENABLED))
 			map.put(Constants.TWOFA_DUO, "Duo");
 		select.setValueMap(map);
 		if (value != null && map.get(value) != null)
-			select.setValue(value.toString());
+			select.setValue(value);
 		else
 			select.setValue("");
 		return select;
@@ -2473,13 +2426,10 @@ public class ItemFactory {
 		selector.setValueMap(opts);
 		selector.setRequired(false);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				selector.clearValue();
-				selector.setValue((String) null);
-				selector.fireEvent(new ChangedEvent(selector.getJsObj()));
-			}
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			selector.clearValue();
+			selector.setValue((String) null);
+			selector.fireEvent(new ChangedEvent(selector.getJsObj()));
 		});
 		clear.setWidth(12);
 		clear.setHeight(12);
@@ -2505,30 +2455,22 @@ public class ItemFactory {
 		TextAreaItem item = newTextAreaItem(name, title, value);
 		if (withSimplifiedHtmlEditor) {
 			FormItemIcon editHtml = new FormItemIcon();
-			editHtml.setName("edithtml");
+			editHtml.setName(EDITHTML);
 			editHtml.setWidth(16);
 			editHtml.setHeight(16);
 			editHtml.setSrc("[SKIN]/html.png");
 			editHtml.setPrompt(I18N.message("openhtmleditor"));
-			editHtml.addFormItemClickHandler(new FormItemClickHandler() {
-
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					RichTextItem htmlItem = newRichTextItemForNote("html", "html", item.getValueAsString());
-					htmlItem.setBrowserSpellCheck(true);
-					htmlItem.setShowTitle(false);
+			editHtml.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+				RichTextItem htmlItem = newRichTextItemForNote("html", "html", item.getValueAsString());
+				htmlItem.setBrowserSpellCheck(true);
+				htmlItem.setShowTitle(false);
+				if (handler != null)
+					htmlItem.addChangedHandler(handler);
+				LD.askForValue(EDITHTML, null, item.getValueAsString(), htmlItem, (String val) -> {
+					item.setValue(val);
 					if (handler != null)
-						htmlItem.addChangedHandler(handler);
-					LD.askForValue("edithtml", null, item.getValueAsString(), htmlItem, new ValueCallback() {
-
-						@Override
-						public void execute(String value) {
-							item.setValue(value);
-							if (handler != null)
-								handler.onChanged(null);
-						}
-					});
-				}
+						handler.onChanged(null);
+				});
 			});
 
 			item.setIcons(editHtml);
@@ -2559,7 +2501,7 @@ public class ItemFactory {
 		else
 			item.setValue("");
 		item.setWrapTitle(false);
-		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		item.setShowTitle(false);
 		item.setRequired(true);
 		item.setWidth("*");
@@ -2576,16 +2518,14 @@ public class ItemFactory {
 
 				@Override
 				protected boolean condition(Object value) {
-					if (getFormItem().getRequired() && (value == null || value.toString().length() < 1)) {
-						setErrorMessage(I18N.message("fieldrequired"));
+					if (Boolean.TRUE.equals(getFormItem().getRequired())
+							&& (value == null || value.toString().length() < 1)) {
+						setErrorMessage(I18N.message(FIELDREQUIRED));
 						return false;
 					}
 
 					setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
-					if (value != null && value.toString().length() > maxlength) {
-						return false;
-					}
-					return true;
+					return value == null || value.toString().length() <= maxlength;
 				}
 			});
 	}
@@ -2616,16 +2556,14 @@ public class ItemFactory {
 
 				@Override
 				protected boolean condition(Object value) {
-					if (getFormItem().getRequired() && (value == null || value.toString().length() < 1)) {
-						setErrorMessage(I18N.message("fieldrequired"));
+					if (Boolean.TRUE.equals(getFormItem().getRequired())
+							&& (value == null || value.toString().length() < 1)) {
+						setErrorMessage(I18N.message(FIELDREQUIRED));
 						return false;
 					}
 
 					setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
-					if (value != null && value.toString().length() > maxlength) {
-						return false;
-					}
-					return true;
+					return value == null || value.toString().length() <= maxlength;
 				}
 			});
 		return item;

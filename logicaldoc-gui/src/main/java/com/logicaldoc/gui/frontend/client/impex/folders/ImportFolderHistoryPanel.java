@@ -69,7 +69,7 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		event.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				if (value.toString().contains("importfolder.imported"))
 					return "<span class='event-ok'>" + I18N.message("iimport").toLowerCase() + "</span>";
 				else if (value.toString().contains("importfolder.updated"))
@@ -104,8 +104,8 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				Record record = event.getRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("docId")));
+				Record rec = event.getRecord();
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("docId")));
 			}
 		});
 
@@ -118,8 +118,8 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 				openInFolder.setTitle(I18N.message("openinfolder"));
 				openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 					public void onClick(MenuItemClickEvent event) {
-						Record record = list.getSelectedRecord();
-						DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("docId")));
+						Record rec = list.getSelectedRecord();
+						DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("docId")));
 					}
 				});
 
@@ -127,12 +127,12 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 				preview.setTitle(I18N.message("preview"));
 				preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 					public void onClick(MenuItemClickEvent event) {
-						Record record = list.getSelectedRecord();
+						Record rec = list.getSelectedRecord();
 						GUIDocument doc = new GUIDocument();
-						doc.setId(record.getAttributeAsLong("docId"));
-						doc.setFileName(record.getAttributeAsString("filename"));
+						doc.setId(rec.getAttributeAsLong("docId"));
+						doc.setFileName(rec.getAttributeAsString("filename"));
 
-						GUIFolder folder = new GUIFolder(record.getAttributeAsLong("folderId"));
+						GUIFolder folder = new GUIFolder(rec.getAttributeAsLong("folderId"));
 						doc.setFolder(folder);
 
 						PreviewPopup iv = new PreviewPopup(doc);

@@ -87,37 +87,37 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		filename.setDetailFormatter(new DetailFormatter() {
 
 			@Override
-			public String format(Object value, Record record, DetailViewerField field) {
+			public String format(Object value, Record rec, DetailViewerField field) {
 				try {
 					String html = "<table style='margin-top:2px' align='center' border='0' cellspacing='0'>";
 
 					// The title row
-					html += "<tr><td>" + Util.imageHTML(record.getAttribute("icon") + ".png") + "</td><td>" + value
+					html += "<tr><td>" + Util.imageHTML(rec.getAttribute("icon") + ".png") + "</td><td>" + value
 							+ "</td></tr></table>";
 					html += "<table align='center' border='0' cellspacing='0'><tr>";
 
 					// The status row
-					if (record.getAttributeAsBoolean("bookmarked"))
-						html += "<td>" + DocUtil.getBookmarkedIcon(record.getAttributeAsBoolean("bookmarked"))
+					if (rec.getAttributeAsBoolean("bookmarked"))
+						html += "<td>" + DocUtil.getBookmarkedIcon(rec.getAttributeAsBoolean("bookmarked"))
 								+ "</td>";
-					html += "<td>" + AwesomeFactory.getIndexedIcon(record.getAttributeAsInt("indexed")) + "</td>";
+					html += "<td>" + AwesomeFactory.getIndexedIcon(rec.getAttributeAsInt("indexed")) + "</td>";
 
 					// The locked icon
-					if (record.getAttribute("status") != null) {
-						Integer status = record.getAttributeAsInt("status");
+					if (rec.getAttribute("status") != null) {
+						Integer status = rec.getAttributeAsInt("status");
 						if (status != null && status.intValue() > 0) {
 							String alt = "";
 							if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
-								alt = I18N.message("lockedby") + " " + record.getAttributeAsString("lockUser");
+								alt = I18N.message("lockedby") + " " + rec.getAttributeAsString("lockUser");
 							html += "<td><span title='" + alt + "'>" + DocUtil.getLockedIcon(status) + "</span></td>";
 						}
 					}
 
-					html += "<td>" + DocUtil.getPasswordProtectedIcon(record.getAttributeAsBoolean("password"))
+					html += "<td>" + DocUtil.getPasswordProtectedIcon(rec.getAttributeAsBoolean("password"))
 							+ "</td>";
-					html += "<td>" + DocUtil.getImmutableIcon(record.getAttributeAsInt("immutable")) + "</td>";
-					html += "<td>" + DocUtil.getSignedIcon(record.getAttributeAsInt("signed")) + "</td>";
-					html += "<td>" + DocUtil.getStampedIcon(record.getAttributeAsInt("stamped")) + "</td>";
+					html += "<td>" + DocUtil.getImmutableIcon(rec.getAttributeAsInt("immutable")) + "</td>";
+					html += "<td>" + DocUtil.getSignedIcon(rec.getAttributeAsInt("signed")) + "</td>";
+					html += "<td>" + DocUtil.getStampedIcon(rec.getAttributeAsInt("stamped")) + "</td>";
 					html += "</tr></table>";
 
 					return html;
@@ -134,17 +134,17 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		thumbnail.setDetailFormatter(new DetailFormatter() {
 
 			@Override
-			public String format(Object value, Record record, DetailViewerField field) {
+			public String format(Object value, Record rec, DetailViewerField field) {
 				int thumbnailSize = 200;
 				if (Session.get().getConfig("gui.thumbnail.size") != null)
 					thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
 
 				try {
-					if ("folder".equals(record.getAttribute("type")))
+					if ("folder".equals(rec.getAttribute("type")))
 						return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
 					else {
-						long docId = Long.parseLong(record.getAttribute("id"));
-						if (!record.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
+						long docId = Long.parseLong(rec.getAttribute("id"));
+						if (!rec.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
 							return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
 						else
 							return Util.imageHTML("blank.png", null,
@@ -177,10 +177,10 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public void updateDocument(GUIDocument document) {
-		Record record = findRecord(document.getId());
-		if (record != null) {
-			DocumentGridUtil.updateRecord(document, record);
-			Canvas tile = getTile(record);
+		Record rec = findRecord(document.getId());
+		if (rec != null) {
+			DocumentGridUtil.updateRecord(document, rec);
+			Canvas tile = getTile(rec);
 			tile.redraw();
 		}
 	}
@@ -192,8 +192,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			records = new Record[documents.length];
 			for (int i = 0; i < documents.length; i++) {
 				GUIDocument doc = documents[i];
-				Record record = DocumentGridUtil.fromDocument(doc);
-				records[i] = record;
+				Record rec = DocumentGridUtil.fromDocument(doc);
+				records[i] = rec;
 			}
 		}
 		setData(records);
@@ -271,9 +271,9 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	public void selectDocument(long docId) {
 		deselectAll();
 		RecordList rlist = getDataAsRecordList();
-		Record record = rlist.find("id", Long.toString(docId));
-		if (record != null)
-			selectRecord(record);
+		Record rec = rlist.find("id", Long.toString(docId));
+		if (rec != null)
+			selectRecord(rec);
 	}
 
 	@Override
@@ -387,10 +387,10 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	@Override
 	public void onDocumentsDeleted(GUIDocument[] documents) {
 		for (GUIDocument doc : documents) {
-			Record record = findRecord(doc.getId());
-			if (record != null) {
+			Record rec = findRecord(doc.getId());
+			if (rec != null) {
 				try {
-					removeData(record);
+					removeData(rec);
 					cursor.setMessage(I18N.message("showndocuments",
 							"" + (getData() != null ? Integer.toString(getData().length) : 0)));
 				} catch (Throwable t) {
@@ -437,10 +437,10 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	private Record findRecord(long docId) {
-		Record record = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
-		if (record == null)
-			record = find(new AdvancedCriteria("docref", OperatorId.EQUALS, docId));
-		return record;
+		Record rec = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
+		if (rec == null)
+			rec = find(new AdvancedCriteria("docref", OperatorId.EQUALS, docId));
+		return rec;
 	}
 
 	@Override

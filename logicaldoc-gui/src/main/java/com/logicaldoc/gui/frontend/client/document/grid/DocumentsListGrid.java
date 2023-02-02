@@ -272,8 +272,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		language.setCanFilter(false);
 		language.setAlign(Alignment.CENTER);
 		language.setHidden(true);
-		language.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
-			return languages.get(record.getAttribute("language"));
+		language.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			return languages.get(rec.getAttribute("language"));
 		});
 		fieldsMap.put(language.getName(), language);
 
@@ -321,7 +321,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		/**
 		 * NOTE: If we put the thumbnail the layout of the grid gets corrupted
-		 * when filters are activated and the user selects a record
+		 * when filters are activated and the user selects a rec
 		 */
 //		ListGridField thumbnail = new ListGridField("thumbnail", I18N.message("thumbnail"), 200);
 //		thumbnail.setHidden(true);
@@ -329,12 +329,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 //		thumbnail.setCellFormatter(new CellFormatter() {
 //
 //			@Override
-//			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+//			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 //				try {
-//					if (record.getAttribute("docId") != null)
-//						return Util.thumbnailImgageHTML(Long.parseLong(record.getAttribute("docId")), null, 200, null);
+//					if (rec.getAttribute("docId") != null)
+//						return Util.thumbnailImgageHTML(Long.parseLong(rec.getAttribute("docId")), null, 200, null);
 //					else
-//						return Util.thumbnailImgageHTML(Long.parseLong(record.getAttribute("id")), null, 200, null);
+//						return Util.thumbnailImgageHTML(Long.parseLong(rec.getAttribute("id")), null, 200, null);
 //				} catch (Throwable e) {
 //					return "";
 //				}
@@ -362,9 +362,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		ListGridField score = new ColoredListGridField("score", I18N.message("score"), 120);
 		score.setCanFilter(false);
 		score.setHidden(true);
-		score.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		score.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			try {
-				int scoreValue = record.getAttributeAsInt("score");
+				int scoreValue = rec.getAttributeAsInt("score");
 				int red = 100 - scoreValue > 0 ? 100 - scoreValue : 0;
 				return "<img src='" + Util.imageUrl("dotblue.gif") + "' style='width: " + score
 						+ "px; height: 8px' title='" + score + "%'/>" + "<img src='" + Util.imageUrl("dotgrey.gif")
@@ -395,86 +395,86 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		statusIcons.setCanFilter(false);
 		statusIcons.setCanSort(false);
 		fieldsMap.put(statusIcons.getName(), statusIcons);
-		statusIcons.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
-			return formatStatusIconCell(record);
+		statusIcons.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			return formatStatusIconCell(rec);
 		});
 	}
 
-	private String formatStatusIconCell(ListGridRecord record) {
-		String color = record.getAttributeAsString("color");
+	private String formatStatusIconCell(ListGridRecord rec) {
+		String color = rec.getAttributeAsString("color");
 
 		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
 
 		// Put the bookmark icon
-		content = putBookmarkStatusIcon(record, color, content);
+		content = putBookmarkStatusIcon(rec, color, content);
 
 		// Put the indexing icon
-		content = putIndexedStatusIcon(record, color, content);
+		content = putIndexedStatusIcon(rec, color, content);
 
 		// Put the status icon
-		if (record.getAttribute("status") != null) {
-			Integer status = record.getAttributeAsInt("status");
+		if (rec.getAttribute("status") != null) {
+			Integer status = rec.getAttributeAsInt("status");
 			if (status != null && status.intValue() > 0)
-				content += AwesomeFactory.getLockedButtonHTML(status, record.getAttributeAsString("lockUser"),
+				content += AwesomeFactory.getLockedButtonHTML(status, rec.getAttributeAsString("lockUser"),
 						color);
 		}
 
 		// Put the immutable icon
-		content = putImmutableStatusIcon(record, color, content);
+		content = putImmutableStatusIcon(rec, color, content);
 
 		// Put the password protection icon
-		if (record.getAttribute("password") != null) {
-			Boolean password = record.getAttributeAsBoolean("password");
+		if (rec.getAttribute("password") != null) {
+			Boolean password = rec.getAttributeAsBoolean("password");
 			if (password != null && password.booleanValue())
 				content += AwesomeFactory.getIconButtonHTML("key", null, "passwordprotected", color, null);
 		}
 
 		// Put the signed icon
-		content = putSignedStatusIcon(record, color, content);
+		content = putSignedStatusIcon(rec, color, content);
 
 		// Put the stamped icon
-		content = putStampedStatusIcon(record, color, content);
+		content = putStampedStatusIcon(rec, color, content);
 
 		// Put the links icon
-		content = putLinksStatusIcon(record, color, content);
+		content = putLinksStatusIcon(rec, color, content);
 
 		content += "</div>";
 		return content;
 	}
 
-	private String putLinksStatusIcon(ListGridRecord record, String color, String content) {
-		if (record.getAttribute("links") != null) {
-			Integer links = record.getAttributeAsInt("links");
+	private String putLinksStatusIcon(ListGridRecord rec, String color, String content) {
+		if (rec.getAttribute("links") != null) {
+			Integer links = rec.getAttributeAsInt("links");
 			if (links != null && links.intValue() > 0)
 				content += AwesomeFactory.getIconButtonHTML("link", null, "withlinks", color, null);
 		}
 		return content;
 	}
 
-	private String putImmutableStatusIcon(ListGridRecord record, String color, String content) {
-		if (record.getAttribute("immutable") != null) {
-			Integer immutable = record.getAttributeAsInt("immutable");
+	private String putImmutableStatusIcon(ListGridRecord rec, String color, String content) {
+		if (rec.getAttribute("immutable") != null) {
+			Integer immutable = rec.getAttributeAsInt("immutable");
 			if (immutable != null && immutable.intValue() == 1)
 				content += AwesomeFactory.getIconButtonHTML("hand-paper", null, "immutable", color, null);
 		}
 		return content;
 	}
 
-	private String putBookmarkStatusIcon(ListGridRecord record, String color, String content) {
-		if (record.getAttribute("bookmarked") != null) {
-			Boolean bookmarked = record.getAttributeAsBoolean("bookmarked");
+	private String putBookmarkStatusIcon(ListGridRecord rec, String color, String content) {
+		if (rec.getAttribute("bookmarked") != null) {
+			Boolean bookmarked = rec.getAttributeAsBoolean("bookmarked");
 			if (bookmarked != null && bookmarked)
 				content += AwesomeFactory.getIconButtonHTML("bookmark", null, "bookmarked", color, null);
 		}
 		return content;
 	}
 
-	private String putIndexedStatusIcon(ListGridRecord record, String color, String content) {
-		if (record.getAttribute("indexed") != null) {
-			Integer indexed = record.getAttributeAsInt("indexed");
+	private String putIndexedStatusIcon(ListGridRecord rec, String color, String content) {
+		if (rec.getAttribute("indexed") != null) {
+			Integer indexed = rec.getAttributeAsInt("indexed");
 			if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
 					&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
-				Long idValue = record.getAttributeAsLong("id");
+				Long idValue = rec.getAttributeAsLong("id");
 				content += AwesomeFactory.getIndexedIconButtonHTML(idValue,
 						FolderController.get().getCurrentFolder().isDownload(), indexed, color);
 			}
@@ -482,12 +482,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		return content;
 	}
 
-	private String putStampedStatusIcon(ListGridRecord record, String color, String content) {
-		if (record.getAttribute("stamped") != null) {
-			Integer stamped = record.getAttributeAsInt("stamped");
+	private String putStampedStatusIcon(ListGridRecord rec, String color, String content) {
+		if (rec.getAttribute("stamped") != null) {
+			Integer stamped = rec.getAttributeAsInt("stamped");
 			if (stamped != null && stamped.intValue() == 1) {
-				Long docId = record.getAttributeAsLong("id");
-				String fileVersion = record.getAttribute("fileVersion");
+				Long docId = rec.getAttributeAsLong("id");
+				String fileVersion = rec.getAttribute("fileVersion");
 				if (FolderController.get().getCurrentFolder().isDownload())
 					content += AwesomeFactory.getIconButtonHTML("tint", null, "stamped", color,
 							(Feature.enabled(Feature.STAMP) ? Util.downloadPdfURL(docId, fileVersion) : null));
@@ -498,15 +498,15 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		return content;
 	}
 
-	private String putSignedStatusIcon(ListGridRecord record, String color, String content) {
-		if (record.getAttribute("signed") != null) {
-			Integer signed = record.getAttributeAsInt("signed");
+	private String putSignedStatusIcon(ListGridRecord rec, String color, String content) {
+		if (rec.getAttribute("signed") != null) {
+			Integer signed = rec.getAttributeAsInt("signed");
 			if (signed != null && signed.intValue() == 1) {
-				Long docId = record.getAttributeAsLong("id");
+				Long docId = rec.getAttributeAsLong("id");
 				if (FolderController.get().getCurrentFolder().isDownload())
 					content += AwesomeFactory.getIconButtonHTML("badge-check", null, "signed", color,
-							(record.getAttributeAsString("filename") != null
-									&& record.getAttributeAsString("filename").toLowerCase().endsWith(".pdf")
+							(rec.getAttributeAsString("filename") != null
+									&& rec.getAttributeAsString("filename").toLowerCase().endsWith(".pdf")
 											? Util.downloadURL(docId, null)
 											: Util.downloadPdfURL(docId, null)));
 				else
@@ -679,43 +679,43 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+	protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
 		if (getFieldName(colNum).equals("filename")) {
 			int immutable = 0;
-			if (record.getAttribute("immutable") != null)
-				immutable = record.getAttributeAsInt("immutable");
+			if (rec.getAttribute("immutable") != null)
+				immutable = rec.getAttributeAsInt("immutable");
 
-			if (immutable == 1 || !"yes".equals(record.getAttribute("publishedStatus"))) {
+			if (immutable == 1 || !"yes".equals(rec.getAttribute("publishedStatus"))) {
 				return "color: #888888; font-style: italic;";
 			} else {
-				return super.getCellCSSText(record, rowNum, colNum);
+				return super.getCellCSSText(rec, rowNum, colNum);
 			}
 		} else {
-			return super.getCellCSSText(record, rowNum, colNum);
+			return super.getCellCSSText(rec, rowNum, colNum);
 		}
 	}
 
 	@Override
 	public void updateDocument(GUIDocument document) {
-		Record record = findRecord(document.getId());
-		if (record != null) {
-			DocumentGridUtil.updateRecord(document, record);
-			refreshRow(record);
+		Record rec = findRecord(document.getId());
+		if (rec != null) {
+			DocumentGridUtil.updateRecord(document, rec);
+			refreshRow(rec);
 		}
 
 		// Now consider the aliases
 		if (document.getDocRef() != null) {
-			record = findRecord(document.getDocRef());
-			if (record != null) {
-				DocumentGridUtil.updateRecord(document, record);
-				refreshRow(record);
+			rec = findRecord(document.getDocRef());
+			if (rec != null) {
+				DocumentGridUtil.updateRecord(document, rec);
+				refreshRow(rec);
 			}
 		}
 	}
 
-	private void refreshRow(Record record) {
+	private void refreshRow(Record rec) {
 		invalidateRecordComponents();
-		refreshRecordComponent(getRecordIndex(record));
+		refreshRecordComponent(getRecordIndex(rec));
 		refreshFields();
 	}
 
@@ -837,10 +837,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	public void selectDocument(long docId) {
 		deselectAll();
 		RecordList rlist = getDataAsRecordList();
-		Record record = rlist.find("id", docId);
-		if (record != null) {
-			selectSingleRecord(record);
-			scrollToRow(rlist.indexOf(record));
+		Record rec = rlist.find("id", docId);
+		if (rec != null) {
+			selectSingleRecord(rec);
+			scrollToRow(rlist.indexOf(rec));
 			Session.get().setHiliteDocId(null);
 			DocumentController.get().selected(getSelectedDocument());
 		}
@@ -883,9 +883,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	protected Canvas getExpansionComponent(final ListGridRecord record) {
+	protected Canvas getExpansionComponent(final ListGridRecord rec) {
 		return new HTMLFlow("<div class='details'>"
-				+ (record.getAttributeAsString("summary") != null ? record.getAttributeAsString("summary") : "")
+				+ (rec.getAttributeAsString("summary") != null ? rec.getAttributeAsString("summary") : "")
 				+ "</div>");
 	}
 
@@ -897,8 +897,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			records = new ListGridRecord[documents.length];
 			for (int i = 0; i < documents.length; i++) {
 				GUIDocument doc = documents[i];
-				ListGridRecord record = DocumentGridUtil.fromDocument(doc);
-				records[i] = record;
+				ListGridRecord rec = DocumentGridUtil.fromDocument(doc);
+				records[i] = rec;
 			}
 		}
 
@@ -960,8 +960,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 			Record[] records = getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
-				for (Record record : records)
-					rec.add(new ListGridRecord(record));
+				for (Record recd : records)
+					rec.add(new ListGridRecord(recd));
 			}
 
 			cursor.setMessage(I18N.message("showndocuments", Integer.toString(rec.size())));
@@ -1000,9 +1000,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		if (documents != null) {
 			for (GUIDocument doc : documents) {
 				try {
-					Record record = findRecord(doc.getId());
-					if (record != null)
-						removeData(record);
+					Record rec = findRecord(doc.getId());
+					if (rec != null)
+						removeData(rec);
 				} catch (Throwable t) {
 					// Nothing to do
 				}
@@ -1034,8 +1034,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	private Record findRecord(long docId) {
-		Record record = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
-		return record;
+		Record rec = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
+		return rec;
 	}
 
 	@Override

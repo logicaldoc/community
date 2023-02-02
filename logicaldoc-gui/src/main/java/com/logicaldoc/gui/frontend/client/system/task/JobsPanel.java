@@ -148,9 +148,9 @@ public class JobsPanel extends VLayout {
 
 							List<GUIValue> selectedJobs = new ArrayList<GUIValue>();
 							ListGridRecord[] selection = list.getSelectedRecords();
-							for (ListGridRecord record : selection)
-								selectedJobs.add(new GUIValue(record.getAttributeAsString("trigger"),
-										record.getAttributeAsString("group")));
+							for (ListGridRecord rec : selection)
+								selectedJobs.add(new GUIValue(rec.getAttributeAsString("trigger"),
+										rec.getAttributeAsString("group")));
 
 							SystemService.Instance.get().unscheduleJobs(selectedJobs.toArray(new GUIValue[0]),
 									new AsyncCallback<Void>() {

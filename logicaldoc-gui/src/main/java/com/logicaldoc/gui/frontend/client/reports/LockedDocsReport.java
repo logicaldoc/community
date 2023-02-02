@@ -111,25 +111,25 @@ public class LockedDocsReport extends ReportPanel {
 		statusIcons.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String color = record.getAttributeAsString("color");
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
+				String color = rec.getAttributeAsString("color");
 
 				String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
 
 				// Put the status icon
 				{
-					if (record.getAttribute("status") != null) {
-						Integer status = record.getAttributeAsInt("status");
+					if (rec.getAttribute("status") != null) {
+						Integer status = rec.getAttributeAsInt("status");
 						if (status != null && status.intValue() > 0)
 							content += AwesomeFactory.getLockedButtonHTML(status,
-									record.getAttributeAsString("lockUser"), color);
+									rec.getAttributeAsString("lockUser"), color);
 					}
 				}
 
 				// Put the immutable icon
 				{
-					if (record.getAttribute("immutable") != null) {
-						Integer immutable = record.getAttributeAsInt("immutable");
+					if (rec.getAttribute("immutable") != null) {
+						Integer immutable = rec.getAttributeAsInt("immutable");
 						if (immutable != null && immutable.intValue() == 1)
 							content += AwesomeFactory.getIconButtonHTML("hand-paper", null, "immutable", color, null);
 					}
@@ -215,9 +215,9 @@ public class LockedDocsReport extends ReportPanel {
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-						Long.parseLong(record.getAttributeAsString("id")));
+				ListGridRecord rec = list.getSelectedRecord();
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+						Long.parseLong(rec.getAttributeAsString("id")));
 			}
 		});
 

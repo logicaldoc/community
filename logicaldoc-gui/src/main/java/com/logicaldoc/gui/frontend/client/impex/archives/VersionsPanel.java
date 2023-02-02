@@ -115,8 +115,8 @@ public class VersionsPanel extends VLayout {
 		listGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord record = event.getRecord();
-				DocUtil.download(record.getAttributeAsLong("docid"), null, record.getAttribute("id"));
+				ListGridRecord rec = event.getRecord();
+				DocUtil.download(rec.getAttributeAsLong("docid"), null, rec.getAttribute("id"));
 			}
 		});
 

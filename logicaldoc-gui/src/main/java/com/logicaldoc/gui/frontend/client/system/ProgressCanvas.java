@@ -22,9 +22,9 @@ public class ProgressCanvas extends HLayout {
 		progressBar.setShowTitle(true);
 
 		boolean enabled = true;
-		// record.getAttributeAsBoolean("eenabled");
+		// rec.getAttributeAsBoolean("eenabled");
 		boolean running = true;
-		// record.getAttributeAsInt("status") ==
+		// rec.getAttributeAsInt("status") ==
 		// GUITask.STATUS_RUNNING;
 		Img image = new Img();
 		if (enabled && running) {

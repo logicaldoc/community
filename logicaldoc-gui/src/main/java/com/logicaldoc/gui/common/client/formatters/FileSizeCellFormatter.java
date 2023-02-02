@@ -23,7 +23,7 @@ public class FileSizeCellFormatter implements CellFormatter {
 	}
 
 	@Override
-	public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+	public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 		if (win7format)
 			return Util.formatSizeW7(value);
 		else

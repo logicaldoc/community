@@ -116,12 +116,12 @@ public class VersionsPanel extends DocumentDetailTab {
 
 	private void addListHandlers() {
 		list.addCellDoubleClickHandler((CellDoubleClickEvent clickEvent) -> {
-			ListGridRecord record = clickEvent.getRecord();
+			ListGridRecord rec = clickEvent.getRecord();
 			if (FolderController.get().getCurrentFolder().isDownload()
 					&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-				onDownload(document, record);
+				onDownload(document, rec);
 			else
-				onPreview(document, record);
+				onPreview(document, rec);
 		});
 
 		list.addCellContextClickHandler((CellContextClickEvent contextClickEvent) -> {
@@ -139,8 +139,8 @@ public class VersionsPanel extends DocumentDetailTab {
 		wfStatus.setCanFilter(true);
 		wfStatus.setCanSort(true);
 		wfStatus.setAlign(Alignment.LEFT);
-		wfStatus.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
-			String display = record.getAttributeAsString("workflowStatusDisplay");
+		wfStatus.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			String display = rec.getAttributeAsString("workflowStatusDisplay");
 			if (display != null && !display.isEmpty())
 				return "<span style='color: " + display + ";'>" + value + "</span>";
 			else
@@ -152,9 +152,9 @@ public class VersionsPanel extends DocumentDetailTab {
 	private ListGridField preparePermalink() {
 		ListGridField permalink = new ColoredListGridField("permalink", I18N.message("permalink"), 90);
 		permalink.setAlign(Alignment.CENTER);
-		permalink.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		permalink.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
-			String fileVer = record.getAttributeAsString("fileVersion");
+			String fileVer = rec.getAttributeAsString("fileVersion");
 			String downloadUrl = Util.downloadURL(docId, fileVer);
 			String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message("download") + "</a>";
 			return perma;
@@ -162,22 +162,22 @@ public class VersionsPanel extends DocumentDetailTab {
 		return permalink;
 	}
 
-	protected void onDownload(final GUIDocument document, ListGridRecord record) {
+	protected void onDownload(final GUIDocument document, ListGridRecord rec) {
 		if (document.getFolder().isDownload())
 			DocUtil.download(document.getDocRef() != null ? document.getDocRef() : document.getId(),
-					record.getAttribute("fileVersion"));
+					rec.getAttribute("fileVersion"));
 	}
 
-	protected void onPreview(final GUIDocument document, ListGridRecord record) {
+	protected void onPreview(final GUIDocument document, ListGridRecord rec) {
 		GUIVersion version = new GUIVersion();
 		version.setId(document.getId());
 		version.setFolder(document.getFolder());
 		version.setDocId(document.getId());
 		version.setId(document.getId());
-		version.setVersion(record.getAttribute("version"));
-		version.setFileVersion(record.getAttribute("fileVersion"));
-		version.setType(record.getAttribute("type"));
-		version.setFileName(record.getAttribute("filename"));
+		version.setVersion(rec.getAttribute("version"));
+		version.setFileVersion(rec.getAttribute("fileVersion"));
+		version.setType(rec.getAttribute("type"));
+		version.setFileName(rec.getAttribute("filename"));
 		version.setFileSize(document.getFileSize());
 		PreviewPopup iv = new PreviewPopup(version);
 		iv.show();
@@ -268,8 +268,8 @@ public class VersionsPanel extends DocumentDetailTab {
 								if (value) {
 									long[] ids = new long[selection.length];
 									int i = 0;
-									for (ListGridRecord record : selection)
-										ids[i++] = Long.parseLong(record.getAttribute("id"));
+									for (ListGridRecord rec : selection)
+										ids[i++] = Long.parseLong(rec.getAttribute("id"));
 
 									DocumentService.Instance.get().deleteVersions(ids,
 											new AsyncCallback<GUIDocument>() {

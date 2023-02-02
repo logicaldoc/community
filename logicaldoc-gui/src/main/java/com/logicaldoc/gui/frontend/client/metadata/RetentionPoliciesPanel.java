@@ -161,9 +161,9 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		});
 
 		list.addSelectionChangedHandler((SelectionEvent listChanged) -> {
-			Record record = list.getSelectedRecord();
-			if (record != null)
-				RetentionPoliciesService.Instance.get().getPolicy(Long.parseLong(record.getAttributeAsString("id")),
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				RetentionPoliciesService.Instance.get().getPolicy(Long.parseLong(rec.getAttributeAsString("id")),
 						new AsyncCallback<GUIRetentionPolicy>() {
 
 							@Override
@@ -205,7 +205,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 	private ListGridField prepareActionField() {
 		ListGridField action = new ListGridField("action", I18N.message("action"), 150);
 		action.setCanFilter(false);
-		action.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		action.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			int val = Integer.parseInt(value.toString());
 			if (val == GUIRetentionPolicy.ACTION_ARCHIVE)
 				return I18N.message("archive");
@@ -220,7 +220,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 	private ListGridField prepareDateOptionField() {
 		ListGridField dateOption = new ListGridField("dateOption", I18N.message("dateoption"), 100);
 		dateOption.setCanFilter(false);
-		dateOption.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		dateOption.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			int val = Integer.parseInt(value.toString());
 			if (val == GUIRetentionPolicy.DATE_OPT_ARCHIVED)
 				return I18N.message("archiveds");
@@ -237,8 +237,8 @@ public class RetentionPoliciesPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -271,7 +271,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				RetentionPoliciesService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")),
+				RetentionPoliciesService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
 						true, new AsyncCallback<Void>() {
 
 							@Override
@@ -281,8 +281,8 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "0");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -292,7 +292,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				RetentionPoliciesService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")),
+				RetentionPoliciesService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
 						false, new AsyncCallback<Void>() {
 
 							@Override
@@ -302,14 +302,14 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "2");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
 		});
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString("eenabled")))
 			contextMenu.setItems(disable, delete);
 		else
 			contextMenu.setItems(enable, delete);
@@ -331,28 +331,28 @@ public class RetentionPoliciesPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param policy the policy to update
 	 */
 	public void updateRecord(GUIRetentionPolicy policy) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, policy.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", policy.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, policy.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", policy.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", policy.getName());
-		record.setAttribute("days", "" + policy.getRetentionDays());
-		record.setAttribute("dateOption", "" + policy.getDateOption());
-		record.setAttribute("template", policy.getTemplateName() != null ? policy.getTemplateName() : null);
-		record.setAttribute("position", "" + policy.getPosition());
-		record.setAttribute("action", "" + policy.getAction());
+		rec.setAttribute("name", policy.getName());
+		rec.setAttribute("days", "" + policy.getRetentionDays());
+		rec.setAttribute("dateOption", "" + policy.getDateOption());
+		rec.setAttribute("template", policy.getTemplateName() != null ? policy.getTemplateName() : null);
+		rec.setAttribute("position", "" + policy.getPosition());
+		rec.setAttribute("action", "" + policy.getAction());
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	public void refresh() {

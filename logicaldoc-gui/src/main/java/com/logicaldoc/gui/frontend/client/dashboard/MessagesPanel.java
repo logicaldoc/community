@@ -89,15 +89,15 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 		grid = new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
 				if (getFieldName(colNum).equals("subject")) {
-					if ("false".equals(record.getAttributeAsString("read"))) {
+					if ("false".equals(rec.getAttributeAsString("read"))) {
 						return "font-weight:bold;";
 					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
+						return super.getCellCSSText(rec, rowNum, colNum);
 					}
 				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rec, rowNum, colNum);
 				}
 			}
 		};
@@ -119,8 +119,8 @@ public class MessagesPanel extends VLayout implements UserObserver {
 			public void onDataArrived(DataArrivedEvent event) {
 				Record[] records = grid.getRecordList().toArray();
 				int unread = 0;
-				for (Record record : records) {
-					if ("false".equals(record.getAttributeAsString("read")))
+				for (Record rec : records) {
+					if ("false".equals(rec.getAttributeAsString("read")))
 						unread++;
 				}
 
@@ -131,9 +131,9 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		grid.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				final Record record = grid.getSelectedRecord();
-				if (record != null)
-					MessageService.Instance.get().getMessage(Long.parseLong(record.getAttributeAsString("id")), true,
+				final Record rec = grid.getSelectedRecord();
+				if (rec != null)
+					MessageService.Instance.get().getMessage(Long.parseLong(rec.getAttributeAsString("id")), true,
 							new AsyncCallback<GUIMessage>() {
 
 								@Override
@@ -143,8 +143,8 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 								@Override
 								public void onSuccess(GUIMessage message) {
-									record.setAttribute("read", "true");
-									grid.refreshRow(grid.getRecordIndex(record));
+									rec.setAttribute("read", "true");
+									grid.refreshRow(grid.getRecordIndex(rec));
 									body.setContents(grid.getSelectedRecord().getAttributeAsString("text"));
 								}
 							});

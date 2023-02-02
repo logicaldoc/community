@@ -34,7 +34,7 @@ public class IntegerListGridField extends ColoredListGridField {
 	public class LongCellFormatter extends ColoredCellFormatter {
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
@@ -43,7 +43,7 @@ public class IntegerListGridField extends ColoredListGridField {
 				val=Util.formatInt(Integer.parseInt(value.toString()));
 			else
 				val=Util.formatLong(Long.parseLong(value.toString()));
-			return super.format(val, record, rowNum, colNum);
+			return super.format(val, rec, rowNum, colNum);
 		}
 	}
 }

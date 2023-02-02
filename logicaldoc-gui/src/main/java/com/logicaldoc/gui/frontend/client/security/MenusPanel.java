@@ -82,9 +82,9 @@ public class MenusPanel extends VLayout {
 		menus.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = menus.getSelectedRecord();
-				if (record != null)
-					SecurityService.Instance.get().getMenu(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = menus.getSelectedRecord();
+				if (rec != null)
+					SecurityService.Instance.get().getMenu(Long.parseLong(rec.getAttributeAsString("id")),
 							I18N.getLocale(), new AsyncCallback<GUIMenu>() {
 
 								@Override
@@ -102,34 +102,34 @@ public class MenusPanel extends VLayout {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param user the user to update
 	 */
 	public void updateRecord(GUIUser user) {
-		ListGridRecord record = menus.getSelectedRecord();
-		if (record == null)
-			record = new ListGridRecord();
+		ListGridRecord rec = menus.getSelectedRecord();
+		if (rec == null)
+			rec = new ListGridRecord();
 
-		record.setAttribute("username", user.getUsername());
-		record.setAttribute("name", user.getName());
-		record.setAttribute("firstName", user.getFirstName());
-		record.setAttribute("email", user.getEmail());
-		record.setAttribute("cell", user.getCell());
-		record.setAttribute("phone", user.getPhone());
+		rec.setAttribute("username", user.getUsername());
+		rec.setAttribute("name", user.getName());
+		rec.setAttribute("firstName", user.getFirstName());
+		rec.setAttribute("email", user.getEmail());
+		rec.setAttribute("cell", user.getCell());
+		rec.setAttribute("phone", user.getPhone());
 		if (user.isEnabled())
-			record.setAttribute("eenabled", "0");
+			rec.setAttribute("eenabled", "0");
 		else
-			record.setAttribute("eenabled", "2");
+			rec.setAttribute("eenabled", "2");
 
-		if (record.getAttributeAsString("id") != null
-				&& (user.getId() == Long.parseLong(record.getAttributeAsString("id")))) {
-			menus.refreshRow(menus.getRecordIndex(record));
+		if (rec.getAttributeAsString("id") != null
+				&& (user.getId() == Long.parseLong(rec.getAttributeAsString("id")))) {
+			menus.refreshRow(menus.getRecordIndex(rec));
 		} else {
-			// Append a new record
-			record.setAttribute("id", user.getId());
-			menus.addData(record);
-			menus.selectRecord(record);
+			// Append a new rec
+			rec.setAttribute("id", user.getId());
+			menus.addData(rec);
+			menus.selectRecord(rec);
 		}
 	}
 

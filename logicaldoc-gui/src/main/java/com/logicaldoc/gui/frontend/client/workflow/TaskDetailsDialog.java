@@ -597,9 +597,9 @@ public class TaskDetailsDialog extends Window {
 
 		notesGrid = new ListGrid() {
 			@Override
-			protected Canvas getExpansionComponent(final ListGridRecord record) {
+			protected Canvas getExpansionComponent(final ListGridRecord rec) {
 				return new HTMLFlow("<div class='details'>"
-						+ (record.getAttributeAsString("comment") != null ? record.getAttributeAsString("comment") : "")
+						+ (rec.getAttributeAsString("comment") != null ? rec.getAttributeAsString("comment") : "")
 						+ "</div>");
 			}
 		};

@@ -107,11 +107,11 @@ public class FolderSearchDialog extends Window {
 				lastResult = new ListGridRecord[result.getHits().length];
 				for (int i = 0; i < result.getHits().length; i++) {
 					GUIDocument hit = result.getHits()[i];
-					ListGridRecord record = new ListGridRecord();
-					lastResult[i] = record;
-					record.setAttribute("id", hit.getId());
-					record.setAttribute("name", hit.getFileName());
-					record.setAttribute("description", hit.getSummary());
+					ListGridRecord rec = new ListGridRecord();
+					lastResult[i] = rec;
+					rec.setAttribute("id", hit.getId());
+					rec.setAttribute("name", hit.getFileName());
+					rec.setAttribute("description", hit.getSummary());
 				}
 
 				if (lastResult.length == 1) {

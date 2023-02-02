@@ -123,8 +123,8 @@ public class RunLevelPanel extends VLayout {
 		id.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return I18N.message("aspect." + record.getAttributeAsString("id"));
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
+				return I18N.message("aspect." + rec.getAttributeAsString("id"));
 			}
 		});
 

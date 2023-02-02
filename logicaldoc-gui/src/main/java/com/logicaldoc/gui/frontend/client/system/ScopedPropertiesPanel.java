@@ -68,7 +68,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		scope.setCanSort(true);
 		scope.setCellFormatter(new CellFormatter() {
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				return I18N.message(value.toString());
 			}
 		});

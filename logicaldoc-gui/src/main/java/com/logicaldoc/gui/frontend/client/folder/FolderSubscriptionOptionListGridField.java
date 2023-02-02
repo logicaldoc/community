@@ -20,16 +20,16 @@ public class FolderSubscriptionOptionListGridField extends ColoredListGridField 
 		setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				try {
 					String decoded = I18N.message("document");
-					if ("folder".equals(record.getAttributeAsString("type")))
+					if ("folder".equals(rec.getAttributeAsString("type")))
 						if ("1".equals(value.toString()))
 							decoded = I18N.message("tree");
 						else
 							decoded = I18N.message("folder");
 
-					String colorSpec = record.getAttributeAsString("color");
+					String colorSpec = rec.getAttributeAsString("color");
 					if (colorSpec != null && !colorSpec.isEmpty())
 						return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
 					else

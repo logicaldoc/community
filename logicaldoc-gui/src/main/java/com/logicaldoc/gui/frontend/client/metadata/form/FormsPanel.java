@@ -85,9 +85,9 @@ public class FormsPanel extends AdminPanel {
 		permaLink.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if (record.getAttributeAsBoolean("webEnabled")) {
-					return "<a href='" + webformURL(record.getAttributeAsString("formId")) + "' target='_blank'>"
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
+				if (rec.getAttributeAsBoolean("webEnabled")) {
+					return "<a href='" + webformURL(rec.getAttributeAsString("formId")) + "' target='_blank'>"
 							+ I18N.message("preview") + "</a>";
 				} else
 					return "";
@@ -155,9 +155,9 @@ public class FormsPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					FormService.Instance.get().getById(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					FormService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString("id")),
 							new AsyncCallback<GUIForm>() {
 
 								@Override
@@ -189,9 +189,9 @@ public class FormsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
-		final String formId = record.getAttributeAsString("formId");
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
+		final String formId = rec.getAttributeAsString("formId");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -237,7 +237,7 @@ public class FormsPanel extends AdminPanel {
 				WindowUtils.openUrlInNewTab(webformURL(formId));
 			}
 		});
-		preview.setEnabled(record.getAttributeAsBoolean("webEnabled"));
+		preview.setEnabled(rec.getAttributeAsBoolean("webEnabled"));
 
 		MenuItem invite = new MenuItem();
 		invite.setTitle(I18N.message("invite"));
@@ -251,7 +251,7 @@ public class FormsPanel extends AdminPanel {
 				}
 			}
 		});
-		invite.setEnabled(record.getAttributeAsBoolean("webEnabled"));
+		invite.setEnabled(rec.getAttributeAsBoolean("webEnabled"));
 
 		if (Feature.enabled(Feature.WEB_FORM))
 			contextMenu.setItems(edit, preview, invite, delete);
@@ -278,36 +278,36 @@ public class FormsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param form updates the form document
 	 */
 	public void updateRecord(GUIForm form) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, form.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", form.getId());
-			record.setAttribute("formId", form.getFormId());
-			record.setAttribute("name", form.getName());
-			record.setAttribute("webEnabled", form.isWebEnabled());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, form.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", form.getId());
+			rec.setAttribute("formId", form.getFormId());
+			rec.setAttribute("name", form.getName());
+			rec.setAttribute("webEnabled", form.isWebEnabled());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", form.getName());
-		record.setAttribute("webEnabled", form.isWebEnabled());
-		list.refreshRow(list.getRecordIndex(record));
+		rec.setAttribute("name", form.getName());
+		rec.setAttribute("webEnabled", form.isWebEnabled());
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	private GUIForm getSelectedForm() {
-		ListGridRecord record = list.getSelectedRecord();
-		if (record == null)
+		ListGridRecord rec = list.getSelectedRecord();
+		if (rec == null)
 			return null;
 
 		GUIForm form = new GUIForm();
-		form.setId(Long.parseLong(record.getAttributeAsString("id")));
-		form.setName(record.getAttributeAsString("name"));
+		form.setId(Long.parseLong(rec.getAttributeAsString("id")));
+		form.setName(rec.getAttributeAsString("name"));
 		return form;
 	}
 

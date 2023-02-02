@@ -105,7 +105,7 @@ public class PatchPanel extends VLayout {
 		rating.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				int rating = 0;
 				if (value != null)
 					rating = Integer.parseInt(value.toString());
@@ -123,9 +123,9 @@ public class PatchPanel extends VLayout {
 
 		final ListGrid list = new ListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (!record.getAttributeAsBoolean("installed"))
-					return super.getCellCSSText(record, rowNum, colNum);
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				if (!rec.getAttributeAsBoolean("installed"))
+					return super.getCellCSSText(rec, rowNum, colNum);
 				else
 					return "color: #888888; font-style: italic;";
 			}
@@ -152,17 +152,17 @@ public class PatchPanel extends VLayout {
 		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
 		if (patches != null && patches.length > 0) {
 			for (GUIPatch patch : patches) {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("id", patch.getId());
-				record.setAttribute("name", patch.getName());
-				record.setAttribute("rating", patch.getRating());
-				record.setAttribute("file", patch.getFile());
-				record.setAttribute("date", patch.getDate());
-				record.setAttribute("size", patch.getSize());
-				record.setAttribute("description", patch.getDescription());
-				record.setAttribute("installed", patch.isInstalled());
-				record.setAttribute("restart", patch.isRestart());
-				records.add(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("id", patch.getId());
+				rec.setAttribute("name", patch.getName());
+				rec.setAttribute("rating", patch.getRating());
+				rec.setAttribute("file", patch.getFile());
+				rec.setAttribute("date", patch.getDate());
+				rec.setAttribute("size", patch.getSize());
+				rec.setAttribute("description", patch.getDescription());
+				rec.setAttribute("installed", patch.isInstalled());
+				rec.setAttribute("restart", patch.isRestart());
+				records.add(rec);
 			}
 			list.setRecords(records.toArray(new ListGridRecord[0]));
 		}
@@ -432,15 +432,15 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void showContextMenu(ListGrid list) {
-		ListGridRecord record = list.getSelectedRecord();
+		ListGridRecord rec = list.getSelectedRecord();
 		final GUIPatch patch = new GUIPatch();
-		patch.setId(record.getAttribute("id"));
-		patch.setName(record.getAttribute("name"));
-		patch.setFile(record.getAttribute("file"));
-		patch.setDescription(record.getAttribute("description"));
-		patch.setSize(record.getAttributeAsLong("size"));
-		patch.setDate(record.getAttributeAsDate("date"));
-		patch.setInstalled(record.getAttributeAsBoolean("installed"));
+		patch.setId(rec.getAttribute("id"));
+		patch.setName(rec.getAttribute("name"));
+		patch.setFile(rec.getAttribute("file"));
+		patch.setDescription(rec.getAttribute("description"));
+		patch.setSize(rec.getAttributeAsLong("size"));
+		patch.setDate(rec.getAttributeAsDate("date"));
+		patch.setInstalled(rec.getAttributeAsBoolean("installed"));
 
 		Menu contextMenu = new Menu();
 

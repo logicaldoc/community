@@ -372,10 +372,10 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 					tags.add(oldVal[i]);
 
 			// Put the new tag in the options
-			Record record = new Record();
-			record.setAttribute("index", t);
-			record.setAttribute("word", t);
-			ds.addData(record);
+			Record rec = new Record();
+			rec.setAttribute("index", t);
+			rec.setAttribute("word", t);
+			ds.addData(rec);
 		}
 
 		// Update the tag item and trigger the change

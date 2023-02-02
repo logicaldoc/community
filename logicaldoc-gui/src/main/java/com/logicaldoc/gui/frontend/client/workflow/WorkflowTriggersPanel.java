@@ -102,8 +102,8 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		list = new ListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				return super.getCellCSSText(record, rowNum, colNum);
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				return super.getCellCSSText(rec, rowNum, colNum);
 			}
 		};
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -140,9 +140,9 @@ public class WorkflowTriggersPanel extends VLayout {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
-							ListGridRecord record = list.getSelectedRecord();
+							ListGridRecord rec = list.getSelectedRecord();
 							WorkflowService.Instance.get().deleteTrigger(
-									Long.parseLong(record.getAttributeAsString("id")), new AsyncCallback<Void>() {
+									Long.parseLong(rec.getAttributeAsString("id")), new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
 											GuiLog.serverError(caught);

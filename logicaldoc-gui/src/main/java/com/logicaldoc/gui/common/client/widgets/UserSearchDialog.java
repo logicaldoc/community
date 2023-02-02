@@ -106,13 +106,13 @@ public class UserSearchDialog extends Window {
 				lastResult = new ListGridRecord[result.length];
 				for (int i = 0; i < result.length; i++) {
 					GUIUser hit = result[i];
-					ListGridRecord record = new ListGridRecord();
-					lastResult[i] = record;
-					record.setAttribute("avatar", hit.getId());
-					record.setAttribute("id", hit.getId());
-					record.setAttribute("username", hit.getUsername());
-					record.setAttribute("firstname", hit.getFirstName());
-					record.setAttribute("lastname", hit.getName());
+					ListGridRecord rec = new ListGridRecord();
+					lastResult[i] = rec;
+					rec.setAttribute("avatar", hit.getId());
+					rec.setAttribute("id", hit.getId());
+					rec.setAttribute("username", hit.getUsername());
+					rec.setAttribute("firstname", hit.getFirstName());
+					rec.setAttribute("lastname", hit.getName());
 				}
 
 				if (lastResult.length == 1) {

@@ -147,9 +147,9 @@ public class SyndicationsPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					SyndicationService.Instance.get().getSyndication(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					SyndicationService.Instance.get().getSyndication(Long.parseLong(rec.getAttributeAsString("id")),
 							new AsyncCallback<GUISyndication>() {
 
 								@Override
@@ -188,8 +188,8 @@ public class SyndicationsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -222,7 +222,7 @@ public class SyndicationsPanel extends AdminPanel {
 		test.setTitle(I18N.message("testconnection"));
 		test.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SyndicationService.Instance.get().test(Long.parseLong(record.getAttributeAsString("id")),
+				SyndicationService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -245,7 +245,7 @@ public class SyndicationsPanel extends AdminPanel {
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SyndicationService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), true,
+				SyndicationService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -255,8 +255,8 @@ public class SyndicationsPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "0");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -266,7 +266,7 @@ public class SyndicationsPanel extends AdminPanel {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SyndicationService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), false,
+				SyndicationService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -276,8 +276,8 @@ public class SyndicationsPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute("eenabled", "2");
+								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
 			}
@@ -308,7 +308,7 @@ public class SyndicationsPanel extends AdminPanel {
 			}
 		});
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString("eenabled")))
 			contextMenu.setItems(test, disable, delete, resetCache);
 		else
 			contextMenu.setItems(test, enable, delete, resetCache);
@@ -329,24 +329,24 @@ public class SyndicationsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param syndication the syndication to update
 	 */
 	public void updateRecord(GUISyndication syndication) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, syndication.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", syndication.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, syndication.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", syndication.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", syndication.getName());
-		record.setAttribute("url", syndication.getUrl());
-		record.setAttribute("eenabled", syndication.getEnabled() == 1 ? "0" : "2");
-		record.setAttribute("targetPath", syndication.getTargetPath());
-		list.refreshRow(list.getRecordIndex(record));
+		rec.setAttribute("name", syndication.getName());
+		rec.setAttribute("url", syndication.getUrl());
+		rec.setAttribute("eenabled", syndication.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute("targetPath", syndication.getTargetPath());
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

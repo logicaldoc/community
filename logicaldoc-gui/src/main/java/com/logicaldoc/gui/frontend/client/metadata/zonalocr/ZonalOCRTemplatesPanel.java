@@ -304,8 +304,8 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		ocrTemplateSelector.setMultiple(false);
 		ocrTemplateSelector.setEndRow(false);
 		ocrTemplateSelector.addChangedHandler((ChangedEvent event) -> {
-			ListGridRecord record = ocrTemplateSelector.getSelectedRecord();
-			ZonalOCRService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
+			ListGridRecord rec = ocrTemplateSelector.getSelectedRecord();
+			ZonalOCRService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
 					new AsyncCallback<GUIOCRTemplate>() {
 
 						@Override
@@ -331,16 +331,16 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		templateSelector.addChangedHandler((ChangedEvent event) -> {
 			selectedOcrTemplate = null;
 
-			ListGridRecord record = templateSelector.getSelectedRecord();
-			if (record == null || record.getAttributeAsLong("id") == null
-					|| record.getAttributeAsLong("id").longValue() == 0L) {
+			ListGridRecord rec = templateSelector.getSelectedRecord();
+			if (rec == null || rec.getAttributeAsLong("id") == null
+					|| rec.getAttributeAsLong("id").longValue() == 0L) {
 				selectedDocumentTemplate = null;
 				refresh(null, null);
 			} else {
 				selectedDocumentTemplate = new GUITemplate();
-				selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
-				selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
-				selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
+				selectedDocumentTemplate.setId(rec.getAttributeAsLong("id"));
+				selectedDocumentTemplate.setName(rec.getAttributeAsString("name"));
+				selectedDocumentTemplate.setDescription(rec.getAttributeAsString("description"));
 				refresh(selectedDocumentTemplate.getId(), null);
 			}
 		});

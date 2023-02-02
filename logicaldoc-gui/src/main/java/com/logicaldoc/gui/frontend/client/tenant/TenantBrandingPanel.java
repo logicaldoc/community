@@ -399,9 +399,9 @@ public class TenantBrandingPanel extends HLayout {
 		image.setWidth("*");
 		image.setCanFilter(false);
 		image.setCanSort(false);
-		image.setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		image.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			String html = "";
-			String name = record.getAttributeAsString("name");
+			String name = rec.getAttributeAsString("name");
 			if (name.equals("logo"))
 				html = tenant.getBranding().getLogoSrc();
 			else if (name.equals("logo_head"))
@@ -435,8 +435,8 @@ public class TenantBrandingPanel extends HLayout {
 	}
 
 	private void showImagesContextMenu() {
-		final ListGridRecord record = grid.getSelectedRecord();
-		final String name = record.getAttributeAsString("name");
+		final ListGridRecord rec = grid.getSelectedRecord();
+		final String name = rec.getAttributeAsString("name");
 
 		if ((!Feature.enabled(Feature.BRANDING_LOGO) && !Feature.enabled(Feature.BRANDING_FULL))
 				&& !"logo_oem".equals(name) && !"logo_head_oem".equals(name))
@@ -481,7 +481,7 @@ public class TenantBrandingPanel extends HLayout {
 		upload.setTitle(I18N.message("uploadnewimage"));
 		upload.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ImageUploader uploader = new ImageUploader(record.getAttributeAsString("name"),
+				ImageUploader uploader = new ImageUploader(rec.getAttributeAsString("name"),
 						TenantBrandingPanel.this);
 				uploader.show();
 			}
@@ -511,18 +511,18 @@ public class TenantBrandingPanel extends HLayout {
 		else if (imageName.equals("favicon"))
 			tenant.getBranding().setFaviconSrc(content);
 
-		Record record = null;
+		Record rec = null;
 
-		// Find the record the corresponds to the given document
+		// Find the rec the corresponds to the given document
 		Record[] records = grid.getRecords();
-		for (Record rec : records)
-			if (rec.getAttribute("name").equals(imageName))
-				record = rec;
+		for (Record recd : records)
+			if (recd.getAttribute("name").equals(imageName))
+				rec = recd;
 
-		if (record != null) {
-			record.setAttribute("image", content);
+		if (rec != null) {
+			rec.setAttribute("image", content);
 			grid.invalidateRecordComponents();
-			grid.refreshRecordComponent(grid.getRecordIndex(record));
+			grid.refreshRecordComponent(grid.getRecordIndex(rec));
 			grid.redraw();
 		}
 

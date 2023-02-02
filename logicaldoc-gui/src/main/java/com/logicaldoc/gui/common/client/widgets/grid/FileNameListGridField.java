@@ -53,26 +53,26 @@ public class FileNameListGridField extends ColoredListGridField {
 		}
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
-			String val = super.format(value, record, rowNum, colNum);
+			String val = super.format(value, rec, rowNum, colNum);
 
-			String iconName = record.getAttributeAsString(iconFieldName);
+			String iconName = rec.getAttributeAsString(iconFieldName);
 			if (iconName == null || iconName.isEmpty())
 				return val != null ? val.toString() : "";
 
 			if (iconName.contains("folder") || iconName.contains("workspace"))
 				if (iconName.contains("alias"))
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_ALIAS, value.toString(), null),
-							record, rowNum, colNum);
+							rec, rowNum, colNum);
 				else if (iconName.contains("workspace"))
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_WORKSPACE, value.toString(), null),
-							record, rowNum, colNum);
+							rec, rowNum, colNum);
 				else
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_DEFAULT, value.toString(), null),
-							record, rowNum, colNum);
+							rec, rowNum, colNum);
 			else
 				return Util.iconWithFilename(iconName, val != null ? val.toString() : "");
 		}

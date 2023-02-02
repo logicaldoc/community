@@ -155,8 +155,8 @@ public class AddTemplateAttributeDialog extends Window {
 			public void onSuccess(GUIAttributeSet set) {
 				ListGridRecord[] records = setAttributesList.getRecords();
 				if (records != null)
-					for (ListGridRecord record : records)
-						setAttributesList.removeData(record);
+					for (ListGridRecord rec : records)
+						setAttributesList.removeData(rec);
 
 				GUIAttribute[] attributes = set.getAttributes();
 
@@ -165,21 +165,21 @@ public class AddTemplateAttributeDialog extends Window {
 
 				for (int i = 0; i < attributes.length; i++) {
 					GUIAttribute att = attributes[i];
-					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("name", att.getName());
-					record.setAttribute("label", att.getLabel());
-					record.setAttribute("set", att.getSet());
-					record.setAttribute("setId", att.getSetId());
-					record.setAttribute("type", att.getType());
-					record.setAttribute("editor", att.getEditor());
-					record.setAttribute("mandatory", att.isMandatory());
-					record.setAttribute("hidden", att.isHidden());
-					record.setAttribute("readonly", att.isReadonly());
-					record.setAttribute("multiple", att.isMultiple());
-					record.setAttribute("validation", att.getValidation());
-					record.setAttribute("initialization", att.getInitialization());
-					record.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
-					setAttributesList.getRecordList().add(record);
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("name", att.getName());
+					rec.setAttribute("label", att.getLabel());
+					rec.setAttribute("set", att.getSet());
+					rec.setAttribute("setId", att.getSetId());
+					rec.setAttribute("type", att.getType());
+					rec.setAttribute("editor", att.getEditor());
+					rec.setAttribute("mandatory", att.isMandatory());
+					rec.setAttribute("hidden", att.isHidden());
+					rec.setAttribute("readonly", att.isReadonly());
+					rec.setAttribute("multiple", att.isMultiple());
+					rec.setAttribute("validation", att.getValidation());
+					rec.setAttribute("initialization", att.getInitialization());
+					rec.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
+					setAttributesList.getRecordList().add(rec);
 				}
 			}
 		});

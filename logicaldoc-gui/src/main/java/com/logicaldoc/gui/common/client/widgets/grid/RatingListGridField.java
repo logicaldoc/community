@@ -32,12 +32,12 @@ public class RatingListGridField extends ColoredListGridField {
 	public class RatingCellFormatter extends ColoredCellFormatter {
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
 			String val = DocUtil.getRatingIcon((Integer) value);
-			return super.format(val, record, rowNum, colNum);
+			return super.format(val, rec, rowNum, colNum);
 		}
 
 	}

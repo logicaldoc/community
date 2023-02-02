@@ -65,7 +65,7 @@ public class PluginsPanel extends VLayout {
 		name.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				if (value.toString().startsWith("logicaldoc-"))
 					return value.toString().substring(value.toString().indexOf('-') + 1);
 				else

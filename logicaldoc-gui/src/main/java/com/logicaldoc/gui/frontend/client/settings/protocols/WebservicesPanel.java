@@ -63,9 +63,9 @@ public class WebservicesPanel extends VLayout {
 		for (GUIParameter parameter : settings) {
 			if (parameter.getName().equals("webservice.enabled"))
 				enabled = parameter;
-			if (parameter.getName().equals("webservice.call.record"))
+			if (parameter.getName().equals("webservice.call.rec"))
 				recCalls = parameter;
-			if (parameter.getName().equals("webservice.call.record.payload"))
+			if (parameter.getName().equals("webservice.call.rec.payload"))
 				recCallsPayload = parameter;
 			if (parameter.getName().equals("webservice.call.ttl"))
 				callsTtl = parameter;
@@ -98,10 +98,10 @@ public class WebservicesPanel extends VLayout {
 		ttl.setStep(1);
 		ttl.setDisabled(recCalls.getValue().equals("false"));
 
-		// Flag to record webservice calls payload
+		// Flag to rec webservice calls payload
 		RadioGroupItem recordCallsPayload = prepareRecordCallsPayloadItem();
 
-		// Flag to record webservice calls
+		// Flag to rec webservice calls
 		RadioGroupItem recordCalls = ItemFactory.newBooleanSelector("wsRecordCalls", "recordcalls");
 		recordCalls.setRequired(true);
 		recordCalls.setValue(recCalls.getValue().equals("true") ? "yes" : "no");

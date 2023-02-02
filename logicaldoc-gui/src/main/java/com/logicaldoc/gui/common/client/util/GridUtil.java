@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 public class GridUtil {
 
 	/**
-	 * Scrolls the grid trying to display all the record and fetch all the data
+	 * Scrolls the grid trying to display all the rec and fetch all the data
 	 * 
 	 * @param listGrid the grid to process
 	 * @param listener optional listener inoked at the end of the scroll
@@ -161,8 +161,8 @@ public class GridUtil {
 			Record[] records = getData(listGrid);
 
 			for (int i = 0; i < records.length; i++) {
-				Record record = records[i];
-				printRecord(stringBuilder, fields, record);
+				Record rec = records[i];
+				printRecord(stringBuilder, fields, rec);
 			}
 
 			String content = stringBuilder.toString();
@@ -173,14 +173,14 @@ public class GridUtil {
 		}
 	}
 
-	private static void printRecord(StringBuilder stringBuilder, ListGridField[] fields, Record record) {
+	private static void printRecord(StringBuilder stringBuilder, ListGridField[] fields, Record rec) {
 		for (int j = 0; j < fields.length; j++) {
 			try {
 				ListGridField listGridField = fields[j];
 				if (isImageOrIcon(listGridField))
 					continue;
 
-				printRecordColumn(stringBuilder, record, listGridField);
+				printRecordColumn(stringBuilder, rec, listGridField);
 			} catch (Throwable t) {
 				/*
 				 * May be that not all the rows are available, since we can
@@ -194,14 +194,14 @@ public class GridUtil {
 		stringBuilder.append("\n");
 	}
 
-	private static void printRecordColumn(StringBuilder stringBuilder, Record record, ListGridField listGridField) {
+	private static void printRecordColumn(StringBuilder stringBuilder, Record rec, ListGridField listGridField) {
 		stringBuilder.append("\"");
 		if (listGridField.getType().equals(ListGridFieldType.DATE)
 				|| listGridField.getType().equals(ListGridFieldType.DATETIME)) {
-			Date val = record.getAttributeAsDate(listGridField.getName());
+			Date val = rec.getAttributeAsDate(listGridField.getName());
 			stringBuilder.append(val == null ? "" : I18N.formatDateLong(val));
 		} else {
-			Object val = record.getAttribute(listGridField.getName());
+			Object val = rec.getAttribute(listGridField.getName());
 			stringBuilder.append(val == null || "null".equals(val.toString()) ? "" : Util.encodeUTF8(val.toString()));
 		}
 		stringBuilder.append("\";");

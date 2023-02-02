@@ -32,10 +32,10 @@ public class EventsListGridField extends ColoredListGridField {
 
 	private void setup() {
 		setCanEdit(false);
-		setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+		setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			try {
 				if (value != null && !value.toString().isEmpty()) {
-					return decodeEvents(value, record);
+					return decodeEvents(value, rec);
 				} else
 					return "";
 			} catch (Throwable e) {
@@ -44,7 +44,7 @@ public class EventsListGridField extends ColoredListGridField {
 		});
 	}
 
-	private String decodeEvents(Object value, ListGridRecord record) {
+	private String decodeEvents(Object value, ListGridRecord rec) {
 		String decoded = "document";
 		// Translate the set of events
 		String[] key = null;
@@ -63,7 +63,7 @@ public class EventsListGridField extends ColoredListGridField {
 		String str = labels.toString().substring(1);
 		decoded = str.substring(0, str.length() - 1);
 
-		String colorSpec = record.getAttributeAsString("color");
+		String colorSpec = rec.getAttributeAsString("color");
 		if (colorSpec != null && !colorSpec.isEmpty())
 			return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
 		else

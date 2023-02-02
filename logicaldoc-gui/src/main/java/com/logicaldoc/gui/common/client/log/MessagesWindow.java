@@ -52,10 +52,10 @@ public class MessagesWindow extends Window {
 		grid = new ListGrid() {
 
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (GUIEvent.ERROR.equals(record.getAttribute("severity")))
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				if (GUIEvent.ERROR.equals(rec.getAttribute("severity")))
 					return "color: #EF4A4A";
-				if (GUIEvent.WARNING.equals(record.getAttribute("severity")))
+				if (GUIEvent.WARNING.equals(rec.getAttribute("severity")))
 					return "color: #FF8723";
 				else
 					return "color: #577ED0";
@@ -97,12 +97,12 @@ public class MessagesWindow extends Window {
 	}
 
 	public void addEvent(GUIEvent event) {
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("date", event.getDate());
-		record.setAttribute("detail", event.getDetail());
-		record.setAttribute("severity", event.getSeverity());
-		record.setAttribute("severityLabel", I18N.message(event.getSeverity()));
-		grid.addData(record);
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("date", event.getDate());
+		rec.setAttribute("detail", event.getDetail());
+		rec.setAttribute("severity", event.getSeverity());
+		rec.setAttribute("severityLabel", I18N.message(event.getSeverity()));
+		grid.addData(rec);
 		grid.sort("date", SortDirection.DESCENDING);
 	}
 

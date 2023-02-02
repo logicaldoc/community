@@ -141,8 +141,8 @@ public class SearchToolbar extends ToolStrip {
 				return;
 
 			String url = GWT.getHostPageBaseURL() + "zip-export?1=1";
-			for (GUIDocument record : Search.get().getLastResult()) {
-				url += "&docId=" + record.getId();
+			for (GUIDocument rec : Search.get().getLastResult()) {
+				url += "&docId=" + rec.getId();
 			}
 
 			Util.download(url);

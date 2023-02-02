@@ -219,8 +219,8 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		Record[] records = list.getRecords();
 		GUIValue[] values = new GUIValue[records.length];
 		int i = 0;
-		for (Record record : records)
-			values[i++] = new GUIValue(record.getAttributeAsString("category"), record.getAttributeAsString("value"));
+		for (Record rec : records)
+			values[i++] = new GUIValue(rec.getAttributeAsString("category"), rec.getAttributeAsString("value"));
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<Void>() {

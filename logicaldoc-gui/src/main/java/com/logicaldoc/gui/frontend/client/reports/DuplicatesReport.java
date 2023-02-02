@@ -271,9 +271,9 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
-			ListGridRecord record = list.getSelectedRecord();
-			DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-					Long.parseLong(record.getAttributeAsString("id")));
+			ListGridRecord rec = list.getSelectedRecord();
+			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+					Long.parseLong(rec.getAttributeAsString("id")));
 		});
 
 		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {
@@ -282,8 +282,8 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 			openInFolder.setEnabled(false);
 		}
 
-		for (ListGridRecord record : selection) {
-			if (!"blank".equals(record.getAttribute("locked")) || !"blank".equals(record.getAttribute("immutable"))) {
+		for (ListGridRecord rec : selection) {
+			if (!"blank".equals(rec.getAttribute("locked")) || !"blank".equals(rec.getAttribute("immutable"))) {
 				delete.setEnabled(false);
 			}
 		}

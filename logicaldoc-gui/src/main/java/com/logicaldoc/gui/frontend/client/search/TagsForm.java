@@ -157,8 +157,8 @@ public class TagsForm extends VLayout {
 		tags.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord record = event.getRecord();
-				executeSearch(record);
+				ListGridRecord rec = event.getRecord();
+				executeSearch(rec);
 			}
 		});
 
@@ -171,8 +171,8 @@ public class TagsForm extends VLayout {
 		});
 	}
 
-	private void executeSearch(ListGridRecord record) {
-		searchTag(record.getAttributeAsString("word"),
+	private void executeSearch(ListGridRecord rec) {
+		searchTag(rec.getAttributeAsString("word"),
 				Boolean.parseBoolean(otherCharForm.getValueAsString(SEARCHINHITS)));
 	}
 

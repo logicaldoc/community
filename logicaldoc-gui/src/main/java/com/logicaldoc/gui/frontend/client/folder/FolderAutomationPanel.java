@@ -198,32 +198,32 @@ public class FolderAutomationPanel extends FolderDetailTab {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param trigger the trigger to update
 	 */
 	public void updateRecord(GUIAutomationTrigger trigger) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, trigger.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", trigger.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, trigger.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", trigger.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : "");
-		record.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
+		rec.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : "");
+		rec.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
 
 		if (trigger.getRoutine() != null) {
-			record.setAttribute("routine", trigger.getRoutine().getName());
-			record.setAttribute("routineId", trigger.getRoutine().getId());
+			rec.setAttribute("routine", trigger.getRoutine().getName());
+			rec.setAttribute("routineId", trigger.getRoutine().getId());
 		} else {
-			record.setAttribute("routine", (String) null);
-			record.setAttribute("routineId", (Long) null);
+			rec.setAttribute("routine", (String) null);
+			rec.setAttribute("routineId", (Long) null);
 		}
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	private void onEdit() {

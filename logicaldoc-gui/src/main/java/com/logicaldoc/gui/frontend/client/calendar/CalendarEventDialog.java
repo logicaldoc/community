@@ -186,7 +186,7 @@ public class CalendarEventDialog extends Window {
 
 		remindersGrid = new ListGrid() {
 			@Override
-			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
+			protected Canvas createRecordComponent(final ListGridRecord rec, Integer colNum) {
 				String fieldName = this.getFieldName(colNum);
 
 				HLayout iconCanvas = new HLayout(3);
@@ -202,7 +202,7 @@ public class CalendarEventDialog extends Window {
 					deleteIcon.addClickHandler((ClickEvent event) -> {
 						LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean answer) -> {
 							if (answer) {
-								remindersGrid.removeData(record);
+								remindersGrid.removeData(rec);
 							}
 						});
 					});
@@ -265,16 +265,16 @@ public class CalendarEventDialog extends Window {
 	private ListGridField prepareReminderUnitField() {
 		ListGridField unit = new ListGridField("unit", I18N.message("unit"), 100);
 		unit.setAutoFitWidth(true);
-		unit.setCellFormatter((Object cellValue, ListGridRecord record, int rowNum, int colNum) -> {
+		unit.setCellFormatter((Object cellValue, ListGridRecord rec, int rowNum, int colNum) -> {
 			if ("minute".equals(cellValue))
 				return I18N.message("minutes").toLowerCase() + " "
-						+ I18N.message(record.getAttributeAsString("when")).toLowerCase();
+						+ I18N.message(rec.getAttributeAsString("when")).toLowerCase();
 			else if ("hour".equals(cellValue))
 				return I18N.message("hours").toLowerCase() + " "
-						+ I18N.message(record.getAttributeAsString("when")).toLowerCase();
+						+ I18N.message(rec.getAttributeAsString("when")).toLowerCase();
 			else if ("day".equals(cellValue))
 				return I18N.message("ddays").toLowerCase() + " "
-						+ I18N.message(record.getAttributeAsString("when")).toLowerCase();
+						+ I18N.message(rec.getAttributeAsString("when")).toLowerCase();
 			else
 				return cellValue != null ? cellValue.toString() : "";
 		});
@@ -418,7 +418,7 @@ public class CalendarEventDialog extends Window {
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler((MenuItemClickEvent event) -> {
-			// Detect the selected record
+			// Detect the selected rec
 			ListGridRecord selection = documentsGrid.getSelectedRecord();
 
 			long id = Long.parseLong(selection.getAttribute("id"));
@@ -446,8 +446,8 @@ public class CalendarEventDialog extends Window {
 			// Detect selected records
 			ListGridRecord[] selection = documentsGrid.getSelectedRecords();
 			if (selection.length > 0) {
-				for (ListGridRecord record : selection) {
-					calendarEvent.removeDocument(Long.parseLong(record.getAttribute("id")));
+				for (ListGridRecord rec : selection) {
+					calendarEvent.removeDocument(Long.parseLong(rec.getAttribute("id")));
 				}
 				refreshDocumentsGrid(documentsGrid);
 			}
@@ -470,8 +470,8 @@ public class CalendarEventDialog extends Window {
 
 		documentsGrid.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
 			destroy();
-			Record record = event.getRecord();
-			DocumentsPanel.get().openInFolder(record.getAttributeAsLong("folderId"), record.getAttributeAsLong("id"));
+			Record rec = event.getRecord();
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"), rec.getAttributeAsLong("id"));
 		});
 
 		IButton addDocuments = new IButton();
@@ -759,11 +759,11 @@ public class CalendarEventDialog extends Window {
 		ArrayList<GUIReminder> reminders = new ArrayList<GUIReminder>();
 		ListGridRecord[] records = remindersGrid.getRecords();
 		if (records != null)
-			for (ListGridRecord record : records) {
-				GUIReminder reminder = new GUIReminder(record.getAttributeAsInt("value"),
-						record.getAttributeAsString("unit"));
-				reminder.setDate(record.getAttributeAsDate("date"));
-				reminder.setReminded(record.getAttributeAsInt("reminded"));
+			for (ListGridRecord rec : records) {
+				GUIReminder reminder = new GUIReminder(rec.getAttributeAsInt("value"),
+						rec.getAttributeAsString("unit"));
+				reminder.setDate(rec.getAttributeAsDate("date"));
+				reminder.setReminded(rec.getAttributeAsInt("reminded"));
 				reminders.add(reminder);
 			}
 		calendarEvent.setReminders(reminders.toArray(new GUIReminder[0]));
@@ -826,12 +826,12 @@ public class CalendarEventDialog extends Window {
 		}
 
 		// Update the table
-		ListGridRecord record = new ListGridRecord();
+		ListGridRecord rec = new ListGridRecord();
 
-		record.setAttribute("id", id);
-		record.setAttribute("name", name);
-		record.setAttribute("username", username);
-		list.addData(record);
+		rec.setAttribute("id", id);
+		rec.setAttribute("name", name);
+		rec.setAttribute("username", username);
+		list.addData(rec);
 
 		if (id.startsWith("g-")) {
 			GUIGroup group = new GUIGroup();
@@ -840,7 +840,7 @@ public class CalendarEventDialog extends Window {
 			group.setDescription(name);
 			CalendarEventDialog.this.calendarEvent.addParticipant(group);
 		} else {
-			record.setAttribute("avatar", id);
+			rec.setAttribute("avatar", id);
 			GUIUser user = new GUIUser();
 			user.setId(Long.parseLong(id));
 			user.setUsername(username);
