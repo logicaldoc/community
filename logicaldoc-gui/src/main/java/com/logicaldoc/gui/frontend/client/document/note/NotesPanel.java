@@ -25,7 +25,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -43,9 +42,7 @@ public class NotesPanel extends DocumentDetailTab {
 
 	private ListGrid notesGrid;
 
-	private ToolStripButton addNote;
-
-	private HLayout buttons;
+	private ToolStrip buttons;
 
 	private VLayout container = new VLayout();
 
@@ -61,8 +58,6 @@ public class NotesPanel extends DocumentDetailTab {
 	}
 
 	public void refresh() {
-		if (addNote != null)
-			container.removeMember(addNote);
 		if (notesGrid != null)
 			container.removeMember(notesGrid);
 		if (buttons != null)
@@ -91,10 +86,10 @@ public class NotesPanel extends DocumentDetailTab {
 		notesGrid.setDataSource(new NotesDS(null, document.getId(), document.getFileVersion(), null));
 		notesGrid.setFields(id, userId, user, date, page, content);
 
-		ToolStrip buttons = new ToolStrip();
+		buttons = new ToolStrip();
 		buttons.setWidth100();
 
-		addNote = new ToolStripButton(I18N.message("addnote"));
+		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -121,7 +116,7 @@ public class NotesPanel extends DocumentDetailTab {
 				GridUtil.exportCSV(notesGrid, true);
 			}
 		});
-		
+
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		print.addClickHandler(new ClickHandler() {
 			@Override

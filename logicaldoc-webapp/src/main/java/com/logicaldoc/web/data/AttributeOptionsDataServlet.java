@@ -41,22 +41,16 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 			List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
 
 			if (withempty) {
-				List<String> categories = options.stream().map(o -> o.getCategory()).distinct()
-						.collect(Collectors.toList());
-				if (!categories.contains(""))
-					categories.add("");
+				if (category == null)
+					category = "";
 
-				for (String cat : categories) {
-					if (cat == null)
-						continue;
-					writer.print("<option>");
-					writer.print("<id>-" + cat.hashCode() + "</id>");
-					writer.print("<attribute></attribute>");
-					writer.print("<value></value>");
-					writer.print("<position></position>");
-					writer.print("<category><![CDATA[" + (StringUtils.isEmpty(cat) ? "" : cat) + "]]></category>");
-					writer.print("</option>");
-				}
+				writer.print("<option>");
+				writer.print("<id>-" + category.hashCode() + "</id>");
+				writer.print("<attribute></attribute>");
+				writer.print("<value></value>");
+				writer.print("<position></position>");
+				writer.print("<category><![CDATA[" + (StringUtils.isEmpty(category) ? "" : category) + "]]></category>");
+				writer.print("</option>");
 			}
 
 			for (AttributeOption option : options) {
