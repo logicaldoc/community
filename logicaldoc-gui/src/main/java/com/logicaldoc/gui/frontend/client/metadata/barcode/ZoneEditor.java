@@ -92,14 +92,14 @@ public class ZoneEditor extends Window {
 		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", "sample", zone.getSampleText());
 		sample.setVisible(zone.getSampleText() != null && !zone.getSampleText().isEmpty());
 
-		TextItem patterns = ItemFactory.newTextItem("patterns", "patterns", zone.getPatterns());
+		TextItem patterns = ItemFactory.newTextItem("patterns", zone.getPatterns());
 		patterns.setWidth(300);
 		patterns.setRequired(true);
 
-		TextItem include = ItemFactory.newTextItem("include", "include", zone.getInclude());
+		TextItem include = ItemFactory.newTextItem("include", zone.getInclude());
 		include.setWidth(200);
 
-		TextItem exclude = ItemFactory.newTextItem("exclude", "exclude", zone.getExclude());
+		TextItem exclude = ItemFactory.newTextItem("exclude", zone.getExclude());
 		exclude.setWidth(200);
 
 		MultiComboBoxItem formats = ItemFactory.newBarcodeFormatsComboBoxItem("formats", "formats", zone.getFormats());

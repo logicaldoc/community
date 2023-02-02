@@ -77,10 +77,10 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		path.setWidth(250);
 		path.setRequired(true);
 
-		TextItem domain = ItemFactory.newTextItem("domain", "domain", importFolder.getDomain());
+		TextItem domain = ItemFactory.newTextItem("domain", importFolder.getDomain());
 		domain.addChangedHandler(changedHandler);
 
-		TextItem server = ItemFactory.newTextItem("server", "server", importFolder.getHost());
+		TextItem server = ItemFactory.newTextItem("server", importFolder.getHost());
 		server.addChangedHandler(changedHandler);
 
 		IntegerItem port = ItemFactory.newIntegerItem("port", "port", importFolder.getPort());
@@ -95,10 +95,10 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		language.setRequired(true);
 		language.setValue(importFolder.getLanguage());
 
-		TextItem include = ItemFactory.newTextItem("include", "include", importFolder.getIncludes());
+		TextItem include = ItemFactory.newTextItem("include", importFolder.getIncludes());
 		include.addChangedHandler(changedHandler);
 
-		TextItem exclude = ItemFactory.newTextItem("exclude", "exclude", importFolder.getExcludes());
+		TextItem exclude = ItemFactory.newTextItem("exclude", importFolder.getExcludes());
 		exclude.addChangedHandler(changedHandler);
 
 		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch", importFolder.getBatch());
@@ -112,11 +112,9 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
-				importFolder.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", importFolder.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
-		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden",
-				importFolder.getPassword());
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", importFolder.getPassword());
 		hiddenPassword.setCellStyle("nodisplay");
 		hiddenPassword.addChangedHandler(changedHandler);
 		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),

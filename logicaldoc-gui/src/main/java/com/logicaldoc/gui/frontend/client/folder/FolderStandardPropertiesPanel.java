@@ -102,7 +102,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		SpinnerItem maxVersions = prepareMaxVersionsItem();
 
-		TextItem description = ItemFactory.newTextItem("description", "description", folder.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", folder.getDescription());
 		description.setWidth(250);
 		if (folder.hasPermission(Constants.PERMISSION_RENAME))
 			description.addChangedHandler(changedHandler);
@@ -300,7 +300,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private TextItem prepareNameItem() {
-		TextItem name = ItemFactory.newTextItem("name", "name", folder.getName());
+		TextItem name = ItemFactory.newTextItem("name", folder.getName());
 		name.setWidth(200);
 		name.setRequired(true);
 		DoesntContainValidator validator = new DoesntContainValidator();
@@ -378,7 +378,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private TextItem prepareNewTagItem(final TagsDS ds) {
-		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", null);
 		newTagItem.setRequired(false);
 		newTagItem.setEndRow(true);
 		newTagItem.setDisabled(!folder.isWrite());

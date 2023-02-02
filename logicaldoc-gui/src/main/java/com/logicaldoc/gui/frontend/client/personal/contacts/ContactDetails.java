@@ -44,15 +44,15 @@ public class ContactDetails extends Window {
 		form.setNumCols(3);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem firstName = ItemFactory.newTextItem("firstname", "firstname", contact.getFirstName());
-		TextItem lastName = ItemFactory.newTextItem("lastname", "lastname", contact.getLastName());
+		TextItem firstName = ItemFactory.newTextItem("firstname", contact.getFirstName());
+		TextItem lastName = ItemFactory.newTextItem("lastname", contact.getLastName());
 		TextItem email = ItemFactory.newEmailItem("email", "email", false);
 		email.setRequired(true);
 		email.setValue(contact.getEmail());
-		TextItem address = ItemFactory.newTextItem("address", "address", contact.getAddress());
-		TextItem phone = ItemFactory.newTextItem("phone", "phone", contact.getPhone());
-		TextItem cell = ItemFactory.newTextItem("cell", "cell", contact.getMobile());
-		TextItem company = ItemFactory.newTextItem("company", "company", contact.getCompany());
+		TextItem address = ItemFactory.newTextItem("address", contact.getAddress());
+		TextItem phone = ItemFactory.newTextItem("phone", contact.getPhone());
+		TextItem cell = ItemFactory.newTextItem("cell", contact.getMobile());
+		TextItem company = ItemFactory.newTextItem("company", contact.getCompany());
 		company.setWidth(180);
 
 		ButtonItem save = new ButtonItem();

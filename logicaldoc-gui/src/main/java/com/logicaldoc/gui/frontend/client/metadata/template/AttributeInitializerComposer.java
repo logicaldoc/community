@@ -198,7 +198,7 @@ public class AttributeInitializerComposer extends Window {
 	}
 
 	private DynamicForm prepareTextForm() {
-		TextItem value = ItemFactory.newTextItem("value", "value", null);
+		TextItem value = ItemFactory.newTextItem("value", null);
 		value.setWidth(500);
 		value.setRequired(true);
 		value.setWrapTitle(false);

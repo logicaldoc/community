@@ -71,7 +71,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		form1.setValuesManager(vm);
 		form1.setTitleOrientation(TitleOrientation.LEFT);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", folder.getName());
+		TextItem name = ItemFactory.newTextItem("name", folder.getName());
 		name.setWidth(200);
 		name.setRequired(true);
 		DoesntContainValidator validator = new DoesntContainValidator();
@@ -79,7 +79,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		validator.setErrorMessage(I18N.message("invalidchar"));
 		name.setValidators(validator);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", folder.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", folder.getDescription());
 		description.setWidth(250);
 
 		List<FormItem> items = new ArrayList<FormItem>();
@@ -121,7 +121,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		tagItem.setEndRow(true);
 		tagItem.setDisabled(!folder.isWrite());
 
-		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", null);
 		newTagItem.setRequired(false);
 		newTagItem.setEndRow(true);
 		newTagItem.addKeyPressHandler(new KeyPressHandler() {

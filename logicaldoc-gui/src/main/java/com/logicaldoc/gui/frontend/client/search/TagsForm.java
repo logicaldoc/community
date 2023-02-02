@@ -115,7 +115,7 @@ public class TagsForm extends VLayout {
 			}
 		});
 
-		TextItem otherChar = ItemFactory.newTextItem("otherchar", "otherchar", null);
+		TextItem otherChar = ItemFactory.newTextItem("otherchar", null);
 		otherChar.setRequired(true);
 		otherChar.setWrapTitle(false);
 		otherChar.setIcons(searchPicker);

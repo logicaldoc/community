@@ -187,7 +187,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		final TextItem attributeName = addAttributeNameItem();
 
 		// Attribute Label
-		final TextItem label = ItemFactory.newTextItem("label", "label", null);
+		final TextItem label = ItemFactory.newTextItem("label", null);
 		label.setWidth(400);
 
 		// Mandatory
@@ -234,7 +234,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		addTypeSelector();
 
 		// Values (for preset editor)
-		group = ItemFactory.newTextItem("group", "group", null);
+		group = ItemFactory.newTextItem("group", null);
 		group.setHint(I18N.message("groupname"));
 		group.setDisabled(attributeSet.isReadonly());
 

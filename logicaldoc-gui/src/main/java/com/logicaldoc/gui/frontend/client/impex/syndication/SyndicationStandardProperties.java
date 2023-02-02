@@ -76,7 +76,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		name.setRequired(true);
 		name.setDisabled(syndication.getId() != 0L);
 
-		TextItem targetPath = ItemFactory.newTextItem("targetPath", "targetpath", syndication.getTargetPath());
+		TextItem targetPath = ItemFactory.newTextItem("targetpath", syndication.getTargetPath());
 		targetPath.addChangedHandler(changedHandler);
 		targetPath.setWidth(250);
 		targetPath.setRequired(true);
@@ -94,21 +94,19 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
-				syndication.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", syndication.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
-		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden",
-				syndication.getPassword());
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", syndication.getPassword());
 		hiddenPassword.setCellStyle("nodisplay");
 		hiddenPassword.addChangedHandler(changedHandler);
 		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
 				syndication.getPassword(), hiddenPassword, changedHandler);
 		password.addChangedHandler(changedHandler);
 
-		TextItem include = ItemFactory.newTextItem("include", "include", syndication.getIncludes());
+		TextItem include = ItemFactory.newTextItem("include", syndication.getIncludes());
 		include.addChangedHandler(changedHandler);
 
-		TextItem exclude = ItemFactory.newTextItem("exclude", "exclude", syndication.getExcludes());
+		TextItem exclude = ItemFactory.newTextItem("exclude", syndication.getExcludes());
 		exclude.addChangedHandler(changedHandler);
 
 		SpinnerItem maxPacketSize = ItemFactory.newSpinnerItem("maxPacketSize", "maxpacketsize",
@@ -174,7 +172,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 			syndication.setName((String) values.get("name"));
 			syndication.setUsername((String) values.get("username"));
 			syndication.setPassword((String) values.get("password"));
-			syndication.setTargetPath((String) values.get("targetPath"));
+			syndication.setTargetPath((String) values.get("targetpath"));
 			syndication.setUrl((String) values.get("url"));
 			syndication.setSourceFolder(sourceSelector.getFolder());
 			syndication.setIncludes((String) values.get("include"));

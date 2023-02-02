@@ -81,7 +81,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		language.setRequired(true);
 		language.setValue(account.getLanguage());
 
-		TextItem server = ItemFactory.newTextItem("server", "server", account.getHost());
+		TextItem server = ItemFactory.newTextItem("server", account.getHost());
 		server.setRequired(true);
 		server.setWidth(180);
 		server.addChangedHandler(changedHandler);
@@ -108,12 +108,11 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", account.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", account.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
-		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", "prevent_autofill",
-				account.getUsername());
+		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", account.getUsername());
 		fakeUsernameAgain.setCellStyle("nodisplay");
-		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden", account.getPassword());
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", account.getPassword());
 		hiddenPassword.setCellStyle("nodisplay");
 		hiddenPassword.addChangedHandler(changedHandler);
 		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"), account.getPassword(),

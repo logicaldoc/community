@@ -87,11 +87,11 @@ public class CalendarReport extends AdminPanel {
 
 		SelectItem frequencySelector = ItemFactory.newFrequencySelector("frequency", "frequency");
 
-		TextItem title = ItemFactory.newTextItem("title", "title", null);
+		TextItem title = ItemFactory.newTextItem("title", null);
 
-		TextItem type = ItemFactory.newTextItem("type", "type", null);
+		TextItem type = ItemFactory.newTextItem("type", null);
 
-		TextItem subtype = ItemFactory.newTextItem("subtype", "subtype", null);
+		TextItem subtype = ItemFactory.newTextItem("subtype", null);
 
 		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector("status", "status");
 
@@ -270,7 +270,7 @@ public class CalendarReport extends AdminPanel {
 		list.setData(new ListGridRecord[0]);
 
 		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		
+
 		if (!vm.validate())
 			return;
 

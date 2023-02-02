@@ -98,17 +98,15 @@ public class ZoneEditor extends Window {
 		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", "sample", zone.getSampleText());
 		sample.setVisible(zone.getSampleText() != null && !zone.getSampleText().isEmpty());
 
-		TextItem format = ItemFactory.newTextItem("format", "format", zone.getFormat());
+		TextItem format = ItemFactory.newTextItem("format", zone.getFormat());
 		format.setVisible(zone.getType() != GUIAttribute.TYPE_BOOLEAN && zone.getType() != GUIAttribute.TYPE_STRING);
 
-		TextItem decimalSeparator = ItemFactory.newTextItem("decimalseparator", "decimalseparator",
-				zone.getDecimalSeparator());
+		TextItem decimalSeparator = ItemFactory.newTextItem("decimalseparator", zone.getDecimalSeparator());
 		decimalSeparator.setLength(1);
 		decimalSeparator.setWidth(50);
 		decimalSeparator.setVisible(zone.getType() == GUIAttribute.TYPE_DOUBLE);
 
-		TextItem groupingSeparator = ItemFactory.newTextItem("groupingseparator", "groupingseparator",
-				zone.getGroupingSeparator());
+		TextItem groupingSeparator = ItemFactory.newTextItem("groupingseparator", zone.getGroupingSeparator());
 		groupingSeparator.setLength(1);
 		groupingSeparator.setWidth(50);
 		groupingSeparator

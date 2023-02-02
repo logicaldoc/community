@@ -30,7 +30,7 @@ public class ImportSettingsPanel extends VLayout {
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", archive.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", archive.getDescription());
 		description.addChangedHandler(changedHandler);
 		description.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
 

@@ -99,7 +99,7 @@ public class LastChangesReport extends AdminPanel {
 		tillDate.setColSpan(4);
 
 		// Session ID
-		TextItem sessionId = ItemFactory.newTextItem("sid", "sid", null);
+		TextItem sessionId = ItemFactory.newTextItem("sid", null);
 		sessionId.setWidth(250);
 		sessionId.setColSpan(8);
 		sessionId.setEndRow(true);

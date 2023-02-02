@@ -27,7 +27,6 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -125,15 +124,15 @@ public class BarcodeTemplateSettings extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", template.getName());
+		TextItem name = ItemFactory.newTextItem("name", template.getName());
 		name.setRequired(true);
 		name.setDisabled(template.getId() != 0L);
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", I18N.message("id"), "" + template.getId());
 		id.setVisible(template != null && template.getId() != 0L);
 
-		SelectItem type = ItemFactory.newSelectItem("type", "type");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		SelectItem type = ItemFactory.newSelectItem("type");
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("zonal", I18N.message("zonal").toLowerCase());
 		opts.put("positional", I18N.message("positional").toLowerCase());
 		type.setValueMap(opts);
@@ -144,13 +143,8 @@ public class BarcodeTemplateSettings extends Window {
 		if (!Feature.enabled(Feature.ZONAL_BARCODE))
 			type.setValue("positonal");
 
-		type.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				uploader.setVisible("zonal".equals(event.getValue().toString()));
-			}
-		});
+		type.addChangedHandler(
+				(ChangedEvent event) -> uploader.setVisible("zonal".equals(event.getValue().toString())));
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", template.getDescription());
 		description.setHeight(150);
@@ -187,7 +181,7 @@ public class BarcodeTemplateSettings extends Window {
 
 	public void onSave() {
 		if ("zonal".equals(vm.getValueAsString("type")) && template.getId() == 0L
-				&& uploader.getUploadedFile()==null) {
+				&& uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}

@@ -54,8 +54,7 @@ public class CreateDialog extends Dialog {
 		inheritSecurity.setTitle(I18N.message("inheritparentsec"));
 		inheritSecurity.setHidden(!inheritOptionEnabled);
 
-		TextItem name = ItemFactory.newTextItem("name", "name",
-				folder.getType() == 0 ? I18N.message("newfolder") : I18N.message("newworkspace"));
+		TextItem name = ItemFactory.newTextItem("name", folder.getType() == 0 ? I18N.message("newfolder") : I18N.message("newworkspace"));
 		name.setWidth(250);
 		name.setRequired(true);
 		name.addKeyPressHandler(new KeyPressHandler() {

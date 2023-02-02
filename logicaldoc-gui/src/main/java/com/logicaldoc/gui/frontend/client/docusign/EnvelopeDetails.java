@@ -86,12 +86,12 @@ public class EnvelopeDetails extends Window {
 
 		List<FormItem> items = new ArrayList<FormItem>();
 
-		TextItem subject = ItemFactory.newTextItem("subject", "subject", I18N.message("newdocumentstosign"));
+		TextItem subject = ItemFactory.newTextItem("subject", I18N.message("newdocumentstosign"));
 		subject.setRequired(true);
 		subject.setWidth(200);
 		items.add(subject);
 
-		TextItem message = ItemFactory.newTextItem("message", "message", null);
+		TextItem message = ItemFactory.newTextItem("message", null);
 		message.setWidth(350);
 		items.add(message);
 

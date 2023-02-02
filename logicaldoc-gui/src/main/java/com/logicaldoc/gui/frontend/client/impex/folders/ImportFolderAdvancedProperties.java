@@ -122,7 +122,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		inheritRights.setValue(importFolder.isInheritRights());
 		inheritRights.addChangedHandler(changedHandler);
 
-		TextItem tags = ItemFactory.newTextItem("tags", "tags", importFolder.getTags());
+		TextItem tags = ItemFactory.newTextItem("tags", importFolder.getTags());
 		tags.addChangedHandler(changedHandler);
 
 		final DateItem startDate = ItemFactory.newDateItem("startdate", "earliestdate");

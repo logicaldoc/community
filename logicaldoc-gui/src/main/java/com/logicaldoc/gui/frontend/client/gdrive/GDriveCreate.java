@@ -46,7 +46,7 @@ public class GDriveCreate extends Window {
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", null);
+		TextItem fileName = ItemFactory.newTextItem("filename", null);
 		fileName.setRequired(true);
 		fileName.setWidth(200);
 
@@ -85,7 +85,7 @@ public class GDriveCreate extends Window {
 		LD.contactingServer();
 
 		final String type = vm.getValueAsString("type");
-		String filename = vm.getValueAsString("fileName");
+		String filename = vm.getValueAsString("filename");
 		if (!filename.toLowerCase().endsWith("." + type))
 			filename = filename + "." + type;
 		final String fn = filename;

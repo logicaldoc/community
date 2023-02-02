@@ -67,7 +67,7 @@ public class TagsSettingsPanel extends VLayout {
 		cloudElements.setRequired(true);
 		cloudElements.setWrapTitle(false);
 
-		TextItem vocabulary = ItemFactory.newTextItem("vocabulary", I18N.message("vocabulary"), null);
+		TextItem vocabulary = ItemFactory.newTextItem("vocabulary", null);
 		vocabulary.setRequired(true);
 		vocabulary.setWidth(300);
 

@@ -115,7 +115,7 @@ public class ParameterConditionRow extends HLayout {
 		if (fieldSelected != null && !fieldSelected.trim().isEmpty()) {
 			value = valueItemFor(fieldSelected);
 		} else {
-			value = ItemFactory.newTextItem("value", "value", null);
+			value = ItemFactory.newTextItem("value", null);
 		}
 		value.setRequired(true);
 		value.setEndRow(true);
@@ -282,7 +282,7 @@ public class ParameterConditionRow extends HLayout {
 		} else if (criteriaField.equals("tags")) {
 			return ItemFactory.newTagsMultiplePickList("value", "tags", new TagsDS(null, false, null, null), null);
 		} else {
-			return ItemFactory.newTextItem("value", "text", null);
+			return ItemFactory.newTextItem("value", null);
 		}
 	}
 

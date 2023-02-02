@@ -31,12 +31,12 @@ public class AddAttributeOptionDialog extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		TextItem value = ItemFactory.newTextItem("value", "value", null);
+		TextItem value = ItemFactory.newTextItem("value", null);
 		value.setWidth(200);
 		value.setRequired(true);
 		value.setWrapTitle(false);
 
-		TextItem category = ItemFactory.newTextItem("category", "category", null);
+		TextItem category = ItemFactory.newTextItem("category", null);
 		category.setWidth(200);
 		category.setWrapTitle(false);
 

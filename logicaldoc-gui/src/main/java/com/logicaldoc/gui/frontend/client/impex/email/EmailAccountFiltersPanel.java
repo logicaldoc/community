@@ -63,7 +63,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 		ListGridField expression = new ListGridField("expression", I18N.message("expression"));
 		expression.setWidth(150);
-		TextItem conditionEdit = ItemFactory.newTextItem("expression", "expression", null);
+		TextItem conditionEdit = ItemFactory.newTextItem("expression", null);
 		expression.setEditorType(conditionEdit);
 		conditionEdit.addChangedHandler(changedHandler);
 

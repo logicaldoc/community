@@ -1134,6 +1134,10 @@ public class ItemFactory {
 		select.setWrapTitle(false);
 		return select;
 	}
+	
+	public static SelectItem newSelectItem(String name) {
+		return newSelectItem(name, name);
+	}
 
 	public static SelectItem newConversionFormatItem(String fileName) {
 		SelectItem select = ItemFactory.newSelectItem("format", I18N.message("format"));

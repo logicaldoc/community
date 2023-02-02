@@ -52,13 +52,13 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem include = ItemFactory.newTextItem("include", "include", account.getIncludes());
+		TextItem include = ItemFactory.newTextItem("include", account.getIncludes());
 		include.addChangedHandler(changedHandler);
 
-		TextItem exclude = ItemFactory.newTextItem("exclude", "exclude", account.getExcludes());
+		TextItem exclude = ItemFactory.newTextItem("exclude", account.getExcludes());
 		exclude.addChangedHandler(changedHandler);
 
-		TextItem folder = ItemFactory.newTextItem("mailfolder", "mailfolder", account.getMailFolder());
+		TextItem folder = ItemFactory.newTextItem("mailfolder", account.getMailFolder());
 		folder.addChangedHandler(changedHandler);
 
 		SelectItem format = ItemFactory.newSelectItem("format", "format");

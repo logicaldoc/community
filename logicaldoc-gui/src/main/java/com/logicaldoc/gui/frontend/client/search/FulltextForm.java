@@ -95,7 +95,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			}
 		});
 
-		expression = ItemFactory.newTextItem("expression", "expression", I18N.message("search") + "...");
+		expression = ItemFactory.newTextItem("expression", I18N.message("search") + "...");
 		expression.setWidth("*");
 		expression.setColSpan(3);
 		expression.setRequired(true);

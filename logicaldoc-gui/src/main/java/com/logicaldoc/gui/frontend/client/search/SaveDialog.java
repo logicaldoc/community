@@ -45,12 +45,12 @@ public class SaveDialog extends Window {
 		form.setWidth(350);
 		form.setMargin(5);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", null);
+		TextItem name = ItemFactory.newTextItem("name", null);
 		name.setRequired(true);
 		name.setValidators(new SimpleTextValidator());
 		name.setWidth(200);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", null);
+		TextItem description = ItemFactory.newTextItem("description", null);
 		description.setBrowserSpellCheck(true);
 		description.setWidth(300);
 

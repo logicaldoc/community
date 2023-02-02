@@ -82,7 +82,7 @@ public class ApiCallsReport extends AdminPanel {
 		proto.setAllowEmptyValue(true);
 
 		// Session ID
-		TextItem sessionId = ItemFactory.newTextItem("sid", "sid", null);
+		TextItem sessionId = ItemFactory.newTextItem("sid", null);
 		sessionId.setWidth(250);
 		sessionId.setEndRow(true);
 

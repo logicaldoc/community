@@ -126,7 +126,7 @@ public class ZonalOCRTemplateSettings extends Window {
 				I18N.message("attention"), I18N.message("filenamewarning"));
 		fileNameWaring.setRequired(true);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", ocrPanel.getSelectedOcrTemplate().getName());
+		TextItem name = ItemFactory.newTextItem("name", ocrPanel.getSelectedOcrTemplate().getName());
 		name.setRequired(true);
 		name.setDisabled(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
@@ -148,7 +148,7 @@ public class ZonalOCRTemplateSettings extends Window {
 		else
 			form.setItems(id, name, description);
 	}
-	
+
 	public void onSave() {
 		if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
