@@ -60,7 +60,7 @@ public class FolderCopyDialog extends Dialog {
 				FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"));
 		name.setHidden(selectedSourceIds.length > 1);
 
-		SelectItem securityOption = ItemFactory.newFolderSecurityOption("security", "security");
+		SelectItem securityOption = ItemFactory.newFolderSecurityOption("security");
 		securityOption.setHidden(!securityOptionEnabled);
 
 		CheckboxItem foldersOnly = ItemFactory.newCheckbox("foldersOnly", "copyfoldersonly");

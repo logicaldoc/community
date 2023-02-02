@@ -908,6 +908,10 @@ public class ItemFactory {
 		return radioGroupItem;
 	}
 
+	public static RadioGroupItem newBooleanSelector(String name) {
+		return newBooleanSelector(name, name);
+	}
+
 	public static CheckboxItem newCheckbox(String name, String title) {
 		CheckboxItem item = new CheckboxItem();
 		item.setName(originalItemName(name));
@@ -1059,8 +1063,8 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newFolderSecurityOption(String name, String title) {
-		SelectItem securityOption = newSelectItem(name, title);
+	public static SelectItem newFolderSecurityOption(String name) {
+		SelectItem securityOption = newSelectItem(name);
 		securityOption.setWidth("*");
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("none", I18N.message("none").toLowerCase());
