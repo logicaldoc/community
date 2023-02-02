@@ -37,6 +37,30 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CronExpressionComposer extends Window {
 
+	private static final String SUNDAY = "sunday";
+
+	private static final String SATURDAY = "saturday";
+
+	private static final String FRIDAY = "friday";
+
+	private static final String THURSDAY = "thursday";
+
+	private static final String WEDNESDAY = "wednesday";
+
+	private static final String TUESDAY = "tuesday";
+
+	private static final String MONDAY = "monday";
+
+	private static final String EVERY = "every";
+
+	private static final String HOURLY_TIME = "hourly-time";
+
+	private static final String GENERATE = "generate";
+
+	private static final String EXPRESSION = "expression";
+
+	private static final String DESCRIPTION = "description";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private TabSet topTabSet = new TabSet();
@@ -87,11 +111,11 @@ public class CronExpressionComposer extends Window {
 		topTabSet.addTab(monthlyTab);
 		topTabSet.addTab(yearlyTab);
 
-		StaticTextItem expression = ItemFactory.newStaticTextItem("expression", null);
+		StaticTextItem expression = ItemFactory.newStaticTextItem(EXPRESSION, null);
 		expression.setWidth(300);
 		expression.setWrap(false);
 
-		StaticTextItem description = ItemFactory.newStaticTextItem("description", null);
+		StaticTextItem description = ItemFactory.newStaticTextItem(DESCRIPTION, null);
 		description.setWidth(400);
 		description.setWrap(false);
 
@@ -108,7 +132,7 @@ public class CronExpressionComposer extends Window {
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
 				if (sourceItem != null) {
 					sourceItem.clearErrors();
-					sourceItem.setValue(vm.getItem("expression").getValue());
+					sourceItem.setValue(vm.getItem(EXPRESSION).getValue());
 					if (changedHandler != null)
 						changedHandler.onChanged(null);
 					destroy();
@@ -138,13 +162,13 @@ public class CronExpressionComposer extends Window {
 	}
 
 	private Tab prepareMinutesTab() {
-		SelectItem minute = ItemFactory.newSelectItem("minutes-minute", "every");
+		SelectItem minute = ItemFactory.newSelectItem("minutes-minute", EVERY);
 		minute.setWidth(50);
 		minute.setHint(I18N.message("minutes").toLowerCase());
 		minute.setValueMap("1", "2", "3", "4", "5", "6", "10", "15", "20", "30");
 		minute.setValue("1");
 
-		ButtonItem generate = new ButtonItem(I18N.message("generate"));
+		ButtonItem generate = new ButtonItem(I18N.message(GENERATE));
 		generate.setStartRow(true);
 		generate.addClickHandler(new ClickHandler() {
 
@@ -171,7 +195,7 @@ public class CronExpressionComposer extends Window {
 		form.setNumCols(1);
 		form.setValuesManager(vm);
 
-		SelectItem hour = ItemFactory.newSelectItem("hourly-hour", "every");
+		SelectItem hour = ItemFactory.newSelectItem("hourly-hour", EVERY);
 		hour.setWidth(50);
 		hour.setHint(I18N.message("hours").toLowerCase());
 		hour.setValueMap("", "1", "2", "3", "4", "6", "12");
@@ -181,16 +205,16 @@ public class CronExpressionComposer extends Window {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
-				form.getItem("hourly-time").setDisabled(event.getValue() != null && !"".equals(event.getValue()));
+				form.getItem(HOURLY_TIME).setDisabled(event.getValue() != null && !"".equals(event.getValue()));
 			}
 		});
 
-		TimeItem startsAt = ItemFactory.newTimeItemPicklist("hourly-time", "startsat");
+		TimeItem startsAt = ItemFactory.newTimeItemPicklist(HOURLY_TIME, "startsat");
 		startsAt.setWrapTitle(false);
 		startsAt.setDisabled(true);
 		startsAt.setValue(new Date());
 
-		ButtonItem generate = new ButtonItem(I18N.message("generate"));
+		ButtonItem generate = new ButtonItem(I18N.message(GENERATE));
 		generate.setStartRow(true);
 		generate.addClickHandler(new ClickHandler() {
 
@@ -229,7 +253,7 @@ public class CronExpressionComposer extends Window {
 		startsAt.setWrapTitle(false);
 		startsAt.setValue(new Date());
 
-		ButtonItem generate = new ButtonItem(I18N.message("generate"));
+		ButtonItem generate = new ButtonItem(I18N.message(GENERATE));
 		generate.setStartRow(true);
 		generate.addClickHandler(new ClickHandler() {
 
@@ -254,13 +278,13 @@ public class CronExpressionComposer extends Window {
 		form.setValuesManager(vm);
 
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		map.put("MON", I18N.message("monday"));
-		map.put("TUE", I18N.message("tuesday"));
-		map.put("WED", I18N.message("wednesday"));
-		map.put("THU", I18N.message("thursday"));
-		map.put("FRI", I18N.message("friday"));
-		map.put("SAT", I18N.message("saturday"));
-		map.put("SUN", I18N.message("sunday"));
+		map.put("MON", I18N.message(MONDAY));
+		map.put("TUE", I18N.message(TUESDAY));
+		map.put("WED", I18N.message(WEDNESDAY));
+		map.put("THU", I18N.message(THURSDAY));
+		map.put("FRI", I18N.message(FRIDAY));
+		map.put("SAT", I18N.message(SATURDAY));
+		map.put("SUN", I18N.message(SUNDAY));
 
 		SelectItem days = ItemFactory.newSelectItem("weekly-days", "ddays");
 		days.setWidth(200);
@@ -273,7 +297,7 @@ public class CronExpressionComposer extends Window {
 		startsAt.setWrapTitle(false);
 		startsAt.setValue(new Date());
 
-		ButtonItem generate = new ButtonItem(I18N.message("generate"));
+		ButtonItem generate = new ButtonItem(I18N.message(GENERATE));
 		generate.setStartRow(true);
 		generate.addClickHandler(new ClickHandler() {
 
@@ -351,13 +375,13 @@ public class CronExpressionComposer extends Window {
 		});
 
 		LinkedHashMap<String, String> dayMap = new LinkedHashMap<String, String>();
-		dayMap.put("MON", I18N.message("monday"));
-		dayMap.put("TUE", I18N.message("tuesday"));
-		dayMap.put("WED", I18N.message("wednesday"));
-		dayMap.put("THU", I18N.message("thursday"));
-		dayMap.put("FRI", I18N.message("friday"));
-		dayMap.put("SAT", I18N.message("saturday"));
-		dayMap.put("SUN", I18N.message("sunday"));
+		dayMap.put("MON", I18N.message(MONDAY));
+		dayMap.put("TUE", I18N.message(TUESDAY));
+		dayMap.put("WED", I18N.message(WEDNESDAY));
+		dayMap.put("THU", I18N.message(THURSDAY));
+		dayMap.put("FRI", I18N.message(FRIDAY));
+		dayMap.put("SAT", I18N.message(SATURDAY));
+		dayMap.put("SUN", I18N.message(SUNDAY));
 		SelectItem dayName = ItemFactory.newSelectItem("monthly-day-name", "dayname");
 		dayName.setDisabled(true);
 		dayName.setWidth(80);
@@ -380,7 +404,7 @@ public class CronExpressionComposer extends Window {
 		startsAt.setColSpan(6);
 		startsAt.setValue(new Date());
 
-		ButtonItem generate = new ButtonItem(I18N.message("generate"));
+		ButtonItem generate = new ButtonItem(I18N.message(GENERATE));
 		generate.setStartRow(true);
 		generate.addClickHandler(new ClickHandler() {
 
@@ -419,7 +443,7 @@ public class CronExpressionComposer extends Window {
 		monthMap.put("11", I18N.message("november"));
 		monthMap.put("12", I18N.message("december"));
 
-		SelectItem month = ItemFactory.newSelectItem("yearly-month", "every");
+		SelectItem month = ItemFactory.newSelectItem("yearly-month", EVERY);
 		month.setWidth(80);
 		month.setValueMap(monthMap);
 		month.setValue("1");
@@ -469,13 +493,13 @@ public class CronExpressionComposer extends Window {
 		});
 
 		LinkedHashMap<String, String> dayMap = new LinkedHashMap<String, String>();
-		dayMap.put("MON", I18N.message("monday"));
-		dayMap.put("TUE", I18N.message("tuesday"));
-		dayMap.put("WED", I18N.message("wednesday"));
-		dayMap.put("THU", I18N.message("thursday"));
-		dayMap.put("FRI", I18N.message("friday"));
-		dayMap.put("SAT", I18N.message("saturday"));
-		dayMap.put("SUN", I18N.message("sunday"));
+		dayMap.put("MON", I18N.message(MONDAY));
+		dayMap.put("TUE", I18N.message(TUESDAY));
+		dayMap.put("WED", I18N.message(WEDNESDAY));
+		dayMap.put("THU", I18N.message(THURSDAY));
+		dayMap.put("FRI", I18N.message(FRIDAY));
+		dayMap.put("SAT", I18N.message(SATURDAY));
+		dayMap.put("SUN", I18N.message(SUNDAY));
 		SelectItem dayName = ItemFactory.newSelectItem("yearly-day-name", "dayname");
 		dayName.setDisabled(true);
 		dayName.setWidth(80);
@@ -508,7 +532,7 @@ public class CronExpressionComposer extends Window {
 		startsAt.setColSpan(6);
 		startsAt.setValue(new Date());
 
-		ButtonItem generate = new ButtonItem(I18N.message("generate"));
+		ButtonItem generate = new ButtonItem(I18N.message(GENERATE));
 		generate.setStartRow(true);
 		generate.addClickHandler(new ClickHandler() {
 
@@ -533,7 +557,7 @@ public class CronExpressionComposer extends Window {
 		int selectedTab = topTabSet.getSelectedTabNumber();
 		switch (selectedTab) {
 		case 0:
-			vm.getItem("expression").setValue("0 0/" + vm.getValue("minutes-minute") + " * 1/1 * ? *");
+			vm.getItem(EXPRESSION).setValue("0 0/" + vm.getValue("minutes-minute") + " * 1/1 * ? *");
 			break;
 		case 1:
 			generateHourly();
@@ -558,7 +582,7 @@ public class CronExpressionComposer extends Window {
 			// do nothing
 		}
 
-		InfoService.Instance.get().getCronDescription("" + vm.getItem("expression").getValue(), I18N.getLocale(),
+		InfoService.Instance.get().getCronDescription("" + vm.getItem(EXPRESSION).getValue(), I18N.getLocale(),
 				new AsyncCallback<String>() {
 
 					@Override
@@ -568,7 +592,7 @@ public class CronExpressionComposer extends Window {
 
 					@Override
 					public void onSuccess(String description) {
-						vm.getItem("description").setValue(description);
+						vm.getItem(DESCRIPTION).setValue(description);
 					}
 				});
 	}
@@ -584,10 +608,10 @@ public class CronExpressionComposer extends Window {
 
 		String month = vm.getValueAsString("yearly-month");
 		if (month != null && !"".equals(month)) {
-			vm.getItem("expression")
+			vm.getItem(EXPRESSION)
 					.setValue("0 " + m + " " + h + " " + vm.getValueAsString("yearly-day") + " " + month + " ? *");
 		} else
-			vm.getItem("expression")
+			vm.getItem(EXPRESSION)
 					.setValue("0 " + m + " " + h + " ? " + vm.getValueAsString("yearly-day-name-month") + " "
 							+ vm.getValueAsString("yearly-day-name") + "#" + vm.getValueAsString("yearly-day-position")
 							+ " *");
@@ -604,10 +628,10 @@ public class CronExpressionComposer extends Window {
 
 		String day = vm.getValueAsString("monthly-day");
 		if (day != null && !"".equals(day)) {
-			vm.getItem("expression").setValue(
+			vm.getItem(EXPRESSION).setValue(
 					"0 " + m + " " + h + " " + day + " 1/" + vm.getValueAsString("monthly-day-months") + " ? *");
 		} else
-			vm.getItem("expression")
+			vm.getItem(EXPRESSION)
 					.setValue("0 " + m + " " + h + " ? 1/" + vm.getValueAsString("monthly-day-name-months") + " "
 							+ vm.getValueAsString("monthly-day-name") + "#"
 							+ vm.getValueAsString("monthly-day-position") + " *");
@@ -621,7 +645,7 @@ public class CronExpressionComposer extends Window {
 		String h = timeItem.getHourItem().getValueAsString();
 		if (h.length() > 1 && h.startsWith("0"))
 			h = h.substring(1);
-		vm.getItem("expression").setValue("0 " + m + " " + h + " ? * " + vm.getValueAsString("weekly-days") + " *");
+		vm.getItem(EXPRESSION).setValue("0 " + m + " " + h + " ? * " + vm.getValueAsString("weekly-days") + " *");
 	}
 
 	private void generateDaily() {
@@ -634,26 +658,26 @@ public class CronExpressionComposer extends Window {
 			h = h.substring(1);
 
 		if ("everyday".equals(vm.getValueAsString("daily-frequency")))
-			vm.getItem("expression").setValue("0 " + m + " " + h + " 1/1 * ? *");
+			vm.getItem(EXPRESSION).setValue("0 " + m + " " + h + " 1/1 * ? *");
 		else {
 
-			vm.getItem("expression").setValue("0 " + m + " " + h + " ? * MON-FRI *");
+			vm.getItem(EXPRESSION).setValue("0 " + m + " " + h + " ? * MON-FRI *");
 		}
 	}
 
 	private void generateHourly() {
 		String hour = vm.getValueAsString("hourly-hour");
 		if (hour != null && !"".equals(hour))
-			vm.getItem("expression").setValue("0 0 0/" + hour + " 1/1 * ? *");
+			vm.getItem(EXPRESSION).setValue("0 0 0/" + hour + " 1/1 * ? *");
 		else {
-			TimeItem timeItem = (TimeItem) vm.getItem("hourly-time");
+			TimeItem timeItem = (TimeItem) vm.getItem(HOURLY_TIME);
 			String m = timeItem.getMinuteItem().getValueAsString();
 			if (m.length() > 1 && m.startsWith("0"))
 				m = m.substring(1);
 			String h = timeItem.getHourItem().getValueAsString();
 			if (h.length() > 1 && h.startsWith("0"))
 				h = h.substring(1);
-			vm.getItem("expression").setValue("0 " + m + " " + h + " 1/1 * ? *");
+			vm.getItem(EXPRESSION).setValue("0 " + m + " " + h + " 1/1 * ? *");
 		}
 	}
 }

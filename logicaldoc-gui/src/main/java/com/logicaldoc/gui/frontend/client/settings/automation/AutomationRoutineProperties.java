@@ -58,7 +58,7 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", I18N.message("name"), routine.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", routine.getName());
 		name.addChangedHandler(changedHandler);
 		name.setDisabled(routine.getId() != 0L);
 

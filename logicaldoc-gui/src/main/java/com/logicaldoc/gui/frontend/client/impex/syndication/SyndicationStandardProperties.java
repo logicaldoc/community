@@ -71,7 +71,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", syndication.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", syndication.getName());
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
 		name.setDisabled(syndication.getId() != 0L);

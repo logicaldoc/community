@@ -127,7 +127,7 @@ public class TenantPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareNameItem(boolean readonly) {
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", tenant.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", tenant.getName());
 		name.setRequired(true);
 		name.setSelectOnFocus(true);
 		name.setDisabled(readonly || (tenant.getId() != 0 && Constants.TENANT_DEFAULTNAME.equals(tenant.getName())));

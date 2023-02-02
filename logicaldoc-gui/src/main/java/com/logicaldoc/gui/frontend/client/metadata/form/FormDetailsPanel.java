@@ -163,7 +163,7 @@ public class FormDetailsPanel extends VLayout {
 		propertiesTabPanel.setHeight100();
 		propertiesTab.setPane(propertiesTabPanel);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", form.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", form.getName());
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
 		name.setDisabled(form.getId() != 0L);

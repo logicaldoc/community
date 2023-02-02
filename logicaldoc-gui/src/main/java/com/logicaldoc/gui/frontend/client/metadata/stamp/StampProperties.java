@@ -233,7 +233,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private TextItem prepareNameItem() {
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", stamp.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", stamp.getName());
 		if (changedHandler != null)
 			name.addChangedHandler(changedHandler);
 		name.setRequired(true);

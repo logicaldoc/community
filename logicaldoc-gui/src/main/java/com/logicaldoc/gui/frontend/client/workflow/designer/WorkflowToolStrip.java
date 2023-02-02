@@ -350,7 +350,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		newWorkflow.addClickHandler((ClickEvent event) -> {
 			event.cancel();
 
-			FormItem workflowName = ItemFactory.newSimpleTextItem("workflowName", "workflowname", null);
+			FormItem workflowName = ItemFactory.newSimpleTextItem("workflowName", null);
 			workflowName.setRequired(true);
 			LD.askForValue(I18N.message("newwftemplate"), I18N.message("workflowname"), null, workflowName,
 					new ValueCallback() {

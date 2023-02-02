@@ -47,7 +47,7 @@ public class IncrementalSettingsPanel extends VLayout {
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		prefix = ItemFactory.newSimpleTextItem("prefix", "prefix", incremental.getPrefix());
+		prefix = ItemFactory.newSimpleTextItem("prefix", incremental.getPrefix());
 		prefix.setRequired(true);
 		prefix.addChangedHandler(changedHandler);
 

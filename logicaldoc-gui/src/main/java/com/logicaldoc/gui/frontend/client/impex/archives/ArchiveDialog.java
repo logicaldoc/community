@@ -59,7 +59,7 @@ public class ArchiveDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", null);
+		TextItem name = ItemFactory.newSimpleTextItem("name", null);
 		name.setRequired(true);
 
 		TextItem description = ItemFactory.newTextItem("description", null);
