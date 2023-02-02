@@ -175,7 +175,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				}
 			}
 
-			// Update the document's record
+			// Update the document's gridRecord
 			documentDAO.initialize(document);
 			document.setFileSize(fileSize);
 			if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
@@ -787,7 +787,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			if (file != null)
 				transaction.setFile(file.getAbsolutePath());
 
-			// Create the record
+			// Create the gridRecord
 			transaction.setEvent(DocumentEvent.STORED.toString());
 			documentDAO.store(docVO, transaction);
 
@@ -1471,7 +1471,7 @@ public class DocumentManagerImpl implements DocumentManager {
 								.setComment(String.format("%d files moved to storage %d", movedFiles, targetStorage));
 						documentDAO.saveDocumentHistory(document, transaction);
 					} catch (Throwable t) {
-						log.warn("Cannot record history for document {}", document, t);
+						log.warn("Cannot gridRecord history for document {}", document, t);
 					}
 				}
 			}

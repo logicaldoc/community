@@ -17,6 +17,8 @@ import com.logicaldoc.util.Context;
  */
 public class MockStorer extends FSStorer {
 	
+	private static final String POM_XML = "pom.xml";
+
 	private boolean errorOnStore = false;
 
 	private boolean useDummyFile = false;
@@ -34,7 +36,7 @@ public class MockStorer extends FSStorer {
 		if (errorOnStore)
 			throw new IOException("error");
 		if (useDummyFile)
-			super.store(new File("pom.xml"), docId, resource);
+			super.store(new File(POM_XML), docId, resource);
 		else
 			super.store(file, docId, resource);
 	}
@@ -44,7 +46,7 @@ public class MockStorer extends FSStorer {
 		if (errorOnStore)
 			throw new IOException("error");
 		if (useDummyFile)
-			super.store(new FileInputStream("pom.xml"), docId, resource);
+			super.store(new FileInputStream(POM_XML), docId, resource);
 		else
 			super.store(stream, docId, resource);
 	}
@@ -52,7 +54,7 @@ public class MockStorer extends FSStorer {
 	@Override
 	public InputStream getStream(long docId, String resource) throws IOException {
 		if (useDummyFile)
-			return new FileInputStream("pom.xml");
+			return new FileInputStream(POM_XML);
 		else
 			return super.getStream(docId, resource);
 	}

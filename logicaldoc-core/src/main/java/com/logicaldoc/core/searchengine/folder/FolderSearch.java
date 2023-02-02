@@ -35,6 +35,11 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class FolderSearch extends Search {
 
+	private static final String IS_NOT_NULL = " is not null ";
+	private static final String IS_NULL = " is null ";
+	private static final String LOWER = "lower(";
+	private static final String AND = " and ";
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
@@ -149,7 +154,7 @@ public class FolderSearch extends Search {
 		prepareExtendedAttributesJoins(query);
 
 		query.append(" where A.ld_deleted=0 and A.ld_hidden=0 ");
-		query.append(" and " + (searchAliases ? "" : "not") + " A.ld_type=" + Folder.TYPE_ALIAS);
+		query.append(AND + (searchAliases ? "" : "not") + " A.ld_type=" + Folder.TYPE_ALIAS);
 
 		appendTenantCondition(query);
 
@@ -263,7 +268,7 @@ public class FolderSearch extends Search {
 
 	private void appendTemplateCondition(StringBuilder query, String tableAlias) {
 		if (options.getTemplate() != null)
-			query.append(" and " + tableAlias + ".ld_templateid=" + options.getTemplate());
+			query.append(AND + tableAlias + ".ld_templateid=" + options.getTemplate());
 	}
 
 	private void appendFoldRefConfition(StringBuilder query, boolean searchAliases) {
@@ -277,7 +282,7 @@ public class FolderSearch extends Search {
 			throws PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (fOptions.getFolderId() != null) {
-			query.append(" and ");
+			query.append(AND);
 			if (fOptions.isSearchInSubPath()) {
 				String path = dao.computePath(fOptions.getFolderId());
 				query.append(tableAlias + ".ld_path like '" + path + "/%'");
@@ -326,21 +331,21 @@ public class FolderSearch extends Search {
 			FolderCriterion criterion) {
 		String val = SqlUtil.doubleQuotes(criterion.getStringValue().toLowerCase());
 		if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-			query.append("lower(" + columnName + ") = '" + val + "'");
+			query.append(LOWER + columnName + ") = '" + val + "'");
 		else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
 			query.append("(not lower(" + columnName + ") = '" + val + "')");
 		else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
-			query.append("lower(" + columnName + ") like '%" + val + "%'");
+			query.append(LOWER + columnName + ") like '%" + val + "%'");
 		else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
 			query.append(" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val + "%')");
 		else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
-			query.append("lower(" + columnName + ") like '" + val + "%'");
+			query.append(LOWER + columnName + ") like '" + val + "%'");
 		else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
-			query.append("lower(" + columnName + ") like  '%" + val + "'");
+			query.append(LOWER + columnName + ") like  '%" + val + "'");
 		else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 	}
 
 	private void appendStringCriterionCaseSensitive(StringBuilder query, String columnName, FolderCriterion criterion) {
@@ -348,7 +353,7 @@ public class FolderSearch extends Search {
 		if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
 			query.append(columnName + " = '" + val + "'");
 		else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-			query.append("(not " + columnName + " = '" + val + "')");
+			query.append(" (not " + columnName + " = '" + val + "')");
 		else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
 			query.append(columnName + " like '%" + val + "%'");
 		else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
@@ -358,9 +363,9 @@ public class FolderSearch extends Search {
 		else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
 			query.append(columnName + " like '%" + val + "'");
 		else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 	}
 
 	private void appendFolderCriterion(StringBuilder query, String tableAlias, String columnName,
@@ -375,9 +380,9 @@ public class FolderSearch extends Search {
 
 	private void appendLanguageCriterion(StringBuilder query, String columnName, FolderCriterion criterion) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 		} else {
 			String val2 = criterion.getStringValue();
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
@@ -390,9 +395,9 @@ public class FolderSearch extends Search {
 	private void appendDateCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
 			ArrayList<Serializable> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 		} else {
 			params.add(criterion.getSqlDateValue());
 			if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
@@ -405,9 +410,9 @@ public class FolderSearch extends Search {
 	private void appendDoubleCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
 			ArrayList<Serializable> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 		} else {
 			params.add(criterion.getDoubleValue());
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
@@ -427,18 +432,18 @@ public class FolderSearch extends Search {
 			params.add(criterion.getLongValue());
 			query.append(columnName + " = ?");
 		} else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 		}
 	}
 
 	private void appendFolderOrUserOrTemplateCriterion(StringBuilder query, String columnName,
 			FolderCriterion criterion, ArrayList<Serializable> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 		} else {
 			params.add(criterion.getLongValue());
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
@@ -451,9 +456,9 @@ public class FolderSearch extends Search {
 	private void appendIntegerCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
 			ArrayList<Serializable> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is null ");
+			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-			query.append(columnName + " is not null ");
+			query.append(columnName + IS_NOT_NULL);
 		} else {
 			params.add(criterion.getLongValue());
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))

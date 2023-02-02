@@ -148,7 +148,7 @@ public class Group extends PersistentObject implements Serializable {
 	}
 
 	public boolean isAdmin() {
-		return "admin".equals(name);
+		return GROUP_ADMIN.equals(name);
 	}
 
 	public String getSource() {

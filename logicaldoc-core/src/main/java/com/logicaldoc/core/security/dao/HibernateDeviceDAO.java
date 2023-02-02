@@ -24,6 +24,9 @@ import com.logicaldoc.core.security.User;
  */
 public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> implements DeviceDAO {
 
+	private static final String USER_ID_EQUAL_USER_ID = ".userId = :userId";
+	private static final String AND = " and ";
+	private static final String USER_ID = "userId";
 	private UserDAO userDAO;
 
 	private HibernateDeviceDAO() {
@@ -49,9 +52,9 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	public List<Device> findTrustedDevices(long userId) {
 		try {
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("userId", userId);
+			params.put(USER_ID, userId);
 
-			return findByWhere(ENTITY + ".trusted=1 and " + ENTITY + ".userId = :userId", params,
+			return findByWhere(ENTITY + ".trusted=1 and " + ENTITY + USER_ID_EQUAL_USER_ID, params,
 					ENTITY + ".lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -63,9 +66,9 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	public List<Device> findByUserId(long userId) {
 		try {
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("userId", userId);
+			params.put(USER_ID, userId);
 
-			return findByWhere(ENTITY + ".userId = :userId", params, ENTITY + ".lastLogin desc", null);
+			return findByWhere(ENTITY + USER_ID_EQUAL_USER_ID, params, ENTITY + ".lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Device>();
@@ -131,31 +134,31 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 
 		StringBuilder query = new StringBuilder();
 
-		query.append(ENTITY + ".userId = :userId");
-		params.put("userId", device.getUserId());
+		query.append(ENTITY + USER_ID_EQUAL_USER_ID);
+		params.put(USER_ID, device.getUserId());
 
-		query.append(" and ");
+		query.append(AND);
 		if (device.getBrowser() != null) {
 			query.append(ENTITY + ".browser = :browser");
 			params.put("browser", device.getBrowser());
 		} else
 			query.append(ENTITY + ".browser is null");
 
-		query.append(" and ");
+		query.append(AND);
 		if (device.getBrowserVersion() != null) {
 			query.append(ENTITY + ".browserVersion = :browserVersion");
 			params.put("browserVersion", device.getBrowserVersion());
 		} else
 			query.append(ENTITY + ".browserVersion is null");
 
-		query.append(" and ");
+		query.append(AND);
 		if (device.getOperativeSystem() != null) {
 			query.append(ENTITY + ".operativeSystem = :operativeSystem");
 			params.put("operativeSystem", device.getOperativeSystem());
 		} else
 			query.append(ENTITY + ".operativeSystem is null");
 
-		query.append(" and ");
+		query.append(AND);
 		if (device.getType() != null) {
 			query.append(ENTITY + ".type = :type");
 			params.put("type", device.getType());

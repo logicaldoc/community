@@ -32,7 +32,7 @@ public class ServiceFactory extends AbstractServiceFactory {
 
 	private static final BigInteger DEFAULT_DEPTH_OBJECTS = BigInteger.valueOf(10);
 
-	private static final Logger log = LoggerFactory.getLogger(CmisService.class);
+	private static final Logger log = LoggerFactory.getLogger(ServiceFactory.class);
 
 	public ServiceFactory() {
 		super();

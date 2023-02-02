@@ -668,9 +668,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (Object record : records) {
-			Long id = (Long) record;
-			// Discard a record if already visited
+		for (Object gridRecord : records) {
+			Long id = (Long) gridRecord;
+			// Discard a gridRecord if already visited
 			if (docIds.contains(id))
 				continue;
 			else

@@ -21,7 +21,7 @@ public interface PasswordHistoryDAO extends PersistentObjectDAO<PasswordHistory>
 	 * @param password The password to check
 	 * @param max number of most recent records to evaluate
 	 * 
-	 * @return the found history record, if any
+	 * @return the found history gridRecord, if any
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */

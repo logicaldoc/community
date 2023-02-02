@@ -22,6 +22,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence> implements SequenceDAO {
 
+	private static final String AND = " and ";
+
 	private HibernateSequenceDAO() {
 		super(Sequence.class);
 		super.log = LoggerFactory.getLogger(HibernateSequenceDAO.class);
@@ -86,7 +88,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 	@Override
 	public List<Sequence> findByName(String name, long tenantId) {
 		String query = " " + ENTITY + ".tenantId=" + tenantId;
-		query += " and " + ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "%' ";
+		query += AND + ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "%' ";
 
 		try {
 			return findByWhere(query, null, null);
@@ -102,8 +104,8 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			Sequence sequence = null;
 
 			String query = " " + ENTITY + ".tenantId = :tenantId ";
-			query += " and " + ENTITY + ".objectId = :objectId ";
-			query += " and " + ENTITY + ".name = :name ";
+			query += AND + ENTITY + ".objectId = :objectId ";
+			query += AND + ENTITY + ".name = :name ";
 			List<Sequence> sequences = new ArrayList<Sequence>();
 			try {
 				Map<String, Object> params = new HashMap<String, Object>();

@@ -34,6 +34,8 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class ThreadPools {
 
+	private static final String THREADPOOL = "threadpool.";
+
 	private static String TYPE_DEFAULT = "default";
 
 	private static String TYPE_SCHEDULED = "scheduled";
@@ -67,10 +69,10 @@ public class ThreadPools {
 			if (pools.get(name).isShutdown())
 				throw new RuntimeException(name + " pool was shutdown");
 		} else {
-			int core = config.getInt("threadpool." + name + ".core", 5);
-			int max = config.getInt("threadpool." + name + ".max", 10);
-			int keepalive = config.getInt("threadpool." + name + ".keepalive", 5);
-			String type = config.getString("threadpool." + name + ".type", TYPE_SCHEDULED);
+			int core = config.getInt(THREADPOOL + name + ".core", 5);
+			int max = config.getInt(THREADPOOL + name + ".max", 10);
+			int keepalive = config.getInt(THREADPOOL + name + ".keepalive", 5);
+			String type = config.getString(THREADPOOL + name + ".type", TYPE_SCHEDULED);
 
 			if (TYPE_DEFAULT.equals(type))
 				pool = new ScheduledThreadPoolExecutor(core, new NamedThreadFactory(name));

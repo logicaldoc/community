@@ -114,7 +114,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 	@Override
 	public Class<?> getObjectType() {
 		try {
-			if ("simple".equals(config.getProperty("schedule.mode." + getName())))
+			if (MODE_SIMPLE.equals(config.getProperty("schedule.mode." + getName())))
 				return SimpleTrigger.class;
 			else
 				return CronTrigger.class;

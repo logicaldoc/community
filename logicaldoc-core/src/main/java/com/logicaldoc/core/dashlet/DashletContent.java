@@ -531,18 +531,18 @@ public class DashletContent extends HttpServlet {
 			 * Iterate over records composing the response XML document
 			 */
 			DateFormat df = getDateFormat();
-			for (DocumentNote record : records) {
+			for (DocumentNote note : records) {
 				writer.write("<post>");
-				printField("id", record.getId(), writer);
-				writer.write("<title><![CDATA[" + StringUtils.abbreviate(record.getMessage(), 100) + "]]></title>");
-				writer.write("<page>" + record.getPage() + "</page>");
-				writer.write("<user><![CDATA[" + record.getUsername() + "]]></user>");
-				writer.write("<date>" + (record.getDate() != null ? df.format(record.getDate()) : "") + "</date>");
-				writer.write("<message><![CDATA[" + record.getMessage() + "]]></message>");
-				writer.write("<docId>" + record.getDocId() + "</docId>");
-				writer.write("<filename><![CDATA[" + record.getFileName() + "]]></filename>");
-				printIcon(writer, record.getFileName());
-				writer.write("<userId><![CDATA[" + record.getUserId() + "]]></userId>");
+				printField("id", note.getId(), writer);
+				writer.write("<title><![CDATA[" + StringUtils.abbreviate(note.getMessage(), 100) + "]]></title>");
+				writer.write("<page>" + note.getPage() + "</page>");
+				writer.write("<user><![CDATA[" + note.getUsername() + "]]></user>");
+				writer.write("<date>" + (note.getDate() != null ? df.format(note.getDate()) : "") + "</date>");
+				writer.write("<message><![CDATA[" + note.getMessage() + "]]></message>");
+				writer.write("<docId>" + note.getDocId() + "</docId>");
+				writer.write("<filename><![CDATA[" + note.getFileName() + "]]></filename>");
+				printIcon(writer, note.getFileName());
+				writer.write("<userId><![CDATA[" + note.getUserId() + "]]></userId>");
 				writer.write("</post>");
 			}
 

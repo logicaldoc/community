@@ -50,7 +50,7 @@ public class Device extends PersistentObject implements Serializable {
 	private String type;
 
 	/**
-	 * Instant of record creation
+	 * Instant of gridRecord creation
 	 */
 	private Date creation = new Date();
 

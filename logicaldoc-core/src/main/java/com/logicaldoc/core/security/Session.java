@@ -252,7 +252,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 				}
 
 			} catch (PersistenceException e) {
-				log.warn("Cannot record the device {}", device);
+				log.warn("Cannot gridRecord the device {}", device);
 			}
 		}
 

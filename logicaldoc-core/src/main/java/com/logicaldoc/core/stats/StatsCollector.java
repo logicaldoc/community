@@ -45,6 +45,10 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 6.0
  */
 public class StatsCollector extends Task {
+	private static final String AND_NOT_A_LD_STATUS = " and not A.ld_status=";
+
+	private static final String AND_A_LD_TENANTID = " and A.ld_tenantid=";
+
 	public static final String STAT = "stat";
 
 	public final static String NAME = "StatsCollector";
@@ -575,8 +579,8 @@ public class StatsCollector extends Task {
 		try {
 			stats[0] = documentDAO.queryForLong(
 					"SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = 0 and A.ld_deleted = 0 "
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
-							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "")
+							+ AND_NOT_A_LD_STATUS + AbstractDocument.DOC_ARCHIVED);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -585,8 +589,8 @@ public class StatsCollector extends Task {
 		try {
 			stats[1] = documentDAO.queryForLong(
 					"SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = 1 and A.ld_deleted = 0 "
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
-							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "")
+							+ AND_NOT_A_LD_STATUS + AbstractDocument.DOC_ARCHIVED);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -594,7 +598,7 @@ public class StatsCollector extends Task {
 		stats[2] = 0;
 		try {
 			stats[2] = documentDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_deleted  > 0 "
-					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+					+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -609,7 +613,7 @@ public class StatsCollector extends Task {
 		try {
 			stats[4] = documentDAO.queryForLong(
 					"SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_status = " + AbstractDocument.DOC_ARCHIVED
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -620,7 +624,7 @@ public class StatsCollector extends Task {
 		try {
 			stats[6] = documentDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = "
 					+ AbstractDocument.INDEX_SKIP + " and A.ld_deleted = 0 "
-					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "") + " and not A.ld_status="
+					+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "") + AND_NOT_A_LD_STATUS
 					+ AbstractDocument.DOC_ARCHIVED);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -660,8 +664,8 @@ public class StatsCollector extends Task {
 		try {
 			stats[0] = documentDAO.queryForLong(
 					"SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_pages > 0 and A.ld_indexed = 0 and A.ld_deleted = 0 "
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
-							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "")
+							+ AND_NOT_A_LD_STATUS + AbstractDocument.DOC_ARCHIVED);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -670,8 +674,8 @@ public class StatsCollector extends Task {
 		try {
 			stats[1] = documentDAO.queryForLong(
 					"SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_pages > 0 and A.ld_indexed = 1 and A.ld_deleted = 0 "
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
-							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "")
+							+ AND_NOT_A_LD_STATUS + AbstractDocument.DOC_ARCHIVED);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -679,7 +683,7 @@ public class StatsCollector extends Task {
 		stats[2] = 0;
 		try {
 			stats[2] = documentDAO.queryForLong("SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_deleted  > 0 "
-					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+					+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -687,7 +691,7 @@ public class StatsCollector extends Task {
 		stats[3] = 0;
 		try {
 			stats[3] = documentDAO.queryForLong("SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_pages > 0 "
-					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+					+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -696,7 +700,7 @@ public class StatsCollector extends Task {
 		try {
 			stats[4] = documentDAO.queryForLong(
 					"SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_status = " + AbstractDocument.DOC_ARCHIVED
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -705,7 +709,7 @@ public class StatsCollector extends Task {
 		try {
 			stats[5] = documentDAO.queryForLong("SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_indexed = "
 					+ AbstractDocument.INDEX_SKIP + " and A.ld_deleted = 0 "
-					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "") + " and not A.ld_status="
+					+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "") + AND_NOT_A_LD_STATUS
 					+ AbstractDocument.DOC_ARCHIVED);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -741,7 +745,7 @@ public class StatsCollector extends Task {
 		try {
 			stats[0] = folderDAO.queryForLong(
 					"SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted = 0 and A.ld_id in (select B.ld_folderid FROM ld_document B where B.ld_deleted = 0) "
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -750,7 +754,7 @@ public class StatsCollector extends Task {
 		try {
 			stats[1] = folderDAO.queryForLong(
 					"SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted = 0 and A.ld_id not in (select B.ld_folderid FROM ld_document B where B.ld_deleted = 0) "
-							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -758,7 +762,7 @@ public class StatsCollector extends Task {
 		stats[2] = 0;
 		try {
 			stats[2] = folderDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted  > 0 "
-					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+					+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

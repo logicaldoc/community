@@ -20,6 +20,8 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 5.1
  */
 public class UserListenerManager {
+	private static final String POSITION = "position";
+
 	protected static Logger log = LoggerFactory.getLogger(UserListenerManager.class);
 
 	private List<UserListener> listeners = null;
@@ -38,8 +40,8 @@ public class UserListenerManager {
 		}
 		Collections.sort(sortedExts, new Comparator<Extension>() {
 			public int compare(Extension e1, Extension e2) {
-				int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
+				int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
+				int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
 				if (position1 < position2)
 					return -1;
 				else if (position1 > position2)
@@ -60,7 +62,7 @@ public class UserListenerManager {
 							"The specified listener " + className + " doesn't implement UserListener interface");
 				listeners.add((UserListener) listener);
 				log.info("Added new user listener {} position {}", className,
-						ext.getParameter("position").valueAsString());
+						ext.getParameter(POSITION).valueAsString());
 			} catch (Throwable e) {
 				log.error(e.getMessage());
 			}

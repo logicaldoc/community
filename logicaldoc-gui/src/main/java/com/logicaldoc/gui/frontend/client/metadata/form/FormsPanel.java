@@ -107,6 +107,7 @@ public class FormsPanel extends AdminPanel {
 		list.setCanSort(false);
 		list.setFilterOnKeypress(true);
 		list.setDataSource(new FormsDS());
+		list.setShowFilterEditor(true);
 
 		if (Feature.enabled(Feature.WEB_FORM))
 			list.setFields(id, formId, name, webEnabled, permaLink);

@@ -27,6 +27,9 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 8.3.1
  */
 public class GhostUtil {
+	private static final String S_OUTPUT_FILE = "-sOutputFile=";
+	private static final String D_NOPAUSE = "-dNOPAUSE";
+	private static final String D_BATCH = "-dBATCH";
 	protected static Logger log = LoggerFactory.getLogger(GhostUtil.class);
 
 	/**
@@ -48,23 +51,23 @@ public class GhostUtil {
 		String[] cmd = null;
 		if (page != null) {
 			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", "-dBATCH", "-dNOPAUSE",
-						"-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi, "-sOutputFile=" + dst.getPath(),
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE,
+						"-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi, S_OUTPUT_FILE + dst.getPath(),
 						srcPdf.getPath() };
 			else
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
-						"-dNOPAUSE", "-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi,
-						"-sOutputFile=" + dst.getPath(), srcPdf.getPath() };
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
+						D_NOPAUSE, "-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi,
+						S_OUTPUT_FILE + dst.getPath(), srcPdf.getPath() };
 			pages.add(dst);
 		} else {
 			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", "-dBATCH", "-dNOPAUSE", "-r" + dpi,
-						"-sOutputFile=" + dst.getParent() + "/" + FileUtil.getBaseName(dst.getName()) + "-%04d."
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE, "-r" + dpi,
+						S_OUTPUT_FILE + dst.getParent() + "/" + FileUtil.getBaseName(dst.getName()) + "-%04d."
 								+ FileUtil.getExtension(dst.getName()),
 						srcPdf.getPath() };
 			else
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
-						"-dNOPAUSE", "-r" + dpi, "-sOutputFile=" + dst.getParent() + "/"
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
+						D_NOPAUSE, "-r" + dpi, S_OUTPUT_FILE + dst.getParent() + "/"
 								+ FileUtil.getBaseName(dst.getName()) + "-%04d." + FileUtil.getExtension(dst.getName()),
 						srcPdf.getPath() };
 		}

@@ -36,7 +36,7 @@ public abstract class PersistentObject implements Serializable {
 	/**
 	 * Unique identifier in the data store
 	 * 
-	 * @return the unique identifier of this record
+	 * @return the unique identifier of this gridRecord
 	 */
 	public long getId() {
 		return id;
@@ -62,7 +62,7 @@ public abstract class PersistentObject implements Serializable {
 	/**
 	 * This flag is used to mark an object as deleted
 	 * 
-	 * @return <b>1</b> if the record is deleted, <b>0</b> otherwise
+	 * @return <b>1</b> if the gridRecord is deleted, <b>0</b> otherwise
 	 */
 	public int getDeleted() {
 		return deleted;
