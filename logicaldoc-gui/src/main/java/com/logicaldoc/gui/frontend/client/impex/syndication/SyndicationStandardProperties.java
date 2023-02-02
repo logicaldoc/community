@@ -125,7 +125,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		batch.setStep(1000);
 		batch.addChangedHandler(changedHandler);
 
-		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", "timeout", syndication.getTimeout());
+		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", syndication.getTimeout());
 		timeout.setRequired(true);
 		timeout.setWidth(100);
 		timeout.setMin(60);

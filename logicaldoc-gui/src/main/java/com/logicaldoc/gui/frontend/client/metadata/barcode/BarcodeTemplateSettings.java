@@ -150,7 +150,7 @@ public class BarcodeTemplateSettings extends Window {
 		description.setHeight(150);
 
 		// The optional batch
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch", template.getBatch());
+		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", template.getBatch());
 		batch.setRequired(true);
 		batch.setMin(1);
 		batch.setStep(10);

@@ -65,7 +65,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		SpinnerItem position = ItemFactory.newSpinnerItem("position", "position", folder.getPosition());
+		SpinnerItem position = ItemFactory.newSpinnerItem("position", folder.getPosition());
 
 		ColorItem color = ItemFactory.newColorItemPicker("color", "color", folder.getColor(), true, changedHandler);
 

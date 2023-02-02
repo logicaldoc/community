@@ -184,7 +184,7 @@ public class AttributeInitializerComposer extends Window {
 			}
 		});
 
-		SpinnerItem offset = ItemFactory.newSpinnerItem("offset", "offset", 0);
+		SpinnerItem offset = ItemFactory.newSpinnerItem("offset",  0);
 		offset.setWrapTitle(false);
 		offset.setMin(Integer.MIN_VALUE);
 		offset.setHint(I18N.message("days"));

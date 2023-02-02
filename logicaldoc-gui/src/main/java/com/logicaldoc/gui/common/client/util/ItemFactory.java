@@ -1134,7 +1134,7 @@ public class ItemFactory {
 		select.setWrapTitle(false);
 		return select;
 	}
-	
+
 	public static SelectItem newSelectItem(String name) {
 		return newSelectItem(name, name);
 	}
@@ -1188,6 +1188,10 @@ public class ItemFactory {
 			return newSpinnerItem(name, title, value.longValue());
 		else
 			return newSpinnerItem(name, title, (Long) null);
+	}
+
+	public static SpinnerItem newSpinnerItem(String name, Integer value) {
+		return newSpinnerItem(name, name, value);
 	}
 
 	public static Img newImgIcon(String name) {

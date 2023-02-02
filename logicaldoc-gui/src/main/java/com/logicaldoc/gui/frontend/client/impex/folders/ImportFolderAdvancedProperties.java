@@ -56,7 +56,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		form.setNumCols(3);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		SpinnerItem depth = ItemFactory.newSpinnerItem("depth", "depth", importFolder.getDepth());
+		SpinnerItem depth = ItemFactory.newSpinnerItem("depth", importFolder.getDepth());
 		depth.setRequired(true);
 		depth.setWidth(60);
 		depth.addChangedHandler(changedHandler);

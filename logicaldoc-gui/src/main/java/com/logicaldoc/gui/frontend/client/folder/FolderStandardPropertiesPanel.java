@@ -162,8 +162,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private SpinnerItem prepareMaxVersionsItem() {
-		SpinnerItem maxVersions = ItemFactory.newSpinnerItem("maxVersions", I18N.message("maxversions"),
-				folder.getMaxVersions());
+		SpinnerItem maxVersions = ItemFactory.newSpinnerItem("maxversions", folder.getMaxVersions());
 		maxVersions.setWrapTitle(false);
 		maxVersions.setDisabled(!folder.isWrite());
 		boolean maxVersionsVisible = folder.isWorkspace() && folder.getFoldRef() == null;
@@ -484,13 +483,13 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		if (folder.isWorkspace())
 			try {
-				folder.setMaxVersions(Integer.parseInt(vm.getValueAsString("maxVersions")));
+				folder.setMaxVersions(Integer.parseInt(vm.getValueAsString("maxversions")));
 				if (folder.getMaxVersions() != null && folder.getMaxVersions() < 1)
 					folder.setMaxVersions(null);
 			} catch (Throwable t) {
 				folder.setMaxVersions(null);
 			}
-		
+
 		return !vm.hasErrors();
 	}
 }

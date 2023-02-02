@@ -273,13 +273,13 @@ public class FormDetailsPanel extends VLayout {
 			editAfterSubmit.setRequired(true);
 			editAfterSubmit.addChangedHandler(changedHandler);
 
-			SpinnerItem width = ItemFactory.newSpinnerItem("width", "width", form.getWidth());
+			SpinnerItem width = ItemFactory.newSpinnerItem("width", form.getWidth());
 			width.setMin(100);
 			width.setStep(10);
 			width.setRequired(true);
 			width.addChangedHandler(changedHandler);
 
-			SpinnerItem columns = ItemFactory.newSpinnerItem("columns", "columns", form.getColumns());
+			SpinnerItem columns = ItemFactory.newSpinnerItem("columns", form.getColumns());
 			columns.setMin(1);
 			columns.setStep(1);
 			columns.setRequired(true);
