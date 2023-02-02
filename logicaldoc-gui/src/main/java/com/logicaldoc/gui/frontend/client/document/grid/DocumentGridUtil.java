@@ -21,32 +21,83 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class DocumentGridUtil {
 
-	static public long[] getIds(Record[] records) {
+	private static final String SUMMARY = "summary";
+
+	private static final String WORKFLOW_STATUS_DISPLAY = "workflowStatusDisplay";
+
+	private static final String WORKFLOW_STATUS = "workflowStatus";
+
+	private static final String PUBLISHED = "published";
+
+	private static final String LAST_MODIFIED = "lastModified";
+
+	private static final String DOCREF = "docref";
+
+	private static final String COMMENT = "comment";
+
+	private static final String FOLDER_ID = "folderId";
+
+	private static final String FOLDER = "folder";
+
+	private static final String CREATED = "created";
+
+	private static final String BOOKMARKED = "bookmarked";
+
+	private static final String STAMPED = "stamped";
+
+	private static final String SIGNED = "signed";
+
+	private static final String PASSWORD = "password";
+
+	private static final String IMMUTABLE = "immutable";
+
+	private static final String CREATOR_ID = "creatorId";
+
+	private static final String PUBLISHER_ID = "publisherId";
+
+	private static final String LOCK_USER = "lockUser";
+
+	private static final String LOCK_USER_ID = "lockUserId";
+
+	private static final String STATUS = "status";
+
+	private static final String INDEXED = "indexed";
+
+	private static final String PAGES = "pages";
+
+	private static final String TENANT_ID = "tenantId";
+
+	private static final String FILENAME = "filename";
+
+	private DocumentGridUtil() {
+	}
+
+	public static long[] getIds(Record[] records) {
 		long[] ids = new long[records.length];
 		for (int i = 0; i < records.length; i++)
 			ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
 		return ids;
 	}
 
-	static public Long[] getIdsAsLong(Record[] records) {
+	public static Long[] getIdsAsLong(Record[] records) {
 		Long[] ids = new Long[records.length];
 		for (int i = 0; i < records.length; i++)
 			ids[i] = records[i].getAttributeAsLong("id");
 		return ids;
 	}
 
-	static public GUIDocument[] toDocuments(Record[] records) {
-		ArrayList<GUIDocument> docs = new ArrayList<GUIDocument>();
+	public static GUIDocument[] toDocuments(Record[] records) {
+		ArrayList<GUIDocument> docs = new ArrayList<>();
 		if (records != null)
 			for (Record rec : records)
 				docs.add(DocumentGridUtil.toDocument(rec));
 		return docs.toArray(new GUIDocument[0]);
 	}
 
-	static public GUIDocument toDocument(Record rec) {
+	public static GUIDocument toDocument(Record rec) {
 		try {
 			return prepareDocument(rec);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			GuiLog.warn(t.getMessage(), null);
 			return null;
 		}
@@ -62,27 +113,27 @@ public class DocumentGridUtil {
 			document.setExtResId(rec.getAttributeAsString("extResId"));
 			document.setCustomId(rec.getAttributeAsString("customId"));
 			document.setType(rec.getAttribute("type"));
-			document.setFileName(rec.getAttribute("filename"));
+			document.setFileName(rec.getAttribute(FILENAME));
 			document.setTemplate(rec.getAttribute("template"));
 			document.setVersion(rec.getAttribute("version"));
 			document.setFileVersion(rec.getAttribute("fileVersion"));
 			document.setLanguage(rec.getAttribute("language"));
 			document.setPublisher(rec.getAttributeAsString("publisher"));
 
-			if (rec.getAttribute("tenantId") != null)
-				document.setTenantId(rec.getAttributeAsLong("tenantId"));
+			if (rec.getAttribute(TENANT_ID) != null)
+				document.setTenantId(rec.getAttributeAsLong(TENANT_ID));
 
 			if (rec.getAttributeAsFloat("size") != null)
 				document.setFileSize(rec.getAttributeAsLong("size"));
 
-			if (rec.getAttributeAsFloat("pages") != null)
-				document.setPages(rec.getAttributeAsInt("pages"));
+			if (rec.getAttributeAsFloat(PAGES) != null)
+				document.setPages(rec.getAttributeAsInt(PAGES));
 
-			if (rec.getAttributeAsInt("indexed") != null)
-				document.setIndexed(rec.getAttributeAsInt("indexed"));
+			if (rec.getAttributeAsInt(INDEXED) != null)
+				document.setIndexed(rec.getAttributeAsInt(INDEXED));
 
-			if (rec.getAttributeAsInt("status") != null)
-				document.setStatus(rec.getAttributeAsInt("status"));
+			if (rec.getAttributeAsInt(STATUS) != null)
+				document.setStatus(rec.getAttributeAsInt(STATUS));
 
 			setFlags(rec, document);
 
@@ -98,135 +149,135 @@ public class DocumentGridUtil {
 	}
 
 	private static void setUsers(Record rec, GUIDocument document) {
-		if (rec.getAttribute("lockUserId") != null)
-			document.setLockUserId(rec.getAttributeAsLong("lockUserId"));
+		if (rec.getAttribute(LOCK_USER_ID) != null)
+			document.setLockUserId(rec.getAttributeAsLong(LOCK_USER_ID));
 
-		if (rec.getAttribute("lockUser") != null)
-			document.setLockUser(rec.getAttribute("lockUser"));
+		if (rec.getAttribute(LOCK_USER) != null)
+			document.setLockUser(rec.getAttribute(LOCK_USER));
 
-		if (rec.getAttribute("publisherId") != null)
-			document.setPublisherId(rec.getAttributeAsLong("publisherId"));
+		if (rec.getAttribute(PUBLISHER_ID) != null)
+			document.setPublisherId(rec.getAttributeAsLong(PUBLISHER_ID));
 
-		if (rec.getAttribute("creatorId") != null)
-			document.setCreatorId(rec.getAttributeAsLong("creatorId"));
+		if (rec.getAttribute(CREATOR_ID) != null)
+			document.setCreatorId(rec.getAttributeAsLong(CREATOR_ID));
 	}
 
 	private static void setFlags(Record rec, GUIDocument document) {
-		if (rec.getAttributeAsInt("immutable") != null)
-			document.setImmutable(rec.getAttributeAsInt("immutable"));
+		if (rec.getAttributeAsInt(IMMUTABLE) != null)
+			document.setImmutable(rec.getAttributeAsInt(IMMUTABLE));
 
-		if (rec.getAttributeAsInt("password") != null)
-			document.setPasswordProtected(rec.getAttributeAsBoolean("password"));
+		if (rec.getAttributeAsInt(PASSWORD) != null)
+			document.setPasswordProtected(rec.getAttributeAsBoolean(PASSWORD));
 
-		if (rec.getAttributeAsInt("signed") != null)
-			document.setSigned(rec.getAttributeAsInt("signed"));
+		if (rec.getAttributeAsInt(SIGNED) != null)
+			document.setSigned(rec.getAttributeAsInt(SIGNED));
 
-		if (rec.getAttributeAsInt("stamped") != null)
-			document.setStamped(rec.getAttributeAsInt("stamped"));
+		if (rec.getAttributeAsInt(STAMPED) != null)
+			document.setStamped(rec.getAttributeAsInt(STAMPED));
 
-		if (rec.getAttributeAsInt("bookmarked") != null)
-			document.setBookmarked(rec.getAttributeAsBoolean("bookmarked"));
+		if (rec.getAttributeAsInt(BOOKMARKED) != null)
+			document.setBookmarked(rec.getAttributeAsBoolean(BOOKMARKED));
 	}
 
 	private static void setDates(Record rec, GUIDocument document) {
-		if (rec.getAttributeAsDate("lastModified") != null)
-			document.setLastModified(rec.getAttributeAsDate("lastModified"));
-		if (rec.getAttributeAsDate("published") != null)
-			document.setDate(rec.getAttributeAsDate("published"));
-		if (rec.getAttributeAsDate("created") != null)
-			document.setCreation(rec.getAttributeAsDate("created"));
+		if (rec.getAttributeAsDate(LAST_MODIFIED) != null)
+			document.setLastModified(rec.getAttributeAsDate(LAST_MODIFIED));
+		if (rec.getAttributeAsDate(PUBLISHED) != null)
+			document.setDate(rec.getAttributeAsDate(PUBLISHED));
+		if (rec.getAttributeAsDate(CREATED) != null)
+			document.setCreation(rec.getAttributeAsDate(CREATED));
 	}
 
 	private static void setWorkflow(Record rec, GUIDocument document) {
-		if (rec.getAttributeAsInt("workflowStatus") != null)
-			document.setWorkflowStatus(rec.getAttributeAsString("workflowStatus"));
+		if (rec.getAttributeAsInt(WORKFLOW_STATUS) != null)
+			document.setWorkflowStatus(rec.getAttributeAsString(WORKFLOW_STATUS));
 
-		if (rec.getAttributeAsString("workflowStatusDisplay") != null)
-			document.setWorkflowStatusDisplay(rec.getAttributeAsString("workflowStatusDisplay"));
+		if (rec.getAttributeAsString(WORKFLOW_STATUS_DISPLAY) != null)
+			document.setWorkflowStatusDisplay(rec.getAttributeAsString(WORKFLOW_STATUS_DISPLAY));
 	}
 
 	private static void setId(Record rec, GUIDocument document) {
 		document.setId(rec.getAttributeAsLong("id"));
-		if (rec.getAttribute("docref") != null) {
-			document.setDocRef(Long.parseLong(rec.getAttribute("docref")));
+		if (rec.getAttribute(DOCREF) != null) {
+			document.setDocRef(Long.parseLong(rec.getAttribute(DOCREF)));
 			document.setDocRefType(rec.getAttribute("docrefType"));
 		}
 	}
 
 	private static void setFolder(Record rec, GUIDocument document) {
 		GUIFolder folder = new GUIFolder();
-		if ("folder".equals(document.getType())) {
+		if (FOLDER.equals(document.getType())) {
 			folder.setId(Long.parseLong(rec.getAttributeAsString("id")));
-		} else if (rec.getAttributeAsLong("folderId") != null)
-			folder.setId(rec.getAttributeAsLong("folderId"));
+		} else if (rec.getAttributeAsLong(FOLDER_ID) != null)
+			folder.setId(rec.getAttributeAsLong(FOLDER_ID));
 		else
 			folder.setId(FolderController.get().getCurrentFolder().getFoldRef() != null
 					? FolderController.get().getCurrentFolder().getFoldRef()
 					: FolderController.get().getCurrentFolder().getId());
-		folder.setName(rec.getAttribute("filename"));
-		folder.setDescription(rec.getAttribute("comment"));
+		folder.setName(rec.getAttribute(FILENAME));
+		folder.setDescription(rec.getAttribute(COMMENT));
 
 		document.setFolder(folder);
 	}
 
-	static public ListGridRecord fromDocument(GUIDocument doc) {
+	public static ListGridRecord fromDocument(GUIDocument doc) {
 		ListGridRecord rec = new ListGridRecord();
 		updateRecord(doc, rec);
 		return rec;
 	}
 
-	static public void updateRecord(GUIDocument doc, Record rec) {
+	public static void updateRecord(GUIDocument doc, Record rec) {
 		if (rec == null || doc == null)
 			return;
 
-		if ("folder".equals(rec.getAttribute("type"))) {
-			rec.setAttribute("filename", doc.getFolder().getName());
-			rec.setAttribute("comment", doc.getFolder().getDescription());
-			rec.setAttribute("folderId", doc.getId());
-			rec.setAttribute("tenantId", doc.getTenantId());
+		if (FOLDER.equals(rec.getAttribute("type"))) {
+			rec.setAttribute(FILENAME, doc.getFolder().getName());
+			rec.setAttribute(COMMENT, doc.getFolder().getDescription());
+			rec.setAttribute(FOLDER_ID, doc.getId());
+			rec.setAttribute(TENANT_ID, doc.getTenantId());
 		} else {
-			rec.setAttribute("summary", rec.getAttribute("summary"));
+			rec.setAttribute(SUMMARY, rec.getAttribute(SUMMARY));
 
 			updateDocRef(doc, rec);
 
-			rec.setAttribute("filename", doc.getFileName());
+			rec.setAttribute(FILENAME, doc.getFileName());
 			rec.setAttribute("size", doc.getFileSize());
-			rec.setAttribute("pages", doc.getPages());
-			rec.setAttribute("tenantId", doc.getTenantId());
+			rec.setAttribute(PAGES, doc.getPages());
+			rec.setAttribute(TENANT_ID, doc.getTenantId());
 
 			updateIcon(doc, rec);
 
-			rec.setAttribute("lastModified", doc.getLastModified());
-			rec.setAttribute("published", doc.getDate());
+			rec.setAttribute(LAST_MODIFIED, doc.getLastModified());
+			rec.setAttribute(PUBLISHED, doc.getDate());
 			rec.setAttribute("publisher", doc.getPublisher());
-			rec.setAttribute("publisherId", doc.getPublisherId());
+			rec.setAttribute(PUBLISHER_ID, doc.getPublisherId());
 			rec.setAttribute("creator", doc.getCreator());
-			rec.setAttribute("creatorId", doc.getCreatorId());
-			rec.setAttribute("created", doc.getCreation());
+			rec.setAttribute(CREATOR_ID, doc.getCreatorId());
+			rec.setAttribute(CREATED, doc.getCreation());
 			rec.setAttribute("customId", doc.getCustomId());
 			rec.setAttribute("type", doc.getType());
-			rec.setAttribute("immutable", doc.getImmutable());
-			rec.setAttribute("password", doc.isPasswordProtected());
-			rec.setAttribute("signed", doc.getSigned());
-			rec.setAttribute("stamped", doc.getStamped());
+			rec.setAttribute(IMMUTABLE, doc.getImmutable());
+			rec.setAttribute(PASSWORD, doc.isPasswordProtected());
+			rec.setAttribute(SIGNED, doc.getSigned());
+			rec.setAttribute(STAMPED, doc.getStamped());
 			rec.setAttribute("fileVersion", doc.getFileVersion());
 			rec.setAttribute("version", doc.getVersion());
-			rec.setAttribute("comment", doc.getComment());
-			rec.setAttribute("workflowStatus", doc.getWorkflowStatus());
-			rec.setAttribute("workflowStatusDisplay", doc.getWorkflowStatusDisplay());
+			rec.setAttribute(COMMENT, doc.getComment());
+			rec.setAttribute(WORKFLOW_STATUS, doc.getWorkflowStatus());
+			rec.setAttribute(WORKFLOW_STATUS_DISPLAY, doc.getWorkflowStatusDisplay());
 			rec.setAttribute("color", doc.getColor());
 			rec.setAttribute("startPublishing", doc.getStartPublishing());
 			rec.setAttribute("stopPublishing", doc.getStopPublishing());
 			rec.setAttribute("publishedStatus", doc.getPublished() == 1 ? "yes" : "no");
 			rec.setAttribute("score", doc.getScore());
-			rec.setAttribute("summary", doc.getSummary());
+			rec.setAttribute(SUMMARY, doc.getSummary());
 			rec.setAttribute("rating", doc.getRating());
 			rec.setAttribute("template", doc.getTemplate());
-			rec.setAttribute("lockUserId", doc.getLockUserId());
-			rec.setAttribute("lockUser", doc.getLockUser());
-			rec.setAttribute("indexed", doc.getIndexed());
-			rec.setAttribute("status", doc.getStatus());
-			rec.setAttribute("bookmarked", doc.isBookmarked());
+			rec.setAttribute(LOCK_USER_ID, doc.getLockUserId());
+			rec.setAttribute(LOCK_USER, doc.getLockUser());
+			rec.setAttribute(INDEXED, doc.getIndexed());
+			rec.setAttribute(STATUS, doc.getStatus());
+			rec.setAttribute(BOOKMARKED, doc.isBookmarked());
 			rec.setAttribute("extResId", doc.getExtResId());
 			rec.setAttribute("language", doc.getLanguage());
 			rec.setAttribute("links", doc.getLinks());
@@ -260,25 +311,25 @@ public class DocumentGridUtil {
 
 	private static void updateFolder(GUIDocument doc, Record rec) {
 		if (doc.getFolder() != null) {
-			rec.setAttribute("folderId", doc.getFolder().getId());
-			rec.setAttribute("folder", doc.getFolder().getName());
+			rec.setAttribute(FOLDER_ID, doc.getFolder().getId());
+			rec.setAttribute(FOLDER, doc.getFolder().getName());
 		}
 	}
 
 	private static void updateIcon(GUIDocument doc, Record rec) {
 		rec.setAttribute("icon", doc.getIcon());
-		if (rec.getAttribute("docref") != null && !rec.getAttribute("docref").isEmpty() && doc.getIcon() != null
+		if (rec.getAttribute(DOCREF) != null && !rec.getAttribute(DOCREF).isEmpty() && doc.getIcon() != null
 				&& !doc.getIcon().endsWith("-sc"))
 			rec.setAttribute("icon", doc.getIcon() + "-sc");
 	}
 
 	private static void updateDocRef(GUIDocument doc, Record rec) {
-		if (rec.getAttribute("docref") == null || rec.getAttribute("docref").isEmpty()) {
-			rec.setAttribute("docref", doc.getDocRef());
+		if (rec.getAttribute(DOCREF) == null || rec.getAttribute(DOCREF).isEmpty()) {
+			rec.setAttribute(DOCREF, doc.getDocRef());
 			rec.setAttribute("id", doc.getId());
 		} else {
 			rec.setAttribute("id", doc.getDocRef());
-			rec.setAttribute("docref", doc.getId());
+			rec.setAttribute(DOCREF, doc.getId());
 		}
 		rec.setAttribute("docrefType", doc.getDocRefType());
 	}
@@ -297,21 +348,23 @@ public class DocumentGridUtil {
 	}
 
 	public static String getSortSpec(SortSpecifier[] sortSpecifiers) {
-		String sortSpec = "";
+		StringBuilder sortSpec = new StringBuilder();
 		if (sortSpecifiers != null) {
 			for (SortSpecifier sortSpecifier : sortSpecifiers) {
 				String attribute = getDocAttribute(sortSpecifier.getAttributeAsString("property"));
 				if (attribute == null)
 					continue;
-				if (!sortSpec.isEmpty())
-					sortSpec += ",";
-				sortSpec += attribute + " "
-						+ (sortSpecifier.getAttributeAsString("direction").equalsIgnoreCase("ascending") ? "asc"
-								: "desc");
+
+				if (sortSpec.length() > 0)
+					sortSpec.append(",");
+				sortSpec.append(attribute);
+				sortSpec.append(" ");
+				sortSpec.append(
+						sortSpecifier.getAttributeAsString("direction").equalsIgnoreCase("ascending") ? "asc" : "desc");
 			}
 		}
 
-		return sortSpec;
+		return sortSpec.toString();
 	}
 
 	/**
@@ -323,17 +376,17 @@ public class DocumentGridUtil {
 	 */
 	private static String getDocAttribute(String property) {
 		String attribute;
-		if (property.equalsIgnoreCase("filename"))
+		if (property.equalsIgnoreCase(FILENAME))
 			attribute = "fileName";
 		else if (property.equalsIgnoreCase("size"))
 			attribute = "fileSize";
-		else if (property.equalsIgnoreCase("docref"))
+		else if (property.equalsIgnoreCase(DOCREF))
 			attribute = "docRef";
 		else if (property.equalsIgnoreCase("docreftype"))
 			attribute = "docRefType";
-		else if (property.equalsIgnoreCase("published"))
+		else if (property.equalsIgnoreCase(PUBLISHED))
 			attribute = "date";
-		else if (property.equalsIgnoreCase("created"))
+		else if (property.equalsIgnoreCase(CREATED))
 			attribute = "creation";
 		else if (property.equalsIgnoreCase("order"))
 			attribute = null;
@@ -359,7 +412,7 @@ public class DocumentGridUtil {
 					return Integer.parseInt(tokens[0]);
 				else if (tokens.length == 2)
 					return Integer.parseInt(tokens[1]);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				return null;
 			}
 		}
@@ -381,7 +434,7 @@ public class DocumentGridUtil {
 				String[] tokens = txt.split("\\|");
 				if (tokens.length == 2)
 					return Integer.parseInt(tokens[0]);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				return null;
 			}
 		}
@@ -404,7 +457,7 @@ public class DocumentGridUtil {
 		if (spec.startsWith("|")) {
 			try {
 				return spec.substring(spec.indexOf('('));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				return null;
 			}
 		} else

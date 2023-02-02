@@ -596,9 +596,4 @@ public class GUISettingsPanel extends AdminPanel {
 	private String trueFalse(String name) {
 		return "yes".equals(vm.getValues().get(name)) ? "true" : "false";
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj == this || this.getClass().equals(obj.getClass());
-	}
 }
