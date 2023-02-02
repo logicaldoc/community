@@ -145,8 +145,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		securityForm.setTitleOrientation(TitleOrientation.TOP);
 		securityForm.setNumCols(1);
 
-		final SpinnerItem maxInactivity = ItemFactory.newSpinnerItem("maxinactivity", "maxinactivity",
-				settings.getMaxInactivity());
+		final SpinnerItem maxInactivity = ItemFactory.newSpinnerItem("maxinactivity", settings.getMaxInactivity());
 		maxInactivity.setRequired(false);
 		maxInactivity.setHint(I18N.message("daysafteruserdisabled"));
 		maxInactivity.setWidth(50);

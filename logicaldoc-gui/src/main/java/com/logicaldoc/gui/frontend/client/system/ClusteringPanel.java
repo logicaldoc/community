@@ -79,8 +79,7 @@ public class ClusteringPanel extends AdminPanel {
 		cacheResources.setHint(I18N.message("cachesresources"));
 		cacheResources.setValue("true".equals(parameters[4].getValue()) ? "yes" : "no");
 
-		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunkSize", I18N.message("chunksize"),
-				Integer.valueOf(parameters[5].getValue()));
+		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", Integer.valueOf(parameters[5].getValue()));
 		chunkSize.setHint("MB");
 		chunkSize.setRequired(true);
 		chunkSize.setWrapTitle(false);
@@ -107,7 +106,7 @@ public class ClusteringPanel extends AdminPanel {
 					settings[3] = new GUIParameter("cluster.multicastip", vm.getValueAsString("multicastip"));
 					settings[4] = new GUIParameter("cluster.cache.resources",
 							values.get("cacheResources").equals("yes") ? "true" : "false");
-					settings[5] = new GUIParameter("cluster.chunk.size", vm.getValueAsString("chunkSize"));
+					settings[5] = new GUIParameter("cluster.chunk.size", vm.getValueAsString("chunksize"));
 
 					SettingService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
 						@Override

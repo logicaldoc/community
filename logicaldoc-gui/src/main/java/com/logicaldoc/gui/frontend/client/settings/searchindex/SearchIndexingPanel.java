@@ -503,14 +503,14 @@ public class SearchIndexingPanel extends AdminPanel {
 		});
 
 		// The optional batch
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch", this.searchEngine.getBatch());
+		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", this.searchEngine.getBatch());
 		batch.setMin(1);
 		batch.setStep(50);
 		batch.setWidth(100);
 		batch.setVisible(Session.get().isDefaultTenant());
 
 		// The number of threads
-		SpinnerItem threads = ItemFactory.newSpinnerItem("threads", "threads", this.searchEngine.getThreads());
+		SpinnerItem threads = ItemFactory.newSpinnerItem("threads", this.searchEngine.getThreads());
 		threads.setRequired(true);
 		threads.setMin(1);
 		threads.setStep(1);
@@ -525,7 +525,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		timeout.setStep(10);
 
 		// The optional max text that will be put in the index
-		SpinnerItem maxText = ItemFactory.newSpinnerItem("maxtext", "maxtext", this.searchEngine.getMaxText());
+		SpinnerItem maxText = ItemFactory.newSpinnerItem("maxtext", this.searchEngine.getMaxText());
 		maxText.setHint(I18N.message("maxtextinindex"));
 		maxText.setWidth(100);
 		maxText.setMin(0);
@@ -533,7 +533,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		maxText.setVisible(Session.get().isDefaultTenant());
 
 		// The optional max size elaborated when parsing text files
-		SpinnerItem maxTextFileSize = ItemFactory.newSpinnerItem("maxtextfilesize", "maxtextfilesize",
+		SpinnerItem maxTextFileSize = ItemFactory.newSpinnerItem("maxtextfilesize",
 				this.searchEngine.getMaxTextFileSize());
 		maxTextFileSize.setHint(I18N.message("maxtextfilesizehint"));
 		maxTextFileSize.setWidth(100);

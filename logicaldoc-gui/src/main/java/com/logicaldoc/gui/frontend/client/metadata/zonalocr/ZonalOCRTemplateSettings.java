@@ -134,8 +134,7 @@ public class ZonalOCRTemplateSettings extends Window {
 				"" + ocrPanel.getSelectedOcrTemplate().getId());
 		id.setVisible(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch",
-				Session.get().getConfigAsInt("zonalocr.batch"));
+		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt("zonalocr.batch"));
 		batch.setStep(50);
 		batch.setMin(1);
 

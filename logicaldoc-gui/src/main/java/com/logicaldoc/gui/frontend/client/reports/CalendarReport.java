@@ -96,7 +96,7 @@ public class CalendarReport extends AdminPanel {
 		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector("status", "status");
 
 		// Max results
-		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", (Integer) null);
+		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displaymax", (Integer) null);
 		displayMax.setValue(100);
 		displayMax.setDefaultValue(100);
 		displayMax.setStep(10);
@@ -309,11 +309,11 @@ public class CalendarReport extends AdminPanel {
 
 	private int getMaxRecords(final Map<String, Object> values) {
 		int maxRecords = 0;
-		if (values.get("displayMax") != null) {
-			if (values.get("displayMax") instanceof Integer)
-				maxRecords = (Integer) values.get("displayMax");
+		if (values.get("displaymax") != null) {
+			if (values.get("displaymax") instanceof Integer)
+				maxRecords = (Integer) values.get("displaymax");
 			else
-				maxRecords = Integer.parseInt((String) values.get("displayMax"));
+				maxRecords = Integer.parseInt((String) values.get("displaymax"));
 		}
 		return maxRecords;
 	}

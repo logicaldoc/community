@@ -118,7 +118,7 @@ public class AntivirusPanel extends VLayout {
 		TextItem excludes = ItemFactory.newTextItem("excludes", "exclude", null);
 		excludes.setWidth(400);
 
-		TextItem timeout = ItemFactory.newSpinnerItem("timeout", "timeout", (Integer) null);
+		TextItem timeout = ItemFactory.newSpinnerItem("timeout", (Integer) null);
 		timeout.setHint(I18N.message("seconds"));
 
 		for (GUIParameter setting : settings) {

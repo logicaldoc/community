@@ -141,13 +141,13 @@ public class LDAPServerDetailsPanel extends VLayout {
 		groupExclude.setWidth(300);
 
 		// Page size
-		SpinnerItem pageSize = ItemFactory.newSpinnerItem("pagesize", "pagesize", this.server.getPageSize());
+		SpinnerItem pageSize = ItemFactory.newSpinnerItem("pagesize", this.server.getPageSize());
 		pageSize.setRequired(true);
 		pageSize.setMin(0);
 		pageSize.setStep(50);
 
 		// Timepout
-		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", "timeout", this.server.getTimeout());
+		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", this.server.getTimeout());
 		timeout.setRequired(true);
 		timeout.setMin(1);
 		timeout.setStep(5);

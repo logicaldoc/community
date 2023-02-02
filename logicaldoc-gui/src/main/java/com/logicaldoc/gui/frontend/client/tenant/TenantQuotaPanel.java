@@ -69,7 +69,7 @@ public class TenantQuotaPanel extends HLayout {
 
 		layout.addMember(form, 1);
 
-		SpinnerItem usersQuota = ItemFactory.newSpinnerItem("usersquota", "usersquota", tenant.getMaxUsers());
+		SpinnerItem usersQuota = ItemFactory.newSpinnerItem("usersquota", tenant.getMaxUsers());
 		usersQuota.setDisabled(readonly);
 		usersQuota.setRequired(false);
 		usersQuota.setMin((double) tenant.getUsers());
@@ -88,8 +88,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			guestsQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem("sessionsquota", "sessionsquota",
-				tenant.getMaxSessions());
+		SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem("sessionsquota", tenant.getMaxSessions());
 		sessionsQuota.setDisabled(readonly);
 		sessionsQuota.setRequired(false);
 		sessionsQuota.setMin(0);

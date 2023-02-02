@@ -116,7 +116,7 @@ public class WorkflowDashlet extends Portlet {
 		maxSelector.setNumCols(1);
 		maxSelector.setLayoutAlign(Alignment.CENTER);
 
-		max = ItemFactory.newSpinnerItem("max", "max", Session.get().getConfigAsInt("gui.wf.dashlet.rows"));
+		max = ItemFactory.newSpinnerItem("max", Session.get().getConfigAsInt("gui.wf.dashlet.rows"));
 		max.setMin(0);
 		max.setStep(10);
 		max.setShowHint(false);

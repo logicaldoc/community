@@ -190,7 +190,7 @@ public class DashletEditor extends Window {
 		title.setRequired(true);
 		title.setDisabled(dashlet.isSystemDashlet());
 
-		max = ItemFactory.newSpinnerItem("max", "max", dashlet.getMax() != null ? dashlet.getMax() : 1);
+		max = ItemFactory.newSpinnerItem("max", dashlet.getMax() != null ? dashlet.getMax() : 1);
 		max.setMin(1);
 		max.setRequired(true);
 

@@ -236,8 +236,7 @@ public class TenantKeystorePanel extends VLayout {
 	}
 
 	private SpinnerItem prepareValiditySpinner() {
-		SpinnerItem validity = ItemFactory.newSpinnerItem("validity", "validity",
-				keystore != null ? keystore.getValidity() : 2);
+		SpinnerItem validity = ItemFactory.newSpinnerItem("validity", keystore != null ? keystore.getValidity() : 2);
 		validity.setHint(I18N.message("years"));
 		validity.setRequired(true);
 		validity.setMin(1);

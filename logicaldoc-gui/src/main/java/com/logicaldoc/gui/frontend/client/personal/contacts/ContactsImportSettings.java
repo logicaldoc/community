@@ -61,31 +61,31 @@ public class ContactsImportSettings extends Window {
 		RadioGroupItem skip = ItemFactory.newBooleanSelector("skipfirstrow", "skipfirstrow");
 		skip.setValue("yes");
 
-		SpinnerItem firstName = ItemFactory.newSpinnerItem("firstname", "firstname", 1);
+		SpinnerItem firstName = ItemFactory.newSpinnerItem("firstname", 1);
 		firstName.setRequired(true);
 		firstName.setWidth(60);
 		firstName.setMin(1);
 		firstName.setHint(I18N.message("columnindex"));
 
-		SpinnerItem lastName = ItemFactory.newSpinnerItem("lastname", "lastname", 2);
+		SpinnerItem lastName = ItemFactory.newSpinnerItem("lastname", 2);
 		lastName.setRequired(true);
 		lastName.setWidth(60);
 		lastName.setMin(1);
 		lastName.setHint(I18N.message("columnindex"));
 
-		SpinnerItem email = ItemFactory.newSpinnerItem("email", "email", 3);
+		SpinnerItem email = ItemFactory.newSpinnerItem("email", 3);
 		email.setRequired(true);
 		email.setWidth(60);
 		email.setMin(1);
 		email.setHint(I18N.message("columnindex"));
 
-		SpinnerItem company = ItemFactory.newSpinnerItem("company", "company", 4);
+		SpinnerItem company = ItemFactory.newSpinnerItem("company", 4);
 		company.setRequired(true);
 		company.setWidth(60);
 		company.setMin(1);
 		company.setHint(I18N.message("columnindex"));
 
-		SpinnerItem phone = ItemFactory.newSpinnerItem("phone", "phone", 5);
+		SpinnerItem phone = ItemFactory.newSpinnerItem("phone", 5);
 		phone.setRequired(true);
 		phone.setWidth(60);
 		phone.setMin(1);
@@ -97,7 +97,7 @@ public class ContactsImportSettings extends Window {
 		mobile.setMin(1);
 		mobile.setHint(I18N.message("columnindex"));
 
-		SpinnerItem address = ItemFactory.newSpinnerItem("address", "address", 7);
+		SpinnerItem address = ItemFactory.newSpinnerItem("address", 7);
 		address.setRequired(true);
 		address.setWidth(60);
 		address.setMin(1);

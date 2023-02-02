@@ -486,7 +486,7 @@ public class TaskEditor extends Window {
 			requiresNote.setWrapTitle(false);
 			requiresNote.setDefaultValue(this.state.isRequiresNote() ? "yes" : "no");
 
-			SpinnerItem minNoteSize = ItemFactory.newSpinnerItem("minNoteSize", "minnotesize",
+			SpinnerItem minNoteSize = ItemFactory.newSpinnerItem("minnotesize",
 					this.state.getMinNoteSize() != null && this.state.getMinNoteSize() > 0 ? this.state.getMinNoteSize()
 							: null);
 			minNoteSize.setMin(0);
@@ -570,7 +570,7 @@ public class TaskEditor extends Window {
 
 		if (state.getType() == GUIWFState.TYPE_TASK) {
 			TaskEditor.this.state.setRequiresNote("yes".equals(values.get("requiresNote")));
-			TaskEditor.this.state.setMinNoteSize((Integer) values.get("minNoteSize"));
+			TaskEditor.this.state.setMinNoteSize((Integer) values.get("minnotesize"));
 			TaskEditor.this.state.setDueDateNumber((Integer) values.get("duedateNumber"));
 			TaskEditor.this.state.setDueDateUnit((String) values.get("duedateTime"));
 			TaskEditor.this.state.setReminderNumber((Integer) values.get("remindtimeNumber"));

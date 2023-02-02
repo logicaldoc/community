@@ -164,7 +164,7 @@ public class GUIGridsPanel extends VLayout {
 		section.setCanCollapse(false);
 		section.setExpanded(true);
 
-		pageSize = ItemFactory.newSpinnerItem("pagesize", I18N.message("pagesize"), Session.get().getConfigAsInt("gui.document.pagesize"));
+		pageSize = ItemFactory.newSpinnerItem("pagesize", Session.get().getConfigAsInt("gui.document.pagesize"));
 		pageSize.setRequired(true);
 		pageSize.setWrapTitle(false);
 		pageSize.setMin(5);

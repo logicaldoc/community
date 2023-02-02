@@ -95,8 +95,7 @@ public class UserSecurityPanel extends VLayout {
 	}
 
 	private SpinnerItem prepareMaxInactivitySpinner(boolean readonly) {
-		SpinnerItem maxInactivity = ItemFactory.newSpinnerItem("maxinactivity", "maxinactivity",
-				user.getMaxInactivity());
+		SpinnerItem maxInactivity = ItemFactory.newSpinnerItem("maxinactivity", user.getMaxInactivity());
 		maxInactivity.setRequired(false);
 		maxInactivity.setHint(I18N.message("days"));
 		maxInactivity.setWidth(50);

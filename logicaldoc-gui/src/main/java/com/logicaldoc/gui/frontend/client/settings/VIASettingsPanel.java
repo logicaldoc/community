@@ -102,8 +102,7 @@ public class VIASettingsPanel extends AdminPanel {
 		enabled.setRequired(true);
 		enabled.setValue(settings.isEnabled() ? "yes" : "no");
 
-		SpinnerItem maxAttachments = ItemFactory.newSpinnerItem("maxattachments", "maxattachments",
-				settings.getMaxAttachments());
+		SpinnerItem maxAttachments = ItemFactory.newSpinnerItem("maxattachments", settings.getMaxAttachments());
 		maxAttachments.setMin(0);
 		maxAttachments.setStep(1);
 		maxAttachments.setWrapTitle(false);

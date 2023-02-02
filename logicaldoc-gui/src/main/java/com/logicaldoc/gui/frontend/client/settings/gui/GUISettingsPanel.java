@@ -120,7 +120,7 @@ public class GUISettingsPanel extends AdminPanel {
 		previewSize.setMin(1);
 		previewSize.setStep(10);
 
-		SpinnerItem previewTimeout = ItemFactory.newSpinnerItem("previewtimeout", "previewtimeout",
+		SpinnerItem previewTimeout = ItemFactory.newSpinnerItem("previewtimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.timeout").trim()));
 		previewTimeout.setHint(I18N.message("seconds"));
 		previewTimeout.setWrapTitle(false);
@@ -214,7 +214,7 @@ public class GUISettingsPanel extends AdminPanel {
 		attrTextBoxW.setStep(50);
 		attrTextBoxW.setMin(50);
 
-		SpinnerItem noteMaxSize = ItemFactory.newSpinnerItem("notemaxsize", I18N.message("notemaxsize"),
+		SpinnerItem noteMaxSize = ItemFactory.newSpinnerItem("notemaxsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.note.maxlength").trim()));
 		noteMaxSize.setHint(I18N.message("chars").toLowerCase());
 		noteMaxSize.setRequired(true);
@@ -223,7 +223,7 @@ public class GUISettingsPanel extends AdminPanel {
 		noteMaxSize.setMin(0);
 		noteMaxSize.setWidth(70);
 
-		SpinnerItem emailMaxSize = ItemFactory.newSpinnerItem("emailmaxsize", "emailmaxsize",
+		SpinnerItem emailMaxSize = ItemFactory.newSpinnerItem("emailmaxsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.email.maxlength").trim()));
 		emailMaxSize.setHint(I18N.message("chars").toLowerCase());
 		emailMaxSize.setRequired(true);
@@ -232,7 +232,7 @@ public class GUISettingsPanel extends AdminPanel {
 		emailMaxSize.setMin(0);
 		emailMaxSize.setWidth(70);
 
-		SpinnerItem thumbSize = ItemFactory.newSpinnerItem("thumbsize", "thumbsize",
+		SpinnerItem thumbSize = ItemFactory.newSpinnerItem("thumbsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.size").trim()));
 		thumbSize.setHint("pixels");
 		thumbSize.setRequired(true);
@@ -240,7 +240,7 @@ public class GUISettingsPanel extends AdminPanel {
 		thumbSize.setMin(10);
 		thumbSize.setStep(10);
 
-		SpinnerItem thumbQuality = ItemFactory.newSpinnerItem("thumbquality", "thumbquality",
+		SpinnerItem thumbQuality = ItemFactory.newSpinnerItem("thumbquality",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.quality").trim()));
 		thumbQuality.setHint("%");
 		thumbQuality.setRequired(true);
@@ -249,7 +249,7 @@ public class GUISettingsPanel extends AdminPanel {
 		thumbQuality.setStep(10);
 		thumbQuality.setMax(100);
 
-		SpinnerItem mobileSize = ItemFactory.newSpinnerItem("mobilesize", "mobilesize",
+		SpinnerItem mobileSize = ItemFactory.newSpinnerItem("mobilesize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.size").trim()));
 		mobileSize.setHint("pixels");
 		mobileSize.setRequired(true);
@@ -257,7 +257,7 @@ public class GUISettingsPanel extends AdminPanel {
 		mobileSize.setMin(10);
 		mobileSize.setStep(10);
 
-		SpinnerItem mobileQuality = ItemFactory.newSpinnerItem("mobilequality", "mobilequality",
+		SpinnerItem mobileQuality = ItemFactory.newSpinnerItem("mobilequality",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.quality").trim()));
 		mobileQuality.setHint("%");
 		mobileQuality.setRequired(true);
@@ -265,14 +265,14 @@ public class GUISettingsPanel extends AdminPanel {
 		mobileQuality.setMin(1);
 		mobileQuality.setStep(10);
 
-		SpinnerItem tileSize = ItemFactory.newSpinnerItem("tilesize", "tilesize",
+		SpinnerItem tileSize = ItemFactory.newSpinnerItem("tilesize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.size").trim()));
 		tileSize.setHint("pixels");
 		tileSize.setRequired(true);
 		tileSize.setMin(1);
 		tileSize.setStep(10);
 
-		SpinnerItem tileQuality = ItemFactory.newSpinnerItem("tilequality", "tilequality",
+		SpinnerItem tileQuality = ItemFactory.newSpinnerItem("tilequality",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.quality").trim()));
 		tileQuality.setHint("%");
 		tileQuality.setRequired(true);
@@ -281,7 +281,7 @@ public class GUISettingsPanel extends AdminPanel {
 		tileQuality.setStep(10);
 		tileQuality.setMax(100);
 
-		SpinnerItem uploadMax = ItemFactory.newSpinnerItem("uploadmax", "uploadmax",
+		SpinnerItem uploadMax = ItemFactory.newSpinnerItem("uploadmax",
 				Integer.parseInt(Util.getParameterValue(settings, "upload.maxsize").trim()));
 		uploadMax.setHint("MB");
 		uploadMax.setRequired(true);
@@ -290,7 +290,7 @@ public class GUISettingsPanel extends AdminPanel {
 		uploadMax.setStep(10);
 		uploadMax.setWidth(70);
 
-		SpinnerItem previewMaxFileSize = ItemFactory.newSpinnerItem("previewmaxfilesize", "previewmaxfilesize",
+		SpinnerItem previewMaxFileSize = ItemFactory.newSpinnerItem("previewmaxfilesize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.maxfilesize").trim()));
 		previewMaxFileSize.setHint("MB");
 		previewMaxFileSize.setRequired(true);
@@ -342,11 +342,11 @@ public class GUISettingsPanel extends AdminPanel {
 		foldOpenSelect.setWrapTitle(false);
 		foldOpenSelect.setValue(yesNo(settings, "gui.folder.openonselect"));
 
-		SpinnerItem foldMaxChildren = ItemFactory.newSpinnerItem("foldmaxchildren", I18N.message("foldmaxchildren"),
+		SpinnerItem foldMaxChildren = ItemFactory.newSpinnerItem("foldmaxchildren",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.folder.maxchildren").trim()));
 		foldMaxChildren.setWrapTitle(false);
 
-		SpinnerItem maxHistories = ItemFactory.newSpinnerItem("maxhistories", I18N.message("maxhistories"),
+		SpinnerItem maxHistories = ItemFactory.newSpinnerItem("maxhistories",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.maxhistories").trim()));
 		maxHistories.setStep(10);
 		maxHistories.setWrapTitle(false);
@@ -373,7 +373,7 @@ public class GUISettingsPanel extends AdminPanel {
 		webcontentFolders.setHint(I18N.message("commaseplistofids"));
 		webcontentFolders.setWidth(350);
 
-		SpinnerItem sessionTimeout = ItemFactory.newSpinnerItem("sessiontimeout", "sessiontimeout",
+		SpinnerItem sessionTimeout = ItemFactory.newSpinnerItem("sessiontimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "session.timeout").trim()));
 		sessionTimeout.setHint(I18N.message("minutes"));
 		sessionTimeout.setRequired(true);
@@ -381,7 +381,7 @@ public class GUISettingsPanel extends AdminPanel {
 		sessionTimeout.setMin(1);
 		sessionTimeout.setStep(5);
 
-		SpinnerItem rpcTimeout = ItemFactory.newSpinnerItem("rpctimeout", "rpctimeout",
+		SpinnerItem rpcTimeout = ItemFactory.newSpinnerItem("rpctimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.rpc.timeout").trim()));
 		rpcTimeout.setHint(I18N.message("minutes"));
 		rpcTimeout.setRequired(true);
@@ -389,7 +389,7 @@ public class GUISettingsPanel extends AdminPanel {
 		rpcTimeout.setMin(1);
 		rpcTimeout.setStep(1);
 
-		SpinnerItem sessionHeartbeat = ItemFactory.newSpinnerItem("sessionheartbeat", "sessionheartbeat",
+		SpinnerItem sessionHeartbeat = ItemFactory.newSpinnerItem("sessionheartbeat",
 				Integer.parseInt(Util.getParameterValue(settings, "session.heartbeat").trim()));
 		sessionHeartbeat.setHint(I18N.message("seconds"));
 		sessionHeartbeat.setRequired(true);
@@ -397,7 +397,7 @@ public class GUISettingsPanel extends AdminPanel {
 		sessionHeartbeat.setMin(0);
 		sessionHeartbeat.setStep(10);
 
-		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout", "popuptimeout",
+		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.popup.timeout").trim()));
 		popupTimeout.setHint(I18N.message("seconds"));
 		popupTimeout.setRequired(true);
@@ -414,7 +414,7 @@ public class GUISettingsPanel extends AdminPanel {
 		lockOnEditing.setWrapTitle(false);
 		lockOnEditing.setValue(yesNo(settings, "gui.onedit.lock"));
 
-		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize", "avatarsize",
+		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.avatar.size").trim()));
 		avatarSize.setHint("pixels");
 		avatarSize.setRequired(true);
@@ -422,7 +422,7 @@ public class GUISettingsPanel extends AdminPanel {
 		avatarSize.setStep(16);
 		avatarSize.setMin(16);
 
-		SpinnerItem wfDashletRows = ItemFactory.newSpinnerItem("wfDashletRows", "wfdashletrows",
+		SpinnerItem wfDashletRows = ItemFactory.newSpinnerItem("wfdashletrows",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.wf.dashlet.rows").trim()));
 		wfDashletRows.setRequired(true);
 		wfDashletRows.setWrapTitle(false);
@@ -550,7 +550,7 @@ public class GUISettingsPanel extends AdminPanel {
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.avatar.size",
 				values.get("avatarsize").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.wf.dashlet.rows",
-				values.get("wfDashletRows").toString()));
+				values.get("wfdashletrows").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".charset", values.get("charset").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption.default",
 				values.get("securityoptiondef").toString()));
