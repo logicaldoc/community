@@ -75,7 +75,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.FormItemValueFormatter;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
@@ -112,7 +111,6 @@ import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 import com.smartgwt.client.widgets.form.validator.IsFloatValidator;
 import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -123,6 +121,38 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @since 6.0
  */
 public class ItemFactory {
+
+	private static final String EAN_8 = "EAN_8";
+
+	private static final String SPAN_STYLE_COLOR_RED = "<span style='color:red;'>";
+
+	private static final String CLOSE_SPAN = "</span>";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String CONVERTER = "converter";
+
+	private static final String EENABLED = "eenabled";
+
+	private static final String COMPARATOR = "comparator";
+
+	private static final String LABEL = "label";
+
+	private static final String QR_CODE = "QR_CODE";
+
+	private static final String UPC_A = "UPC_A";
+
+	private static final String ITF = "ITF";
+
+	private static final String CODE_128 = "CODE_128";
+
+	private static final String CODE_39 = "CODE_39";
+
+	private static final String EAN_13 = "EAN_13";
+
+	private static final String DOCUMENT = "document";
+
+	private static final String DEFAULT = "default";
 
 	static {
 		DateRangeDialog dialog = new DateRangeDialog();
@@ -279,7 +309,7 @@ public class ItemFactory {
 
 	public static ColorPickerItem newColorItemPicker(String name, String title, String value, boolean clearOption,
 			ChangedHandler changedHandler) {
-		ColorPickerItem item = new ColorPickerItem(filterItemName(name));
+		ColorPickerItem item = new ColorPickerItem(originalItemName(name));
 
 		if (title != null)
 			item.setTitle(I18N.message(title));
@@ -290,13 +320,10 @@ public class ItemFactory {
 			item.setValue(value);
 
 		if (clearOption) {
-			PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					item.setValue((String) null);
-					if (changedHandler != null)
-						changedHandler.onChanged(null);
-				}
+			PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+				item.setValue((String) null);
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
 			});
 			item.setIcons(clear);
 			item.setIconVAlign(VerticalAlignment.CENTER);
@@ -316,7 +343,7 @@ public class ItemFactory {
 	 * @return the new item
 	 */
 	public static DateItem newDateItem(String name, String title) {
-		DateItem date = new DateItem(filterItemName(name));
+		DateItem date = new DateItem(originalItemName(name));
 		if (title != null)
 			date.setTitle(I18N.message(title));
 		else
@@ -341,7 +368,7 @@ public class ItemFactory {
 	}
 
 	public static MiniDateRangeItem newMiniDateRangeItem(String name, String title) {
-		final MiniDateRangeItem date = new MiniDateRangeItem(filterItemName(name));
+		final MiniDateRangeItem date = new MiniDateRangeItem(originalItemName(name));
 		if (title != null)
 			date.setTitle(I18N.message(title));
 		else
@@ -382,19 +409,18 @@ public class ItemFactory {
 
 	public static SelectItem newUserSelectorForAttribute(String name, String title, String groupIdOrName,
 			List<FormItemIcon> additionalIcons) {
-		final SelectItem item = new UserSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), title,
-				groupIdOrName, false, true, additionalIcons);
-		return item;
+		return new UserSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), title, groupIdOrName, false, true,
+				additionalIcons);
 	}
 
 	public static SelectItem newRecipientTypeSelector(String name) {
 		SelectItem selector = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("to", I18N.message("to").toUpperCase());
 		opts.put("cc", I18N.message("cc").toUpperCase());
 		opts.put("bcc", I18N.message("bcc").toUpperCase());
 		selector.setValueMap(opts);
-		selector.setName(filterItemName(name));
+		selector.setName(originalItemName(name));
 		selector.setShowTitle(false);
 		selector.setValue("to");
 		selector.setRequired(true);
@@ -403,11 +429,11 @@ public class ItemFactory {
 
 	public static SelectItem newUserTypeSelector(String name, int userType) {
 		SelectItem selector = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
-		opts.put("" + GUIUser.TYPE_DEFAULT, I18N.message("default"));
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+		opts.put("" + GUIUser.TYPE_DEFAULT, I18N.message(DEFAULT));
 		opts.put("" + GUIUser.TYPE_READONLY, I18N.message("readonly"));
 		selector.setValueMap(opts);
-		selector.setName(filterItemName(name));
+		selector.setName(originalItemName(name));
 		selector.setTitle(I18N.message("usertype"));
 		selector.setValue("" + userType);
 		selector.setRequired(true);
@@ -417,8 +443,8 @@ public class ItemFactory {
 
 	public static SelectItem newDashletTypeSelector(String value) {
 		SelectItem selector = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
-		opts.put("document", I18N.message("dashlet.type.document"));
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+		opts.put(DOCUMENT, I18N.message("dashlet.type.document"));
 		opts.put("docevent", I18N.message("dashlet.type.docevent"));
 		opts.put("note", I18N.message("dashlet.type.note"));
 		opts.put("content", I18N.message("dashlet.type.content"));
@@ -433,7 +459,7 @@ public class ItemFactory {
 
 	public static SelectItem newDensitySelector() {
 		SelectItem densitySelector = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("dense", I18N.message("dense"));
 		opts.put("compact", I18N.message("compact"));
 		opts.put("medium", I18N.message("mmedium"));
@@ -456,7 +482,7 @@ public class ItemFactory {
 		skinSelector.setName("skin");
 		skinSelector.setTitle(I18N.message("skin"));
 		skinSelector.setValueField("name");
-		skinSelector.setDisplayField("label");
+		skinSelector.setDisplayField(LABEL);
 		skinSelector.setOptionDataSource(new SkinsDS());
 
 		if (Session.get() != null && Session.get().getInfo().getBranding() != null)
@@ -467,11 +493,11 @@ public class ItemFactory {
 
 	public static SelectItem newDateOperator(String name, String title) {
 		SelectItem dateOperator = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("before", I18N.message("before"));
 		opts.put("after", I18N.message("after"));
 		dateOperator.setValueMap(opts);
-		dateOperator.setName(filterItemName(name));
+		dateOperator.setName(originalItemName(name));
 		if (title != null)
 			dateOperator.setTitle(I18N.message(title));
 		else
@@ -482,11 +508,11 @@ public class ItemFactory {
 
 	public static SelectItem newSizeOperator(String name, String title) {
 		SelectItem item = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("lessthan", I18N.message("lessthan"));
 		opts.put("greaterthan", I18N.message("greaterthan"));
 		item.setValueMap(opts);
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		if (title != null)
 			item.setTitle(I18N.message(title));
 		else
@@ -500,14 +526,14 @@ public class ItemFactory {
 		item.setWrapTitle(false);
 		item.setWidth(110);
 
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
-		opts.put("CODE_128", "CODE_128");
-		opts.put("CODE_39", "CODE_39");
-		opts.put("EAN_13", "EAN_13");
-		opts.put("EAN_8", "EAN_8");
-		opts.put("ITF", "ITF");
-		opts.put("UPC_A", "UPC_A");
-		opts.put("QR_CODE", "QR_CODE");
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+		opts.put(CODE_128, CODE_128);
+		opts.put(CODE_39, CODE_39);
+		opts.put(EAN_13, EAN_13);
+		opts.put(EAN_8, EAN_8);
+		opts.put(ITF, ITF);
+		opts.put(UPC_A, UPC_A);
+		opts.put(QR_CODE, QR_CODE);
 
 		item.setValueMap(opts);
 
@@ -523,7 +549,7 @@ public class ItemFactory {
 			item.setValueMap(I18N.getSupportedGuiLanguages(withEmpty));
 		else
 			item.setValueMap(I18N.getSupportedLanguages(withEmpty));
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message("language"));
 		item.setWrapTitle(false);
 		item.setWidth(120);
@@ -532,7 +558,7 @@ public class ItemFactory {
 
 	public static ComboBoxItem newTimeZoneSelector(String name, String title, String value) {
 		ComboBoxItem item = new ComboBoxItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		item.setWrapTitle(false);
 		item.setDisplayField("id");
@@ -551,7 +577,7 @@ public class ItemFactory {
 
 	public static SelectItem newCharsetSelector(String name) {
 		SelectItem item = new SelectItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message("charset"));
 		item.setWrapTitle(false);
 		item.setDefaultValue("UTF-8");
@@ -575,7 +601,7 @@ public class ItemFactory {
 
 	public static SelectItem newStorageSelector(String name, Integer value) {
 		SelectItem item = new SelectItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message("storage"));
 		item.setWrapTitle(false);
 		item.setDisplayField("name");
@@ -607,7 +633,7 @@ public class ItemFactory {
 
 	public static SelectItem newAnnotationShapeSelector(String value) {
 		SelectItem selector = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("square", I18N.message("square"));
 		opts.put("circle", I18N.message("circle"));
 		opts.put("line", I18N.message("line"));
@@ -626,40 +652,34 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newComparatorSelector(String inExt) {
-		SelectItem item = new SelectItem("comparator", I18N.message("comparator"));
+		SelectItem item = new SelectItem(COMPARATOR, I18N.message(COMPARATOR));
 		item.setWidth(150);
 		item.setWrapTitle(false);
 		item.setMultiple(false);
-		item.setDisplayField("label");
-		item.setValueField("comparator");
+		item.setDisplayField(LABEL);
+		item.setValueField(COMPARATOR);
 		item.setOptionDataSource(new ComparatorsDS(inExt));
 
-		item.setValueFormatter(new FormItemValueFormatter() {
+		item.setValueFormatter((Object value, Record rec, DynamicForm form, FormItem formItem) -> {
+			ListGridRecord r = formItem.getSelectedRecord();
+			String label = r.getAttribute(LABEL);
+			if (label == null || "".equals(label))
+				return null;
 
-			@Override
-			public String formatValue(Object value, Record record, DynamicForm form, FormItem item) {
-				ListGridRecord r = item.getSelectedRecord();
-				String label = r.getAttribute("label");
-				if (label == null || "".equals(label))
-					return null;
-
-				if (r.getAttribute("eenabled") != null && !r.getAttributeAsBoolean("eenabled"))
-					label = "<span style='color:red;'>" + label + "</span>";
-				return label;
-			}
+			if (r.getAttribute(EENABLED) != null && !r.getAttributeAsBoolean(EENABLED))
+				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
+			return label;
 		});
 
-		ListGridField f = new ListGridField("label");
-		f.setCellFormatter(new CellFormatter() {
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String label = record.getAttribute("label");
-				if (label == null || "".equals(label))
-					return null;
+		ListGridField f = new ListGridField(LABEL);
+		f.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			String label = rec.getAttribute(LABEL);
+			if (label == null || "".equals(label))
+				return null;
 
-				if (record.getAttribute("eenabled") != null && !record.getAttributeAsBoolean("eenabled"))
-					label = "<span style='color:red;'>" + label + "</span>";
-				return label;
-			}
+			if (rec.getAttribute(EENABLED) != null && !rec.getAttributeAsBoolean(EENABLED))
+				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
+			return label;
 		});
 		item.setPickListFields(f);
 
@@ -671,40 +691,34 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newFormatConverterSelector(String inExt, String outExt) {
-		SelectItem item = new SelectItem("converter", I18N.message("converter"));
+		SelectItem item = new SelectItem(CONVERTER, I18N.message(CONVERTER));
 		item.setWidth(150);
 		item.setWrapTitle(false);
 		item.setMultiple(false);
-		item.setDisplayField("label");
-		item.setValueField("converter");
+		item.setDisplayField(LABEL);
+		item.setValueField(CONVERTER);
 		item.setOptionDataSource(new FormatConvertersDS(inExt, outExt));
 
-		item.setValueFormatter(new FormItemValueFormatter() {
+		item.setValueFormatter((Object value, Record rec, DynamicForm form, FormItem itm) -> {
+			ListGridRecord r = itm.getSelectedRecord();
+			String label = r.getAttribute(LABEL);
+			if (label == null || "".equals(label))
+				return null;
 
-			@Override
-			public String formatValue(Object value, Record record, DynamicForm form, FormItem item) {
-				ListGridRecord r = item.getSelectedRecord();
-				String label = r.getAttribute("label");
-				if (label == null || "".equals(label))
-					return null;
-
-				if (r.getAttribute("eenabled") != null && !r.getAttributeAsBoolean("eenabled"))
-					label = "<span style='color:red;'>" + label + "</span>";
-				return label;
-			}
+			if (r.getAttribute(EENABLED) != null && !r.getAttributeAsBoolean(EENABLED))
+				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
+			return label;
 		});
 
-		ListGridField f = new ListGridField("label");
-		f.setCellFormatter(new CellFormatter() {
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String label = record.getAttribute("label");
-				if (label == null || "".equals(label))
-					return null;
+		ListGridField f = new ListGridField(LABEL);
+		f.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			String label = rec.getAttribute(LABEL);
+			if (label == null || "".equals(label))
+				return null;
 
-				if (record.getAttribute("eenabled") != null && !record.getAttributeAsBoolean("eenabled"))
-					label = "<span style='color:red;'>" + label + "</span>";
-				return label;
-			}
+			if (rec.getAttribute(EENABLED) != null && !rec.getAttributeAsBoolean(EENABLED))
+				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
+			return label;
 		});
 		item.setPickListFields(f);
 
@@ -713,7 +727,7 @@ public class ItemFactory {
 
 	public static TextItem newEmailItem(String name, String title, boolean multiple) {
 		TextItem item = new TextItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		if (title != null)
 			item.setTitle(I18N.message(title));
 		else
@@ -729,7 +743,7 @@ public class ItemFactory {
 	}
 
 	public static ComboBoxItem newEmailComboSelector(String name, String title) {
-		final ComboBoxItem selector = new ComboBoxItem(filterItemName(name));
+		final ComboBoxItem selector = new ComboBoxItem(originalItemName(name));
 		selector.setTitle(I18N.message(title));
 		selector.setWrapTitle(false);
 		selector.setValueField("email");
@@ -749,7 +763,7 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newEmailSelector(String name, String title) {
-		final SelectItem selector = new SelectItem(filterItemName(name));
+		final SelectItem selector = new SelectItem(originalItemName(name));
 		selector.setTitle(I18N.message(title));
 		selector.setWrapTitle(false);
 		selector.setValueField("email");
@@ -769,7 +783,7 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newEmailFromSelector(String name, String title) {
-		final SelectItem selector = new SelectItem(filterItemName(name));
+		final SelectItem selector = new SelectItem(originalItemName(name));
 		if (title != null)
 			selector.setTitle(I18N.message(title));
 		else
@@ -791,14 +805,14 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newGroupSelector(String name, String title) {
-		SelectItem group = new SelectItem(filterItemName(name));
+		SelectItem group = new SelectItem(originalItemName(name));
 		group.setTitle(I18N.message(title));
 		group.setWrapTitle(false);
 		group.setValueField("id");
 		group.setDisplayField("name");
 		group.setPickListWidth(300);
 		ListGridField n = new ListGridField("name", I18N.message("name"));
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		group.setPickListFields(n, description);
 		group.setOptionDataSource(new GroupsDS());
 		return group;
@@ -832,7 +846,7 @@ public class ItemFactory {
 
 	public static SelectItem newAutomationRoutineSelector(String name, Long value, final ChangedHandler handler,
 			boolean showEmpty) {
-		final SelectItem select = newSelectItem(filterItemName(name), "routine");
+		final SelectItem select = newSelectItem(originalItemName(name), "routine");
 		select.setValueField("id");
 		select.setDisplayField("name");
 		select.setEmptyDisplayValue(I18N.message("customcode"));
@@ -840,7 +854,7 @@ public class ItemFactory {
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setHidden(true);
 		ListGridField _name = new ListGridField("name", I18N.message("name"));
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		select.setPickListFields(id, _name, description);
 		select.setPickListWidth(250);
 		select.setOptionDataSource(new AutomationRoutinesDS(showEmpty));
@@ -865,7 +879,7 @@ public class ItemFactory {
 
 	public static RadioGroupItem newRadioGroup(String name, String title) {
 		RadioGroupItem radioGroupItem = new RadioGroupItem();
-		radioGroupItem.setName(filterItemName(name));
+		radioGroupItem.setName(originalItemName(name));
 		radioGroupItem.setVertical(false);
 		radioGroupItem.setTitle(I18N.message(title));
 		radioGroupItem.setWidth(80);
@@ -874,7 +888,7 @@ public class ItemFactory {
 
 	public static RadioGroupItem newBooleanSelector(String name, String title) {
 		RadioGroupItem radioGroupItem = newRadioGroup(name, title);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("yes", I18N.message("yes"));
 		map.put("no", I18N.message("no"));
 		radioGroupItem.setValueMap(map);
@@ -883,7 +897,7 @@ public class ItemFactory {
 
 	public static CheckboxItem newCheckbox(String name, String title) {
 		CheckboxItem item = new CheckboxItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		return item;
 	}
@@ -934,20 +948,20 @@ public class ItemFactory {
 		closeButton.setIconOrientation("body");
 		item.setButtonProperties(closeButton);
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		map.put("CODE_39", "CODE_39");
-		map.put("CODE_128", "CODE_128");
-		map.put("EAN_8", "EAN_8");
-		map.put("EAN_13", "EAN_13");
-		map.put("QR_CODE", "QR_CODE");
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put(CODE_39, CODE_39);
+		map.put(CODE_128, CODE_128);
+		map.put(EAN_8, EAN_8);
+		map.put(EAN_13, EAN_13);
+		map.put(QR_CODE, QR_CODE);
 		map.put("AZTEC", "AZTEC");
 		map.put("CODE_93", "CODE_93");
 		map.put("RSS_14", "RSS_14");
 		map.put("RSS_EXPANDED", "RSS_EXPANDED");
-		map.put("UPC_A", "UPC_A");
+		map.put(UPC_A, UPC_A);
 		map.put("UPC_E", "UPC_E");
 		map.put("DATA_MATRIX", "DATA_MATRIX");
-		map.put("ITF", "ITF");
+		map.put(ITF, ITF);
 		map.put("PDF_417", "PDF_417");
 		map.put("CODABAR", "CODABAR");
 		map.put("MAXICODE", "MAXICODE");
@@ -973,7 +987,7 @@ public class ItemFactory {
 
 	public static SelectItem newMultipleSelector(String name, String title) {
 		SelectItem selectItemMultipleGrid = new SelectItem();
-		selectItemMultipleGrid.setName(filterItemName(name));
+		selectItemMultipleGrid.setName(originalItemName(name));
 		selectItemMultipleGrid.setTitle(I18N.message(title));
 		selectItemMultipleGrid.setMultiple(true);
 		selectItemMultipleGrid.setValueMap("");
@@ -981,8 +995,8 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newPrioritySelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), title);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		SelectItem select = new SelectItem(originalItemName(name), title);
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("low"));
 		map.put("1", I18N.message("medium"));
 		map.put("2", I18N.message("high"));
@@ -994,7 +1008,7 @@ public class ItemFactory {
 	public static SelectItem newWelcomeScreenSelector(Integer value) {
 		SelectItem select = new SelectItem("welcomescreen", I18N.message("welcomescreen"));
 		select.setWidth(150);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("1500", I18N.message("documents"));
 		map.put("1510", I18N.message("search"));
 		map.put("1520", I18N.message("dashboard"));
@@ -1007,7 +1021,7 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newDashletSelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), title);
+		SelectItem select = new SelectItem(originalItemName(name), title);
 		select.setAllowEmptyValue(false);
 		select.setOptionDataSource(new DashletsDS());
 		select.setPickListWidth(200);
@@ -1020,7 +1034,7 @@ public class ItemFactory {
 	public static SelectItem newOCRStatusSelector(Integer value) {
 		SelectItem select = new SelectItem("ocrstatus", I18N.message("processedbyzonalocr"));
 		select.setWidth(150);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("no"));
 		map.put("1", I18N.message("yes"));
 		map.put("2", I18N.message("skip"));
@@ -1035,7 +1049,7 @@ public class ItemFactory {
 	public static SelectItem newFolderSecurityOption(String name, String title) {
 		SelectItem securityOption = newSelectItem(name, title);
 		securityOption.setWidth("*");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("none", I18N.message("none").toLowerCase());
 		opts.put("inherit", I18N.message("inheritparentsec").toLowerCase());
 		opts.put("replicate", I18N.message("replicatesourcesec").toLowerCase());
@@ -1052,14 +1066,14 @@ public class ItemFactory {
 
 	public static SelectItem newEventsSelector(String name, String title, final ChangedHandler handler, boolean folder,
 			boolean workflow, boolean user, boolean importfolder) {
-		final SelectItem select = newMultipleSelector(filterItemName(name), title);
+		final SelectItem select = newMultipleSelector(originalItemName(name), title);
 		select.setWidth(350);
 		select.setHeight(250);
 		select.setMultipleAppearance(MultipleAppearance.GRID);
 		select.setMultiple(true);
 		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder));
 		select.setValueField("code");
-		select.setDisplayField("label");
+		select.setDisplayField(LABEL);
 		if (handler != null)
 			select.addChangedHandler(handler);
 
@@ -1081,12 +1095,12 @@ public class ItemFactory {
 
 	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler, boolean folder,
 			boolean workflow, boolean user, boolean importfolder) {
-		final SelectItem select = newSelectItem(filterItemName(name), title);
+		final SelectItem select = newSelectItem(originalItemName(name), title);
 		select.setWidth(350);
 		select.setMultiple(false);
 		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder));
 		select.setValueField("code");
-		select.setDisplayField("label");
+		select.setDisplayField(LABEL);
 		if (handler != null)
 			select.addChangedHandler(handler);
 
@@ -1107,7 +1121,7 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newSelectItem(String name, String title) {
-		SelectItem select = newMultipleSelector(filterItemName(name),
+		SelectItem select = newMultipleSelector(originalItemName(name),
 				title != null ? I18N.message(title) : I18N.message(name));
 		select.setMultiple(false);
 		select.setWrapTitle(false);
@@ -1126,7 +1140,7 @@ public class ItemFactory {
 
 	public static ComboBoxItem newComboBoxItem(String name, String title) {
 		ComboBoxItem item = new ComboBoxItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		item.setMultiple(true);
 		item.setValueMap("");
@@ -1136,7 +1150,7 @@ public class ItemFactory {
 
 	public static SelectItem newYesNoSelectItem(String name, String title) {
 		SelectItem item = newSelectItem(name, title);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("true", I18N.message("yes"));
 		map.put("false", I18N.message("no"));
 		item.setValueMap(map);
@@ -1280,7 +1294,7 @@ public class ItemFactory {
 	 */
 	public static TextItem newTextItem(String name, String title, String value) {
 		TextItem item = new TextItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		if (value != null)
 			item.setValue(value);
@@ -1413,8 +1427,8 @@ public class ItemFactory {
 				Record[] records = options.getCacheData();
 				boolean found = false;
 				if (records != null)
-					for (Record record : records) {
-						if (record.getAttributeAsString("value").equals(val)) {
+					for (Record rec : records) {
+						if (rec.getAttributeAsString("value").equals(val)) {
 							found = true;
 							break;
 						}
@@ -1432,7 +1446,7 @@ public class ItemFactory {
 	public static PasswordItem newPasswordItem(String name, String title, String value) {
 		PasswordItem password = new PasswordItem();
 		password.setTitle(I18N.message(title));
-		password.setName(filterItemName(name));
+		password.setName(originalItemName(name));
 		if (value != null)
 			password.setValue(value);
 		return password;
@@ -1542,7 +1556,7 @@ public class ItemFactory {
 	 * @return the new item
 	 */
 	public static TextItem newSimpleTextItem(String name, String title, String value) {
-		TextItem item = newTextItem(filterItemName(name), I18N.message(title), value);
+		TextItem item = newTextItem(originalItemName(name), I18N.message(title), value);
 		item.setValidators(new SimpleTextValidator());
 		return item;
 	}
@@ -1566,7 +1580,7 @@ public class ItemFactory {
 		StaticTextItem item = new StaticTextItem();
 		if (name.trim().isEmpty())
 			item.setShouldSaveValue(false);
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		if (value != null)
 			item.setValue(value);
@@ -1587,7 +1601,7 @@ public class ItemFactory {
 	 */
 	public static IntegerItem newLongItem(String name, String title, Long value) {
 		IntegerItem item = new IntegerItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		if (value != null)
 			item.setValue(value);
@@ -1608,7 +1622,7 @@ public class ItemFactory {
 	 */
 	public static IntegerItem newIntegerItem(String name, String title, Integer value) {
 		IntegerItem item = new IntegerItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		if (value != null)
 			item.setValue(value);
@@ -1653,7 +1667,7 @@ public class ItemFactory {
 		String itemName = "_" + name.replace(" ", Constants.BLANK_PLACEHOLDER);
 		SelectItem select = new SelectItem();
 		select.setName(itemName);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		if (allowEmpty)
 			map.put("", " ");
 
@@ -1680,7 +1694,7 @@ public class ItemFactory {
 	 */
 	public static IntegerItem newValidateIntegerItem(String name, String title, Integer value, Integer min,
 			Integer max) {
-		IntegerItem item = newIntegerItem(filterItemName(name), I18N.message(title), value);
+		IntegerItem item = newIntegerItem(originalItemName(name), I18N.message(title), value);
 		IntegerRangeValidator rv = null;
 		if (min != null || max != null) {
 			rv = new IntegerRangeValidator();
@@ -1746,7 +1760,7 @@ public class ItemFactory {
 	}
 
 	public static LinkItem newLinkItem(String name, String title) {
-		LinkItem linkItem = new LinkItem(filterItemName(name));
+		LinkItem linkItem = new LinkItem(originalItemName(name));
 		if (!title.trim().isEmpty()) {
 			linkItem.setTitle(I18N.message(title));
 			linkItem.setLinkTitle(I18N.message(title));
@@ -1766,7 +1780,7 @@ public class ItemFactory {
 	 */
 	public static TextAreaItem newTextAreaItem(String name, String title, String value) {
 		TextAreaItem item = new TextAreaItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		item.setHeight("*");
 		if (value != null)
@@ -1836,11 +1850,11 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newDueTimeSelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message(title));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(90);
 		select.setShowTitle(false);
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("minute", I18N.message("minutes"));
 		map.put("hour", I18N.message("hours"));
 		map.put("day", I18N.message("ddays"));
@@ -1951,14 +1965,14 @@ public class ItemFactory {
 		final SelectItem selectItem = new SelectItem("attributes", I18N.message("attributes"));
 		selectItem.setMultiple(true);
 		selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
-		selectItem.setDisplayField("label");
+		selectItem.setDisplayField(LABEL);
 		selectItem.setValueField("name");
 		selectItem.setPickListWidth(150);
 		selectItem.setOptionDataSource(new AttributesDS(context));
 		selectItem.setWrapTitle(false);
 
 		// Make the options ordered by label
-		SortSpecifier sp = new SortSpecifier("label", SortDirection.ASCENDING);
+		SortSpecifier sp = new SortSpecifier(LABEL, SortDirection.ASCENDING);
 		selectItem.setPickListSort(new SortSpecifier[] { sp });
 
 		return selectItem;
@@ -1969,9 +1983,9 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newFrequencySelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message(title));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", "");
 		map.put("1", I18N.message("daily"));
 		map.put("7", I18N.message("weekly"));
@@ -1986,9 +2000,9 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newCalendarEventStatusSelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message(title));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", "");
 		map.put("1", I18N.message("working"));
 		map.put("2", I18N.message("completed"));
@@ -2000,16 +2014,16 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newEmailProtocolSelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message(title));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(110);
 		select.setValueMap("pop3", "imap");
 		return select;
 	}
 
 	public static SelectItem newEmailFolderingSelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message(title));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(110);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("none"));
 		map.put("1", I18N.message("year"));
 		map.put("2", I18N.message("month"));
@@ -2019,9 +2033,9 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newEffectSelector(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message(title));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(110);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("", "");
 		map.put("move", I18N.message("move"));
 		map.put("copy", I18N.message("copy"));
@@ -2030,9 +2044,9 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newEmailFields(String name, String title) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message(title));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(110);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("subject"));
 		map.put("1", I18N.message("sender"));
 		map.put("2", I18N.message("content"));
@@ -2047,8 +2061,8 @@ public class ItemFactory {
 		item.setTitle(I18N.message("type"));
 		item.setWrapTitle(false);
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		map.put("", I18N.message("document"));
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put("", I18N.message(DOCUMENT));
 		map.put("conversion.pdf", I18N.message("pdfconversion"));
 
 		item.setValueMap(map);
@@ -2060,7 +2074,7 @@ public class ItemFactory {
 		item.setTitle("");
 		item.setRequiredMessage(I18N.message("fieldrequired"));
 		ListGridField name = new ListGridField("name", I18N.message("name"));
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		item.setValueField("id");
 		item.setDisplayField("name");
 		item.setPickListWidth(300);
@@ -2074,7 +2088,7 @@ public class ItemFactory {
 	public static SelectItem newImportCustomIds() {
 		SelectItem item = newSelectItem("importcids", null);
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put(Integer.toString(GUIArchive.CUSTOMID_NOT_IMPORT), I18N.message("ignore"));
 		map.put(Integer.toString(GUIArchive.CUSTOMID_IMPORT_AND_NEW_RELEASE), I18N.message("importasnewversion"));
 		map.put(Integer.toString(GUIArchive.CUSTOMID_IMPORT_AND_NEW_SUBVERSION), I18N.message("importasnewsubversion"));
@@ -2092,20 +2106,20 @@ public class ItemFactory {
 		item.setShowHintInField(true);
 		item.setHint(I18N.message("workflowselect") + "...");
 		item.setRequiredMessage(I18N.message("fieldrequired"));
-		ListGridField label = new ListGridField("label", I18N.message("workflow"));
+		ListGridField label = new ListGridField(LABEL, I18N.message("workflow"));
 		label.setWidth(150);
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setWidth(150);
 		name.setHidden(true);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		description.setWidth(500);
 
 		item.setWidth(250);
 		item.setPickListWidth(500);
 		item.setPickListFields(label, description, name);
-		item.setDisplayField("label");
+		item.setDisplayField(LABEL);
 		item.setValueField("id");
 		item.setWrapTitle(false);
 		item.setOptionDataSource(new WorkflowsDS(false, deployedOnly, userId));
@@ -2121,8 +2135,8 @@ public class ItemFactory {
 		item.setWidth(200);
 		item.setWrapTitle(false);
 		ListGridField name = new ListGridField("name");
-		ListGridField label = new ListGridField("label", I18N.message("workflow"));
-		item.setDisplayField("label");
+		ListGridField label = new ListGridField(LABEL, I18N.message("workflow"));
+		item.setDisplayField(LABEL);
 		item.setValueField("id");
 		item.setPickListWidth(300);
 		item.setPickListFields(label, name);
@@ -2194,7 +2208,7 @@ public class ItemFactory {
 	 */
 	public static FloatItem newFloatItem(String name, String title, Float value) {
 		FloatItem item = new FloatItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		if (value != null)
 			item.setValue(value);
@@ -2246,13 +2260,13 @@ public class ItemFactory {
 	 * @return the new item
 	 */
 	public static RadioGroupItem newYesNoRadioItem(String name, String label) {
-		RadioGroupItem item = new RadioGroupItem(filterItemName(name), I18N.message(label));
+		RadioGroupItem item = new RadioGroupItem(originalItemName(name), I18N.message(label));
 		item.setVertical(false);
 		item.setShowTitle(true);
 		item.setWrap(false);
 		item.setWrapTitle(false);
 
-		LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> values = new LinkedHashMap<>();
 		values.put("true", I18N.message("yes"));
 		values.put("false", I18N.message("no"));
 		item.setValueMap(values);
@@ -2263,11 +2277,11 @@ public class ItemFactory {
 
 	public static SelectItem newTagInputMode(String name, String title) {
 		SelectItem mode = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("free", I18N.message("free"));
 		opts.put("preset", I18N.message("preset"));
 		mode.setValueMap(opts);
-		mode.setName(filterItemName(name));
+		mode.setName(originalItemName(name));
 		if (title != null)
 			mode.setTitle(I18N.message(title));
 		else
@@ -2280,8 +2294,8 @@ public class ItemFactory {
 
 	public static SelectItem newRunlevelSelector() {
 		SelectItem item = new SelectItem("runlevel", I18N.message("currentrunlevel"));
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
-		opts.put("default", I18N.message("default"));
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+		opts.put(DEFAULT, I18N.message(DEFAULT));
 		opts.put("bulkload", I18N.message("bulkload"));
 		opts.put("slave", I18N.message("slave"));
 		opts.put("devel", I18N.message("devel"));
@@ -2323,7 +2337,7 @@ public class ItemFactory {
 
 	public static SelectItem newRetentionDateOption(int value) {
 		SelectItem selector = new SelectItem("dateoption", I18N.message("dateoption"));
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("" + GUIRetentionPolicy.DATE_OPT_CREATION, I18N.message("created"));
 		opts.put("" + GUIRetentionPolicy.DATE_OPT_PUBLISHED, I18N.message("published"));
 		opts.put("" + GUIRetentionPolicy.DATE_OPT_STOPPUBLISHING, I18N.message("stoppublishing"));
@@ -2341,7 +2355,7 @@ public class ItemFactory {
 
 	public static SelectItem newImportFolderProviderOption(String value) {
 		SelectItem selector = new SelectItem("provider", I18N.message("type"));
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS))
 			opts.put(GUIImportFolder.PROVIDER_FILE, I18N.message("localfolder"));
 		if (Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS)) {
@@ -2365,7 +2379,7 @@ public class ItemFactory {
 
 	public static SelectItem newDocuSignTabType(String value) {
 		SelectItem selector = new SelectItem("type", I18N.message("type"));
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("esig-signhere", I18N.message("annotation.type.esig-signhere"));
 		opts.put("esig-text", I18N.message("annotation.type.esig-text"));
 		opts.put("esig-date", I18N.message("annotation.type.esig-date"));
@@ -2386,7 +2400,7 @@ public class ItemFactory {
 
 	public static SelectItem newRetentionAction(int value) {
 		SelectItem selector = new SelectItem("action", I18N.message("action"));
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("" + GUIRetentionPolicy.ACTION_ARCHIVE, I18N.message("archive"));
 		opts.put("" + GUIRetentionPolicy.ACTION_UNPUBLISH, I18N.message("unpublish"));
 		opts.put("" + GUIRetentionPolicy.ACTION_DELETE, I18N.message("ddelete"));
@@ -2402,10 +2416,10 @@ public class ItemFactory {
 	}
 
 	public static SelectItem new2AFMethodSelector(String name, String value, boolean enabledOnly) {
-		SelectItem select = new SelectItem(filterItemName(name), I18N.message("authenticationmethod"));
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message("authenticationmethod"));
 		select.setWidth(250);
 		select.setWrapTitle(false);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("", I18N.message("disable2fa"));
 		if (!enabledOnly
 				|| Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled"))
@@ -2427,7 +2441,7 @@ public class ItemFactory {
 
 	public static SelectItem newSplittingPolicySelector() {
 		SelectItem select = new SelectItem("splittingpolicy", I18N.message("splittingpolicy"));
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("allpages"));
 		map.put("1", I18N.message("selectionofpages"));
 		map.put("2", I18N.message("blankpageasseparator"));
@@ -2441,7 +2455,7 @@ public class ItemFactory {
 
 	public static SelectItem newSplitSeparatorHandlingSelector() {
 		SelectItem select = new SelectItem("separatorhandling", I18N.message("separatorhandling"));
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("skip"));
 		map.put("1", I18N.message("currentsegment"));
 		map.put("2", I18N.message("nextsegment"));
@@ -2453,8 +2467,8 @@ public class ItemFactory {
 
 	public static SelectItem newSubscriptionTypeSelector() {
 		SelectItem selector = new SelectItem("subscriptionType", I18N.message("type"));
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
-		opts.put("document", I18N.message("document").toLowerCase());
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+		opts.put(DOCUMENT, I18N.message(DOCUMENT).toLowerCase());
 		opts.put("folder", I18N.message("folder").toLowerCase());
 		selector.setValueMap(opts);
 		selector.setRequired(false);
@@ -2538,7 +2552,7 @@ public class ItemFactory {
 	 */
 	public static RichTextItem newRichTextItemForNote(String name, String title, String value) {
 		RichTextItem item = new RichTextItem();
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		if (value != null)
 			item.setValue(value);
@@ -2589,7 +2603,7 @@ public class ItemFactory {
 	public static RichTextItem newRichTextItemForEmail(String name, String title, String value,
 			ChangedHandler chagnedHandler) {
 		RichTextItem item = newRichTextItemForAutomation(name, title, value, chagnedHandler);
-		item.setName(filterItemName(name));
+		item.setName(originalItemName(name));
 		item.setTitle(I18N.message(title));
 		if (value != null)
 			item.setValue(value);
@@ -2624,19 +2638,8 @@ public class ItemFactory {
 	 * 
 	 * @return sanitized name
 	 */
-	public static String filterItemName(String name) {
-		return name.toString().replace("\\.", "_");
-	}
-
-	/**
-	 * Obtain the original item name
-	 * 
-	 * @param name sanitized name
-	 * 
-	 * @return original name
-	 */
 	public static String originalItemName(String name) {
-		return name.toString().replace("_", "\\.");
+		return name.replace("\\.", "_");
 	}
 
 	public static String itemNameForAttribute(String name) {
