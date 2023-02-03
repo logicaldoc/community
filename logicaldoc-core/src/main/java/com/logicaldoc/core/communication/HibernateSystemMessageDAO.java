@@ -73,10 +73,8 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 					+ SqlUtil.doubleQuotes(recipient) + "' and R.ld_read=1 and R.ld_messageid=ld_id)";
 		sql = sql + " order by ld_sentdate desc";
 
-		List<SystemMessage> messages;
 		try {
-			messages = (List<SystemMessage>) query(sql, null, new SystemMessageMapper(), null);
-			return messages;
+			return query(sql, null, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -118,7 +116,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 			long time = date.getTime();
 
 			while (iter.hasNext()) {
-				SystemMessage sm = (SystemMessage) iter.next();
+				SystemMessage sm = iter.next();
 				long sentdate = new Date().getTime();
 				long timespan = sm.getDateScope();
 				timespan = timespan * 86400000;
@@ -152,8 +150,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				+ SqlUtil.doubleQuotes(mode) + "') order by ld_sentdate desc";
 
 		try {
-			List<SystemMessage> messages = (List<SystemMessage>) query(sql, null, new SystemMessageMapper(), null);
-			return messages;
+			return query(sql, null, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -167,8 +164,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				+ type + ") order by ld_sentdate desc";
 
 		try {
-			List<SystemMessage> messages = (List<SystemMessage>) query(sql, null, new SystemMessageMapper(), null);
-			return messages;
+			return query(sql, null, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -194,8 +190,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 		sql = sql + " order by ld_sentdate desc";
 
 		try {
-			List<SystemMessage> messages = (List<SystemMessage>) query(sql, null, new SystemMessageMapper(), null);
-			return messages;
+			return query(sql, null, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();

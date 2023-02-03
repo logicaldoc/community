@@ -35,6 +35,9 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class FolderSearch extends Search {
 
+	private static final String EQUAL_PARAMETER = " = ?)";
+	private static final String NOT = "(not ";
+	private static final String LIKE = " like '%";
 	private static final String IS_NOT_NULL = " is not null ";
 	private static final String IS_NULL = " is null ";
 	private static final String LOWER = "lower(";
@@ -355,13 +358,13 @@ public class FolderSearch extends Search {
 		else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
 			query.append(" (not " + columnName + " = '" + val + "')");
 		else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
-			query.append(columnName + " like '%" + val + "%'");
+			query.append(columnName + LIKE + val + "%'");
 		else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
-			query.append(" (" + columnName + " is null or not (" + columnName + " like '%" + val + "%'))");
+			query.append(" (" + columnName + " is null or not (" + columnName + LIKE + val + "%'))");
 		else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
 			query.append(columnName + " like '" + val + "%'");
 		else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
-			query.append(columnName + " like '%" + val + "'");
+			query.append(columnName + LIKE + val + "'");
 		else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
 			query.append(columnName + IS_NULL);
 		else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
@@ -388,7 +391,7 @@ public class FolderSearch extends Search {
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
 				query.append(columnName + " = '" + val2 + "'");
 			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-				query.append("(not " + columnName + " = '" + val2 + "')");
+				query.append(NOT + columnName + " = '" + val2 + "')");
 		}
 	}
 
@@ -418,7 +421,7 @@ public class FolderSearch extends Search {
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
 				query.append(columnName + " = ?");
 			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-				query.append("(not " + columnName + " = ?)");
+				query.append(NOT + columnName + EQUAL_PARAMETER);
 			else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
 				query.append(columnName + " > ?");
 			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
@@ -449,7 +452,7 @@ public class FolderSearch extends Search {
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
 				query.append(columnName + " = ?");
 			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-				query.append("(not " + columnName + " = ?)");
+				query.append(NOT + columnName + EQUAL_PARAMETER);
 		}
 	}
 
@@ -464,7 +467,7 @@ public class FolderSearch extends Search {
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
 				query.append(columnName + " = ?");
 			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-				query.append("(not " + columnName + " = ?)");
+				query.append(NOT + columnName + EQUAL_PARAMETER);
 			else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
 				query.append(columnName + " > ?");
 			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))

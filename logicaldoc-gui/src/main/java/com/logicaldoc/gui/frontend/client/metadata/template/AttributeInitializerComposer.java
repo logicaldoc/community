@@ -167,7 +167,7 @@ public class AttributeInitializerComposer extends Window {
 	}
 
 	private DynamicForm prepareDateForm() {
-		DateItem date = ItemFactory.newDateItem("date", "date");
+		DateItem date = ItemFactory.newDateItem("date");
 		date.setWrapTitle(false);
 		date.setRequired(true);
 		date.setValue(new Date());

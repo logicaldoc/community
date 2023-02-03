@@ -62,7 +62,7 @@ public class PluginDbInit extends DBInit {
 
 			List<String> idSet = new ArrayList<>();
 			if (ids != null)
-				idSet = (List<String>) Arrays.asList(ids);
+				idSet = Arrays.asList(ids);
 
 			// Acquire the ordered list of sql files
 			for (Extension ext : sortedExts) {

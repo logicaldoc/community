@@ -49,7 +49,7 @@ public class PathCalculator extends Task {
 			// First of all find folders to be processed and not already
 			// involved into a transaction
 			@SuppressWarnings("unchecked")
-			List<Long> ids = (List<Long>) folderDao
+			List<Long> ids = folderDao
 					.queryForList("select ld_id from ld_folder where ld_deleted=0 and ld_path is null", Long.class);
 			log.info("Found a total of {} folders to be processed", ids.size());
 			setSize(ids.size());

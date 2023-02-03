@@ -88,7 +88,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 
 		assert (code != 0);
 
-		MessageTemplate template = (MessageTemplate) findById(id);
+		MessageTemplate template = findById(id);
 		if (template != null) {
 			template.setDeleted(code);
 			template.setName(template.getName() + "." + template.getId());

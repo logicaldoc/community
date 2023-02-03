@@ -55,7 +55,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		published.setEndRow(true);
 		published.addChangedHandler(changedHandler);
 
-		final DateItem startPublishing = ItemFactory.newDateItem("startpublishing", "startpublishing");
+		final DateItem startPublishing = ItemFactory.newDateItem("startpublishing");
 		startPublishing.setValue(document.getStartPublishing());
 		startPublishing.addChangedHandler(changedHandler);
 		startPublishing.setDisabled(!updateEnabled);
@@ -78,7 +78,7 @@ public class PublishingPanel extends DocumentDetailTab {
 			}
 		});
 
-		final DateItem stopPublishing = ItemFactory.newDateItem("stoppublishing", "stoppublishing");
+		final DateItem stopPublishing = ItemFactory.newDateItem("stoppublishing");
 		stopPublishing.setValue(document.getStopPublishing());
 		stopPublishing.addChangedHandler(changedHandler);
 		stopPublishing.setDisabled(!updateEnabled);

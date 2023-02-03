@@ -60,7 +60,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 					Map<String, Object> params = new HashMap<>();
 					params.put(SET_ID, Long.valueOf(setId));
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId order by _opt.position asc",
 							params, null);
 				} else {
@@ -68,7 +68,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 					params.put(SET_ID, Long.valueOf(setId));
 					params.put("category", category);
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.category = :category order by _opt.position asc",
 							params, null);
 				}
@@ -78,7 +78,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 					params.put(SET_ID, Long.valueOf(setId));
 					params.put("attribute", attribute);
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute order by _opt.position asc",
 							params, null);
 				} else {
@@ -87,7 +87,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 					params.put("category", category);
 					params.put("attribute", attribute);
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute and _opt.category = :category order by _opt.position asc",
 							params, null);
 				}

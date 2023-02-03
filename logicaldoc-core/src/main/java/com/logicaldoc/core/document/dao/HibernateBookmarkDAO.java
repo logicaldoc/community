@@ -75,7 +75,7 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 		String sql = "select ld_docid from ld_bookmark where ld_type=" + Bookmark.TYPE_DOCUMENT
 				+ " and ld_deleted = 0 and ld_userid = " + userId;
 		try {
-			return (List<Long>) queryForList(sql, Long.class);
+			return queryForList(sql, Long.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();

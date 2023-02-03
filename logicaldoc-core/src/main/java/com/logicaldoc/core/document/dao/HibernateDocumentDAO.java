@@ -118,7 +118,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void archive(long docId, DocumentHistory transaction) throws PersistenceException {
-		Document doc = (Document) findById(docId);
+		Document doc = findById(docId);
 		doc.setStatus(AbstractDocument.DOC_ARCHIVED);
 		if (doc.getIndexed() != AbstractDocument.INDEX_SKIP)
 			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
@@ -130,7 +130,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void unarchive(long docId, DocumentHistory transaction) throws PersistenceException {
-		Document doc = (Document) findById(docId);
+		Document doc = findById(docId);
 		doc.setStatus(AbstractDocument.DOC_UNLOCKED);
 		doc.setLockUserId(null);
 		transaction.setEvent(DocumentEvent.RESTORED.toString());
@@ -152,7 +152,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (!checkStoringAspect())
 			return;
 
-		Document doc = (Document) findById(docId);
+		Document doc = findById(docId);
 		if (doc != null && doc.getImmutable() == 0
 				|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 
@@ -230,7 +230,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(" and ld_status=" + status);
 
 		try {
-			return (List<Document>) query(sb.toString(), null, new RowMapper<Document>() {
+			return query(sb.toString(), null, new RowMapper<Document>() {
 
 				@Override
 				public Document mapRow(ResultSet rs, int col) throws SQLException {
@@ -260,7 +260,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				"select distinct(A.ld_docid) from ld_tag A, ld_document B where A.ld_docid=B.ld_id and not B.ld_status="
 						+ AbstractDocument.DOC_ARCHIVED);
 		query.append(" and lower(ld_tag)='" + SqlUtil.doubleQuotesAndBackslashes(tag).toLowerCase() + "'");
-		return (List<Long>) queryForList(query.toString(), Long.class);
+		return queryForList(query.toString(), Long.class);
 	}
 
 	@Override
@@ -609,7 +609,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(" and lower(ld_tag) like ? ");
 			parameters.add(firstLetter.toLowerCase() + "%");
 		}
-		return (List<String>) queryForList(sb.toString(), parameters.toArray(new Object[0]), String.class, null);
+		return queryForList(sb.toString(), parameters.toArray(new Object[0]), String.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -623,7 +623,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(ids.stream().map(f -> f.toString()).collect(Collectors.joining(",")));
 			query.append(")");
 			try {
-				coll = (List<Document>) findByQuery(query.toString(), (Map<String, Object>) null, max);
+				coll = findByQuery(query.toString(), (Map<String, Object>) null, max);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -631,6 +631,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return coll;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findDocIdByUserIdAndTag(long userId, String tag) throws PersistenceException {
 		List<Long> ids = new ArrayList<>();
@@ -659,9 +660,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(" AND lower(D.ld_tag)='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
 
 			log.debug("Find by tag: {}", query);
-
-			List<Long> docIds = (List<Long>) queryForList(query.toString(), Long.class);
-			ids.addAll(docIds);
+			ids.addAll(queryForList(query.toString(), Long.class));
 		}
 
 		return ids;
@@ -677,7 +676,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		query.append(" order by date desc");
 
 		@SuppressWarnings("unchecked")
-		List<Long> results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<Long> results = findByQuery(query.toString(), (Map<String, Object>) null, null);
 		ArrayList<Long> tmpal = new ArrayList<>(results);
 		List<Long> docIds = tmpal;
 
@@ -702,7 +701,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		// execute the query
 		@SuppressWarnings("unchecked")
-		List<Document> unorderdColl = (List<Document>) findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<Document> unorderdColl = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		// put all elements in a map
 		HashMap<Long, Document> hm = new HashMap<>();
@@ -726,7 +725,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public List<Long> findDocIdByFolder(long folderId, Integer max) throws PersistenceException {
 		String sql = "select ld_id from ld_document where ld_deleted=0 and ld_folderid = " + folderId
 				+ " and not ld_status=" + AbstractDocument.DOC_ARCHIVED;
-		return (List<Long>) queryForList(sql, null, Long.class, max);
+		return queryForList(sql, null, Long.class, max);
 	}
 
 	@Override
@@ -755,7 +754,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		else if (direction.intValue() == 2)
 			query.append("select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
 		@SuppressWarnings("unchecked")
-		List<Long> ids = (List<Long>) queryForList(query.toString(),
+		List<Long> ids = queryForList(query.toString(),
 				linkType != null ? new Object[] { docId } : new Object[] { docId, docId }, Long.class, null);
 		coll = findByWhere(ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
 				+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
@@ -798,7 +797,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Long> findDeletedDocIds() throws PersistenceException {
 		String query = "select ld_id from ld_document where ld_deleted=1 order by ld_lastmodified desc";
-		return (List<Long>) queryForList(query, Long.class);
+		return queryForList(query, Long.class);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -820,7 +819,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			}
 		};
 
-		return (List<Document>) query(query, new Object[] {}, docMapper, null);
+		return query(query, new Object[] {}, docMapper, null);
 	}
 
 	@Override
@@ -1005,7 +1004,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			}
 		};
 
-		return (List<Document>) query(query, null, docMapper, maxHits);
+		return query(query, null, docMapper, maxHits);
 	}
 
 	public void setConfig(ContextProperties config) {
@@ -1066,7 +1065,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Date now = new Date();
 
 		@SuppressWarnings("unchecked")
-		Collection<Long> buf = (Collection<Long>) queryForList(query.toString(), new Object[] { now, now }, Long.class,
+		Collection<Long> buf = queryForList(query.toString(), new Object[] { now, now }, Long.class,
 				null);
 		Set<Long> ids = new HashSet<>();
 		for (Long id : buf) {
@@ -1200,7 +1199,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public List<TagCloud> getTagCloud(long tenantId, int maxTags) throws PersistenceException {
 		GenericDAO gendao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
-		List<TagCloud> list = (List<TagCloud>) gendao.query(
+		List<TagCloud> list = gendao.query(
 				"select ld_tag, ld_count from ld_uniquetag where ld_tenantid=" + tenantId + " order by ld_count desc",
 				null, new RowMapper<TagCloud>() {
 

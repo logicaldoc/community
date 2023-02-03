@@ -99,7 +99,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 				}
 			};
 
-			coll = (List<Rating>) query(query, new Object[] {}, ratingMapper, null);
+			coll = query(query, new Object[] {}, ratingMapper, null);
 			if (!coll.isEmpty() && coll.get(0).getCount() != 0)
 				return coll.get(0);
 

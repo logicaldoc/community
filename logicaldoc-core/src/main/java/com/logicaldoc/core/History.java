@@ -425,14 +425,13 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public void setColor(String color) {
 		this.color = color;
 	}
-	
+
 	@Override
 	public int compareTo(History o) {
-		History other = (History) o;
+		History other = o;
 		return getDate().compareTo(other.getDate());
 	}
-	
-	
+
 	protected void copyAttributesFrom(History source) {
 		setTenantId(source.getTenantId());
 		setDate(source.getDate());

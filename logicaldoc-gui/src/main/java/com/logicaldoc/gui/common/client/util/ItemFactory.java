@@ -372,6 +372,17 @@ public class ItemFactory {
 	}
 
 	/**
+	 * Creates a new DateItem.
+	 * 
+	 * @param name The item name (mandatory)
+	 * 
+	 * @return the new item
+	 */
+	public static DateItem newDateItem(String name) {
+		return newDateItem(name, name);
+	}
+	
+	/**
 	 * Creates a new DateItem for the Extended AttributesDS.
 	 * 
 	 * @param name The item name (mandatory)

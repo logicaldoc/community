@@ -120,7 +120,7 @@ public class UserSecurityPanel extends VLayout {
 	}
 
 	private DateItem prepareExpireItem(boolean readonly) {
-		DateItem expire = ItemFactory.newDateItem("expireson", "expireson");
+		DateItem expire = ItemFactory.newDateItem("expireson");
 		expire.setValue(user.getExpire());
 		if (readonly || "admin".equals(user.getUsername())) {
 			expire.setDisabled(true);

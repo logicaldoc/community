@@ -199,7 +199,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		if (!checkStoringAspect())
 			return;
 
-		Version ver = (Version) findById(versionId);
+		Version ver = findById(versionId);
 		assert ver != null : "Unezisting version with ID=" + versionId;
 		if (ver != null) {
 			ver.setDeleted(delCode);
