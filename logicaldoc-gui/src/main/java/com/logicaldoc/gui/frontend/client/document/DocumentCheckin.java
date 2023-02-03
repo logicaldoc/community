@@ -117,7 +117,7 @@ public class DocumentCheckin extends Window {
 			return;
 		}
 
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		if ("true".equals(vm.getValueAsString("checkfilename"))

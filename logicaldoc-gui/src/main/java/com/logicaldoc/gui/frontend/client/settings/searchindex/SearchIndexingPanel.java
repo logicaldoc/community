@@ -721,7 +721,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		IButton save = new IButton(I18N.message("save"));
 		save.setAutoFit(true);
 		save.addClickHandler((ClickEvent saveClick) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			collectValues();

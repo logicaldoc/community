@@ -239,7 +239,7 @@ public class ParametricForm extends VLayout {
 
 	@SuppressWarnings("unchecked")
 	private void search() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		Map<String, Object> values = vm.getValues();

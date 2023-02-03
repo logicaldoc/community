@@ -178,7 +178,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 	@SuppressWarnings("rawtypes")
 	private void search() {
-		if (!vm.validate()) {
+		if (Boolean.FALSE.equals(vm.validate())) {
 			return;
 		}
 

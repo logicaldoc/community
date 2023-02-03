@@ -73,7 +73,7 @@ public class OptionsUploader extends Window {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		LD.contactingServer();

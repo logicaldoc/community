@@ -95,7 +95,7 @@ public class DropboxAuthorizationWizard extends Window {
 	}
 
 	public void onSubmit() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(), new AsyncCallback<String>() {

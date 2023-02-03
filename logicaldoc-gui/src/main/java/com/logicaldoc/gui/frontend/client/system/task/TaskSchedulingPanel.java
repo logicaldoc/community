@@ -150,7 +150,7 @@ public class TaskSchedulingPanel extends VLayout {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();

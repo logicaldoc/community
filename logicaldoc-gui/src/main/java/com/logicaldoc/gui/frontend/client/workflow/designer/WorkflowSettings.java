@@ -93,7 +93,7 @@ public class WorkflowSettings extends Window {
 		ButtonItem save = new ButtonItem("save", I18N.message("save"));
 		save.setAutoFit(true);
 		save.addClickHandler((ClickEvent event) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			onSave(workflow, supervisors);

@@ -148,7 +148,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 	private ButtonItem prepareTestButton() {
 		ButtonItem test = new ButtonItem("test", I18N.message("testconnection"));
 		test.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			LD.askForValue(I18N.message("email"), I18N.message("email"), (String) vm.getValueAsString("senderEmail"),
@@ -180,7 +180,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		save.setStartRow(true);
 		save.setEndRow(false);
 		save.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			@SuppressWarnings("unchecked")

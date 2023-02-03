@@ -68,7 +68,7 @@ public class FormCreate extends Window {
 	}
 
 	public void onCreate() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		GUIForm vo = new GUIForm();

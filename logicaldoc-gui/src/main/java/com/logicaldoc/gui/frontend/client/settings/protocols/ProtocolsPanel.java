@@ -258,7 +258,7 @@ public class ProtocolsPanel extends AdminPanel {
 	}
 
 	private void onSave() {
-		if (!vm.validate()) {
+		if (Boolean.FALSE.equals(vm.validate())) {
 			SC.warn(I18N.message("invalidsettings"));
 			return;
 		}

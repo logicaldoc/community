@@ -125,7 +125,7 @@ public class ZoneEditor extends Window {
 	}
 
 	public void onSave() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		zone.setFormat(vm.getValueAsString("format"));

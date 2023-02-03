@@ -271,7 +271,7 @@ public class CalendarReport extends AdminPanel {
 
 		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		Date fromValue = null;

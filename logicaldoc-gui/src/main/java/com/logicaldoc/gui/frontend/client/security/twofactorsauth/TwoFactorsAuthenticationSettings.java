@@ -180,7 +180,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				if (!vm.validate())
+				if (Boolean.FALSE.equals(vm.validate()))
 					return;
 
 				String tenant = Session.get().getTenantName();

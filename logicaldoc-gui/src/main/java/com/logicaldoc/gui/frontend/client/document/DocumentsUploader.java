@@ -169,7 +169,7 @@ public class DocumentsUploader extends Window {
 	}
 
 	public void onSend() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		
 		if (uploader.getUploadedFiles().isEmpty()) {

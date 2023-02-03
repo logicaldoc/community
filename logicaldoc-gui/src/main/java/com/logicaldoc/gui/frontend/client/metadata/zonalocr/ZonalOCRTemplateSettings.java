@@ -153,7 +153,7 @@ public class ZonalOCRTemplateSettings extends Window {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		ocrPanel.getSelectedOcrTemplate().setName(vm.getValueAsString("name"));

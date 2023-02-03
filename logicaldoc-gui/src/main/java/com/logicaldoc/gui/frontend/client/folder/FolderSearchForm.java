@@ -254,7 +254,7 @@ public abstract class FolderSearchForm extends VLayout {
 	 * Prepare the search options.
 	 */
 	protected GUISearchOptions prepareOptions() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return null;
 
 		@SuppressWarnings("unchecked")

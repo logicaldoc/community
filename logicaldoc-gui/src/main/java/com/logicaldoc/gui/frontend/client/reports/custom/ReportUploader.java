@@ -150,7 +150,7 @@ public class ReportUploader extends Window {
 				}
 			});
 		} else {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			report = new GUIReport();

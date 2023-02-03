@@ -120,7 +120,7 @@ public class ChangePassword extends Window {
 		apply.setTitle(I18N.message("apply"));
 		apply.setAutoFit(true);
 		apply.addClickHandler((ClickEvent event) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			if (vm.getValueAsString(PASSWORD).equals(vm.getValueAsString(NEWPASSWORD))) {

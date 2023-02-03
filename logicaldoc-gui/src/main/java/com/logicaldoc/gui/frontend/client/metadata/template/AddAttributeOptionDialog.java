@@ -48,7 +48,7 @@ public class AddAttributeOptionDialog extends Window {
 		save.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (!vm.validate())
+				if (Boolean.FALSE.equals(vm.validate()))
 					return;
 
 				Record rec = new ListGridRecord();

@@ -221,7 +221,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler((ClickEvent event) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			onSave();

@@ -151,7 +151,7 @@ public class TenantQuotaPanel extends HLayout {
 	@SuppressWarnings("unchecked")
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
 		if (values.get("documentsquota") == null)

@@ -186,7 +186,7 @@ public class BarcodeTemplateSettings extends Window {
 			return;
 		}
 
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		template.setName(vm.getValueAsString("name"));

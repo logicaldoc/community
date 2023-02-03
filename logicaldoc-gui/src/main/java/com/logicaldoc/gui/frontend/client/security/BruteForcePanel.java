@@ -243,7 +243,7 @@ public class BruteForcePanel extends AdminPanel {
 	}
 
 	public void onSave() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		@SuppressWarnings("unchecked")

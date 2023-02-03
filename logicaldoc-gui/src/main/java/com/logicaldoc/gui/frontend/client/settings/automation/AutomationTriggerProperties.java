@@ -251,7 +251,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 	@SuppressWarnings("unchecked")
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
 		if (values.get("routine") != null) {

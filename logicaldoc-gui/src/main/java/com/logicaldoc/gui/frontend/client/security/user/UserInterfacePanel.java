@@ -181,7 +181,7 @@ public class UserInterfacePanel extends HLayout {
 	}
 
 	boolean validate() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
 		collectValues();

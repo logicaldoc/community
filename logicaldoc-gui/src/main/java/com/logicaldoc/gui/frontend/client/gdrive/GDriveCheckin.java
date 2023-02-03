@@ -70,7 +70,7 @@ public class GDriveCheckin extends Window {
 	}
 
 	public void onCheckin(final GUIDocument document, final GDriveEditor parentDialog) {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		LD.contactingServer();
 		GDriveService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),

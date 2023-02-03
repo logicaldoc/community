@@ -79,7 +79,7 @@ public class GDriveCreate extends Window {
 	}
 
 	public void onCreate() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		hide();
 		LD.contactingServer();

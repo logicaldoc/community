@@ -70,7 +70,7 @@ public class ZohoCheckin extends Window {
 	}
 
 	public void onCheckin(final GUIDocument document, final ZohoEditor parentDialog) {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		LD.contactingServer();
 		ZohoService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),

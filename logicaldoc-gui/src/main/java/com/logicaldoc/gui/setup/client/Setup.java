@@ -393,7 +393,7 @@ public class Setup implements EntryPoint {
 				return;
 
 			if (step == tabs.getTabs().length - 1) {
-				if (!vm.validate())
+				if (Boolean.FALSE.equals(vm.validate()))
 					SC.warn("invalidfields");
 
 				SetupInfo data = new SetupInfo();
