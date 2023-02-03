@@ -12,7 +12,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -41,10 +40,10 @@ public class MenuRightsPanel extends VLayout {
 	protected GUIMenu menu;
 
 	boolean withApplyButton = false;
-	
+
 	public MenuRightsPanel(final GUIMenu menu, boolean withApplyButton) {
 		this.menu = menu;
-		this.withApplyButton=withApplyButton;
+		this.withApplyButton = withApplyButton;
 	}
 
 	@Override
@@ -57,7 +56,7 @@ public class MenuRightsPanel extends VLayout {
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 
-		ListGridField entity = new UserListGridField("entity", "avatar", "entity");  
+		ListGridField entity = new UserListGridField("entity", "avatar", "entity");
 		entity.setCanEdit(false);
 
 		rightsGrid = new ListGrid();
@@ -71,11 +70,11 @@ public class MenuRightsPanel extends VLayout {
 		rightsGrid.setEditEvent(ListGridEditEvent.CLICK);
 		rightsGrid.setModalEditing(true);
 		rightsGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
-				if (event.getColNum() == 0) {
-					Menu contextMenu = setupContextMenu();
-					contextMenu.showContextMenu();
-				}
-				event.cancel();
+			if (event.getColNum() == 0) {
+				Menu contextMenu = setupContextMenu();
+				contextMenu.showContextMenu();
+			}
+			event.cancel();
 		});
 
 		container.addMember(rightsGrid);
@@ -89,19 +88,19 @@ public class MenuRightsPanel extends VLayout {
 		buttons.setMembersMargin(4);
 		buttons.setWidth100();
 		buttons.setHeight(20);
-		
+
 		Button applyRights = new Button(I18N.message("applyrights"));
 		applyRights.setAutoFit(true);
 		applyRights.addClickHandler((ClickEvent event) -> {
-				onApply();
+			onApply();
 		});
-		if(withApplyButton)
+		if (withApplyButton)
 			buttons.addMember(applyRights);
 
 		addGroupSelector(buttons);
 
 		addUserSelector(buttons);
-		
+
 		return buttons;
 	}
 
@@ -111,29 +110,29 @@ public class MenuRightsPanel extends VLayout {
 		userForm.setItems(user);
 
 		user.addChangedHandler((ChangedEvent event) -> {
-				ListGridRecord selectedRecord = user.getSelectedRecord();
-				if (selectedRecord == null)
-					return;
+			ListGridRecord selectedRecord = user.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
 
-				// Check if the selected user is already present in the rights
-				// table
-				ListGridRecord[] records = rightsGrid.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
-						user.clearValue();
-						return;
-					}
+			// Check if the selected user is already present in the rights
+			// table
+			ListGridRecord[] records = rightsGrid.getRecords();
+			for (ListGridRecord test : records) {
+				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
+					user.clearValue();
+					return;
+				}
 			}
 
-				// Update the rights table
-				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-				rec.setAttribute("entity", selectedRecord.getAttribute("label") + " ("
-						+ selectedRecord.getAttribute("username") + ")");
-				rec.setAttribute("avatar", selectedRecord.getAttribute("id"));
-				rec.setAttribute("read", true);
-				rightsGrid.addData(rec);
-				user.clearValue();
+			// Update the rights table
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
+			rec.setAttribute("entity",
+					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
+			rec.setAttribute("avatar", selectedRecord.getAttribute("id"));
+			rec.setAttribute("read", true);
+			rightsGrid.addData(rec);
+			user.clearValue();
 		});
 		buttons.addMember(userForm);
 	}
@@ -146,28 +145,28 @@ public class MenuRightsPanel extends VLayout {
 		buttons.addMember(groupForm);
 
 		group.addChangedHandler((ChangedEvent event) -> {
-				ListGridRecord selectedRecord = group.getSelectedRecord();
-				if (selectedRecord == null)
+			ListGridRecord selectedRecord = group.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
+
+			// Check if the selected user is already present in the rights
+			// table
+			ListGridRecord[] records = rightsGrid.getRecords();
+			for (ListGridRecord test : records) {
+				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
+					group.clearValue();
 					return;
-
-				// Check if the selected user is already present in the rights
-				// table
-				ListGridRecord[] records = rightsGrid.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
-						group.clearValue();
-						return;
-					}
 				}
+			}
 
-				// Update the rights table
-				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute("entityId", selectedRecord.getAttribute("id"));
-				rec.setAttribute("entity", selectedRecord.getAttribute("name"));
-				rec.setAttribute("avatar", "group");
-				rec.setAttribute("read", true);
-				rightsGrid.addData(rec);
-				group.clearValue();
+			// Update the rights table
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("entityId", selectedRecord.getAttribute("id"));
+			rec.setAttribute("entity", selectedRecord.getAttribute("name"));
+			rec.setAttribute("avatar", "group");
+			rec.setAttribute("read", true);
+			rightsGrid.addData(rec);
+			group.clearValue();
 		});
 	}
 
@@ -210,14 +209,11 @@ public class MenuRightsPanel extends VLayout {
 				if (selection == null || selection.length == 0)
 					return;
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							rightsGrid.removeSelectedData();
-							if(!withApplyButton)
-								onApply();
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						rightsGrid.removeSelectedData();
+						if (!withApplyButton)
+							onApply();
 					}
 				});
 			}

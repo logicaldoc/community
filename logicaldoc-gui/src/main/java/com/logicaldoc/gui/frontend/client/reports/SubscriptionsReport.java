@@ -22,7 +22,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -176,23 +175,20 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+							}
+						});
 					}
 				});
 			}
@@ -200,17 +196,11 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SubscriptionDialog dialog = new SubscriptionDialog(list);
-				dialog.show();
-			}
-		});
+		edit.addClickHandler((MenuItemClickEvent event) -> new SubscriptionDialog(list).show());
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
+		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
 				ListGridRecord rec = list.getSelectedRecord();
 				String type = rec.getAttribute("type");
 				String id = rec.getAttribute("objectid");
@@ -230,7 +220,6 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 						}
 					});
 				}
-			}
 		});
 
 		contextMenu.setItems(openInFolder, edit, delete);

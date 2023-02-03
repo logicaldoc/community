@@ -191,10 +191,8 @@ public class GroupUsersPanel extends VLayout {
 					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 				}
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
 							SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
@@ -208,7 +206,6 @@ public class GroupUsersPanel extends VLayout {
 								}
 							});
 						}
-					}
 				});
 			}
 		});

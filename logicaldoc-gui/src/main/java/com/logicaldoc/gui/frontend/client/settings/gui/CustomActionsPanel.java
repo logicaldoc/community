@@ -17,7 +17,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
@@ -305,28 +304,25 @@ public class CustomActionsPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							long menuId = selectedRecord.getAttributeAsLong("id");
-							if (menuId == 0L) {
-								int index = grid.getRecordIndex(selectedRecord);
-								actions.remove(index);
-							} else {
-								SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
-										new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						long menuId = selectedRecord.getAttributeAsLong("id");
+						if (menuId == 0L) {
+							int index = grid.getRecordIndex(selectedRecord);
+							actions.remove(index);
+						} else {
+							SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
+									new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onSuccess(Void arg) {
-												reload();
-											}
-										});
-							}
+										@Override
+										public void onSuccess(Void arg) {
+											reload();
+										}
+									});
 						}
 					}
 				});

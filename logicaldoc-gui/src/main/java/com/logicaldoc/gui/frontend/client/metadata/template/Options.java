@@ -15,7 +15,6 @@ import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -184,12 +183,12 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		list.setCanReorderRecords(!readOnly);
 		list.setCanDragRecordsOut(!readOnly);
 		list.setCanAcceptDroppedRecords(!readOnly);
-		
+
 		list.setShowRowNumbers(true);
-		ListGridField numbers=new ListGridField(" ", 60);
+		ListGridField numbers = new ListGridField(" ", 60);
 		numbers.setAutoFitWidth(true);
 		list.setRowNumberFieldProperties(numbers);
-		
+
 		list.setDragDataAction(DragDataAction.MOVE);
 		list.setFields(id, value, category);
 		list.sort("position", SortDirection.ASCENDING);
@@ -275,12 +274,9 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							onDelete();
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						onDelete();
 					}
 				});
 			}

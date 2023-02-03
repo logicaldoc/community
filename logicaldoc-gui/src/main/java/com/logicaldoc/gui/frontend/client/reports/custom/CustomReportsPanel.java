@@ -26,7 +26,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -224,8 +223,10 @@ public class CustomReportsPanel extends AdminPanel {
 
 			long oldVersion = rec.getAttributeAsLong("recordVersion");
 
-			rec.setAttribute("runningIcon", rec.getAttribute("name").equals(report.getName())
-					&& report.getStatus() != GUIReport.STATUS_IDLE ? "running_task" : "idle_task");
+			rec.setAttribute("runningIcon",
+					rec.getAttribute("name").equals(report.getName()) && report.getStatus() != GUIReport.STATUS_IDLE
+							? "running_task"
+							: "idle_task");
 			rec.setAttribute("status", report.getStatus());
 			rec.setAttribute("lastRun", report.getLastRun());
 			rec.setAttribute("lastModified", report.getLastModified());
@@ -237,8 +238,7 @@ public class CustomReportsPanel extends AdminPanel {
 				rec.setAttribute("outputDocId", (String) null);
 			list.refreshRow(list.getRecordIndex(rec));
 
-			boolean selected = list.getSelectedRecord() != null ? rec.equals(list.getSelectedRecord())
-					: false;
+			boolean selected = list.getSelectedRecord() != null ? rec.equals(list.getSelectedRecord()) : false;
 
 			// Decide if we have to refresh the properties
 			// panel
@@ -249,9 +249,10 @@ public class CustomReportsPanel extends AdminPanel {
 			break;
 		}
 	}
-	
+
 	private boolean canUploadDesign() {
-		return Session.get().getUser().getTenant().isDefault() && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
+		return Session.get().getUser().getTenant().isDefault()
+				&& Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 	}
 
 	private void showContextMenu() {
@@ -304,96 +305,76 @@ public class CustomReportsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ReportService.Instance.get().delete(selectedId, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value))
+						ReportService.Instance.get().delete(selectedId, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showReportDetails(null);
-								}
-							});
-						}
-					}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showReportDetails(null);
+							}
+						});
 				});
 			}
 		});
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ReportService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler((MenuItemClickEvent event) -> ReportService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", true);
-								rec.setAttribute("enabledIcon", "bullet_green");
-								list.refreshRow(list.getRecordIndex(rec));
-							}
-						});
-			}
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute("eenabled", true);
+						rec.setAttribute("enabledIcon", "bullet_green");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 		enable.setEnabled(!list.getSelectedRecord().getAttributeAsBoolean("eenabled"));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ReportService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
-						new AsyncCallback<Void>() {
+		disable.addClickHandler((MenuItemClickEvent event) -> ReportService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", false);
-								rec.setAttribute("enabledIcon", "bullet_red");
-								list.refreshRow(list.getRecordIndex(rec));
-							}
-						});
-			}
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute("eenabled", false);
+						rec.setAttribute("enabledIcon", "bullet_red");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean("eenabled"));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocumentsPanel.get().openInFolder(outputFolderId, outputDocId);
-			}
-		});
+		openInFolder.addClickHandler(
+				(MenuItemClickEvent event) -> DocumentsPanel.get().openInFolder(outputFolderId, outputDocId));
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				Util.downloadDoc(outputDocId);
-			}
-		});
+		download.addClickHandler((MenuItemClickEvent event) -> Util.downloadDoc(outputDocId));
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocumentService.Instance.get().getById(outputDocId, new AsyncCallback<GUIDocument>() {
+		preview.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get().getById(outputDocId,
+				new AsyncCallback<GUIDocument>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -405,18 +386,12 @@ public class CustomReportsPanel extends AdminPanel {
 						PreviewPopup iv = new PreviewPopup(doc);
 						iv.show();
 					}
-				});
-			}
-		});
+				}));
 
 		MenuItem export = new MenuItem();
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				Util.download(Util.contextPath() + "report/controller?command=export&reportId="
-						+ rec.getAttributeAsString("id"));
-			}
-		});
+		export.addClickHandler((MenuItemClickEvent event) -> Util.download(
+				Util.contextPath() + "report/controller?command=export&reportId=" + rec.getAttributeAsString("id")));
 
 		if (outputDocId != null)
 			contextMenu.setItems(execute, upload, export, enable, disable, delete, openInFolder, download, preview);

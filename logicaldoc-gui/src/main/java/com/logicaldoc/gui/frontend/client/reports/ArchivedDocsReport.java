@@ -24,7 +24,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -240,22 +239,19 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 				for (int i = 0; i < selection.length; i++)
 					docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							DocumentService.Instance.get().delete(docIds, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						DocumentService.Instance.get().delete(docIds, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+							}
+						});
 					}
 				});
 			}
@@ -263,14 +259,12 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem sendToExpArchive = new MenuItem();
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
-		sendToExpArchive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				long[] selectionIds = new long[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					selectionIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
-				SendToArchiveDialog archiveDialog = new SendToArchiveDialog(selectionIds, true);
-				archiveDialog.show();
-			}
+		sendToExpArchive.addClickHandler((MenuItemClickEvent event) -> {
+			long[] selectionIds = new long[selection.length];
+			for (int i = 0; i < selection.length; i++)
+				selectionIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
+			SendToArchiveDialog archiveDialog = new SendToArchiveDialog(selectionIds, true);
+			archiveDialog.show();
 		});
 
 		download.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);

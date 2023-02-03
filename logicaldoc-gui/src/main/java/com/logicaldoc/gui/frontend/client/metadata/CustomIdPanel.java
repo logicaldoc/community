@@ -14,7 +14,6 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SchemeService;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -290,29 +289,25 @@ public class CustomIdPanel extends AdminPanel {
 		clean.setTitle(I18N.message("clean"));
 		clean.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmclean"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							final ListGridRecord rec = schemes.getSelectedRecord();
-							SchemeService.Instance.get().delete(
-									Long.parseLong(rec.getAttributeAsString("templateId")),
-									rec.getAttributeAsString("type"), new AsyncCallback<Void>() {
+				LD.ask(I18N.message("question"), I18N.message("confirmclean"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						final ListGridRecord rec = schemes.getSelectedRecord();
+						SchemeService.Instance.get().delete(Long.parseLong(rec.getAttributeAsString("templateId")),
+								rec.getAttributeAsString("type"), new AsyncCallback<Void>() {
 
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onSuccess(Void ret) {
-											schemes.getSelectedRecord().setAttribute("scheme", (String) null);
-											schemes.getSelectedRecord().setAttribute("evaluateAtCheckin", false);
-											schemes.getSelectedRecord().setAttribute("evaluateAtUpdate", false);
-											schemes.refreshRow(schemes.getRecordIndex(rec));
-										}
-									});
-						}
+									@Override
+									public void onSuccess(Void ret) {
+										schemes.getSelectedRecord().setAttribute("scheme", (String) null);
+										schemes.getSelectedRecord().setAttribute("evaluateAtCheckin", false);
+										schemes.getSelectedRecord().setAttribute("evaluateAtUpdate", false);
+										schemes.refreshRow(schemes.getRecordIndex(rec));
+									}
+								});
 					}
 				});
 			}
@@ -332,23 +327,20 @@ public class CustomIdPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									sequences.removeSelectedData();
-									sequences.deselectAllRecords();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								sequences.removeSelectedData();
+								sequences.deselectAllRecords();
+							}
+						});
 					}
 				});
 			}

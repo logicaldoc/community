@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
 import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -126,9 +125,9 @@ public class SavedSearchesPanel extends VLayout {
 				ListGridRecord selection = list.getSelectedRecord();
 
 				final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
-				
+
 				final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
-				
+
 				LD.askForValues("sharesearch", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }),
 						350, new ValuesCallback() {
 							@Override
@@ -140,7 +139,8 @@ public class SavedSearchesPanel extends VLayout {
 							public void execute(Map<String, Object> values) {
 								LD.contactingServer();
 								SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
-										usersSelector.getUserIds(), groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+										usersSelector.getUserIds(), groupsSelector.getGroupIds(),
+										new AsyncCallback<Void>() {
 
 											@Override
 											public void onFailure(Throwable caught) {
@@ -170,22 +170,19 @@ public class SavedSearchesPanel extends VLayout {
 					names[i] = selection[i].getAttributeAsString("name");
 				}
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SearchService.Instance.get().delete(names, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						SearchService.Instance.get().delete(names, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+							}
+						});
 					}
 				});
 			}

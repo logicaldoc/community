@@ -20,7 +20,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -211,25 +210,21 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							AutomationService.Instance.get().deleteTriggers(new long[] { id },
-									new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						AutomationService.Instance.get().deleteTriggers(new long[] { id }, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-										@Override
-										public void onSuccess(Void result) {
-											list.removeSelectedData();
-											list.deselectAllRecords();
-											showTriggerDetails(null);
-										}
-									});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showTriggerDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -269,8 +264,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 
 		rec.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : null);
 		rec.setAttribute("date", trigger.getDate() != null ? trigger.getDate() : null);
-		rec.setAttribute("cron",
-				trigger.getCron() != null && !trigger.getCron().isEmpty() ? trigger.getCron() : null);
+		rec.setAttribute("cron", trigger.getCron() != null && !trigger.getCron().isEmpty() ? trigger.getCron() : null);
 
 		rec.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
 

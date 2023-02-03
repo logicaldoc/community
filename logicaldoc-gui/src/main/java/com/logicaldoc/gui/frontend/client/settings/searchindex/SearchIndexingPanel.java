@@ -36,7 +36,6 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -450,7 +449,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		entries.setWidth("1%");
 
 		// Locked
-		StaticTextItem status = ItemFactory.newStaticTextItem("status", 
+		StaticTextItem status = ItemFactory.newStaticTextItem("status",
 				this.searchEngine.isLocked() ? ("<span style='color:red'>" + I18N.message("locked") + "</span>")
 						: I18N.message("unlocked"));
 		status.setRedrawOnChange(true);
@@ -666,30 +665,27 @@ public class SearchIndexingPanel extends AdminPanel {
 		final IButton rescheduleAll = new IButton(I18N.message("rescheduleall"));
 		rescheduleAll.setAutoFit(true);
 		rescheduleAll.addClickHandler((ClickEvent rescheduleAllClick) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmreindex"), new BooleanCallback() {
-				@Override
-				public void execute(Boolean value) {
-					if (value) {
-						LD.contactingServer();
-						rescheduleAll.setDisabled(true);
-						SearchEngineService.Instance.get().rescheduleAll(false, new AsyncCallback<Void>() {
+			LD.ask(I18N.message("question"), I18N.message("confirmreindex"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					LD.contactingServer();
+					rescheduleAll.setDisabled(true);
+					SearchEngineService.Instance.get().rescheduleAll(false, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								rescheduleAll.setDisabled(false);
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
+							rescheduleAll.setDisabled(false);
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void ret) {
-								GuiLog.info(I18N.message("docsreindex"), null);
-								rescheduleAll.setDisabled(false);
-								LD.clearPrompt();
-								AdminScreen.get().setContent(new SearchIndexingPanel());
-							}
-						});
-					}
+						@Override
+						public void onSuccess(Void ret) {
+							GuiLog.info(I18N.message("docsreindex"), null);
+							rescheduleAll.setDisabled(false);
+							LD.clearPrompt();
+							AdminScreen.get().setContent(new SearchIndexingPanel());
+						}
+					});
 				}
 			});
 		});

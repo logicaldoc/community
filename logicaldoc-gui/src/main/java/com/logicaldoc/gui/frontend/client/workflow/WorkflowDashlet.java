@@ -26,7 +26,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -220,7 +219,7 @@ public class WorkflowDashlet extends Portlet {
 
 		if (type == WorkflowDashboard.TASKS_ASSIGNED)
 			countTotalAssignedTasksToCurrentUser();
-		
+
 		addItem(list);
 	}
 
@@ -278,16 +277,13 @@ public class WorkflowDashlet extends Portlet {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ArrayList<String> ids = new ArrayList<String>();
-							ListGridRecord[] selectedRecords = list.getSelectedRecords();
-							for (ListGridRecord rec : selectedRecords)
-								ids.add(rec.getAttributeAsString("processId"));
-							workflowDashboard.killWorkflows(ids);
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ArrayList<String> ids = new ArrayList<String>();
+						ListGridRecord[] selectedRecords = list.getSelectedRecords();
+						for (ListGridRecord rec : selectedRecords)
+							ids.add(rec.getAttributeAsString("processId"));
+						workflowDashboard.killWorkflows(ids);
 					}
 				});
 			}

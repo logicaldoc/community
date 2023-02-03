@@ -17,7 +17,6 @@ import com.logicaldoc.gui.frontend.client.services.TagService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -172,8 +171,7 @@ public class TagsForm extends VLayout {
 	}
 
 	private void executeSearch(ListGridRecord rec) {
-		searchTag(rec.getAttributeAsString("word"),
-				Boolean.parseBoolean(otherCharForm.getValueAsString(SEARCHINHITS)));
+		searchTag(rec.getAttributeAsString("word"), Boolean.parseBoolean(otherCharForm.getValueAsString(SEARCHINHITS)));
 	}
 
 	private void showContextMenu(boolean admin) {
@@ -228,26 +226,21 @@ public class TagsForm extends VLayout {
 			delete.setTitle(I18N.message("ddelete"));
 			delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 				public void onClick(MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-						@Override
-						public void execute(Boolean value) {
-							if (value) {
-								ListGridRecord selection = tags.getSelectedRecord();
-								TagService.Instance.get().delete(selection.getAttribute("word"),
-										new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
+							ListGridRecord selection = tags.getSelectedRecord();
+							TagService.Instance.get().delete(selection.getAttribute("word"), new AsyncCallback<Void>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-											@Override
-											public void onSuccess(Void arg) {
-												GuiLog.info(I18N.message("procinexecution"),
-														I18N.message("taginexecution"));
-												tags.removeSelectedData();
-											}
-										});
-							}
+								@Override
+								public void onSuccess(Void arg) {
+									GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
+									tags.removeSelectedData();
+								}
+							});
 						}
 					});
 				}

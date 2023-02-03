@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
@@ -128,26 +127,23 @@ public class PluginsPanel extends VLayout {
 		initialize.setTitle(I18N.message("initialize"));
 		initialize.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirminitializeplugin"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							LD.contactingServer();
-							SystemService.Instance.get().initializePlugin(
-									list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											LD.clearPrompt();
-											GuiLog.serverError(caught);
-										}
+				LD.ask(I18N.message("question"), I18N.message("confirminitializeplugin"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						LD.contactingServer();
+						SystemService.Instance.get().initializePlugin(
+								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onSuccess(Void result) {
-											LD.clearPrompt();
-											GuiLog.info(I18N.message("plugininitialized"), null);
-										}
-									});
-						}
+									@Override
+									public void onSuccess(Void result) {
+										LD.clearPrompt();
+										GuiLog.info(I18N.message("plugininitialized"), null);
+									}
+								});
 					}
 				});
 			}
@@ -156,26 +152,23 @@ public class PluginsPanel extends VLayout {
 		uninstall.setTitle(I18N.message("uninstall"));
 		uninstall.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmuninstallplugin"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							LD.contactingServer();
-							SystemService.Instance.get().uninstallPlugin(
-									list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											LD.clearPrompt();
-											GuiLog.serverError(caught);
-										}
+				LD.ask(I18N.message("question"), I18N.message("confirmuninstallplugin"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						LD.contactingServer();
+						SystemService.Instance.get().uninstallPlugin(
+								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onSuccess(Void result) {
-											LD.clearPrompt();
-											GuiLog.info(I18N.message("pluginuninstalled"), null);
-										}
-									});
-						}
+									@Override
+									public void onSuccess(Void result) {
+										LD.clearPrompt();
+										GuiLog.info(I18N.message("pluginuninstalled"), null);
+									}
+								});
 					}
 				});
 			}

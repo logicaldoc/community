@@ -19,7 +19,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -244,26 +243,23 @@ public class WorkflowHistoryDialog extends Window {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							WorkflowService.Instance.get().deleteInstance(selection.getAttributeAsString("id"),
-									new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						WorkflowService.Instance.get().deleteInstance(selection.getAttributeAsString("id"),
+								new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onSuccess(Void result) {
-											instancesGrid.removeSelectedData();
-											instancesGrid.deselectAllRecords();
-											historiesPanel.getHistoriesGrid().removeSelectedData();
-											historiesPanel.getHistoriesGrid().deselectAllRecords();
-										}
-									});
-						}
+									@Override
+									public void onSuccess(Void result) {
+										instancesGrid.removeSelectedData();
+										instancesGrid.deselectAllRecords();
+										historiesPanel.getHistoriesGrid().removeSelectedData();
+										historiesPanel.getHistoriesGrid().deselectAllRecords();
+									}
+								});
 					}
 				});
 			}
@@ -271,23 +267,21 @@ public class WorkflowHistoryDialog extends Window {
 
 		MenuItem completionDiagram = new MenuItem();
 		completionDiagram.setTitle(I18N.message("completiondiagram"));
-		completionDiagram.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
-						selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
-						new AsyncCallback<GUIWorkflow>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		completionDiagram.addClickHandler((MenuItemClickEvent event) -> {
+			WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
+					selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
+					new AsyncCallback<GUIWorkflow>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIWorkflow workflow) {
-								WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
-								diagramWindow.show();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(GUIWorkflow workflow) {
+							WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
+							diagramWindow.show();
+						}
+					});
 		});
 
 		contextMenu.setItems(completionDiagram, delete);

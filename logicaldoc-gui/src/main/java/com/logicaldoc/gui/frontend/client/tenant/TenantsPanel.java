@@ -20,7 +20,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -240,25 +239,22 @@ public class TenantsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							TenantService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						TenantService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									details = SELECT_TENANT;
-									detailsContainer.setMembers(details);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								details = SELECT_TENANT;
+								detailsContainer.setMembers(details);
+							}
+						});
 					}
 				});
 			}
@@ -266,12 +262,8 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));
-		password.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SetAdminPassword dialog = new SetAdminPassword(rec.getAttributeAsString("name"));
-				dialog.show();
-			}
-		});
+		password.addClickHandler(
+				(MenuItemClickEvent event) -> new SetAdminPassword(rec.getAttributeAsString("name")).show());
 		password.setEnabled(!Session.get().isDemo());
 
 		if (id == Constants.TENANT_DEFAULTID) {

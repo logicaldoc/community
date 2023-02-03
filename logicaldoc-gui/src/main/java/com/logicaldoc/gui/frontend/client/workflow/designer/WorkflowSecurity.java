@@ -15,7 +15,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -287,13 +286,9 @@ public class WorkflowSecurity extends Window {
 		if (selection == null || selection.length == 0)
 			return;
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-			@Override
-			public void execute(Boolean value) {
-				if (value) {
-					list.removeSelectedData();
-				}
-			}
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+			if (Boolean.TRUE.equals(value))
+				list.removeSelectedData();
 		});
 	}
 

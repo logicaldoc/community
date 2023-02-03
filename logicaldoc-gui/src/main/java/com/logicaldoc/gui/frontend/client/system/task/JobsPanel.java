@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -140,33 +139,30 @@ public class JobsPanel extends VLayout {
 		unschedule.setTitle(I18N.message("unschedule"));
 		unschedule.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmunschedule"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							LD.contactingServer();
+				LD.ask(I18N.message("question"), I18N.message("confirmunschedule"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						LD.contactingServer();
 
-							List<GUIValue> selectedJobs = new ArrayList<GUIValue>();
-							ListGridRecord[] selection = list.getSelectedRecords();
-							for (ListGridRecord rec : selection)
-								selectedJobs.add(new GUIValue(rec.getAttributeAsString("trigger"),
-										rec.getAttributeAsString("group")));
+						List<GUIValue> selectedJobs = new ArrayList<GUIValue>();
+						ListGridRecord[] selection = list.getSelectedRecords();
+						for (ListGridRecord rec : selection)
+							selectedJobs.add(new GUIValue(rec.getAttributeAsString("trigger"),
+									rec.getAttributeAsString("group")));
 
-							SystemService.Instance.get().unscheduleJobs(selectedJobs.toArray(new GUIValue[0]),
-									new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											LD.clearPrompt();
-											GuiLog.serverError(caught);
-										}
+						SystemService.Instance.get().unscheduleJobs(selectedJobs.toArray(new GUIValue[0]),
+								new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onSuccess(Void result) {
-											LD.clearPrompt();
-											refresh();
-										}
-									});
-						}
+									@Override
+									public void onSuccess(Void result) {
+										LD.clearPrompt();
+										refresh();
+									}
+								});
 					}
 				});
 			}
