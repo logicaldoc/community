@@ -20,6 +20,8 @@ import com.smartgwt.client.widgets.Window;
  */
 public class ToastNotification extends Window {
 
+	private static final String WHITE = "white";
+
 	public ToastNotification(String messageText) {
 		setShowEdges(false);
 		setShowHeader(false);
@@ -32,8 +34,8 @@ public class ToastNotification extends Window {
 		setMargin(0);
 		setMembersMargin(3);
 		setPadding(0);
-		setBodyColor("white");
-		setBackgroundColor("white");
+		setBodyColor(WHITE);
+		setBackgroundColor(WHITE);
 		setBorder("1px solid DarkBlue");
 		setOverflow(Overflow.HIDDEN);
 		setAutoSize(true);
@@ -45,7 +47,7 @@ public class ToastNotification extends Window {
 		message.setStyleName("contactingserver");
 		message.setLayoutAlign(Alignment.CENTER);
 		message.setLayoutAlign(VerticalAlignment.CENTER);
-		message.setBackgroundColor("white");
+		message.setBackgroundColor(WHITE);
 		message.setHeight(50);
 
 		addItem(message);

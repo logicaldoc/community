@@ -25,6 +25,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class UserSelector extends SelectItem {
 
+	private static final String USERNAME = "username";
+
 	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled) {
 		this(name, title, groupIdOrName, allowNull, skipDisabled, null);
 	}
@@ -37,12 +39,12 @@ public class UserSelector extends SelectItem {
 
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setHidden(true);
-		ListGridField username = new ListGridField("username", I18N.message("username"));
+		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME));
 		ListGridField label = new ListGridField("label", I18N.message("name"));
 		UserListGridField avatar = new UserListGridField();
 
 		setValueField("id");
-		setDisplayField("username");
+		setDisplayField(USERNAME);
 		setSortField("label");
 		setPickListWidth(300);
 		setPickListFields(id, avatar, username, label);
@@ -91,7 +93,7 @@ public class UserSelector extends SelectItem {
 		if (selection != null) {
 			user = new GUIUser();
 			user.setId(selection.getAttributeAsLong("id"));
-			user.setUsername(selection.getAttributeAsString("username"));
+			user.setUsername(selection.getAttributeAsString(USERNAME));
 		}
 		return user;
 	}

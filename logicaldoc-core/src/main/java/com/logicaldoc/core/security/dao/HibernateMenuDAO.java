@@ -31,6 +31,8 @@ import com.logicaldoc.util.sql.SqlUtil;
 @SuppressWarnings("unchecked")
 public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> implements MenuDAO {
 
+	private static final String DOT_PARENT_ID = ".parentId=";
+
 	private static final String SELECT = "select ";
 
 	private static final String PARENT_ID = "parentId";
@@ -124,7 +126,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return coll;
 			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findByWhere(
-						ENTITY + ".id!=" + ENTITY + ".parentId and " + ENTITY + ".parentId=" + parentId
+						ENTITY + ".id!=" + ENTITY + ".parentId and " + ENTITY + DOT_PARENT_ID + parentId
 								+ (type == null ? "" : (AND + ENTITY + ".type=" + type))
 								+ (enabledOnly ? AND + ENTITY + ".enabled=1" : ""),
 						" order by  " + ENTITY + ".position asc, " + ENTITY + ".name asc", null);
@@ -217,7 +219,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query1.append(Long.toString(ug.getId()));
 				first = false;
 			}
-			query1.append(") and " + ENTITY + ".parentId=" + parentId);
+			query1.append(") and " + ENTITY + DOT_PARENT_ID + parentId);
 			query1.append(" and not(" + ENTITY + ".id=" + parentId + ")");
 
 			coll = (List<Menu>) findByQuery(query1.toString(), (Map<String, Object>) null, null);
@@ -430,7 +432,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (user == null)
 				return ids;
 			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return findIdsByWhere(ENTITY + ".enabled=1 and " + ENTITY + ".parentId=" + parentId
+				return findIdsByWhere(ENTITY + ".enabled=1 and " + ENTITY + DOT_PARENT_ID + parentId
 						+ (type == null ? "" : AND + ENTITY + ".type=" + type), null, null);
 
 			StringBuilder query1 = new StringBuilder();
@@ -671,7 +673,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (user == null)
 				return ids;
 			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return findIdsByWhere(ENTITY + ".parentId=" + parentId, null, null);
+				return findIdsByWhere(ENTITY + DOT_PARENT_ID + parentId, null, null);
 
 			StringBuilder query1 = new StringBuilder();
 			Set<Group> precoll = user.getGroups();

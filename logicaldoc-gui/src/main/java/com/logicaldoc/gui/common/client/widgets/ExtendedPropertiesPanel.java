@@ -48,6 +48,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class ExtendedPropertiesPanel extends HLayout {
 
+	private static final String TEMPLATE = "template";
+
 	protected GUIExtensibleObject object;
 
 	protected ChangedHandler changedHandler;
@@ -536,10 +538,10 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return;
 
 		if (allowTemplateSelection) {
-			if (values.get("template") == null || values.get("template").toString().isEmpty())
+			if (values.get(TEMPLATE) == null || values.get(TEMPLATE).toString().isEmpty())
 				object.setTemplateId(null);
 			else {
-				object.setTemplateId(Long.parseLong(values.get("template").toString()));
+				object.setTemplateId(Long.parseLong(values.get(TEMPLATE).toString()));
 			}
 		}
 

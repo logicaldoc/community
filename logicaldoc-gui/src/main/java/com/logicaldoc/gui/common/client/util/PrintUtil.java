@@ -16,11 +16,13 @@ import com.smartgwt.client.widgets.Canvas;
  */
 public class PrintUtil {
 
+	private static final String PRINT = "print";
+
 	public static void printPreview(String title, String htmlContent) {
 		StringBuilder content = new StringBuilder("<html><head>\n");
 
 		// Prepare the header
-		content.append("<title>" + (title != null ? I18N.message(title) : I18N.message("print")) + "</title>");
+		content.append("<title>" + (title != null ? I18N.message(title) : I18N.message(PRINT)) + "</title>");
 		content.append("\n<style>\n");
 		content.append(".cell, .cellDarkAltCol, .cellDark{white-space: nowrap;}\n ");
 		content.append(".printHeader{white-space: nowrap; font-weight: bold; border:0px solid white;}\n");
@@ -39,7 +41,7 @@ public class PrintUtil {
 		// Put the panel with the buttons
 		content.append(
 				"<div id='printPanel' class='printPanel default'><ul><li><a href='javascript:printPage();' id='printButton'>"
-						+ I18N.message("print") + "</a></li><li><a href='javascript:window.close();' id='printClose'>"
+						+ I18N.message(PRINT) + "</a></li><li><a href='javascript:window.close();' id='printClose'>"
 						+ I18N.message("close") + "</a></li></ul></div>");
 
 		// Get the HTML
@@ -80,11 +82,11 @@ public class PrintUtil {
 	}
 
 	public static void printScreenShot(String id) {
-		printScreenShot(id, I18N.message("print"));
+		printScreenShot(id, I18N.message(PRINT));
 	}
 
 	public static void printScreenShot(String id, String title) {
-		printScreenShot(id, title, I18N.message("print"), I18N.message("close"));
+		printScreenShot(id, title, I18N.message(PRINT), I18N.message("close"));
 	}
 
 	/**

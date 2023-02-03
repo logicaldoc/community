@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.layout.VStack;
  */
 public class LD {
 
+	private static final String VALUE = "value";
+
 	/**
 	 * Show a dialog to confirm a operation
 	 * 
@@ -133,7 +135,7 @@ public class LD {
 	 */
 	public static void askForValue(String title, String message, String defaultValue, Integer width,
 			ValueCallback callback) {
-		TextItem textItem = ItemFactory.newTextItem("value", message, defaultValue);
+		TextItem textItem = ItemFactory.newTextItem(VALUE, message, defaultValue);
 		askForValue(title, message, defaultValue, textItem, width, callback);
 	}
 
@@ -154,16 +156,16 @@ public class LD {
 		form.setWrapItemTitles(false);
 		form.setNumCols(1);
 
-		PasswordItem item = ItemFactory.newPasswordItem("value", message, null);
+		PasswordItem item = ItemFactory.newPasswordItem(VALUE, message, null);
 		item.setWidth("100%");
-		item.setName("value");
+		item.setName(VALUE);
 		item.setTitle(I18N.message(message));
 		item.setWrapTitle(false);
 		item.addKeyPressHandler((KeyPressEvent event) -> {
 			if (form.validate() && event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
 				if (callback != null) {
 					dialog.close();
-					callback.execute(form.getValue("value").toString());
+					callback.execute(form.getValue(VALUE).toString());
 					dialog.destroy();
 				}
 			}
@@ -177,7 +179,7 @@ public class LD {
 		ok.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
 			if (form.validate() && callback != null) {
 				dialog.close();
-				callback.execute(form.getValue("value").toString());
+				callback.execute(form.getValue(VALUE).toString());
 				dialog.destroy();
 			}
 		});
@@ -287,7 +289,7 @@ public class LD {
 				if (callback instanceof ValuesCallback) {
 					((ValuesCallback) callback).execute(form.getValues());
 				} else
-					callback.execute(form.getValue("value") != null ? form.getValue("value").toString() : null);
+					callback.execute(form.getValue(VALUE) != null ? form.getValue(VALUE).toString() : null);
 				dialog.destroy();
 			}
 		});
@@ -323,7 +325,7 @@ public class LD {
 			final Window dialog, final DynamicForm form) {
 		for (FormItem item : items) {
 			if (items.size() == 1)
-				item.setName("value");
+				item.setName(VALUE);
 
 			item.setWidth("100%");
 			if (message == null)
@@ -342,7 +344,7 @@ public class LD {
 					if (form.validate() && event.getKeyName() != null
 							&& "enter".equals(event.getKeyName().toLowerCase())) {
 						dialog.close();
-						callback.execute(form.getValue("value").toString());
+						callback.execute(form.getValue(VALUE).toString());
 						dialog.destroy();
 					}
 				});

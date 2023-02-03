@@ -15,6 +15,7 @@ import com.smartgwt.client.widgets.Label;
  */
 public class SessionTimeout extends Dialog {
 
+	private static final String WHITE = "white";
 	public static SessionTimeout instance;
 
 	public static SessionTimeout get() {
@@ -32,8 +33,8 @@ public class SessionTimeout extends Dialog {
 		setAlign(Alignment.CENTER);
 		setMargin(2);
 		setMembersMargin(0);
-		setBodyColor("white");
-		setBackgroundColor("white");
+		setBodyColor(WHITE);
+		setBackgroundColor(WHITE);
 		setOverflow(Overflow.HIDDEN);
 		setHeight100();
 		setWidth100();
@@ -45,7 +46,7 @@ public class SessionTimeout extends Dialog {
 		message.setLayoutAlign(Alignment.CENTER);
 		message.setLayoutAlign(VerticalAlignment.CENTER);
 		message.setHeight(50);
-		message.setBackgroundColor("white");
+		message.setBackgroundColor(WHITE);
 
 		addMember(message);
 	}

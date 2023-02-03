@@ -40,6 +40,8 @@ import com.smartgwt.client.widgets.IButton;
  */
 public class MultipleUpload extends HorizontalPanel {
 
+	private static final String DROP_FILES_LABEL_HOVER = "dropFilesLabelHover";
+
 	private Uploader uploader = new Uploader();
 
 	private List<String> uploadedFiles = new ArrayList<>();
@@ -58,14 +60,14 @@ public class MultipleUpload extends HorizontalPanel {
 			dropFilesLabel.setStyleName("dropFilesLabel");
 			dropFilesLabel.addDragOverHandler((DragOverEvent event) -> {
 				if (!uploader.getButtonDisabled()) {
-					dropFilesLabel.addStyleName("dropFilesLabelHover");
+					dropFilesLabel.addStyleName(DROP_FILES_LABEL_HOVER);
 				}
 			});
 			dropFilesLabel.addDragLeaveHandler((DragLeaveEvent event) -> {
-				dropFilesLabel.removeStyleName("dropFilesLabelHover");
+				dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER);
 			});
 			dropFilesLabel.addDropHandler((DropEvent event) -> {
-				dropFilesLabel.removeStyleName("dropFilesLabelHover");
+				dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER);
 
 				if (uploader.getStats().getUploadsInProgress() <= 0) {
 					progressBarPanel.clear();

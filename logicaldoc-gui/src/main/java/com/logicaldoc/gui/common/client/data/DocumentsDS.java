@@ -25,6 +25,8 @@ import com.smartgwt.client.types.FieldType;
  */
 public class DocumentsDS extends DataSource {
 
+	private static final String PAGE = "&page=";
+
 	public static final Integer DEFAULT_MAX = 100;
 
 	private GUIFolder folder = null;
@@ -55,13 +57,13 @@ public class DocumentsDS extends DataSource {
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
 					+ defaultValue(folderId) + "&filename=" + defaultValue(fileFilter)
 					+ "&max=" + max(max) + "&indexed="
-					+ defaultValue(indexed) + "&page=" + page
+					+ defaultValue(indexed) + PAGE + page
 					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : "")
 					+ defaultValue(Session.get().getHiliteDocId()));
 		} else if (barcoded)
-			setDataURL("data/barcodequeue.xml?max=" + max(max) + "&page=" + page);
+			setDataURL("data/barcodequeue.xml?max=" + max(max) + PAGE + page);
 		else
-			setDataURL("data/zonalocrqueue.xml?max=" + max(max) + "&page=" + page);
+			setDataURL("data/zonalocrqueue.xml?max=" + max(max) + PAGE + page);
 	}
 
 	private Integer max(Integer max) {

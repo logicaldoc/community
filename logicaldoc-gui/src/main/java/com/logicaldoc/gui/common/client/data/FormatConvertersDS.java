@@ -13,6 +13,8 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class FormatConvertersDS extends DataSource {
 
+	private static final String CONVERTER = "converter";
+
 	public FormatConvertersDS(String converter) {
 		setTitleField("converters");
 		setRecordXPath("/list/association");
@@ -38,9 +40,9 @@ public class FormatConvertersDS extends DataSource {
 		id.setPrimaryKey(true);
 		DataSourceTextField in = new DataSourceTextField("in", I18N.message("in"));
 		DataSourceTextField out = new DataSourceTextField("out", I18N.message("out"));
-		DataSourceTextField converter = new DataSourceTextField("converter", I18N.message("converter"));
+		DataSourceTextField converter = new DataSourceTextField(CONVERTER, I18N.message(CONVERTER));
 		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled", I18N.message("enabled"));
-		DataSourceTextField label = new DataSourceTextField("label", I18N.message("converter"));
+		DataSourceTextField label = new DataSourceTextField("label", I18N.message(CONVERTER));
 
 		setFields(id, in, out, converter, label, enabled);
 		setDataURL("data/formatconverters.xml?1=1" + (inExt != null ? "&in=" + inExt : "")

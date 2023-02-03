@@ -32,6 +32,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class Avatar extends HLayout {
 
+	private static final String GUI_AVATAR_SIZE = "gui.avatar.size";
+
 	private long userId;
 
 	private AsyncCallback<Void> callback;
@@ -57,7 +59,7 @@ public class Avatar extends HLayout {
 			for (Canvas canvas : members)
 				removeChild(canvas);
 
-		int avatarSize = Session.get().getConfigAsInt("gui.avatar.size");
+		int avatarSize = Session.get().getConfigAsInt(GUI_AVATAR_SIZE);
 		Img avatarImage = new Img(Util.avatarUrl(Long.toString(userId), true), avatarSize, avatarSize);
 		avatarImage.setLeft(0);
 		avatarImage.setLayoutAlign(Alignment.LEFT);
@@ -130,8 +132,8 @@ public class Avatar extends HLayout {
 				}
 			});
 
-			Label hint = new Label(I18N.message("avatarhint", Session.get().getConfig("gui.avatar.size"),
-					Session.get().getConfig("gui.avatar.size")));
+			Label hint = new Label(I18N.message("avatarhint", Session.get().getConfig(GUI_AVATAR_SIZE),
+					Session.get().getConfig(GUI_AVATAR_SIZE)));
 			hint.setHeight(20);
 			hint.setWrap(false);
 

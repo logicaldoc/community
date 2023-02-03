@@ -131,7 +131,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public T findById(long id) throws PersistenceException {
 		T entity = null;
 		try {
-			entity = (T) sessionFactory.getCurrentSession().get(entityClass, id);
+			entity = sessionFactory.getCurrentSession().get(entityClass, id);
 			if (entity != null && entity.getDeleted() == 1)
 				return null;
 			return entity;
@@ -171,7 +171,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			logQuery(query);
 			Query<T> queryObject = prepareQueryForObject(query, values, max);
-			coll = (List<T>) queryObject.list();
+			coll = queryObject.list();
 			return coll;
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
@@ -199,12 +199,10 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Override
 	public List<T> findByObjectQuery(String query, Map<String, Object> parameters, Integer max)
 			throws PersistenceException {
-		List<T> coll = new ArrayList<>();
 		try {
 			logQuery(query);
 			Query<T> queryObject = prepareQueryForObject(query, parameters, max);
-			coll = (List<T>) queryObject.list();
-			return coll;
+			return queryObject.list();
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
 		}
@@ -217,12 +215,10 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List findByQuery(String query, Object[] values, Integer max) throws PersistenceException {
-		List<Object> coll = new ArrayList<>();
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, values, max);
-			coll = (List<Object>) queryObject.list();
-			return coll;
+			return queryObject.list();
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
 		}
@@ -231,12 +227,10 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
-		List<Object> coll = new ArrayList<>();
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, parameters, max);
-			coll = (List<Object>) queryObject.list();
-			return coll;
+			return queryObject.list();
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
 		}
@@ -250,7 +244,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Override
 	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max)
 			throws PersistenceException {
-		List<Long> coll = new ArrayList<>();
 		try {
 			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
 					? ORDER_BY + " " + order
@@ -260,8 +253,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
 			logQuery(query);
 			Query<Long> queryObject = prepareQueryForLong(query, values, max);
-			coll = (List<Long>) queryObject.list();
-			return coll;
+			return queryObject.list();
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
 		}
@@ -323,9 +315,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	protected void refresh(Object entity) {
-		if(entity==null)
+		if (entity == null)
 			return;
-		
+
 		try {
 			if (!sessionFactory.getCurrentSession().contains(entity)) {
 				sessionFactory.getCurrentSession().refresh(entity);

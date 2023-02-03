@@ -11,8 +11,10 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 6.0
  */
 public class WorkflowTriggersDS extends DataSource {
+	private static final String WORKFLOW = "workflow";
+
 	public WorkflowTriggersDS(String folderId) {
-		setTitleField("workflow");
+		setTitleField(WORKFLOW);
 		setRecordXPath("/list/workflowtrigger");
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
@@ -22,7 +24,7 @@ public class WorkflowTriggersDS extends DataSource {
 		workflowId.setHidden(true);
 		DataSourceTextField templateId = new DataSourceTextField("templateId");
 		templateId.setHidden(true);
-		DataSourceTextField workflow = new DataSourceTextField("workflow", I18N.message("workflow"));
+		DataSourceTextField workflow = new DataSourceTextField(WORKFLOW, I18N.message(WORKFLOW));
 		DataSourceTextField template = new DataSourceTextField("template", I18N.message("template"));
 		DataSourceTextField events = new DataSourceTextField("events", I18N.message("triggeron"));
 		setFields(id, workflowId, templateId, workflow, template, events);

@@ -17,6 +17,12 @@ import com.smartgwt.client.types.DateDisplayFormat;
  * @since 6.0
  */
 public class I18N {
+	private static final String FORMAT_DATELONG = "format_datelong";
+
+	private static final String FORMAT_DATE = "format_date";
+
+	private static final String FORMAT_DATESHORT = "format_dateshort";
+
 	private static String locale = "en";
 
 	private static GUIValue[] languages;
@@ -169,9 +175,9 @@ public class I18N {
 		/*
 		 * Prepare the date formatters
 		 */
-		dateFormat = DateTimeFormat.getFormat(message("format_date"));
-		dateFormatShort = DateTimeFormat.getFormat(message("format_dateshort"));
-		dateFormatLong = DateTimeFormat.getFormat(message("format_datelong"));
+		dateFormat = DateTimeFormat.getFormat(message(FORMAT_DATE));
+		dateFormatShort = DateTimeFormat.getFormat(message(FORMAT_DATESHORT));
+		dateFormatLong = DateTimeFormat.getFormat(message(FORMAT_DATELONG));
 	}
 
 	public static void init(GUIUser user) {
@@ -183,17 +189,17 @@ public class I18N {
 		if (user.getDateFormat() != null && !user.getDateFormat().isEmpty())
 			dateFormat = DateTimeFormat.getFormat(user.getDateFormat());
 		else
-			dateFormat = DateTimeFormat.getFormat(message("format_date"));
+			dateFormat = DateTimeFormat.getFormat(message(FORMAT_DATE));
 
 		if (user.getDateFormatShort() != null && !user.getDateFormatShort().isEmpty())
 			dateFormatShort = DateTimeFormat.getFormat(user.getDateFormatShort());
 		else
-			dateFormatShort = DateTimeFormat.getFormat(message("format_dateshort"));
+			dateFormatShort = DateTimeFormat.getFormat(message(FORMAT_DATESHORT));
 
 		if (user.getDateFormatLong() != null && !user.getDateFormatLong().isEmpty())
 			dateFormatLong = DateTimeFormat.getFormat(user.getDateFormatLong());
 		else
-			dateFormatLong = DateTimeFormat.getFormat(message("format_datelong"));
+			dateFormatLong = DateTimeFormat.getFormat(message(FORMAT_DATELONG));
 	}
 
 	public static GUIValue[] getGuiLanguages() {
@@ -231,12 +237,12 @@ public class I18N {
 	}
 
 	public static DateDisplayFormat getDateDisplayFormat(boolean withTime) {
-		if ("yyyy/MM/dd".equals(I18N.message("format_dateshort"))) {
+		if ("yyyy/MM/dd".equals(I18N.message(FORMAT_DATESHORT))) {
 			if (withTime)
 				return DateDisplayFormat.TOJAPANSHORTDATETIME;
 			else
 				return DateDisplayFormat.TOJAPANSHORTDATE;
-		} else if (I18N.message("format_dateshort").contains("MM/dd")) {
+		} else if (I18N.message(FORMAT_DATESHORT).contains("MM/dd")) {
 			if (withTime)
 				return DateDisplayFormat.TOUSSHORTDATETIME;
 			else
