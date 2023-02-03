@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
@@ -149,31 +148,28 @@ public class VersionsPanel extends VLayout {
 					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 				}
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							listGrid.removeSelectedData();
-							listGrid.deselectAllRecords();
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						listGrid.removeSelectedData();
+						listGrid.deselectAllRecords();
 
-							ImpexService.Instance.get().deleteVersions(archiveId, ids, new AsyncCallback<GUIArchive>() {
+						ImpexService.Instance.get().deleteVersions(archiveId, ids, new AsyncCallback<GUIArchive>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIArchive archive) {
+								ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
+								if (selectedRecord != null) {
+									selectedRecord.setAttribute("size", archive.getSize());
+									archivesList.getList()
+											.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
 								}
-
-								@Override
-								public void onSuccess(GUIArchive archive) {
-									ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
-									if (selectedRecord != null) {
-										selectedRecord.setAttribute("size", archive.getSize());
-										archivesList.getList()
-												.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
-									}
-								}
-							});
-						}
+							}
+						});
 					}
 				});
 			}

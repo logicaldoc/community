@@ -17,7 +17,6 @@ import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -210,24 +209,21 @@ public class ExportArchivesList extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showDetails(null, true);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showDetails(null, true);
+							}
+						});
 					}
 				});
 			}
@@ -245,12 +241,9 @@ public class ExportArchivesList extends VLayout {
 		close.setTitle(I18N.message("close"));
 		close.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							onClosingArchive(rec, id);
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						onClosingArchive(rec, id);
 					}
 				});
 			}
@@ -282,8 +275,8 @@ public class ExportArchivesList extends VLayout {
 	}
 
 	protected void closeArchive(final ListGridRecord rec) {
-		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")),
-				GUIArchive.STATUS_CLOSED, new AsyncCallback<Void>() {
+		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_CLOSED,
+				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -321,8 +314,8 @@ public class ExportArchivesList extends VLayout {
 	}
 
 	protected void openArchive(final ListGridRecord rec) {
-		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")),
-				GUIArchive.STATUS_OPENED, new AsyncCallback<Void>() {
+		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_OPENED,
+				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

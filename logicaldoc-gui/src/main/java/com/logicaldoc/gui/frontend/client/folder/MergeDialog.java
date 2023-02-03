@@ -4,7 +4,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -55,16 +54,12 @@ public class MergeDialog extends Dialog {
 				LD.ask(I18N.message("merge"),
 						I18N.message("mergeask",
 								new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
-						new BooleanCallback() {
-
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									FolderNavigator.get().mergeTo(Long
-											.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
-								}
-								destroy();
+						(Boolean value) -> {
+							if (Boolean.TRUE.equals(value)) {
+								FolderNavigator.get().mergeTo(
+										Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
 							}
+							destroy();
 						});
 			}
 		});

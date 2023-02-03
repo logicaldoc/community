@@ -214,10 +214,8 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"),(Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
 							MessageService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
@@ -230,7 +228,6 @@ public class MessagesPanel extends VLayout implements UserObserver {
 								}
 							});
 						}
-					}
 				});
 			}
 		});

@@ -17,7 +17,6 @@ import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.document.note.NotesPanel;
 import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignaturePanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -625,13 +624,9 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			try {
 				// Check if the user has changed the extension and warn him
 				if (!originalExtension.equalsIgnoreCase(Util.getExtension(document.getFileName()))) {
-					LD.ask(I18N.message("filename"), I18N.message("extchangewarn"), new BooleanCallback() {
-
-						@Override
-						public void execute(Boolean value) {
-							if (value)
+					LD.ask(I18N.message("filename"), I18N.message("extchangewarn"), (Boolean value) -> {
+							if (Boolean.TRUE.equals(value))
 								saveDocument();
-						}
 					});
 				} else {
 					saveDocument();

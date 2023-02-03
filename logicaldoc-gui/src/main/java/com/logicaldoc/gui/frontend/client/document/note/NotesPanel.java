@@ -15,7 +15,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -121,7 +120,7 @@ public class NotesPanel extends DocumentDetailTab {
 				GridUtil.exportCSV(notesGrid, true);
 			}
 		});
-		
+
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		print.addClickHandler(new ClickHandler() {
 			@Override
@@ -212,22 +211,19 @@ public class NotesPanel extends DocumentDetailTab {
 		for (int i = 0; i < selection.length; i++)
 			ids[i] = selection[i].getAttributeAsLong("id");
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-			@Override
-			public void execute(Boolean value) {
-				if (value) {
-					DocumentService.Instance.get().deleteNotes(ids, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+			if (Boolean.TRUE.equals(value)) {
+				DocumentService.Instance.get().deleteNotes(ids, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							notesGrid.removeSelectedData();
-						}
-					});
-				}
+					@Override
+					public void onSuccess(Void result) {
+						notesGrid.removeSelectedData();
+					}
+				});
 			}
 		});
 	}

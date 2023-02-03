@@ -67,7 +67,7 @@ public class SaveDialog extends Window {
 
 	private void onSave() {
 		vm.validate();
-		if (vm.hasErrors())
+		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return;
 
 		final GUISearchOptions options = Search.get().getOptions();

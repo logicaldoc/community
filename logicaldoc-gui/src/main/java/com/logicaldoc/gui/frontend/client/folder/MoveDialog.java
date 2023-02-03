@@ -4,7 +4,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -53,16 +52,12 @@ public class MoveDialog extends Dialog {
 					shownName = selection.length + " " + I18N.message("folders").toLowerCase();
 
 				LD.ask(I18N.message("move"),
-						I18N.message("moveask", new String[] { shownName,
-								folders.getSelectedRecord().getAttributeAsString("name") }), new BooleanCallback() {
-
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									FolderNavigator.get()
-											.moveTo(Long.parseLong(folders.getSelectedRecord().getAttributeAsString(
-													"folderId")));
-								}
+						I18N.message("moveask",
+								new String[] { shownName, folders.getSelectedRecord().getAttributeAsString("name") }),
+						(Boolean value) -> {
+							if (Boolean.TRUE.equals(value)) {
+								FolderNavigator.get().moveTo(
+										Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
 								destroy();
 							}
 						});

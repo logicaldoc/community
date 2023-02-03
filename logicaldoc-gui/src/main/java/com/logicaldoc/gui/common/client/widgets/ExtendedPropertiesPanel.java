@@ -517,7 +517,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
 
-		if (vm.hasErrors())
+		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
 
 		if (isDocument() && allowTemplateSelection)

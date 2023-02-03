@@ -8,7 +8,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -56,34 +55,29 @@ public class InheritRightsDialog extends Dialog {
 		inheritRights.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				LD.ask(I18N.message("inheritrights"),
-						I18N.message("inheritrightsask", new String[] {
-								FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
-								folders.getSelectedRecord().getAttributeAsString("name") }), new BooleanCallback() {
+						I18N.message("inheritrightsask",
+								new String[] { FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
+										folders.getSelectedRecord().getAttributeAsString("name") }),
+						(Boolean value) -> {
+							if (Boolean.TRUE.equals(value)) {
+								FolderService.Instance.get().inheritRights(panel.getFolder().getId(),
+										Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
+										new AsyncCallback<GUIFolder>() {
 
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									FolderService.Instance.get()
-											.inheritRights(
-													panel.getFolder().getId(),
-													Long.parseLong(folders.getSelectedRecord().getAttributeAsString(
-															"folderId")), new AsyncCallback<GUIFolder>() {
+											@Override
+											public void onFailure(Throwable caught) {
+												GuiLog.serverError(caught);
+												destroy();
+											}
 
-														@Override
-														public void onFailure(Throwable caught) {
-															GuiLog.serverError(caught);
-															destroy();
-														}
-
-														@Override
-														public void onSuccess(GUIFolder arg) {
-															panel.refresh(arg);
-															destroy();
-														}
-													});
-								}
-								destroy();
+											@Override
+											public void onSuccess(GUIFolder arg) {
+												panel.refresh(arg);
+												destroy();
+											}
+										});
 							}
+							destroy();
 						});
 			}
 		});

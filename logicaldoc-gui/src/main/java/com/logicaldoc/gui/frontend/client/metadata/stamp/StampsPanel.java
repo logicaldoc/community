@@ -20,7 +20,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -207,24 +206,21 @@ public class StampsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							StampService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						StampService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showStampDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showStampDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -232,44 +228,40 @@ public class StampsPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler((MenuItemClickEvent event) -> {
+			StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(rec));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute("eenabled", "0");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
-						new AsyncCallback<Void>() {
+		disable.addClickHandler((MenuItemClickEvent event) -> {
+			StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(rec));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute("eenabled", "2");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
 		if ("0".equals(rec.getAttributeAsString("eenabled")))

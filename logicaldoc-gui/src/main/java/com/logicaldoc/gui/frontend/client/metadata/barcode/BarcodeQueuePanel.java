@@ -19,7 +19,6 @@ import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -94,27 +93,23 @@ public class BarcodeQueuePanel extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				LD.ask(I18N.message("rescheduleallprocessing"), I18N.message("rescheduleallprocessingask"),
-						new BooleanCallback() {
+						(Boolean value) -> {
+							if (Boolean.TRUE.equals(value))
+								BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
 
-							@Override
-							public void execute(Boolean value) {
-								if (value)
-									BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(Void ret) {
-											GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
-											maxRecords = (Integer) max.getValue();
-											list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false,
-													null));
-										}
-									});
-							}
+									@Override
+									public void onSuccess(Void ret) {
+										GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
+										maxRecords = (Integer) max.getValue();
+										list.refresh(
+												new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
+									}
+								});
 						});
 			}
 		});

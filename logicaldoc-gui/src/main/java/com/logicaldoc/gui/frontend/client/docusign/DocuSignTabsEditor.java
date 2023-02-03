@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.note.AbstractAnnotationsWindow;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -40,19 +39,17 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 	@Override
 	protected DrawItem prepareAnnotationItem(GUIDocumentNote note) {
 		DrawItem drawItem = newAnnotationItem(note);
-		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN) || note.getUserId() == Session.get().getUser().getId()) {
+		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
+				|| note.getUserId() == Session.get().getUser().getId()) {
 			DocuSignTabContextMenu contextMenu = new DocuSignTabContextMenu(drawItem, note);
 			contextMenu.addDeleteClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 
 				@Override
 				public void onClick(com.smartgwt.client.widgets.menu.events.MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-						@Override
-						public void execute(Boolean value) {
-							if (value) {
-								notes.remove(note);
-								drawItem.erase();
-							}
+					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
+							notes.remove(note);
+							drawItem.erase();
 						}
 					});
 				}

@@ -19,7 +19,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -197,24 +196,21 @@ public class FormsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showFormDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showFormDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -222,33 +218,20 @@ public class FormsPanel extends AdminPanel {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				onEdit();
-			}
-		});
+		edit.addClickHandler((MenuItemClickEvent event) -> onEdit());
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				WindowUtils.openUrlInNewTab(webformURL(formId));
-			}
-		});
+		preview.addClickHandler((MenuItemClickEvent event) -> WindowUtils.openUrlInNewTab(webformURL(formId)));
 		preview.setEnabled(rec.getAttributeAsBoolean("webEnabled"));
 
 		MenuItem invite = new MenuItem();
 		invite.setTitle(I18N.message("invite"));
-		invite.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				GUIForm selectedForm = getSelectedForm();
-				if (selectedForm != null) {
-					FormInvitationDialog invitation = new FormInvitationDialog(selectedForm.getId());
-					invitation.show();
-				}
+		invite.addClickHandler((MenuItemClickEvent event) -> {
+			GUIForm selectedForm = getSelectedForm();
+			if (selectedForm != null) {
+				FormInvitationDialog invitation = new FormInvitationDialog(selectedForm.getId());
+				invitation.show();
 			}
 		});
 		invite.setEnabled(rec.getAttributeAsBoolean("webEnabled"));

@@ -391,7 +391,7 @@ public class StampProperties extends StampDetailsTab {
 
 	public boolean validate() {
 		vm.validate();
-		if (vm.hasErrors())
+		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
 
 		if (vm.getValueAsString("name") != null)

@@ -53,14 +53,11 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 				@Override
 				public void onClick(com.smartgwt.client.widgets.menu.events.MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-						@Override
-						public void execute(Boolean value) {
-							if (value) {
+					LD.ask(I18N.message("question"), I18N.message("confirmdelete"),(Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
 								notes.remove(note);
 								drawItem.erase();
 							}
-						}
 					});
 				}
 			});

@@ -13,14 +13,12 @@ import com.logicaldoc.gui.common.client.widgets.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.EmailAccountService;
-import com.logicaldoc.gui.frontend.client.services.ImportFolderService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -87,10 +85,9 @@ public class EmailAccountsPanel extends AdminPanel {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
-		
 		IntegerListGridField emails = new IntegerListGridField("emails", I18N.message("importedemails"));
 		emails.setAutoFitWidth(true);
-		
+
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
@@ -190,24 +187,21 @@ public class EmailAccountsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							EmailAccountService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						EmailAccountService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -240,8 +234,8 @@ public class EmailAccountsPanel extends AdminPanel {
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				EmailAccountService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
-						true, new AsyncCallback<Void>() {
+				EmailAccountService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
+						new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -261,8 +255,8 @@ public class EmailAccountsPanel extends AdminPanel {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				EmailAccountService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
-						false, new AsyncCallback<Void>() {
+				EmailAccountService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
+						new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -282,22 +276,19 @@ public class EmailAccountsPanel extends AdminPanel {
 		resetCache.setTitle(I18N.message("resetcache"));
 		resetCache.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							EmailAccountService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						EmailAccountService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									GuiLog.info(I18N.message("cachedeleted"), null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("cachedeleted"), null);
+							}
+						});
 					}
 				});
 			}
@@ -307,29 +298,26 @@ public class EmailAccountsPanel extends AdminPanel {
 		resetCounter.setTitle(I18N.message("resetcounter"));
 		resetCounter.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcounter"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							EmailAccountService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcounter"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						EmailAccountService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									GuiLog.info(I18N.message("counterreseted"), null);
-									rec.setAttribute("emails", "0");
-									list.refreshRow(list.getRecordIndex(rec));
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("counterreseted"), null);
+								rec.setAttribute("emails", "0");
+								list.refreshRow(list.getRecordIndex(rec));
+							}
+						});
 					}
 				});
 			}
 		});
-		
+
 		if ("0".equals(rec.getAttributeAsString("eenabled")))
 			contextMenu.setItems(test, disable, delete, resetCache, resetCounter);
 		else

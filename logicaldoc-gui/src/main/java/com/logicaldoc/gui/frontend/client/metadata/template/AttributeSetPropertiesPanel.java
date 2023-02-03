@@ -661,25 +661,22 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			final ListGridRecord selection = attributesList.getSelectedRecord();
 
 			LD.ask(I18N.message("applyvalidationtotemplates"), I18N.message("applyvalidationtotemplatesquestion"),
-					new BooleanCallback() {
-						@Override
-						public void execute(Boolean value) {
-							if (value) {
-								LD.contactingServer();
-								AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
-										selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-												LD.clearPrompt();
-											}
+					(Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
+							LD.contactingServer();
+							AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
+									selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+											LD.clearPrompt();
+										}
 
-											@Override
-											public void onSuccess(Void arg0) {
-												LD.clearPrompt();
-											}
-										});
-							}
+										@Override
+										public void onSuccess(Void arg0) {
+											LD.clearPrompt();
+										}
+									});
 						}
 					});
 		});
@@ -699,17 +696,14 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				names[i] = selection[i].getAttribute("name");
 			}
 
-			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), new BooleanCallback() {
-				@Override
-				public void execute(Boolean value) {
-					if (value) {
+			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
 						for (String attrName : names)
 							attributeSet.removeAttribute(attrName);
 						attributesList.removeSelectedData();
 						clean();
 						detailsPanel.enableSave();
 					}
-				}
 			});
 		});
 		return delete;

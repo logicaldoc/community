@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.ListGridEditEvent;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
@@ -153,22 +152,19 @@ public class BookmarksPanel extends VLayout {
 					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 				}
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+							}
+						});
 					}
 				});
 			}
@@ -206,8 +202,7 @@ public class BookmarksPanel extends VLayout {
 	private void onBookmarkSelected() {
 		ListGridRecord rec = list.getSelectedRecord();
 		if (rec.getAttributeAsString("type").equals("0"))
-			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"),
-					rec.getAttributeAsLong("targetId"));
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"), rec.getAttributeAsLong("targetId"));
 		else
 			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("targetId"), null);
 	}

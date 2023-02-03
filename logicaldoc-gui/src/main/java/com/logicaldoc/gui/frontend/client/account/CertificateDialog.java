@@ -122,11 +122,8 @@ public class CertificateDialog extends Window {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				SC.ask(I18N.message("deletecertwarn"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
+				SC.ask(I18N.message("deletecertwarn"), (Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
 							LD.contactingServer();
 							SignService.Instance.get().deleteCertificate(new AsyncCallback<Void>() {
 								@Override
@@ -144,7 +141,6 @@ public class CertificateDialog extends Window {
 								}
 							});
 						}
-					}
 				});
 
 			}

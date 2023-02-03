@@ -20,7 +20,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -153,8 +152,8 @@ public class ImportFoldersPanel extends AdminPanel {
 			public void onSelectionChanged(SelectionEvent event) {
 				Record rec = list.getSelectedRecord();
 				if (rec != null)
-					ImportFolderService.Instance.get().getImportFolder(
-							Long.parseLong(rec.getAttributeAsString("id")), new AsyncCallback<GUIImportFolder>() {
+					ImportFolderService.Instance.get().getImportFolder(Long.parseLong(rec.getAttributeAsString("id")),
+							new AsyncCallback<GUIImportFolder>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -199,24 +198,21 @@ public class ImportFoldersPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImportFolderService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImportFolderService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showShareDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showShareDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -235,7 +231,7 @@ public class ImportFoldersPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
-								if (result.booleanValue())
+								if (Boolean.TRUE.equals(result))
 									SC.say(I18N.message("connectionestablished"));
 								else
 									SC.warn(I18N.message("connectionfailed"));
@@ -270,8 +266,8 @@ public class ImportFoldersPanel extends AdminPanel {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ImportFolderService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
-						false, new AsyncCallback<Void>() {
+				ImportFolderService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
+						new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -291,22 +287,19 @@ public class ImportFoldersPanel extends AdminPanel {
 		resetCache.setTitle(I18N.message("resetcache"));
 		resetCache.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImportFolderService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImportFolderService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									GuiLog.info(I18N.message("cachedeleted"), null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("cachedeleted"), null);
+							}
+						});
 					}
 				});
 			}
@@ -316,24 +309,21 @@ public class ImportFoldersPanel extends AdminPanel {
 		resetCounter.setTitle(I18N.message("resetcounter"));
 		resetCounter.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcounter"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImportFolderService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcounter"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImportFolderService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									GuiLog.info(I18N.message("counterreseted"), null);
-									rec.setAttribute("docs", "0");
-									list.refreshRow(list.getRecordIndex(rec));
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("counterreseted"), null);
+								rec.setAttribute("docs", "0");
+								list.refreshRow(list.getRecordIndex(rec));
+							}
+						});
 					}
 				});
 			}

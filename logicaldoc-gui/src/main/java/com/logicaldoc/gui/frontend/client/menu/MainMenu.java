@@ -49,7 +49,6 @@ import com.logicaldoc.gui.frontend.client.textcontent.TextContentEditor;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentCreate;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentEditor;
 import com.logicaldoc.gui.frontend.client.zoho.ZohoMenuItem;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -507,13 +506,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 							dialog.show();
 						} else {
 							SC.say(I18N.message("youneedtoauthorizesharefile",
-									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
-
-										@Override
-										public void execute(Boolean value) {
-											new ShareFileSettings().show();
-										}
-									});
+									Session.get().getInfo().getBranding().getProduct()),
+									(Boolean value) -> new ShareFileSettings().show());
 						}
 					}
 				});
@@ -573,13 +567,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 							new EnvelopeDetails().show();
 						} else {
 							SC.say(I18N.message("youneedtoauthorizedocusign",
-									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
-
-										@Override
-										public void execute(Boolean value) {
-											new DocuSignSettings().show();
-										}
-									});
+									Session.get().getInfo().getBranding().getProduct()),
+									(Boolean value) -> new DocuSignSettings().show());
 						}
 					}
 				});
@@ -607,13 +596,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 							new Envelopes().show();
 						} else {
 							SC.say(I18N.message("youneedtoauthorizedocusign",
-									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
-
-										@Override
-										public void execute(Boolean value) {
-											new DocuSignSettings().show();
-										}
-									});
+									Session.get().getInfo().getBranding().getProduct()),
+									(Boolean value) -> new DocuSignSettings().show());
 						}
 					}
 				});

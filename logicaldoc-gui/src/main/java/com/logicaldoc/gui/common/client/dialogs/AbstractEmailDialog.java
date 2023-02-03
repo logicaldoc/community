@@ -107,7 +107,7 @@ public abstract class AbstractEmailDialog extends Window {
 		sendButton.setHeight(30);
 		sendButton.addClickHandler((ClickEvent event) -> {
 			vm.validate();
-			if (vm.hasErrors())
+			if (Boolean.TRUE.equals(vm.hasErrors()))
 				return;
 
 			GUIEmail mail = new GUIEmail();
@@ -148,7 +148,7 @@ public abstract class AbstractEmailDialog extends Window {
 
 	private void fillRecipients(List<String> to, List<String> cc, List<String> bcc, ListGridRecord[] records) {
 		for (int i = 0; i < records.length; i++) {
-			if (!recipientsGrid.validateCell(i, "email"))
+			if (Boolean.FALSE.equals(recipientsGrid.validateCell(i, "email")))
 				continue;
 
 			ListGridRecord rec = records[i];

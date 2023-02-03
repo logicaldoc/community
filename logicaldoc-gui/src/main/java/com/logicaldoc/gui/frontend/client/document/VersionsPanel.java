@@ -82,7 +82,7 @@ public class VersionsPanel extends DocumentDetailTab {
 			list.setFields(user, event, fileName, type, fileVersion, version, date, permalink, wfStatus, comment);
 		else
 			list.setFields(user, event, fileName, type, fileVersion, version, date, comment);
-		
+
 		addListHandlers();
 
 		VLayout container = new VLayout();
@@ -262,34 +262,30 @@ public class VersionsPanel extends DocumentDetailTab {
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("question"),
-						I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), new BooleanCallback() {
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									long[] ids = new long[selection.length];
-									int i = 0;
-									for (ListGridRecord rec : selection)
-										ids[i++] = Long.parseLong(rec.getAttribute("id"));
+						I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
+							if (Boolean.TRUE.equals(value)) {
+								long[] ids = new long[selection.length];
+								int i = 0;
+								for (ListGridRecord rec : selection)
+									ids[i++] = Long.parseLong(rec.getAttribute("id"));
 
-									DocumentService.Instance.get().deleteVersions(ids,
-											new AsyncCallback<GUIDocument>() {
-												@Override
-												public void onFailure(Throwable caught) {
-													GuiLog.serverError(caught);
-												}
+								DocumentService.Instance.get().deleteVersions(ids, new AsyncCallback<GUIDocument>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-												@Override
-												public void onSuccess(GUIDocument result) {
-													if (result != null) {
-														document.setVersion(result.getVersion());
-														document.setFileVersion(result.getFileVersion());
-														DocumentController.get().modified(result);
-														DocumentController.get().selected(result);
-														list.removeSelectedData();
-													}
-												}
-											});
-								}
+									@Override
+									public void onSuccess(GUIDocument result) {
+										if (result != null) {
+											document.setVersion(result.getVersion());
+											document.setFileVersion(result.getFileVersion());
+											DocumentController.get().modified(result);
+											DocumentController.get().selected(result);
+											list.removeSelectedData();
+										}
+									}
+								});
 							}
 						});
 			}
