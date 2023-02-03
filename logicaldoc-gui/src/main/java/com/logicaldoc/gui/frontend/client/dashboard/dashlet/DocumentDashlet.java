@@ -161,7 +161,7 @@ public class DocumentDashlet extends Dashlet {
 	}
 
 	protected List<ListGridField> prepareGridFields(RefreshableListGrid grid) {
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 
 		Map<String, ListGridField> fieldsMap = ((DocumentsListGrid) grid).getFieldsMap();
 		fieldsMap.get("statusIcons").setHidden(true);

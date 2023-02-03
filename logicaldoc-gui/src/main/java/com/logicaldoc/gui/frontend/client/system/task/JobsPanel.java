@@ -143,7 +143,7 @@ public class JobsPanel extends VLayout {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 
-						List<GUIValue> selectedJobs = new ArrayList<GUIValue>();
+						List<GUIValue> selectedJobs = new ArrayList<>();
 						ListGridRecord[] selection = list.getSelectedRecords();
 						for (ListGridRecord rec : selection)
 							selectedJobs.add(new GUIValue(rec.getAttributeAsString("trigger"),

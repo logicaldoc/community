@@ -163,7 +163,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 					@Override
 					public void onSuccess(GUIMessageTemplate[] templates) {
-						LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+						LinkedHashMap<String, String> map = new LinkedHashMap<>();
 						map.put("", "");
 						for (GUIMessageTemplate t : templates)
 							map.put("" + t.getId(), t.getName());

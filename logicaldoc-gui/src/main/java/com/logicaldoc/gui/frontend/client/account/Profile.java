@@ -238,7 +238,7 @@ public class Profile extends Window {
 		guiForm.setFields(welcomeScreen, defaultWorkspace, docsGrid, hitsGrid, dateFormat, dateFormatShort,
 				dateFormatLong);
 
-		ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		ArrayList<ListGridRecord> records = new ArrayList<>();
 		for (String search : user.orderedSearches()) {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute("search", search);

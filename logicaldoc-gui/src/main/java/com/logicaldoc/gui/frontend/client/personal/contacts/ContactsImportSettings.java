@@ -44,7 +44,7 @@ public class ContactsImportSettings extends Window {
 
 		SelectItem separated = ItemFactory.newSelectItem("separatedby", "separatedby");
 		separated.setWidth(80);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put(",", ",");
 		map.put(";", ";");
 		separated.setValueMap(map);
@@ -52,7 +52,7 @@ public class ContactsImportSettings extends Window {
 
 		SelectItem delimiter = ItemFactory.newSelectItem("textdelimiter", "textdelimiter");
 		delimiter.setWidth(80);
-		LinkedHashMap<String, String> map2 = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map2 = new LinkedHashMap<>();
 		map2.put("\"", "\"");
 		map2.put("'", "'");
 		delimiter.setValueMap(map2);

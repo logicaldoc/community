@@ -53,7 +53,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 
 	@Override
 	public List<AttributeOption> findByAttributeAndCategory(long setId, String attribute, String category) {
-		List<AttributeOption> coll = new ArrayList<AttributeOption>();
+		List<AttributeOption> coll = new ArrayList<>();
 		try {
 			if (StringUtils.isEmpty(attribute)) {
 				if (StringUtils.isEmpty(category)) {

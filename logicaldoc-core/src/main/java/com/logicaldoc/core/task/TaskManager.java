@@ -38,7 +38,7 @@ public class TaskManager {
 	 * @return collection of tasks
 	 */
 	Collection<Task> getTasks(ApplicationContext context) {
-		List<Task> tasks = new ArrayList<Task>();
+		List<Task> tasks = new ArrayList<>();
 		tasks.add((Task) context.getBean(IndexOptimizer.NAME));
 		tasks.add((Task) context.getBean(IndexerTask.NAME));
 		tasks.add((Task) context.getBean(TagsProcessor.NAME));
@@ -64,7 +64,7 @@ public class TaskManager {
 	public Collection<Task> getTasks() {
 		Context context=Context.get();
 		
-		List<Task> tasks = new ArrayList<Task>();		
+		List<Task> tasks = new ArrayList<>();		
 		tasks.add((Task) context.getBean(IndexOptimizer.NAME));
 		tasks.add((Task) context.getBean(IndexerTask.NAME));
 		tasks.add((Task) context.getBean(TagsProcessor.NAME));

@@ -191,7 +191,7 @@ public class CoreWorkBench {
 	}
 
 	static void statsStuff() throws ClientProtocolException, IOException {
-		List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+		List<NameValuePair> postParams = new ArrayList<>();
 
 		// Add all statistics as parameters
 		postParams.add(new BasicNameValuePair("id", "pippo"));

@@ -59,7 +59,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 				"select ld_id, ld_username, ld_firstname, ld_name from ld_user where ld_deleted=0 and ld_tenantid="
 						+ tenantId,
 				null, null);
-		Map<Long, String> users = new HashMap<Long, String>();
+		Map<Long, String> users = new HashMap<>();
 		while (set.next())
 			users.put(set.getLong(1), set.getString(3) + " " + set.getString(4) + " (" + set.getString(2) + ")");
 		return users;

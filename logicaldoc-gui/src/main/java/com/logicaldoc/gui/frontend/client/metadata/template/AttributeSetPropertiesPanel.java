@@ -371,7 +371,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 							: GUIAttribute.TYPE_STRING);
 			composer.show();
 		});
-		List<FormItemIcon> initializationIcons = new ArrayList<FormItemIcon>();
+		List<FormItemIcon> initializationIcons = new ArrayList<>();
 		initializationIcons.addAll(Arrays.asList(initialization.getIcons()));
 		initializationIcons.add(initializationComposer);
 		initialization.setIcons(initializationIcons.toArray(new FormItemIcon[0]));
@@ -399,7 +399,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 							: GUIAttribute.TYPE_STRING);
 			composer.show();
 		});
-		List<FormItemIcon> validationIcons = new ArrayList<FormItemIcon>();
+		List<FormItemIcon> validationIcons = new ArrayList<>();
 		validationIcons.addAll(Arrays.asList(validation.getIcons()));
 		validationIcons.add(validationComposer);
 		validation.setIcons(validationIcons.toArray(new FormItemIcon[0]));
@@ -422,7 +422,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	private void addTypeSelector() {
 		type = new SelectItem("type", I18N.message("type"));
-		LinkedHashMap<String, String> types = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> types = new LinkedHashMap<>();
 		types.put("" + GUIAttribute.TYPE_STRING, I18N.message("string"));
 		types.put("" + GUIAttribute.TYPE_INT, I18N.message("integer"));
 		types.put("" + GUIAttribute.TYPE_DOUBLE, I18N.message("decimal"));
@@ -442,7 +442,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	private void addEditorItem() {
 		editor = new SelectItem("editor", I18N.message("inputmode"));
-		LinkedHashMap<String, String> editors = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> editors = new LinkedHashMap<>();
 		editors.put("" + GUIAttribute.EDITOR_DEFAULT, I18N.message("free"));
 		editors.put("" + GUIAttribute.EDITOR_TEXTAREA, I18N.message("freetextarea"));
 		editors.put("" + GUIAttribute.EDITOR_LISTBOX, I18N.message("preset"));

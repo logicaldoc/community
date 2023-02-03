@@ -17,7 +17,7 @@ public class StubTypeTree {
 
 	private Class<?> type;
 
-	private Set<StubTypeTree> children = new LinkedHashSet<StubTypeTree>();
+	private Set<StubTypeTree> children = new LinkedHashSet<>();
 
 	private StubTypeTree parent;
 

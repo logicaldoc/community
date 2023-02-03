@@ -28,7 +28,7 @@ public class SearchIndexEntriesGrid extends DocumentsListGrid {
 		fieldsMap.get("tenantId").setHidden(false);
 		fieldsMap.get("language").setHidden(false);
 
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 		fields.add(fieldsMap.get("id"));
 		fields.add(fieldsMap.get("thumbnail"));
 		fields.add(fieldsMap.get("statusIcons"));

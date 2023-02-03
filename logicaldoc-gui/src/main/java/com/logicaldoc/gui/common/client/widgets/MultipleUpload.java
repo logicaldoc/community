@@ -46,8 +46,8 @@ public class MultipleUpload extends HorizontalPanel {
 
 	public MultipleUpload(IButton confirmButton) {
 		final VerticalPanel progressBarPanel = new VerticalPanel();
-		final Map<String, ProgressBar> progressBars = new LinkedHashMap<String, ProgressBar>();
-		final Map<String, Image> cancelButtons = new LinkedHashMap<String, Image>();
+		final Map<String, ProgressBar> progressBars = new LinkedHashMap<>();
+		final Map<String, Image> cancelButtons = new LinkedHashMap<>();
 		prepareUploader(confirmButton, progressBarPanel, progressBars, cancelButtons);
 
 		VerticalPanel verticalPanel = new VerticalPanel();

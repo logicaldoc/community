@@ -130,7 +130,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Override
 	public List<Resource> getChildResources(Resource parentResource) throws DavException {
-		List<Resource> resourceList = new LinkedList<Resource>();
+		List<Resource> resourceList = new LinkedList<>();
 		final Long folderID = Long.parseLong(parentResource.getID());
 
 		try {
@@ -901,7 +901,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public List<Resource> getHistory(Resource resource) {
-		List<Resource> resourceHistory = new LinkedList<Resource>();
+		List<Resource> resourceHistory = new LinkedList<>();
 
 		Document document = null;
 		try {

@@ -71,12 +71,12 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	/**
 	 * List of all the notes in all the pages
 	 */
-	protected List<GUIDocumentNote> notes = new ArrayList<GUIDocumentNote>();
+	protected List<GUIDocumentNote> notes = new ArrayList<>();
 
 	/**
 	 * Map of the items in the current page
 	 */
-	protected Map<DrawItem, GUIDocumentNote> currentPageItems = new HashMap<DrawItem, GUIDocumentNote>();
+	protected Map<DrawItem, GUIDocumentNote> currentPageItems = new HashMap<>();
 
 	protected String fileVersion = null;
 

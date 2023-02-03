@@ -85,7 +85,7 @@ public class IncrementalSettingsPanel extends VLayout {
 						.replace("]", "");
 				if (!templateIdString.isEmpty()) {
 					String[] selection = templateIdString.split(",");
-					List<GUITemplate> templates = new ArrayList<GUITemplate>();
+					List<GUITemplate> templates = new ArrayList<>();
 					for (String selectionId : selection) {
 						GUITemplate currentTemplate = new GUITemplate();
 						currentTemplate.setId(Long.parseLong(selectionId.trim()));

@@ -62,7 +62,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		folder.addChangedHandler(changedHandler);
 
 		SelectItem format = ItemFactory.newSelectItem("format", "format");
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("multiplefiles"));
 		map.put("1", I18N.message("singleeml"));
 		format.setValueMap(map);

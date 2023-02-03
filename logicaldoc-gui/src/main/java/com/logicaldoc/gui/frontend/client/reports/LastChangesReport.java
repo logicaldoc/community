@@ -297,7 +297,7 @@ public class LastChangesReport extends AdminPanel {
 	 * @return an array of select items
 	 */
 	public SelectItem[] getEventTypes() {
-		List<SelectItem> items = new ArrayList<SelectItem>();
+		List<SelectItem> items = new ArrayList<>();
 
 		return items.toArray(new SelectItem[0]);
 	}

@@ -138,7 +138,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 		User user = validateSession(sid);
 		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		List<Bookmark> list = bDao.findByUserId(user.getId());
-		List<WSBookmark> wsBookmarks = new ArrayList<WSBookmark>();
+		List<WSBookmark> wsBookmarks = new ArrayList<>();
 		for (Bookmark bookmark : list)
 			wsBookmarks.add(WSBookmark.fromBookmark(bookmark));
 		return wsBookmarks.toArray(new WSBookmark[0]);

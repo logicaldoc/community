@@ -81,7 +81,7 @@ public class AnnotationContextMenu extends Menu {
 
 		MenuItem contentMenuItem = prepareContentMenuItem();
 
-		List<MenuItem> items = new ArrayList<MenuItem>();
+		List<MenuItem> items = new ArrayList<>();
 		if (editEnabled)
 			items.add(moveOrResize);
 		if (drawItem instanceof DrawRect || drawItem instanceof DrawOval || drawItem instanceof DrawShape

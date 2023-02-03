@@ -573,7 +573,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public Map<String, Long> findTags(String firstLetter, Long tenantId) throws PersistenceException {
-		final Map<String, Long> map = new HashMap<String, Long>();
+		final Map<String, Long> map = new HashMap<>();
 
 		StringBuilder query = new StringBuilder("SELECT ld_count, ld_tag from ld_uniquetag where 1=1 ");
 		if (StringUtils.isNotEmpty(firstLetter))
@@ -678,7 +678,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		@SuppressWarnings("unchecked")
 		List<Long> results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
-		ArrayList<Long> tmpal = new ArrayList<Long>(results);
+		ArrayList<Long> tmpal = new ArrayList<>(results);
 		List<Long> docIds = tmpal;
 
 		if (docIds.isEmpty())
@@ -1215,7 +1215,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		 */
 		List<TagCloud> mostUsedTags = list;
 		if (maxTags > 0 && mostUsedTags.size() > maxTags)
-			mostUsedTags = new ArrayList<TagCloud>(list.subList(0, maxTags));
+			mostUsedTags = new ArrayList<>(list.subList(0, maxTags));
 
 		if (mostUsedTags != null && !mostUsedTags.isEmpty()) {
 			// Find the Max frequency

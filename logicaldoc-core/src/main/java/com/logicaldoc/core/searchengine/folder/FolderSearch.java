@@ -97,7 +97,7 @@ public class FolderSearch extends Search {
 		if (StringUtils.isNotEmpty(options.getExpression()))
 			return options.getParameters();
 
-		ArrayList<Serializable> params = new ArrayList<Serializable>();
+		ArrayList<Serializable> params = new ArrayList<>();
 
 		StringBuilder query = new StringBuilder();
 

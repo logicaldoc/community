@@ -118,7 +118,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 				RadioGroupItem maintain = ItemFactory.newRadioGroup("maintain", I18N.message("maintain"));
 				maintain.setRequired(true);
 				maintain.setEndRow(true);
-				LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+				LinkedHashMap<String, String> map = new LinkedHashMap<>();
 				map.put("newest", I18N.message("newest"));
 				map.put("oldest", I18N.message("oldest"));
 				maintain.setValueMap(map);

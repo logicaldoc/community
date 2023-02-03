@@ -65,7 +65,7 @@ public class ContextConfigurator {
 	}
 
 	private void addPropertyListValues(Element property, List<? extends String> values) {
-		Collection<Element> beanRefChildren = new LinkedList<Element>();
+		Collection<Element> beanRefChildren = new LinkedList<>();
 		Element listElement = property.getChild("list", property.getNamespace());
 		if (listElement != null) {
 			List<Element> elms = listElement.getChildren();

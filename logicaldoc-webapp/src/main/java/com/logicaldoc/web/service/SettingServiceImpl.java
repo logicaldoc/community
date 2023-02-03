@@ -204,7 +204,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 
 		ContextProperties conf = Context.get().getProperties();
-		List<GUIParameter> params = new ArrayList<GUIParameter>();
+		List<GUIParameter> params = new ArrayList<>();
 		for (Object key : conf.keySet()) {
 			if (key.toString().startsWith("webservice.") || key.toString().startsWith("webdav")
 					|| key.toString().startsWith("cmis") || key.toString().startsWith("ftp.")) {
@@ -360,7 +360,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 		ContextProperties conf = Context.get().getProperties();
 
-		List<GUIParameter> params = new ArrayList<GUIParameter>();
+		List<GUIParameter> params = new ArrayList<>();
 		for (Object name : conf.keySet()) {
 			if (name.toString().startsWith(tenantName + ".gui"))
 				params.add(new GUIParameter(name.toString(), conf.getProperty(name.toString())));
@@ -457,7 +457,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	public GUIParameter[] loadConverterParameters(String converter) throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
 
-		List<GUIParameter> parameters = new ArrayList<GUIParameter>();
+		List<GUIParameter> parameters = new ArrayList<>();
 		try {
 			ServletUtil.checkMenu(getThreadLocalRequest(), 1750L);
 			FormatConverter conv = (FormatConverter) Class.forName(converter).getDeclaredConstructor().newInstance();
@@ -509,7 +509,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		try {
 			checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 
-			List<GUIParameter> params = new ArrayList<GUIParameter>();
+			List<GUIParameter> params = new ArrayList<>();
 
 			// Retrieve API calls stats
 			SequenceDAO dao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);

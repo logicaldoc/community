@@ -312,7 +312,7 @@ public class StampProperties extends StampDetailsTab {
 
 	private RadioGroupItem preparePageOptionItem(final TextItem pageSelection) {
 		final RadioGroupItem pageOption = ItemFactory.newRadioGroup("pageOption", "stampin");
-		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<>();
 		pageOptions.put("" + GUIStamp.PAGE_OPT_ALL, I18N.message("allpages"));
 		pageOptions.put("" + GUIStamp.PAGE_OPT_FIRST, I18N.message("firstpage"));
 		pageOptions.put("" + GUIStamp.PAGE_OPT_LAST, I18N.message("lastpage"));
@@ -335,7 +335,7 @@ public class StampProperties extends StampDetailsTab {
 
 	private SelectItem prepareTypeItem() {
 		final SelectItem type = ItemFactory.newSelectItem("type", "type");
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("" + GUIStamp.TYPE_IMAGE, I18N.message("image"));
 		map.put("" + GUIStamp.TYPE_TEXT, I18N.message("text"));
 		map.put("" + GUIStamp.TYPE_HTML, I18N.message("html"));

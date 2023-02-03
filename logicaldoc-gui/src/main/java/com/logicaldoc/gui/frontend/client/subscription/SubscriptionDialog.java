@@ -55,7 +55,7 @@ public class SubscriptionDialog extends Window {
 
 		SelectItem option = new SelectItem("option", I18N.message("subscriptionoption"));
 		option.setWidth(290);
-		LinkedHashMap<String, String> options = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> options = new LinkedHashMap<>();
 		options.put("current", I18N.message("subscribecurrent"));
 		options.put("subfolders", I18N.message("subscribesubfolders"));
 		option.setValueMap(options);
@@ -63,7 +63,7 @@ public class SubscriptionDialog extends Window {
 
 		SelectItem notifyon = new SelectItem("notifyon", I18N.message("notifyon"));
 		notifyon.setWidth(310);
-		LinkedHashMap<String, String> vals = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> vals = new LinkedHashMap<>();
 		vals.put("all", I18N.message("allevents"));
 		vals.put("selection", I18N.message("selectedevents"));
 		notifyon.setValueMap(vals);
@@ -193,7 +193,7 @@ public class SubscriptionDialog extends Window {
 
 		SelectItem option = new SelectItem("option", I18N.message("subscriptionoption"));
 		option.setWidth(280);
-		LinkedHashMap<String, String> options = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> options = new LinkedHashMap<>();
 		options.put("current", I18N.message("subscribecurrent"));
 		options.put("subfolders", I18N.message("subscribesubfolders"));
 		option.setValueMap(options);
@@ -201,7 +201,7 @@ public class SubscriptionDialog extends Window {
 
 		SelectItem notifyon = new SelectItem("notifyon", I18N.message("notifyon"));
 		notifyon.setWidth(280);
-		LinkedHashMap<String, String> vals = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> vals = new LinkedHashMap<>();
 		vals.put("all", I18N.message("allevents"));
 		vals.put("selection", I18N.message("selectedevents"));
 		notifyon.setValueMap(vals);

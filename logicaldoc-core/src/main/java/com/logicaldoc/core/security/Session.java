@@ -52,7 +52,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	private final static String INFO = "INFO";
 
 	// Map docId - Password used to unprotect it
-	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<Long, String>());
+	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<>());
 
 	private Date creation = new Date();
 
@@ -94,7 +94,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 */
 	private transient Map<String, Object> dictionary =  new ConcurrentHashMap<>();
 
-	private transient List<Log> logs = new ArrayList<Log>();
+	private transient List<Log> logs = new ArrayList<>();
 
 	public Map<String, Object> getDictionary() {
 		return dictionary;

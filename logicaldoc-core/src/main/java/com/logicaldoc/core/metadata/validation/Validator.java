@@ -69,7 +69,7 @@ public class Validator {
 		executeObjectValidation(object, template, transaction, errors);
 		
 		if (!errors.isEmpty()) {
-			List<ValidationError> errorsList = new ArrayList<ValidationError>();
+			List<ValidationError> errorsList = new ArrayList<>();
 			for (String key : errors.keySet()) {
 				Attribute att = template.getAttribute(key);
 				if (att != null)

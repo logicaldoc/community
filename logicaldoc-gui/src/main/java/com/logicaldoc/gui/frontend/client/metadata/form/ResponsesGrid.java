@@ -107,7 +107,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 		folder.setHidden(true);
 		folder.setCanSort(false);
 
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 		fields.add(id);
 		fields.add(filename);
 		fields.add(size);

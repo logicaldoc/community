@@ -77,7 +77,7 @@ public class SessionIdFilter extends GenericFilterBean {
 				session.getUser().clearPassword();
 
 				String[] groups = session.getUser().getGroupNames();
-				Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+				Collection<GrantedAuthority> authorities = new ArrayList<>();
 				for (String role : groups)
 					authorities.add(new SimpleGrantedAuthority(role));
 

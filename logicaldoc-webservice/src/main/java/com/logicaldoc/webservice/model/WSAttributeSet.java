@@ -94,7 +94,7 @@ public class WSAttributeSet implements Serializable {
 	}
 
 	public void addAttribute(WSAttribute att) {
-		List<WSAttribute> buf = new ArrayList<WSAttribute>();
+		List<WSAttribute> buf = new ArrayList<>();
 		buf.addAll(Arrays.asList(getAttributes()));
 		buf.add(att);
 		setAttributes(buf.toArray(new WSAttribute[0]));

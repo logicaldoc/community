@@ -93,7 +93,7 @@ public class Setup implements EntryPoint {
 
 	private TabSet tabs;
 
-	private Map<String, String[]> engines = new HashMap<String, String[]>();
+	private Map<String, String[]> engines = new HashMap<>();
 
 	protected SetupServiceAsync setupService = (SetupServiceAsync) GWT.create(SetupService.class);
 
@@ -270,7 +270,7 @@ public class Setup implements EntryPoint {
 		dbEngine.setWrapTitle(false);
 		dbEngine.setVisible(false);
 		dbEngine.setName(DB_ENGINE);
-		LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
 		for (String engine : engines.keySet())
 			valueMap.put(engine, engines.get(engine)[0]);
 		dbEngine.setValueMap(valueMap);

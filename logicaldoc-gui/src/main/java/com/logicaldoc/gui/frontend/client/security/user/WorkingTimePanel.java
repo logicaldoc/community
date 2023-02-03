@@ -197,7 +197,7 @@ public class WorkingTimePanel extends VLayout {
 		if (calendar != null) {
 			CalendarEvent[] events = calendar.getData();
 			if (events != null && events.length > 0) {
-				ArrayList<GUIWorkingTime> wts = new ArrayList<GUIWorkingTime>();
+				ArrayList<GUIWorkingTime> wts = new ArrayList<>();
 				for (CalendarEvent calendarEvent : events) {
 					GUIWorkingTime wt = new GUIWorkingTime(calendarEvent.getName(), calendarEvent.getStartDate(),
 							calendarEvent.getEndDate());

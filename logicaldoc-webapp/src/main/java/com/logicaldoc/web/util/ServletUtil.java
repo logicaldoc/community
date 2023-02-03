@@ -338,7 +338,7 @@ public class ServletUtil {
 		// Validate and process Range and If-Range headers.
 		String range = request.getHeader("Range");
 		if (range == null) {
-			List<Range> ranges = new ArrayList<Range>();
+			List<Range> ranges = new ArrayList<>();
 			ranges.add(rangeFull);
 			return ranges;
 		}
@@ -396,7 +396,7 @@ public class ServletUtil {
 
 	private static List<Range> getRangesAsSpecifiedInIfRangeHeader(HttpServletRequest request, long lastModified,
 			String eTag, Range rangeFull) {
-		List<Range> ranges = new ArrayList<Range>();
+		List<Range> ranges = new ArrayList<>();
 		String ifRange = request.getHeader("If-Range");
 		if (ifRange != null && !ifRange.equals(eTag)) {
 			try {

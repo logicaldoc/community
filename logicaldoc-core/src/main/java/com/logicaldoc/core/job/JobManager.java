@@ -97,7 +97,7 @@ public class JobManager {
 				.withDescription(job.getDescription() != null ? job.getDescription() : "")
 				.usingJobData(new JobDataMap(dictionary)).build();
 
-		Set<Trigger> trgs = new HashSet<Trigger>();
+		Set<Trigger> trgs = new HashSet<>();
 		for (Object triggerSpec : triggers.keySet()) {
 			Trigger trig = prepareTrigger(job, triggerSpec, triggers);
 			trgs.add(trig);
@@ -251,7 +251,7 @@ public class JobManager {
 				.getTriggerKeys(StringUtils.isNotEmpty(group) ? GroupMatcher.triggerGroupEquals(group)
 						: GroupMatcher.anyTriggerGroup());
 
-		List<Trigger> triggers = new ArrayList<Trigger>();
+		List<Trigger> triggers = new ArrayList<>();
 		for (TriggerKey key : triggerKeys) {
 			Trigger trigger = getTrigger(key.getName(), key.getGroup());
 			if (tenantId == null || (tenantId != null && tenantId.equals(trigger.getJobDataMap().get(TENANT_ID))))

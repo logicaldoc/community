@@ -121,7 +121,7 @@ public class I18N {
 	}
 
 	public static LinkedHashMap<String, String> getSupportedLanguages(boolean addEmpty) {
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		if (addEmpty)
 			map.put("", " ");
 		if (languages != null)
@@ -131,7 +131,7 @@ public class I18N {
 	}
 
 	public static LinkedHashMap<String, String> getSupportedGuiLanguages(boolean addEmpty) {
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		if (addEmpty)
 			map.put("", " ");
 		if (guiLanguages != null)

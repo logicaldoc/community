@@ -170,7 +170,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 			// Prepare a fieldsMap docId-path
-			Map<Long, String> documents = new HashMap<Long, String>();
+			Map<Long, String> documents = new HashMap<>();
 
 			// First of all put all single selected documents
 			List<Long> dIds = new ArrayList<>();
@@ -185,7 +185,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			 */
 
 			// Prepare a fieldsMap folderId-basepath
-			Map<Long, String> folders = new HashMap<Long, String>();
+			Map<Long, String> folders = new HashMap<>();
 			for (long folderId : folderIds) {
 				Folder folder = folderDao.findFolder(folderId);
 				if (folder == null || !folderDao.isPermissionEnabled(Permission.DOWNLOAD, folder.getId(), user.getId()))

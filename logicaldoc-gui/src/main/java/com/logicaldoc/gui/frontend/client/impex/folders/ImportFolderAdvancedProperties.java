@@ -146,7 +146,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 
 		SelectItem updatePolicy = ItemFactory.newSelectItem("updatePolicy", "onupdate");
 		updatePolicy.addChangedHandler(changedHandler);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("createnewversion"));
 		map.put("1", I18N.message("createnewdoc"));
 		updatePolicy.setValueMap(map);

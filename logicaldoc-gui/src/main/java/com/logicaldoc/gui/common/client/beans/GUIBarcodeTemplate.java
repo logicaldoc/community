@@ -51,7 +51,7 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 		if (getZones() == null || getZones().length < 1 || index > getZones().length - 1)
 			return;
 
-		List<GUIBarcodeZone> newSpecs = new ArrayList<GUIBarcodeZone>();
+		List<GUIBarcodeZone> newSpecs = new ArrayList<>();
 		for (int i = 0; i < getZones().length; i++) {
 			if (i != index)
 				newSpecs.add((GUIBarcodeZone) getZones()[i]);
@@ -61,7 +61,7 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 	}
 
 	public void appendBarcodeZone(GUIBarcodeZone a) {
-		List<GUIBarcodeZone> newSpecs = new ArrayList<GUIBarcodeZone>();
+		List<GUIBarcodeZone> newSpecs = new ArrayList<>();
 		if (getZones() != null)
 			for (GUIZone barcodeZone : getZones())
 				newSpecs.add((GUIBarcodeZone)barcodeZone);

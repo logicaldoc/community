@@ -193,7 +193,7 @@ public class PDFImageExtractor {
 	}
 
 	private Map<COSName, PDImageXObject> getImagesFromResources(PDResources resources) throws IOException {
-		Map<COSName, PDImageXObject> images = new HashMap<COSName, PDImageXObject>();
+		Map<COSName, PDImageXObject> images = new HashMap<>();
 
 		for (COSName xObjectName : resources.getXObjectNames()) {
 			PDXObject xObject = resources.getXObject(xObjectName);
@@ -216,7 +216,7 @@ public class PDFImageExtractor {
 	 * @throws IOException if the pdf file cannot be read
 	 */
 	public List<BufferedImage> extractImages() throws IOException {
-		List<BufferedImage> imgs = new ArrayList<BufferedImage>();
+		List<BufferedImage> imgs = new ArrayList<>();
 		Iterator<PDPage> iter = document.getPages().iterator();
 		while (iter.hasNext()) {
 			try {

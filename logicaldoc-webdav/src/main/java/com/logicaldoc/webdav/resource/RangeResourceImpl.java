@@ -103,13 +103,13 @@ public class RangeResourceImpl extends DavResourceImpl {
 			final Long lower = requestRange.getLeft().isEmpty() ? null : Long.valueOf(requestRange.getLeft());
 			final Long upper = requestRange.getRight().isEmpty() ? null : Long.valueOf(requestRange.getRight());
 			if (lower == null && upper == null) {
-				return new ImmutablePair<Long, Long>(0l, contentLength - 1);
+				return new ImmutablePair<>(0l, contentLength - 1);
 			} else if (lower == null) {
-				return new ImmutablePair<Long, Long>(contentLength - upper, contentLength - 1);
+				return new ImmutablePair<>(contentLength - upper, contentLength - 1);
 			} else if (upper == null) {
-				return new ImmutablePair<Long, Long>(lower, contentLength - 1);
+				return new ImmutablePair<>(lower, contentLength - 1);
 			} else {
-				return new ImmutablePair<Long, Long>(lower, Math.min(upper, contentLength - 1));
+				return new ImmutablePair<>(lower, Math.min(upper, contentLength - 1));
 			}
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid byte range: " + requestRange, e);

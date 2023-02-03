@@ -113,7 +113,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 	public void onUserLogin(String username) {
 		Record rec = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
 		if (rec == null) {
-			List<ListGridRecord> recds = new ArrayList<ListGridRecord>();
+			List<ListGridRecord> recds = new ArrayList<>();
 
 			Record[] records = onlineUsers.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
@@ -133,7 +133,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 	public void onUserLogout(String username) {
 		Record rec = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
 		if (rec != null) {
-			List<ListGridRecord> recds = new ArrayList<ListGridRecord>();
+			List<ListGridRecord> recds = new ArrayList<>();
 
 			Record[] records = onlineUsers.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {

@@ -72,7 +72,7 @@ public class PositionalBarcodesGrid extends ListGrid {
 		});
 
 		if (barcodeTemplate != null) {
-			ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
+			ArrayList<ListGridRecord> records = new ArrayList<>();
 			if (barcodeTemplate.getZones() != null)
 				for (GUIZone pat : barcodeTemplate.getZones()) {
 					GUIBarcodeZone brcPat = (GUIBarcodeZone) pat;

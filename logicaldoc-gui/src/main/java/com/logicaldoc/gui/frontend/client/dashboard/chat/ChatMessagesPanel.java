@@ -109,7 +109,7 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 	public void onMessage(long id, Date date, String username, String message) {
 		Record rec = messages.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
 		if (rec == null) {
-			List<ListGridRecord> recd = new ArrayList<ListGridRecord>();
+			List<ListGridRecord> recd = new ArrayList<>();
 
 			Record[] records = messages.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {

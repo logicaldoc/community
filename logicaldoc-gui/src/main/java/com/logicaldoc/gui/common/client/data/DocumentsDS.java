@@ -151,7 +151,7 @@ public class DocumentsDS extends DataSource {
 		DataSourceImageField tenantId = new DataSourceImageField("tenantId", "", 60);
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 
-		List<DataSourceField> fields = new ArrayList<DataSourceField>();
+		List<DataSourceField> fields = new ArrayList<>();
 		fields.add(id);
 		fields.add(icon);
 		fields.add(filename);

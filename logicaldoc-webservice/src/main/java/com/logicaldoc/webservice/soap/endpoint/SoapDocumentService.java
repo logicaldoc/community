@@ -936,7 +936,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		checkReadEnable(user, document.getFolder().getId());
 		List<DocumentLink> links = linkDao.findByDocId(docId);
-		List<WSLink> lnks = new ArrayList<WSLink>();
+		List<WSLink> lnks = new ArrayList<>();
 		for (DocumentLink link : links) {
 			WSLink lnk = new WSLink();
 			lnk.setId(link.getId());
@@ -1146,7 +1146,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 		List<DocumentNote> notes = dao.findByDocId(docId, document.getFileVersion());
-		List<WSNote> wsNotes = new ArrayList<WSNote>();
+		List<WSNote> wsNotes = new ArrayList<>();
 		if (notes != null)
 			for (DocumentNote note : notes)
 				wsNotes.add(WSNote.fromDocumentNote(note));
@@ -1190,7 +1190,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 		List<Rating> ratings = ratingDao.findByDocId(docId);
-		List<WSRating> wsRatings = new ArrayList<WSRating>();
+		List<WSRating> wsRatings = new ArrayList<>();
 		if (ratings != null)
 			for (Rating rating : ratings)
 				wsRatings.add(WSRating.fromRating(rating));

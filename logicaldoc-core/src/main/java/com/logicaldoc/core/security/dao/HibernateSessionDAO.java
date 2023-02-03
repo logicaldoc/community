@@ -92,7 +92,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Session>();
+			return new ArrayList<>();
 		}
 	}
 

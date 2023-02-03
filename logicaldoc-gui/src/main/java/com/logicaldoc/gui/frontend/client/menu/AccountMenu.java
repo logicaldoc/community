@@ -99,7 +99,7 @@ public class AccountMenu extends Menu {
 			}
 		});
 
-		List<MenuItem> items = new ArrayList<MenuItem>();
+		List<MenuItem> items = new ArrayList<>();
 
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ACCOUNT)) {
 			items.add(profile);

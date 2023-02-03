@@ -220,7 +220,7 @@ public class WebservicesPanel extends VLayout {
 	}
 
 	public List<GUIParameter> getSettings() {
-		List<GUIParameter> settings = new ArrayList<GUIParameter>();
+		List<GUIParameter> settings = new ArrayList<>();
 		settings.add(enabled);
 		settings.add(recCalls);
 		settings.add(recCallsPayload);

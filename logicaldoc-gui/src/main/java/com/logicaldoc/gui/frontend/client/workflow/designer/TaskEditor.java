@@ -167,7 +167,7 @@ public class TaskEditor extends Window {
 
 					@Override
 					public void onSuccess(GUIMessageTemplate[] templates) {
-						LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+						LinkedHashMap<String, String> map = new LinkedHashMap<>();
 						map.put("", "");
 						for (GUIMessageTemplate t : templates)
 							map.put("" + t.getName(), t.getName());
@@ -512,7 +512,7 @@ public class TaskEditor extends Window {
 		// Initialize the participants list
 		try {
 			if (this.state.getParticipants() != null) {
-				ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
+				ArrayList<ListGridRecord> records = new ArrayList<>();
 
 				for (GUIValue part : this.state.getParticipants()) {
 					if (part.getCode() == null || part.getValue() == null)
@@ -586,7 +586,7 @@ public class TaskEditor extends Window {
 			}
 		}
 
-		ArrayList<GUIValue> participants = new ArrayList<GUIValue>();
+		ArrayList<GUIValue> participants = new ArrayList<>();
 		for (ListGridRecord rec : participantsGrid.getRecords())
 			participants.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString("label")));
 		TaskEditor.this.state.setParticipants(participants.toArray(new GUIValue[0]));

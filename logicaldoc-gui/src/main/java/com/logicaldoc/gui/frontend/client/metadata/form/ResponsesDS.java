@@ -52,7 +52,7 @@ public class ResponsesDS extends DataSource {
 
 		DataSourceTextField language = new DataSourceTextField("language");
 
-		List<DataSourceField> fields = new ArrayList<DataSourceField>();
+		List<DataSourceField> fields = new ArrayList<>();
 		fields.add(id);
 		fields.add(filename);
 		fields.add(created);

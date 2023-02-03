@@ -72,7 +72,7 @@ public class UserSelector extends SelectItem {
 		search.setWidth(12);
 		search.setHeight(12);
 
-		List<FormItemIcon> icons = new ArrayList<FormItemIcon>();
+		List<FormItemIcon> icons = new ArrayList<>();
 		icons.add(clear);
 		if (groupIdOrName == null || "".equals(groupIdOrName))
 			icons.add(search);

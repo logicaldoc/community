@@ -83,7 +83,7 @@ public class RunLevelPanel extends VLayout {
 	}
 
 	protected void onSave() {
-		final List<GUIParameter> settings = new ArrayList<GUIParameter>();
+		final List<GUIParameter> settings = new ArrayList<>();
 		settings.add(new GUIParameter("runlevel", currentRunlevel.getValueAsString()));
 		settings.add(new GUIParameter("runlevel.back", currentRunlevel.getValueAsString()));
 		for (ListGridRecord rec : aspects.getRecords()) {

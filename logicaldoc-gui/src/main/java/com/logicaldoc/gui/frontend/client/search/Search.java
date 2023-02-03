@@ -27,7 +27,7 @@ public class Search {
 
 	private GUISearchOptions options = new GUISearchOptions();
 
-	private Set<SearchObserver> observers = new HashSet<SearchObserver>();
+	private Set<SearchObserver> observers = new HashSet<>();
 
 	private long time;
 

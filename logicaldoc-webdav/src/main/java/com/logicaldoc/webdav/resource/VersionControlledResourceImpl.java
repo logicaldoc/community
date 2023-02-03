@@ -269,13 +269,13 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 
 			// DAV:auto-version property: there is no auto version, explicit
 			// EVENT_CHECKEDOUT is required.
-			properties.add(new DefaultDavProperty<Object>(AUTO_VERSION, null, false));
+			properties.add(new DefaultDavProperty<>(AUTO_VERSION, null, false));
 
 			if (resource == null)
 				return;
 
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, resource.getName(), false));
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.GETCONTENTTYPE,
+			properties.add(new DefaultDavProperty<>(DavPropertyName.DISPLAYNAME, resource.getName(), false));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.GETCONTENTTYPE,
 					AbstractWebdavServlet.getContext().getMimeType(resource.getName()), false));
 
 			if (resource.isFolder())
@@ -283,7 +283,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 
 			SupportedLock supportedLock = new SupportedLock();
 			supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
-			properties.add(new DefaultDavProperty<Object>(DavPropertyName.SUPPORTEDLOCK, supportedLock, false));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.SUPPORTEDLOCK, supportedLock, false));
 
 			String baseVHref = getLocatorFromResource(resource).getHref(false);
 
@@ -294,8 +294,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 
 				DefaultActiveLock activeLock = new DefaultActiveLock();
 				activeLock.setOwner(resource.getLockUser());
-				properties.add(new DefaultDavProperty<Object>(DavPropertyName.LOCKDISCOVERY, activeLock, false));
-				properties.add(new DefaultDavProperty<Object>("activelock", activeLock, Namespace.XMLNS_NAMESPACE));
+				properties.add(new DefaultDavProperty<>(DavPropertyName.LOCKDISCOVERY, activeLock, false));
+				properties.add(new DefaultDavProperty<>("activelock", activeLock, Namespace.XMLNS_NAMESPACE));
 			} else {
 				properties.add(new HrefProperty(CHECKED_IN, locator.getResourcePath(), true));
 			}

@@ -76,7 +76,7 @@ public class GUIAttributeSet implements Serializable {
 	}
 
 	public void appendAttribute(GUIAttribute a) {
-		List<GUIAttribute> newAttrs = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> newAttrs = new ArrayList<>();
 		if (getAttributes() != null)
 			newAttrs.addAll(Arrays.asList(getAttributes()));
 		newAttrs.add(a);
@@ -87,7 +87,7 @@ public class GUIAttributeSet implements Serializable {
 		if (getAttribute(name) == null)
 			return;
 
-		List<GUIAttribute> newAttrs = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> newAttrs = new ArrayList<>();
 		for (GUIAttribute att : getAttributes())
 			if (!att.getName().equals(name))
 				newAttrs.add(att);
@@ -96,7 +96,7 @@ public class GUIAttributeSet implements Serializable {
 	}
 
 	public void reorderAttributes(List<String> names) {
-		List<GUIAttribute> newAttrs = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> newAttrs = new ArrayList<>();
 		int i = 0;
 		for (String name : names) {
 			GUIAttribute att = getAttribute(name);

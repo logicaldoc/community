@@ -36,7 +36,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 
 	protected static Logger log = LoggerFactory.getLogger(Context.class);
 
-	private static HashMap<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new HashMap<SystemEventStatus, LinkedList<SystemEventListener>>();
+	private static HashMap<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new HashMap<>();
 
 	// Singleton instance
 	private static Context instance;
@@ -167,7 +167,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 
 			// firstly we have to initialize every systemstatus
 			if (evts == null) {
-				evts = new LinkedList<SystemEventListener>();
+				evts = new LinkedList<>();
 				Context.systemEvents.put(evt.getSystemStatus(), evts);
 			}
 

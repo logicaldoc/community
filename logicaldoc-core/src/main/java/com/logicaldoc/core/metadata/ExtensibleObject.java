@@ -82,7 +82,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 	 * different values
 	 */
 	private Set<String> getValueAttributesName(String name) {
-		TreeSet<String> attNames = new TreeSet<String>();
+		TreeSet<String> attNames = new TreeSet<>();
 		for (String n : attributes.keySet()) {
 			if (n.equals(name) || name.equals(getAttribute(n).getParent()))
 				attNames.add(n);

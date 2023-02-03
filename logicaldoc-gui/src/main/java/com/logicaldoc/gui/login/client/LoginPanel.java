@@ -441,7 +441,7 @@ public class LoginPanel extends VLayout {
 	 * Prepares the panel to show messages
 	 */
 	protected void prepareAlerts() {
-		List<MessageLabel> messages = new ArrayList<MessageLabel>();
+		List<MessageLabel> messages = new ArrayList<>();
 		if (info.getAlerts() != null && info.getAlerts().length > 0) {
 			for (GUIMessage alert : info.getAlerts()) {
 				MessageLabel label = new MessageLabel(alert, info.getTenant().getId() == 1L);

@@ -74,7 +74,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		super.setApplicationContext(applicationContext);
 
-		List<Trigger> triggers = new ArrayList<Trigger>();
+		List<Trigger> triggers = new ArrayList<>();
 
 		TaskManager manager = (TaskManager) applicationContext.getBean("TaskManager");
 		Collection<Task> tasks = manager.getTasks(applicationContext);

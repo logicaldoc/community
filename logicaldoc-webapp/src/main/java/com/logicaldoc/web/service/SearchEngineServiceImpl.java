@@ -358,7 +358,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			result.setTime(hits.getElapsedTime());
 
 			
-			List<GUIDocument> guiResults = new ArrayList<GUIDocument>();
+			List<GUIDocument> guiResults = new ArrayList<>();
 
 			Map<Long, Hit> hitsMap = new HashMap<>();
 			while (hits.hasNext()) {

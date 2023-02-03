@@ -48,7 +48,7 @@ public class EventEndpoint implements EventListener {
 
 	private static Logger log = LoggerFactory.getLogger(EventEndpoint.class);
 
-	private static Set<String> MONITORED_EVENTS = new HashSet<String>(Arrays.asList(new String[] {
+	private static Set<String> MONITORED_EVENTS = new HashSet<>(Arrays.asList(new String[] {
 			DocumentEvent.STORED.toString(), DocumentEvent.CHANGED.toString(), DocumentEvent.CHECKEDIN.toString(),
 			DocumentEvent.CHECKEDOUT.toString(), DocumentEvent.IMMUTABLE.toString(), DocumentEvent.LOCKED.toString(),
 			DocumentEvent.UNLOCKED.toString(), DocumentEvent.SIGNED.toString(), DocumentEvent.STAMPED.toString(),

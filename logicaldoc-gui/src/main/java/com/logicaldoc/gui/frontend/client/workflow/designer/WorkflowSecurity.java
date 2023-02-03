@@ -225,7 +225,7 @@ public class WorkflowSecurity extends Window {
 	 */
 	public GUIRight[] getRights() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIRight> tmp = new ArrayList<GUIRight>();
+		List<GUIRight> tmp = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);

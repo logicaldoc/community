@@ -51,7 +51,7 @@ public class SecurityManagerImpl implements SecurityManager {
 
 	@Override
 	public Set<Group> getAllowedGroups(long menuId) {
-		Set<Group> groups = new HashSet<Group>();
+		Set<Group> groups = new HashSet<>();
 		try {
 			Menu menu = menuDAO.findById(menuId);
 			if (menu.getSecurityRef() != null)

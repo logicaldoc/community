@@ -74,7 +74,7 @@ public class JavaLanguageVariableFactory {
 	 * @return list of variables
 	 */
 	public static List<JavaLanguageVariable> createVariablesFromMethodParamaters(Method method) {
-		List<JavaLanguageVariable> variables = new ArrayList<JavaLanguageVariable>();
+		List<JavaLanguageVariable> variables = new ArrayList<>();
 		Annotation[][] annotationMatrix = method.getParameterAnnotations();
 		for (int paramIndex = 0; paramIndex < annotationMatrix.length; paramIndex++) {
 			Annotation[] annotationsForSingleParam = annotationMatrix[paramIndex];

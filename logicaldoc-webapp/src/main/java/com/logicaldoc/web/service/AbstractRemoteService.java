@@ -310,7 +310,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
 
-		List<GUIAttribute> attributes = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
 			return new GUIAttribute[0];
 		try {

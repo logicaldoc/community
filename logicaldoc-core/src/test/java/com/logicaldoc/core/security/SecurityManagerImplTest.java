@@ -38,7 +38,7 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 
 	@Test
 	public void testAssignUsersToGroup() throws PersistenceException {
-		ArrayList<User> users = new ArrayList<User>();
+		ArrayList<User> users = new ArrayList<>();
 		users.add(userDAO.findByUsername("test"));
 		users.add(userDAO.findByUsername("admin"));
 		Group group = groupDAO.findByName("author", 1);

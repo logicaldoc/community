@@ -110,7 +110,7 @@ public class CustomIdPanel extends AdminPanel {
 		customIds.setSelectionType(SelectionStyle.SINGLE);
 		customIds.setModalEditing(true);
 
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 		if (data != null)
 			for (GUIScheme cid : data) {
 				if (!type.equals(cid.getType()))
@@ -264,7 +264,7 @@ public class CustomIdPanel extends AdminPanel {
 
 			@Override
 			public void onSuccess(GUISequence[] data) {
-				List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+				List<ListGridRecord> records = new ArrayList<>();
 				if (data != null)
 					for (GUISequence cid : data) {
 						ListGridRecord rec = new ListGridRecord();

@@ -51,7 +51,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();
 
-	private transient List<SessionListener> listeners = new ArrayList<SessionListener>();
+	private transient List<SessionListener> listeners = new ArrayList<>();
 
 	private SessionManager() {
 		timeoutWatchDog.start();
@@ -294,7 +294,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return list of sessions
 	 */
 	public List<Session> getSessions() {
-		List<Session> sessions = new ArrayList<Session>(values());
+		List<Session> sessions = new ArrayList<>(values());
 		Collections.sort(sessions);
 		return sessions;
 	}

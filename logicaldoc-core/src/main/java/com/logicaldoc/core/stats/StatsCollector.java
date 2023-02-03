@@ -230,7 +230,7 @@ public class StatsCollector extends Task {
 			log.debug("Package collected statistics");
 
 			// Prepare the post parameters
-			List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+			List<NameValuePair> postParams = new ArrayList<>();
 
 			// Add all statistics as parameters
 			postParams.add(new BasicNameValuePair("id", StringUtils.defaultString(id)));

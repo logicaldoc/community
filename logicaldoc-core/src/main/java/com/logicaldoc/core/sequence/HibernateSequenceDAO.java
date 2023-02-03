@@ -94,7 +94,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			return findByWhere(query, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Sequence>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -106,7 +106,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			String query = " " + ENTITY + ".tenantId = :tenantId ";
 			query += AND + ENTITY + ".objectId = :objectId ";
 			query += AND + ENTITY + ".name = :name ";
-			List<Sequence> sequences = new ArrayList<Sequence>();
+			List<Sequence> sequences = new ArrayList<>();
 			try {
 				Map<String, Object> params = new HashMap<>();
 				params.put("tenantId", tenantId);

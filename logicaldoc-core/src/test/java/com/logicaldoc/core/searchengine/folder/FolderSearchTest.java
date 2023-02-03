@@ -19,7 +19,7 @@ public class FolderSearchTest extends AbstractCoreTCase {
 
 	@Test
 	public void testSearch() {
-		List<FolderCriterion> criteria = new ArrayList<FolderCriterion>();
+		List<FolderCriterion> criteria = new ArrayList<>();
 
 		FolderCriterion criterion = new FolderCriterion();
 		criterion.setComposition("and");
@@ -29,7 +29,7 @@ public class FolderSearchTest extends AbstractCoreTCase {
 		criteria.add(criterion);
 
 		FolderSearchOptions opt = new FolderSearchOptions();
-		opt.setCriteria(new ArrayList<FolderCriterion>());
+		opt.setCriteria(new ArrayList<>());
 		opt.setMaxHits(10);
 		opt.setUserId(1);
 		opt.setRetrieveAliases(true);
@@ -68,7 +68,7 @@ public class FolderSearchTest extends AbstractCoreTCase {
 		criteria.add(criterion);
 
 		opt = new FolderSearchOptions();
-		opt.setCriteria(new ArrayList<FolderCriterion>());
+		opt.setCriteria(new ArrayList<>());
 		opt.setMaxHits(10);
 		opt.setUserId(1);
 		opt.setRetrieveAliases(true);

@@ -9,7 +9,7 @@ public class HTMLColor {
 
 	static {
 		// color names.
-		colorNames = new HashMap<String, Color>();
+		colorNames = new HashMap<>();
 		colorNames.put("black", new Color(0x000000));
 		colorNames.put("green", new Color(0x008000));
 		colorNames.put("silver", new Color(0xC0C0C0));

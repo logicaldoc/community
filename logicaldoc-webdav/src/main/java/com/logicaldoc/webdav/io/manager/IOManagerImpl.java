@@ -26,7 +26,7 @@ public class IOManagerImpl implements IOManager {
 
 	protected static Logger log = LoggerFactory.getLogger(IOManagerImpl.class);
 
-	private final List<IOHandler> ioHandlers = new ArrayList<IOHandler>();
+	private final List<IOHandler> ioHandlers = new ArrayList<>();
 	
 	public void addIOHandler(IOHandler ioHandler) {
 		if (ioHandler == null) {

@@ -71,7 +71,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			List<Long> bookmarks = bDao.findBookmarkedDocs(session.getUserId());
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			List<GUIDocument> guiResults = new ArrayList<GUIDocument>();
+			List<GUIDocument> guiResults = new ArrayList<>();
 			for (Hit hit : hits) {
 				GUIDocument guiHit = null;
 				if (hit.getType().startsWith("folder")) {
@@ -117,7 +117,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		 * have not been fully compiled so the DocumentServiceImpl.fromDocument
 		 * doesn't do the job
 		 */
-		List<GUIAttribute> extList = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> extList = new ArrayList<>();
 		for (String name : hit.getAttributeNames()) {
 			Attribute e = hit.getAttributes().get(name);
 			GUIAttribute ext = new GUIAttribute();
@@ -303,7 +303,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	public static List<SearchOptions> getSearches(Session session) throws PersistenceException, IOException {
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
-		Map<String, SearchOptions> map = new HashMap<String, SearchOptions>();
+		Map<String, SearchOptions> map = new HashMap<>();
 		List<com.logicaldoc.core.searchengine.saved.SavedSearch> searches = dao.findByUserId(session.getUserId());
 		for (com.logicaldoc.core.searchengine.saved.SavedSearch search : searches) {
 			try {
@@ -331,7 +331,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		}
 
 		// initiate the list
-		List<SearchOptions> queries = new ArrayList<SearchOptions>();
+		List<SearchOptions> queries = new ArrayList<>();
 
 		File[] searchesFiles = file.listFiles();
 		for (int i = 0; i < searchesFiles.length; i++) {
@@ -375,7 +375,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			op.setSizeMax(((FulltextSearchOptions) searchOptions).getSizeMax());
 			op.setSizeMin(((FulltextSearchOptions) searchOptions).getSizeMin());
 		} else if (searchOptions.getType() == SearchOptions.TYPE_FOLDERS) {
-			List<GUICriterion> criteria = new ArrayList<GUICriterion>();
+			List<GUICriterion> criteria = new ArrayList<>();
 			for (FolderCriterion crit : ((FolderSearchOptions) searchOptions).getCriteria()) {
 				GUICriterion criterion = new GUICriterion();
 				criterion.setField(crit.getField());
@@ -504,7 +504,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			((FulltextSearchOptions) searchOptions).setSizeMax(options.getSizeMax());
 			((FulltextSearchOptions) searchOptions).setSizeMin(options.getSizeMin());
 		} else if (options.getType() == SearchOptions.TYPE_FOLDERS) {
-			List<FolderCriterion> criteria = new ArrayList<FolderCriterion>();
+			List<FolderCriterion> criteria = new ArrayList<>();
 			for (GUICriterion crit : options.getCriteria()) {
 				FolderCriterion c = new FolderCriterion();
 				c.setField(crit.getField());

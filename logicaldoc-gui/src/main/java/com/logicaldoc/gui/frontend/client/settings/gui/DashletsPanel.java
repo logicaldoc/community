@@ -50,7 +50,7 @@ public class DashletsPanel extends VLayout {
 
 	private HLayout rollOverCanvas;
 
-	private List<GUIDashlet> dashlets = new ArrayList<GUIDashlet>();
+	private List<GUIDashlet> dashlets = new ArrayList<>();
 
 	public DashletsPanel() {
 		setWidth100();

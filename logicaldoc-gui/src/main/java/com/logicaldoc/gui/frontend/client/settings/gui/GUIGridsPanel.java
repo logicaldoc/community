@@ -272,7 +272,7 @@ public class GUIGridsPanel extends VLayout {
 
 	private void onSave() {
 		List<String> extendedAttributes = new ArrayList<>();
-		List<GUIParameter> parameters = new ArrayList<GUIParameter>();
+		List<GUIParameter> parameters = new ArrayList<>();
 		
 		/*
 		 * Prepare the list of columns for the documents screen

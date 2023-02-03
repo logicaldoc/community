@@ -156,7 +156,7 @@ public class ParametricForm extends VLayout {
 
 		CheckboxItem searchinhits = new CheckboxItem(SEARCHINHITS, I18N.message(SEARCHINHITS));
 
-		LinkedHashMap<String, String> matchMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> matchMap = new LinkedHashMap<>();
 		matchMap.put("and", I18N.message("matchall"));
 		matchMap.put("or", I18N.message("matchany"));
 		matchMap.put("not", I18N.message("matchnone"));
@@ -260,7 +260,7 @@ public class ParametricForm extends VLayout {
 
 		setFolderCondition(options);
 
-		List<GUICriterion> criteria = new ArrayList<GUICriterion>();
+		List<GUICriterion> criteria = new ArrayList<>();
 		if (conditionsLayout.getMembers() != null)
 			addCriteria(criteria);
 

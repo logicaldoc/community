@@ -284,18 +284,18 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (exists()) {
 			if (name.getNamespace().equals(namespace) && name.getName().equals("id")) {
 				if (!isCollection() && !resource.isFolder()) {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "d-" + resource.getID(),
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<>("id", "d-" + resource.getID(),
 							namespace);
 					properties.add(idProp);
 				} else {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "f-" + resource.getID(),
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<>("id", "f-" + resource.getID(),
 							namespace);
 					properties.add(idProp);
 				}
 			}
 
 			if (name.getName().equals("getetag")) {
-				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>(DavPropertyName.GETETAG,
+				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<>(DavPropertyName.GETETAG,
 						resource.getETag());
 				properties.add(defaultDavProperty);
 			}
@@ -330,16 +330,16 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 		// set (or reset) fundamental properties
 		if (getDisplayName() != null) {
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, getDisplayName()));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.DISPLAYNAME, getDisplayName()));
 		}
 		if (isCollection()) {
 			properties.add(new ResourceType(ResourceType.COLLECTION));
 			// Windows XP support
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.ISCOLLECTION, "1"));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.ISCOLLECTION, "1"));
 		} else {
 			properties.add(new ResourceType(ResourceType.DEFAULT_RESOURCE));
 			// Windows XP support
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.ISCOLLECTION, "0"));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.ISCOLLECTION, "0"));
 		}
 
 		/*
@@ -353,7 +353,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		// supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
 		// properties.add(supportedLock);
 		properties
-				.add(new DefaultDavProperty<Long>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
+				.add(new DefaultDavProperty<>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
 
 		// Set Dav property LastModified
 		long lastmodTime = IOUtil.UNDEFINED_TIME;
@@ -362,7 +362,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		}
 
 		String lastModified = IOUtil.getLastModified(lastmodTime);
-		properties.add(new DefaultDavProperty<String>(DavPropertyName.GETLASTMODIFIED, lastModified));
+		properties.add(new DefaultDavProperty<>(DavPropertyName.GETLASTMODIFIED, lastModified));
 
 		// Set Dav property CreationDate
 		long creationTime = IOUtil.UNDEFINED_TIME;
@@ -370,7 +370,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			creationTime = this.resource.getCreationDate().getTime();
 		}
 		String creationDate = IOUtil.getCreated(creationTime);
-		properties.add(new DefaultDavProperty<String>(DavPropertyName.CREATIONDATE, creationDate));
+		properties.add(new DefaultDavProperty<>(DavPropertyName.CREATIONDATE, creationDate));
 
 		propsInitialized = true;
 	}
@@ -433,7 +433,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (list != null)
 			return new DavResourceIteratorImpl(list);
 
-		list = new ArrayList<DavResource>();
+		list = new ArrayList<>();
 		if (exists() && isCollection()) {
 			try {
 				String path = locator.getResourcePath() == null ? "/" : locator.getResourcePath() + "/";

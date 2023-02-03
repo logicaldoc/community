@@ -13,7 +13,7 @@ import com.logicaldoc.webservice.doc.model.StubTypeTree;
  */
 public class StubTypeTreeRepository {
 
-	private Map<Class<?>, StubTypeTree> repository = new HashMap<Class<?>, StubTypeTree>();
+	private Map<Class<?>, StubTypeTree> repository = new HashMap<>();
 
 	public StubTypeTree getStubTypeTree(Class<?> type) {
 		StubTypeTree tree = repository.get(type);

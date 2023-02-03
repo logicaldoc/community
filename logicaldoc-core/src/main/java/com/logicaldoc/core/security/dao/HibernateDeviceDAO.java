@@ -58,7 +58,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 					ENTITY + ".lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Device>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -71,7 +71,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			return findByWhere(ENTITY + USER_ID_EQUAL_USER_ID, params, ENTITY + ".lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Device>();
+			return new ArrayList<>();
 		}
 	}
 

@@ -104,7 +104,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 	}
 
 	private List<User> findUsers(Session session, String groupIdOrName) throws PersistenceException {
-		List<User> users = new ArrayList<User>();
+		List<User> users = new ArrayList<>();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);

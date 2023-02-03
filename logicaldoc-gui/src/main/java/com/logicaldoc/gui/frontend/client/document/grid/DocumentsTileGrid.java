@@ -46,7 +46,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	private GUIFolder folder = null;
 
-	private List<DetailViewerField> fields = new ArrayList<DetailViewerField>();
+	private List<DetailViewerField> fields = new ArrayList<>();
 
 	public DocumentsTileGrid(GUIFolder folder) {
 		this.folder = folder;

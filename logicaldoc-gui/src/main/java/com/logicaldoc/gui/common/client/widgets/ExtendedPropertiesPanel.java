@@ -432,7 +432,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	 * @return the list of additional icons
 	 */
 	private List<FormItemIcon> prepareMultiValueIcons(GUIAttribute att) {
-		List<FormItemIcon> multiValIcons = new ArrayList<FormItemIcon>();
+		List<FormItemIcon> multiValIcons = new ArrayList<>();
 		if (att.isMultiple()) {
 			FormItemIcon add = new FormItemIcon();
 			add.setWidth(10);

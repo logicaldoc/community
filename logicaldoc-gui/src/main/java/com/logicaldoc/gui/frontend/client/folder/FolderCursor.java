@@ -34,7 +34,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 	private FolderPagination currentPagination = new FolderPagination(0L, 1000, 0, 1);
 
-	private Map<Long, FolderPagination> paginations = new HashMap<Long, FolderPagination>();
+	private Map<Long, FolderPagination> paginations = new HashMap<>();
 
 	public static FolderCursor get() {
 		if (instance == null)

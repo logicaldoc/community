@@ -147,7 +147,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 	}
 
 	public void setContacts(GUIContact[] contacts) {
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 		for (GUIContact contact : contacts) {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute("id", contact.getId());

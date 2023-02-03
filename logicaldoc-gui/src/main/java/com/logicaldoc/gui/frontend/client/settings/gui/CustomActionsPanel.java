@@ -53,7 +53,7 @@ public class CustomActionsPanel extends VLayout {
 
 	private HLayout rollOverCanvas;
 
-	private List<GUIMenu> actions = new ArrayList<GUIMenu>();
+	private List<GUIMenu> actions = new ArrayList<>();
 
 	public CustomActionsPanel() {
 		setWidth100();

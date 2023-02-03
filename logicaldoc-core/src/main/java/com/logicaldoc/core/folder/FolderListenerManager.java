@@ -25,7 +25,7 @@ public class FolderListenerManager {
 
 	protected static Logger log = LoggerFactory.getLogger(FolderListenerManager.class);
 
-	private List<FolderListener> listeners = new ArrayList<FolderListener>();
+	private List<FolderListener> listeners = new ArrayList<>();
 
 	@SuppressWarnings("rawtypes")
 	public synchronized void init() {

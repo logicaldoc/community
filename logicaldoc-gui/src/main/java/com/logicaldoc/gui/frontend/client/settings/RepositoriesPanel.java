@@ -87,7 +87,7 @@ public class RepositoriesPanel extends AdminPanel {
 	}
 
 	private void onSaveFolders() {
-		final List<GUIParameter> settings = new ArrayList<GUIParameter>();
+		final List<GUIParameter> settings = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = foldersForm.getValues();
 		for (String name : values.keySet()) {

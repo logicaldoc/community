@@ -247,7 +247,7 @@ public class CalendarEventDialog extends Window {
 					return remindValue;
 				} else if (field.getName().equals("unit")) {
 					SelectItem unitSelector = ItemFactory.newDueTimeSelector("remindUnit", "");
-					LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+					LinkedHashMap<String, String> map = new LinkedHashMap<>();
 					map.put("minute", I18N.message("minutes"));
 					map.put("hour", I18N.message("hours"));
 					map.put("day", I18N.message("ddays"));
@@ -754,7 +754,7 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private void saveReminders(GUICalendarEvent calendarEvent) {
-		ArrayList<GUIReminder> reminders = new ArrayList<GUIReminder>();
+		ArrayList<GUIReminder> reminders = new ArrayList<>();
 		ListGridRecord[] records = remindersGrid.getRecords();
 		if (records != null)
 			for (ListGridRecord rec : records) {
@@ -779,7 +779,7 @@ public class CalendarEventDialog extends Window {
 		LD.ask(I18N.message("delevent"), I18N.message("deleventconfirm"), new BooleanCallback() {
 			@Override
 			public void execute(Boolean confirmToDelete) {
-				if (Boolean.FALSE.equals(confirmToDelete.booleanValue()))
+				if (Boolean.FALSE.equals(confirmToDelete))
 					return;
 
 				if (calendarEvent.getParentId() != null) {

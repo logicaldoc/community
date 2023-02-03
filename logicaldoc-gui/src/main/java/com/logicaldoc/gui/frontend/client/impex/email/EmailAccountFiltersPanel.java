@@ -70,7 +70,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 		prepareList(field);
 
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 		if (account.getRules() != null)
 			for (GUIEmailRule rule : account.getRules()) {
 				ListGridRecord rec = new ListGridRecord();
@@ -172,7 +172,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		ListGridField condition = new ListGridField("condition", I18N.message("condition"));
 		condition.setWidth(120);
 		SelectItem conditionSelect = new SelectItem();
-		LinkedHashMap<String, String> map2 = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map2 = new LinkedHashMap<>();
 		map2.put("0", I18N.message("contains"));
 		map2.put("1", I18N.message("notcontains"));
 		map2.put("2", I18N.message("matches"));
@@ -229,7 +229,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		try {
 			if (list != null) {
 				ListGridRecord[] records = list.getRecords();
-				List<GUIEmailRule> rules = new ArrayList<GUIEmailRule>();
+				List<GUIEmailRule> rules = new ArrayList<>();
 				for (ListGridRecord rec : records) {
 					if (rec.getAttribute("expression") == null)
 						continue;

@@ -38,7 +38,7 @@ public class DuoSetup extends TwoFactorsAuthenticationSetup {
 		username.setRequired(true);
 
 		SelectItem factor = ItemFactory.newSelectItem("factor", I18N.message("factor"));
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("passcode", "passcode");
 		map.put("sms", "sms");
 		map.put("push", "push");

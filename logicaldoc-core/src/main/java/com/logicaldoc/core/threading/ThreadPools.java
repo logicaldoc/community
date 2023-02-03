@@ -42,7 +42,7 @@ public class ThreadPools {
 
 	private static Logger log = LoggerFactory.getLogger(ThreadPools.class);
 
-	private Map<String, ExecutorService> pools = new HashMap<String, ExecutorService>();
+	private Map<String, ExecutorService> pools = new HashMap<>();
 
 	private ContextProperties config;
 
@@ -78,7 +78,7 @@ public class ThreadPools {
 				pool = new ScheduledThreadPoolExecutor(core, new NamedThreadFactory(name));
 			else
 				pool = new ThreadPoolExecutor(core, max, keepalive, TimeUnit.SECONDS,
-						new LinkedBlockingQueue<Runnable>());
+						new LinkedBlockingQueue<>());
 			pools.put(name, pool);
 		}
 

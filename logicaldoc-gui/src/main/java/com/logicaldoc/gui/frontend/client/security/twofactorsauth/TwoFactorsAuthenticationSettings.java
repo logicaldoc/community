@@ -184,7 +184,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 					return;
 
 				String tenant = Session.get().getTenantName();
-				final List<GUIParameter> params = new ArrayList<GUIParameter>();
+				final List<GUIParameter> params = new ArrayList<>();
 				params.add(new GUIParameter(tenant + ".2fa.enabled",
 						vm.getValueAsString("enable2fa").equals("yes") ? "true" : "false"));
 				params.add(new GUIParameter(tenant + ".2fa.allowtrusted",

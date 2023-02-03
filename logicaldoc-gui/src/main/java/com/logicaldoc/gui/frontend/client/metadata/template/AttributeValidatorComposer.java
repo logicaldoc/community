@@ -171,7 +171,7 @@ public class AttributeValidatorComposer extends Window {
 		regexp.setWrapTitle(false);
 
 		SelectItem patterns = ItemFactory.newSelectItem("text-patterns", "commonexpressions");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$", I18N.message("email"));
 		opts.put("^(https?|ftps?|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]$", I18N.message("url"));
 		patterns.setValueMap(opts);

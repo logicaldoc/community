@@ -23,7 +23,7 @@ public class UrlUtil {
 
 	public static Map<String, List<String>> getQueryParams(String url) {
 		try {
-			Map<String, List<String>> params = new HashMap<String, List<String>>();
+			Map<String, List<String>> params = new HashMap<>();
 			String[] urlParts = url.split("\\?");
 			if (urlParts.length > 1) {
 				String query = urlParts[1];
@@ -53,7 +53,7 @@ public class UrlUtil {
 	public static Map<String, String> getParams(String urlString)
 			throws UnsupportedEncodingException, MalformedURLException {
 		URL url = new URL(urlString);
-		Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+		Map<String, String> query_pairs = new LinkedHashMap<>();
 		String query = url.getQuery();
 		String[] pairs = query.split("&");
 		for (String pair : pairs) {

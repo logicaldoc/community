@@ -91,7 +91,7 @@ public class TemplateSecurityPanel extends VLayout {
 
 		prepareList(template);
 
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 		fields.add(entityId);
 		fields.add(entity);
 		fields.add(read);
@@ -232,7 +232,7 @@ public class TemplateSecurityPanel extends VLayout {
 	 */
 	private GUIRight[] getRights() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIRight> tmp = new ArrayList<GUIRight>();
+		List<GUIRight> tmp = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);

@@ -299,7 +299,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		Session session = validateSession(getThreadLocalRequest());
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
-			List<GUIAttributeSet> guiSets = new ArrayList<GUIAttributeSet>();
+			List<GUIAttributeSet> guiSets = new ArrayList<>();
 			List<Long> setIds = dao.findAllIds(session.getTenantId());
 			for (Long setId : setIds)
 				guiSets.add(getAttributeSet(setId));
@@ -315,7 +315,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
-		List<GUIValue> options = new ArrayList<GUIValue>();
+		List<GUIValue> options = new ArrayList<>();
 
 		try (CSVFileReader reader = new CSVFileReader(file.getPath());) {
 			List<String> row = reader.readFields();

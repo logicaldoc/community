@@ -26,7 +26,7 @@ import com.logicaldoc.core.security.SessionManager;
  */
 public class LDSecurityContextRepository implements SecurityContextRepository {
 
-	private static Map<String, HttpSession> servletSessionMapping = new HashMap<String, HttpSession>();
+	private static Map<String, HttpSession> servletSessionMapping = new HashMap<>();
 
 	@Override
 	public boolean containsContext(HttpServletRequest request) {

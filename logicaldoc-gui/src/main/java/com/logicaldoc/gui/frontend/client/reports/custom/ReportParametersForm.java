@@ -168,7 +168,7 @@ public class ReportParametersForm extends Window {
 
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 
-		ArrayList<GUIAttribute> parameters = new ArrayList<GUIAttribute>();
+		ArrayList<GUIAttribute> parameters = new ArrayList<>();
 
 		for (String name : values.keySet()) {
 			if (!name.startsWith("_"))

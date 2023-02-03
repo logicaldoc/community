@@ -50,7 +50,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 
 		HashMap<String, Long> tagsMap = buildTagsMap(session, mode, firstLetter, editing);
 
-		List<String> words = new ArrayList<String>(tagsMap.keySet());
+		List<String> words = new ArrayList<>(tagsMap.keySet());
 		Collections.sort(words);
 
 		// Limit the collection
@@ -116,7 +116,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 			throws PersistenceException {
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		HashMap<String, Long> tagsMap = new HashMap<String, Long>();
+		HashMap<String, Long> tagsMap = new HashMap<>();
 
 		if (("preset".equals(firstLetter) || "preset".equals(mode)) && "true".equals(editing)) {
 			// We have to return the preset only, because the user is

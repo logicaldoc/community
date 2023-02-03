@@ -51,7 +51,7 @@ public class GDriveCreate extends Window {
 		fileName.setWidth(200);
 
 		SelectItem type = ItemFactory.newSelectItem("type", I18N.message("type"));
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("doc", "doc");
 		map.put("docx", "docx");
 		map.put("txt", "txt");

@@ -90,7 +90,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		if (!user.getPassword().equals(adminPasswd))
 			throw new BadCredentialsException(BADCREDENTIALS);
 
-		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		Collection<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(ADMIN));
 
 		// Return an authenticated token, containing user data and

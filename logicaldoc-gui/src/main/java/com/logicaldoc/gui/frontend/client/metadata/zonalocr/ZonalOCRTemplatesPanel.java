@@ -201,7 +201,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		addZone.addClickHandler((ClickEvent event) -> {
 			FormItem select = new SelectItem("zone", I18N.message("zone"));
 
-			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+			LinkedHashMap<String, String> map = new LinkedHashMap<>();
 			for (GUIAttribute att : selectedOcrTemplate.getTemplate().getAttributes()) {
 				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null)
 					map.put(att.getName(), att.getName() + " (" + AttributeTypeFormatter.format(att.getType()) + ")");

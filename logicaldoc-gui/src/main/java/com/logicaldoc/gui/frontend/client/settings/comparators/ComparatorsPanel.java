@@ -277,7 +277,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 		String[] attrs = rec.getAttributes();
 		if (attrs != null && attrs.length > 0) {
-			List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+			List<ListGridRecord> records = new ArrayList<>();
 			for (String attr : attrs) {
 				if (!isParameterAttribute(attr))
 					continue;
@@ -339,7 +339,7 @@ public class ComparatorsPanel extends AdminPanel {
 	}
 
 	private List<GUIParameter> collectSettings() {
-		List<GUIParameter> settings = new ArrayList<GUIParameter>();
+		List<GUIParameter> settings = new ArrayList<>();
 
 		for (Record rec : associationsGrid.getRecordList().toArray()) {
 			String in = rec.getAttributeAsString("in").trim();
@@ -354,7 +354,7 @@ public class ComparatorsPanel extends AdminPanel {
 	}
 
 	private void collectComparatorAttributes(List<GUIParameter> settings, Record comparatorRecord) {
-		Set<String> settingNames = new TreeSet<String>();
+		Set<String> settingNames = new TreeSet<>();
 		String comparator = comparatorRecord.getAttributeAsString(gridAttributeName).trim();
 		String comparatorShort = getComparatorShortName(comparator);
 

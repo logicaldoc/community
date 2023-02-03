@@ -67,7 +67,7 @@ public class TaskSchedulingPanel extends VLayout {
 
 		// Policy
 		final SelectItem simple = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("true", I18N.message("simple"));
 		opts.put("false", I18N.message("advanced"));
 		simple.setValueMap(opts);

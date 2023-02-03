@@ -74,7 +74,7 @@ public class ApiCallsReport extends AdminPanel {
 
 		// Protocol
 		SelectItem proto = ItemFactory.newSelectItem("protocol", "protocol");
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("soap", "soap");
 		map.put("rest", "rest");
 		proto.setWidth(120);
@@ -262,7 +262,7 @@ public class ApiCallsReport extends AdminPanel {
 	 * @return an array of select items
 	 */
 	public SelectItem[] getEventTypes() {
-		List<SelectItem> items = new ArrayList<SelectItem>();
+		List<SelectItem> items = new ArrayList<>();
 
 		return items.toArray(new SelectItem[0]);
 	}

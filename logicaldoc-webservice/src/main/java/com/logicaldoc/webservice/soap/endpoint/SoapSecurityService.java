@@ -64,7 +64,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	private List<WSUser> collectUsers(String group, User user) {
-		List<WSUser> users = new ArrayList<WSUser>();
+		List<WSUser> users = new ArrayList<>();
 		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 		if (StringUtils.isEmpty(group)) {
 			for (User usr : dao.findAll(user.getTenantId())) {

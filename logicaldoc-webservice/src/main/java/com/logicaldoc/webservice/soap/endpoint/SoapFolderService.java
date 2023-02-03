@@ -73,7 +73,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		folderVO.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 		folderVO.setColor(folder.getColor());
 
-		Set<String> tagsSet = new TreeSet<String>();
+		Set<String> tagsSet = new TreeSet<>();
 		if (folder.getTags() != null) {
 			for (int i = 0; i < folder.getTags().length; i++) {
 				tagsSet.add(folder.getTags()[i]);
@@ -196,7 +196,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Folder> folders = folderDao.findChildren(folderId, user.getId());
-		List<WSFolder> wsFolders = new ArrayList<WSFolder>();
+		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {
 			if (folder.getHidden() == 0) {
 				folderDao.initialize(folder);
@@ -376,7 +376,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		checkReadEnable(user, folderId);
 
-		List<WSFolder> path = new ArrayList<WSFolder>();
+		List<WSFolder> path = new ArrayList<>();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		long rootId = folderDao.findRoot(user.getTenantId()).getId();
@@ -452,7 +452,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
 
-		List<WSRight> rightsList = new ArrayList<WSRight>();
+		List<WSRight> rightsList = new ArrayList<>();
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		Folder folder = folderDao.findById(folderId);
@@ -515,7 +515,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			fld.setStorage(folder.getStorage());
 			fld.setMaxVersions(folder.getMaxVersions());
 
-			Set<String> tagsSet = new TreeSet<String>();
+			Set<String> tagsSet = new TreeSet<>();
 			if (folder.getTags() != null) {
 				for (int i = 0; i < folder.getTags().length; i++) {
 					tagsSet.add(folder.getTags()[i]);
@@ -591,7 +591,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Folder> folders = folderDao.findByUserId(user.getId(), folderDao.findRoot(user.getTenantId()).getId());
-		List<WSFolder> wsFolders = new ArrayList<WSFolder>();
+		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {
 			if (folder.getType() == Folder.TYPE_WORKSPACE) {
 				folderDao.initialize(folder);

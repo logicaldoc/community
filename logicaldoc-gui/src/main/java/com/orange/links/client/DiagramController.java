@@ -111,13 +111,13 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 	private ContextMenu canvasMenu;
 
-	private DrawableSet<Connection> connections = new DrawableSet<Connection>();
+	private DrawableSet<Connection> connections = new DrawableSet<>();
 
-	private DrawableSet<FunctionShape> shapes = new DrawableSet<FunctionShape>();
+	private DrawableSet<FunctionShape> shapes = new DrawableSet<>();
 
-	private Map<Widget, FunctionShape> widgetShapeMap = new HashMap<Widget, FunctionShape>();
+	private Map<Widget, FunctionShape> widgetShapeMap = new HashMap<>();
 
-	private Map<Widget, Map<Widget, Connection>> functionsMap = new HashMap<Widget, Map<Widget, Connection>>();
+	private Map<Widget, Map<Widget, Connection>> functionsMap = new HashMap<>();
 
 	private Point mousePoint = new Point(0, 0);
 
@@ -341,7 +341,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 		shapes.add(shape);
 		widgetShapeMap.put(w, shape);
-		functionsMap.put(w, new HashMap<Widget, Connection>());
+		functionsMap.put(w, new HashMap<>());
 
 		if (w instanceof HasContextMenu) {
 			w.addDomHandler(new MouseUpHandler() {
@@ -913,7 +913,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		// Display the converted graphical representation
 		clearDiagram();
 		// Add Functions
-		Map<String, Widget> idToWidgetMap = new HashMap<String, Widget>();
+		Map<String, Widget> idToWidgetMap = new HashMap<>();
 		for (FunctionModel function : diagramRepresentation.getFunctionRepresentationSet()) {
 			Widget w = saveFactory.getFunctionByType(function.identifier, function.content);
 			addWidget(w, function.left, function.top);

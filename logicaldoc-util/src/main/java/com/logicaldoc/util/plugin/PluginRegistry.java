@@ -110,7 +110,7 @@ public abstract class PluginRegistry {
 
 	protected List<PluginManager.PluginLocation> locatePlugins(String pluginsDirectoryPath) {
 
-		List<PluginManager.PluginLocation> pluginLocations = new LinkedList<PluginManager.PluginLocation>();
+		List<PluginManager.PluginLocation> pluginLocations = new LinkedList<>();
 
 		// look for all zip files in plugin directory
 		File pluginDirectory = new File(pluginsDirectoryPath);
@@ -242,7 +242,7 @@ public abstract class PluginRegistry {
 		if (registry != null)
 			return registry.getManager().getRegistry().getPluginDescriptors();
 		else
-			return new ArrayList<PluginDescriptor>();
+			return new ArrayList<>();
 	}
 
 	/**

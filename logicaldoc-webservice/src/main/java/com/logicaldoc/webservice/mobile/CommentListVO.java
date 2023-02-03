@@ -22,7 +22,7 @@ public class CommentListVO implements Serializable {
     
     public PermissionVO nodePermissions = new PermissionVO();
     
-    private List<CommentVO> items = new ArrayList<CommentVO>();
+    private List<CommentVO> items = new ArrayList<>();
 
 	public void setTotal(int total) {
 		this.total = total;

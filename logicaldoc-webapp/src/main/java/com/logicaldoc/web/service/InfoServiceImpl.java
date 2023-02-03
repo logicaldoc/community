@@ -83,7 +83,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			}
 			info.setSupportedLanguages(supportedLanguages.toArray(new GUIValue[0]));
 
-			List<GUIMessage> alerts = new ArrayList<GUIMessage>();
+			List<GUIMessage> alerts = new ArrayList<>();
 
 			// Checks if LogicalDOC has been initialized
 			ContextProperties config = Context.get().getProperties();
@@ -172,7 +172,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	}
 
 	private ArrayList<GUIValue> setSupportedLocales(String tenantName, GUIInfo info, Locale withLocale) {
-		ArrayList<GUIValue> supportedLanguages = new ArrayList<GUIValue>();
+		ArrayList<GUIValue> supportedLanguages = new ArrayList<>();
 		List<String> installedLocales = I18N.getLocales();
 		for (String loc : installedLocales) {
 			if ("enabled".equals(Context.get().getProperties().getProperty(tenantName + ".lang." + loc + ".gui"))) {
@@ -249,7 +249,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		info.getBranding().setVendorCountry(inf.getVendorCountry());
 
 		try {
-			ArrayList<GUIValue> values = new ArrayList<GUIValue>();
+			ArrayList<GUIValue> values = new ArrayList<>();
 			for (Object key : config.keySet()) {
 				GUIValue pair = new GUIValue();
 				pair.setCode((String) key);
@@ -352,7 +352,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 		try {
 			SystemMessageDAO messageDao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
-			List<GUIParameter> parameters = new ArrayList<GUIParameter>();
+			List<GUIParameter> parameters = new ArrayList<>();
 
 			if (session != null) {
 				GUIParameter messages = new GUIParameter("messages",

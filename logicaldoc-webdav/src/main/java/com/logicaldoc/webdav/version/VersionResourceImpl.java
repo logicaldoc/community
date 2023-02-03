@@ -107,16 +107,16 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 		if (!propsInitialized) {
 			super.initProperties();
 
-			properties.add(new DefaultDavProperty<String>(VERSION_NAME, resource.getVersionLabel(), true));
+			properties.add(new DefaultDavProperty<>(VERSION_NAME, resource.getVersionLabel(), true));
 
 			// properties.add(new
 			// DefaultDavProperty<String>(DavPropertyName.CREATIONDATE,
 			// resource.getVersionDate()));
 			String creationDate = IOUtil.getCreated(resource.getVersionDate().getTime());
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.CREATIONDATE, creationDate));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.CREATIONDATE, creationDate));
 			properties.add(new HrefProperty(VersionResource.VERSION_HISTORY,
 					locator.getResourcePath() + resource.getID(), true));
-			properties.add(new DefaultDavProperty<String>(DeltaVConstants.COMMENT, resource.getComment()));
+			properties.add(new DefaultDavProperty<>(DeltaVConstants.COMMENT, resource.getComment()));
 		}
 	}
 

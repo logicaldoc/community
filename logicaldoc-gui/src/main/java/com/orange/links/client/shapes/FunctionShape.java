@@ -94,13 +94,13 @@ public class FunctionShape extends AbstractShape {
 		}
 
 		if (p.distance(centerW) <= selectableAreaRadius) {
-			return new Couple<Direction, Point>(Direction.W, centerW);
+			return new Couple<>(Direction.W, centerW);
 		} else if (p.distance(centerN) <= selectableAreaRadius) {
-			return new Couple<Direction, Point>(Direction.N, centerN);
+			return new Couple<>(Direction.N, centerN);
 		} else if (p.distance(centerS) <= selectableAreaRadius) {
-			return new Couple<Direction, Point>(Direction.S, centerS);
+			return new Couple<>(Direction.S, centerS);
 		} else if (p.distance(centerE) <= selectableAreaRadius) {
-			return new Couple<Direction, Point>(Direction.E, centerE);
+			return new Couple<>(Direction.E, centerE);
 		}
 		return null;
 	}

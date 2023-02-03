@@ -126,7 +126,7 @@ public class Dropbox {
 	}
 
 	public List<FileMetadata> listFilesInTree(String basePath) throws DbxException {
-		List<FileMetadata> files = new ArrayList<FileMetadata>();
+		List<FileMetadata> files = new ArrayList<>();
 		if (basePath.endsWith("/"))
 			basePath = basePath.substring(0, basePath.length() - 1);
 		if (!basePath.startsWith("/"))
@@ -138,7 +138,7 @@ public class Dropbox {
 	}
 
 	public List<FileMetadata> find(String basePath, String query) throws DbxException {
-		List<FileMetadata> list = new ArrayList<FileMetadata>();
+		List<FileMetadata> list = new ArrayList<>();
 		SearchResult result = client.files().search(basePath, query);
 		List<SearchMatch> matches = result.getMatches();
 		for (SearchMatch searchMatch : matches) {

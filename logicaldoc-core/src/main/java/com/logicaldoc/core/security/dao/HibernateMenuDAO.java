@@ -67,7 +67,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public List<Menu> findByUserId(long userId) {
-		List<Menu> coll = new ArrayList<Menu>();
+		List<Menu> coll = new ArrayList<>();
 
 		try {
 			User user = userDAO.findById(userId);
@@ -91,7 +91,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 				// Now collect all menus that references the policies of the
 				// previously found menus
-				List<Menu> tmp = new ArrayList<Menu>();
+				List<Menu> tmp = new ArrayList<>();
 				query = new StringBuilder("select _menu from Menu _menu  where _menu.securityRef in (");
 				query.append(coll.stream().map(m -> Long.toString(m.getId())).collect(Collectors.joining(",")));
 				query.append(")");
@@ -116,7 +116,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	public List<Menu> findByUserId(long userId, long parentId, Integer type, boolean enabledOnly) {
-		List<Menu> coll = new ArrayList<Menu>();
+		List<Menu> coll = new ArrayList<>();
 
 		try {
 			User user = userDAO.findById(userId);
@@ -184,14 +184,14 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 					null, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Menu>();
+			return new ArrayList<>();
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<Menu> findChildren(long parentId, long userId) {
-		List<Menu> coll = new ArrayList<Menu>();
+		List<Menu> coll = new ArrayList<>();
 		try {
 			User user = userDAO.findById(userId);
 			if (user.isMemberOf(Group.GROUP_ADMIN))
@@ -261,7 +261,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public List<Menu> findByParentId(long parentId, boolean enaledOnly) {
-		List<Menu> coll = new ArrayList<Menu>();
+		List<Menu> coll = new ArrayList<>();
 		List<Menu> temp = findChildren(parentId, null);
 		Iterator<Menu> iter = temp.iterator();
 
@@ -379,7 +379,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public List<Menu> findByGroupId(long groupId) {
-		List<Menu> coll = new ArrayList<Menu>();
+		List<Menu> coll = new ArrayList<>();
 
 		// The administrators can see all menus
 		if (groupId == Group.GROUPID_ADMIN)
@@ -489,7 +489,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			return findByWhere(query.toString(), null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Menu>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -526,13 +526,13 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 					+ SqlUtil.doubleQuotes(name) + "'", null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Menu>();
+			return new ArrayList<>();
 		}
 	}
 
 	@Override
 	public List<Menu> findParents(long menuId) {
-		List<Menu> coll = new ArrayList<Menu>();
+		List<Menu> coll = new ArrayList<>();
 		try {
 			Menu menu = findById(menuId);
 			while (menu != null && menu.getId() != 1 && menu.getId() != menu.getParentId()) {

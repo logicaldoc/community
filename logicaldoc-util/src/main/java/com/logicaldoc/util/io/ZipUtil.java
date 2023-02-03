@@ -80,7 +80,7 @@ public class ZipUtil {
 	}
 
 	public List<ZipEntry> listZipEntries(File zipFile) {
-		List<ZipEntry> files = new ArrayList<ZipEntry>();
+		List<ZipEntry> files = new ArrayList<>();
 
 		try (java.util.zip.ZipFile zFile = new java.util.zip.ZipFile(zipFile)) {
 			Enumeration<? extends ZipEntry> e = zFile.entries();

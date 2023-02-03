@@ -204,7 +204,7 @@ public class StoragesPanel extends VLayout {
 
 		String[] attrs = rec.getAttributes();
 		if (attrs != null && attrs.length > 0) {
-			List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+			List<ListGridRecord> records = new ArrayList<>();
 			for (String attr : attrs) {
 				if (!StoragesPanel.isParameterAttribute(attr))
 					continue;
@@ -380,7 +380,7 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private List<GUIParameter> collectSettings() {
-		List<GUIParameter> settings = new ArrayList<GUIParameter>();
+		List<GUIParameter> settings = new ArrayList<>();
 		ListGridRecord[] records = storagesGrid.getRecords();
 		for (ListGridRecord storageRecord : records) {
 			try {

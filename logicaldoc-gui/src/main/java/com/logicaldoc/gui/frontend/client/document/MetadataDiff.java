@@ -41,7 +41,7 @@ public class MetadataDiff extends Window {
 		centerInPage();
 
 		// Prepare the records, each one is related to a version's attribute
-		ArrayList<DiffRecord> records = new ArrayList<DiffRecord>();
+		ArrayList<DiffRecord> records = new ArrayList<>();
 		records.add(new DiffRecord(I18N.message("versiondate"), I18N.message("versiondate"),
 				I18N.formatDate(version1.getVersionDate()), I18N.formatDate(version2.getVersionDate()), 0));
 		records.add(new DiffRecord(I18N.message("fileversion"), I18N.message("fileversion"), version1.getFileVersion(),
@@ -135,7 +135,7 @@ public class MetadataDiff extends Window {
 		DateTimeFormat dateFormat = DateTimeFormat.getFormat(I18N.message("format_date"));
 		NumberFormat numberFormat = NumberFormat.getDecimalFormat();
 
-		List<DiffRecord> attributeRecords = new ArrayList<DiffRecord>();
+		List<DiffRecord> attributeRecords = new ArrayList<>();
 
 		List<String> names = prepareAttributeNames(version1, version2);
 

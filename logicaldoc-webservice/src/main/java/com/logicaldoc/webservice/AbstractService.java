@@ -74,7 +74,7 @@ public class AbstractService {
 			user.setId(1L);
 			user.setTenantId(1L);
 			user.setName("admin");
-			Set<Group> groups = new HashSet<Group>();
+			Set<Group> groups = new HashSet<>();
 			GroupDAO grpDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			groups.add(grpDao.findById(1));
 			user.setGroups(groups);

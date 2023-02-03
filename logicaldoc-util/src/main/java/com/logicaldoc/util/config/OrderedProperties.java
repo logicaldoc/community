@@ -96,7 +96,7 @@ public class OrderedProperties extends Properties {
 	 * @return the ordered collection of all the keys 
 	 */
 	public List<String> getKeys() {
-		Vector<String> keys = new Vector<String>();
+		Vector<String> keys = new Vector<>();
 
 		for (Object key : keySet()) {
 			keys.addElement(key.toString());

@@ -78,7 +78,7 @@ public class ConversionDialog extends Window {
 					public void onSuccess(GUIFolder folder) {
 						convert.setDisabled(!folder.isDownload() && !folder.isWrite());
 
-						LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+						LinkedHashMap<String, String> map = new LinkedHashMap<>();
 						if (folder.isDownload())
 							map.put("download", I18N.message("download"));
 						if (folder.isWrite())

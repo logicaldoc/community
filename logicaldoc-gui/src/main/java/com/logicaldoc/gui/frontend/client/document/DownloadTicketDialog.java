@@ -114,7 +114,7 @@ public class DownloadTicketDialog extends Window {
 		duedateTimeItem.setDefaultValue(24);
 		duedateTimeItem.setMin(0);
 		SelectItem duedateTime = ItemFactory.newDueTimeSelector("duedatetime", "");
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("hour", I18N.message("hours"));
 		map.put("day", I18N.message("ddays"));
 		duedateTime.setValueMap(map);

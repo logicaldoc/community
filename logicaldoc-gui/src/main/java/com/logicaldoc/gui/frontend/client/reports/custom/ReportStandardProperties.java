@@ -87,7 +87,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		SelectItem format = ItemFactory.newSelectItem("outputFormat", "format");
 		format.addChangedHandler(changedHandler);
 		format.setRequired(true);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("pdf", "pdf");
 		map.put("xlsx", "xlsx");
 		map.put("html", "html");
@@ -96,7 +96,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 
 		SelectItem updatePolicy = ItemFactory.newSelectItem("updatePolicy", "onupdate");
 		updatePolicy.addChangedHandler(changedHandler);
-		LinkedHashMap<String, String> map2 = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map2 = new LinkedHashMap<>();
 		map2.put("0", I18N.message("createnewversion"));
 		map2.put("1", I18N.message("createnewdoc"));
 		updatePolicy.setValueMap(map2);

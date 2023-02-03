@@ -46,14 +46,14 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Version>();
+			return new ArrayList<>();
 		}
 
 	}
 
 	@Override
 	public Version findByVersion(long docId, String version) {
-		List<Version> versions = new ArrayList<Version>();
+		List<Version> versions = new ArrayList<>();
 		try {
 			versions = findByWhere(
 					" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version='" + version + "'",
@@ -70,7 +70,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	@Override
 	public Version findByFileVersion(long docId, String fileVersion) {
-		List<Version> versions = new ArrayList<Version>();
+		List<Version> versions = new ArrayList<>();
 		try {
 			versions = findByWhere(" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion='"
 					+ fileVersion + "'", "order by " + ENTITY + ".date asc", null);

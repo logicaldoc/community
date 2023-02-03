@@ -20,7 +20,7 @@ public class WebserviceDocGen {
 		String release = args[0];
 		File outputDir = new File(args[1]);
 
-		List<Class<?>> services = new ArrayList<Class<?>>();
+		List<Class<?>> services = new ArrayList<>();
 		for (int i = 2; i < args.length; i++) {
 			try {
 				String name = args[i];

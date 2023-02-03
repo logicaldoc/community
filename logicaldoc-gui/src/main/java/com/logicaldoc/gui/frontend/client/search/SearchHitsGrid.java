@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
  */
 public class SearchHitsGrid extends DocumentsListGrid {
 
-	private List<ListGridField> fields = new ArrayList<ListGridField>();
+	private List<ListGridField> fields = new ArrayList<>();
 
 	public SearchHitsGrid() {
 		super();

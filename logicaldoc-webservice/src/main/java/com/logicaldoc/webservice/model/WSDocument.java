@@ -521,7 +521,7 @@ public class WSDocument implements Serializable {
 	public void addAttribute(WSAttribute att) {
 		if (attributes == null)
 			attributes = new WSAttribute[0];
-		List<WSAttribute> buf = new ArrayList<WSAttribute>();
+		List<WSAttribute> buf = new ArrayList<>();
 		for (WSAttribute tmp : attributes)
 			buf.add(tmp);
 		buf.add(att);

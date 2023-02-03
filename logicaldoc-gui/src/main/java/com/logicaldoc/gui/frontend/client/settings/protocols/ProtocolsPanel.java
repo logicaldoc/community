@@ -289,7 +289,7 @@ public class ProtocolsPanel extends AdminPanel {
 			ProtocolsPanel.this.ftpKeystorePassword.setValue(values.get("ftpKeystorePassword").toString());
 		}
 
-		List<GUIParameter> params = new ArrayList<GUIParameter>();
+		List<GUIParameter> params = new ArrayList<>();
 		params.addAll(webservicesPanel.getSettings());
 		params.add(ProtocolsPanel.this.wdEnabled);
 		params.add(ProtocolsPanel.this.wdDepth);

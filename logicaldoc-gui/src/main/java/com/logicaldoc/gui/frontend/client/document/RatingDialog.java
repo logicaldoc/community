@@ -132,7 +132,7 @@ public class RatingDialog extends Window {
 			}
 		});
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		for (int i = 1; i <= 5; i++)
 			map.put("" + i, DocUtil.getRatingIcon(i));
 

@@ -30,7 +30,7 @@ public class Stub {
 	/**
 	 * Child elements, such as {orderId, orderDate}
 	 */
-	private List<Stub> childStubs = new ArrayList<Stub>();
+	private List<Stub> childStubs = new ArrayList<>();
 
 	/**
 	 * if parent stub's type = Product, is it FunProduct or NotFunProduct?

@@ -206,7 +206,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		Collection<Long> accessibleIds = folderDao.findFolderIdByUserId(session.getUserId(), parentFolder.getId(),
 				false);
 		if (!accessibleIds.isEmpty()) {
-			List<Long> folderIds = new ArrayList<Long>(accessibleIds);
+			List<Long> folderIds = new ArrayList<>(accessibleIds);
 			query.append(" and ( ");
 
 			/*

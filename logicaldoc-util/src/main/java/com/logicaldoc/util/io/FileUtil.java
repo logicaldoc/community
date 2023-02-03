@@ -722,7 +722,7 @@ public class FileUtil {
 	}
 
 	public static List<File> split(File file, long chunkSize, File destDir) throws IOException {
-		List<File> chunks = new ArrayList<File>();
+		List<File> chunks = new ArrayList<>();
 		try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
 			long numSplits = file.length() / chunkSize;
 			long sourceSize = raf.length();

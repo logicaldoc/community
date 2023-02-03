@@ -19,7 +19,7 @@ import com.logicaldoc.webservice.doc.JavaNameDisplayStrategy;
 
 public class SimpleJavaNameDisplayStrategy extends JavaNameDisplayStrategy {
 
-	private static final Map<Class<?>, String> PRIMITIVE_TYPE_DISPLAY = new HashMap<Class<?>, String>();
+	private static final Map<Class<?>, String> PRIMITIVE_TYPE_DISPLAY = new HashMap<>();
 	static {
 		PRIMITIVE_TYPE_DISPLAY.put(String.class, "String");
 

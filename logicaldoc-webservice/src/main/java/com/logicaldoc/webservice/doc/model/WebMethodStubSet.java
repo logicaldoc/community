@@ -14,7 +14,7 @@ public class WebMethodStubSet {
 
 	private String description;
 
-	private List<Stub> requestStubs = new ArrayList<Stub>();
+	private List<Stub> requestStubs = new ArrayList<>();
 
 	private Stub responseStub;
 

@@ -30,7 +30,7 @@ public class WorkflowDrawingPanel extends VStack {
 	private GUIWorkflow workflow;
 
 	// stateId - widget instance
-	private Map<String, StateWidget> widgets = new HashMap<String, StateWidget>();
+	private Map<String, StateWidget> widgets = new HashMap<>();
 
 	public WorkflowDrawingPanel(GUIWorkflow workflow) {
 		super();

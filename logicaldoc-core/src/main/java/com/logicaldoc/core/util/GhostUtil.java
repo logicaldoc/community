@@ -47,7 +47,7 @@ public class GhostUtil {
 		ContextProperties config = Context.get().getProperties();
 		String ghostCommand = config.getProperty("converter.GhostscriptConverter.path");
 
-		List<File> pages = new ArrayList<File>();
+		List<File> pages = new ArrayList<>();
 		String[] cmd = null;
 		if (page != null) {
 			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))

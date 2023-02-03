@@ -86,7 +86,7 @@ public class WSUtil {
 			String[] tags = new String[0];
 			if (document.getTags() != null && document.getTags().size() > 0) {
 				tags = new String[document.getTags().size()];
-				List<String> docTags = new ArrayList<String>(document.getTagsAsWords());
+				List<String> docTags = new ArrayList<>(document.getTagsAsWords());
 				if (docTags != null && docTags.size() > 0) {
 					for (int j = 0; j < docTags.size(); j++) {
 						tags[j] = docTags.get(j);
@@ -186,7 +186,7 @@ public class WSUtil {
 		doc.setColor(wsDoc.getColor());
 		doc.setLocale(LocaleUtil.toLocale(wsDoc.getLanguage()));
 
-		Set<String> tagsSet = new TreeSet<String>();
+		Set<String> tagsSet = new TreeSet<>();
 		if (wsDoc.getTags() != null) {
 			for (int i = 0; i < wsDoc.getTags().length; i++) {
 				tagsSet.add(wsDoc.getTags()[i]);

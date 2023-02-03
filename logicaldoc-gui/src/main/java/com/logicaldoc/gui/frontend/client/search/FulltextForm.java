@@ -311,7 +311,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		searchinItem = ItemFactory.newMultiComboBoxItem("searchin", "searchin", null, null);
 		searchinItem.setWidth(300);
 
-		final LinkedHashMap<String, String> fieldsMap = new LinkedHashMap<String, String>();
+		final LinkedHashMap<String, String> fieldsMap = new LinkedHashMap<>();
 		fieldsMap.put(Constants.FULLTEXT_FIELD_FILENAME, I18N.message("filename"));
 		fieldsMap.put(Constants.FULLTEXT_FIELD_CONTENT, I18N.message("content"));
 		fieldsMap.put(Constants.FULLTEXT_FIELD_TAGS, I18N.message("tags"));

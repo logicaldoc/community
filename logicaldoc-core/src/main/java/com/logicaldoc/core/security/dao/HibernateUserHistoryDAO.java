@@ -46,7 +46,7 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<UserHistory>();
+			return new ArrayList<>();
 		}
 	}
 

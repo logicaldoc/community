@@ -62,7 +62,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	 * A cache of counters: key=countername-tenantId name value=actual total
 	 * calls
 	 */
-	private static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<Pair<String, Long>, AtomicLong>();
+	private static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<>();
 
 	/**
 	 * Last time a database synchronization of the coutners has done
@@ -253,7 +253,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	}
 
 	protected void increaseCounter(String counterName, long tenantId) {
-		Pair<String, Long> counterPair = new Pair<String, Long>(counterName, tenantId);
+		Pair<String, Long> counterPair = new Pair<>(counterName, tenantId);
 		AtomicLong counter = counters.get(counterPair);
 		if (counter == null) {
 			counter = new AtomicLong(0L);

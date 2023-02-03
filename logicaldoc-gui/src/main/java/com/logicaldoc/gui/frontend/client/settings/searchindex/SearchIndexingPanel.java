@@ -373,7 +373,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		IButton saveButton = new IButton(I18N.message("save"));
 		saveButton.setTop(250);
 		saveButton.addClickHandler((ClickEvent event) -> {
-			final List<GUIParameter> params = new ArrayList<GUIParameter>();
+			final List<GUIParameter> params = new ArrayList<>();
 			ListGridRecord[] records = configsGrid.getRecords();
 			for (ListGridRecord recd : records) {
 				params.add(new GUIParameter(recd.getAttributeAsString("name"), recd.getAttributeAsString("value")));
@@ -480,7 +480,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		excludePatternsMetadata.setWidth(300);
 
 		SelectItem sorting = ItemFactory.newSelectItem("sorting");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("", I18N.message("none").toLowerCase());
 		opts.put("oldestfirst", I18N.message("oldestfirst"));
 		opts.put("mostrecentfirst", I18N.message("mostrecentfirst"));

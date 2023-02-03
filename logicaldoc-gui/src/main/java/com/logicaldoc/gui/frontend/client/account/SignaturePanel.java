@@ -92,7 +92,7 @@ public class SignaturePanel extends StampProperties {
 			pageSelection.addChangedHandler(changedHandler);
 
 		final RadioGroupItem pageOption = ItemFactory.newRadioGroup("pageOption", "stampin");
-		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<>();
 		pageOptions.put("" + GUIStamp.PAGE_OPT_ALL, I18N.message("allpages"));
 		pageOptions.put("" + GUIStamp.PAGE_OPT_FIRST, I18N.message("firstpage"));
 		pageOptions.put("" + GUIStamp.PAGE_OPT_LAST, I18N.message("lastpage"));

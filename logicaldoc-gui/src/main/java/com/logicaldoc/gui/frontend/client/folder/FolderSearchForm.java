@@ -152,7 +152,7 @@ public abstract class FolderSearchForm extends VLayout {
 		casesensitive.setValue(true);
 		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
 
-		LinkedHashMap<String, String> matchMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> matchMap = new LinkedHashMap<>();
 		matchMap.put("and", I18N.message("matchall"));
 		matchMap.put("or", I18N.message("matchany"));
 		matchMap.put("not", I18N.message("matchnone"));
@@ -273,7 +273,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
 
-		List<GUICriterion> criteria = new ArrayList<GUICriterion>();
+		List<GUICriterion> criteria = new ArrayList<>();
 		if (conditionsLayout.getMembers() != null)
 			for (Canvas canvas : conditionsLayout.getMembers()) {
 				ParameterConditionRow condition = (ParameterConditionRow) canvas;

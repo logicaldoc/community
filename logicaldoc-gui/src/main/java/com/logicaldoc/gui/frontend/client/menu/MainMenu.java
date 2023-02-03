@@ -249,7 +249,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		});
 
-		LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
 		valueMap.put("fulltext", I18N.message("fulltext"));
 		valueMap.put("filename", I18N.message("filename"));
 		valueMap.put("id", I18N.message("id"));

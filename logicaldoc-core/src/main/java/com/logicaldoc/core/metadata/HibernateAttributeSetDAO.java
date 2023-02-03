@@ -170,7 +170,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	@Override
 	public Map<Long, AttributeSet> load(long tenantId) {
-		Map<Long, AttributeSet> map = new HashMap<Long, AttributeSet>();
+		Map<Long, AttributeSet> map = new HashMap<>();
 		List<AttributeSet> all = findAll(tenantId);
 		for (AttributeSet set : all)
 			map.put(set.getId(), set);
@@ -192,7 +192,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		else
 			sets.addAll(findAll(tenantId));
 
-		Map<String, Attribute> attributes = new TreeMap<String, Attribute>();
+		Map<String, Attribute> attributes = new TreeMap<>();
 		for (AttributeSet set : sets) {
 			initialize(set);
 			Map<String, Attribute> localAttributes = set.getAttributes();

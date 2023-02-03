@@ -179,7 +179,7 @@ public class BruteForcePanel extends AdminPanel {
 		blockedEntities.setHeight100();
 		blockedEntities.setSelectionType(SelectionStyle.MULTIPLE);
 
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 		if (data != null)
 			for (GUISequence cid : data) {
 				ListGridRecord rec = new ListGridRecord();

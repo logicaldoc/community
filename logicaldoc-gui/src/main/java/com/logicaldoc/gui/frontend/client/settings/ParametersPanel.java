@@ -90,7 +90,7 @@ public class ParametersPanel extends AdminPanel {
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				ArrayList<GUIParameter> params = new ArrayList<GUIParameter>();
+				ArrayList<GUIParameter> params = new ArrayList<>();
 				ListGridRecord[] records = parametersGrid.getRecords();
 				for (ListGridRecord rec : records) {
 					GUIParameter param = new GUIParameter(rec.getAttributeAsString("parameter"),

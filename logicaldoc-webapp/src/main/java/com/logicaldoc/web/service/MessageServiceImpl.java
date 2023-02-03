@@ -165,10 +165,10 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		try {
 			MessageTemplateDAO dao = (MessageTemplateDAO) context.getBean(MessageTemplateDAO.class);
 
-			List<GUIMessageTemplate> buf = new ArrayList<GUIMessageTemplate>();
+			List<GUIMessageTemplate> buf = new ArrayList<>();
 
 			List<MessageTemplate> standardTemplates = dao.findByTypeAndLanguage(type, "en", session.getTenantId());
-			Map<String, MessageTemplate> templates = new HashMap<String, MessageTemplate>();
+			Map<String, MessageTemplate> templates = new HashMap<>();
 
 			List<MessageTemplate> tmp = dao.findByTypeAndLanguage(type, language, session.getTenantId());
 			for (MessageTemplate m : tmp) {

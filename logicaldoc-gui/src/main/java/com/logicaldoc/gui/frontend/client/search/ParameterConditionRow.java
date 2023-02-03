@@ -80,7 +80,7 @@ public class ParameterConditionRow extends HLayout {
 
 		DataSource ds = prepareDataSource();
 
-		LinkedHashMap<String, String> fieldsMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> fieldsMap = new LinkedHashMap<>();
 		fieldsMap.put("", " ");
 		for (DataSourceField sourceField : ds.getFields())
 			fieldsMap.put(sourceField.getName(), I18N.message(sourceField.getTitle()));
@@ -189,7 +189,7 @@ public class ParameterConditionRow extends HLayout {
 	}
 
 	private LinkedHashMap<String, String> operatorsFor(String criteriaField) {
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		if (criteriaField == null)
 			return map;
 

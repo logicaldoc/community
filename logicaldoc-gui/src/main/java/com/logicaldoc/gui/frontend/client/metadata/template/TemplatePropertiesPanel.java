@@ -338,7 +338,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			@Override
 			public void onSuccess(GUIAttributeSet[] sets) {
 				LD.clearPrompt();
-				Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
+				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
 				for (GUIAttributeSet set : sets)
 					setsMap.put(set.getId(), set);
 

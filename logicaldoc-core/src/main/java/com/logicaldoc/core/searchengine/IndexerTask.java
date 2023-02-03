@@ -152,7 +152,7 @@ public class IndexerTask extends Task {
 				Collection<List<Long>> partitions = CollectionUtil.partition(docIds, threadsTotal);
 
 				startIndexerThreads(threadsTotal);
-				List<IndexerThread> threads = new ArrayList<IndexerThread>();
+				List<IndexerThread> threads = new ArrayList<>();
 
 				// Prepare the threads and launch them
 				int i = 1;

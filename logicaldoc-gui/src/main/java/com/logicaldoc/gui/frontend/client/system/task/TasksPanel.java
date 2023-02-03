@@ -51,7 +51,7 @@ public class TasksPanel extends AdminPanel {
 
 	private Canvas detailPanel;
 
-	private Map<String, Progressbar> progresses = new HashMap<String, Progressbar>();
+	private Map<String, Progressbar> progresses = new HashMap<>();
 
 	public TasksPanel() {
 		super("scheduledtasks");

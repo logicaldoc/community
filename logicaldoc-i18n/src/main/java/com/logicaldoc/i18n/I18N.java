@@ -31,7 +31,7 @@ public class I18N {
 
 	static {
 		String[] languages = Locale.getISOLanguages();
-		iso3LocaleMap = new HashMap<String, Locale>(languages.length);
+		iso3LocaleMap = new HashMap<>(languages.length);
 		for (String language : languages) {
 			Locale locale = new Locale(language);
 			iso3LocaleMap.put(locale.getISO3Language().toLowerCase(), locale);

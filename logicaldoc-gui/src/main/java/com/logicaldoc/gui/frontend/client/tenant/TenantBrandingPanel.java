@@ -351,7 +351,7 @@ public class TenantBrandingPanel extends HLayout {
 
 		grid.setFields(nameField, image);
 
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", "logo");

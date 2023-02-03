@@ -282,7 +282,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		toGuiAttributes(template, guiTemplate, sets);
 
 		if (template.getTemplateGroups() != null && !template.getTemplateGroups().isEmpty()) {
-			List<GUIRight> rights = new ArrayList<GUIRight>();
+			List<GUIRight> rights = new ArrayList<>();
 			for (TemplateGroup tg : template.getTemplateGroups()) {
 				GUIRight right = new GUIRight();
 				right.setEntityId(tg.getGroupId());
@@ -414,7 +414,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 
-		List<GUIAttribute> attributes = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
 			return new GUIAttribute[0];
 

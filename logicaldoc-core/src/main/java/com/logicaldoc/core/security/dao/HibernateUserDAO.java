@@ -83,7 +83,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return findByWhere(LOWER + ENTITY + ".name) like :name", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<User>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -132,7 +132,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return findByWhere(ENTITY + ".username like :username", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<User>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -147,7 +147,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 					params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<User>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -858,7 +858,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public Map<String, Generic> findUserSettings(long userId, String namePrefix) {
 		List<Generic> generics = genericDAO.findByTypeAndSubtype("usersetting", namePrefix + "%", userId, null);
-		Map<String, Generic> map = new HashMap<String, Generic>();
+		Map<String, Generic> map = new HashMap<>();
 		for (Generic generic : generics) {
 			map.put(generic.getSubtype(), generic);
 		}
