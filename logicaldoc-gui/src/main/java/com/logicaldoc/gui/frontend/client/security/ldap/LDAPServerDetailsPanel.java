@@ -37,6 +37,10 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class LDAPServerDetailsPanel extends VLayout {
 
+	private static final String GRPSBASENODE = "grpsbasenode";
+
+	private static final String USERSBASENODE = "usersbasenode";
+
 	private static final String PASSWORD_HIDDEN = "password_hidden";
 
 	private static final String KEEPMEMBERSHIP = "keepmembership";
@@ -148,7 +152,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		groupClass.setWidth(300);
 
 		// Users base node
-		TextItem usersBaseNode = ItemFactory.newTextItem("usersbasenode", this.server.getUserNodes());
+		TextItem usersBaseNode = ItemFactory.newTextItem(USERSBASENODE, this.server.getUserNodes());
 		usersBaseNode.setWidth(300);
 
 		// User filters
@@ -160,7 +164,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		userExclude.setWidth(300);
 
 		// Groups base node
-		TextItem groupsBaseNode = ItemFactory.newTextItem("grpsbasenode", this.server.getGroupNodes());
+		TextItem groupsBaseNode = ItemFactory.newTextItem(GRPSBASENODE, this.server.getGroupNodes());
 		groupsBaseNode.setWidth(300);
 
 		// Group filters
@@ -280,10 +284,10 @@ public class LDAPServerDetailsPanel extends VLayout {
 			LDAPServerDetailsPanel.this.server.setLogonAttr((String) values.get(LOGONATTR));
 			LDAPServerDetailsPanel.this.server.setUserClass((String) values.get(USERCLASS));
 			LDAPServerDetailsPanel.this.server.setGroupClass((String) values.get(GRPCLASS));
-			LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get("usersbasenode"));
+			LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get(USERSBASENODE));
 			LDAPServerDetailsPanel.this.server.setUserIncludes((String) values.get(USERINCLUDE));
 			LDAPServerDetailsPanel.this.server.setUserExcludes((String) values.get(USEREXCLUDE));
-			LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get("grpsbasenode"));
+			LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get(GRPSBASENODE));
 			LDAPServerDetailsPanel.this.server.setGroupIncludes((String) values.get(GROUPINCLUDE));
 			LDAPServerDetailsPanel.this.server.setGroupExcludes((String) values.get(GROUPEXCLUDE));
 			LDAPServerDetailsPanel.this.server.setPageSize(Integer.parseInt(values.get("pagesize").toString()));
@@ -320,24 +324,24 @@ public class LDAPServerDetailsPanel extends VLayout {
 		IButton activedir = new IButton();
 		activedir.setAutoFit(true);
 		activedir.setTitle(I18N.message("activedirectory"));
-		activedir.addClickHandler((ClickEvent event) -> 
-			LD.askForValue(I18N.message("activedirectory"), I18N.message("addomain"), "", (String value) -> {
-				if (value == null)
-					return;
-				String node = value.replace("\\.", ",DC=");
-				node = "DC=" + node;
-				vm.setValue("url", "ldap://AD_SERVER:389");
-				vm.setValue(USERNAME, "CN=Administrator,CN=Users," + node);
-				vm.setValue(USERIDENTIFIERATTR, "CN");
-				vm.setValue(GRPIDENTIFIERATTR, "CN");
-				vm.setValue(LOGONATTR, "sAMAccountName");
-				vm.setValue(USERCLASS, "person");
-				vm.setValue(GRPCLASS, "group");
-				vm.setValue(USERCLASS, "person");
-				vm.setValue("usersbasenode", "CN=Users," + node);
-				vm.setValue("grpsbasenode", "CN=Builtin," + node);
-				vm.setValue("anon", "no");
-			}));
+		activedir.addClickHandler((ClickEvent event) -> LD.askForValue(I18N.message("activedirectory"),
+				I18N.message("addomain"), "", (String value) -> {
+					if (value == null)
+						return;
+					String node = value.replace("\\.", ",DC=");
+					node = "DC=" + node;
+					vm.setValue("url", "ldap://AD_SERVER:389");
+					vm.setValue(USERNAME, "CN=Administrator,CN=Users," + node);
+					vm.setValue(USERIDENTIFIERATTR, "CN");
+					vm.setValue(GRPIDENTIFIERATTR, "CN");
+					vm.setValue(LOGONATTR, "sAMAccountName");
+					vm.setValue(USERCLASS, "person");
+					vm.setValue(GRPCLASS, "group");
+					vm.setValue(USERCLASS, "person");
+					vm.setValue(USERSBASENODE, "CN=Users," + node);
+					vm.setValue(GRPSBASENODE, "CN=Builtin," + node);
+					vm.setValue("anon", "no");
+				}));
 		return activedir;
 	}
 
@@ -352,10 +356,9 @@ public class LDAPServerDetailsPanel extends VLayout {
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
-			LDAPServerDetailsPanel.this.server.setEnabled(values.get(EENABLED).equals("yes") ? true : false);
-			LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes") ? true : false);
-			LDAPServerDetailsPanel.this.server
-					.setKeepLocalMemberships(values.get(KEEPMEMBERSHIP).equals("yes") ? true : false);
+			LDAPServerDetailsPanel.this.server.setEnabled(values.get(EENABLED).equals("yes"));
+			LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes"));
+			LDAPServerDetailsPanel.this.server.setKeepLocalMemberships(values.get(KEEPMEMBERSHIP).equals("yes"));
 			LDAPServerDetailsPanel.this.server.setUrl((String) values.get("url"));
 			LDAPServerDetailsPanel.this.server.setUsername((String) values.get(USERNAME));
 			LDAPServerDetailsPanel.this.server.setRealm((String) values.get(REALM));
@@ -364,10 +367,10 @@ public class LDAPServerDetailsPanel extends VLayout {
 			LDAPServerDetailsPanel.this.server.setLogonAttr((String) values.get(LOGONATTR));
 			LDAPServerDetailsPanel.this.server.setUserClass((String) values.get(USERCLASS));
 			LDAPServerDetailsPanel.this.server.setGroupClass((String) values.get(GRPCLASS));
-			LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get("usersbasenode"));
+			LDAPServerDetailsPanel.this.server.setUserNodes((String) values.get(USERSBASENODE));
 			LDAPServerDetailsPanel.this.server.setUserIncludes((String) values.get(USERINCLUDE));
 			LDAPServerDetailsPanel.this.server.setUserExcludes((String) values.get(USEREXCLUDE));
-			LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get("grpsbasenode"));
+			LDAPServerDetailsPanel.this.server.setGroupNodes((String) values.get(GRPSBASENODE));
 			LDAPServerDetailsPanel.this.server.setGroupIncludes((String) values.get(GROUPINCLUDE));
 			LDAPServerDetailsPanel.this.server.setGroupExcludes((String) values.get(GROUPEXCLUDE));
 			LDAPServerDetailsPanel.this.server.setLanguage((String) values.get(LANGUAGE));
@@ -375,7 +378,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 			LDAPServerDetailsPanel.this.server.setPassword((String) values.get(PASSWORD_HIDDEN));
 
-			if (browser != null && browser instanceof LDAPBrowser)
+			if (browser instanceof LDAPBrowser)
 				browser.setServer(LDAPServerDetailsPanel.this.server);
 
 			listing.updateRecord(LDAPServerDetailsPanel.this.server);
@@ -389,7 +392,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 				@Override
 				public void onSuccess(Boolean ret) {
-					if (ret)
+					if (Boolean.TRUE.equals(ret))
 						SC.say(I18N.message("connectionestablished"));
 					else
 						SC.warn(I18N.message("connectionfailed"));
