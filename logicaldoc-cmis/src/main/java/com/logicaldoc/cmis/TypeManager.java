@@ -97,8 +97,8 @@ public class TypeManager {
 	 * Creates the base types.
 	 */
 	private void setup() {
-		types = new HashMap<String, TypeDefinitionContainerImpl>();
-		typesList = new ArrayList<TypeDefinitionContainer>();
+		types = new HashMap<>();
+		typesList = new ArrayList<>();
 
 		// folder type
 		FolderTypeDefinitionImpl folderType = new FolderTypeDefinitionImpl();
@@ -476,7 +476,7 @@ public class TypeManager {
 			TypeDefinitionContainerImpl tdc = types.get(type.getParentTypeId());
 			if (tdc != null) {
 				if (tdc.getChildren() == null) {
-					tdc.setChildren(new ArrayList<TypeDefinitionContainer>());
+					tdc.setChildren(new ArrayList<>());
 				}
 				tdc.getChildren().add(tc);
 			}
@@ -502,7 +502,7 @@ public class TypeManager {
 	public TypeDefinitionList getTypesChildren(CallContext context, String typeId, boolean includePropertyDefinitions,
 			BigInteger maxItems, BigInteger skipCount) {
 		TypeDefinitionContainer tc = types.get(typeId);
-		TypeDefinitionListImpl result = new TypeDefinitionListImpl(new ArrayList<TypeDefinition>());
+		TypeDefinitionListImpl result = new TypeDefinitionListImpl(new ArrayList<>());
 		if (typeId == null) {
 			result.getList().add(copyTypeDefintion(types.get(FOLDER_TYPE_ID).getTypeDefinition()));
 			result.getList().add(copyTypeDefintion(types.get(DOCUMENT_TYPE_ID).getTypeDefinition()));
@@ -586,7 +586,7 @@ public class TypeManager {
 
 		if (depth != 0) {
 			if (tc.getChildren() != null) {
-				result.setChildren(new ArrayList<TypeDefinitionContainer>());
+				result.setChildren(new ArrayList<>());
 				for (TypeDefinitionContainer tdc : tc.getChildren()) {
 					result.getChildren()
 							.add(getTypesDescendants(depth < 0 ? -1 : depth - 1, tdc, includePropertyDefinitions));

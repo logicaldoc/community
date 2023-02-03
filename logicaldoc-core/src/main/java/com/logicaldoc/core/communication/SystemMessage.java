@@ -59,7 +59,7 @@ public class SystemMessage extends Message {
 		setLastNotified(source.getLastNotified());
 		setLocale(source.getLocale());
 		setMessageText(source.getMessageText());
-		Set<Recipient> recs = new HashSet<Recipient>();
+		Set<Recipient> recs = new HashSet<>();
 		for (Recipient rec : source.getRecipients())
 			recs.add(new Recipient(rec));
 

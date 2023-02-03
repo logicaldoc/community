@@ -109,7 +109,7 @@ public class SystemInfo {
 		 */
 		if (info.getFeatures() == null || info.getFeatures().length == 0)
 			try {
-				List<String> features = new ArrayList<String>();
+				List<String> features = new ArrayList<>();
 				PluginRegistry registry = PluginRegistry.getInstance();
 				Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Feature");
 				for (Extension extension : exts) {

@@ -77,7 +77,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public List<User> findByName(String name) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("name", name.toLowerCase());
 
 			return findByWhere(LOWER + ENTITY + ".name) like :name", params, null, null);
@@ -91,7 +91,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	public User findByUsername(String username) {
 		User user = null;
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(USERNAME, username);
 
 			List<User> coll = findByWhere(ENTITY + ".username = :username", params, null, null);
@@ -108,7 +108,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	public User findByUsernameIgnoreCase(String username) {
 		User user = null;
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(USERNAME, username.toLowerCase());
 
 			List<User> coll = findByWhere(LOWER + ENTITY + ".username) = :username", params, null, null);
@@ -126,7 +126,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 */
 	public List<User> findByLikeUsername(String username) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(USERNAME, username);
 
 			return findByWhere(ENTITY + ".username like :username", params, null, null);
@@ -139,7 +139,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public List<User> findByUsernameAndName(String username, String name) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(USERNAME, username);
 			params.put("name", name.toLowerCase());
 
@@ -244,7 +244,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		enforceReadOnlyUserGroups(user);
 
-		Map<String, Object> dictionary = new HashMap<String, Object>();
+		Map<String, Object> dictionary = new HashMap<>();
 
 		invokeListenersBefore(user, transaction, dictionary);
 
@@ -827,7 +827,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		for (WorkingTime wt : user.getWorkingTimes())
 			log.debug("Initializing working time {}", wt.getLabel());
 
-		List<Long> groupIds = new ArrayList<Long>();
+		List<Long> groupIds = new ArrayList<>();
 		try {
 			groupIds = queryForList("select distinct ld_groupid from ld_usergroup where ld_userid=" + user.getId(),
 					Long.class);
@@ -879,13 +879,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public Set<User> findByGroup(long groupId) {
-		List<Long> docIds = new ArrayList<Long>();
+		List<Long> docIds = new ArrayList<>();
 		try {
 			docIds = queryForList("select ld_userid from ld_usergroup where ld_groupid=" + groupId, Long.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
-		Set<User> set = new HashSet<User>();
+		Set<User> set = new HashSet<>();
 		if (!docIds.isEmpty()) {
 			String query = ENTITY + ".id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
 

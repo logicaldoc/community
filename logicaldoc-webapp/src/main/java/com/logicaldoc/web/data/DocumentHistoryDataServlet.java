@@ -55,7 +55,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		// Used only to cache the already encountered documents when the
 		// history
 		// is related to a single user (for dashboard visualization)
-		Set<Long> docIds = new HashSet<Long>();
+		Set<Long> docIds = new HashSet<>();
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -113,7 +113,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
 	private Map<String, Object> prepareQueryParams(HttpServletRequest request, StringBuilder query)
 			throws PersistenceException {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		if (request.getParameter("docId") != null) {
 			Long docId = Long.parseLong(request.getParameter("docId"));
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);

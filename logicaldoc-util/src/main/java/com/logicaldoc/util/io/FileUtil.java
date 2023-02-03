@@ -474,8 +474,8 @@ public class FileUtil {
 	 *         excludes
 	 */
 	public static boolean matches(String filename, String includes, String excludes) {
-		List<String> inc = new ArrayList<String>();
-		List<String> exc = new ArrayList<String>();
+		List<String> inc = new ArrayList<>();
+		List<String> exc = new ArrayList<>();
 
 		StringTokenizer st;
 

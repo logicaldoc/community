@@ -37,7 +37,7 @@ public class FolderListenerManager {
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "FolderListener");
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}

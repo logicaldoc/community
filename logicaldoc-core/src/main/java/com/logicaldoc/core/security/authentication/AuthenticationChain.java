@@ -222,7 +222,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Authentication");
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}

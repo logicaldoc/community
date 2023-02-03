@@ -131,7 +131,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		template.setReadonly(guiTemplate.isReadonly() ? 1 : 0);
 		template.setType(guiTemplate.getType());
 
-		Map<String, Attribute> attrs = new HashMap<String, Attribute>();
+		Map<String, Attribute> attrs = new HashMap<>();
 		if (guiTemplate.getAttributes() != null && guiTemplate.getAttributes().length > 0) {
 			template.getAttributes().clear();
 			for (GUIAttribute attribute : guiTemplate.getAttributes()) {
@@ -217,7 +217,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				&& !sessionUser.isMemberOf(Group.GROUP_ADMIN))
 			return;
 
-		Set<TemplateGroup> grps = new HashSet<TemplateGroup>();
+		Set<TemplateGroup> grps = new HashSet<>();
 		for (GUIRight right : guiTemplate.getRights()) {
 			boolean isAdmin = right.getEntityId() == 1;
 			TemplateGroup wg = null;
@@ -271,7 +271,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		Set<Permission> permissions = dao.getEnabledPermissions(templateId, session.getUserId());
-		List<String> permissionsList = new ArrayList<String>();
+		List<String> permissionsList = new ArrayList<>();
 		for (Permission permission : permissions)
 			permissionsList.add(permission.toString());
 		guiTemplate.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
@@ -496,7 +496,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		String buf = setExtAttr != null ? (String) setExtAttr.getStringValue()
 				: (String) templateExtAttr.getStringValue();
 
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (buf != null) {
 			if (buf.contains(",")) {
 				StringTokenizer st = new StringTokenizer(buf, ",");

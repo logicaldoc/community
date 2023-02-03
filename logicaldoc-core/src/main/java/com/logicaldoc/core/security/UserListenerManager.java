@@ -27,14 +27,14 @@ public class UserListenerManager {
 	private List<UserListener> listeners = null;
 
 	public void init() {
-		listeners = new ArrayList<UserListener>();
+		listeners = new ArrayList<>();
 
 		// Acquire the 'UserListener' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "UserListener");
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}

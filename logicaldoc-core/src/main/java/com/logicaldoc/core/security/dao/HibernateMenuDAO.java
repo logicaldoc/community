@@ -140,7 +140,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query1.append(
 					user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(PARENT_ID, parentId);
 			query1.append(") and " + ENTITY + ".parentId = :parentId and " + ENTITY + ".id!=" + ENTITY
 					+ ".parentId and " + ENTITY + ".enabled=1 ");
@@ -178,7 +178,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	@Override
 	public List<Menu> findChildren(long parentId, Integer max) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(PARENT_ID, parentId);
 			return findByWhere(ENTITY + ".parentId = :parentId and " + ENTITY + ".id !=" + ENTITY + ".parentId", params,
 					null, max);
@@ -244,7 +244,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query2.append("))");
 			query2.append(" and not(" + ENTITY + ".id=" + parentId + ")");
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(PARENT_ID, parentId);
 			List<Menu> coll2 = (List<Menu>) findByQuery(query2.toString(), params, null);
 			for (Menu menu : coll2) {
@@ -306,7 +306,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(") and " + ENTITY + ".id = :id");
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("id", Long.valueOf(id));
 
 			List<MenuGroup> coll = (List<MenuGroup>) findByQuery(query.toString(), params, null);
@@ -424,7 +424,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	public List<Long> findIdByUserId(long userId, long parentId, Integer type) {
-		List<Long> ids = new ArrayList<Long>();
+		List<Long> ids = new ArrayList<>();
 		try {
 			User user = userDAO.findById(userId);
 			if (user == null)
@@ -568,7 +568,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public List<Long> findMenuIdByUserIdAndPermission(long userId, Permission permission, boolean enabledOnly) {
-		List<Long> ids = new ArrayList<Long>();
+		List<Long> ids = new ArrayList<>();
 		try {
 			User user = userDAO.findById(userId);
 			if (user == null)
@@ -665,7 +665,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<Long> findIdByUserId(long userId, long parentId) {
-		List<Long> ids = new ArrayList<Long>();
+		List<Long> ids = new ArrayList<>();
 		try {
 			User user = userDAO.findById(userId);
 			if (user == null)

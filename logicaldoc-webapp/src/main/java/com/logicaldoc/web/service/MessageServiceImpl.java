@@ -87,7 +87,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					recipient.setType(Recipient.TYPE_SYSTEM);
 					recipient.setRead(0);
 					recipient.setMode("");
-					Set<Recipient> recipients = new HashSet<Recipient>();
+					Set<Recipient> recipients = new HashSet<>();
 					recipients.add(recipient);
 					SystemMessage sysmess = new SystemMessage();
 					sysmess.setAuthor("SYSTEM");
@@ -143,7 +143,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			recipient.setAddress(user.getUsername());
 			recipient.setType(Recipient.TYPE_SYSTEM);
 			recipient.setMode("message");
-			Set<Recipient> recipients = new HashSet<Recipient>();
+			Set<Recipient> recipients = new HashSet<>();
 			recipients.add(recipient);
 			m.setRecipients(recipients);
 			m.setDateScope(message.getValidity());

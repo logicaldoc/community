@@ -31,7 +31,7 @@ public class LongRunningOperationCompleteListener implements ThreadCompleteListe
 
 	private static Logger log = LoggerFactory.getLogger(LongRunningOperationCompleteListener.class);
 
-	private Set<String> usernames = new HashSet<String>();
+	private Set<String> usernames = new HashSet<>();
 
 	/**
 	 * Creates a new listener with just one user to notify
@@ -69,7 +69,7 @@ public class LongRunningOperationCompleteListener implements ThreadCompleteListe
 			recipient.setAddress(user.getUsername());
 			recipient.setType(Recipient.TYPE_SYSTEM);
 			recipient.setMode("message");
-			Set<Recipient> recipients = new HashSet<Recipient>();
+			Set<Recipient> recipients = new HashSet<>();
 			recipients.add(recipient);
 			SystemMessage sysmess = new SystemMessage();
 			sysmess.setAuthor("SYSTEM");

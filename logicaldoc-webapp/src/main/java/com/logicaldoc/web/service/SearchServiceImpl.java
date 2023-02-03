@@ -445,7 +445,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	}
 
 	private HashSet<Long> prepareUsersSet(long[] userIds) {
-		HashSet<Long> users = new HashSet<Long>();
+		HashSet<Long> users = new HashSet<>();
 		if (userIds != null)
 			for (Long uId : userIds) {
 				if (!users.contains(uId))
@@ -540,7 +540,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	private void putFilterIdOptions(GUISearchOptions options, SearchOptions searchOptions) {
 		if (options.getFilterIds() != null && options.getFilterIds().length > 0) {
-			Set<Long> ids = new HashSet<Long>();
+			Set<Long> ids = new HashSet<>();
 			for (Long id : options.getFilterIds()) {
 				ids.add(id);
 			}

@@ -249,7 +249,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			countPages(file, document);
 
-			Map<String, Object> dictionary = new HashMap<String, Object>();
+			Map<String, Object> dictionary = new HashMap<>();
 
 			log.debug("Invoke listeners before checkin");
 			for (DocumentListener listener : listenerManager.getListeners())
@@ -1242,7 +1242,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException {
-		List<Long> docIds = new ArrayList<Long>();
+		List<Long> docIds = new ArrayList<>();
 		Folder root = folderDAO.findFolder(folderId);
 
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
@@ -1268,7 +1268,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction.getUser() != null);
-		List<Long> idsList = new ArrayList<Long>();
+		List<Long> idsList = new ArrayList<>();
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
 				Permission.ARCHIVE, null, true);

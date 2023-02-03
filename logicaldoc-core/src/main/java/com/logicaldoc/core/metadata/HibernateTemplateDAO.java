@@ -171,7 +171,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(") and " + ENTITY + ".id = :templateId");
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("templateId", Long.valueOf(templateId));
 
 			@SuppressWarnings("unchecked")
@@ -198,7 +198,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 	@Override
 	public Set<Permission> getEnabledPermissions(long templateId, long userId) {
-		Set<Permission> permissions = new HashSet<Permission>();
+		Set<Permission> permissions = new HashSet<>();
 
 		try {
 			User user = userDAO.findById(userId);

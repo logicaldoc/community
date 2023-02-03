@@ -189,7 +189,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 			@Override
 			public void onDropComplete(DropCompleteEvent event) {
-				List<Long> ids = new ArrayList<Long>();
+				List<Long> ids = new ArrayList<>();
 				if (list.getRecords() != null && list.getRecords().length > 0) {
 					for (ListGridRecord rec : list.getRecords())
 						ids.add(rec.getAttributeAsLong("id"));

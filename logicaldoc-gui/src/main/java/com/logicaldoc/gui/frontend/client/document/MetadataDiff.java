@@ -193,7 +193,7 @@ public class MetadataDiff extends Window {
 	}
 
 	private List<String> prepareAttributeNames(GUIVersion version1, GUIVersion version2) {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 
 		// Collect all attribute names from version1
 		for (GUIAttribute att : version1.getAttributes()) {

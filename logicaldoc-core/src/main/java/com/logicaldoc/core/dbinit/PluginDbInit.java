@@ -41,7 +41,7 @@ public class PluginDbInit extends DBInit {
 			Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "DbInit");
 
 			// Sort the extensions according to ascending position
-			List<Extension> sortedExts = new ArrayList<Extension>();
+			List<Extension> sortedExts = new ArrayList<>();
 			for (Extension extension : exts) {
 				sortedExts.add(extension);
 			}
@@ -60,7 +60,7 @@ public class PluginDbInit extends DBInit {
 
 			getSqlList().clear();
 
-			List<String> idSet = new ArrayList<String>();
+			List<String> idSet = new ArrayList<>();
 			if (ids != null)
 				idSet = (List<String>) Arrays.asList(ids);
 

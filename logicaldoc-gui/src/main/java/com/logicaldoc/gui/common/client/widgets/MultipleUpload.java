@@ -42,7 +42,7 @@ public class MultipleUpload extends HorizontalPanel {
 
 	private Uploader uploader = new Uploader();
 
-	private List<String> uploadedFiles = new ArrayList<String>();
+	private List<String> uploadedFiles = new ArrayList<>();
 
 	public MultipleUpload(IButton confirmButton) {
 		final VerticalPanel progressBarPanel = new VerticalPanel();

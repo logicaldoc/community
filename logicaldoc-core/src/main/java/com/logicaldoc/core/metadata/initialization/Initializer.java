@@ -77,7 +77,7 @@ public class Initializer {
 
 	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,
 			Attribute attribute, Attribute templateAttribute) {
-		Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
+		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
 		fieldValidationDictionary.put("event", transaction);
 		fieldValidationDictionary.put("attributeName", attributeName);

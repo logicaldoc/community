@@ -65,7 +65,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 
 	@Override
 	public Collection<String> findAllGroupNames(long tenantId) {
-		Collection<String> coll = new ArrayList<String>();
+		Collection<String> coll = new ArrayList<>();
 
 		try {
 			Collection<Group> coll2 = findAll();
@@ -176,7 +176,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	@Override
 	public Collection<Group> findByLikeName(String name, long tenantId) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("name", name.toLowerCase());
 			params.put("tenantId", tenantId);
 			return findByWhere(
@@ -184,7 +184,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Group>();
+			return new ArrayList<>();
 		}
 	}
 

@@ -81,7 +81,7 @@ public class ReportParametersForm extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 		for (GUIAttribute att : parameters) {
 			if (att.getType() == GUIAttribute.TYPE_STRING) {
 				FormItem item = ItemFactory.newStringItemForAttribute(att);

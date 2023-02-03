@@ -87,7 +87,7 @@ public class TagsForm extends VLayout {
 		vocabularyForm.setNumCols(9);
 		vocabularyForm.setWidth(1);
 		vocabularyForm.setHeight(1);
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 		String str = Session.get().getInfo().getConfig("gui.tag.vocabulary", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 		for (int i = 0; i < str.length(); i++) {
 			final StaticTextItem item = ItemFactory.newStaticTextItem("" + i, "", "" + str.charAt(i));

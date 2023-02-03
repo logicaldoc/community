@@ -94,7 +94,7 @@ public class RequestInfo {
 
 	protected void setQueryString(String queryString) {
 		this.queryString = queryString;
-		paramMap = new HashMap<String, String>();
+		paramMap = new HashMap<>();
 
 		if (queryString != null && queryString.length() > 1) {
 			String qs = queryString.substring(1);

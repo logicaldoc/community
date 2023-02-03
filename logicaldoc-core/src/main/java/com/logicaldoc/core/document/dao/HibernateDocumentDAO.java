@@ -204,7 +204,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public List<Long> findByUserId(long userId) throws PersistenceException {
 		Collection<Folder> folders = folderDAO.findByUserId(userId);
 		if (folders.isEmpty())
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 
 		StringBuilder query = new StringBuilder();
 		query.append(ENTITY + ".folder.id in (");
@@ -249,7 +249,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			}, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Document>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -304,7 +304,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				doc.setCustomId(UUID.randomUUID().toString());
 
 			log.debug("Invoke listeners before store");
-			Map<String, Object> dictionary = new HashMap<String, Object>();
+			Map<String, Object> dictionary = new HashMap<>();
 			for (DocumentListener listener : listenerManager.getListeners())
 				listener.beforeStore(doc, transaction, dictionary);
 
@@ -432,7 +432,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Set<Tag> src = doc.getTags();
 		if (src != null && src.size() > 0) {
 			// Trim too long tags
-			Set<Tag> dst = new HashSet<Tag>();
+			Set<Tag> dst = new HashSet<>();
 			for (Tag str : src) {
 				str.setTenantId(doc.getTenantId());
 				String s = str.getTag();
@@ -491,7 +491,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		/*
 		 * These sets will contain the found collisions in the given folder
 		 */
-		final Set<String> fileNames = new HashSet<String>();
+		final Set<String> fileNames = new HashSet<>();
 
 		StringBuilder query = new StringBuilder(
 				"select lower(ld_filename) from ld_document where ld_deleted=0 and ld_folderid=");
@@ -541,13 +541,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@SuppressWarnings("unchecked")
 	public List<Document> findLastModifiedByUserId(long userId, int maxElements) throws PersistenceException {
-		List<Document> coll = new ArrayList<Document>();
+		List<Document> coll = new ArrayList<>();
 
 		StringBuilder query = new StringBuilder("SELECT _history.docId from DocumentHistory _history");
 		query.append(" WHERE _history.userId = " + Long.toString(userId) + " ");
 		query.append(" ORDER BY _history.date DESC");
 
-		List<Long> results = new ArrayList<Long>();
+		List<Long> results = new ArrayList<>();
 		try {
 			results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
 		} catch (PersistenceException e) {
@@ -604,7 +604,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(AND_LD_TENANTID + tenantId);
 		}
 
-		List<Object> parameters = new ArrayList<Object>();
+		List<Object> parameters = new ArrayList<>();
 		if (firstLetter != null) {
 			sb.append(" and lower(ld_tag) like ? ");
 			parameters.add(firstLetter.toLowerCase() + "%");
@@ -615,7 +615,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Document> findByUserIdAndTag(long userId, String tag, Integer max) throws PersistenceException {
-		List<Document> coll = new ArrayList<Document>();
+		List<Document> coll = new ArrayList<>();
 
 		List<Long> ids = findDocIdByUserIdAndTag(userId, tag);
 		if (!ids.isEmpty()) {
@@ -633,7 +633,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public List<Long> findDocIdByUserIdAndTag(long userId, String tag) throws PersistenceException {
-		List<Long> ids = new ArrayList<Long>();
+		List<Long> ids = new ArrayList<>();
 
 		User user = userDAO.findById(userId);
 		if (user == null)
@@ -669,7 +669,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public List<Document> findLastDownloadsByUserId(long userId, int maxResults) throws PersistenceException {
-		List<Document> coll = new ArrayList<Document>();
+		List<Document> coll = new ArrayList<>();
 
 		StringBuilder query = new StringBuilder("select docId from DocumentHistory ");
 		query.append(" where userId = " + userId);
@@ -705,7 +705,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		List<Document> unorderdColl = (List<Document>) findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		// put all elements in a map
-		HashMap<Long, Document> hm = new HashMap<Long, Document>();
+		HashMap<Long, Document> hm = new HashMap<>();
 		for (Document doc : unorderdColl) {
 			hm.put(doc.getId(), doc);
 		}
@@ -731,7 +731,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public List<Document> findByFolder(long folderId, Integer max) throws PersistenceException {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("folderId", Long.valueOf(folderId));
 		return findByWhere(ENTITY + ".folder.id = :folderId ", params, null, max);
 	}
@@ -745,7 +745,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction)
 			throws PersistenceException {
-		List<Document> coll = new ArrayList<Document>();
+		List<Document> coll = new ArrayList<>();
 		StringBuilder query = new StringBuilder("");
 		if (direction == null)
 			query.append(
@@ -929,7 +929,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void saveDocumentHistory(Document doc, DocumentHistory transaction) throws PersistenceException {
-		Map<String, Object> dictionary = new HashMap<String, Object>();
+		Map<String, Object> dictionary = new HashMap<>();
 		saveDocumentHistory(doc, transaction, dictionary);
 	}
 
@@ -1018,7 +1018,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public List<Document> findByIds(Long[] ids, Integer max) {
-		List<Document> docs = new ArrayList<Document>();
+		List<Document> docs = new ArrayList<>();
 		if (ids.length < 1)
 			return docs;
 
@@ -1068,7 +1068,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		@SuppressWarnings("unchecked")
 		Collection<Long> buf = (Collection<Long>) queryForList(query.toString(), new Object[] { now, now }, Long.class,
 				null);
-		Set<Long> ids = new HashSet<Long>();
+		Set<Long> ids = new HashSet<>();
 		for (Long id : buf) {
 			if (!ids.contains(id))
 				ids.add(id);

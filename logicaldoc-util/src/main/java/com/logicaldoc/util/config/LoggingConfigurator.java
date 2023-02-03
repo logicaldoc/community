@@ -47,7 +47,7 @@ public class LoggingConfigurator {
 	 * @return collection of the log file paths
 	 */
 	public Collection<String> getLoggingFiles() {
-		Collection<String> result = new ArrayList<String>();
+		Collection<String> result = new ArrayList<>();
 		Element appenders = xml.findElement("//Appenders");
 		List list = appenders.getChildren("RollingFile");
 		Iterator iter = list.iterator();

@@ -39,7 +39,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 					"order by " + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<MessageTemplate>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -54,7 +54,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 			return findByWhere(query.toString(), "order by " + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<MessageTemplate>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -104,7 +104,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<MessageTemplate>();
+			return new ArrayList<>();
 		}
 	}
 }

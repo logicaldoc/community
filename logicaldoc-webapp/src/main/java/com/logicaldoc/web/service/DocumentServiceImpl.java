@@ -2845,7 +2845,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					}, null);
 			log.info("Found {} duplicated files to deduplicate", duplications.size());
 
-			List<Document> currentDuplications = new ArrayList<Document>();
+			List<Document> currentDuplications = new ArrayList<>();
 			String currentDigest = null;
 			for (Document doc : duplications) {
 				if (currentDigest != null && !currentDigest.equals(doc.getDigest()))

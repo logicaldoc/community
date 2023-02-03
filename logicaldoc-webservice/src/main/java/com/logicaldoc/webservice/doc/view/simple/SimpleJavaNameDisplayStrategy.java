@@ -52,7 +52,7 @@ public class SimpleJavaNameDisplayStrategy extends JavaNameDisplayStrategy {
 		else {
 			String[] words = StringUtils.split(elementName, "-");
 
-			List<String> capitalized = new ArrayList<String>();
+			List<String> capitalized = new ArrayList<>();
 			for (String word : words) {
 				capitalized.add(!capitalized.isEmpty() ? StringUtils.capitalize(word) : word);
 			}

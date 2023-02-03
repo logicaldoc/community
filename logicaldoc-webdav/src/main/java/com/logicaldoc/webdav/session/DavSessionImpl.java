@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 public class DavSessionImpl implements WebdavSession {
 
-	private HashMap<String, Object> map = new HashMap<String, Object>();
+	private HashMap<String, Object> map = new HashMap<>();
 
 	private long tenantId;
 

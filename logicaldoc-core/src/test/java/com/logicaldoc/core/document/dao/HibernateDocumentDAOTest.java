@@ -335,7 +335,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 
 		dao.store(doc);
 
-		Set<Long> fids = new HashSet<Long>();
+		Set<Long> fids = new HashSet<>();
 		fids.add(Folder.ROOTID);
 
 		Collection<Long> ids = dao.findPublishedIds(fids);

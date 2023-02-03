@@ -79,7 +79,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 			return messages;
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<SystemMessage>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -111,7 +111,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 	 * @return The cleaned messages collection
 	 */
 	protected List<SystemMessage> collectGarbage(Collection<SystemMessage> coll, boolean removeExpired) {
-		List<SystemMessage> out = new ArrayList<SystemMessage>();
+		List<SystemMessage> out = new ArrayList<>();
 		try {
 			Iterator<SystemMessage> iter = coll.iterator();
 			Date date = new Date();
@@ -156,7 +156,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 			return messages;
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<SystemMessage>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -171,7 +171,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 			return messages;
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<SystemMessage>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -198,7 +198,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 			return messages;
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<SystemMessage>();
+			return new ArrayList<>();
 		}
 	}
 

@@ -399,7 +399,7 @@ public class Exec {
 	 * @return the set of allowed commands
 	 */
 	private static Set<String> getAllowedCommands() {
-		Set<String> allowedCommands = new HashSet<String>();
+		Set<String> allowedCommands = new HashSet<>();
 		URL resource = Exec.class.getResource(ALLOWED_COMMANDS);
 		if (resource == null)
 			return allowedCommands;

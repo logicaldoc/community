@@ -37,7 +37,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	@Override
 	public Device findByDeviceId(String deviceId) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("deviceId", deviceId);
 
 			List<Device> devices = findByWhere(ENTITY + ".deviceId = :deviceId", params, null, null);
@@ -51,7 +51,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	@Override
 	public List<Device> findTrustedDevices(long userId) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(USER_ID, userId);
 
 			return findByWhere(ENTITY + ".trusted=1 and " + ENTITY + USER_ID_EQUAL_USER_ID, params,
@@ -65,7 +65,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	@Override
 	public List<Device> findByUserId(long userId) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(USER_ID, userId);
 
 			return findByWhere(ENTITY + USER_ID_EQUAL_USER_ID, params, ENTITY + ".lastLogin desc", null);
@@ -130,7 +130,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 		if (device.getDeviceId() != null)
 			return findByDeviceId(device.getDeviceId());
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 
 		StringBuilder query = new StringBuilder();
 

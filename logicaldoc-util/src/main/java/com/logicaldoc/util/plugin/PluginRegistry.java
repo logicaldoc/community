@@ -181,7 +181,7 @@ public abstract class PluginRegistry {
 	 * @return List of connected extensions
 	 */
 	public Collection<Extension> getExtensions(String pluginId, String extensionPoint) {
-		Collection<Extension> exts = new ArrayList<Extension>();
+		Collection<Extension> exts = new ArrayList<>();
 		try {
 			PluginRegistry registry = PluginRegistry.getInstance();
 			if (registry != null) {
@@ -209,7 +209,7 @@ public abstract class PluginRegistry {
 		Collection<Extension> exts = getExtensions(pluginId, extensionPoint);
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}

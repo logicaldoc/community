@@ -96,7 +96,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 */
 	public List<Object> getBeansOfType(@SuppressWarnings("rawtypes")
 	Class clazz) {
-		List<Object> beans = new ArrayList<Object>();
+		List<Object> beans = new ArrayList<>();
 		for (String name : applicationContext.getBeanNamesForType(clazz)) {
 			beans.add(getBean(name));
 		}

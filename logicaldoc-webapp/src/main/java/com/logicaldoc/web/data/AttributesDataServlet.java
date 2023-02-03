@@ -85,7 +85,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over the collection of extended attributes
 		 */
-		Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+		Map<String, Attribute> attributes = new HashMap<>();
 		if (templateId == null) {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			attributes = dao.findAttributes(session.getTenantId(), null);

@@ -40,7 +40,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 			return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<AttributeSet>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -51,7 +51,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<AttributeSet>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -98,7 +98,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 					ORDER_BY + ENTITY + ".name asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<AttributeSet>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -182,7 +182,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	 */
 	@Override
 	public Map<String, Attribute> findAttributes(long tenantId, Long setId) {
-		List<AttributeSet> sets = new ArrayList<AttributeSet>();
+		List<AttributeSet> sets = new ArrayList<>();
 		if (setId != null)
 			try {
 				sets.add(findById(setId));

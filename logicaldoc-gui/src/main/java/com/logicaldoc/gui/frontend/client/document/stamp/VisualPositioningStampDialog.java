@@ -251,7 +251,7 @@ public class VisualPositioningStampDialog extends Window {
 		});
 
 		pageOption = ItemFactory.newRadioGroup("pageOption", "stampin");
-		HashMap<String, String> pageOptions = new HashMap<String, String>();
+		HashMap<String, String> pageOptions = new HashMap<>();
 		pageOptions.put("01" + CURRENTPAGE, I18N.message(CURRENTPAGE));
 		pageOptions.put("02" + GUIStamp.PAGE_OPT_ALL, I18N.message("allpages"));
 		pageOptions.put("03" + GUIStamp.PAGE_OPT_FIRST, I18N.message("firstpage"));

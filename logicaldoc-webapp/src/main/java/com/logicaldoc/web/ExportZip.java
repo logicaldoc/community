@@ -129,7 +129,7 @@ public class ExportZip extends HttpServlet {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-		ArrayList<Long> docIds = new ArrayList<Long>();
+		ArrayList<Long> docIds = new ArrayList<>();
 		if (request.getParameterValues("docId") != null && request.getParameterValues("docId").length > 0) {
 			String[] ids = request.getParameterValues("docId");
 			for (int i = 0; i < ids.length; i++) {

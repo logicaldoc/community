@@ -106,7 +106,7 @@ public class WSFolder implements Serializable {
 	public void addTag(String tag) {
 		if (tags == null)
 			tags = new String[0];
-		List<String> buf = new ArrayList<String>();
+		List<String> buf = new ArrayList<>();
 		for (String tmp : tags)
 			buf.add(tmp);
 		if (!buf.contains(tag))
@@ -115,7 +115,7 @@ public class WSFolder implements Serializable {
 	}
 
 	public Collection<String> listAttributeNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		for (WSAttribute att : getAttributes()) {
 			names.add(att.getName());
 		}

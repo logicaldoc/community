@@ -192,7 +192,7 @@ public class IndexerTask extends Task {
 
 			// Remove the transaction reference
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("transactionId", transactionId);
 			documentDao.bulkUpdate("set ld_transactionid = null where ld_transactionId = :transactionId", params);
 
@@ -234,7 +234,7 @@ public class IndexerTask extends Task {
 			// transaction. This may require time
 			String idsStr = docIds.toString().replace('[', '(').replace(']', ')');
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("transactionId", transactionId);
 
 			documentDao.bulkUpdate(
@@ -345,7 +345,7 @@ public class IndexerTask extends Task {
 
 		private long parsingTime = 0;
 
-		private List<Long> docIds = new ArrayList<Long>();
+		private List<Long> docIds = new ArrayList<>();
 
 		private int number = 1;
 

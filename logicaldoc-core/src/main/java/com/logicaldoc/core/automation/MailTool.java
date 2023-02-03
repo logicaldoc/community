@@ -255,7 +255,7 @@ public class MailTool {
 		rec.setAddress(user.getUsername());
 		rec.setType(Recipient.TYPE_SYSTEM);
 		rec.setMode("message");
-		Set<Recipient> recipients = new HashSet<Recipient>();
+		Set<Recipient> recipients = new HashSet<>();
 		recipients.add(rec);
 		m.setRecipients(recipients);
 		m.setDateScope(scope);
@@ -277,7 +277,7 @@ public class MailTool {
 	 */
 	public List<Document> extractAttachments(Document doc, String filterFileName, String username) {
 
-		List<Document> createdDocs = new ArrayList<Document>();
+		List<Document> createdDocs = new ArrayList<>();
 
 		User user = new SecurityTool().getUser(username);
 		InputStream is = null;

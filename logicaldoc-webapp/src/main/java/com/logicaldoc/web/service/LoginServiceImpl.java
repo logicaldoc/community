@@ -151,7 +151,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			/*
 			 * Prepare the template
 			 */
-			Map<String, Object> dictionary = new HashMap<String, Object>();
+			Map<String, Object> dictionary = new HashMap<>();
 			dictionary.put("product", productName);
 			dictionary.put("url", address);
 			dictionary.put("user", user);

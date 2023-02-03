@@ -56,7 +56,7 @@ public class StringUtil {
 	 * @return array of splitted tokens
 	 */
 	public static String[] split(String src, int tokenSize) {
-		ArrayList<String> buf = new ArrayList<String>();
+		ArrayList<String> buf = new ArrayList<>();
 		for (int i = 0; i < src.length(); i += tokenSize) {
 			int j = i + tokenSize;
 			if (j > src.length())

@@ -36,7 +36,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 
 	private static final String COMMAND = "command";
 
-	private static Set<String> moniteredEvents = new HashSet<String>();
+	private static Set<String> moniteredEvents = new HashSet<>();
 
 	static {
 		moniteredEvents.addAll(Arrays.asList("event.changed", "event.renamed", "event.checkedin", "event.checkedout",

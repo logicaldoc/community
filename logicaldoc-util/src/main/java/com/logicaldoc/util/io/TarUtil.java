@@ -40,7 +40,7 @@ public class TarUtil {
 	}
 
 	public List<String> listEntries(File tarFile) throws IOException {
-		List<String> entries = new ArrayList<String>();
+		List<String> entries = new ArrayList<>();
 
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);

@@ -39,7 +39,7 @@ public class DBInit {
 	private Connection con;
 
 	// List of sql files to be executed
-	private List<String> sqlList = new ArrayList<String>();
+	private List<String> sqlList = new ArrayList<>();
 
 	/**
 	 * A list of sql files to execute

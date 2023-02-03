@@ -83,7 +83,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 	private List<Object> executeQuery(HttpServletRequest request, Integer max) throws PersistenceException {
 		VersionDAO dao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 
 		StringBuilder query = new StringBuilder(
 				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"

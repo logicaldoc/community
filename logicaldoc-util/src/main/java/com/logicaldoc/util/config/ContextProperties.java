@@ -365,7 +365,7 @@ public class ContextProperties extends OrderedProperties {
 	 * @return the map property_name = property_value
 	 */
 	public Map<String, String> getProperties(String prefix) {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 		for (Object key : keySet()) {
 			String prop = key.toString();
 			if (prop.startsWith(prefix))
@@ -382,7 +382,7 @@ public class ContextProperties extends OrderedProperties {
 	public void removeTenantProperties(String tenant) {
 		if ("default".equals(tenant))
 			return;
-		List<String> toBeDeleted = new ArrayList<String>();
+		List<String> toBeDeleted = new ArrayList<>();
 		for (Object key : keySet()) {
 			String prop = key.toString();
 			if (prop.startsWith(tenant + "."))

@@ -25,9 +25,9 @@ public class HibernateDashletDAO extends HibernatePersistentObjectDAO<Dashlet> i
 
 	@Override
 	public Dashlet findByName(String name, long tenantId) {
-		List<Dashlet> dashlets = new ArrayList<Dashlet>();
+		List<Dashlet> dashlets = new ArrayList<>();
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("tenantId", tenantId);
 			params.put("name", name);
 			dashlets = findByWhere(ENTITY + ".tenantId = :tenantId and " + ENTITY + ".name = :name", params,

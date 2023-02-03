@@ -123,8 +123,8 @@ public class Automation {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
 		if (clientDictionary == null)
-			clientDictionary = new ConcurrentHashMap<String, Object>();
-		HashMap<String, Object> dictionary = new HashMap<String, Object>();
+			clientDictionary =  new ConcurrentHashMap<>();
+		HashMap<String, Object> dictionary = new HashMap<>();
 
 		/*
 		 * Scan the classpath to add all the @AutomationDictionary classes

@@ -75,7 +75,7 @@ public abstract class AbstractEmailDialog extends Window {
 	}
 
 	protected List<FormItem> prepareFormItems() {
-		List<FormItem> fields = new ArrayList<FormItem>();
+		List<FormItem> fields = new ArrayList<>();
 		fields.add(from);
 
 		message = ItemFactory.newRichTextItemForEmail("message", "message", I18N.message("invitedyoutofillform"), null);
@@ -116,9 +116,9 @@ public abstract class AbstractEmailDialog extends Window {
 
 			prepareEmail(mail);
 
-			List<String> to = new ArrayList<String>();
-			List<String> cc = new ArrayList<String>();
-			List<String> bcc = new ArrayList<String>();
+			List<String> to = new ArrayList<>();
+			List<String> cc = new ArrayList<>();
+			List<String> bcc = new ArrayList<>();
 			ListGridRecord[] records = recipientsGrid.getRecords();
 			fillRecipients(to, cc, bcc, records);
 

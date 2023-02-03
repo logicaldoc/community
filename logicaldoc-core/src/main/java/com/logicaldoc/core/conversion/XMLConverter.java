@@ -261,7 +261,7 @@ public class XMLConverter extends AbstractFormatConverter {
 	}
 
 	private Map<String, String> loadStyleSheets() {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		String value = getParameter(STYLE_SHEETS);
 		if (StringUtils.isNotEmpty(value)) {
 			String[] styles = value.split("\\,");

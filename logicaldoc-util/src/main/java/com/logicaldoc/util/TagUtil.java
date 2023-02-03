@@ -30,7 +30,7 @@ public class TagUtil {
 	 * @return the collection of tags
 	 */
 	public static Set<String> extractTags(String tenantName, String words) {
-		Set<String> coll = new HashSet<String>();
+		Set<String> coll = new HashSet<>();
 		if (words == null)
 			return coll;
 

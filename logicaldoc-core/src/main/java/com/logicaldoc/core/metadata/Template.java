@@ -16,7 +16,7 @@ public class Template extends AbstractAttributeSet {
 
 	private String validation;
 
-	private Set<TemplateGroup> templateGroups = new HashSet<TemplateGroup>();
+	private Set<TemplateGroup> templateGroups = new HashSet<>();
 
 	public Set<TemplateGroup> getTemplateGroups() {
 		return templateGroups;

@@ -432,7 +432,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 						return;
 
 					GUIDocument docs[] = grid.getSelectedDocuments();
-					List<Long> unlockedIds = new ArrayList<Long>();
+					List<Long> unlockedIds = new ArrayList<>();
 					for (GUIDocument doc : docs)
 						if (doc.getStatus() == 0 && doc.getImmutable() == 0)
 							unlockedIds.add(doc.getId());

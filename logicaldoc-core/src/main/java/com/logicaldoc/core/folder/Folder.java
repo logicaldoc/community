@@ -69,7 +69,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	private int hidden = 0;
 
-	private Set<FolderGroup> folderGroups = new HashSet<FolderGroup>();
+	private Set<FolderGroup> folderGroups = new HashSet<>();
 
 	/**
 	 * If 1, the users cannot change the template of the contained documents
@@ -94,13 +94,13 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	 * The default storages to use for this folder in the nodes(key: nodeId -
 	 * value: storageId)
 	 */
-	private Map<String, Integer> storages = new HashMap<String, Integer>();
+	private Map<String, Integer> storages = new HashMap<>();
 
 	private Integer maxVersions;
 
 	private String color;
 
-	private Set<Tag> tags = new HashSet<Tag>();
+	private Set<Tag> tags = new HashSet<>();
 
 	private String tgs;
 
@@ -173,7 +173,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 		setTenantId(source.getTenantId());
 
-		setAttributes(new HashMap<String, Attribute>());
+		setAttributes(new HashMap<>());
 		try {
 			for (String name : source.getAttributes().keySet()) {
 				getAttributes().put(name, source.getAttributes().get(name));
@@ -183,7 +183,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		}
 
 		try {
-			setTags(new HashSet<Tag>());
+			setTags(new HashSet<>());
 			for (Tag tag : source.getTags()) {
 				getTags().add(tag);
 			}
@@ -191,7 +191,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 			// may happen do nothing
 		}
 		try {
-			setFolderGroups(new HashSet<FolderGroup>());
+			setFolderGroups(new HashSet<>());
 			for (FolderGroup fg : source.getFolderGroups()) {
 				getFolderGroups().add(new FolderGroup(fg));
 			}
@@ -199,7 +199,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 			// may happen do nothing
 		}
 
-		setStorages(new HashMap<String, Integer>());
+		setStorages(new HashMap<>());
 		try {
 			for (String nodeId : source.getStorages().keySet()) {
 				getStorages().put(nodeId, source.getStorages().get(nodeId));
@@ -231,7 +231,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public void clearFolderGroups() {
 		folderGroups.clear();
-		folderGroups = new HashSet<FolderGroup>();
+		folderGroups = new HashSet<>();
 	}
 
 	public void setId(long id) {
@@ -487,7 +487,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public void clearTags() {
 		tags.clear();
-		tags = new HashSet<Tag>();
+		tags = new HashSet<>();
 		tgs = null;
 	}
 
@@ -495,7 +495,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		if (this.tags != null)
 			this.tags.clear();
 		else
-			this.tags = new HashSet<Tag>();
+			this.tags = new HashSet<>();
 
 		if (tgs != null)
 			for (String word : tgs) {
@@ -505,7 +505,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	}
 
 	public Set<String> getTagsAsWords() {
-		Set<String> words = new HashSet<String>();
+		Set<String> words = new HashSet<>();
 		if (tags != null)
 			for (Tag tag : tags) {
 				words.add(tag.getTag());
@@ -563,7 +563,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	}
 
 	public List<String> getQuotaAlertRecipientsAsList() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (!StringUtils.isEmpty(getQuotaAlertRecipients())) {
 			StringTokenizer st = new StringTokenizer(getQuotaAlertRecipients(), ",", false);
 			while (st.hasMoreTokens())

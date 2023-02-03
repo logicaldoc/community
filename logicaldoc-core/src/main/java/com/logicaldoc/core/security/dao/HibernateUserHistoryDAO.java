@@ -37,7 +37,7 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 				return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc",
 						null);
 			else {
-				Map<String, Object> params = new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<>();
 				params.put("userId", userId);
 				params.put("event", event);
 

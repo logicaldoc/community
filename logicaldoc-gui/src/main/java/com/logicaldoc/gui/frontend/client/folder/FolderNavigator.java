@@ -1292,7 +1292,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 */
 	public long[] getSelectedIds() {
 		ListGridRecord[] selection = getSelectedRecords();
-		List<Long> ids = new ArrayList<Long>();
+		List<Long> ids = new ArrayList<>();
 		for (ListGridRecord rec : selection)
 			ids.add(Long.parseLong(rec.getAttributeAsString("folderId")));
 		long[] idsArray = new long[ids.size()];

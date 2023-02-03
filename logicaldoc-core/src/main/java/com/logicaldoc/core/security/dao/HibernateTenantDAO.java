@@ -55,7 +55,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	public Tenant findByName(String name) {
 		Tenant tenant = null;
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("name", name);
 			Collection<Tenant> coll = findByWhere(ENTITY + ".name = :name", params, null, null);
 			if (coll.size() > 0) {
@@ -112,7 +112,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 
 	@Override
 	public Set<String> findAllNames() {
-		Set<String> names = new HashSet<String>();
+		Set<String> names = new HashSet<>();
 		List<Tenant> tenants = findAll();
 		for (Tenant tenant : tenants) {
 			names.add(tenant.getName());

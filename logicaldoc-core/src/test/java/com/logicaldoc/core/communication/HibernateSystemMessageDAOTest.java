@@ -105,7 +105,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testStore() throws PersistenceException {
-		Set<Recipient> recipients = new HashSet<Recipient>();
+		Set<Recipient> recipients = new HashSet<>();
 		Recipient recipient = new Recipient();
 		recipient.setName("pippo");
 		recipient.setAddress("pippo");

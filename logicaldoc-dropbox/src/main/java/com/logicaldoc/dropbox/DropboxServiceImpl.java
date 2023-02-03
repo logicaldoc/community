@@ -173,7 +173,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			Map<Long, String> documents = new HashMap<Long, String>();
 
 			// First of all put all single selected documents
-			List<Long> dIds = new ArrayList<Long>();
+			List<Long> dIds = new ArrayList<>();
 			for (int i = 0; i < docIds.length; i++)
 				dIds.add(docIds[i]);
 
@@ -279,7 +279,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 			Folder root = fdao.findById(targetFolder);
 
-			Set<String> imported = new HashSet<String>();
+			Set<String> imported = new HashSet<>();
 			for (String path : paths) {
 				if (imported.contains(path))
 					continue;

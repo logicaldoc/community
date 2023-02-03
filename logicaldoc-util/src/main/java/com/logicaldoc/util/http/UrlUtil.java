@@ -37,7 +37,7 @@ public class UrlUtil {
 
 					List<String> values = params.get(key);
 					if (values == null) {
-						values = new ArrayList<String>();
+						values = new ArrayList<>();
 						params.put(key, values);
 					}
 					values.add(value);

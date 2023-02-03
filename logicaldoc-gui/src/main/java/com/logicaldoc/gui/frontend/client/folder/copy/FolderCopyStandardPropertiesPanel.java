@@ -82,7 +82,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		TextItem description = ItemFactory.newTextItem("description", folder.getDescription());
 		description.setWidth(250);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 		items.addAll(Arrays.asList(new FormItem[] { name, description }));
 
 		form1.setItems(items.toArray(new FormItem[0]));
@@ -112,7 +112,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private void fillTagsForm() {
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 		
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
@@ -181,7 +181,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
 		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
 		boolean containsInvalid = false;
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
 			String t = token.trim();
 

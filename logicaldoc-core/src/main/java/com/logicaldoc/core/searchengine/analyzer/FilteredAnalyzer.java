@@ -83,7 +83,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 		 */
 		for (String filter : order) {
 			// Prepare the configuration of the filter
-			Map<String, String> configs = new HashMap<String, String>();
+			Map<String, String> configs = new HashMap<>();
 			configs.put("luceneMatchVersion", StandardSearchEngine.VERSION.toString());
 			configs.put("lang", lang.get());
 
@@ -155,14 +155,14 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 	}
 
 	private static Map<String, String> getTokenFilters() {
-		Map<String, String> activeAnalyzers = new HashMap<String, String>();
+		Map<String, String> activeAnalyzers = new HashMap<>();
 
 		// Acquire the 'TokenFilter' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
 		if (registry == null)
 			return activeAnalyzers;
 
-		Collection<Extension> extensions = new ArrayList<Extension>();
+		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "TokenFilter");
 		} catch (Throwable e) {
@@ -188,7 +188,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 	public static List<String> getTokenFilterNames(boolean justActives) {
 		ContextProperties config = Context.get().getProperties();
 		Map<String, String> filters = getTokenFilters();
-		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> names = new ArrayList<>();
 		if (!justActives)
 			names.addAll(filters.keySet());
 		else {

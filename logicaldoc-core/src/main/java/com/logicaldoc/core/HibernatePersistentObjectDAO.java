@@ -106,7 +106,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return findIdsByWhere("", "", null);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -115,7 +115,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -217,7 +217,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List findByQuery(String query, Object[] values, Integer max) throws PersistenceException {
-		List<Object> coll = new ArrayList<Object>();
+		List<Object> coll = new ArrayList<>();
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, values, max);
@@ -231,7 +231,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
-		List<Object> coll = new ArrayList<Object>();
+		List<Object> coll = new ArrayList<>();
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, parameters, max);
@@ -250,7 +250,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Override
 	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max)
 			throws PersistenceException {
-		List<Long> coll = new ArrayList<Long>();
+		List<Long> coll = new ArrayList<>();
 		try {
 			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
 					? ORDER_BY + " " + order

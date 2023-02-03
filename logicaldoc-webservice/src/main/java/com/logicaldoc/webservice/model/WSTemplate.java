@@ -99,7 +99,7 @@ public class WSTemplate implements Serializable {
 	}
 
 	public Collection<String> listAttributeNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		for (WSAttribute att : getAttributes()) {
 			names.add(att.getName());
 		}

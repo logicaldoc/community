@@ -84,7 +84,7 @@ public class ChangePassword extends Window {
 			vm.validate();
 			if (Boolean.FALSE.equals(vm.hasErrors())) {
 				if (vm.getValueAsString(PASSWORD).equals(vm.getValueAsString(NEWPASSWORD))) {
-					Map<String, String> errors = new HashMap<String, String>();
+					Map<String, String> errors = new HashMap<>();
 					errors.put(NEWPASSWORD, I18N.message("useanotherpassword"));
 					vm.setErrors(errors, true);
 					return;

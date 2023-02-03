@@ -29,7 +29,7 @@ public class Language implements Comparable<Language> {
 
 	private Locale locale;
 
-	private Set<String> stopWords = new HashSet<String>();
+	private Set<String> stopWords = new HashSet<>();
 
 	private Analyzer analyzer;
 
@@ -64,7 +64,7 @@ public class Language implements Comparable<Language> {
 	 */
 	void loadStopwords() {
 		try {
-			Set<String> swSet = new HashSet<String>();
+			Set<String> swSet = new HashSet<>();
 			String stopwordsResource = "/stopwords/stopwords_" + getLocale().toString() + ".txt";
 			log.debug("Loading stopwords from: " + stopwordsResource);
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(stopwordsResource);

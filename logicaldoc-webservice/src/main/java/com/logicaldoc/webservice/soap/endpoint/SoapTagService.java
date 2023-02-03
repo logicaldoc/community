@@ -140,7 +140,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	public String[] getTagsPreset(String sid) throws Exception {
 		validateSession(sid);
 		Session session = SessionManager.get().get(sid);
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 
 		ContextProperties config = Context.get().getProperties();
 		String mode = config.getProperty(session.getTenantName() + ".tag.mode");

@@ -235,7 +235,7 @@ public class WSUtil {
 
 	private static void setAttributesIntoDocument(WSDocument wsDoc, Document doc) throws PersistenceException {
 		Template template = null;
-		Map<String, Attribute> attrs = new HashMap<String, Attribute>();
+		Map<String, Attribute> attrs = new HashMap<>();
 		if (wsDoc.getTemplateId() != null) {
 			TemplateDAO templDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			template = templDao.findById(wsDoc.getTemplateId());
@@ -359,7 +359,7 @@ public class WSUtil {
 			Map<String, Attribute> attributes = null;
 			if (wsSet.getAttributes() != null && wsSet.getAttributes().length > 0) {
 				set.getAttributes().clear();
-				attributes = new HashMap<String, Attribute>();
+				attributes = new HashMap<>();
 				for (int i = 0; i < wsSet.getAttributes().length; i++) {
 					Attribute att = new Attribute();
 					att.setLabel(wsSet.getAttributes()[i].getLabel());
@@ -403,7 +403,7 @@ public class WSUtil {
 			Map<String, Attribute> attributes = null;
 			if (wsTemplate.getAttributes() != null && wsTemplate.getAttributes().length > 0) {
 				template.getAttributes().clear();
-				attributes = new HashMap<String, Attribute>();
+				attributes = new HashMap<>();
 				for (int i = 0; i < wsTemplate.getAttributes().length; i++) {
 					Attribute att = new Attribute();
 					att.setLabel(wsTemplate.getAttributes()[i].getLabel());

@@ -271,7 +271,7 @@ public class GUIGridsPanel extends VLayout {
 	}
 
 	private void onSave() {
-		List<String> extendedAttributes = new ArrayList<String>();
+		List<String> extendedAttributes = new ArrayList<>();
 		List<GUIParameter> parameters = new ArrayList<GUIParameter>();
 		
 		/*

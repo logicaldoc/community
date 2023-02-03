@@ -148,7 +148,7 @@ public class CoreWorkBench {
 //		doc4.setFileName("doc004.pdf");
 //		doc4.setDate(df.parse("2020-05-21"));
 //		
-//		List<Document> docs = new ArrayList<Document>();
+//		List<Document> docs = new ArrayList<>();
 //		docs.add(doc1);
 //		docs.add(doc2);
 //		docs.add(doc3);

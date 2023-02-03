@@ -50,7 +50,7 @@ public class SecurityConfigurator {
 	}
 
 	private Element getContentSecurityPolicyElement() {
-		Map<String, String> namespaces=new HashMap<String, String>();
+		Map<String, String> namespaces=new HashMap<>();
 		namespaces.put("security", "http://www.springframework.org/schema/security");
 		return xml.findElement("//security:header[@name='Content-Security-Policy']", namespaces);
 	}

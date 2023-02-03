@@ -27,7 +27,7 @@ public class PurifyRB {
 			locales.add(toLocale(elem));
 		}
 
-		List<String> bundles = new ArrayList<String>();
+		List<String> bundles = new ArrayList<>();
 		st = new StringTokenizer(loc.getProperty("bundles"), ",", false);
 		while (st.hasMoreElements()) {
 			String elem = (String) st.nextElement();

@@ -53,7 +53,7 @@ public class EventsListGridField extends ColoredListGridField {
 			key = new String[] { value.toString().trim() };
 		else
 			key = value.toString().split(",");
-		List<String> labels = new ArrayList<String>();
+		List<String> labels = new ArrayList<>();
 		for (String string : key) {
 			if (string.trim().isEmpty())
 				continue;

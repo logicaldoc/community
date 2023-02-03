@@ -116,12 +116,12 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		List<Long> bookmarks = (List<Long>) dao.queryForList(sql, Long.class);
 
 		// The list of documents to be returned
-		List<Document> documentsInCurrentPage = new ArrayList<Document>();
+		List<Document> documentsInCurrentPage = new ArrayList<>();
 
 		/*
 		 * Retrieve the names of the extended attributes to show
 		 */
-		List<String> extendedAttributes = new ArrayList<String>();
+		List<String> extendedAttributes = new ArrayList<>();
 
 		String extendedAttributesSpec = prepareExtendedAttributes(request, session, extendedAttributes);
 
@@ -130,7 +130,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		 * documentId-atttributeName, the value is the attribute value. This
 		 * fieldsMap is used to maximize the listing performances.
 		 */
-		final Map<String, Object> extendedAttributesValues = new HashMap<String, Object>();
+		final Map<String, Object> extendedAttributesValues = new HashMap<>();
 
 		Document hiliteDoc = null;
 
@@ -386,14 +386,14 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		if (StringUtils.isNotEmpty(request.getParameter("indexed")))
 			query.append(" and A.indexed=" + request.getParameter("indexed"));
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		if (filename != null) {
 			query.append(" and lower(A.fileName) like :fileName ");
 			params.put("fileName", "%" + filename.toLowerCase() + "%");
 		}
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<Object> records = new ArrayList<Object>();
+		List<Object> records = new ArrayList<>();
 		if (folderId != null || filename != null || formId != null
 				|| StringUtils.isNotEmpty(request.getParameter("indexed")))
 			records = (List<Object>) docDao.findByQuery(query.toString(), params, null);
@@ -410,7 +410,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records enriching the data
 		 */
-		List<Document> documents = new ArrayList<Document>();
+		List<Document> documents = new ArrayList<>();
 		for (int i = 0; i < records.size(); i++) {
 			Object[] cols = (Object[]) records.get(i);
 

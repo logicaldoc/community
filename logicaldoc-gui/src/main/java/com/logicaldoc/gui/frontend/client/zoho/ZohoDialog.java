@@ -129,8 +129,8 @@ public class ZohoDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final List<String> docIds = new ArrayList<String>();
-		final List<String> folderCompositeIds = new ArrayList<String>();
+		final List<String> docIds = new ArrayList<>();
+		final List<String> folderCompositeIds = new ArrayList<>();
 		for (Record rec : selection) {
 			if ("folder".equals(rec.getAttributeAsString("type")))
 				folderCompositeIds.add(rec.getAttributeAsString("name") + ":" + rec.getAttributeAsString("id"));

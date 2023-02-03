@@ -204,7 +204,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		try {
 			StringTokenizer st = new StringTokenizer(aliases, ",", false);
-			List<String> buf = new ArrayList<String>();
+			List<String> buf = new ArrayList<>();
 			while (st.hasMoreElements())
 				buf.add(((String) st.nextElement()).trim());
 
@@ -360,7 +360,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			
 			List<GUIDocument> guiResults = new ArrayList<GUIDocument>();
 
-			Map<Long, Hit> hitsMap = new HashMap<Long, Hit>();
+			Map<Long, Hit> hitsMap = new HashMap<>();
 			while (hits.hasNext()) {
 				Hit hit = hits.next();
 				hitsMap.put(hit.getId(), hit);
@@ -369,7 +369,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			executeEnrichingQuery(hitsMap);
 
 			// Now sort the hits by score desc
-			List<Hit> sortedHitsList = new ArrayList<Hit>(hitsMap.values());
+			List<Hit> sortedHitsList = new ArrayList<>(hitsMap.values());
 			sortedHitsList.sort((h1, h2) -> Long.valueOf(h1.getId()).compareTo(Long.valueOf(h2.getId())));
 			for (Hit hit : sortedHitsList) {
 				GUIDocument document = new GUIDocument();

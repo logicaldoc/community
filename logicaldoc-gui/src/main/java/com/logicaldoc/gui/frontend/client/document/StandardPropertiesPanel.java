@@ -351,7 +351,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
 		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
 		boolean containsInvalid = false;
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
 			String t = token.trim();
 

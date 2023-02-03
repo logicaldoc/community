@@ -343,7 +343,7 @@ public class Profile extends Window {
 			u.setDateFormatLong(vm.getValueAsString("dateformatlong"));
 
 		ListGridRecord[] records = searchesList.getRecords();
-		List<String> searches = new ArrayList<String>();
+		List<String> searches = new ArrayList<>();
 		for (ListGridRecord rec : records)
 			searches.add(rec.getAttributeAsString("search"));
 		u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));

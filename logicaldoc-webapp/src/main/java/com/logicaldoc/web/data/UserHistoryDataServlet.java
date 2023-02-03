@@ -79,7 +79,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 	}
 
 	private List<Object> executeQuery(Integer max, long userId, String event) throws PersistenceException {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("userId", userId);
 
 		StringBuilder query = new StringBuilder(

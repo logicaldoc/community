@@ -96,11 +96,11 @@ public enum Permission {
 	}
 
 	public static Set<Permission> all() {
-		return new HashSet<Permission>(Arrays.asList(Permission.values()));
+		return new HashSet<>(Arrays.asList(Permission.values()));
 	}
 
 	public static Set<Permission> forGuests() {
-		HashSet<Permission> set = new HashSet<Permission>();
+		HashSet<Permission> set = new HashSet<>();
 		set.add(READ);
 		set.add(DOWNLOAD);
 		set.add(PRINT);

@@ -115,7 +115,7 @@ public class SampleClient {
 		boolean major = false;
 				// Check in the pwc
 		try {
-			Map<String, Object> properties = new HashMap<String, Object>();
+			Map<String, Object> properties = new HashMap<>();
 			properties.put("cmis:name","test-doc.txt");
 
 			pwc.checkIn(major, properties, contentStream, "minor version");
@@ -191,7 +191,7 @@ public class SampleClient {
 	 * @param newDocName
 	 */
 	private static void createDocument(Folder target, String newDocName) {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 		props.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
 		props.put(PropertyIds.NAME, newDocName);
 		props.put(TypeManager.PROP_TAGS, "tag1,tag2,tag3");
@@ -217,7 +217,7 @@ public class SampleClient {
 	 * @return newly created folder
 	 */
 	private static Folder createFolder(Folder target, String newFolderName) {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 		props.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
 		props.put(PropertyIds.NAME, newFolderName);
 		Folder newFolder = target.createFolder(props);
@@ -240,7 +240,7 @@ public class SampleClient {
 	 */
 	private static Folder connect(String username, String password) {
 		SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
-		Map<String, String> parameter = new HashMap<String, String>();
+		Map<String, String> parameter = new HashMap<>();
 		parameter.put(SessionParameter.USER, username);
 		parameter.put(SessionParameter.PASSWORD, password);
 		parameter.put(SessionParameter.ATOMPUB_URL, CONNECTION_URL);

@@ -337,7 +337,7 @@ public class ZipExport {
 		folders.add(folder);
 		Collections.reverse(folders);
 
-		List<String> folderNames = new ArrayList<String>();
+		List<String> folderNames = new ArrayList<>();
 		for (int i = 0; i < folders.size(); i++) {
 			Folder f = folders.get(i);
 			if (f.getId() == startFolderId)

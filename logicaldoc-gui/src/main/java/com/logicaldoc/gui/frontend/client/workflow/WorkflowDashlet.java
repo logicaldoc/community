@@ -279,7 +279,7 @@ public class WorkflowDashlet extends Portlet {
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						ArrayList<String> ids = new ArrayList<String>();
+						ArrayList<String> ids = new ArrayList<>();
 						ListGridRecord[] selectedRecords = list.getSelectedRecords();
 						for (ListGridRecord rec : selectedRecords)
 							ids.add(rec.getAttributeAsString("processId"));

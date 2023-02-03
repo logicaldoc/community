@@ -244,7 +244,7 @@ public class TaskDetailsDialog extends Window {
 		transitionsForm.setIsGroup(true);
 		transitionsForm.setGroupTitle(I18N.message("actions"));
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 		// Add Transitions buttons
 		if (workflow.getSelectedTask().getTransitions() != null)
 			for (GUITransition transition : workflow.getSelectedTask().getTransitions()) {

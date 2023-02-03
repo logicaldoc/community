@@ -26,7 +26,7 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 
 	@Override
 	public List<Contact> findByUser(Long userId, String email) {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		StringBuilder sb = new StringBuilder("");
 		if (userId == null) {
 			sb.append(" " + ENTITY + ".userId is null ");
@@ -44,7 +44,7 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 					"order by " + ENTITY + ".firstName, " + ENTITY + ".lastName", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Contact>();
+			return new ArrayList<>();
 		}
 	}
 }

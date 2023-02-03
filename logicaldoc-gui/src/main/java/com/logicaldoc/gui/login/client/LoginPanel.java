@@ -211,7 +211,7 @@ public class LoginPanel extends VLayout {
 		rememberMePlaceholder.setColSpan(2);
 		rememberMePlaceholder.setWidth(rememberMe.getWidth());
 
-		List<FormItem> formItems = new ArrayList<FormItem>();
+		List<FormItem> formItems = new ArrayList<>();
 		formItems.add(username);
 		formItems.add(spacerItem12);
 		formItems.add(password);

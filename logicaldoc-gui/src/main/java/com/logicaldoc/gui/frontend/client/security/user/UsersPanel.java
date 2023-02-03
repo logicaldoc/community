@@ -453,7 +453,7 @@ public class UsersPanel extends AdminPanel {
 		MenuItem replicate = new MenuItem();
 		replicate.setTitle(I18N.message("replicatesettings"));
 		replicate.addClickHandler((MenuItemClickEvent event) -> {
-			List<Long> selectedIds = new ArrayList<Long>();
+			List<Long> selectedIds = new ArrayList<>();
 			for (ListGridRecord rec : selectedUsers)
 				selectedIds.add(rec.getAttributeAsLong("id"));
 			ReplicateUserSettings dialog = new ReplicateUserSettings(selectedIds, UsersPanel.this);

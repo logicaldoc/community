@@ -139,7 +139,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		addComputeStatsIcons(documents, subfolders);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 		items.addAll(Arrays.asList(new FormItem[] { idItem, pathItem, name, description, storage, maxVersions, creation,
 				documents, subfolders, barcode }));
 
@@ -329,7 +329,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		form2 = new DynamicForm();
 		form2.setAutoWidth();
 		form2.setValuesManager(vm);
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
@@ -404,7 +404,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
 		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
 		boolean containsInvalid = false;
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
 			String t = token.trim();
 

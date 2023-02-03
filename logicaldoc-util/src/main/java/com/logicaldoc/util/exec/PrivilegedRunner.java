@@ -31,7 +31,7 @@ public class PrivilegedRunner {
 	}
 
 	protected List<String> getElevator(String command) throws IOException {
-		List<String> elevator = new ArrayList<String>();
+		List<String> elevator = new ArrayList<>();
 
 		if (isMac()) {
 			elevator.add(extractMacElevator().getCanonicalPath());

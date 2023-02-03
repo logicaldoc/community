@@ -57,7 +57,7 @@ public class Validator {
 
 		setUser(transaction);
 
-		Map<String, String> errors = new HashMap<String, String>();
+		Map<String, String> errors = new HashMap<>();
 
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
@@ -119,7 +119,7 @@ public class Validator {
 
 	private void executeAttributeValidation(ExtensibleObject object, History transaction, Map<String, String> errors,
 			String attributeName, Attribute attribute, Attribute templateAttribute) {
-		Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
+		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
 		fieldValidationDictionary.put("event", transaction);
 		fieldValidationDictionary.put("errors", errors);

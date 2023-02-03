@@ -313,7 +313,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private void prepareGroupsForm(boolean readOnly) {
-		List<String> groupIds = new ArrayList<String>();
+		List<String> groupIds = new ArrayList<>();
 		GUIGroup[] groups = user.getGroups();
 		if (groups != null && groups.length > 0) {
 			for (int i = 0; i < groups.length; i++)

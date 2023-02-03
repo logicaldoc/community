@@ -304,7 +304,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * {@value #MAX_CLOSED_SESSIONS}
 	 */
 	private void cleanClosedSessions() {
-		List<String> garbage = new ArrayList<String>();
+		List<String> garbage = new ArrayList<>();
 		int counter = 0;
 		for (Session session : getSessions()) {
 			if (getStatus(session.getSid()) != Session.STATUS_OPEN)

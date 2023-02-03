@@ -58,7 +58,7 @@ public class RepositoriesPanel extends AdminPanel {
 
 					@Override
 					public void onSuccess(GUIParameter[] folderParameters) {
-						List<FormItem> items = new ArrayList<FormItem>();
+						List<FormItem> items = new ArrayList<>();
 
 						for (GUIParameter f : folderParameters) {
 							TextItem item = ItemFactory.newTextItem(f.getName(),

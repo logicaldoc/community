@@ -122,7 +122,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 
 			users.addAll(group.getUsers());
 		} else {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("tenantId", session.getTenantId());
 
 			users = userDao.findByWhere("_entity.tenantId = :tenantId", params, null, null);

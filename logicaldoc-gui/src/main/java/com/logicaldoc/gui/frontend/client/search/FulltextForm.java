@@ -206,7 +206,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		setTemplateCondition(values, options);
 
-		List<String> fields = new ArrayList<String>();
+		List<String> fields = new ArrayList<>();
 		if (searchinItem.getValues() != null && searchinItem.getValues().length > 0)
 			for (String fld : searchinItem.getValues())
 				fields.add(fld);

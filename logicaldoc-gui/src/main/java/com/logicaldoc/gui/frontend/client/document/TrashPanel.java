@@ -196,8 +196,8 @@ public class TrashPanel extends VLayout {
 	}
 
 	private void deleteSelectedElements(final ListGridRecord[] records) {
-		final List<Long> docIds = new ArrayList<Long>();
-		final List<Long> folderIds = new ArrayList<Long>();
+		final List<Long> docIds = new ArrayList<>();
+		final List<Long> folderIds = new ArrayList<>();
 		for (ListGridRecord rec : records) {
 			if ("document".equals(rec.getAttribute("type")))
 				docIds.add(Long.parseLong(rec.getAttribute("id")));

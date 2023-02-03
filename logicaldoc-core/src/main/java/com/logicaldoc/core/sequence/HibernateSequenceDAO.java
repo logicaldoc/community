@@ -108,7 +108,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			query += AND + ENTITY + ".name = :name ";
 			List<Sequence> sequences = new ArrayList<Sequence>();
 			try {
-				Map<String, Object> params = new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<>();
 				params.put("tenantId", tenantId);
 				params.put("objectId", objectId);
 				params.put("name", name);

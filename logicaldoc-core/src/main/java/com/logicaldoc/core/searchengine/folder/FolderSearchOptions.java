@@ -20,7 +20,7 @@ public class FolderSearchOptions extends SearchOptions {
 	/**
 	 * List of order criteria eg: lastmodified asc, title desc
 	 */
-	private List<String> order = new ArrayList<String>();
+	private List<String> order = new ArrayList<>();
 
 	public List<FolderCriterion> getCriteria() {
 		return criteria;

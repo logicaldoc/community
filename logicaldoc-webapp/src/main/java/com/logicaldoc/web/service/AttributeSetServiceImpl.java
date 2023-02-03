@@ -136,7 +136,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	}
 
 	private void saveAttributes(GUIAttributeSet attributeSet, AttributeSet attSet) {
-		Map<String, Attribute> attrs = new HashMap<String, Attribute>();
+		Map<String, Attribute> attrs = new HashMap<>();
 		if (attributeSet.getAttributes() != null && attributeSet.getAttributes().length > 0) {
 			attSet.getAttributes().clear();
 			for (GUIAttribute attribute : attributeSet.getAttributes()) {
@@ -274,7 +274,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void readAttributeOptions(Attribute extAttr, GUIAttribute att) {
 		String buf = (String) extAttr.getStringValue();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (buf != null) {
 			if (buf.contains(",")) {
 				StringTokenizer st = new StringTokenizer(buf, ",");

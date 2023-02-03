@@ -526,7 +526,7 @@ public class EMailSender {
 			emailDocument.setTenantId(folder.getTenantId());
 			emailDocument.setTemplate(templateDao.findByName("email", folder.getTenantId()));
 			if (emailDocument.getTemplate() != null) {
-				Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+				Map<String, Attribute> attributes = new HashMap<>();
 				Attribute ext = new Attribute();
 				ext.setStringValue(StringUtils.substring(from.getAddress(), 0, 3999));
 				attributes.put("from", ext);

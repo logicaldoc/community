@@ -33,7 +33,7 @@ public class FreemarkerWebServiceDisplayer {
 	public String displayWebService() {
 
 		try {
-			Map<String, Object> rootMap = new HashMap<String, Object>();
+			Map<String, Object> rootMap = new HashMap<>();
 
 			rootMap.put("service", serviceStubSet);
 

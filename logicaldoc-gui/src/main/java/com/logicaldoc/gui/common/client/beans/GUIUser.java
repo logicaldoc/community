@@ -675,7 +675,7 @@ public class GUIUser implements Serializable {
 	}
 
 	public List<String> orderedSearches() {
-		List<String> searches = new ArrayList<String>();
+		List<String> searches = new ArrayList<>();
 		if (searchPref != null && !searchPref.isEmpty()) {
 			searches = Arrays.asList(searchPref.replace(" ", "").split(","));
 		} else

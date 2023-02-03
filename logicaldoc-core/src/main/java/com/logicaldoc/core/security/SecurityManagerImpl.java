@@ -178,7 +178,7 @@ public class SecurityManagerImpl implements SecurityManager {
 			log.error(e.getMessage(), e);
 		}
 		if (doc == null)
-			return new HashSet<Permission>();
+			return new HashSet<>();
 		else
 			return folderDAO.getEnabledPermissions(doc.getFolder().getId(), userId);
 	}

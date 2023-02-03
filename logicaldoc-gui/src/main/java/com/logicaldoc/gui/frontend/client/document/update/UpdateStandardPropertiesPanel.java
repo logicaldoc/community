@@ -81,7 +81,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		form = new DynamicForm();
 		form.setValuesManager(vm);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
 		if (document.getLanguage() != null)
@@ -165,7 +165,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
 		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
 		boolean containsInvalid = false;
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
 			String t = token.trim();
 

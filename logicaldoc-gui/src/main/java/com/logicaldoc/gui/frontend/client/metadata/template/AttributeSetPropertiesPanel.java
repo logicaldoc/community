@@ -144,7 +144,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributesList.setFields(name, label);
 
 		attributesList.addDropCompleteHandler((DropCompleteEvent attributesListDropCompleted) -> {
-			List<String> attributes = new ArrayList<String>();
+			List<String> attributes = new ArrayList<>();
 			for (int i = 0; i < attributesList.getTotalRows(); i++) {
 				ListGridRecord rec = attributesList.getRecord(i);
 				attributes.add(rec.getAttributeAsString("name"));

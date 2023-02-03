@@ -66,11 +66,11 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected ValuesManager vm = new ValuesManager();
 
-	protected List<FormItem> standardItems = new ArrayList<FormItem>();
+	protected List<FormItem> standardItems = new ArrayList<>();
 
 	protected SelectItem templateItem = null;
 
-	protected List<FormItem> extendedItems = new ArrayList<FormItem>();
+	protected List<FormItem> extendedItems = new ArrayList<>();
 
 	private ClearDependantAttributes dependeciesHandler = new ClearDependantAttributes();
 

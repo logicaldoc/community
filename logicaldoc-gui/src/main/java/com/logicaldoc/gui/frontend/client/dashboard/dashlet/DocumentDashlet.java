@@ -85,7 +85,7 @@ public class DocumentDashlet extends Dashlet {
 	private List<String> getColumnsList() {
 		List<String> set = guiDashlet.getColumnsList();
 		if (set == null || set.isEmpty()) {
-			set = new ArrayList<String>();
+			set = new ArrayList<>();
 			set.add("filename");
 			set.add("version");
 			set.add("published");

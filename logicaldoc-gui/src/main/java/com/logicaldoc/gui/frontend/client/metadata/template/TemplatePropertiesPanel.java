@@ -224,7 +224,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		dependsOn.setMinWidth(70);
 
 		attributesList.addDropCompleteHandler((DropCompleteEvent event) -> {
-			List<String> attributes = new ArrayList<String>();
+			List<String> attributes = new ArrayList<>();
 			for (int i = 0; i < attributesList.getTotalRows(); i++) {
 				ListGridRecord rec = attributesList.getRecord(i);
 				attributes.add(rec.getAttributeAsString("name"));

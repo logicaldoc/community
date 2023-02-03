@@ -122,7 +122,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private int stamped = 0;
 
-	private Set<Tag> tags = new HashSet<Tag>();
+	private Set<Tag> tags = new HashSet<>();
 
 	private String tgs;
 
@@ -360,7 +360,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		if (this.tags != null)
 			this.tags.clear();
 		else
-			this.tags = new HashSet<Tag>();
+			this.tags = new HashSet<>();
 
 		if (tgs != null)
 			for (String word : tgs) {
@@ -370,7 +370,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	public Set<String> getTagsAsWords() {
-		Set<String> words = new HashSet<String>();
+		Set<String> words = new HashSet<>();
 		if (tags != null)
 			for (Tag tag : tags) {
 				words.add(tag.getTag());
@@ -498,7 +498,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public void clearTags() {
 		tags.clear();
-		tags = new HashSet<Tag>();
+		tags = new HashSet<>();
 		tgs = null;
 	}
 
@@ -978,7 +978,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
 		setColor(docVO.getColor());
 
-		setAttributes(new HashMap<String, Attribute>());
+		setAttributes(new HashMap<>());
 		try {
 			for (String name : docVO.getAttributes().keySet()) {
 				getAttributes().put(name, docVO.getAttributes().get(name));
@@ -988,7 +988,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		}
 
 		try {
-			setTags(new HashSet<Tag>());
+			setTags(new HashSet<>());
 			for (Tag tag : docVO.getTags()) {
 				getTags().add(tag);
 			}

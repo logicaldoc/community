@@ -313,7 +313,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 			@Override
 			public void onDropComplete(DropCompleteEvent event) {
-				List<String> filters = new ArrayList<String>();
+				List<String> filters = new ArrayList<>();
 				ListGridRecord[] records = filtersGrid.getRecords();
 				for (ListGridRecord rec : records) {
 					filters.add(rec.getAttributeAsString("name"));

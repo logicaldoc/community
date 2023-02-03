@@ -78,7 +78,7 @@ public class I18N {
 	}
 
 	public static Map<String, String> getMessages(Locale locale) {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 
 		for (String b : bundles) {
 			try {
@@ -100,7 +100,7 @@ public class I18N {
 	}
 
 	public static List<String> getLocales() {
-		List<String> locales = new ArrayList<String>();
+		List<String> locales = new ArrayList<>();
 		Properties p = new Properties();
 		try {
 			p.load(I18N.class.getResourceAsStream("/i18n/i18n.properties"));

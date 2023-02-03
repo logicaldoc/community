@@ -91,7 +91,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		User user = validateSession(sid);
 
 		try {
-			List<WSGroup> groups = new ArrayList<WSGroup>();
+			List<WSGroup> groups = new ArrayList<>();
 			GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			for (Group grp : dao.findAll(user.getTenantId())) {
 				if (grp.getType() == Group.TYPE_DEFAULT) {

@@ -609,7 +609,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				}
 			});
 
-		List<WSDocument> wsDocs = new ArrayList<WSDocument>();
+		List<WSDocument> wsDocs = new ArrayList<>();
 		for (Document doc : docs) {
 			try {
 				checkPublished(user, doc);
@@ -637,7 +637,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Document> docs = docDao.findByIds(docIds, null);
-		List<WSDocument> wsDocs = new ArrayList<WSDocument>();
+		List<WSDocument> wsDocs = new ArrayList<>();
 		for (int i = 0; i < docs.size(); i++) {
 			try {
 				checkPublished(user, docs.get(i));
@@ -663,7 +663,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		query.append(" order by date desc");
 		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, max);
 
-		Set<Long> docIds = new HashSet<Long>();
+		Set<Long> docIds = new HashSet<>();
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -709,7 +709,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		/*
 		 * Only readable documents can be sent
 		 */
-		List<Document> docs = new ArrayList<Document>();
+		List<Document> docs = new ArrayList<>();
 		if (docIds != null && docIds.length > 0) {
 			for (long id : docIds) {
 				Document doc = docDao.findById(id);
@@ -849,7 +849,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		}
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<Document> docs = new ArrayList<Document>();
+		List<Document> docs = new ArrayList<>();
 		if (user.isMemberOf(Group.GROUP_ADMIN))
 			docs = docDao.findByWhere("_entity.docRef=" + docId, null, null);
 		else if (folderIds != null) {
@@ -857,7 +857,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			docs = docDao.findByWhere("_entity.docRef=" + docId + " and _entity.id in " + idsStr, null, null);
 		}
 
-		List<WSDocument> wsDocs = new ArrayList<WSDocument>();
+		List<WSDocument> wsDocs = new ArrayList<>();
 		for (int i = 0; i < docs.size(); i++) {
 			docDao.initialize(docs.get(i));
 			if (user.isMemberOf(Group.GROUP_ADMIN)

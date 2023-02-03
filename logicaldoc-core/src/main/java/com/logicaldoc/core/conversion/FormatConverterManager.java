@@ -64,10 +64,10 @@ public class FormatConverterManager {
 
 	// Key is the src_extension-dst_extension, value is a collection of
 	// converters
-	private Map<String, List<FormatConverter>> converters = new HashMap<String, List<FormatConverter>>();
+	private Map<String, List<FormatConverter>> converters = new HashMap<>();
 
 	// All the available converters
-	private Map<String, FormatConverter> availableConverters = new HashMap<String, FormatConverter>();
+	private Map<String, FormatConverter> availableConverters = new HashMap<>();
 
 	/**
 	 * Retrieves the content of the Pdf conversion. If the Pdf conversion is not
@@ -348,7 +348,7 @@ public class FormatConverterManager {
 	 */
 	public List<String> getEnabledOutputFormats(String srcFilename) {
 		String inExt = AbstractFormatConverter.getExtension(srcFilename);
-		List<String> formats = new ArrayList<String>();
+		List<String> formats = new ArrayList<>();
 		for (String key : getConverters().keySet()) {
 			String inOut[] = key.split("-");
 			FormatConverter assignedConverter = getConverter(srcFilename, inOut[1]);
@@ -371,7 +371,7 @@ public class FormatConverterManager {
 		String inExt = inFileName;
 		if (inFileName.contains("."))
 			inExt = FileUtil.getExtension(inFileName);
-		List<String> formats = new ArrayList<String>();
+		List<String> formats = new ArrayList<>();
 		for (String key : getConverters().keySet()) {
 			String inOut[] = key.split("-");
 			if (!formats.contains(inOut[1]) && (inExt.equalsIgnoreCase(inOut[0]) || "*".equals(inOut[0]))
@@ -387,7 +387,7 @@ public class FormatConverterManager {
 	 * @return the collection of all available input formats
 	 */
 	public List<String> getAvailableInputFormats() {
-		List<String> formats = new ArrayList<String>();
+		List<String> formats = new ArrayList<>();
 		for (String key : getConverters().keySet()) {
 			String inOut[] = key.split("-");
 			if (!formats.contains(inOut[0]) && !"*".equals(inOut[0]))
@@ -407,7 +407,7 @@ public class FormatConverterManager {
 	 */
 	public List<FormatConverter> getAvailableConverters(String inFileName, String outFileName) {
 		String key = composeKey(inFileName, outFileName);
-		return getConverters().get(key) != null ? getConverters().get(key) : new ArrayList<FormatConverter>();
+		return getConverters().get(key) != null ? getConverters().get(key) : new ArrayList<>();
 	}
 
 	/**
@@ -555,7 +555,7 @@ public class FormatConverterManager {
 			for (String o : outs) {
 				String key = composeKey(i, o);
 				if (!converters.containsKey(key))
-					converters.put(key, new ArrayList<FormatConverter>());
+					converters.put(key, new ArrayList<>());
 				if (!converters.get(key).contains(cnvrt))
 					converters.get(key).add(cnvrt);
 			}

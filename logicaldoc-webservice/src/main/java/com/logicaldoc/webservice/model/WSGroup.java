@@ -125,7 +125,7 @@ public class WSGroup implements Serializable {
 
 			if (getUserIds().length > 0) {
 				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-				Set<User> users = new HashSet<User>();
+				Set<User> users = new HashSet<>();
 				for (long userId : getUserIds()) {
 					User user = userDao.findById(userId);
 					if (user != null && user.getType() == User.TYPE_DEFAULT)

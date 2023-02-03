@@ -103,7 +103,7 @@ public class ZipUtil {
 	}
 
 	public List<String> listEntries(File zipFile) {
-		List<String> files = new ArrayList<String>();
+		List<String> files = new ArrayList<>();
 		try {
 			ZipFile zFile = new ZipFile(zipFile);
 			setCharset(zFile);

@@ -23,7 +23,7 @@ public class I18N {
 
 	private static GUIValue[] guiLanguages;
 
-	private static HashMap<String, String> bundle = new HashMap<String, String>();
+	private static HashMap<String, String> bundle = new HashMap<>();
 
 	private static DateTimeFormat dateFormatLong = null;
 

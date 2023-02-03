@@ -53,7 +53,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 			return findByWhere(query.toString(), ORDER_BY + ENTITY + ".date desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentHistory>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -72,7 +72,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 			return findByWhere(ENTITY + ".folderId =" + folderId, ORDER_BY + ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentHistory>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -82,7 +82,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 			return findByWhere(ENTITY + ".notified = 0", ORDER_BY + ENTITY + DATE_ASC, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentHistory>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -107,7 +107,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 			return findByWhere(query, ORDER_BY + ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentHistory>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -138,7 +138,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 			Integer max) {
 		StringBuilder query = new StringBuilder("(" + ENTITY + ".path like :pathExpression or " + ENTITY
 				+ ".pathOld like :pathExpression) ");
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("pathExpression", pathExpression);
 
 		if (oldestDate != null) {
@@ -161,7 +161,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 			return findByWhere(query.toString(), params, ORDER_BY + ENTITY + DATE_ASC, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentHistory>();
+			return new ArrayList<>();
 		}
 	}
 }

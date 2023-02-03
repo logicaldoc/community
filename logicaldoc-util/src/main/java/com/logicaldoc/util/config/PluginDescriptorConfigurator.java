@@ -42,7 +42,7 @@ public class PluginDescriptorConfigurator extends XMLBean {
 	}
 
 	public Set<String> getDependencies() {
-		Set<String> deps = new HashSet<String>();
+		Set<String> deps = new HashSet<>();
 		Element requires = getRootElement().getChild("requires");
 		if (requires != null) {
 			@SuppressWarnings("unchecked")
