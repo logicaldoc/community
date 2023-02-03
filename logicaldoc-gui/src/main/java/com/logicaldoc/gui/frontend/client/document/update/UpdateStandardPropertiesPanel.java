@@ -73,7 +73,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private void prepareForm() {
-		if (formsContainer.contains(form)) {
+		if (Boolean.TRUE.equals(formsContainer.contains(form))) {
 			formsContainer.removeMember(form);
 			form.destroy();
 		}
@@ -144,7 +144,8 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler((KeyPressEvent newTagKeyPress) -> {
-			if (!newTagItem.validate() || newTagItem.getValue() == null || newTagKeyPress.getKeyName() == null
+			if (Boolean.FALSE.equals(newTagItem.validate()) || newTagItem.getValue() == null
+					|| newTagKeyPress.getKeyName() == null
 					|| !"enter".equals(newTagKeyPress.getKeyName().toLowerCase()))
 				return;
 
@@ -191,7 +192,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			tagItem.setValues((Object[]) tags.toArray(new String[0]));
 			changedHandler.onChanged(null);
 		}
-		
+
 		if (containsInvalid)
 			SC.warn(I18N.message("sometagaddedbecauseinvalid"));
 	}
@@ -200,7 +201,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			document.setLanguage((String) values.get("language"));
 			document.setColor((String) values.get("color"));
 			document.setTags(tagItem.getValues());

@@ -60,7 +60,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		setWidth100();
 
 		prepareDataSource(folder);
-		
+
 		addThumbnail();
 
 		addFilename();
@@ -97,9 +97,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 					html += "<table align='center' border='0' cellspacing='0'><tr>";
 
 					// The status row
-					if (rec.getAttributeAsBoolean("bookmarked"))
-						html += "<td>" + DocUtil.getBookmarkedIcon(rec.getAttributeAsBoolean("bookmarked"))
-								+ "</td>";
+					if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
+						html += "<td>" + DocUtil.getBookmarkedIcon(rec.getAttributeAsBoolean("bookmarked")) + "</td>";
 					html += "<td>" + AwesomeFactory.getIndexedIcon(rec.getAttributeAsInt("indexed")) + "</td>";
 
 					// The locked icon
@@ -113,8 +112,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 						}
 					}
 
-					html += "<td>" + DocUtil.getPasswordProtectedIcon(rec.getAttributeAsBoolean("password"))
-							+ "</td>";
+					html += "<td>" + DocUtil.getPasswordProtectedIcon(rec.getAttributeAsBoolean("password")) + "</td>";
 					html += "<td>" + DocUtil.getImmutableIcon(rec.getAttributeAsInt("immutable")) + "</td>";
 					html += "<td>" + DocUtil.getSignedIcon(rec.getAttributeAsInt("signed")) + "</td>";
 					html += "<td>" + DocUtil.getStampedIcon(rec.getAttributeAsInt("stamped")) + "</td>";
@@ -144,7 +142,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 						return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
 					else {
 						long docId = Long.parseLong(rec.getAttribute("id"));
-						if (!rec.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
+						if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("password"))
+								|| DocumentProtectionManager.isUnprotected(docId))
 							return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
 						else
 							return Util.imageHTML("blank.png", null,
@@ -164,7 +163,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			int max = loadGridLayout(folder);
 			ds = new DocumentsDS(folder, null, max, 1, null, false, false, null);
 		}
-		
+
 		if (ds == null) {
 			/*
 			 * We are searching

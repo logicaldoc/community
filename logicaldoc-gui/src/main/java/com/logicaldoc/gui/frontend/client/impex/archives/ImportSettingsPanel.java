@@ -53,7 +53,7 @@ public class ImportSettingsPanel extends VLayout {
 	public boolean validate() {
 		vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			archive.setDescription(vm.getValueAsString("description").toString());
 			archive.setImportCustomId(Integer.parseInt(vm.getValueAsString("importcids")));
 			archive.setImportTemplate("yes".equals(vm.getValueAsString("importtemplates")) ? 1 : 0);

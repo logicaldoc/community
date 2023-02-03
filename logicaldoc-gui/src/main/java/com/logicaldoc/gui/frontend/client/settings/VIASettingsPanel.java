@@ -204,7 +204,7 @@ public class VIASettingsPanel extends AdminPanel {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
 								new AsyncCallback<Void>() {
 									@Override
@@ -281,7 +281,7 @@ public class VIASettingsPanel extends AdminPanel {
 	@SuppressWarnings("unchecked")
 	boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 			settings.setEnabled("yes".equals(values.get("eenabled").toString()));
 			settings.setMaxAttachments(Integer.parseInt(values.get("maxattachments").toString()));

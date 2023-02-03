@@ -178,7 +178,7 @@ public class WorkflowToolStrip extends ToolStrip {
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
 				@Override
 				public void execute(Boolean yes) {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -208,7 +208,7 @@ public class WorkflowToolStrip extends ToolStrip {
 				return;
 
 			LD.ask(I18N.message("undeploy"), I18N.message("undeploywarn"), (Boolean yes) -> {
-				if (yes)
+				if (Boolean.TRUE.equals(yes))
 					WorkflowService.Instance.get().undeploy(currentWorkflow.getName(), new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

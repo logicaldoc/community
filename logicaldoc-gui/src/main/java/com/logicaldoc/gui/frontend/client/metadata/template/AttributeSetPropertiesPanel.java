@@ -572,7 +572,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	protected boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			attributeSet.setName((String) values.get("name"));
 			attributeSet.setDescription((String) values.get("description"));
 		}
@@ -632,7 +632,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 			LD.ask(I18N.message("applyinitializationtotemplates"),
 					I18N.message("applyinitializationtotemplatesquestion"), (Boolean yes) -> {
-						if (yes) {
+						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyInitializationToTemplates(attributeSet.getId(),
 									selection.getAttributeAsString("name"), new AsyncCallback<Void>() {

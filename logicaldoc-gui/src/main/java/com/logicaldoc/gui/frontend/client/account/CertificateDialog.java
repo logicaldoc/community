@@ -84,7 +84,7 @@ public class CertificateDialog extends Window {
 		createNew.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					LD.contactingServer();
 					SignService.Instance.get().generateNewCertificate(new AsyncCallback<Void>() {
 						@Override

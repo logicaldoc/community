@@ -155,7 +155,7 @@ public class SessionsPanel extends VLayout {
 		killSession.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmkill"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						ListGridRecord rec = sessionsGrid.getSelectedRecord();
 						SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"),
 								new AsyncCallback<Void>() {

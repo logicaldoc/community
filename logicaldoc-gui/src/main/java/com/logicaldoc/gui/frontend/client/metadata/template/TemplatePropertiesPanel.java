@@ -316,7 +316,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		resetInitialization.setTitle(I18N.message("resetinitialization"));
 		resetInitialization.addClickHandler((MenuItemClickEvent event) -> {
 			LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"), (Boolean yes) -> {
-				if (yes)
+				if (Boolean.TRUE.equals(yes))
 					resetInitialization();
 			});
 		});
@@ -393,7 +393,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		resetValidation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), (Boolean yes) -> {
-					if (yes)
+					if (Boolean.TRUE.equals(yes))
 						resetValidation();
 				});
 			}
@@ -540,7 +540,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						for (String attrName : names)
 							template.removeAttribute(attrName);
 						attributesList.removeSelectedData();
@@ -662,7 +662,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			template.setName((String) values.get("name"));
 			template.setDescription((String) values.get("description"));
 		}

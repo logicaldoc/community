@@ -83,7 +83,7 @@ public class SystemMenu extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				SC.ask(I18N.message("restartalert"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						SystemService.Instance.get().restart(new AsyncCallback<Void>() {
 
 							@Override

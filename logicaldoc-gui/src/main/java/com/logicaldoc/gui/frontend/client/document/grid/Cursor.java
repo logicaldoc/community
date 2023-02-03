@@ -124,7 +124,7 @@ public class Cursor extends ToolStrip {
 	}
 
 	private void onPageSizeChange() {
-		if (pageSizeItem.validate()) {
+		if (Boolean.TRUE.equals(pageSizeItem.validate())) {
 			setCurrentPage(1);
 			setTotalRecords(totalRecords);
 		}

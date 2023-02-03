@@ -300,7 +300,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 	private void addPropertiesTab(ChangedHandler changeHandler) {
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 		propertiesPanel = new UserPropertiesPanel(user, changeHandler, usersPanel);

@@ -104,7 +104,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 				if (!form.validate())
 					return;
 
-				if (visualPositioning.getValueAsBoolean()) {
+				if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
 					VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(
 							new long[] { document.getId() }, form.getValueAsString("reason"));
 					dialog.show();

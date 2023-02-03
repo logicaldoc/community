@@ -62,7 +62,7 @@ public class AnnotationContextMenu extends Menu {
 		moveOrResize.setIconWidth(16);
 		moveOrResize.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				if (drawItem.getCanDrag())
+				if (Boolean.TRUE.equals(drawItem.getCanDrag()))
 					AbstractAnnotationsWindow.hideKnowbs(drawItem);
 				else
 					AbstractAnnotationsWindow.showKnowbs(drawItem);

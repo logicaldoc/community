@@ -56,7 +56,7 @@ public class ReplicateUserSettings extends Window {
 		confirm.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					long masterUserId = Long.parseLong(vm.getValueAsString("user"));
 					LD.contactingServer();
 					SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds.toArray(new Long[0]),

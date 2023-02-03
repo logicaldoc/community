@@ -106,7 +106,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		published.setTooltip(
 				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
 
-		StaticTextItem size = ItemFactory.newStaticTextItem("size", 
+		StaticTextItem size = ItemFactory.newStaticTextItem("size",
 				Util.formatSizeW7(document.getFileSize()) + " (" + Util.formatSizeBytes(document.getFileSize()) + ")");
 
 		StaticTextItem pages = preparePagesItem();
@@ -182,10 +182,10 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (thumbnail != null)
 			thumbnail.destroy();
 
-		if (columns.contains(form1))
+		if (Boolean.TRUE.equals(columns.contains(form1)))
 			columns.removeMember(form1);
 
-		if (columns.contains(thumbnail))
+		if (Boolean.TRUE.equals(columns.contains(thumbnail)))
 			columns.removeChild(thumbnail);
 
 		form1 = new DynamicForm();
@@ -254,7 +254,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private void prepareRightForm() {
-		if (columns.contains(form2)) {
+		if (Boolean.TRUE.equals(columns.contains(form2))) {
 			columns.removeMember(form2);
 			form2.destroy();
 		}
@@ -262,7 +262,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		form2 = new DynamicForm();
 		form2.setValuesManager(vm);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
 		addRating(items);
 
@@ -328,7 +328,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		newTagItem.setEndRow(true);
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
-			if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
+			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null && event.getKeyName() != null
 					&& "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();
@@ -417,8 +417,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	@Override
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.TRUE.equals(vm.validate())) {
 			document.setFileName((String) values.get("filename"));
 			document.setLanguage((String) values.get("language"));
 			document.setColor((String) values.get("color"));

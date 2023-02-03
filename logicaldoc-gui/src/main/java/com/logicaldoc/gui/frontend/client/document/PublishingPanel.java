@@ -40,7 +40,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 		form1 = new DynamicForm();
 		form1.setValuesManager(vm);
@@ -109,7 +109,7 @@ public class PublishingPanel extends DocumentDetailTab {
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			if (!"".equals(values.get("published")) && values.get("published") != null)
 				document.setPublished("yes".equals(values.get("published")) ? 1 : 0);
 			document.setStartPublishing((Date) values.get("startpublishing"));

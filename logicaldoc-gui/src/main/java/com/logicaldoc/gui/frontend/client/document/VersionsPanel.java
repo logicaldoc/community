@@ -297,10 +297,8 @@ public class VersionsPanel extends DocumentDetailTab {
 		MenuItem promote = new MenuItem();
 		promote.setTitle(I18N.message("promote"));
 		promote.addClickHandler((MenuItemClickEvent promoteEvent) -> {
-			LD.ask(I18N.message("question"), I18N.message("promotequestion"), new BooleanCallback() {
-				@Override
-				public void execute(Boolean confirmPromotion) {
-					if (confirmPromotion) {
+			LD.ask(I18N.message("question"), I18N.message("promotequestion"), (Boolean yes) -> {
+					if (Boolean.TRUE.equals(yes)) {
 						LD.contactingServer();
 						DocumentService.Instance.get().promoteVersion(document.getId(),
 								selection[0].getAttributeAsString("version"), new AsyncCallback<GUIDocument>() {
@@ -319,7 +317,6 @@ public class VersionsPanel extends DocumentDetailTab {
 									}
 								});
 					}
-				}
 			});
 		});
 		return promote;

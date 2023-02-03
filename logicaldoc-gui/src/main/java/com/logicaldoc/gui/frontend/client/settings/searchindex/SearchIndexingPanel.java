@@ -587,7 +587,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		purge.setAutoFit(true);
 		purge.addClickHandler((ClickEvent purgeClick) -> {
 			SC.ask(I18N.message("purgeconfirmation"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					LD.contactingServer();
 					SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
 						@Override
@@ -635,7 +635,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		dropIndex.setAutoFit(true);
 		dropIndex.addClickHandler((ClickEvent dropIndexClick) -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmdropindex"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					LD.contactingServer();
 					rescheduleAll.setDisabled(true);
 					SearchEngineService.Instance.get().rescheduleAll(true, new AsyncCallback<Void>() {

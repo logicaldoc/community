@@ -149,7 +149,7 @@ public class RatingDialog extends Window {
 		vote.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					RatingDialog.this.rating.setUserId(Session.get().getUser().getId());
 					RatingDialog.this.rating.setVote(Integer.parseInt(vm.getValueAsString("stars")));
 

@@ -99,7 +99,7 @@ public class DocumentProtectionManager {
 
 					@Override
 					public void onSuccess(Boolean granted) {
-						if (granted) {
+						if (Boolean.TRUE.equals(granted)) {
 							saveProtectionPasswordAndNotify(docId, handler, result,
 									password);
 						} else if (handler != null) {

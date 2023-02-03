@@ -67,7 +67,7 @@ public class BookmarkDialog extends Window {
 			public void onClick(ClickEvent event) {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					if ((String) values.get("name") != null && !((String) values.get("name")).trim().isEmpty()) {
 						bookmark.setName((String) values.get("name"));
 					}

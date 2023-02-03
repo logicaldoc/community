@@ -350,7 +350,7 @@ public class UsersPanel extends AdminPanel {
 		items.add(password);
 
 		if (!"admin".equals(list.getSelectedRecord().getAttributeAsString("username")))
-			if (list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+			if (Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 				items.add(disableUser);
 			else
 				items.add(enableUser);
@@ -477,7 +477,7 @@ public class UsersPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((MenuItemClickEvent event) -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					SecurityService.Instance.get().deleteUser(selectedUserId, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

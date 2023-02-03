@@ -144,7 +144,7 @@ public class TenantPropertiesPanel extends HLayout {
 		if (form != null)
 			form.destroy();
 
-		if (contains(form))
+		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 
 		form = new DynamicForm();
@@ -161,7 +161,7 @@ public class TenantPropertiesPanel extends HLayout {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			if (values.get("name") != null)
 				tenant.setName((String) values.get("name"));
 

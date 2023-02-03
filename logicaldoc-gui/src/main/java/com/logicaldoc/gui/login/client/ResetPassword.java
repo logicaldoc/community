@@ -71,7 +71,7 @@ public class ResetPassword extends Window {
 			public void onClick(ClickEvent event) {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					final String userName = (String) values.get("username");
 					final String emailAddress = (String) values.get("email");
 					buttonForm.setDisabled(true);

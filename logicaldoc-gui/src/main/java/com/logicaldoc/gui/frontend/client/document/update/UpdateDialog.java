@@ -203,8 +203,8 @@ public class UpdateDialog extends StickyWindow {
 	}
 
 	private void doBulkUpdate(final DynamicForm saveForm) {
-		LD.ask(I18N.message("bulkupdate"), I18N.message("bulkwarning"), (Boolean confirmBulkUpdate) -> {
-			if (confirmBulkUpdate) {
+		LD.ask(I18N.message("bulkupdate"), I18N.message("bulkwarning"), (Boolean yes) -> {
+			if (Boolean.TRUE.equals(yes)) {
 				bulkPanel.getDocument().setComment(saveForm.getValueAsString("versioncomment"));
 				LD.contactingServer();
 				DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),

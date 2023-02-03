@@ -48,7 +48,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		if (form != null)
 			form.destroy();
 
-		if (contains(form))
+		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 
 		form = new DynamicForm();

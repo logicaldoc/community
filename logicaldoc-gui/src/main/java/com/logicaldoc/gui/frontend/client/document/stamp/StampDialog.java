@@ -109,7 +109,7 @@ public class StampDialog extends StickyWindow {
 	}
 		
 	static void applyStamp(GUIStamp stamp, Boolean visualPositioningFlag, Window popup, DocumentsGrid sourceGrid) {
-		if (visualPositioningFlag) {
+		if (Boolean.TRUE.equals(visualPositioningFlag)) {
 			VisualPositioningStampDialog dialog = new VisualPositioningStampDialog(sourceGrid, stamp);
 			dialog.show();
 			popup.destroy();

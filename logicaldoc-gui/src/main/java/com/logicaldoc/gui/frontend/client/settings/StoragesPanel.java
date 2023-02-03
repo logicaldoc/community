@@ -270,7 +270,7 @@ public class StoragesPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((MenuItemClickEvent event) -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					doRemoveStorage(selectedStorageId);
 				}
 			});

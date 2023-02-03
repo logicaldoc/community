@@ -97,7 +97,7 @@ public class ClusteringPanel extends AdminPanel {
 			public void onClick(ClickEvent event) {
 				final Map<String, Object> values = vm.getValues();
 
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					final GUIParameter[] settings = new GUIParameter[6];
 					settings[0] = new GUIParameter("cluster.enabled",
 							values.get("eenabled").equals("yes") ? "true" : "false");

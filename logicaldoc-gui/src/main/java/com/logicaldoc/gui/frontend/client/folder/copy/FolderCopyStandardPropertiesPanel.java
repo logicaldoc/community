@@ -65,7 +65,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 		form1 = new DynamicForm();
 		form1.setValuesManager(vm);
@@ -218,7 +218,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 
 	public boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			folder.setTags(tagItem.getValues());
 			folder.setDescription(vm.getValueAsString("description"));
 			if (vm.getValueAsString("name") != null)

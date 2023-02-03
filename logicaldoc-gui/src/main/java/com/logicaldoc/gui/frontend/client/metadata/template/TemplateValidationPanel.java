@@ -86,7 +86,7 @@ public class TemplateValidationPanel extends HLayout {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			template.setValidation((String) values.get("validation"));
 		}
 

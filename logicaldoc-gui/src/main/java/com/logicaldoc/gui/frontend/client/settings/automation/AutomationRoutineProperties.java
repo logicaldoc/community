@@ -73,7 +73,7 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 
 	boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			routine.setName(vm.getValueAsString("name"));
 			routine.setDescription(vm.getValueAsString("description"));
 			routine.setAutomation(vm.getValueAsString("automation"));

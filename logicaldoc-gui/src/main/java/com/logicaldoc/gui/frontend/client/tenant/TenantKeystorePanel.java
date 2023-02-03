@@ -312,7 +312,7 @@ public class TenantKeystorePanel extends VLayout {
 		delete.setAutoFit(true);
 		delete.addClickHandler((ClickEvent event) -> {
 			SC.ask(I18N.message("deletekeystorewarn"), (Boolean yes) -> {
-				if (yes)
+				if (Boolean.TRUE.equals(yes))
 					SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -389,7 +389,7 @@ public class TenantKeystorePanel extends VLayout {
 	@SuppressWarnings("unchecked")
 	boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 			keystore.setTenantId(tenantId);
 			keystore.setOrganizationAlias((String) values.get("localCAalias"));

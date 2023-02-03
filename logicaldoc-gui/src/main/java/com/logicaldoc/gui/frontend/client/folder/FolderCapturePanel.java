@@ -46,7 +46,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		if (form != null)
 			form.destroy();
 
-		if (contains(form))
+		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 		form = new DynamicForm();
 		form.setValuesManager(vm);
@@ -113,7 +113,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			if (values.get("ocrtemplate") == null || values.get("ocrtemplate").toString().isEmpty())
 				folder.setOcrTemplateId(null);
 			else {

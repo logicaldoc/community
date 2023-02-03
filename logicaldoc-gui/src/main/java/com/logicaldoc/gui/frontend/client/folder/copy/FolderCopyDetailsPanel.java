@@ -101,7 +101,7 @@ public class FolderCopyDetailsPanel extends VLayout {
 		 */
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
@@ -113,7 +113,7 @@ public class FolderCopyDetailsPanel extends VLayout {
 		 */
 		if (extendedPropertiesPanel != null) {
 			extendedPropertiesPanel.destroy();
-			if (extendedPropertiesTabPanel.contains(extendedPropertiesPanel))
+			if (Boolean.TRUE.equals(extendedPropertiesTabPanel.contains(extendedPropertiesPanel)))
 				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
 		}
 

@@ -61,7 +61,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (formsContainer.contains(form))
+		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);
 
 		form = new DynamicForm();
@@ -133,7 +133,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			importFolder.setProvider((String) values.get("provider"));
 			importFolder.setPath((String) values.get("path"));
 			importFolder.setUsername((String) values.get("username"));

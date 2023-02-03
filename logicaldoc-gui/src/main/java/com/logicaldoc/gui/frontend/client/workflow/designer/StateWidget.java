@@ -76,7 +76,7 @@ public class StateWidget extends Label {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((MenuItemClickEvent click) -> {
 			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean yes) -> {
-				if (yes)
+				if (Boolean.TRUE.equals(yes))
 					delete();
 			});
 		});

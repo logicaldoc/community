@@ -61,7 +61,7 @@ public class ContactDetails extends Window {
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 
 					GUIContact c = new GUIContact();
 					c.setId(contact.getId());

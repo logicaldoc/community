@@ -239,9 +239,9 @@ public class TenantBrandingPanel extends HLayout {
 		if (form != null)
 			form.destroy();
 
-		if (layout.contains(form))
+		if (Boolean.TRUE.equals(layout.contains(form)))
 			layout.removeMember(form);
-		if (layout.contains(imagesPanel))
+		if (Boolean.TRUE.equals(layout.contains(imagesPanel)))
 			layout.removeMember(imagesPanel);
 
 		skin.setValue(tenant.getBranding().getSkin());
@@ -530,7 +530,7 @@ public class TenantBrandingPanel extends HLayout {
 
 	public boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			if (Feature.enabled(Feature.BRANDING_FULL)) {
 				tenant.getBranding().setSkin(skin.getValueAsString());
 				tenant.getBranding().setProduct(vm.getValueAsString("product"));

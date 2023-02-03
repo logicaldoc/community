@@ -176,7 +176,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 		form1 = new DynamicForm();
 		form1.setValuesManager(vm);
@@ -248,7 +248,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 				LD.ask(I18N.message("enforcementofstorage"),
 						I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"),
 						(Boolean yes) -> {
-							if (yes) {
+							if (Boolean.TRUE.equals(yes)) {
 								DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
 										new AsyncCallback<Void>() {
 

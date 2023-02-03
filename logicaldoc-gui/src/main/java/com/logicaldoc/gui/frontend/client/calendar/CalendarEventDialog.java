@@ -201,7 +201,7 @@ public class CalendarEventDialog extends Window {
 					deleteIcon.setMargin(2);
 					deleteIcon.addClickHandler((ClickEvent event) -> {
 						LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean answer) -> {
-							if (answer) {
+							if (Boolean.TRUE.equals(answer)) {
 								remindersGrid.removeData(rec);
 							}
 						});
@@ -210,9 +210,7 @@ public class CalendarEventDialog extends Window {
 					Button addIcon = AwesomeFactory.newIconButton("plus", "add");
 					addIcon.setBaseStyle("statusIcon");
 					addIcon.setMargin(2);
-					addIcon.addClickHandler((ClickEvent event) -> {
-						addNewReminder();
-					});
+					addIcon.addClickHandler((ClickEvent event) -> addNewReminder());
 
 					iconCanvas.setMembers(deleteIcon, addIcon);
 					return iconCanvas;
@@ -682,7 +680,7 @@ public class CalendarEventDialog extends Window {
 	 * Save button handler
 	 */
 	private void onSave() {
-		if (vm.validate()) {
+		if (Boolean.TRUE.equals(vm.validate())) {
 			calendarEvent.setTitle(vm.getValueAsString("title"));
 			calendarEvent.setType(vm.getValueAsString("type"));
 			calendarEvent.setSubType(vm.getValueAsString("subtype"));
@@ -781,12 +779,12 @@ public class CalendarEventDialog extends Window {
 		LD.ask(I18N.message("delevent"), I18N.message("deleventconfirm"), new BooleanCallback() {
 			@Override
 			public void execute(Boolean confirmToDelete) {
-				if (!confirmToDelete.booleanValue())
+				if (Boolean.FALSE.equals(confirmToDelete.booleanValue()))
 					return;
 
 				if (calendarEvent.getParentId() != null) {
 					LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), (Boolean answer) -> {
-						Long id = answer ? calendarEvent.getParentId() : calendarEvent.getId();
+						Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
 						CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {

@@ -153,7 +153,7 @@ public class LDAPBrowser extends VLayout {
 
 		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-		if (vm.validate()) {
+		if (Boolean.TRUE.equals(vm.validate()))  {
 			String username = (String) values.get("username");
 
 			if (username == null || "".equals(username.trim()))

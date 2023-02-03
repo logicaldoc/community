@@ -127,7 +127,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		makelocal.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmmakelocal"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						ClusterService.Instance.get().makeLocal(selectedSettings, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -155,7 +155,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		makeglobal.setTitle(I18N.message("makeglobal"));
 		makeglobal.addClickHandler((MenuItemClickEvent event) -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmmakeglobal"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					ClusterService.Instance.get().makeGlobal(selectedSettings, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

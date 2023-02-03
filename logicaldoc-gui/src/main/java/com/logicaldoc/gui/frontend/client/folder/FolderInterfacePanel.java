@@ -56,7 +56,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		if (form != null)
 			form.destroy();
 
-		if (contains(form))
+		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 
 		form = new DynamicForm();
@@ -179,7 +179,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 	public boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			folder.setPosition(
 					vm.getValueAsString("position") != null ? Integer.parseInt(vm.getValueAsString("position")) : 1);
 			folder.setColor(vm.getValueAsString("color"));

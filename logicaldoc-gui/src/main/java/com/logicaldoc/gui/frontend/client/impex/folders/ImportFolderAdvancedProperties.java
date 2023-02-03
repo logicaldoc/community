@@ -49,7 +49,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (formsContainer.contains(form))
+		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);
 
 		form = new DynamicForm();

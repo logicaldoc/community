@@ -241,7 +241,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((ClickEvent deleteClick) -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmdeletebarcodetemplate"), (Boolean yes) -> {
-				if (yes)
+				if (Boolean.TRUE.equals(yes))
 					BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
 
 						@Override

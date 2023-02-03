@@ -64,7 +64,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (formsContainer.contains(form))
+		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);
 
 		form = new DynamicForm();
@@ -168,7 +168,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			syndication.setName((String) values.get("name"));
 			syndication.setUsername((String) values.get("username"));
 			syndication.setPassword((String) values.get("password"));

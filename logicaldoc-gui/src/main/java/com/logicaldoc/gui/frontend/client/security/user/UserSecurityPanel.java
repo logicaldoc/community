@@ -58,7 +58,7 @@ public class UserSecurityPanel extends VLayout {
 		if (form != null)
 			form.destroy();
 
-		if (contains(form))
+		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 
 		form = new DynamicForm();
@@ -175,7 +175,7 @@ public class UserSecurityPanel extends VLayout {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			user.setPasswordExpires(Boolean.parseBoolean(values.get("passwordExpires").toString()));
 			user.setEnabled(Boolean.parseBoolean(values.get("eenabled").toString()));
 			user.setEnforceWorkingTime(Boolean.parseBoolean(values.get("enforceworkingtime").toString()));

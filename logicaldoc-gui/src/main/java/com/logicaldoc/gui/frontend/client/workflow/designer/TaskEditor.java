@@ -110,7 +110,7 @@ public class TaskEditor extends Window {
 
 			@Override
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					onSave();
 					destroy();
 				}

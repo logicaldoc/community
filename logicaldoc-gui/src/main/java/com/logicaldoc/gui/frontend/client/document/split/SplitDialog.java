@@ -108,7 +108,7 @@ public class SplitDialog extends Window {
 			public void onClick(ClickEvent event) {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					LD.contactingServer();
 					SplitService.Instance.get().split(document.getId(),
 							Integer.parseInt((String) values.get("splittingpolicy")),

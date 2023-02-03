@@ -16,7 +16,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.BooleanItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -60,12 +59,9 @@ public class DocumentCheckin extends Window {
 		filenameItem.setTitle(I18N.message("checkfilename"));
 		filenameItem.setDefaultValue(true);
 		filenameItem.setWrapTitle(false);
-		filenameItem.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (!filenameItem.getValueAsBoolean())
-					sendButton.setDisabled(false);
-			}
+		filenameItem.addChangedHandler((ChangedEvent event) -> {
+			if (Boolean.FALSE.equals(filenameItem.getValueAsBoolean()))
+				sendButton.setDisabled(false);
 		});
 
 		TextItem commentItem = ItemFactory.newTextItem("comment", null);
@@ -76,13 +72,7 @@ public class DocumentCheckin extends Window {
 		form.setItems(versionItem, filenameItem, commentItem);
 
 		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSend();
-			}
-		});
+		sendButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSend());
 		sendButton.setDisabled(true);
 
 		VLayout layout = new VLayout();
@@ -112,7 +102,7 @@ public class DocumentCheckin extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}
@@ -120,8 +110,7 @@ public class DocumentCheckin extends Window {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		if ("true".equals(vm.getValueAsString("checkfilename"))
-				&& !uploader.getUploadedFile().equals(fileName)) {
+		if ("true".equals(vm.getValueAsString("checkfilename")) && !uploader.getUploadedFile().equals(fileName)) {
 			sendButton.setDisabled(true);
 			SC.warn(I18N.message("nosamefilename"));
 			return;

@@ -329,7 +329,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 
 			if (ids.length > 0)
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {

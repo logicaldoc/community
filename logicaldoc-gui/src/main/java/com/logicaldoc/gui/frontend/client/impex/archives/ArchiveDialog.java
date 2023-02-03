@@ -74,7 +74,7 @@ public class ArchiveDialog extends Window {
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					GUIArchive archive = new GUIArchive();
 					archive.setType(ArchiveDialog.this.archivesPanel.getArchivesType());
 					archive.setName(vm.getValueAsString("name"));

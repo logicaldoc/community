@@ -99,7 +99,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 	}
 
 	private void onMaxChange() {
-		if (maxItem.validate()) {
+		if (Boolean.TRUE.equals(maxItem.validate())) {
 			currentPagination.setPage(1);
 			currentPagination.setPageSize(Integer.parseInt(maxItem.getValue().toString()));
 			update();
@@ -107,7 +107,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 	}
 
 	private void onPageChange() {
-		if (pageItem.validate()) {
+		if (Boolean.TRUE.equals(pageItem.validate())) {
 			currentPagination.setPage(Integer.parseInt(pageItem.getValue().toString()));
 			update();
 		}

@@ -185,7 +185,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		deleteZones.setTitle(I18N.message("deletezones"));
 		deleteZones.addClickHandler((ClickEvent event) -> {
 			LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					selectedOcrTemplate.setZones(new GUIZone[0]);
 					setSelectedOcrTemplate(selectedOcrTemplate);
 				}
@@ -252,7 +252,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		delete.addClickHandler((ClickEvent event) -> {
 			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L)
 				LD.ask(I18N.message("question"), I18N.message("confirmdeleteocrtemplate"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						ZonalOCRService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {

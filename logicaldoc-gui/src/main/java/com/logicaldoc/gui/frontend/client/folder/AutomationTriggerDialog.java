@@ -142,7 +142,7 @@ public class AutomationTriggerDialog extends Window {
 
 	private void onSave() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			Long routineId = null;
 			if (routine.getValue() != null && !routine.getValueAsString().isEmpty())
 				routineId = Long.parseLong(routine.getValueAsString());

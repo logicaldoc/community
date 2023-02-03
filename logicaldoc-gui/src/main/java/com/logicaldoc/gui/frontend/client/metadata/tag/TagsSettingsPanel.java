@@ -96,7 +96,7 @@ public class TagsSettingsPanel extends VLayout {
 			public void onClick(ClickEvent event) {
 				final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					List<GUIParameter> params = new ArrayList<GUIParameter>();
 
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.mode",

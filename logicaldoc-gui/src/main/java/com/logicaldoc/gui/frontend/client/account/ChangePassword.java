@@ -82,7 +82,7 @@ public class ChangePassword extends Window {
 		apply.setAutoFit(true);
 		apply.addClickHandler((ClickEvent event) -> {
 			vm.validate();
-			if (!vm.hasErrors()) {
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
 				if (vm.getValueAsString(PASSWORD).equals(vm.getValueAsString(NEWPASSWORD))) {
 					Map<String, String> errors = new HashMap<String, String>();
 					errors.put(NEWPASSWORD, I18N.message("useanotherpassword"));

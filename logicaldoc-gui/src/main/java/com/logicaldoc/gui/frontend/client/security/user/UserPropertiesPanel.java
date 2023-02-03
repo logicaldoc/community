@@ -86,7 +86,7 @@ public class UserPropertiesPanel extends HLayout {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 
 		form1 = new DynamicForm();
@@ -340,7 +340,7 @@ public class UserPropertiesPanel extends HLayout {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			user.setUsername((String) values.get("username"));
 			user.setName((String) values.get("name"));
 			user.setFirstName((String) values.get("firstname"));

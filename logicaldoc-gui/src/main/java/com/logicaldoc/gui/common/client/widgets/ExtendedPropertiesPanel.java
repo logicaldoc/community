@@ -131,7 +131,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (templateForm != null)
 			templateForm.destroy();
 
-		if (contains(templateForm))
+		if (Boolean.TRUE.equals(contains(templateForm)))
 			removeChild(templateForm);
 		templateForm = new DynamicForm();
 		templateForm.setValuesManager(vm);

@@ -396,7 +396,7 @@ public class FormDetailsPanel extends VLayout {
 	}
 
 	public void onSave() {
-		if (vm.validate()) {
+		if (Boolean.TRUE.equals(vm.validate()))  {
 			collectValuesAndSave();
 		} else {
 			if (!form1.validate() || !form2.validate())

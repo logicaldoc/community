@@ -113,7 +113,7 @@ public class MessageDialog extends Window {
 		send.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				form.validate();
-				if (!form.hasErrors()) {
+				if (Boolean.FALSE.equals(form.hasErrors())) {
 					GUIMessage message = new GUIMessage();
 					message.setSubject(form.getValueAsString("subject"));
 					message.setMessage(form.getValueAsString("message"));

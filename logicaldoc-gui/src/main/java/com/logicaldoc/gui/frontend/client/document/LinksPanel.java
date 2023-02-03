@@ -33,7 +33,6 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -86,8 +85,8 @@ public class LinksPanel extends DocumentDetailTab {
 					public void onCellDoubleClick(CellDoubleClickEvent event) {
 						final ListGridRecord rec = event.getRecord();
 
-						FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false,
-								false, new AsyncCallback<GUIFolder>() {
+						FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
+								new AsyncCallback<GUIFolder>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
@@ -125,7 +124,7 @@ public class LinksPanel extends DocumentDetailTab {
 			delete.addClickHandler((MenuItemClickEvent evnt) -> {
 
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (value) {
+					if (Boolean.TRUE.equals(value)) {
 						DocumentService.Instance.get().deleteLinks(ids, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -147,29 +146,21 @@ public class LinksPanel extends DocumentDetailTab {
 
 			final MenuItem preview = new MenuItem();
 			preview.setTitle(I18N.message("preview"));
-			preview.addClickHandler((MenuItemClickEvent evnt) -> {
-				onPreview(treeGrid.getSelectedRecord());
-			});
+			preview.addClickHandler((MenuItemClickEvent evnt) -> onPreview(treeGrid.getSelectedRecord()));
 			preview.setEnabled(
 					com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 			final MenuItem download = new MenuItem();
 			download.setTitle(I18N.message("download"));
-			download.addClickHandler((MenuItemClickEvent evnt) -> {
-				onDownload(treeGrid.getSelectedRecord());
-			});
+			download.addClickHandler((MenuItemClickEvent evnt) -> onDownload(treeGrid.getSelectedRecord()));
 
 			final MenuItem downloadPackage = new MenuItem();
 			downloadPackage.setTitle(I18N.message("downloadpackage"));
-			downloadPackage.addClickHandler((MenuItemClickEvent evnt) -> {
-				onDownloadPackage();
-			});
+			downloadPackage.addClickHandler((MenuItemClickEvent evnt) -> onDownloadPackage());
 
 			final MenuItem openInFolder = new MenuItem();
 			openInFolder.setTitle(I18N.message("openinfolder"));
-			openInFolder.addClickHandler((MenuItemClickEvent evnt) -> {
-				onOpenInFolder(treeGrid.getSelectedRecord());
-			});
+			openInFolder.addClickHandler((MenuItemClickEvent evnt) -> onOpenInFolder(treeGrid.getSelectedRecord()));
 
 			// Compute the folder ID of the referenced document
 			long folderId = selection[0].getAttributeAsLong("folderId1");
@@ -226,25 +217,22 @@ public class LinksPanel extends DocumentDetailTab {
 			treeGrid.setCanEdit(true);
 			treeGrid.setEditEvent(ListGridEditEvent.CLICK);
 			treeGrid.setEditByCell(true);
-			treeGrid.addEditCompleteHandler(new EditCompleteHandler() {
-				@Override
-				public void onEditComplete(EditCompleteEvent event) {
-					long id = Long.parseLong(event.getOldValues().getAttribute("linkId"));
-					final String type = (String) event.getNewValues().get("type");
-					DocumentService.Instance.get().updateLink(id, type, new AsyncCallback<Void>() {
+			treeGrid.addEditCompleteHandler((EditCompleteEvent event) -> {
+				long id = Long.parseLong(event.getOldValues().getAttribute("linkId"));
+				final String typ = (String) event.getNewValues().get("type");
+				DocumentService.Instance.get().updateLink(id, typ, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							treeGrid.getSelectedRecord().setAttribute("type", type);
-							treeGrid.updateData(treeGrid.getSelectedRecord());
-						}
-					});
-				}
+					@Override
+					public void onSuccess(Void result) {
+						treeGrid.getSelectedRecord().setAttribute("type", typ);
+						treeGrid.updateData(treeGrid.getSelectedRecord());
+					}
+				});
 			});
 		}
 	}
@@ -282,7 +270,7 @@ public class LinksPanel extends DocumentDetailTab {
 			treeGrid.getRecords();
 
 			for (ListGridRecord rec : treeGrid.getRecords()) {
-				if (rec.getAttributeAsBoolean("password")) {
+				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("password"))) {
 					SC.warn(I18N.message("somedocsprotected"));
 					break;
 				}

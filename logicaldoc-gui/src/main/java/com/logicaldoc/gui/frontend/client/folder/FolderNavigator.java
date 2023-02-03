@@ -333,8 +333,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		final String targetName = selectedNode.getAttributeAsString("name");
 
 		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
-				(Boolean moveConfirmed) -> {
-					if (moveConfirmed) {
+				(Boolean yes) -> {
+					if (Boolean.TRUE.equals(yes)) {
 						FolderService.Instance.get().paste(ids, folderId, "cut", new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -365,8 +365,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		final String targetName = getDropFolder().getAttributeAsString("name");
 
 		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
-				(Boolean moveConfirmed) -> {
-					if (moveConfirmed) {
+				(Boolean yes) -> {
+					if (Boolean.TRUE.equals(yes)) {
 						for (long id : source) {
 							TreeNode node = getTree().find("folderId", (Object) id);
 							getTree().remove(node);
@@ -610,14 +610,13 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
 			sendToExpArchive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 				public void onClick(MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"),
-							(Boolean archiveConfirmed) -> {
-								if (archiveConfirmed) {
-									SendToArchiveDialog archiveDialog = new SendToArchiveDialog(
-											new long[] { folder.getId() }, false);
-									archiveDialog.show();
-								}
-							});
+					LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), (Boolean yes) -> {
+						if (Boolean.TRUE.equals(yes)) {
+							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(new long[] { folder.getId() },
+									false);
+							archiveDialog.show();
+						}
+					});
 				}
 			});
 			contextMenu.addItem(sendToExpArchive);
@@ -917,7 +916,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			return;
 		}
 
-		if (!getTree().isOpen(node)) {
+		if (Boolean.FALSE.equals(getTree().isOpen(node))) {
 			getTree().openFolder(node);
 			currentIndexInPathToOpen++;
 			getTree().reloadChildren(node);

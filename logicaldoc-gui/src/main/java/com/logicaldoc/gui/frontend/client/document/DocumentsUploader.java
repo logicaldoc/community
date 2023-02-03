@@ -141,7 +141,7 @@ public class DocumentsUploader extends Window {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
-				if ((Boolean) event.getValue())
+				if (Boolean.TRUE.equals((Boolean) event.getValue()))
 					charset.show();
 				else
 					charset.hide();
@@ -171,7 +171,7 @@ public class DocumentsUploader extends Window {
 	public void onSend() {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
-		
+
 		if (uploader.getUploadedFiles().isEmpty()) {
 			SC.warn(I18N.message("filerequired"));
 			return;

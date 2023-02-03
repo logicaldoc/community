@@ -60,7 +60,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (formsContainer.contains(form))
+		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);
 
 		form = new DynamicForm();
@@ -130,7 +130,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			account.setMailAddress((String) values.get("mailaddress"));
 			account.setHost((String) values.get("server"));
 			account.setUsername((String) values.get("username"));

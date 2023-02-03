@@ -37,7 +37,7 @@ public class EmailAccountAutomationPanel extends EmailAccountDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (container.contains(form))
+		if (Boolean.TRUE.equals(container.contains(form))) 
 			container.removeChild(form);
 
 		form = new DynamicForm();
@@ -69,7 +69,7 @@ public class EmailAccountAutomationPanel extends EmailAccountDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			account.setAutomation((String) values.get("automationBefore"));
 			account.setAutomationAfter((String) values.get("automationAfter"));
 		}

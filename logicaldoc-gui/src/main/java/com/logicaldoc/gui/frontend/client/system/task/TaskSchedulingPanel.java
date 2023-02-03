@@ -133,7 +133,7 @@ public class TaskSchedulingPanel extends VLayout {
 		restoreDefaults.setWidth(150);
 		restoreDefaults.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					TaskSchedulingPanel.this.maxDuration.setValue("30");
 					TaskSchedulingPanel.this.initialDelay.setValue(1800);
 					TaskSchedulingPanel.this.repeatInterval.setValue(1800);

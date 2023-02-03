@@ -73,13 +73,13 @@ public class EventsCalendar extends Calendar {
 								long creatorId = Long.parseLong(event.getEvent().getAttribute("creatorId"));
 								GUIUser currentUser = Session.get().getUser();
 
-								if (ev.getParentId() != null
-										&& (currentUser.getId() == creatorId || currentUser.isMemberOf(Constants.GROUP_ADMIN))) {
+								if (ev.getParentId() != null && (currentUser.getId() == creatorId
+										|| currentUser.isMemberOf(Constants.GROUP_ADMIN))) {
 									LD.ask(I18N.message("editevent"), I18N.message("douwantmodifyalloccurrences"),
 											new BooleanCallback() {
 												@Override
 												public void execute(final Boolean editAllOccurrences) {
-													if (!editAllOccurrences) {
+													if (Boolean.FALSE.equals(editAllOccurrences)) {
 														CalendarEventDialog eventDialog = new CalendarEventDialog(ev,
 																onChangeCallback);
 														eventDialog.show();

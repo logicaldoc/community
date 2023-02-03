@@ -15,11 +15,11 @@ public class UserCellFormatter implements CellFormatter {
 		if (value == null)
 			return null;
 		if (rec.getAttributeAsBoolean("guest") != null && rec.getAttributeAsBoolean("guest"))
-			if (rec.getAttributeAsBoolean("eenabled"))
+			if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("eenabled")))
 				return "<span style='color: #888888;'>" + value + "</span>";
 			else
 				return "<span style='color: #cc8888;'>" + value + "</span>";
-		else if (rec.getAttributeAsBoolean("eenabled"))
+		else if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("eenabled")))
 			return value.toString();
 		else
 			return "<span style='color: red;'>" + value + "</span>";

@@ -122,7 +122,7 @@ public class FolderCopyDialog extends Dialog {
 				I18N.message("copyask",
 						new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
 				(Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						FolderNavigator.get().copyTo(tagetFolderId,
 								"true".equals(form.getValueAsString("foldersOnly")),
 								!securityOptionEnabled ? "inheritparentsec"

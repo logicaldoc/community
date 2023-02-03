@@ -61,7 +61,7 @@ public class UserInterfacePanel extends HLayout {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 
 		form1 = new DynamicForm();

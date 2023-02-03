@@ -18,7 +18,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -168,23 +167,20 @@ public class TrashPanel extends VLayout {
 		emptyTrash.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean response) {
-						if (response) {
-							DocumentService.Instance.get().emptyTrash(new AsyncCallback<Void>() {
+				LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), (Boolean response) -> {
+					if (Boolean.TRUE.equals(response)) {
+						DocumentService.Instance.get().emptyTrash(new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void arg) {
-									refresh();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void arg) {
+								refresh();
+							}
+						});
 					}
 				});
 			}
@@ -195,9 +191,7 @@ public class TrashPanel extends VLayout {
 	private MenuItem prepareRemoveItem(final ListGridRecord[] records) {
 		MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("remove"));
-		remove.addClickHandler((MenuItemClickEvent clickEvent) -> {
-				deleteSelectedElements(records);
-		});
+		remove.addClickHandler((MenuItemClickEvent clickEvent) -> deleteSelectedElements(records));
 		return remove;
 	}
 
@@ -212,7 +206,7 @@ public class TrashPanel extends VLayout {
 		}
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean response) -> {
-			if (response) {
+			if (Boolean.TRUE.equals(response)) {
 				if (!docIds.isEmpty())
 					DocumentService.Instance.get().deleteFromTrash(docIds.toArray(new Long[0]),
 							new AsyncCallback<Void>() {

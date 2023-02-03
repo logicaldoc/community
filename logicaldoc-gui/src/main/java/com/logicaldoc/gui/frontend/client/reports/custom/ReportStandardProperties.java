@@ -66,10 +66,10 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		if (tile != null)
 			tile.destroy();
 
-		if (columns.contains(form))
+		if (Boolean.TRUE.equals(columns.contains(form)))
 			columns.removeChild(form);
 
-		if (columns.contains(tile))
+		if (Boolean.TRUE.equals(columns.contains(tile)))
 			columns.removeChild(tile);
 
 		form = new DynamicForm();
@@ -128,7 +128,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			report.setName((String) values.get("name"));
 			report.setDescription((String) values.get("description"));
 			report.setOutputFormat((String) values.get("outputFormat"));
