@@ -314,7 +314,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private void prepareRightForm() {
-		if (columns.contains(form2)) {
+		if (Boolean.TRUE.equals(columns.contains(form2))) {
 			columns.removeMember(form2);
 			form2.destroy();
 		}
@@ -382,7 +382,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		newTagItem.setEndRow(true);
 		newTagItem.setDisabled(!folder.isWrite());
 		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
-			if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
+			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null && event.getKeyName() != null
 					&& "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();

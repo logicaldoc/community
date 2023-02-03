@@ -106,7 +106,7 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 	}
 
 	public boolean validate() {
-		if (vm.validate() && setupPanel.validate()) {
+		if (Boolean.TRUE.equals(vm.validate()) && setupPanel.validate()) {
 			user.setSecondFactor(vm.getValueAsString("factor"));
 			user.setKey(setupPanel.getKey());
 		}

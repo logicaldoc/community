@@ -790,8 +790,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						? (I18N.message(selectedIds.length == 1 ? "confirmdeletefolder" : "confirmdeletefolders"))
 						: (I18N.message(selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
 								: "confirmdeletefoldersarchdocs")),
-						(Boolean deleteConfirmed) -> {
-							if (deleteConfirmed) {
+						(Boolean yes) -> {
+							if (Boolean.TRUE.equals(yes)) {
 								LD.contactingServer();
 								doDelete(selectedIds);
 							}

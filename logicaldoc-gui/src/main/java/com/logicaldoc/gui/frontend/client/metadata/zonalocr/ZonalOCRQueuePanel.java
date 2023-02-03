@@ -41,7 +41,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
-public class OcrQueuePanel extends VLayout {
+public class ZonalOCRQueuePanel extends VLayout {
 
 	private RefreshableListGrid list;
 
@@ -49,7 +49,7 @@ public class OcrQueuePanel extends VLayout {
 
 	private InfoPanel infoPanel = null;
 
-	public OcrQueuePanel(int maxRecords) {
+	public ZonalOCRQueuePanel(int maxRecords) {
 		this.maxRecords = maxRecords;
 		setWidth100();
 		setHeight100();
@@ -80,7 +80,7 @@ public class OcrQueuePanel extends VLayout {
 		display.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (max.validate()) {
+				if (Boolean.TRUE.equals(max.validate())) {
 					maxRecords = (Integer) max.getValue();
 					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, false, true, null));
 				}

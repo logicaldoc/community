@@ -96,7 +96,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private void prepareRightForm() {
-		if (rows.contains(form2)) {
+		if (Boolean.TRUE.equals(rows.contains(form2))) {
 			rows.removeMember(form2);
 			form2.destroy();
 		}
@@ -127,7 +127,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		newTagItem.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
-				if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
+				if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null && event.getKeyName() != null
 						&& "enter".equals(event.getKeyName().toLowerCase())) {
 					String input = newTagItem.getValueAsString().trim();
 					newTagItem.clearValue();

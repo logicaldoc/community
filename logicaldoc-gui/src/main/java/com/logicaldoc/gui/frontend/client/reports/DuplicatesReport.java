@@ -71,22 +71,13 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		max.addChangedHandler((ChangedEvent event) -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate())
-					refresh();
-			}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refresh();
 		});
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
@@ -101,7 +92,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		final SelectItem groupBy = new SelectItem("groupBy", I18N.message("groupby"));
 		groupBy.setWrapTitle(false);
 		groupBy.setWidth(100);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("", " ");
 		map.put("filename", I18N.message("filename"));
 		map.put("digest", I18N.message("digest"));

@@ -36,12 +36,10 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -84,7 +82,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void switchListView(GUIPatch[] patches) {
-		if (contains(downloadPanel))
+		if (Boolean.TRUE.equals(contains(downloadPanel)))
 			removeMember(downloadPanel);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"), 100);
@@ -102,17 +100,13 @@ public class PatchPanel extends VLayout {
 		restart.setType(ListGridFieldType.BOOLEAN);
 
 		ListGridField rating = new ListGridField("rating", I18N.message("severityrating"), 110);
-		rating.setCellFormatter(new CellFormatter() {
+		rating.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			int ratingVal = 0;
+			if (value != null)
+				ratingVal = Integer.parseInt(value.toString());
 
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				int rating = 0;
-				if (value != null)
-					rating = Integer.parseInt(value.toString());
-
-				return "<span style='color: " + GUIPatch.getColor(rating) + "'>"
-						+ I18N.message("severityrating." + rating) + "</span>";
-			}
+			return "<span style='color: " + GUIPatch.getColor(ratingVal) + "'>"
+					+ I18N.message("severityrating." + rating) + "</span>";
 		});
 
 		ListGridField date = new DateListGridField("date", I18N.message("date"), DateCellFormatter.FORMAT_SHORT);
@@ -124,7 +118,7 @@ public class PatchPanel extends VLayout {
 		final ListGrid list = new ListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (!rec.getAttributeAsBoolean("installed"))
+				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("installed")))
 					return super.getCellCSSText(rec, rowNum, colNum);
 				else
 					return "color: #888888; font-style: italic;";
@@ -141,15 +135,12 @@ public class PatchPanel extends VLayout {
 		list.setDetailField("description");
 		list.setFields(id, name, rating, date, size, installed, restart, file);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu(list);
-				event.cancel();
-			}
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu(list);
+			event.cancel();
 		});
 
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 		if (patches != null && patches.length > 0) {
 			for (GUIPatch patch : patches) {
 				ListGridRecord rec = new ListGridRecord();
@@ -175,7 +166,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void switchDownloadView(GUIPatch patch) {
-		if (contains(listPanel))
+		if (Boolean.TRUE.equals(contains(listPanel)))
 			removeMember(listPanel);
 
 		DynamicForm form = new DynamicForm();

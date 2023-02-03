@@ -134,7 +134,7 @@ public class TenantDetailsPanel extends VLayout {
 		 */
 		if (quotaPanel != null) {
 			quotaPanel.destroy();
-			if (quotaTabPanel.contains(quotaPanel))
+			if (Boolean.TRUE.equals(quotaTabPanel.contains(quotaPanel)))
 				quotaTabPanel.removeMember(quotaPanel);
 		}
 
@@ -143,7 +143,7 @@ public class TenantDetailsPanel extends VLayout {
 		 */
 		if (brandingPanel != null) {
 			brandingPanel.destroy();
-			if (brandingTabPanel.contains(brandingPanel))
+			if (Boolean.TRUE.equals(brandingTabPanel.contains(brandingPanel)))
 				brandingTabPanel.removeMember(brandingPanel);
 		}
 
@@ -152,16 +152,11 @@ public class TenantDetailsPanel extends VLayout {
 		 */
 		if (keystorePanel != null) {
 			keystorePanel.destroy();
-			if (keystoreTabPanel.contains(keystorePanel))
+			if (Boolean.TRUE.equals(keystoreTabPanel.contains(keystorePanel)))
 				keystoreTabPanel.removeMember(keystorePanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
 
 		propertiesPanel = new TenantPropertiesPanel(this.tenant, changeHandler);
 		propertiesTabPanel.addMember(propertiesPanel);
@@ -223,7 +218,7 @@ public class TenantDetailsPanel extends VLayout {
 	public void onSave() {
 		if (validate()) {
 			final boolean newTenant = TenantDetailsPanel.this.tenant.getId() == 0L;
-			
+
 			TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
 				@Override
 				public void onFailure(Throwable caught) {

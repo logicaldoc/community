@@ -203,7 +203,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 			return;
 
 		if (document == null || document.getId() < 1 || !(detailPanel instanceof DocumentDetailsPanel)) {
-			if (details.contains(detailPanel))
+			if (Boolean.TRUE.equals(details.contains(detailPanel)))
 				details.removeMember(detailPanel);
 			detailPanel.destroy();
 			if (document == null || document.getId() < 1) {

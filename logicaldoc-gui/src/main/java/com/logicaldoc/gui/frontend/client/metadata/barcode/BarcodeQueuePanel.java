@@ -77,15 +77,12 @@ public class BarcodeQueuePanel extends VLayout {
 		toolStrip.setWidth100();
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate()) {
+		display.addClickHandler((ClickEvent event) -> {
+				if (Boolean.TRUE.equals(max.validate())) {
 					maxRecords = (Integer) max.getValue();
 					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
 				}
-			}
-		});
+			});
 
 		ToolStripButton reschedule = new ToolStripButton();
 		reschedule.setTitle(I18N.message("rescheduleallprocessing"));

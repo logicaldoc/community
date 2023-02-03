@@ -82,7 +82,7 @@ public class SaveDialog extends Window {
 
 			@Override
 			public void onSuccess(Boolean b) {
-				if (!b)
+				if (Boolean.FALSE.equals(b))
 					SC.warn(I18N.message("duplicateelement"));
 				else {
 					try {

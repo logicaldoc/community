@@ -1067,7 +1067,7 @@ public class TaskDetailsDialog extends Window {
 
 			@Override
 			public void execute(String value) {
-				if (noteInput.validate())
+				if (Boolean.TRUE.equals(noteInput.validate()))
 					WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(), value,
 							new AsyncCallback<Long>() {
 								@Override

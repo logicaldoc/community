@@ -161,9 +161,8 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
-		form.validate();
-		if (form.hasErrors())
+		Map<String, Object> values = form.getValues();
+		if (!form.validate())
 			return false;
 
 		collectSizeMax(values);
@@ -176,9 +175,9 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		importFolder.setDelImport((Boolean) values.get("delImport"));
 		importFolder.setInheritRights((Boolean) values.get("inheritRights"));
 		importFolder.setImportEmpty((Boolean) values.get("importEmpty"));
-		
+
 		collectTags(values);
-		
+
 		importFolder.setStartDate((Date) values.get("startdate"));
 
 		return !form.hasErrors();

@@ -488,7 +488,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (setPropertiesForm != null)
 			setPropertiesForm.destroy();
 
-		if (contains(setPropertiesForm))
+		if (Boolean.TRUE.equals(contains(setPropertiesForm)))
 			removeChild(setPropertiesForm);
 		addMetadata();
 		addMember(setPropertiesForm);
@@ -513,7 +513,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		if (attributeSettingsForm1 != null)
 			attributeSettingsForm1.destroy();
-		if (contains(attributeSettingsForm1))
+		if (Boolean.TRUE.equals(contains(attributeSettingsForm1)))
 			removeChild(attributeSettingsForm1);
 		attributeSettingsForm1 = new DynamicForm();
 		attributeSettingsForm1.setTitleOrientation(TitleOrientation.LEFT);
@@ -522,7 +522,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		if (attributeSettingsForm2 != null)
 			attributeSettingsForm2.destroy();
-		if (contains(attributeSettingsForm2))
+		if (Boolean.TRUE.equals(contains(attributeSettingsForm2)))
 			removeChild(attributeSettingsForm2);
 		attributeSettingsForm2 = new DynamicForm();
 		attributeSettingsForm2.setTitleOrientation(TitleOrientation.TOP);
@@ -532,7 +532,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		if (attributeButtonsForm != null)
 			attributeButtonsForm.destroy();
-		if (contains(attributeButtonsForm))
+		if (Boolean.TRUE.equals(contains(attributeButtonsForm)))
 			removeChild(attributeButtonsForm);
 		attributeButtonsForm = new DynamicForm();
 		attributeButtonsForm.setTitleOrientation(TitleOrientation.TOP);

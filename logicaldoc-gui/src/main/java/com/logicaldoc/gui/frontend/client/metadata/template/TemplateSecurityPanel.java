@@ -236,7 +236,7 @@ public class TemplateSecurityPanel extends VLayout {
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
-			if (!rec.getAttributeAsBoolean("read"))
+			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("read")))
 				continue;
 
 			GUIRight right = new GUIRight();

@@ -29,7 +29,7 @@ public class ZonalOCRPanel extends AdminPanel {
 	public void onDraw() {
 		tab.setPane(new ZonalOCRTemplatesPanel(selectedDocumentTemplate, selectedOcrTemplate));
 		Tab processingQueueTab = new Tab(I18N.message("processingqueue"));
-		processingQueueTab.setPane(new OcrQueuePanel(100));
+		processingQueueTab.setPane(new ZonalOCRQueuePanel(100));
 		tabs.addTab(processingQueueTab);
 	}
 }

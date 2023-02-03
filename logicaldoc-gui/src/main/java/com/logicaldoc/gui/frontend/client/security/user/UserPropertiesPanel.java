@@ -299,7 +299,7 @@ public class UserPropertiesPanel extends HLayout {
 	private void addGuestChangeHandlers(final CheckboxItem guest) {
 		guest.addChangedHandler(changedHandler);
 		guest.addChangedHandler((ChangedEvent event) -> {
-			if (guest.getValueAsBoolean()) {
+			if (Boolean.TRUE.equals(guest.getValueAsBoolean())) {
 				groupsItem.clearValue();
 				Record[] records = groupsItem.getOptionDataSource().getCacheData();
 				if (records != null)

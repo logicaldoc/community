@@ -95,22 +95,17 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 
 		if (standardPanel != null) {
 			standardPanel.destroy();
-			if (standardTabPanel.contains(standardPanel))
+			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
 				standardTabPanel.removeMember(standardPanel);
 		}
 
 		if (parametersPanel != null) {
 			parametersPanel.destroy();
-			if (parametersTabPanel.contains(parametersPanel))
+			if (Boolean.TRUE.equals(parametersTabPanel.contains(parametersPanel)))
 				parametersTabPanel.removeMember(parametersPanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
 
 		standardPanel = new AutomationRoutineProperties(routine, changeHandler);
 		standardTabPanel.addMember(standardPanel);

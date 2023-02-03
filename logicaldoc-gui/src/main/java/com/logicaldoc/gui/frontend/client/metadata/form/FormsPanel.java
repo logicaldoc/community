@@ -21,16 +21,12 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -85,7 +81,7 @@ public class FormsPanel extends AdminPanel {
 
 			@Override
 			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				if (rec.getAttributeAsBoolean("webEnabled")) {
+				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("webEnabled"))) {
 					return "<a href='" + webformURL(rec.getAttributeAsString("formId")) + "' target='_blank'>"
 							+ I18N.message("preview") + "</a>";
 				} else
@@ -124,60 +120,41 @@ public class FormsPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler((ClickEvent event) -> refresh());
 
 		ToolStripButton addForm = new ToolStripButton();
 		addForm.setTitle(I18N.message("addform"));
 		toolStrip.addButton(addForm);
-		addForm.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				FormCreate dialog = new FormCreate(FormsPanel.this);
-				dialog.show();
-			}
+		addForm.addClickHandler((ClickEvent event) -> {
+			list.deselectAllRecords();
+			new FormCreate(FormsPanel.this).show();
 		});
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record rec = list.getSelectedRecord();
-				if (rec != null)
-					FormService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString("id")),
-							new AsyncCallback<GUIForm>() {
+		list.addSelectionChangedHandler((SelectionEvent event) -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				FormService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString("id")),
+						new AsyncCallback<GUIForm>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIForm form) {
-									showFormDetails(form);
-								}
-							});
-			}
+							@Override
+							public void onSuccess(GUIForm form) {
+								showFormDetails(form);
+							}
+						});
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showforms", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
+				.setMessage(I18N.message("showforms", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -194,8 +171,7 @@ public class FormsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
+		delete.addClickHandler((MenuItemClickEvent event) -> {
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
@@ -213,7 +189,6 @@ public class FormsPanel extends AdminPanel {
 						});
 					}
 				});
-			}
 		});
 
 		MenuItem edit = new MenuItem();

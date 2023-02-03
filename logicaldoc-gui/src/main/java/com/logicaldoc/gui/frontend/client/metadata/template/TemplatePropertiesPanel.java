@@ -591,7 +591,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		if (templateForm != null)
 			templateForm.destroy();
 
-		if (contains(container))
+		if (Boolean.TRUE.equals(contains(container)))
 			removeMember(container);
 
 		container = new HLayout();

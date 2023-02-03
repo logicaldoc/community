@@ -342,7 +342,7 @@ public class UsersPanel extends AdminPanel {
 
 		List<MenuItem> items = new ArrayList<MenuItem>();
 		if (!Session.get().isAdmin()) {
-			if (list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+			if (Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 				items.add(disableUser);
 			else
 				items.add(enableUser);

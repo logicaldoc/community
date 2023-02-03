@@ -40,7 +40,6 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.events.DropCompleteHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -52,7 +51,6 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -61,7 +59,6 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -788,13 +785,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refreshIndexingQueue((Integer) max.getValue());
-			}
-		});
+		max.addChangedHandler((ChangedEvent event) -> refreshIndexingQueue((Integer) max.getValue()));
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
@@ -802,12 +793,9 @@ public class SearchIndexingPanel extends AdminPanel {
 		display.setTitle(I18N.message("display"));
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate())
-					refreshIndexingQueue((Integer) max.getValue());
-			}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refreshIndexingQueue((Integer) max.getValue());
 		});
 
 		// Prepare a panel containing a title and the documents number
@@ -869,20 +857,13 @@ public class SearchIndexingPanel extends AdminPanel {
 		};
 		docsList.setEmptyMessage(I18N.message("notitemstoshow"));
 
-		docsList.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showIndexQueueMenu();
-				event.cancel();
-			}
+		docsList.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showIndexQueueMenu();
+			event.cancel();
 		});
 
-		docsList.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showndocuments", Integer.toString(docsList.getTotalRows())));
-			}
-		});
+		docsList.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
+				.setMessage(I18N.message("showndocuments", Integer.toString(docsList.getTotalRows()))));
 
 		docsList.setShowRecordComponents(true);
 		docsList.setShowRecordComponentsByCell(true);
@@ -908,41 +889,37 @@ public class SearchIndexingPanel extends AdminPanel {
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord rec = docsList.getSelectedRecord();
-				if (rec == null)
-					return;
+		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord rec = docsList.getSelectedRecord();
+			if (rec == null)
+				return;
 
-				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
-			}
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
 		});
 
 		MenuItem markUnindexable = new MenuItem();
 		markUnindexable.setTitle(I18N.message("markunindexable"));
-		markUnindexable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null)
-					return;
-				final long[] ids = new long[selection.length];
-				for (int j = 0; j < selection.length; j++) {
-					ids[j] = Long.parseLong(selection[j].getAttribute("id"));
+		markUnindexable.addClickHandler((MenuItemClickEvent event) -> {
+			if (selection == null)
+				return;
+			final long[] ids = new long[selection.length];
+			for (int j = 0; j < selection.length; j++) {
+				ids[j] = Long.parseLong(selection[j].getAttribute("id"));
+			}
+
+			DocumentService.Instance.get().markUnindexable(ids, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
 				}
 
-				DocumentService.Instance.get().markUnindexable(ids, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+				@Override
+				public void onSuccess(Void result) {
+					for (ListGridRecord rec : selection) {
+						docsList.removeData(rec);
 					}
-
-					@Override
-					public void onSuccess(Void result) {
-						for (ListGridRecord rec : selection) {
-							docsList.removeData(rec);
-						}
-					}
-				});
-			}
+				}
+			});
 		});
 
 		contextMenu.setItems(markUnindexable, openInFolder);
@@ -955,46 +932,42 @@ public class SearchIndexingPanel extends AdminPanel {
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SearchEngineService.Instance.get().setLanguageStatus(rec.getAttributeAsString("code"), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler((MenuItemClickEvent event) -> {
+			SearchEngineService.Instance.get().setLanguageStatus(rec.getAttributeAsString("code"), true,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "0");
-								langsList.refreshRow(langsList.getRecordIndex(rec));
-								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute("eenabled", "0");
+							langsList.refreshRow(langsList.getRecordIndex(rec));
+							GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
+						}
+					});
 		});
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SearchEngineService.Instance.get().setLanguageStatus(rec.getAttributeAsString("code"), false,
-						new AsyncCallback<Void>() {
+		disable.addClickHandler((MenuItemClickEvent event) -> {
+			SearchEngineService.Instance.get().setLanguageStatus(rec.getAttributeAsString("code"), false,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "2");
-								langsList.refreshRow(langsList.getRecordIndex(rec));
-								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute("eenabled", "2");
+							langsList.refreshRow(langsList.getRecordIndex(rec));
+							GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
+						}
+					});
 		});
 
 		if ("0".equals(rec.getAttributeAsString("eenabled")))
@@ -1010,44 +983,40 @@ public class SearchIndexingPanel extends AdminPanel {
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SearchEngineService.Instance.get().setTokenFilterStatus(rec.getAttributeAsString("name"), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler((MenuItemClickEvent event) -> {
+			SearchEngineService.Instance.get().setTokenFilterStatus(rec.getAttributeAsString("name"), true,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "0");
-								grid.refreshRow(grid.getRecordIndex(rec));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute("eenabled", "0");
+							grid.refreshRow(grid.getRecordIndex(rec));
+						}
+					});
 		});
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SearchEngineService.Instance.get().setTokenFilterStatus(rec.getAttributeAsString("name"), false,
-						new AsyncCallback<Void>() {
+		disable.addClickHandler((MenuItemClickEvent event) -> {
+			SearchEngineService.Instance.get().setTokenFilterStatus(rec.getAttributeAsString("name"), false,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "2");
-								grid.refreshRow(grid.getRecordIndex(rec));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute("eenabled", "2");
+							grid.refreshRow(grid.getRecordIndex(rec));
+						}
+					});
 		});
 
 		if ("0".equals(rec.getAttributeAsString("eenabled")))

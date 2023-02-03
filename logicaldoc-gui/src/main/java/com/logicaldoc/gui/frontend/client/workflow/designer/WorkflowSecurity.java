@@ -25,7 +25,6 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -104,7 +103,7 @@ public class WorkflowSecurity extends Window {
 		dataSource = new WorkflowRightsDS(Long.parseLong(workflow.getId()));
 		list.setDataSource(dataSource);
 
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 		fields.add(entityId);
 		fields.add(entity);
 		fields.add(read);
@@ -114,15 +113,12 @@ public class WorkflowSecurity extends Window {
 
 		container.addMember(list);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				if (event.getColNum() == 0) {
-					Menu contextMenu = setupContextMenu();
-					contextMenu.showContextMenu();
-				}
-				event.cancel();
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			if (event.getColNum() == 0) {
+				Menu contextMenu = setupContextMenu();
+				contextMenu.showContextMenu();
 			}
+			event.cancel();
 		});
 
 		addButtons();
@@ -137,9 +133,7 @@ public class WorkflowSecurity extends Window {
 
 		Button save = new Button(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler((ClickEvent event) -> {
-			onSave();
-		});
+		save.addClickHandler((ClickEvent event) -> onSave());
 		buttons.addMember(save);
 
 		// Prepare the combo and button for adding a new Group
@@ -151,16 +145,12 @@ public class WorkflowSecurity extends Window {
 		Button exportButton = new Button(I18N.message("export"));
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
-		exportButton.addClickHandler((ClickEvent event) -> {
-			GridUtil.exportCSV(list, true);
-		});
+		exportButton.addClickHandler((ClickEvent event) -> GridUtil.exportCSV(list, true));
 
 		Button printButton = new Button(I18N.message("print"));
 		printButton.setAutoFit(true);
 		buttons.addMember(printButton);
-		printButton.addClickHandler((ClickEvent event) -> {
-			GridUtil.print(list);
-		});
+		printButton.addClickHandler((ClickEvent event) -> GridUtil.print(list));
 	}
 
 	private void addUserSelector(HLayout buttons) {
@@ -239,7 +229,7 @@ public class WorkflowSecurity extends Window {
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
-			if (!rec.getAttributeAsBoolean("read"))
+			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("read")))
 				continue;
 
 			GUIRight right = new GUIRight();

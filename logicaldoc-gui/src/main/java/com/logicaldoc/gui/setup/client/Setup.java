@@ -385,11 +385,9 @@ public class Setup implements EntryPoint {
 
 	private void onSubmit(final GUIInfo info) {
 		try {
-			Tab tab = tabs.getSelectedTab();
 			int tabIndex = tabs.getSelectedTabNumber();
 
-			DynamicForm form = (DynamicForm) tab.getPane();
-			if (!vm.validate() || form.hasErrors())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			if (step == tabs.getTabs().length - 1) {

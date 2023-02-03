@@ -9,7 +9,6 @@ import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -77,22 +76,15 @@ public class ImportDetailsPanel extends VLayout {
 	}
 
 	private void refresh() {
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
-
 		/*
 		 * Prepare the import settings tab
 		 */
 		if (settingsPanel != null) {
 			settingsPanel.destroy();
-			if (settingsTabPanel.contains(settingsPanel))
+			if (Boolean.TRUE.equals(settingsTabPanel.contains(settingsPanel)))
 				settingsTabPanel.removeMember(settingsPanel);
 		}
-		settingsPanel = new ImportSettingsPanel(archive, changeHandler);
+		settingsPanel = new ImportSettingsPanel(archive, (ChangedEvent event) -> onModified());
 		settingsTabPanel.addMember(settingsPanel);
 	}
 

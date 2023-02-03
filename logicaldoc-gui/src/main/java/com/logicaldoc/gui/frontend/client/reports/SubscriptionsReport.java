@@ -23,7 +23,6 @@ import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -85,12 +84,9 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate())
-					refresh();
-			}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refresh();
 		});
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
@@ -99,12 +95,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
-		userSelector.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		userSelector.addChangedHandler((ChangedEvent event) -> refresh());
 		toolStrip.addFormItem(userSelector);
 
 		folderSelector = new FolderSelector("folder", true);
@@ -114,12 +105,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		toolStrip.addFormItem(folderSelector);
 
 		typeSelector = ItemFactory.newSubscriptionTypeSelector();
-		typeSelector.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		typeSelector.addChangedHandler((ChangedEvent event) -> refresh());
 		toolStrip.addFormItem(typeSelector);
 	}
 
@@ -201,25 +187,25 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
-				ListGridRecord rec = list.getSelectedRecord();
-				String type = rec.getAttribute("type");
-				String id = rec.getAttribute("objectid");
-				if ("folder".equals(type))
-					DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
-				else {
-					DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
+			ListGridRecord rec = list.getSelectedRecord();
+			String type = rec.getAttribute("type");
+			String id = rec.getAttribute("objectid");
+			if ("folder".equals(type))
+				DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
+			else {
+				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIDocument result) {
-							DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());
-						}
-					});
-				}
+					@Override
+					public void onSuccess(GUIDocument result) {
+						DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());
+					}
+				});
+			}
 		});
 
 		contextMenu.setItems(openInFolder, edit, delete);

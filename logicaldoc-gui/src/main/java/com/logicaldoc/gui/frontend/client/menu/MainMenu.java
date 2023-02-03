@@ -400,7 +400,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 					@Override
 					public void onSuccess(Boolean connected) {
-						if (!connected)
+						if (Boolean.FALSE.equals(connected))
 							DropboxService.Instance.get().startAuthorization(new AsyncCallback<String>() {
 
 								@Override
@@ -437,7 +437,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 					@Override
 					public void onSuccess(Boolean connected) {
-						if (!connected)
+						if (Boolean.FALSE.equals(connected))
 							DropboxService.Instance.get().startAuthorization(new AsyncCallback<String>() {
 
 								@Override
@@ -501,7 +501,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					@Override
 					public void onSuccess(Boolean authorized) {
 						LD.clearPrompt();
-						if (authorized) {
+						if (Boolean.TRUE.equals(authorized)) {
 							ShareFileDialog dialog = new ShareFileDialog(false);
 							dialog.show();
 						} else {
@@ -563,7 +563,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					@Override
 					public void onSuccess(Boolean authorized) {
 						LD.clearPrompt();
-						if (authorized) {
+						if (Boolean.TRUE.equals(authorized)) {
 							new EnvelopeDetails().show();
 						} else {
 							SC.say(I18N.message("youneedtoauthorizedocusign",
@@ -592,7 +592,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					@Override
 					public void onSuccess(Boolean authorized) {
 						LD.clearPrompt();
-						if (authorized) {
+						if (Boolean.TRUE.equals(authorized)) {
 							new Envelopes().show();
 						} else {
 							SC.say(I18N.message("youneedtoauthorizedocusign",

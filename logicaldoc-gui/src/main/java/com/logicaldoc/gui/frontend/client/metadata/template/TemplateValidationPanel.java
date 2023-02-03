@@ -52,7 +52,7 @@ public class TemplateValidationPanel extends HLayout {
 		if (form != null)
 			form.destroy();
 
-		if (contains(container))
+		if (Boolean.TRUE.equals(contains(container)))
 			removeMember(container);
 
 		container = new HLayout();

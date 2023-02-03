@@ -125,7 +125,7 @@ public class ComparatorAssociationsDialog extends Window {
 
 	protected void onApply() {
 		for (Record rec : associationsGrid.getRecordList().toArray()) {
-			if (rec.getAttributeAsBoolean("selected")) {
+			if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("selected"))) {
 				String id = rec.getAttributeAsString("id").trim();
 				String selectedComparator = selectItem.getValueAsString();
 

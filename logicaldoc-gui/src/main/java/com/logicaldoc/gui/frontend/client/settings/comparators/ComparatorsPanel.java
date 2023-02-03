@@ -387,12 +387,12 @@ public class ComparatorsPanel extends AdminPanel {
 
 		MenuItem enable = prepareEnableMenuItem();
 
-		if (settingsGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+		if (Boolean.TRUE.equals(settingsGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 			enable.setEnabled(false);
 
 		MenuItem disable = prepareDisableMenuItem();
 
-		if (!settingsGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+		if (Boolean.FALSE.equals(settingsGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 			disable.setEnabled(false);
 
 		contextMenu.setItems(enable, disable);

@@ -285,7 +285,7 @@ public class CustomReportsPanel extends AdminPanel {
 		});
 
 		if (GUIReport.STATUS_IDLE != list.getSelectedRecord().getAttributeAsInt("status")
-				|| !list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+				|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 			execute.setEnabled(false);
 
 		MenuItem upload = new MenuItem();

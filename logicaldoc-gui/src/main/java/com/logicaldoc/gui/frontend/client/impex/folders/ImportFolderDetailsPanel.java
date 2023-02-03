@@ -110,16 +110,12 @@ public class ImportFolderDetailsPanel extends VLayout {
 		 */
 		if (standardPanel != null) {
 			standardPanel.destroy();
-			if (standardTabPanel.contains(standardPanel))
+			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
 				standardTabPanel.removeMember(standardPanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
+
 		standardPanel = new ImportFolderStandardProperties(importFolder, changeHandler);
 		standardTabPanel.addMember(standardPanel);
 
@@ -128,7 +124,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 		 */
 		if (advancedPanel != null) {
 			advancedPanel.destroy();
-			if (advancedTabPanel.contains(advancedPanel))
+			if (Boolean.TRUE.equals(advancedTabPanel.contains(advancedPanel)))
 				advancedTabPanel.removeMember(advancedPanel);
 		}
 		advancedPanel = new ImportFolderAdvancedProperties(importFolder, changeHandler);
@@ -139,7 +135,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 		 */
 		if (historyPanel != null) {
 			historyPanel.destroy();
-			if (historyTabPanel.contains(historyPanel))
+			if (Boolean.TRUE.equals(historyTabPanel.contains(historyPanel)))
 				historyTabPanel.removeMember(historyPanel);
 		}
 		historyPanel = new ImportFolderHistoryPanel(importFolder, changeHandler);

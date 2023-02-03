@@ -110,7 +110,7 @@ public class TaskEditor extends Window {
 
 			@Override
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (Boolean.TRUE.equals(vm.validate()))  {
+				if (Boolean.TRUE.equals(vm.validate())) {
 					onSave();
 					destroy();
 				}
@@ -553,11 +553,10 @@ public class TaskEditor extends Window {
 
 	@SuppressWarnings("unchecked")
 	private void onSave() {
-		vm.validate();
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		boolean humanInteraction = "yes".equals(values.get("humanInteraction"));
 
-		if (!vm.validate() && humanInteraction)
+		if (Boolean.FALSE.equals(vm.validate()) && humanInteraction)
 			return;
 
 		TaskEditor.this.state.setName((String) values.get("taskName"));

@@ -14,15 +14,12 @@ import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -63,16 +60,13 @@ public class VersionsPanel extends VLayout {
 		display.setTitle(I18N.message("display"));
 		toolbar.addButton(display);
 		toolbar.addFormItem(maxItem);
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (maxItem.validate() && maxItem.getValue() != null) {
-					if (maxItem.getValue() instanceof Integer)
-						max = (Integer) maxItem.getValue();
-					else
-						max = Integer.parseInt(maxItem.getValue().toString());
-					initListGrid(archiveId, readonly);
-				}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(maxItem.validate()) && maxItem.getValue() != null) {
+				if (maxItem.getValue() instanceof Integer)
+					max = (Integer) maxItem.getValue();
+				else
+					max = Integer.parseInt(maxItem.getValue().toString());
+				initListGrid(archiveId, readonly);
 			}
 		});
 		toolbar.addFill();
@@ -111,21 +105,15 @@ public class VersionsPanel extends VLayout {
 		listGrid.setFields(id, docid, customid, fileName, version, date, size, template);
 		addMember(listGrid, 1);
 
-		listGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord rec = event.getRecord();
-				DocUtil.download(rec.getAttributeAsLong("docid"), null, rec.getAttribute("id"));
-			}
+		listGrid.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
+			ListGridRecord rec = event.getRecord();
+			DocUtil.download(rec.getAttributeAsLong("docid"), null, rec.getAttribute("id"));
 		});
 
-		listGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = setupContextMenu(archiveId, readonly);
-				contextMenu.showContextMenu();
-				event.cancel();
-			}
+		listGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+			Menu contextMenu = setupContextMenu(archiveId, readonly);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 	}
 

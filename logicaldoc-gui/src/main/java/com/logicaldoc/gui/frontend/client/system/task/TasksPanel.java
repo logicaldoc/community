@@ -99,7 +99,7 @@ public class TasksPanel extends AdminPanel {
 		});
 
 		if (GUITask.STATUS_IDLE != tasksGrid.getSelectedRecord().getAttributeAsInt("status")
-				|| !tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 			taskExecution.setEnabled(false);
 
 		MenuItem taskStop = new MenuItem();
@@ -124,7 +124,7 @@ public class TasksPanel extends AdminPanel {
 		});
 
 		if (GUITask.STATUS_RUNNING != tasksGrid.getSelectedRecord().getAttributeAsInt("status")
-				|| !tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 			taskStop.setEnabled(false);
 
 		MenuItem enableTask = new MenuItem();
@@ -150,7 +150,7 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		if (tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+		if (Boolean.TRUE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
 			enableTask.setEnabled(false);
 
 		MenuItem disableTask = new MenuItem();
@@ -176,7 +176,7 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		if (!tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")
+		if (Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
 				|| tasksGrid.getSelectedRecord().getAttributeAsInt("status") != GUITask.STATUS_IDLE)
 			disableTask.setEnabled(false);
 
@@ -294,32 +294,32 @@ public class TasksPanel extends AdminPanel {
 
 	private void addGridContextHandler() {
 		tasksGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
-				event.cancel();
-				if (!Session.get().isDefaultTenant())
-					return;
+			event.cancel();
+			if (!Session.get().isDefaultTenant())
+				return;
 
-				final ListGridRecord rec = tasksGrid.getSelectedRecord();
-				if (rec != null)
-					SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
-							new AsyncCallback<GUITask>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+			final ListGridRecord rec = tasksGrid.getSelectedRecord();
+			if (rec != null)
+				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
+						new AsyncCallback<GUITask>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUITask task) {
-									rec.setAttribute("status", task.getStatus());
-									rec.setAttribute("eenabled", task.getScheduling().isEnabled());
-									if (task.getStatus() != GUITask.STATUS_IDLE) {
-										rec.setAttribute("runningIcon", "running_task");
-									} else {
-										rec.setAttribute("runningIcon", "idle_task");
-									}
-									tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
-									showContextMenu();
+							@Override
+							public void onSuccess(GUITask task) {
+								rec.setAttribute("status", task.getStatus());
+								rec.setAttribute("eenabled", task.getScheduling().isEnabled());
+								if (task.getStatus() != GUITask.STATUS_IDLE) {
+									rec.setAttribute("runningIcon", "running_task");
+								} else {
+									rec.setAttribute("runningIcon", "idle_task");
 								}
-							});
+								tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
+								showContextMenu();
+							}
+						});
 		});
 	}
 
@@ -417,8 +417,7 @@ public class TasksPanel extends AdminPanel {
 
 	private void updateRecords(GUITask guiTask) {
 		for (ListGridRecord rec : tasksGrid.getRecords()) {
-			if (rec.getAttribute("name").equals(guiTask.getName())
-					&& guiTask.getStatus() != GUITask.STATUS_IDLE) {
+			if (rec.getAttribute("name").equals(guiTask.getName()) && guiTask.getStatus() != GUITask.STATUS_IDLE) {
 				rec.setAttribute("runningIcon", "running_task");
 				rec.setAttribute("completion", guiTask.getCompletionPercentage());
 				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));

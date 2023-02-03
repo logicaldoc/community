@@ -309,7 +309,7 @@ public class LoginPanel extends VLayout {
 		prepareSwitchViewLink();
 
 		// If the case, initialize the credentials from client's cookies
-		if (saveLoginEnabled && rememberMe.getValueAsBoolean()) {
+		if (saveLoginEnabled && Boolean.TRUE.equals(rememberMe.getValueAsBoolean())) {
 			String[] credentials = CookiesManager.getSavedCredentials();
 			username.setValue(credentials[0]);
 			password.setValue(credentials[1]);
@@ -509,7 +509,7 @@ public class LoginPanel extends VLayout {
 
 						@Override
 						public void onSuccess(Boolean required) {
-							if (required) {
+							if (Boolean.TRUE.equals(required)) {
 								LoginService.Instance.get().getUser(login, new AsyncCallback<GUIUser>() {
 
 									@Override
@@ -688,7 +688,7 @@ public class LoginPanel extends VLayout {
 
 											@Override
 											public void execute(Boolean choice) {
-												if (!choice) {
+												if (Boolean.FALSE.equals(choice)) {
 													Util.redirectToSuccessUrl(language.getValueAsString());
 												} else {
 													LD.askForString(I18N.message("trustdevice"),

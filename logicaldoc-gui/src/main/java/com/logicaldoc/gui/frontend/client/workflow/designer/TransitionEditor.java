@@ -7,7 +7,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -27,11 +26,7 @@ public class TransitionEditor extends Window {
 	public TransitionEditor(StateWidget widget) {
 		this.widget = widget;
 
-		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, (ClickEvent event) -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
 		setTitle(I18N.message("editworkflowstate", I18N.message("transition")));
@@ -66,27 +61,18 @@ public class TransitionEditor extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (name.validate()) {
-					TransitionEditor.this.widget.getTransition().setText(name.getValue().toString().trim());
-					TransitionEditor.this.widget.setContents(name.getValue().toString().trim());
-					TransitionEditor.this.widget.getTransition()
-							.setOnChosen(automationForm.getValueAsString("automation"));
-					destroy();
-				}
+		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			if (Boolean.TRUE.equals(name.validate())) {
+				TransitionEditor.this.widget.getTransition().setText(name.getValue().toString().trim());
+				TransitionEditor.this.widget.setContents(name.getValue().toString().trim());
+				TransitionEditor.this.widget.getTransition().setOnChosen(automationForm.getValueAsString("automation"));
+				destroy();
 			}
 		});
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> destroy());
 
 		toolStrip.addFormItem(name);
 		toolStrip.addButton(save);

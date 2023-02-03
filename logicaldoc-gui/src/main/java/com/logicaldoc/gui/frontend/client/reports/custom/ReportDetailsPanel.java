@@ -10,7 +10,6 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -98,23 +97,17 @@ public class ReportDetailsPanel extends VLayout {
 		 */
 		if (standardPanel != null) {
 			standardPanel.destroy();
-			if (standardTabPanel.contains(standardPanel))
+			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
 				standardTabPanel.removeMember(standardPanel);
 		}
 
 		if (logLabel != null) {
 			logLabel.destroy();
-			if (logTabPanel.contains(logLabel))
+			if (Boolean.TRUE.equals(logTabPanel.contains(logLabel)))
 				logTabPanel.removeMember(logLabel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
-		standardPanel = new ReportStandardProperties(report, changeHandler);
+		standardPanel = new ReportStandardProperties(report, (ChangedEvent event) -> onModified());
 		standardTabPanel.addMember(standardPanel);
 
 		logLabel = new Label(report.getLog() != null ? report.getLog() : "");
