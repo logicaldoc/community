@@ -16,10 +16,8 @@ import com.logicaldoc.gui.common.client.widgets.Avatar;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
@@ -30,7 +28,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -48,6 +45,24 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class Profile extends Window {
+
+	private static final String DATEFORMATLONG = "dateformatlong";
+
+	private static final String DATEFORMATSHORT = "dateformatshort";
+
+	private static final String DATEFORMAT = "dateformat";
+
+	private static final String HITSGRIDLAYOUT = "hitsgridlayout";
+
+	private static final String DOCSGRIDLAYOUT = "docsgridlayout";
+
+	private static final String NOTCUSTOMIZED = "notcustomized";
+
+	private static final String SIGNATURE = "signature";
+
+	private static final String EMAIL = "email";
+
+	private static final String TIMEZONE = "timezone";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -88,7 +103,7 @@ public class Profile extends Window {
 		TextItem state = ItemFactory.newTextItem("state", user.getState());
 		TextItem phone = ItemFactory.newTextItem("phone", user.getPhone());
 		TextItem cell = ItemFactory.newTextItem("cell", user.getCell());
-		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", "timezone", user.getTimeZone());
+		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector(TIMEZONE, user.getTimeZone());
 		timeZone.setEndRow(true);
 
 		StaticTextItem quota = ItemFactory.newStaticTextItem("quota", "maxquota", Util.formatSizeW7(user.getQuota()));
@@ -110,14 +125,14 @@ public class Profile extends Window {
 		emailForm.setMargin(5);
 		emailForm.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setRequired(true);
 		email.setWidth(300);
 		email.setValue(user.getEmail());
 
 		RichTextItem signature = new RichTextItem();
-		signature.setName("signature");
-		signature.setTitle(I18N.message("signature"));
+		signature.setName(SIGNATURE);
+		signature.setTitle(I18N.message(SIGNATURE));
 		signature.setShowTitle(true);
 		signature.setValue(user.getEmailSignature());
 		signature.setWidth(getWidth() - 60);
@@ -137,7 +152,7 @@ public class Profile extends Window {
 
 		RichTextItem signature2 = new RichTextItem();
 		signature2.setName("signature2");
-		signature2.setTitle(I18N.message("signature"));
+		signature2.setTitle(I18N.message(SIGNATURE));
 		signature2.setShowTitle(true);
 		signature2.setValue(user.getEmailSignature2());
 		signature2.setWidth(getWidth() - 60);
@@ -148,22 +163,16 @@ public class Profile extends Window {
 		SelectItem welcomeScreen = ItemFactory.newWelcomeScreenSelector(user.getWelcomeScreen());
 		SelectItem defaultWorkspace = ItemFactory.newWorkspaceSelector(user.getDefaultWorkspace());
 
-		PickerIcon clearDocsGrid = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				event.getItem().setValue(I18N.message("notcustomized"));
-				user.setDocsGrid(null);
-			}
+		PickerIcon clearDocsGrid = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			event.getItem().setValue(I18N.message(NOTCUSTOMIZED));
+			user.setDocsGrid(null);
 		});
 		clearDocsGrid.setWidth(12);
 		clearDocsGrid.setHeight(12);
 
-		PickerIcon clearHitsGrid = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				event.getItem().setValue(I18N.message("notcustomized"));
-				user.setHitsGrid(null);
-			}
+		PickerIcon clearHitsGrid = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			event.getItem().setValue(I18N.message(NOTCUSTOMIZED));
+			user.setHitsGrid(null);
 		});
 		clearHitsGrid.setWidth(12);
 		clearHitsGrid.setHeight(12);
@@ -173,21 +182,13 @@ public class Profile extends Window {
 		showDocsDefinition.setPrompt(I18N.message("editlayout"));
 		showDocsDefinition.setWidth(12);
 		showDocsDefinition.setHeight(12);
-		showDocsDefinition.addFormItemClickHandler(new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"),
-						null);
-				textArea.setHeight(300);
-				LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
-						user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								user.setDocsGrid(value);
-							}
-						});
-				event.cancel();
-			}
+		showDocsDefinition.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			TextAreaItem textArea = ItemFactory.newTextAreaItem(DOCSGRIDLAYOUT, I18N.message(DOCSGRIDLAYOUT), null);
+			textArea.setHeight(300);
+			LD.askForValue(I18N.message(DOCSGRIDLAYOUT), I18N.message(DOCSGRIDLAYOUT),
+					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400,
+					(final String value) -> user.setDocsGrid(value));
+			event.cancel();
 		});
 
 		FormItemIcon showHitsDefinition = new FormItemIcon();
@@ -195,38 +196,30 @@ public class Profile extends Window {
 		showHitsDefinition.setPrompt(I18N.message("editlayout"));
 		showHitsDefinition.setWidth(12);
 		showHitsDefinition.setHeight(12);
-		showHitsDefinition.addFormItemClickHandler(new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("hitsgridlayout", I18N.message("hitsgridlayout"),
-						null);
-				textArea.setHeight(300);
-				LD.askForValue(I18N.message("hitsgridlayout"), I18N.message("hitsgridlayout"),
-						user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400, new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								user.setHitsGrid(value);
-							}
-						});
-				event.cancel();
-			}
+		showHitsDefinition.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			TextAreaItem textArea = ItemFactory.newTextAreaItem(HITSGRIDLAYOUT, I18N.message(HITSGRIDLAYOUT), null);
+			textArea.setHeight(300);
+			LD.askForValue(I18N.message(HITSGRIDLAYOUT), I18N.message(HITSGRIDLAYOUT),
+					user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400,
+					(final String value) -> user.setHitsGrid(value));
+			event.cancel();
 		});
 
-		StaticTextItem docsGrid = ItemFactory.newStaticTextItem("docsgrid", "docsgridlayout",
+		StaticTextItem docsGrid = ItemFactory.newStaticTextItem("docsgrid", DOCSGRIDLAYOUT,
 				user.getDocsGrid() != null && !user.getDocsGrid().isEmpty() ? I18N.message("customized")
-						: I18N.message("notcustomized"));
+						: I18N.message(NOTCUSTOMIZED));
 		docsGrid.setIcons(showDocsDefinition, clearDocsGrid);
 
-		StaticTextItem hitsGrid = ItemFactory.newStaticTextItem("hitsgrid", "hitsgridlayout",
+		StaticTextItem hitsGrid = ItemFactory.newStaticTextItem("hitsgrid", HITSGRIDLAYOUT,
 				user.getHitsGrid() != null && !user.getHitsGrid().isEmpty() ? I18N.message("customized")
-						: I18N.message("notcustomized"));
+						: I18N.message(NOTCUSTOMIZED));
 		hitsGrid.setIcons(showHitsDefinition, clearHitsGrid);
 
-		TextItem dateFormat = ItemFactory.newTextItem("dateformat", user.getDateFormat());
+		TextItem dateFormat = ItemFactory.newTextItem(DATEFORMAT, user.getDateFormat());
 		dateFormat.setWidth(180);
-		TextItem dateFormatShort = ItemFactory.newTextItem("dateformatshort", user.getDateFormatShort());
+		TextItem dateFormatShort = ItemFactory.newTextItem(DATEFORMATSHORT, user.getDateFormatShort());
 		dateFormatShort.setWidth(180);
-		TextItem dateFormatLong = ItemFactory.newTextItem("dateformatlong", user.getDateFormatLong());
+		TextItem dateFormatLong = ItemFactory.newTextItem(DATEFORMATLONG, user.getDateFormatLong());
 		dateFormatLong.setWidth(180);
 
 		final DynamicForm guiForm = new DynamicForm();
@@ -275,7 +268,7 @@ public class Profile extends Window {
 		Tab guiTab = new Tab(I18N.message("userinterface"));
 		guiTab.setPane(guiLayout);
 
-		Tab emailTab = new Tab(I18N.message("email"));
+		Tab emailTab = new Tab(I18N.message(EMAIL));
 		emailTab.setPane(emailForm);
 		Tab emailTab2 = new Tab(I18N.message("secondaryemail"));
 		emailTab2.setPane(emailForm2);
@@ -283,13 +276,7 @@ public class Profile extends Window {
 		tabs.setTabs(detailsTab, guiTab, emailTab, emailTab2);
 
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave(user, detailsForm, guiForm, emailForm, emailForm2, tabs);
-			}
-		});
+		save.addClickHandler((ClickEvent event) -> onSave(user, detailsForm, guiForm, emailForm, emailForm2, tabs));
 		ToolStrip toolbar = new ToolStrip();
 		toolbar.setWidth100();
 		toolbar.setMembers(save);
@@ -307,7 +294,7 @@ public class Profile extends Window {
 		u.setId(user.getId());
 		u.setFirstName(vm.getValueAsString("firstname"));
 		u.setName(vm.getValueAsString("lastname"));
-		u.setEmail(vm.getValueAsString("email"));
+		u.setEmail(vm.getValueAsString(EMAIL));
 		u.setEmail2(vm.getValueAsString("email2"));
 		u.setLanguage(vm.getValueAsString("language"));
 		u.setAddress(vm.getValueAsString("address"));
@@ -321,26 +308,26 @@ public class Profile extends Window {
 		String str = vm.getValueAsString("workspace");
 		if (str != null && !str.isEmpty())
 			u.setDefaultWorkspace(Long.parseLong(str));
-		u.setEmailSignature(vm.getValueAsString("signature"));
+		u.setEmailSignature(vm.getValueAsString(SIGNATURE));
 		u.setEmailSignature2(vm.getValueAsString("signature2"));
 		u.setDocsGrid(user.getDocsGrid());
 		u.setHitsGrid(user.getHitsGrid());
-		u.setTimeZone(vm.getValueAsString("timezone"));
+		u.setTimeZone(vm.getValueAsString(TIMEZONE));
 
-		if (vm.getValueAsString("dateformat") == null || vm.getValueAsString("dateformat").isEmpty())
+		if (vm.getValueAsString(DATEFORMAT) == null || vm.getValueAsString(DATEFORMAT).isEmpty())
 			u.setDateFormat(null);
 		else
-			u.setDateFormat(vm.getValueAsString("dateformat"));
+			u.setDateFormat(vm.getValueAsString(DATEFORMAT));
 
-		if (vm.getValueAsString("dateformatshort") == null || vm.getValueAsString("dateformatshort").isEmpty())
+		if (vm.getValueAsString(DATEFORMATSHORT) == null || vm.getValueAsString(DATEFORMATSHORT).isEmpty())
 			u.setDateFormatShort(null);
 		else
-			u.setDateFormatShort(vm.getValueAsString("dateformatshort"));
+			u.setDateFormatShort(vm.getValueAsString(DATEFORMATSHORT));
 
-		if (vm.getValueAsString("dateformatlong") == null || vm.getValueAsString("dateformatlong").isEmpty())
+		if (vm.getValueAsString(DATEFORMATLONG) == null || vm.getValueAsString(DATEFORMATLONG).isEmpty())
 			u.setDateFormatLong(null);
 		else
-			u.setDateFormatLong(vm.getValueAsString("dateformatlong"));
+			u.setDateFormatLong(vm.getValueAsString(DATEFORMATLONG));
 
 		ListGridRecord[] records = searchesList.getRecords();
 		List<String> searches = new ArrayList<>();

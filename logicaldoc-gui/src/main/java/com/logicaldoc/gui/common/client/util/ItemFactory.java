@@ -381,7 +381,7 @@ public class ItemFactory {
 	public static DateItem newDateItem(String name) {
 		return newDateItem(name, name);
 	}
-	
+
 	/**
 	 * Creates a new DateItem for the Extended AttributesDS.
 	 * 
@@ -587,10 +587,10 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static ComboBoxItem newTimeZoneSelector(String name, String title, String value) {
+	public static ComboBoxItem newTimeZoneSelector(String name, String value) {
 		ComboBoxItem item = new ComboBoxItem();
 		item.setName(originalItemName(name));
-		item.setTitle(I18N.message(title));
+		item.setTitle(I18N.message(name));
 		item.setWrapTitle(false);
 		item.setDisplayField("id");
 		item.setValueField("id");
@@ -1552,7 +1552,7 @@ public class ItemFactory {
 		item.setValidators(new SimpleTextValidator());
 		return item;
 	}
-	
+
 	/**
 	 * Creates a new TextItem that validates a simple text
 	 * 
@@ -1583,7 +1583,7 @@ public class ItemFactory {
 	public static StaticTextItem newStaticTextItem(String name, String value) {
 		return newStaticTextItem(name, name, value);
 	}
-	
+
 	/**
 	 * Creates a new StaticTextItem
 	 * 

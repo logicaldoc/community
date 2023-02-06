@@ -15,10 +15,11 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class FileNameListGridField extends ColoredListGridField {
 
+	private static final String FILENAME = "filename";
 	private String iconFieldName = "icon";
 
 	public FileNameListGridField() {
-		this("filename", "icon", I18N.message("filename"), 210);
+		this(FILENAME, "icon", I18N.message(FILENAME), 210);
 	}
 
 	public FileNameListGridField(String name) {
@@ -26,7 +27,7 @@ public class FileNameListGridField extends ColoredListGridField {
 	}
 
 	public FileNameListGridField(String name, String iconFieldName, String title, int width) {
-		super(name, "color", title != null ? title : I18N.message("filename"), width);
+		super(name, "color", title != null ? title : I18N.message(FILENAME), width);
 		this.iconFieldName = iconFieldName;
 		setCellFormatter(new FileNameCellFormatter(16));
 		setCellAlign(Alignment.LEFT);

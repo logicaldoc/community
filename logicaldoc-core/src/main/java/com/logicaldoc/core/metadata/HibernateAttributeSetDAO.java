@@ -76,7 +76,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		if (!checkStoringAspect())
 			return;
 
-		AttributeSet set = (AttributeSet) findById(id);
+		AttributeSet set = findById(id);
 		if (set == null)
 			return;
 

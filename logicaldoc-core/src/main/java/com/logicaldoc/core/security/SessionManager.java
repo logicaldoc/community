@@ -378,7 +378,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		else if (request.getAttribute(PARAM_SID) != null)
 			sid = (String) request.getAttribute(PARAM_SID);
 		else if (request.getParameter(PARAM_SID) != null)
-			sid = (String) request.getParameter(PARAM_SID);
+			sid = request.getParameter(PARAM_SID);
 		else {
 			Cookie cookies[] = request.getCookies();
 			if (cookies != null)

@@ -513,13 +513,8 @@ public class LDCmisService extends AbstractCmisService {
 
 		validateSession();
 
-		try {
-			ObjectList ret = getRepository().getContentChanges(changeLogToken,
-					maxItems != null ? (int) maxItems.doubleValue() : 2000);
-			return ret;
-		} catch (Exception e) {
-			throw e;
-		}
+		return getRepository().getContentChanges(changeLogToken,
+				maxItems != null ? (int) maxItems.doubleValue() : 2000);
 	}
 
 	@Override

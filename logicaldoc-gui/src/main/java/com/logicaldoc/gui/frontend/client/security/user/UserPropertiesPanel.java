@@ -164,7 +164,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private ComboBoxItem prepareTimeZoneSelector(boolean readonly) {
-		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", "timezone", user.getTimeZone());
+		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", user.getTimeZone());
 		timeZone.setRequired(false);
 		timeZone.setDisabled(readonly);
 		if (!readonly)

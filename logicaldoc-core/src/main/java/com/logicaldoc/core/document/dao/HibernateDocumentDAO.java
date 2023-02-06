@@ -549,7 +549,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		List<Long> results = new ArrayList<>();
 		try {
-			results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
+			results = findByQuery(query.toString(), (Map<String, Object>) null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -585,8 +585,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			@Override
 			public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
-				Long value = (Long) rs.getLong(1);
-				String key = (String) rs.getString(2);
+				Long value = rs.getLong(1);
+				String key = rs.getString(2);
 				map.put(key, value);
 				return null;
 			}
@@ -963,7 +963,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			}
 			log.error(e.getMessage(), e);
 			if (e instanceof PersistenceException)
-				throw (PersistenceException) e;
+				throw e;
 			else
 				throw new PersistenceException(e);
 		}
@@ -1177,7 +1177,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		List<Long> tenantIds = tenantDAO.findAllIds();
 		for (Long tenantId : tenantIds) {
 			// Get the actual unique tags for the given tenant
-			List<String> uniqueTags = (List<String>) queryForList("select ld_tag from ld_uniquetag", String.class);
+			List<String> uniqueTags = queryForList("select ld_tag from ld_uniquetag", String.class);
 
 			// Update the count for each tag skipping those tags that belong to
 			// deleted documents
@@ -1340,7 +1340,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
 
-		return (List<String>) query(digestQuery.toString(), null, new RowMapper<String>() {
+		return query(digestQuery.toString(), null, new RowMapper<String>() {
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 				return rs.getString(1);
 			}

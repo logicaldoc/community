@@ -52,7 +52,7 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 		if (!checkStoringAspect())
 			return;
 
-		SavedSearch search = (SavedSearch) findById(id);
+		SavedSearch search = findById(id);
 		if (search != null) {
 			search.setDeleted(code);
 			search.setName(search.getName() + "." + search.getId());

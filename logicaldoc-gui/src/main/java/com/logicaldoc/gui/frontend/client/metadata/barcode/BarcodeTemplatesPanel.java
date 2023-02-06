@@ -133,33 +133,33 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
-		
+
 		addTemplateSelector(documentTemplateId);
 
 		addBarcodeTemplateSelector(documentTemplateId, barcodeTemplateId);
 
 		addNewTemplateButton();
-		
+
 		addSettingsButton();
-		
+
 		addSaveButton();
 
 		addAppendButton();
-		
+
 		addDeleteButton();
 
 		toolStrip.addSeparator();
-		
+
 		addZoomInButton();
-		
+
 		addZoomOutButton();
-		
+
 		addPrintButton();
-		
+
 		toolStrip.addSeparator();
-		
+
 		addCloseButton();
-		
+
 		toolStrip.addFill();
 
 		editorPanel = new HLayout();
@@ -213,11 +213,11 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		zoomOut = new ToolStripButton();
 		zoomOut.setTitle(I18N.message("zoomout"));
 		zoomOut.addClickHandler((ClickEvent zoomOutClick) -> {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(-100);
-					showZones();
-				}
+			if (sample != null) {
+				sample.clearCanvases();
+				sample.resize(-100);
+				showZones();
+			}
 		});
 		toolStrip.addButton(zoomOut);
 	}
@@ -226,11 +226,11 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		zoomIn = new ToolStripButton();
 		zoomIn.setTitle(I18N.message("zoomin"));
 		zoomIn.addClickHandler((ClickEvent zoomInClick) -> {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(+100);
-					showZones();
-				}
+			if (sample != null) {
+				sample.clearCanvases();
+				sample.resize(+100);
+				showZones();
+			}
 		});
 		toolStrip.addButton(zoomIn);
 	}
@@ -299,9 +299,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
 		settings.addClickHandler((ClickEvent settingsClick) -> {
-			BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this,
-					((GUIBarcodeTemplate) selectedOcrTemplate));
-			editor.show();
+			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, ((GUIBarcodeTemplate) selectedOcrTemplate)).show();
 		});
 		toolStrip.addButton(settings);
 	}
@@ -312,8 +310,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		newTemplate.addClickHandler((ClickEvent newTemplateClick) -> {
 			GUIBarcodeTemplate newTemplate = new GUIBarcodeTemplate();
 			newTemplate.setTemplate(selectedDocumentTemplate);
-			BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newTemplate);
-			editor.show();
+			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newTemplate).show();
 		});
 		toolStrip.addButton(newTemplate);
 	}
@@ -351,8 +348,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 			selectedOcrTemplate = null;
 
 			ListGridRecord rec = templateSelector.getSelectedRecord();
-			if (rec == null || rec.getAttributeAsLong("id") == null
-					|| rec.getAttributeAsLong("id").longValue() == 0L) {
+			if (rec == null || rec.getAttributeAsLong("id") == null || rec.getAttributeAsLong("id").longValue() == 0L) {
 				selectedDocumentTemplate = null;
 				refresh(null, null);
 			} else {

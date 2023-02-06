@@ -67,7 +67,7 @@ public class FolderSearch extends Search {
 		// Execute the search
 		List<Hit> folders;
 		try {
-			folders = (List<Hit>) dao.query(options.getExpression(), params, new HitMapper(), null);
+			folders = dao.query(options.getExpression(), params, new HitMapper(), null);
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
 		}
@@ -600,7 +600,7 @@ public class FolderSearch extends Search {
 			if (hit.getTgs() != null) {
 				StringTokenizer st = new StringTokenizer(hit.getTgs(), ",", false);
 				while (st.hasMoreElements()) {
-					Object tag = (Object) st.nextElement();
+					Object tag = st.nextElement();
 					if (tag != null && !tag.toString().isEmpty())
 						hit.addTag(tag.toString());
 				}

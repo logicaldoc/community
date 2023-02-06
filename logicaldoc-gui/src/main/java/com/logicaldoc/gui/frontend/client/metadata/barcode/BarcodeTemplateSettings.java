@@ -18,7 +18,6 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -61,15 +60,6 @@ public class BarcodeTemplateSettings extends Window {
 		this.panel = panel;
 		this.template = template;
 
-		save = new IButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
-
 		prepareForm();
 
 		VLayout layout = new VLayout();
@@ -78,27 +68,28 @@ public class BarcodeTemplateSettings extends Window {
 
 		layout.addMember(form);
 		uploader = new Upload(save);
+		layout.addMember(uploader);
+
+		save = new IButton(I18N.message("save"));
+		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSave());
 		layout.addMember(save);
 
 		addItem(layout);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler((CloseClickEvent event) -> {
+			DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void result) {
-						destroy();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void result) {
+					destroy();
+				}
+			});
 		});
 
 		// Just to clean the upload folder

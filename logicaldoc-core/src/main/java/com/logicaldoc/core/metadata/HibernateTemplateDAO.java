@@ -87,7 +87,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		if (!checkStoringAspect())
 			return;
 
-		Template template = (Template) findById(id);
+		Template template = findById(id);
 
 		if (countDocs(id) > 0)
 			throw new PersistenceException(String.format("Some documents are referencing the template %s (%d)",
@@ -175,7 +175,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			params.put("templateId", Long.valueOf(templateId));
 
 			@SuppressWarnings("unchecked")
-			List<TemplateGroup> coll = (List<TemplateGroup>) findByQuery(query.toString(), params, null);
+			List<TemplateGroup> coll = findByQuery(query.toString(), params, null);
 			result = coll.size() > 0;
 		} catch (Exception e) {
 			if (log.isErrorEnabled())

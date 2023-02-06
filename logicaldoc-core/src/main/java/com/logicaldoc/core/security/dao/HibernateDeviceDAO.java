@@ -182,7 +182,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 		if (!checkStoringAspect())
 			return;
 
-		Device device = (Device) findById(deviceId);
+		Device device = findById(deviceId);
 		if (device != null) {
 			device.setDeleted(code);
 			device.setDeviceId(device.getId() + "." + device.getDeviceId());
