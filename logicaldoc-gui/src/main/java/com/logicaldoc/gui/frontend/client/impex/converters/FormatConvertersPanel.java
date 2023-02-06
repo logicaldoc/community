@@ -32,6 +32,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class FormatConvertersPanel extends ComparatorsPanel {
 
+	private static final String EENABLED = "eenabled";
+
 	public FormatConvertersPanel() {
 		super("formatconverters");
 		gridAttributeName = "converter";
@@ -76,7 +78,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 			@Override
 			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				String label = getConverterShortName(value != null ? value.toString() : null);
-				boolean enabled = rec.getAttributeAsBoolean("eenabled");
+				boolean enabled = rec.getAttributeAsBoolean(EENABLED);
 				if (!enabled)
 					label = "<span style='color:red;'>" + label + "</span>";
 
@@ -110,8 +112,8 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 				Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
 						associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 				if (converterRecord != null)
-					associationsGrid.getSelectedRecord().setAttribute("eenabled",
-							converterRecord.getAttributeAsBoolean("eenabled"));
+					associationsGrid.getSelectedRecord().setAttribute(EENABLED,
+							converterRecord.getAttributeAsBoolean(EENABLED));
 			}
 		});
 	}

@@ -354,6 +354,10 @@ public class ItemFactory {
 		return item;
 	}
 
+	public static ColorPickerItem newColorItemPicker(String value, boolean clearOption, ChangedHandler changedHandler) {
+		return newColorItemPicker("color", "color", value, clearOption, changedHandler);
+	}
+
 	/**
 	 * Creates a new DateItem.
 	 * 
@@ -1197,6 +1201,10 @@ public class ItemFactory {
 		else
 			spinner.setValue((Integer) null);
 		return spinner;
+	}
+
+	public static SpinnerItem newSpinnerItem(String name, Long value) {
+		return newSpinnerItem(name, name, value);
 	}
 
 	public static SpinnerItem newSpinnerItem(String name, String title, Integer value) {
@@ -2046,15 +2054,15 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newEmailProtocolSelector(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
+	public static SelectItem newEmailProtocolSelector() {
+		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
 		select.setWidth(110);
 		select.setValueMap("pop3", "imap");
 		return select;
 	}
 
-	public static SelectItem newEmailFolderingSelector(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
+	public static SelectItem newEmailFolderingSelector() {
+		SelectItem select = new SelectItem(originalItemName("foldering"), I18N.message("foldering"));
 		select.setWidth(110);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("none"));

@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.3
  */
 public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
+	private static final String LANGUAGE = "language";
+
 	private DynamicForm form = new DynamicForm();
 
 	private VLayout container = new VLayout();
@@ -83,14 +85,14 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 
 		List<FormItem> items = new ArrayList<>();
 
-		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
+		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		if (document.getLanguage() != null)
-			language = ItemFactory.newLanguageSelector("language", false, false);
+			language = ItemFactory.newLanguageSelector(LANGUAGE, false, false);
 		language.setDisabled(!updateEnabled);
 		language.setValue(document.getLanguage());
 		items.add(language);
 
-		ColorItem color = ItemFactory.newColorItemPicker("color", "color", document.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorItemPicker(document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
 		items.add(color);
 
@@ -202,7 +204,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			document.setLanguage((String) values.get("language"));
+			document.setLanguage((String) values.get(LANGUAGE));
 			document.setColor((String) values.get("color"));
 			document.setTags(tagItem.getValues());
 		}

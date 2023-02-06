@@ -18,7 +18,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * Shows folder's OCR options.
@@ -27,6 +26,10 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 8.4.2
  */
 public class FolderCapturePanel extends FolderDetailTab {
+	private static final String BARCODETEMPLATE = "barcodetemplate";
+
+	private static final String OCRTEMPLATE = "ocrtemplate";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -58,24 +61,21 @@ public class FolderCapturePanel extends FolderDetailTab {
 		applySubFolders.setEndRow(true);
 		applySubFolders.setDisabled(!folder.isWrite());
 		applySubFolders.setColSpan(1);
-		applySubFolders.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.contactingServer();
-				FolderService.Instance.get().applyOCR(folder.getId(), new AsyncCallback<Void>() {
+		applySubFolders.addClickHandler((ClickEvent event) -> {
+			LD.contactingServer();
+			FolderService.Instance.get().applyOCR(folder.getId(), new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void v) {
-						LD.clearPrompt();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void v) {
+					LD.clearPrompt();
+				}
+			});
 		});
 
 		SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
@@ -83,13 +83,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		ocrTemplate.setWrapTitle(false);
 		ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) && folder.getTemplateId() == null);
 		ocrTemplate.addChangedHandler(changedHandler);
-		ocrTemplate.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				applySubFolders.setDisabled(true);
-			}
-		});
+		ocrTemplate.addChangedHandler((ChangedEvent event) -> applySubFolders.setDisabled(true));
 		ocrTemplate.setDisabled(documentTemplateId == null);
 
 		SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
@@ -97,13 +91,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		barcodeTemplate.setWrapTitle(false);
 		barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
 		barcodeTemplate.addChangedHandler(changedHandler);
-		barcodeTemplate.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				applySubFolders.setDisabled(true);
-			}
-		});
+		barcodeTemplate.addChangedHandler((ChangedEvent event) -> applySubFolders.setDisabled(true));
 
 		form.setItems(ocrTemplate, barcodeTemplate, applySubFolders);
 		addMember(form);
@@ -114,16 +102,16 @@ public class FolderCapturePanel extends FolderDetailTab {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			if (values.get("ocrtemplate") == null || values.get("ocrtemplate").toString().isEmpty())
+			if (values.get(OCRTEMPLATE) == null || values.get(OCRTEMPLATE).toString().isEmpty())
 				folder.setOcrTemplateId(null);
 			else {
-				folder.setOcrTemplateId(Long.parseLong(values.get("ocrtemplate").toString()));
+				folder.setOcrTemplateId(Long.parseLong(values.get(OCRTEMPLATE).toString()));
 			}
 
-			if (values.get("barcodetemplate") == null || values.get("barcodetemplate").toString().isEmpty())
+			if (values.get(BARCODETEMPLATE) == null || values.get(BARCODETEMPLATE).toString().isEmpty())
 				folder.setBarcodeTemplateId(null);
 			else {
-				folder.setBarcodeTemplateId(Long.parseLong(values.get("barcodetemplate").toString()));
+				folder.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
 			}
 		}
 		return !vm.hasErrors();

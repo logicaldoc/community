@@ -40,6 +40,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class NotesPanel extends DocumentDetailTab {
 
+	private static final String MESSAGE = "message";
+
+	private static final String USER_ID = "userId";
+
 	private ListGrid notesGrid;
 
 	private ToolStripButton addNote;
@@ -70,17 +74,17 @@ public class NotesPanel extends DocumentDetailTab {
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
 
-		ListGridField userId = new ListGridField("userId", "userid", 50);
+		ListGridField userId = new ListGridField(USER_ID, "userid", 50);
 		userId.setHidden(true);
 
-		UserListGridField user = new UserListGridField("user", "userId", "author");
+		UserListGridField user = new UserListGridField("user", USER_ID, "author");
 		ListGridField date = new DateListGridField("date", "date");
 
 		ListGridField page = new ListGridField("page", I18N.message("page"), 50);
 		page.setAutoFitWidth(true);
 		page.setAlign(Alignment.CENTER);
 
-		ListGridField content = new ListGridField("message", I18N.message("content"), 70);
+		ListGridField content = new ListGridField(MESSAGE, I18N.message("content"), 70);
 		content.setWidth("*");
 
 		notesGrid = new ListGrid();
@@ -168,7 +172,7 @@ public class NotesPanel extends DocumentDetailTab {
 					public void onClick(MenuItemClickEvent event) {
 						NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
 								notesGrid.getSelectedRecord().getAttributeAsLong("id"),
-								notesGrid.getSelectedRecord().getAttribute("message"), NotesPanel.this);
+								notesGrid.getSelectedRecord().getAttribute(MESSAGE), NotesPanel.this);
 						note.show();
 					}
 				});
@@ -178,7 +182,7 @@ public class NotesPanel extends DocumentDetailTab {
 				print.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 					public void onClick(MenuItemClickEvent event) {
 						HTMLPane printContainer = new HTMLPane();
-						printContainer.setContents(notesGrid.getSelectedRecord().getAttribute("message"));
+						printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
 						Canvas.showPrintPreview(printContainer);
 					}
 				});
@@ -189,7 +193,7 @@ public class NotesPanel extends DocumentDetailTab {
 					delete.setEnabled(selection.length > 0);
 					edit.setEnabled(selection.length == 1);
 				} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {
-					long userId = Long.parseLong(selection[0].getAttribute("userId"));
+					long userId = Long.parseLong(selection[0].getAttribute(USER_ID));
 					delete.setEnabled(selection.length == 1 && userId == Session.get().getUser().getId());
 					edit.setEnabled(selection.length == 1 && userId == Session.get().getUser().getId());
 				}

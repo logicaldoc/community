@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class DigitalSignatureDialog extends Window {
 
+	private static final String REASON = "reason";
+
 	private CheckboxItem visualPositioning;
 
 	private ValuesManager vm = new ValuesManager();
@@ -58,7 +60,7 @@ public class DigitalSignatureDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
 
-		TextItem reason = ItemFactory.newTextItem("reason", null);
+		TextItem reason = ItemFactory.newTextItem(REASON, null);
 		reason.setRequired(true);
 		reason.setWrapTitle(false);
 		reason.setWidth(250);
@@ -110,13 +112,13 @@ public class DigitalSignatureDialog extends Window {
 
 		if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
 			VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(docIds,
-					vm.getValueAsString("reason"));
+					vm.getValueAsString(REASON));
 			dialog.show();
 			destroy();
 		} else {
 			destroy();
 			LD.contactingServer();
-			SignService.Instance.get().signDocuments(docIds, vm.getValueAsString("reason"), 1, null, null, null,
+			SignService.Instance.get().signDocuments(docIds, vm.getValueAsString(REASON), 1, null, null, null,
 					new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

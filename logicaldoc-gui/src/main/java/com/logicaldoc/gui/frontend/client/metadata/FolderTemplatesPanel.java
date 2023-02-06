@@ -32,6 +32,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class FolderTemplatesPanel extends AdminPanel {
 
+	private static final String FOLDERS = "folders";
 	private ListGrid grid;
 
 	public FolderTemplatesPanel() {
@@ -113,7 +114,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 			for (Record rec : records) {
 				templates[i] = new GUIValue();
 				templates[i].setCode(rec.getAttributeAsString("name"));
-				templates[i++].setValue(rec.getAttributeAsString("folders"));
+				templates[i++].setValue(rec.getAttributeAsString(FOLDERS));
 			}
 
 		FolderService.Instance.get().saveTemplates(templates, new AsyncCallback<Void>() {
@@ -133,7 +134,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 		if (grid != null)
 			body.removeMember(grid);
 
-		ListGridField folders = new ListGridField("folders", I18N.message("folders"));
+		ListGridField folders = new ListGridField(FOLDERS, I18N.message(FOLDERS));
 		folders.setWidth(400);
 		folders.setRequired(true);
 		folders.setEditorProperties(new TextAreaItem());
@@ -166,7 +167,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 		for (GUIValue template : templates) {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute("name", template.getCode());
-			rec.setAttribute("folders", template.getValue());
+			rec.setAttribute(FOLDERS, template.getValue());
 			records[i++] = rec;
 		}
 		grid.setData(records);

@@ -45,6 +45,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ExportArchivesList extends VLayout {
 
+	private static final String STATUS = "status";
+
+	private static final String STATUSICON = "statusicon";
+
 	protected Layout detailsContainer;
 
 	protected RefreshableListGrid list;
@@ -87,7 +91,7 @@ public class ExportArchivesList extends VLayout {
 		ListGridField typeLabel = new ListGridField("typelabel", I18N.message("type"), 130);
 		typeLabel.setCanFilter(false);
 
-		ListGridField status = new ListGridField("statusicon", I18N.message("status"), 50);
+		ListGridField status = new ListGridField(STATUSICON, I18N.message(STATUS), 50);
 		status.setType(ListGridFieldType.IMAGE);
 		status.setCanSort(false);
 		status.setAlign(Alignment.CENTER);
@@ -176,7 +180,7 @@ public class ExportArchivesList extends VLayout {
 				ListGridRecord rec = list.getSelectedRecord();
 				try {
 					showDetails(Long.parseLong(rec.getAttribute("id")),
-							!Integer.toString(GUIArchive.STATUS_OPENED).equals(rec.getAttribute("status")));
+							!Integer.toString(GUIArchive.STATUS_OPENED).equals(rec.getAttribute(STATUS)));
 				} catch (Throwable t) {
 					// Nothing to do
 				}
@@ -249,10 +253,10 @@ public class ExportArchivesList extends VLayout {
 			}
 		});
 
-		if (GUIArchive.STATUS_OPENED != Integer.parseInt(rec.getAttributeAsString("status")))
+		if (GUIArchive.STATUS_OPENED != Integer.parseInt(rec.getAttributeAsString(STATUS)))
 			close.setEnabled(false);
 
-		if (GUIArchive.STATUS_ERROR != Integer.parseInt(rec.getAttributeAsString("status")))
+		if (GUIArchive.STATUS_ERROR != Integer.parseInt(rec.getAttributeAsString(STATUS)))
 			open.setEnabled(false);
 
 		contextMenu.setItems(close, open, delete);
@@ -284,8 +288,8 @@ public class ExportArchivesList extends VLayout {
 
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute("status", "1");
-						rec.setAttribute("statusicon", "lock");
+						rec.setAttribute(STATUS, "1");
+						rec.setAttribute(STATUSICON, "lock");
 						list.refreshRow(list.getRecordIndex(rec));
 						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
 					}
@@ -323,8 +327,8 @@ public class ExportArchivesList extends VLayout {
 
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute("status", "0");
-						rec.setAttribute("statusicon", "lock_open");
+						rec.setAttribute(STATUS, "0");
+						rec.setAttribute(STATUSICON, "lock_open");
 						list.refreshRow(list.getRecordIndex(rec));
 						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
 					}

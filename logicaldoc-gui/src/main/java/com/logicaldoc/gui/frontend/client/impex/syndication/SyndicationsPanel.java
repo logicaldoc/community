@@ -47,6 +47,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class SyndicationsPanel extends AdminPanel {
 
+	private static final String EENABLED = "eenabled";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -81,7 +83,7 @@ public class SyndicationsPanel extends AdminPanel {
 		ListGridField targetPath = new ListGridField("targetPath", I18N.message("targetpath"), 300);
 		targetPath.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -248,7 +250,7 @@ public class SyndicationsPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "0");
+							rec.setAttribute(EENABLED, "0");
 							list.refreshRow(list.getRecordIndex(rec));
 						}
 					});
@@ -267,7 +269,7 @@ public class SyndicationsPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "2");
+							rec.setAttribute(EENABLED, "2");
 							list.refreshRow(list.getRecordIndex(rec));
 						}
 					});
@@ -295,7 +297,7 @@ public class SyndicationsPanel extends AdminPanel {
 			}
 		});
 
-		if ("0".equals(rec.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(test, disable, delete, resetCache);
 		else
 			contextMenu.setItems(test, enable, delete, resetCache);
@@ -332,7 +334,7 @@ public class SyndicationsPanel extends AdminPanel {
 
 		rec.setAttribute("name", syndication.getName());
 		rec.setAttribute("url", syndication.getUrl());
-		rec.setAttribute("eenabled", syndication.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute(EENABLED, syndication.getEnabled() == 1 ? "0" : "2");
 		rec.setAttribute("targetPath", syndication.getTargetPath());
 		list.refreshRow(list.getRecordIndex(rec));
 	}

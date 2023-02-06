@@ -38,6 +38,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class FolderSubscriptionsPanel extends FolderDetailTab {
 
+	private static final String USER_ID = "userId";
+
 	private ListGrid list;
 
 	private VLayout container = new VLayout();
@@ -57,12 +59,12 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 		if (list != null)
 			container.removeMember(list);
 
-		ListGridField userId = new ColoredListGridField("userId", "userId");
+		ListGridField userId = new ColoredListGridField(USER_ID, USER_ID);
 		userId.setWidth(50);
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new UserListGridField("userName", "userId", "user");
+		ListGridField userName = new UserListGridField("userName", USER_ID, "user");
 		userName.setCanEdit(false);
 
 		ListGridField created = new DateListGridField("created", "subscription");

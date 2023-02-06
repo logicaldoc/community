@@ -36,6 +36,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class BarcodeTemplateSettings extends Window {
 
+	private static final String ZONAL = "zonal";
+
 	private ValuesManager vm;
 
 	private DynamicForm form;
@@ -124,18 +126,18 @@ public class BarcodeTemplateSettings extends Window {
 
 		SelectItem type = ItemFactory.newSelectItem("type");
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
-		opts.put("zonal", I18N.message("zonal").toLowerCase());
+		opts.put(ZONAL, I18N.message(ZONAL).toLowerCase());
 		opts.put("positional", I18N.message("positional").toLowerCase());
 		type.setValueMap(opts);
 		type.setRequired(true);
 		type.setDisabled(template.getId() != 0L || !Feature.enabled(Feature.ZONAL_BARCODE));
 		if (template.getId() != 0L)
-			type.setValue(template.isZonal() ? "zonal" : "positonal");
+			type.setValue(template.isZonal() ? ZONAL : "positonal");
 		if (!Feature.enabled(Feature.ZONAL_BARCODE))
 			type.setValue("positonal");
 
 		type.addChangedHandler(
-				(ChangedEvent event) -> uploader.setVisible("zonal".equals(event.getValue().toString())));
+				(ChangedEvent event) -> uploader.setVisible(ZONAL.equals(event.getValue().toString())));
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setHeight(150);
@@ -171,7 +173,7 @@ public class BarcodeTemplateSettings extends Window {
 	}
 
 	public void onSave() {
-		if ("zonal".equals(vm.getValueAsString("type")) && template.getId() == 0L
+		if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L
 				&& uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
@@ -184,7 +186,7 @@ public class BarcodeTemplateSettings extends Window {
 		template.setDescription(vm.getValueAsString("description"));
 
 		if (Feature.enabled(Feature.ZONAL_BARCODE))
-			template.setZonal("zonal".equals(vm.getValueAsString("type")));
+			template.setZonal(ZONAL.equals(vm.getValueAsString("type")));
 		else
 			template.setZonal(false);
 

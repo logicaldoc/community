@@ -35,7 +35,8 @@ import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
  */
 public class DocumentHistoryDashlet extends DocumentDashlet {
 
-	private static final String EVENT = "event";
+	private static final String EVENT_STR = "event";
+	
 	protected String event;
 
 	public DocumentHistoryDashlet(GUIDashlet guiDashlet) {
@@ -114,7 +115,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 				date.setHidden(true);
 				fieldsMap.put(date.getName(), date);
 
-				ListGridField evnt = new ColoredListGridField(EVENT);
+				ListGridField evnt = new ColoredListGridField(EVENT_STR);
 				evnt.setHidden(true);
 				fieldsMap.put(evnt.getName(), evnt);
 
@@ -164,9 +165,9 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 			fieldsMap.get("date").setHidden(true);
 			fields.add(fieldsMap.get("date"));
 		}
-		if (!fields.contains(fieldsMap.get(EVENT)) && fieldsMap.get(EVENT) != null) {
-			fieldsMap.get(EVENT).setHidden(true);
-			fields.add(fieldsMap.get(EVENT));
+		if (!fields.contains(fieldsMap.get(EVENT_STR)) && fieldsMap.get(EVENT_STR) != null) {
+			fieldsMap.get(EVENT_STR).setHidden(true);
+			fields.add(fieldsMap.get(EVENT_STR));
 		}
 		if (!fields.contains(fieldsMap.get("path")) && fieldsMap.get("path") != null) {
 			fieldsMap.get("path").setHidden(true);

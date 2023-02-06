@@ -17,7 +17,6 @@ import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -57,6 +56,22 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 7.5
  */
 public class AttributeSetPropertiesPanel extends HLayout {
+
+	private static final String INITIALIZATION = "initialization";
+
+	private static final String VALIDATION = "validation";
+
+	private static final String GROUP = "group";
+
+	private static final String MULTIPLE = "multiple";
+
+	private static final String READONLY = "readonly";
+
+	private static final String HIDDEN = "hidden";
+
+	private static final String MANDATORY = "mandatory";
+
+	private static final String LABEL = "label";
 
 	protected DynamicForm setPropertiesForm = new DynamicForm();
 
@@ -132,7 +147,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			}
 		});
 
-		ListGridField label = new ListGridField("label", I18N.message("label"));
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL));
 		label.setCanEdit(true);
 		label.setCanSort(false);
 		label.addCellSavedHandler((CellSavedEvent labelSaved) -> {
@@ -175,7 +190,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			for (GUIAttribute att : attributeSet.getAttributesOrderedByPosition()) {
 				ListGridRecord rec = new ListGridRecord();
 				rec.setAttribute("name", att.getName());
-				rec.setAttribute("label", att.getLabel());
+				rec.setAttribute(LABEL, att.getLabel());
 				attributesList.addData(rec);
 			}
 		}
@@ -187,13 +202,13 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		final TextItem attributeName = addAttributeNameItem();
 
 		// Attribute Label
-		final TextItem label = ItemFactory.newTextItem("label", null);
+		final TextItem label = ItemFactory.newTextItem(LABEL, null);
 		label.setWidth(400);
 
 		// Mandatory
 		final CheckboxItem mandatory = new CheckboxItem();
-		mandatory.setName("mandatory");
-		mandatory.setTitle(I18N.message("mandatory"));
+		mandatory.setName(MANDATORY);
+		mandatory.setTitle(I18N.message(MANDATORY));
 		mandatory.setRedrawOnChange(true);
 		mandatory.setWidth(50);
 		mandatory.setDefaultValue(false);
@@ -201,8 +216,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		// Hidden
 		final CheckboxItem hidden = new CheckboxItem();
-		hidden.setName("hidden");
-		hidden.setTitle(I18N.message("hidden"));
+		hidden.setName(HIDDEN);
+		hidden.setTitle(I18N.message(HIDDEN));
 		hidden.setRedrawOnChange(true);
 		hidden.setWidth(50);
 		hidden.setDefaultValue(false);
@@ -210,8 +225,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		// Readonly
 		final CheckboxItem readonly = new CheckboxItem();
-		readonly.setName("readonly");
-		readonly.setTitle(I18N.message("readonly"));
+		readonly.setName(READONLY);
+		readonly.setTitle(I18N.message(READONLY));
 		readonly.setRedrawOnChange(true);
 		readonly.setWidth(50);
 		readonly.setDefaultValue(false);
@@ -219,7 +234,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		// Multiple
 		final CheckboxItem multiple = new CheckboxItem();
-		multiple.setName("multiple");
+		multiple.setName(MULTIPLE);
 		multiple.setTitle(I18N.message("multiplevalues"));
 		multiple.setRedrawOnChange(true);
 		multiple.setWidth(50);
@@ -234,7 +249,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		addTypeSelector();
 
 		// Values (for preset editor)
-		group = ItemFactory.newTextItem("group", null);
+		group = ItemFactory.newTextItem(GROUP, null);
 		group.setHint(I18N.message("groupname"));
 		group.setDisabled(attributeSet.isReadonly());
 
@@ -331,9 +346,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 			ListGridRecord rec = attributesList.getSelectedRecord();
 			rec.setAttribute("name", att.getName());
-			rec.setAttribute("label", att.getLabel());
-			rec.setAttribute("validation", att.getValidation());
-			rec.setAttribute("initialization", att.getInitialization());
+			rec.setAttribute(LABEL, att.getLabel());
+			rec.setAttribute(VALIDATION, att.getValidation());
+			rec.setAttribute(INITIALIZATION, att.getInitialization());
 
 			changedHandler.onChanged(null);
 		}
@@ -344,15 +359,12 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		clean.setTitle(I18N.message("clean"));
 		clean.setAutoFit(true);
 		clean.setStartRow(false);
-		clean.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent cleanClick) -> {
-			clean();
-		});
+		clean.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent cleanClick) -> clean());
 		return clean;
 	}
 
 	private TextAreaItem prepareInitializationItem() {
-		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation("initialization", null,
-				null, false);
+		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation(INITIALIZATION, null, null, false);
 		initialization.setWidth("*");
 		initialization.setDisabled(attributeSet.isReadonly());
 		initialization.setStartRow(true);
@@ -364,13 +376,11 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		initializationComposer.setHeight(16);
 		initializationComposer.setSrc("[SKIN]/cog.png");
 		initializationComposer.setPrompt(I18N.message("openinitializatorcomposer"));
-		initializationComposer.addFormItemClickHandler((FormItemIconClickEvent initializationComposerClick) -> {
-			AttributeInitializerComposer composer = new AttributeInitializerComposer(initialization,
-					type.getValue() != null && !type.getValue().toString().isEmpty()
-							? Integer.parseInt(type.getValueAsString())
-							: GUIAttribute.TYPE_STRING);
-			composer.show();
-		});
+		initializationComposer.addFormItemClickHandler(
+				(FormItemIconClickEvent initializationComposerClick) -> new AttributeInitializerComposer(initialization,
+						type.getValue() != null && !type.getValue().toString().isEmpty()
+								? Integer.parseInt(type.getValueAsString())
+								: GUIAttribute.TYPE_STRING).show());
 		List<FormItemIcon> initializationIcons = new ArrayList<>();
 		initializationIcons.addAll(Arrays.asList(initialization.getIcons()));
 		initializationIcons.add(initializationComposer);
@@ -379,8 +389,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	private TextAreaItem prepareValidationItem() {
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", null, null,
-				false);
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation(VALIDATION, null, null, false);
 		validation.setWidth("*");
 		validation.setDisabled(attributeSet.isReadonly());
 		validation.setStartRow(true);
@@ -392,13 +401,11 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		validationComposer.setHeight(16);
 		validationComposer.setSrc("[SKIN]/cog.png");
 		validationComposer.setPrompt(I18N.message("openvalidatorcomposer"));
-		validationComposer.addFormItemClickHandler((FormItemIconClickEvent validationComposerClick) -> {
-			AttributeValidatorComposer composer = new AttributeValidatorComposer(validation,
-					type.getValue() != null && !type.getValue().toString().isEmpty()
-							? Integer.parseInt(type.getValueAsString())
-							: GUIAttribute.TYPE_STRING);
-			composer.show();
-		});
+		validationComposer.addFormItemClickHandler(
+				(FormItemIconClickEvent validationComposerClick) -> new AttributeValidatorComposer(validation,
+						type.getValue() != null && !type.getValue().toString().isEmpty()
+								? Integer.parseInt(type.getValueAsString())
+								: GUIAttribute.TYPE_STRING).show());
 		List<FormItemIcon> validationIcons = new ArrayList<>();
 		validationIcons.addAll(Arrays.asList(validation.getIcons()));
 		validationIcons.add(validationComposer);
@@ -462,15 +469,15 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeName.setWidth(180);
 		PickerIcon cleanPicker = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent attributeNameClick) -> {
 			clean();
-			attributeSettingsForm1.getField("mandatory").setDisabled(false);
-			attributeSettingsForm1.getField("hidden").setDisabled(false);
-			attributeSettingsForm1.getField("readonly").setDisabled(false);
-			attributeSettingsForm1.getField("multiple").setDisabled(false);
+			attributeSettingsForm1.getField(MANDATORY).setDisabled(false);
+			attributeSettingsForm1.getField(HIDDEN).setDisabled(false);
+			attributeSettingsForm1.getField(READONLY).setDisabled(false);
+			attributeSettingsForm1.getField(MULTIPLE).setDisabled(false);
 			attributeSettingsForm2.getField("type").setDisabled(false);
 			attributeSettingsForm2.getField("editor").setDisabled(false);
-			attributeSettingsForm2.getField("group").setDisabled(true);
-			attributeSettingsForm2.getField("validation").setDisabled(false);
-			attributeSettingsForm2.getField("initialization").setDisabled(false);
+			attributeSettingsForm2.getField(GROUP).setDisabled(true);
+			attributeSettingsForm2.getField(VALIDATION).setDisabled(false);
+			attributeSettingsForm2.getField(INITIALIZATION).setDisabled(false);
 			refreshFieldForm();
 		});
 		if (!attributeSet.isReadonly()) {
@@ -556,8 +563,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (!attributeSet.isReadonly())
 			name.addChangedHandler(changedHandler);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", 
-				attributeSet.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", attributeSet.getDescription());
 		description.setDisabled(attributeSet.isReadonly());
 
 		if (!attributeSet.isReadonly())
@@ -582,7 +588,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	private void addAttribute(GUIAttribute att) {
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", att.getName());
-		rec.setAttribute("label", att.getLabel());
+		rec.setAttribute(LABEL, att.getLabel());
 		updatingAttributeName = att.getName();
 		attributesList.getDataAsRecordList().add(rec);
 		attributeSet.appendAttribute(att);
@@ -597,16 +603,16 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeSettingsForm1.setValue("attributeName", "");
 		updatingAttributeName = "";
 
-		attributeSettingsForm2.setValue("label", (String) null);
-		attributeSettingsForm1.setValue("mandatory", false);
-		attributeSettingsForm1.setValue("hidden", false);
-		attributeSettingsForm1.setValue("readonly", false);
-		attributeSettingsForm1.setValue("multiple", false);
+		attributeSettingsForm2.setValue(LABEL, (String) null);
+		attributeSettingsForm1.setValue(MANDATORY, false);
+		attributeSettingsForm1.setValue(HIDDEN, false);
+		attributeSettingsForm1.setValue(READONLY, false);
+		attributeSettingsForm1.setValue(MULTIPLE, false);
 		attributeSettingsForm2.setValue("type", GUIAttribute.TYPE_STRING);
 		attributeSettingsForm2.setValue("editor", GUIAttribute.EDITOR_DEFAULT);
-		attributeSettingsForm2.setValue("group", (String) null);
-		attributeSettingsForm2.setValue("validation", (String) null);
-		attributeSettingsForm2.setValue("initialization", (String) null);
+		attributeSettingsForm2.setValue(GROUP, (String) null);
+		attributeSettingsForm2.setValue(VALIDATION, (String) null);
+		attributeSettingsForm2.setValue(INITIALIZATION, (String) null);
 
 		attributesList.deselectAllRecords();
 	}
@@ -698,12 +704,12 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean value) -> {
 				if (Boolean.TRUE.equals(value)) {
-						for (String attrName : names)
-							attributeSet.removeAttribute(attrName);
-						attributesList.removeSelectedData();
-						clean();
-						detailsPanel.enableSave();
-					}
+					for (String attrName : names)
+						attributeSet.removeAttribute(attrName);
+					attributesList.removeSelectedData();
+					clean();
+					detailsPanel.enableSave();
+				}
 			});
 		});
 		return delete;
@@ -714,16 +720,16 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			String selectedAttributeName = rec.getAttributeAsString("name");
 			GUIAttribute extAttr = attributeSet.getAttribute(selectedAttributeName);
 			attributeSettingsForm1.setValue("attributeName", extAttr.getName());
-			attributeSettingsForm1.setValue("mandatory", extAttr.isMandatory());
-			attributeSettingsForm1.setValue("hidden", extAttr.isHidden());
-			attributeSettingsForm1.setValue("readonly", extAttr.isReadonly());
-			attributeSettingsForm1.setValue("multiple", extAttr.isMultiple());
-			attributeSettingsForm2.setValue("label", extAttr.getLabel());
+			attributeSettingsForm1.setValue(MANDATORY, extAttr.isMandatory());
+			attributeSettingsForm1.setValue(HIDDEN, extAttr.isHidden());
+			attributeSettingsForm1.setValue(READONLY, extAttr.isReadonly());
+			attributeSettingsForm1.setValue(MULTIPLE, extAttr.isMultiple());
+			attributeSettingsForm2.setValue(LABEL, extAttr.getLabel());
 			attributeSettingsForm2.setValue("type", extAttr.getType());
 			attributeSettingsForm2.setValue("editor", extAttr.getEditor());
-			attributeSettingsForm2.setValue("group", extAttr.getStringValue());
-			attributeSettingsForm2.setValue("validation", extAttr.getValidation());
-			attributeSettingsForm2.setValue("initialization", extAttr.getInitialization());
+			attributeSettingsForm2.setValue(GROUP, extAttr.getStringValue());
+			attributeSettingsForm2.setValue(VALIDATION, extAttr.getValidation());
+			attributeSettingsForm2.setValue(INITIALIZATION, extAttr.getInitialization());
 			updatingAttributeName = selectedAttributeName;
 			refreshFieldForm();
 		}

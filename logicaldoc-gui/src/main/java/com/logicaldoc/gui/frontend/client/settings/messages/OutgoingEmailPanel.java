@@ -118,7 +118,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		if (emailSettings.getTargetFolder() != null)
 			targetSelector.setFolder(emailSettings.getTargetFolder());
 
-		SelectItem foldering = ItemFactory.newEmailFolderingSelector("foldering", "foldering");
+		SelectItem foldering = ItemFactory.newEmailFolderingSelector();
 		foldering.setRequired(false);
 		foldering.setValue("" + emailSettings.getFoldering());
 

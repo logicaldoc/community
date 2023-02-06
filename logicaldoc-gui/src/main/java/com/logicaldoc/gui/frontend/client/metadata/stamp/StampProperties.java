@@ -37,6 +37,20 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class StampProperties extends StampDetailsTab {
 
+	private static final String IMAGE_HEIGHT = "imageHeight";
+
+	private static final String IMAGE_WIDTH = "imageWidth";
+
+	private static final String BARCODE_FORMAT = "barcodeFormat";
+
+	private static final String BARCODE_LABEL = "barcodeLabel";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String OPACITY = "opacity";
+
+	private static final String ROTATION = "rotation";
+
 	protected Layout formsContainer = new HLayout();
 
 	protected ValuesManager vm = new ValuesManager();
@@ -87,7 +101,7 @@ public class StampProperties extends StampDetailsTab {
 
 		prepareTextItem();
 
-		final ColorItem color = ItemFactory.newColorItemPicker("color", "color", stamp.getColor(), true,
+		final ColorItem color = ItemFactory.newColorItemPicker(stamp.getColor(), true,
 				changedHandler);
 
 		final RadioGroupItem barcodeLabel = prepareBarcodeLabelSelector();
@@ -121,8 +135,8 @@ public class StampProperties extends StampDetailsTab {
 		 * For the spinners we need to manually update the VM or the widget will
 		 * NOT be refreshed (unbelievable but that is)
 		 */
-		vm.setValue("rotation", stamp.getRotation());
-		vm.setValue("opacity", stamp.getOpacity());
+		vm.setValue(ROTATION, stamp.getRotation());
+		vm.setValue(OPACITY, stamp.getOpacity());
 		vm.setValue("size", stamp.getSize());
 
 		formsContainer.setMembers(form1, form2, image);
@@ -195,7 +209,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private SpinnerItem prepareOpacitySpinner() {
-		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity", stamp.getOpacity(), 1, 100);
+		SpinnerItem opacity = ItemFactory.newSpinnerItem(OPACITY, OPACITY, stamp.getOpacity(), 1, 100);
 		if (changedHandler != null)
 			opacity.addChangedHandler(changedHandler);
 		return opacity;
@@ -243,7 +257,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private TextAreaItem prepareDescritptionITem() {
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", stamp.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem(DESCRIPTION, stamp.getDescription());
 		if (changedHandler != null)
 			description.addChangedHandler(changedHandler);
 		description.setRowSpan(2);
@@ -261,7 +275,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private RadioGroupItem prepareBarcodeLabelSelector() {
-		final RadioGroupItem barcodeLabel = ItemFactory.newBooleanSelector("barcodeLabel", "label");
+		final RadioGroupItem barcodeLabel = ItemFactory.newBooleanSelector(BARCODE_LABEL, "label");
 		barcodeLabel.setValue(stamp.getBarcodeLabel() == 1 ? "yes" : "no");
 		if (changedHandler != null)
 			barcodeLabel.addChangedHandler(changedHandler);
@@ -269,7 +283,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private SelectItem prepareBarcodeItemSelector() {
-		final SelectItem barcodeFormat = ItemFactory.newBarcodeGenerationFormatSelector("barcodeFormat", "format",
+		final SelectItem barcodeFormat = ItemFactory.newBarcodeGenerationFormatSelector(BARCODE_FORMAT, "format",
 				stamp.getBarcodeFormat());
 		if (changedHandler != null)
 			barcodeFormat.addChangedHandler(changedHandler);
@@ -277,7 +291,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private IntegerItem prepareImageWidthItem() {
-		final IntegerItem imageWidth = ItemFactory.newIntegerItem("imageWidth", "width", stamp.getImageWidth());
+		final IntegerItem imageWidth = ItemFactory.newIntegerItem(IMAGE_WIDTH, "width", stamp.getImageWidth());
 		imageWidth.setWidth(80);
 		imageWidth.setHint("px");
 		if (changedHandler != null)
@@ -286,7 +300,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private IntegerItem prepareImageHeightItem() {
-		final IntegerItem imageHeight = ItemFactory.newIntegerItem("imageHeight", "height", stamp.getImageHeight());
+		final IntegerItem imageHeight = ItemFactory.newIntegerItem(IMAGE_HEIGHT, "height", stamp.getImageHeight());
 		imageHeight.setWidth(80);
 		imageHeight.setHint("px");
 		if (changedHandler != null)
@@ -295,7 +309,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private SpinnerItem prepareRotaionSpinner() {
-		SpinnerItem rotation = ItemFactory.newSpinnerItem("rotation", "rotation", stamp.getRotation(), 0, 360);
+		SpinnerItem rotation = ItemFactory.newSpinnerItem(ROTATION, ROTATION, stamp.getRotation(), 0, 360);
 		if (changedHandler != null)
 			rotation.addChangedHandler(changedHandler);
 		return rotation;
@@ -404,8 +418,8 @@ public class StampProperties extends StampDetailsTab {
 		stamp.setExprY(vm.getValueAsString("expry"));
 		stamp.setExprW(vm.getValueAsString("exprw"));
 		stamp.setExprH(vm.getValueAsString("exprh"));
-		stamp.setRotation(Integer.parseInt(vm.getValueAsString("rotation")));
-		stamp.setOpacity(Integer.parseInt(vm.getValueAsString("opacity")));
+		stamp.setRotation(Integer.parseInt(vm.getValueAsString(ROTATION)));
+		stamp.setOpacity(Integer.parseInt(vm.getValueAsString(OPACITY)));
 
 		if (vm.getValueAsString("size") != null)
 			stamp.setSize(Integer.parseInt(vm.getValueAsString("size")));
@@ -416,18 +430,18 @@ public class StampProperties extends StampDetailsTab {
 		stamp.setPageOption(Integer.parseInt(vm.getValueAsString("pageOption")));
 		stamp.setPageSelection(vm.getValueAsString("pageSelection"));
 
-		if (vm.getValueAsString("imageWidth") != null)
-			stamp.setImageWidth(Integer.parseInt(vm.getValueAsString("imageWidth")));
-		if (vm.getValueAsString("imageHeight") != null)
-			stamp.setImageHeight(Integer.parseInt(vm.getValueAsString("imageHeight")));
+		if (vm.getValueAsString(IMAGE_WIDTH) != null)
+			stamp.setImageWidth(Integer.parseInt(vm.getValueAsString(IMAGE_WIDTH)));
+		if (vm.getValueAsString(IMAGE_HEIGHT) != null)
+			stamp.setImageHeight(Integer.parseInt(vm.getValueAsString(IMAGE_HEIGHT)));
 
-		if (vm.getValueAsString("barcodeLabel") != null)
-			stamp.setBarcodeLabel("yes".equals(vm.getValueAsString("barcodeLabel")) ? 1 : 0);
-		if (vm.getValueAsString("barcodeFormat") != null)
-			stamp.setBarcodeFormat(vm.getValueAsString("barcodeFormat"));
+		if (vm.getValueAsString(BARCODE_LABEL) != null)
+			stamp.setBarcodeLabel("yes".equals(vm.getValueAsString(BARCODE_LABEL)) ? 1 : 0);
+		if (vm.getValueAsString(BARCODE_FORMAT) != null)
+			stamp.setBarcodeFormat(vm.getValueAsString(BARCODE_FORMAT));
 
-		if (vm.getValueAsString("description") != null)
-			stamp.setDescription(vm.getValueAsString("description"));
+		if (vm.getValueAsString(DESCRIPTION) != null)
+			stamp.setDescription(vm.getValueAsString(DESCRIPTION));
 
 		if (vm.getValueAsString("color") != null)
 			stamp.setColor(vm.getValueAsString("color"));

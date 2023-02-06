@@ -22,6 +22,8 @@ import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
  */
 public class ExtensionAliasesDialog extends Window {
 
+	private static final String ALIASES = "aliases";
+	private static final String EXTENSION = "extension";
 	private ListGrid extensionsGrid;
 
 	public ExtensionAliasesDialog() {
@@ -40,9 +42,9 @@ public class ExtensionAliasesDialog extends Window {
 	}
 
 	private void refresh() {
-		ListGridField extension = new ListGridField("extension", I18N.message("extension"), 60);
+		ListGridField extension = new ListGridField(EXTENSION, I18N.message(EXTENSION), 60);
 		extension.setCanEdit(false);
-		ListGridField aliases = new ListGridField("aliases", I18N.message("aliases"));
+		ListGridField aliases = new ListGridField(ALIASES, I18N.message(ALIASES));
 		aliases.setCanEdit(true);
 		aliases.setWidth("*");
 
@@ -63,8 +65,8 @@ public class ExtensionAliasesDialog extends Window {
 			public void onEditComplete(EditCompleteEvent event) {
 				ListGridRecord rec = extensionsGrid.getRecord(event.getRowNum());
 
-				String extension = rec.getAttributeAsString("extension");
-				String aliases = (String) event.getNewValues().get("aliases");
+				String extension = rec.getAttributeAsString(EXTENSION);
+				String aliases = (String) event.getNewValues().get(ALIASES);
 				aliases = aliases.trim().toLowerCase().replace(" ", "");
 
 				SettingService.Instance.get().saveExtensionAliases(extension, aliases, new AsyncCallback<Void>() {

@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class IncrementalSettingsPanel extends VLayout {
+	private static final String FREQUENCY_STR = "frequency";
+
 	protected GUIIncrementalArchive incremental;
 
 	protected ValuesManager vm = new ValuesManager();
@@ -51,7 +53,7 @@ public class IncrementalSettingsPanel extends VLayout {
 		prefix.setRequired(true);
 		prefix.addChangedHandler(changedHandler);
 
-		frequency = ItemFactory.newIntegerItem("frequency", "frequency", incremental.getFrequency());
+		frequency = ItemFactory.newIntegerItem(FREQUENCY_STR, FREQUENCY_STR, incremental.getFrequency());
 		IntegerRangeValidator min = new IntegerRangeValidator();
 		min.setMin(1);
 		frequency.setValidators(min);
@@ -77,7 +79,7 @@ public class IncrementalSettingsPanel extends VLayout {
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			incremental.setPrefix(vm.getValueAsString("prefix").toString());
-			incremental.setFrequency(Integer.parseInt(vm.getValueAsString("frequency")));
+			incremental.setFrequency(Integer.parseInt(vm.getValueAsString(FREQUENCY_STR)));
 			incremental.setFolder(folderSelector.getFolder());
 
 			if (vm.getValues().get("template") != null) {

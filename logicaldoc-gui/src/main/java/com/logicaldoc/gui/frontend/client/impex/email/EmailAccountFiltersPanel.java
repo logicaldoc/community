@@ -42,6 +42,11 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
+	private static final String TARGET_NAME = "targetName";
+	private static final String TARGET_ID = "targetId";
+	private static final String CONDITION = "condition";
+	private static final String FIELD = "field";
+	private static final String EXPRESSION = "expression";
 	private ListGrid list;
 
 	public EmailAccountFiltersPanel(GUIEmailAccount account, ChangedHandler changedHandler) {
@@ -60,9 +65,9 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 		ListGridField condition = prepareConditionField();
 
-		ListGridField expression = new ListGridField("expression", I18N.message("expression"));
+		ListGridField expression = new ListGridField(EXPRESSION, I18N.message(EXPRESSION));
 		expression.setWidth(150);
-		TextItem conditionEdit = ItemFactory.newTextItem("expression", null);
+		TextItem conditionEdit = ItemFactory.newTextItem(EXPRESSION, null);
 		expression.setEditorType(conditionEdit);
 		conditionEdit.addChangedHandler(changedHandler);
 
@@ -74,11 +79,11 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		if (account.getRules() != null)
 			for (GUIEmailRule rule : account.getRules()) {
 				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute("field", Integer.toString(rule.getField()));
-				rec.setAttribute("condition", Integer.toString(rule.getPolicy()));
-				rec.setAttribute("expression", rule.getExpression());
-				rec.setAttribute("targetId", Long.toString(rule.getTarget().getId()));
-				rec.setAttribute("targetName", rule.getTarget().getName());
+				rec.setAttribute(FIELD, Integer.toString(rule.getField()));
+				rec.setAttribute(CONDITION, Integer.toString(rule.getPolicy()));
+				rec.setAttribute(EXPRESSION, rule.getExpression());
+				rec.setAttribute(TARGET_ID, Long.toString(rule.getTarget().getId()));
+				rec.setAttribute(TARGET_NAME, rule.getTarget().getName());
 				records.add(rec);
 			}
 		list.setData(records.toArray(new ListGridRecord[0]));
@@ -116,18 +121,18 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 			@Override
 			protected Canvas createRecordComponent(final ListGridRecord rec, Integer colNum) {
 				String fieldName = this.getFieldName(colNum);
-				if (fieldName.equals("targetName")) {
+				if (fieldName.equals(TARGET_NAME)) {
 					final FolderSelector folderSelector = new FolderSelector("target", true);
 					folderSelector.setShowTitle(false);
-					folderSelector.setFolder(Long.parseLong(rec.getAttributeAsString("targetId")),
-							rec.getAttributeAsString("targetName"));
+					folderSelector.setFolder(Long.parseLong(rec.getAttributeAsString(TARGET_ID)),
+							rec.getAttributeAsString(TARGET_NAME));
 					folderSelector.addFolderChangeListener((GUIFolder folder) -> {
 						if (folderSelector.getFolderId() != null) {
-							rec.setAttribute("targetId", Long.toString(folderSelector.getFolderId()));
-							rec.setAttribute("targetName", folderSelector.getFolderName());
+							rec.setAttribute(TARGET_ID, Long.toString(folderSelector.getFolderId()));
+							rec.setAttribute(TARGET_NAME, folderSelector.getFolderName());
 						} else {
-							rec.setAttribute("targetId", (Long) null);
-							rec.setAttribute("targetName", "");
+							rec.setAttribute(TARGET_ID, (Long) null);
+							rec.setAttribute(TARGET_NAME, "");
 						}
 
 						changedHandler.onChanged(null);
@@ -159,7 +164,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 	}
 
 	private ListGridField prepareTargetField() {
-		final ListGridField target = new ListGridField("targetName", I18N.message("targetfolder"));
+		final ListGridField target = new ListGridField(TARGET_NAME, I18N.message("targetfolder"));
 		target.setWidth(150);
 		target.setCanEdit(false);
 		target.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
@@ -169,7 +174,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 	}
 
 	private ListGridField prepareConditionField() {
-		ListGridField condition = new ListGridField("condition", I18N.message("condition"));
+		ListGridField condition = new ListGridField(CONDITION, I18N.message(CONDITION));
 		condition.setWidth(120);
 		SelectItem conditionSelect = new SelectItem();
 		LinkedHashMap<String, String> map2 = new LinkedHashMap<>();
@@ -191,9 +196,9 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 	}
 
 	private ListGridField prepareFieldField() {
-		ListGridField field = new ListGridField("field", I18N.message("field"));
+		ListGridField field = new ListGridField(FIELD, I18N.message(FIELD));
 		field.setWidth(120);
-		SelectItem fieldSelect = ItemFactory.newEmailFields("field", "field");
+		SelectItem fieldSelect = ItemFactory.newEmailFields(FIELD, FIELD);
 		field.setEditorType(fieldSelect);
 		fieldSelect.addChangedHandler(changedHandler);
 		field.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
@@ -214,11 +219,11 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		addRule.setHeight(25);
 		addRule.addClickHandler((ClickEvent addRuleClick) -> {
 			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute("field", "0");
-			rec.setAttribute("condition", "0");
-			rec.setAttribute("expression", "");
-			rec.setAttribute("targetId", "5");
-			rec.setAttribute("targetName", "/");
+			rec.setAttribute(FIELD, "0");
+			rec.setAttribute(CONDITION, "0");
+			rec.setAttribute(EXPRESSION, "");
+			rec.setAttribute(TARGET_ID, "5");
+			rec.setAttribute(TARGET_NAME, "/");
 			list.addData(rec);
 			EmailAccountFiltersPanel.this.changedHandler.onChanged(null);
 		});
@@ -231,21 +236,21 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 				ListGridRecord[] records = list.getRecords();
 				List<GUIEmailRule> rules = new ArrayList<>();
 				for (ListGridRecord rec : records) {
-					if (rec.getAttribute("expression") == null)
+					if (rec.getAttribute(EXPRESSION) == null)
 						continue;
 					GUIEmailRule rule = new GUIEmailRule();
 					GUIFolder target = new GUIFolder();
 
-					if (rec.getAttributeAsLong("targetId") != null)
-						target.setId(rec.getAttributeAsLong("targetId"));
+					if (rec.getAttributeAsLong(TARGET_ID) != null)
+						target.setId(rec.getAttributeAsLong(TARGET_ID));
 					else
 						target.setId(0L);
 
-					target.setName(rec.getAttribute("targetName"));
+					target.setName(rec.getAttribute(TARGET_NAME));
 					rule.setTarget(target);
-					rule.setField(Integer.parseInt(rec.getAttribute("field")));
-					rule.setPolicy(Integer.parseInt(rec.getAttribute("condition")));
-					rule.setExpression(rec.getAttribute("expression"));
+					rule.setField(Integer.parseInt(rec.getAttribute(FIELD)));
+					rule.setPolicy(Integer.parseInt(rec.getAttribute(CONDITION)));
+					rule.setExpression(rec.getAttribute(EXPRESSION));
 					rules.add(rule);
 				}
 

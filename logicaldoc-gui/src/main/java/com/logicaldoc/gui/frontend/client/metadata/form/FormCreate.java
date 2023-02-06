@@ -24,6 +24,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 7.3
  */
 public class FormCreate extends Window {
+	private static final String TEMPLATE = "template";
+
 	private SubmitItem create;
 
 	private ValuesManager vm;
@@ -74,10 +76,10 @@ public class FormCreate extends Window {
 		GUIForm vo = new GUIForm();
 		vo.setName(vm.getValueAsString("name").trim());
 
-		if (vm.getValueAsString("template") == null || "".equals(vm.getValueAsString("template").toString()))
+		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE).toString()))
 			vo.setTemplateId(null);
 		else
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString("template").toString()));
+			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE).toString()));
 
 		FormService.Instance.get().save(vo, new AsyncCallback<GUIForm>() {
 			@Override

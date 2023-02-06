@@ -18,10 +18,12 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  * @since 8.7.1
  */
 public class MergeDialog extends Dialog {
+	private static final String MERGE = "merge";
+
 	public MergeDialog() {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("merge"));
+		setTitle(I18N.message(MERGE));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -41,7 +43,7 @@ public class MergeDialog extends Dialog {
 		VLayout buttons = new VLayout();
 		buttons.setWidth100();
 
-		Button merge = new Button(I18N.message("merge"));
+		Button merge = new Button(I18N.message(MERGE));
 		merge.setAutoFit(true);
 		merge.setMargin(1);
 		merge.addClickHandler(new ClickHandler() {
@@ -51,7 +53,7 @@ public class MergeDialog extends Dialog {
 				if (selectedIds.length > 1)
 					label = selectedIds.length + " " + I18N.message("folders").toLowerCase();
 
-				LD.ask(I18N.message("merge"),
+				LD.ask(I18N.message(MERGE),
 						I18N.message("mergeask",
 								new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
 						(Boolean value) -> {

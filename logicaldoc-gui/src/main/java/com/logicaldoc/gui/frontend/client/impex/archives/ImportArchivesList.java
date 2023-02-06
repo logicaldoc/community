@@ -43,6 +43,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ImportArchivesList extends VLayout {
 
+	private static final String DESCRIPTION = "description";
+
 	private Layout detailsContainer;
 
 	private RefreshableListGrid list;
@@ -72,7 +74,7 @@ public class ImportArchivesList extends VLayout {
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 130);
 
-		ListGridField desdcription = new ListGridField("description", I18N.message("description"), 250);
+		ListGridField desdcription = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 250);
 		desdcription.setCanFilter(false);
 
 		ListGridField status = new ListGridField("statusicon", I18N.message("status"), 50);
@@ -226,7 +228,7 @@ public class ImportArchivesList extends VLayout {
 
 	public void updateRecord(GUIArchive result) {
 		ListGridRecord rec = list.getSelectedRecord();
-		rec.setAttribute("description", result.getDescription());
+		rec.setAttribute(DESCRIPTION, result.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

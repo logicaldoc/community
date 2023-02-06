@@ -30,6 +30,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TagsSettingsPanel extends VLayout {
 
+	private static final String CLOUD_ELEMENTS = "cloudElements";
+
+	private static final String SELECT_ELEMENTS = "selectElements";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private GUIParameter[] settings;
@@ -51,18 +55,18 @@ public class TagsSettingsPanel extends VLayout {
 
 		SelectItem mode = ItemFactory.newTagInputMode("mode", "inputmode");
 
-		SpinnerItem maxsize = ItemFactory.newSpinnerItem("maxsize", I18N.message("maxsize"), (Long) null);
+		SpinnerItem maxsize = ItemFactory.newSpinnerItem("maxsize", (Long) null);
 		maxsize.setRequired(true);
 
-		SpinnerItem minsize = ItemFactory.newSpinnerItem("minsize", I18N.message("minsize"), (Long) null);
+		SpinnerItem minsize = ItemFactory.newSpinnerItem("minsize", (Long) null);
 		minsize.setRequired(true);
 
-		SpinnerItem selectElements = ItemFactory.newSpinnerItem("selectElements", I18N.message("tagselectelements"),
+		SpinnerItem selectElements = ItemFactory.newSpinnerItem(SELECT_ELEMENTS, I18N.message("tagselectelements"),
 				(Long) null);
 		selectElements.setRequired(true);
 		selectElements.setWrapTitle(false);
 
-		SpinnerItem cloudElements = ItemFactory.newSpinnerItem("cloudElements", I18N.message("tagcloudelements"),
+		SpinnerItem cloudElements = ItemFactory.newSpinnerItem(CLOUD_ELEMENTS, I18N.message("tagcloudelements"),
 				(Long) null);
 		cloudElements.setRequired(true);
 		cloudElements.setWrapTitle(false);
@@ -96,7 +100,7 @@ public class TagsSettingsPanel extends VLayout {
 			public void onClick(ClickEvent event) {
 				final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-				if (Boolean.TRUE.equals(vm.validate()))  {
+				if (Boolean.TRUE.equals(vm.validate())) {
 					List<GUIParameter> params = new ArrayList<>();
 
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.mode",
@@ -108,9 +112,9 @@ public class TagsSettingsPanel extends VLayout {
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.tag.vocabulary",
 							values.get("vocabulary").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tagcloud.maxtags",
-							values.get("cloudElements").toString()));
+							values.get(CLOUD_ELEMENTS).toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.select.maxtags",
-							values.get("selectElements").toString()));
+							values.get(SELECT_ELEMENTS).toString()));
 
 					SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]),
 							new AsyncCallback<Void>() {
@@ -132,11 +136,11 @@ public class TagsSettingsPanel extends VLayout {
 
 									Session.get().getInfo().setConfig(
 											Session.get().getTenantName() + ".tagcloud.maxtags",
-											values.get("cloudElements").toString());
+											values.get(CLOUD_ELEMENTS).toString());
 
 									Session.get().getInfo().setConfig(
 											Session.get().getTenantName() + ".tag.select.maxtags",
-											values.get("selectElements").toString());
+											values.get(SELECT_ELEMENTS).toString());
 
 									GuiLog.info(I18N.message("settingssaved"), null);
 								}

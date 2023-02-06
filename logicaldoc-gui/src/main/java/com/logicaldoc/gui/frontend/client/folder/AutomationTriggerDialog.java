@@ -31,6 +31,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class AutomationTriggerDialog extends Window {
 
+	private static final String EVENTS = "events";
+
 	private GUIAutomationTrigger trigger;
 
 	private FolderAutomationPanel automationPanel;
@@ -124,7 +126,7 @@ public class AutomationTriggerDialog extends Window {
 		form1.setNumCols(1);
 		form1.setValuesManager(vm);
 
-		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeron"), null, true, true, true,
+		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeron"), null, true, true, true,
 				true);
 		events.setHeight(210);
 		events.setHeight(250);
@@ -158,8 +160,8 @@ public class AutomationTriggerDialog extends Window {
 			trigger.setAutomation(vm.getValueAsString("automation"));
 
 			String eventsStr = null;
-			if (vm.getValueAsString("events") != null) {
-				String buf = vm.getValueAsString("events").toString().trim().toLowerCase();
+			if (vm.getValueAsString(EVENTS) != null) {
+				String buf = vm.getValueAsString(EVENTS).toString().trim().toLowerCase();
 				buf = buf.replace('[', ' ');
 				buf = buf.replace(']', ' ');
 				eventsStr = buf.replace(" ", "");

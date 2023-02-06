@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
+	private static final String DELETE = "delete";
+
 	private DynamicForm form = new DynamicForm();
 
 	private HLayout formsContainer = new HLayout();
@@ -61,7 +63,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		TextItem folder = ItemFactory.newTextItem("mailfolder", account.getMailFolder());
 		folder.addChangedHandler(changedHandler);
 
-		SelectItem format = ItemFactory.newSelectItem("format", "format");
+		SelectItem format = ItemFactory.newSelectItem("format");
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("multiplefiles"));
 		map.put("1", I18N.message("singleeml"));
@@ -70,7 +72,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		format.setValue(Integer.toString(account.getFormat()));
 
 		CheckboxItem deleteFomMailbox = new CheckboxItem();
-		deleteFomMailbox.setName("delete");
+		deleteFomMailbox.setName(DELETE);
 		deleteFomMailbox.setTitle(I18N.message("deletefrommailbox"));
 		deleteFomMailbox.setRedrawOnChange(true);
 		deleteFomMailbox.setWidth(50);
@@ -87,7 +89,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| "delete".equals(event.getKeyName().toLowerCase())) {
+						|| DELETE.equals(event.getKeyName().toLowerCase())) {
 					startDate.clearValue();
 					startDate.setValue((Date) null);
 					changedHandler.onChanged(null);
@@ -109,7 +111,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		if (Boolean.FALSE.equals(form.hasErrors())) {
 			account.setIncludes((String) values.get("include"));
 			account.setExcludes((String) values.get("exclude"));
-			account.setDeleteFromMailbox(Boolean.parseBoolean(values.get("delete").toString()));
+			account.setDeleteFromMailbox(Boolean.parseBoolean(values.get(DELETE).toString()));
 			account.setMailFolder((String) values.get("mailfolder"));
 			account.setFormat(Integer.parseInt((String) values.get("format")));
 			account.setStartDate((Date) values.get("startdate"));

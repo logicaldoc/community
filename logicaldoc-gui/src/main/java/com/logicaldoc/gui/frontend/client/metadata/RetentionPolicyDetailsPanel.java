@@ -12,7 +12,6 @@ import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.services.RetentionPoliciesService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -31,6 +30,8 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 7.2
  */
 public class RetentionPolicyDetailsPanel extends VLayout implements FolderChangeListener {
+	private static final String TEMPLATE = "template";
+
 	private GUIRetentionPolicy policy;
 
 	private Layout propertiesTabPanel;
@@ -62,33 +63,25 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 			removeMember(tabSet);
 		}
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (policy.getId() != 0) {
-					RetentionPoliciesService.Instance.get().getPolicy(policy.getId(),
-							new AsyncCallback<GUIRetentionPolicy>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		tabSet = new EditingTabSet((ClickEvent event) -> onSave(), (ClickEvent event) -> {
+			if (policy.getId() != 0) {
+				RetentionPoliciesService.Instance.get().getPolicy(policy.getId(),
+						new AsyncCallback<GUIRetentionPolicy>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIRetentionPolicy policy) {
-									setPolicy(policy);
-								}
-							});
-				} else {
-					GUIRetentionPolicy newsPolicy = new GUIRetentionPolicy();
-					setPolicy(newsPolicy);
-				}
-				tabSet.hideSave();
+							@Override
+							public void onSuccess(GUIRetentionPolicy policy) {
+								setPolicy(policy);
+							}
+						});
+			} else {
+				GUIRetentionPolicy newsPolicy = new GUIRetentionPolicy();
+				setPolicy(newsPolicy);
 			}
+			tabSet.hideSave();
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
@@ -100,12 +93,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 
 		addMember(tabSet);
 
-		ChangedHandler changedHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changedHandler = (ChangedEvent event) -> onModified();
 
 		form = new DynamicForm();
 		form.setNumCols(2);
@@ -158,10 +146,10 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 			policy.setRetentionDays(Integer.parseInt(form.getValueAsString("days")));
 			policy.setDateOption(Integer.parseInt(form.getValueAsString("dateoption")));
 			policy.setAction(Integer.parseInt(form.getValueAsString("action")));
-			if (form.getValue("template") == null || "".equals(form.getValueAsString("template")))
+			if (form.getValue(TEMPLATE) == null || "".equals(form.getValueAsString(TEMPLATE)))
 				policy.setTemplateId(null);
 			else
-				policy.setTemplateId(Long.parseLong(form.getValueAsString("template")));
+				policy.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
 
 			if (folder == null || folder.getFolderId() == null)
 				policy.setFolderId(null);

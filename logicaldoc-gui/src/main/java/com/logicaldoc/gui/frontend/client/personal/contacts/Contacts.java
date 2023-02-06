@@ -47,6 +47,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class Contacts extends com.smartgwt.client.widgets.Window {
 
+	private static final String EMAIL = "email";
+
 	private ListGrid list;
 
 	private static Contacts instance = null;
@@ -166,7 +168,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField email = new ListGridField("email", I18N.message("email"));
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
 		email.setWidth("*");
 		email.setCanFilter(true);
 
@@ -209,7 +211,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		list.setShowFilterEditor(true);
 		list.setDataSource(new ContactsDS());
 		list.setFields(id, email, firstName, lastName, company, phone, mobile, address);
-		list.sort("email", SortDirection.ASCENDING);
+		list.sort(EMAIL, SortDirection.ASCENDING);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override

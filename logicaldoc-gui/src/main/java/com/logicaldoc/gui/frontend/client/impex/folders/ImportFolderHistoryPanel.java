@@ -42,6 +42,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 
+	private static final String DOC_ID = "docId";
+	private static final String CLOSE_SPAN = "</span>";
 	private CheckboxItem recordHistory;
 
 	public ImportFolderHistoryPanel(GUIImportFolder importFolder, final ChangedHandler changedHandler) {
@@ -64,11 +66,11 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		event.setCanFilter(true);
 		event.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			if (value.toString().contains("importfolder.imported"))
-				return "<span class='event-ok'>" + I18N.message("iimport").toLowerCase() + "</span>";
+				return "<span class='event-ok'>" + I18N.message("iimport").toLowerCase() + CLOSE_SPAN;
 			else if (value.toString().contains("importfolder.updated"))
-				return "<span class='event-med'>" + I18N.message("update").toLowerCase() + "</span>";
+				return "<span class='event-med'>" + I18N.message("update").toLowerCase() + CLOSE_SPAN;
 			else if (value.toString().contains("importfolder.error"))
-				return "<span class='event-error'>" + I18N.message("error").toLowerCase() + "</span>";
+				return "<span class='event-error'>" + I18N.message("error").toLowerCase() + CLOSE_SPAN;
 			else
 				return value.toString();
 		});
@@ -95,7 +97,7 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 
 		list.addCellDoubleClickHandler((CellDoubleClickEvent evnt) -> {
 			Record rec = evnt.getRecord();
-			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("docId")));
+			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(DOC_ID)));
 		});
 
 		list.addCellContextClickHandler((CellContextClickEvent e) -> {
@@ -105,7 +107,7 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 			openInFolder.setTitle(I18N.message("openinfolder"));
 			openInFolder.addClickHandler((MenuItemClickEvent evnt) -> {
 				Record rec = list.getSelectedRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("docId")));
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(DOC_ID)));
 			});
 
 			MenuItem preview = new MenuItem();
@@ -113,7 +115,7 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 			preview.addClickHandler((MenuItemClickEvent evnt) -> {
 				Record rec = list.getSelectedRecord();
 				GUIDocument doc = new GUIDocument();
-				doc.setId(rec.getAttributeAsLong("docId"));
+				doc.setId(rec.getAttributeAsLong(DOC_ID));
 				doc.setFileName(rec.getAttributeAsString("filename"));
 
 				GUIFolder folder = new GUIFolder(rec.getAttributeAsLong("folderId"));

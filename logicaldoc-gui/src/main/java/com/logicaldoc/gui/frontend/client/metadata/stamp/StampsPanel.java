@@ -48,6 +48,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 7.3
  */
 public class StampsPanel extends AdminPanel {
+	private static final String EENABLED = "eenabled";
+
+	private static final String IMAGE = "image";
+
+	private static final String DESCRIPTION = "description";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -75,11 +81,11 @@ public class StampsPanel extends AdminPanel {
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"), 200);
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 200);
 
 		ListGridField text = new ListGridField("text", I18N.message("text"), 200);
 
-		ListGridField image = new ListGridField("image", I18N.message("image"), 300);
+		ListGridField image = new ListGridField(IMAGE, I18N.message(IMAGE), 300);
 		image.setCanFilter(false);
 		image.setCellFormatter(new CellFormatter() {
 
@@ -93,7 +99,7 @@ public class StampsPanel extends AdminPanel {
 			}
 		});
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -239,7 +245,7 @@ public class StampsPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "0");
+							rec.setAttribute(EENABLED, "0");
 							list.refreshRow(list.getRecordIndex(rec));
 						}
 					});
@@ -258,13 +264,13 @@ public class StampsPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "2");
+							rec.setAttribute(EENABLED, "2");
 							list.refreshRow(list.getRecordIndex(rec));
 						}
 					});
 		});
 
-		if ("0".equals(rec.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable, delete);
 		else
 			contextMenu.setItems(enable, delete);
@@ -301,13 +307,13 @@ public class StampsPanel extends AdminPanel {
 		}
 
 		rec.setAttribute("name", stamp.getName());
-		rec.setAttribute("description", "" + stamp.getDescription());
+		rec.setAttribute(DESCRIPTION, "" + stamp.getDescription());
 		if (stamp.getType() == GUIStamp.TYPE_IMAGE) {
-			rec.setAttribute("image", "" + stamp.getId());
+			rec.setAttribute(IMAGE, "" + stamp.getId());
 			rec.setAttribute("text", "");
 		} else {
 			rec.setAttribute("text", "" + stamp.getText());
-			rec.setAttribute("image", "");
+			rec.setAttribute(IMAGE, "");
 		}
 		list.refreshRow(list.getRecordIndex(rec));
 	}

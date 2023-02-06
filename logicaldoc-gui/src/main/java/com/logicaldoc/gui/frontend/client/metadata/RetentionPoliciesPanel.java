@@ -45,6 +45,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class RetentionPoliciesPanel extends AdminPanel {
 
+	private static final String ACTION = "action";
+
+	private static final String EENABLED = "eenabled";
+
+	private static final String TEMPLATE = "template";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -87,12 +93,12 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 		ListGridField dateOption = prepareDateOptionField();
 
-		ListGridField template = new ListGridField("template", I18N.message("template"), 150);
+		ListGridField template = new ListGridField(TEMPLATE, I18N.message(TEMPLATE), 150);
 		template.setCanFilter(false);
 
 		ListGridField action = prepareActionField();
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -202,7 +208,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 	}
 
 	private ListGridField prepareActionField() {
-		ListGridField action = new ListGridField("action", I18N.message("action"), 150);
+		ListGridField action = new ListGridField(ACTION, I18N.message(ACTION), 150);
 		action.setCanFilter(false);
 		action.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			int val = Integer.parseInt(value.toString());
@@ -276,7 +282,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "0");
+								rec.setAttribute(EENABLED, "0");
 								list.refreshRow(list.getRecordIndex(rec));
 							}
 						});
@@ -296,13 +302,13 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "2");
+							rec.setAttribute(EENABLED, "2");
 							list.refreshRow(list.getRecordIndex(rec));
 						}
 					});
 		});
 
-		if ("0".equals(rec.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable, delete);
 		else
 			contextMenu.setItems(enable, delete);
@@ -341,9 +347,9 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		rec.setAttribute("name", policy.getName());
 		rec.setAttribute("days", "" + policy.getRetentionDays());
 		rec.setAttribute("dateOption", "" + policy.getDateOption());
-		rec.setAttribute("template", policy.getTemplateName() != null ? policy.getTemplateName() : null);
+		rec.setAttribute(TEMPLATE, policy.getTemplateName() != null ? policy.getTemplateName() : null);
 		rec.setAttribute("position", "" + policy.getPosition());
-		rec.setAttribute("action", "" + policy.getAction());
+		rec.setAttribute(ACTION, "" + policy.getAction());
 
 		list.refreshRow(list.getRecordIndex(rec));
 	}

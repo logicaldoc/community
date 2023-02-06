@@ -97,8 +97,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			sessionsQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem("documentsquota", "documentsquota",
-				tenant.getMaxRepoDocs());
+		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem("documentsquota", tenant.getMaxRepoDocs());
 		documentsQuota.setDisabled(readonly);
 		documentsQuota.setRequired(false);
 		documentsQuota.setMin(0);
@@ -107,7 +106,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			documentsQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem("sizequota", "sizequota", tenant.getMaxRepoSize());
+		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem("sizequota", tenant.getMaxRepoSize());
 		sizeQuota.setHint("MB");
 		sizeQuota.setDisabled(readonly);
 		sizeQuota.setRequired(false);

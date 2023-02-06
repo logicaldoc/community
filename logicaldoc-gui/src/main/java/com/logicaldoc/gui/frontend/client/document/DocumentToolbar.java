@@ -444,7 +444,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 				GUIFolder currentFolder = FolderController.get().getCurrentFolder();
 				GUIDocument metadata = currentFolder.newDocument();
-				new UpdateDialog(grid.getSelectedIds(), metadata, UpdateDialog.CONTEXT_UPDATE, false).show();
+				new UpdateDialog(grid.getSelectedIds(), metadata, UpdateDialog.BULKUPDATE, false).show();
 			});
 		}
 	}

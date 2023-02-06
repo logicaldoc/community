@@ -23,10 +23,12 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  */
 public class InheritRightsDialog extends Dialog {
 
+	private static final String INHERITRIGHTS = "inheritrights";
+
 	public InheritRightsDialog(final FolderSecurityPanel panel) {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("inheritrights"));
+		setTitle(I18N.message(INHERITRIGHTS));
 		setWidth(250);
 		setHeight(270);
 		setCanDragResize(true);
@@ -49,12 +51,12 @@ public class InheritRightsDialog extends Dialog {
 		buttons.setWidth100();
 		buttons.setHeight(30);
 
-		Button inheritRights = new Button(I18N.message("inheritrights"));
+		Button inheritRights = new Button(I18N.message(INHERITRIGHTS));
 		inheritRights.setAutoFit(true);
 		inheritRights.setMargin(1);
 		inheritRights.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				LD.ask(I18N.message("inheritrights"),
+				LD.ask(I18N.message(INHERITRIGHTS),
 						I18N.message("inheritrightsask",
 								new String[] { FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
 										folders.getSelectedRecord().getAttributeAsString("name") }),

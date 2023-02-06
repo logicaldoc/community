@@ -175,7 +175,7 @@ public class SearchToolbar extends ToolStrip {
 					metadata.setFolder(fld);
 
 					UpdateDialog dialog = new UpdateDialog(hitsPanel.getGrid().getSelectedIds(), metadata,
-							UpdateDialog.CONTEXT_UPDATE, false);
+							UpdateDialog.BULKUPDATE, false);
 					dialog.show();
 				}
 			});

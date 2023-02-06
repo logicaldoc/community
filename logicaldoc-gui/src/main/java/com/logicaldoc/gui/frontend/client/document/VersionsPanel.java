@@ -44,6 +44,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class VersionsPanel extends DocumentDetailTab {
 
+	private static final String DOWNLOAD = "download";
+
+	private static final String VERSION = "version";
+
 	private static final String PERMALINK = "permalink";
 
 	private static final String FILE_VERSION = "fileVersion";
@@ -61,7 +65,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 		ListGridField user = new UserListGridField("user", "userId", "user");
 		ListGridField event = new ColoredListGridField("event", 200);
-		ListGridField version = new ColoredListGridField("version", 70);
+		ListGridField version = new ColoredListGridField(VERSION, 70);
 		ListGridField fileVersion = new ColoredListGridField(FILE_VERSION, I18N.message("fileversion"), 70);
 		ListGridField date = new DateListGridField("date", "date");
 		ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"));
@@ -121,7 +125,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		list.addCellDoubleClickHandler((CellDoubleClickEvent clickEvent) -> {
 			ListGridRecord rec = clickEvent.getRecord();
 			if (FolderController.get().getCurrentFolder().isDownload()
-					&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
+					&& DOWNLOAD.equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 				onDownload(document, rec);
 			else
 				onPreview(document, rec);
@@ -159,7 +163,7 @@ public class VersionsPanel extends DocumentDetailTab {
 			long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
 			String fileVer = rec.getAttributeAsString(FILE_VERSION);
 			String downloadUrl = Util.downloadURL(docId, fileVer);
-			String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message("download") + "</a>";
+			String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message(DOWNLOAD) + "</a>";
 			return perma;
 		});
 		return permalink;
@@ -177,7 +181,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		version.setFolder(document.getFolder());
 		version.setDocId(document.getId());
 		version.setId(document.getId());
-		version.setVersion(rec.getAttribute("version"));
+		version.setVersion(rec.getAttribute(VERSION));
 		version.setFileVersion(rec.getAttribute(FILE_VERSION));
 		version.setType(rec.getAttribute("type"));
 		version.setFileName(rec.getAttribute("filename"));
@@ -199,17 +203,13 @@ public class VersionsPanel extends DocumentDetailTab {
 		MenuItem compareContent = compareContentMenuItem(selection);
 
 		MenuItem download = new MenuItem();
-		download.setTitle(I18N.message("download"));
-		download.addClickHandler((MenuItemClickEvent downloadEvent) -> {
-			onDownload(document, selection[0]);
-		});
+		download.setTitle(I18N.message(DOWNLOAD));
+		download.addClickHandler((MenuItemClickEvent downloadEvent) -> onDownload(document, selection[0]));
 		download.setEnabled(document.getFolder().isDownload());
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler((MenuItemClickEvent previewEvent) -> {
-			onPreview(document, selection[0]);
-		});
+		preview.addClickHandler((MenuItemClickEvent previewEvent) -> onPreview(document, selection[0]));
 		preview.setEnabled(
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
@@ -219,19 +219,13 @@ public class VersionsPanel extends DocumentDetailTab {
 
 		MenuItem replaceFile = new MenuItem();
 		replaceFile.setTitle(I18N.message("replacefile"));
-		replaceFile.addClickHandler((MenuItemClickEvent replaceFileEvent) -> {
-			ReplaceVersionFile dialog = new ReplaceVersionFile(document,
-					selection[0].getAttributeAsString(FILE_VERSION));
-			dialog.show();
-		});
+		replaceFile.addClickHandler((MenuItemClickEvent replaceFileEvent) -> new ReplaceVersionFile(document,
+				selection[0].getAttributeAsString(FILE_VERSION)).show());
 
 		MenuItem notes = new MenuItem();
 		notes.setTitle(I18N.message("notes"));
-		notes.addClickHandler((MenuItemClickEvent notesEvent) -> {
-			VersionNotesWindow versionNotes = new VersionNotesWindow(document,
-					selection[0].getAttributeAsString(FILE_VERSION));
-			versionNotes.show();
-		});
+		notes.addClickHandler((MenuItemClickEvent notesEvent) -> new VersionNotesWindow(document,
+				selection[0].getAttributeAsString(FILE_VERSION)).show());
 
 		compareMetadata.setEnabled(selection != null && selection.length == 2);
 		compareContent.setEnabled(Feature.enabled(Feature.COMPARISON) && (selection != null && selection.length == 2));
@@ -262,108 +256,101 @@ public class VersionsPanel extends DocumentDetailTab {
 	private MenuItem prepareDeleteMenuItem(final ListGridRecord[] selection) {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"),
-						I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
-							if (Boolean.TRUE.equals(value)) {
-								long[] ids = new long[selection.length];
-								int i = 0;
-								for (ListGridRecord rec : selection)
-									ids[i++] = Long.parseLong(rec.getAttribute("id"));
+		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
+				I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						long[] ids = new long[selection.length];
+						int i = 0;
+						for (ListGridRecord rec : selection)
+							ids[i++] = Long.parseLong(rec.getAttribute("id"));
 
-								DocumentService.Instance.get().deleteVersions(ids, new AsyncCallback<GUIDocument>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+						DocumentService.Instance.get().deleteVersions(ids, new AsyncCallback<GUIDocument>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(GUIDocument result) {
-										if (result != null) {
-											document.setVersion(result.getVersion());
-											document.setFileVersion(result.getFileVersion());
-											DocumentController.get().modified(result);
-											DocumentController.get().selected(result);
-											list.removeSelectedData();
-										}
-									}
-								});
+							@Override
+							public void onSuccess(GUIDocument result) {
+								if (result != null) {
+									document.setVersion(result.getVersion());
+									document.setFileVersion(result.getFileVersion());
+									DocumentController.get().modified(result);
+									DocumentController.get().selected(result);
+									list.removeSelectedData();
+								}
 							}
 						});
-			}
-		});
+					}
+				}));
 		return delete;
 	}
 
 	private MenuItem comparePromoteMenuItem(final ListGridRecord[] selection) {
 		MenuItem promote = new MenuItem();
 		promote.setTitle(I18N.message("promote"));
-		promote.addClickHandler((MenuItemClickEvent promoteEvent) -> {
-			LD.ask(I18N.message("question"), I18N.message("promotequestion"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes)) {
-					LD.contactingServer();
-					DocumentService.Instance.get().promoteVersion(document.getId(),
-							selection[0].getAttributeAsString("version"), new AsyncCallback<GUIDocument>() {
+		promote.addClickHandler((MenuItemClickEvent promoteEvent) -> LD.ask(I18N.message("question"),
+				I18N.message("promotequestion"), (Boolean yes) -> {
+					if (Boolean.TRUE.equals(yes)) {
+						LD.contactingServer();
+						DocumentService.Instance.get().promoteVersion(document.getId(),
+								selection[0].getAttributeAsString(VERSION), new AsyncCallback<GUIDocument>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+									}
 
-								@Override
-								public void onSuccess(GUIDocument document) {
-									LD.clearPrompt();
-									DocumentController.get().checkedIn(document);
-									destroy();
-								}
-							});
-				}
-			});
-		});
+									@Override
+									public void onSuccess(GUIDocument document) {
+										LD.clearPrompt();
+										DocumentController.get().checkedIn(document);
+										destroy();
+									}
+								});
+					}
+				}));
 		return promote;
 	}
 
 	private MenuItem compareContentMenuItem(final ListGridRecord[] selection) {
 		MenuItem compareContent = new MenuItem();
 		compareContent.setTitle(I18N.message("comparecontent"));
-		compareContent.addClickHandler((MenuItemClickEvent compareContentEvent) -> {
-			DocumentService.Instance.get().getVersionsById(Long.parseLong(selection[0].getAttribute("id")),
-					Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		compareContent.addClickHandler((MenuItemClickEvent compareContentEvent) -> DocumentService.Instance.get()
+				.getVersionsById(Long.parseLong(selection[0].getAttribute("id")),
+						Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(GUIVersion[] versions) {
-							ComparisonWindow diffWinfow = new ComparisonWindow(versions[0], versions[1]);
-							diffWinfow.show();
-						}
-					});
-		});
+							@Override
+							public void onSuccess(GUIVersion[] versions) {
+								ComparisonWindow diffWinfow = new ComparisonWindow(versions[0], versions[1]);
+								diffWinfow.show();
+							}
+						}));
 		return compareContent;
 	}
 
 	private MenuItem prepareCompareMetadataItem(final ListGridRecord[] selection) {
 		MenuItem compareMetadata = new MenuItem();
 		compareMetadata.setTitle(I18N.message("comparemetadata"));
-		compareMetadata.addClickHandler((MenuItemClickEvent compareMetadataEvent) -> {
-			DocumentService.Instance.get().getVersionsById(Long.parseLong(selection[0].getAttribute("id")),
-					Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		compareMetadata.addClickHandler((MenuItemClickEvent compareMetadataEvent) -> DocumentService.Instance.get()
+				.getVersionsById(Long.parseLong(selection[0].getAttribute("id")),
+						Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(GUIVersion[] result) {
-							MetadataDiff diffWinfow = new MetadataDiff(result[0], result[1]);
-							diffWinfow.show();
-						}
-					});
-		});
+							@Override
+							public void onSuccess(GUIVersion[] result) {
+								MetadataDiff diffWinfow = new MetadataDiff(result[0], result[1]);
+								diffWinfow.show();
+							}
+						}));
 		return compareMetadata;
 	}
 }

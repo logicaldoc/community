@@ -37,6 +37,10 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class FolderAutomationPanel extends FolderDetailTab {
 
+	private static final String ROUTINE = "routine";
+
+	private static final String AUTOMATION = "automation";
+
 	private ListGrid list;
 
 	private VLayout container = new VLayout();
@@ -60,11 +64,11 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		id.setCanEdit(false);
 		id.setHidden(true);
 
-		ListGridField automation = new ListGridField("automation", I18N.message("automation"));
+		ListGridField automation = new ListGridField(AUTOMATION, I18N.message(AUTOMATION));
 		automation.setWidth("*");
 		automation.setCanEdit(false);
 
-		ListGridField routine = new ListGridField("routine", I18N.message("routine"), 150);
+		ListGridField routine = new ListGridField(ROUTINE, I18N.message(ROUTINE), 150);
 		routine.setCanFilter(true);
 
 		ListGridField events = new EventsListGridField("events", "triggeron");
@@ -209,13 +213,13 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		}
 
 		rec.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : "");
-		rec.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
+		rec.setAttribute(AUTOMATION, trigger.getAutomation() != null ? trigger.getAutomation() : "");
 
 		if (trigger.getRoutine() != null) {
-			rec.setAttribute("routine", trigger.getRoutine().getName());
+			rec.setAttribute(ROUTINE, trigger.getRoutine().getName());
 			rec.setAttribute("routineId", trigger.getRoutine().getId());
 		} else {
-			rec.setAttribute("routine", (String) null);
+			rec.setAttribute(ROUTINE, (String) null);
 			rec.setAttribute("routineId", (Long) null);
 		}
 

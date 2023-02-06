@@ -18,9 +18,7 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -36,6 +34,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 7.3
  */
 public class GDriveImport extends Window {
+
+	private static final String FILENAME = "filename";
+
+	private static final String RESOURCE_ID = "resourceId";
 
 	private VLayout layout = null;
 
@@ -58,17 +60,12 @@ public class GDriveImport extends Window {
 		layout.setWidth100();
 		layout.setHeight100();
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler((CloseClickEvent event) -> destroy());
 
-		ListGridField resourceId = new ListGridField("resourceId", "id", 200);
+		ListGridField resourceId = new ListGridField(RESOURCE_ID, "id", 200);
 		resourceId.setHidden(true);
 
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"));
+		ListGridField fileName = new ListGridField(FILENAME, I18N.message(FILENAME));
 		fileName.setCanFilter(true);
 		fileName.setWidth("*");
 
@@ -128,9 +125,9 @@ public class GDriveImport extends Window {
 						int i = 0;
 						for (GUIDocument hit : hits) {
 							ListGridRecord rec = new ListGridRecord();
-							rec.setAttribute("resourceId", hit.getExtResId());
+							rec.setAttribute(RESOURCE_ID, hit.getExtResId());
 							rec.setAttribute("icon", hit.getIcon());
-							rec.setAttribute("filename", hit.getFileName());
+							rec.setAttribute(FILENAME, hit.getFileName());
 							rec.setAttribute("version", hit.getVersion());
 							rec.setAttribute("size", hit.getFileSize());
 							rec.setAttribute("editor", hit.getPublisher());
@@ -147,33 +144,30 @@ public class GDriveImport extends Window {
 		ToolStripButton importSelection = new ToolStripButton();
 		importSelection.setTitle(I18N.message("iimport"));
 		toolStrip.addButton(importSelection);
-		importSelection.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ListGridRecord[] selection = grid.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
+		importSelection.addClickHandler((ClickEvent event) -> {
+			ListGridRecord[] selection = grid.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
 
-				String[] resIds = new String[selection.length];
-				for (int i = 0; i < resIds.length; i++)
-					resIds[i] = selection[i].getAttributeAsString("resourceId");
+			String[] resIds = new String[selection.length];
+			for (int i = 0; i < resIds.length; i++)
+				resIds[i] = selection[i].getAttributeAsString(RESOURCE_ID);
 
-				LD.contactingServer();
-				GDriveService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(), null,
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								GuiLog.serverError(caught);
-							}
+			LD.contactingServer();
+			GDriveService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(),
+					null, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void ret) {
-								LD.clearPrompt();
-								DocumentsPanel.get().refresh();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void ret) {
+							LD.clearPrompt();
+							DocumentsPanel.get().refresh();
+						}
+					});
 		});
 		toolStrip.addFill();
 

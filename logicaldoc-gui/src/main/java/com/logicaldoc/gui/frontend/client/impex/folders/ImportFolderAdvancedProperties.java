@@ -30,6 +30,14 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
+	private static final String BARCODETEMPLATE = "barcodetemplate";
+
+	private static final String OCRTEMPLATE = "ocrtemplate";
+
+	private static final String TEMPLATE = "template";
+
+	private static final String SIZEMAX = "sizemax";
+
 	private DynamicForm form = new DynamicForm();
 
 	private HLayout formsContainer = new HLayout();
@@ -61,7 +69,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		depth.setWidth(60);
 		depth.addChangedHandler(changedHandler);
 
-		IntegerItem size = ItemFactory.newIntegerItem("sizemax", "sizemax", importFolder.getMaxSize());
+		IntegerItem size = ItemFactory.newIntegerItem(SIZEMAX, SIZEMAX, importFolder.getMaxSize());
 		size.addChangedHandler(changedHandler);
 		size.setHint("KB");
 		size.setWidth(100);
@@ -75,10 +83,10 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		ChangedHandler changeTemplateHandler = new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-				if (form.getValue("template") == null || "".equals(form.getValueAsString("template")))
+				if (form.getValue(TEMPLATE) == null || "".equals(form.getValueAsString(TEMPLATE)))
 					importFolder.setTemplateId(null);
 				else
-					importFolder.setTemplateId(Long.parseLong(form.getValueAsString("template")));
+					importFolder.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
 				importFolder.setOcrTemplateId(null);
 				importFolder.setBarcodeTemplateId(null);
 				refresh();
@@ -191,28 +199,28 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 	}
 
 	private void collectTemplates(Map<String, Object> values) {
-		if (values.get("template") == null || "".equals((String) values.get("template")))
+		if (values.get(TEMPLATE) == null || "".equals((String) values.get(TEMPLATE)))
 			importFolder.setTemplateId(null);
 		else
-			importFolder.setTemplateId(Long.parseLong((String) values.get("template")));
+			importFolder.setTemplateId(Long.parseLong((String) values.get(TEMPLATE)));
 
-		if (values.get("ocrtemplate") == null || "".equals((String) values.get("ocrtemplate")))
+		if (values.get(OCRTEMPLATE) == null || "".equals((String) values.get(OCRTEMPLATE)))
 			importFolder.setOcrTemplateId(null);
 		else
-			importFolder.setOcrTemplateId(Long.parseLong((String) values.get("ocrtemplate")));
+			importFolder.setOcrTemplateId(Long.parseLong((String) values.get(OCRTEMPLATE)));
 
-		if (values.get("barcodetemplate") == null || "".equals((String) values.get("barcodetemplate")))
+		if (values.get(BARCODETEMPLATE) == null || "".equals((String) values.get(BARCODETEMPLATE)))
 			importFolder.setBarcodeTemplateId(null);
 		else
-			importFolder.setBarcodeTemplateId(Long.parseLong((String) values.get("barcodetemplate")));
+			importFolder.setBarcodeTemplateId(Long.parseLong((String) values.get(BARCODETEMPLATE)));
 	}
 
 	private void collectSizeMax(Map<String, Object> values) {
-		if (values.get("sizemax") == null)
+		if (values.get(SIZEMAX) == null)
 			importFolder.setMaxSize(null);
-		else if (values.get("sizemax") instanceof Integer)
-			importFolder.setMaxSize((Integer) form.getValue("sizemax"));
+		else if (values.get(SIZEMAX) instanceof Integer)
+			importFolder.setMaxSize((Integer) form.getValue(SIZEMAX));
 		else
-			importFolder.setMaxSize(Integer.parseInt((String) values.get("sizemax")));
+			importFolder.setMaxSize(Integer.parseInt((String) values.get(SIZEMAX)));
 	}
 }

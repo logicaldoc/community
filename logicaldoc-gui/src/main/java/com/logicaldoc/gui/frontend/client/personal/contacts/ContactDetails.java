@@ -25,6 +25,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  */
 public class ContactDetails extends Window {
 
+	private static final String EMAIL = "email";
+
 	public ContactDetails(final GUIContact contact, final Contacts parent) {
 		super();
 
@@ -46,7 +48,7 @@ public class ContactDetails extends Window {
 
 		TextItem firstName = ItemFactory.newTextItem("firstname", contact.getFirstName());
 		TextItem lastName = ItemFactory.newTextItem("lastname", contact.getLastName());
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setRequired(true);
 		email.setValue(contact.getEmail());
 		TextItem address = ItemFactory.newTextItem("address", contact.getAddress());
@@ -68,7 +70,7 @@ public class ContactDetails extends Window {
 					c.setUserId(Session.get().getUser().getId());
 					c.setFirstName(vm.getValueAsString("firstname"));
 					c.setLastName(vm.getValueAsString("lastname"));
-					c.setEmail(vm.getValueAsString("email"));
+					c.setEmail(vm.getValueAsString(EMAIL));
 					c.setAddress(vm.getValueAsString("address"));
 					c.setPhone(vm.getValueAsString("phone"));
 					c.setMobile(vm.getValueAsString("cell"));

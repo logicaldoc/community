@@ -125,7 +125,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		LinkItem folder = prepareFolderItem();
 
-		ColorItem color = ItemFactory.newColorItemPicker(COLOR, COLOR, document.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorItemPicker(document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
 
 		String downloadUrl = Util.downloadURL(document.getId());
@@ -330,8 +330,8 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		newTagItem.setEndRow(true);
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
-			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null && event.getKeyName() != null
-					&& "enter".equals(event.getKeyName().toLowerCase())) {
+			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
+					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();
 

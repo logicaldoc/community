@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  */
 public class FolderCursor extends DynamicForm implements FolderObserver {
 
+	private static final String GUI_FOLDER_MAXCHILDREN = "gui.folder.maxchildren";
+
 	private static FolderCursor instance = null;
 
 	private SpinnerItem maxItem;
@@ -47,7 +49,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		setHeight(1);
 		setAlign(Alignment.RIGHT);
 
-		maxItem = ItemFactory.newSpinnerItem("max", "display", Session.get().getConfigAsInt("gui.folder.maxchildren"),
+		maxItem = ItemFactory.newSpinnerItem("max", "display", Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN),
 				2, (Integer) null);
 		maxItem.setWidth(60);
 		maxItem.setStep(20);
@@ -125,7 +127,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 	public void onFolderSelected(GUIFolder folder) {
 		FolderPagination pagination = paginations.get(folder.getId());
 		if (pagination == null) {
-			pagination = new FolderPagination(folder.getId(), Session.get().getConfigAsInt("gui.folder.maxchildren"),
+			pagination = new FolderPagination(folder.getId(), Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN),
 					folder.getSubfolderCount(), 1);
 			// Save it only if there are more than one page
 			if (pagination.getTotalPages() >= 2)
@@ -175,7 +177,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 	private void updateServer() {
 		if (currentPagination.getTotalPages() < 2
-				&& currentPagination.getPageSize() == Session.get().getConfigAsInt("gui.folder.maxchildren"))
+				&& currentPagination.getPageSize() == Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN))
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(), null, null,
 					new AsyncCallback<Void>() {
 

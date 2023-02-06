@@ -88,7 +88,7 @@ public class TaskSchedulingPanel extends VLayout {
 		long max = 0;
 		if (task.getScheduling().getMaxLength() > 0)
 			max = task.getScheduling().getMaxLength() / 60;
-		maxDuration = ItemFactory.newSpinnerItem("maxDuration", "maxduration", max);
+		maxDuration = ItemFactory.newSpinnerItem("maxduration", max);
 		maxDuration.setWidth(80);
 		maxDuration.setHint(I18N.message("minutes").toLowerCase());
 		maxDuration.setStep(10);
@@ -96,7 +96,7 @@ public class TaskSchedulingPanel extends VLayout {
 		maxDuration.addChangedHandler(changedHandler);
 
 		// Initial delay
-		initialDelay = ItemFactory.newSpinnerItem("initialDelay", "initialdelay", task.getScheduling().getDelay());
+		initialDelay = ItemFactory.newSpinnerItem("initialdelay", task.getScheduling().getDelay());
 		initialDelay.setWidth(80);
 		initialDelay.setVisible(simplePolicy);
 		initialDelay.setStep(10);
@@ -159,7 +159,7 @@ public class TaskSchedulingPanel extends VLayout {
 		else
 			task.getScheduling().setSimple(false);
 
-		long max = Long.parseLong(values.get("maxDuration").toString());
+		long max = Long.parseLong(values.get("maxduration").toString());
 		if (max <= 0)
 			max = -1L;
 		else
@@ -168,10 +168,10 @@ public class TaskSchedulingPanel extends VLayout {
 
 		if (task.getScheduling().isSimple() || ((String) values.get("simple")).equals("true")) {
 			long longValue = 0;
-			if (values.get("initialDelay") instanceof String)
-				longValue = Long.parseLong((String) values.get("initialDelay"));
+			if (values.get("initialdelay") instanceof String)
+				longValue = Long.parseLong((String) values.get("initialdelay"));
 			else
-				longValue = ((Integer) values.get("initialDelay")).longValue();
+				longValue = ((Integer) values.get("initialdelay")).longValue();
 			task.getScheduling().setDelay(longValue);
 
 			if (values.get("repeatInterval") instanceof String)

@@ -152,7 +152,7 @@ public class VIASettingsPanel extends AdminPanel {
 		RadioGroupItem ssl = ItemFactory.newBooleanSelector("ssl", "ssl");
 		ssl.setValue(account.isSsl() ? "yes" : "no");
 
-		SelectItem protocol = ItemFactory.newEmailProtocolSelector("protocol", "protocol");
+		SelectItem protocol = ItemFactory.newEmailProtocolSelector();
 		protocol.setValue(account.getProvider());
 
 		TextItem folder = ItemFactory.newTextItem("mailfolder", account.getMailFolder());

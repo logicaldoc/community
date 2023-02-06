@@ -25,6 +25,10 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  */
 public class FolderQuotaPanel extends FolderDetailTab {
 
+	private static final String SIZEQUOTA = "sizequota";
+
+	private static final String DOCUMENTSQUOTA = "documentsquota";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -57,12 +61,12 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
 
-		TextItem documentsQuota = ItemFactory.newLongItem("documentsquota", "documentsquota", folder.getQuotaDocs());
+		TextItem documentsQuota = ItemFactory.newLongItem(DOCUMENTSQUOTA, DOCUMENTSQUOTA, folder.getQuotaDocs());
 		documentsQuota.setDisabled(!update);
 		if (update)
 			documentsQuota.addChangedHandler(changedHandler);
 
-		TextItem sizeQuota = ItemFactory.newLongItem("sizequota", "sizequota", folder.getQuotaSize());
+		TextItem sizeQuota = ItemFactory.newLongItem(SIZEQUOTA, SIZEQUOTA, folder.getQuotaSize());
 		sizeQuota.setHint("MB");
 		sizeQuota.setWidth(120);
 		sizeQuota.setDisabled(!update);
@@ -75,8 +79,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		StaticTextItem documents = ItemFactory.newStaticTextItem("documents",
 				Util.formatLong(folder.getDocumentsTotal()));
 
-		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("quotaThreshold", "alertthreshold",
-				folder.getQuotaThreshold());
+		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("alertthreshold", folder.getQuotaThreshold());
 		quotaThreshold.setDisabled(!update);
 		quotaThreshold.setMax(100);
 		quotaThreshold.setMin(0);
@@ -109,20 +112,20 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
 
-		if (values.get("documentsquota") == null)
+		if (values.get(DOCUMENTSQUOTA) == null)
 			folder.setQuotaDocs(null);
 		else
-			folder.setQuotaDocs(Long.parseLong(values.get("documentsquota").toString()));
+			folder.setQuotaDocs(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
 
-		if (values.get("sizequota") == null)
+		if (values.get(SIZEQUOTA) == null)
 			folder.setQuotaSize(null);
 		else
-			folder.setQuotaSize(Long.parseLong(values.get("sizequota").toString()));
+			folder.setQuotaSize(Long.parseLong(values.get(SIZEQUOTA).toString()));
 
-		if (values.get("quotaThreshold") == null)
+		if (values.get("quotathreshold") == null)
 			folder.setQuotaThreshold(null);
 		else
-			folder.setQuotaThreshold(Integer.parseInt(values.get("quotaThreshold").toString()));
+			folder.setQuotaThreshold(Integer.parseInt(values.get("quotathreshold").toString()));
 
 		folder.clearQuotaAlertRecipients();
 		String[] usernames = recipients.getValues();

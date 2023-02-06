@@ -23,11 +23,9 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -39,6 +37,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 8.7
  */
 public class ResponsesGrid extends RefreshableListGrid {
+
+	private static final String LANGUAGE = "language";
 
 	protected GUIForm form = null;
 
@@ -54,13 +54,9 @@ public class ResponsesGrid extends RefreshableListGrid {
 
 		prepareFields();
 
-		addCellContextClickHandler(new CellContextClickHandler() {
-
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				event.cancel();
-				showContextMenu();
-			}
+		addCellContextClickHandler((CellContextClickEvent event) -> {
+			event.cancel();
+			showContextMenu();
 		});
 
 		ResponsesDS dataSource = new ResponsesDS(form, 100);
@@ -85,17 +81,13 @@ public class ResponsesGrid extends RefreshableListGrid {
 
 		final LinkedHashMap<String, String> languages = I18N.getSupportedLanguages(false);
 
-		ListGridField language = new ListGridField("language", I18N.message("language"), 100);
+		ListGridField language = new ListGridField(LANGUAGE, I18N.message(LANGUAGE), 100);
 		language.setType(ListGridFieldType.TEXT);
 		language.setCanFilter(false);
 		language.setAlign(Alignment.CENTER);
 		language.setHidden(true);
-		language.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				return languages.get(rec.getAttribute("language"));
-			}
+		language.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			return languages.get(rec.getAttribute(LANGUAGE));
 		});
 
 		ListGridField respondent = new ListGridField("_respondent", I18N.message("respondent"), 200);
@@ -155,60 +147,53 @@ public class ResponsesGrid extends RefreshableListGrid {
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord rec = getSelectedRecord();
-				if (rec == null)
-					return;
+		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord rec = getSelectedRecord();
+			if (rec == null)
+				return;
 
-				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
-			}
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
 		});
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				PreviewPopup iv = null;
+		preview.addClickHandler((MenuItemClickEvent event) -> {
+			PreviewPopup iv = null;
 
-				if (selection.length == 1) {
-					GUIDocument doc = DocumentGridUtil.toDocument(getSelectedRecord());
-					if (doc.getDocRef() != null) {
-						/*
-						 * in case of alias the data servlet inverts the docId
-						 * and the docRef so in order to have the preview to do
-						 * the right security checks we have to restore the
-						 * correct ids
-						 */
-						long aliasId = doc.getDocRef();
-						doc.setDocRef(doc.getId());
-						doc.setId(aliasId);
-					}
-					iv = new PreviewPopup(doc);
-				} else {
-					GUIDocument[] docs = DocumentGridUtil.toDocuments(selection);
-					for (GUIDocument doc : docs) {
-						/*
-						 * in case of alias the data servlet inverts the docId
-						 * and the docRef so in order to have the preview to do
-						 * the right security checks we have to restore the
-						 * correct ids
-						 */
-						long aliasId = doc.getDocRef();
-						doc.setDocRef(doc.getId());
-						doc.setId(aliasId);
-					}
-					iv = new PreviewPopup(docs, 0);
+			if (selection.length == 1) {
+				GUIDocument doc = DocumentGridUtil.toDocument(getSelectedRecord());
+				if (doc.getDocRef() != null) {
+					/*
+					 * in case of alias the data servlet inverts the docId and
+					 * the docRef so in order to have the preview to do the
+					 * right security checks we have to restore the correct ids
+					 */
+					long aliasId = doc.getDocRef();
+					doc.setDocRef(doc.getId());
+					doc.setId(aliasId);
 				}
-				iv.show();
+				iv = new PreviewPopup(doc);
+			} else {
+				GUIDocument[] docs = DocumentGridUtil.toDocuments(selection);
+				for (GUIDocument doc : docs) {
+					/*
+					 * in case of alias the data servlet inverts the docId and
+					 * the docRef so in order to have the preview to do the
+					 * right security checks we have to restore the correct ids
+					 */
+					long aliasId = doc.getDocRef();
+					doc.setDocRef(doc.getId());
+					doc.setId(aliasId);
+				}
+				iv = new PreviewPopup(docs, 0);
 			}
+			iv.show();
 		});
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocumentService.Instance.get().delete(DocumentGridUtil.getIds(selection), new AsyncCallback<Void>() {
+		delete.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
+				.delete(DocumentGridUtil.getIds(selection), new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -219,9 +204,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 					public void onSuccess(Void arg0) {
 						refresh(getDataSource());
 					}
-				});
-			}
-		});
+				}));
 
 		contextMenu.setItems(preview, openInFolder, delete);
 		contextMenu.showContextMenu();

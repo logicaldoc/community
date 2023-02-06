@@ -22,6 +22,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @since 8.8.2
  */
 public class AddAttributeOptionDialog extends Window {
+	private static final String CATEGORY = "category";
+
+	private static final String VALUE = "value";
+
 	public AddAttributeOptionDialog(long setId, String attribute, ListGrid options) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("option"));
@@ -31,12 +35,12 @@ public class AddAttributeOptionDialog extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		TextItem value = ItemFactory.newTextItem("value", null);
+		TextItem value = ItemFactory.newTextItem(VALUE, null);
 		value.setWidth(200);
 		value.setRequired(true);
 		value.setWrapTitle(false);
 
-		TextItem category = ItemFactory.newTextItem("category", null);
+		TextItem category = ItemFactory.newTextItem(CATEGORY, null);
 		category.setWidth(200);
 		category.setWrapTitle(false);
 
@@ -52,9 +56,9 @@ public class AddAttributeOptionDialog extends Window {
 					return;
 
 				Record rec = new ListGridRecord();
-				rec.setAttribute("value", vm.getValueAsString("value").trim());
-				if (vm.getValueAsString("category") != null)
-					rec.setAttribute("category", vm.getValueAsString("category").trim());
+				rec.setAttribute(VALUE, vm.getValueAsString(VALUE).trim());
+				if (vm.getValueAsString(CATEGORY) != null)
+					rec.setAttribute(CATEGORY, vm.getValueAsString(CATEGORY).trim());
 				rec.setAttribute("setId", Long.toString(setId));
 				rec.setAttribute("attribute", attribute);
 				options.addData(rec);

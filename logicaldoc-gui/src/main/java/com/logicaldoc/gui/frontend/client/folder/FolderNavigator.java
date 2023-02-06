@@ -58,7 +58,6 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
@@ -73,6 +72,18 @@ import com.smartgwt.client.widgets.tree.events.FolderOpenedHandler;
  * @since 6.0
  */
 public class FolderNavigator extends TreeGrid implements FolderObserver {
+
+	private static final String POSITION = "position";
+
+	private static final String COLOR = "color";
+
+	private static final String FOLD_REF = "foldRef";
+
+	private static final String OPERATIONNOTALLOWED = "operationnotallowed";
+
+	private static final String FOLDER_ID = "folderId";
+
+	private static final String OPENED = "opened";
 
 	/**
 	 * String typed by the user inside the tree, to quickly select folders
@@ -139,7 +150,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		 * To refresh the folder's decoration
 		 */
 		addFolderClosedHandler((FolderClosedEvent folderClosedEvent) -> {
-			folderClosedEvent.getNode().setAttribute("opened", false);
+			folderClosedEvent.getNode().setAttribute(OPENED, false);
 			updateData(folderClosedEvent.getNode());
 		});
 
@@ -200,7 +211,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				final long[] ids = getSelectedDocIDs(selection);
 
 				final TreeNode selectedNode = getDropFolder();
-				final long folderId = Long.parseLong(selectedNode.getAttribute("folderId"));
+				final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
 
 				if (FolderController.get().getCurrentFolder().getId() == folderId)
 					return;
@@ -229,7 +240,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 					AdvancedCriteria crit = new AdvancedCriteria("name", OperatorId.ISTARTS_WITH, typed);
 					Record rec = find(crit);
 					if (rec != null) {
-						final Long folderId = rec.getAttributeAsLong("folderId");
+						final Long folderId = rec.getAttributeAsLong(FOLDER_ID);
 						deselectAllRecords();
 						selectRecord(rec);
 						selectFolder(folderId);
@@ -252,23 +263,23 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			@Override
 			public void onFolderOpened(FolderOpenedEvent event) {
-				event.getNode().setAttribute("opened", true);
+				event.getNode().setAttribute(OPENED, true);
 				updateData(event.getNode());
 
 				if (Session.get().getConfigAsBoolean("gui.folder.autoclose")) {
 					TreeNode selectedNode = event.getNode();
-					long selectedFolderId = selectedNode.getAttributeAsLong("folderId");
+					long selectedFolderId = selectedNode.getAttributeAsLong(FOLDER_ID);
 
 					// Expand the selected node if it is not already expanded
 					TreeNode parentNode = getTree().getParent(selectedNode);
 					TreeNode[] children = getTree().getChildren(parentNode);
 					if (children != null)
 						for (TreeNode child : children) {
-							if (child.getAttributeAsLong("folderId") == selectedFolderId)
+							if (child.getAttributeAsLong(FOLDER_ID) == selectedFolderId)
 								continue;
 							else {
 								getTree().closeAll(child);
-								child.setAttribute("opened", false);
+								child.setAttribute(OPENED, false);
 								updateData(child);
 							}
 						}
@@ -284,7 +295,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		addCellClickHandler(new CellClickHandler() {
 			@Override
 			public void onCellClick(CellClickEvent event) {
-				long selectedFolderId = event.getRecord().getAttributeAsLong("folderId");
+				long selectedFolderId = event.getRecord().getAttributeAsLong(FOLDER_ID);
 
 				selectFolder(selectedFolderId);
 
@@ -306,7 +317,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				Menu contextMenu = prepateContextMenu();
 				contextMenu.showContextMenu();
 			} else {
-				FolderService.Instance.get().getFolder(getSelectedRecord().getAttributeAsLong("folderId"), false, true,
+				FolderService.Instance.get().getFolder(getSelectedRecord().getAttributeAsLong(FOLDER_ID), false, true,
 						false, new AsyncCallback<GUIFolder>() {
 
 							@Override
@@ -339,7 +350,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
-								GuiLog.warn(I18N.message("operationnotallowed"), null);
+								GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
 							}
 
 							@Override
@@ -350,16 +361,15 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						});
 					}
 
-					TreeNode node = getTree().find("folderId", (Object) Long.valueOf(folderId));
-					if (node != null) {
+					TreeNode node = getTree().find(FOLDER_ID, (Object) Long.valueOf(folderId));
+					if (node != null)
 						getTree().reloadChildren(node);
-					}
 				});
 	}
 
 	private void doMoveFolderOnDrop() {
 		final long[] source = getSelectedIds();
-		final long target = Long.parseLong(getDropFolder().getAttributeAsString("folderId"));
+		final long target = Long.parseLong(getDropFolder().getAttributeAsString(FOLDER_ID));
 
 		final String sourceName = getDragData()[0].getAttributeAsString("name");
 		final String targetName = getDropFolder().getAttributeAsString("name");
@@ -368,7 +378,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				(Boolean yes) -> {
 					if (Boolean.TRUE.equals(yes)) {
 						for (long id : source) {
-							TreeNode node = getTree().find("folderId", (Object) id);
+							TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 							getTree().remove(node);
 						}
 
@@ -376,12 +386,12 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
-								GuiLog.warn(I18N.message("operationnotallowed"), null);
+								GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
 							}
 
 							@Override
 							public void onSuccess(Void ret) {
-								TreeNode targetNode = getTree().find("folderId", (Object) Long.valueOf(target));
+								TreeNode targetNode = getTree().find(FOLDER_ID, (Object) Long.valueOf(target));
 								if (targetNode != null)
 									getTree().reloadChildren(targetNode);
 							}
@@ -441,38 +451,28 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private Menu prepateContextMenu() {
 		MenuItem move = new MenuItem();
 		move.setTitle(I18N.message("move"));
-		move.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				MoveDialog dialog = new MoveDialog();
-				dialog.show();
-			}
+		move.addClickHandler((MenuItemClickEvent event) -> {
+			MoveDialog dialog = new MoveDialog();
+			dialog.show();
 		});
 
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				FolderCopyDialog dialog = new FolderCopyDialog();
-				dialog.show();
-			}
+		copy.addClickHandler((MenuItemClickEvent event) -> {
+			FolderCopyDialog dialog = new FolderCopyDialog();
+			dialog.show();
 		});
 
 		MenuItem merge = new MenuItem();
 		merge.setTitle(I18N.message("merge"));
-		merge.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				MergeDialog dialog = new MergeDialog();
-				dialog.show();
-			}
+		merge.addClickHandler((MenuItemClickEvent event) -> {
+			MergeDialog dialog = new MergeDialog();
+			dialog.show();
 		});
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onDelete();
-			}
-		});
+		delete.addClickHandler((MenuItemClickEvent event) -> onDelete());
 
 		Menu contextMenu = new Menu();
 		contextMenu.setItems(move, copy, merge, delete);
@@ -486,7 +486,6 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * @param selectedFolder the folder to use
 	 */
 	private Menu prepateContextMenu(final GUIFolder selectedFolder) {
-		final TreeNode selectedNode = (TreeNode) getSelectedRecord();
 
 		Menu contextMenu = new Menu();
 
@@ -502,15 +501,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		MenuItem createWorkspace = new MenuItem();
 		createWorkspace.setTitle(I18N.message("newworkspace"));
-		createWorkspace.addClickHandler((MenuItemClickEvent nwClick) -> {
-			onCreateWorkspace();
-		});
+		createWorkspace.addClickHandler((MenuItemClickEvent nwClick) -> onCreateWorkspace());
 
 		MenuItem reload = new MenuItem();
 		reload.setTitle(I18N.message("reload"));
-		reload.addClickHandler((MenuItemClickEvent reloadClick) -> {
-			reload();
-		});
+		reload.addClickHandler((MenuItemClickEvent reloadClick) -> reload());
 
 		MenuItem move = prepareMoveMenuItem(selectedFolder);
 
@@ -520,23 +515,17 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		MenuItem paste = new MenuItem();
 		paste.setTitle(I18N.message("paste"));
-		paste.addClickHandler((MenuItemClickEvent pasteClick) -> {
-			onPaste();
-		});
+		paste.addClickHandler((MenuItemClickEvent pasteClick) -> onPaste());
 
 		MenuItem pasteAsAlias = new MenuItem();
 		pasteAsAlias.setTitle(I18N.message("pasteasalias"));
-		pasteAsAlias.addClickHandler((MenuItemClickEvent pasteAliasClick) -> {
-			onPasteAsAlias();
-		});
+		pasteAsAlias.addClickHandler((MenuItemClickEvent pasteAliasClick) -> onPasteAsAlias());
 
 		MenuItem exportZip = prepareExportZipMenuItem(selectedFolder);
 
 		MenuItem addBookmark = new MenuItem();
 		addBookmark.setTitle(I18N.message("addbookmark"));
-		addBookmark.addClickHandler((MenuItemClickEvent bookmarkClick) -> {
-			onAddBookmark();
-		});
+		addBookmark.addClickHandler((MenuItemClickEvent bookmarkClick) -> onAddBookmark());
 
 		if (!selectedFolder.hasPermission(Constants.PERMISSION_WRITE) || Clipboard.getInstance().isEmpty()) {
 			paste.setEnabled(false);
@@ -681,7 +670,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			CreateAliasDialog dialog = new CreateAliasDialog();
 			dialog.show();
 		});
-		createAlias.setEnabled(getSelectedRecord().getAttributeAsString("foldRef") == null);
+		createAlias.setEnabled(getSelectedRecord().getAttributeAsString(FOLD_REF) == null);
 		return createAlias;
 	}
 
@@ -816,12 +805,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			@Override
 			public void onSuccess(Void result) {
 				LD.clearPrompt();
-				TreeNode node = getTree().find("folderId",
-						(Object) getSelectedRecord().getAttributeAsString("folderId"));
+				TreeNode node = getTree().find(FOLDER_ID, (Object) getSelectedRecord().getAttributeAsString(FOLDER_ID));
 				TreeNode parent = getTree().getParent(node);
 
-				if (parent.getAttributeAsString("folderId") != null)
-					selectFolder(Long.parseLong(parent.getAttributeAsString("folderId")));
+				if (parent.getAttributeAsString(FOLDER_ID) != null)
+					selectFolder(Long.parseLong(parent.getAttributeAsString(FOLDER_ID)));
 
 				reloadParentsOfSelection();
 			}
@@ -841,7 +829,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 */
 	private void onAddBookmark() {
 		final TreeNode selectedNode = (TreeNode) getSelectedRecord();
-		final long folderId = Long.parseLong(selectedNode.getAttributeAsString("folderId"));
+		final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
 
 		DocumentService.Instance.get().addBookmarks(new long[] { folderId }, 1, new AsyncCallback<Void>() {
 
@@ -887,7 +875,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		while (fld.getName().isEmpty())
 			fld = pathToOpen[++currentIndexInPathToOpen];
 
-		TreeNode node = getTree().find("folderId", "" + fld.getId());
+		TreeNode node = getTree().find(FOLDER_ID, "" + fld.getId());
 
 		// Perhaps the node is in another page
 		if (node == null) {
@@ -908,7 +896,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 							@Override
 							public void onSuccess(Void arg) {
-								TreeNode parentNode = getTree().find("folderId", "" + FolderCursor.get().getFolderId());
+								TreeNode parentNode = getTree().find(FOLDER_ID, "" + FolderCursor.get().getFolderId());
 								getTree().reloadChildren(parentNode);
 							}
 						});
@@ -961,8 +949,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		 * Redirect the user to the correct folder and/or document
 		 */
 		RequestInfo loc = WindowUtils.getRequestInfo();
-		if (loc.getParameter("folderId") != null) {
-			DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter("folderId")), null);
+		if (loc.getParameter(FOLDER_ID) != null) {
+			DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter(FOLDER_ID)), null);
 		} else if (loc.getParameter("docId") != null) {
 			DocumentsPanel.get().openInFolder(Long.parseLong(loc.getParameter("docId")));
 		} else {
@@ -986,7 +974,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			/*
 			 * Get the first workspace and use it as the node to open
 			 */
-			folderId = Long.parseLong(children[0].getAttributeAsString("folderId"));
+			folderId = Long.parseLong(children[0].getAttributeAsString(FOLDER_ID));
 			nodeToOpen = children[0];
 
 			/*
@@ -995,7 +983,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			if (Session.get().getUser().getDefaultWorkspace() != null) {
 				folderId = Session.get().getUser().getDefaultWorkspace();
 				for (TreeNode child : children) {
-					long val = Long.parseLong(child.getAttributeAsString("folderId"));
+					long val = Long.parseLong(child.getAttributeAsString(FOLDER_ID));
 					if (Session.get().getUser().getDefaultWorkspace() == val) {
 						nodeToOpen = child;
 						break;
@@ -1073,11 +1061,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 						TreeNode node = new TreeNode(folder.getName());
 						node.setAttribute("id", parent.getAttributeAsString("id") + "-" + Long.toString(folderId));
-						node.setAttribute("folderId", Long.toString(folderId));
+						node.setAttribute(FOLDER_ID, Long.toString(folderId));
 						node.setAttribute("type", Integer.toString(folder.getType()));
-						node.setAttribute("foldRef", folderRef != null ? Long.toString(folderRef) : null);
+						node.setAttribute(FOLD_REF, folderRef != null ? Long.toString(folderRef) : null);
 						if (folder.getColor() != null)
-							node.setAttribute("color", folder.getColor());
+							node.setAttribute(COLOR, folder.getColor());
 						node.setAttribute(Constants.PERMISSION_ADD,
 								Boolean.toString(folder.hasPermission(Constants.PERMISSION_ADD)));
 						node.setAttribute(Constants.PERMISSION_DELETE,
@@ -1117,11 +1105,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			TreeNode node = new TreeNode(fld.getName());
 			node.setAttribute("id", parentId + "-" + Long.toString(fldId));
-			node.setAttribute("folderId", Long.toString(fldId));
+			node.setAttribute(FOLDER_ID, Long.toString(fldId));
 			node.setAttribute("type", Integer.toString(fld.getType()));
-			node.setAttribute("foldRef", fldRef != null ? Long.toString(fldRef) : null);
+			node.setAttribute(FOLD_REF, fldRef != null ? Long.toString(fldRef) : null);
 			if (fld.getColor() != null)
-				node.setAttribute("color", fld.getColor());
+				node.setAttribute(COLOR, fld.getColor());
 			node.setAttribute(Constants.PERMISSION_ADD, fld.hasPermission(Constants.PERMISSION_ADD));
 			node.setAttribute(Constants.PERMISSION_DELETE, fld.hasPermission(Constants.PERMISSION_DELETE));
 			node.setAttribute(Constants.PERMISSION_RENAME, fld.hasPermission(Constants.PERMISSION_RENAME));
@@ -1152,7 +1140,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	public String getPath(long folderId) {
-		TreeNode selectedNode = getTree().find("folderId", Long.toString(folderId));
+		TreeNode selectedNode = getTree().find(FOLDER_ID, Long.toString(folderId));
 		return getNodePath(selectedNode);
 	}
 
@@ -1163,7 +1151,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	public void reload() {
 		TreeNode selectedNode = (TreeNode) getSelectedRecord();
 		getTree().reloadChildren(selectedNode);
-		selectFolder(selectedNode.getAttributeAsLong("folderId"));
+		selectFolder(selectedNode.getAttributeAsLong(FOLDER_ID));
 	}
 
 	/**
@@ -1190,7 +1178,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						if (value == null || "".equals(value.trim()))
 							return;
 						final String val = value.trim().replace("/", "").replace("\\\\", "");
-						final long folderId = Long.parseLong(selectedNode.getAttributeAsString("folderId"));
+						final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
 						FolderService.Instance.get().rename(folderId, val, new AsyncCallback<Void>() {
 
 							@Override
@@ -1218,7 +1206,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	private void onPaste() {
 		TreeNode selectedNode = (TreeNode) getSelectedRecord();
-		final long folderId = Long.parseLong(selectedNode.getAttribute("folderId"));
+		final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
 		final long[] docIds = new long[Clipboard.getInstance().size()];
 		int i = 0;
 		for (GUIDocument doc : Clipboard.getInstance()) {
@@ -1243,7 +1231,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	private void onPasteAsAlias() {
 		TreeNode selectedNode = (TreeNode) getSelectedRecord();
-		final long folderId = Long.parseLong(selectedNode.getAttribute("folderId"));
+		final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
 		final long[] docIds = new long[Clipboard.getInstance().size()];
 		int i = 0;
 		for (GUIDocument doc : Clipboard.getInstance())
@@ -1294,7 +1282,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		ListGridRecord[] selection = getSelectedRecords();
 		List<Long> ids = new ArrayList<>();
 		for (ListGridRecord rec : selection)
-			ids.add(Long.parseLong(rec.getAttributeAsString("folderId")));
+			ids.add(Long.parseLong(rec.getAttributeAsString(FOLDER_ID)));
 		long[] idsArray = new long[ids.size()];
 		for (int i = 0; i < idsArray.length; i++) {
 			idsArray[i] = ids.get(i);
@@ -1310,7 +1298,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	public void moveTo(final long targetFolderId) {
 		long[] ids = getSelectedIds();
 		for (long id : ids) {
-			TreeNode node = getTree().find("folderId", (Object) id);
+			TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 			getTree().remove(node);
 		}
 
@@ -1321,13 +1309,13 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
 				GuiLog.serverError(caught);
-				GuiLog.warn(I18N.message("operationnotallowed"), null);
+				GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
 			}
 
 			@Override
 			public void onSuccess(Void ret) {
 				LD.clearPrompt();
-				TreeNode target = getTree().find("folderId", Long.toString(targetFolderId));
+				TreeNode target = getTree().find(FOLDER_ID, Long.toString(targetFolderId));
 				if (target != null)
 					getTree().reloadChildren(target);
 			}
@@ -1342,7 +1330,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	public void mergeTo(final long targetFolderId) {
 		long[] ids = getSelectedIds();
 		for (long id : ids) {
-			TreeNode node = getTree().find("folderId", (Object) id);
+			TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 			getTree().remove(node);
 		}
 
@@ -1358,7 +1346,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			@Override
 			public void onSuccess(Void ret) {
 				LD.clearPrompt();
-				TreeNode target = getTree().find("folderId", Long.toString(targetFolderId));
+				TreeNode target = getTree().find(FOLDER_ID, Long.toString(targetFolderId));
 				if (target != null)
 					getTree().reloadChildren(target);
 			}
@@ -1403,7 +1391,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	public void createAlias(long referencedFolderId) {
 		final TreeNode parent = getSelectedRecord();
 
-		FolderService.Instance.get().createAlias(parent.getAttributeAsLong("folderId"), referencedFolderId,
+		FolderService.Instance.get().createAlias(parent.getAttributeAsLong(FOLDER_ID), referencedFolderId,
 				new AsyncCallback<GUIFolder>() {
 
 					@Override
@@ -1438,20 +1426,20 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
-		TreeNode folderNode = getTree().find("folderId", Long.toString(folder.getId()));
+		TreeNode folderNode = getTree().find(FOLDER_ID, Long.toString(folder.getId()));
 
 		if (folderNode != null) {
 			folderNode.setTitle(folder.getName());
 			folderNode.setName(folder.getName());
-			folderNode.setAttribute("color", folder.getColor());
+			folderNode.setAttribute(COLOR, folder.getColor());
 
 			getTree().reloadChildren(folderNode);
 
-			boolean positionChanged = folderNode.getAttributeAsInt("position") != folder.getPosition();
+			boolean positionChanged = folderNode.getAttributeAsInt(POSITION) != folder.getPosition();
 
 			if (positionChanged) {
-				folderNode.setAttribute("position", folder.getPosition());
-				TreeNode parentNode = getTree().find("folderId", Long.toString(folder.getParentId()));
+				folderNode.setAttribute(POSITION, folder.getPosition());
+				TreeNode parentNode = getTree().find(FOLDER_ID, Long.toString(folder.getParentId()));
 				if (parentNode != null)
 					getTree().reloadChildren(parentNode);
 				else
@@ -1477,23 +1465,23 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	@Override
 	public void onFolderCreated(GUIFolder folder) {
-		TreeNode parent = getTree().find("folderId", (Object) folder.getParentId());
+		TreeNode parent = getTree().find(FOLDER_ID, (Object) folder.getParentId());
 		if (parent == null)
 			return;
 
 		TreeNode node = new TreeNode();
 		node.setTitle(folder.getName());
 		node.setName(folder.getName());
-		node.setAttribute("color", folder.getColor());
-		node.setAttribute("folderId", folder.getId());
+		node.setAttribute(COLOR, folder.getColor());
+		node.setAttribute(FOLDER_ID, folder.getId());
 		node.setAttribute("id", parent.getAttribute("id") + "-" + folder.getId());
 		node.setAttribute("type", folder.getType());
 		node.setAttribute("customIcon", "folder");
 		node.setAttribute("status", 0);
 		node.setAttribute("publishedStatus", "yes");
-		node.setAttribute("position", folder.getPosition());
+		node.setAttribute(POSITION, folder.getPosition());
 		if (folder.getFoldRef() != null) {
-			node.setAttribute("foldRef", folder.getFoldRef());
+			node.setAttribute(FOLD_REF, folder.getFoldRef());
 			node.setAttribute("customIcon", "folder_alias");
 		}
 
@@ -1502,14 +1490,14 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	@Override
 	public void onFolderDeleted(GUIFolder folder) {
-		TreeNode node = getTree().find("folderId", (Object) folder.getId());
+		TreeNode node = getTree().find(FOLDER_ID, (Object) folder.getId());
 		if (node == null)
 			return;
 
 		TreeNode parent = getTree().getParent(node);
-		if (parent.getAttributeAsLong("folderId") != null) {
+		if (parent.getAttributeAsLong(FOLDER_ID) != null) {
 			if (folder.getId() == FolderController.get().getCurrentFolder().getId())
-				selectFolder(parent.getAttributeAsLong("folderId"));
+				selectFolder(parent.getAttributeAsLong(FOLDER_ID));
 		}
 
 		getTree().remove(node);
@@ -1518,7 +1506,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	@Override
 	public void onFolderMoved(GUIFolder folder) {
-		TreeNode node = getTree().find("folderId", (Object) folder.getId());
+		TreeNode node = getTree().find(FOLDER_ID, (Object) folder.getId());
 		if (node != null)
 			getTree().remove(node);
 
@@ -1562,12 +1550,12 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	public TreeNode getNode(long folderId) {
-		TreeNode node = getTree().find("folderId", Long.toString(folderId));
+		TreeNode node = getTree().find(FOLDER_ID, Long.toString(folderId));
 		return node;
 	}
 
 	public long getSelectedFolderId() {
-		return getSelectedRecord().getAttributeAsLong("folderId");
+		return getSelectedRecord().getAttributeAsLong(FOLDER_ID);
 	}
 
 	public TreeNode getRootNode() {
@@ -1627,71 +1615,63 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		MenuItem actionItem = new MenuItem(I18N.message(menuAction.getName()));
 		customActionsMenu.addItem(actionItem);
 
-		actionItem.addClickHandler(new ClickHandler() {
+		actionItem.addClickHandler((MenuItemClickEvent event) -> {
+			/**
+			 * Check on the server if the action has been modified
+			 */
+			SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
 
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				/**
-				 * Check on the server if the action has been modified
-				 */
-				SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(),
-						new AsyncCallback<GUIMenu>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+				@Override
+				public void onSuccess(GUIMenu action) {
+					Session.get().getUser().updateCustomAction(action);
 
-							@Override
-							public void onSuccess(GUIMenu action) {
-								Session.get().getUser().updateCustomAction(action);
+					if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
+							&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
+						/*
+						 * An automation cript is specified directly, so launch
+						 * it's execution
+						 */
+						GUIAutomationRoutine routine = new GUIAutomationRoutine();
+						routine.setAutomation(action.getAutomation());
+						executeRoutine(folderId, null, routine);
+					} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
+						AutomationService.Instance.get().getRoutine(action.getRoutineId(),
+								new AsyncCallback<GUIAutomationRoutine>() {
 
-								if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
-										&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
-									/*
-									 * An automation cript is specified
-									 * directly, so launch it's execution
-									 */
-									GUIAutomationRoutine routine = new GUIAutomationRoutine();
-									routine.setAutomation(action.getAutomation());
-									executeRoutine(folderId, null, routine);
-								} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
-									AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-											new AsyncCallback<GUIAutomationRoutine>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-												@Override
-												public void onFailure(Throwable caught) {
-													GuiLog.serverError(caught);
-												}
-
-												@Override
-												public void onSuccess(GUIAutomationRoutine routine) {
-													if (routine.getTemplateId() != null
-															&& routine.getTemplateId().longValue() != 0L) {
-														/*
-														 * A routine with
-														 * parameters is
-														 * referenced, so open
-														 * the input popup
-														 */
-														FillRoutineParams dialog = new FillRoutineParams(
-																action.getName(), routine, folderId, null);
-														dialog.show();
-													} else {
-														/*
-														 * A routine without
-														 * parameters is
-														 * referenced, so launch
-														 * directly
-														 */
-														executeRoutine(folderId, null, routine);
-													}
-												}
-											});
-								}
-							}
-						});
-			}
+									@Override
+									public void onSuccess(GUIAutomationRoutine routine) {
+										if (routine.getTemplateId() != null
+												&& routine.getTemplateId().longValue() != 0L) {
+											/*
+											 * A routine with parameters is
+											 * referenced, so open the input
+											 * popup
+											 */
+											FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
+													folderId, null);
+											dialog.show();
+										} else {
+											/*
+											 * A routine without parameters is
+											 * referenced, so launch directly
+											 */
+											executeRoutine(folderId, null, routine);
+										}
+									}
+								});
+					}
+				}
+			});
 		});
 	}
 

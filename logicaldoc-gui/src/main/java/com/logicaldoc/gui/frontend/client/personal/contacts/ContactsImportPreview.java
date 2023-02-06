@@ -26,6 +26,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 
+	private static final String ADDRESS = "address";
+	private static final String PHONE = "phone";
+	private static final String COMPANY = "company";
+	private static final String EMAIL = "email";
 	private ListGrid list = null;
 
 	public ContactsImportPreview(final ContactsImportSettings settings) {
@@ -49,9 +53,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		ToolStripButton importButton = new ToolStripButton();
 		importButton.setTitle(I18N.message("iimport"));
 		toolStrip.addButton(importButton);
-		importButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		importButton.addClickHandler((ClickEvent event) -> {
 				LD.contactingServer();
 				try {
 					ContactService.Instance.get().parseContacts(false, settings.getSeparator(),
@@ -82,25 +84,20 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 				} catch (Throwable t) {
 					LD.clearPrompt();
 				}
-			}
 		});
 
 		ToolStripButton cancel = new ToolStripButton();
 		cancel.setTitle(I18N.message("cancel"));
 		toolStrip.addButton(cancel);
-		cancel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		cancel.addClickHandler((ClickEvent event) -> 
+				destroy());
 
 		toolStrip.addFill();
 
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField email = new ListGridField("email", I18N.message("email"), 200);
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 200);
 		email.setWidth("*");
 		email.setCanFilter(true);
 
@@ -112,11 +109,11 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		firstName.setCanFilter(true);
 		lastName.setWidth(80);
 
-		ListGridField company = new ListGridField("company", I18N.message("company"));
+		ListGridField company = new ListGridField(COMPANY, I18N.message(COMPANY));
 		company.setCanFilter(true);
 		company.setWidth(110);
 
-		ListGridField phone = new ListGridField("phone", I18N.message("phone"));
+		ListGridField phone = new ListGridField(PHONE, I18N.message(PHONE));
 		phone.setCanFilter(true);
 		phone.setWidth(100);
 		phone.setHidden(true);
@@ -126,7 +123,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		mobile.setWidth(100);
 		mobile.setHidden(true);
 
-		ListGridField address = new ListGridField("address", I18N.message("address"));
+		ListGridField address = new ListGridField(ADDRESS, I18N.message(ADDRESS));
 		address.setCanFilter(true);
 		address.setWidth(150);
 		address.setHidden(true);
@@ -153,11 +150,11 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 			rec.setAttribute("id", contact.getId());
 			rec.setAttribute("firstName", contact.getFirstName());
 			rec.setAttribute("lastName", contact.getLastName());
-			rec.setAttribute("email", contact.getEmail());
-			rec.setAttribute("company", contact.getCompany());
-			rec.setAttribute("address", contact.getAddress());
+			rec.setAttribute(EMAIL, contact.getEmail());
+			rec.setAttribute(COMPANY, contact.getCompany());
+			rec.setAttribute(ADDRESS, contact.getAddress());
 			rec.setAttribute("mobile", contact.getMobile());
-			rec.setAttribute("phone", contact.getPhone());
+			rec.setAttribute(PHONE, contact.getPhone());
 			records.add(rec);
 		}
 		list.setRecords(records.toArray(new ListGridRecord[0]));

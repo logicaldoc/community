@@ -31,6 +31,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class AttributeInitializerComposer extends Window {
 
+	private static final String OFFSET = "offset";
+
+	private static final String CURRENTDATE = "currentdate";
+
+	private static final String NUMBER = "number";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private FormItem sourceItem = null;
@@ -106,12 +112,12 @@ public class AttributeInitializerComposer extends Window {
 		if (attributeType == GUIAttribute.TYPE_DATE) {
 			initializeDate(stringBuilder);
 		} else if (attributeType == GUIAttribute.TYPE_INT) {
-			Long number = Long.valueOf(vm.getValueAsString("number"));
+			Long number = Long.valueOf(vm.getValueAsString(NUMBER));
 			stringBuilder.append("#set($number = " + number + ")\n");
 			stringBuilder.append("$attribute.setIntValue($number);");
 
 		} else if (attributeType == GUIAttribute.TYPE_DOUBLE) {
-			Double number = Double.valueOf(vm.getValueAsString("number"));
+			Double number = Double.valueOf(vm.getValueAsString(NUMBER));
 			stringBuilder.append("#set($number = " + number + ")\n");
 			stringBuilder.append("$attribute.setDoubleValue($number);");
 		} else if (attributeType == GUIAttribute.TYPE_STRING || attributeType == GUIAttribute.TYPE_STRING_PRESET
@@ -125,7 +131,7 @@ public class AttributeInitializerComposer extends Window {
 
 	private void initializeDate(StringBuilder stringBuilder) {
 		Date date = (Date) vm.getValue("date");
-		boolean currentdate = vm.getValue("currentdate") != null ? (Boolean) vm.getValue("currentdate") : false;
+		boolean currentdate = vm.getValue(CURRENTDATE) != null ? (Boolean) vm.getValue(CURRENTDATE) : false;
 		if (currentdate) {
 			stringBuilder.append("#set($dt = $CURRENT_DATE)\n");
 		} else {
@@ -133,7 +139,7 @@ public class AttributeInitializerComposer extends Window {
 			stringBuilder.append("#set($dt = $DateTool.parse('" + dateStr + "', 'yyyy-MM-dd'))\n");
 		}
 
-		int offset = vm.getValue("offset") != null ? (Integer) vm.getValue("offset") : 0;
+		int offset = vm.getValue(OFFSET) != null ? (Integer) vm.getValue(OFFSET) : 0;
 		if (offset != 0)
 			stringBuilder.append("#set($dt = $DateTool.addDays($dt, " + offset + "))\n");
 
@@ -141,7 +147,7 @@ public class AttributeInitializerComposer extends Window {
 	}
 
 	private DynamicForm prepareFloatForm() {
-		FloatItem number = ItemFactory.newFloatItem("number", "number", null);
+		FloatItem number = ItemFactory.newFloatItem(NUMBER, NUMBER, null);
 		number.setWrapTitle(false);
 		number.setRequired(true);
 
@@ -154,7 +160,7 @@ public class AttributeInitializerComposer extends Window {
 	}
 
 	private DynamicForm prepareIntegerForm() {
-		IntegerItem number = ItemFactory.newIntegerItem("number", "number", null);
+		IntegerItem number = ItemFactory.newIntegerItem(NUMBER, NUMBER, null);
 		number.setWrapTitle(false);
 		number.setRequired(true);
 
@@ -173,7 +179,7 @@ public class AttributeInitializerComposer extends Window {
 		date.setValue(new Date());
 		date.setDisabled(true);
 
-		CheckboxItem currentDate = ItemFactory.newCheckbox("currentdate", "currentdate");
+		CheckboxItem currentDate = ItemFactory.newCheckbox(CURRENTDATE, CURRENTDATE);
 		currentDate.setWrapTitle(false);
 		currentDate.setValue(true);
 		currentDate.addChangedHandler(new ChangedHandler() {
@@ -184,7 +190,7 @@ public class AttributeInitializerComposer extends Window {
 			}
 		});
 
-		SpinnerItem offset = ItemFactory.newSpinnerItem("offset",  0);
+		SpinnerItem offset = ItemFactory.newSpinnerItem(OFFSET,  0);
 		offset.setWrapTitle(false);
 		offset.setMin(Integer.MIN_VALUE);
 		offset.setHint(I18N.message("days"));

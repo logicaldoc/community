@@ -42,6 +42,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class IncrementalArchivesList extends VLayout {
 
+	private static final String FREQUENCY = "frequency";
+
+	private static final String PREFIX = "prefix";
+
 	protected Layout detailsContainer;
 
 	protected RefreshableListGrid list;
@@ -73,12 +77,12 @@ public class IncrementalArchivesList extends VLayout {
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField prefix = new ListGridField("prefix", I18N.message("prefix"), 250);
+		ListGridField prefix = new ListGridField(PREFIX, I18N.message(PREFIX), 250);
 
 		ListGridField type = new ListGridField("typelabel", I18N.message("type"), 130);
 		type.setCanFilter(false);
 
-		ListGridField frequency = new ListGridField("frequency", I18N.message("frequency"), 110);
+		ListGridField frequency = new ListGridField(FREQUENCY, I18N.message(FREQUENCY), 110);
 		frequency.setCellFormatter(new DaysCellFormatter());
 		frequency.setCanFilter(false);
 
@@ -237,8 +241,8 @@ public class IncrementalArchivesList extends VLayout {
 		if (rec == null)
 			rec = new ListGridRecord();
 
-		rec.setAttribute("prefix", incremental.getPrefix());
-		rec.setAttribute("frequency", incremental.getFrequency());
+		rec.setAttribute(PREFIX, incremental.getPrefix());
+		rec.setAttribute(FREQUENCY, incremental.getFrequency());
 		rec.setAttribute("type", incremental.getType());
 		rec.setAttribute("typelabel", incremental.getType() == GUIArchive.TYPE_DEFAULT ? I18N.message("default")
 				: I18N.message("paperdematerialization"));

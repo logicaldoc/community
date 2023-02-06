@@ -44,6 +44,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class FormsPanel extends AdminPanel {
 
+	private static final String PREVIEW = "preview";
+
+	private static final String WEB_ENABLED = "webEnabled";
+
+	private static final String FORM_ID = "formId";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -71,19 +77,19 @@ public class FormsPanel extends AdminPanel {
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 
-		ListGridField formId = new ListGridField("formId", 150);
+		ListGridField formId = new ListGridField(FORM_ID, 150);
 		formId.setHidden(true);
 
-		ListGridField webEnabled = new ListGridField("webEnabled", I18N.message("web"), 50);
+		ListGridField webEnabled = new ListGridField(WEB_ENABLED, I18N.message("web"), 50);
 
-		ListGridField permaLink = new ListGridField("preview", I18N.message("preview"), 90);
+		ListGridField permaLink = new ListGridField(PREVIEW, I18N.message(PREVIEW), 90);
 		permaLink.setCellFormatter(new CellFormatter() {
 
 			@Override
 			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("webEnabled"))) {
-					return "<a href='" + webformURL(rec.getAttributeAsString("formId")) + "' target='_blank'>"
-							+ I18N.message("preview") + "</a>";
+				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(WEB_ENABLED))) {
+					return "<a href='" + webformURL(rec.getAttributeAsString(FORM_ID)) + "' target='_blank'>"
+							+ I18N.message(PREVIEW) + "</a>";
 				} else
 					return "";
 			}
@@ -167,7 +173,7 @@ public class FormsPanel extends AdminPanel {
 
 		final ListGridRecord rec = list.getSelectedRecord();
 		final long id = Long.parseLong(rec.getAttributeAsString("id"));
-		final String formId = rec.getAttributeAsString("formId");
+		final String formId = rec.getAttributeAsString(FORM_ID);
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -196,9 +202,9 @@ public class FormsPanel extends AdminPanel {
 		edit.addClickHandler((MenuItemClickEvent event) -> onEdit());
 
 		MenuItem preview = new MenuItem();
-		preview.setTitle(I18N.message("preview"));
+		preview.setTitle(I18N.message(PREVIEW));
 		preview.addClickHandler((MenuItemClickEvent event) -> WindowUtils.openUrlInNewTab(webformURL(formId)));
-		preview.setEnabled(rec.getAttributeAsBoolean("webEnabled"));
+		preview.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
 
 		MenuItem invite = new MenuItem();
 		invite.setTitle(I18N.message("invite"));
@@ -209,7 +215,7 @@ public class FormsPanel extends AdminPanel {
 				invitation.show();
 			}
 		});
-		invite.setEnabled(rec.getAttributeAsBoolean("webEnabled"));
+		invite.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
 
 		if (Feature.enabled(Feature.WEB_FORM))
 			contextMenu.setItems(edit, preview, invite, delete);
@@ -246,15 +252,15 @@ public class FormsPanel extends AdminPanel {
 			rec = new ListGridRecord();
 			// Append a new rec
 			rec.setAttribute("id", form.getId());
-			rec.setAttribute("formId", form.getFormId());
+			rec.setAttribute(FORM_ID, form.getFormId());
 			rec.setAttribute("name", form.getName());
-			rec.setAttribute("webEnabled", form.isWebEnabled());
+			rec.setAttribute(WEB_ENABLED, form.isWebEnabled());
 			list.addData(rec);
 			list.selectRecord(rec);
 		}
 
 		rec.setAttribute("name", form.getName());
-		rec.setAttribute("webEnabled", form.isWebEnabled());
+		rec.setAttribute(WEB_ENABLED, form.isWebEnabled());
 		list.refreshRow(list.getRecordIndex(rec));
 	}
 

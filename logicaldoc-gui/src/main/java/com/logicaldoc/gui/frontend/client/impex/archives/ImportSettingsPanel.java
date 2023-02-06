@@ -18,6 +18,9 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class ImportSettingsPanel extends VLayout {
+	
+	private static final String IMPORTTEMPLATES = "importtemplates";
+
 	private GUIArchive archive;
 
 	private ValuesManager vm = new ValuesManager();
@@ -34,7 +37,7 @@ public class ImportSettingsPanel extends VLayout {
 		description.addChangedHandler(changedHandler);
 		description.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
 
-		RadioGroupItem importTemplates = ItemFactory.newBooleanSelector("importtemplates", "importtemplates");
+		RadioGroupItem importTemplates = ItemFactory.newBooleanSelector(IMPORTTEMPLATES, IMPORTTEMPLATES);
 		importTemplates.setValue(archive.getImportTemplate() == 1 ? "yes" : "no");
 		importTemplates.addChangedHandler(changedHandler);
 		importTemplates.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
@@ -56,7 +59,7 @@ public class ImportSettingsPanel extends VLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			archive.setDescription(vm.getValueAsString("description").toString());
 			archive.setImportCustomId(Integer.parseInt(vm.getValueAsString("importcids")));
-			archive.setImportTemplate("yes".equals(vm.getValueAsString("importtemplates")) ? 1 : 0);
+			archive.setImportTemplate("yes".equals(vm.getValueAsString(IMPORTTEMPLATES)) ? 1 : 0);
 			return true;
 		} else
 			return false;
