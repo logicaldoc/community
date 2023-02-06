@@ -47,6 +47,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
  */
 public class LinksPanel extends DocumentDetailTab {
 
+	private static final String DOCUMENT_ID = "documentId";
 	private TreeGrid treeGrid;
 
 	public LinksPanel(final GUIDocument document) {
@@ -238,7 +239,7 @@ public class LinksPanel extends DocumentDetailTab {
 	}
 
 	protected void onOpenInFolder(ListGridRecord rec) {
-		String documentId = rec.getAttributeAsString("documentId");
+		String documentId = rec.getAttributeAsString(DOCUMENT_ID);
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
 
@@ -256,7 +257,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 	protected void onDownload(ListGridRecord rec) {
 		if (document.getFolder().isDownload()) {
-			String documentId = rec.getAttributeAsString("documentId");
+			String documentId = rec.getAttributeAsString(DOCUMENT_ID);
 			long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 			DocUtil.download(docId, null);
 		}
@@ -275,7 +276,7 @@ public class LinksPanel extends DocumentDetailTab {
 					break;
 				}
 
-				String docId = rec.getAttribute("documentId");
+				String docId = rec.getAttribute(DOCUMENT_ID);
 				docId = docId.substring(docId.indexOf('-') + 1);
 				url += "&docId=" + docId;
 			}
@@ -284,7 +285,7 @@ public class LinksPanel extends DocumentDetailTab {
 	}
 
 	protected void onPreview(ListGridRecord rec) {
-		String documentId = rec.getAttributeAsString("documentId");
+		String documentId = rec.getAttributeAsString(DOCUMENT_ID);
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
 

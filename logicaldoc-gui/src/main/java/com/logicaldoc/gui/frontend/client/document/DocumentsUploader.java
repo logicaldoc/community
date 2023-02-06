@@ -18,16 +18,13 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -37,6 +34,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class DocumentsUploader extends Window {
+
+	private static final String CHARSET = "charset";
 
 	private IButton sendButton;
 
@@ -59,13 +58,7 @@ public class DocumentsUploader extends Window {
 		setAutoSize(true);
 
 		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSend();
-			}
-		});
+		sendButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSend());
 		sendButton.setDisabled(true);
 
 		prepareForm();
@@ -81,22 +74,19 @@ public class DocumentsUploader extends Window {
 		layout.addMember(sendButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler((CloseClickEvent event) -> {
+			DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void result) {
-						destroy();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void result) {
+					destroy();
+				}
+			});
 		});
 
 		addItem(layout);
@@ -128,8 +118,8 @@ public class DocumentsUploader extends Window {
 				I18N.message("attention"), I18N.message("filenamewarning"));
 		fileNameWaring.setRequired(true);
 
-		final SelectItem charset = ItemFactory.newCharsetSelector("charset");
-		charset.setValue(Session.get().getConfig("charset") != null ? Session.get().getConfig("charset") : "UTF-8");
+		final SelectItem charset = ItemFactory.newCharsetSelector(CHARSET);
+		charset.setValue(Session.get().getConfig(CHARSET) != null ? Session.get().getConfig(CHARSET) : "UTF-8");
 		charset.setHidden(true);
 
 		final CheckboxItem zipItem = new CheckboxItem();
@@ -137,15 +127,11 @@ public class DocumentsUploader extends Window {
 		zipItem.setTitle(I18N.message("importfromzip"));
 		zipItem.setValue(!zipImport);
 		zipItem.setTitleAlign(Alignment.LEFT);
-		zipItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (Boolean.TRUE.equals((Boolean) event.getValue()))
-					charset.show();
-				else
-					charset.hide();
-			}
+		zipItem.addChangedHandler((ChangedEvent event) -> {
+			if (Boolean.TRUE.equals((Boolean) event.getValue()))
+				charset.show();
+			else
+				charset.hide();
 		});
 
 		final CheckboxItem immediateIndexing = new CheckboxItem();
@@ -159,11 +145,7 @@ public class DocumentsUploader extends Window {
 			zipItem.setValue(false);
 		}
 
-		zipItem.addChangeHandler(new ChangeHandler() {
-			public void onChange(ChangeEvent event) {
-				zipImport = !zipImport;
-			}
-		});
+		zipItem.addChangeHandler((ChangeEvent event) -> zipImport = !zipImport);
 
 		form.setItems(zipItem, charset, immediateIndexing, fileNameWaring);
 	}
@@ -188,7 +170,7 @@ public class DocumentsUploader extends Window {
 		metadata.setOcrTemplateId(folder.getOcrTemplateId());
 
 		UpdateDialog bulk = new UpdateDialog(null, metadata, UpdateDialog.CONTEXT_UPLOAD, false,
-				vm.getValueAsString("charset"));
+				vm.getValueAsString(CHARSET));
 		bulk.setZip(getImportZip());
 		bulk.setCharset(getCharset());
 		bulk.setImmediateIndexing(getImmediateIndexing());
@@ -198,7 +180,7 @@ public class DocumentsUploader extends Window {
 	}
 
 	public String getCharset() {
-		return vm.getValueAsString("charset");
+		return vm.getValueAsString(CHARSET);
 	}
 
 	public boolean getImportZip() {

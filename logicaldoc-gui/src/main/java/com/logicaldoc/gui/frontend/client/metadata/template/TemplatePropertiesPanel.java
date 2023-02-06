@@ -369,7 +369,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		initialization.setTitle(I18N.message(INITIALIZATION));
 		initialization.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
-			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation(INITIALIZATION, INITIALIZATION,
+			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation(INITIALIZATION, 
 					null, null, false);
 			initializationItem.setWidth(600);
 			initializationItem.setHeight(400);
@@ -406,7 +406,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		validation.setTitle(I18N.message(VALIDATION));
 		validation.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
-			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation(VALIDATION, VALIDATION, null, null,
+			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation(VALIDATION, null, null,
 					false);
 			validationItem.setWidth(600);
 			validationItem.setHeight(400);
@@ -620,7 +620,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		if (!template.isReadonly() && template.isWrite())
 			name.addChangedHandler(changedHandler);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", template.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setDisabled(template.isReadonly() || !template.isWrite());
 
 		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {

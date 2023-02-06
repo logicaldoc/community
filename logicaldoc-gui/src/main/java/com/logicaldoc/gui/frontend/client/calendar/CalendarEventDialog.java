@@ -72,6 +72,18 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class CalendarEventDialog extends Window {
 
+	private static final String AUTOMATION = "automation";
+
+	private static final String COMPLETION_DATE = "completionDate";
+
+	private static final String DEADLINE = "deadline";
+
+	private static final String EXPIRATION_TIME = "expirationTime";
+
+	private static final String EXPIRATIONDATE = "expirationdate";
+
+	private static final String START_TIME = "startTime";
+
 	private static final String FOLDER_ID = "folderId";
 
 	private static final String USERNAME = "username";
@@ -584,7 +596,7 @@ public class CalendarEventDialog extends Window {
 		startDate.setWrapTitle(false);
 		startDate.setValue(calendarEvent.getStartDate());
 		startDate.setCanEdit(!readOnly);
-		TimeItem startTime = ItemFactory.newTimeItem("startTime", "   ");
+		TimeItem startTime = ItemFactory.newTimeItem(START_TIME, "   ");
 		DateTimeFormat df = DateTimeFormat.getFormat("HH:mm");
 		startTime.setValue(df.format(calendarEvent.getStartDate()));
 		startTime.setRequired(true);
@@ -594,14 +606,14 @@ public class CalendarEventDialog extends Window {
 		startTime.setCanEdit(!readOnly);
 		startTime.setTitleColSpan(1);
 
-		DateItem expirationDate = ItemFactory.newDateItem("expirationdate");
+		DateItem expirationDate = ItemFactory.newDateItem(EXPIRATIONDATE);
 		expirationDate.setRequired(false);
 		expirationDate.setTitleOrientation(TitleOrientation.LEFT);
 		expirationDate.setWrapTitle(false);
 		expirationDate.setCanEdit(!readOnly);
 		if (calendarEvent.getExpirationDate() != null)
 			expirationDate.setValue(calendarEvent.getExpirationDate());
-		TimeItem expirationTime = ItemFactory.newTimeItem("expirationTime", "   ");
+		TimeItem expirationTime = ItemFactory.newTimeItem(EXPIRATION_TIME, "   ");
 		expirationTime.setTitleOrientation(TitleOrientation.LEFT);
 		expirationTime.setShowTitle(false);
 		expirationTime.setEndRow(true);
@@ -610,7 +622,7 @@ public class CalendarEventDialog extends Window {
 		if (calendarEvent.getExpirationDate() != null)
 			expirationTime.setValue(df.format(calendarEvent.getExpirationDate()));
 
-		final DateItem deadline = ItemFactory.newDateItem("deadline", "enddate");
+		final DateItem deadline = ItemFactory.newDateItem(DEADLINE, "enddate");
 		deadline.setRequired(false);
 		deadline.setShowTitle(true);
 		deadline.setTitleOrientation(TitleOrientation.LEFT);
@@ -619,7 +631,7 @@ public class CalendarEventDialog extends Window {
 		if (calendarEvent.getDeadline() != null)
 			deadline.setValue(calendarEvent.getDeadline());
 
-		final SelectItem frequency = ItemFactory.newFrequencySelector("frequency", "frequency");
+		final SelectItem frequency = ItemFactory.newFrequencySelector();
 		frequency.setTitleOrientation(TitleOrientation.LEFT);
 		frequency.setValue(Integer.toString(calendarEvent.getFrequency()));
 		frequency.setCanEdit(!readOnly);
@@ -630,7 +642,7 @@ public class CalendarEventDialog extends Window {
 				deadline.setValue((Date) null);
 		});
 
-		final DateItem completionDate = ItemFactory.newDateItem("completionDate", "completedon");
+		final DateItem completionDate = ItemFactory.newDateItem(COMPLETION_DATE, "completedon");
 		completionDate.setRequired(false);
 		completionDate.setShowTitle(false);
 		completionDate.setTitleOrientation(TitleOrientation.LEFT);
@@ -639,7 +651,7 @@ public class CalendarEventDialog extends Window {
 		if (calendarEvent.getCompletionDate() != null)
 			completionDate.setValue(calendarEvent.getCompletionDate());
 
-		SelectItem status = ItemFactory.newCalendarEventStatusSelector("status", "status");
+		SelectItem status = ItemFactory.newCalendarEventStatusSelector();
 		status.setTitleOrientation(TitleOrientation.LEFT);
 		status.setWrapTitle(false);
 		status.setValue(Integer.toString(calendarEvent.getStatus()));
@@ -652,8 +664,7 @@ public class CalendarEventDialog extends Window {
 				completionDate.setValue((Date) null);
 		});
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description",
-				calendarEvent.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", calendarEvent.getDescription());
 		description.setWidth("*");
 		description.setHeight("*");
 		description.setColSpan(formColumns);
@@ -667,8 +678,8 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private Tab prepareAutomation() {
-		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
-				calendarEvent.getAutomation(), null, false);
+		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation(AUTOMATION, calendarEvent.getAutomation(),
+				null, false);
 		automation.setCanEdit(!readOnly);
 		automation.setShowTitle(false);
 		automation.setWidth("*");
@@ -683,7 +694,7 @@ public class CalendarEventDialog extends Window {
 		automationForm.setFields(automation);
 
 		Tab automationTab = new Tab();
-		automationTab.setTitle(I18N.message("automation"));
+		automationTab.setTitle(I18N.message(AUTOMATION));
 		automationTab.setPane(automationForm);
 		return automationTab;
 	}
@@ -697,7 +708,7 @@ public class CalendarEventDialog extends Window {
 			calendarEvent.setType(vm.getValueAsString("type"));
 			calendarEvent.setSubType(vm.getValueAsString("subtype"));
 			calendarEvent.setDescription(vm.getValueAsString("description"));
-			calendarEvent.setAutomation(vm.getValueAsString("automation"));
+			calendarEvent.setAutomation(vm.getValueAsString(AUTOMATION));
 
 			if (vm.getValue("frequency") != null)
 				calendarEvent.setFrequency(Integer.parseInt(vm.getValueAsString("frequency").trim()));
@@ -712,8 +723,8 @@ public class CalendarEventDialog extends Window {
 
 			calendarEvent.setStatus(Integer.parseInt(vm.getValue("status").toString()));
 
-			if (vm.getValue("deadline") != null)
-				calendarEvent.setDeadline((Date) vm.getValue("deadline"));
+			if (vm.getValue(DEADLINE) != null)
+				calendarEvent.setDeadline((Date) vm.getValue(DEADLINE));
 			else
 				calendarEvent.setDeadline(null);
 
@@ -741,26 +752,26 @@ public class CalendarEventDialog extends Window {
 		DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm");
 
 		String str = dfDate.format((Date) vm.getValue("startDate"));
-		if (vm.getValue("startTime") != null)
+		if (vm.getValue(START_TIME) != null)
 			try {
-				calendarEvent.setStartDate(df.parse(str + " " + vm.getValue("startTime").toString()));
+				calendarEvent.setStartDate(df.parse(str + " " + vm.getValue(START_TIME).toString()));
 			} catch (Throwable t) {
-				calendarEvent.setStartDate(df.parse(str + " " + dfTime.format((Date) vm.getValue("startTime"))));
+				calendarEvent.setStartDate(df.parse(str + " " + dfTime.format((Date) vm.getValue(START_TIME))));
 			}
 
-		if (vm.getValue("expirationdate") != null) {
-			str = dfDate.format((Date) vm.getValue("expirationdate"));
-			if (vm.getValue("expirationTime") != null)
+		if (vm.getValue(EXPIRATIONDATE) != null) {
+			str = dfDate.format((Date) vm.getValue(EXPIRATIONDATE));
+			if (vm.getValue(EXPIRATION_TIME) != null)
 				try {
-					calendarEvent.setExpirationDate(df.parse(str + " " + vm.getValue("expirationTime").toString()));
+					calendarEvent.setExpirationDate(df.parse(str + " " + vm.getValue(EXPIRATION_TIME).toString()));
 				} catch (Throwable t) {
 					calendarEvent.setExpirationDate(
-							df.parse(str + " " + dfTime.format((Date) vm.getValue("expirationTime"))));
+							df.parse(str + " " + dfTime.format((Date) vm.getValue(EXPIRATION_TIME))));
 				}
 		}
 
-		if (vm.getValue("completionDate") != null)
-			calendarEvent.setCompletionDate((Date) vm.getValue("completionDate"));
+		if (vm.getValue(COMPLETION_DATE) != null)
+			calendarEvent.setCompletionDate((Date) vm.getValue(COMPLETION_DATE));
 		else
 			calendarEvent.setCompletionDate(null);
 	}

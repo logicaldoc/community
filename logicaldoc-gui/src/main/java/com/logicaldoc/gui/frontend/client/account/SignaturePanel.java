@@ -78,10 +78,10 @@ public class SignaturePanel extends StampProperties {
 		exprh.setWidth(300);
 		exprh.setColSpan(4);
 
-		text = ItemFactory.newTextAreaItemForAutomation("text", "text", stamp.getText(), changedHandler, false);
+		text = ItemFactory.newTextAreaItemForAutomation("text", stamp.getText(), changedHandler, false);
 		text.setWidth("*");
 
-		SpinnerItem rotation = ItemFactory.newSpinnerItem("rotation", "rotation", stamp.getRotation(), 0, 360);
+		SpinnerItem rotation = ItemFactory.newSpinnerItem("rotation", stamp.getRotation(), 0, 360);
 		if (changedHandler != null)
 			rotation.addChangedHandler(changedHandler);
 
@@ -111,7 +111,7 @@ public class SignaturePanel extends StampProperties {
 			}
 		});
 
-		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity", stamp.getOpacity(), 1, 100);
+		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", stamp.getOpacity(), 1, 100);
 		opacity.setEndRow(true);
 		if (changedHandler != null)
 			opacity.addChangedHandler(changedHandler);

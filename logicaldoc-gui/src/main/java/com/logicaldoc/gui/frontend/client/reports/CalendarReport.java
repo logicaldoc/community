@@ -85,7 +85,7 @@ public class CalendarReport extends AdminPanel {
 		// End date To
 		DateItem deadLineTo = ItemFactory.newDateItem("endTo", "till");
 
-		SelectItem frequencySelector = ItemFactory.newFrequencySelector("frequency", "frequency");
+		SelectItem frequencySelector = ItemFactory.newFrequencySelector();
 
 		TextItem title = ItemFactory.newTextItem("title", null);
 
@@ -93,7 +93,7 @@ public class CalendarReport extends AdminPanel {
 
 		TextItem subtype = ItemFactory.newTextItem("subtype", null);
 
-		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector("status", "status");
+		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector();
 
 		// Max results
 		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displaymax", (Integer) null);

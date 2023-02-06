@@ -204,7 +204,7 @@ public class FirewallPanel extends VLayout {
 	}
 
 	private TextAreaItem prepareBlackListItem() {
-		final TextAreaItem blacklist = ItemFactory.newTextAreaItem("blacklist", "blacklist", null);
+		final TextAreaItem blacklist = ItemFactory.newTextAreaItem("blacklist", null);
 		blacklist.setHeight(120);
 		blacklist.setWidth(350);
 		blacklist.setHint(I18N.message("blacklisthint"));
@@ -215,7 +215,7 @@ public class FirewallPanel extends VLayout {
 	}
 
 	private TextAreaItem prepareWhiteListItem() {
-		final TextAreaItem whitelist = ItemFactory.newTextAreaItem("whitelist", "whitelist", null);
+		final TextAreaItem whitelist = ItemFactory.newTextAreaItem("whitelist", null);
 		whitelist.setHeight(120);
 		whitelist.setWidth(350);
 		whitelist.setHint(I18N.message("blacklisthint"));

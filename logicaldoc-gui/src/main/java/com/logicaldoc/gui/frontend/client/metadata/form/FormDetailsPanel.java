@@ -185,7 +185,7 @@ public class FormDetailsPanel extends VLayout {
 		form1.setValuesManager(vm);
 		form1.setItems(name, template, css);
 
-		TextAreaItem content = ItemFactory.newTextAreaItemForAutomation("content", "content", form.getContent(),
+		TextAreaItem content = ItemFactory.newTextAreaItemForAutomation("content", form.getContent(),
 				changedHandler, true);
 		content.addChangedHandler(changedHandler);
 		content.setColSpan(2);
@@ -285,7 +285,7 @@ public class FormDetailsPanel extends VLayout {
 			columns.setRequired(true);
 			columns.addChangedHandler(changedHandler);
 
-			TextAreaItem title = ItemFactory.newTextAreaItemForAutomation("title", "title", form.getTitle(),
+			TextAreaItem title = ItemFactory.newTextAreaItemForAutomation("title", form.getTitle(),
 					changedHandler, true);
 			title.setRequired(true);
 			title.setColSpan(3);

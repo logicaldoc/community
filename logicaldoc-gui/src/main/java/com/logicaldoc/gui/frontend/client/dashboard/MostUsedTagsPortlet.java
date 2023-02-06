@@ -32,6 +32,8 @@ import com.smartgwt.client.widgets.layout.Portlet;
  */
 public class MostUsedTagsPortlet extends Portlet {
 
+	private static final String COUNT = "count";
+
 	private ListGrid list;
 
 	private HLayout container = null;
@@ -61,7 +63,7 @@ public class MostUsedTagsPortlet extends Portlet {
 		setDragOpacity(30);
 
 		ListGridField word = new ListGridField("word", I18N.message("tag"), 150);
-		ListGridField count = new ListGridField("count", I18N.message("count"), 60);
+		ListGridField count = new ListGridField(COUNT, I18N.message(COUNT), 60);
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setWidth100();
@@ -102,7 +104,7 @@ public class MostUsedTagsPortlet extends Portlet {
 				for (int i = 0; i < cloud.length; i++) {
 					records[i] = new ListGridRecord();
 					records[i].setAttribute("word", cloud[i].getTag());
-					records[i].setAttribute("count", cloud[i].getCount());
+					records[i].setAttribute(COUNT, cloud[i].getCount());
 				}
 				list.setRecords(records);
 			}

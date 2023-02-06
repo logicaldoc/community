@@ -351,7 +351,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	private TextAreaItem prepareInitializationItem() {
-		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation("initialization", "initialization", null,
+		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation("initialization", null,
 				null, false);
 		initialization.setWidth("*");
 		initialization.setDisabled(attributeSet.isReadonly());
@@ -379,7 +379,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	private TextAreaItem prepareValidationItem() {
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", "validation", null, null,
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", null, null,
 				false);
 		validation.setWidth("*");
 		validation.setDisabled(attributeSet.isReadonly());
@@ -556,7 +556,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (!attributeSet.isReadonly())
 			name.addChangedHandler(changedHandler);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description",
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", 
 				attributeSet.getDescription());
 		description.setDisabled(attributeSet.isReadonly());
 

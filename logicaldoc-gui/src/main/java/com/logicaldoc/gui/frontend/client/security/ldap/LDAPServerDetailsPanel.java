@@ -207,7 +207,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		keepMembership.setRequired(true);
 		keepMembership.setEndRow(true);
 
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation(VALIDATION, VALIDATION,
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation(VALIDATION, 
 				this.server.getValidation(), null, false);
 		validation.setHeight(150);
 		validation.setWidth(400);

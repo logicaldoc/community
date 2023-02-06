@@ -50,6 +50,16 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class MessageDialog extends Window {
 
+	private static final String AVATAR = "avatar";
+
+	private static final String LABEL = "label";
+
+	private static final String PRIORITY = "priority";
+
+	private static final String VALIDITY = "validity";
+
+	private static final String CONFIRMATION = "confirmation";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ListGrid recipientsGrid;
@@ -87,24 +97,24 @@ public class MessageDialog extends Window {
 		subject.setWidth("*");
 		subject.setColSpan(formColumns);
 
-		final TextAreaItem message = ItemFactory.newTextAreaItem("message", "message", null);
+		final TextAreaItem message = ItemFactory.newTextAreaItem("message", null);
 		message.setHeight(160);
 		message.setBrowserSpellCheck(true);
 		message.setWidth("*");
 		message.setColSpan(formColumns);
 
 		final CheckboxItem confirmation = new CheckboxItem();
-		confirmation.setName("confirmation");
-		confirmation.setTitle(I18N.message("confirmation"));
+		confirmation.setName(CONFIRMATION);
+		confirmation.setTitle(I18N.message(CONFIRMATION));
 		confirmation.setEndRow(true);
 
-		IntegerItem validity = ItemFactory.newIntegerItem("validity", I18N.message("validity"), 1);
+		IntegerItem validity = ItemFactory.newIntegerItem(VALIDITY, I18N.message(VALIDITY), 1);
 		IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();
 		integerRangeValidator.setMin(1);
 		validity.setValidators(integerRangeValidator);
 		validity.setHint(I18N.message("days"));
 
-		SelectItem priority = ItemFactory.newPrioritySelector("priority", I18N.message("priority"));
+		SelectItem priority = ItemFactory.newPrioritySelector(PRIORITY, I18N.message(PRIORITY));
 
 		final IButton send = new IButton();
 		send.setTitle(I18N.message("send"));
@@ -117,10 +127,10 @@ public class MessageDialog extends Window {
 					GUIMessage message = new GUIMessage();
 					message.setSubject(form.getValueAsString("subject"));
 					message.setMessage(form.getValueAsString("message"));
-					message.setConfirmation("true".equals(form.getValueAsString("confirmation")));
-					if (form.getValueAsString("validity") != null)
-						message.setValidity(Integer.parseInt(form.getValueAsString("validity")));
-					message.setPriority(Integer.parseInt(form.getValue("priority").toString()));
+					message.setConfirmation("true".equals(form.getValueAsString(CONFIRMATION)));
+					if (form.getValueAsString(VALIDITY) != null)
+						message.setValidity(Integer.parseInt(form.getValueAsString(VALIDITY)));
+					message.setPriority(Integer.parseInt(form.getValue(PRIORITY).toString()));
 
 					if (recipientsGrid.getRecords() == null || recipientsGrid.getRecords().length < 1) {
 						SC.warn(I18N.message("noselectedrecipients"));
@@ -174,7 +184,7 @@ public class MessageDialog extends Window {
 
 		UserListGridField avatar = new UserListGridField();
 		
-		ListGridField name = new ListGridField("label", I18N.message("name"));
+		ListGridField name = new ListGridField(LABEL, I18N.message("name"));
 		name.setCanFilter(true);
 
 		ListGridField id = new ListGridField("id", I18N.message(" "));
@@ -246,8 +256,8 @@ public class MessageDialog extends Window {
 						for (int i = 0; i < users.length; i++) {
 							records[i] = new ListGridRecord();
 							records[i].setAttribute("id", users[i].getId());
-							records[i].setAttribute("avatar", users[i].getId());
-							records[i].setAttribute("label", users[i].getFullName());
+							records[i].setAttribute(AVATAR, users[i].getId());
+							records[i].setAttribute(LABEL, users[i].getFullName());
 						}
 
 						addRecipients(records);
@@ -277,8 +287,8 @@ public class MessageDialog extends Window {
 		for (int i = 0; i < newSelection.length; i++) {
 			ListGridRecord newRec = new ListGridRecord();
 			newRec.setAttribute("id", newSelection[i].getAttributeAsString("id"));
-			newRec.setAttribute("avatar", newSelection[i].getAttributeAsString("avatar"));
-			newRec.setAttribute("label", newSelection[i].getAttributeAsString("label"));
+			newRec.setAttribute(AVATAR, newSelection[i].getAttributeAsString(AVATAR));
+			newRec.setAttribute(LABEL, newSelection[i].getAttributeAsString(LABEL));
 
 			// Iterate over the current recipients avoiding duplicates
 			boolean duplicate = false;

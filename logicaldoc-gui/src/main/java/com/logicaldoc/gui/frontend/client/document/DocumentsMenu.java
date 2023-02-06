@@ -23,6 +23,10 @@ import com.smartgwt.client.widgets.layout.events.SectionHeaderClickHandler;
  */
 public class DocumentsMenu extends SectionStack {
 
+	private static final String BOOKMARKS = "bookmarks";
+
+	private static final String TRASH = "trash";
+
 	protected SectionStackSection browser = null;
 
 	protected SectionStackSection bookmarksSection = null;
@@ -78,8 +82,8 @@ public class DocumentsMenu extends SectionStack {
 	private void addTrash(boolean showTrash) {
 		if (showTrash && Feature.visible(Feature.TRASH)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TRASH)) {
-			trashSection = new SectionStackSection(I18N.message("trash"));
-			trashSection.setName("trash");
+			trashSection = new SectionStackSection(I18N.message(TRASH));
+			trashSection.setName(TRASH);
 			trashSection.setCanCollapse(true);
 			if (Feature.enabled(Feature.TRASH))
 				trashSection.setItems(TrashPanel.get());
@@ -91,8 +95,8 @@ public class DocumentsMenu extends SectionStack {
 
 	private void addBookmarks(boolean showBookmarks) {
 		if (showBookmarks && Feature.visible(Feature.BOOKMARKS)) {
-			bookmarksSection = new SectionStackSection(I18N.message("bookmarks"));
-			bookmarksSection.setName("bookmarks");
+			bookmarksSection = new SectionStackSection(I18N.message(BOOKMARKS));
+			bookmarksSection.setName(BOOKMARKS);
 			bookmarksSection.setCanCollapse(true);
 
 			if (Feature.enabled(Feature.BOOKMARKS))
@@ -117,9 +121,9 @@ public class DocumentsMenu extends SectionStack {
 	}
 
 	public void refresh(String sectionNameToExpand) {
-		if ("bookmarks".equals(sectionNameToExpand)) {
+		if (BOOKMARKS.equals(sectionNameToExpand)) {
 			BookmarksPanel.get().refresh();
-		} else if ("trash".equals(sectionNameToExpand)
+		} else if (TRASH.equals(sectionNameToExpand)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TRASH)) {
 			TrashPanel.get().refresh();
 		}

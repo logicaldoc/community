@@ -109,7 +109,7 @@ public class TextContentEditor extends Window {
 			}
 		});
 
-		TextAreaItem contentItem = ItemFactory.newTextAreaItem("content", I18N.message("content"), content);
+		TextAreaItem contentItem = ItemFactory.newTextAreaItem("content", content);
 		contentItem.setShowTitle(false);
 		contentItem.setWidth(getWidth() - 6);
 		contentItem.setHeight("*");

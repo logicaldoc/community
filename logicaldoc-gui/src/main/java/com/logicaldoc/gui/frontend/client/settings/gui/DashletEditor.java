@@ -210,10 +210,10 @@ public class DashletEditor extends Window {
 			}
 		});
 
-		content = ItemFactory.newTextAreaItemForAutomation("content", "content", dashlet.getContent(), null, true);
+		content = ItemFactory.newTextAreaItemForAutomation("content",  dashlet.getContent(), null, true);
 		content.setWidth("*");
 
-		query = ItemFactory.newTextAreaItemForAutomation("query", "query", dashlet.getQuery(), null, false);
+		query = ItemFactory.newTextAreaItemForAutomation("query", dashlet.getQuery(), null, false);
 		query.setWidth("*");
 
 		form.setWidth100();

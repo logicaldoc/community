@@ -23,7 +23,6 @@ import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -45,6 +44,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class VersionsPanel extends DocumentDetailTab {
 
+	private static final String PERMALINK = "permalink";
+
+	private static final String FILE_VERSION = "fileVersion";
+
 	private ListGrid list = null;
 
 	public VersionsPanel(final GUIDocument document) {
@@ -57,14 +60,14 @@ public class VersionsPanel extends DocumentDetailTab {
 		id.setHidden(true);
 
 		ListGridField user = new UserListGridField("user", "userId", "user");
-		ListGridField event = new ColoredListGridField("event", I18N.message("event"), 200);
-		ListGridField version = new ColoredListGridField("version", I18N.message("version"), 70);
-		ListGridField fileVersion = new ColoredListGridField("fileVersion", I18N.message("fileversion"), 70);
+		ListGridField event = new ColoredListGridField("event", 200);
+		ListGridField version = new ColoredListGridField("version", 70);
+		ListGridField fileVersion = new ColoredListGridField(FILE_VERSION, I18N.message("fileversion"), 70);
 		ListGridField date = new DateListGridField("date", "date");
 		ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"));
 		FileNameListGridField fileName = new FileNameListGridField();
 
-		ListGridField type = new ColoredListGridField("type", I18N.message("type"), 55);
+		ListGridField type = new ColoredListGridField("type", 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
 		type.setHidden(true);
@@ -126,7 +129,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 		list.addCellContextClickHandler((CellContextClickEvent contextClickEvent) -> {
 			ListGridField field = list.getField(contextClickEvent.getColNum());
-			if (!"permalink".equals(field.getName())) {
+			if (!PERMALINK.equals(field.getName())) {
 				prepareContextMenu().showContextMenu();
 				contextClickEvent.cancel();
 			}
@@ -150,11 +153,11 @@ public class VersionsPanel extends DocumentDetailTab {
 	}
 
 	private ListGridField preparePermalink() {
-		ListGridField permalink = new ColoredListGridField("permalink", I18N.message("permalink"), 90);
+		ListGridField permalink = new ColoredListGridField(PERMALINK, I18N.message(PERMALINK), 90);
 		permalink.setAlign(Alignment.CENTER);
 		permalink.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
-			String fileVer = rec.getAttributeAsString("fileVersion");
+			String fileVer = rec.getAttributeAsString(FILE_VERSION);
 			String downloadUrl = Util.downloadURL(docId, fileVer);
 			String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message("download") + "</a>";
 			return perma;
@@ -165,7 +168,7 @@ public class VersionsPanel extends DocumentDetailTab {
 	protected void onDownload(final GUIDocument document, ListGridRecord rec) {
 		if (document.getFolder().isDownload())
 			DocUtil.download(document.getDocRef() != null ? document.getDocRef() : document.getId(),
-					rec.getAttribute("fileVersion"));
+					rec.getAttribute(FILE_VERSION));
 	}
 
 	protected void onPreview(final GUIDocument document, ListGridRecord rec) {
@@ -175,7 +178,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		version.setDocId(document.getId());
 		version.setId(document.getId());
 		version.setVersion(rec.getAttribute("version"));
-		version.setFileVersion(rec.getAttribute("fileVersion"));
+		version.setFileVersion(rec.getAttribute(FILE_VERSION));
 		version.setType(rec.getAttribute("type"));
 		version.setFileName(rec.getAttribute("filename"));
 		version.setFileSize(document.getFileSize());
@@ -218,7 +221,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		replaceFile.setTitle(I18N.message("replacefile"));
 		replaceFile.addClickHandler((MenuItemClickEvent replaceFileEvent) -> {
 			ReplaceVersionFile dialog = new ReplaceVersionFile(document,
-					selection[0].getAttributeAsString("fileVersion"));
+					selection[0].getAttributeAsString(FILE_VERSION));
 			dialog.show();
 		});
 
@@ -226,7 +229,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		notes.setTitle(I18N.message("notes"));
 		notes.addClickHandler((MenuItemClickEvent notesEvent) -> {
 			VersionNotesWindow versionNotes = new VersionNotesWindow(document,
-					selection[0].getAttributeAsString("fileVersion"));
+					selection[0].getAttributeAsString(FILE_VERSION));
 			versionNotes.show();
 		});
 
@@ -298,25 +301,25 @@ public class VersionsPanel extends DocumentDetailTab {
 		promote.setTitle(I18N.message("promote"));
 		promote.addClickHandler((MenuItemClickEvent promoteEvent) -> {
 			LD.ask(I18N.message("question"), I18N.message("promotequestion"), (Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						LD.contactingServer();
-						DocumentService.Instance.get().promoteVersion(document.getId(),
-								selection[0].getAttributeAsString("version"), new AsyncCallback<GUIDocument>() {
+				if (Boolean.TRUE.equals(yes)) {
+					LD.contactingServer();
+					DocumentService.Instance.get().promoteVersion(document.getId(),
+							selection[0].getAttributeAsString("version"), new AsyncCallback<GUIDocument>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-									}
+								@Override
+								public void onFailure(Throwable caught) {
+									LD.clearPrompt();
+									GuiLog.serverError(caught);
+								}
 
-									@Override
-									public void onSuccess(GUIDocument document) {
-										LD.clearPrompt();
-										DocumentController.get().checkedIn(document);
-										destroy();
-									}
-								});
-					}
+								@Override
+								public void onSuccess(GUIDocument document) {
+									LD.clearPrompt();
+									DocumentController.get().checkedIn(document);
+									destroy();
+								}
+							});
+				}
 			});
 		});
 		return promote;

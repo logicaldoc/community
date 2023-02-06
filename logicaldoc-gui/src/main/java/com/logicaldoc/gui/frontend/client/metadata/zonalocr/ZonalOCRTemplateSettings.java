@@ -138,7 +138,7 @@ public class ZonalOCRTemplateSettings extends Window {
 		batch.setStep(50);
 		batch.setMin(1);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description",
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", 
 				ocrPanel.getSelectedOcrTemplate().getDescription());
 		description.setHeight(200);
 

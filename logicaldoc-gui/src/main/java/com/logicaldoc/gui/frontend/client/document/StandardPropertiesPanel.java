@@ -51,6 +51,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class StandardPropertiesPanel extends DocumentDetailTab {
+	private static final String COLOR = "color";
+
 	private static final int DEFAULT_ITEM_WIDTH = 250;
 
 	private DynamicForm form1 = new DynamicForm();
@@ -123,7 +125,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		LinkItem folder = prepareFolderItem();
 
-		ColorItem color = ItemFactory.newColorItemPicker("color", "color", document.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorItemPicker(COLOR, COLOR, document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
 
 		String downloadUrl = Util.downloadURL(document.getId());
@@ -420,7 +422,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (Boolean.TRUE.equals(vm.validate())) {
 			document.setFileName((String) values.get("filename"));
 			document.setLanguage((String) values.get("language"));
-			document.setColor((String) values.get("color"));
+			document.setColor((String) values.get(COLOR));
 			document.setTags(tagItem.getValues());
 		}
 		return !vm.hasErrors();

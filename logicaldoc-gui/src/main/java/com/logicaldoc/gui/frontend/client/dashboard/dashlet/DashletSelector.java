@@ -45,7 +45,7 @@ public class DashletSelector extends Window {
 		form.setNumCols(1);
 
 		SelectItem dashlet;
-		dashlet = ItemFactory.newDashletSelector("dashlet", I18N.message("dashlet"));
+		dashlet = ItemFactory.newDashletSelector();
 
 		dashlet.setEndRow(true);
 

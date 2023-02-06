@@ -405,11 +405,11 @@ public class PatchPanel extends VLayout {
 				form.setColWidths("*");
 				form.setNumCols(1);
 
-				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", "changelog", infos[0]);
+				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos[0]);
 				changelog.setWidth("100%");
 				changelog.setHeight(220);
 
-				TextAreaItem patchNotes = ItemFactory.newTextAreaItem("patchnotes", "patchnotes", infos[1]);
+				TextAreaItem patchNotes = ItemFactory.newTextAreaItem("patchnotes", infos[1]);
 				patchNotes.setWidth("100%");
 				patchNotes.setHeight(220);
 

@@ -80,7 +80,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 
 		StaticTextItem name = ItemFactory.newStaticTextItem("name", report.getName());
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", report.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", report.getDescription());
 		description.setWidth(250);
 		description.addChangedHandler(changedHandler);
 

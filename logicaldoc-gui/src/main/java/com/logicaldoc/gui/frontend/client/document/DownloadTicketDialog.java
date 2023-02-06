@@ -30,6 +30,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class DownloadTicketDialog extends Window {
 
+	private static final String DUEDATENUMBER = "duedatenumber";
+
 	private IButton save;
 
 	private DynamicForm form;
@@ -109,7 +111,7 @@ public class DownloadTicketDialog extends Window {
 		maxDownloads.setRequired(false);
 		maxDownloads.setMin(0);
 
-		SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem("duedatenumber", I18N.message("expiresin"), 24);
+		SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem(DUEDATENUMBER, I18N.message("expiresin"), 24);
 		duedateTimeItem.setWrapTitle(false);
 		duedateTimeItem.setDefaultValue(24);
 		duedateTimeItem.setMin(0);
@@ -131,8 +133,8 @@ public class DownloadTicketDialog extends Window {
 		Date date = (Date) form.getValue("date");
 
 		Integer expireHours = null;
-		if (form.getValue("duedatenumber") != null)
-			expireHours = Integer.parseInt(form.getValueAsString("duedatenumber"));
+		if (form.getValue(DUEDATENUMBER) != null)
+			expireHours = Integer.parseInt(form.getValueAsString(DUEDATENUMBER));
 		if ("day".equals(form.getValueAsString("duedatetime")))
 			expireHours = expireHours * 24;
 

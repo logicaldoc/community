@@ -49,6 +49,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class MessagesPanel extends VLayout implements UserObserver {
 
+	private static final String SUBJECT = "subject";
+
 	private RefreshableListGrid grid;
 
 	private Layout listing;
@@ -79,7 +81,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		priority.setImageURLSuffix(".gif");
 		priority.setCanFilter(false);
 
-		ListGridField subject = new ListGridField("subject", I18N.message("subject"));
+		ListGridField subject = new ListGridField(SUBJECT, I18N.message(SUBJECT));
 		subject.setCanFilter(true);
 
 		UserListGridField from = new UserListGridField("from", "avatar", I18N.message("from"));
@@ -90,7 +92,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		grid = new RefreshableListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (getFieldName(colNum).equals("subject")) {
+				if (getFieldName(colNum).equals(SUBJECT)) {
 					if ("false".equals(rec.getAttributeAsString("read"))) {
 						return "font-weight:bold;";
 					} else {

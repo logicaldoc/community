@@ -222,20 +222,20 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 	public void selectWorkflowTab() {
 		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.WORKFLOW_ID);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.WORKFLOW_ID);
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.WORKFLOW);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.WORKFLOW);
 	}
 
 	public void selectMessagesTab() {
 		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.MESSAGES_ID);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.MESSAGES_ID);
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.MESSAGES);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.MESSAGES);
 	}
 
 	public void selectCalendarTab() {
 		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR_ID);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR_ID);
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR);
 	}
 
 	public boolean isOnDocumentsTab() {

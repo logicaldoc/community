@@ -116,7 +116,7 @@ public class ZoneEditor extends Window {
 		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
 		language.setValue(zone.getLanguage());
 
-		TextAreaItem parsing = ItemFactory.newTextAreaItemForAutomation("parsing", "parsing", zone.getParsing(), null,
+		TextAreaItem parsing = ItemFactory.newTextAreaItemForAutomation("parsing", zone.getParsing(), null,
 				false);
 		parsing.setHeight(100);
 		parsing.setWidth(300);

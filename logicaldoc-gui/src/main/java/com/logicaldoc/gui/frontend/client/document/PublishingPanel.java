@@ -21,6 +21,8 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
  * @since 6.0
  */
 public class PublishingPanel extends DocumentDetailTab {
+	private static final String PUBLISHED = "published";
+
 	private DynamicForm form1 = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -47,7 +49,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setWrapItemTitles(false);
 
-		RadioGroupItem published = ItemFactory.newBooleanSelector("published", "published");
+		RadioGroupItem published = ItemFactory.newBooleanSelector(PUBLISHED, PUBLISHED);
 		if (document.getPublished() != -1) {
 			published.setRequired(true);
 			published.setValue(document.getPublished() == 1 ? "yes" : "no");
@@ -110,8 +112,8 @@ public class PublishingPanel extends DocumentDetailTab {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			if (!"".equals(values.get("published")) && values.get("published") != null)
-				document.setPublished("yes".equals(values.get("published")) ? 1 : 0);
+			if (!"".equals(values.get(PUBLISHED)) && values.get(PUBLISHED) != null)
+				document.setPublished("yes".equals(values.get(PUBLISHED)) ? 1 : 0);
 			document.setStartPublishing((Date) values.get("startpublishing"));
 			document.setStopPublishing((Date) values.get("stoppublishing"));
 		}

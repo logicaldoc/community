@@ -70,7 +70,7 @@ public class MessageTemplateEditor extends Window {
 
 		addItem(toolStrip);
 
-		TextAreaItem subject = ItemFactory.newTextAreaItemForAutomation("subject", "subject",
+		TextAreaItem subject = ItemFactory.newTextAreaItemForAutomation("subject", 
 				rec.getAttributeAsString("subject"), null, false);
 		subject.setRequired(true);
 		subject.setWidth("*");

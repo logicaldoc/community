@@ -243,7 +243,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private TextAreaItem prepareDescritptionITem() {
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", stamp.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", stamp.getDescription());
 		if (changedHandler != null)
 			description.addChangedHandler(changedHandler);
 		description.setRowSpan(2);
@@ -252,7 +252,7 @@ public class StampProperties extends StampDetailsTab {
 	}
 
 	private void prepareTextItem() {
-		text = ItemFactory.newTextAreaItemForAutomation("text", "text", stamp.getText(), changedHandler, false);
+		text = ItemFactory.newTextAreaItemForAutomation("text", stamp.getText(), changedHandler, false);
 		text.setWidth("*");
 		if (stamp.getType() == GUIStamp.TYPE_HTML) {
 			text = ItemFactory.newRichTextItemForAutomation("text", "text", stamp.getText(), changedHandler);

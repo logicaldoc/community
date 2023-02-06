@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class BookmarksPanel extends VLayout {
 
+	private static final String TARGET_ID = "targetId";
+
 	private RefreshableListGrid list;
 
 	private static BookmarksPanel instance;
@@ -60,7 +62,7 @@ public class BookmarksPanel extends VLayout {
 		name.setWidth("*");
 		name.setValidators(validator);
 
-		ListGridField description = new ColoredListGridField("description", I18N.message("description"));
+		ListGridField description = new ColoredListGridField("description");
 		description.setValidators(validator);
 		description.setHidden(true);
 
@@ -195,15 +197,15 @@ public class BookmarksPanel extends VLayout {
 	}
 
 	private void download() {
-		Long id = list.getSelectedRecord().getAttributeAsLong("targetId");
+		Long id = list.getSelectedRecord().getAttributeAsLong(TARGET_ID);
 		DocUtil.download(id, null);
 	}
 
 	private void onBookmarkSelected() {
 		ListGridRecord rec = list.getSelectedRecord();
 		if (rec.getAttributeAsString("type").equals("0"))
-			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"), rec.getAttributeAsLong("targetId"));
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"), rec.getAttributeAsLong(TARGET_ID));
 		else
-			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("targetId"), null);
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(TARGET_ID), null);
 	}
 }

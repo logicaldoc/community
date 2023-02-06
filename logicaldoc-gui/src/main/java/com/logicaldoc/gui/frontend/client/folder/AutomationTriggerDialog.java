@@ -91,8 +91,8 @@ public class AutomationTriggerDialog extends Window {
 		form2.setNumCols(1);
 		form2.setValuesManager(vm);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
-				trigger.getAutomation(), null, false);
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", trigger.getAutomation(),
+				null, false);
 		automation.setShowTitle(false);
 		automation.setStartRow(false);
 		automation.setWidth("*");
@@ -124,7 +124,8 @@ public class AutomationTriggerDialog extends Window {
 		form1.setNumCols(1);
 		form1.setValuesManager(vm);
 
-		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeron"), null, true, true, true, true);
+		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeron"), null, true, true, true,
+				true);
 		events.setHeight(210);
 		events.setHeight(250);
 		events.setEndRow(true);

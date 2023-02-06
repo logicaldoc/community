@@ -242,7 +242,7 @@ public class ApiCallsReport extends AdminPanel {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
 				String value = event.getRecord().getAttributeAsString(calls.getField(event.getColNum()).getName());
-				TextAreaItem item = ItemFactory.newTextAreaItem("value", "value", value);
+				TextAreaItem item = ItemFactory.newTextAreaItem("value", value);
 				item.setWidth(500);
 				item.setHeight(400);
 				LD.askForValue(I18N.message("value"), I18N.message("value"), value, item, 500, new ValueCallback() {

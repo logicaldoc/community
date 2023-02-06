@@ -118,7 +118,7 @@ public class UserInterfacePanel extends HLayout {
 		editDocsLayout.setWidth(12);
 		editDocsLayout.setHeight(12);
 		editDocsLayout.addFormItemClickHandler((FormItemIconClickEvent event) -> {
-			TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"), null);
+			TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
 					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, new ValueCallback() {
@@ -150,8 +150,7 @@ public class UserInterfacePanel extends HLayout {
 		editHitsLayout.addFormItemClickHandler(new FormItemClickHandler() {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("hitsgridlayout", I18N.message("hitsgridlayout"),
-						null);
+				TextAreaItem textArea = ItemFactory.newTextAreaItem("hitsgridlayout", null);
 				textArea.setHeight(300);
 				LD.askForValue(I18N.message("hitsgridlayout"), I18N.message("hitsgridlayout"),
 						user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400, (final String value) -> {

@@ -35,6 +35,7 @@ import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
  */
 public class DocumentHistoryDashlet extends DocumentDashlet {
 
+	private static final String EVENT = "event";
 	protected String event;
 
 	public DocumentHistoryDashlet(GUIDashlet guiDashlet) {
@@ -105,7 +106,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 			protected void prepareFieldsMap() {
 				super.prepareFieldsMap();
 
-				ColoredListGridField docId = new ColoredListGridField("docId", "docid");
+				ColoredListGridField docId = new ColoredListGridField("docId");
 				docId.setHidden(true);
 				fieldsMap.put(docId.getName(), docId);
 
@@ -113,15 +114,15 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 				date.setHidden(true);
 				fieldsMap.put(date.getName(), date);
 
-				ListGridField evnt = new ColoredListGridField("event", "event");
+				ListGridField evnt = new ColoredListGridField(EVENT);
 				evnt.setHidden(true);
 				fieldsMap.put(evnt.getName(), evnt);
 
-				ListGridField path = new ColoredListGridField("path", "path");
+				ListGridField path = new ColoredListGridField("path");
 				path.setHidden(true);
 				fieldsMap.put(path.getName(), path);
 
-				ListGridField reason = new ColoredListGridField("reason", "reason");
+				ListGridField reason = new ColoredListGridField("reason");
 				reason.setHidden(true);
 				fieldsMap.put(reason.getName(), reason);
 
@@ -163,9 +164,9 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 			fieldsMap.get("date").setHidden(true);
 			fields.add(fieldsMap.get("date"));
 		}
-		if (!fields.contains(fieldsMap.get("event")) && fieldsMap.get("event") != null) {
-			fieldsMap.get("event").setHidden(true);
-			fields.add(fieldsMap.get("event"));
+		if (!fields.contains(fieldsMap.get(EVENT)) && fieldsMap.get(EVENT) != null) {
+			fieldsMap.get(EVENT).setHidden(true);
+			fields.add(fieldsMap.get(EVENT));
 		}
 		if (!fields.contains(fieldsMap.get("path")) && fieldsMap.get("path") != null) {
 			fieldsMap.get("path").setHidden(true);

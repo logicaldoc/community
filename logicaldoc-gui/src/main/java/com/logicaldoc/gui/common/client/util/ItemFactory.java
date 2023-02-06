@@ -1050,14 +1050,13 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newDashletSelector(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), title);
+	public static SelectItem newDashletSelector() {
+		SelectItem select = new SelectItem(originalItemName("dashlet"), I18N.message("dashlet"));
 		select.setAllowEmptyValue(false);
 		select.setOptionDataSource(new DashletsDS());
 		select.setPickListWidth(200);
 		select.setDisplayField("title");
 		select.setValueField("name");
-
 		return select;
 	}
 
@@ -1385,7 +1384,7 @@ public class ItemFactory {
 
 		FormItem item = null;
 		if (att.getEditor() == GUIAttribute.EDITOR_TEXTAREA) {
-			item = newTextAreaItem(itemName, itemName, initialValue);
+			item = newTextAreaItem(itemName, initialValue);
 			item.setWidth(Session.get().getConfigAsInt("gui.textarea.w"));
 			item.setHeight(Session.get().getConfigAsInt("gui.textarea.h"));
 		} else {
@@ -1755,6 +1754,20 @@ public class ItemFactory {
 	}
 
 	/**
+	 * Creates a new SpinnerItem(with a range validator)
+	 * 
+	 * @param name name of the item
+	 * @param value default value(optional)
+	 * @param min minimum value(optional)
+	 * @param max maximum value(optional)
+	 * 
+	 * @return the new item
+	 */
+	public static SpinnerItem newSpinnerItem(String name, Integer value, Integer min, Integer max) {
+		return newSpinnerItem(name, name, value, min, max);
+	}
+
+	/**
 	 * Creates a new SliderItem
 	 * 
 	 * @param name name of the item
@@ -1807,6 +1820,18 @@ public class ItemFactory {
 		return item;
 	}
 
+	/**
+	 * Creates a new TextAreaItem
+	 * 
+	 * @param name The item name (mandatory)s
+	 * @param value The item value (optional)
+	 * 
+	 * @return the new item
+	 */
+	public static TextAreaItem newTextAreaItem(String name, String value) {
+		return newTextAreaItem(name, name, value);
+	}
+
 	public static TextAreaItem newTextAreaItemForAutomation(String name, String title, String value,
 			ChangedHandler handler, boolean withHtmlEditor) {
 		TextAreaItem item = newTextAreaItem(name, title, value);
@@ -1814,6 +1839,11 @@ public class ItemFactory {
 		if (handler != null)
 			item.addChangedHandler(handler);
 		return item;
+	}
+
+	public static TextAreaItem newTextAreaItemForAutomation(String name, String value, ChangedHandler handler,
+			boolean withHtmlEditor) {
+		return newTextAreaItemForAutomation(name, name, value, handler, withHtmlEditor);
 	}
 
 	private static void appendAutomationEditorIcon(FormItem item, ChangedHandler handler, boolean withHtmlEditor) {
@@ -1985,8 +2015,8 @@ public class ItemFactory {
 		return newAttributesSelector(null);
 	}
 
-	public static SelectItem newFrequencySelector(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
+	public static SelectItem newFrequencySelector() {
+		SelectItem select = new SelectItem(originalItemName("frequency"), I18N.message("frequency"));
 
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", "");
@@ -2002,8 +2032,8 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newCalendarEventStatusSelector(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
+	public static SelectItem newCalendarEventStatusSelector() {
+		SelectItem select = new SelectItem(originalItemName("status"), I18N.message("status"));
 
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", "");

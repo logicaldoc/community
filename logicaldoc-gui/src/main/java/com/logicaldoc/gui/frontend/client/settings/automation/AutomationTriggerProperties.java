@@ -71,7 +71,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		form2.setValuesManager(vm);
 		form2.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", 
 				trigger.getAutomation(), changedHandler, false);
 		automation.setStartRow(false);
 		automation.setWidth("*");

@@ -72,7 +72,7 @@ public class MailPreviewPanel extends VLayout {
 		form.setItems(from, subject, replyto, to, cc, bcc, sent, received);
 
 		VLayout header = preparePreviewHeader(mail, document, form);
-		
+
 		Canvas body = null;
 		if (mail.getMessage().toLowerCase().startsWith("<html")
 				|| mail.getMessage().toLowerCase().startsWith("<body")) {
@@ -103,8 +103,7 @@ public class MailPreviewPanel extends VLayout {
 				html.setContents(contents);
 				body = html;
 			} else {
-				TextAreaItem contentItem = ItemFactory.newTextAreaItem("content", I18N.message("content"),
-						mail.getMessage());
+				TextAreaItem contentItem = ItemFactory.newTextAreaItem("content", mail.getMessage());
 				contentItem.setShowTitle(false);
 				contentItem.setWidth(width);
 				contentItem.setHeight("*");
@@ -121,9 +120,10 @@ public class MailPreviewPanel extends VLayout {
 	}
 
 	/**
-	 * Prepares the header that shows the most important informations about the email and the attachment buttons
+	 * Prepares the header that shows the most important informations about the
+	 * email and the attachment buttons
 	 * 
-	 * @param mail The email 
+	 * @param mail The email
 	 * @param document The document that represents the emil
 	 * @param form the form
 	 * 
@@ -205,7 +205,7 @@ public class MailPreviewPanel extends VLayout {
 					toString += ", ";
 				toString += contact.displayLink();
 			}
-		StaticTextItem to = ItemFactory.newStaticTextItem("to",  toString);
+		StaticTextItem to = ItemFactory.newStaticTextItem("to", toString);
 		to.setVisible(!toString.isEmpty());
 		return to;
 	}

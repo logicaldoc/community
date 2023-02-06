@@ -66,8 +66,7 @@ public class WorkflowSettings extends Window {
 		StaticTextItem version = ItemFactory.newStaticTextItem("version",
 				this.workflow != null ? "" + this.workflow.getVersion() : "");
 
-		TextAreaItem workflowDescr = ItemFactory.newTextAreaItem("workflowDescr", "workflowdescr",
-				workflow.getDescription());
+		TextAreaItem workflowDescr = ItemFactory.newTextAreaItem("workflowdescr", workflow.getDescription());
 		workflowDescr.setWrapTitle(false);
 		workflowDescr.setHeight(80);
 		workflowDescr.setWidth("*");
@@ -106,8 +105,8 @@ public class WorkflowSettings extends Window {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-		if (values.get("workflowDescr") != null)
-			WorkflowSettings.this.workflow.setDescription(values.get("workflowDescr").toString());
+		if (values.get("workflowdescr") != null)
+			WorkflowSettings.this.workflow.setDescription(values.get("workflowdescr").toString());
 		else
 			WorkflowSettings.this.workflow.setDescription(null);
 

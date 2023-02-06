@@ -93,7 +93,7 @@ public class CustomActionEditor extends Window {
 		description.setRequired(false);
 		description.setWidth(300);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", 
 				action.getAutomation(), null, false);
 		automation.setShowTitle(false);
 		automation.setStartRow(false);

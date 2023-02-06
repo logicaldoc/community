@@ -45,7 +45,7 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 		form2.setValuesManager(vm);
 		form2.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", 
 				routine.getAutomation(), changedHandler, false);
 		automation.setStartRow(false);
 		automation.setRequired(true);

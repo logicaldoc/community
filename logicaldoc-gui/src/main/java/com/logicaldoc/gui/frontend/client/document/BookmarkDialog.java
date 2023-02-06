@@ -21,6 +21,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 public class BookmarkDialog extends Window {
+	private static final String DESCRIPTION = "description";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private GUIBookmark bookmark = null;
@@ -56,7 +58,7 @@ public class BookmarkDialog extends Window {
 		TextItem name = ItemFactory.newTextItem("name", bookmark.getName());
 		name.setRequired(true);
 
-		TextItem description = ItemFactory.newTextItem("description", bookmark.getDescription());
+		TextItem description = ItemFactory.newTextItem(DESCRIPTION, bookmark.getDescription());
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
@@ -71,8 +73,8 @@ public class BookmarkDialog extends Window {
 					if ((String) values.get("name") != null && !((String) values.get("name")).trim().isEmpty()) {
 						bookmark.setName((String) values.get("name"));
 					}
-					if ((String) values.get("description") != null) {
-						bookmark.setDescription((String) values.get("description"));
+					if ((String) values.get(DESCRIPTION) != null) {
+						bookmark.setDescription((String) values.get(DESCRIPTION));
 					}
 
 					DocumentService.Instance.get().updateBookmark(bookmark, new AsyncCallback<Void>() {

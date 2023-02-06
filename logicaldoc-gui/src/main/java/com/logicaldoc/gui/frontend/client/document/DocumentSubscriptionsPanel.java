@@ -37,6 +37,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
+	private static final String USER_ID = "userId";
+
 	private ListGrid list;
 
 	private VLayout container = new VLayout();
@@ -55,11 +57,11 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		if (list != null)
 			container.removeMember(list);
 
-		ListGridField userId = new ListGridField("userId", "userId", 50);
+		ListGridField userId = new ListGridField(USER_ID, USER_ID, 50);
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new UserListGridField("userName", "userId", "user");
+		ListGridField userName = new UserListGridField("userName", USER_ID, "user");
 		userName.setCanEdit(false);
 
 		DateListGridField created = new DateListGridField("created", "subscription");

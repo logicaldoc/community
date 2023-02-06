@@ -70,7 +70,7 @@ public class TemplateValidationPanel extends HLayout {
 		form.setWidth100();
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", "validation",
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", 
 				template.getValidation(), (!template.isReadonly() && template.isWrite()) ? changedHandler : null,
 				false);
 		validation.setDisabled(template.isReadonly() || !template.isWrite());

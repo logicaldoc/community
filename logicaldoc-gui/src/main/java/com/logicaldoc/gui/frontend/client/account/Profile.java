@@ -183,7 +183,7 @@ public class Profile extends Window {
 		showDocsDefinition.setWidth(12);
 		showDocsDefinition.setHeight(12);
 		showDocsDefinition.addFormItemClickHandler((FormItemIconClickEvent event) -> {
-			TextAreaItem textArea = ItemFactory.newTextAreaItem(DOCSGRIDLAYOUT, I18N.message(DOCSGRIDLAYOUT), null);
+			TextAreaItem textArea = ItemFactory.newTextAreaItem(DOCSGRIDLAYOUT, null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message(DOCSGRIDLAYOUT), I18N.message(DOCSGRIDLAYOUT),
 					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400,
@@ -197,7 +197,7 @@ public class Profile extends Window {
 		showHitsDefinition.setWidth(12);
 		showHitsDefinition.setHeight(12);
 		showHitsDefinition.addFormItemClickHandler((FormItemIconClickEvent event) -> {
-			TextAreaItem textArea = ItemFactory.newTextAreaItem(HITSGRIDLAYOUT, I18N.message(HITSGRIDLAYOUT), null);
+			TextAreaItem textArea = ItemFactory.newTextAreaItem(HITSGRIDLAYOUT, null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message(HITSGRIDLAYOUT), I18N.message(HITSGRIDLAYOUT),
 					user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400,

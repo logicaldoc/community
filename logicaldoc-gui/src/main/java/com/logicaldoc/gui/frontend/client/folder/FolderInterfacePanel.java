@@ -141,7 +141,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		editLayout.setWidth(12);
 		editLayout.setHeight(12);
 		editLayout.addFormItemClickHandler((FormItemIconClickEvent event) -> {
-			TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"), null);
+			TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
 					folder.getGrid() != null ? folder.getGrid() : "", textArea, 400, (final String value) -> {

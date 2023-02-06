@@ -137,7 +137,7 @@ public class BarcodeTemplateSettings extends Window {
 		type.addChangedHandler(
 				(ChangedEvent event) -> uploader.setVisible("zonal".equals(event.getValue().toString())));
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", template.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setHeight(150);
 
 		// The optional batch

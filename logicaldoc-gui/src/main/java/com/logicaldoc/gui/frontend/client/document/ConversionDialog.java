@@ -32,6 +32,10 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  */
 public class ConversionDialog extends Window {
 
+	private static final String DOWNLOAD = "download";
+
+	private static final String ACTION = "action";
+
 	private GUIDocument document;
 
 	private DynamicForm form = new DynamicForm();
@@ -47,7 +51,7 @@ public class ConversionDialog extends Window {
 		centerInPage();
 		setAutoSize(true);
 
-		final RadioGroupItem action = ItemFactory.newRadioGroup("action", I18N.message("action"));
+		final RadioGroupItem action = ItemFactory.newRadioGroup(ACTION, I18N.message(ACTION));
 		action.setRequired(true);
 		action.setEndRow(true);
 
@@ -80,11 +84,11 @@ public class ConversionDialog extends Window {
 
 						LinkedHashMap<String, String> map = new LinkedHashMap<>();
 						if (folder.isDownload())
-							map.put("download", I18N.message("download"));
+							map.put(DOWNLOAD, I18N.message(DOWNLOAD));
 						if (folder.isWrite())
 							map.put("save", I18N.message("save"));
 						action.setValueMap(map);
-						action.setValue("download");
+						action.setValue(DOWNLOAD);
 
 						form.setFields(format, action, convert);
 						addItem(form);
@@ -99,7 +103,7 @@ public class ConversionDialog extends Window {
 		String format = form.getValueAsString("format");
 
 		LD.contactingServer();
-		if ("save".equals(form.getValueAsString("action"))) {
+		if ("save".equals(form.getValueAsString(ACTION))) {
 			DocumentService.Instance.get().convert(document.getId(), document.getFileVersion(), format,
 					new AsyncCallback<GUIDocument>() {
 

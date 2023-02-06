@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.0.1
  */
 public class ChatMessagesPanel extends VLayout implements ChatObserver {
+	private static final String MESSAGE = "message";
+
 	private RefreshableListGrid messages = null;
 
 	private Timer timer;
@@ -40,7 +42,7 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 
 	@Override
 	public void onDraw() {
-		ListGridField message = new ListGridField("message", I18N.message("message"));
+		ListGridField message = new ListGridField(MESSAGE, I18N.message(MESSAGE));
 		message.setWidth("*");
 		message.setShowTitle(false);
 
@@ -121,7 +123,7 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 			r.setAttribute("id", id);
 			r.setAttribute("username", username);
 			r.setAttribute("date", date);
-			r.setAttribute("message", message);
+			r.setAttribute(MESSAGE, message);
 			recd.add(r);
 
 			messages.setRecords(recd.toArray(new ListGridRecord[0]));
