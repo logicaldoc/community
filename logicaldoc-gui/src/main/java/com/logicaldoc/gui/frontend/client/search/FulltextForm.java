@@ -45,6 +45,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class FulltextForm extends VLayout implements SearchObserver {
+	private static final String TEMPLATE = "template";
+
+	private static final String LANGUAGE = "language";
+
+	private static final String EXPRESSION = "expression";
+
 	private static final String SEARCHINHITS = "searchinhits";
 
 	private static final String CREATION_DATE_RANGE = "creationDateRange";
@@ -95,7 +101,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			}
 		});
 
-		expression = ItemFactory.newTextItem("expression", I18N.message("search") + "...");
+		expression = ItemFactory.newTextItem(EXPRESSION, I18N.message("search") + "...");
 		expression.setWidth("*");
 		expression.setColSpan(3);
 		expression.setRequired(true);
@@ -118,10 +124,10 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			}
 		});
 
-		CheckboxItem searchinhits = new CheckboxItem("searchinhits", I18N.message("searchinhits"));
+		CheckboxItem searchinhits = new CheckboxItem(SEARCHINHITS, I18N.message(SEARCHINHITS));
 		searchinhits.setColSpan(3);
 
-		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
+		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		language.setDefaultValue(NO_LANGUAGE);
 		language.setColSpan(3);
 
@@ -176,7 +182,6 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		prepareFields(null);
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void search() {
 		if (Boolean.FALSE.equals(vm.validate())) {
 			return;
@@ -189,7 +194,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setType(GUISearchOptions.TYPE_FULLTEXT);
-		options.setExpression(vm.getValueAsString("expression"));
+		options.setExpression(vm.getValueAsString(EXPRESSION));
 
 		setLanguageCondition(options);
 		setSizeCondition(options);
@@ -245,9 +250,8 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	}
 
 	private void setTemplateCondition(Map<String, Object> values, GUISearchOptions options) {
-		if (values.containsKey("template") && values.get("template") != null
-				&& !((String) values.get("template")).isEmpty())
-			options.setTemplate(Long.parseLong((String) values.get("template")));
+		if (values.containsKey(TEMPLATE) && values.get(TEMPLATE) != null && !((String) values.get(TEMPLATE)).isEmpty())
+			options.setTemplate(Long.parseLong((String) values.get(TEMPLATE)));
 	}
 
 	private void setPublicationDateCondition(Map<String, Object> values, GUISearchOptions options) {
@@ -287,11 +291,11 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	}
 
 	private void setLanguageCondition(GUISearchOptions options) {
-		if (NO_LANGUAGE.equals(vm.getValueAsString("language")) || vm.getValue("language") == null) {
+		if (NO_LANGUAGE.equals(vm.getValueAsString(LANGUAGE)) || vm.getValue(LANGUAGE) == null) {
 			options.setLanguage(null);
 			options.setExpressionLanguage(I18N.getLocale());
 		} else {
-			options.setLanguage(vm.getValueAsString("language"));
+			options.setLanguage(vm.getValueAsString(LANGUAGE));
 			options.setExpressionLanguage(options.getLanguage());
 		}
 	}
@@ -353,7 +357,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	@Override
 	public void onOptionsChanged(GUISearchOptions newOptions) {
 		if (newOptions.getType() == GUISearchOptions.TYPE_FULLTEXT) {
-			vm.setValue("expression", newOptions.getExpression());
+			vm.setValue(EXPRESSION, newOptions.getExpression());
 			folder.setFolder(newOptions.getFolder(), newOptions.getFolderName());
 		}
 	}

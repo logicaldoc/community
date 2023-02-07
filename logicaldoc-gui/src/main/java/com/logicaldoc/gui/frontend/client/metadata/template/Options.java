@@ -40,6 +40,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class Options extends com.smartgwt.client.widgets.Window {
 
+	private static final String CATEGORY = "category";
+
+	private static final String VALUE = "value";
+
 	private ListGrid list;
 
 	private long setId;
@@ -161,11 +165,11 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField value = new ListGridField("value", I18N.message("value"));
+		ListGridField value = new ListGridField(VALUE, I18N.message(VALUE));
 		value.setWidth("*");
 		value.setCanFilter(true);
 
-		ListGridField category = new ListGridField("category", I18N.message("category"));
+		ListGridField category = new ListGridField(CATEGORY, I18N.message(CATEGORY));
 		category.setCanFilter(true);
 		category.setAutoFitWidth(true);
 		category.setMinWidth(80);
@@ -219,7 +223,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		GUIValue[] values = new GUIValue[records.length];
 		int i = 0;
 		for (Record rec : records)
-			values[i++] = new GUIValue(rec.getAttributeAsString("category"), rec.getAttributeAsString("value"));
+			values[i++] = new GUIValue(rec.getAttributeAsString(CATEGORY), rec.getAttributeAsString(VALUE));
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<Void>() {
@@ -246,7 +250,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 			return;
 		final String[] values = new String[selection.length];
 		for (int i = 0; i < selection.length; i++)
-			values[i] = selection[i].getAttributeAsString("value");
+			values[i] = selection[i].getAttributeAsString(VALUE);
 
 		AttributeSetService.Instance.get().deleteOptions(setId, attribute, values, new AsyncCallback<Void>() {
 			@Override

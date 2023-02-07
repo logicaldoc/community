@@ -23,6 +23,18 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class TenantQuotaPanel extends HLayout {
+	private static final String QUOTA_THRESHOLD = "quotaThreshold";
+
+	private static final String SIZEQUOTA = "sizequota";
+
+	private static final String DOCUMENTSQUOTA = "documentsquota";
+
+	private static final String SESSIONSQUOTA = "sessionsquota";
+
+	private static final String GUESTSQUOTA = "guestsquota";
+
+	private static final String USERSQUOTA = "usersquota";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -69,7 +81,7 @@ public class TenantQuotaPanel extends HLayout {
 
 		layout.addMember(form, 1);
 
-		SpinnerItem usersQuota = ItemFactory.newSpinnerItem("usersquota", tenant.getMaxUsers());
+		SpinnerItem usersQuota = ItemFactory.newSpinnerItem(USERSQUOTA, tenant.getMaxUsers());
 		usersQuota.setDisabled(readonly);
 		usersQuota.setRequired(false);
 		usersQuota.setMin((double) tenant.getUsers());
@@ -78,7 +90,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			usersQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem("guestsquota", "readonlyusersquota",
+		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota",
 				tenant.getMaxGuests());
 		guestsQuota.setDisabled(readonly);
 		guestsQuota.setRequired(false);
@@ -88,7 +100,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			guestsQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem("sessionsquota", tenant.getMaxSessions());
+		SpinnerItem sessionsQuota = ItemFactory.newSpinnerItem(SESSIONSQUOTA, tenant.getMaxSessions());
 		sessionsQuota.setDisabled(readonly);
 		sessionsQuota.setRequired(false);
 		sessionsQuota.setMin(0);
@@ -97,7 +109,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			sessionsQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem("documentsquota", tenant.getMaxRepoDocs());
+		SpinnerItem documentsQuota = ItemFactory.newSpinnerItem(DOCUMENTSQUOTA, tenant.getMaxRepoDocs());
 		documentsQuota.setDisabled(readonly);
 		documentsQuota.setRequired(false);
 		documentsQuota.setMin(0);
@@ -106,7 +118,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			documentsQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem("sizequota", tenant.getMaxRepoSize());
+		SpinnerItem sizeQuota = ItemFactory.newSpinnerItem(SIZEQUOTA, tenant.getMaxRepoSize());
 		sizeQuota.setHint("MB");
 		sizeQuota.setDisabled(readonly);
 		sizeQuota.setRequired(false);
@@ -116,7 +128,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			sizeQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem("quotaThreshold", "alertthreshold",
+		SpinnerItem quotaThreshold = ItemFactory.newSpinnerItem(QUOTA_THRESHOLD, "alertthreshold",
 				tenant.getQuotaThreshold());
 		quotaThreshold.setDisabled(readonly);
 		quotaThreshold.setMax(100);
@@ -153,35 +165,35 @@ public class TenantQuotaPanel extends HLayout {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		if (values.get("documentsquota") == null)
+		if (values.get(DOCUMENTSQUOTA) == null)
 			tenant.setMaxRepoDocs(null);
 		else
-			tenant.setMaxRepoDocs(Long.parseLong(values.get("documentsquota").toString()));
+			tenant.setMaxRepoDocs(Long.parseLong(values.get(DOCUMENTSQUOTA).toString()));
 
-		if (values.get("sizequota") == null)
+		if (values.get(SIZEQUOTA) == null)
 			tenant.setMaxRepoSize(null);
 		else
-			tenant.setMaxRepoSize(Long.parseLong(values.get("sizequota").toString()));
+			tenant.setMaxRepoSize(Long.parseLong(values.get(SIZEQUOTA).toString()));
 
-		if (values.get("usersquota") == null)
+		if (values.get(USERSQUOTA) == null)
 			tenant.setMaxUsers(null);
 		else
-			tenant.setMaxUsers(Integer.parseInt(values.get("usersquota").toString()));
+			tenant.setMaxUsers(Integer.parseInt(values.get(USERSQUOTA).toString()));
 
-		if (values.get("guestsquota") == null)
+		if (values.get(GUESTSQUOTA) == null)
 			tenant.setMaxGuests(null);
 		else
-			tenant.setMaxGuests(Integer.parseInt(values.get("guestsquota").toString()));
+			tenant.setMaxGuests(Integer.parseInt(values.get(GUESTSQUOTA).toString()));
 
-		if (values.get("sessionsquota") == null)
+		if (values.get(SESSIONSQUOTA) == null)
 			tenant.setMaxSessions(null);
 		else
-			tenant.setMaxSessions(Integer.parseInt(values.get("sessionsquota").toString()));
+			tenant.setMaxSessions(Integer.parseInt(values.get(SESSIONSQUOTA).toString()));
 
-		if (values.get("quotaThreshold") == null)
+		if (values.get(QUOTA_THRESHOLD) == null)
 			tenant.setQuotaThreshold(null);
 		else
-			tenant.setQuotaThreshold(Integer.parseInt(values.get("quotaThreshold").toString()));
+			tenant.setQuotaThreshold(Integer.parseInt(values.get(QUOTA_THRESHOLD).toString()));
 
 		setQuotaAlertRecipients();
 

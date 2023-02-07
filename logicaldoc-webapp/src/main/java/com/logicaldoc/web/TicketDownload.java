@@ -34,6 +34,8 @@ import com.logicaldoc.web.util.ServletUtil;
 
 public class TicketDownload extends HttpServlet {
 
+	private static final String TICKET_ID = "ticketId";
+
 	private static final long serialVersionUID = 9088160958327454062L;
 
 	protected static Logger log = LoggerFactory.getLogger(TicketDownload.class);
@@ -55,7 +57,7 @@ public class TicketDownload extends HttpServlet {
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		String ticketId = request.getParameter("ticketId");
+		String ticketId = request.getParameter(TICKET_ID);
 		try {
 			ticketId = getTicketId(request);
 
@@ -73,9 +75,9 @@ public class TicketDownload extends HttpServlet {
 
 			downloadDocument(request, response, document, null, suffix, ticketId);
 			ticket.setCount(ticket.getCount() + 1);
-			
+
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
-			
+
 			ticketDao.store(ticket);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -125,14 +127,14 @@ public class TicketDownload extends HttpServlet {
 	}
 
 	private String getTicketId(HttpServletRequest request) {
-		String ticketId = request.getParameter("ticketId");
+		String ticketId = request.getParameter(TICKET_ID);
 		if (StringUtils.isEmpty(ticketId)) {
-			ticketId = (String) request.getAttribute("ticketId");
+			ticketId = (String) request.getAttribute(TICKET_ID);
 		}
 
 		if (StringUtils.isEmpty(ticketId)) {
 			HttpSession session = request.getSession();
-			ticketId = (String) session.getAttribute("ticketId");
+			ticketId = (String) session.getAttribute(TICKET_ID);
 		}
 
 		log.debug("Download ticket ticketId={}", ticketId);

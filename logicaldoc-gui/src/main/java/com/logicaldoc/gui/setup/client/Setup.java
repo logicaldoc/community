@@ -49,6 +49,8 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class Setup implements EntryPoint {
 
+	private static final String SELECT_1 = "SELECT 1";
+
 	private static final String EMBEDDED = "embedded";
 
 	private static final String REG_EMAIL = "regEmail";
@@ -227,22 +229,22 @@ public class Setup implements EntryPoint {
 	 */
 	private Tab setupDatabase(final ValuesManager vm, GUIInfo info) {
 		// Prepare the fieldsMap with all database engines
-		engines.put(MYSQL, new String[] { "MySQL", "com.mysql.cj.jdbc.Driver",
+		engines.put(MYSQL, new String[] { MYSQL, "com.mysql.cj.jdbc.Driver",
 				"jdbc:mysql://<server>[,<failoverhost>][<:3306>]/<database>?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
-				"org.hibernate.dialect.MySQLDialect", "SELECT 1" });
-		engines.put(MARIADB, new String[] { "MariaDB", "org.mariadb.jdbc.Driver",
-				"jdbc:mariadb://<server>[<:3306>]/<database>", "org.hibernate.dialect.MySQLDialect", "SELECT 1" });
+				"org.hibernate.dialect.MySQLDialect", SELECT_1 });
+		engines.put(MARIADB, new String[] { MARIADB, "org.mariadb.jdbc.Driver",
+				"jdbc:mariadb://<server>[<:3306>]/<database>", "org.hibernate.dialect.MySQLDialect", SELECT_1 });
 		engines.put(POSTGRESQL,
-				new String[] { "PostgreSQL", "org.postgresql.Driver",
+				new String[] { POSTGRESQL, "org.postgresql.Driver",
 						"jdbc:postgresql:[<//server>[<:5432>/]]<database>", "org.hibernate.dialect.PostgreSQLDialect",
-						"SELECT 1" });
+						SELECT_1 });
 		engines.put(ORACLE,
-				new String[] { "Oracle", "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@<server>[<:1521>]:<sid>",
+				new String[] { ORACLE, "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@<server>[<:1521>]:<sid>",
 						"org.hibernate.dialect.Oracle10gDialect", "SELECT 1 FROM DUAL" });
 		engines.put(SQLSERVER,
 				new String[] { "SQL Server", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
 						"jdbc:sqlserver://<server>[:<1433>];databaseName=<database>;instanceName=<instance>",
-						"org.hibernate.dialect.SQLServer2008Dialect", "SELECT 1" });
+						"org.hibernate.dialect.SQLServer2008Dialect", SELECT_1 });
 
 		Tab databaseTab = new Tab();
 		databaseTab.setTitle(I18N.message("database"));

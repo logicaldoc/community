@@ -51,6 +51,10 @@ import com.logicaldoc.util.SystemUtil;
  * @version 4.0
  */
 public class FileUtil {
+	private static final String CANNOT_CREATE_FILE = "Cannot create file ";
+
+	private static final String UTF_8 = "UTF-8";
+
 	static final int BUFF_SIZE = 8192;
 
 	static final byte[] buffer = new byte[BUFF_SIZE];
@@ -95,7 +99,7 @@ public class FileUtil {
 
 	public static void writeFile(String text, String filepath) {
 		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filepath));) {
-			bos.write(text.getBytes("UTF-8"));
+			bos.write(text.getBytes(UTF_8));
 			bos.flush();
 		} catch (Throwable e) {
 			logError(e.getLocalizedMessage());
@@ -104,7 +108,7 @@ public class FileUtil {
 
 	public static String readFile(File file) throws IOException {
 		try (FileInputStream fisTargetFile = new FileInputStream(file);) {
-			return IOUtils.toString(fisTargetFile, "UTF-8");
+			return IOUtils.toString(fisTargetFile, UTF_8);
 		}
 	}
 
@@ -196,7 +200,7 @@ public class FileUtil {
 	 */
 	public static String computeDigest(String src) {
 		String digest = null;
-		try (InputStream is = IOUtils.toInputStream(src, "UTF-8");) {
+		try (InputStream is = IOUtils.toInputStream(src, UTF_8);) {
 			digest = computeDigest(is);
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -591,9 +595,8 @@ public class FileUtil {
 		File tmp = new File(sourcePath + ".tmp");
 		File file = new File(sourcePath);
 
-		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(new FileInputStream(sourcePath), "UTF-8"));
-				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp), "UTF-8");) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourcePath), UTF_8));
+				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp), UTF_8);) {
 			// Reading all the lines of input text file into oldContent
 			String line = reader.readLine();
 
@@ -693,14 +696,14 @@ public class FileUtil {
 	public static void merge(List<File> files, File merged) throws IOException {
 		boolean created = merged.createNewFile();
 		if (!created)
-			throw new IOException("Cannot create file " + merged.getAbsolutePath());
+			throw new IOException(CANNOT_CREATE_FILE + merged.getAbsolutePath());
 
 		File tmp = new File(merged.getParent(), "tmp");
 
 		try {
 			created = tmp.createNewFile();
 			if (!created)
-				throw new IOException("Cannot create file " + tmp.getAbsolutePath());
+				throw new IOException(CANNOT_CREATE_FILE + tmp.getAbsolutePath());
 
 			for (File chunk : files) {
 				FileUtil.merge(merged, chunk, tmp);
@@ -712,7 +715,7 @@ public class FileUtil {
 				tmp = new File(merged.getParent(), "tmp");
 				created = tmp.createNewFile();
 				if (!created)
-					throw new IOException("Cannot create file " + tmp.getAbsolutePath());
+					throw new IOException(CANNOT_CREATE_FILE + tmp.getAbsolutePath());
 			}
 		} finally {
 			if (tmp != null && tmp.exists())

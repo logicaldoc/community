@@ -33,6 +33,10 @@ import org.slf4j.LoggerFactory;
  */
 public class Exec {
 
+	private static final String COMMAND_FAILED_TO_EXECUTE = "Command failed to execute - {}";
+
+	private static final String TIMEOUT_COMMAND = "Timeout command {}";
+
 	private static final String ALLOWED_COMMANDS = "/allowed-commands.txt";
 
 	protected static Logger log = LoggerFactory.getLogger(Exec.class);
@@ -166,9 +170,9 @@ public class Exec {
 				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
-				log.warn("Timeout command {}", commandLine);
+				log.warn(TIMEOUT_COMMAND, commandLine);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - {}", commandLine);
+				log.warn(COMMAND_FAILED_TO_EXECUTE, commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();
@@ -243,9 +247,9 @@ public class Exec {
 				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
-				log.warn("Timeout command {}", commandLine);
+				log.warn(TIMEOUT_COMMAND, commandLine);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - {}", commandLine);
+				log.warn(COMMAND_FAILED_TO_EXECUTE, commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();
@@ -296,9 +300,9 @@ public class Exec {
 				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
-				log.warn("Timeout command {}", commandLine);
+				log.warn(TIMEOUT_COMMAND, commandLine);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - {}", commandLine);
+				log.warn(COMMAND_FAILED_TO_EXECUTE, commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();

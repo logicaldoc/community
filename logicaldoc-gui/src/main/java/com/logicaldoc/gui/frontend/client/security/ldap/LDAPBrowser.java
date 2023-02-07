@@ -24,12 +24,10 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -43,6 +41,10 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.4
  */
 public class LDAPBrowser extends VLayout {
+
+	private static final String EMAIL = "email";
+
+	private static final String USERNAME = "username";
 
 	private Layout search = new VLayout();
 
@@ -74,19 +76,14 @@ public class LDAPBrowser extends VLayout {
 		form.setWrapItemTitles(false);
 
 		// Username
-		TextItem username = ItemFactory.newTextItem("username", null);
+		TextItem username = ItemFactory.newTextItem(USERNAME, null);
 
 		searchButton = new ButtonItem();
 		searchButton.setTitle(I18N.message("search"));
 		searchButton.setAutoFit(true);
 		searchButton.setEndRow(true);
 		searchButton.setColSpan(2);
-		searchButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSearch();
-			}
-		});
+		searchButton.addClickHandler((ClickEvent event) -> onSearch());
 
 		form.setItems(username, searchButton);
 
@@ -97,13 +94,13 @@ public class LDAPBrowser extends VLayout {
 		search.setWidth100();
 		search.setMargin(5);
 
-		ListGridField usernameField = new ListGridField("username", I18N.message("username"), 100);
+		ListGridField usernameField = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		usernameField.setCanFilter(true);
 
 		ListGridField nameField = new ListGridField("name", I18N.message("name"), 150);
 		usernameField.setCanFilter(true);
 
-		ListGridField emailField = new ListGridField("email", I18N.message("email"), 150);
+		ListGridField emailField = new ListGridField(EMAIL, I18N.message(EMAIL), 150);
 		emailField.setCanFilter(true);
 
 		ListGridField dnField = new ListGridField("dn", "DN");
@@ -132,12 +129,9 @@ public class LDAPBrowser extends VLayout {
 
 		addMember(ldapusers);
 
-		users.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		users.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
 		});
 	}
 
@@ -153,8 +147,8 @@ public class LDAPBrowser extends VLayout {
 
 		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-		if (Boolean.TRUE.equals(vm.validate()))  {
-			String username = (String) values.get("username");
+		if (Boolean.TRUE.equals(vm.validate())) {
+			String username = (String) values.get(USERNAME);
 
 			if (username == null || "".equals(username.trim()))
 				username = null;
@@ -183,8 +177,8 @@ public class LDAPBrowser extends VLayout {
 							ListGridRecord rec = new ListGridRecord();
 							rec.setAttribute("name", result[i].getFullName());
 							rec.setAttribute("dn", result[i].getAddress());
-							rec.setAttribute("username", result[i].getUsername());
-							rec.setAttribute("email", result[i].getEmail());
+							rec.setAttribute(USERNAME, result[i].getUsername());
+							rec.setAttribute(EMAIL, result[i].getEmail());
 							records[i] = rec;
 						}
 						users.setData(records);
@@ -203,34 +197,32 @@ public class LDAPBrowser extends VLayout {
 			return;
 		final String[] usernames = new String[selection.length];
 		for (int i = 0; i < selection.length; i++)
-			usernames[i] = selection[i].getAttributeAsString("username");
+			usernames[i] = selection[i].getAttributeAsString(USERNAME);
 
 		MenuItem _import = new MenuItem();
 		_import.setTitle(I18N.message("iimport"));
-		_import.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.contactingServer();
-				users.deselectAllRecords();
-				LDAPService.Instance.get().importUsers(usernames, server.getId(), new AsyncCallback<GUIValue[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						LD.clearPrompt();
-					}
+		_import.addClickHandler((MenuItemClickEvent event) -> {
+			LD.contactingServer();
+			users.deselectAllRecords();
+			LDAPService.Instance.get().importUsers(usernames, server.getId(), new AsyncCallback<GUIValue[]>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+					LD.clearPrompt();
+				}
 
-					@Override
-					public void onSuccess(GUIValue[] report) {
-						LD.clearPrompt();
-						String message = I18N.message("importreport",
-								new String[] { report[0].getValue(), report[1].getValue(), report[2].getValue() });
-						if ("0".equals(report[2].getValue()))
-							GuiLog.info(I18N.message("importcompleted"), message);
-						else
-							GuiLog.error(I18N.message("importerrors"), message, null);
-						SC.warn(message);
-					}
-				});
-			}
+				@Override
+				public void onSuccess(GUIValue[] report) {
+					LD.clearPrompt();
+					String message = I18N.message("importreport",
+							new String[] { report[0].getValue(), report[1].getValue(), report[2].getValue() });
+					if ("0".equals(report[2].getValue()))
+						GuiLog.info(I18N.message("importcompleted"), message);
+					else
+						GuiLog.error(I18N.message("importerrors"), message, null);
+					SC.warn(message);
+				}
+			});
 		});
 
 		contextMenu.setItems(_import);

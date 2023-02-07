@@ -21,6 +21,8 @@ import java.util.Map;
  */
 public class UrlUtil {
 
+	private static final String UTF_8 = "UTF-8";
+
 	public static Map<String, List<String>> getQueryParams(String url) {
 		try {
 			Map<String, List<String>> params = new HashMap<>();
@@ -29,10 +31,10 @@ public class UrlUtil {
 				String query = urlParts[1];
 				for (String param : query.split("&")) {
 					String[] pair = param.split("=");
-					String key = URLDecoder.decode(pair[0], "UTF-8");
+					String key = URLDecoder.decode(pair[0], UTF_8);
 					String value = "";
 					if (pair.length > 1) {
-						value = URLDecoder.decode(pair[1], "UTF-8");
+						value = URLDecoder.decode(pair[1], UTF_8);
 					}
 
 					List<String> values = params.get(key);
@@ -58,8 +60,8 @@ public class UrlUtil {
 		String[] pairs = query.split("&");
 		for (String pair : pairs) {
 			int idx = pair.indexOf("=");
-			query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
-					URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+			query_pairs.put(URLDecoder.decode(pair.substring(0, idx), UTF_8),
+					URLDecoder.decode(pair.substring(idx + 1), UTF_8));
 		}
 		return query_pairs;
 	}

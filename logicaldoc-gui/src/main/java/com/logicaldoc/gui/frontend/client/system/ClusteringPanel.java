@@ -30,6 +30,7 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class ClusteringPanel extends AdminPanel {
 
+	private static final String BASEPORT = "baseport";
 	private ValuesManager vm = new ValuesManager();
 
 	public ClusteringPanel() {
@@ -69,7 +70,7 @@ public class ClusteringPanel extends AdminPanel {
 		TextItem name = ItemFactory.newTextItem("name", parameters[1].getValue());
 		name.setRequired(true);
 
-		IntegerItem baseport = ItemFactory.newIntegerItem("baseport", I18N.message("baseport"),
+		IntegerItem baseport = ItemFactory.newIntegerItem(BASEPORT, I18N.message(BASEPORT),
 				Integer.parseInt(parameters[2].getValue()));
 		baseport.setRequired(true);
 
@@ -102,7 +103,7 @@ public class ClusteringPanel extends AdminPanel {
 					settings[0] = new GUIParameter("cluster.enabled",
 							values.get("eenabled").equals("yes") ? "true" : "false");
 					settings[1] = new GUIParameter("cluster.name", vm.getValueAsString("name"));
-					settings[2] = new GUIParameter("cluster.port", vm.getValueAsString("baseport"));
+					settings[2] = new GUIParameter("cluster.port", vm.getValueAsString(BASEPORT));
 					settings[3] = new GUIParameter("cluster.multicastip", vm.getValueAsString("multicastip"));
 					settings[4] = new GUIParameter("cluster.cache.resources",
 							values.get("cacheResources").equals("yes") ? "true" : "false");

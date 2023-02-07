@@ -44,6 +44,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DashletsPanel extends VLayout {
 
+	private static final String QUERY = "query";
+
+	private static final String TITLE = "title";
+
+	private static final String CONTENT = "content";
+
 	private ListGrid grid;
 
 	private ListGridRecord rollOverRecord;
@@ -77,7 +83,7 @@ public class DashletsPanel extends VLayout {
 					public void execute(String value) {
 						GUIDashlet dashlet = new GUIDashlet();
 						dashlet.setName(value);
-						dashlet.setType("content");
+						dashlet.setType(CONTENT);
 						dashlet.setId(-1L);
 						dashlets.add(dashlet);
 
@@ -117,7 +123,7 @@ public class DashletsPanel extends VLayout {
 		name.setWidth(100);
 		name.setRequired(true);
 
-		ListGridField title = new ListGridField("title", I18N.message("title"));
+		ListGridField title = new ListGridField(TITLE, I18N.message(TITLE));
 		title.setWidth(120);
 		title.setCellFormatter(new CellFormatter() {
 			@Override
@@ -140,10 +146,10 @@ public class DashletsPanel extends VLayout {
 		max.setWidth(50);
 		max.setAlign(Alignment.CENTER);
 
-		ListGridField content = new ListGridField("content", I18N.message("content"));
+		ListGridField content = new ListGridField(CONTENT, I18N.message(CONTENT));
 		content.setWidth("*");
 
-		ListGridField query = new ListGridField("query", I18N.message("query"));
+		ListGridField query = new ListGridField(QUERY, I18N.message(QUERY));
 		query.setWidth("*");
 
 		grid = new ListGrid() {
@@ -239,10 +245,10 @@ public class DashletsPanel extends VLayout {
 			rec.setAttribute("id", dashlet.getId());
 			rec.setAttribute("name", dashlet.getName());
 			rec.setAttribute("type", dashlet.getType());
-			rec.setAttribute("title", dashlet.getTitle());
+			rec.setAttribute(TITLE, dashlet.getTitle());
 			rec.setAttribute("max", dashlet.getMax());
-			rec.setAttribute("query", dashlet.getQuery());
-			rec.setAttribute("content", dashlet.getContent());
+			rec.setAttribute(QUERY, dashlet.getQuery());
+			rec.setAttribute(CONTENT, dashlet.getContent());
 			records[i++] = rec;
 		}
 		grid.setData(records);

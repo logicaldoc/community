@@ -32,6 +32,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ScopedPropertiesPanel extends VLayout {
 
+	private static final String SCOPE = "scope";
 	private RefreshableListGrid list;
 
 	public ScopedPropertiesPanel() {
@@ -63,7 +64,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		value.setCanFilter(true);
 		value.setCanSort(true);
 
-		ListGridField scope = new ListGridField("scope", I18N.message("scope"), 80);
+		ListGridField scope = new ListGridField(SCOPE, I18N.message(SCOPE), 80);
 		scope.setCanFilter(true);
 		scope.setCanSort(true);
 		scope.setCellFormatter(new CellFormatter() {
@@ -138,7 +139,7 @@ public class ScopedPropertiesPanel extends VLayout {
 							public void onSuccess(Void result) {
 								ListGridRecord[] selection = list.getSelectedRecords();
 								for (int i = 0; i < selectedSettings.length; i++) {
-									selection[i].setAttribute("scope", "local");
+									selection[i].setAttribute(SCOPE, "local");
 									list.refreshRow(list.getRecordIndex(selection[i]));
 								}
 							}
@@ -166,7 +167,7 @@ public class ScopedPropertiesPanel extends VLayout {
 						public void onSuccess(Void result) {
 							ListGridRecord[] selection = list.getSelectedRecords();
 							for (int i = 0; i < selectedSettings.length; i++) {
-								selection[i].setAttribute("scope", "global");
+								selection[i].setAttribute(SCOPE, "global");
 								list.refreshRow(list.getRecordIndex(selection[i]));
 							}
 						}

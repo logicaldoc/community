@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DateUtil {
 
+	private static final String YYYY_MM_DD = "yyyy-MM-dd";
+
 	protected static Logger log = LoggerFactory.getLogger(DateUtil.class);
 
 	/**
@@ -27,14 +29,14 @@ public class DateUtil {
 	 * @return the formatted date
 	 */
 	public static String format(Date date) {
-		if(date==null)
+		if (date == null)
 			return null;
-		
+
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 		try {
 			return df.format(date);
 		} catch (Exception e) {
-			df = new SimpleDateFormat("yyyy-MM-dd");
+			df = new SimpleDateFormat(YYYY_MM_DD);
 			try {
 				return df.format(date);
 			} catch (Exception e1) {
@@ -53,14 +55,14 @@ public class DateUtil {
 	 * @return the formatted date
 	 */
 	public static String formatWithMillis(Date date) {
-		if(date==null)
+		if (date == null)
 			return null;
-		
+
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
 		try {
 			return df.format(date);
 		} catch (Exception e) {
-			df = new SimpleDateFormat("yyyy-MM-dd");
+			df = new SimpleDateFormat(YYYY_MM_DD);
 			try {
 				return df.format(date);
 			} catch (Exception e1) {
@@ -83,7 +85,7 @@ public class DateUtil {
 
 		Date date = null;
 		String[] possibleFormats = new String[] { "yyyy-MM-dd HH:mm:ss.SSS Z", "yyyy-MM-dd HH:mm:ss.SS Z",
-				"yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd" };
+				"yyyy-MM-dd HH:mm:ss Z", YYYY_MM_DD };
 		for (String format : possibleFormats) {
 			try {
 				SimpleDateFormat df = new SimpleDateFormat(format);

@@ -80,6 +80,16 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class SearchIndexingPanel extends AdminPanel {
 
+	private static final String SEPARATEDCOMMA = "separatedcomma";
+
+	private static final String VALUE = "value";
+
+	private static final String EENABLED = "eenabled";
+
+	private static final String ALIASES = "aliases";
+
+	private static final String EXTENSION = "extension";
+
 	private Layout searchEngineTabPanel;
 
 	private Layout parsersInfoTabPanel;
@@ -175,7 +185,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		icon.setCanEdit(false);
 		icon.setCanFilter(false);
 
-		ListGridField extension = new ListGridField("extension", I18N.message("extension"), 80);
+		ListGridField extension = new ListGridField(EXTENSION, I18N.message(EXTENSION), 80);
 		extension.setCanEdit(false);
 		extension.setValidators(validator);
 
@@ -183,7 +193,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		name.setCanEdit(false);
 		name.setValidators(validator);
 
-		ListGridField aliases = new ListGridField("aliases", I18N.message("aliases"));
+		ListGridField aliases = new ListGridField(ALIASES, I18N.message(ALIASES));
 		aliases.setCanEdit(true);
 		aliases.setCanFilter(false);
 		aliases.setCanSort(false);
@@ -204,8 +214,8 @@ public class SearchIndexingPanel extends AdminPanel {
 		parsersList.addEditCompleteHandler((EditCompleteEvent event) -> {
 			ListGridRecord rec = parsersList.getRecord(event.getRowNum());
 
-			SearchEngineService.Instance.get().setAliases(rec.getAttributeAsString("extension"),
-					(String) event.getNewValues().get("aliases"), new AsyncCallback<Void>() {
+			SearchEngineService.Instance.get().setAliases(rec.getAttributeAsString(EXTENSION),
+					(String) event.getNewValues().get(ALIASES), new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -231,7 +241,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		languagesTabPanel.setWidth100();
 		languagesTabPanel.setHeight100();
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -270,7 +280,7 @@ public class SearchIndexingPanel extends AdminPanel {
 	}
 
 	private Tab fillFiltersTab() {
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -360,7 +370,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 		ListGridField name = new ListGridField("name", I18N.message("parameter"), 150);
 		name.setCanEdit(false);
-		ListGridField value = new ListGridField("value", I18N.message("value"));
+		ListGridField value = new ListGridField(VALUE, I18N.message(VALUE));
 		value.setWidth("*");
 		value.setCanEdit(true);
 		configsGrid.setFields(name, value);
@@ -376,7 +386,7 @@ public class SearchIndexingPanel extends AdminPanel {
 			final List<GUIParameter> params = new ArrayList<>();
 			ListGridRecord[] records = configsGrid.getRecords();
 			for (ListGridRecord recd : records) {
-				params.add(new GUIParameter(recd.getAttributeAsString("name"), recd.getAttributeAsString("value")));
+				params.add(new GUIParameter(recd.getAttributeAsString("name"), recd.getAttributeAsString(VALUE)));
 			}
 
 			SearchEngineService.Instance.get().saveTokenFilterSettings(filter, params.toArray(new GUIParameter[0]),
@@ -454,28 +464,28 @@ public class SearchIndexingPanel extends AdminPanel {
 		// Include Patters
 		TextItem includePatterns = ItemFactory.newTextItem("includepatterns", null);
 		includePatterns.setValue(this.searchEngine.getIncludePatters());
-		includePatterns.setHint(I18N.message("separatedcomma"));
+		includePatterns.setHint(I18N.message(SEPARATEDCOMMA));
 		includePatterns.setHintStyle("hint");
 		includePatterns.setWidth(300);
 
 		// Exclude Patters
 		TextItem excludePatterns = ItemFactory.newTextItem("excludepatterns", null);
 		excludePatterns.setValue(this.searchEngine.getExcludePatters());
-		excludePatterns.setHint(I18N.message("separatedcomma"));
+		excludePatterns.setHint(I18N.message(SEPARATEDCOMMA));
 		excludePatterns.setHintStyle("hint");
 		excludePatterns.setWidth(300);
 
 		// Include Patters
 		TextItem includePatternsMetadata = ItemFactory.newTextItem("includepatternsmetadata", null);
 		includePatternsMetadata.setValue(this.searchEngine.getIncludePattersMetadata());
-		includePatternsMetadata.setHint(I18N.message("separatedcomma"));
+		includePatternsMetadata.setHint(I18N.message(SEPARATEDCOMMA));
 		includePatternsMetadata.setHintStyle("hint");
 		includePatternsMetadata.setWidth(300);
 
 		// Exclude Patters
 		TextItem excludePatternsMetadata = ItemFactory.newTextItem("excludepatternsmetadata", null);
 		excludePatternsMetadata.setValue(this.searchEngine.getExcludePatternsMetadata());
-		excludePatternsMetadata.setHint(I18N.message("separatedcomma"));
+		excludePatternsMetadata.setHint(I18N.message(SEPARATEDCOMMA));
 		excludePatternsMetadata.setHintStyle("hint");
 		excludePatternsMetadata.setWidth(300);
 
@@ -943,7 +953,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "0");
+							rec.setAttribute(EENABLED, "0");
 							langsList.refreshRow(langsList.getRecordIndex(rec));
 							GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 						}
@@ -963,14 +973,14 @@ public class SearchIndexingPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "2");
+							rec.setAttribute(EENABLED, "2");
 							langsList.refreshRow(langsList.getRecordIndex(rec));
 							GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 						}
 					});
 		});
 
-		if ("0".equals(rec.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable);
 		else
 			contextMenu.setItems(enable);
@@ -994,7 +1004,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "0");
+							rec.setAttribute(EENABLED, "0");
 							grid.refreshRow(grid.getRecordIndex(rec));
 						}
 					});
@@ -1013,13 +1023,13 @@ public class SearchIndexingPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void result) {
-							rec.setAttribute("eenabled", "2");
+							rec.setAttribute(EENABLED, "2");
 							grid.refreshRow(grid.getRecordIndex(rec));
 						}
 					});
 		});
 
-		if ("0".equals(rec.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable);
 		else
 			contextMenu.setItems(enable);

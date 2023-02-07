@@ -30,6 +30,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TagsSettingsPanel extends VLayout {
 
+	private static final String MINSIZE = "minsize";
+
+	private static final String MAXSIZE = "maxsize";
+
 	private static final String CLOUD_ELEMENTS = "cloudElements";
 
 	private static final String SELECT_ELEMENTS = "selectElements";
@@ -55,10 +59,10 @@ public class TagsSettingsPanel extends VLayout {
 
 		SelectItem mode = ItemFactory.newTagInputMode("mode", "inputmode");
 
-		SpinnerItem maxsize = ItemFactory.newSpinnerItem("maxsize", (Long) null);
+		SpinnerItem maxsize = ItemFactory.newSpinnerItem(MAXSIZE, (Long) null);
 		maxsize.setRequired(true);
 
-		SpinnerItem minsize = ItemFactory.newSpinnerItem("minsize", (Long) null);
+		SpinnerItem minsize = ItemFactory.newSpinnerItem(MINSIZE, (Long) null);
 		minsize.setRequired(true);
 
 		SpinnerItem selectElements = ItemFactory.newSpinnerItem(SELECT_ELEMENTS, I18N.message("tagselectelements"),
@@ -106,9 +110,9 @@ public class TagsSettingsPanel extends VLayout {
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.mode",
 							values.get("mode").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.maxsize",
-							values.get("maxsize").toString()));
+							values.get(MAXSIZE).toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.minsize",
-							values.get("minsize").toString()));
+							values.get(MINSIZE).toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.tag.vocabulary",
 							values.get("vocabulary").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".tagcloud.maxtags",
@@ -129,10 +133,10 @@ public class TagsSettingsPanel extends VLayout {
 									Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.mode",
 											values.get("mode").toString());
 									Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.maxsize",
-											values.get("maxsize").toString());
+											values.get(MAXSIZE).toString());
 
 									Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.minsize",
-											values.get("minsize").toString());
+											values.get(MINSIZE).toString());
 
 									Session.get().getInfo().setConfig(
 											Session.get().getTenantName() + ".tagcloud.maxtags",

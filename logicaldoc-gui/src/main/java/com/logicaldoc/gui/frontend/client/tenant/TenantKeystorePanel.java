@@ -146,11 +146,11 @@ public class TenantKeystorePanel extends VLayout {
 		TextItem width = ItemFactory.newTextItem("width", keystore != null ? keystore.getSignWidth() : "");
 		width.setWidth(300);
 
-		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual", "visual");
+		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual");
 		visual.setValue(keystore != null && keystore.isSignVisual() ? "yes" : "no");
 
-		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity",
-				keystore != null ? keystore.getSignOpacity() : 100, 1, 100);
+		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", keystore != null ? keystore.getSignOpacity() : 100,
+				1, 100);
 
 		RichTextItem text = ItemFactory.newRichTextItemForAutomation("text", "text",
 				keystore != null ? keystore.getSignText() : "", null);

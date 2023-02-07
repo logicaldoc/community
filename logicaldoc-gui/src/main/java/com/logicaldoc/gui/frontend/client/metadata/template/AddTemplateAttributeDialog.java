@@ -26,6 +26,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 public class AddTemplateAttributeDialog extends Window {
 
+	private static final String PRESET = "preset";
+
+	private static final String LABEL = "label";
+
 	private ListGrid setAttributesList;
 
 	private TemplatePropertiesPanel propertiesPanel;
@@ -74,7 +78,7 @@ public class AddTemplateAttributeDialog extends Window {
 		name.setAutoFitWidth(true);
 		name.setMinWidth(80);
 
-		ListGridField label = new ListGridField("label", I18N.message("label"));
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL));
 		label.setCanEdit(true);
 		label.setCanSort(false);
 		label.setAutoFitWidth(true);
@@ -87,7 +91,7 @@ public class AddTemplateAttributeDialog extends Window {
 		type.setMinWidth(70);
 		type.setCellFormatter(new AttributeTypeFormatter());
 
-		ListGridField preset = new ListGridField("preset", I18N.message("preset"));
+		ListGridField preset = new ListGridField(PRESET, I18N.message(PRESET));
 		preset.setCanEdit(false);
 		preset.setCanSort(false);
 		preset.setAutoFitWidth(true);
@@ -167,7 +171,7 @@ public class AddTemplateAttributeDialog extends Window {
 					GUIAttribute att = attributes[i];
 					ListGridRecord rec = new ListGridRecord();
 					rec.setAttribute("name", att.getName());
-					rec.setAttribute("label", att.getLabel());
+					rec.setAttribute(LABEL, att.getLabel());
 					rec.setAttribute("set", att.getSet());
 					rec.setAttribute("setId", att.getSetId());
 					rec.setAttribute("type", att.getType());
@@ -178,7 +182,7 @@ public class AddTemplateAttributeDialog extends Window {
 					rec.setAttribute("multiple", att.isMultiple());
 					rec.setAttribute("validation", att.getValidation());
 					rec.setAttribute("initialization", att.getInitialization());
-					rec.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
+					rec.setAttribute(PRESET, att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
 					setAttributesList.getRecordList().add(rec);
 				}
 			}

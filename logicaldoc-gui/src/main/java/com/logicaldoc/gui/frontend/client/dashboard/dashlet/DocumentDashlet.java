@@ -139,6 +139,9 @@ public class DocumentDashlet extends Dashlet {
 
 	@Override
 	protected void onDraw() {
+		if(list!=null)
+			removeItem(list);
+		
 		list = getListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);

@@ -34,6 +34,8 @@ import com.logicaldoc.web.util.ServletUtil;
  * @since 6.0
  */
 public class ExportZip extends HttpServlet {
+	private static final String DOC_ID = "docId";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LoggerFactory.getLogger(ExportZip.class);
@@ -130,8 +132,8 @@ public class ExportZip extends HttpServlet {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		ArrayList<Long> docIds = new ArrayList<>();
-		if (request.getParameterValues("docId") != null && request.getParameterValues("docId").length > 0) {
-			String[] ids = request.getParameterValues("docId");
+		if (request.getParameterValues(DOC_ID) != null && request.getParameterValues(DOC_ID).length > 0) {
+			String[] ids = request.getParameterValues(DOC_ID);
 			for (int i = 0; i < ids.length; i++) {
 				Document doc = docDao.findDocument(Long.parseLong(ids[i]));
 				Long docId = Long.parseLong(ids[i]);

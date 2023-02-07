@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings.automation;
 
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
-import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -45,8 +44,8 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 		form2.setValuesManager(vm);
 		form2.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", 
-				routine.getAutomation(), changedHandler, false);
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", routine.getAutomation(),
+				changedHandler, false);
 		automation.setStartRow(false);
 		automation.setRequired(true);
 		automation.setWidth("*");

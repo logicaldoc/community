@@ -36,6 +36,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class SessionsPanel extends VLayout {
 
+	private static final String STATUS_LABEL = "statusLabel";
+
+	private static final String STATUS = "status";
+
 	private RefreshableListGrid sessionsGrid;
 
 	private StaticTextItem activeSessions;
@@ -84,7 +88,7 @@ public class SessionsPanel extends VLayout {
 
 		sessionsGrid.addDataArrivedHandler((DataArrivedEvent event) -> {
 			// Search the records with status=0 that are the active sessions
-			Record[] records = sessionsGrid.getRecordList().findAll("status", "0");
+			Record[] records = sessionsGrid.getRecordList().findAll(STATUS, "0");
 			if (records == null || records.length < 1)
 				activeSessions.setValue("0");
 			else
@@ -113,7 +117,7 @@ public class SessionsPanel extends VLayout {
 
 		ListGridField renew = new DateListGridField("renew", "lastrenew");
 
-		ListGridField statusLabel = new ListGridField("statusLabel", I18N.message("status"), 80);
+		ListGridField statusLabel = new ListGridField(STATUS_LABEL, I18N.message(STATUS), 80);
 		statusLabel.setCanFilter(false);
 
 		sessionsGrid = new RefreshableListGrid() {
@@ -125,8 +129,8 @@ public class SessionsPanel extends VLayout {
 					} else {
 						return super.getCellCSSText(rec, rowNum, colNum);
 					}
-				} else if (getFieldName(colNum).equals("statusLabel")) {
-					if (!"0".equals(rec.getAttribute("status"))) {
+				} else if (getFieldName(colNum).equals(STATUS_LABEL)) {
+					if (!"0".equals(rec.getAttribute(STATUS))) {
 						return "color: red;";
 					} else {
 						return super.getCellCSSText(rec, rowNum, colNum);
@@ -166,8 +170,8 @@ public class SessionsPanel extends VLayout {
 
 									@Override
 									public void onSuccess(Void result) {
-										sessionsGrid.getSelectedRecord().setAttribute("statusLabel", "Closed");
-										sessionsGrid.getSelectedRecord().setAttribute("status", "1");
+										sessionsGrid.getSelectedRecord().setAttribute(STATUS_LABEL, "Closed");
+										sessionsGrid.getSelectedRecord().setAttribute(STATUS, "1");
 										sessionsGrid.refreshRow(
 												sessionsGrid.getRecordIndex(sessionsGrid.getSelectedRecord()));
 									}
@@ -177,7 +181,7 @@ public class SessionsPanel extends VLayout {
 			}
 		});
 
-		if (!"0".equals(sessionsGrid.getSelectedRecord().getAttributeAsString("status"))
+		if (!"0".equals(sessionsGrid.getSelectedRecord().getAttributeAsString(STATUS))
 				|| (Session.get().getSid() != null
 						&& Session.get().getSid().equals(sessionsGrid.getSelectedRecord().getAttributeAsString("sid"))))
 			killSession.setEnabled(false);

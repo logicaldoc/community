@@ -31,7 +31,6 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -41,6 +40,24 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 6.0
  */
 public class SecuritySettingsPanel extends AdminPanel {
+
+	private static final String ENABLEANONYMOUS = "enableanonymous";
+
+	private static final String CONTENTSECURITYPOLICY = "contentsecuritypolicy";
+
+	private static final String PWD_OCCURRENCE = "pwdOccurrence";
+
+	private static final String PWD_SEQUENCE = "pwdSequence";
+
+	private static final String PWD_SPECIAL = "pwdSpecial";
+
+	private static final String PWD_DIGIT = "pwdDigit";
+
+	private static final String PWD_LOWER_CASE = "pwdLowerCase";
+
+	private static final String PWD_UPPER_CASE = "pwdUpperCase";
+
+	private static final String PWD_SIZE = "pwdSize";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -64,7 +81,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		passwordForm.setWidth(1);
 		passwordForm.setValuesManager(vm);
 
-		final SpinnerItem pwdSize = ItemFactory.newSpinnerItem("pwdSize", "size", settings.getPwdSize());
+		final SpinnerItem pwdSize = ItemFactory.newSpinnerItem(PWD_SIZE, "size", settings.getPwdSize());
 		pwdSize.setWrapTitle(false);
 		pwdSize.setRequired(true);
 		pwdSize.setWidth(50);
@@ -88,7 +105,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdEnforce.setMin(0);
 		pwdEnforce.setStep(1);
 
-		final SpinnerItem pwUpperCase = ItemFactory.newSpinnerItem("pwdUpperCase", "uppercasechars",
+		final SpinnerItem pwUpperCase = ItemFactory.newSpinnerItem(PWD_UPPER_CASE, "uppercasechars",
 				settings.getPwdUpperCase());
 		pwUpperCase.setRequired(true);
 		pwUpperCase.setWrapTitle(false);
@@ -96,7 +113,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwUpperCase.setMin(1);
 		pwUpperCase.setStep(1);
 
-		final SpinnerItem pwLowerCase = ItemFactory.newSpinnerItem("pwdLowerCase", "lowercasechars",
+		final SpinnerItem pwLowerCase = ItemFactory.newSpinnerItem(PWD_LOWER_CASE, "lowercasechars",
 				settings.getPwdLowerCase());
 		pwLowerCase.setRequired(true);
 		pwLowerCase.setWrapTitle(false);
@@ -104,14 +121,14 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwLowerCase.setMin(1);
 		pwLowerCase.setStep(1);
 
-		final SpinnerItem pwdDigit = ItemFactory.newSpinnerItem("pwdDigit", "digitchars", settings.getPwdDigit());
+		final SpinnerItem pwdDigit = ItemFactory.newSpinnerItem(PWD_DIGIT, "digitchars", settings.getPwdDigit());
 		pwdDigit.setRequired(true);
 		pwdDigit.setWrapTitle(false);
 		pwdDigit.setWidth(50);
 		pwdDigit.setMin(1);
 		pwdDigit.setStep(1);
 
-		final SpinnerItem pwdSpecial = ItemFactory.newSpinnerItem("pwdSpecial", "specialchars",
+		final SpinnerItem pwdSpecial = ItemFactory.newSpinnerItem(PWD_SPECIAL, "specialchars",
 				settings.getPwdSpecial());
 		pwdSpecial.setRequired(true);
 		pwdSpecial.setWrapTitle(false);
@@ -119,7 +136,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdSpecial.setMin(1);
 		pwdSpecial.setStep(1);
 
-		final SpinnerItem pwdSequence = ItemFactory.newSpinnerItem("pwdSequence", "maxsequencesize",
+		final SpinnerItem pwdSequence = ItemFactory.newSpinnerItem(PWD_SEQUENCE, "maxsequencesize",
 				settings.getPwdSequence());
 		pwdSequence.setRequired(true);
 		pwdSequence.setWrapTitle(false);
@@ -127,7 +144,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdSequence.setMin(3);
 		pwdSequence.setStep(1);
 
-		final SpinnerItem pwdOccurrence = ItemFactory.newSpinnerItem("pwdOccurrence", "maxoccurrences",
+		final SpinnerItem pwdOccurrence = ItemFactory.newSpinnerItem(PWD_OCCURRENCE, "maxoccurrences",
 				settings.getPwdOccurrence());
 		pwdOccurrence.setRequired(true);
 		pwdOccurrence.setWrapTitle(false);
@@ -151,14 +168,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		maxInactivity.setWidth(50);
 		maxInactivity.setStep(1);
 
-		final RadioGroupItem savelogin = ItemFactory.newBooleanSelector("savelogin", I18N.message("savelogin"));
+		final RadioGroupItem savelogin = ItemFactory.newBooleanSelector("savelogin");
 		savelogin.setHint(I18N.message("saveloginhint"));
 		savelogin.setValue(settings.isSaveLogin() ? "yes" : "no");
 		savelogin.setWrapTitle(false);
 		savelogin.setRequired(true);
 
-		final RadioGroupItem ignorelogincase = ItemFactory.newBooleanSelector("ignorelogincase",
-				I18N.message("ignorelogincase"));
+		final RadioGroupItem ignorelogincase = ItemFactory.newBooleanSelector("ignorelogincase");
 		ignorelogincase.setValue(settings.isIgnoreLoginCase() ? "yes" : "no");
 		ignorelogincase.setWrapTitle(false);
 		ignorelogincase.setRequired(true);
@@ -182,13 +198,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		secureCookies.setRequired(true);
 		secureCookies.setDisabled(Session.get().isDemo());
 
-		final RadioGroupItem forceSsl = ItemFactory.newBooleanSelector("forcessl", I18N.message("forcessl"));
+		final RadioGroupItem forceSsl = ItemFactory.newBooleanSelector("forcessl");
 		forceSsl.setValue(settings.isForceSsl() ? "yes" : "no");
 		forceSsl.setWrapTitle(false);
 		forceSsl.setRequired(true);
 		forceSsl.setDisabled(Session.get().isDemo());
 
-		final TextItem contentSecurityPolicy = ItemFactory.newTextItem("contentsecuritypolicy",
+		final TextItem contentSecurityPolicy = ItemFactory.newTextItem(CONTENTSECURITYPOLICY,
 				settings.getContentSecurityPolicy());
 		contentSecurityPolicy.setHint(I18N.message("contentsecuritypolicyhint"));
 		contentSecurityPolicy.setWidth(400);
@@ -231,20 +247,20 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 	private void onSave() {
 		@SuppressWarnings("unchecked")
-		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		final Map<String, Object> values = vm.getValues();
 		SecuritySettingsPanel.this.settings.setPwdExpiration((Integer) values.get("pwdExp"));
-		SecuritySettingsPanel.this.settings.setPwdSize((Integer) values.get("pwdSize"));
-		SecuritySettingsPanel.this.settings.setPwdUpperCase((Integer) values.get("pwdUpperCase"));
-		SecuritySettingsPanel.this.settings.setPwdLowerCase((Integer) values.get("pwdLowerCase"));
-		SecuritySettingsPanel.this.settings.setPwdDigit((Integer) values.get("pwdDigit"));
-		SecuritySettingsPanel.this.settings.setPwdSpecial((Integer) values.get("pwdSpecial"));
-		SecuritySettingsPanel.this.settings.setPwdSequence((Integer) values.get("pwdSequence"));
-		SecuritySettingsPanel.this.settings.setPwdOccurrence((Integer) values.get("pwdOccurrence"));
+		SecuritySettingsPanel.this.settings.setPwdSize((Integer) values.get(PWD_SIZE));
+		SecuritySettingsPanel.this.settings.setPwdUpperCase((Integer) values.get(PWD_UPPER_CASE));
+		SecuritySettingsPanel.this.settings.setPwdLowerCase((Integer) values.get(PWD_LOWER_CASE));
+		SecuritySettingsPanel.this.settings.setPwdDigit((Integer) values.get(PWD_DIGIT));
+		SecuritySettingsPanel.this.settings.setPwdSpecial((Integer) values.get(PWD_SPECIAL));
+		SecuritySettingsPanel.this.settings.setPwdSequence((Integer) values.get(PWD_SEQUENCE));
+		SecuritySettingsPanel.this.settings.setPwdOccurrence((Integer) values.get(PWD_OCCURRENCE));
 		SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
 		SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
 		SecuritySettingsPanel.this.settings.setSaveLogin(values.get("savelogin").equals("yes") ? true : false);
 		SecuritySettingsPanel.this.settings
-				.setEnableAnonymousLogin(values.get("enableanonymous").equals("yes") ? true : false);
+				.setEnableAnonymousLogin(values.get(ENABLEANONYMOUS).equals("yes") ? true : false);
 		SecuritySettingsPanel.this.settings
 				.setAlertNewDevice(values.get("alertnewdevice").equals("yes") ? true : false);
 
@@ -274,8 +290,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 					.setCookiesSecure(values.get("secureCookies").equals("yes") ? true : false);
 			SecuritySettingsPanel.this.settings.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
 			SecuritySettingsPanel.this.settings.setContentSecurityPolicy(
-					values.get("contentsecuritypolicy") != null ? values.get("contentsecuritypolicy").toString()
-							: null);
+					values.get(CONTENTSECURITYPOLICY) != null ? values.get(CONTENTSECURITYPOLICY).toString() : null);
 
 			SecuritySettingsPanel.this.settings
 					.setGeolocationEnabled(values.get("geoEnabled").equals("yes") ? true : false);
@@ -312,10 +327,10 @@ public class SecuritySettingsPanel extends AdminPanel {
 			if (passwordForm.validate()) {
 				@SuppressWarnings("unchecked")
 				final Map<String, Object> values = (Map<String, Object>) vm.getValues();
-				PasswordGenerator generator = new PasswordGenerator((Integer) values.get("pwdSize"),
-						(Integer) values.get("pwdUpperCase"), (Integer) values.get("pwdLowerCase"),
-						(Integer) values.get("pwdDigit"), (Integer) values.get("pwdSpecial"),
-						(Integer) values.get("pwdSequence"), (Integer) values.get("pwdOccurrence"));
+				PasswordGenerator generator = new PasswordGenerator((Integer) values.get(PWD_SIZE),
+						(Integer) values.get(PWD_UPPER_CASE), (Integer) values.get(PWD_LOWER_CASE),
+						(Integer) values.get(PWD_DIGIT), (Integer) values.get(PWD_SPECIAL),
+						(Integer) values.get(PWD_SEQUENCE), (Integer) values.get(PWD_OCCURRENCE));
 				generator.show();
 			}
 		});
@@ -356,27 +371,23 @@ public class SecuritySettingsPanel extends AdminPanel {
 				settings.getGeolocationDbVer());
 
 		ButtonItem syncGeoDB = new ButtonItem("geoSyncDb", I18N.message("syncgeolocationdb"));
-		syncGeoDB.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+		syncGeoDB.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			LD.contactingServer();
+			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
+					new AsyncCallback<String>() {
 
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				LD.contactingServer();
-				SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
-						new AsyncCallback<String>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+							LD.clearPrompt();
+						}
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								LD.clearPrompt();
-							}
-
-							@Override
-							public void onSuccess(String dbVer) {
-								geoDBversion.setValue(dbVer);
-								LD.clearPrompt();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(String dbVer) {
+							geoDBversion.setValue(dbVer);
+							LD.clearPrompt();
+						}
+					});
 		});
 
 		geolocationForm.setFields(enableGeolocation, useCache, licenseKey, geoDBversion, syncGeoDB);
@@ -392,8 +403,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 		anonymousForm.setValuesManager(vm);
 		anonymousForm.setTitleOrientation(TitleOrientation.TOP);
 		anonymousForm.setNumCols(1);
-		final RadioGroupItem enableAnonymous = ItemFactory.newBooleanSelector("enableanonymous",
-				I18N.message("enableanonymous"));
+		final RadioGroupItem enableAnonymous = ItemFactory.newBooleanSelector(ENABLEANONYMOUS,
+				I18N.message(ENABLEANONYMOUS));
 		enableAnonymous.setValue(settings.isEnableAnonymousLogin() ? "yes" : "no");
 		enableAnonymous.setWrapTitle(false);
 		enableAnonymous.setRequired(true);
@@ -405,29 +416,23 @@ public class SecuritySettingsPanel extends AdminPanel {
 		TextItem anonymousKey = ItemFactory.newSimpleTextItem("anonymousKey", "key", settings.getAnonymousKey());
 		anonymousKey.setHintStyle("hint");
 		anonymousKey.setRequired(true);
-		anonymousKey.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue() != null)
-					url.setValue(Util.contextPath() + "frontend.jsp?anonymous=login&tenant="
-							+ Session.get().getTenantName() + "&key=" + event.getValue().toString());
-			}
+		anonymousKey.addChangedHandler((ChangedEvent event) -> {
+			if (event.getValue() != null)
+				url.setValue(Util.contextPath() + "frontend.jsp?anonymous=login&tenant=" + Session.get().getTenantName()
+						+ "&key=" + event.getValue().toString());
 		});
 
 		anonymousUser = ItemFactory.newUserSelector("anonymousUser", "user", null, false, false);
 		anonymousUser.setHint(I18N.message("anonymoususerhint"));
 		anonymousUser.setHintStyle("hint");
-		anonymousUser.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (anonymousUser.getSelectedRecord() == null) {
-					SecuritySettingsPanel.this.settings.setAnonymousUser(null);
-				} else {
-					GUIUser u = new GUIUser();
-					u.setId(Long.parseLong(anonymousUser.getSelectedRecord().getAttribute("id")));
-					u.setUsername(anonymousUser.getSelectedRecord().getAttribute("username"));
-					SecuritySettingsPanel.this.settings.setAnonymousUser(u);
-				}
+		anonymousUser.addChangedHandler((ChangedEvent event) -> {
+			if (anonymousUser.getSelectedRecord() == null) {
+				SecuritySettingsPanel.this.settings.setAnonymousUser(null);
+			} else {
+				GUIUser u = new GUIUser();
+				u.setId(Long.parseLong(anonymousUser.getSelectedRecord().getAttribute("id")));
+				u.setUsername(anonymousUser.getSelectedRecord().getAttribute("username"));
+				SecuritySettingsPanel.this.settings.setAnonymousUser(u);
 			}
 		});
 		if (SecuritySettingsPanel.this.settings.getAnonymousUser() != null)

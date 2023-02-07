@@ -61,6 +61,10 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class TaskEditor extends Window {
 
+	private static final String AVATAR = "avatar";
+
+	private static final String LABEL = "label";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private GUIWFState state;
@@ -106,15 +110,11 @@ public class TaskEditor extends Window {
 
 		Button save = new Button(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
 				if (Boolean.TRUE.equals(vm.validate())) {
 					onSave();
 					destroy();
 				}
-			}
 		});
 		save.setMargin(3);
 
@@ -306,7 +306,7 @@ public class TaskEditor extends Window {
 		VLayout addUsersAndGroupsPanel = new VLayout();
 		addUsersAndGroupsPanel.setMargin(3);
 
-		ListGridField label = new ListGridField("label", I18N.message("label"));
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL));
 		label.setWidth("*");
 		label.setCanFilter(false);
 
@@ -440,7 +440,7 @@ public class TaskEditor extends Window {
 						selectedRecord.getAttribute("username"))) != null)
 					return;
 				else
-					addParticipant(selectedRecord.getAttribute("username"), selectedRecord.getAttribute("label"));
+					addParticipant(selectedRecord.getAttribute("username"), selectedRecord.getAttribute(LABEL));
 				addUser.clearValue();
 			}
 		});
@@ -533,13 +533,13 @@ public class TaskEditor extends Window {
 	private ListGridRecord createParticipantRecord(String name, String label) {
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", name);
-		rec.setAttribute("label", label);
+		rec.setAttribute(LABEL, label);
 		if (name.startsWith("g."))
-			rec.setAttribute("avatar", "group");
+			rec.setAttribute(AVATAR, "group");
 		else if (name.startsWith("att."))
-			rec.setAttribute("avatar", "attribute");
+			rec.setAttribute(AVATAR, "attribute");
 		else
-			rec.setAttribute("avatar", name);
+			rec.setAttribute(AVATAR, name);
 		return rec;
 	}
 
@@ -588,7 +588,7 @@ public class TaskEditor extends Window {
 
 		ArrayList<GUIValue> participants = new ArrayList<>();
 		for (ListGridRecord rec : participantsGrid.getRecords())
-			participants.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString("label")));
+			participants.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString(LABEL)));
 		TaskEditor.this.state.setParticipants(participants.toArray(new GUIValue[0]));
 
 		if (humanInteraction && state.getType() == GUIWFState.TYPE_TASK

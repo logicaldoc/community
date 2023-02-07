@@ -45,7 +45,6 @@ import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -60,9 +59,7 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -79,6 +76,12 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 6.0
  */
 public class TaskDetailsDialog extends Window {
+
+	private static final String COMMENT = "comment";
+
+	private static final String USER_ID = "userId";
+
+	private static final String WORKFLOW = "workflow";
 
 	private GUIWorkflow workflow = null;
 
@@ -133,7 +136,7 @@ public class TaskDetailsDialog extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-		setTitle(I18N.message("workflow"));
+		setTitle(I18N.message(WORKFLOW));
 		setWidth(760);
 		setHeight(650);
 		setCanDragResize(true);
@@ -145,7 +148,7 @@ public class TaskDetailsDialog extends Window {
 		tabs.setWidth100();
 		tabs.setHeight100();
 
-		workflowTab = new Tab(I18N.message("workflow"));
+		workflowTab = new Tab(I18N.message(WORKFLOW));
 		tabs.addTab(workflowTab, 0);
 
 		buttonsPanel = new VLayout();
@@ -327,7 +330,7 @@ public class TaskDetailsDialog extends Window {
 		workflowForm.setColWidths(60, "*");
 
 		StaticTextItem workflowTitle = ItemFactory.newStaticTextItem("workflowTitle", "",
-				"<b>" + I18N.message("workflow") + "</b>");
+				"<b>" + I18N.message(WORKFLOW) + "</b>");
 		workflowTitle.setShouldSaveValue(false);
 		workflowTitle.setWrapTitle(false);
 		workflowTitle.setShowTitle(false);
@@ -584,21 +587,21 @@ public class TaskDetailsDialog extends Window {
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
 
-		ListGridField userId = new ListGridField("userId", "userid", 50);
+		ListGridField userId = new ListGridField(USER_ID, "userid", 50);
 		userId.setHidden(true);
 
 		ListGridField taskId = new ListGridField("taskId", "taskid", 50);
 		taskId.setHidden(true);
 
 		ListGridField task = new ListGridField("name", I18N.message("task"), 150);
-		ListGridField user = new UserListGridField("user", "userId", "user");
+		ListGridField user = new UserListGridField("user", USER_ID, "user");
 		ListGridField date = new DateListGridField("date", "date");
 
 		notesGrid = new ListGrid() {
 			@Override
 			protected Canvas getExpansionComponent(final ListGridRecord rec) {
 				return new HTMLFlow("<div class='details'>"
-						+ (rec.getAttributeAsString("comment") != null ? rec.getAttributeAsString("comment") : "")
+						+ (rec.getAttributeAsString(COMMENT) != null ? rec.getAttributeAsString(COMMENT) : "")
 						+ "</div>");
 			}
 		};
@@ -620,76 +623,61 @@ public class TaskDetailsDialog extends Window {
 
 		Button addNote = new Button(I18N.message("addnote"));
 		addNote.setAutoFit(true);
-		addNote.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				WorkflowNoteEditor dialog = new WorkflowNoteEditor(TaskDetailsDialog.this);
-				dialog.show();
-			}
+		addNote.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			WorkflowNoteEditor dialog = new WorkflowNoteEditor(TaskDetailsDialog.this);
+			dialog.show();
 		});
 
 		if (!readOnly)
 			notesPanel.addMember(addNote);
 
 		// Expand all notes after arrived
-		notesGrid.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				for (ListGridRecord rec : notesGrid.getRecords()) {
-					notesGrid.expandRecord(rec);
-				}
+		notesGrid.addDataArrivedHandler((DataArrivedEvent event) -> {
+			for (ListGridRecord rec : notesGrid.getRecords()) {
+				notesGrid.expandRecord(rec);
 			}
 		});
 
-		notesGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new Menu();
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						WorkflowService.Instance.get().deleteNote(
-								notesGrid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<Void>() {
+		notesGrid.addCellContextClickHandler((CellContextClickEvent eevent) -> {
+			Menu contextMenu = new Menu();
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.addClickHandler((MenuItemClickEvent evnt) -> WorkflowService.Instance.get()
+					.deleteNote(notesGrid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<Void>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-									@Override
-									public void onSuccess(Void arg) {
-										refreshAndSelectNotesTab();
-									}
-								});
-					}
-				});
+						@Override
+						public void onSuccess(Void arg) {
+							refreshAndSelectNotesTab();
+						}
+					}));
 
-				MenuItem print = new MenuItem();
-				print.setTitle(I18N.message("print"));
-				print.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						HTMLPane printContainer = new HTMLPane();
-						printContainer.setContents(notesGrid.getSelectedRecord().getAttribute("comment"));
-						Canvas.printComponents(new Canvas[] { printContainer });
-					}
-				});
+			MenuItem print = new MenuItem();
+			print.setTitle(I18N.message("print"));
+			print.addClickHandler((MenuItemClickEvent eee) -> {
+				HTMLPane printContainer = new HTMLPane();
+				printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(COMMENT));
+				Canvas.printComponents(new Canvas[] { printContainer });
+			});
 
-				ListGridRecord[] selection = notesGrid.getSelectedRecords();
+			ListGridRecord[] selection = notesGrid.getSelectedRecords();
 
-				if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-					delete.setEnabled(selection.length > 0);
-				} else {
-					long userId = Long.parseLong(selection[0].getAttribute("userId"));
-					delete.setEnabled(selection.length == 1 && userId == Session.get().getUser().getId());
-				}
-
-				print.setEnabled(selection.length == 1);
-
-				contextMenu.setItems(print, delete);
-				contextMenu.showContextMenu();
-				event.cancel();
+			if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
+				delete.setEnabled(selection.length > 0);
+			} else {
+				long usrId = Long.parseLong(selection[0].getAttribute(USER_ID));
+				delete.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
 			}
+
+			print.setEnabled(selection.length == 1);
+
+			contextMenu.setItems(print, delete);
+			contextMenu.showContextMenu();
+			eevent.cancel();
 		});
 	}
 
@@ -725,37 +713,29 @@ public class TaskDetailsDialog extends Window {
 						: "empty"));
 		appendedDocs.setFields(statusIcons, docFilename, docLastModified);
 
-		appendedDocs.registerCellContextClickHandler(new CellContextClickHandler() {
-
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				event.cancel();
-				showAppendedDocsContextMenu();
-			}
+		appendedDocs.registerCellContextClickHandler((CellContextClickEvent event) -> {
+			event.cancel();
+			showAppendedDocsContextMenu();
 		});
-		appendedDocs.registerDoubleClickHandler(new DoubleClickHandler() {
+		appendedDocs.registerDoubleClickHandler((DoubleClickEvent eevent) -> {
+			final ListGridRecord selection = appendedDocs.getSelectedRecord();
+			FolderService.Instance.get().getFolder(selection.getAttributeAsLong("folderId"), false, false, false,
+					new AsyncCallback<GUIFolder>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				final ListGridRecord selection = appendedDocs.getSelectedRecord();
-				FolderService.Instance.get().getFolder(selection.getAttributeAsLong("folderId"), false, false, false,
-						new AsyncCallback<GUIFolder>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							if (folder != null) {
+								destroy();
+								if (com.logicaldoc.gui.common.client.Menu
+										.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
+									DocumentsPanel.get().openInFolder(selection.getAttributeAsLong("id"));
 							}
-
-							@Override
-							public void onSuccess(GUIFolder folder) {
-								if (folder != null) {
-									destroy();
-									if (com.logicaldoc.gui.common.client.Menu
-											.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
-										DocumentsPanel.get().openInFolder(selection.getAttributeAsLong("id"));
-								}
-							}
-						});
-			}
+						}
+					});
 		});
 
 		appendedDocsPanel.addMember(appendedDocs);
@@ -763,50 +743,47 @@ public class TaskDetailsDialog extends Window {
 		Button addDocuments = new Button(I18N.message("adddocuments"));
 		addDocuments.setAutoFit(true);
 		addDocuments.setVisible(workflow.getSelectedTask().getTaskState().equals("started"));
-		addDocuments.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				Clipboard clipboard = Clipboard.getInstance();
-				if (clipboard.isEmpty()) {
-					SC.warn(I18N.message("nodocsinclipboard"));
-					return;
-				}
-
-				Long[] ids = new Long[clipboard.size()];
-				int i = 0;
-				for (GUIDocument doc : clipboard)
-					ids[i++] = doc.getId();
-
-				WorkflowService.Instance.get().appendDocuments(workflow.getSelectedTask().getId(), ids,
-						new AsyncCallback<Void>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void ret) {
-								WorkflowService.Instance.get().getWorkflowDetailsByTask(
-										workflow.getSelectedTask().getId(), new AsyncCallback<GUIWorkflow>() {
-
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(GUIWorkflow result) {
-												TaskDetailsDialog.this.workflow
-														.setAppendedDocIds(result.getAppendedDocIds());
-												refreshAppendedDocsTab();
-												tabs.selectTab(1);
-												Clipboard.getInstance().clear();
-											}
-										});
-							}
-						});
+		addDocuments.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent eevnt) -> {
+			Clipboard clipboard = Clipboard.getInstance();
+			if (clipboard.isEmpty()) {
+				SC.warn(I18N.message("nodocsinclipboard"));
+				return;
 			}
+
+			Long[] ids = new Long[clipboard.size()];
+			int i = 0;
+			for (GUIDocument doc : clipboard)
+				ids[i++] = doc.getId();
+
+			WorkflowService.Instance.get().appendDocuments(workflow.getSelectedTask().getId(), ids,
+					new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void ret) {
+							WorkflowService.Instance.get().getWorkflowDetailsByTask(workflow.getSelectedTask().getId(),
+									new AsyncCallback<GUIWorkflow>() {
+
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
+
+										@Override
+										public void onSuccess(GUIWorkflow result) {
+											TaskDetailsDialog.this.workflow
+													.setAppendedDocIds(result.getAppendedDocIds());
+											refreshAppendedDocsTab();
+											tabs.selectTab(1);
+											Clipboard.getInstance().clear();
+										}
+									});
+						}
+					});
 		});
 
 		if (workflow.getSelectedTask().getEndDate() == null && !readOnly) {
@@ -899,85 +876,80 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareCheckinContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem checkin = new MenuItem();
 		checkin.setTitle(I18N.message("checkin"));
-		checkin.addClickHandler((MenuItemClickEvent event) -> {
-			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+		checkin.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
+				.getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(GUIDocument document) {
-					DocumentCheckin checkin = new DocumentCheckin(document, document.getFileName());
-					checkin.show();
-				}
-			});
-		});
+					@Override
+					public void onSuccess(GUIDocument document) {
+						DocumentCheckin checkin = new DocumentCheckin(document, document.getFileName());
+						checkin.show();
+					}
+				}));
 		return checkin;
 	}
 
 	private MenuItem prepareUnlockContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem unlock = new MenuItem();
 		unlock.setTitle(I18N.message("unlock"));
-		unlock.addClickHandler((MenuItemClickEvent event) -> {
-			DocumentService.Instance.get().unlock(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+		unlock.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
+				.unlock(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(Void result) {
-					GUIDocument doc = appendedDocs.getSelectedDocument();
-					DocUtil.markUnlocked(doc);
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						GUIDocument doc = appendedDocs.getSelectedDocument();
+						DocUtil.markUnlocked(doc);
+					}
+				}));
 		return unlock;
 	}
 
 	private MenuItem prepareCheckoutContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem checkout = new MenuItem();
 		checkout.setTitle(I18N.message("checkout"));
-		checkout.addClickHandler((MenuItemClickEvent event) -> {
-			DocumentService.Instance.get().checkout(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+		checkout.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
+				.checkout(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(Void result) {
-					GUIDocument doc = appendedDocs.getSelectedDocument();
-					DocUtil.markCheckedOut(doc);
-					GuiLog.info(I18N.message("documentcheckedout"), null);
+					@Override
+					public void onSuccess(Void result) {
+						GUIDocument doc = appendedDocs.getSelectedDocument();
+						DocUtil.markCheckedOut(doc);
+						GuiLog.info(I18N.message("documentcheckedout"), null);
 
-					WindowUtils.openUrl(Util.downloadURL(selectedDocument.getId()));
-				}
-			});
-		});
+						WindowUtils.openUrl(Util.downloadURL(selectedDocument.getId()));
+					}
+				}));
 		return checkout;
 	}
 
 	private MenuItem prepareRemoveContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("remove"));
-		remove.addClickHandler((MenuItemClickEvent event) -> {
-			WorkflowService.Instance.get().removeDocument(workflow.getSelectedTask().getId(), selectedDocument.getId(),
-					new AsyncCallback<Void>() {
+		remove.addClickHandler((MenuItemClickEvent event) -> WorkflowService.Instance.get().removeDocument(
+				workflow.getSelectedTask().getId(), selectedDocument.getId(), new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void arg) {
-							appendedDocs.removeSelectedData();
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void arg) {
+						appendedDocs.removeSelectedData();
+					}
+				}));
 		return remove;
 	}
 
@@ -998,9 +970,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
 		download.setEnabled(false);
-		download.addClickHandler((MenuItemClickEvent event) -> {
-			DocUtil.download(selectedDocument.getId(), null);
-		});
+		download.addClickHandler((MenuItemClickEvent event) -> DocUtil.download(selectedDocument.getId(), null));
 		return download;
 	}
 
@@ -1008,21 +978,20 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(false);
-		preview.addClickHandler((MenuItemClickEvent event) -> {
-			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+		preview.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
+				.getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
-				}
-			});
-		});
+					@Override
+					public void onSuccess(GUIDocument doc) {
+						PreviewPopup iv = new PreviewPopup(doc);
+						iv.show();
+					}
+				}));
 		return preview;
 	}
 

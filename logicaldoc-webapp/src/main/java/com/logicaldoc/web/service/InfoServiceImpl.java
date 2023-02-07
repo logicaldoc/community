@@ -55,6 +55,10 @@ import com.logicaldoc.web.listener.ApplicationListener;
  */
 public class InfoServiceImpl extends AbstractRemoteService implements InfoService {
 
+	private static final String ENABLED = "enabled";
+
+	private static final String LANG = ".lang.";
+
 	private static Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
 
 	private static final long serialVersionUID = 1L;
@@ -175,7 +179,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		ArrayList<GUIValue> supportedLanguages = new ArrayList<>();
 		List<String> installedLocales = I18N.getLocales();
 		for (String loc : installedLocales) {
-			if ("enabled".equals(Context.get().getProperties().getProperty(tenantName + ".lang." + loc + ".gui"))) {
+			if (ENABLED.equals(Context.get().getProperties().getProperty(tenantName + LANG + loc + ".gui"))) {
 				Locale lc = LocaleUtil.toLocale(loc);
 				GUIValue l = new GUIValue();
 				l.setCode(loc);
@@ -313,7 +317,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 		Locale locale = null;
 		for (String loc : installedLocales) {
-			if ("enabled".equals(config.getProperty(tenantName + ".lang." + loc + ".gui"))
+			if (ENABLED.equals(config.getProperty(tenantName + LANG + loc + ".gui"))
 					&& loc.equals(proposedLocale.toString())) {
 				locale = LocaleUtil.toLocale(loc);
 				break;
@@ -322,7 +326,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 		if (locale == null)
 			for (String loc : installedLocales) {
-				if ("enabled".equals(config.getProperty(tenantName + ".lang." + loc + ".gui"))) {
+				if (ENABLED.equals(config.getProperty(tenantName + LANG + loc + ".gui"))) {
 					Locale x = LocaleUtil.toLocale(loc);
 					if (proposedLocale.getLanguage().equals(x.getLanguage())) {
 						locale = LocaleUtil.toLocale(loc);

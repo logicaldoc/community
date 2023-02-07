@@ -33,6 +33,12 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
+	private static final String EVENTS = "events";
+
+	private static final String ROUTINE = "routine";
+
+	private static final String FOLDER = "folder";
+
 	private HLayout formsContainer = new HLayout();
 
 	private FolderSelector folderSelector;
@@ -45,15 +51,13 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		setHeight100();
 
 		setMembers(formsContainer);
-		folderSelector = new FolderSelector("folder", true);
+		folderSelector = new FolderSelector(FOLDER, true);
 		folderSelector.setWidth(200);
 		folderSelector.setEndRow(true);
-		folderSelector.setTitle(I18N.message("folder"));
+		folderSelector.setTitle(I18N.message(FOLDER));
 		if (trigger.getFolder() != null)
 			folderSelector.setFolder(trigger.getFolder());
-		folderSelector.addFolderChangeListener((GUIFolder folder) -> {
-			changedHandler.onChanged(null);
-		});
+		folderSelector.addFolderChangeListener((GUIFolder folder) -> changedHandler.onChanged(null));
 
 		refresh();
 	}
@@ -71,8 +75,8 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		form2.setValuesManager(vm);
 		form2.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", 
-				trigger.getAutomation(), changedHandler, false);
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", trigger.getAutomation(),
+				changedHandler, false);
 		automation.setStartRow(false);
 		automation.setWidth("*");
 		automation.setDisabled(trigger.getRoutine() != null);
@@ -118,7 +122,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 	}
 
 	private SelectItem prepareRoutineSelector(final TextAreaItem automation) {
-		SelectItem routine = ItemFactory.newAutomationRoutineSelector("routine",
+		SelectItem routine = ItemFactory.newAutomationRoutineSelector(ROUTINE,
 				trigger.getRoutine() != null ? trigger.getRoutine().getId() : null, changedHandler, true);
 		routine.setEndRow(true);
 		routine.addChangedHandler(changedHandler);
@@ -134,9 +138,9 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 	}
 
 	private SelectItem prepareEventsSelector() {
-		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeronevents"),
+		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeronevents"),
 				(ChangedEvent event) -> {
-					SelectItem item = (SelectItem) vm.getItem("events");
+					SelectItem item = (SelectItem) vm.getItem(EVENTS);
 					if (item.getValues() != null && item.getValues().length > 0) {
 						vm.getItem("date").setDisabled(true);
 						vm.getItem("date").clearValue();
@@ -145,7 +149,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 						vm.getItem("cron").setDisabled(true);
 						vm.getItem("cron").clearValue();
 					} else {
-						vm.getItem("folder").setDisabled(false);
+						vm.getItem(FOLDER).setDisabled(false);
 						vm.getItem("date").setDisabled(false);
 						vm.getItem("time").setDisabled(false);
 						vm.getItem("cron").setDisabled(false);
@@ -166,17 +170,17 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 				(ChangedEvent event) -> {
 					FormItem cron = (FormItem) vm.getItem("cron");
 					if (cron.getValue() != null) {
-						vm.getItem("events").setDisabled(true);
-						vm.getItem("events").clearValue();
-						vm.getItem("folder").setDisabled(true);
-						vm.getItem("folder").clearValue();
+						vm.getItem(EVENTS).setDisabled(true);
+						vm.getItem(EVENTS).clearValue();
+						vm.getItem(FOLDER).setDisabled(true);
+						vm.getItem(FOLDER).clearValue();
 						vm.getItem("date").setDisabled(true);
 						vm.getItem("date").clearValue();
 						vm.getItem("time").setDisabled(true);
 						vm.getItem("time").clearValue();
 					} else {
-						vm.getItem("events").setDisabled(false);
-						vm.getItem("folder").setDisabled(false);
+						vm.getItem(EVENTS).setDisabled(false);
+						vm.getItem(FOLDER).setDisabled(false);
 						vm.getItem("date").setDisabled(false);
 						vm.getItem("time").setDisabled(false);
 					}
@@ -201,15 +205,15 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 			FormItem time = (FormItem) vm.getItem("time");
 			FormItem date = (FormItem) vm.getItem("date");
 			if (time.getValue() != null || date.getValue() != null) {
-				vm.getItem("events").setDisabled(true);
-				vm.getItem("events").clearValue();
-				vm.getItem("folder").setDisabled(true);
-				vm.getItem("folder").clearValue();
+				vm.getItem(EVENTS).setDisabled(true);
+				vm.getItem(EVENTS).clearValue();
+				vm.getItem(FOLDER).setDisabled(true);
+				vm.getItem(FOLDER).clearValue();
 				vm.getItem("cron").setDisabled(true);
 				vm.getItem("cron").clearValue();
 			} else {
-				vm.getItem("events").setDisabled(false);
-				vm.getItem("folder").setDisabled(true);
+				vm.getItem(EVENTS).setDisabled(false);
+				vm.getItem(FOLDER).setDisabled(true);
 				vm.getItem("cron").setDisabled(false);
 			}
 
@@ -228,15 +232,15 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 			FormItem time = (FormItem) vm.getItem("time");
 			FormItem date = (FormItem) vm.getItem("date");
 			if (time.getValue() != null || date.getValue() != null) {
-				vm.getItem("events").setDisabled(true);
-				vm.getItem("events").clearValue();
-				vm.getItem("folder").setDisabled(true);
-				vm.getItem("folder").clearValue();
+				vm.getItem(EVENTS).setDisabled(true);
+				vm.getItem(EVENTS).clearValue();
+				vm.getItem(FOLDER).setDisabled(true);
+				vm.getItem(FOLDER).clearValue();
 				vm.getItem("cron").setDisabled(true);
 				vm.getItem("cron").clearValue();
 			} else {
-				vm.getItem("events").setDisabled(false);
-				vm.getItem("folder").setDisabled(false);
+				vm.getItem(EVENTS).setDisabled(false);
+				vm.getItem(FOLDER).setDisabled(false);
 				vm.getItem("cron").setDisabled(false);
 			}
 
@@ -254,9 +258,9 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		if (values.get("routine") != null) {
-			SelectItem item = (SelectItem) vm.getItem("routine");
-			GUIAutomationRoutine routine = new GUIAutomationRoutine(Long.parseLong(values.get("routine").toString()));
+		if (values.get(ROUTINE) != null) {
+			SelectItem item = (SelectItem) vm.getItem(ROUTINE);
+			GUIAutomationRoutine routine = new GUIAutomationRoutine(Long.parseLong(values.get(ROUTINE).toString()));
 			routine.setName(item.getSelectedRecord().getAttributeAsString("name"));
 			trigger.setRoutine(routine);
 		} else
@@ -270,8 +274,8 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		trigger.setAutomation((String) values.get("automation"));
 
 		String eventsStr = null;
-		if (vm.getValueAsString("events") != null && !vm.getValueAsString("events").isEmpty()) {
-			String buf = vm.getValueAsString("events").toString().trim().toLowerCase();
+		if (vm.getValueAsString(EVENTS) != null && !vm.getValueAsString(EVENTS).isEmpty()) {
+			String buf = vm.getValueAsString(EVENTS).toString().trim().toLowerCase();
 			buf = buf.replace('[', ' ');
 			buf = buf.replace(']', ' ');
 			eventsStr = buf.replace(" ", "");

@@ -25,10 +25,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -45,6 +42,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class GroupsPanel extends AdminPanel {
+
+	private static final String DESCRIPTION = "description";
 
 	private RefreshableListGrid list;
 
@@ -137,7 +136,7 @@ public class GroupsPanel extends AdminPanel {
 		source.setCanFilter(true);
 		source.setHidden(true);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"), 200);
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 200);
 		description.setCanFilter(true);
 
 		list = new RefreshableListGrid();
@@ -153,41 +152,31 @@ public class GroupsPanel extends AdminPanel {
 		listing.addMember(infoPanel);
 		listing.addMember(list);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record rec = list.getSelectedRecord();
-				if (rec != null)
-					SecurityService.Instance.get().getGroup(Long.parseLong(rec.getAttributeAsString("id")),
-							new AsyncCallback<GUIGroup>() {
+		list.addSelectionChangedHandler((SelectionEvent event) -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				SecurityService.Instance.get().getGroup(Long.parseLong(rec.getAttributeAsString("id")),
+						new AsyncCallback<GUIGroup>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIGroup group) {
-									showGroupDetails(group);
-								}
-							});
-			}
+							@Override
+							public void onSuccess(GUIGroup group) {
+								showGroupDetails(group);
+							}
+						});
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showgroups", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
+				.setMessage(I18N.message("showgroups", Integer.toString(list.getTotalRows()))));
 
 		details = SELECT_GROUP;
 		detailsContainer.setMembers(details);
@@ -210,7 +199,7 @@ public class GroupsPanel extends AdminPanel {
 			list.selectRecord(rec);
 		}
 
-		rec.setAttribute("description", group.getDescription());
+		rec.setAttribute(DESCRIPTION, group.getDescription());
 		rec.setAttribute("name", group.getName());
 		list.refreshRow(list.getRecordIndex(rec));
 	}
@@ -232,9 +221,8 @@ public class GroupsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
+				I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						SecurityService.Instance.get().deleteGroup(id, new AsyncCallback<Void>() {
 							@Override
@@ -251,9 +239,7 @@ public class GroupsPanel extends AdminPanel {
 							}
 						});
 					}
-				});
-			}
-		});
+				}));
 
 		if (Constants.GROUP_ADMIN.equals(rec.getAttributeAsString("name"))
 				|| Constants.GROUP_PUBLISHER.equals(rec.getAttributeAsString("name"))

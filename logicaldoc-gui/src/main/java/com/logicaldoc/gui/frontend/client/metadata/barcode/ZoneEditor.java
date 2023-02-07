@@ -102,7 +102,7 @@ public class ZoneEditor extends Window {
 		TextItem exclude = ItemFactory.newTextItem("exclude", zone.getExclude());
 		exclude.setWidth(200);
 
-		MultiComboBoxItem formats = ItemFactory.newBarcodeFormatsComboBoxItem("formats", "formats", zone.getFormats());
+		MultiComboBoxItem formats = ItemFactory.newBarcodeFormatsComboBoxItem(zone.getFormats());
 
 		form.setItems(sample, patterns, include, exclude, formats);
 	}

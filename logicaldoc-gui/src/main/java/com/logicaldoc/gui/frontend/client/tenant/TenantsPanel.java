@@ -48,6 +48,14 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class TenantsPanel extends AdminPanel {
 
+	private static final String ENABLED_ICON = "enabledIcon";
+
+	private static final String ADDRESS = "address";
+
+	private static final String EMAIL = "email";
+
+	private static final String COUNTRY = "country";
+
 	private ListGrid list;
 
 	private Layout detailsContainer = new VLayout();
@@ -82,19 +90,19 @@ public class TenantsPanel extends AdminPanel {
 		ListGridField telephone = new ListGridField("telephone", I18N.message("phone"), 90);
 		telephone.setCanFilter(true);
 
-		ListGridField country = new ListGridField("country", I18N.message("country"), 90);
+		ListGridField country = new ListGridField(COUNTRY, I18N.message(COUNTRY), 90);
 		country.setCanFilter(true);
 
 		ListGridField city = new ListGridField("city", I18N.message("city"), 90);
 		city.setCanFilter(true);
 
-		ListGridField email = new ListGridField("email", I18N.message("email"), 200);
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 200);
 		email.setCanFilter(true);
 
-		ListGridField address = new ListGridField("address", I18N.message("address"), 150);
+		ListGridField address = new ListGridField(ADDRESS, I18N.message(ADDRESS), 150);
 		address.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField("enabledIcon", " ", 24);
+		ListGridField enabled = new ListGridField(ENABLED_ICON, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -200,20 +208,20 @@ public class TenantsPanel extends AdminPanel {
 
 		rec.setAttribute("name", tenant.getName());
 		rec.setAttribute("displayName", tenant.getDisplayName());
-		rec.setAttribute("email", tenant.getEmail());
+		rec.setAttribute(EMAIL, tenant.getEmail());
 		rec.setAttribute("telephone", tenant.getTelephone());
-		rec.setAttribute("address", tenant.getStreet());
-		rec.setAttribute("country", tenant.getCountry());
+		rec.setAttribute(ADDRESS, tenant.getStreet());
+		rec.setAttribute(COUNTRY, tenant.getCountry());
 		rec.setAttribute("city", tenant.getCity());
 		rec.setAttribute("postalCode", tenant.getPostalCode());
 		rec.setAttribute("state", tenant.getState());
 		rec.setAttribute("expire", tenant.getExpire());
 
 		if (tenant.isEnabled()) {
-			rec.setAttribute("enabledIcon", "bullet_green");
+			rec.setAttribute(ENABLED_ICON, "bullet_green");
 			rec.setAttribute("eenabled", false);
 		} else {
-			rec.setAttribute("enabledIcon", "bullet_red");
+			rec.setAttribute(ENABLED_ICON, "bullet_red");
 			rec.setAttribute("eenabled", false);
 		}
 

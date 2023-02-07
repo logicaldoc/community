@@ -30,6 +30,8 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class FormatConvertersDataServlet extends AbstractDataServlet {
 
+	private static final String CLOSE_ID = "]]></id>";
+	private static final String ID = "<id><![CDATA[";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -68,7 +70,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 					if (converterSpecification.equals(formatConverter.getClass().getName())) {
 						FormatConverter associatedConverter = manager.getConverter(inExt, outExt);
 						writer.print("<association>");
-						writer.print("<id><![CDATA[" + id + "]]></id>");
+						writer.print(ID + id + CLOSE_ID);
 						writer.print("<in><![CDATA[" + inExt + "]]></in>");
 						writer.print("<out><![CDATA[" + outExt + "]]></out>");
 						writer.print(
@@ -126,9 +128,9 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 
 		writer.print("<converter>");
 		if ("-".equals(inExt) && "-".equals(outExt))
-			writer.print("<id><![CDATA[" + converter.getClass().getName() + "]]></id>");
+			writer.print(ID + converter.getClass().getName() + CLOSE_ID);
 		else
-			writer.print("<id><![CDATA[" + inExt + "-" + outExt + "]]></id>");
+			writer.print(ID + inExt + "-" + outExt + CLOSE_ID);
 		writer.print("<in><![CDATA[" + inExt + "]]></in>");
 		writer.print("<out><![CDATA[" + outExt + "]]></out>");
 		writer.print("<converter><![CDATA[" + converter.getClass().getName() + "]]></converter>");

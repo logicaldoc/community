@@ -47,6 +47,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class WorkflowHistoryDialog extends Window {
 
+	private static final String STARTDATE = "startdate";
+
 	private GUIWorkflow selectedWorkflow = null;
 
 	private ComboBoxItem user = null;
@@ -116,22 +118,14 @@ public class WorkflowHistoryDialog extends Window {
 		ToolStripButton export = new ToolStripButton();
 		export.setAutoFit(true);
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(instancesGrid, true);
-			}
-		});
+		export.addClickHandler((ClickEvent event) -> 
+				GridUtil.exportCSV(instancesGrid, true));
 
 		ToolStripButton print = new ToolStripButton();
 		print.setAutoFit(true);
 		print.setTitle(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(instancesGrid);
-			}
-		});
+		print.addClickHandler((ClickEvent event) ->
+				GridUtil.print(instancesGrid));
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addFormItem(max);
@@ -160,7 +154,7 @@ public class WorkflowHistoryDialog extends Window {
 		addItem(body);
 
 		ListGridField id = new ListGridField("id", I18N.message("instance"), 70);
-		ListGridField startDate = new DateListGridField("startdate", "startdate", DateCellFormatter.FORMAT_LONG);
+		ListGridField startDate = new DateListGridField(STARTDATE, STARTDATE, DateCellFormatter.FORMAT_LONG);
 
 		ListGridField endDate = new DateListGridField("enddate", "enddate", DateCellFormatter.FORMAT_LONG);
 
@@ -183,7 +177,7 @@ public class WorkflowHistoryDialog extends Window {
 		instancesGrid.setHeight100();
 		instancesGrid.setWidth100();
 		instancesGrid.setBorder("1px solid #E1E1E1");
-		instancesGrid.sort("startdate", SortDirection.DESCENDING);
+		instancesGrid.sort(STARTDATE, SortDirection.DESCENDING);
 		instancesGrid.setFields(id, version, templateId, tag, startDate, endDate, documents, initiator, documentIds);
 
 		instancesGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {

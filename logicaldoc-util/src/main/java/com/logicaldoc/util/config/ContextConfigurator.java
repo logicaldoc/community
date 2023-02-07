@@ -16,6 +16,8 @@ import org.jdom2.Element;
  */
 public class ContextConfigurator {
 
+	private static final String PROPERTY = "property";
+
 	protected XMLBean xml;
 
 	public ContextConfigurator(String resource) {
@@ -31,7 +33,7 @@ public class ContextConfigurator {
 
 	public void setProperty(String id, String propertyName, String value) {
 		Element element = xml.getChild("bean", "id", id);
-		for (Element property : element.getChildren("property", element.getNamespace())) {
+		for (Element property : element.getChildren(PROPERTY, element.getNamespace())) {
 			if (propertyName.equals(property.getAttribute("name").getValue())) {
 				property.getChild("value").setText(value);
 				break;
@@ -43,7 +45,7 @@ public class ContextConfigurator {
 		Element element = xml.getChild("bean", "id", id);
 		if (element == null)
 			return;
-		for (Element property : element.getChildren("property", element.getNamespace())) {
+		for (Element property : element.getChildren(PROPERTY, element.getNamespace())) {
 			if (propertyName.equals(property.getAttribute("name").getValue())) {
 				property.removeContent();
 				return;
@@ -56,7 +58,7 @@ public class ContextConfigurator {
 		if (element == null)
 			return;
 
-		for (Element property : element.getChildren("property", element.getNamespace())) {
+		for (Element property : element.getChildren(PROPERTY, element.getNamespace())) {
 			if (propertyName.equals(property.getAttribute("name").getValue())) {
 				addPropertyListValues(property, values);
 				break;
@@ -163,7 +165,7 @@ public class ContextConfigurator {
 		Element element = xml.getChild("bean", "id", id);
 		if (element == null)
 			return null;
-		List properties = element.getChildren("property", element.getNamespace());
+		List properties = element.getChildren(PROPERTY, element.getNamespace());
 		for (Iterator iter = properties.iterator(); iter.hasNext();) {
 			Element property = (Element) iter.next();
 			Attribute nameAttribute = property.getAttribute("name");

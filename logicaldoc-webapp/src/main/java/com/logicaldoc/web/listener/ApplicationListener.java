@@ -45,6 +45,10 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public class ApplicationListener implements ServletContextListener, HttpSessionListener {
 
+	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
+	private static final String JDBC_URL = "jdbc.url";
+
 	private static Logger log = LoggerFactory.getLogger(ApplicationListener.class);
 
 	private boolean pidCreated = false;
@@ -77,16 +81,16 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		 */
 		try {
 			ContextProperties config = new ContextProperties();
-			if (config.getProperty("jdbc.url").contains("jdbc:hsqldb")) {
+			if (config.getProperty(JDBC_URL).contains("jdbc:hsqldb")) {
 				DBInit dbInit = new DBInit();
 				dbInit.setDriver(config.getProperty("jdbc.driver"));
-				dbInit.setUrl(config.getProperty("jdbc.url"));
+				dbInit.setUrl(config.getProperty(JDBC_URL));
 				dbInit.setUsername(config.getProperty("jdbc.username"));
 				dbInit.setPassword(config.getProperty("jdbc.password"));
 
 				dbInit.executeSql("shutdown compact");
 				log.warn("Embedded database stopped");
-			} else if (config.getProperty("jdbc.url").contains("jdbc:mysql")) {
+			} else if (config.getProperty(JDBC_URL).contains("jdbc:mysql")) {
 				com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.uncheckedShutdown();
 			}
 		} catch (Throwable e) {
@@ -193,7 +197,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			log.warn(e.getMessage());
 		}
 
-		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/upload");
+		tempDirToDelete = new File(System.getProperty(JAVA_IO_TMPDIR) + "/upload");
 		try {
 			if (tempDirToDelete.exists())
 				FileUtils.forceDelete(tempDirToDelete);
@@ -201,7 +205,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			log.warn(e.getMessage());
 		}
 
-		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/convertjpg");
+		tempDirToDelete = new File(System.getProperty(JAVA_IO_TMPDIR) + "/convertjpg");
 		try {
 			if (tempDirToDelete.exists())
 				FileUtils.forceDelete(tempDirToDelete);
@@ -319,7 +323,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		}
 
 		String sid = (String) session.getAttribute("sid");
-		File uploadDir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + sid);
+		File uploadDir = new File(System.getProperty(JAVA_IO_TMPDIR) + "/upload/" + sid);
 		try {
 			if (uploadDir.exists())
 				FileUtils.forceDelete(uploadDir);

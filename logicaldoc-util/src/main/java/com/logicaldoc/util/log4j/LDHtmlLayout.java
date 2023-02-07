@@ -35,6 +35,12 @@ import org.apache.logging.log4j.util.Strings;
 @Plugin(name = "LDHtmlLayout", category = Node.CATEGORY, elementType = Layout.ELEMENT_TYPE, printObject = true)
 public class LDHtmlLayout extends AbstractStringLayout {
 
+	private static final String CLOSE_TD_TR = "</td></tr>";
+
+	private static final String CLOSE_TD = "</td>";
+
+	private static final String CHARSET = "; charset=";
+
 	/**
 	 * Default font family: {@value}.
 	 */
@@ -125,9 +131,9 @@ public class LDHtmlLayout extends AbstractStringLayout {
 
 	private String addCharsetToContentType(final String contentType) {
 		if (contentType == null) {
-			return DEFAULT_CONTENT_TYPE + "; charset=" + getCharset();
+			return DEFAULT_CONTENT_TYPE + CHARSET + getCharset();
 		}
-		return contentType.contains("charset") ? contentType : contentType + "; charset=" + getCharset();
+		return contentType.contains("charset") ? contentType : contentType + CHARSET + getCharset();
 	}
 
 	/**
@@ -149,12 +155,12 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		} else {
 			datePatternConverter.format(event, sbuf);
 		}
-		sbuf.append("</td>").append(Strings.LINE_SEPARATOR);
+		sbuf.append(CLOSE_TD).append(Strings.LINE_SEPARATOR);
 
 		final String escapedThread = Transform.escapeHtmlTags(event.getThreadName());
 		sbuf.append("<td title=\"").append(escapedThread).append(" thread\">");
 		sbuf.append(escapedThread);
-		sbuf.append("</td>").append(Strings.LINE_SEPARATOR);
+		sbuf.append(CLOSE_TD).append(Strings.LINE_SEPARATOR);
 
 		sbuf.append("<td title=\"Level\">");
 		if (event.getLevel().equals(Level.DEBUG)) {
@@ -168,7 +174,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		} else {
 			sbuf.append(Transform.escapeHtmlTags(String.valueOf(event.getLevel())));
 		}
-		sbuf.append("</td>").append(Strings.LINE_SEPARATOR);
+		sbuf.append(CLOSE_TD).append(Strings.LINE_SEPARATOR);
 
 		String escapedLogger = Transform.escapeHtmlTags(event.getLoggerName());
 		if (Strings.isEmpty(escapedLogger)) {
@@ -176,7 +182,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		}
 		sbuf.append("<td title=\"").append(escapedLogger).append(" logger\">");
 		sbuf.append(escapedLogger);
-		sbuf.append("</td>").append(Strings.LINE_SEPARATOR);
+		sbuf.append(CLOSE_TD).append(Strings.LINE_SEPARATOR);
 
 		if (locationInfo) {
 			final StackTraceElement element = event.getSource();
@@ -184,12 +190,12 @@ public class LDHtmlLayout extends AbstractStringLayout {
 			sbuf.append(Transform.escapeHtmlTags(element.getFileName()));
 			sbuf.append(':');
 			sbuf.append(element.getLineNumber());
-			sbuf.append("</td>").append(Strings.LINE_SEPARATOR);
+			sbuf.append(CLOSE_TD).append(Strings.LINE_SEPARATOR);
 		}
 
 		sbuf.append("<td title=\"Message\">");
 		sbuf.append(Transform.escapeHtmlTags(event.getMessage().getFormattedMessage()).replaceAll(REGEXP, "<br />"));
-		sbuf.append("</td>").append(Strings.LINE_SEPARATOR);
+		sbuf.append(CLOSE_TD).append(Strings.LINE_SEPARATOR);
 		sbuf.append("</tr>").append(Strings.LINE_SEPARATOR);
 
 		if (event.getContextStack() != null && !event.getContextStack().isEmpty()) {
@@ -197,7 +203,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 			sbuf.append(";\" colspan=\"6\" ");
 			sbuf.append("title=\"Nested Diagnostic Context\">");
 			sbuf.append("NDC: ").append(Transform.escapeHtmlTags(event.getContextStack().toString()));
-			sbuf.append("</td></tr>").append(Strings.LINE_SEPARATOR);
+			sbuf.append(CLOSE_TD_TR).append(Strings.LINE_SEPARATOR);
 		}
 
 		if (event.getContextData() != null && !event.getContextData().isEmpty()) {
@@ -205,7 +211,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 			sbuf.append(";\" colspan=\"6\" ");
 			sbuf.append("title=\"Mapped Diagnostic Context\">");
 			sbuf.append("MDC: ").append(Transform.escapeHtmlTags(event.getContextData().toMap().toString()));
-			sbuf.append("</td></tr>").append(Strings.LINE_SEPARATOR);
+			sbuf.append(CLOSE_TD_TR).append(Strings.LINE_SEPARATOR);
 		}
 
 		final Throwable throwable = event.getThrown();
@@ -213,7 +219,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 
 			sbuf.append("<tr><td style=\"color:White; font-size : xx-small;\" colspan=\"5\" bgcolor=\"#993300\">");
 			appendThrowableAsHtml(throwable, sbuf);
-			sbuf.append("</td></tr>").append(Strings.LINE_SEPARATOR);
+			sbuf.append(CLOSE_TD_TR).append(Strings.LINE_SEPARATOR);
 		}
 
 		return sbuf.toString();
@@ -418,7 +424,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		public LDHtmlLayout build() {
 			// Extract charset from content-type
 			if (contentType == null) {
-				contentType = DEFAULT_CONTENT_TYPE + "; charset=" + charset;
+				contentType = DEFAULT_CONTENT_TYPE + CHARSET + charset;
 			}
 			return new LDHtmlLayout(locationInfo, title, contentType, charset, fontName, fontSize.getFontSize(),
 					fontSize.larger().getFontSize(), datePattern, timezone);

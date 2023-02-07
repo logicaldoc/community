@@ -27,6 +27,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class StringUtil {
 
+	private static final String UTF_8 = "UTF-8";
+
 	/**
 	 * Splits a string into tokens separated by a separator
 	 * 
@@ -77,7 +79,7 @@ public class StringUtil {
 	 *         or if the string cannot be written
 	 */
 	public static String writeToString(Reader reader) throws IOException {
-		return writeToString(reader, "UTF-8");
+		return writeToString(reader, UTF_8);
 	}
 
 	/**
@@ -91,7 +93,7 @@ public class StringUtil {
 	 *         get the contents
 	 */
 	public static String writeToString(Reader reader, String targetEncoding) throws IOException {
-		String enc = "UTF-8";
+		String enc = UTF_8;
 		if (StringUtils.isNotEmpty(targetEncoding))
 			enc = targetEncoding;
 
@@ -111,7 +113,7 @@ public class StringUtil {
 	}
 
 	public static String writeToString(InputStream is, String targetEncoding) throws IOException {
-		String enc = "UTF-8";
+		String enc = UTF_8;
 		if (StringUtils.isNotEmpty(targetEncoding))
 			enc = targetEncoding;
 

@@ -21,6 +21,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class MessageTemplateEditor extends Window {
 
+	private static final String SUBJECT = "subject";
+
 	private ListGrid grid;
 
 	private ListGridRecord rec;
@@ -70,8 +72,8 @@ public class MessageTemplateEditor extends Window {
 
 		addItem(toolStrip);
 
-		TextAreaItem subject = ItemFactory.newTextAreaItemForAutomation("subject", 
-				rec.getAttributeAsString("subject"), null, false);
+		TextAreaItem subject = ItemFactory.newTextAreaItemForAutomation(SUBJECT, 
+				rec.getAttributeAsString(SUBJECT), null, false);
 		subject.setRequired(true);
 		subject.setWidth("*");
 		subject.setHeight(30);
@@ -92,7 +94,7 @@ public class MessageTemplateEditor extends Window {
 	}
 
 	private void onSave() {
-		rec.setAttribute("subject", form.getValueAsString("subject"));
+		rec.setAttribute(SUBJECT, form.getValueAsString(SUBJECT));
 		rec.setAttribute("body", form.getValueAsString("body"));
 		grid.refreshRow(grid.getRowNum(rec));
 	}

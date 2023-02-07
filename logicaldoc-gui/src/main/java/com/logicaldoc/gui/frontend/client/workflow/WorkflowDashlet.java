@@ -53,6 +53,10 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class WorkflowDashlet extends Portlet {
 
+	private static final String STARTDATE = "startdate";
+
+	private static final String PROCESS_ID = "processId";
+
 	private RefreshableListGrid list;
 
 	private int type = WorkflowDashboard.TASKS_ASSIGNED;
@@ -136,7 +140,7 @@ public class WorkflowDashlet extends Portlet {
 		workflow.setHidden(true);
 		ListGridField id = new ListGridField("id", I18N.message("id"), 70);
 		id.setHidden(true);
-		ListGridField processId = new ListGridField("processId", I18N.message("processid"), 80);
+		ListGridField processId = new ListGridField(PROCESS_ID, I18N.message("processid"), 80);
 		processId.setHidden(true);
 		ListGridField name = new WorkflowTaskNameListGridField("name", "display", "task", 100);
 
@@ -150,7 +154,7 @@ public class WorkflowDashlet extends Portlet {
 		ListGridField tag = new ListGridField("tag", I18N.message("tag"), 120);
 		ListGridField lastnote = new ListGridField("lastnote", I18N.message("lastnote"), 120);
 
-		ListGridField startdate = new DateListGridField("startdate", "startdate");
+		ListGridField startdate = new DateListGridField(STARTDATE, STARTDATE);
 
 		ListGridField duedate = new DateListGridField("duedate", "duedate");
 
@@ -167,7 +171,7 @@ public class WorkflowDashlet extends Portlet {
 		list.setHeight100();
 		list.setBorder("0px");
 		list.setDataSource(new WorkflowTasksDS(type, null, max.getValueAsInteger()));
-		list.sort("startdate", SortDirection.ASCENDING);
+		list.sort(STARTDATE, SortDirection.ASCENDING);
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ALL
 				|| type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
 			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, name, id,
@@ -252,12 +256,12 @@ public class WorkflowDashlet extends Portlet {
 
 	public void refresh(String processId) {
 		if (processId == null || processId.isEmpty()
-				|| list.find(new AdvancedCriteria("processId", OperatorId.EQUALS, processId)) != null)
+				|| list.find(new AdvancedCriteria(PROCESS_ID, OperatorId.EQUALS, processId)) != null)
 			list.refresh(new WorkflowTasksDS(type, null, max.getValueAsInteger()));
 	}
 
 	public void onDeletedWorkflow(String processId) {
-		Record[] records = list.findAll(new AdvancedCriteria("processId", OperatorId.EQUALS, processId));
+		Record[] records = list.findAll(new AdvancedCriteria(PROCESS_ID, OperatorId.EQUALS, processId));
 		for (Record rec : records)
 			list.removeData(rec);
 	}
@@ -282,7 +286,7 @@ public class WorkflowDashlet extends Portlet {
 						ArrayList<String> ids = new ArrayList<>();
 						ListGridRecord[] selectedRecords = list.getSelectedRecords();
 						for (ListGridRecord rec : selectedRecords)
-							ids.add(rec.getAttributeAsString("processId"));
+							ids.add(rec.getAttributeAsString(PROCESS_ID));
 						workflowDashboard.killWorkflows(ids);
 					}
 				});

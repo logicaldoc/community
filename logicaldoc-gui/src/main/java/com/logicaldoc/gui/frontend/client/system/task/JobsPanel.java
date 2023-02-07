@@ -40,6 +40,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class JobsPanel extends VLayout {
 
+	private static final String TRIGGER = "trigger";
+
 	private RefreshableListGrid list;
 
 	private SpinnerItem max;
@@ -98,7 +100,7 @@ public class JobsPanel extends VLayout {
 	public void onDraw() {
 		ListGridField job = new ListGridField("name", I18N.message("job"), 250);
 
-		ListGridField trigger = new ListGridField("trigger", I18N.message("trigger"), 300);
+		ListGridField trigger = new ListGridField(TRIGGER, I18N.message(TRIGGER), 300);
 
 		ListGridField tenantId = new ListGridField("tenantId", I18N.message("tenantId"), 80);
 		tenantId.setHidden(true);
@@ -146,7 +148,7 @@ public class JobsPanel extends VLayout {
 						List<GUIValue> selectedJobs = new ArrayList<>();
 						ListGridRecord[] selection = list.getSelectedRecords();
 						for (ListGridRecord rec : selection)
-							selectedJobs.add(new GUIValue(rec.getAttributeAsString("trigger"),
+							selectedJobs.add(new GUIValue(rec.getAttributeAsString(TRIGGER),
 									rec.getAttributeAsString("group")));
 
 						SystemService.Instance.get().unscheduleJobs(selectedJobs.toArray(new GUIValue[0]),

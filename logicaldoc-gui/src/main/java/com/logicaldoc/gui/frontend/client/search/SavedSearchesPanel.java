@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class SavedSearchesPanel extends VLayout {
 
+	private static final String DESCRIPTION = "description";
+
 	private ListGrid list;
 
 	private static SavedSearchesPanel instance;
@@ -51,7 +53,7 @@ public class SavedSearchesPanel extends VLayout {
 	public void onDraw() {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 100);
 		ListGridField type = new ListGridField("type", I18N.message("type"), 70);
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 
 		list = new ListGrid();
 		list.setWidth100();
@@ -201,7 +203,7 @@ public class SavedSearchesPanel extends VLayout {
 		System.out.println("");
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", name);
-		rec.setAttribute("description", description);
+		rec.setAttribute(DESCRIPTION, description);
 		rec.setAttribute("type", type);
 		list.addData(rec);
 	}

@@ -82,7 +82,7 @@ public class CustomActionEditor extends Window {
 
 		addItem(toolStrip);
 
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("enabled", "enabled");
+		RadioGroupItem enabled = ItemFactory.newBooleanSelector("enabled");
 		enabled.setRequired(true);
 		enabled.setValue(action.isEnabled() ? "yes" : "no");
 

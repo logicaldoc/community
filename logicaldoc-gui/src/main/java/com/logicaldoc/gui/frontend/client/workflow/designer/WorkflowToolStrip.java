@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class WorkflowToolStrip extends ToolStrip {
 
+	private static final String VERSION = "version";
+
 	private GUIWorkflow currentWorkflow = null;
 
 	private WorkflowDesigner designer = null;
@@ -384,14 +386,14 @@ public class WorkflowToolStrip extends ToolStrip {
 	}
 
 	private void addVersionSelector() {
-		versionSelector = new SelectItem("version", I18N.message("version"));
+		versionSelector = new SelectItem(VERSION, I18N.message(VERSION));
 		versionSelector.setWidth(60);
 		versionSelector.setWrapTitle(false);
-		ListGridField version = new ListGridField("version");
+		ListGridField version = new ListGridField(VERSION);
 		ListGridField date = new ListGridField("date");
 		ListGridField deployed = new ListGridField("deployed");
-		versionSelector.setValueField("version");
-		versionSelector.setDisplayField("version");
+		versionSelector.setValueField(VERSION);
+		versionSelector.setDisplayField(VERSION);
 		versionSelector.setPickListWidth(200);
 		versionSelector.setPickListFields(version, date, deployed);
 		versionSelector.addChangedHandler((ChangedEvent event) -> {

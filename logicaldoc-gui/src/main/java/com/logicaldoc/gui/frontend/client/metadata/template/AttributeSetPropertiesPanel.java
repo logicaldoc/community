@@ -57,11 +57,15 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class AttributeSetPropertiesPanel extends HLayout {
 
+	private static final String ATTRIBUTE_NAME = "attributeName";
+
+	private static final String EDITOR_STR	= "editor";
+
 	private static final String INITIALIZATION = "initialization";
 
 	private static final String VALIDATION = "validation";
 
-	private static final String GROUP = "group";
+	private static final String GROUP_STR = "group";
 
 	private static final String MULTIPLE = "multiple";
 
@@ -249,7 +253,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		addTypeSelector();
 
 		// Values (for preset editor)
-		group = ItemFactory.newTextItem(GROUP, null);
+		group = ItemFactory.newTextItem(GROUP_STR, null);
 		group.setHint(I18N.message("groupname"));
 		group.setDisabled(attributeSet.isReadonly());
 
@@ -448,7 +452,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	private void addEditorItem() {
-		editor = new SelectItem("editor", I18N.message("inputmode"));
+		editor = new SelectItem(EDITOR_STR, I18N.message("inputmode"));
 		LinkedHashMap<String, String> editors = new LinkedHashMap<>();
 		editors.put("" + GUIAttribute.EDITOR_DEFAULT, I18N.message("free"));
 		editors.put("" + GUIAttribute.EDITOR_TEXTAREA, I18N.message("freetextarea"));
@@ -464,7 +468,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	private TextItem addAttributeNameItem() {
 		// Attribute Name
-		final TextItem attributeName = ItemFactory.newSimpleTextItem("attributeName", null);
+		final TextItem attributeName = ItemFactory.newSimpleTextItem(ATTRIBUTE_NAME, null);
 		attributeName.setRequired(true);
 		attributeName.setWidth(180);
 		PickerIcon cleanPicker = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent attributeNameClick) -> {
@@ -474,8 +478,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			attributeSettingsForm1.getField(READONLY).setDisabled(false);
 			attributeSettingsForm1.getField(MULTIPLE).setDisabled(false);
 			attributeSettingsForm2.getField("type").setDisabled(false);
-			attributeSettingsForm2.getField("editor").setDisabled(false);
-			attributeSettingsForm2.getField(GROUP).setDisabled(true);
+			attributeSettingsForm2.getField(EDITOR_STR).setDisabled(false);
+			attributeSettingsForm2.getField(GROUP_STR).setDisabled(true);
 			attributeSettingsForm2.getField(VALIDATION).setDisabled(false);
 			attributeSettingsForm2.getField(INITIALIZATION).setDisabled(false);
 			refreshFieldForm();
@@ -599,8 +603,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	private void clean() {
 		attributeSettingsForm1.clearValues();
-		attributeSettingsForm1.getField("attributeName").setDisabled(false);
-		attributeSettingsForm1.setValue("attributeName", "");
+		attributeSettingsForm1.getField(ATTRIBUTE_NAME).setDisabled(false);
+		attributeSettingsForm1.setValue(ATTRIBUTE_NAME, "");
 		updatingAttributeName = "";
 
 		attributeSettingsForm2.setValue(LABEL, (String) null);
@@ -609,8 +613,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeSettingsForm1.setValue(READONLY, false);
 		attributeSettingsForm1.setValue(MULTIPLE, false);
 		attributeSettingsForm2.setValue("type", GUIAttribute.TYPE_STRING);
-		attributeSettingsForm2.setValue("editor", GUIAttribute.EDITOR_DEFAULT);
-		attributeSettingsForm2.setValue(GROUP, (String) null);
+		attributeSettingsForm2.setValue(EDITOR_STR, GUIAttribute.EDITOR_DEFAULT);
+		attributeSettingsForm2.setValue(GROUP_STR, (String) null);
 		attributeSettingsForm2.setValue(VALIDATION, (String) null);
 		attributeSettingsForm2.setValue(INITIALIZATION, (String) null);
 
@@ -719,15 +723,15 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (rec != null) {
 			String selectedAttributeName = rec.getAttributeAsString("name");
 			GUIAttribute extAttr = attributeSet.getAttribute(selectedAttributeName);
-			attributeSettingsForm1.setValue("attributeName", extAttr.getName());
+			attributeSettingsForm1.setValue(ATTRIBUTE_NAME, extAttr.getName());
 			attributeSettingsForm1.setValue(MANDATORY, extAttr.isMandatory());
 			attributeSettingsForm1.setValue(HIDDEN, extAttr.isHidden());
 			attributeSettingsForm1.setValue(READONLY, extAttr.isReadonly());
 			attributeSettingsForm1.setValue(MULTIPLE, extAttr.isMultiple());
 			attributeSettingsForm2.setValue(LABEL, extAttr.getLabel());
 			attributeSettingsForm2.setValue("type", extAttr.getType());
-			attributeSettingsForm2.setValue("editor", extAttr.getEditor());
-			attributeSettingsForm2.setValue(GROUP, extAttr.getStringValue());
+			attributeSettingsForm2.setValue(EDITOR_STR, extAttr.getEditor());
+			attributeSettingsForm2.setValue(GROUP_STR, extAttr.getStringValue());
 			attributeSettingsForm2.setValue(VALIDATION, extAttr.getValidation());
 			attributeSettingsForm2.setValue(INITIALIZATION, extAttr.getInitialization());
 			updatingAttributeName = selectedAttributeName;
@@ -763,7 +767,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		}
 
 		if (!updatingAttributeName.isEmpty())
-			attributeSettingsForm1.getItem("attributeName").setDisabled(true);
+			attributeSettingsForm1.getItem(ATTRIBUTE_NAME).setDisabled(true);
 
 		attributeSettingsForm1.markForRedraw();
 		attributeSettingsForm2.markForRedraw();

@@ -15,6 +15,28 @@ import org.jdom2.Namespace;
  */
 public class WebConfigurator extends XMLBean {
 
+	private static final String INIT_PARAM_STR = "init-param";
+
+	private static final String URL_PATTERN = "url-pattern";
+
+	private static final String LISTENER_CLASS = "listener-class";
+
+	private static final String LISTENER = "listener";
+
+	private static final String SERVLET_NAME = "servlet-name";
+
+	private static final String SERVLET = "servlet";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String FILTER_NAME = "filter-name";
+
+	private static final String FILTER = "filter";
+
+	private static final String PARAM_VALUE = "param-value";
+
+	private static final String PARAM_NAME = "param-name";
+
 	public static enum INIT_PARAM {
 		PARAM_OVERWRITE, PARAM_APPEND, PARAM_STOP
 	}
@@ -27,9 +49,11 @@ public class WebConfigurator extends XMLBean {
 	 * Check for existing element within a XML-document
 	 * 
 	 * @param elements List of Elements which have as child a
+	 * 
 	 *        <pre>
 	 *        name
 	 *        </pre>
+	 * 
 	 *        tag
 	 * @param match_text The text for looking up whether exists
 	 * @param name The tag that should be right there for checking this value
@@ -60,8 +84,8 @@ public class WebConfigurator extends XMLBean {
 	 *        {@link WebConfigurator.INIT_PARAM}
 	 */
 	public void addContextParam(String name, String value, String description, INIT_PARAM append) {
-		List contextParams = getRootElement().getChildren("context-param", getRootElement().getNamespace());
-		Element contextParam = this.elementLookUp(contextParams, "param-name", name);
+		List<Element> contextParams = getRootElement().getChildren("context-param", getRootElement().getNamespace());
+		Element contextParam = this.elementLookUp(contextParams, PARAM_NAME, name);
 
 		if (contextParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
@@ -70,16 +94,16 @@ public class WebConfigurator extends XMLBean {
 			// Retrieve the last <servlet> element
 			Element lastContextParam = (Element) contextParams.get(contextParams.size() - 1);
 
-			List children = getRootElement().getChildren();
+			List<Element> children = getRootElement().getChildren();
 
 			// Find the index of the element to add the new element after.
-			int index = children.indexOf(contextParams);
+			int index = children.indexOf(lastContextParam);
 
 			// Prepare the new mapping
 			contextParam = new Element("context-param", getRootElement().getNamespace());
-			Element paramName = new Element("param-name", getRootElement().getNamespace());
+			Element paramName = new Element(PARAM_NAME, getRootElement().getNamespace());
 			paramName.setText(name);
-			Element paramValue = new Element("param-value", getRootElement().getNamespace());
+			Element paramValue = new Element(PARAM_VALUE, getRootElement().getNamespace());
 			paramValue.setText(value);
 			contextParam.addContent("\n ");
 			contextParam.addContent(paramName);
@@ -128,47 +152,47 @@ public class WebConfigurator extends XMLBean {
 	 */
 	public void addFilterInitParam(String filterName, String name, String value, String description,
 			INIT_PARAM append) {
-		List filters = getRootElement().getChildren("filter", getRootElement().getNamespace());
-		Element filter = this.elementLookUp(filters, "filter-name", filterName);
+		List filters = getRootElement().getChildren(FILTER, getRootElement().getNamespace());
+		Element filter = this.elementLookUp(filters, FILTER_NAME, filterName);
 
 		if (filter == null)
 			throw new IllegalStateException(
 					"The filter " + filterName + " has not been found. Have you already written the filter?");
 
-		Element initParam = this.elementLookUp(filter.getChildren(), "param-name", name);
+		Element initParam = this.elementLookUp(filter.getChildren(), PARAM_NAME, name);
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
-			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
+			Element paramValue = ((Element) initParam.getParent()).getChild(PARAM_VALUE);
 			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
-			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
+			Element paramValue = ((Element) initParam.getParent()).getChild(PARAM_VALUE);
 			paramValue.setText(value);
 			writeXMLDoc();
 			return;
 		}
 
-		Element paramElement = new Element("init-param", getRootElement().getNamespace());
+		Element paramElement = new Element(INIT_PARAM_STR, getRootElement().getNamespace());
 
 		// the name
-		Element param = new Element("param-name", getRootElement().getNamespace());
+		Element param = new Element(PARAM_NAME, getRootElement().getNamespace());
 		param.setText(name);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
-		param = new Element("param-value", getRootElement().getNamespace());
+		param = new Element(PARAM_VALUE, getRootElement().getNamespace());
 		param.setText(value);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		if (description != null && description.equals("") != true) {
-			param = new Element("description", getRootElement().getNamespace());
+			param = new Element(DESCRIPTION, getRootElement().getNamespace());
 			param.setText(description);
 			// paramElement.addContent("\n ");
 			paramElement.getChildren().add(param);
@@ -188,49 +212,48 @@ public class WebConfigurator extends XMLBean {
 	 * @param append if the param exist, should the new value appended? possible
 	 *        values are represented in {@link WebConfigurator.INIT_PARAM}
 	 */
-	public void addInitParam(String servletName, String name, String value, String description,
-			INIT_PARAM append) {
-		List servlets = getRootElement().getChildren("servlet", getRootElement().getNamespace());
-		Element servlet = this.elementLookUp(servlets, "servlet-name", servletName);
+	public void addInitParam(String servletName, String name, String value, String description, INIT_PARAM append) {
+		List servlets = getRootElement().getChildren(SERVLET, getRootElement().getNamespace());
+		Element servlet = this.elementLookUp(servlets, SERVLET_NAME, servletName);
 
 		if (servlet == null)
 			throw new IllegalStateException(
 					"The servlet " + servletName + " has not been found. Have you already written the servlet?");
 
-		Element initParam = this.elementLookUp(servlet.getChildren(), "param-name", name);
+		Element initParam = this.elementLookUp(servlet.getChildren(), PARAM_NAME, name);
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
-			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
+			Element paramValue = ((Element) initParam.getParent()).getChild(PARAM_VALUE);
 			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
-			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
+			Element paramValue = ((Element) initParam.getParent()).getChild(PARAM_VALUE);
 			paramValue.setText(value);
 			writeXMLDoc();
 			return;
 		}
 
-		Element paramElement = new Element("init-param", getRootElement().getNamespace());
+		Element paramElement = new Element(INIT_PARAM_STR, getRootElement().getNamespace());
 
 		// the name
-		Element param = new Element("param-name", getRootElement().getNamespace());
+		Element param = new Element(PARAM_NAME, getRootElement().getNamespace());
 		param.setText(name);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
-		param = new Element("param-value", getRootElement().getNamespace());
+		param = new Element(PARAM_VALUE, getRootElement().getNamespace());
 		param.setText(value);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		if (description != null && description.equals("") != true) {
-			param = new Element("description", getRootElement().getNamespace());
+			param = new Element(DESCRIPTION, getRootElement().getNamespace());
 			param.setText(description);
 			// paramElement.addContent("\n ");
 			paramElement.getChildren().add(param);
@@ -259,41 +282,41 @@ public class WebConfigurator extends XMLBean {
 	 *        values are represented in {@link WebConfigurator.INIT_PARAM}
 	 */
 	public void addListenerInitParam(String listenerClazz, String name, String value, INIT_PARAM append) {
-		List listeners = getRootElement().getChildren("listener", getRootElement().getNamespace());
-		Element listener = this.elementLookUp(listeners, "listener-class", listenerClazz);
+		List listeners = getRootElement().getChildren(LISTENER, getRootElement().getNamespace());
+		Element listener = this.elementLookUp(listeners, LISTENER_CLASS, listenerClazz);
 
 		if (listener == null)
 			throw new IllegalStateException(
 					"The listener " + listenerClazz + " has not been found. Have you already written the listener?");
 
-		Element initParam = this.elementLookUp(listener.getChildren(), "param-name", name);
+		Element initParam = this.elementLookUp(listener.getChildren(), PARAM_NAME, name);
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
-			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
+			Element paramValue = ((Element) initParam.getParent()).getChild(PARAM_VALUE);
 			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
-			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
+			Element paramValue = ((Element) initParam.getParent()).getChild(PARAM_VALUE);
 			paramValue.setText(value);
 			writeXMLDoc();
 			return;
 		}
 
-		Element paramElement = new Element("init-param", getRootElement().getNamespace());
+		Element paramElement = new Element(INIT_PARAM_STR, getRootElement().getNamespace());
 
 		// the name
-		Element param = new Element("param-name", getRootElement().getNamespace());
+		Element param = new Element(PARAM_NAME, getRootElement().getNamespace());
 		param.setText(name);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
-		param = new Element("param-value", getRootElement().getNamespace());
+		param = new Element(PARAM_VALUE, getRootElement().getNamespace());
 		param.setText(value);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
@@ -329,7 +352,8 @@ public class WebConfigurator extends XMLBean {
 	 * 
 	 * @param name The servlet name
 	 * @param clazz The servlet class fully qualified name
-	 * @param loadOnStartup use 1 in case the servlet must be started during the startup
+	 * @param loadOnStartup use 1 in case the servlet must be started during the
+	 *        startup
 	 */
 	@SuppressWarnings("unchecked")
 	public void addServlet(String name, String clazz, int loadOnStartup) {
@@ -337,8 +361,8 @@ public class WebConfigurator extends XMLBean {
 		Element servletClass = null;
 
 		// Search for the specified servlet
-		List servlets = getRootElement().getChildren("servlet", getRootElement().getNamespace());
-		servlet = this.elementLookUp(servlets, "servlet-name", name);
+		List servlets = getRootElement().getChildren(SERVLET, getRootElement().getNamespace());
+		servlet = this.elementLookUp(servlets, SERVLET_NAME, name);
 		if (servlet != null) {
 			// The servlet already exists, so update it
 			servletClass = servlet.getChild("servlet-class", getRootElement().getNamespace());
@@ -354,8 +378,8 @@ public class WebConfigurator extends XMLBean {
 			int index = children.indexOf(lastServlet);
 
 			// Prepare the new mapping
-			servlet = new Element("servlet", getRootElement().getNamespace());
-			Element servletNameElement = new Element("servlet-name", getRootElement().getNamespace());
+			servlet = new Element(SERVLET, getRootElement().getNamespace());
+			Element servletNameElement = new Element(SERVLET_NAME, getRootElement().getNamespace());
 			servletNameElement.setText(name);
 			servletClass = new Element("servlet-class", getRootElement().getNamespace());
 			servletClass.setText(clazz);
@@ -386,8 +410,8 @@ public class WebConfigurator extends XMLBean {
 		Element filterClass = null;
 
 		// Search for the specified filter
-		List filters = getRootElement().getChildren("filter", getRootElement().getNamespace());
-		filter = this.elementLookUp(filters, "filter-name", name);
+		List filters = getRootElement().getChildren(FILTER, getRootElement().getNamespace());
+		filter = this.elementLookUp(filters, FILTER_NAME, name);
 		if (filter != null) {
 			// The filter already exists, so update it
 			filterClass = filter.getChild("filter-class", getRootElement().getNamespace());
@@ -403,8 +427,8 @@ public class WebConfigurator extends XMLBean {
 			int index = children.indexOf(lastFilter);
 
 			// Prepare the new mapping
-			filter = new Element("filter", getRootElement().getNamespace());
-			Element filterNameElement = new Element("filter-name", getRootElement().getNamespace());
+			filter = new Element(FILTER, getRootElement().getNamespace());
+			Element filterNameElement = new Element(FILTER_NAME, getRootElement().getNamespace());
 			filterNameElement.setText(name);
 			filterClass = new Element("filter-class", getRootElement().getNamespace());
 			filterClass.setText(clazz);
@@ -428,27 +452,26 @@ public class WebConfigurator extends XMLBean {
 	 * 
 	 * @param clazz The filter class fully qualified name
 	 */
-	@SuppressWarnings("unchecked")
 	public void addListener(String clazz) {
 		Element listener = null;
 		Element listenerClass = null;
 
 		// Search for the specified filter
-		List listeners = getRootElement().getChildren("listener", getRootElement().getNamespace());
-		listener = this.elementLookUp(listeners, "listener-class", clazz);
+		List<Element> listeners = getRootElement().getChildren(LISTENER, getRootElement().getNamespace());
+		listener = this.elementLookUp(listeners, LISTENER_CLASS, clazz);
 		if (listener == null) {
 			// The listener doesn't exist, so create it
 			// Retrieve the last <listener> element
 			Element lastListener = (Element) listeners.get(listeners.size() - 1);
 
-			List children = getRootElement().getChildren();
+			List<Element> children = getRootElement().getChildren();
 
 			// Find the index of the element to add the new element after.
 			int index = children.indexOf(lastListener);
 
 			// Prepare the new mapping
-			listener = new Element("listener", getRootElement().getNamespace());
-			listenerClass = new Element("listener-class", getRootElement().getNamespace());
+			listener = new Element(LISTENER, getRootElement().getNamespace());
+			listenerClass = new Element(LISTENER_CLASS, getRootElement().getNamespace());
 			listenerClass.setText(clazz);
 			listener.addContent("\n ");
 			listener.addContent(listenerClass);
@@ -469,14 +492,13 @@ public class WebConfigurator extends XMLBean {
 	 * @param servlet The name of the servlet
 	 * @param pattern The mapping pattern
 	 */
-	@SuppressWarnings("unchecked")
 	public void addServletMapping(String servlet, String pattern) {
 		// Search for the specified mapping
-		List mappings = getRootElement().getChildren("servlet-mapping", getRootElement().getNamespace());
-		for (Iterator iterator = mappings.iterator(); iterator.hasNext();) {
+		List<Element> mappings = getRootElement().getChildren("servlet-mapping", getRootElement().getNamespace());
+		for (Iterator<Element> iterator = mappings.iterator(); iterator.hasNext();) {
 			Element elem = (Element) iterator.next();
-			Element servletName = elem.getChild("servlet-name", elem.getNamespace());
-			Element urlPattern = elem.getChild("url-pattern", elem.getNamespace());
+			Element servletName = elem.getChild(SERVLET_NAME, elem.getNamespace());
+			Element urlPattern = elem.getChild(URL_PATTERN, elem.getNamespace());
 
 			if (servletName.getText().trim().equals(servlet) && urlPattern.getText().trim().equals(pattern)) {
 				// The mapping already exists
@@ -487,15 +509,15 @@ public class WebConfigurator extends XMLBean {
 		// Retrieve the last <servlet-mapping> element
 		Element lastMapping = (Element) mappings.get(mappings.size() - 1);
 
-		List children = getRootElement().getChildren();
+		List<Element> children = getRootElement().getChildren();
 		// Find the index of the element to add the new element after.
 		int index = children.indexOf(lastMapping);
 
 		// Prepare the new mapping
 		Element servletMapping = new Element("servlet-mapping", getRootElement().getNamespace());
-		Element servletName = new Element("servlet-name", getRootElement().getNamespace());
+		Element servletName = new Element(SERVLET_NAME, getRootElement().getNamespace());
 		servletName.setText(servlet);
-		Element servletPattern = new Element("url-pattern", getRootElement().getNamespace());
+		Element servletPattern = new Element(URL_PATTERN, getRootElement().getNamespace());
 		servletPattern.setText(pattern);
 		servletMapping.addContent("\n ");
 		servletMapping.addContent(servletName);
@@ -519,11 +541,11 @@ public class WebConfigurator extends XMLBean {
 	@SuppressWarnings("unchecked")
 	public void addFilterMapping(String filter, String pattern) {
 		// Search for the specified mapping
-		List mappings = getRootElement().getChildren("filter-mapping", getRootElement().getNamespace());
-		for (Iterator iterator = mappings.iterator(); iterator.hasNext();) {
+		List<Element> mappings = getRootElement().getChildren("filter-mapping", getRootElement().getNamespace());
+		for (Iterator<Element> iterator = mappings.iterator(); iterator.hasNext();) {
 			Element elem = (Element) iterator.next();
-			Element filterName = elem.getChild("filter-name", elem.getNamespace());
-			Element urlPattern = elem.getChild("url-pattern", elem.getNamespace());
+			Element filterName = elem.getChild(FILTER_NAME, elem.getNamespace());
+			Element urlPattern = elem.getChild(URL_PATTERN, elem.getNamespace());
 
 			if (filterName.getText().trim().equals(filter) && urlPattern.getText().trim().equals(pattern)) {
 				// The mapping already exists
@@ -534,15 +556,15 @@ public class WebConfigurator extends XMLBean {
 		// Retrieve the last <servlet-mapping> element
 		Element lastMapping = (Element) mappings.get(mappings.size() - 1);
 
-		List children = getRootElement().getChildren();
+		List<Element> children = getRootElement().getChildren();
 		// Find the index of the element to add the new element after.
 		int index = children.indexOf(lastMapping);
 
 		// Prepare the new mapping
 		Element filterMapping = new Element("filter-mapping", getRootElement().getNamespace());
-		Element filterName = new Element("filter-name", getRootElement().getNamespace());
+		Element filterName = new Element(FILTER_NAME, getRootElement().getNamespace());
 		filterName.setText(filter);
-		Element filterPattern = new Element("url-pattern", getRootElement().getNamespace());
+		Element filterPattern = new Element(URL_PATTERN, getRootElement().getNamespace());
 		filterPattern.setText(pattern);
 		filterMapping.addContent("\n ");
 		filterMapping.addContent(filterName);
@@ -571,7 +593,7 @@ public class WebConfigurator extends XMLBean {
 
 	public void setDescription(String description) {
 		// Retrieve the <display-name> element
-		Element element = getRootElement().getChild("description", getRootElement().getNamespace());
+		Element element = getRootElement().getChild(DESCRIPTION, getRootElement().getNamespace());
 		element.setText(description);
 		writeXMLDoc();
 	}

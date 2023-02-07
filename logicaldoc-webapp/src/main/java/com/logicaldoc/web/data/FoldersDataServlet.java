@@ -33,6 +33,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class FoldersDataServlet extends AbstractDataServlet {
 
+	private static final String PARENT = "parent";
+
 	public static String FOLDER_PAGE_SIZE = "ld-folder-page-size";
 
 	public static String FOLDER_START_RECORD = "ld-folder-start-gridRecord";
@@ -45,8 +47,8 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 		int maxChildren = getMaxChildren(session, max);
 
-		if (request.getParameter("parent") != null
-				&& (request.getParameter("parent").startsWith("d-") || request.getParameter("parent").equals("null"))) {
+		if (request.getParameter(PARENT) != null
+				&& (request.getParameter(PARENT).startsWith("d-") || request.getParameter(PARENT).equals("null"))) {
 			// The user clicked on a file
 			PrintWriter writer = response.getWriter();
 			writer.write("<list></list>");
@@ -133,8 +135,8 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	}
 
 	private void printCustomIcon(PrintWriter writer, SqlRowSet rs) {
-		writer.print("<customIcon>" + (rs.getInt(4) == Folder.TYPE_ALIAS ? "folder_alias" : "folder")
-				+ "</customIcon>");
+		writer.print(
+				"<customIcon>" + (rs.getInt(4) == Folder.TYPE_ALIAS ? "folder_alias" : "folder") + "</customIcon>");
 	}
 
 	private void printFoldRef(PrintWriter writer, SqlRowSet rs) {
@@ -210,9 +212,9 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			query.append(" and ( ");
 
 			/*
-			 * Oracle has a dramatic limitation: no more than 1000 elements
-			 * in a list, so we have to partition the list groups of at
-			 * least 1000 elements.
+			 * Oracle has a dramatic limitation: no more than 1000 elements in a
+			 * list, so we have to partition the list groups of at least 1000
+			 * elements.
 			 */
 			int length = folderIds.size();
 			int chunkSize = 1000;
@@ -298,8 +300,8 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		String parent = "" + Folder.ROOTID;
 
-		if (request.getParameter("parent") != null) {
-			parent = request.getParameter("parent");
+		if (request.getParameter(PARENT) != null) {
+			parent = request.getParameter(PARENT);
 		} else if (request.getParameter("criteria") != null) {
 			// The request comes from a menu, expecting something like
 			// criteria={"fieldName":"parent","value":"5-4","operator":"equals"}

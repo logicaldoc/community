@@ -26,7 +26,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -42,6 +41,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 8.7
  */
 public class SubscriptionsReport extends ReportPanel implements FolderChangeListener {
+
+	private static final String USER_ID = "userId";
 
 	protected SelectItem userSelector;
 
@@ -74,13 +75,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		max.addChangedHandler((ChangedEvent event) -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
@@ -111,12 +106,12 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 	@Override
 	protected void prepareListGrid() {
-		ListGridField userId = new ColoredListGridField("userId", "userId");
+		ListGridField userId = new ColoredListGridField(USER_ID, USER_ID);
 		userId.setWidth(50);
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new UserListGridField("userName", "userId", "user");
+		ListGridField userName = new UserListGridField("userName", USER_ID, "user");
 		userName.setCanEdit(false);
 
 		ListGridField created = new DateListGridField("created", "subscription");

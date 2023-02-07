@@ -36,6 +36,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.7
  */
 public class WebservicesPanel extends VLayout {
+	private static final String FALSE = "false";
+
+	private static final String WS_TTL = "wsTtl";
+
 	private GUIParameter enabled = null;
 
 	private GUIParameter recCalls = null;
@@ -92,11 +96,11 @@ public class WebservicesPanel extends VLayout {
 		// Web Service Enabled
 		RadioGroupItem wsEnabled = prepareEnabledItem();
 
-		SpinnerItem ttl = ItemFactory.newSpinnerItem("wsTtl", "timetolive", Integer.parseInt(callsTtl.getValue()));
+		SpinnerItem ttl = ItemFactory.newSpinnerItem(WS_TTL, "timetolive", Integer.parseInt(callsTtl.getValue()));
 		ttl.setHint(I18N.message("days"));
 		ttl.setMin(1);
 		ttl.setStep(1);
-		ttl.setDisabled(recCalls.getValue().equals("false"));
+		ttl.setDisabled(recCalls.getValue().equals(FALSE));
 
 		// Flag to rec webservice calls payload
 		RadioGroupItem recordCallsPayload = prepareRecordCallsPayloadItem();
@@ -211,12 +215,12 @@ public class WebservicesPanel extends VLayout {
 	}
 
 	public void save() {
-		enabled.setValue(webServiceForm.getValueAsString("wsEnabled").equals("yes") ? "true" : "false");
-		recCalls.setValue(webServiceForm.getValueAsString("wsRecordCalls").equals("yes") ? "true" : "false");
+		enabled.setValue(webServiceForm.getValueAsString("wsEnabled").equals("yes") ? "true" : FALSE);
+		recCalls.setValue(webServiceForm.getValueAsString("wsRecordCalls").equals("yes") ? "true" : FALSE);
 		recCallsPayload
-				.setValue(webServiceForm.getValueAsString("wsRecordCallsPayload").equals("yes") ? "true" : "false");
+				.setValue(webServiceForm.getValueAsString("wsRecordCallsPayload").equals("yes") ? "true" : FALSE);
 		callsTtl.setValue(
-				webServiceForm.getValueAsString("wsTtl") != null ? webServiceForm.getValueAsString("wsTtl") : "90");
+				webServiceForm.getValueAsString(WS_TTL) != null ? webServiceForm.getValueAsString(WS_TTL) : "90");
 	}
 
 	public List<GUIParameter> getSettings() {

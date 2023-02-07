@@ -40,6 +40,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class WorkflowHistoriesPanel extends VLayout {
 
+	private static final String DOCUMENT_ID = "documentId";
+
 	private RefreshableListGrid historiesGrid = new RefreshableListGrid();
 
 	private Long wfInstanceId;
@@ -89,7 +91,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 		historyComment.setWidth("*");
 		historyComment.setHidden(!showComment);
 		FileNameListGridField historyFilename = new FileNameListGridField();
-		ListGridField documentId = new ListGridField("documentId", I18N.message("docid"), 80);
+		ListGridField documentId = new ListGridField(DOCUMENT_ID, I18N.message("docid"), 80);
 		documentId.setHidden(true);
 		ListGridField historySid = new ListGridField("sessionid", I18N.message("sid"), 240);
 		historySid.setHidden(true);
@@ -170,11 +172,11 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 	private void showHistoryContextMenu() {
 		final ListGridRecord selection = historiesGrid.getSelectedRecord();
-		if (selection.getAttributeAsString("documentId") == null
-				|| selection.getAttributeAsString("documentId").isEmpty())
+		if (selection.getAttributeAsString(DOCUMENT_ID) == null
+				|| selection.getAttributeAsString(DOCUMENT_ID).isEmpty())
 			return;
 
-		DocumentService.Instance.get().getById(Long.parseLong(selection.getAttributeAsString("documentId")),
+		DocumentService.Instance.get().getById(Long.parseLong(selection.getAttributeAsString(DOCUMENT_ID)),
 				new AsyncCallback<GUIDocument>() {
 
 					@Override

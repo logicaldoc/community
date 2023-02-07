@@ -40,6 +40,26 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class TenantBrandingPanel extends HLayout {
 
+	private static final String FAVICON = "favicon";
+
+	private static final String LOGO_HEAD_OEM = "logo_head_oem";
+
+	private static final String LOGO_OEM = "logo_oem";
+
+	private static final String NAME = "name";
+
+	private static final String BANNER = "banner";
+
+	private static final String LOGO_MENU = "logo_menu";
+
+	private static final String LOGO_HEAD = "logo_head";
+
+	private static final String IMAGE = "image";
+
+	private static final String SALES = "sales";
+
+	private static final String SUPPORT = "support";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -290,12 +310,12 @@ public class TenantBrandingPanel extends HLayout {
 		country.setDisabled(readonlyOrNotFullBranding);
 		country.addChangedHandler(changedHandler);
 
-		TextItem support = ItemFactory.newEmailItem("support", "support", false);
+		TextItem support = ItemFactory.newEmailItem(SUPPORT, SUPPORT, false);
 		support.setValue(tenant.getBranding().getSupport());
 		support.setDisabled(readonlyOrNotFullBranding);
 		support.addChangedHandler(changedHandler);
 
-		TextItem sales = ItemFactory.newEmailItem("sales", "sales", false);
+		TextItem sales = ItemFactory.newEmailItem(SALES, SALES, false);
 		sales.setValue(tenant.getBranding().getSales());
 		sales.setEndRow(true);
 		sales.setDisabled(readonlyOrNotFullBranding);
@@ -343,7 +363,7 @@ public class TenantBrandingPanel extends HLayout {
 		grid.setShowRecordComponentsByCell(true);
 		grid.setHeight100();
 
-		ListGridField nameField = new ListGridField("name", I18N.getAttributeLabel("image"), 100);
+		ListGridField nameField = new ListGridField(NAME, I18N.getAttributeLabel(IMAGE), 100);
 		nameField.setCanFilter(false);
 		nameField.setCanSort(false);
 
@@ -354,33 +374,33 @@ public class TenantBrandingPanel extends HLayout {
 		List<ListGridRecord> records = new ArrayList<>();
 
 		ListGridRecord rec = new ListGridRecord();
-		rec.setAttribute("name", "logo");
-		rec.setAttribute("image", tenant.getBranding().getLogoSrc());
+		rec.setAttribute(NAME, "logo");
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_head");
-		rec.setAttribute("image", tenant.getBranding().getLogoHeadSrc());
+		rec.setAttribute(NAME, LOGO_HEAD);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHeadSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_menu");
-		rec.setAttribute("image", tenant.getBranding().getLogoMenuSrc());
+		rec.setAttribute(NAME, LOGO_MENU);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoMenuSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "banner");
-		rec.setAttribute("image", tenant.getBranding().getBannerSrc());
+		rec.setAttribute(NAME, BANNER);
+		rec.setAttribute(IMAGE, tenant.getBranding().getBannerSrc());
 		records.add(rec);
 
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_oem");
-		rec.setAttribute("image", tenant.getBranding().getLogoOemSrc());
+		rec.setAttribute(NAME, LOGO_OEM);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoOemSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_head_oem");
-		rec.setAttribute("image", tenant.getBranding().getLogoHeadOemSrc());
+		rec.setAttribute(NAME, LOGO_HEAD_OEM);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHeadOemSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "favicon");
-		rec.setAttribute("image", tenant.getBranding().getFaviconSrc());
+		rec.setAttribute(NAME, FAVICON);
+		rec.setAttribute(IMAGE, tenant.getBranding().getFaviconSrc());
 		records.add(rec);
 		grid.setRecords(records.toArray(new ListGridRecord[0]));
 
@@ -394,26 +414,26 @@ public class TenantBrandingPanel extends HLayout {
 	}
 
 	private ListGridField prepareImageField() {
-		ListGridField image = new ListGridField("image", " ", 300);
+		ListGridField image = new ListGridField(IMAGE, " ", 300);
 		image.setWidth("*");
 		image.setCanFilter(false);
 		image.setCanSort(false);
 		image.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			String html = "";
-			String name = rec.getAttributeAsString("name");
+			String name = rec.getAttributeAsString(NAME);
 			if (name.equals("logo"))
 				html = tenant.getBranding().getLogoSrc();
-			else if (name.equals("logo_head"))
+			else if (name.equals(LOGO_HEAD))
 				html = tenant.getBranding().getLogoHeadSrc();
-			else if (name.equals("logo_menu"))
+			else if (name.equals(LOGO_MENU))
 				html = tenant.getBranding().getLogoMenuSrc();
-			else if (name.equals("logo_oem"))
+			else if (name.equals(LOGO_OEM))
 				html = tenant.getBranding().getLogoOemSrc();
-			else if (name.equals("logo_head_oem"))
+			else if (name.equals(LOGO_HEAD_OEM))
 				html = tenant.getBranding().getLogoHeadOemSrc();
-			else if (name.equals("banner"))
+			else if (name.equals(BANNER))
 				html = tenant.getBranding().getBannerSrc();
-			else if (name.equals("favicon"))
+			else if (name.equals(FAVICON))
 				html = tenant.getBranding().getFaviconSrc();
 
 			if (html != null && !html.isEmpty()) {
@@ -435,10 +455,10 @@ public class TenantBrandingPanel extends HLayout {
 
 	private void showImagesContextMenu() {
 		final ListGridRecord rec = grid.getSelectedRecord();
-		final String name = rec.getAttributeAsString("name");
+		final String name = rec.getAttributeAsString(NAME);
 
 		if ((!Feature.enabled(Feature.BRANDING_LOGO) && !Feature.enabled(Feature.BRANDING_FULL))
-				&& !"logo_oem".equals(name) && !"logo_head_oem".equals(name))
+				&& !LOGO_OEM.equals(name) && !LOGO_HEAD_OEM.equals(name))
 			return;
 
 		Menu contextMenu = new Menu();
@@ -452,22 +472,22 @@ public class TenantBrandingPanel extends HLayout {
 				if ("logo".equals(name)) {
 					tenant.getBranding().setLogoSrc(model.getLogoSrc());
 					image = model.getLogo();
-				} else if ("logo_head".equals(name)) {
+				} else if (LOGO_HEAD.equals(name)) {
 					tenant.getBranding().setLogoHeadSrc(model.getLogoHeadSrc());
 					image = model.getLogoHead();
-				} else if ("logo_menu".equals(name)) {
+				} else if (LOGO_MENU.equals(name)) {
 					tenant.getBranding().setLogoMenuSrc(model.getLogoMenuSrc());
 					image = model.getLogoMenu();
-				} else if ("logo_oem".equals(name)) {
+				} else if (LOGO_OEM.equals(name)) {
 					tenant.getBranding().setLogoOemSrc(model.getLogoOemSrc());
 					image = model.getLogoOem();
-				} else if ("logo_head_oem".equals(name)) {
+				} else if (LOGO_HEAD_OEM.equals(name)) {
 					tenant.getBranding().setLogoHeadOemSrc(model.getLogoHeadOemSrc());
 					image = model.getLogoHeadOem();
-				} else if ("favicon".equals(name)) {
+				} else if (FAVICON.equals(name)) {
 					tenant.getBranding().setFaviconSrc(model.getFaviconSrc());
 					image = model.getFavicon();
-				} else if ("banner".equals(name)) {
+				} else if (BANNER.equals(name)) {
 					tenant.getBranding().setBannerSrc(model.getBannerSrc());
 					image = model.getBanner();
 				}
@@ -480,7 +500,7 @@ public class TenantBrandingPanel extends HLayout {
 		upload.setTitle(I18N.message("uploadnewimage"));
 		upload.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ImageUploader uploader = new ImageUploader(rec.getAttributeAsString("name"), TenantBrandingPanel.this);
+				ImageUploader uploader = new ImageUploader(rec.getAttributeAsString(NAME), TenantBrandingPanel.this);
 				uploader.show();
 			}
 		});
@@ -496,17 +516,17 @@ public class TenantBrandingPanel extends HLayout {
 
 		if (imageName.equals("logo"))
 			tenant.getBranding().setLogoSrc(content);
-		else if (imageName.equals("logo_head"))
+		else if (imageName.equals(LOGO_HEAD))
 			tenant.getBranding().setLogoHeadSrc(content);
-		else if (imageName.equals("logo_menu"))
+		else if (imageName.equals(LOGO_MENU))
 			tenant.getBranding().setLogoMenuSrc(content);
-		else if (imageName.equals("logo_oem"))
+		else if (imageName.equals(LOGO_OEM))
 			tenant.getBranding().setLogoOemSrc(content);
-		else if (imageName.equals("logo_head_oem"))
+		else if (imageName.equals(LOGO_HEAD_OEM))
 			tenant.getBranding().setLogoHeadOemSrc(content);
-		else if (imageName.equals("banner"))
+		else if (imageName.equals(BANNER))
 			tenant.getBranding().setBannerSrc(content);
-		else if (imageName.equals("favicon"))
+		else if (imageName.equals(FAVICON))
 			tenant.getBranding().setFaviconSrc(content);
 
 		Record rec = null;
@@ -514,11 +534,11 @@ public class TenantBrandingPanel extends HLayout {
 		// Find the rec the corresponds to the given document
 		Record[] records = grid.getRecords();
 		for (Record recd : records)
-			if (recd.getAttribute("name").equals(imageName))
+			if (recd.getAttribute(NAME).equals(imageName))
 				rec = recd;
 
 		if (rec != null) {
-			rec.setAttribute("image", content);
+			rec.setAttribute(IMAGE, content);
 			grid.invalidateRecordComponents();
 			grid.refreshRecordComponent(grid.getRecordIndex(rec));
 			grid.redraw();
@@ -544,8 +564,8 @@ public class TenantBrandingPanel extends HLayout {
 				tenant.getBranding().setBugs(vm.getValueAsString("bugs"));
 				tenant.getBranding().setForum(vm.getValueAsString("forum"));
 				tenant.getBranding().setHelp(vm.getValueAsString("help"));
-				tenant.getBranding().setSupport(vm.getValueAsString("support"));
-				tenant.getBranding().setSales(vm.getValueAsString("sales"));
+				tenant.getBranding().setSupport(vm.getValueAsString(SUPPORT));
+				tenant.getBranding().setSales(vm.getValueAsString(SALES));
 			}
 		}
 

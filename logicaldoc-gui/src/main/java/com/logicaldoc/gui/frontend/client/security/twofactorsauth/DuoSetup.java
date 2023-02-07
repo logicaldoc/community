@@ -18,6 +18,8 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class DuoSetup extends TwoFactorsAuthenticationSetup {
 
+	private static final String FACTOR = "factor";
+	private static final String PASSCODE = "passcode";
 	private DynamicForm form;
 
 	public DuoSetup(GUIUser user) {
@@ -28,7 +30,7 @@ public class DuoSetup extends TwoFactorsAuthenticationSetup {
 		setMargin(5);
 
 		// The key contains the settings
-		String[] settings = new String[] { null, "passcode", "auto" };
+		String[] settings = new String[] { null, PASSCODE, "auto" };
 		if (user.getKey() != null && user.getKey().contains("|"))
 			settings = user.getKey().split("\\|");
 
@@ -37,9 +39,9 @@ public class DuoSetup extends TwoFactorsAuthenticationSetup {
 		username.setWidth(300);
 		username.setRequired(true);
 
-		SelectItem factor = ItemFactory.newSelectItem("factor", I18N.message("factor"));
+		SelectItem factor = ItemFactory.newSelectItem(FACTOR, I18N.message(FACTOR));
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-		map.put("passcode", "passcode");
+		map.put(PASSCODE, PASSCODE);
 		map.put("sms", "sms");
 		map.put("push", "push");
 		factor.setValueMap(map);
@@ -74,7 +76,7 @@ public class DuoSetup extends TwoFactorsAuthenticationSetup {
 		boolean valid = form.validate();
 		if (valid) {
 			String username = form.getValueAsString("username");
-			String factor = form.getValueAsString("factor");
+			String factor = form.getValueAsString(FACTOR);
 			String device = form.getValueAsString("device");
 			if (device == null || device.isEmpty())
 				device = "auto";

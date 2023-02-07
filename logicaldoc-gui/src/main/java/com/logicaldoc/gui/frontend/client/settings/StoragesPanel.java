@@ -31,7 +31,6 @@ import com.smartgwt.client.widgets.grid.ListGridEditorCustomizer;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellSavedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -47,6 +46,14 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.1
  */
 public class StoragesPanel extends VLayout {
+
+	private static final String STORE = "store.";
+
+	private static final String DATABASE_EDIT = "database_edit";
+
+	private static final String VALUE = "value";
+
+	private static final String WRITE = "write";
 
 	public static final int OPERATION_NONE = 0;
 
@@ -90,18 +97,14 @@ public class StoragesPanel extends VLayout {
 	private void addRefreshButton(ToolStrip toolStrip) {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
-		refresh.addClickHandler((ClickEvent event) -> {
-			refresh();
-		});
+		refresh.addClickHandler((ClickEvent event) -> refresh());
 		toolStrip.addButton(refresh);
 	}
 
 	private void addSaveButton(ToolStrip toolStrip) {
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> {
-			onSave(true);
-		});
+		save.addClickHandler((ClickEvent event) -> onSave(true));
 		save.setDisabled(Session.get().isDemo() || Session.get().getUser().getId() != 1);
 		toolStrip.addButton(save);
 	}
@@ -109,9 +112,7 @@ public class StoragesPanel extends VLayout {
 	private void addAddButton(ToolStrip toolStrip) {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addstore"));
-		add.addClickHandler((ClickEvent event) -> {
-			onAddStorage();
-		});
+		add.addClickHandler((ClickEvent event) -> onAddStorage());
 		add.setDisabled(Session.get().isDemo());
 		if (Feature.visible(Feature.MULTI_STORAGE)) {
 			toolStrip.addButton(add);
@@ -143,7 +144,7 @@ public class StoragesPanel extends VLayout {
 
 		ListGridField type = prepareTypeField();
 
-		ListGridField write = new ListGridField("write", " ", 20);
+		ListGridField write = new ListGridField(WRITE, " ", 20);
 		write.setType(ListGridFieldType.IMAGE);
 		write.setCanSort(false);
 		write.setAlign(Alignment.CENTER);
@@ -154,12 +155,9 @@ public class StoragesPanel extends VLayout {
 
 		storagesGrid.setFields(id, write, name, type, path);
 		storagesGrid.setAutoFetchData(true);
-		storagesGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		storagesGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
 		});
 		storagesGrid.setEditorCustomizer(new ListGridEditorCustomizer() {
 			public FormItem getEditor(ListGridEditorContext context) {
@@ -191,7 +189,7 @@ public class StoragesPanel extends VLayout {
 
 		ListGridField name = new ListGridField("name", I18N.message("parameter"), 150);
 		name.setCanEdit(false);
-		ListGridField value = new ListGridField("value", I18N.message("value"));
+		ListGridField value = new ListGridField(VALUE, I18N.message(VALUE));
 		value.setWidth("*");
 		value.setCanEdit(true);
 		parametersGrid.setFields(name, value);
@@ -210,7 +208,7 @@ public class StoragesPanel extends VLayout {
 					continue;
 				ListGridRecord recd = new ListGridRecord();
 				recd.setAttribute("name", attr);
-				recd.setAttribute("value", rec.getAttributeAsString(attr));
+				recd.setAttribute(VALUE, rec.getAttributeAsString(attr));
 				records.add(recd);
 			}
 			parametersGrid.setRecords(records.toArray(new ListGridRecord[0]));
@@ -236,8 +234,8 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private static boolean isParameterAttribute(String name) {
-		if ("type".equals(name) || "id".equals(name) || "name".equals(name) || "path".equals(name)
-				|| "write".equals(name) || name.startsWith("_"))
+		if ("type".equals(name) || "id".equals(name) || "name".equals(name) || "path".equals(name) || WRITE.equals(name)
+				|| name.startsWith("_"))
 			return false;
 		else
 			return true;
@@ -275,8 +273,7 @@ public class StoragesPanel extends VLayout {
 				}
 			});
 		});
-		delete.setEnabled(
-				!Session.get().isDemo() && !"database_edit".equals(selectedRecord.getAttributeAsString("write")));
+		delete.setEnabled(!Session.get().isDemo() && !DATABASE_EDIT.equals(selectedRecord.getAttributeAsString(WRITE)));
 		return delete;
 	}
 
@@ -341,11 +338,11 @@ public class StoragesPanel extends VLayout {
 		makeWrite.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord[] recs = storagesGrid.getRecords();
 			for (ListGridRecord rec : recs) {
-				rec.setAttribute("write", "blank");
+				rec.setAttribute(WRITE, "blank");
 				storagesGrid.refreshRow(storagesGrid.getRowNum(rec));
 			}
 			ListGridRecord selectedRecord = storagesGrid.getSelectedRecord();
-			selectedRecord.setAttribute("write", "database_edit");
+			selectedRecord.setAttribute(WRITE, DATABASE_EDIT);
 			storagesGrid.refreshRow(storagesGrid.getRowNum(storagesGrid.getSelectedRecord()));
 		});
 		makeWrite.setEnabled(!Session.get().isDemo());
@@ -385,11 +382,11 @@ public class StoragesPanel extends VLayout {
 		for (ListGridRecord storageRecord : records) {
 			try {
 				String storageId = storageRecord.getAttributeAsString("id").trim();
-				settings.add(new GUIParameter("store." + storageId + ".dir",
+				settings.add(new GUIParameter(STORE + storageId + ".dir",
 						storageRecord.getAttributeAsString("path").trim()));
-				settings.add(new GUIParameter("store." + storageId + ".type",
+				settings.add(new GUIParameter(STORE + storageId + ".type",
 						storageRecord.getAttributeAsString("type").trim()));
-				if ("database_edit".equals(storageRecord.getAttributeAsString("write"))) {
+				if (DATABASE_EDIT.equals(storageRecord.getAttributeAsString(WRITE))) {
 					settings.add(new GUIParameter("store.write", storageId));
 				}
 
@@ -412,7 +409,7 @@ public class StoragesPanel extends VLayout {
 					if (!StoragesPanel.isParameterAttribute(attr))
 						continue;
 					String storageId = storageRecord.getAttributeAsString("id").trim();
-					settings.add(new GUIParameter("store." + storageId + "." + attr,
+					settings.add(new GUIParameter(STORE + storageId + "." + attr,
 							storageRecord.getAttributeAsString(attr).trim()));
 				}
 			} catch (Throwable t) {
@@ -434,7 +431,7 @@ public class StoragesPanel extends VLayout {
 				newStore.setAttribute("type", "fs");
 				newStore.setAttribute("encryption", "false");
 				newStore.setAttribute("compression", "5");
-				newStore.setAttribute("write", "blank");
+				newStore.setAttribute(WRITE, "blank");
 
 				storagesGrid.getDataSource().addData(newStore);
 				storagesGrid.redraw();

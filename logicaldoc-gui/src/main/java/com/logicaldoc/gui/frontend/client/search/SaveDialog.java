@@ -24,6 +24,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
  */
 public class SaveDialog extends Window {
 
+	private static final String DESCRIPTION = "description";
 	private ValuesManager vm = new ValuesManager();
 
 	public SaveDialog() {
@@ -50,7 +51,7 @@ public class SaveDialog extends Window {
 		name.setValidators(new SimpleTextValidator());
 		name.setWidth(200);
 
-		TextItem description = ItemFactory.newTextItem("description", null);
+		TextItem description = ItemFactory.newTextItem(DESCRIPTION, null);
 		description.setBrowserSpellCheck(true);
 		description.setWidth(300);
 
@@ -72,7 +73,7 @@ public class SaveDialog extends Window {
 
 		final GUISearchOptions options = Search.get().getOptions();
 		options.setName(vm.getValueAsString("name"));
-		options.setDescription(vm.getValueAsString("description"));
+		options.setDescription(vm.getValueAsString(DESCRIPTION));
 		SearchService.Instance.get().save(Search.get().getOptions(), new AsyncCallback<Boolean>() {
 
 			@Override
@@ -88,7 +89,7 @@ public class SaveDialog extends Window {
 					try {
 						if (SavedSearchesPanel.get() != null)
 							SavedSearchesPanel.get().addEntry(vm.getValueAsString("name"),
-									vm.getValueAsString("description"),
+									vm.getValueAsString(DESCRIPTION),
 									options.getType() == GUISearchOptions.TYPE_FULLTEXT ? I18N.message("fulltext")
 											: I18N.message("parametric"));
 					} catch (Throwable t) {

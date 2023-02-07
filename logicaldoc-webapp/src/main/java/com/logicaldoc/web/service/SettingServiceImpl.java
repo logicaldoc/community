@@ -46,6 +46,16 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class SettingServiceImpl extends AbstractRemoteService implements SettingService {
 
+	private static final String CONVERTER_ALIAS = "converter.alias.";
+
+	private static final String GUI_TAG_VOCABULARY = "gui.tag.vocabulary";
+
+	private static final String GUISETTING = "guisetting";
+
+	private static final String GUI_WELCOME = "gui.welcome";
+
+	private static final String CHARSET = ".charset";
+
 	private static final String HIDDEN = ".hidden";
 
 	private static final String SMTP_SAVE_FOLDER_ID = ".smtp.save.folderId";
@@ -182,7 +192,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 					|| name.startsWith("firewall.") || name.contains(".2fa.") || name.startsWith("ftp.")
 					|| name.startsWith("cas.") || name.startsWith("cache.") || name.startsWith("jdbc.")
 					|| name.startsWith("comparator.") || name.contains(".via.") || name.contains(".downloadticket.")
-					|| name.startsWith("zonalocr.") || name.endsWith(".charset") || name.startsWith("policy."))
+					|| name.startsWith("zonalocr.") || name.endsWith(CHARSET) || name.startsWith("policy."))
 				continue;
 
 			sortedSet.add(key.toString());
@@ -242,23 +252,23 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	private void extracted(GUIParameter[] settings, int settingIndex, Session session, GenericDAO genericDao,
 			ContextProperties conf) throws PersistenceException {
-		if (settings[settingIndex].getName().endsWith("gui.welcome")) {
+		if (settings[settingIndex].getName().endsWith(GUI_WELCOME)) {
 			/*
 			 * This is a setting we save into the database
 			 */
-			Generic setting = genericDao.findByAlternateKey("guisetting", "gui.welcome", 0L, session.getTenantId());
+			Generic setting = genericDao.findByAlternateKey(GUISETTING, GUI_WELCOME, 0L, session.getTenantId());
 			if (setting == null)
-				setting = new Generic("guisetting", "gui.welcome", 0L, session.getTenantId());
+				setting = new Generic(GUISETTING, GUI_WELCOME, 0L, session.getTenantId());
 			setting.setString1(settings[settingIndex].getValue());
 			genericDao.store(setting);
-		} else if (settings[settingIndex].getName().endsWith("gui.tag.vocabulary")) {
+		} else if (settings[settingIndex].getName().endsWith(GUI_TAG_VOCABULARY)) {
 			/*
 			 * This is a setting we save into the database
 			 */
-			Generic setting = genericDao.findByAlternateKey("guisetting", "gui.tag.vocabulary", 0L,
+			Generic setting = genericDao.findByAlternateKey(GUISETTING, GUI_TAG_VOCABULARY, 0L,
 					session.getTenantId());
 			if (setting == null)
-				setting = new Generic("guisetting", "gui.tag.vocabulary", 0L, session.getTenantId());
+				setting = new Generic(GUISETTING, GUI_TAG_VOCABULARY, 0L, session.getTenantId());
 			setting.setString1(settings[settingIndex].getValue());
 			genericDao.store(setting);
 		} else {
@@ -377,13 +387,13 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 				conf.getProperty(tenantName + ".session.heartbeat")));
 		params.add(new GUIParameter(tenantName + ".downloadticket.behavior",
 				conf.getProperty(tenantName + ".downloadticket.behavior")));
-		params.add(new GUIParameter(tenantName + ".charset", conf.getProperty(tenantName + ".charset")));
+		params.add(new GUIParameter(tenantName + CHARSET, conf.getProperty(tenantName + CHARSET)));
 
 		/*
 		 * Now go into the DB
 		 */
 		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		List<Generic> generics = gDao.findByTypeAndSubtype("guisetting", null, null, session.getTenantId());
+		List<Generic> generics = gDao.findByTypeAndSubtype(GUISETTING, null, null, session.getTenantId());
 		for (Generic gen : generics) {
 			params.add(new GUIParameter(tenantName + "." + gen.getSubtype(), gen.getString1()));
 		}
@@ -475,7 +485,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 		try {
 			ContextProperties config = Context.get().getProperties();
-			Map<String, String> aliasMap = config.getProperties("converter.alias.");
+			Map<String, String> aliasMap = config.getProperties(CONVERTER_ALIAS);
 
 			// Get all the keys that correspond to the same target
 			// extension
@@ -484,14 +494,14 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 			// Delete all actual aliases
 			for (String key : keys)
-				config.remove("converter.alias." + key);
+				config.remove(CONVERTER_ALIAS + key);
 
 			// Now add the new ones
 			if (StringUtils.isNotEmpty(aliases)) {
 				String[] tokens = aliases.split(",");
 				for (String token : tokens)
 					config.setProperty(
-							"converter.alias."
+							CONVERTER_ALIAS
 									+ token.toLowerCase().trim().replace(" ", "").replace(".", "").replace("=", ""),
 							extension);
 			}

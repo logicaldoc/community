@@ -54,6 +54,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class SearchServiceImpl extends AbstractRemoteService implements SearchService {
 
+	private static final String QUERIES = "queries";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -238,7 +240,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	 */
 	@Deprecated(forRemoval = true, since = "9.0")
 	private void legacyDelete(long userId, String[] names) {
-		File dir = UserUtil.getUserResource(userId, "queries");
+		File dir = UserUtil.getUserResource(userId, QUERIES);
 		for (String name : names) {
 			File file = new File(dir, name + ".ser");
 			try {
@@ -278,7 +280,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	 */
 	@Deprecated(forRemoval = true, since = "9.0")
 	private GUISearchOptions legacyLoad(long userId, String name) {
-		File dir = UserUtil.getUserResource(userId, "queries");
+		File dir = UserUtil.getUserResource(userId, QUERIES);
 		File file = new File(dir, name + ".ser");
 		SearchOptions opt = null;
 		try {
@@ -325,7 +327,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	@Deprecated(forRemoval = true, since = "9.0")
 	private static List<SearchOptions> legacyGetSearches(Session session) {
-		File file = UserUtil.getUserResource(session.getUserId(), "queries");
+		File file = UserUtil.getUserResource(session.getUserId(), QUERIES);
 		if (!file.exists()) {
 			return null;
 		}

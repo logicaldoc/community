@@ -15,7 +15,9 @@ import java.util.List;
  * @author Fabrizio Fazzino
  * @version %I%, %G%
  */
-public class CSVFileWriter extends CSVFile  implements Closeable {
+public class CSVFileWriter extends CSVFile implements Closeable {
+	private static final String UTF_8 = "UTF-8";
+
 	/**
 	 * The print writer linked to the CSV file to be written.
 	 */
@@ -30,7 +32,7 @@ public class CSVFileWriter extends CSVFile  implements Closeable {
 	 */
 	public CSVFileWriter(String outputFileName) throws IOException {
 		super();
-		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName), "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName), UTF_8);
 		out = new PrintWriter(new BufferedWriter(osw));
 	}
 
@@ -43,7 +45,7 @@ public class CSVFileWriter extends CSVFile  implements Closeable {
 	 */
 	public CSVFileWriter(String outputFileName, char sep) throws IOException {
 		super(sep);
-		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName), "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName), UTF_8);
 		out = new PrintWriter(new BufferedWriter(osw));
 	}
 
@@ -57,7 +59,7 @@ public class CSVFileWriter extends CSVFile  implements Closeable {
 	 */
 	public CSVFileWriter(String outputFileName, char sep, char qual) throws IOException {
 		super(sep, qual);
-		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName), "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName), UTF_8);
 		out = new PrintWriter(new BufferedWriter(osw));
 	}
 
@@ -71,7 +73,7 @@ public class CSVFileWriter extends CSVFile  implements Closeable {
 	 */
 	public CSVFileWriter(String outputFileName, boolean append) throws IOException {
 		super();
-		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName, append), "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName, append), UTF_8);
 		out = new PrintWriter(new BufferedWriter(osw));
 	}
 
@@ -85,7 +87,7 @@ public class CSVFileWriter extends CSVFile  implements Closeable {
 	 */
 	public CSVFileWriter(String outputFileName, char sep, boolean append) throws IOException {
 		super(sep);
-		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName, append), "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName, append), UTF_8);
 		out = new PrintWriter(new BufferedWriter(osw));
 	}
 
@@ -100,7 +102,7 @@ public class CSVFileWriter extends CSVFile  implements Closeable {
 	 */
 	public CSVFileWriter(String outputFileName, char sep, char qual, boolean append) throws IOException {
 		super(sep, qual);
-		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName, append), "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(outputFileName, append), UTF_8);
 		out = new PrintWriter(new BufferedWriter(osw));
 	}
 

@@ -46,6 +46,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class SearchEngineServiceImpl extends AbstractRemoteService implements SearchEngineService {
 
+	private static final String INDEX_TOKENFILTER = "index.tokenfilter.";
+
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(SearchEngineServiceImpl.class);
@@ -232,7 +234,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			ContextProperties conf = Context.get().getProperties();
 			int i = 1;
 			for (String filter : filters)
-				conf.setProperty("index.tokenfilter." + filter + ".position", Integer.toString(i++));
+				conf.setProperty(INDEX_TOKENFILTER + filter + ".position", Integer.toString(i++));
 			conf.write();
 		} catch (Throwable t) {
 			throwServerException(session, log, t);
@@ -243,7 +245,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	public void saveTokenFilterSettings(String filter, GUIParameter[] settings) throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
 		try {
-			String prefix = "index.tokenfilter." + filter + ".";
+			String prefix = INDEX_TOKENFILTER + filter + ".";
 			ContextProperties conf = Context.get().getProperties();
 			for (GUIParameter setting : settings)
 				conf.setProperty(prefix + setting.getName(), setting.getValue().trim());
@@ -258,7 +260,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession(getThreadLocalRequest());
 		try {
 			ContextProperties conf = Context.get().getProperties();
-			conf.setProperty("index.tokenfilter." + filter, active ? "enabled" : "disabled");
+			conf.setProperty(INDEX_TOKENFILTER + filter, active ? "enabled" : "disabled");
 			conf.write();
 		} catch (Throwable t) {
 			throwServerException(session, log, t);

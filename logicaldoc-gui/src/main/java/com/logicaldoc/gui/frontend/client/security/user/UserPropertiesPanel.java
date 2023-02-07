@@ -39,6 +39,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class UserPropertiesPanel extends HLayout {
+	private static final String USERMUSTBELONGTOGROUP = "usermustbelongtogroup";
+
+	private static final String ADMIN = "admin";
+
+	private static final String READONLY = "readonly";
+
+	private static final String EMAIL = "email";
+
 	private DynamicForm form1 = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -183,7 +191,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareEmailItem(boolean readonly) {
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setRequired(true);
 		email.setDisabled(readonly);
 		email.setValue(user.getEmail());
@@ -286,9 +294,9 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private CheckboxItem prepareGuestItem(boolean readonly) {
-		final CheckboxItem guest = new CheckboxItem("readonly", I18N.message("readonly"));
+		final CheckboxItem guest = new CheckboxItem(READONLY, I18N.message(READONLY));
 		guest.setValue(user.isReadOnly());
-		if (readonly || "admin".equals(user.getUsername())) {
+		if (readonly || ADMIN.equals(user.getUsername())) {
 			guest.setDisabled(true);
 		} else {
 			addGuestChangeHandlers(guest);
@@ -323,8 +331,8 @@ public class UserPropertiesPanel extends HLayout {
 
 		groupsItem = ItemFactory.newMultiComboBoxItem("groups", "groups", new GroupsDS(),
 				groupIds.toArray(new String[0]));
-		groupsItem.setDisabled(readOnly || "admin".equals(user.getUsername())
-				|| ("admin" + Session.get().getTenantName()).equals(user.getUsername()));
+		groupsItem.setDisabled(readOnly || ADMIN.equals(user.getUsername())
+				|| (ADMIN + Session.get().getTenantName()).equals(user.getUsername()));
 		groupsItem.setValueField("id");
 		groupsItem.setDisplayField("name");
 		groupsItem.addChangedHandler(changedHandler);
@@ -352,7 +360,7 @@ public class UserPropertiesPanel extends HLayout {
 			user.setLanguage((String) values.get("language"));
 			user.setPhone((String) values.get("phone"));
 			user.setCell((String) values.get("cell"));
-			user.setEmail((String) values.get("email"));
+			user.setEmail((String) values.get(EMAIL));
 			user.setEmail2((String) values.get("email2"));
 			user.setTimeZone((String) values.get("timezone"));
 
@@ -362,8 +370,8 @@ public class UserPropertiesPanel extends HLayout {
 
 		String[] ids = groupsItem.getValues();
 		if (ids == null || ids.length == 0) {
-			SC.warn(I18N.message("usermustbelongtogroup"));
-			GuiLog.warn(I18N.message("usermustbelongtogroup"), I18N.message("usermustbelongtogroup"));
+			SC.warn(I18N.message(USERMUSTBELONGTOGROUP));
+			GuiLog.warn(I18N.message(USERMUSTBELONGTOGROUP), I18N.message(USERMUSTBELONGTOGROUP));
 			return false;
 		}
 
@@ -375,7 +383,7 @@ public class UserPropertiesPanel extends HLayout {
 		}
 		user.setGroups(groups);
 
-		if (Boolean.parseBoolean(values.get("readonly").toString())) {
+		if (Boolean.parseBoolean(values.get(READONLY).toString())) {
 			user.setType(GUIUser.TYPE_READONLY);
 			user.setGroups(new GUIGroup[0]);
 		} else

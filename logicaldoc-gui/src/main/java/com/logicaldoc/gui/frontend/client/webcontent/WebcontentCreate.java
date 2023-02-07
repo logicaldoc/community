@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 6.7
  */
 public class WebcontentCreate extends Window {
+	private static final String TEMPLATE = "template";
+
 	private SubmitItem create;
 
 	private ValuesManager vm;
@@ -76,10 +78,10 @@ public class WebcontentCreate extends Window {
 		if (title.lastIndexOf('.') != -1)
 			title = title.substring(0, title.lastIndexOf('.'));
 
-		if (vm.getValueAsString("template") == null || "".equals(vm.getValueAsString("template").toString()))
+		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE).toString()))
 			vo.setTemplateId(null);
 		else {
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString("template").toString()));
+			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE).toString()));
 		}
 
 		vo.setType("html");

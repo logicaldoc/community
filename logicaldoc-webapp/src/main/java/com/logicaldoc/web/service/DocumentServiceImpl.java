@@ -127,6 +127,8 @@ import com.logicaldoc.web.UploadServlet;
  */
 public class DocumentServiceImpl extends AbstractRemoteService implements DocumentService {
 
+	private static final String DOCUMENT_STR = "Document ";
+
 	private static final String UTF_8 = "UTF-8";
 
 	private static final String UNEXISTING_DOCUMENT = "Unexisting document";
@@ -570,7 +572,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-				throw new PermissionException(session.getUsername(), "Document " + docId, Permission.WRITE);
+				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
 				throw new PermissionException("The document " + docId + " is locked");
@@ -2488,7 +2490,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-				throw new PermissionException(session.getUsername(), "Document " + docId, Permission.WRITE);
+				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT || doc.getLockUserId() != session.getUserId())
 				throw new PermissionException("You have not checked out the file " + docId);
@@ -2623,7 +2625,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-				throw new PermissionException(session.getUsername(), "Document " + doc.getId(), Permission.WRITE);
+				throw new PermissionException(session.getUsername(), DOCUMENT_STR + doc.getId(), Permission.WRITE);
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 

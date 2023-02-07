@@ -29,6 +29,28 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class ParameterConditionRow extends HLayout {
 
+	private static final String NOTCONTAINS = "notcontains";
+
+	private static final String CONTAINS = "contains";
+
+	private static final String ISNOTNULL = "isnotnull";
+
+	private static final String ISNULL = "isnull";
+
+	private static final String NOTEQUAL = "notequal";
+
+	private static final String EQUALS = "equals";
+
+	private static final String LESSTHAN = "lessthan";
+
+	private static final String GREATERTHAN = "greaterthan";
+
+	private static final String TYPE = "type:";
+
+	private static final String NOTNULL = "notnull";
+
+	private static final String VALUE = "value";
+
 	private ImgButton removeImg = null;
 
 	private DynamicForm form = null;
@@ -115,7 +137,7 @@ public class ParameterConditionRow extends HLayout {
 		if (fieldSelected != null && !fieldSelected.trim().isEmpty()) {
 			value = valueItemFor(fieldSelected);
 		} else {
-			value = ItemFactory.newTextItem("value", null);
+			value = ItemFactory.newTextItem(VALUE, null);
 		}
 		value.setRequired(true);
 		value.setEndRow(true);
@@ -177,12 +199,12 @@ public class ParameterConditionRow extends HLayout {
 	}
 
 	private void onOperatorChanged(String valueOperator) {
-		if (valueOperator == null || "null".equals(valueOperator) || "notnull".equals(valueOperator)) {
-			form.hideItem("value");
+		if (valueOperator == null || "null".equals(valueOperator) || NOTNULL.equals(valueOperator)) {
+			form.hideItem(VALUE);
 			if (value != null)
 				value.setVisible(false);
 		} else {
-			form.showItem("value");
+			form.showItem(VALUE);
 			if (value != null)
 				value.setVisible(true);
 		}
@@ -195,50 +217,50 @@ public class ParameterConditionRow extends HLayout {
 
 		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
 				|| criteriaField.equals("rating") || criteriaField.equals("published")
-				|| criteriaField.equals("indexed") || criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
-			map.put("greaterthan", I18N.message("greaterthan").toLowerCase());
-			map.put("lessthan", I18N.message("lessthan").toLowerCase());
-			map.put("equals", I18N.message("equals").toLowerCase());
-			map.put("notequal", I18N.message("notequal").toLowerCase());
-			map.put("null", I18N.message("isnull").toLowerCase());
-			map.put("notnull", I18N.message("isnotnull").toLowerCase());
+				|| criteriaField.equals("indexed") || criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT)
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
+			map.put(GREATERTHAN, I18N.message(GREATERTHAN).toLowerCase());
+			map.put(LESSTHAN, I18N.message(LESSTHAN).toLowerCase());
+			map.put(EQUALS, I18N.message(EQUALS).toLowerCase());
+			map.put(NOTEQUAL, I18N.message(NOTEQUAL).toLowerCase());
+			map.put("null", I18N.message(ISNULL).toLowerCase());
+			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
 				|| criteriaField.equals("date") || criteriaField.equals("creation")
 				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DATE)) {
-			map.put("greaterthan", I18N.message("greaterthan").toLowerCase());
-			map.put("lessthan", I18N.message("lessthan").toLowerCase());
-			map.put("null", I18N.message("isnull").toLowerCase());
-			map.put("notnull", I18N.message("isnotnull").toLowerCase());
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN)) {
-			map.put("equals", I18N.message("equals").toLowerCase());
-			map.put("null", I18N.message("isnull").toLowerCase());
-			map.put("notnull", I18N.message("isnotnull").toLowerCase());
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_USER)
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_FOLDER)) {
-			map.put("equals", I18N.message("equals").toLowerCase());
-			map.put("notequal", I18N.message("notequal").toLowerCase());
-			map.put("null", I18N.message("isnull").toLowerCase());
-			map.put("notnull", I18N.message("isnotnull").toLowerCase());
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DATE)) {
+			map.put(GREATERTHAN, I18N.message(GREATERTHAN).toLowerCase());
+			map.put(LESSTHAN, I18N.message(LESSTHAN).toLowerCase());
+			map.put("null", I18N.message(ISNULL).toLowerCase());
+			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {
+			map.put(EQUALS, I18N.message(EQUALS).toLowerCase());
+			map.put("null", I18N.message(ISNULL).toLowerCase());
+			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_USER)
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
+			map.put(EQUALS, I18N.message(EQUALS).toLowerCase());
+			map.put(NOTEQUAL, I18N.message(NOTEQUAL).toLowerCase());
+			map.put("null", I18N.message(ISNULL).toLowerCase());
+			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
 		} else if (criteriaField.equals("tags") || criteriaField.equals("notes")) {
-			map.put("contains", I18N.message("contains").toLowerCase());
-			map.put("notcontains", I18N.message("notcontains").toLowerCase());
-			map.put("null", I18N.message("isnull").toLowerCase());
-			map.put("notnull", I18N.message("isnotnull").toLowerCase());
+			map.put(CONTAINS, I18N.message(CONTAINS).toLowerCase());
+			map.put(NOTCONTAINS, I18N.message(NOTCONTAINS).toLowerCase());
+			map.put("null", I18N.message(ISNULL).toLowerCase());
+			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
 		} else if (criteriaField.equals("template")) {
-			map.put("null", I18N.message("isnull").toLowerCase());
-			map.put("notnull", I18N.message("isnotnull").toLowerCase());
+			map.put("null", I18N.message(ISNULL).toLowerCase());
+			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
 		} else {
-			map.put("contains", I18N.message("contains").toLowerCase());
-			map.put("notcontains", I18N.message("notcontains").toLowerCase());
-			map.put("equals", I18N.message("equals").toLowerCase());
-			map.put("notequal", I18N.message("notequal").toLowerCase());
+			map.put(CONTAINS, I18N.message(CONTAINS).toLowerCase());
+			map.put(NOTCONTAINS, I18N.message(NOTCONTAINS).toLowerCase());
+			map.put(EQUALS, I18N.message(EQUALS).toLowerCase());
+			map.put(NOTEQUAL, I18N.message(NOTEQUAL).toLowerCase());
 			map.put("beginswith", I18N.message("beginswith").toLowerCase());
 			map.put("endswith", I18N.message("endswith").toLowerCase());
-			map.put("null", I18N.message("isnull").toLowerCase());
-			map.put("notnull", I18N.message("isnotnull").toLowerCase());
+			map.put("null", I18N.message(ISNULL).toLowerCase());
+			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
 		}
 
 		return map;
@@ -248,41 +270,41 @@ public class ParameterConditionRow extends HLayout {
 		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
 				|| criteriaField.equals("rating") || criteriaField.equals("template")
 				|| criteriaField.equals("published") || criteriaField.equals("indexed")
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)) {
-			return ItemFactory.newIntegerItem("value", "integer", null);
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
-			return ItemFactory.newFloatItem("value", "double", null);
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN)) {
-			FormItem item = ItemFactory.newBooleanSelector("value", "boolean");
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT)) {
+			return ItemFactory.newIntegerItem(VALUE, "integer", null);
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
+			return ItemFactory.newFloatItem(VALUE, "double", null);
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {
+			FormItem item = ItemFactory.newBooleanSelector(VALUE, "boolean");
 			item.setValue("yes");
 			return item;
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			FormItem item = ItemFactory.newStringItemForAttribute(template.getAttribute(attributeName));
-			item.setName("value");
+			item.setName(VALUE);
 			return item;
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_USER)) {
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_USER)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
-			FormItem item = ItemFactory.newUserSelectorForAttribute("value", att.getLabel(),
+			FormItem item = ItemFactory.newUserSelectorForAttribute(VALUE, att.getLabel(),
 					(att.getOptions() != null && att.getOptions().length > 0) ? att.getOptions()[0] : null, null);
-			item.setName("value");
+			item.setName(VALUE);
 			return item;
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_FOLDER)) {
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
-			FormItem item = ItemFactory.newFolderSelectorForAttribute("value", att.getLabel(), false, null);
-			item.setName("value");
+			FormItem item = ItemFactory.newFolderSelectorForAttribute(VALUE, att.getLabel(), false, null);
+			item.setName(VALUE);
 			return item;
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
 				|| criteriaField.equals("date") || criteriaField.equals("creation")
 				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DATE)) {
-			return ItemFactory.newDateItem("value", "date");
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DATE)) {
+			return ItemFactory.newDateItem(VALUE, "date");
 		} else if (criteriaField.equals("tags")) {
-			return ItemFactory.newTagsMultiplePickList("value", "tags", new TagsDS(null, false, null, null), null);
+			return ItemFactory.newTagsMultiplePickList(VALUE, "tags", new TagsDS(null, false, null, null), null);
 		} else {
-			return ItemFactory.newTextItem("value", null);
+			return ItemFactory.newTextItem(VALUE, null);
 		}
 	}
 

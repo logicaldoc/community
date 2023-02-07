@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -38,6 +37,16 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.0
  */
 public class GroupUsersPanel extends VLayout {
+	private static final String EMAIL = "email";
+
+	private static final String EENABLED = "eenabled";
+
+	private static final String PHONE = "phone";
+
+	private static final String FIRST_NAME = "firstName";
+
+	private static final String USERNAME = "username";
+
 	private ListGrid list;
 
 	private long groupId;
@@ -53,29 +62,29 @@ public class GroupUsersPanel extends VLayout {
 		final InfoPanel infoPanel = new InfoPanel("");
 
 		UserListGridField avatar = new UserListGridField(true);
-		
+
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField username = new ListGridField("username", I18N.message("username"), 100);
+		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		username.setCanFilter(true);
 
 		ListGridField name = new ListGridField("name", I18N.message("lastname"), 100);
 		name.setCanFilter(true);
 
-		ListGridField firstName = new ListGridField("firstName", I18N.message("firstname"), 100);
+		ListGridField firstName = new ListGridField(FIRST_NAME, I18N.message("firstname"), 100);
 		firstName.setCanFilter(true);
 
-		ListGridField phone = new ListGridField("phone", I18N.message("phone"), 90);
+		ListGridField phone = new ListGridField(PHONE, I18N.message(PHONE), 90);
 		phone.setCanFilter(true);
 
 		ListGridField cell = new ListGridField("cell", I18N.message("cell"), 90);
 		cell.setCanFilter(true);
 
-		ListGridField email = new ListGridField("email", I18N.message("email"), 200);
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 200);
 		email.setCanFilter(true);
 
-		ListGridField eenabled = new ListGridField("eenabled", " ", 24);
+		ListGridField eenabled = new ListGridField(EENABLED, " ", 24);
 		eenabled.setType(ListGridFieldType.IMAGE);
 		eenabled.setCanSort(false);
 		eenabled.setAlign(Alignment.CENTER);
@@ -139,13 +148,13 @@ public class GroupUsersPanel extends VLayout {
 								// Update the users table
 								ListGridRecord rec = new ListGridRecord();
 								rec.setAttribute("id", selectedRecord.getAttribute("id"));
-								rec.setAttribute("username", selectedRecord.getAttribute("username"));
+								rec.setAttribute(USERNAME, selectedRecord.getAttribute(USERNAME));
 								rec.setAttribute("name", selectedRecord.getAttribute("name"));
-								rec.setAttribute("firstName", selectedRecord.getAttribute("firstName"));
-								rec.setAttribute("email", selectedRecord.getAttribute("email"));
-								rec.setAttribute("phone", selectedRecord.getAttribute("phone"));
+								rec.setAttribute(FIRST_NAME, selectedRecord.getAttribute(FIRST_NAME));
+								rec.setAttribute(EMAIL, selectedRecord.getAttribute(EMAIL));
+								rec.setAttribute(PHONE, selectedRecord.getAttribute(PHONE));
 								rec.setAttribute("cell", selectedRecord.getAttribute("cell"));
-								rec.setAttribute("eenabled", selectedRecord.getAttribute("eenabled"));
+								rec.setAttribute(EENABLED, selectedRecord.getAttribute(EENABLED));
 								list.addData(rec);
 								user.clearValue();
 							}
@@ -193,19 +202,19 @@ public class GroupUsersPanel extends VLayout {
 
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-							SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+						SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+							}
+						});
+					}
 				});
 			}
 		});

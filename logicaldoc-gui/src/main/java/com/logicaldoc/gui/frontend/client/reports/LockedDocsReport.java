@@ -21,11 +21,8 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -41,6 +38,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
  */
 public class LockedDocsReport extends ReportPanel {
 
+	private static final String IMMUTABLE = "immutable";
+
 	private SelectItem userSelector;
 
 	public LockedDocsReport() {
@@ -52,12 +51,7 @@ public class LockedDocsReport extends ReportPanel {
 		userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
-		userSelector.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		userSelector.addChangedHandler((ChangedEvent event) -> refresh());
 		toolStrip.addFormItem(userSelector);
 	}
 
@@ -108,46 +102,38 @@ public class LockedDocsReport extends ReportPanel {
 		statusIcons.setWidth(110);
 		statusIcons.setCanFilter(false);
 		statusIcons.setCanSort(false);
-		statusIcons.setCellFormatter(new CellFormatter() {
+		statusIcons.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			String color = rec.getAttributeAsString("color");
 
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				String color = rec.getAttributeAsString("color");
+			String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
 
-				String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-
-				// Put the status icon
-				{
-					if (rec.getAttribute("status") != null) {
-						Integer status = rec.getAttributeAsInt("status");
-						if (status != null && status.intValue() > 0)
-							content += AwesomeFactory.getLockedButtonHTML(status,
-									rec.getAttributeAsString("lockUser"), color);
-					}
+			// Put the status icon
+			{
+				if (rec.getAttribute("status") != null) {
+					Integer status = rec.getAttributeAsInt("status");
+					if (status != null && status.intValue() > 0)
+						content += AwesomeFactory.getLockedButtonHTML(status, rec.getAttributeAsString("lockUser"),
+								color);
 				}
-
-				// Put the immutable icon
-				{
-					if (rec.getAttribute("immutable") != null) {
-						Integer immutable = rec.getAttributeAsInt("immutable");
-						if (immutable != null && immutable.intValue() == 1)
-							content += AwesomeFactory.getIconButtonHTML("hand-paper", null, "immutable", color, null);
-					}
-				}
-
-				content += "</div>";
-				return content;
 			}
+
+			// Put the immutable icon
+			{
+				if (rec.getAttribute(IMMUTABLE) != null) {
+					Integer immutable = rec.getAttributeAsInt(IMMUTABLE);
+					if (immutable != null && immutable.intValue() == 1)
+						content += AwesomeFactory.getIconButtonHTML("hand-paper", null, IMMUTABLE, color, null);
+				}
+			}
+
+			content += "</div>";
+			return content;
 		});
 
 		list.setFields(statusIcons, filename, version, fileVersion, size, lastModified, user, customId, type);
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null);
-			}
-		});
+		list.addDoubleClickHandler(
+				(DoubleClickEvent event) -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 	}
 
 	@Override
@@ -157,68 +143,59 @@ public class LockedDocsReport extends ReportPanel {
 
 		MenuItem unlock = new MenuItem();
 		unlock.setTitle(I18N.message("unlock"));
-		unlock.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null || selection.length == 0)
-					return;
-				final long[] ids = new long[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
+		unlock.addClickHandler((MenuItemClickEvent event) -> {
+			if (selection == null || selection.length == 0)
+				return;
+			final long[] ids = new long[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
+			}
+
+			DocumentService.Instance.get().unlock(ids, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
 				}
 
-				DocumentService.Instance.get().unlock(ids, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						refresh();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void result) {
+					refresh();
+				}
+			});
 		});
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
-		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
-				DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+		preview.addClickHandler((MenuItemClickEvent event) -> {
+			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
+			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(GUIDocument doc) {
-						PreviewPopup iv = new PreviewPopup(doc);
-						iv.show();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					PreviewPopup iv = new PreviewPopup(doc);
+					iv.show();
+				}
+			});
 		});
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null);
-			}
-		});
+		download.addClickHandler((MenuItemClickEvent event) -> DocUtil
+				.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord rec = list.getSelectedRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
-						Long.parseLong(rec.getAttributeAsString("id")));
-			}
+		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord rec = list.getSelectedRecord();
+			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+					Long.parseLong(rec.getAttributeAsString("id")));
 		});
 
 		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {

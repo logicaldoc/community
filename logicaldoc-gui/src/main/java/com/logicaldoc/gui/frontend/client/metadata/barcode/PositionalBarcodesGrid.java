@@ -52,7 +52,7 @@ public class PositionalBarcodesGrid extends ListGrid {
 		formats.setWidth(200);
 		formats.setRequired(false);
 		formats.setCanEdit(true);
-		formats.setEditorProperties(ItemFactory.newBarcodeFormatsComboBoxItem(FORMATS, FORMATS, (String) null));
+		formats.setEditorProperties(ItemFactory.newBarcodeFormatsComboBoxItem((String) null));
 
 		setEmptyMessage(I18N.message("notitemstoshow"));
 		setShowAllRecords(true);

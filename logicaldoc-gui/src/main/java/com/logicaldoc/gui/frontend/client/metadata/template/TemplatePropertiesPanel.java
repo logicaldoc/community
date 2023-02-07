@@ -19,7 +19,6 @@ import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -49,6 +48,10 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.0
  */
 public class TemplatePropertiesPanel extends HLayout {
+
+	private static final String DEPENDSON = "dependson";
+
+	private static final String PRESET = "preset";
 
 	private static final String DEPENDS_ON = "dependsOn";
 
@@ -211,13 +214,13 @@ public class TemplatePropertiesPanel extends HLayout {
 		type.setMinWidth(70);
 		type.setCellFormatter(new AttributeTypeFormatter());
 
-		ListGridField preset = new ListGridField("preset", I18N.message("preset"));
+		ListGridField preset = new ListGridField(PRESET, I18N.message(PRESET));
 		preset.setCanEdit(false);
 		preset.setCanSort(false);
 		preset.setAutoFitWidth(true);
 		preset.setMinWidth(70);
 
-		ListGridField dependsOn = new ListGridField(DEPENDS_ON, I18N.message("dependson"));
+		ListGridField dependsOn = new ListGridField(DEPENDS_ON, I18N.message(DEPENDSON));
 		dependsOn.setCanEdit(false);
 		dependsOn.setCanSort(false);
 		dependsOn.setAutoFitWidth(true);
@@ -296,18 +299,17 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	private MenuItem prepareDependsOnItem() {
 		MenuItem dependsOn = new MenuItem();
-		dependsOn.setTitle(I18N.message("dependson"));
+		dependsOn.setTitle(I18N.message(DEPENDSON));
 		dependsOn.addClickHandler((MenuItemClickEvent event) -> {
-				ListGridRecord selection = attributesList.getSelectedRecord();
-				LD.askForString("dependson", "attributename", selection.getAttributeAsString(DEPENDS_ON),
-						(String value) -> {
-							ListGridRecord selectedRecord = attributesList.getSelectedRecord();
-							selectedRecord.setAttribute(DEPENDS_ON, value);
-							if (changedHandler != null)
-								changedHandler.onChanged(null);
-						});
+			ListGridRecord selection = attributesList.getSelectedRecord();
+			LD.askForString(DEPENDSON, "attributename", selection.getAttributeAsString(DEPENDS_ON), (String value) -> {
+				ListGridRecord selectedRecord = attributesList.getSelectedRecord();
+				selectedRecord.setAttribute(DEPENDS_ON, value);
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			});
 		});
-		dependsOn.setEnabled(attributesList.getSelectedRecord().getAttributeAsBoolean("preset"));
+		dependsOn.setEnabled(attributesList.getSelectedRecord().getAttributeAsBoolean(PRESET));
 		return dependsOn;
 	}
 
@@ -369,8 +371,8 @@ public class TemplatePropertiesPanel extends HLayout {
 		initialization.setTitle(I18N.message(INITIALIZATION));
 		initialization.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
-			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation(INITIALIZATION, 
-					null, null, false);
+			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation(INITIALIZATION, null, null,
+					false);
 			initializationItem.setWidth(600);
 			initializationItem.setHeight(400);
 
@@ -406,8 +408,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		validation.setTitle(I18N.message(VALIDATION));
 		validation.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
-			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation(VALIDATION, null, null,
-					false);
+			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation(VALIDATION, null, null, false);
 			validationItem.setWidth(600);
 			validationItem.setHeight(400);
 
@@ -540,13 +541,13 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						for (String attrName : names)
-							template.removeAttribute(attrName);
-						attributesList.removeSelectedData();
-						if (TemplatePropertiesPanel.this.changedHandler != null)
-							TemplatePropertiesPanel.this.changedHandler.onChanged(null);
-					}
+				if (Boolean.TRUE.equals(yes)) {
+					for (String attrName : names)
+						template.removeAttribute(attrName);
+					attributesList.removeSelectedData();
+					if (TemplatePropertiesPanel.this.changedHandler != null)
+						TemplatePropertiesPanel.this.changedHandler.onChanged(null);
+				}
 			});
 		});
 		return delete;
@@ -578,7 +579,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			rec.setAttribute(MULTIPLE, att.isMultiple());
 			rec.setAttribute(VALIDATION, att.getValidation());
 			rec.setAttribute(INITIALIZATION, att.getInitialization());
-			rec.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
+			rec.setAttribute(PRESET, att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
 			rec.setAttribute(DEPENDS_ON, att.getDependsOn());
 			attributesList.getRecordList().add(rec);
 		}

@@ -42,6 +42,8 @@ import com.logicaldoc.webservice.soap.DocumentMetadataService;
  */
 public class SoapDocumentMetadataService extends AbstractService implements DocumentMetadataService {
 
+	private static final String TEMPLATE = "template ";
+
 	@Override
 	public WSTemplate[] listTemplates(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
@@ -135,7 +137,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			template.setDescription(wsTemplate.getDescription());
 
 			if (template.getReadonly() == 1 || !isTemplateWritable(sid, template.getId()))
-				throw new PermissionException(user.getUsername(), "template " + wsTemplate.getName(), "read");
+				throw new PermissionException(user.getUsername(), TEMPLATE + wsTemplate.getName(), "read");
 		}
 
 		if (StringUtils.isEmpty(template.getName()))
@@ -153,7 +155,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 					+ " because some documents belongs to that template.");
 		Template templ = dao.findById(templateId);
 		if (templ.getReadonly() == 1 || !isTemplateWritable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templ.getName(), "write");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templ.getName(), "write");
 
 		dao.delete(templateId);
 	}
@@ -325,7 +327,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		if (!isTemplateWritable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templateId, "write");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "write");
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		Template templ = dao.findById(templateId);
@@ -368,7 +370,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		if (!isTemplateReadable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templateId, "read");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "read");
 
 		return getGranted(sid, templateId, true);
 	}
@@ -378,7 +380,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		if (!isTemplateReadable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templateId, "read");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "read");
 
 		return getGranted(sid, templateId, false);
 	}

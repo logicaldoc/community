@@ -58,6 +58,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class LoginPanel extends VLayout {
 
+	private static final String PASSWORD = "password";
+
+	private static final String ENTER = "enter";
+
+	private static final String LOGIN_FIELD = "login-field";
+
+	private static final String A_HREF = "<a href='";
+
 	protected static final int FORM_WIDTH = 280;
 
 	private static final int COLUMN_WIDTH = FORM_WIDTH + 20;
@@ -141,7 +149,7 @@ public class LoginPanel extends VLayout {
 		 */
 		String productInfoHtml = "<b>" + info.getBranding().getProductName() + " " + info.getRelease() + "</b>";
 		if (info.getBranding().getUrl() != null && !"-".equals(info.getBranding().getUrl()))
-			productInfoHtml = "<a href='" + info.getBranding().getUrl() + "' target='_blank' class='login-link'>"
+			productInfoHtml = A_HREF + info.getBranding().getUrl() + "' target='_blank' class='login-link'>"
 					+ productInfoHtml + "</a>";
 		HTMLFlow productInfo = new HTMLFlow(productInfoHtml);
 		productInfo.setHeight(16);
@@ -201,7 +209,7 @@ public class LoginPanel extends VLayout {
 		rememberMe.setRequired(false);
 		rememberMe.setShowTitle(false);
 		rememberMe.setValue(CookiesManager.isSaveLogin());
-		rememberMe.setTextBoxStyle("login-field");
+		rememberMe.setTextBoxStyle(LOGIN_FIELD);
 		rememberMe.setAlign(Alignment.LEFT);
 		rememberMe.setEndRow(false);
 		rememberMe.setColSpan(2);
@@ -247,7 +255,7 @@ public class LoginPanel extends VLayout {
 		 */
 		String copyrightHtml = "<div>\u00A9 " + info.getYear() + " " + info.getBranding().getVendor();
 		if (info.getBranding().getUrl() != null && !"-".equals(info.getBranding().getUrl()))
-			copyrightHtml = "<a href='" + info.getBranding().getUrl()
+			copyrightHtml = A_HREF + info.getBranding().getUrl()
 					+ "' target='_blank' class='login-copyright-link'>" + copyrightHtml + "</a></div>";
 		String licenseeHtml = "";
 		if (info.getLicensee() != null && !"".equals(info.getLicensee().trim()))
@@ -328,7 +336,7 @@ public class LoginPanel extends VLayout {
 		secretKey.setTextBoxStyle("secretkey-field");
 		secretKey.setColSpan(3);
 		secretKey.addKeyPressHandler((KeyPressEvent event) -> {
-			if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
 				onSignin();
 		});
 	}
@@ -365,19 +373,19 @@ public class LoginPanel extends VLayout {
 	}
 
 	private void preparePassword() {
-		password = ItemFactory.newPasswordItem("password", "password", null);
+		password = ItemFactory.newPasswordItem(PASSWORD, PASSWORD, null);
 		password.setShowTitle(false);
-		password.setHint(I18N.message("password").toLowerCase());
+		password.setHint(I18N.message(PASSWORD).toLowerCase());
 		password.setShowHintInField(true);
 		password.setRequired(true);
 		password.setHeight(34);
 		password.setWidth(FORM_WIDTH);
-		password.setTextBoxStyle("login-field");
+		password.setTextBoxStyle(LOGIN_FIELD);
 		password.setAlign(Alignment.LEFT);
 		password.setWrapTitle(false);
 		password.setColSpan(3);
 		password.addKeyPressHandler((KeyPressEvent event) -> {
-			if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
 				onSignin();
 		});
 	}
@@ -392,10 +400,10 @@ public class LoginPanel extends VLayout {
 		username.setHeight(34);
 		username.setWidth(FORM_WIDTH);
 		username.setAlign(Alignment.LEFT);
-		username.setTextBoxStyle("login-field");
+		username.setTextBoxStyle(LOGIN_FIELD);
 		username.setColSpan(3);
 		username.addKeyPressHandler((KeyPressEvent event) -> {
-			if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
 				onSignin();
 		});
 	}
@@ -415,7 +423,7 @@ public class LoginPanel extends VLayout {
 		/*
 		 * A link to the alternative login page
 		 */
-		HTMLFlow switchLink = new HTMLFlow("<a href='" + url + "' class='login-switchview'>" + label + "</a>");
+		HTMLFlow switchLink = new HTMLFlow(A_HREF + url + "' class='login-switchview'>" + label + "</a>");
 		switchLink.setHeight(16);
 		switchLink.setWidth(COLUMN_WIDTH + 20);
 		switchLink.setStyleName("login-switchview");

@@ -35,6 +35,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 7.8
  */
 public class VIASettingsPanel extends AdminPanel {
+	private static final String PASSWORD = "password";
+
+	private static final String USERNAME = "username";
+
+	private static final String MAXATTACHMENTSIZE = "maxattachmentsize";
+
 	private DynamicForm settingsForm = new DynamicForm();
 
 	private DynamicForm emailForm = new DynamicForm();
@@ -108,7 +114,7 @@ public class VIASettingsPanel extends AdminPanel {
 		maxAttachments.setWrapTitle(false);
 		maxAttachments.setRequired(true);
 
-		IntegerItem maxAttachmentSize = ItemFactory.newLongItem("maxattachmentsize", "maxattachmentsize",
+		IntegerItem maxAttachmentSize = ItemFactory.newLongItem(MAXATTACHMENTSIZE, MAXATTACHMENTSIZE,
 				settings.getMaxAttachmentSize() / 1024L);
 		maxAttachmentSize.setRequired(true);
 		maxAttachmentSize.setWrapTitle(false);
@@ -136,10 +142,10 @@ public class VIASettingsPanel extends AdminPanel {
 		mailaddress.setValue(account.getMailAddress());
 		mailaddress.setRequired(false);
 
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", account.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME, account.getUsername());
 		username.setWidth(180);
 
-		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password",
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD,
 				account.getPassword());
 		password.setWidth(180);
 
@@ -285,7 +291,7 @@ public class VIASettingsPanel extends AdminPanel {
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 			settings.setEnabled("yes".equals(values.get("eenabled").toString()));
 			settings.setMaxAttachments(Integer.parseInt(values.get("maxattachments").toString()));
-			settings.setMaxAttachmentSize(Long.parseLong(values.get("maxattachmentsize").toString()) * 1024L);
+			settings.setMaxAttachmentSize(Long.parseLong(values.get(MAXATTACHMENTSIZE).toString()) * 1024L);
 
 			GUIEmailAccount account = settings.getEmailAccount();
 			if (account == null) {
@@ -295,8 +301,8 @@ public class VIASettingsPanel extends AdminPanel {
 
 			account.setMailAddress((String) values.get("mailaddress"));
 			account.setHost((String) values.get("server"));
-			account.setUsername((String) values.get("username"));
-			account.setPassword((String) values.get("password"));
+			account.setUsername((String) values.get(USERNAME));
+			account.setPassword((String) values.get(PASSWORD));
 			account.setProvider((String) values.get("protocol"));
 			if (values.get("port") instanceof Integer)
 				account.setPort((Integer) values.get("port"));

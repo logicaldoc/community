@@ -60,6 +60,10 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Sebastian Stein
  */
 public class ServletUtil {
+	private static final String UTF_8 = "UTF-8";
+
+	private static final String CONTENT_RANGE = "Content-Range";
+
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
 
 	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
@@ -280,7 +284,7 @@ public class ServletUtil {
 			} else if (ranges.size() == 1) {
 				// Return single part of file.
 				Range r = ranges.get(0);
-				response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
+				response.setHeader(CONTENT_RANGE, "bytes " + r.start + "-" + r.end + "/" + r.total);
 
 				if (length == r.length)
 					response.setStatus(HttpServletResponse.SC_OK); // 200.
@@ -346,7 +350,7 @@ public class ServletUtil {
 		// Range header should match format "bytes=n-n,n-n,n-n...". If not,
 		// then return 416. Impose a max range size in order avoid stack overflow of the Java regex 
 		if (!StringUtils.left(range, 500).matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
-			response.setHeader("Content-Range", "bytes */" + length); // Required
+			response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
 																		// in
 																		// 416.
 			// response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -380,7 +384,7 @@ public class ServletUtil {
 			// Check if Range is syntactically valid. If not, then
 			// return 416.
 			if (start > end) {
-				response.setHeader("Content-Range", "bytes */" + length); // Required
+				response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
 																			// in
 																			// 416.
 				// response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -588,7 +592,7 @@ public class ServletUtil {
 		if (userAgent.contains("msie") || userAgent.contains("opera")
 				|| (userAgent.contains("trident") && userAgent.contains("windows"))
 				|| (userAgent.contains("edge") && userAgent.contains("windows"))) {
-			encodedFileName = URLEncoder.encode(filename, "UTF-8");
+			encodedFileName = URLEncoder.encode(filename, UTF_8);
 			encodedFileName = encodedFileName.replace("+", "%20");
 		} else if (userAgent.contains("safari") && !userAgent.contains("chrome")) {
 			// Safari User-Agent contains "chrome"
@@ -597,7 +601,7 @@ public class ServletUtil {
 			// Used by some LG phones
 			encodedFileName = filename;
 		} else {
-			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes("UTF-8")), "UTF-8")
+			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8)
 					+ "?=";
 		}
 
@@ -632,7 +636,7 @@ public class ServletUtil {
 	public static void downloadDocumentText(HttpServletRequest request, HttpServletResponse response, long docId,
 			User user) throws FileNotFoundException, IOException, PersistenceException {
 
-		response.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding(UTF_8);
 
 		// get document
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -666,7 +670,7 @@ public class ServletUtil {
 			content = "";
 
 		try {
-			response.getOutputStream().write(content.getBytes(Charset.forName("UTF-8")));
+			response.getOutputStream().write(content.getBytes(Charset.forName(UTF_8)));
 		} finally {
 			response.getOutputStream().flush();
 			response.getOutputStream().close();

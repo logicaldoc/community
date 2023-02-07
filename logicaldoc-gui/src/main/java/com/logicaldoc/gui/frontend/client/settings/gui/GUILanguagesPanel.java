@@ -29,6 +29,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class GUILanguagesPanel extends VLayout {
 
+	private static final String EENABLED = "eenabled";
 	private ListGrid list;
 
 	public GUILanguagesPanel() {
@@ -37,7 +38,7 @@ public class GUILanguagesPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -92,7 +93,7 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "0");
+								rec.setAttribute(EENABLED, "0");
 								list.refreshRow(list.getRecordIndex(rec));
 								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
@@ -114,7 +115,7 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onSuccess(Void result) {
-								rec.setAttribute("eenabled", "2");
+								rec.setAttribute(EENABLED, "2");
 								list.refreshRow(list.getRecordIndex(rec));
 								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
@@ -122,7 +123,7 @@ public class GUILanguagesPanel extends VLayout {
 			}
 		});
 
-		if ("0".equals(rec.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable);
 		else
 			contextMenu.setItems(enable);

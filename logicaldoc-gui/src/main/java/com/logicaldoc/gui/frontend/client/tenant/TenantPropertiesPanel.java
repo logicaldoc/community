@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class TenantPropertiesPanel extends HLayout {
+	private static final String EMAIL = "email";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -108,7 +110,7 @@ public class TenantPropertiesPanel extends HLayout {
 		if (!readonly)
 			expire.addChangedHandler(changedHandler);
 
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setDisabled(readonly);
 		email.setValue(tenant.getEmail());
 		if (!readonly)
@@ -172,7 +174,7 @@ public class TenantPropertiesPanel extends HLayout {
 			tenant.setState((String) values.get("state"));
 			tenant.setPostalCode((String) values.get("postalcode"));
 			tenant.setTelephone((String) values.get("phone"));
-			tenant.setEmail((String) values.get("email"));
+			tenant.setEmail((String) values.get(EMAIL));
 			tenant.setEnabled(Boolean.valueOf(values.get("eenabled").toString()));
 			tenant.setExpire((Date) values.get("expire"));
 		}

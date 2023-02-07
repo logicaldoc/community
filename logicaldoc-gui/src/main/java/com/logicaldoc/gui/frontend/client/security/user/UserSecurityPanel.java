@@ -26,6 +26,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.7.2
  */
 public class UserSecurityPanel extends VLayout {
+	private static final String ENFORCEWORKINGTIME = "enforceworkingtime";
+
+	private static final String ADMIN = "admin";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -101,7 +105,7 @@ public class UserSecurityPanel extends VLayout {
 		maxInactivity.setWidth(50);
 		maxInactivity.setStep(1);
 		maxInactivity.setMin(-1);
-		if (readonly || "admin".equals(user.getUsername())) {
+		if (readonly || ADMIN.equals(user.getUsername())) {
 			maxInactivity.setDisabled(true);
 		} else {
 			maxInactivity.addChangedHandler(changedHandler);
@@ -122,7 +126,7 @@ public class UserSecurityPanel extends VLayout {
 	private DateItem prepareExpireItem(boolean readonly) {
 		DateItem expire = ItemFactory.newDateItem("expireson");
 		expire.setValue(user.getExpire());
-		if (readonly || "admin".equals(user.getUsername())) {
+		if (readonly || ADMIN.equals(user.getUsername())) {
 			expire.setDisabled(true);
 		} else {
 			expire.addChangedHandler(changedHandler);
@@ -141,9 +145,9 @@ public class UserSecurityPanel extends VLayout {
 	}
 
 	private CheckboxItem prepareEnforceWorkingTImeSwitch(boolean readonly) {
-		CheckboxItem enforceWorkingTime = new CheckboxItem("enforceworkingtime", I18N.message("enforceworkingtime"));
+		CheckboxItem enforceWorkingTime = new CheckboxItem(ENFORCEWORKINGTIME, I18N.message(ENFORCEWORKINGTIME));
 		enforceWorkingTime.setValue(user.isEnforceWorkingTime());
-		if (readonly || "admin".equals(user.getUsername())) {
+		if (readonly || ADMIN.equals(user.getUsername())) {
 			enforceWorkingTime.setDisabled(true);
 		} else {
 			enforceWorkingTime.addChangedHandler(changedHandler);
@@ -154,7 +158,7 @@ public class UserSecurityPanel extends VLayout {
 	private CheckboxItem prepareEnabledSwitch(boolean readonly) {
 		CheckboxItem enabled = new CheckboxItem("eenabled", I18N.message("enabled"));
 		enabled.setValue(user.isEnabled());
-		if (readonly || "admin".equals(user.getUsername())) {
+		if (readonly || ADMIN.equals(user.getUsername())) {
 			enabled.setDisabled(true);
 		} else {
 			enabled.addChangedHandler(changedHandler);
@@ -178,7 +182,7 @@ public class UserSecurityPanel extends VLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			user.setPasswordExpires(Boolean.parseBoolean(values.get("passwordExpires").toString()));
 			user.setEnabled(Boolean.parseBoolean(values.get("eenabled").toString()));
-			user.setEnforceWorkingTime(Boolean.parseBoolean(values.get("enforceworkingtime").toString()));
+			user.setEnforceWorkingTime(Boolean.parseBoolean(values.get(ENFORCEWORKINGTIME).toString()));
 			user.setMaxInactivity((Integer) values.get("maxinactivity"));
 			user.setExpire((Date) values.get("expireson"));
 			user.setSecondFactor(values.get("2fa").toString());

@@ -45,6 +45,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class DocumentsDataServlet extends AbstractDataServlet {
 
+	private static final String INDEXED = "indexed";
+
 	private final class ExtendedAttributeRowMapper implements RowMapper<Long> {
 		private final Map<String, Object> extAttributesValues;
 
@@ -383,8 +385,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			query.append(" and A.folder.id=" + folderId);
 		if (formId != null)
 			query.append(" and A.formId=" + Long.toString(formId));
-		if (StringUtils.isNotEmpty(request.getParameter("indexed")))
-			query.append(" and A.indexed=" + request.getParameter("indexed"));
+		if (StringUtils.isNotEmpty(request.getParameter(INDEXED)))
+			query.append(" and A.indexed=" + request.getParameter(INDEXED));
 
 		Map<String, Object> params = new HashMap<>();
 		if (filename != null) {
@@ -395,7 +397,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Object> records = new ArrayList<>();
 		if (folderId != null || filename != null || formId != null
-				|| StringUtils.isNotEmpty(request.getParameter("indexed")))
+				|| StringUtils.isNotEmpty(request.getParameter(INDEXED)))
 			records = (List<Object>) docDao.findByQuery(query.toString(), params, null);
 
 		List<Document> documents = enrichRecords(records, extendedAttributes, extendedAttributesValues, user);

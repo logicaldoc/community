@@ -28,6 +28,7 @@ import com.logicaldoc.util.MimeType;
  * @since 8.7
  */
 public class WebserviceServletUtil {
+	private static final String UTF_8 = "UTF-8";
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
 
 	/**
@@ -48,7 +49,7 @@ public class WebserviceServletUtil {
 		if (userAgent.contains("msie") || userAgent.contains("opera")
 				|| (userAgent.contains("trident") && userAgent.contains("windows"))
 				|| (userAgent.contains("edge") && userAgent.contains("windows"))) {
-			encodedFileName = URLEncoder.encode(filename, "UTF-8");
+			encodedFileName = URLEncoder.encode(filename, UTF_8);
 			encodedFileName = encodedFileName.replace("+", "%20");
 		} else if (userAgent.contains("safari") && !userAgent.contains("chrome")) {
 			// Safari User-Agent contains "chrome"
@@ -57,7 +58,7 @@ public class WebserviceServletUtil {
 			// Used by some LG phones
 			encodedFileName = filename;
 		} else {
-			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes("UTF-8")), "UTF-8")
+			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8)
 					+ "?=";
 		}
 

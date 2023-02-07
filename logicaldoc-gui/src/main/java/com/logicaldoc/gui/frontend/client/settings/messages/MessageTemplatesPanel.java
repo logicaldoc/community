@@ -18,16 +18,13 @@ import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -43,6 +40,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.5
  */
 public class MessageTemplatesPanel extends VLayout {
+
+	private static final String SUBJECT = "subject";
+
+	private static final String LANGUAGE = "language";
 
 	private ListGrid list;
 
@@ -64,51 +65,36 @@ public class MessageTemplatesPanel extends VLayout {
 		HTMLFlow hint = new HTMLFlow(I18N.message("messagetemplatehint"));
 		hint.setMargin(3);
 
-		langSelector = ItemFactory.newLanguageSelector("language", false, true);
+		langSelector = ItemFactory.newLanguageSelector(LANGUAGE, false, true);
 		langSelector.setWrapTitle(false);
 		langSelector.setMultiple(false);
 		langSelector.setEndRow(false);
-		langSelector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				reload();
-			}
-		});
+		langSelector.addChangedHandler((ChangedEvent event) -> reload());
 
 		ToolStripButton add = new ToolStripButton();
 		add.setAutoFit(true);
 		add.setTitle(I18N.message("addmessagetemplate"));
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				langSelector.setValue("en");
-				TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
-				item.setRequired(true);
-				LD.askForValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item,
-						new ValueCallback() {
-							@Override
-							public void execute(String value) {
-								ListGridRecord rec = new ListGridRecord();
-								rec.setAttribute("id", "-1");
-								rec.setAttribute("type", "user");
-								rec.setAttribute("name", value);
-								list.getRecordList().addAt(rec, 0);
-								list.startEditing(0);
-							}
-						});
-			}
+		add.addClickHandler((ClickEvent event) -> {
+			langSelector.setValue("en");
+			TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
+			item.setRequired(true);
+			LD.askForValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item, new ValueCallback() {
+				@Override
+				public void execute(String value) {
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("id", "-1");
+					rec.setAttribute("type", "user");
+					rec.setAttribute("name", value);
+					list.getRecordList().addAt(rec, 0);
+					list.startEditing(0);
+				}
+			});
 		});
 
 		ToolStripButton save = new ToolStripButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				saveTemplates();
-			}
-		});
+		save.addClickHandler((ClickEvent event) -> saveTemplates());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addFormItem(langSelector);
@@ -127,7 +113,7 @@ public class MessageTemplatesPanel extends VLayout {
 		type.setWidth(60);
 		type.setCanEdit(false);
 
-		ListGridField subject = new ListGridField("subject", I18N.message("subject"));
+		ListGridField subject = new ListGridField(SUBJECT, I18N.message(SUBJECT));
 		subject.setWidth(160);
 		subject.setRequired(false);
 
@@ -182,21 +168,12 @@ public class MessageTemplatesPanel extends VLayout {
 		list.setCanAcceptDroppedRecords(true);
 		list.setDragDataAction(DragDataAction.MOVE);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				onEdit();
-			}
-		});
+		list.addDoubleClickHandler((DoubleClickEvent event) -> onEdit());
 
 		// Initialize with english language
 		langSelector.setValue("en");
@@ -227,7 +204,7 @@ public class MessageTemplatesPanel extends VLayout {
 			t.setId(new Long(rec.getAttributeAsString("id")));
 			t.setLanguage(lang);
 			t.setName(rec.getAttributeAsString("name"));
-			t.setSubject(rec.getAttributeAsString("subject"));
+			t.setSubject(rec.getAttributeAsString(SUBJECT));
 			t.setBody(rec.getAttributeAsString("body"));
 			t.setType(rec.getAttributeAsString("type"));
 
@@ -252,47 +229,43 @@ public class MessageTemplatesPanel extends VLayout {
 
 		MenuItem copyFromDefault = new MenuItem();
 		copyFromDefault.setTitle(I18N.message("copyfromdefault"));
-		copyFromDefault.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] records = list.getSelectedRecords();
-				long[] ids = new long[records.length];
-				for (int i = 0; i < records.length; i++) {
-					// Avoid deletion of default templates
-					if (!"en".equals(records[i].getAttributeAsString("language")))
-						ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
+		copyFromDefault.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord[] records = list.getSelectedRecords();
+			long[] ids = new long[records.length];
+			for (int i = 0; i < records.length; i++) {
+				// Avoid deletion of default templates
+				if (!"en".equals(records[i].getAttributeAsString(LANGUAGE)))
+					ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
+			}
+
+			MessageService.Instance.get().deleteTemplates(ids, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
 				}
 
-				MessageService.Instance.get().deleteTemplates(ids, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void arg0) {
-						reload();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void arg0) {
+					reload();
+				}
+			});
 		});
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				MessageService.Instance.get().deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"),
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler((MenuItemClickEvent event) -> {
+			MessageService.Instance.get().deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"),
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void arg) {
-								reload();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void arg) {
+							reload();
+						}
+					});
 		});
 
 		delete.setEnabled(!"system".equals(list.getSelectedRecord().getAttributeAsString("type")));
@@ -319,8 +292,8 @@ public class MessageTemplatesPanel extends VLayout {
 					ListGridRecord rec = new ListGridRecord();
 					rec.setAttribute("id", pat.getId());
 					rec.setAttribute("name", pat.getName());
-					rec.setAttribute("language", pat.getName());
-					rec.setAttribute("subject", pat.getSubject());
+					rec.setAttribute(LANGUAGE, pat.getName());
+					rec.setAttribute(SUBJECT, pat.getSubject());
 					rec.setAttribute("body", pat.getBody());
 					rec.setAttribute("type", pat.getType());
 					records[i++] = rec;

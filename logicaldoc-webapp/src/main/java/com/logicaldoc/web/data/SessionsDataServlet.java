@@ -30,6 +30,8 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class SessionsDataServlet extends AbstractDataServlet {
 
+	private static final String CLOSE_STATUS_LABEL = "</statusLabel>";
+	private static final String STATUS_LABEL = "<statusLabel>";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -151,11 +153,11 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print("<status>" + (showSid ? session.getStatus() : "") + "</status>");
 		if (showSid) {
 			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
-				writer.print("<statusLabel>" + I18N.message("opened", locale) + "</statusLabel>");
+				writer.print(STATUS_LABEL + I18N.message("opened", locale) + CLOSE_STATUS_LABEL);
 			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
-				writer.print("<statusLabel>" + I18N.message("closed", locale) + "</statusLabel>");
+				writer.print(STATUS_LABEL + I18N.message("closed", locale) + CLOSE_STATUS_LABEL);
 			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_EXPIRED)
-				writer.print("<statusLabel>" + I18N.message("expired", locale) + "</statusLabel>");
+				writer.print(STATUS_LABEL + I18N.message("expired", locale) + CLOSE_STATUS_LABEL);
 		} else {
 			writer.print("<statusLabel></statusLabel>");
 		}

@@ -30,6 +30,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class VersionsDataServlet extends AbstractDataServlet {
 
+	private static final String DOC_ID = "docId";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -88,15 +89,15 @@ public class VersionsDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder(
 				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
 						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
-		if (request.getParameter("docId") != null) {
-			long docId = Long.parseLong(request.getParameter("docId"));
+		if (request.getParameter(DOC_ID) != null) {
+			long docId = Long.parseLong(request.getParameter(DOC_ID));
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();
 
 			query.append(" from Version A where A.deleted = 0 and A.docId = :docId ");
-			params.put("docId", docId);
+			params.put(DOC_ID, docId);
 		} else {
 			query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
 			query.append(" and B.id = :archiveId");

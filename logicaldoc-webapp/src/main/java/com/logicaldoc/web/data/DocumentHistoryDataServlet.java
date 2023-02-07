@@ -34,6 +34,10 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
+	private static final String EVENT = "event";
+
+	private static final String DOC_ID = "docId";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -60,7 +64,6 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		DateFormat df = getDateFormat();
 		for (Object gridRecord : records) {
 			Object[] cols = (Object[]) gridRecord;
 			if (request.getParameter("userId") != null) {
@@ -114,22 +117,22 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 	private Map<String, Object> prepareQueryParams(HttpServletRequest request, StringBuilder query)
 			throws PersistenceException {
 		Map<String, Object> params = new HashMap<>();
-		if (request.getParameter("docId") != null) {
-			Long docId = Long.parseLong(request.getParameter("docId"));
+		if (request.getParameter(DOC_ID) != null) {
+			Long docId = Long.parseLong(request.getParameter(DOC_ID));
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();
 			query.append(" and A.docId = :docId");
-			params.put("docId", docId);
+			params.put(DOC_ID, docId);
 		}
 		if (request.getParameter("userId") != null) {
 			query.append(" and A.userId = :userId");
 
 		}
-		if (request.getParameter("event") != null) {
+		if (request.getParameter(EVENT) != null) {
 			query.append(" and A.event = :event");
-			params.put("event", request.getParameter("event"));
+			params.put(EVENT, request.getParameter(EVENT));
 		}
 		query.append(" order by A.date desc ");
 		return params;

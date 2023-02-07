@@ -41,6 +41,8 @@ import com.logicaldoc.webservice.model.WSUtil;
  */
 public class AbstractService {
 
+	private static final String FOLDER = "folder ";
+
 	private static Logger log = LoggerFactory.getLogger(AbstractService.class);
 
 	private boolean validateSession = true;
@@ -144,7 +146,7 @@ public class AbstractService {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
 					permission.getName(), folderId);
 			log.error(message);
-			throw new PermissionException(user.getUsername(), "folder " + folderId, permission);
+			throw new PermissionException(user.getUsername(), FOLDER + folderId, permission);
 		}
 	}
 
@@ -169,7 +171,7 @@ public class AbstractService {
 			String message = String.format("User %s doesn't have read permission on folder %s", user.getUsername(),
 					folderId);
 			log.error(message);
-			throw new PermissionException(user.getUsername(), "folder " + folderId, Permission.READ);
+			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.READ);
 		}
 	}
 
@@ -180,7 +182,7 @@ public class AbstractService {
 			String message = String.format("User %s doesn't have download permission on folder %s", user.getUsername(),
 					folderId);
 			log.error(message);
-			throw new PermissionException(user.getUsername(), "folder " + folderId, Permission.DOWNLOAD);
+			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.DOWNLOAD);
 		}
 	}
 

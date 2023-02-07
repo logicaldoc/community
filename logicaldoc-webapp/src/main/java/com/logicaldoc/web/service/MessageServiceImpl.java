@@ -35,6 +35,8 @@ import com.logicaldoc.util.Context;
  */
 public class MessageServiceImpl extends AbstractRemoteService implements MessageService {
 
+	private static final String TEMPLATES_HAVE_NOT_BEEN_SAVED = "Templates have not been saved";
+
 	private static Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
 
 	private static final long serialVersionUID = 1L;
@@ -220,7 +222,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 				try {
 					dao.store(template);
 				} catch (Exception e) {
-					throw new Exception("Templates have not been saved");
+					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED);
 				}
 			}
 		} catch (Throwable t) {
@@ -242,7 +244,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					try {
 						dao.delete(id);
 					} catch (Exception e) {
-						throw new Exception("Templates have not been saved", e);
+						throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 					}
 				}
 			}
@@ -266,7 +268,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 				try {
 					dao.delete(template.getId());
 				} catch (Exception e) {
-					throw new Exception("Templates have not been saved", e);
+					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 				}
 			}
 		} catch (Throwable t) {

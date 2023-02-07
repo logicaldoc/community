@@ -54,6 +54,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CustomReportsPanel extends AdminPanel {
 
+	private static final String EENABLED = "eenabled";
+
+	private static final String OUTPUT_DOC_ID = "outputDocId";
+
+	private static final String ENABLED_ICON = "enabledIcon";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -88,7 +94,7 @@ public class CustomReportsPanel extends AdminPanel {
 		ListGridField outputFormat = new ListGridField("outputFormat", I18N.message("format"), 70);
 		outputFormat.setCanFilter(true);
 
-		ListGridField enabledIcon = new ListGridField("enabledIcon", " ", 24);
+		ListGridField enabledIcon = new ListGridField(ENABLED_ICON, " ", 24);
 		enabledIcon.setType(ListGridFieldType.IMAGE);
 		enabledIcon.setCanSort(false);
 		enabledIcon.setAlign(Alignment.CENTER);
@@ -233,9 +239,9 @@ public class CustomReportsPanel extends AdminPanel {
 			rec.setAttribute("recordVersion", report.getRecordVersion());
 
 			if (report.getOutputDocId() != null)
-				rec.setAttribute("outputDocId", "" + report.getOutputDocId());
+				rec.setAttribute(OUTPUT_DOC_ID, "" + report.getOutputDocId());
 			else
-				rec.setAttribute("outputDocId", (String) null);
+				rec.setAttribute(OUTPUT_DOC_ID, (String) null);
 			list.refreshRow(list.getRecordIndex(rec));
 
 			boolean selected = list.getSelectedRecord() != null ? rec.equals(list.getSelectedRecord()) : false;
@@ -260,8 +266,8 @@ public class CustomReportsPanel extends AdminPanel {
 
 		final ListGridRecord rec = list.getSelectedRecord();
 		final long selectedId = Long.parseLong(rec.getAttributeAsString("id"));
-		final Long outputDocId = rec.getAttribute("outputDocId") != null
-				? Long.parseLong(rec.getAttributeAsString("outputDocId"))
+		final Long outputDocId = rec.getAttribute(OUTPUT_DOC_ID) != null
+				? Long.parseLong(rec.getAttributeAsString(OUTPUT_DOC_ID))
 				: null;
 		final long outputFolderId = Long.parseLong(rec.getAttributeAsString("outputFolderId"));
 
@@ -285,7 +291,7 @@ public class CustomReportsPanel extends AdminPanel {
 		});
 
 		if (GUIReport.STATUS_IDLE != list.getSelectedRecord().getAttributeAsInt("status")
-				|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean("eenabled")))
+				|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 			execute.setEnabled(false);
 
 		MenuItem upload = new MenuItem();
@@ -336,12 +342,12 @@ public class CustomReportsPanel extends AdminPanel {
 
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute("eenabled", true);
-						rec.setAttribute("enabledIcon", "bullet_green");
+						rec.setAttribute(EENABLED, true);
+						rec.setAttribute(ENABLED_ICON, "bullet_green");
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
-		enable.setEnabled(!list.getSelectedRecord().getAttributeAsBoolean("eenabled"));
+		enable.setEnabled(!list.getSelectedRecord().getAttributeAsBoolean(EENABLED));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
@@ -355,12 +361,12 @@ public class CustomReportsPanel extends AdminPanel {
 
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute("eenabled", false);
-						rec.setAttribute("enabledIcon", "bullet_red");
+						rec.setAttribute(EENABLED, false);
+						rec.setAttribute(ENABLED_ICON, "bullet_red");
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
-		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean("eenabled"));
+		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(EENABLED));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
@@ -429,7 +435,7 @@ public class CustomReportsPanel extends AdminPanel {
 		}
 
 		rec.setAttribute("name", report.getName());
-		rec.setAttribute("eenabled", report.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute(EENABLED, report.getEnabled() == 1 ? "0" : "2");
 		rec.setAttribute("outputFormat", report.getOutputFormat());
 		if (report.getOutputFolder() != null) {
 			rec.setAttribute("outputFolder", report.getOutputFolder().getName());

@@ -33,6 +33,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class SearchToolbar extends ToolStrip {
 
+	private static final String TOGGLE_OFF = "toggle-off";
+	private static final String CLOSESELEFTPANEL = "closeseleftpanel";
+	private static final String TOGGLE_ON = "toggle-on";
+
 	public SearchToolbar(final HitsListPanel hitsPanel) {
 		setVisible(true);
 		setHeight(20);
@@ -85,18 +89,18 @@ public class SearchToolbar extends ToolStrip {
 
 	private void addSaveButton() {
 		ToolStripButton save = AwesomeFactory.newToolStripButton("save", "savesearch");
-		save.addClickHandler((ClickEvent event) -> {
-			SaveDialog dialog = new SaveDialog();
-			dialog.show();
-		});
+		save.addClickHandler((ClickEvent event) -> new SaveDialog().show());
 		if (Feature.visible(Feature.SAVED_SEARCHES)) {
 			addSeparator();
 			addButton(save);
-			if (!Feature.enabled(Feature.SAVED_SEARCHES)) {
-				save.setDisabled(true);
-				save.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.SAVED_SEARCHES))
+				setFeatureDisabled(save);
 		}
+	}
+
+	private void setFeatureDisabled(ToolStripButton button) {
+		button.setDisabled(true);
+		button.setTooltip(I18N.message("featuredisabled"));
 	}
 
 	private void addPrintButton(final HitsListPanel hitsPanel) {
@@ -114,21 +118,15 @@ public class SearchToolbar extends ToolStrip {
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
 			addButton(export);
-			export.addClickHandler((ClickEvent event) -> {
-				GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false);
-			});
-			if (!Feature.enabled(Feature.EXPORT_CSV)) {
-				export.setDisabled(true);
-				export.setTooltip(I18N.message("featuredisabled"));
-			}
+			export.addClickHandler((ClickEvent event) -> GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false));
+			if (!Feature.enabled(Feature.EXPORT_CSV))
+				setFeatureDisabled(export);
 		}
 	}
 
 	private void addSaveLayoutButton() {
 		ToolStripButton saveLayout = AwesomeFactory.newToolStripButton("save", "savelayoutinuserprofile");
-		saveLayout.addClickHandler((ClickEvent event) -> {
-			saveGridState();
-		});
+		saveLayout.addClickHandler((ClickEvent event) -> saveGridState());
 		addButton(saveLayout);
 	}
 
@@ -155,8 +153,7 @@ public class SearchToolbar extends ToolStrip {
 			ToolStripButton bulkUpdate = AwesomeFactory.newToolStripButton("edit", "bulkupdate");
 			addButton(bulkUpdate);
 			if (!Feature.enabled(Feature.BULK_UPDATE)) {
-				bulkUpdate.setDisabled(true);
-				bulkUpdate.setTooltip(I18N.message("featuredisabled"));
+				setFeatureDisabled(bulkUpdate);
 			}
 
 			bulkUpdate.addClickHandler((ClickEvent event) -> {
@@ -183,21 +180,21 @@ public class SearchToolbar extends ToolStrip {
 	}
 
 	private void addToggleLeftPanelButton() {
-		ToolStripButton toggle = AwesomeFactory.newToolStripButton("toggle-on", "closeseleftpanel");
+		ToolStripButton toggle = AwesomeFactory.newToolStripButton(TOGGLE_ON, CLOSESELEFTPANEL);
 		if (SearchMenu.get().getWidth() > 0) {
-			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-			toggle.setTooltip(I18N.message("closeseleftpanel"));
+			toggle.setTitle(AwesomeFactory.getIconHtml(TOGGLE_ON));
+			toggle.setTooltip(I18N.message(CLOSESELEFTPANEL));
 		} else {
-			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
+			toggle.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
 			toggle.setTooltip(I18N.message("openleftpanel"));
 		}
 		toggle.addClickHandler((ClickEvent event) -> {
 			SearchPanel.get().toggleMenu();
 			if (SearchPanel.get().isMenuOpened()) {
-				toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-				toggle.setTooltip(I18N.message("closeseleftpanel"));
+				toggle.setTitle(AwesomeFactory.getIconHtml(TOGGLE_ON));
+				toggle.setTooltip(I18N.message(CLOSESELEFTPANEL));
 			} else {
-				toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
+				toggle.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
 				toggle.setTooltip(I18N.message("openleftpanel"));
 			}
 		});
@@ -206,17 +203,17 @@ public class SearchToolbar extends ToolStrip {
 	}
 
 	private void addTogglePreviewButton(HitsListPanel hitsPanel) {
-		ToolStripButton togglePreview = AwesomeFactory.newToolStripButton("toggle-on", "closepreview");
+		ToolStripButton togglePreview = AwesomeFactory.newToolStripButton(TOGGLE_ON, "closepreview");
 		// Retrieve the saved preview width
 		String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
 		if (Integer.parseInt(w) <= 0) {
-			togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
+			togglePreview.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
 			togglePreview.setTooltip(I18N.message("openpreview"));
 		}
 		togglePreview.addClickHandler((ClickEvent event) -> {
 			if (SearchPanel.get().getPreviewPanel().isVisible() && SearchPanel.get().getPreviewPanel().getWidth() > 1) {
 				SearchPanel.get().getPreviewPanel().setWidth(0);
-				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
+				togglePreview.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
 				togglePreview.setTooltip(I18N.message("openpreview"));
 			} else {
 				try {
@@ -226,7 +223,7 @@ public class SearchToolbar extends ToolStrip {
 					SearchPanel.get().getPreviewPanel().setWidth(350);
 				}
 				SearchPanel.get().getPreviewPanel().setDocument(hitsPanel.getGrid().getSelectedDocument());
-				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
+				togglePreview.setTitle(AwesomeFactory.getIconHtml(TOGGLE_ON));
 				togglePreview.setTooltip(I18N.message("closepreview"));
 			}
 		});

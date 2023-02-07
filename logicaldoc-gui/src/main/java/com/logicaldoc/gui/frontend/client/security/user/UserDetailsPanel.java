@@ -32,6 +32,10 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class UserDetailsPanel extends VLayout implements UserObserver {
 
+	private static final String USERNAMEALREADYINUSE = "usernamealreadyinuse";
+
+	private static final String ADMIN = "admin";
+
 	private static final String TABID_USERINTERFACE = "userinterface";
 
 	private static final String TABID_SECURITY = "security";
@@ -284,7 +288,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 		}
 		workingTimePanel = new WorkingTimePanel(user, changeHandler);
 		workingTimeTabPanel.addMember(workingTimePanel);
-		workingTimePanel.setDisabled("admin".equals(user.getUsername()));
+		workingTimePanel.setDisabled(ADMIN.equals(user.getUsername()));
 	}
 
 	private void addSecurityTab(ChangedHandler changeHandler) {
@@ -311,8 +315,8 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
 		
 		// Admin only can change the 'admin' user
-		if (user.getUsername().equalsIgnoreCase("admin")
-				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
+		if (user.getUsername().equalsIgnoreCase(ADMIN)
+				&& !Session.get().getUser().getUsername().equalsIgnoreCase(ADMIN))
 			changeHandler = null;
 		return changeHandler;
 	}
@@ -328,8 +332,8 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 
 	public void onModified() {
 		// Admin only can change the admin user
-		if (user.getUsername().equalsIgnoreCase("admin")
-				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
+		if (user.getUsername().equalsIgnoreCase(ADMIN)
+				&& !Session.get().getUser().getUsername().equalsIgnoreCase(ADMIN))
 			tabSet.hideSave();
 		else
 			tabSet.displaySave();
@@ -384,8 +388,8 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 					LD.clearPrompt();
 					tabSet.hideSave();
 					if (createNew && user.getWelcomeScreen() == -99) {
-						GuiLog.warn(I18N.message("usernamealreadyinuse"), I18N.message("usernamealreadyinuse"));
-						SC.warn(I18N.message("usernamealreadyinuse"));
+						GuiLog.warn(I18N.message(USERNAMEALREADYINUSE), I18N.message(USERNAMEALREADYINUSE));
+						SC.warn(I18N.message(USERNAMEALREADYINUSE));
 						return;
 					}
 

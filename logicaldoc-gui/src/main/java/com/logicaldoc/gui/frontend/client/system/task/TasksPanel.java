@@ -41,6 +41,22 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class TasksPanel extends AdminPanel {
 
+	private static final String COMPLETION = "completion";
+
+	private static final String SCHEDULING = "scheduling";
+
+	private static final String IDLE_TASK = "idle_task";
+
+	private static final String ENABLED_ICON = "enabledIcon";
+
+	private static final String RUNNING_ICON = "runningIcon";
+
+	private static final String EENABLED = "eenabled";
+
+	private static final String RUNNING_TASK = "running_task";
+
+	private static final String STATUS = "status";
+
 	private Layout results = new VLayout();
 
 	private Layout details;
@@ -84,8 +100,8 @@ public class TasksPanel extends AdminPanel {
 											@Override
 											public void onSuccess(Boolean result) {
 												final ListGridRecord rec = tasksGrid.getSelectedRecord();
-												rec.setAttribute("status", GUITask.STATUS_RUNNING);
-												rec.setAttribute("runningIcon", "running_task");
+												rec.setAttribute(STATUS, GUITask.STATUS_RUNNING);
+												rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
 												Date now = new Date();
 												rec.setAttribute("lastStart", now);
 												rec.setAttribute("nextStart", new Date(now.getTime()
@@ -98,8 +114,8 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		if (GUITask.STATUS_IDLE != tasksGrid.getSelectedRecord().getAttributeAsInt("status")
-				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
+		if (GUITask.STATUS_IDLE != tasksGrid.getSelectedRecord().getAttributeAsInt(STATUS)
+				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 			taskExecution.setEnabled(false);
 
 		MenuItem taskStop = new MenuItem();
@@ -115,7 +131,7 @@ public class TasksPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
-								tasksGrid.getSelectedRecord().setAttribute("status", GUITask.STATUS_STOPPING);
+								tasksGrid.getSelectedRecord().setAttribute(STATUS, GUITask.STATUS_STOPPING);
 								tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 							}
 						});
@@ -123,8 +139,8 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		if (GUITask.STATUS_RUNNING != tasksGrid.getSelectedRecord().getAttributeAsInt("status")
-				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
+		if (GUITask.STATUS_RUNNING != tasksGrid.getSelectedRecord().getAttributeAsInt(STATUS)
+				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 			taskStop.setEnabled(false);
 
 		MenuItem enableTask = new MenuItem();
@@ -140,9 +156,9 @@ public class TasksPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
-								tasksGrid.getSelectedRecord().setAttribute("enabledIcon", "bullet_green");
-								tasksGrid.getSelectedRecord().setAttribute("eenabled", true);
-								tasksGrid.getSelectedRecord().setAttribute("runningIcon", "idle_task");
+								tasksGrid.getSelectedRecord().setAttribute(ENABLED_ICON, "bullet_green");
+								tasksGrid.getSelectedRecord().setAttribute(EENABLED, true);
+								tasksGrid.getSelectedRecord().setAttribute(RUNNING_ICON, IDLE_TASK);
 								tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 							}
 						});
@@ -150,7 +166,7 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		if (Boolean.TRUE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled")))
+		if (Boolean.TRUE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 			enableTask.setEnabled(false);
 
 		MenuItem disableTask = new MenuItem();
@@ -166,9 +182,9 @@ public class TasksPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
-								tasksGrid.getSelectedRecord().setAttribute("enabledIcon", "bullet_red");
-								tasksGrid.getSelectedRecord().setAttribute("eenabled", false);
-								tasksGrid.getSelectedRecord().setAttribute("runningIcon", "idle_task");
+								tasksGrid.getSelectedRecord().setAttribute(ENABLED_ICON, "bullet_red");
+								tasksGrid.getSelectedRecord().setAttribute(EENABLED, false);
+								tasksGrid.getSelectedRecord().setAttribute(RUNNING_ICON, IDLE_TASK);
 								tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 							}
 						});
@@ -176,8 +192,8 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		if (Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean("eenabled"))
-				|| tasksGrid.getSelectedRecord().getAttributeAsInt("status") != GUITask.STATUS_IDLE)
+		if (Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED))
+				|| tasksGrid.getSelectedRecord().getAttributeAsInt(STATUS) != GUITask.STATUS_IDLE)
 			disableTask.setEnabled(false);
 
 		contextMenu.setItems(taskExecution, taskStop, enableTask, disableTask);
@@ -206,7 +222,7 @@ public class TasksPanel extends AdminPanel {
 		tasksGrid.setShowRecordComponentsByCell(true);
 		tasksGrid.setAutoFetchData(true);
 
-		ListGridField enabled = new ListGridField("enabledIcon", " ", 30);
+		ListGridField enabled = new ListGridField(ENABLED_ICON, " ", 30);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -214,7 +230,7 @@ public class TasksPanel extends AdminPanel {
 		enabled.setImageURLSuffix(".png");
 		enabled.setCanFilter(false);
 
-		ListGridField running = new ListGridField("runningIcon", " ", 30);
+		ListGridField running = new ListGridField(RUNNING_ICON, " ", 30);
 		running.setType(ListGridFieldType.IMAGE);
 		running.setCanSort(false);
 		running.setAlign(Alignment.CENTER);
@@ -231,7 +247,7 @@ public class TasksPanel extends AdminPanel {
 
 		ListGridField nextStart = new DateListGridField("nextStart", "nextstart");
 
-		ListGridField scheduling = new ListGridField("scheduling", I18N.message("scheduling"), 130);
+		ListGridField scheduling = new ListGridField(SCHEDULING, I18N.message(SCHEDULING), 130);
 		scheduling.setCanFilter(false);
 		scheduling.setAlign(Alignment.CENTER);
 		scheduling.setCanSort(false);
@@ -244,7 +260,7 @@ public class TasksPanel extends AdminPanel {
 			return "";
 		});
 
-		ListGridField completion = new ListGridField("completion", " ", 35);
+		ListGridField completion = new ListGridField(COMPLETION, " ", 35);
 		completion.setCanFilter(false);
 		completion.setCanSort(false);
 		completion.setAlign(Alignment.LEFT);
@@ -309,12 +325,12 @@ public class TasksPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(GUITask task) {
-								rec.setAttribute("status", task.getStatus());
-								rec.setAttribute("eenabled", task.getScheduling().isEnabled());
+								rec.setAttribute(STATUS, task.getStatus());
+								rec.setAttribute(EENABLED, task.getScheduling().isEnabled());
 								if (task.getStatus() != GUITask.STATUS_IDLE) {
-									rec.setAttribute("runningIcon", "running_task");
+									rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
 								} else {
-									rec.setAttribute("runningIcon", "idle_task");
+									rec.setAttribute(RUNNING_ICON, IDLE_TASK);
 								}
 								tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 								showContextMenu();
@@ -384,7 +400,7 @@ public class TasksPanel extends AdminPanel {
 	 * @param task the task to update
 	 */
 	public void updateSelectedRecord(GUITask task) {
-		tasksGrid.getSelectedRecord().setAttribute("scheduling", task.getSchedulingLabel());
+		tasksGrid.getSelectedRecord().setAttribute(SCHEDULING, task.getSchedulingLabel());
 		tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 	}
 
@@ -418,14 +434,14 @@ public class TasksPanel extends AdminPanel {
 	private void updateRecords(GUITask guiTask) {
 		for (ListGridRecord rec : tasksGrid.getRecords()) {
 			if (rec.getAttribute("name").equals(guiTask.getName()) && guiTask.getStatus() != GUITask.STATUS_IDLE) {
-				rec.setAttribute("runningIcon", "running_task");
-				rec.setAttribute("completion", guiTask.getCompletionPercentage());
+				rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
+				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
 				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 				break;
 			} else if (rec.getAttribute("name").equals(guiTask.getName())
 					&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
-				rec.setAttribute("runningIcon", "idle_task");
-				rec.setAttribute("completion", guiTask.getCompletionPercentage());
+				rec.setAttribute(RUNNING_ICON, IDLE_TASK);
+				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
 				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 				break;
 			}

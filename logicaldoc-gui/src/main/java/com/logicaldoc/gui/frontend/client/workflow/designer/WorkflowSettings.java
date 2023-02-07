@@ -27,6 +27,10 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
  */
 public class WorkflowSettings extends Window {
 
+	private static final String WORKFLOWDESCR = "workflowdescr";
+
+	private static final String WORKFLOW_LABEL = "workflowLabel";
+
 	private GUIWorkflow workflow = null;
 
 	private ValuesManager vm = new ValuesManager();
@@ -60,13 +64,13 @@ public class WorkflowSettings extends Window {
 			workflowName.setDisabled(!(this.workflow.getName() == null || this.workflow.getName().trim().isEmpty()));
 		}
 
-		TextItem workflowLabel = ItemFactory.newTextItem("workflowLabel", "label", workflow.getLabel());
+		TextItem workflowLabel = ItemFactory.newTextItem(WORKFLOW_LABEL, "label", workflow.getLabel());
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", this.workflow != null ? this.workflow.getId() : "");
 		StaticTextItem version = ItemFactory.newStaticTextItem("version",
 				this.workflow != null ? "" + this.workflow.getVersion() : "");
 
-		TextAreaItem workflowDescr = ItemFactory.newTextAreaItem("workflowdescr", workflow.getDescription());
+		TextAreaItem workflowDescr = ItemFactory.newTextAreaItem(WORKFLOWDESCR, workflow.getDescription());
 		workflowDescr.setWrapTitle(false);
 		workflowDescr.setHeight(80);
 		workflowDescr.setWidth("*");
@@ -105,13 +109,13 @@ public class WorkflowSettings extends Window {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-		if (values.get("workflowdescr") != null)
-			WorkflowSettings.this.workflow.setDescription(values.get("workflowdescr").toString());
+		if (values.get(WORKFLOWDESCR) != null)
+			WorkflowSettings.this.workflow.setDescription(values.get(WORKFLOWDESCR).toString());
 		else
 			WorkflowSettings.this.workflow.setDescription(null);
 
-		if (values.get("workflowLabel") != null)
-			WorkflowSettings.this.workflow.setLabel(values.get("workflowLabel").toString());
+		if (values.get(WORKFLOW_LABEL) != null)
+			WorkflowSettings.this.workflow.setLabel(values.get(WORKFLOW_LABEL).toString());
 		else
 			WorkflowSettings.this.workflow.setLabel(null);
 

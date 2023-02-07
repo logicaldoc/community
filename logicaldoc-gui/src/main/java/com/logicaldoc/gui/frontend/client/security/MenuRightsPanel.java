@@ -35,6 +35,12 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class MenuRightsPanel extends VLayout {
 
+	private static final String AVATAR = "avatar";
+
+	private static final String ENTITY = "entity";
+
+	private static final String ENTITY_ID = "entityId";
+
 	private ListGrid rightsGrid;
 
 	protected GUIMenu menu;
@@ -52,11 +58,11 @@ public class MenuRightsPanel extends VLayout {
 		container.setMembersMargin(3);
 		addMember(container);
 
-		ListGridField entityId = new ListGridField("entityId", "entityId", 50);
+		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID, 50);
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 
-		ListGridField entity = new UserListGridField("entity", "avatar", "entity");
+		ListGridField entity = new UserListGridField(ENTITY, AVATAR, ENTITY);
 		entity.setCanEdit(false);
 
 		rightsGrid = new ListGrid();
@@ -91,9 +97,7 @@ public class MenuRightsPanel extends VLayout {
 
 		Button applyRights = new Button(I18N.message("applyrights"));
 		applyRights.setAutoFit(true);
-		applyRights.addClickHandler((ClickEvent event) -> {
-			onApply();
-		});
+		applyRights.addClickHandler((ClickEvent event) -> onApply());
 		if (withApplyButton)
 			buttons.addMember(applyRights);
 
@@ -118,7 +122,7 @@ public class MenuRightsPanel extends VLayout {
 			// table
 			ListGridRecord[] records = rightsGrid.getRecords();
 			for (ListGridRecord test : records) {
-				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("usergroup"))) {
 					user.clearValue();
 					return;
 				}
@@ -126,10 +130,10 @@ public class MenuRightsPanel extends VLayout {
 
 			// Update the rights table
 			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-			rec.setAttribute("entity",
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("usergroup"));
+			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-			rec.setAttribute("avatar", selectedRecord.getAttribute("id"));
+			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
 			rec.setAttribute("read", true);
 			rightsGrid.addData(rec);
 			user.clearValue();
@@ -153,7 +157,7 @@ public class MenuRightsPanel extends VLayout {
 			// table
 			ListGridRecord[] records = rightsGrid.getRecords();
 			for (ListGridRecord test : records) {
-				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
 					group.clearValue();
 					return;
 				}
@@ -161,9 +165,9 @@ public class MenuRightsPanel extends VLayout {
 
 			// Update the rights table
 			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute("entityId", selectedRecord.getAttribute("id"));
-			rec.setAttribute("entity", selectedRecord.getAttribute("name"));
-			rec.setAttribute("avatar", "group");
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
+			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
+			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute("read", true);
 			rightsGrid.addData(rec);
 			group.clearValue();
@@ -183,8 +187,8 @@ public class MenuRightsPanel extends VLayout {
 		for (ListGridRecord rec : records) {
 			GUIRight right = new GUIRight();
 
-			right.setName(rec.getAttributeAsString("entity"));
-			right.setEntityId(Long.parseLong(rec.getAttribute("entityId")));
+			right.setName(rec.getAttributeAsString(ENTITY));
+			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
 
 			tmp[i] = right;
 			i++;
@@ -203,20 +207,18 @@ public class MenuRightsPanel extends VLayout {
 
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
-		deleteItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] selection = rightsGrid.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
+		deleteItem.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord[] selection = rightsGrid.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						rightsGrid.removeSelectedData();
-						if (!withApplyButton)
-							onApply();
-					}
-				});
-			}
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					rightsGrid.removeSelectedData();
+					if (!withApplyButton)
+						onApply();
+				}
+			});
 		});
 
 		contextMenu.setItems(deleteItem);

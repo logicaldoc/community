@@ -67,6 +67,8 @@ import com.logicaldoc.webdav.web.AbstractWebdavServlet;
  */
 public class DavResourceImpl implements DavResource, Serializable {
 
+	private static final String RESOURCE_SERVICE = "ResourceService";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LoggerFactory.getLogger(DavResourceImpl.class);
@@ -102,7 +104,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		this.config = config;
 		this.session = session;
 
-		resourceService = (ResourceService) Context.get().getBean("ResourceService");
+		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
 		if (this.resource != null) {
 			this.isCollection = this.resource.isFolder();
 			this.resource.setRequestedPerson(Long.parseLong(session.getObject("id").toString()));
@@ -126,7 +128,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		this.locator = locator;
 		this.config = config;
 		this.session = session;
-		resourceService = (ResourceService) Context.get().getBean("ResourceService");
+		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
 	}
 
 	/**
@@ -144,7 +146,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			ResourceConfig config, boolean isCollection) throws DavException {
 		this(locator, factory, session, config);
 		this.isCollection = isCollection;
-		resourceService = (ResourceService) Context.get().getBean("ResourceService");
+		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
 	}
 
 	/**

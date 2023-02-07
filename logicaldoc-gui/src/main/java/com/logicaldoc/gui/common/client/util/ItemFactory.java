@@ -967,12 +967,12 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static MultiComboBoxItem newBarcodeFormatsComboBoxItem(String name, String title, String values) {
-		return newBarcodeFormatsComboBoxItem(name, title, values != null ? values.split(",") : null);
+	public static MultiComboBoxItem newBarcodeFormatsComboBoxItem(String values) {
+		return newBarcodeFormatsComboBoxItem(values != null ? values.split(",") : null);
 	}
 
-	public static MultiComboBoxItem newBarcodeFormatsComboBoxItem(String name, String title, String[] values) {
-		MultiComboBoxItem item = new MultiComboBoxItem(name, I18N.message(title));
+	public static MultiComboBoxItem newBarcodeFormatsComboBoxItem(String[] values) {
+		MultiComboBoxItem item = new MultiComboBoxItem("formats", I18N.message("formats"));
 		item.setLayoutStyle(MultiComboBoxLayoutStyle.FLOW);
 		item.setWidth(200);
 		item.setMultiple(true);

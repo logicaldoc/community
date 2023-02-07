@@ -46,6 +46,28 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CalendarReport extends AdminPanel {
 
+	private static final String DESCRIPTION = "description";
+
+	private static final String PARTICIPANTS = "participants";
+
+	private static final String STATUS = "status";
+
+	private static final String FREQUENCY = "frequency";
+
+	private static final String DISPLAYMAX = "displaymax";
+
+	private static final String SUBTYPE = "subtype";
+
+	private static final String TITLE = "title";
+
+	private static final String END_TO = "endTo";
+
+	private static final String END_FROM = "endFrom";
+
+	private static final String TO_DATE = "toDate";
+
+	private static final String FROM_DATE = "fromDate";
+
 	private Layout search = new VLayout();
 
 	private Layout results = new VLayout();
@@ -74,29 +96,29 @@ public class CalendarReport extends AdminPanel {
 		form.setWrapItemTitles(false);
 
 		// From
-		DateItem fromDate = ItemFactory.newDateItem("fromDate", "from");
+		DateItem fromDate = ItemFactory.newDateItem(FROM_DATE, "from");
 
 		// To
-		DateItem toDate = ItemFactory.newDateItem("toDate", "till");
+		DateItem toDate = ItemFactory.newDateItem(TO_DATE, "till");
 
 		// End date From
-		DateItem deadLineFrom = ItemFactory.newDateItem("endFrom", "endsfrom");
+		DateItem deadLineFrom = ItemFactory.newDateItem(END_FROM, "endsfrom");
 
 		// End date To
-		DateItem deadLineTo = ItemFactory.newDateItem("endTo", "till");
+		DateItem deadLineTo = ItemFactory.newDateItem(END_TO, "till");
 
 		SelectItem frequencySelector = ItemFactory.newFrequencySelector();
 
-		TextItem title = ItemFactory.newTextItem("title", null);
+		TextItem title = ItemFactory.newTextItem(TITLE, null);
 
 		TextItem type = ItemFactory.newTextItem("type", null);
 
-		TextItem subtype = ItemFactory.newTextItem("subtype", null);
+		TextItem subtype = ItemFactory.newTextItem(SUBTYPE, null);
 
 		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector();
 
 		// Max results
-		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displaymax", (Integer) null);
+		SpinnerItem displayMax = ItemFactory.newSpinnerItem(DISPLAYMAX, (Integer) null);
 		displayMax.setValue(100);
 		displayMax.setDefaultValue(100);
 		displayMax.setStep(10);
@@ -127,7 +149,7 @@ public class CalendarReport extends AdminPanel {
 		search.setWidth100();
 		search.setMargin(10);
 
-		ListGridField titleCol = new ListGridField("title", I18N.message("title"));
+		ListGridField titleCol = new ListGridField(TITLE, I18N.message(TITLE));
 		titleCol.setWidth("*");
 		titleCol.setCanFilter(true);
 
@@ -135,7 +157,7 @@ public class CalendarReport extends AdminPanel {
 		typeCol.setWidth(100);
 		typeCol.setCanFilter(true);
 
-		ListGridField subtypeCol = new ListGridField("subtype", I18N.message("subtype"));
+		ListGridField subtypeCol = new ListGridField(SUBTYPE, I18N.message(SUBTYPE));
 		subtypeCol.setWidth(100);
 		subtypeCol.setCanFilter(true);
 
@@ -143,7 +165,7 @@ public class CalendarReport extends AdminPanel {
 
 		ListGridField endDate = new DateListGridField("endDate", "enddate");
 
-		ListGridField frequency = new ListGridField("frequency", I18N.message("frequency"), 90);
+		ListGridField frequency = new ListGridField(FREQUENCY, I18N.message(FREQUENCY), 90);
 		frequency.setType(ListGridFieldType.INTEGER);
 		frequency.setAlign(Alignment.CENTER);
 		frequency.setCanFilter(false);
@@ -171,7 +193,7 @@ public class CalendarReport extends AdminPanel {
 			}
 		});
 
-		ListGridField status = new ListGridField("status", I18N.message("status"), 90);
+		ListGridField status = new ListGridField(STATUS, I18N.message(STATUS), 90);
 		status.setType(ListGridFieldType.INTEGER);
 		status.setAlign(Alignment.CENTER);
 		status.setCanFilter(false);
@@ -193,11 +215,11 @@ public class CalendarReport extends AdminPanel {
 			}
 		});
 
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		description.setWidth(400);
 		description.setHidden(true);
 
-		ListGridField participants = new ListGridField("participants", I18N.message("participants"));
+		ListGridField participants = new ListGridField(PARTICIPANTS, I18N.message(PARTICIPANTS));
 		participants.setWidth(300);
 
 		list = new ListGrid();
@@ -211,7 +233,7 @@ public class CalendarReport extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setAutoFetchData(true);
 		list.setFields(date, endDate, titleCol, typeCol, subtypeCol, status, frequency, participants, description);
-		list.setDetailField("description");
+		list.setDetailField(DESCRIPTION);
 		list.setCanExpandRecords(true);
 		list.setExpansionMode(ExpansionMode.DETAIL_FIELD);
 
@@ -275,31 +297,31 @@ public class CalendarReport extends AdminPanel {
 			return;
 
 		Date fromValue = null;
-		if (values.get("fromDate") != null)
-			fromValue = (Date) values.get("fromDate");
+		if (values.get(FROM_DATE) != null)
+			fromValue = (Date) values.get(FROM_DATE);
 		Date toValue = null;
-		if (values.get("toDate") != null)
-			toValue = (Date) values.get("toDate");
+		if (values.get(TO_DATE) != null)
+			toValue = (Date) values.get(TO_DATE);
 		Date endDateFrom = null;
-		if (values.get("endFrom") != null)
-			endDateFrom = (Date) values.get("endFrom");
+		if (values.get(END_FROM) != null)
+			endDateFrom = (Date) values.get(END_FROM);
 		Date endDateTo = null;
-		if (values.get("endTo") != null)
-			endDateTo = (Date) values.get("endTo");
+		if (values.get(END_TO) != null)
+			endDateTo = (Date) values.get(END_TO);
 
 		Integer frequencyValue = null;
-		if (values.get("frequency") != null)
-			frequencyValue = Integer.parseInt(values.get("frequency").toString());
+		if (values.get(FREQUENCY) != null)
+			frequencyValue = Integer.parseInt(values.get(FREQUENCY).toString());
 
 		Integer statusValue = null;
-		if (values.get("status") != null)
-			statusValue = Integer.parseInt(values.get("status").toString());
+		if (values.get(STATUS) != null)
+			statusValue = Integer.parseInt(values.get(STATUS).toString());
 
-		String titleValue = values.get("title") != null ? values.get("title").toString() : null;
+		String titleValue = values.get(TITLE) != null ? values.get(TITLE).toString() : null;
 
 		String typeValue = values.get("type") != null ? values.get("type").toString() : null;
 
-		String subtypeValue = values.get("subtype") != null ? values.get("subtype").toString() : null;
+		String subtypeValue = values.get(SUBTYPE) != null ? values.get(SUBTYPE).toString() : null;
 
 		int maxRecords = getMaxRecords(values);
 
@@ -309,11 +331,11 @@ public class CalendarReport extends AdminPanel {
 
 	private int getMaxRecords(final Map<String, Object> values) {
 		int maxRecords = 0;
-		if (values.get("displaymax") != null) {
-			if (values.get("displaymax") instanceof Integer)
-				maxRecords = (Integer) values.get("displaymax");
+		if (values.get(DISPLAYMAX) != null) {
+			if (values.get(DISPLAYMAX) instanceof Integer)
+				maxRecords = (Integer) values.get(DISPLAYMAX);
 			else
-				maxRecords = Integer.parseInt((String) values.get("displaymax"));
+				maxRecords = Integer.parseInt((String) values.get(DISPLAYMAX));
 		}
 		return maxRecords;
 	}
@@ -335,12 +357,12 @@ public class CalendarReport extends AdminPanel {
 							for (int i = 0; i < result.length; i++) {
 								ListGridRecord rec = new ListGridRecord();
 								rec.setAttribute("date", result[i].getStartDate());
-								rec.setAttribute("title", result[i].getTitle());
+								rec.setAttribute(TITLE, result[i].getTitle());
 								rec.setAttribute("type", result[i].getType());
-								rec.setAttribute("subtype", result[i].getSubType());
-								rec.setAttribute("frequency", result[i].getFrequency());
-								rec.setAttribute("status", result[i].getStatus());
-								rec.setAttribute("description", result[i].getDescription());
+								rec.setAttribute(SUBTYPE, result[i].getSubType());
+								rec.setAttribute(FREQUENCY, result[i].getFrequency());
+								rec.setAttribute(STATUS, result[i].getStatus());
+								rec.setAttribute(DESCRIPTION, result[i].getDescription());
 								rec.setAttribute("endDate", result[i].getDeadline());
 
 								StringBuilder participants = new StringBuilder();
@@ -350,7 +372,7 @@ public class CalendarReport extends AdminPanel {
 										participants.append(", ");
 									participants.append(user.toString());
 								}
-								rec.setAttribute("participants", participants.toString());
+								rec.setAttribute(PARTICIPANTS, participants.toString());
 
 								records[i] = rec;
 							}

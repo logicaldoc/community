@@ -17,7 +17,6 @@ import com.smartgwt.client.widgets.form.fields.BooleanItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to perform the checkin of a Zoho document into
@@ -27,6 +26,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 7.5.1
  */
 public class ZohoCheckin extends Window {
+	private static final String MAJORVERSION = "majorversion";
+
 	private SubmitItem checkin;
 
 	private ValuesManager vm;
@@ -47,8 +48,8 @@ public class ZohoCheckin extends Window {
 		form.setValuesManager(vm);
 
 		BooleanItem versionItem = new BooleanItem();
-		versionItem.setName("majorversion");
-		versionItem.setTitle(I18N.message("majorversion"));
+		versionItem.setName(MAJORVERSION);
+		versionItem.setTitle(I18N.message(MAJORVERSION));
 
 		TextItem commentItem = ItemFactory.newTextItem("comment", null);
 		commentItem.setRequired(true);
@@ -57,12 +58,7 @@ public class ZohoCheckin extends Window {
 		checkin = new SubmitItem();
 		checkin.setTitle(I18N.message("checkin"));
 		checkin.setAlign(Alignment.RIGHT);
-		checkin.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onCheckin(document, parentDialog);
-			}
-		});
+		checkin.addClickHandler((ClickEvent event) -> onCheckin(document, parentDialog));
 
 		form.setItems(versionItem, commentItem, checkin);
 
@@ -74,7 +70,7 @@ public class ZohoCheckin extends Window {
 			return;
 		LD.contactingServer();
 		ZohoService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
-				"true".equals(vm.getValueAsString("majorversion")), new AsyncCallback<GUIDocument>() {
+				"true".equals(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();

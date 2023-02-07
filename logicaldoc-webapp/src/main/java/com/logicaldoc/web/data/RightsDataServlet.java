@@ -30,6 +30,10 @@ import com.logicaldoc.util.Context;
  */
 public class RightsDataServlet extends AbstractDataServlet {
 
+	private static final String ENTITY = "<entity><![CDATA[";
+
+	private static final String CLOSE_ENTITY = "]]></entity>";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -115,10 +119,10 @@ public class RightsDataServlet extends AbstractDataServlet {
 		writer.print("<entityId>" + groupId + "</entityId>");
 
 		if (groupType == Group.TYPE_DEFAULT) {
-			writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
+			writer.print(ENTITY + groupName + CLOSE_ENTITY);
 			writer.print("<avatar>group</avatar>");
 		} else {
-			writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
+			writer.print(ENTITY + users.get(userId) + CLOSE_ENTITY);
 			writer.print("<avatar>" + userId + "</avatar>");
 		}
 		writer.print("<read>true</read>");
@@ -187,10 +191,10 @@ public class RightsDataServlet extends AbstractDataServlet {
 			writer.print("<entityId>" + groupId + "</entityId>");
 
 			if (groupType == Group.TYPE_DEFAULT) {
-				writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
+				writer.print(ENTITY + groupName + CLOSE_ENTITY);
 				writer.print("<avatar>group</avatar>");
 			} else {
-				writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
+				writer.print(ENTITY + users.get(userId) + CLOSE_ENTITY);
 				writer.print("<avatar>" + userId + "</avatar>");
 			}
 

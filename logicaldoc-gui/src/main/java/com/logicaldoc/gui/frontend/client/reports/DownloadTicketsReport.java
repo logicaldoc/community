@@ -41,6 +41,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DownloadTicketsReport extends ReportPanel {
 
+	private static final String DOC_ID = "docId";
+	private static final String VALID = "valid";
+	private static final String EENABLED = "eenabled";
 	private SpinnerItem max;
 
 	public DownloadTicketsReport() {
@@ -71,7 +74,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		id.setHidden(true);
 		id.setCanGroupBy(false);
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -116,7 +119,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		return new RefreshableListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("valid")))
+				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(VALID)))
 					return "color: #888888; font-style: italic;";
 				else
 					return super.getCellCSSText(rec, rowNum, colNum);
@@ -138,7 +141,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler((MenuItemClickEvent event) -> {
-			long id = Long.parseLong(rec.getAttribute("docId"));
+			long id = Long.parseLong(rec.getAttribute(DOC_ID));
 			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
 
 				@Override
@@ -159,7 +162,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler((MenuItemClickEvent event) -> {
-				String id = rec.getAttribute("docId");
+				String id = rec.getAttribute(DOC_ID);
 				WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + id);
 		});
 
@@ -181,7 +184,7 @@ public class DownloadTicketsReport extends ReportPanel {
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
 				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
-						Long.parseLong(rec.getAttributeAsString("docId")));
+						Long.parseLong(rec.getAttributeAsString(DOC_ID)));
 		});
 
 		MenuItem enable = new MenuItem();
@@ -196,8 +199,8 @@ public class DownloadTicketsReport extends ReportPanel {
 
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute("eenabled", "0");
-						rec.setAttribute("valid", true);
+						rec.setAttribute(EENABLED, "0");
+						rec.setAttribute(VALID, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				});
@@ -215,8 +218,8 @@ public class DownloadTicketsReport extends ReportPanel {
 
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute("eenabled", "2");
-						rec.setAttribute("valid", false);
+						rec.setAttribute(EENABLED, "2");
+						rec.setAttribute(VALID, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				});
@@ -253,7 +256,7 @@ public class DownloadTicketsReport extends ReportPanel {
 			delete.setEnabled(false);
 		}
 
-		if ("0".equals(rec.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable, ticketURL, download, preview, openInFolder, delete);
 		else
 			contextMenu.setItems(enable, ticketURL, download, preview, openInFolder, delete);

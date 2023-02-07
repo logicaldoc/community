@@ -47,6 +47,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CustomActionsPanel extends VLayout {
 
+	private static final String ALLOWED = "allowed";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String EENABLED = "eenabled";
+
 	private ListGrid grid;
 
 	private ListGridRecord rollOverRecord;
@@ -122,7 +128,7 @@ public class CustomActionsPanel extends VLayout {
 		toolStrip.addFill();
 		toolStrip.setWidth100();
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -141,10 +147,10 @@ public class CustomActionsPanel extends VLayout {
 		name.setWidth(100);
 		name.setRequired(true);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		description.setWidth(300);
 
-		ListGridField allowed = new ListGridField("allowed", I18N.message("allowedentities"));
+		ListGridField allowed = new ListGridField(ALLOWED, I18N.message("allowedentities"));
 		allowed.setWidth("*");
 
 		grid = new ListGrid() {
@@ -273,9 +279,9 @@ public class CustomActionsPanel extends VLayout {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute("id", menu.getId());
 			rec.setAttribute("name", menu.getName());
-			rec.setAttribute("description", menu.getDescription());
-			rec.setAttribute("eenabled", menu.isEnabled() ? "0" : "2");
-			rec.setAttribute("allowed", Util.toString(menu.getRights()));
+			rec.setAttribute(DESCRIPTION, menu.getDescription());
+			rec.setAttribute(EENABLED, menu.isEnabled() ? "0" : "2");
+			rec.setAttribute(ALLOWED, Util.toString(menu.getRights()));
 			records[i++] = rec;
 		}
 		grid.setData(records);
@@ -285,9 +291,9 @@ public class CustomActionsPanel extends VLayout {
 		Record rec = grid.find(new AdvancedCriteria("id", OperatorId.EQUALS, action.getId()));
 		if (rec != null) {
 			rec.setAttribute("name", action.getName());
-			rec.setAttribute("description", action.getDescription());
-			rec.setAttribute("eenabled", action.isEnabled() ? "0" : "2");
-			rec.setAttribute("allowed", Util.toString(action.getRights()));
+			rec.setAttribute(DESCRIPTION, action.getDescription());
+			rec.setAttribute(EENABLED, action.isEnabled() ? "0" : "2");
+			rec.setAttribute(ALLOWED, Util.toString(action.getRights()));
 
 			grid.invalidateRecordComponents();
 			grid.refreshRecordComponent(grid.getRecordIndex(rec));

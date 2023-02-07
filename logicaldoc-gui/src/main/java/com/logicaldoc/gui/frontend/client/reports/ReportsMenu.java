@@ -33,15 +33,15 @@ public class ReportsMenu extends VLayout {
 		addArchivedDocsButton();
 
 		addDubplicatesButton();
-		
+
 		addCalendarButton();
 
 		addDownloadTicketsButton();
-		
+
 		addSubscriptionsButton();
 
 		addApiCallsButton();
-		
+
 		addCustomReportsButton();
 	}
 
@@ -49,25 +49,24 @@ public class ReportsMenu extends VLayout {
 		Button customReports = new Button(I18N.message("customreports"));
 		customReports.setWidth100();
 		customReports.setHeight(25);
-		customReports.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new CustomReportsPanel());
-		});
+		customReports.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new CustomReportsPanel()));
 		if (Feature.visible(Feature.CUSTOM_REPORTS) && Menu.enabled(Menu.CUSTOMREPORTS)) {
 			addMember(customReports);
-			if (!Feature.enabled(Feature.CUSTOM_REPORTS)) {
-				customReports.setDisabled(true);
-				customReports.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.CUSTOM_REPORTS))
+				setFeatureDisabled(customReports);
 		}
+	}
+
+	private void setFeatureDisabled(Button button) {
+		button.setDisabled(true);
+		button.setTooltip(I18N.message("featuredisabled"));
 	}
 
 	private void addApiCallsButton() {
 		Button apiCalls = new Button(I18N.message("apicalls"));
 		apiCalls.setWidth100();
 		apiCalls.setHeight(25);
-		apiCalls.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new ApiCallsReport());
-		});
+		apiCalls.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ApiCallsReport()));
 		if (Menu.enabled(Menu.DOWNLOAD_TICKETS))
 			addMember(apiCalls);
 	}
@@ -76,15 +75,11 @@ public class ReportsMenu extends VLayout {
 		Button subscriptions = new Button(I18N.message("subscriptions"));
 		subscriptions.setWidth100();
 		subscriptions.setHeight(25);
-		subscriptions.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new SubscriptionsReport());
-		});
+		subscriptions.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new SubscriptionsReport()));
 		if (Feature.visible(Feature.AUDIT) && Menu.enabled(Menu.SUBSCRIPTIONS_REPORT)) {
 			addMember(subscriptions);
-			if (!Feature.enabled(Feature.AUDIT)) {
-				subscriptions.setDisabled(true);
-				subscriptions.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.AUDIT))
+				setFeatureDisabled(subscriptions);
 		}
 	}
 
@@ -92,9 +87,8 @@ public class ReportsMenu extends VLayout {
 		Button downloadTickets = new Button(I18N.message("downloadtickets"));
 		downloadTickets.setWidth100();
 		downloadTickets.setHeight(25);
-		downloadTickets.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new DownloadTicketsReport());
-		});
+		downloadTickets
+				.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new DownloadTicketsReport()));
 		if (Menu.enabled(Menu.DOWNLOAD_TICKETS))
 			addMember(downloadTickets);
 	}
@@ -103,15 +97,11 @@ public class ReportsMenu extends VLayout {
 		Button calendar = new Button(I18N.message("calendar"));
 		calendar.setWidth100();
 		calendar.setHeight(25);
-		calendar.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new CalendarReport());
-		});
+		calendar.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new CalendarReport()));
 		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.CALENDAR_REPORT)) {
 			addMember(calendar);
-			if (!Feature.enabled(Feature.CALENDAR)) {
-				calendar.setDisabled(true);
-				calendar.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.CALENDAR))
+				setFeatureDisabled(calendar);
 		}
 	}
 
@@ -119,14 +109,11 @@ public class ReportsMenu extends VLayout {
 		Button duplicates = new Button(I18N.message("duplicates"));
 		duplicates.setWidth100();
 		duplicates.setHeight(25);
-		duplicates.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new DuplicatesReport());
-		});
+		duplicates.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new DuplicatesReport()));
 		if (Feature.visible(Feature.DUPLICATES_DISCOVERY)) {
 			addMember(duplicates);
 			if (!Feature.enabled(Feature.DUPLICATES_DISCOVERY)) {
-				duplicates.setDisabled(true);
-				duplicates.setTooltip(I18N.message("featuredisabled"));
+				setFeatureDisabled(duplicates);
 			}
 		}
 	}
@@ -136,7 +123,7 @@ public class ReportsMenu extends VLayout {
 		deletedFolders.setWidth100();
 		deletedFolders.setHeight(25);
 		deletedFolders.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new DeletedFoldersReport());
+			AdminScreen.get().setContent(new DeletedFoldersReport());
 		});
 		if (Menu.enabled(Menu.DELETED_FOLDERS))
 			addMember(deletedFolders);
@@ -146,14 +133,11 @@ public class ReportsMenu extends VLayout {
 		Button archivedDocs = new Button(I18N.message("archiveddocs"));
 		archivedDocs.setWidth100();
 		archivedDocs.setHeight(25);
-		archivedDocs.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new ArchivedDocsReport());
-		});
+		archivedDocs.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ArchivedDocsReport()));
 		if (Feature.visible(Feature.ARCHIVING) && Menu.enabled(Menu.ARCHIVED_DOCS)) {
 			addMember(archivedDocs);
 			if (!Feature.enabled(Feature.ARCHIVING)) {
-				archivedDocs.setDisabled(true);
-				archivedDocs.setTooltip(I18N.message("featuredisabled"));
+				setFeatureDisabled(archivedDocs);
 			}
 		}
 	}
@@ -163,7 +147,7 @@ public class ReportsMenu extends VLayout {
 		deletedDocs.setWidth100();
 		deletedDocs.setHeight(25);
 		deletedDocs.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new DeletedDocsReport());
+			AdminScreen.get().setContent(new DeletedDocsReport());
 		});
 		if (Menu.enabled(Menu.DELETED_DOCS))
 			addMember(deletedDocs);
@@ -173,9 +157,7 @@ public class ReportsMenu extends VLayout {
 		Button lockedDocs = new Button(I18N.message("lockeddocs"));
 		lockedDocs.setWidth100();
 		lockedDocs.setHeight(25);
-		lockedDocs.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new LockedDocsReport());
-		});
+		lockedDocs.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new LockedDocsReport()));
 		if (Menu.enabled(Menu.LOCKED_DOCS))
 			addMember(lockedDocs);
 	}
@@ -184,9 +166,7 @@ public class ReportsMenu extends VLayout {
 		Button lastChanges = new Button(I18N.message("lastchanges"));
 		lastChanges.setWidth100();
 		lastChanges.setHeight(25);
-		lastChanges.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new LastChangesReport());
-		});
+		lastChanges.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new LastChangesReport()));
 		if (Menu.enabled(Menu.LAST_CHANGES))
 			addMember(lastChanges);
 	}

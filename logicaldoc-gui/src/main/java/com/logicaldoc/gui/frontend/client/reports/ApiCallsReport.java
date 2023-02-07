@@ -27,7 +27,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
@@ -39,7 +38,6 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -51,6 +49,28 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.7
  */
 public class ApiCallsReport extends AdminPanel {
+
+	private static final String VALUE = "value";
+
+	private static final String DISPLAY_MAX = "displaymax";
+
+	private static final String USERNAME = "username";
+
+	private static final String PAYLOAD = "payload";
+
+	private static final String GEOLOCATION = "geolocation";
+
+	private static final String DEVICE = "device";
+
+	private static final String TENANT = "tenant";
+
+	private static final String USER_ID = "userId";
+
+	private static final String TILL_DATE = "tillDate";
+
+	private static final String FROM_DATE = "fromDate";
+
+	private static final String PROTOCOL = "protocol";
 
 	private Layout search = new VLayout();
 
@@ -73,7 +93,7 @@ public class ApiCallsReport extends AdminPanel {
 		SelectItem userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 
 		// Protocol
-		SelectItem proto = ItemFactory.newSelectItem("protocol", "protocol");
+		SelectItem proto = ItemFactory.newSelectItem(PROTOCOL, PROTOCOL);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("soap", "soap");
 		map.put("rest", "rest");
@@ -87,14 +107,14 @@ public class ApiCallsReport extends AdminPanel {
 		sessionId.setEndRow(true);
 
 		// From
-		DateItem fromDate = ItemFactory.newDateItem("fromDate", "from");
+		DateItem fromDate = ItemFactory.newDateItem(FROM_DATE, "from");
 
 		// To
-		DateItem tillDate = ItemFactory.newDateItem("tillDate", "till");
+		DateItem tillDate = ItemFactory.newDateItem(TILL_DATE, "till");
 		tillDate.setEndRow(true);
 
 		// Max results
-		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", 100, 5, null);
+		SpinnerItem displayMax = ItemFactory.newSpinnerItem(DISPLAY_MAX, 100, 5, null);
 		displayMax.setHint(I18N.message("elements"));
 		displayMax.setStep(10);
 		displayMax.setEndRow(true);
@@ -110,39 +130,18 @@ public class ApiCallsReport extends AdminPanel {
 
 		IButton searchButton = new IButton(I18N.message("search"));
 		searchButton.setAutoFit(true);
-		searchButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onSearch();
-			}
-		});
+		searchButton.addClickHandler((ClickEvent event) -> onSearch());
 
 		IButton resetButton = new IButton(I18N.message("reset"));
-		resetButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				vm.clearValues();
-			}
-		});
+		resetButton.addClickHandler((ClickEvent event) -> vm.clearValues());
 		resetButton.setAutoFit(true);
 
 		IButton print = new IButton(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(calls);
-			}
-		});
+		print.addClickHandler((ClickEvent event) -> GridUtil.print(calls));
 		print.setAutoFit(true);
 
 		IButton export = new IButton(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(calls, false);
-			}
-		});
+		export.addClickHandler((ClickEvent event) -> GridUtil.exportCSV(calls, false));
 		if (!Feature.enabled(Feature.EXPORT_CSV)) {
 			export.setDisabled(true);
 			export.setTooltip(I18N.message("featuredisabled"));
@@ -169,11 +168,11 @@ public class ApiCallsReport extends AdminPanel {
 
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 
-		ListGridField userField = new UserListGridField("user", "userId", "user");
+		ListGridField userField = new UserListGridField("user", USER_ID, "user");
 		userField.setCanFilter(true);
 		userField.setAlign(Alignment.CENTER);
 
-		ListGridField protocol = new ListGridField("protocol", I18N.message("protocol"));
+		ListGridField protocol = new ListGridField(PROTOCOL, I18N.message(PROTOCOL));
 		protocol.setCanFilter(true);
 		protocol.setAutoFitWidth(true);
 		protocol.setAlign(Alignment.CENTER);
@@ -184,28 +183,28 @@ public class ApiCallsReport extends AdminPanel {
 		sid.setHidden(true);
 		sid.setAlign(Alignment.CENTER);
 
-		ListGridField tenant = new ListGridField("tenant", I18N.message("tenant"));
+		ListGridField tenant = new ListGridField(TENANT, I18N.message(TENANT));
 		tenant.setCanFilter(true);
 		tenant.setHidden(true);
 		tenant.setAutoFitWidth(true);
 
-		ListGridField userId = new ListGridField("userId", I18N.message("userid"), 100);
+		ListGridField userId = new ListGridField(USER_ID, I18N.message("userid"), 100);
 		userId.setCanFilter(true);
 		userId.setHidden(true);
 
 		ListGridField ip = new ListGridField("ip", I18N.message("ip"), 100);
 		ip.setCanFilter(true);
 
-		ListGridField device = new ListGridField("device", I18N.message("device"), 200);
+		ListGridField device = new ListGridField(DEVICE, I18N.message(DEVICE), 200);
 		device.setHidden(true);
-		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"), 200);
+		ListGridField geolocation = new ListGridField(GEOLOCATION, I18N.message(GEOLOCATION), 200);
 		geolocation.setHidden(true);
 
-		ListGridField username = new ListGridField("username", I18N.message("username"), 100);
+		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		username.setCanFilter(true);
 		username.setHidden(true);
 
-		ListGridField payload = new ListGridField("payload", I18N.message("payload"));
+		ListGridField payload = new ListGridField(PAYLOAD, I18N.message(PAYLOAD));
 		payload.setCanFilter(true);
 		payload.setWidth("*");
 		payload.setHidden(true);
@@ -237,22 +236,18 @@ public class ApiCallsReport extends AdminPanel {
 
 		body.setMembers(callsLayout);
 
-		calls.addCellDoubleClickHandler(new CellDoubleClickHandler() {
+		calls.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
+			String value = event.getRecord().getAttributeAsString(calls.getField(event.getColNum()).getName());
+			TextAreaItem item = ItemFactory.newTextAreaItem(VALUE, value);
+			item.setWidth(500);
+			item.setHeight(400);
+			LD.askForValue(I18N.message(VALUE), I18N.message(VALUE), value, item, 500, new ValueCallback() {
 
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				String value = event.getRecord().getAttributeAsString(calls.getField(event.getColNum()).getName());
-				TextAreaItem item = ItemFactory.newTextAreaItem("value", value);
-				item.setWidth(500);
-				item.setHeight(400);
-				LD.askForValue(I18N.message("value"), I18N.message("value"), value, item, 500, new ValueCallback() {
-
-					@Override
-					public void execute(String value) {
-						// Nothing to do
-					}
-				});
-			}
+				@Override
+				public void execute(String value) {
+					// Nothing to do
+				}
+			});
 		});
 	}
 
@@ -279,20 +274,20 @@ public class ApiCallsReport extends AdminPanel {
 		Long userId = getUserId(values);
 
 		Date fromValue = null;
-		if (values.get("fromDate") != null)
-			fromValue = (Date) values.get("fromDate");
+		if (values.get(FROM_DATE) != null)
+			fromValue = (Date) values.get(FROM_DATE);
 
 		Date tillValue = null;
-		if (values.get("tillDate") != null)
-			tillValue = (Date) values.get("tillDate");
+		if (values.get(TILL_DATE) != null)
+			tillValue = (Date) values.get(TILL_DATE);
 
 		String sid = null;
 		if (values.get("sid") != null)
 			sid = (String) values.get("sid");
 
 		String protocol = null;
-		if (values.get("protocol") != null)
-			protocol = (String) values.get("protocol");
+		if (values.get(PROTOCOL) != null)
+			protocol = (String) values.get(PROTOCOL);
 
 		String uri = null;
 		if (values.get("uri") != null)
@@ -305,11 +300,11 @@ public class ApiCallsReport extends AdminPanel {
 
 	private int getDisplayMaxValue(final Map<String, Object> values) {
 		int displayMaxValue = 0;
-		if (values.get("displayMax") != null) {
-			if (values.get("displayMax") instanceof Integer)
-				displayMaxValue = (Integer) values.get("displayMax");
+		if (values.get(DISPLAY_MAX) != null) {
+			if (values.get(DISPLAY_MAX) instanceof Integer)
+				displayMaxValue = (Integer) values.get(DISPLAY_MAX);
 			else
-				displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
+				displayMaxValue = Integer.parseInt((String) values.get(DISPLAY_MAX));
 		}
 		return displayMaxValue;
 	}
@@ -348,15 +343,15 @@ public class ApiCallsReport extends AdminPanel {
 								rec.setAttribute("date", result[i].getDate());
 								rec.setAttribute("user", result[i].getUsername());
 								rec.setAttribute("sid", result[i].getSessionId());
-								rec.setAttribute("userId", result[i].getUserId());
+								rec.setAttribute(USER_ID, result[i].getUserId());
 								rec.setAttribute("ip", result[i].getIp());
-								rec.setAttribute("device", result[i].getDevice());
-								rec.setAttribute("geolocation", result[i].getGeolocation());
-								rec.setAttribute("username", result[i].getUserLogin());
-								rec.setAttribute("payload", result[i].getComment());
+								rec.setAttribute(DEVICE, result[i].getDevice());
+								rec.setAttribute(GEOLOCATION, result[i].getGeolocation());
+								rec.setAttribute(USERNAME, result[i].getUserLogin());
+								rec.setAttribute(PAYLOAD, result[i].getComment());
 								rec.setAttribute("uri", result[i].getPath());
-								rec.setAttribute("protocol", result[i].getProtocol());
-								rec.setAttribute("tenant", result[i].getTenant());
+								rec.setAttribute(PROTOCOL, result[i].getProtocol());
+								rec.setAttribute(TENANT, result[i].getTenant());
 								records[i] = rec;
 							}
 							calls.setData(records);

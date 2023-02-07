@@ -54,6 +54,14 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class PatchPanel extends VLayout {
 
+	private static final String DESCRIPTION = "description";
+
+	private static final String RATING = "rating";
+
+	private static final String RESTART = "restart";
+
+	private static final String INSTALLED = "installed";
+
 	// Shows the install notes panel
 	VLayout notesPanel = new VLayout();
 
@@ -93,13 +101,13 @@ public class PatchPanel extends VLayout {
 
 		ListGridField name = new ListGridField("name", I18N.message("patch"), 110);
 
-		ListGridField installed = new ListGridField("installed", I18N.message("installed"), 110);
+		ListGridField installed = new ListGridField(INSTALLED, I18N.message(INSTALLED), 110);
 		installed.setType(ListGridFieldType.BOOLEAN);
 
-		ListGridField restart = new ListGridField("restart", I18N.message("requiresrestart"), 110);
+		ListGridField restart = new ListGridField(RESTART, I18N.message("requiresrestart"), 110);
 		restart.setType(ListGridFieldType.BOOLEAN);
 
-		ListGridField rating = new ListGridField("rating", I18N.message("severityrating"), 110);
+		ListGridField rating = new ListGridField(RATING, I18N.message("severityrating"), 110);
 		rating.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			int ratingVal = 0;
 			if (value != null)
@@ -118,7 +126,7 @@ public class PatchPanel extends VLayout {
 		final ListGrid list = new ListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("installed")))
+				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(INSTALLED)))
 					return super.getCellCSSText(rec, rowNum, colNum);
 				else
 					return "color: #888888; font-style: italic;";
@@ -132,7 +140,7 @@ public class PatchPanel extends VLayout {
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setCanExpandRecords(true);
 		list.setExpansionMode(ExpansionMode.DETAIL_FIELD);
-		list.setDetailField("description");
+		list.setDetailField(DESCRIPTION);
 		list.setFields(id, name, rating, date, size, installed, restart, file);
 
 		list.addCellContextClickHandler((CellContextClickEvent event) -> {
@@ -146,13 +154,13 @@ public class PatchPanel extends VLayout {
 				ListGridRecord rec = new ListGridRecord();
 				rec.setAttribute("id", patch.getId());
 				rec.setAttribute("name", patch.getName());
-				rec.setAttribute("rating", patch.getRating());
+				rec.setAttribute(RATING, patch.getRating());
 				rec.setAttribute("file", patch.getFile());
 				rec.setAttribute("date", patch.getDate());
 				rec.setAttribute("size", patch.getSize());
-				rec.setAttribute("description", patch.getDescription());
-				rec.setAttribute("installed", patch.isInstalled());
-				rec.setAttribute("restart", patch.isRestart());
+				rec.setAttribute(DESCRIPTION, patch.getDescription());
+				rec.setAttribute(INSTALLED, patch.isInstalled());
+				rec.setAttribute(RESTART, patch.isRestart());
 				records.add(rec);
 			}
 			list.setRecords(records.toArray(new ListGridRecord[0]));
@@ -179,7 +187,7 @@ public class PatchPanel extends VLayout {
 		name.setRequired(true);
 		name.setWrapTitle(false);
 
-		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "severityrating", "<span style='color: "
+		StaticTextItem rating = ItemFactory.newStaticTextItem(RATING, "severityrating", "<span style='color: "
 				+ patch.getColor() + "'>" + I18N.message("severityrating." + patch.getRating()) + "</span>");
 		rating.setRequired(true);
 		rating.setWrapTitle(false);
@@ -192,12 +200,12 @@ public class PatchPanel extends VLayout {
 		size.setRequired(true);
 		size.setWrapTitle(false);
 
-		StaticTextItem restart = ItemFactory.newStaticTextItem("restart", "requiresrestart",
+		StaticTextItem restart = ItemFactory.newStaticTextItem(RESTART, "requiresrestart",
 				patch.isRestart() ? I18N.message("yes") : I18N.message("no"));
 		restart.setRequired(true);
 		restart.setWrapTitle(false);
 
-		StaticTextItem description = ItemFactory.newStaticTextItem("description", patch.getDescription());
+		StaticTextItem description = ItemFactory.newStaticTextItem(DESCRIPTION, patch.getDescription());
 		description.setWidth(500);
 		description.setRequired(true);
 		description.setWrapTitle(false);
@@ -426,10 +434,10 @@ public class PatchPanel extends VLayout {
 		patch.setId(rec.getAttribute("id"));
 		patch.setName(rec.getAttribute("name"));
 		patch.setFile(rec.getAttribute("file"));
-		patch.setDescription(rec.getAttribute("description"));
+		patch.setDescription(rec.getAttribute(DESCRIPTION));
 		patch.setSize(rec.getAttributeAsLong("size"));
 		patch.setDate(rec.getAttributeAsDate("date"));
-		patch.setInstalled(rec.getAttributeAsBoolean("installed"));
+		patch.setInstalled(rec.getAttributeAsBoolean(INSTALLED));
 
 		Menu contextMenu = new Menu();
 

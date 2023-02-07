@@ -27,6 +27,12 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class WebserviceClient {
 
+	private static final String DOC_ID = "docId";
+
+	private static final String SERVICES_DOCUMENT = "services/Document";
+
+	private static final String INVOKING = "Invoking {}";
+
 	private static Logger log = LoggerFactory.getLogger(WebserviceClient.class);
 
 	private static final String WS_NAMESPACE = "http://ws.logicaldoc.com";
@@ -64,7 +70,7 @@ public class WebserviceClient {
 		envelope.setOutputSoapObject(request);
 
 		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "services/Folder";
-		log.debug("Invoking {}", url);
+		log.debug(INVOKING, url);
 
 		HttpTransportSE transport = new HttpTransportSE(url);
 		transport.call("", envelope);
@@ -119,8 +125,8 @@ public class WebserviceClient {
 
 		marshal.register(envelope);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "services/Document";
-		log.debug("Invoking {}", url);
+		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+		log.debug(INVOKING, url);
 		HttpTransportSE transport = new HttpTransportSE(url);
 
 		// Use an empty SOAPAction or CXF will be not able to parse
@@ -158,13 +164,13 @@ public class WebserviceClient {
 	public Entry getDocument(long id) throws Exception {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "getDocument");
 		request.addProperty("sid", sid);
-		request.addProperty("docId", Long.toString(id));
+		request.addProperty(DOC_ID, Long.toString(id));
 
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
 		envelope.setOutputSoapObject(request);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "services/Document";
-		log.info("Invoking {}", url);
+		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+		log.info(INVOKING, url);
 		HttpTransportSE transport = new HttpTransportSE(url, timeout);
 		transport.call("", envelope);
 
@@ -179,7 +185,7 @@ public class WebserviceClient {
 	public void checkin(long docId, File file) throws IOException, XmlPullParserException {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "checkin");
 		request.addProperty("sid", sid);
-		request.addProperty("docId", docId);
+		request.addProperty(DOC_ID, docId);
 		request.addProperty("filename", file.getName());
 		request.addProperty("release", false);
 
@@ -189,7 +195,7 @@ public class WebserviceClient {
 		byte[] raw = out.toByteArray();
 		request.addProperty("content", raw);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "services/Document";
+		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
 
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
 		envelope.setOutputSoapObject(request);
@@ -204,13 +210,13 @@ public class WebserviceClient {
 	public void checkout(long docId) throws Exception {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "checkout");
 		request.addProperty("sid", sid);
-		request.addProperty("docId", docId);
+		request.addProperty(DOC_ID, docId);
 
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
 		envelope.setOutputSoapObject(request);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "services/Document";
-		log.info("Invoking {}", url);
+		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+		log.info(INVOKING, url);
 		HttpTransportSE transport = new HttpTransportSE(url, timeout);
 		transport.call("", envelope);
 	}
@@ -218,13 +224,13 @@ public class WebserviceClient {
 	public void unlock(long docId) throws Exception {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "unlock");
 		request.addProperty("sid", sid);
-		request.addProperty("docId", docId);
+		request.addProperty(DOC_ID, docId);
 
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SOAP_VERSION);
 		envelope.setOutputSoapObject(request);
 
-		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "services/Document";
-		log.info("Invoking {}", url);
+		String url = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + SERVICES_DOCUMENT;
+		log.info(INVOKING, url);
 		HttpTransportSE transport = new HttpTransportSE(url, timeout);
 		transport.call("", envelope);
 	}

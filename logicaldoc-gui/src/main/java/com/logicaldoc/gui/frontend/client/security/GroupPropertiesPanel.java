@@ -20,6 +20,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class GroupPropertiesPanel extends HLayout {
+	private static final String INHERIT = "inherit";
+
 	private DynamicForm form1 = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -73,7 +75,7 @@ public class GroupPropertiesPanel extends HLayout {
 		if (!readonly)
 			description.addChangedHandler(changedHandler);
 
-		SelectItem inherit = ItemFactory.newGroupSelector("inherit", "inheritgroup");
+		SelectItem inherit = ItemFactory.newGroupSelector(INHERIT, "inheritgroup");
 		inherit.setVisible(!readonly);
 		if (!readonly)
 			inherit.addChangedHandler(changedHandler);
@@ -89,8 +91,8 @@ public class GroupPropertiesPanel extends HLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			group.setDescription((String) values.get("description"));
 			group.setName((String) values.get("name"));
-			if (values.get("inherit") != null)
-				group.setInheritGroupId(Long.parseLong((String) values.get("inherit")));
+			if (values.get(INHERIT) != null)
+				group.setInheritGroupId(Long.parseLong((String) values.get(INHERIT)));
 			else
 				group.setInheritGroupId(null);
 		}

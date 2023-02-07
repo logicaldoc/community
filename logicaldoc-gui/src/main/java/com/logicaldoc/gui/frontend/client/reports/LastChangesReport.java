@@ -56,6 +56,32 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class LastChangesReport extends AdminPanel {
 
+	private static final String DISPLAYMAX = "displaymax";
+
+	private static final String REASON = "reason";
+
+	private static final String COMMENT = "comment";
+
+	private static final String USERNAME = "username";
+
+	private static final String GEOLOCATION = "geolocation";
+
+	private static final String DEVICE = "device";
+
+	private static final String FOLDER_ID = "folderId";
+
+	private static final String DOC_ID = "docId";
+
+	private static final String FOLDER = "folder";
+
+	private static final String USER_ID = "userId";
+
+	private static final String EVENT = "event";
+
+	private static final String TILL_DATE = "tillDate";
+
+	private static final String FROM_DATE = "fromDate";
+
 	private Layout search = new VLayout();
 
 	private Layout results = new VLayout();
@@ -90,11 +116,11 @@ public class LastChangesReport extends AdminPanel {
 		user.setEndRow(true);
 
 		// From
-		DateItem fromDate = ItemFactory.newDateItem("fromDate", "from");
+		DateItem fromDate = ItemFactory.newDateItem(FROM_DATE, "from");
 		fromDate.setColSpan(4);
 
 		// To
-		DateItem tillDate = ItemFactory.newDateItem("tillDate", "till");
+		DateItem tillDate = ItemFactory.newDateItem(TILL_DATE, "till");
 		tillDate.setEndRow(true);
 		tillDate.setColSpan(4);
 
@@ -110,7 +136,7 @@ public class LastChangesReport extends AdminPanel {
 		folder.setColSpan(8);
 
 		// Max results
-		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", 100, 5, null);
+		SpinnerItem displayMax = ItemFactory.newSpinnerItem(DISPLAYMAX, 100, 5, null);
 		displayMax.setHint(I18N.message("elements"));
 		displayMax.setStep(10);
 		displayMax.setStartRow(true);
@@ -181,7 +207,7 @@ public class LastChangesReport extends AdminPanel {
 		eventForm.setColWidths(1, "*");
 
 		// Event
-		SelectItem event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, true, true, true);
+		SelectItem event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null, true, true, true, true);
 		event.setColSpan(2);
 		event.setEndRow(true);
 
@@ -198,34 +224,34 @@ public class LastChangesReport extends AdminPanel {
 		search.setWidth100();
 		search.setMargin(10);
 
-		ListGridField eventField = new ListGridField("event", I18N.message("event"), 200);
+		ListGridField eventField = new ListGridField(EVENT, I18N.message(EVENT), 200);
 		eventField.setCanFilter(true);
 
 		ListGridField date = new DateListGridField("date", "date");
 
-		ListGridField userField = new UserListGridField("user", "userId", "user");
+		ListGridField userField = new UserListGridField("user", USER_ID, "user");
 		userField.setCanFilter(true);
 		userField.setAlign(Alignment.CENTER);
 
 		FileNameListGridField name = new FileNameListGridField("name", "icon", I18N.message("name"), 150);
 		name.setCanFilter(true);
 
-		ListGridField folder = new ListGridField("folder", I18N.message("folder"), 100);
+		ListGridField folder = new ListGridField(FOLDER, I18N.message(FOLDER), 100);
 		folder.setCanFilter(true);
 
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"), 250);
 		sid.setCanFilter(true);
 		sid.setAlign(Alignment.CENTER);
 
-		ListGridField docId = new ListGridField("docId", I18N.message("documentid"), 100);
+		ListGridField docId = new ListGridField(DOC_ID, I18N.message("documentid"), 100);
 		docId.setCanFilter(true);
 		docId.setHidden(true);
 
-		ListGridField folderId = new ListGridField("folderId", I18N.message("folderid"), 100);
+		ListGridField folderId = new ListGridField(FOLDER_ID, I18N.message("folderid"), 100);
 		folderId.setCanFilter(true);
 		folderId.setHidden(true);
 
-		ListGridField userId = new ListGridField("userId", I18N.message("userid"), 100);
+		ListGridField userId = new ListGridField(USER_ID, I18N.message("userid"), 100);
 		userId.setCanFilter(true);
 		userId.setHidden(true);
 
@@ -233,20 +259,20 @@ public class LastChangesReport extends AdminPanel {
 		ip.setCanFilter(true);
 		ip.setHidden(true);
 
-		ListGridField device = new ListGridField("device", I18N.message("device"), 200);
+		ListGridField device = new ListGridField(DEVICE, I18N.message(DEVICE), 200);
 		device.setHidden(true);
-		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"), 200);
+		ListGridField geolocation = new ListGridField(GEOLOCATION, I18N.message(GEOLOCATION), 200);
 		geolocation.setHidden(true);
 
-		ListGridField username = new ListGridField("username", I18N.message("username"), 100);
+		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		username.setCanFilter(true);
 		username.setHidden(true);
 
-		ListGridField comment = new ListGridField("comment", I18N.message("comment"), 200);
+		ListGridField comment = new ListGridField(COMMENT, I18N.message(COMMENT), 200);
 		comment.setCanFilter(true);
 		comment.setHidden(true);
 
-		ListGridField reason = new ListGridField("reason", I18N.message("reason"), 200);
+		ListGridField reason = new ListGridField(REASON, I18N.message(REASON), 200);
 		reason.setCanFilter(true);
 		reason.setHidden(true);
 
@@ -316,11 +342,11 @@ public class LastChangesReport extends AdminPanel {
 		Long userId = getUserId(values);
 
 		Date fromValue = null;
-		if (values.get("fromDate") != null)
-			fromValue = (Date) values.get("fromDate");
+		if (values.get(FROM_DATE) != null)
+			fromValue = (Date) values.get(FROM_DATE);
 		Date tillValue = null;
-		if (values.get("tillDate") != null)
-			tillValue = (Date) values.get("tillDate");
+		if (values.get(TILL_DATE) != null)
+			tillValue = (Date) values.get(TILL_DATE);
 
 		String sid = null;
 		if (values.get("sid") != null)
@@ -333,8 +359,8 @@ public class LastChangesReport extends AdminPanel {
 
 	private String[] getEvents(final Map<String, Object> values) {
 		String[] eventValues = new String[0];
-		if (values.get("event") != null) {
-			String buf = values.get("event").toString().trim().toLowerCase();
+		if (values.get(EVENT) != null) {
+			String buf = values.get(EVENT).toString().trim().toLowerCase();
 			buf = buf.replace('[', ' ');
 			buf = buf.replace(']', ' ');
 			buf = buf.replace(" ", "");
@@ -356,11 +382,11 @@ public class LastChangesReport extends AdminPanel {
 
 	private int getDisplayMax(final Map<String, Object> values) {
 		int displayMaxValue = 0;
-		if (values.get("displayMax") != null) {
-			if (values.get("displayMax") instanceof Integer)
-				displayMaxValue = (Integer) values.get("displayMax");
+		if (values.get(DISPLAYMAX) != null) {
+			if (values.get(DISPLAYMAX) instanceof Integer)
+				displayMaxValue = (Integer) values.get(DISPLAYMAX);
 			else
-				displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
+				displayMaxValue = Integer.parseInt((String) values.get(DISPLAYMAX));
 		}
 		return displayMaxValue;
 	}
@@ -385,21 +411,21 @@ public class LastChangesReport extends AdminPanel {
 							ListGridRecord[] records = new ListGridRecord[result.length];
 							for (int i = 0; i < result.length; i++) {
 								ListGridRecord rec = new ListGridRecord();
-								rec.setAttribute("event", I18N.message(result[i].getEvent()));
+								rec.setAttribute(EVENT, I18N.message(result[i].getEvent()));
 								rec.setAttribute("date", result[i].getDate());
 								rec.setAttribute("user", result[i].getUsername());
 								rec.setAttribute("name", result[i].getFileName());
-								rec.setAttribute("folder", result[i].getPath());
+								rec.setAttribute(FOLDER, result[i].getPath());
 								rec.setAttribute("sid", result[i].getSessionId());
-								rec.setAttribute("docId", result[i].getDocId());
-								rec.setAttribute("folderId", result[i].getFolderId());
-								rec.setAttribute("userId", result[i].getUserId());
+								rec.setAttribute(DOC_ID, result[i].getDocId());
+								rec.setAttribute(FOLDER_ID, result[i].getFolderId());
+								rec.setAttribute(USER_ID, result[i].getUserId());
 								rec.setAttribute("ip", result[i].getIp());
-								rec.setAttribute("device", result[i].getDevice());
-								rec.setAttribute("geolocation", result[i].getGeolocation());
-								rec.setAttribute("username", result[i].getUserLogin());
-								rec.setAttribute("comment", result[i].getComment());
-								rec.setAttribute("reason", result[i].getReason());
+								rec.setAttribute(DEVICE, result[i].getDevice());
+								rec.setAttribute(GEOLOCATION, result[i].getGeolocation());
+								rec.setAttribute(USERNAME, result[i].getUserLogin());
+								rec.setAttribute(COMMENT, result[i].getComment());
+								rec.setAttribute(REASON, result[i].getReason());
 								rec.setAttribute("icon", result[i].getIcon());
 								records[i] = rec;
 							}
@@ -420,11 +446,11 @@ public class LastChangesReport extends AdminPanel {
 		if (selection == null)
 			return;
 
-		final Long docId = selection.getAttributeAsLong("docId") != null && selection.getAttributeAsLong("docId") != 0L
-				? selection.getAttributeAsLong("docId")
+		final Long docId = selection.getAttributeAsLong(DOC_ID) != null && selection.getAttributeAsLong(DOC_ID) != 0L
+				? selection.getAttributeAsLong(DOC_ID)
 				: null;
-		final Long folderId = selection.getAttributeAsLong("folderId") != null
-				&& selection.getAttributeAsLong("folderId") != 0L ? selection.getAttributeAsLong("folderId") : null;
+		final Long folderId = selection.getAttributeAsLong(FOLDER_ID) != null
+				&& selection.getAttributeAsLong(FOLDER_ID) != 0L ? selection.getAttributeAsLong(FOLDER_ID) : null;
 		if (docId == null && folderId == null)
 			return;
 

@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
  * JavaLauncher Provides an easy way to launch java applications.
  */
 public class JavaLauncher {
+	private static final String FAILED_TO_LAUNCH_JAVA_PROGRAM = "Failed to launch java program: ";
+
 	protected static Logger log = LoggerFactory.getLogger(JavaLauncher.class);
 
 	private static boolean debug = false;
@@ -74,7 +76,7 @@ public class JavaLauncher {
 
 		} catch (Exception e) {
 			log.error("Failed to launch java program: {}", e.getMessage());
-			throw new Exception("Failed to launch java program: " + e.getMessage());
+			throw new Exception(FAILED_TO_LAUNCH_JAVA_PROGRAM + e.getMessage());
 		}
 
 	}
@@ -118,7 +120,7 @@ public class JavaLauncher {
 			return proc;
 
 		} catch (Exception e) {
-			throw new Exception("Failed to launch java program: " + e.getMessage());
+			throw new Exception(FAILED_TO_LAUNCH_JAVA_PROGRAM + e.getMessage());
 		}
 
 	}
@@ -202,7 +204,7 @@ public class JavaLauncher {
 			JavaLauncher.monitorProcess(proc);
 
 		} catch (Exception e) {
-			log.error("Failed to launch java program: " + e.getMessage());
+			log.error(FAILED_TO_LAUNCH_JAVA_PROGRAM + e.getMessage());
 		}
 	}
 }

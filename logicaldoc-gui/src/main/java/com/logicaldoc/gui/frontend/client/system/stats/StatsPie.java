@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class StatsPie extends HLayout {
 
+	private static final String PX250 = "250px";
+
 	private static final int STATS_REPOSITORY = 0;
 
 	private static final int STATS_DOCUMENTS = 1;
@@ -56,8 +58,8 @@ public class StatsPie extends HLayout {
 		}
 
 		Image pieImage = new Image(Util.contextPath() + "stat?chart=repository&random=" + new Date().getTime());
-		pieImage.setWidth("250px");
-		pieImage.setHeight("250px");
+		pieImage.setWidth(PX250);
+		pieImage.setHeight(PX250);
 		repository.addMember(pieImage);
 
 		HLayout spacer = new HLayout();
@@ -73,8 +75,8 @@ public class StatsPie extends HLayout {
 
 		VLayout documents = new VLayout();
 		pieImage = new Image(Util.contextPath() + "stat?chart=documents&random=" + new Date().getTime());
-		pieImage.setWidth("250px");
-		pieImage.setHeight("250px");
+		pieImage.setWidth(PX250);
+		pieImage.setHeight(PX250);
 		documents.addMember(pieImage);
 
 		spacer = new HLayout();
@@ -90,8 +92,8 @@ public class StatsPie extends HLayout {
 
 		VLayout pages = new VLayout();
 		pieImage = new Image(Util.contextPath() + "stat?chart=pages&random=" + new Date().getTime());
-		pieImage.setWidth("250px");
-		pieImage.setHeight("250px");
+		pieImage.setWidth(PX250);
+		pieImage.setHeight(PX250);
 		pages.addMember(pieImage);
 
 		spacer = new HLayout();
@@ -108,8 +110,8 @@ public class StatsPie extends HLayout {
 		VLayout folders = new VLayout();
 		pieImage = new Image(Util.contextPath() + "stat?sid=" + Session.get().getSid() + "&chart=folders&random="
 				+ new Date().getTime());
-		pieImage.setWidth("250px");
-		pieImage.setHeight("250px");
+		pieImage.setWidth(PX250);
+		pieImage.setHeight(PX250);
 		folders.addMember(pieImage);
 
 		spacer = new HLayout();

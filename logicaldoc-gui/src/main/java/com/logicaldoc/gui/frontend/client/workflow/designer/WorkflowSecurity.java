@@ -39,6 +39,14 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class WorkflowSecurity extends Window {
 
+	private static final String WRITE = "write";
+
+	private static final String AVATAR = "avatar";
+
+	private static final String ENTITY = "entity";
+
+	private static final String ENTITY_ID = "entityId";
+
 	private WorkflowRightsDS dataSource;
 
 	private ListGrid list;
@@ -72,12 +80,12 @@ public class WorkflowSecurity extends Window {
 		this.workflow = workflow;
 		container.removeMembers(container.getMembers());
 
-		ListGridField entityId = new ListGridField("entityId", "entityId");
+		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID);
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 		entityId.setAutoFitWidth(true);
 
-		ListGridField entity = new UserListGridField("entity", "avatar", "entity");
+		ListGridField entity = new UserListGridField(ENTITY, AVATAR, ENTITY);
 		entity.setCanEdit(false);
 		entity.setRotateTitle(false);
 
@@ -86,7 +94,7 @@ public class WorkflowSecurity extends Window {
 		read.setCanEdit(true);
 		read.setAutoFitWidth(true);
 
-		ListGridField write = new ListGridField("write", I18N.message("write"), 80);
+		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE), 80);
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
@@ -167,7 +175,7 @@ public class WorkflowSecurity extends Window {
 			 */
 			ListGridRecord[] records = list.getRecords();
 			for (ListGridRecord test : records) {
-				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("usergroup"))) {
 					user.clearValue();
 					return;
 				}
@@ -175,9 +183,9 @@ public class WorkflowSecurity extends Window {
 
 			// Update the rights table
 			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-			rec.setAttribute("avatar", selectedRecord.getAttribute("id"));
-			rec.setAttribute("entity",
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("usergroup"));
+			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
+			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 			rec.setAttribute("read", true);
 
@@ -201,7 +209,7 @@ public class WorkflowSecurity extends Window {
 			// table
 			ListGridRecord[] records = list.getRecords();
 			for (ListGridRecord test : records) {
-				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
 					group.clearValue();
 					return;
 				}
@@ -209,9 +217,9 @@ public class WorkflowSecurity extends Window {
 
 			// Update the rights table
 			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute("entityId", selectedRecord.getAttribute("id"));
-			rec.setAttribute("avatar", "group");
-			rec.setAttribute("entity", selectedRecord.getAttribute("name"));
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
+			rec.setAttribute(AVATAR, "group");
+			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute("read", true);
 			list.addData(rec);
 			group.clearValue();
@@ -234,9 +242,9 @@ public class WorkflowSecurity extends Window {
 
 			GUIRight right = new GUIRight();
 
-			right.setName(rec.getAttributeAsString("entity"));
-			right.setEntityId(Long.parseLong(rec.getAttribute("entityId")));
-			right.setWrite("true".equals(rec.getAttributeAsString("write")));
+			right.setName(rec.getAttributeAsString(ENTITY));
+			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+			right.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
 
 			tmp.add(right);
 		}

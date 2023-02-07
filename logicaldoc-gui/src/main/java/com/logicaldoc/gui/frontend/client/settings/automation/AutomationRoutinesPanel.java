@@ -17,15 +17,11 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -42,6 +38,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class AutomationRoutinesPanel extends VLayout {
+
+	private static final String AUTOMATION = "automation";
+
+	private static final String DESCRIPTION = "description";
 
 	private Layout detailsContainer = new VLayout();
 
@@ -67,10 +67,10 @@ public class AutomationRoutinesPanel extends VLayout {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 		name.setCanFilter(true);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"), 200);
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 200);
 		description.setCanFilter(true);
 
-		ListGridField automation = new ListGridField("automation", I18N.message("automation"));
+		ListGridField automation = new ListGridField(AUTOMATION, I18N.message(AUTOMATION));
 		automation.setWidth("*");
 		automation.setCanFilter(true);
 
@@ -100,60 +100,43 @@ public class AutomationRoutinesPanel extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler((ClickEvent event) -> refresh());
 
 		toolStrip.addSeparator();
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addroutine"));
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				GUIAutomationRoutine routine = new GUIAutomationRoutine();
-				showRoutineDetails(routine);
-			}
+		add.addClickHandler((ClickEvent event) -> {
+			list.deselectAllRecords();
+			GUIAutomationRoutine routine = new GUIAutomationRoutine();
+			showRoutineDetails(routine);
 		});
 		toolStrip.addButton(add);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record rec = list.getSelectedRecord();
-				if (rec != null)
-					AutomationService.Instance.get().getRoutine(rec.getAttributeAsLong("id"),
-							new AsyncCallback<GUIAutomationRoutine>() {
+		list.addSelectionChangedHandler((SelectionEvent event) -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				AutomationService.Instance.get().getRoutine(rec.getAttributeAsLong("id"),
+						new AsyncCallback<GUIAutomationRoutine>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIAutomationRoutine routine) {
-									showRoutineDetails(routine);
-								}
-							});
-			}
+							@Override
+							public void onSuccess(GUIAutomationRoutine routine) {
+								showRoutineDetails(routine);
+							}
+						});
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showroutines", Integer.toString(list.getTotalRows())));
-			}
+		list.addDataArrivedHandler((DataArrivedEvent event) -> {
+			infoPanel.setMessage(I18N.message("showroutines", Integer.toString(list.getTotalRows())));
 		});
 
 		detailsContainer.setAlign(Alignment.CENTER);
@@ -177,26 +160,24 @@ public class AutomationRoutinesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						AutomationService.Instance.get().deleteRoutines(new long[] { id }, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler((MenuItemClickEvent event) -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					AutomationService.Instance.get().deleteRoutines(new long[] { id }, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								showRoutineDetails(null);
-							}
-						});
-					}
-				});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+							showRoutineDetails(null);
+						}
+					});
+				}
+			});
 		});
 
 		contextMenu.setItems(delete);
@@ -232,8 +213,8 @@ public class AutomationRoutinesPanel extends VLayout {
 		}
 
 		rec.setAttribute("name", routine.getName());
-		rec.setAttribute("description", routine.getDescription());
-		rec.setAttribute("automation", routine.getAutomation());
+		rec.setAttribute(DESCRIPTION, routine.getDescription());
+		rec.setAttribute(AUTOMATION, routine.getAutomation());
 
 		list.refreshRow(list.getRecordIndex(rec));
 	}

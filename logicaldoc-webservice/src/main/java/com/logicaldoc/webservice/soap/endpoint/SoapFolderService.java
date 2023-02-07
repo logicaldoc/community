@@ -37,6 +37,10 @@ import com.logicaldoc.webservice.soap.FolderService;
  */
 public class SoapFolderService extends AbstractService implements FolderService {
 
+	private static final String FOLDER = "Folder ";
+	private static final String NOT_ALLOWED = "Not Allowed";
+	private static final String NO_CHANGES = "No Changes";
+	private static final String CANNOT_MOVE_FOLDERS_IN_THE_ROOT = "Cannot move folders in the root";
 	protected static Logger log = LoggerFactory.getLogger(SoapFolderService.class);
 
 	@Override
@@ -214,7 +218,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		if (parentId == folderDao.findRoot(user.getTenantId()).getId()) {
-			String message = "Cannot move folders in the root";
+			String message = CANNOT_MOVE_FOLDERS_IN_THE_ROOT;
 			log.error(message);
 			throw new WebserviceException(message);
 		}
@@ -225,12 +229,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		// Check destParentId: Must be different from the current folder
 		// parentId
 		if (parentId == folderToMove.getParentId())
-			throw new SecurityException("No Changes");
+			throw new SecurityException(NO_CHANGES);
 
 		// Check destParentId: Must be different from the current folder Id
 		// A folder cannot be children of herself
 		if (parentId == folderToMove.getId())
-			throw new SecurityException("Not Allowed");
+			throw new SecurityException(NOT_ALLOWED);
 
 		// Check delete permission on the folder parent of folderToMove
 		Folder sourceParent = folderDao.findById(folderToMove.getParentId());
@@ -259,7 +263,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		if (targetId == folderDao.findRoot(user.getTenantId()).getId()) {
-			String message = "Cannot move folders in the root";
+			String message = CANNOT_MOVE_FOLDERS_IN_THE_ROOT;
 			log.error(message);
 			throw new WebserviceException(message);
 		}
@@ -270,12 +274,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		// Check destParentId: Must be different from the current folder
 		// parentId
 		if (targetId == folderToCopy.getParentId())
-			throw new SecurityException("No Changes");
+			throw new SecurityException(NO_CHANGES);
 
 		// Check destParentId: Must be different from the current folder Id
 		// A folder cannot be children of herself
 		if (targetId == folderToCopy.getId())
-			throw new SecurityException("Not Allowed");
+			throw new SecurityException(NOT_ALLOWED);
 
 		// Check add permission on destParentFolder
 		boolean addEnabled = folderDao.isPermissionEnabled(Permission.ADD, destTargetFolder.getId(), user.getId());
@@ -296,7 +300,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!folderDao.isPermissionEnabled(Permission.RENAME, folderId, user.getId()))
-			throw new PermissionException(user.getUsername(), "Folder " + folderId, Permission.RENAME.toString());
+			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME.toString());
 
 		long rootId = folderDao.findRoot(user.getTenantId()).getId();
 		if (folderId == rootId)
@@ -417,7 +421,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		// Check if the session user has the Security Permission of this folder
 		if (!folderDao.isPermissionEnabled(Permission.SECURITY, folderId, sessionUser.getId()))
-			throw new PermissionException(sessionUser.getUsername(), "Folder " + folderId, Permission.SECURITY);
+			throw new PermissionException(sessionUser.getUsername(), FOLDER + folderId, Permission.SECURITY);
 
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);
@@ -488,7 +492,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!folderDao.isPermissionEnabled(Permission.RENAME, folderId, user.getId()))
-			throw new PermissionException(user.getUsername(), "Folder " + folderId, Permission.RENAME);
+			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME);
 
 		if (folderId == folderDao.findRoot(user.getTenantId()).getId())
 			throw new PermissionException("cannot update the root folder");
@@ -607,7 +611,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		if (targetId == folderDao.findRoot(user.getTenantId()).getId()) {
-			throw new PermissionException("Cannot move folders in the root");
+			throw new PermissionException(CANNOT_MOVE_FOLDERS_IN_THE_ROOT);
 		}
 
 		Folder destTargetFolder = folderDao.findById(targetId);
@@ -616,12 +620,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		// Check destParentId: Must be different from the current folder
 		// parentId
 		if (targetId == folderToCopy.getParentId())
-			throw new SecurityException("No Changes");
+			throw new SecurityException(NO_CHANGES);
 
 		// Check destParentId: Must be different from the current folder Id
 		// A folder cannot be children of herself
 		if (targetId == folderToCopy.getId())
-			throw new SecurityException("Not Allowed");
+			throw new SecurityException(NOT_ALLOWED);
 
 		// Check add permission on destParentFolder
 		boolean addEnabled = folderDao.isPermissionEnabled(Permission.ADD, destTargetFolder.getId(), user.getId());

@@ -22,11 +22,23 @@ import com.logicaldoc.i18n.I18N;
  */
 public class EventsDataServlet extends AbstractDataServlet {
 
+	private static final String LABEL_CDATA = "<label><![CDATA[";
+
+	private static final String CLOSE_EVENT = "</event>";
+
+	private static final String CLOSE_LABEL = "]]></label>";
+
+	private static final String CLOSE_CODE = "</code>";
+
+	private static final String CODE = "<code>";
+
+	private static final String EVENT = "<event>";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+			Locale locale) throws PersistenceException, IOException {
 
 		boolean folder = Boolean.parseBoolean(request.getParameter("folder"));
 		boolean workflow = Boolean.parseBoolean(request.getParameter("workflow"));
@@ -45,29 +57,29 @@ public class EventsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		for (DocumentEvent event : DocumentEvent.values()) {
-			writer.print("<event>");
-			writer.print("<code>" + event.toString() + "</code>");
-			writer.print("<label><![CDATA[" + I18N.message(event.toString(), locale) + "]]></label>");
+			writer.print(EVENT);
+			writer.print(CODE + event.toString() + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
 			writer.print("<type>document</type>");
-			writer.print("</event>");
+			writer.print(CLOSE_EVENT);
 		}
 
 		if (folder)
 			for (FolderEvent event : FolderEvent.values()) {
-				writer.print("<event>");
-				writer.print("<code>" + event.toString() + "</code>");
-				writer.print("<label><![CDATA[" + I18N.message(event.toString(), locale) + "]]></label>");
+				writer.print(EVENT);
+				writer.print(CODE + event.toString() + CLOSE_CODE);
+				writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
 				writer.print("<type>folder</type>");
-				writer.print("</event>");
+				writer.print(CLOSE_EVENT);
 			}
 
 		if (user) {
 			for (UserEvent event : UserEvent.values()) {
-				writer.print("<event>");
-				writer.print("<code>" + event.toString() + "</code>");
-				writer.print("<label><![CDATA[" + I18N.message(event.toString(), locale) + "]]></label>");
+				writer.print(EVENT);
+				writer.print(CODE + event.toString() + CLOSE_CODE);
+				writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
 				writer.print("<type>user</type>");
-				writer.print("</event>");
+				writer.print(CLOSE_EVENT);
 			}
 		}
 
@@ -76,11 +88,11 @@ public class EventsDataServlet extends AbstractDataServlet {
 					"event.workflow.task.start", "event.workflow.task.end", "event.workflow.task.assigned",
 					"event.workflow.docappended", "event.workflow.task.reassigned", "event.workflow.task.note" };
 			for (String event : events) {
-				writer.print("<event>");
-				writer.print("<code>" + event + "</code>");
-				writer.print("<label><![CDATA[" + I18N.message(event, locale) + "]]></label>");
+				writer.print(EVENT);
+				writer.print(CODE + event + CLOSE_CODE);
+				writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
 				writer.print("<type>workflow</type>");
-				writer.print("</event>");
+				writer.print(CLOSE_EVENT);
 			}
 		}
 
@@ -88,11 +100,11 @@ public class EventsDataServlet extends AbstractDataServlet {
 			String[] events = new String[] { "event.importfolder.imported", "event.importfolder.updated",
 					"event.importfolder.error" };
 			for (String event : events) {
-				writer.print("<event>");
-				writer.print("<code>" + event + "</code>");
-				writer.print("<label><![CDATA[" + I18N.message(event, locale) + "]]></label>");
+				writer.print(EVENT);
+				writer.print(CODE + event + CLOSE_CODE);
+				writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
 				writer.print("<type>workflow</type>");
-				writer.print("</event>");
+				writer.print(CLOSE_EVENT);
 			}
 		}
 

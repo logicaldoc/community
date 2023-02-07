@@ -51,6 +51,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class AutomationTriggersPanel extends VLayout implements FolderChangeListener {
 
+	private static final String AUTOMATION = "automation";
+
+	private static final String FOLDER = "folder";
+
+	private static final String ROUTINE = "routine";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -79,13 +85,13 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		ListGridField triggeron = new EventsListGridField("events", "triggeron");
 		triggeron.setCanFilter(true);
 
-		ListGridField routine = new ListGridField("routine", I18N.message("routine"), 150);
+		ListGridField routine = new ListGridField(ROUTINE, I18N.message(ROUTINE), 150);
 		routine.setCanFilter(true);
 
-		ListGridField folder = new ListGridField("folder", I18N.message("folder"), 150);
+		ListGridField folder = new ListGridField(FOLDER, I18N.message(FOLDER), 150);
 		folder.setCanFilter(true);
 
-		ListGridField automation = new ListGridField("automation", I18N.message("automation"));
+		ListGridField automation = new ListGridField(AUTOMATION, I18N.message(AUTOMATION));
 		automation.setWidth("*");
 		automation.setCanFilter(true);
 
@@ -121,7 +127,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 			}
 		});
 
-		folderSelector = new FolderSelector("folder", true);
+		folderSelector = new FolderSelector(FOLDER, true);
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);
@@ -266,21 +272,21 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		rec.setAttribute("date", trigger.getDate() != null ? trigger.getDate() : null);
 		rec.setAttribute("cron", trigger.getCron() != null && !trigger.getCron().isEmpty() ? trigger.getCron() : null);
 
-		rec.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
+		rec.setAttribute(AUTOMATION, trigger.getAutomation() != null ? trigger.getAutomation() : "");
 
 		if (trigger.getRoutine() != null) {
-			rec.setAttribute("routine", trigger.getRoutine().getName());
+			rec.setAttribute(ROUTINE, trigger.getRoutine().getName());
 			rec.setAttribute("routineId", trigger.getRoutine().getId());
 		} else {
-			rec.setAttribute("routine", (String) null);
+			rec.setAttribute(ROUTINE, (String) null);
 			rec.setAttribute("routineId", (Long) null);
 		}
 
 		if (trigger.getFolder() != null) {
-			rec.setAttribute("folder", trigger.getFolder().getName());
+			rec.setAttribute(FOLDER, trigger.getFolder().getName());
 			rec.setAttribute("folderId", trigger.getFolder().getId());
 		} else {
-			rec.setAttribute("folder", (String) null);
+			rec.setAttribute(FOLDER, (String) null);
 			rec.setAttribute("folderId", (Long) null);
 		}
 

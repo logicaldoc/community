@@ -29,6 +29,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class TextContentEditor extends Window {
 
+	private static final String CONTENT = "content";
+
 	private DynamicForm form = null;
 
 	private VLayout layout = null;
@@ -109,7 +111,7 @@ public class TextContentEditor extends Window {
 			}
 		});
 
-		TextAreaItem contentItem = ItemFactory.newTextAreaItem("content", content);
+		TextAreaItem contentItem = ItemFactory.newTextAreaItem(CONTENT, content);
 		contentItem.setShowTitle(false);
 		contentItem.setWidth(getWidth() - 6);
 		contentItem.setHeight("*");
@@ -145,7 +147,7 @@ public class TextContentEditor extends Window {
 		LD.contactingServer();
 		if (document.getId() != 0L) {
 			// We are editing an existing file
-			DocumentService.Instance.get().checkinContent(document.getId(), form.getValueAsString("content"),
+			DocumentService.Instance.get().checkinContent(document.getId(), form.getValueAsString(CONTENT),
 					new AsyncCallback<GUIDocument>() {
 
 						@Override
@@ -164,7 +166,7 @@ public class TextContentEditor extends Window {
 					});
 		} else {
 			// We are creating a new file
-			DocumentService.Instance.get().createDocument(document, form.getValueAsString("content"),
+			DocumentService.Instance.get().createDocument(document, form.getValueAsString(CONTENT),
 					new AsyncCallback<GUIDocument>() {
 						@Override
 						public void onFailure(Throwable caught) {
