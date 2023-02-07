@@ -356,8 +356,9 @@ public class ComparatorsPanel extends AdminPanel {
 
 		for (Record rec : associationsGrid.getRecordList().toArray()) {
 			String in = rec.getAttributeAsString("in").trim();
+			String out = rec.getAttributeAsString("out") != null ? "-" + rec.getAttributeAsString("out").trim() : "";
 			String comparator = rec.getAttributeAsString(gridAttributeName).trim();
-			settings.add(new GUIParameter(settingsPrefix + in, comparator));
+			settings.add(new GUIParameter(settingsPrefix + in + out, comparator));
 		}
 
 		for (Record rec : settingsGrid.getRecordList().toArray()) {

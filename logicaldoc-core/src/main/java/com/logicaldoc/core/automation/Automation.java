@@ -67,11 +67,11 @@ public class Automation {
 
 	public static synchronized void initialize() {
 		try {
-			if (!RuntimeSingleton.isInitialized()) {
+			
 				RuntimeSingleton.init();
 
 				log.info("Automation has been initialized");
-			}
+			
 		} catch (Throwable t) {
 			log.error("Unable to initialize the automation engine", t);
 		}

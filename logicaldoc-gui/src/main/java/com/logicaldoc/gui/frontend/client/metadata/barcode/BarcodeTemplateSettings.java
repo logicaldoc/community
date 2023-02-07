@@ -79,6 +79,10 @@ public class BarcodeTemplateSettings extends Window {
 
 		layout.addMember(form);
 		uploader = new Upload(save);
+		layout.addMember(uploader);
+
+		save = new IButton(I18N.message("save"));
+		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSave());
 		layout.addMember(save);
 
 		addItem(layout);
