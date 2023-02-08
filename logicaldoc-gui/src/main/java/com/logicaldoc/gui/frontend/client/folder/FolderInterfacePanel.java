@@ -30,6 +30,16 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
  */
 public class FolderInterfacePanel extends FolderDetailTab {
 
+	private static final String NOTCUSTOMIZED = "notcustomized";
+
+	private static final String CUSTOMIZED = "customized";
+
+	private static final String DOCSGRIDLAYOUT = "docsgridlayout";
+
+	private static final String COLOR = "color";
+
+	private static final String POSITION = "position";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -56,7 +66,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		if (form != null)
 			form.destroy();
 
-		if (contains(form))
+		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 
 		form = new DynamicForm();
@@ -65,13 +75,13 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		SpinnerItem position = ItemFactory.newSpinnerItem("position", "position", folder.getPosition());
+		SpinnerItem position = ItemFactory.newSpinnerItem(POSITION, folder.getPosition());
 
-		ColorItem color = ItemFactory.newColorItemPicker("color", "color", folder.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorItemPicker(folder.getColor(), true, changedHandler);
 
-		StaticTextItem docsGrid = ItemFactory.newStaticTextItem("grid", "docsgridlayout",
-				folder.getGrid() != null && !folder.getGrid().isEmpty() ? I18N.message("customized")
-						: I18N.message("notcustomized"));
+		StaticTextItem docsGrid = ItemFactory.newStaticTextItem("grid", DOCSGRIDLAYOUT,
+				folder.getGrid() != null && !folder.getGrid().isEmpty() ? I18N.message(CUSTOMIZED)
+						: I18N.message(NOTCUSTOMIZED));
 
 		FormItemIcon saveCurrentLayout = prepareSaveCurrentLayout();
 
@@ -82,31 +92,28 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		applyToSubFolders.setPrompt(I18N.message("applytosubfolders"));
 		applyToSubFolders.setWidth(12);
 		applyToSubFolders.setHeight(12);
-		applyToSubFolders.addFormItemClickHandler(new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				LD.contactingServer();
-				FolderService.Instance.get().applyGridLayout(folder.getId(), new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+		applyToSubFolders.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			LD.contactingServer();
+			FolderService.Instance.get().applyGridLayout(folder.getId(), new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						LD.clearPrompt();
-						GuiLog.info(I18N.message("appliedgridonsubfolders"));
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void arg0) {
+					LD.clearPrompt();
+					GuiLog.info(I18N.message("appliedgridonsubfolders"));
+				}
+			});
 		});
 
 		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
 				folder.setGrid(null);
-				event.getItem().setValue(I18N.message("notcustomized"));
+				event.getItem().setValue(I18N.message(NOTCUSTOMIZED));
 				applyToSubFolders.setDisabled(true);
 				if (changedHandler != null)
 					changedHandler.onChanged(null);
@@ -141,12 +148,12 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		editLayout.setWidth(12);
 		editLayout.setHeight(12);
 		editLayout.addFormItemClickHandler((FormItemIconClickEvent event) -> {
-			TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"), null);
+			TextAreaItem textArea = ItemFactory.newTextAreaItem(DOCSGRIDLAYOUT, null);
 			textArea.setHeight(300);
-			LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
+			LD.askForValue(I18N.message(DOCSGRIDLAYOUT), I18N.message(DOCSGRIDLAYOUT),
 					folder.getGrid() != null ? folder.getGrid() : "", textArea, 400, (final String value) -> {
-						vm.setValue("grid", (value != null && !value.trim().isEmpty()) ? I18N.message("customized")
-								: I18N.message("notcustomized"));
+						vm.setValue("grid", (value != null && !value.trim().isEmpty()) ? I18N.message(CUSTOMIZED)
+								: I18N.message(NOTCUSTOMIZED));
 
 						folder.setGrid(value);
 						if (changedHandler != null)
@@ -168,7 +175,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 			String gridState = DocumentsPanel.get().getDocsGridViewState();
 			if (gridState != null) {
 				folder.setGrid(gridState);
-				event.getItem().setValue(I18N.message("customized"));
+				event.getItem().setValue(I18N.message(CUSTOMIZED));
 				applyToSubFolders.setDisabled(true);
 				if (changedHandler != null)
 					changedHandler.onChanged(null);
@@ -179,13 +186,13 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 	public boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			folder.setPosition(
-					vm.getValueAsString("position") != null ? Integer.parseInt(vm.getValueAsString("position")) : 1);
-			folder.setColor(vm.getValueAsString("color"));
+					vm.getValueAsString(POSITION) != null ? Integer.parseInt(vm.getValueAsString(POSITION)) : 1);
+			folder.setColor(vm.getValueAsString(COLOR));
 
 			if (vm.getValueAsString("grid") == null || vm.getValueAsString("grid").isEmpty()
-					|| I18N.message("notcustomized").equals(vm.getValueAsString("grid")))
+					|| I18N.message(NOTCUSTOMIZED).equals(vm.getValueAsString("grid")))
 				folder.setGrid(null);
 		}
 		return !vm.hasErrors();

@@ -123,7 +123,7 @@ public class ReportUploader extends Window {
 		outputFolderSelector.setWidth(250);
 		outputFolderSelector.setTitle(I18N.message("outputfolder"));
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", null);
+		TextItem name = ItemFactory.newSimpleTextItem("name", null);
 		name.setRequired(true);
 
 		form.setItems(name, outputFolderSelector);
@@ -150,7 +150,7 @@ public class ReportUploader extends Window {
 				}
 			});
 		} else {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			report = new GUIReport();

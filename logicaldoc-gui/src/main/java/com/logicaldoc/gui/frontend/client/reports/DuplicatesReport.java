@@ -30,14 +30,12 @@ import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.GroupNode;
 import com.smartgwt.client.widgets.grid.GroupTitleRenderer;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -57,6 +55,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DuplicatesReport extends ReportPanel implements FolderChangeListener {
 
+	private static final String NEWEST = "newest";
+
+	private static final String DIGEST = "digest";
+
+	private static final String FILENAME = "filename";
+
 	private SpinnerItem max;
 
 	private FolderSelector folderSelector;
@@ -71,22 +75,13 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		max.addChangedHandler((ChangedEvent event) -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate())
-					refresh();
-			}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refresh();
 		});
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
@@ -101,64 +96,57 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		final SelectItem groupBy = new SelectItem("groupBy", I18N.message("groupby"));
 		groupBy.setWrapTitle(false);
 		groupBy.setWidth(100);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("", " ");
-		map.put("filename", I18N.message("filename"));
-		map.put("digest", I18N.message("digest"));
+		map.put(FILENAME, I18N.message(FILENAME));
+		map.put(DIGEST, I18N.message(DIGEST));
 		groupBy.setValueMap(map);
 		groupBy.setPickListWidth(100);
-		groupBy.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue() != null && !"".equals((String) event.getValue())) {
-					list.ungroup();
-					list.groupBy((String) event.getValue());
-				}
-
+		groupBy.addChangedHandler((ChangedEvent event) -> {
+			if (event.getValue() != null && !"".equals((String) event.getValue())) {
+				list.ungroup();
+				list.groupBy((String) event.getValue());
 			}
 		});
 		toolStrip.addFormItem(groupBy);
 
 		ToolStripButton deDuplicate = new ToolStripButton();
 		deDuplicate.setTitle(I18N.message("deduplicate"));
-		deDuplicate.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				RadioGroupItem maintain = ItemFactory.newRadioGroup("maintain", I18N.message("maintain"));
-				maintain.setRequired(true);
-				maintain.setEndRow(true);
-				LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-				map.put("newest", I18N.message("newest"));
-				map.put("oldest", I18N.message("oldest"));
-				maintain.setValueMap(map);
-				maintain.setValue("newest");
+		deDuplicate.addClickHandler((ClickEvent event) -> {
+			RadioGroupItem maintain = ItemFactory.newRadioGroup("maintain", I18N.message("maintain"));
+			maintain.setRequired(true);
+			maintain.setEndRow(true);
+			LinkedHashMap<String, String> mp = new LinkedHashMap<>();
+			mp.put(NEWEST, I18N.message(NEWEST));
+			mp.put("oldest", I18N.message("oldest"));
+			maintain.setValueMap(mp);
+			maintain.setValue(NEWEST);
 
-				LD.askForValue(I18N.message("deduplicate"), I18N.message("deduplicatequestion"), "newest", maintain,
-						null, new ValueCallback() {
+			LD.askForValue(I18N.message("deduplicate"), I18N.message("deduplicatequestion"), NEWEST, maintain, null,
+					new ValueCallback() {
 
-							@Override
-							public void execute(String value) {
-								if (value != null) {
-									LD.contactingServer();
-									DocumentService.Instance.get().deDuplicate(folderSelector.getFolderId(),
-											"newest".equals(value), new AsyncCallback<Void>() {
+						@Override
+						public void execute(String value) {
+							if (value != null) {
+								LD.contactingServer();
+								DocumentService.Instance.get().deDuplicate(folderSelector.getFolderId(),
+										NEWEST.equals(value), new AsyncCallback<Void>() {
 
-												@Override
-												public void onFailure(Throwable caught) {
-													LD.clearPrompt();
-													GuiLog.serverError(caught);
-												}
+											@Override
+											public void onFailure(Throwable caught) {
+												LD.clearPrompt();
+												GuiLog.serverError(caught);
+											}
 
-												@Override
-												public void onSuccess(Void arg) {
-													LD.clearPrompt();
-													refresh();
-												}
-											});
-								}
+											@Override
+											public void onSuccess(Void arg) {
+												LD.clearPrompt();
+												refresh();
+											}
+										});
 							}
-						});
-			}
+						}
+					});
 		});
 		toolStrip.addSeparator();
 		toolStrip.addButton(deDuplicate);
@@ -194,11 +182,11 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		customId.setHidden(true);
 		customId.setCanGroupBy(false);
 
-		ListGridField digest = new ColoredListGridField("digest", I18N.message("digest"), 250);
+		ListGridField digest = new ColoredListGridField(DIGEST, I18N.message(DIGEST), 250);
 		digest.setType(ListGridFieldType.TEXT);
 		digest.setCanFilter(true);
 
-		ListGridField filename = new FileNameListGridField("filename", "icon", I18N.message("filename"), 200);
+		ListGridField filename = new FileNameListGridField(FILENAME, "icon", I18N.message(FILENAME), 200);
 		filename.setCanFilter(true);
 
 		ListGridField folderName = new FolderListGridField("foldername", "folder");
@@ -213,12 +201,12 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 
 		// Initial group by
 		list.setGroupStartOpen(GroupStartOpen.ALL);
-		list.setGroupByField("digest");
+		list.setGroupByField(DIGEST);
 
 		filename.setGroupTitleRenderer(new GroupTitleRenderer() {
 			public String getGroupTitle(Object groupValue, GroupNode groupNode, ListGridField field, String fieldName,
 					ListGrid grid) {
-				String baseTitle = I18N.message("filename") + ": " + groupValue.toString();
+				String baseTitle = I18N.message(FILENAME) + ": " + groupValue.toString();
 				return baseTitle;
 			}
 		});
@@ -226,7 +214,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		digest.setGroupTitleRenderer(new GroupTitleRenderer() {
 			public String getGroupTitle(Object groupValue, GroupNode groupNode, ListGridField field, String fieldName,
 					ListGrid grid) {
-				String baseTitle = I18N.message("digest") + ": " + groupValue.toString();
+				String baseTitle = I18N.message(DIGEST) + ": " + groupValue.toString();
 				return baseTitle;
 			}
 		});
@@ -271,9 +259,9 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
-			ListGridRecord record = list.getSelectedRecord();
-			DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-					Long.parseLong(record.getAttributeAsString("id")));
+			ListGridRecord rec = list.getSelectedRecord();
+			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+					Long.parseLong(rec.getAttributeAsString("id")));
 		});
 
 		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {
@@ -282,8 +270,8 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 			openInFolder.setEnabled(false);
 		}
 
-		for (ListGridRecord record : selection) {
-			if (!"blank".equals(record.getAttribute("locked")) || !"blank".equals(record.getAttribute("immutable"))) {
+		for (ListGridRecord rec : selection) {
+			if (!"blank".equals(rec.getAttribute("locked")) || !"blank".equals(rec.getAttribute("immutable"))) {
 				delete.setEnabled(false);
 			}
 		}
@@ -329,7 +317,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 
 			if (ids.length > 0)
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {

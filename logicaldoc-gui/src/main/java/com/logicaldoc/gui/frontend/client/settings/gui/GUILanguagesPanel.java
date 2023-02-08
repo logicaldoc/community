@@ -29,6 +29,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class GUILanguagesPanel extends VLayout {
 
+	private static final String EENABLED = "eenabled";
 	private ListGrid list;
 
 	public GUILanguagesPanel() {
@@ -37,7 +38,7 @@ public class GUILanguagesPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -75,14 +76,14 @@ public class GUILanguagesPanel extends VLayout {
 	}
 
 	private void showContextMenu() {
-		final ListGridRecord record = list.getSelectedRecord();
+		final ListGridRecord rec = list.getSelectedRecord();
 
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().setGUILanguageStatus(record.getAttributeAsString("code"), true,
+				SystemService.Instance.get().setGUILanguageStatus(rec.getAttributeAsString("code"), true,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -92,8 +93,8 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute(EENABLED, "0");
+								list.refreshRow(list.getRecordIndex(rec));
 								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
@@ -104,7 +105,7 @@ public class GUILanguagesPanel extends VLayout {
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().setGUILanguageStatus(record.getAttributeAsString("code"), false,
+				SystemService.Instance.get().setGUILanguageStatus(rec.getAttributeAsString("code"), false,
 						new AsyncCallback<Void>() {
 
 							@Override
@@ -114,15 +115,15 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
+								rec.setAttribute(EENABLED, "2");
+								list.refreshRow(list.getRecordIndex(rec));
 								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
 			}
 		});
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable);
 		else
 			contextMenu.setItems(enable);

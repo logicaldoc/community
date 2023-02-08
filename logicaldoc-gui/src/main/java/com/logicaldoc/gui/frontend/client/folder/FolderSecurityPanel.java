@@ -23,13 +23,11 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -50,6 +48,46 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.0
  */
 public class FolderSecurityPanel extends FolderDetailTab {
+
+	private static final String ARCHIVE = "archive";
+
+	private static final String WORKFLOW = "workflow";
+
+	private static final String CALENDAR = "calendar";
+
+	private static final String SUBSCRIPTION = "subscription";
+
+	private static final String AUTOMATION = "automation";
+
+	private static final String STORAGE = "storage";
+
+	private static final String EMAIL = "email";
+
+	private static final String PASSWORD = "password";
+
+	private static final String EXPORT = "export";
+
+	private static final String IMPORT = "import";
+
+	private static final String RENAME = "rename";
+
+	private static final String DELETE = "delete";
+
+	private static final String IMMUTABLE = "immutable";
+
+	private static final String SECURITY = "security";
+
+	private static final String WRITE = "write";
+
+	private static final String DOWNLOAD = "download";
+
+	private static final String PRINT = "print";
+
+	private static final String AVATAR = "avatar";
+
+	private static final String ENTITY = "entity";
+
+	private static final String ENTITY_ID = "entityId";
 
 	private RightsDS dataSource;
 
@@ -79,12 +117,12 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			displayInheritingPanel(folder);
 		}
 
-		ListGridField entityId = new ListGridField("entityId", "entityId");
+		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID);
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 		entityId.setAutoFitWidth(true);
 
-		ListGridField entity = new UserListGridField("entity", "avatar", "entity");
+		ListGridField entity = new UserListGridField(ENTITY, AVATAR, ENTITY);
 		entity.setCanEdit(false);
 		entity.setAutoFitWidth(true);
 		entity.setRotateTitle(false);
@@ -94,17 +132,17 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		read.setCanEdit(true);
 		read.setAutoFitWidth(true);
 
-		ListGridField print = new ListGridField("print", I18N.message("print"));
+		ListGridField print = new ListGridField(PRINT, I18N.message(PRINT));
 		print.setType(ListGridFieldType.BOOLEAN);
 		print.setCanEdit(true);
 		print.setAutoFitWidth(true);
 
-		ListGridField download = new ListGridField("download", I18N.message("download"));
+		ListGridField download = new ListGridField(DOWNLOAD, I18N.message(DOWNLOAD));
 		download.setType(ListGridFieldType.BOOLEAN);
 		download.setCanEdit(true);
 		download.setAutoFitWidth(true);
 
-		ListGridField write = new ListGridField("write", I18N.message("write"));
+		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
@@ -114,37 +152,37 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		add.setCanEdit(true);
 		add.setAutoFitWidth(true);
 
-		ListGridField security = new ListGridField("security", I18N.message("security"));
+		ListGridField security = new ListGridField(SECURITY, I18N.message(SECURITY));
 		security.setType(ListGridFieldType.BOOLEAN);
 		security.setCanEdit(true);
 		security.setAutoFitWidth(true);
 
-		ListGridField immutable = new ListGridField("immutable", I18N.message("immutable"));
+		ListGridField immutable = new ListGridField(IMMUTABLE, I18N.message(IMMUTABLE));
 		immutable.setType(ListGridFieldType.BOOLEAN);
 		immutable.setCanEdit(true);
 		immutable.setAutoFitWidth(true);
 
-		ListGridField delete = new ListGridField("delete", I18N.message("ddelete"));
+		ListGridField delete = new ListGridField(DELETE, I18N.message("ddelete"));
 		delete.setType(ListGridFieldType.BOOLEAN);
 		delete.setCanEdit(true);
 		delete.setAutoFitWidth(true);
 
-		ListGridField rename = new ListGridField("rename", I18N.message("rename"));
+		ListGridField rename = new ListGridField(RENAME, I18N.message(RENAME));
 		rename.setType(ListGridFieldType.BOOLEAN);
 		rename.setCanEdit(true);
 		rename.setAutoFitWidth(true);
 
-		ListGridField _import = new ListGridField("import", I18N.message("iimport"));
-		_import.setType(ListGridFieldType.BOOLEAN);
-		_import.setCanEdit(true);
-		_import.setAutoFitWidth(true);
+		ListGridField iimport = new ListGridField(IMPORT, I18N.message("iimport"));
+		iimport.setType(ListGridFieldType.BOOLEAN);
+		iimport.setCanEdit(true);
+		iimport.setAutoFitWidth(true);
 
-		ListGridField export = new ListGridField("export", I18N.message("eexport"));
+		ListGridField export = new ListGridField(EXPORT, I18N.message("eexport"));
 		export.setType(ListGridFieldType.BOOLEAN);
 		export.setCanEdit(true);
 		export.setAutoFitWidth(true);
 
-		ListGridField password = new ListGridField("password", I18N.message("password"));
+		ListGridField password = new ListGridField(PASSWORD, I18N.message(PASSWORD));
 		password.setType(ListGridFieldType.BOOLEAN);
 		password.setCanEdit(true);
 		password.setAutoFitWidth(true);
@@ -154,7 +192,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		move.setCanEdit(true);
 		move.setAutoFitWidth(true);
 
-		ListGridField email = new ListGridField("email", I18N.message("email"));
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
 		email.setType(ListGridFieldType.BOOLEAN);
 		email.setCanEdit(true);
 		email.setAutoFitWidth(true);
@@ -169,7 +207,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		dataSource = new RightsDS(folder.getId(), true);
 		list.setDataSource(dataSource);
 
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 		fields.add(entityId);
 		fields.add(entity);
 		fields.add(read);
@@ -184,7 +222,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		fields.add(security);
 		fields.add(immutable);
 		fields.add(password);
-		fields.add(_import);
+		fields.add(iimport);
 		fields.add(export);
 		addSign(fields);
 		addArchive(fields);
@@ -226,12 +264,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 						Label path = new Label("<b><span style='text-decoration: underline'>"
 								+ refFolder.getPathExtended() + "</span></b>");
 						path.setWrap(false);
-						path.addClickHandler(new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								FolderNavigator.get().openFolder(refFolder.getId());
-							}
-						});
+						path.addClickHandler((ClickEvent event) -> FolderNavigator.get().openFolder(refFolder.getId()));
 
 						HTMLPane spacer = new HTMLPane();
 						spacer.setContents("<div>&nbsp;</div>");
@@ -240,12 +273,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 						Img closeImage = ItemFactory.newImgIcon("delete.png");
 						closeImage.setHeight("16px");
-						closeImage.addClickHandler(new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								inheritInfoPanel.setVisible(false);
-							}
-						});
+						closeImage.addClickHandler((ClickEvent event) -> inheritInfoPanel.setVisible(false));
 						closeImage.setCursor(Cursor.HAND);
 						closeImage.setTooltip(I18N.message("close"));
 						closeImage.setLayoutAlign(Alignment.RIGHT);
@@ -259,7 +287,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addStorage(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.MULTI_STORAGE)) {
-			ListGridField storage = new ListGridField("storage", I18N.message("storage"));
+			ListGridField storage = new ListGridField(STORAGE, I18N.message(STORAGE));
 			storage.setType(ListGridFieldType.BOOLEAN);
 			storage.setCanEdit(true);
 			storage.setAutoFitWidth(true);
@@ -269,7 +297,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addAutomation(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.AUTOMATION)) {
-			ListGridField automation = new ListGridField("automation", I18N.message("automation"));
+			ListGridField automation = new ListGridField(AUTOMATION, I18N.message(AUTOMATION));
 			automation.setType(ListGridFieldType.BOOLEAN);
 			automation.setCanEdit(true);
 			automation.setAutoFitWidth(true);
@@ -279,7 +307,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addSubscription(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.AUDIT)) {
-			ListGridField subscription = new ListGridField("subscription", I18N.message("subscription"));
+			ListGridField subscription = new ListGridField(SUBSCRIPTION, I18N.message(SUBSCRIPTION));
 			subscription.setType(ListGridFieldType.BOOLEAN);
 			subscription.setCanEdit(true);
 			subscription.setAutoFitWidth(true);
@@ -302,63 +330,51 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		applyRightsSubfolders.setAutoFit(true);
 		buttons.addMember(applyRightsSubfolders);
 
-		applyRights.addClickHandler((ClickEvent applyClick) -> {
-			onSave(false);
-		});
+		applyRights.addClickHandler((ClickEvent applyClick) -> onSave(false));
 
-		applyRightsSubfolders.addClickHandler((ClickEvent rightsClick) -> {
-			onSave(true);
-		});
+		applyRightsSubfolders.addClickHandler((ClickEvent rightsClick) -> onSave(true));
 
 		Button inheritFromParent = new Button(I18N.message("inheritfromparent"));
 		inheritFromParent.setAutoFit(true);
 		buttons.addMember(inheritFromParent);
-		inheritFromParent.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				FolderService.Instance.get().getFolder(folder.getParentId(), false, false, false,
-						new AsyncCallback<GUIFolder>() {
+		inheritFromParent.addClickHandler((ClickEvent event) -> FolderService.Instance.get()
+				.getFolder(folder.getParentId(), false, false, false, new AsyncCallback<GUIFolder>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(GUIFolder parent) {
-								LD.ask(I18N.message("inheritrights"),
-										I18N.message("inheritrightsask",
-												new String[] { folder.getName(), parent.getName() }),
-										(Boolean interitConfirmed) -> {
-											if (interitConfirmed) {
-												FolderService.Instance.get().inheritRights(folder.getId(),
-														folder.getParentId(), new AsyncCallback<GUIFolder>() {
+					@Override
+					public void onSuccess(GUIFolder parent) {
+						LD.ask(I18N.message("inheritrights"),
+								I18N.message("inheritrightsask", new String[] { folder.getName(), parent.getName() }),
+								(Boolean interitConfirmed) -> {
+									if (Boolean.TRUE.equals(interitConfirmed)) {
+										FolderService.Instance.get().inheritRights(folder.getId(), folder.getParentId(),
+												new AsyncCallback<GUIFolder>() {
 
-															@Override
-															public void onFailure(Throwable caught) {
-																GuiLog.serverError(caught);
-															}
+													@Override
+													public void onFailure(Throwable caught) {
+														GuiLog.serverError(caught);
+													}
 
-															@Override
-															public void onSuccess(GUIFolder arg) {
-																FolderSecurityPanel.this.refresh(arg);
-															}
-														});
-											}
-										});
-							}
+													@Override
+													public void onSuccess(GUIFolder arg) {
+														FolderSecurityPanel.this.refresh(arg);
+													}
+												});
+									}
+								});
+					}
 
-						});
-			}
-		});
+				}));
 
 		Button inheritRights = new Button(I18N.message("inheritrights"));
 		inheritRights.setAutoFit(true);
 		buttons.addMember(inheritRights);
-		inheritRights.addClickHandler((ClickEvent InheritClick) -> {
-			InheritRightsDialog dialog = new InheritRightsDialog(FolderSecurityPanel.this);
-			dialog.show();
-		});
+		inheritRights
+				.addClickHandler((ClickEvent inheritClick) -> new InheritRightsDialog(FolderSecurityPanel.this).show());
 
 		addGroupSelector(buttons);
 
@@ -382,21 +398,21 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			 */
 			ListGridRecord[] records = list.getRecords();
 			for (ListGridRecord test : records) {
-				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("usergroup"))) {
 					user.clearValue();
 					return;
 				}
 			}
 
 			// Update the rights table
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-			record.setAttribute("avatar", selectedRecord.getAttribute("id"));
-			record.setAttribute("entity",
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("usergroup"));
+			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
+			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-			record.setAttribute("read", true);
+			rec.setAttribute("read", true);
 
-			list.addData(record);
+			list.addData(rec);
 			user.clearValue();
 		});
 		buttons.addMember(userForm);
@@ -416,38 +432,34 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			// table
 			ListGridRecord[] records = list.getRecords();
 			for (ListGridRecord test : records) {
-				if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
 					group.clearValue();
 					return;
 				}
 			}
 
 			// Update the rights table
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-			record.setAttribute("avatar", "group");
-			record.setAttribute("entity", selectedRecord.getAttribute("name"));
-			record.setAttribute("read", true);
-			list.addData(record);
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
+			rec.setAttribute(AVATAR, "group");
+			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
+			rec.setAttribute("read", true);
+			list.addData(rec);
 			group.clearValue();
 		});
 		buttons.addMember(groupForm);
 	}
 
 	private void addExportAndPrintButtons(HLayout buttons) {
-		Button exportButton = new Button(I18N.message("export"));
+		Button exportButton = new Button(I18N.message(EXPORT));
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
-		exportButton.addClickHandler((ClickEvent exportClick) -> {
-			GridUtil.exportCSV(list, true);
-		});
+		exportButton.addClickHandler((ClickEvent exportClick) -> GridUtil.exportCSV(list, true));
 
-		Button printButton = new Button(I18N.message("print"));
+		Button printButton = new Button(I18N.message(PRINT));
 		printButton.setAutoFit(true);
 		buttons.addMember(printButton);
-		printButton.addClickHandler((ClickEvent printClick) -> {
-			GridUtil.print(list);
-		});
+		printButton.addClickHandler((ClickEvent printClick) -> GridUtil.print(list));
 	}
 
 	private void addCellContextClickHandler(GUIFolder folder) {
@@ -464,7 +476,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addCalendar(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.CALENDAR)) {
-			ListGridField calendar = new ListGridField("calendar", I18N.message("calendar"));
+			ListGridField calendar = new ListGridField(CALENDAR, I18N.message(CALENDAR));
 			calendar.setType(ListGridFieldType.BOOLEAN);
 			calendar.setCanEdit(true);
 			calendar.setAutoFitWidth(true);
@@ -474,7 +486,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addWorkflow(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.WORKFLOW)) {
-			ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"));
+			ListGridField workflow = new ListGridField(WORKFLOW, I18N.message(WORKFLOW));
 			workflow.setType(ListGridFieldType.BOOLEAN);
 			workflow.setCanEdit(true);
 			workflow.setAutoFitWidth(true);
@@ -484,7 +496,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addArchive(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.ARCHIVING) || Feature.enabled(Feature.IMPEX)) {
-			ListGridField archive = new ListGridField("archive", I18N.message("archive"));
+			ListGridField archive = new ListGridField(ARCHIVE, I18N.message(ARCHIVE));
 			archive.setType(ListGridFieldType.BOOLEAN);
 			archive.setCanEdit(true);
 			archive.setAutoFitWidth(true);
@@ -509,37 +521,37 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	 */
 	public GUIRight[] getRights() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIRight> tmp = new ArrayList<GUIRight>();
+		List<GUIRight> tmp = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
-			Record record = list.getRecordList().get(i);
-			if (!record.getAttributeAsBoolean("read"))
+			Record rec = list.getRecordList().get(i);
+			if (!Boolean.TRUE.equals(rec.getAttributeAsBoolean("read")))
 				continue;
 
 			GUIRight right = new GUIRight();
 
-			right.setName(record.getAttributeAsString("entity"));
-			right.setEntityId(Long.parseLong(record.getAttribute("entityId")));
-			right.setPrint("true".equals(record.getAttributeAsString("print")));
-			right.setWrite("true".equals(record.getAttributeAsString("write")));
-			right.setDelete("true".equals(record.getAttributeAsString("delete")));
-			right.setAdd("true".equals(record.getAttributeAsString("add")));
-			right.setWorkflow("true".equals(record.getAttributeAsString("workflow")));
-			right.setSign("true".equals(record.getAttributeAsString("sign")));
-			right.setImport("true".equals(record.getAttributeAsString("import")));
-			right.setExport("true".equals(record.getAttributeAsString("export")));
-			right.setImmutable("true".equals(record.getAttributeAsString("immutable")));
-			right.setRename("true".equals(record.getAttributeAsString("rename")));
-			right.setSecurity("true".equals(record.getAttributeAsString("security")));
-			right.setArchive("true".equals(record.getAttributeAsString("archive")));
-			right.setDownload("true".equals(record.getAttributeAsString("download")));
-			right.setCalendar("true".equals(record.getAttributeAsString("calendar")));
-			right.setSubscription("true".equals(record.getAttributeAsString("subscription")));
-			right.setPassword("true".equals(record.getAttributeAsString("password")));
-			right.setMove("true".equals(record.getAttributeAsString("move")));
-			right.setEmail("true".equals(record.getAttributeAsString("email")));
-			right.setAutomation("true".equals(record.getAttributeAsString("automation")));
-			right.setStorage("true".equals(record.getAttributeAsString("storage")));
+			right.setName(rec.getAttributeAsString(ENTITY));
+			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+			right.setPrint("true".equals(rec.getAttributeAsString(PRINT)));
+			right.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
+			right.setDelete("true".equals(rec.getAttributeAsString(DELETE)));
+			right.setAdd("true".equals(rec.getAttributeAsString("add")));
+			right.setWorkflow("true".equals(rec.getAttributeAsString(WORKFLOW)));
+			right.setSign("true".equals(rec.getAttributeAsString("sign")));
+			right.setImport("true".equals(rec.getAttributeAsString(IMPORT)));
+			right.setExport("true".equals(rec.getAttributeAsString(EXPORT)));
+			right.setImmutable("true".equals(rec.getAttributeAsString(IMMUTABLE)));
+			right.setRename("true".equals(rec.getAttributeAsString(RENAME)));
+			right.setSecurity("true".equals(rec.getAttributeAsString(SECURITY)));
+			right.setArchive("true".equals(rec.getAttributeAsString(ARCHIVE)));
+			right.setDownload("true".equals(rec.getAttributeAsString(DOWNLOAD)));
+			right.setCalendar("true".equals(rec.getAttributeAsString(CALENDAR)));
+			right.setSubscription("true".equals(rec.getAttributeAsString(SUBSCRIPTION)));
+			right.setPassword("true".equals(rec.getAttributeAsString(PASSWORD)));
+			right.setMove("true".equals(rec.getAttributeAsString("move")));
+			right.setEmail("true".equals(rec.getAttributeAsString(EMAIL)));
+			right.setAutomation("true".equals(rec.getAttributeAsString(AUTOMATION)));
+			right.setStorage("true".equals(rec.getAttributeAsString(STORAGE)));
 
 			tmp.add(right);
 		}
@@ -564,11 +576,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
-		deleteItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onDeleteItem();
-			}
-		});
+		deleteItem.addClickHandler((MenuItemClickEvent event) -> onDeleteItem());
 
 		contextMenu.setItems(deleteItem);
 		return contextMenu;
@@ -579,13 +587,9 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		if (selection == null || selection.length == 0)
 			return;
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-			@Override
-			public void execute(Boolean value) {
-				if (value) {
-					list.removeSelectedData();
-				}
-			}
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
+			if (Boolean.TRUE.equals(yes))
+				list.removeSelectedData();
 		});
 	}
 
@@ -610,7 +614,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 				int totalRecords = list.getRecordList().getLength();
 				for (int i = 0; i < totalRecords; i++) {
 					Record rec = list.getRecordList().get(i);
-					if (!rec.getAttributeAsBoolean("read"))
+					if (!Boolean.TRUE.equals(rec.getAttributeAsBoolean("read")))
 						list.removeData(rec);
 				}
 				folder.setSecurityRef(null);

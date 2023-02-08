@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class IncrementalSettingsPanel extends VLayout {
+	private static final String FREQUENCY_STR = "frequency";
+
 	protected GUIIncrementalArchive incremental;
 
 	protected ValuesManager vm = new ValuesManager();
@@ -47,11 +49,11 @@ public class IncrementalSettingsPanel extends VLayout {
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		prefix = ItemFactory.newSimpleTextItem("prefix", "prefix", incremental.getPrefix());
+		prefix = ItemFactory.newSimpleTextItem("prefix", incremental.getPrefix());
 		prefix.setRequired(true);
 		prefix.addChangedHandler(changedHandler);
 
-		frequency = ItemFactory.newIntegerItem("frequency", "frequency", incremental.getFrequency());
+		frequency = ItemFactory.newIntegerItem(FREQUENCY_STR, FREQUENCY_STR, incremental.getFrequency());
 		IntegerRangeValidator min = new IntegerRangeValidator();
 		min.setMin(1);
 		frequency.setValidators(min);
@@ -75,9 +77,9 @@ public class IncrementalSettingsPanel extends VLayout {
 	public boolean validate() {
 		vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			incremental.setPrefix(vm.getValueAsString("prefix").toString());
-			incremental.setFrequency(Integer.parseInt(vm.getValueAsString("frequency")));
+			incremental.setFrequency(Integer.parseInt(vm.getValueAsString(FREQUENCY_STR)));
 			incremental.setFolder(folderSelector.getFolder());
 
 			if (vm.getValues().get("template") != null) {
@@ -85,7 +87,7 @@ public class IncrementalSettingsPanel extends VLayout {
 						.replace("]", "");
 				if (!templateIdString.isEmpty()) {
 					String[] selection = templateIdString.split(",");
-					List<GUITemplate> templates = new ArrayList<GUITemplate>();
+					List<GUITemplate> templates = new ArrayList<>();
 					for (String selectionId : selection) {
 						GUITemplate currentTemplate = new GUITemplate();
 						currentTemplate.setId(Long.parseLong(selectionId.trim()));

@@ -46,15 +46,12 @@ public class ImpexMenu extends VLayout {
 		Button syndication = new Button(I18N.message("syndication"));
 		syndication.setWidth100();
 		syndication.setHeight(25);
-		syndication.addClickHandler((ClickEvent syndicationClick) -> {
-			AdminScreen.get().setContent(new SyndicationsPanel());
-		});
+		syndication.addClickHandler(
+				(ClickEvent syndicationClick) -> AdminScreen.get().setContent(new SyndicationsPanel()));
 		if (Feature.visible(Feature.SYNDICATION) && Menu.enabled(Menu.SYNDICATION)) {
 			addMember(syndication);
-			if (!Feature.enabled(Feature.SYNDICATION)) {
-				syndication.setDisabled(true);
-				syndication.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.SYNDICATION))
+				setFeatureDisabled(syndication);
 		}
 	}
 
@@ -62,17 +59,14 @@ public class ImpexMenu extends VLayout {
 		Button converters = new Button(I18N.message("formatconverters"));
 		converters.setWidth100();
 		converters.setHeight(25);
-		converters.addClickHandler((ClickEvent convertersClick) -> {
-			AdminScreen.get().setContent(new FormatConvertersPanel());
-		});
+		converters.addClickHandler(
+				(ClickEvent convertersClick) -> AdminScreen.get().setContent(new FormatConvertersPanel()));
 
 		if (Session.get().isDefaultTenant() && Feature.visible(Feature.FORMAT_CONVERSION)
 				&& Menu.enabled(Menu.FORMAT_CONVERTERS)) {
 			addMember(converters);
-			if (!Feature.enabled(Feature.FORMAT_CONVERSION)) {
-				converters.setDisabled(true);
-				converters.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.FORMAT_CONVERSION))
+				setFeatureDisabled(converters);
 		}
 	}
 
@@ -80,15 +74,12 @@ public class ImpexMenu extends VLayout {
 		Button exportArchives = new Button(I18N.message("exportarchives"));
 		exportArchives.setWidth100();
 		exportArchives.setHeight(25);
-		exportArchives.addClickHandler((ClickEvent exportArchivesClick) -> {
-			AdminScreen.get().setContent(new ExportArchivesPanel());
-		});
+		exportArchives.addClickHandler(
+				(ClickEvent exportArchivesClick) -> AdminScreen.get().setContent(new ExportArchivesPanel()));
 		if (Feature.visible(Feature.IMPEX)) {
 			addMember(exportArchives);
-			if (!Feature.enabled(Feature.IMPEX)) {
-				exportArchives.setDisabled(true);
-				exportArchives.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.IMPEX))
+				setFeatureDisabled(exportArchives);
 		}
 	}
 
@@ -96,15 +87,12 @@ public class ImpexMenu extends VLayout {
 		Button importArchives = new Button(I18N.message("importarchives"));
 		importArchives.setWidth100();
 		importArchives.setHeight(25);
-		importArchives.addClickHandler((ClickEvent importArchivesClick) -> {
-			AdminScreen.get().setContent(new ImportArchivesPanel());
-		});
+		importArchives.addClickHandler(
+				(ClickEvent importArchivesClick) -> AdminScreen.get().setContent(new ImportArchivesPanel()));
 		if (Feature.visible(Feature.IMPEX)) {
 			addMember(importArchives);
-			if (!Feature.enabled(Feature.IMPEX)) {
-				importArchives.setDisabled(true);
-				importArchives.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.IMPEX))
+				setFeatureDisabled(importArchives);
 		}
 	}
 
@@ -112,15 +100,11 @@ public class ImpexMenu extends VLayout {
 		Button emails = new Button(I18N.message("emailaccounts"));
 		emails.setWidth100();
 		emails.setHeight(25);
-		emails.addClickHandler((ClickEvent emailClick) -> {
-			AdminScreen.get().setContent(new EmailAccountsPanel());
-		});
+		emails.addClickHandler((ClickEvent emailClick) -> AdminScreen.get().setContent(new EmailAccountsPanel()));
 		if (Feature.visible(Feature.EMAIL_IMPORT)) {
 			addMember(emails);
-			if (!Feature.enabled(Feature.EMAIL_IMPORT)) {
-				emails.setDisabled(true);
-				emails.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.EMAIL_IMPORT))
+				setFeatureDisabled(emails);
 		}
 	}
 
@@ -128,15 +112,17 @@ public class ImpexMenu extends VLayout {
 		Button importFolders = new Button(I18N.message("importfolders"));
 		importFolders.setWidth100();
 		importFolders.setHeight(25);
-		importFolders.addClickHandler((ClickEvent importClick) -> {
-			AdminScreen.get().setContent(new ImportFoldersPanel());
-		});
+		importFolders
+				.addClickHandler((ClickEvent importClick) -> AdminScreen.get().setContent(new ImportFoldersPanel()));
 		if (Feature.visible(Feature.IMPORT_REMOTE_FOLDERS) || Feature.visible(Feature.IMPORT_LOCAL_FOLDERS)) {
 			addMember(importFolders);
-			if (!Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS) && !Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS)) {
-				importFolders.setDisabled(true);
-				importFolders.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS) && !Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS))
+				setFeatureDisabled(importFolders);
 		}
+	}
+
+	private void setFeatureDisabled(Button button) {
+		button.setDisabled(true);
+		button.setTooltip(I18N.message("featuredisabled"));
 	}
 }

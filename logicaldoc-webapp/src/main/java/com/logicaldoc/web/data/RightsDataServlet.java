@@ -30,6 +30,10 @@ import com.logicaldoc.util.Context;
  */
 public class RightsDataServlet extends AbstractDataServlet {
 
+	private static final String ENTITY = "<entity><![CDATA[";
+
+	private static final String CLOSE_ENTITY = "]]></entity>";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -59,7 +63,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 				"select ld_id, ld_username, ld_firstname, ld_name from ld_user where ld_deleted=0 and ld_tenantid="
 						+ tenantId,
 				null, null);
-		Map<Long, String> users = new HashMap<Long, String>();
+		Map<Long, String> users = new HashMap<>();
 		while (set.next())
 			users.put(set.getLong(1), set.getString(3) + " " + set.getString(4) + " (" + set.getString(2) + ")");
 		return users;
@@ -97,50 +101,58 @@ public class RightsDataServlet extends AbstractDataServlet {
 		 * Iterate over records composing the response XML document
 		 */
 		while (set.next()) {
-			long groupId = set.getLong(1);
-			String groupName = set.getString(2);
-			int groupType = set.getInt(3);
-			long userId = 0L;
-			if (groupType == Group.TYPE_USER && groupName != null)
-				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
-
-			writer.print("<right>");
-			writer.print("<entityId>" + groupId + "</entityId>");
-
-			if (groupType == Group.TYPE_DEFAULT) {
-				writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
-				writer.print("<avatar>group</avatar>");
-			} else {
-				writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
-				writer.print("<avatar>" + userId + "</avatar>");
-			}
-			writer.print("<read>true</read>");
-			writer.print("<write>" + (set.getInt(4) == 1 ? true : false) + "</write>");
-			writer.print("<add>" + (set.getInt(5) == 1 ? true : false) + "</add>");
-			writer.print("<security>" + (set.getInt(6) == 1 ? true : false) + "</security>");
-			writer.print("<immutable>" + (set.getInt(7) == 1 ? true : false) + "</immutable>");
-			writer.print("<delete>" + (set.getInt(8) == 1 ? true : false) + "</delete>");
-			writer.print("<rename>" + (set.getInt(9) == 1 ? true : false) + "</rename>");
-			writer.print("<import>" + (set.getInt(10) == 1 ? true : false) + "</import>");
-			writer.print("<export>" + (set.getInt(11) == 1 ? true : false) + "</export>");
-			writer.print("<sign>" + (set.getInt(12) == 1 ? true : false) + "</sign>");
-			writer.print("<archive>" + (set.getInt(13) == 1 ? true : false) + "</archive>");
-			writer.print("<workflow>" + (set.getInt(14) == 1 ? true : false) + "</workflow>");
-			writer.print("<download>" + (set.getInt(15) == 1 ? true : false) + "</download>");
-			writer.print("<calendar>" + (set.getInt(16) == 1 ? true : false) + "</calendar>");
-			writer.print("<subscription>" + (set.getInt(17) == 1 ? true : false) + "</subscription>");
-			writer.print("<print>" + (set.getInt(18) == 1 ? true : false) + "</print>");
-			writer.print("<password>" + (set.getInt(19) == 1 ? true : false) + "</password>");
-			writer.print("<move>" + (set.getInt(20) == 1 ? true : false) + "</move>");
-			writer.print("<email>" + (set.getInt(21) == 1 ? true : false) + "</email>");
-			writer.print("<automation>" + (set.getInt(22) == 1 ? true : false) + "</automation>");
-			writer.print("<storage>" + (set.getInt(23) == 1 ? true : false) + "</storage>");
-			writer.print("<type>" + groupType + "</type>");
-			writer.print("</right>");
-
+			printRight(writer, set, users);
 		}
 
 		writer.write("</list>");
+	}
+
+	private void printRight(PrintWriter writer, SqlRowSet set, Map<Long, String> users) {
+		long groupId = set.getLong(1);
+		String groupName = set.getString(2);
+		int groupType = set.getInt(3);
+		long userId = 0L;
+		if (groupType == Group.TYPE_USER && groupName != null)
+			userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
+
+		writer.print("<right>");
+		writer.print("<entityId>" + groupId + "</entityId>");
+
+		if (groupType == Group.TYPE_DEFAULT) {
+			writer.print(ENTITY + groupName + CLOSE_ENTITY);
+			writer.print("<avatar>group</avatar>");
+		} else {
+			writer.print(ENTITY + users.get(userId) + CLOSE_ENTITY);
+			writer.print("<avatar>" + userId + "</avatar>");
+		}
+		writer.print("<read>true</read>");
+		writer.print("<write>" + intToBoolean(set.getInt(4)) + "</write>");
+		writer.print("<add>" + intToBoolean(set.getInt(5)) + "</add>");
+		writer.print("<security>" + intToBoolean(set.getInt(6)) + "</security>");
+		writer.print("<immutable>" + intToBoolean(set.getInt(7)) + "</immutable>");
+		writer.print("<delete>" + intToBoolean(set.getInt(8)) + "</delete>");
+		writer.print("<rename>" + intToBoolean(set.getInt(9)) + "</rename>");
+		writer.print("<import>" + intToBoolean(set.getInt(10)) + "</import>");
+		writer.print("<export>" + intToBoolean(set.getInt(11)) + "</export>");
+		writer.print("<sign>" + intToBoolean(set.getInt(12)) + "</sign>");
+		writer.print("<archive>" + intToBoolean(set.getInt(13)) + "</archive>");
+		writer.print("<workflow>" + intToBoolean(set.getInt(14)) + "</workflow>");
+		writer.print("<download>" + intToBoolean(set.getInt(15)) + "</download>");
+		writer.print("<calendar>" + intToBoolean(set.getInt(16)) + "</calendar>");
+		writer.print("<subscription>" + intToBoolean(set.getInt(17)) + "</subscription>");
+		writer.print("<print>" + intToBoolean(set.getInt(18)) + "</print>");
+		writer.print("<password>" + intToBoolean(set.getInt(19)) + "</password>");
+		writer.print("<move>" + intToBoolean(set.getInt(20)) + "</move>");
+		writer.print("<email>" + intToBoolean(set.getInt(21)) + "</email>");
+		writer.print("<automation>" + intToBoolean(set.getInt(22)) + "</automation>");
+		writer.print("<storage>" + intToBoolean(set.getInt(23)) + "</storage>");
+
+		writer.print("<type>" + groupType + "</type>");
+		writer.print("</right>");
+	}
+
+	private boolean intToBoolean(int val) {
+		return val == 1 ? true : false;
 	}
 
 	private void menuRights(HttpServletResponse response, Long menuId, long tenantId)
@@ -179,10 +191,10 @@ public class RightsDataServlet extends AbstractDataServlet {
 			writer.print("<entityId>" + groupId + "</entityId>");
 
 			if (groupType == Group.TYPE_DEFAULT) {
-				writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
+				writer.print(ENTITY + groupName + CLOSE_ENTITY);
 				writer.print("<avatar>group</avatar>");
 			} else {
-				writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
+				writer.print(ENTITY + users.get(userId) + CLOSE_ENTITY);
 				writer.print("<avatar>" + userId + "</avatar>");
 			}
 

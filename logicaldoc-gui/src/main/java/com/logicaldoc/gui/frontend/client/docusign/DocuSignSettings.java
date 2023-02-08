@@ -56,30 +56,30 @@ public class DocuSignSettings extends Window {
 	}
 
 	private void initGui() {
-		TextItem accountId = ItemFactory.newTextItem("accountId", "accountid", settings.getAccountId());
+		TextItem accountId = ItemFactory.newTextItem("accountid", settings.getAccountId());
 		accountId.setRequired(true);
 		accountId.setWidth(300);
 
-		TextItem integrationKey = ItemFactory.newTextItem("integrationKey", "integrationkey",
+		TextItem integrationKey = ItemFactory.newTextItem("integrationkey", 
 				settings.getIntegrationKey());
 		integrationKey.setRequired(true);
 		integrationKey.setWidth(300);
 
-		TextItem secretKey = ItemFactory.newTextItem("secretKey", "secretkey", settings.getSecretKey());
+		TextItem secretKey = ItemFactory.newTextItem("secretkey", settings.getSecretKey());
 		secretKey.setRequired(true);
 		secretKey.setWidth(300);
 
-		SelectItem authBaseUrl = ItemFactory.newSelectItem("authBaseUrl", "authbaseurl");
+		SelectItem authBaseUrl = ItemFactory.newSelectItem("authbaseurl");
 		authBaseUrl.setValue(settings.getAuthBaseUrl());
 		authBaseUrl.setRequired(true);
 		authBaseUrl.setValueMap("https://account.docusign.com", "https://account-d.docusign.com");
 		authBaseUrl.setWidth(300);
 		
-		TextItem accountBaseUrl = ItemFactory.newTextItem("accountBaseUrl", "accountbaseurl", settings.getApiBaseUrl());
+		TextItem accountBaseUrl = ItemFactory.newTextItem("accountbaseurl", settings.getApiBaseUrl());
 		accountBaseUrl.setRequired(true);
 		accountBaseUrl.setWidth(300);
 
-		TextItem callbackUrl = ItemFactory.newTextItem("callbackUrl", "callbackurl",settings.getCallbackUrl());
+		TextItem callbackUrl = ItemFactory.newTextItem("callbackurl", settings.getCallbackUrl());
 		callbackUrl.setRequired(false);
 		callbackUrl.setDisabled(true);
 		callbackUrl.setWidth(300);
@@ -105,11 +105,11 @@ public class DocuSignSettings extends Window {
 		if (!form.validate())
 			return;
 
-		settings.setAccountId(form.getValueAsString("accountId"));
-		settings.setAuthBaseUrl(form.getValueAsString("authBaseUrl"));
-		settings.setApiBaseUrl(form.getValueAsString("accountBaseUrl"));
-		settings.setIntegrationKey(form.getValueAsString("integrationKey"));
-		settings.setSecretKey(form.getValueAsString("secretKey"));
+		settings.setAccountId(form.getValueAsString("accountid"));
+		settings.setAuthBaseUrl(form.getValueAsString("authbaseurl"));
+		settings.setApiBaseUrl(form.getValueAsString("accountbaseurl"));
+		settings.setIntegrationKey(form.getValueAsString("integrationkey"));
+		settings.setSecretKey(form.getValueAsString("secretkey"));
 
 		DocuSignService.Instance.get().authorize(settings, new AsyncCallback<String>() {
 			@Override

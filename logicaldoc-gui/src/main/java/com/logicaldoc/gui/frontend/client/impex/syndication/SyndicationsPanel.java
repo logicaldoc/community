@@ -18,7 +18,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -47,6 +46,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class SyndicationsPanel extends AdminPanel {
+
+	private static final String EENABLED = "eenabled";
 
 	private Layout detailsContainer = new VLayout();
 
@@ -82,7 +83,7 @@ public class SyndicationsPanel extends AdminPanel {
 		ListGridField targetPath = new ListGridField("targetPath", I18N.message("targetpath"), 300);
 		targetPath.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -147,9 +148,9 @@ public class SyndicationsPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					SyndicationService.Instance.get().getSyndication(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					SyndicationService.Instance.get().getSyndication(Long.parseLong(rec.getAttributeAsString("id")),
 							new AsyncCallback<GUISyndication>() {
 
 								@Override
@@ -188,31 +189,28 @@ public class SyndicationsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SyndicationService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						SyndicationService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showSyndicationDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showSyndicationDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -220,95 +218,86 @@ public class SyndicationsPanel extends AdminPanel {
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SyndicationService.Instance.get().test(Long.parseLong(record.getAttributeAsString("id")),
-						new AsyncCallback<Boolean>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		test.addClickHandler((MenuItemClickEvent event) -> {
+			SyndicationService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
+					new AsyncCallback<Boolean>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Boolean result) {
-								if (result.booleanValue())
-									SC.say(I18N.message("connectionestablished"));
-								else
-									SC.warn(I18N.message("connectionfailed"));
-							}
-						});
+						@Override
+						public void onSuccess(Boolean result) {
+							if (result.booleanValue())
+								SC.say(I18N.message("connectionestablished"));
+							else
+								SC.warn(I18N.message("connectionfailed"));
+						}
+					});
 
-			}
 		});
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SyndicationService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler((MenuItemClickEvent event) -> {
+			SyndicationService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute(EENABLED, "0");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SyndicationService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), false,
-						new AsyncCallback<Void>() {
+		disable.addClickHandler((MenuItemClickEvent event) -> {
+			SyndicationService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute(EENABLED, "2");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
 		MenuItem resetCache = new MenuItem();
 		resetCache.setTitle(I18N.message("resetcache"));
 		resetCache.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SyndicationService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						SyndicationService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									GuiLog.info(I18N.message("cachedeleted"), null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("cachedeleted"), null);
+							}
+						});
 					}
 				});
 			}
 		});
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(test, disable, delete, resetCache);
 		else
 			contextMenu.setItems(test, enable, delete, resetCache);
@@ -329,24 +318,24 @@ public class SyndicationsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param syndication the syndication to update
 	 */
 	public void updateRecord(GUISyndication syndication) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, syndication.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", syndication.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, syndication.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", syndication.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", syndication.getName());
-		record.setAttribute("url", syndication.getUrl());
-		record.setAttribute("eenabled", syndication.getEnabled() == 1 ? "0" : "2");
-		record.setAttribute("targetPath", syndication.getTargetPath());
-		list.refreshRow(list.getRecordIndex(record));
+		rec.setAttribute("name", syndication.getName());
+		rec.setAttribute("url", syndication.getUrl());
+		rec.setAttribute(EENABLED, syndication.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute("targetPath", syndication.getTargetPath());
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

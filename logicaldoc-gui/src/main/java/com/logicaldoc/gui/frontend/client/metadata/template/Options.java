@@ -15,7 +15,6 @@ import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -40,6 +39,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 7.1
  */
 public class Options extends com.smartgwt.client.widgets.Window {
+
+	private static final String CATEGORY = "category";
+
+	private static final String VALUE = "value";
 
 	private ListGrid list;
 
@@ -162,11 +165,11 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField value = new ListGridField("value", I18N.message("value"));
+		ListGridField value = new ListGridField(VALUE, I18N.message(VALUE));
 		value.setWidth("*");
 		value.setCanFilter(true);
 
-		ListGridField category = new ListGridField("category", I18N.message("category"));
+		ListGridField category = new ListGridField(CATEGORY, I18N.message(CATEGORY));
 		category.setCanFilter(true);
 		category.setAutoFitWidth(true);
 		category.setMinWidth(80);
@@ -184,12 +187,12 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		list.setCanReorderRecords(!readOnly);
 		list.setCanDragRecordsOut(!readOnly);
 		list.setCanAcceptDroppedRecords(!readOnly);
-		
+
 		list.setShowRowNumbers(true);
-		ListGridField numbers=new ListGridField(" ", 60);
+		ListGridField numbers = new ListGridField(" ", 60);
 		numbers.setAutoFitWidth(true);
 		list.setRowNumberFieldProperties(numbers);
-		
+
 		list.setDragDataAction(DragDataAction.MOVE);
 		list.setFields(id, value, category);
 		list.sort("position", SortDirection.ASCENDING);
@@ -219,8 +222,8 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		Record[] records = list.getRecords();
 		GUIValue[] values = new GUIValue[records.length];
 		int i = 0;
-		for (Record record : records)
-			values[i++] = new GUIValue(record.getAttributeAsString("category"), record.getAttributeAsString("value"));
+		for (Record rec : records)
+			values[i++] = new GUIValue(rec.getAttributeAsString(CATEGORY), rec.getAttributeAsString(VALUE));
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<Void>() {
@@ -247,7 +250,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 			return;
 		final String[] values = new String[selection.length];
 		for (int i = 0; i < selection.length; i++)
-			values[i] = selection[i].getAttributeAsString("value");
+			values[i] = selection[i].getAttributeAsString(VALUE);
 
 		AttributeSetService.Instance.get().deleteOptions(setId, attribute, values, new AsyncCallback<Void>() {
 			@Override
@@ -275,12 +278,9 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							onDelete();
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						onDelete();
 					}
 				});
 			}

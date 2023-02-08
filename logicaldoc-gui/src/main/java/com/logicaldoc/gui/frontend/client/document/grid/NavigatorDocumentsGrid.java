@@ -34,7 +34,7 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 				DocumentGridUtil.getSortSpec(this));
 		setDataSource(dataSource);
 
-		final List<ListGridField> fields = new ArrayList<ListGridField>();
+		final List<ListGridField> fields = new ArrayList<>();
 
 		fields.add(fieldsMap.get("id"));
 		fields.add(fieldsMap.get("thumbnail"));

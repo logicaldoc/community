@@ -3,13 +3,11 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,31 +42,18 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		long userId = Long.parseLong(request.getParameter("id"));
 		String event = request.getParameter("event");
 
+		List<Object> records = executeQuery(max, userId, event);
+
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-
-		StringBuilder query = new StringBuilder(
-				"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation from UserHistory A where A.deleted = 0 and A.userId = :userId ");
-		if (StringUtils.isNotEmpty(event)) {
-			query.append(" and A.event = :event ");
-			params.put("event", event);
-		}
-		query.append(" order by A.date desc ");
-
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		DateFormat df = getDateFormat();
 
 		/*
 		 * Iterate over the collection of user histories
 		 */
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
+		for (Object gridRecord : records) {
+			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<history>");
 			writer.print("<id>" + cols[0] + "</id>");
@@ -91,5 +76,22 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 			writer.print("</history>");
 		}
 		writer.write("</list>");
+	}
+
+	private List<Object> executeQuery(Integer max, long userId, String event) throws PersistenceException {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userId", userId);
+
+		StringBuilder query = new StringBuilder(
+				"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation from UserHistory A where A.deleted = 0 and A.userId = :userId ");
+		if (StringUtils.isNotEmpty(event)) {
+			query.append(" and A.event = :event ");
+			params.put("event", event);
+		}
+		query.append(" order by A.date desc ");
+
+		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		return records;
 	}
 }

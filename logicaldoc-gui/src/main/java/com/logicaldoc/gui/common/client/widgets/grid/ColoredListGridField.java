@@ -22,6 +22,10 @@ public class ColoredListGridField extends ListGridField {
 		this.colorFieldName = colorFieldName;
 	}
 
+	public ColoredListGridField(String name, int width) {
+		this(name, name, width);
+	}
+	
 	public ColoredListGridField(String name, String title, int width) {
 		this(name, "color", I18N.message(title), width);
 	}
@@ -44,11 +48,11 @@ public class ColoredListGridField extends ListGridField {
 		}
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
-			String colorSpec = record.getAttributeAsString(colorFieldName);
+			String colorSpec = rec.getAttributeAsString(colorFieldName);
 			if (colorSpec != null && !colorSpec.isEmpty())
 				return "<span style='color: " + colorSpec + ";'>" + value + "</span>";
 			else

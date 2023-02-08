@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.ListGridEditEvent;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
@@ -34,6 +33,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.0
  */
 public class BookmarksPanel extends VLayout {
+
+	private static final String TARGET_ID = "targetId";
 
 	private RefreshableListGrid list;
 
@@ -61,7 +62,7 @@ public class BookmarksPanel extends VLayout {
 		name.setWidth("*");
 		name.setValidators(validator);
 
-		ListGridField description = new ColoredListGridField("description", I18N.message("description"));
+		ListGridField description = new ColoredListGridField("description");
 		description.setValidators(validator);
 		description.setHidden(true);
 
@@ -82,13 +83,13 @@ public class BookmarksPanel extends VLayout {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				final ListGridRecord record = list.getSelectedRecord();
-				FolderService.Instance.get().getFolder(Long.parseLong(record.getAttributeAsString("folderId")), false,
+				final ListGridRecord rec = list.getSelectedRecord();
+				FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false,
 						false, false, new AsyncCallback<GUIFolder>() {
 
 							@Override
 							public void onSuccess(GUIFolder folder) {
-								showContextMenu(folder, record.getAttributeAsString("type").equals("0"));
+								showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
 							}
 
 							@Override
@@ -115,11 +116,11 @@ public class BookmarksPanel extends VLayout {
 		edit.setTitle(I18N.message("edit"));
 		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
+				ListGridRecord rec = list.getSelectedRecord();
 				GUIBookmark bookmark = new GUIBookmark();
-				bookmark.setId(Long.parseLong(record.getAttributeAsString("id")));
-				bookmark.setName(record.getAttributeAsString("name"));
-				bookmark.setDescription(record.getAttributeAsString("description"));
+				bookmark.setId(Long.parseLong(rec.getAttributeAsString("id")));
+				bookmark.setName(rec.getAttributeAsString("name"));
+				bookmark.setDescription(rec.getAttributeAsString("description"));
 				BookmarkDialog dialog = new BookmarkDialog(bookmark);
 				dialog.show();
 			}
@@ -153,22 +154,19 @@ public class BookmarksPanel extends VLayout {
 					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 				}
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+							}
+						});
 					}
 				});
 			}
@@ -199,16 +197,15 @@ public class BookmarksPanel extends VLayout {
 	}
 
 	private void download() {
-		Long id = list.getSelectedRecord().getAttributeAsLong("targetId");
+		Long id = list.getSelectedRecord().getAttributeAsLong(TARGET_ID);
 		DocUtil.download(id, null);
 	}
 
 	private void onBookmarkSelected() {
-		ListGridRecord record = list.getSelectedRecord();
-		if (record.getAttributeAsString("type").equals("0"))
-			DocumentsPanel.get().openInFolder(record.getAttributeAsLong("folderId"),
-					record.getAttributeAsLong("targetId"));
+		ListGridRecord rec = list.getSelectedRecord();
+		if (rec.getAttributeAsString("type").equals("0"))
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"), rec.getAttributeAsLong(TARGET_ID));
 		else
-			DocumentsPanel.get().openInFolder(record.getAttributeAsLong("targetId"), null);
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(TARGET_ID), null);
 	}
 }

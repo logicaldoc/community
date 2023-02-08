@@ -20,19 +20,14 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -49,6 +44,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class ImportFoldersPanel extends AdminPanel {
+
+	private static final String QUESTION = "question";
+
+	private static final String EENABLED = "eenabled";
 
 	private Layout detailsContainer = new VLayout();
 
@@ -85,7 +84,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		IntegerListGridField importedDocs = new IntegerListGridField("docs", I18N.message("importeddocuments"));
 		importedDocs.setAutoFitWidth(true);
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -119,62 +118,44 @@ public class ImportFoldersPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler((ClickEvent event) -> refresh());
 
 		ToolStripButton addImportFolder = new ToolStripButton();
 		addImportFolder.setTitle(I18N.message("addimportfolder"));
-		addImportFolder.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				GUIImportFolder share = new GUIImportFolder();
-				share.setProvider("file");
-				showShareDetails(share);
-			}
+		addImportFolder.addClickHandler((ClickEvent event) -> {
+			list.deselectAllRecords();
+			GUIImportFolder share = new GUIImportFolder();
+			share.setProvider("file");
+			showShareDetails(share);
 		});
 		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS) || Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS))
 			toolStrip.addButton(addImportFolder);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					ImportFolderService.Instance.get().getImportFolder(
-							Long.parseLong(record.getAttributeAsString("id")), new AsyncCallback<GUIImportFolder>() {
+		list.addSelectionChangedHandler((SelectionEvent event) -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				ImportFolderService.Instance.get().getImportFolder(Long.parseLong(rec.getAttributeAsString("id")),
+						new AsyncCallback<GUIImportFolder>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIImportFolder share) {
-									showShareDetails(share);
-								}
-							});
-			}
+							@Override
+							public void onSuccess(GUIImportFolder share) {
+								showShareDetails(share);
+							}
+						});
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showimportfolders", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
+				.setMessage(I18N.message("showimportfolders", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -192,154 +173,132 @@ public class ImportFoldersPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImportFolderService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showShareDetails(null);
-								}
-							});
+		delete.addClickHandler((MenuItemClickEvent event) -> {
+			LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					ImportFolderService.Instance.get().delete(id, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
 						}
-					}
-				});
-			}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+							showShareDetails(null);
+						}
+					});
+				}
+			});
 		});
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ImportFolderService.Instance.get().test(Long.parseLong(record.getAttributeAsString("id")),
-						new AsyncCallback<Boolean>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		test.addClickHandler((MenuItemClickEvent event) -> {
+			ImportFolderService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
+					new AsyncCallback<Boolean>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Boolean result) {
-								if (result.booleanValue())
-									SC.say(I18N.message("connectionestablished"));
-								else
-									SC.warn(I18N.message("connectionfailed"));
-							}
-						});
-
-			}
+						@Override
+						public void onSuccess(Boolean result) {
+							if (Boolean.TRUE.equals(result))
+								SC.say(I18N.message("connectionestablished"));
+							else
+								SC.warn(I18N.message("connectionfailed"));
+						}
+					});
 		});
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ImportFolderService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler((MenuItemClickEvent event) -> {
+			ImportFolderService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute(EENABLED, "0");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ImportFolderService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")),
-						false, new AsyncCallback<Void>() {
+		disable.addClickHandler((MenuItemClickEvent event) -> {
+			ImportFolderService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute(EENABLED, "2");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
 		MenuItem resetCache = new MenuItem();
 		resetCache.setTitle(I18N.message("resetcache"));
-		resetCache.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImportFolderService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-									GuiLog.info(I18N.message("cachedeleted"), null);
-								}
-							});
+		resetCache.addClickHandler((MenuItemClickEvent event) -> {
+			LD.ask(I18N.message(QUESTION), I18N.message("confirmresetcache"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					ImportFolderService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
 						}
-					}
-				});
-			}
+
+						@Override
+						public void onSuccess(Void result) {
+							GuiLog.info(I18N.message("cachedeleted"), null);
+						}
+					});
+				}
+			});
 		});
 
 		MenuItem resetCounter = new MenuItem();
 		resetCounter.setTitle(I18N.message("resetcounter"));
-		resetCounter.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcounter"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImportFolderService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-									GuiLog.info(I18N.message("counterreseted"), null);
-									record.setAttribute("docs", "0");
-									list.refreshRow(list.getRecordIndex(record));
-								}
-							});
+		resetCounter.addClickHandler((MenuItemClickEvent event) -> {
+			LD.ask(I18N.message(QUESTION), I18N.message("confirmresetcounter"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					ImportFolderService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
 						}
-					}
-				});
-			}
+
+						@Override
+						public void onSuccess(Void result) {
+							GuiLog.info(I18N.message("counterreseted"), null);
+							rec.setAttribute("docs", "0");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
+				}
+			});
 		});
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(test, disable, delete, resetCache, resetCounter);
 		else
 			contextMenu.setItems(test, enable, delete, resetCache, resetCounter);
@@ -360,23 +319,23 @@ public class ImportFoldersPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param importFolder the import folder to update
 	 */
 	public void updateRecord(GUIImportFolder importFolder) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, importFolder.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", importFolder.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, importFolder.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", importFolder.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("src", importFolder.getDisplayUrl());
+		rec.setAttribute("src", importFolder.getDisplayUrl());
 
-		record.setAttribute("eenabled", importFolder.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute(EENABLED, importFolder.getEnabled() == 1 ? "0" : "2");
 
 		String type = I18N.message("localfolder");
 		if (importFolder.getProvider().startsWith("smb"))
@@ -388,8 +347,8 @@ public class ImportFoldersPanel extends AdminPanel {
 		else if ("sftp".equals(importFolder.getProvider()))
 			type = I18N.message("sftp");
 
-		record.setAttribute("type", type);
+		rec.setAttribute("type", type);
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

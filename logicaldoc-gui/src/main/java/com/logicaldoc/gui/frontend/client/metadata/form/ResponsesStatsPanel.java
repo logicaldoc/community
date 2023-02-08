@@ -60,7 +60,7 @@ public class ResponsesStatsPanel extends VLayout {
 		save.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (tileWidth.validate()) {
+				if (Boolean.TRUE.equals(tileWidth.validate())) {
 					form.setStatChartWidth((Integer) tileWidth.getValue());
 					FormService.Instance.get().save(form, new AsyncCallback<GUIForm>() {
 						@Override
@@ -108,7 +108,7 @@ public class ResponsesStatsPanel extends VLayout {
 		chart.setDetailFormatter(new DetailFormatter() {
 
 			@Override
-			public String format(Object value, Record record, DetailViewerField field) {
+			public String format(Object value, Record rec, DetailViewerField field) {
 				if (value == null)
 					return "";
 

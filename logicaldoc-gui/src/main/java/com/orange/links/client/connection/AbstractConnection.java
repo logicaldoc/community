@@ -51,7 +51,7 @@ public abstract class AbstractConnection implements Connection {
 	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
 		this.startShape = startShape;
 		this.endShape = endShape;
-		this.segmentSet = new HashSet<Segment>();
+		this.segmentSet = new HashSet<>();
 
 		// Build Path
 		this.segmentPath = new SegmentPath(startShape, endShape);
@@ -115,11 +115,11 @@ public abstract class AbstractConnection implements Connection {
 
 	public void draw() {
 		// Reset the segments
-		segmentSet = new HashSet<Segment>();
+		segmentSet = new HashSet<>();
 
 		// Draw each segment
 		segmentPath.update();
-		List<Point> pointList = new ArrayList<Point>();
+		List<Point> pointList = new ArrayList<>();
 		Point startPoint = segmentPath.getFirstPoint();
 		pointList.add(startPoint);
 		for (Point p : segmentPath.getPathWithoutExtremities()) {

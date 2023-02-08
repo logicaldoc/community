@@ -94,7 +94,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 	@Override
 	public Ticket findByTicketId(String ticketid) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("ticketid", ticketid);
 			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
 					"from Ticket _ticket where _ticket.ticketId = :ticketid", params, null);
@@ -118,7 +118,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		boolean result = true;
 
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("docId", docId);
 			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
 					"from Ticket _ticket where _ticket.docId = :docId", params, null);
@@ -144,7 +144,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 			return;
 
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("expired", new Date());
 			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
 					"from Ticket _ticket where _ticket.expired < :expired", params, null);

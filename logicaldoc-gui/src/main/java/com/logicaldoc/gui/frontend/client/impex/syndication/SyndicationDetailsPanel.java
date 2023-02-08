@@ -87,7 +87,7 @@ public class SyndicationDetailsPanel extends VLayout {
 		 */
 		if (standardPanel != null) {
 			standardPanel.destroy();
-			if (standardTabPanel.contains(standardPanel))
+			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
 				standardTabPanel.removeMember(standardPanel);
 		}
 

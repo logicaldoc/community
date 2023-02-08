@@ -15,7 +15,7 @@ public class UserController {
 
 	private static UserController instance = new UserController();
 
-	private Set<UserObserver> observers = new HashSet<UserObserver>();
+	private Set<UserObserver> observers = new HashSet<>();
 
 	private UserController() {
 	}

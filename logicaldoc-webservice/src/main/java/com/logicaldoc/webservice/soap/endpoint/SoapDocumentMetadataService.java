@@ -42,6 +42,8 @@ import com.logicaldoc.webservice.soap.DocumentMetadataService;
  */
 public class SoapDocumentMetadataService extends AbstractService implements DocumentMetadataService {
 
+	private static final String TEMPLATE = "template ";
+
 	@Override
 	public WSTemplate[] listTemplates(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
@@ -79,30 +81,17 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	}
 
 	@Override
-	public long storeTemplate(String sid, WSTemplate template)
+	public long storeTemplate(String sid, WSTemplate wsTemplate)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
+
+		Template template = loadTemplate(sid, wsTemplate, user);
+
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		Template templ = WSUtil.toTemplate(template);
-		templ.setTenantId(user.getTenantId());
-
-		if (template.getId() != 0) {
-			templ = dao.findById(template.getId());
-			dao.initialize(templ);
-			templ.setName(template.getName());
-			templ.setDescription(template.getDescription());
-
-			if (templ.getReadonly() == 1 || !isTemplateWritable(sid, templ.getId()))
-				throw new PermissionException(user.getUsername(), "template " + template.getName(), "read");
-		}
-
-		if (StringUtils.isEmpty(templ.getName()))
-			throw new WebserviceException("Missing mandatory value 'Name'");
-
 		Map<String, Attribute> attrs = new HashMap<>();
-		if (template.getAttributes() != null && template.getAttributes().length > 0) {
-			templ.getAttributes().clear();
-			for (WSAttribute attribute : template.getAttributes()) {
+		if (wsTemplate.getAttributes() != null && wsTemplate.getAttributes().length > 0) {
+			template.getAttributes().clear();
+			for (WSAttribute attribute : wsTemplate.getAttributes()) {
 				if (attribute != null) {
 					Attribute att = new Attribute();
 					att.setPosition(attribute.getPosition());
@@ -130,14 +119,35 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			}
 		}
 		if (attrs.size() > 0)
-			templ.setAttributes(attrs);
+			template.setAttributes(attrs);
 
-		dao.store(templ);
-		return templ.getId();
+		dao.store(template);
+		return template.getId();
+	}
+
+	private Template loadTemplate(String sid, WSTemplate wsTemplate, User user)
+			throws PersistenceException, WebserviceException, PermissionException {
+		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		Template template = WSUtil.toTemplate(wsTemplate);
+		template.setTenantId(user.getTenantId());
+		if (wsTemplate.getId() != 0) {
+			template = dao.findById(wsTemplate.getId());
+			dao.initialize(template);
+			template.setName(wsTemplate.getName());
+			template.setDescription(wsTemplate.getDescription());
+
+			if (template.getReadonly() == 1 || !isTemplateWritable(sid, template.getId()))
+				throw new PermissionException(user.getUsername(), TEMPLATE + wsTemplate.getName(), "read");
+		}
+
+		if (StringUtils.isEmpty(template.getName()))
+			throw new WebserviceException("Missing mandatory value 'Name'");
+		return template;
 	}
 
 	@Override
-	public void deleteTemplate(String sid, long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	public void deleteTemplate(String sid, long templateId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		if (dao.countDocs(templateId) > 0)
@@ -145,7 +155,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 					+ " because some documents belongs to that template.");
 		Template templ = dao.findById(templateId);
 		if (templ.getReadonly() == 1 || !isTemplateWritable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templ.getName(), "write");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templ.getName(), "write");
 
 		dao.delete(templateId);
 	}
@@ -317,7 +327,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		if (!isTemplateWritable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templateId, "write");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "write");
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		Template templ = dao.findById(templateId);
@@ -360,7 +370,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		if (!isTemplateReadable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templateId, "read");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "read");
 
 		return getGranted(sid, templateId, true);
 	}
@@ -370,7 +380,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		if (!isTemplateReadable(sid, templateId))
-			throw new PermissionException(user.getUsername(), "template " + templateId, "read");
+			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "read");
 
 		return getGranted(sid, templateId, false);
 	}

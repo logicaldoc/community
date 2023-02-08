@@ -33,6 +33,8 @@ import com.timgroup.jgravatar.GravatarRating;
  */
 public class UserUtil {
 
+	private static final String ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER = "Error generating default the avatar for user {}";
+
 	/**
 	 * A transparent 1x1 PNG
 	 */
@@ -131,7 +133,7 @@ public class UserUtil {
 			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));
 			userDao.store(user);
 		} catch (Throwable t) {
-			log.warn("Error generating default the avatar for user {}", user, t);
+			log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 		} finally {
 			FileUtil.strongDelete(tmpAvatarImage);
 		}
@@ -166,9 +168,9 @@ public class UserUtil {
 						user.getUsername());
 		} catch (Throwable t) {
 			if (user.getType() == User.TYPE_DEFAULT)
-				log.warn("Error generating default the avatar for user {}", user, t);
+				log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 			else
-				log.debug("Error generating default the avatar for user {}", user, t);
+				log.debug(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 		} finally {
 			FileUtil.strongDelete(tmpAvatarImage);
 		}

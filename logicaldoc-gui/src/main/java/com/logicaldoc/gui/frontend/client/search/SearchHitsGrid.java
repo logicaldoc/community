@@ -18,7 +18,8 @@ import com.smartgwt.client.widgets.grid.ListGridField;
  */
 public class SearchHitsGrid extends DocumentsListGrid {
 
-	private List<ListGridField> fields = new ArrayList<ListGridField>();
+	private static final String CUSTOM_ID = "customId";
+	private List<ListGridField> fields = new ArrayList<>();
 
 	public SearchHitsGrid() {
 		super();
@@ -28,7 +29,7 @@ public class SearchHitsGrid extends DocumentsListGrid {
 		setShowRowNumbers(true);
 
 		fieldsMap.get("type").setHidden(true);
-		fieldsMap.get("customId").setHidden(true);
+		fieldsMap.get(CUSTOM_ID).setHidden(true);
 
 		fields.add(fieldsMap.get("id"));
 		fields.add(fieldsMap.get("thumbnail"));
@@ -52,8 +53,8 @@ public class SearchHitsGrid extends DocumentsListGrid {
 
 		addUsers();
 
-		if (!fields.contains(fieldsMap.get("customId")))
-			fields.add(fieldsMap.get("customId"));
+		if (!fields.contains(fieldsMap.get(CUSTOM_ID)))
+			fields.add(fieldsMap.get(CUSTOM_ID));
 		if (!fields.contains(fieldsMap.get("folder")))
 			fields.add(fieldsMap.get("folder"));
 		if (!fields.contains(fieldsMap.get("rating")))

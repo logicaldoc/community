@@ -18,18 +18,14 @@ import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -46,6 +42,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 
+	private static final String DOC_ID = "docId";
+	private static final String CLOSE_SPAN = "</span>";
 	private CheckboxItem recordHistory;
 
 	public ImportFolderHistoryPanel(GUIImportFolder importFolder, final ChangedHandler changedHandler) {
@@ -66,19 +64,15 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		ListGridField event = new ListGridField("event", I18N.message("event"));
 		event.setAutoFitWidth(true);
 		event.setCanFilter(true);
-		event.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if (value.toString().contains("importfolder.imported"))
-					return "<span class='event-ok'>" + I18N.message("iimport").toLowerCase() + "</span>";
-				else if (value.toString().contains("importfolder.updated"))
-					return "<span class='event-med'>" + I18N.message("update").toLowerCase() + "</span>";
-				else if (value.toString().contains("importfolder.error"))
-					return "<span class='event-error'>" + I18N.message("error").toLowerCase() + "</span>";
-				else
-					return value.toString();
-			}
+		event.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			if (value.toString().contains("importfolder.imported"))
+				return "<span class='event-ok'>" + I18N.message("iimport").toLowerCase() + CLOSE_SPAN;
+			else if (value.toString().contains("importfolder.updated"))
+				return "<span class='event-med'>" + I18N.message("update").toLowerCase() + CLOSE_SPAN;
+			else if (value.toString().contains("importfolder.error"))
+				return "<span class='event-error'>" + I18N.message("error").toLowerCase() + CLOSE_SPAN;
+			else
+				return value.toString();
 		});
 
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
@@ -101,51 +95,42 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		list.setDataSource(new ImportFolderHistoryDS(importFolder.getId(), null));
 		list.setFields(date, event, fileName, size, path, source, comment);
 
-		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				Record record = event.getRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("docId")));
-			}
+		list.addCellDoubleClickHandler((CellDoubleClickEvent evnt) -> {
+			Record rec = evnt.getRecord();
+			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(DOC_ID)));
 		});
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new Menu();
+		list.addCellContextClickHandler((CellContextClickEvent e) -> {
+			Menu contextMenu = new Menu();
 
-				MenuItem openInFolder = new MenuItem();
-				openInFolder.setTitle(I18N.message("openinfolder"));
-				openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						Record record = list.getSelectedRecord();
-						DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("docId")));
-					}
-				});
+			MenuItem openInFolder = new MenuItem();
+			openInFolder.setTitle(I18N.message("openinfolder"));
+			openInFolder.addClickHandler((MenuItemClickEvent evnt) -> {
+				Record rec = list.getSelectedRecord();
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(DOC_ID)));
+			});
 
-				MenuItem preview = new MenuItem();
-				preview.setTitle(I18N.message("preview"));
-				preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						Record record = list.getSelectedRecord();
-						GUIDocument doc = new GUIDocument();
-						doc.setId(record.getAttributeAsLong("docId"));
-						doc.setFileName(record.getAttributeAsString("filename"));
+			MenuItem preview = new MenuItem();
+			preview.setTitle(I18N.message("preview"));
+			preview.addClickHandler((MenuItemClickEvent evnt) -> {
+				Record rec = list.getSelectedRecord();
+				GUIDocument doc = new GUIDocument();
+				doc.setId(rec.getAttributeAsLong(DOC_ID));
+				doc.setFileName(rec.getAttributeAsString("filename"));
 
-						GUIFolder folder = new GUIFolder(record.getAttributeAsLong("folderId"));
-						doc.setFolder(folder);
+				GUIFolder folder = new GUIFolder(rec.getAttributeAsLong("folderId"));
+				doc.setFolder(folder);
 
-						PreviewPopup iv = new PreviewPopup(doc);
-						iv.show();
-					}
-				});
-				preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+				PreviewPopup iv = new PreviewPopup(doc);
+				iv.show();
+			});
+			preview.setEnabled(
+					com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
-				contextMenu.setItems(preview, openInFolder);
-				contextMenu.showContextMenu();
-				if (event != null)
-					event.cancel();
-			}
+			contextMenu.setItems(preview, openInFolder);
+			contextMenu.showContextMenu();
+			if (e != null)
+				e.cancel();
 		});
 
 		ToolStrip buttons = new ToolStrip();
@@ -158,24 +143,13 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		maxItem.setSaveOnEnter(true);
 		maxItem.setImplicitSave(true);
 		maxItem.setHint(I18N.message("elements"));
-		maxItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				list.refresh(
-						new ImportFolderHistoryDS(importFolder.getId(), Integer.parseInt(maxItem.getValueAsString())));
-			}
+		maxItem.addChangedHandler((ChangedEvent evnt) -> {
+			list.refresh(new ImportFolderHistoryDS(importFolder.getId(), Integer.parseInt(maxItem.getValueAsString())));
 		});
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		refresh.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				list.refresh(
-						new ImportFolderHistoryDS(importFolder.getId(), Integer.parseInt(maxItem.getValueAsString())));
-			}
-		});
+		refresh.addClickHandler((ClickEvent evnt) -> list.refresh(
+				new ImportFolderHistoryDS(importFolder.getId(), Integer.parseInt(maxItem.getValueAsString()))));
 
 		buttons.addButton(refresh);
 		buttons.addFormItem(maxItem);
@@ -183,22 +157,11 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		buttons.addButton(export);
-		export.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		export.addClickHandler((ClickEvent evnt) -> GridUtil.exportCSV(list, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		buttons.addButton(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		print.addClickHandler((ClickEvent evnt) -> GridUtil.print(list));
 
 		buttons.addSeparator();
 
@@ -215,7 +178,7 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 	}
 
 	boolean validate() {
-		importFolder.setRecordHistory(recordHistory.getValueAsBoolean() ? 1 : 0);
+		importFolder.setRecordHistory(Boolean.TRUE.equals(recordHistory.getValueAsBoolean()) ? 1 : 0);
 		return true;
 	}
 }

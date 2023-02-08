@@ -13,7 +13,6 @@ import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -38,6 +37,10 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class FolderAutomationPanel extends FolderDetailTab {
 
+	private static final String ROUTINE = "routine";
+
+	private static final String AUTOMATION = "automation";
+
 	private ListGrid list;
 
 	private VLayout container = new VLayout();
@@ -61,11 +64,11 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		id.setCanEdit(false);
 		id.setHidden(true);
 
-		ListGridField automation = new ListGridField("automation", I18N.message("automation"));
+		ListGridField automation = new ListGridField(AUTOMATION, I18N.message(AUTOMATION));
 		automation.setWidth("*");
 		automation.setCanEdit(false);
 
-		ListGridField routine = new ListGridField("routine", I18N.message("routine"), 150);
+		ListGridField routine = new ListGridField(ROUTINE, I18N.message(ROUTINE), 150);
 		routine.setCanFilter(true);
 
 		ListGridField events = new EventsListGridField("events", "triggeron");
@@ -163,23 +166,20 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							AutomationService.Instance.get().deleteTriggers(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						AutomationService.Instance.get().deleteTriggers(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+							}
+						});
 					}
 				});
 			}
@@ -198,32 +198,32 @@ public class FolderAutomationPanel extends FolderDetailTab {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param trigger the trigger to update
 	 */
 	public void updateRecord(GUIAutomationTrigger trigger) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, trigger.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", trigger.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, trigger.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", trigger.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : "");
-		record.setAttribute("automation", trigger.getAutomation() != null ? trigger.getAutomation() : "");
+		rec.setAttribute("events", trigger.getEvents() != null ? trigger.getEvents() : "");
+		rec.setAttribute(AUTOMATION, trigger.getAutomation() != null ? trigger.getAutomation() : "");
 
 		if (trigger.getRoutine() != null) {
-			record.setAttribute("routine", trigger.getRoutine().getName());
-			record.setAttribute("routineId", trigger.getRoutine().getId());
+			rec.setAttribute(ROUTINE, trigger.getRoutine().getName());
+			rec.setAttribute("routineId", trigger.getRoutine().getId());
 		} else {
-			record.setAttribute("routine", (String) null);
-			record.setAttribute("routineId", (Long) null);
+			rec.setAttribute(ROUTINE, (String) null);
+			rec.setAttribute("routineId", (Long) null);
 		}
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	private void onEdit() {

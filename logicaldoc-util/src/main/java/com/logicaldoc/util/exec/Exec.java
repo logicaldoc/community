@@ -33,6 +33,10 @@ import org.slf4j.LoggerFactory;
  */
 public class Exec {
 
+	private static final String COMMAND_FAILED_TO_EXECUTE = "Command failed to execute - {}";
+
+	private static final String TIMEOUT_COMMAND = "Timeout command {}";
+
 	private static final String ALLOWED_COMMANDS = "/allowed-commands.txt";
 
 	protected static Logger log = LoggerFactory.getLogger(Exec.class);
@@ -166,9 +170,9 @@ public class Exec {
 				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
-				log.warn("Timeout command {}", commandLine);
+				log.warn(TIMEOUT_COMMAND, commandLine);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - {}", commandLine);
+				log.warn(COMMAND_FAILED_TO_EXECUTE, commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();
@@ -243,9 +247,9 @@ public class Exec {
 				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
-				log.warn("Timeout command {}", commandLine);
+				log.warn(TIMEOUT_COMMAND, commandLine);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - {}", commandLine);
+				log.warn(COMMAND_FAILED_TO_EXECUTE, commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();
@@ -296,9 +300,9 @@ public class Exec {
 				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
-				log.warn("Timeout command {}", commandLine);
+				log.warn(TIMEOUT_COMMAND, commandLine);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - {}", commandLine);
+				log.warn(COMMAND_FAILED_TO_EXECUTE, commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();
@@ -399,40 +403,43 @@ public class Exec {
 	 * @return the set of allowed commands
 	 */
 	private static Set<String> getAllowedCommands() {
-		Set<String> allowedCommands = new HashSet<String>();
+		Set<String> allowedCommands = new HashSet<>();
 		URL resource = Exec.class.getResource(ALLOWED_COMMANDS);
-		if (resource != null) {
-			InputStream is = null;
+		if (resource == null)
+			return allowedCommands;
+
+		InputStream is = null;
+		try {
 			try {
-				try {
-					is = new FileInputStream(resource.getFile());
-				} catch (FileNotFoundException e) {
-					log.error(e.getMessage(), e);
-				}
-
-				if (is == null)
-					is = Exec.class.getResourceAsStream(ALLOWED_COMMANDS);
-
-				if (is != null) {
-					try (Scanner sc = new Scanner(is);) {
-						while (sc.hasNext()) {
-							String line = sc.nextLine().trim();
-							if (StringUtils.isNotEmpty(line) && !line.startsWith("#")
-									&& !allowedCommands.contains(line))
-								allowedCommands.add(line);
-						}
-					}
-				}
-			} finally {
-				if (is != null)
-					try {
-						is.close();
-					} catch (IOException e) {
-						// Nothing to do
-					}
+				is = new FileInputStream(resource.getFile());
+			} catch (FileNotFoundException e) {
+				log.error(e.getMessage(), e);
 			}
+
+			if (is == null)
+				is = Exec.class.getResourceAsStream(ALLOWED_COMMANDS);
+
+			try (Scanner sc = new Scanner(is);) {
+				while (sc.hasNext()) {
+					String line = sc.nextLine().trim();
+					if (StringUtils.isNotEmpty(line) && !line.startsWith("#") && !allowedCommands.contains(line))
+						allowedCommands.add(line);
+				}
+			}
+		} finally {
+			close(is);
 		}
+
 		return allowedCommands;
+	}
+
+	private static void close(InputStream is) {
+		if (is != null)
+			try {
+				is.close();
+			} catch (IOException e) {
+				// Nothing to do
+			}
 	}
 
 	/**

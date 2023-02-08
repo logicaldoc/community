@@ -14,7 +14,7 @@ public class ChatController {
 
 	private static ChatController instance = new ChatController();
 
-	private Set<ChatObserver> observers = new HashSet<ChatObserver>();
+	private Set<ChatObserver> observers = new HashSet<>();
 
 	private ChatController() {
 	}

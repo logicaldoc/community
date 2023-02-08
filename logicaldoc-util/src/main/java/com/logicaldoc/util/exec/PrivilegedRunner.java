@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  */
 public class PrivilegedRunner {
 
+	private static final String OS_NAME = "os.name";
 	private static final Logger logger = Logger.getLogger(PrivilegedRunner.class.getName());
 
 	public int executeWithElevatedRights(String command) throws IOException, InterruptedException {
@@ -31,7 +32,7 @@ public class PrivilegedRunner {
 	}
 
 	protected List<String> getElevator(String command) throws IOException {
-		List<String> elevator = new ArrayList<String>();
+		List<String> elevator = new ArrayList<>();
 
 		if (isMac()) {
 			elevator.add(extractMacElevator().getCanonicalPath());
@@ -94,17 +95,17 @@ public class PrivilegedRunner {
 	}
 
 	public static boolean isWindows() {
-		boolean windows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+		boolean windows = System.getProperty(OS_NAME).toLowerCase().indexOf("win") >= 0;
 		return windows;
 	}
 
 	public static boolean isMac() {
-		return (System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0);
+		return (System.getProperty(OS_NAME).toLowerCase().indexOf("mac") >= 0);
 	}
 
 	public static boolean isUnix() {
-		return (System.getProperty("os.name").toLowerCase().indexOf("nix") >= 0
-				|| System.getProperty("os.name").toLowerCase().indexOf("nux") >= 0 || System.getProperty("os.name")
+		return (System.getProperty(OS_NAME).toLowerCase().indexOf("nix") >= 0
+				|| System.getProperty(OS_NAME).toLowerCase().indexOf("nux") >= 0 || System.getProperty(OS_NAME)
 				.toLowerCase().indexOf("aix") >= 0);
 	}
 }

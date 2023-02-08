@@ -653,7 +653,7 @@ public class DocTool {
 	 */
 	public List<Long> getIds(Collection<Document> docs) {
 		if (docs == null || docs.isEmpty())
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 		return docs.stream().map(d -> d.getId()).collect(Collectors.toList());
 	}
 

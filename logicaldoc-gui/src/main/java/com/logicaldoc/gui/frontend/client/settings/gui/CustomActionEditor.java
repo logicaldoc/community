@@ -82,18 +82,18 @@ public class CustomActionEditor extends Window {
 
 		addItem(toolStrip);
 
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("enabled", "enabled");
+		RadioGroupItem enabled = ItemFactory.newBooleanSelector("enabled");
 		enabled.setRequired(true);
 		enabled.setValue(action.isEnabled() ? "yes" : "no");
 
-		TextItem name = ItemFactory.newTextItem("name", "name", action.getName());
+		TextItem name = ItemFactory.newTextItem("name", action.getName());
 		name.setRequired(true);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", action.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", action.getDescription());
 		description.setRequired(false);
 		description.setWidth(300);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", 
 				action.getAutomation(), null, false);
 		automation.setShowTitle(false);
 		automation.setStartRow(false);

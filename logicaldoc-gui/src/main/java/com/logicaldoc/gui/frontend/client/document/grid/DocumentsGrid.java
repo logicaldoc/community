@@ -51,7 +51,7 @@ public interface DocumentsGrid {
 	public GUIDocument getSelectedDocument();
 
 	/**
-	 * Retrieves the index of the currently selected record
+	 * Retrieves the index of the currently selected rec
 	 * 
 	 * @return the row of the selected element
 	 */

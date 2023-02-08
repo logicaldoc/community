@@ -76,10 +76,10 @@ public class RatingDialog extends Window {
 		ratingForm.setNumCols(1);
 		ratingForm.setValuesManager(vm);
 
-		StaticTextItem actualRating = ItemFactory.newStaticTextItem("actualrating", "actualrating",
+		StaticTextItem actualRating = ItemFactory.newStaticTextItem("actualrating",
 				DocUtil.getRatingIcon(documentRating));
 
-		final StaticTextItem totalVotes = ItemFactory.newStaticTextItem("totalvotes", "totalvotes",
+		final StaticTextItem totalVotes = ItemFactory.newStaticTextItem("totalvotes",
 				this.rating.getCount().toString() + "&nbsp;&nbsp;" + AwesomeFactory.getIconHtml("eye"));
 		totalVotes.setWrapTitle(false);
 		totalVotes.setWrap(false);
@@ -95,7 +95,7 @@ public class RatingDialog extends Window {
 				vote.setCellFormatter(new CellFormatter() {
 
 					@Override
-					public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+					public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 						return DocUtil.getRatingIcon((Integer) value);
 					}
 				});
@@ -132,7 +132,7 @@ public class RatingDialog extends Window {
 			}
 		});
 
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		for (int i = 1; i <= 5; i++)
 			map.put("" + i, DocUtil.getRatingIcon(i));
 
@@ -149,7 +149,7 @@ public class RatingDialog extends Window {
 		vote.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					RatingDialog.this.rating.setUserId(Session.get().getUser().getId());
 					RatingDialog.this.rating.setVote(Integer.parseInt(vm.getValueAsString("stars")));
 

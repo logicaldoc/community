@@ -27,6 +27,13 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class SubscriptionDialog extends Window {
 
+	private static final String EVENT = "event";
+	private static final String SELECTION = "selection";
+	private static final String NOTIFYON = "notifyon";
+	private static final String SUBFOLDERS = "subfolders";
+	private static final String CURRENT = "current";
+	private static final String OPTION = "option";
+
 	public SubscriptionDialog(final ListGrid grid) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
@@ -53,31 +60,31 @@ public class SubscriptionDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		SelectItem option = new SelectItem("option", I18N.message("subscriptionoption"));
+		SelectItem option = new SelectItem(OPTION, I18N.message("subscriptionoption"));
 		option.setWidth(290);
-		LinkedHashMap<String, String> options = new LinkedHashMap<String, String>();
-		options.put("current", I18N.message("subscribecurrent"));
-		options.put("subfolders", I18N.message("subscribesubfolders"));
+		LinkedHashMap<String, String> options = new LinkedHashMap<>();
+		options.put(CURRENT, I18N.message("subscribecurrent"));
+		options.put(SUBFOLDERS, I18N.message("subscribesubfolders"));
 		option.setValueMap(options);
-		option.setValue("1".equals(selection.getAttributeAsString("folderOption")) ? "subfolders" : "current");
+		option.setValue("1".equals(selection.getAttributeAsString("folderOption")) ? SUBFOLDERS : CURRENT);
 
-		SelectItem notifyon = new SelectItem("notifyon", I18N.message("notifyon"));
+		SelectItem notifyon = new SelectItem(NOTIFYON, I18N.message(NOTIFYON));
 		notifyon.setWidth(310);
-		LinkedHashMap<String, String> vals = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> vals = new LinkedHashMap<>();
 		vals.put("all", I18N.message("allevents"));
-		vals.put("selection", I18N.message("selectedevents"));
+		vals.put(SELECTION, I18N.message("selectedevents"));
 		notifyon.setValueMap(vals);
-		notifyon.setValue((events == null || events.length == 0) ? "all" : "selection");
+		notifyon.setValue((events == null || events.length == 0) ? "all" : SELECTION);
 
 		final SelectItem event;
-		event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, false, false, false);
+		event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null, true, false, false, false);
 		event.setEndRow(true);
 		event.setDisabled(events == null || events.length == 0);
 		if (events != null)
 			event.setValues(events);
 
 		notifyon.addChangedHandler((ChangedEvent e) -> {
-			if ("selection".equals(form.getValueAsString("notifyon")))
+			if (SELECTION.equals(form.getValueAsString(NOTIFYON)))
 				event.setDisabled(false);
 			else
 				event.setDisabled(true);
@@ -123,9 +130,9 @@ public class SubscriptionDialog extends Window {
 		save.addClickHandler((ClickEvent event) -> {
 			String[] events = null;
 			final String eventsStr;
-			final String folderOption = form.getValueAsString("option");
-			if ("selection".equals(form.getValueAsString("notifyon"))) {
-				String buf = form.getValues().get("event").toString().trim().toLowerCase();
+			final String folderOption = form.getValueAsString(OPTION);
+			if (SELECTION.equals(form.getValueAsString(NOTIFYON))) {
+				String buf = form.getValues().get(EVENT).toString().trim().toLowerCase();
 				buf = buf.replace('[', ' ');
 				buf = buf.replace(']', ' ');
 				eventsStr = buf.replace(" ", "");
@@ -141,7 +148,7 @@ public class SubscriptionDialog extends Window {
 
 	private void doUpdateSubscriptions(ListGrid grid, long[] selectedIds, String[] events, final String eventsStr,
 			final String folderOption) {
-		AuditService.Instance.get().update(selectedIds, "current".equals(folderOption), events,
+		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events,
 				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -151,11 +158,11 @@ public class SubscriptionDialog extends Window {
 					@Override
 					public void onSuccess(Void ret) {
 						GuiLog.info(I18N.message("settingssaved"), null);
-						for (ListGridRecord record : grid.getSelectedRecords()) {
-							record.setAttribute("events", eventsStr);
+						for (ListGridRecord rec : grid.getSelectedRecords()) {
+							rec.setAttribute("events", eventsStr);
 							if (folderOption != null && !folderOption.isEmpty())
-								record.setAttribute("folderOption", folderOption.equals("current") ? "0" : "1");
-							grid.refreshRow(grid.getRecordIndex(record));
+								rec.setAttribute("folderOption", folderOption.equals(CURRENT) ? "0" : "1");
+							grid.refreshRow(grid.getRecordIndex(rec));
 						}
 					}
 				});
@@ -191,26 +198,26 @@ public class SubscriptionDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		SelectItem option = new SelectItem("option", I18N.message("subscriptionoption"));
+		SelectItem option = new SelectItem(OPTION, I18N.message("subscriptionoption"));
 		option.setWidth(280);
-		LinkedHashMap<String, String> options = new LinkedHashMap<String, String>();
-		options.put("current", I18N.message("subscribecurrent"));
-		options.put("subfolders", I18N.message("subscribesubfolders"));
+		LinkedHashMap<String, String> options = new LinkedHashMap<>();
+		options.put(CURRENT, I18N.message("subscribecurrent"));
+		options.put(SUBFOLDERS, I18N.message("subscribesubfolders"));
 		option.setValueMap(options);
-		option.setValue("current");
+		option.setValue(CURRENT);
 
-		SelectItem notifyon = new SelectItem("notifyon", I18N.message("notifyon"));
+		SelectItem notifyon = new SelectItem(NOTIFYON, I18N.message(NOTIFYON));
 		notifyon.setWidth(280);
-		LinkedHashMap<String, String> vals = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> vals = new LinkedHashMap<>();
 		vals.put("all", I18N.message("allevents"));
-		vals.put("selection", I18N.message("selectedevents"));
+		vals.put(SELECTION, I18N.message("selectedevents"));
 		notifyon.setValueMap(vals);
 		notifyon.setValue("all");
 
 		final SelectItem event = prepareEventSelector(folderId);
 
 		notifyon.addChangedHandler((ChangedEvent e) -> {
-			if ("selection".equals(form.getValueAsString("notifyon")))
+			if (SELECTION.equals(form.getValueAsString(NOTIFYON)))
 				event.setDisabled(false);
 			else
 				event.setDisabled(true);
@@ -232,8 +239,8 @@ public class SubscriptionDialog extends Window {
 		subscribe.addClickHandler((ClickEvent event) -> {
 			String[] events = null;
 			final String eventsStr;
-			if ("selection".equals(form.getValueAsString("notifyon"))) {
-				String buf = form.getValues().get("event").toString().trim().toLowerCase();
+			if (SELECTION.equals(form.getValueAsString(NOTIFYON))) {
+				String buf = form.getValues().get(EVENT).toString().trim().toLowerCase();
 				buf = buf.replace('[', ' ');
 				buf = buf.replace(']', ' ');
 				eventsStr = buf.replace(" ", "");
@@ -242,7 +249,7 @@ public class SubscriptionDialog extends Window {
 				eventsStr = null;
 
 			if (folderId != null)
-				AuditService.Instance.get().subscribeFolder(folderId, form.getValueAsString("option").equals("current"),
+				AuditService.Instance.get().subscribeFolder(folderId, form.getValueAsString(OPTION).equals(CURRENT),
 						events, null, null, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -277,9 +284,9 @@ public class SubscriptionDialog extends Window {
 	private SelectItem prepareEventSelector(final Long folderId) {
 		final SelectItem event;
 		if (folderId != null)
-			event = ItemFactory.newEventsSelector("event", "event", null, true, false, false, false);
+			event = ItemFactory.newEventsSelector(EVENT, EVENT, null, true, false, false, false);
 		else
-			event = ItemFactory.newEventsSelector("event", "event", null, false, false, false, false);
+			event = ItemFactory.newEventsSelector(EVENT, EVENT, null, false, false, false, false);
 		event.setEndRow(true);
 		event.setDisabled(true);
 		return event;

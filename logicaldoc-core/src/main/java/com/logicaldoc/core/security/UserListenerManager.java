@@ -20,26 +20,28 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 5.1
  */
 public class UserListenerManager {
+	private static final String POSITION = "position";
+
 	protected static Logger log = LoggerFactory.getLogger(UserListenerManager.class);
 
 	private List<UserListener> listeners = null;
 
 	public void init() {
-		listeners = new ArrayList<UserListener>();
+		listeners = new ArrayList<>();
 
 		// Acquire the 'UserListener' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "UserListener");
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}
 		Collections.sort(sortedExts, new Comparator<Extension>() {
 			public int compare(Extension e1, Extension e2) {
-				int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
+				int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
+				int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
 				if (position1 < position2)
 					return -1;
 				else if (position1 > position2)
@@ -60,7 +62,7 @@ public class UserListenerManager {
 							"The specified listener " + className + " doesn't implement UserListener interface");
 				listeners.add((UserListener) listener);
 				log.info("Added new user listener {} position {}", className,
-						ext.getParameter("position").valueAsString());
+						ext.getParameter(POSITION).valueAsString());
 			} catch (Throwable e) {
 				log.error(e.getMessage());
 			}

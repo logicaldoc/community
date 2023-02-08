@@ -14,12 +14,10 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
@@ -90,35 +88,14 @@ public class TenantKeystorePanel extends VLayout {
 	}
 
 	public void refresh() {
-		boolean ksAlreadyGenerated = keystore != null && keystore.getId() != 0L;
-		vm.clearValues();
-		vm.clearErrors(false);
+		boolean ksAlreadyGenerated = prepareForm();
 
-		if (form != null)
-			form.destroy();
-
-		if (layout != null) {
-			layout.destroy();
-		}
-
-		layout = new VLayout();
-		layout.setWidth100();
-
-		form = new DynamicForm();
-		form.setValuesManager(vm);
-		form.setWrapItemTitles(false);
-		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setNumCols(2);
-
-		TextItem localCAalias = ItemFactory.newSimpleTextItemPreventAutocomplete("localCAalias", "localcaalias",
-				keystore != null ? keystore.getOrganizationAlias() : null);
-		localCAalias.setRequired(true);
-		localCAalias.setSelectOnFocus(true);
-		localCAalias.setWrapTitle(false);
+		TextItem localCAalias = prepareLocalCAaliasItem();
 
 		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "keystorepasswd", null);
 		password.setRequired(true);
 		password.setWrapTitle(false);
+
 		PasswordItem passwordAgain = ItemFactory.newPasswordItemPreventAutocomplete("passwordagain",
 				"keystorepasswdagain", null);
 		passwordAgain.setRequired(true);
@@ -128,49 +105,29 @@ public class TenantKeystorePanel extends VLayout {
 		validator.setErrorMessage(I18N.message("passwordnotmatch"));
 		password.setValidators(validator);
 
-		StaticTextItem details = ItemFactory.newStaticTextItem("details", "details",
-				(keystore != null && keystore.getOrganizationDN() != null)
-						? (keystore.getOrganizationDN() + " " + I18N.message("validtill") + ": "
-								+ I18N.formatDate(keystore.getOrganizationExpire()))
-						: I18N.message("error").toLowerCase());
-		details.setWrap(false);
-		details.setColSpan(2);
+		StaticTextItem details = prepareDetailsItem();
 
-		SpinnerItem validity = ItemFactory.newSpinnerItem("validity", "validity",
-				keystore != null ? keystore.getValidity() : 2);
-		validity.setHint(I18N.message("years"));
-		validity.setRequired(true);
-		validity.setMin(1);
-		validity.setMax(10);
-		validity.setStep(1);
+		SpinnerItem validity = prepareValiditySpinner();
 
-		TextItem countryCode = ItemFactory.newTextItem("countryCode", "countrycode", null);
+		TextItem countryCode = ItemFactory.newTextItem("countrycode", null);
 		countryCode.setLength(2);
 		countryCode.setHint("C");
 		countryCode.setRequired(true);
 		countryCode.setWrapTitle(false);
 
-		TextItem organization = ItemFactory.newTextItem("organization", "organization", null);
+		TextItem organization = ItemFactory.newTextItem("organization", null);
 		organization.setHint("O");
 		organization.setRequired(true);
 		organization.setWrapTitle(false);
 
-		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalUnit", "organizationalunit", null);
+		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalunit", null);
 		organizationalUnit.setHint("OU");
 		organizationalUnit.setRequired(true);
 		organizationalUnit.setWrapTitle(false);
 
-		TextItem keytoolCommand = ItemFactory.newTextItem("keytoolCommand", "Keytool",
-				keystore != null ? keystore.getKeytoolPath() : "");
-		keytoolCommand.setWidth(400);
-		keytoolCommand.setRequired(true);
-		keytoolCommand.setColSpan(2);
+		TextItem keytoolCommand = prepareKeytoolCommandItem();
 
-		TextItem opensslCommand = ItemFactory.newTextItem("opensslCommand", "OpenSSL",
-				keystore != null ? keystore.getOpenSSLPath() : "");
-		opensslCommand.setWidth(400);
-		opensslCommand.setRequired(true);
-		opensslCommand.setColSpan(2);
+		TextItem opensslCommand = prepareOpensslCommandItem();
 
 		signatureForm = new DynamicForm();
 		signatureForm.setValuesManager(vm);
@@ -180,20 +137,20 @@ public class TenantKeystorePanel extends VLayout {
 		signatureForm.setAlign(Alignment.LEFT);
 		signatureForm.setGroupTitle(I18N.message("signature"));
 
-		TextItem exprx = ItemFactory.newTextItem("exprx", "exprx", keystore != null ? keystore.getSignX() : "");
+		TextItem exprx = ItemFactory.newTextItem("exprx", keystore != null ? keystore.getSignX() : "");
 		exprx.setWidth(300);
 
-		TextItem expry = ItemFactory.newTextItem("expry", "expry", keystore != null ? keystore.getSignY() : "");
+		TextItem expry = ItemFactory.newTextItem("expry", keystore != null ? keystore.getSignY() : "");
 		expry.setWidth(300);
 
-		TextItem width = ItemFactory.newTextItem("width", "width", keystore != null ? keystore.getSignWidth() : "");
+		TextItem width = ItemFactory.newTextItem("width", keystore != null ? keystore.getSignWidth() : "");
 		width.setWidth(300);
 
-		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual", "visual");
+		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual");
 		visual.setValue(keystore != null && keystore.isSignVisual() ? "yes" : "no");
 
-		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity",
-				keystore != null ? keystore.getSignOpacity() : 100, 1, 100);
+		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", keystore != null ? keystore.getSignOpacity() : 100,
+				1, 100);
 
 		RichTextItem text = ItemFactory.newRichTextItemForAutomation("text", "text",
 				keystore != null ? keystore.getSignText() : "", null);
@@ -204,117 +161,23 @@ public class TenantKeystorePanel extends VLayout {
 		buttons.setMembersMargin(5);
 		buttons.setMargin(3);
 
-		IButton createNew = new IButton(I18N.message("generatenewkeystore"));
-		createNew.setAutoFit(true);
-		createNew.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (validate()) {
-					LD.contactingServer();
-					SignService.Instance.get().generateNewKeystore(keystore, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+		IButton createNew = prepareCreateNewButton();
 
-						@Override
-						public void onSuccess(Void arg) {
-							LD.clearPrompt();
-							initGUI();
-						}
-					});
-				}
-			}
-		});
+		IButton save = prepareSaveButton();
 
-		IButton save = new IButton(I18N.message("save"));
-		save.setAutoFit(true);
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (validate()) {
-					LD.contactingServer();
-					SignService.Instance.get().saveKeystore(keystore, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+		IButton export = prepareExportButton();
 
-						@Override
-						public void onSuccess(Void arg) {
-							LD.clearPrompt();
-						}
-					});
-				}
-			}
-		});
+		IButton delete = prepareDeleteButton();
 
-		IButton export = new IButton(I18N.message("export"));
-		export.setAutoFit(true);
-		export.addClickHandler(new ClickHandler() {
+		IButton _import = prepareImportButto();
 
-			@Override
-			public void onClick(ClickEvent event) {
-				Util.download(Util.contextPath() + "export-keystore?tenantId=" + tenantId);
-			}
-		});
-
-		IButton delete = new IButton(I18N.message("ddelete"));
-		delete.setAutoFit(true);
-		delete.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				SC.ask(I18N.message("deletekeystorewarn"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean value) {
-						if (value)
-							SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void arg) {
-									initGUI();
-								}
-							});
-					}
-				});
-
-			}
-		});
-
-		IButton _import = new IButton(I18N.message("iimport"));
-		_import.setAutoFit(true);
-		_import.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				KeystoreUploader uploader = new KeystoreUploader(TenantKeystorePanel.this);
-				uploader.show();
-			}
-		});
-
-		IButton downloadCert = new IButton(I18N.message("downloadcert"));
-		downloadCert.setAutoFit(true);
-		downloadCert.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				Util.download(Util.contextPath() + "export-keystore?cert=true&tenantId=" + tenantId);
-			}
-		});
+		IButton downloadCert = prepareDownloadCertButton();
 
 		/*
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", "xyz");
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "xyz");
 		fakeUsername.setCellStyle("nodisplay");
 		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake", "xyz");
 		fakePassword.setCellStyle("nodisplay");
@@ -354,10 +217,179 @@ public class TenantKeystorePanel extends VLayout {
 		addMember(layout);
 	}
 
+	private TextItem prepareOpensslCommandItem() {
+		TextItem opensslCommand = ItemFactory.newTextItem("opensslCommand", "OpenSSL",
+				keystore != null ? keystore.getOpenSSLPath() : "");
+		opensslCommand.setWidth(400);
+		opensslCommand.setRequired(true);
+		opensslCommand.setColSpan(2);
+		return opensslCommand;
+	}
+
+	private TextItem prepareKeytoolCommandItem() {
+		TextItem keytoolCommand = ItemFactory.newTextItem("keytoolCommand", "Keytool",
+				keystore != null ? keystore.getKeytoolPath() : "");
+		keytoolCommand.setWidth(400);
+		keytoolCommand.setRequired(true);
+		keytoolCommand.setColSpan(2);
+		return keytoolCommand;
+	}
+
+	private SpinnerItem prepareValiditySpinner() {
+		SpinnerItem validity = ItemFactory.newSpinnerItem("validity", keystore != null ? keystore.getValidity() : 2);
+		validity.setHint(I18N.message("years"));
+		validity.setRequired(true);
+		validity.setMin(1);
+		validity.setMax(10);
+		validity.setStep(1);
+		return validity;
+	}
+
+	private TextItem prepareLocalCAaliasItem() {
+		TextItem localCAalias = ItemFactory.newSimpleTextItemPreventAutocomplete("localCAalias", "localcaalias",
+				keystore != null ? keystore.getOrganizationAlias() : null);
+		localCAalias.setRequired(true);
+		localCAalias.setSelectOnFocus(true);
+		localCAalias.setWrapTitle(false);
+		return localCAalias;
+	}
+
+	private boolean prepareForm() {
+		boolean ksAlreadyGenerated = keystore != null && keystore.getId() != 0L;
+		vm.clearValues();
+		vm.clearErrors(false);
+
+		if (form != null)
+			form.destroy();
+
+		if (layout != null) {
+			layout.destroy();
+		}
+
+		layout = new VLayout();
+		layout.setWidth100();
+
+		form = new DynamicForm();
+		form.setValuesManager(vm);
+		form.setWrapItemTitles(false);
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setNumCols(2);
+		return ksAlreadyGenerated;
+	}
+
+	private StaticTextItem prepareDetailsItem() {
+		StaticTextItem details = ItemFactory.newStaticTextItem("details",
+				(keystore != null && keystore.getOrganizationDN() != null)
+						? (keystore.getOrganizationDN() + " " + I18N.message("validtill") + ": "
+								+ I18N.formatDate(keystore.getOrganizationExpire()))
+						: I18N.message("error").toLowerCase());
+		details.setWrap(false);
+		details.setColSpan(2);
+		return details;
+	}
+
+	private IButton prepareDownloadCertButton() {
+		IButton downloadCert = new IButton(I18N.message("downloadcert"));
+		downloadCert.setAutoFit(true);
+		downloadCert.addClickHandler((ClickEvent event) -> {
+			Util.download(Util.contextPath() + "export-keystore?cert=true&tenantId=" + tenantId);
+		});
+		return downloadCert;
+	}
+
+	private IButton prepareImportButto() {
+		IButton _import = new IButton(I18N.message("iimport"));
+		_import.setAutoFit(true);
+		_import.addClickHandler((ClickEvent event) -> {
+			KeystoreUploader uploader = new KeystoreUploader(TenantKeystorePanel.this);
+			uploader.show();
+		});
+		return _import;
+	}
+
+	private IButton prepareDeleteButton() {
+		IButton delete = new IButton(I18N.message("ddelete"));
+		delete.setAutoFit(true);
+		delete.addClickHandler((ClickEvent event) -> {
+			SC.ask(I18N.message("deletekeystorewarn"), (Boolean yes) -> {
+				if (Boolean.TRUE.equals(yes))
+					SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void arg) {
+							initGUI();
+						}
+					});
+			});
+		});
+		return delete;
+	}
+
+	private IButton prepareExportButton() {
+		IButton export = new IButton(I18N.message("export"));
+		export.setAutoFit(true);
+		export.addClickHandler((ClickEvent event) -> {
+			Util.download(Util.contextPath() + "export-keystore?tenantId=" + tenantId);
+		});
+		return export;
+	}
+
+	private IButton prepareSaveButton() {
+		IButton save = new IButton(I18N.message("save"));
+		save.setAutoFit(true);
+		save.addClickHandler((ClickEvent event) -> {
+			if (!validate())
+				return;
+
+			LD.contactingServer();
+			SignService.Instance.get().saveKeystore(keystore, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void arg) {
+					LD.clearPrompt();
+				}
+			});
+		});
+		return save;
+	}
+
+	private IButton prepareCreateNewButton() {
+		IButton createNew = new IButton(I18N.message("generatenewkeystore"));
+		createNew.setAutoFit(true);
+		createNew.addClickHandler((ClickEvent event) -> {
+			if (!validate())
+				return;
+			LD.contactingServer();
+			SignService.Instance.get().generateNewKeystore(keystore, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void arg) {
+					LD.clearPrompt();
+					initGUI();
+				}
+			});
+		});
+		return createNew;
+	}
+
 	@SuppressWarnings("unchecked")
 	boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 			keystore.setTenantId(tenantId);
 			keystore.setOrganizationAlias((String) values.get("localCAalias"));
@@ -372,8 +404,8 @@ public class TenantKeystorePanel extends VLayout {
 			keystore.setKeytoolPath((String) values.get("keytoolCommand"));
 			keystore.setOpenSSLPath((String) values.get("opensslCommand"));
 			try {
-				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalUnit")
-						+ ",C=" + values.get("countryCode").toString().toUpperCase());
+				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalunit")
+						+ ",C=" + values.get("countrycode").toString().toUpperCase());
 			} catch (Throwable t) {
 				// Nothing to do
 			}

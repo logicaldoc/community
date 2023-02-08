@@ -25,14 +25,12 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
-import com.smartgwt.client.widgets.events.ShowContextMenuHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.tile.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.tile.events.SelectionChangedEvent;
-import com.smartgwt.client.widgets.viewer.DetailFormatter;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 /**
@@ -42,11 +40,15 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
  * @since 7.0
  */
 public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, DocumentObserver {
+	private static final String CLOSE_TD = "</td>";
+
+	private static final String SHOWNDOCUMENTS = "showndocuments";
+
 	private Cursor cursor;
 
 	private GUIFolder folder = null;
 
-	private List<DetailViewerField> fields = new ArrayList<DetailViewerField>();
+	private List<DetailViewerField> fields = new ArrayList<>();
 
 	public DocumentsTileGrid(GUIFolder folder) {
 		this.folder = folder;
@@ -60,23 +62,17 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		setWidth100();
 
 		prepareDataSource(folder);
-		
+
 		addThumbnail();
 
 		addFilename();
 
 		setFields(fields.toArray(new DetailViewerField[0]));
 
-		addDataArrivedHandler(new com.smartgwt.client.widgets.tile.events.DataArrivedHandler() {
-
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				if (cursor != null) {
-					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
-				}
-
-				sortByProperty("filename", true);
-			}
+		addDataArrivedHandler((DataArrivedEvent event) -> {
+			if (cursor != null)
+				cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getCount())));
+			sortByProperty("filename", true);
 		});
 
 		DocumentController.get().addObserver(this);
@@ -84,46 +80,40 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	private void addFilename() {
 		DetailViewerField filename = new DetailViewerField("filename");
-		filename.setDetailFormatter(new DetailFormatter() {
+		filename.setDetailFormatter((Object value, Record rec, DetailViewerField field) -> {
+			try {
+				String html = "<table style='margin-top:2px' align='center' border='0' cellspacing='0'>";
 
-			@Override
-			public String format(Object value, Record record, DetailViewerField field) {
-				try {
-					String html = "<table style='margin-top:2px' align='center' border='0' cellspacing='0'>";
+				// The title row
+				html += "<tr><td>" + Util.imageHTML(rec.getAttribute("icon") + ".png") + "</td><td>" + value
+						+ "</td></tr></table>";
+				html += "<table align='center' border='0' cellspacing='0'><tr>";
 
-					// The title row
-					html += "<tr><td>" + Util.imageHTML(record.getAttribute("icon") + ".png") + "</td><td>" + value
-							+ "</td></tr></table>";
-					html += "<table align='center' border='0' cellspacing='0'><tr>";
+				// The status row
+				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
+					html += "<td>" + DocUtil.getBookmarkedIcon(rec.getAttributeAsBoolean("bookmarked")) + CLOSE_TD;
+				html += "<td>" + AwesomeFactory.getIndexedIcon(rec.getAttributeAsInt("indexed")) + CLOSE_TD;
 
-					// The status row
-					if (record.getAttributeAsBoolean("bookmarked"))
-						html += "<td>" + DocUtil.getBookmarkedIcon(record.getAttributeAsBoolean("bookmarked"))
-								+ "</td>";
-					html += "<td>" + AwesomeFactory.getIndexedIcon(record.getAttributeAsInt("indexed")) + "</td>";
-
-					// The locked icon
-					if (record.getAttribute("status") != null) {
-						Integer status = record.getAttributeAsInt("status");
-						if (status != null && status.intValue() > 0) {
-							String alt = "";
-							if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
-								alt = I18N.message("lockedby") + " " + record.getAttributeAsString("lockUser");
-							html += "<td><span title='" + alt + "'>" + DocUtil.getLockedIcon(status) + "</span></td>";
-						}
+				// The locked icon
+				if (rec.getAttribute("status") != null) {
+					Integer status = rec.getAttributeAsInt("status");
+					if (status != null && status.intValue() > 0) {
+						String alt = "";
+						if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
+							alt = I18N.message("lockedby") + " " + rec.getAttributeAsString("lockUser");
+						html += "<td><span title='" + alt + "'>" + DocUtil.getLockedIcon(status) + "</span></td>";
 					}
-
-					html += "<td>" + DocUtil.getPasswordProtectedIcon(record.getAttributeAsBoolean("password"))
-							+ "</td>";
-					html += "<td>" + DocUtil.getImmutableIcon(record.getAttributeAsInt("immutable")) + "</td>";
-					html += "<td>" + DocUtil.getSignedIcon(record.getAttributeAsInt("signed")) + "</td>";
-					html += "<td>" + DocUtil.getStampedIcon(record.getAttributeAsInt("stamped")) + "</td>";
-					html += "</tr></table>";
-
-					return html;
-				} catch (Throwable e) {
-					return "";
 				}
+
+				html += "<td>" + DocUtil.getPasswordProtectedIcon(rec.getAttributeAsBoolean("password")) + CLOSE_TD;
+				html += "<td>" + DocUtil.getImmutableIcon(rec.getAttributeAsInt("immutable")) + CLOSE_TD;
+				html += "<td>" + DocUtil.getSignedIcon(rec.getAttributeAsInt("signed")) + CLOSE_TD;
+				html += "<td>" + DocUtil.getStampedIcon(rec.getAttributeAsInt("stamped")) + CLOSE_TD;
+				html += "</tr></table>";
+
+				return html;
+			} catch (Throwable e) {
+				return "";
 			}
 		});
 		fields.add(filename);
@@ -131,28 +121,25 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	private void addThumbnail() {
 		DetailViewerField thumbnail = new DetailViewerField("thumbnail");
-		thumbnail.setDetailFormatter(new DetailFormatter() {
+		thumbnail.setDetailFormatter((Object value, Record rec, DetailViewerField field) -> {
+			int thumbnailSize = 200;
+			if (Session.get().getConfig("gui.thumbnail.size") != null)
+				thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
 
-			@Override
-			public String format(Object value, Record record, DetailViewerField field) {
-				int thumbnailSize = 200;
-				if (Session.get().getConfig("gui.thumbnail.size") != null)
-					thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
-
-				try {
-					if ("folder".equals(record.getAttribute("type")))
-						return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
-					else {
-						long docId = Long.parseLong(record.getAttribute("id"));
-						if (!record.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
-							return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
-						else
-							return Util.imageHTML("blank.png", null,
-									"width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
-					}
-				} catch (Throwable e) {
-					return "";
+			try {
+				if ("folder".equals(rec.getAttribute("type")))
+					return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
+				else {
+					long docId = Long.parseLong(rec.getAttribute("id"));
+					if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("password"))
+							|| DocumentProtectionManager.isUnprotected(docId))
+						return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
+					else
+						return Util.imageHTML("blank.png", null,
+								"width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
 				}
+			} catch (Throwable e) {
+				return "";
 			}
 		});
 		fields.add(thumbnail);
@@ -164,7 +151,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			int max = loadGridLayout(folder);
 			ds = new DocumentsDS(folder, null, max, 1, null, false, false, null);
 		}
-		
+
 		if (ds == null) {
 			/*
 			 * We are searching
@@ -177,10 +164,10 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public void updateDocument(GUIDocument document) {
-		Record record = findRecord(document.getId());
-		if (record != null) {
-			DocumentGridUtil.updateRecord(document, record);
-			Canvas tile = getTile(record);
+		Record rec = findRecord(document.getId());
+		if (rec != null) {
+			DocumentGridUtil.updateRecord(document, rec);
+			Canvas tile = getTile(rec);
 			tile.redraw();
 		}
 	}
@@ -192,8 +179,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			records = new Record[documents.length];
 			for (int i = 0; i < documents.length; i++) {
 				GUIDocument doc = documents[i];
-				Record record = DocumentGridUtil.fromDocument(doc);
-				records[i] = record;
+				Record rec = DocumentGridUtil.fromDocument(doc);
+				records[i] = rec;
 			}
 		}
 		setData(records);
@@ -271,9 +258,9 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	public void selectDocument(long docId) {
 		deselectAll();
 		RecordList rlist = getDataAsRecordList();
-		Record record = rlist.find("id", Long.toString(docId));
-		if (record != null)
-			selectRecord(record);
+		Record rec = rlist.find("id", Long.toString(docId));
+		if (rec != null)
+			selectRecord(rec);
 	}
 
 	@Override
@@ -289,72 +276,54 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public void registerDoubleClickHandler(final DoubleClickHandler handler) {
-		addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				GUIDocument selectedDocument = getSelectedDocument();
-				if (selectedDocument == null)
-					return;
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-					@Override
-					public void onUnprotected(GUIDocument document) {
-						handler.onDoubleClick(null);
-					}
-				});
-			}
+		addDoubleClickHandler((DoubleClickEvent event) -> {
+			GUIDocument selectedDocument = getSelectedDocument();
+			if (selectedDocument == null)
+				return;
+			DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
+				@Override
+				public void onUnprotected(GUIDocument document) {
+					handler.onDoubleClick(null);
+				}
+			});
 		});
 	}
 
 	@Override
 	public void registerSelectionChangedHandler(final SelectionChangedHandler handler) {
-		addSelectionChangedHandler(new com.smartgwt.client.widgets.tile.events.SelectionChangedHandler() {
-
-			@Override
-			public void onSelectionChanged(SelectionChangedEvent event) {
-				GUIDocument selectedDocument = getSelectedDocument();
-				if (selectedDocument == null)
-					return;
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-					@Override
-					public void onUnprotected(GUIDocument document) {
-						handler.onSelectionChanged(null);
-					}
-				});
-			}
+		addSelectionChangedHandler((SelectionChangedEvent event) -> {
+			GUIDocument selectedDocument = getSelectedDocument();
+			if (selectedDocument == null)
+				return;
+			DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
+				@Override
+				public void onUnprotected(GUIDocument document) {
+					handler.onSelectionChanged(null);
+				}
+			});
 		});
 	}
 
 	@Override
 	public void registerCellContextClickHandler(final CellContextClickHandler handler) {
-		addShowContextMenuHandler(new ShowContextMenuHandler() {
-
-			@Override
-			public void onShowContextMenu(final ShowContextMenuEvent event) {
-				GUIDocument selectedDocument = getSelectedDocument();
-				if (selectedDocument == null)
-					return;
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-					@Override
-					public void onUnprotected(GUIDocument document) {
-						handler.onCellContextClick(null);
-					}
-				});
-				if (event != null)
-					event.cancel();
-			}
+		addShowContextMenuHandler((final ShowContextMenuEvent event) -> {
+			GUIDocument selectedDocument = getSelectedDocument();
+			if (selectedDocument == null)
+				return;
+			DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
+				@Override
+				public void onUnprotected(GUIDocument document) {
+					handler.onCellContextClick(null);
+				}
+			});
+			if (event != null)
+				event.cancel();
 		});
 	}
 
 	@Override
 	public void registerDataArrivedHandler(final DataArrivedHandler handler) {
-		addDataArrivedHandler(new com.smartgwt.client.widgets.tile.events.DataArrivedHandler() {
-
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				handler.onDataArrived(null);
-			}
-		});
+		addDataArrivedHandler((DataArrivedEvent event) -> handler.onDataArrived(null));
 	}
 
 	@Override
@@ -380,18 +349,18 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 				return;
 
 			addData(DocumentGridUtil.fromDocument(document));
-			cursor.setMessage(I18N.message("showndocuments", Integer.toString(getData().length)));
+			cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getData().length)));
 		}
 	}
 
 	@Override
 	public void onDocumentsDeleted(GUIDocument[] documents) {
 		for (GUIDocument doc : documents) {
-			Record record = findRecord(doc.getId());
-			if (record != null) {
+			Record rec = findRecord(doc.getId());
+			if (rec != null) {
 				try {
-					removeData(record);
-					cursor.setMessage(I18N.message("showndocuments",
+					removeData(rec);
+					cursor.setMessage(I18N.message(SHOWNDOCUMENTS,
 							"" + (getData() != null ? Integer.toString(getData().length) : 0)));
 				} catch (Throwable t) {
 					// Nothing to do
@@ -437,10 +406,10 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	private Record findRecord(long docId) {
-		Record record = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
-		if (record == null)
-			record = find(new AdvancedCriteria("docref", OperatorId.EQUALS, docId));
-		return record;
+		Record rec = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
+		if (rec == null)
+			rec = find(new AdvancedCriteria("docref", OperatorId.EQUALS, docId));
+		return rec;
 	}
 
 	@Override

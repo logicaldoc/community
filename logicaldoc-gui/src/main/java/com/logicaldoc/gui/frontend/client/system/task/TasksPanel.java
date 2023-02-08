@@ -21,13 +21,10 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -44,17 +41,33 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class TasksPanel extends AdminPanel {
 
+	private static final String COMPLETION = "completion";
+
+	private static final String SCHEDULING = "scheduling";
+
+	private static final String IDLE_TASK = "idle_task";
+
+	private static final String ENABLED_ICON = "enabledIcon";
+
+	private static final String RUNNING_ICON = "runningIcon";
+
+	private static final String EENABLED = "eenabled";
+
+	private static final String RUNNING_TASK = "running_task";
+
+	private static final String STATUS = "status";
+
 	private Layout results = new VLayout();
 
 	private Layout details;
 
-	private ListGrid list;
+	private ListGrid tasksGrid;
 
 	private Timer timer;
 
 	private Canvas detailPanel;
 
-	private Map<String, Progressbar> progresses = new HashMap<String, Progressbar>();
+	private Map<String, Progressbar> progresses = new HashMap<>();
 
 	public TasksPanel() {
 		super("scheduledtasks");
@@ -67,7 +80,7 @@ public class TasksPanel extends AdminPanel {
 		taskExecution.setTitle(I18N.message("execute"));
 		taskExecution.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().getTaskByName(list.getSelectedRecord().getAttributeAsString("name"),
+				SystemService.Instance.get().getTaskByName(tasksGrid.getSelectedRecord().getAttributeAsString("name"),
 						I18N.getLocale(), new AsyncCallback<GUITask>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -86,14 +99,14 @@ public class TasksPanel extends AdminPanel {
 
 											@Override
 											public void onSuccess(Boolean result) {
-												final ListGridRecord record = list.getSelectedRecord();
-												record.setAttribute("status", GUITask.STATUS_RUNNING);
-												record.setAttribute("runningIcon", "running_task");
+												final ListGridRecord rec = tasksGrid.getSelectedRecord();
+												rec.setAttribute(STATUS, GUITask.STATUS_RUNNING);
+												rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
 												Date now = new Date();
-												record.setAttribute("lastStart", now);
-												record.setAttribute("nextStart", new Date(now.getTime()
+												rec.setAttribute("lastStart", now);
+												rec.setAttribute("nextStart", new Date(now.getTime()
 														+ (currentTask.getScheduling().getInterval() * 1000)));
-												list.refreshRow(list.getRecordIndex(record));
+												tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 											}
 										});
 							}
@@ -101,15 +114,15 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		if (GUITask.STATUS_IDLE != list.getSelectedRecord().getAttributeAsInt("status")
-				|| !list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+		if (GUITask.STATUS_IDLE != tasksGrid.getSelectedRecord().getAttributeAsInt(STATUS)
+				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 			taskExecution.setEnabled(false);
 
 		MenuItem taskStop = new MenuItem();
 		taskStop.setTitle(I18N.message("stop"));
 		taskStop.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().stopTask(list.getSelectedRecord().getAttributeAsString("name"),
+				SystemService.Instance.get().stopTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"),
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -118,23 +131,23 @@ public class TasksPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
-								list.getSelectedRecord().setAttribute("status", GUITask.STATUS_STOPPING);
-								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+								tasksGrid.getSelectedRecord().setAttribute(STATUS, GUITask.STATUS_STOPPING);
+								tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 							}
 						});
 
 			}
 		});
 
-		if (GUITask.STATUS_RUNNING != list.getSelectedRecord().getAttributeAsInt("status")
-				|| !list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+		if (GUITask.STATUS_RUNNING != tasksGrid.getSelectedRecord().getAttributeAsInt(STATUS)
+				|| Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 			taskStop.setEnabled(false);
 
 		MenuItem enableTask = new MenuItem();
 		enableTask.setTitle(I18N.message("enable"));
 		enableTask.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().enableTask(list.getSelectedRecord().getAttributeAsString("name"),
+				SystemService.Instance.get().enableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"),
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -143,24 +156,24 @@ public class TasksPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
-								list.getSelectedRecord().setAttribute("enabledIcon", "bullet_green");
-								list.getSelectedRecord().setAttribute("eenabled", true);
-								list.getSelectedRecord().setAttribute("runningIcon", "idle_task");
-								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+								tasksGrid.getSelectedRecord().setAttribute(ENABLED_ICON, "bullet_green");
+								tasksGrid.getSelectedRecord().setAttribute(EENABLED, true);
+								tasksGrid.getSelectedRecord().setAttribute(RUNNING_ICON, IDLE_TASK);
+								tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 							}
 						});
 
 			}
 		});
 
-		if (list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+		if (Boolean.TRUE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 			enableTask.setEnabled(false);
 
 		MenuItem disableTask = new MenuItem();
 		disableTask.setTitle(I18N.message("disable"));
 		disableTask.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().disableTask(list.getSelectedRecord().getAttributeAsString("name"),
+				SystemService.Instance.get().disableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"),
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -169,18 +182,18 @@ public class TasksPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Boolean result) {
-								list.getSelectedRecord().setAttribute("enabledIcon", "bullet_red");
-								list.getSelectedRecord().setAttribute("eenabled", false);
-								list.getSelectedRecord().setAttribute("runningIcon", "idle_task");
-								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+								tasksGrid.getSelectedRecord().setAttribute(ENABLED_ICON, "bullet_red");
+								tasksGrid.getSelectedRecord().setAttribute(EENABLED, false);
+								tasksGrid.getSelectedRecord().setAttribute(RUNNING_ICON, IDLE_TASK);
+								tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 							}
 						});
 
 			}
 		});
 
-		if (!list.getSelectedRecord().getAttributeAsBoolean("eenabled")
-				|| list.getSelectedRecord().getAttributeAsInt("status") != GUITask.STATUS_IDLE)
+		if (Boolean.FALSE.equals(tasksGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED))
+				|| tasksGrid.getSelectedRecord().getAttributeAsInt(STATUS) != GUITask.STATUS_IDLE)
 			disableTask.setEnabled(false);
 
 		contextMenu.setItems(taskExecution, taskStop, enableTask, disableTask);
@@ -188,15 +201,15 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	private void prepareTasksGrid() {
-		list = new ListGrid() {
+		tasksGrid = new ListGrid() {
 			@Override
-			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
+			protected Canvas createRecordComponent(final ListGridRecord rec, Integer colNum) {
 				String fieldName = this.getFieldName(colNum);
 				if (fieldName.equals("progressbar")) {
 					Progressbar prgBar = new Progressbar();
 					prgBar.setLength(100);
 					prgBar.setBreadth(15);
-					progresses.put(record.getAttribute("name"), prgBar);
+					progresses.put(rec.getAttribute("name"), prgBar);
 
 					return prgBar;
 				} else {
@@ -204,13 +217,12 @@ public class TasksPanel extends AdminPanel {
 				}
 			}
 		};
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
+		tasksGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		tasksGrid.setShowRecordComponents(true);
+		tasksGrid.setShowRecordComponentsByCell(true);
+		tasksGrid.setAutoFetchData(true);
 
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setAutoFetchData(true);
-
-		ListGridField enabled = new ListGridField("enabledIcon", " ", 30);
+		ListGridField enabled = new ListGridField(ENABLED_ICON, " ", 30);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -218,7 +230,7 @@ public class TasksPanel extends AdminPanel {
 		enabled.setImageURLSuffix(".png");
 		enabled.setCanFilter(false);
 
-		ListGridField running = new ListGridField("runningIcon", " ", 30);
+		ListGridField running = new ListGridField(RUNNING_ICON, " ", 30);
 		running.setType(ListGridFieldType.IMAGE);
 		running.setCanSort(false);
 		running.setAlign(Alignment.CENTER);
@@ -227,7 +239,6 @@ public class TasksPanel extends AdminPanel {
 		running.setCanFilter(false);
 
 		ListGridField label = new ListGridField("label", I18N.message("task"), 180);
-		
 
 		ListGridField description = new ListGridField("description", I18N.message("description"));
 		description.setWidth("*");
@@ -236,7 +247,7 @@ public class TasksPanel extends AdminPanel {
 
 		ListGridField nextStart = new DateListGridField("nextStart", "nextstart");
 
-		ListGridField scheduling = new ListGridField("scheduling", I18N.message("scheduling"), 130);
+		ListGridField scheduling = new ListGridField(SCHEDULING, I18N.message(SCHEDULING), 130);
 		scheduling.setCanFilter(false);
 		scheduling.setAlign(Alignment.CENTER);
 		scheduling.setCanSort(false);
@@ -245,89 +256,86 @@ public class TasksPanel extends AdminPanel {
 		progressbar.setCanFilter(false);
 		progressbar.setCanSort(false);
 		progressbar.setAlign(Alignment.LEFT);
-		progressbar.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return "";
-			}
+		progressbar.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			return "";
 		});
 
-		ListGridField completion = new ListGridField("completion", " ", 35);
+		ListGridField completion = new ListGridField(COMPLETION, " ", 35);
 		completion.setCanFilter(false);
 		completion.setCanSort(false);
 		completion.setAlign(Alignment.LEFT);
-		completion.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if (value != null)
-					return value + "%";
-				else
-					return "";
-			}
+		completion.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			if (value != null)
+				return value + "%";
+			else
+				return "";
 		});
 
-		list.setWidth100();
-		list.setHeight100();
-		list.setFields(enabled, running, label, description, lastStart, nextStart, scheduling, progressbar, completion);
-		list.setSelectionType(SelectionStyle.SINGLE);
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setCanFreezeFields(true);
-		list.setFilterOnKeypress(true);
-		list.setDataSource(new TasksDS());
+		tasksGrid.setWidth100();
+		tasksGrid.setHeight100();
+		tasksGrid.setFields(enabled, running, label, description, lastStart, nextStart, scheduling, progressbar,
+				completion);
+		tasksGrid.setSelectionType(SelectionStyle.SINGLE);
+		tasksGrid.setShowRecordComponents(true);
+		tasksGrid.setShowRecordComponentsByCell(true);
+		tasksGrid.setCanFreezeFields(true);
+		tasksGrid.setFilterOnKeypress(true);
+		tasksGrid.setDataSource(new TasksDS());
 
-		results.addMember(list, 1);
+		results.addMember(tasksGrid, 1);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				event.cancel();
-				if (!Session.get().isDefaultTenant())
-					return;
+		addGridContextHandler();
 
-				final ListGridRecord record = list.getSelectedRecord();
-				if (record != null)
-					SystemService.Instance.get().getTaskByName(record.getAttribute("name"), I18N.getLocale(),
-							new AsyncCallback<GUITask>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		addGridSelectionHandler();
+	}
 
-								@Override
-								public void onSuccess(GUITask task) {
-									record.setAttribute("status", task.getStatus());
-									record.setAttribute("eenabled", task.getScheduling().isEnabled());
-									if (task.getStatus() != GUITask.STATUS_IDLE) {
-										record.setAttribute("runningIcon", "running_task");
-									} else {
-										record.setAttribute("runningIcon", "idle_task");
-									}
-									list.refreshRow(list.getRecordIndex(record));
-									showContextMenu();
-								}
-							});
-			}
+	private void addGridSelectionHandler() {
+		tasksGrid.addSelectionChangedHandler((SelectionEvent event) -> {
+			ListGridRecord rec = tasksGrid.getSelectedRecord();
+			if (rec != null)
+				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
+						new AsyncCallback<GUITask>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUITask task) {
+								onSelectedTask(task);
+							}
+						});
 		});
+	}
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				if (record != null)
-					SystemService.Instance.get().getTaskByName(record.getAttribute("name"), I18N.getLocale(),
-							new AsyncCallback<GUITask>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+	private void addGridContextHandler() {
+		tasksGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+			event.cancel();
+			if (!Session.get().isDefaultTenant())
+				return;
 
-								@Override
-								public void onSuccess(GUITask task) {
-									onSelectedTask(task);
+			final ListGridRecord rec = tasksGrid.getSelectedRecord();
+			if (rec != null)
+				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
+						new AsyncCallback<GUITask>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUITask task) {
+								rec.setAttribute(STATUS, task.getStatus());
+								rec.setAttribute(EENABLED, task.getScheduling().isEnabled());
+								if (task.getStatus() != GUITask.STATUS_IDLE) {
+									rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
+								} else {
+									rec.setAttribute(RUNNING_ICON, IDLE_TASK);
 								}
-							});
-			}
+								tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
+								showContextMenu();
+							}
+						});
 		});
 	}
 
@@ -355,44 +363,7 @@ public class TasksPanel extends AdminPanel {
 		 */
 		timer = new Timer() {
 			public void run() {
-				SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<GUITask[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUITask[] tasks) {
-						for (GUITask guiTask : tasks) {
-							Progressbar p = progresses.get(guiTask.getName());
-							if (p == null)
-								continue;
-
-							if (guiTask.isIndeterminate()) {
-								p.setPercentDone(0);
-							} else {
-								p.setPercentDone(guiTask.getCompletionPercentage());
-							}
-							p.redraw();
-
-							for (ListGridRecord record : list.getRecords()) {
-								if (record.getAttribute("name").equals(guiTask.getName())
-										&& guiTask.getStatus() != GUITask.STATUS_IDLE) {
-									record.setAttribute("runningIcon", "running_task");
-									record.setAttribute("completion", guiTask.getCompletionPercentage());
-									list.refreshRow(list.getRecordIndex(record));
-									break;
-								} else if (record.getAttribute("name").equals(guiTask.getName())
-										&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
-									record.setAttribute("runningIcon", "idle_task");
-									record.setAttribute("completion", guiTask.getCompletionPercentage());
-									list.refreshRow(list.getRecordIndex(record));
-									break;
-								}
-							}
-						}
-					}
-				});
+				loadTasks();
 			}
 		};
 		timer.scheduleRepeating(5 * 1000);
@@ -420,16 +391,60 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	public ListGrid getList() {
-		return list;
+		return tasksGrid;
 	}
 
 	/**
-	 * Updates the selected record with the new task data
+	 * Updates the selected rec with the new task data
 	 * 
 	 * @param task the task to update
 	 */
 	public void updateSelectedRecord(GUITask task) {
-		list.getSelectedRecord().setAttribute("scheduling", task.getSchedulingLabel());
-		list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+		tasksGrid.getSelectedRecord().setAttribute(SCHEDULING, task.getSchedulingLabel());
+		tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
+	}
+
+	private void loadTasks() {
+		SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<GUITask[]>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUITask[] tasks) {
+				for (GUITask guiTask : tasks) {
+					Progressbar p = progresses.get(guiTask.getName());
+					if (p == null)
+						continue;
+
+					if (guiTask.isIndeterminate()) {
+						p.setPercentDone(0);
+					} else {
+						p.setPercentDone(guiTask.getCompletionPercentage());
+					}
+					p.redraw();
+
+					updateRecords(guiTask);
+				}
+			}
+		});
+	}
+
+	private void updateRecords(GUITask guiTask) {
+		for (ListGridRecord rec : tasksGrid.getRecords()) {
+			if (rec.getAttribute("name").equals(guiTask.getName()) && guiTask.getStatus() != GUITask.STATUS_IDLE) {
+				rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
+				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
+				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
+				break;
+			} else if (rec.getAttribute("name").equals(guiTask.getName())
+					&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
+				rec.setAttribute(RUNNING_ICON, IDLE_TASK);
+				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
+				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
+				break;
+			}
+		}
 	}
 }

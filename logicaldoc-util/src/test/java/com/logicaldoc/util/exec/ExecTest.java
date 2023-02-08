@@ -62,7 +62,7 @@ public class ExecTest {
 
 	@Test
 	public void testExec2() {
-		List<String> xxx = new ArrayList<String>();
+		List<String> xxx = new ArrayList<>();
 		File exeFile = new File("target\\test-classes\\nothing.bat");
 		xxx.add(exeFile.getPath());
 		xxx.add("Siemens");
@@ -92,7 +92,7 @@ public class ExecTest {
 	@Test
 	public void testExecListOfString() {
 		// nothing.bat fasfgsa < retr34.txt
-		List<String> xxx = new ArrayList<String>();
+		List<String> xxx = new ArrayList<>();
 		xxx.add("target\\test-classes\\nothing.bat");
 		xxx.add("fasfgsa");
 		xxx.add("<");
@@ -107,7 +107,7 @@ public class ExecTest {
 		}
 
 		// nothing.bat fasfgsa < retr34.txt
-		xxx = new ArrayList<String>();
+		xxx = new ArrayList<>();
 		xxx.add("target\\test-classes\\nothing.bat");
 		xxx.add("Siemens");
 		xxx.add("Gigaset");
@@ -128,7 +128,7 @@ public class ExecTest {
 
 		File exeFile = new File("target\\test-classes\\nothing.bat");
 
-		List<String> xxx = new ArrayList<String>();
+		List<String> xxx = new ArrayList<>();
 
 		xxx.add(exeFile.getPath());
 		xxx.add("Lavender Haze");

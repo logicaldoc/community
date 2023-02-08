@@ -19,7 +19,6 @@ import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -78,15 +77,12 @@ public class BarcodeQueuePanel extends VLayout {
 		toolStrip.setWidth100();
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate()) {
+		display.addClickHandler((ClickEvent event) -> {
+				if (Boolean.TRUE.equals(max.validate())) {
 					maxRecords = (Integer) max.getValue();
 					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
 				}
-			}
-		});
+			});
 
 		ToolStripButton reschedule = new ToolStripButton();
 		reschedule.setTitle(I18N.message("rescheduleallprocessing"));
@@ -94,27 +90,23 @@ public class BarcodeQueuePanel extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				LD.ask(I18N.message("rescheduleallprocessing"), I18N.message("rescheduleallprocessingask"),
-						new BooleanCallback() {
+						(Boolean value) -> {
+							if (Boolean.TRUE.equals(value))
+								BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
 
-							@Override
-							public void execute(Boolean value) {
-								if (value)
-									BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(Void ret) {
-											GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
-											maxRecords = (Integer) max.getValue();
-											list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false,
-													null));
-										}
-									});
-							}
+									@Override
+									public void onSuccess(Void ret) {
+										GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
+										maxRecords = (Integer) max.getValue();
+										list.refresh(
+												new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
+									}
+								});
 						});
 			}
 		});
@@ -182,17 +174,17 @@ public class BarcodeQueuePanel extends VLayout {
 
 		list = new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (record == null)
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				if (rec == null)
 					return "";
 				if (getFieldName(colNum).equals("filename")) {
-					if ("stop".equals(record.getAttribute("immutable"))) {
+					if ("stop".equals(rec.getAttribute("immutable"))) {
 						return "color: #888888; font-style: italic;";
 					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
+						return super.getCellCSSText(rec, rowNum, colNum);
 					}
 				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rec, rowNum, colNum);
 				}
 			}
 		};
@@ -236,11 +228,11 @@ public class BarcodeQueuePanel extends VLayout {
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				if (record == null)
+				ListGridRecord rec = list.getSelectedRecord();
+				if (rec == null)
 					return;
 
-				DocumentsPanel.get().openInFolder(record.getAttributeAsLong("id"));
+				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
 			}
 		});
 
@@ -263,8 +255,8 @@ public class BarcodeQueuePanel extends VLayout {
 
 					@Override
 					public void onSuccess(Void result) {
-						for (ListGridRecord record : selection) {
-							list.removeData(record);
+						for (ListGridRecord rec : selection) {
+							list.removeData(rec);
 						}
 					}
 				});

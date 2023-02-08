@@ -126,20 +126,19 @@ public class ZonalOCRTemplateSettings extends Window {
 				I18N.message("attention"), I18N.message("filenamewarning"));
 		fileNameWaring.setRequired(true);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", ocrPanel.getSelectedOcrTemplate().getName());
+		TextItem name = ItemFactory.newTextItem("name", ocrPanel.getSelectedOcrTemplate().getName());
 		name.setRequired(true);
 		name.setDisabled(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", I18N.message("id"),
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", 
 				"" + ocrPanel.getSelectedOcrTemplate().getId());
 		id.setVisible(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch",
-				Session.get().getConfigAsInt("zonalocr.batch"));
+		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt("zonalocr.batch"));
 		batch.setStep(50);
 		batch.setMin(1);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description",
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", 
 				ocrPanel.getSelectedOcrTemplate().getDescription());
 		description.setHeight(200);
 
@@ -148,13 +147,13 @@ public class ZonalOCRTemplateSettings extends Window {
 		else
 			form.setItems(id, name, description);
 	}
-	
+
 	public void onSave() {
 		if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		ocrPanel.getSelectedOcrTemplate().setName(vm.getValueAsString("name"));

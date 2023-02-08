@@ -20,11 +20,9 @@ import com.logicaldoc.gui.frontend.client.tenant.TenantsPanel;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -54,7 +52,6 @@ public class SystemMenu extends VLayout {
 		addTenantsButton();
 
 		Button updates = addUpdatesButton();
-		
 
 		Button confirmUpdate = addConfirmUpdate(updates);
 
@@ -63,13 +60,15 @@ public class SystemMenu extends VLayout {
 			String runlevel = Session.get().getConfig("runlevel");
 			if ("updated".equals(runlevel)) {
 				confirmUpdate.setVisible(true);
+				updates.setVisible(false);
 			} else {
 				updates.setVisible(true);
+				confirmUpdate.setVisible(false);
 			}
 		}
 
 		addLicenseButton();
-		
+
 		addRestartButton();
 
 		addInformations();
@@ -79,42 +78,37 @@ public class SystemMenu extends VLayout {
 		final Button restart = new Button(I18N.message("restart"));
 		restart.setWidth100();
 		restart.setHeight(25);
-		restart.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SC.ask(I18N.message("restartalert"), (Boolean yes) -> {
-						if (yes) {
-							SystemService.Instance.get().restart(new AsyncCallback<Void>() {
+		restart.addClickHandler((ClickEvent event) -> SC.ask(I18N.message("restartalert"), (Boolean yes) -> {
+			if (Boolean.TRUE.equals(yes)) {
+				SystemService.Instance.get().restart(new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-								@Override
-								public void onSuccess(Void arg) {
-									ApplicationRestarting.get().show();
+					@Override
+					public void onSuccess(Void arg) {
+						ApplicationRestarting.get().show();
 
-									restart.setDisabled(true);
-									final String tenant = Session.get().getUser().getTenant().getName();
-									Session.get().close();
-									CookiesManager.removeSid();
+						restart.setDisabled(true);
+						final String tenant = Session.get().getUser().getTenant().getName();
+						Session.get().close();
+						CookiesManager.removeSid();
 
-									Timer timer = new Timer() {
-										public void run() {
-											Util.waitForUpAndRunning(tenant, I18N.getLocale());
-										}
-									};
-									timer.schedule(6000);
-								}
-							});
-						}
+						Timer timer = new Timer() {
+							public void run() {
+								Util.waitForUpAndRunning(tenant, I18N.getLocale());
+							}
+						};
+						timer.schedule(6000);
+					}
 				});
 			}
-		});
-		if (Menu.enabled(Menu.RESTART) && Session.get().isDefaultTenant()) {
+		}));
+		if (Menu.enabled(Menu.RESTART) && Session.get().isDefaultTenant())
 			addMember(restart);
-		}
+
 		restart.setDisabled(Session.get().isDemo());
 		restart.setVisible(Session.get().isDefaultTenant());
 	}
@@ -123,8 +117,8 @@ public class SystemMenu extends VLayout {
 		final Button license = new Button(I18N.message("license"));
 		license.setWidth100();
 		license.setHeight(25);
-		license.addClickHandler((ClickEvent event) ->  {
-				WindowUtils.openUrlInNewTab(Util.licenseUrl());
+		license.addClickHandler((ClickEvent event) -> {
+			WindowUtils.openUrlInNewTab(Util.licenseUrl());
 		});
 		if (Session.get().isDefaultTenant() && "admin".equals(Session.get().getUser().getUsername())
 				&& !Session.get().isDemo() && Feature.enabled(Feature.LICENSE)) {
@@ -140,22 +134,22 @@ public class SystemMenu extends VLayout {
 		confirmUpdate.setWidth100();
 		confirmUpdate.setHeight(25);
 		confirmUpdate.addClickHandler((ClickEvent event) -> {
-				SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
+			SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg) {
-						Session.get().getInfo().setConfig("runlevel", "default");
-						confirmUpdate.setVisible(false);
-						updates.setVisible(true);
+				@Override
+				public void onSuccess(Void arg) {
+					Session.get().getInfo().setConfig("runlevel", "default");
+					confirmUpdate.setVisible(false);
+					updates.setVisible(true);
 
-						SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
-					}
-				});
+					SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
+				}
+			});
 		});
 		addMember(confirmUpdate);
 		confirmUpdate.setVisible(Session.get().isDefaultTenant());
@@ -166,9 +160,7 @@ public class SystemMenu extends VLayout {
 		Button updates = new Button(I18N.message("updatesandpatches"));
 		updates.setWidth100();
 		updates.setHeight(25);
-		updates.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new UpdateAndPatchPanel());
-		});
+		updates.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new UpdateAndPatchPanel()));
 		addMember(updates);
 		updates.setDisabled(Session.get().isDemo());
 		updates.setVisible(Session.get().isDefaultTenant());
@@ -179,18 +171,11 @@ public class SystemMenu extends VLayout {
 		Button tenants = new Button(I18N.message("tenants"));
 		tenants.setWidth100();
 		tenants.setHeight(25);
-		tenants.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new TenantsPanel());
-			}
-		});
+		tenants.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new TenantsPanel()));
 		if (Feature.visible(Feature.MULTI_TENANT) && Menu.enabled(Menu.TENANTS) && Session.get().isDefaultTenant()) {
 			addMember(tenants);
-			if (!Feature.enabled(Feature.MULTI_TENANT)) {
-				tenants.setDisabled(true);
-				tenants.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.MULTI_TENANT))
+				setFeatureDisabled(tenants);
 		}
 		tenants.setDisabled(Session.get().isDemo());
 		tenants.setVisible(Session.get().isDefaultTenant());
@@ -200,33 +185,31 @@ public class SystemMenu extends VLayout {
 		Button clustering = new Button(I18N.message("clustering"));
 		clustering.setWidth100();
 		clustering.setHeight(25);
-		clustering.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new ClusteringPanel());
-		});
+		clustering.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ClusteringPanel()));
 		if (Feature.visible(Feature.CLUSTERING) && Menu.enabled(Menu.CLUSTERING) && Session.get().isDefaultTenant()) {
 			addMember(clustering);
-			if (!Feature.enabled(Feature.CLUSTERING)) {
-				clustering.setDisabled(true);
-				clustering.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.CLUSTERING))
+				setFeatureDisabled(clustering);
 		}
 		clustering.setDisabled(Session.get().isDemo());
 		clustering.setVisible(Session.get().isDefaultTenant());
+	}
+
+	private void setFeatureDisabled(Button button) {
+		button.setDisabled(true);
+		button.setTooltip(I18N.message("featuredisabled"));
 	}
 
 	private void addBrandingButton() {
 		Button branding = new Button(I18N.message("branding"));
 		branding.setWidth100();
 		branding.setHeight(25);
-		branding.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId()));
-		});
+		branding.addClickHandler(
+				(ClickEvent event) -> AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId())));
 		if (Feature.visible(Feature.BRANDING_STANDARD) && Menu.enabled(Menu.BRANDING)) {
 			addMember(branding);
-			if (!Feature.enabled(Feature.BRANDING_STANDARD)) {
-				branding.setDisabled(true);
-				branding.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.BRANDING_STANDARD))
+				setFeatureDisabled(branding);
 		}
 		branding.setDisabled(Session.get().isDemo());
 	}
@@ -235,9 +218,7 @@ public class SystemMenu extends VLayout {
 		Button tasks = new Button(I18N.message("scheduledtasks"));
 		tasks.setWidth100();
 		tasks.setHeight(25);
-		tasks.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new TasksPanel());
-		});
+		tasks.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new TasksPanel()));
 		addMember(tasks);
 	}
 
@@ -245,9 +226,7 @@ public class SystemMenu extends VLayout {
 		Button general = new Button(I18N.message("general"));
 		general.setWidth100();
 		general.setHeight(25);
-		general.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new GeneralPanel());
-		});
+		general.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new GeneralPanel()));
 		if (Menu.enabled(Menu.GENERAL))
 			addMember(general);
 	}
@@ -302,22 +281,21 @@ public class SystemMenu extends VLayout {
 		support.setRequired(true);
 		support.setShouldSaveValue(false);
 
-		StaticTextItem installationID = ItemFactory.newStaticTextItem("installid", "installid", installationId);
+		StaticTextItem installationID = ItemFactory.newStaticTextItem("installid", installationId);
 		installationID.setWidth(250);
 		installationID.setRequired(true);
 		installationID.setShouldSaveValue(false);
 		installationID.setWrap(true);
 		installationID.setWrapTitle(false);
 
-		StaticTextItem usernoItem = ItemFactory.newStaticTextItem("userno", "userno", userno);
+		StaticTextItem usernoItem = ItemFactory.newStaticTextItem("userno", userno);
 		usernoItem.setWidth(250);
 		usernoItem.setRequired(true);
 		usernoItem.setShouldSaveValue(false);
 		usernoItem.setWrap(true);
 		usernoItem.setWrapTitle(false);
 
-		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", "hostname",
-				Session.get().getInfo().getHostName());
+		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", Session.get().getInfo().getHostName());
 		hostName.setWidth(250);
 		hostName.setRequired(true);
 		hostName.setShouldSaveValue(false);

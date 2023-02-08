@@ -63,12 +63,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 		Button saveButton = new Button(I18N.message("save"));
 		saveButton.setAutoFit(true);
 		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		saveButton.addClickHandler((ClickEvent event) -> onSave());
 		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
 
 		HTMLPane spacer = new HTMLPane();
@@ -78,9 +73,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 
 		Img closeImage = ItemFactory.newImgIcon("delete.png");
 		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		closeImage.addClickHandler((ClickEvent event) -> {
 				if (getIncremental().getId() != 0) {
 					ImpexService.Instance.get().loadIncremental(getIncremental().getId(),
 							new AsyncCallback<GUIIncrementalArchive>() {
@@ -100,7 +93,6 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 					setIncremental(archive);
 				}
 				savePanel.setVisible(false);
-			}
 		});
 		closeImage.setCursor(Cursor.HAND);
 		closeImage.setTooltip(I18N.message("close"));
@@ -155,7 +147,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 		 */
 		if (settingsPanel != null) {
 			settingsPanel.destroy();
-			if (settingsTabPanel.contains(settingsPanel))
+			if (Boolean.TRUE.equals(settingsTabPanel.contains(settingsPanel)))
 				settingsTabPanel.removeMember(settingsPanel);
 		}
 		settingsPanel = new IncrementalSettingsPanel(incremental, changeHandler, this);

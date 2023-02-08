@@ -45,6 +45,14 @@ import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
  * @since 7.3
  */
 public class FormDetailsPanel extends VLayout {
+	private static final String FOOTER = "footer";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String WEB_ENABLED = "webEnabled";
+
+	private static final String CONTENT = "content";
+
 	private GUIForm form;
 
 	private Layout notificationsTabPanel;
@@ -163,7 +171,7 @@ public class FormDetailsPanel extends VLayout {
 		propertiesTabPanel.setHeight100();
 		propertiesTab.setPane(propertiesTabPanel);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", form.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", form.getName());
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
 		name.setDisabled(form.getId() != 0L);
@@ -185,7 +193,7 @@ public class FormDetailsPanel extends VLayout {
 		form1.setValuesManager(vm);
 		form1.setItems(name, template, css);
 
-		TextAreaItem content = ItemFactory.newTextAreaItemForAutomation("content", "content", form.getContent(),
+		TextAreaItem content = ItemFactory.newTextAreaItemForAutomation(CONTENT, form.getContent(),
 				changedHandler, true);
 		content.addChangedHandler(changedHandler);
 		content.setColSpan(2);
@@ -258,7 +266,7 @@ public class FormDetailsPanel extends VLayout {
 			webTabPanel.setHeight100();
 			tab.setPane(webTabPanel);
 
-			RadioGroupItem webEnabled = ItemFactory.newBooleanSelector("webEnabled", "enabled");
+			RadioGroupItem webEnabled = ItemFactory.newBooleanSelector(WEB_ENABLED, "enabled");
 			webEnabled.setValue(form.isWebEnabled() ? "yes" : "no");
 			webEnabled.setRequired(true);
 			webEnabled.addChangedHandler(changedHandler);
@@ -273,31 +281,31 @@ public class FormDetailsPanel extends VLayout {
 			editAfterSubmit.setRequired(true);
 			editAfterSubmit.addChangedHandler(changedHandler);
 
-			SpinnerItem width = ItemFactory.newSpinnerItem("width", "width", form.getWidth());
+			SpinnerItem width = ItemFactory.newSpinnerItem("width", form.getWidth());
 			width.setMin(100);
 			width.setStep(10);
 			width.setRequired(true);
 			width.addChangedHandler(changedHandler);
 
-			SpinnerItem columns = ItemFactory.newSpinnerItem("columns", "columns", form.getColumns());
+			SpinnerItem columns = ItemFactory.newSpinnerItem("columns", form.getColumns());
 			columns.setMin(1);
 			columns.setStep(1);
 			columns.setRequired(true);
 			columns.addChangedHandler(changedHandler);
 
-			TextAreaItem title = ItemFactory.newTextAreaItemForAutomation("title", "title", form.getTitle(),
+			TextAreaItem title = ItemFactory.newTextAreaItemForAutomation("title", form.getTitle(),
 					changedHandler, true);
 			title.setRequired(true);
 			title.setColSpan(3);
 			title.setWidth(400);
 			title.setHeight(50);
 
-			TextAreaItem description = ItemFactory.newTextAreaItemForAutomation("description", "description",
+			TextAreaItem description = ItemFactory.newTextAreaItemForAutomation(DESCRIPTION, DESCRIPTION,
 					form.getDescription(), changedHandler, true);
 			description.setWidth(400);
 			description.setColSpan(3);
 
-			TextAreaItem footer = ItemFactory.newTextAreaItemForAutomation("footer", "footer", form.getFooter(),
+			TextAreaItem footer = ItemFactory.newTextAreaItemForAutomation(FOOTER, FOOTER, form.getFooter(),
 					changedHandler, true);
 			footer.setWidth(400);
 			footer.setColSpan(3);
@@ -328,7 +336,7 @@ public class FormDetailsPanel extends VLayout {
 					changedHandler.onChanged(null);
 				}
 			});
-			targetFolder.setRequiredWhen(new Criteria("webEnabled", "yes"));
+			targetFolder.setRequiredWhen(new Criteria(WEB_ENABLED, "yes"));
 
 			TextItem backgroundColor = ItemFactory.newColorItemPicker("backgroundColor", "background",
 					form.getBackgroundColor(), true, changedHandler);
@@ -372,7 +380,7 @@ public class FormDetailsPanel extends VLayout {
 	 * Call to directly open the HTML edior of the forms's content
 	 */
 	public void openContentEditor() {
-		HtmlItemEditor editor = new HtmlItemEditor(form2.getItem("content"), new ChangedHandler() {
+		HtmlItemEditor editor = new HtmlItemEditor(form2.getItem(CONTENT), new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
 				onModified();
@@ -396,7 +404,7 @@ public class FormDetailsPanel extends VLayout {
 	}
 
 	public void onSave() {
-		if (vm.validate()) {
+		if (Boolean.TRUE.equals(vm.validate()))  {
 			collectValuesAndSave();
 		} else {
 			if (!form1.validate() || !form2.validate())
@@ -414,14 +422,14 @@ public class FormDetailsPanel extends VLayout {
 			form.setTemplateId(null);
 		form.setCss(vm.getValueAsString("css"));
 		form.setWebCss(vm.getValueAsString("webCss"));
-		form.setContent(vm.getValueAsString("content"));
+		form.setContent(vm.getValueAsString(CONTENT));
 
 		if (Feature.enabled(Feature.WEB_FORM)) {
 			form.setTitle(vm.getValueAsString("title"));
-			form.setDescription(vm.getValueAsString("description"));
-			form.setFooter(vm.getValueAsString("footer"));
+			form.setDescription(vm.getValueAsString(DESCRIPTION));
+			form.setFooter(vm.getValueAsString(FOOTER));
 			form.setConfirmation(vm.getValueAsString("confirmation"));
-			form.setWebEnabled("yes".equals(vm.getValueAsString("webEnabled")));
+			form.setWebEnabled("yes".equals(vm.getValueAsString(WEB_ENABLED)));
 			form.setCollectEmails("yes".equals(vm.getValueAsString("collectEmails")));
 			form.setEditAfterSubmit("yes".equals(vm.getValueAsString("editAfterSubmit")));
 			form.setBackgroundColor(vm.getValueAsString("backgroundColor"));

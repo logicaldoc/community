@@ -84,14 +84,14 @@ public class EnvelopeDetails extends Window {
 		form.setNumCols(1);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
-		TextItem subject = ItemFactory.newTextItem("subject", "subject", I18N.message("newdocumentstosign"));
+		TextItem subject = ItemFactory.newTextItem("subject", I18N.message("newdocumentstosign"));
 		subject.setRequired(true);
 		subject.setWidth(200);
 		items.add(subject);
 
-		TextItem message = ItemFactory.newTextItem("message", "message", null);
+		TextItem message = ItemFactory.newTextItem("message", null);
 		message.setWidth(350);
 		items.add(message);
 
@@ -128,7 +128,7 @@ public class EnvelopeDetails extends Window {
 		if (!form.validate())
 			return;
 
-		List<Long> docIds = new ArrayList<Long>();
+		List<Long> docIds = new ArrayList<>();
 		for (GUIDocument document : documents)
 			docIds.add(document.getId());
 

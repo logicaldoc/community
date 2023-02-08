@@ -35,6 +35,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 7.8
  */
 public class VIASettingsPanel extends AdminPanel {
+	private static final String PASSWORD = "password";
+
+	private static final String USERNAME = "username";
+
+	private static final String MAXATTACHMENTSIZE = "maxattachmentsize";
+
 	private DynamicForm settingsForm = new DynamicForm();
 
 	private DynamicForm emailForm = new DynamicForm();
@@ -102,14 +108,13 @@ public class VIASettingsPanel extends AdminPanel {
 		enabled.setRequired(true);
 		enabled.setValue(settings.isEnabled() ? "yes" : "no");
 
-		SpinnerItem maxAttachments = ItemFactory.newSpinnerItem("maxattachments", "maxattachments",
-				settings.getMaxAttachments());
+		SpinnerItem maxAttachments = ItemFactory.newSpinnerItem("maxattachments", settings.getMaxAttachments());
 		maxAttachments.setMin(0);
 		maxAttachments.setStep(1);
 		maxAttachments.setWrapTitle(false);
 		maxAttachments.setRequired(true);
 
-		IntegerItem maxAttachmentSize = ItemFactory.newLongItem("maxattachmentsize", "maxattachmentsize",
+		IntegerItem maxAttachmentSize = ItemFactory.newLongItem(MAXATTACHMENTSIZE, MAXATTACHMENTSIZE,
 				settings.getMaxAttachmentSize() / 1024L);
 		maxAttachmentSize.setRequired(true);
 		maxAttachmentSize.setWrapTitle(false);
@@ -137,14 +142,14 @@ public class VIASettingsPanel extends AdminPanel {
 		mailaddress.setValue(account.getMailAddress());
 		mailaddress.setRequired(false);
 
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", account.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME, account.getUsername());
 		username.setWidth(180);
 
-		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password",
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD,
 				account.getPassword());
 		password.setWidth(180);
 
-		TextItem server = ItemFactory.newTextItem("server", "server", account.getHost());
+		TextItem server = ItemFactory.newTextItem("server", account.getHost());
 		server.setWidth(180);
 
 		IntegerItem port = ItemFactory.newIntegerItem("port", "port", account.getPort());
@@ -153,10 +158,10 @@ public class VIASettingsPanel extends AdminPanel {
 		RadioGroupItem ssl = ItemFactory.newBooleanSelector("ssl", "ssl");
 		ssl.setValue(account.isSsl() ? "yes" : "no");
 
-		SelectItem protocol = ItemFactory.newEmailProtocolSelector("protocol", "protocol");
+		SelectItem protocol = ItemFactory.newEmailProtocolSelector();
 		protocol.setValue(account.getProvider());
 
-		TextItem folder = ItemFactory.newTextItem("mailfolder", "mailfolder", account.getMailFolder());
+		TextItem folder = ItemFactory.newTextItem("mailfolder", account.getMailFolder());
 
 		ButtonItem resetCache = prepareResetCacheButton();
 
@@ -166,7 +171,7 @@ public class VIASettingsPanel extends AdminPanel {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", account.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", account.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
 		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
 				account.getPassword());
@@ -205,7 +210,7 @@ public class VIASettingsPanel extends AdminPanel {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
 								new AsyncCallback<Void>() {
 									@Override
@@ -282,11 +287,11 @@ public class VIASettingsPanel extends AdminPanel {
 	@SuppressWarnings("unchecked")
 	boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 			settings.setEnabled("yes".equals(values.get("eenabled").toString()));
 			settings.setMaxAttachments(Integer.parseInt(values.get("maxattachments").toString()));
-			settings.setMaxAttachmentSize(Long.parseLong(values.get("maxattachmentsize").toString()) * 1024L);
+			settings.setMaxAttachmentSize(Long.parseLong(values.get(MAXATTACHMENTSIZE).toString()) * 1024L);
 
 			GUIEmailAccount account = settings.getEmailAccount();
 			if (account == null) {
@@ -296,8 +301,8 @@ public class VIASettingsPanel extends AdminPanel {
 
 			account.setMailAddress((String) values.get("mailaddress"));
 			account.setHost((String) values.get("server"));
-			account.setUsername((String) values.get("username"));
-			account.setPassword((String) values.get("password"));
+			account.setUsername((String) values.get(USERNAME));
+			account.setPassword((String) values.get(PASSWORD));
 			account.setProvider((String) values.get("protocol"));
 			if (values.get("port") instanceof Integer)
 				account.setPort((Integer) values.get("port"));

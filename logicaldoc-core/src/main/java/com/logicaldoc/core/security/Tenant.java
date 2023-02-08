@@ -264,7 +264,7 @@ public class Tenant extends PersistentObject implements Serializable {
 	}
 
 	public List<String> getQuotaAlertRecipientsAsList() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (!StringUtils.isEmpty(getQuotaAlertRecipients())) {
 			StringTokenizer st = new StringTokenizer(getQuotaAlertRecipients(), ",", false);
 			while (st.hasMoreTokens())

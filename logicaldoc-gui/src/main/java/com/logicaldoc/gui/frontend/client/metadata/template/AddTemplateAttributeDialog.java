@@ -26,6 +26,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 public class AddTemplateAttributeDialog extends Window {
 
+	private static final String PRESET = "preset";
+
+	private static final String LABEL = "label";
+
 	private ListGrid setAttributesList;
 
 	private TemplatePropertiesPanel propertiesPanel;
@@ -74,7 +78,7 @@ public class AddTemplateAttributeDialog extends Window {
 		name.setAutoFitWidth(true);
 		name.setMinWidth(80);
 
-		ListGridField label = new ListGridField("label", I18N.message("label"));
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL));
 		label.setCanEdit(true);
 		label.setCanSort(false);
 		label.setAutoFitWidth(true);
@@ -87,7 +91,7 @@ public class AddTemplateAttributeDialog extends Window {
 		type.setMinWidth(70);
 		type.setCellFormatter(new AttributeTypeFormatter());
 
-		ListGridField preset = new ListGridField("preset", I18N.message("preset"));
+		ListGridField preset = new ListGridField(PRESET, I18N.message(PRESET));
 		preset.setCanEdit(false);
 		preset.setCanSort(false);
 		preset.setAutoFitWidth(true);
@@ -155,8 +159,8 @@ public class AddTemplateAttributeDialog extends Window {
 			public void onSuccess(GUIAttributeSet set) {
 				ListGridRecord[] records = setAttributesList.getRecords();
 				if (records != null)
-					for (ListGridRecord record : records)
-						setAttributesList.removeData(record);
+					for (ListGridRecord rec : records)
+						setAttributesList.removeData(rec);
 
 				GUIAttribute[] attributes = set.getAttributes();
 
@@ -165,21 +169,21 @@ public class AddTemplateAttributeDialog extends Window {
 
 				for (int i = 0; i < attributes.length; i++) {
 					GUIAttribute att = attributes[i];
-					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("name", att.getName());
-					record.setAttribute("label", att.getLabel());
-					record.setAttribute("set", att.getSet());
-					record.setAttribute("setId", att.getSetId());
-					record.setAttribute("type", att.getType());
-					record.setAttribute("editor", att.getEditor());
-					record.setAttribute("mandatory", att.isMandatory());
-					record.setAttribute("hidden", att.isHidden());
-					record.setAttribute("readonly", att.isReadonly());
-					record.setAttribute("multiple", att.isMultiple());
-					record.setAttribute("validation", att.getValidation());
-					record.setAttribute("initialization", att.getInitialization());
-					record.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
-					setAttributesList.getRecordList().add(record);
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("name", att.getName());
+					rec.setAttribute(LABEL, att.getLabel());
+					rec.setAttribute("set", att.getSet());
+					rec.setAttribute("setId", att.getSetId());
+					rec.setAttribute("type", att.getType());
+					rec.setAttribute("editor", att.getEditor());
+					rec.setAttribute("mandatory", att.isMandatory());
+					rec.setAttribute("hidden", att.isHidden());
+					rec.setAttribute("readonly", att.isReadonly());
+					rec.setAttribute("multiple", att.isMultiple());
+					rec.setAttribute("validation", att.getValidation());
+					rec.setAttribute("initialization", att.getInitialization());
+					rec.setAttribute(PRESET, att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
+					setAttributesList.getRecordList().add(rec);
 				}
 			}
 		});

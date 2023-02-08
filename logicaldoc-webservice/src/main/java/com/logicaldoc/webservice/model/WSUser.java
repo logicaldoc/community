@@ -436,7 +436,7 @@ public class WSUser {
 
 			if (getGroupIds().length > 0) {
 				GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-				Set<Group> groups = new HashSet<Group>();
+				Set<Group> groups = new HashSet<>();
 				for (long groupId : getGroupIds()) {
 					Group group = groupDao.findById(groupId);
 					if (group != null)

@@ -31,6 +31,10 @@ import com.logicaldoc.webdav.web.AbstractWebdavServlet;
  */
 public class DefaultHandler implements IOHandler {
 
+	private static final String CANNOT_EXPORT = ": Cannot export ";
+
+	private static final String CANNOT_IMPORT = ": Cannot import ";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractWebdavServlet.class);
@@ -97,8 +101,8 @@ public class DefaultHandler implements IOHandler {
 
 	public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException {
 		if (!canImport(context, isCollection)) {
-			log.warn(getName() + ": Cannot import " + context.getSystemId());
-			throw new IOException(getName() + ": Cannot import " + context.getSystemId());
+			log.warn(getName() + CANNOT_IMPORT + context.getSystemId());
+			throw new IOException(getName() + CANNOT_IMPORT + context.getSystemId());
 		}
 
 		boolean success = false;
@@ -116,7 +120,7 @@ public class DefaultHandler implements IOHandler {
 
 	public boolean importContent(ImportContext context, DavResource resource) throws IOException, DavException {
 		if (!canImport(context, resource)) {
-			throw new IOException(getName() + ": Cannot import " + context.getSystemId());
+			throw new IOException(getName() + CANNOT_IMPORT + context.getSystemId());
 		}
 		return importContent(context, resource.isCollection());
 	}
@@ -142,7 +146,7 @@ public class DefaultHandler implements IOHandler {
 
 	public boolean exportContent(ExportContext context, boolean isCollection) throws IOException {
 		if (!canExport(context, isCollection)) {
-			throw new IOException(getName() + ": Cannot export ");
+			throw new IOException(getName() + CANNOT_EXPORT);
 		}
 		try {
 			if (context.hasStream())
@@ -158,7 +162,7 @@ public class DefaultHandler implements IOHandler {
 
 	public boolean exportContent(ExportContext context, DavResource resource) throws IOException {
 		if (!canExport(context, resource)) {
-			throw new IOException(getName() + ": Cannot export ");
+			throw new IOException(getName() + CANNOT_EXPORT);
 		}
 		return exportContent(context, resource.isCollection());
 	}
@@ -230,7 +234,7 @@ public class DefaultHandler implements IOHandler {
 			throws IOException {
 		
 		if (!canExport(context, resource)) {
-			throw new IOException(getName() + ": Cannot export ");
+			throw new IOException(getName() + CANNOT_EXPORT);
 		}
 		
 		return exportContent(context, resource.isCollection(), left, rangeLength);
@@ -239,7 +243,7 @@ public class DefaultHandler implements IOHandler {
 	private boolean exportContent(ExportContext context, boolean isCollection, Long left, Long rangeLength) throws IOException {
 		
 		if (!canExport(context, isCollection)) {
-			throw new IOException(getName() + ": Cannot export ");
+			throw new IOException(getName() + CANNOT_EXPORT);
 		}
 		
 		try {

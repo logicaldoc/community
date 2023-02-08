@@ -38,6 +38,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 8.6.1
  */
 public class AnnotationContextMenu extends Menu {
+	private static final String CONTENT = "content";
+
 	protected DrawItem drawItem;
 
 	protected GUIDocumentNote note;
@@ -62,7 +64,7 @@ public class AnnotationContextMenu extends Menu {
 		moveOrResize.setIconWidth(16);
 		moveOrResize.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				if (drawItem.getCanDrag())
+				if (Boolean.TRUE.equals(drawItem.getCanDrag()))
 					AbstractAnnotationsWindow.hideKnowbs(drawItem);
 				else
 					AbstractAnnotationsWindow.showKnowbs(drawItem);
@@ -81,7 +83,7 @@ public class AnnotationContextMenu extends Menu {
 
 		MenuItem contentMenuItem = prepareContentMenuItem();
 
-		List<MenuItem> items = new ArrayList<MenuItem>();
+		List<MenuItem> items = new ArrayList<>();
 		if (editEnabled)
 			items.add(moveOrResize);
 		if (drawItem instanceof DrawRect || drawItem instanceof DrawOval || drawItem instanceof DrawShape
@@ -165,12 +167,12 @@ public class AnnotationContextMenu extends Menu {
 		form.setSnapTo("TR");
 		form.setTitleOrientation(TitleOrientation.RIGHT);
 
-		FormItem contentArea = ItemFactory.newTextAreaItemForNote("content", I18N.message("content"), note.getMessage(),
+		FormItem contentArea = ItemFactory.newTextAreaItemForNote(CONTENT, I18N.message(CONTENT), note.getMessage(),
 				new ChangedHandler() {
 
 					@Override
 					public void onChanged(ChangedEvent event) {
-						form.setValue("content", (String) event.getValue());
+						form.setValue(CONTENT, (String) event.getValue());
 						note.setMessage((String) event.getValue());
 
 						if (drawItem instanceof DrawLabel)
@@ -194,7 +196,7 @@ public class AnnotationContextMenu extends Menu {
 
 		stack.setMembers(form);
 
-		final MenuItem menuItem = new MenuItem(I18N.message("content"));
+		final MenuItem menuItem = new MenuItem(I18N.message(CONTENT));
 		menuItem.setShowRollOver(false);
 		menuItem.setEmbeddedComponentFields("key");
 		menuItem.setEmbeddedComponent(stack);

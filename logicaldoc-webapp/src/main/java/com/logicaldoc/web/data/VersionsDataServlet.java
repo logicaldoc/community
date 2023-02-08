@@ -3,13 +3,11 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,48 +30,25 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class VersionsDataServlet extends AbstractDataServlet {
 
+	private static final String DOC_ID = "docId";
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
-
-		VersionDAO dao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-
-		Map<String, Object> params = new HashMap<String, Object>();
-
-		StringBuilder query = new StringBuilder(
-				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
-						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
-		if (request.getParameter("docId") != null) {
-			long docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			Document doc = ddao.findDocument(docId);
-			if (doc != null)
-				docId = doc.getId();
-
-			query.append(" from Version A where A.deleted = 0 and A.docId = :docId ");
-			params.put("docId", docId);
-		} else {
-			query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
-			query.append(" and B.id = :archiveId");
-			params.put("archiveId", Long.parseLong(request.getParameter("archiveId")));
-		}
-		query.append(" order by A.versionDate desc ");
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		List<Object> records = executeQuery(request, max);
 
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
+		DateFormat df = getDateFormat();
+		
+		PrintWriter writer = response.getWriter();
+		writer.write("<list>");
+		
+		for (Object gridRecord : records) {
+			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<version>");
 			writer.print("<id>" + cols[0] + "</id>");
@@ -104,5 +79,33 @@ public class VersionsDataServlet extends AbstractDataServlet {
 		}
 
 		writer.write("</list>");
+	}
+
+	private List<Object> executeQuery(HttpServletRequest request, Integer max) throws PersistenceException {
+		VersionDAO dao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+
+		Map<String, Object> params = new HashMap<>();
+
+		StringBuilder query = new StringBuilder(
+				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
+						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
+		if (request.getParameter(DOC_ID) != null) {
+			long docId = Long.parseLong(request.getParameter(DOC_ID));
+			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = ddao.findDocument(docId);
+			if (doc != null)
+				docId = doc.getId();
+
+			query.append(" from Version A where A.deleted = 0 and A.docId = :docId ");
+			params.put(DOC_ID, docId);
+		} else {
+			query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
+			query.append(" and B.id = :archiveId");
+			params.put("archiveId", Long.parseLong(request.getParameter("archiveId")));
+		}
+		query.append(" order by A.versionDate desc ");
+
+		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		return records;
 	}
 }

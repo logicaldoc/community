@@ -18,7 +18,6 @@ import com.logicaldoc.gui.frontend.client.settings.searchindex.SearchIndexingPan
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -63,9 +62,7 @@ public class SettingsMenu extends VLayout {
 		Button parameters = new Button(I18N.message("parameters"));
 		parameters.setWidth100();
 		parameters.setHeight(25);
-		parameters.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new ParametersPanel());
-		});
+		parameters.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ParametersPanel()));
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
 			addMember(parameters);
 	}
@@ -74,31 +71,28 @@ public class SettingsMenu extends VLayout {
 		Button comparators = new Button(I18N.message("comparators"));
 		comparators.setWidth100();
 		comparators.setHeight(25);
-		comparators.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new ComparatorsPanel());
-		});
+		comparators.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ComparatorsPanel()));
 		if (Feature.visible(Feature.COMPARISON) && Menu.enabled(Menu.COMPARATORS)) {
 			addMember(comparators);
-			if (!Feature.enabled(Feature.COMPARISON)) {
-				comparators.setDisabled(true);
-				comparators.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.COMPARISON))
+				setFeatureDisabled(comparators);
 		}
+	}
+
+	private void setFeatureDisabled(Button button) {
+		button.setDisabled(true);
+		button.setTooltip(I18N.message("featuredisabled"));
 	}
 
 	private void addAutomation() {
 		Button automation = new Button(I18N.message("automation"));
 		automation.setWidth100();
 		automation.setHeight(25);
-		automation.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new AutomationSettingsPanel());
-		});
+		automation.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new AutomationSettingsPanel()));
 		if (Feature.visible(Feature.AUTOMATION) && Menu.enabled(Menu.AUTOMATION)) {
 			addMember(automation);
-			if (!Feature.enabled(Feature.AUTOMATION)) {
-				automation.setDisabled(true);
-				automation.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.AUTOMATION))
+				setFeatureDisabled(automation);
 		}
 	}
 
@@ -106,15 +100,11 @@ public class SettingsMenu extends VLayout {
 		Button via = new Button(I18N.message("via"));
 		via.setWidth100();
 		via.setHeight(25);
-		via.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new VIASettingsPanel());
-		});
+		via.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new VIASettingsPanel()));
 		if (Feature.visible(Feature.VIA) && Menu.enabled(Menu.VIA)) {
 			addMember(via);
-			if (!Feature.enabled(Feature.VIA)) {
-				via.setDisabled(true);
-				via.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.VIA))
+				setFeatureDisabled(via);
 		}
 	}
 
@@ -122,9 +112,7 @@ public class SettingsMenu extends VLayout {
 		Button keystore = new Button(I18N.message("keystore"));
 		keystore.setWidth100();
 		keystore.setHeight(25);
-		keystore.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new KeystorePanel());
-		});
+		keystore.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new KeystorePanel()));
 		if (Feature.enabled(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.KEYSTORE))
 			addMember(keystore);
 	}
@@ -133,9 +121,8 @@ public class SettingsMenu extends VLayout {
 		Button quota = new Button(I18N.message("quota"));
 		quota.setWidth100();
 		quota.setHeight(25);
-		quota.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId()));
-		});
+		quota.addClickHandler(
+				(ClickEvent event) -> AdminScreen.get().setContent(new QuotaPanel(Session.get().getTenantId())));
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.QUOTA))
 			addMember(quota);
 	}
@@ -159,10 +146,9 @@ public class SettingsMenu extends VLayout {
 
 			});
 		});
-		if (Session.get().isDemo()) {
-			smtp.setDisabled(true);
-			smtp.setTooltip(I18N.message("featuredisabled"));
-		}
+		if (Session.get().isDemo())
+			setFeatureDisabled(smtp);
+
 		if (Menu.enabled(Menu.OUTGOING_EMAIL))
 			addMember(smtp);
 	}
@@ -171,15 +157,11 @@ public class SettingsMenu extends VLayout {
 		Button protocols = new Button(I18N.message("protocols"));
 		protocols.setWidth100();
 		protocols.setHeight(25);
-		protocols.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new ProtocolsPanel());
-		});
+		protocols.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ProtocolsPanel()));
 		if (Feature.visible(Feature.PROTOCOLS) && Menu.enabled(Menu.CLIENTS)) {
 			addMember(protocols);
-			if (!Feature.enabled(Feature.PROTOCOLS)) {
-				protocols.setDisabled(true);
-				protocols.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.PROTOCOLS))
+				setFeatureDisabled(protocols);
 		}
 	}
 
@@ -187,15 +169,11 @@ public class SettingsMenu extends VLayout {
 		Button ocr = new Button(I18N.message("ocr"));
 		ocr.setWidth100();
 		ocr.setHeight(25);
-		ocr.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new OCRSettingsPanel());
-		});
+		ocr.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new OCRSettingsPanel()));
 		if (Feature.visible(Feature.OCR) && Menu.enabled(Menu.OCR)) {
 			addMember(ocr);
-			if (!Feature.enabled(Feature.OCR)) {
-				ocr.setDisabled(true);
-				ocr.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.OCR))
+				setFeatureDisabled(ocr);
 		}
 	}
 
@@ -203,9 +181,7 @@ public class SettingsMenu extends VLayout {
 		Button guiSettings = new Button(I18N.message("guisettings"));
 		guiSettings.setWidth100();
 		guiSettings.setHeight(25);
-		guiSettings.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new GUISettingsPanel());
-		});
+		guiSettings.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new GUISettingsPanel()));
 		if (Menu.enabled(Menu.GUI_SETTINGS))
 			addMember(guiSettings);
 	}
@@ -214,12 +190,7 @@ public class SettingsMenu extends VLayout {
 		Button repositories = new Button(I18N.message("repositories"));
 		repositories.setWidth100();
 		repositories.setHeight(25);
-		repositories.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new RepositoriesPanel());
-			}
-		});
+		repositories.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new RepositoriesPanel()));
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.REPOSITORIES))
 			addMember(repositories);
 	}
@@ -228,9 +199,8 @@ public class SettingsMenu extends VLayout {
 		Button searchAndIndexing = new Button(I18N.message("searchandindexing"));
 		searchAndIndexing.setWidth100();
 		searchAndIndexing.setHeight(25);
-		searchAndIndexing.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new SearchIndexingPanel());
-		});
+		searchAndIndexing
+				.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new SearchIndexingPanel()));
 		if (Menu.enabled(Menu.SEARCH_AND_INDEXING))
 			addMember(searchAndIndexing);
 	}

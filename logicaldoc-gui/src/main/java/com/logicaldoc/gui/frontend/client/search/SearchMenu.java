@@ -16,9 +16,9 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
  */
 public class SearchMenu extends SectionStack {
 
-	private static final String FULLTEXT_SECTION = "fulltext";
+	private static final String FULLTEXT = "fulltext";
 
-	private static final String FOLDERS_SECTION = "folders";
+	private static final String FOLDERS = "folders";
 
 	private static final String TAGS_SECTION = "tags";
 
@@ -43,9 +43,9 @@ public class SearchMenu extends SectionStack {
 	}
 
 	private void addSearchSection(String SearchType) {
-		if ("fulltext".equals(SearchType)) {
-			SectionStackSection fulltextSection = new SectionStackSection(I18N.message("fulltext"));
-			fulltextSection.setName(FULLTEXT_SECTION);
+		if (FULLTEXT.equals(SearchType)) {
+			SectionStackSection fulltextSection = new SectionStackSection(I18N.message(FULLTEXT));
+			fulltextSection.setName(FULLTEXT);
 			fulltextSection.setItems(new FulltextForm());
 			addSection(fulltextSection);
 		} else if ("tags".equals(SearchType) && Feature.visible(Feature.TAGS)) {
@@ -64,9 +64,9 @@ public class SearchMenu extends SectionStack {
 			else
 				parametricSection.setItems(new FeatureDisabled());
 			addSection(parametricSection);
-		} else if ("folders".equals(SearchType)) {
-			SectionStackSection foldersSection = new SectionStackSection(I18N.message("folders"));
-			foldersSection.setName(FOLDERS_SECTION);
+		} else if (FOLDERS.equals(SearchType)) {
+			SectionStackSection foldersSection = new SectionStackSection(I18N.message(FOLDERS));
+			foldersSection.setName(FOLDERS);
 			foldersSection.setExpanded(false);
 			foldersSection.setItems(FoldersForm.get());
 			addSection(foldersSection);
@@ -87,7 +87,7 @@ public class SearchMenu extends SectionStack {
 	}
 
 	public void openFulltextSection() {
-		expandSection(FULLTEXT_SECTION);
+		expandSection(FULLTEXT);
 	}
 
 	public void openTagsSection() {
@@ -95,7 +95,7 @@ public class SearchMenu extends SectionStack {
 	}
 
 	public void openFoldersSection() {
-		expandSection(FOLDERS_SECTION);
+		expandSection(FOLDERS);
 	}
 
 	public void openParametricSection() {

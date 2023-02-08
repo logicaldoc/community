@@ -30,6 +30,10 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 8.4.2
  */
 public class DocumentCapturePanel extends DocumentDetailTab {
+	private static final String BARCODETEMPLATE = "barcodetemplate";
+
+	private static final String OCRTEMPLATE = "ocrtemplate";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -52,7 +56,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		if (form != null)
 			form.destroy();
 
-		if (contains(form))
+		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 		
 		form = new DynamicForm();
@@ -157,17 +161,17 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
-			if (values.get("ocrtemplate") == null || values.get("ocrtemplate").toString().isEmpty())
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
+			if (values.get(OCRTEMPLATE) == null || values.get(OCRTEMPLATE).toString().isEmpty())
 				document.setOcrTemplateId(null);
 			else {
-				document.setOcrTemplateId(Long.parseLong(values.get("ocrtemplate").toString()));
+				document.setOcrTemplateId(Long.parseLong(values.get(OCRTEMPLATE).toString()));
 			}
 
-			if (values.get("barcodetemplate") == null || values.get("barcodetemplate").toString().isEmpty())
+			if (values.get(BARCODETEMPLATE) == null || values.get(BARCODETEMPLATE).toString().isEmpty())
 				document.setBarcodeTemplateId(null);
 			else {
-				document.setBarcodeTemplateId(Long.parseLong(values.get("barcodetemplate").toString()));
+				document.setBarcodeTemplateId(Long.parseLong(values.get(BARCODETEMPLATE).toString()));
 			}
 		}
 		return !vm.hasErrors();

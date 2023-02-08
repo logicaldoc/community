@@ -56,7 +56,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 	 * Optional set of document ids. If specified only documents inside this set
 	 * will be returned.
 	 */
-	private Set<Long> filterIds = new HashSet<Long>();
+	private Set<Long> filterIds = new HashSet<>();
 
 	private Long folderId = null;
 

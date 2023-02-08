@@ -14,8 +14,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class RatingListGridField extends ColoredListGridField {
 
-	public RatingListGridField(String name, String title) {
-		super(name, I18N.message(title), 95);
+	public RatingListGridField() {
+		super("rating", I18N.message("rating"), 95);
 		setType(ListGridFieldType.IMAGE);
 		setCanSort(true);
 		setCanFilter(true);
@@ -32,12 +32,12 @@ public class RatingListGridField extends ColoredListGridField {
 	public class RatingCellFormatter extends ColoredCellFormatter {
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
 			String val = DocUtil.getRatingIcon((Integer) value);
-			return super.format(val, record, rowNum, colNum);
+			return super.format(val, rec, rowNum, colNum);
 		}
 
 	}

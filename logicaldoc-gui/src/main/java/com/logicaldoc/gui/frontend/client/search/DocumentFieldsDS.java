@@ -20,6 +20,8 @@ import com.smartgwt.client.types.OperatorId;
  */
 public class DocumentFieldsDS extends DataSource {
 
+	private static final String TYPE = "type:";
+
 	public DocumentFieldsDS(GUITemplate template) {
 		setClientOnly(true);
 
@@ -134,35 +136,35 @@ public class DocumentFieldsDS extends DataSource {
 		if (att.getType() == GUIAttribute.TYPE_DATE) {
 			field = new DataSourceDateTimeField();
 			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN);
-			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DATE;
+			name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_DATE;
 		} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
 			field = new DataSourceFloatField();
 			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
 					OperatorId.NOT_EQUAL);
-			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DOUBLE;
+			name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_DOUBLE;
 		} else if (att.getType() == GUIAttribute.TYPE_INT) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
 					OperatorId.NOT_EQUAL);
-			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_INT;
+			name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_INT;
 		} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS, OperatorId.IS_NULL, OperatorId.NOT_NULL);
-			name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_BOOLEAN;
+			name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_BOOLEAN;
 		} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL, OperatorId.NOT_NULL);
-			name = name + Constants.BLANK_PLACEHOLDER + "type:" + att.getType();
+			name = name + Constants.BLANK_PLACEHOLDER + TYPE + att.getType();
 		} else {
 			field = new DataSourceTextField();
 			field.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,
 					OperatorId.NOT_EQUAL);
 			if (att.getEditor() == GUIAttribute.EDITOR_DEFAULT)
-				name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING;
+				name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_STRING;
 			else if (att.getEditor() == GUIAttribute.EDITOR_TEXTAREA)
-				name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING_TEXTAREA;
+				name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_STRING_TEXTAREA;
 			else
-				name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING_PRESET;
+				name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_STRING_PRESET;
 		}
 		field.setName(name);
 		field.setTitle(titl);

@@ -30,15 +30,15 @@ public class SecurityMenu extends VLayout {
 		setMargin(10);
 		setMembersMargin(5);
 		setOverflow(Overflow.AUTO);
-		
+
 		addUsersButton();
-		
+
 		addGroupsButton();
-		
+
 		addSecurityButton();
 
 		addAntivirusButton();
-		
+
 		addFirewallButton();
 
 		addBruteForceButton();
@@ -55,19 +55,19 @@ public class SecurityMenu extends VLayout {
 		security.setWidth100();
 		security.setHeight(25);
 		security.addClickHandler((ClickEvent event) -> {
-				SecurityService.Instance.get().loadSettings(new AsyncCallback<GUISecuritySettings>() {
+			SecurityService.Instance.get().loadSettings(new AsyncCallback<GUISecuritySettings>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(GUISecuritySettings settings) {
-						AdminScreen.get().setContent(new SecuritySettingsPanel(settings));
-					}
+				@Override
+				public void onSuccess(GUISecuritySettings settings) {
+					AdminScreen.get().setContent(new SecuritySettingsPanel(settings));
+				}
 
-				});
+			});
 		});
 		addMember(security);
 	}
@@ -89,9 +89,7 @@ public class SecurityMenu extends VLayout {
 		Button users = new Button(I18N.message("users"));
 		users.setWidth100();
 		users.setHeight(25);
-		users.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new UsersPanel());
-		});
+		users.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new UsersPanel()));
 		addMember(users);
 	}
 
@@ -99,32 +97,29 @@ public class SecurityMenu extends VLayout {
 		Button singleSingon = new Button(I18N.message("singlesignon"));
 		singleSingon.setWidth100();
 		singleSingon.setHeight(25);
-		singleSingon.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new SingleSignonPanel());
-		});
+		singleSingon.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new SingleSignonPanel()));
 		if (Feature.visible(Feature.SINGLE_SIGNON) && Session.get().isDefaultTenant()
 				&& Menu.enabled(Menu.SINGLE_SIGNON)) {
 			addMember(singleSingon);
-			if (!Feature.enabled(Feature.SINGLE_SIGNON) || Session.get().isDemo()) {
-				singleSingon.setDisabled(true);
-				singleSingon.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.SINGLE_SIGNON) || Session.get().isDemo())
+				setFeatureDisabled(singleSingon);
 		}
+	}
+
+	private void setFeatureDisabled(Button button) {
+		button.setDisabled(true);
+		button.setTooltip(I18N.message("featuredisabled"));
 	}
 
 	private void addExtAuthButton() {
 		Button extAuth = new Button(I18N.message("extauth"));
 		extAuth.setWidth100();
 		extAuth.setHeight(25);
-		extAuth.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new LDAPServersPanel());
-		});
+		extAuth.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new LDAPServersPanel()));
 		if (Feature.visible(Feature.LDAP) && Menu.enabled(Menu.EXTERNAL_AUTHENTICATION)) {
 			addMember(extAuth);
-			if (!Feature.enabled(Feature.LDAP) || Session.get().isDemo()) {
-				extAuth.setDisabled(true);
-				extAuth.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.LDAP) || Session.get().isDemo())
+				setFeatureDisabled(extAuth);
 		}
 	}
 
@@ -132,15 +127,12 @@ public class SecurityMenu extends VLayout {
 		Button twoFactorsAuthentication = new Button(I18N.message("twofactorsauth"));
 		twoFactorsAuthentication.setWidth100();
 		twoFactorsAuthentication.setHeight(25);
-		twoFactorsAuthentication.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new TwoFactorsAuthenticationSettings());
-		});
+		twoFactorsAuthentication.addClickHandler(
+				(ClickEvent event) -> AdminScreen.get().setContent(new TwoFactorsAuthenticationSettings()));
 		if (Feature.visible(Feature.TWO_FACTORS_AUTHENTICATION) && Menu.enabled(Menu.TWO_FACTORS_AUTHENTICATION)) {
 			addMember(twoFactorsAuthentication);
-			if (!Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) || Session.get().isDemo()) {
-				twoFactorsAuthentication.setDisabled(true);
-				twoFactorsAuthentication.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) || Session.get().isDemo())
+				setFeatureDisabled(twoFactorsAuthentication);
 		}
 	}
 
@@ -148,19 +140,12 @@ public class SecurityMenu extends VLayout {
 		Button bruteForcePrevention = new Button(I18N.message("bruteforceprevention"));
 		bruteForcePrevention.setWidth100();
 		bruteForcePrevention.setHeight(25);
-		bruteForcePrevention.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new BruteForcePanel());
-			}
-		});
+		bruteForcePrevention.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new BruteForcePanel()));
 		if (Feature.visible(Feature.BRUTEFORCE_ATTACK_PREVENTION) && Session.get().isDefaultTenant()
 				&& Menu.enabled(Menu.BRUTEFORCE_ATTACK_PREVENTION)) {
 			addMember(bruteForcePrevention);
-			if (!Feature.enabled(Feature.BRUTEFORCE_ATTACK_PREVENTION) || Session.get().isDemo()) {
-				bruteForcePrevention.setDisabled(true);
-				bruteForcePrevention.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.BRUTEFORCE_ATTACK_PREVENTION) || Session.get().isDemo())
+				setFeatureDisabled(bruteForcePrevention);
 		}
 	}
 
@@ -168,15 +153,11 @@ public class SecurityMenu extends VLayout {
 		Button firewall = new Button(I18N.message("firewall"));
 		firewall.setWidth100();
 		firewall.setHeight(25);
-		firewall.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new FirewallPanel());
-		});
+		firewall.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new FirewallPanel()));
 		if (Feature.enabled(Feature.FIREWALL) && Session.get().isDefaultTenant() && Menu.enabled(Menu.FIREWALL)) {
 			addMember(firewall);
-			if (!Feature.enabled(Feature.FIREWALL) || Session.get().isDemo()) {
-				firewall.setDisabled(true);
-				firewall.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.FIREWALL) || Session.get().isDemo())
+				setFeatureDisabled(firewall);
 		}
 	}
 
@@ -184,15 +165,11 @@ public class SecurityMenu extends VLayout {
 		Button antivirus = new Button(I18N.message("antivirus"));
 		antivirus.setWidth100();
 		antivirus.setHeight(25);
-		antivirus.addClickHandler((ClickEvent event) -> {
-				AdminScreen.get().setContent(new AntivirusPanel());
-		});
+		antivirus.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new AntivirusPanel()));
 		if (Feature.visible(Feature.ANTIVIRUS)) {
 			addMember(antivirus);
-			if (!Feature.enabled(Feature.ANTIVIRUS) || Session.get().isDemo()) {
-				antivirus.setDisabled(true);
-				antivirus.setTooltip(I18N.message("featuredisabled"));
-			}
+			if (!Feature.enabled(Feature.ANTIVIRUS) || Session.get().isDemo())
+				setFeatureDisabled(antivirus);
 		}
 	}
 }

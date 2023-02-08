@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -42,6 +41,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class IncrementalArchivesList extends VLayout {
+
+	private static final String FREQUENCY = "frequency";
+
+	private static final String PREFIX = "prefix";
 
 	protected Layout detailsContainer;
 
@@ -74,12 +77,12 @@ public class IncrementalArchivesList extends VLayout {
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField prefix = new ListGridField("prefix", I18N.message("prefix"), 250);
+		ListGridField prefix = new ListGridField(PREFIX, I18N.message(PREFIX), 250);
 
 		ListGridField type = new ListGridField("typelabel", I18N.message("type"), 130);
 		type.setCanFilter(false);
 
-		ListGridField frequency = new ListGridField("frequency", I18N.message("frequency"), 110);
+		ListGridField frequency = new ListGridField(FREQUENCY, I18N.message(FREQUENCY), 110);
 		frequency.setCellFormatter(new DaysCellFormatter());
 		frequency.setCanFilter(false);
 
@@ -138,10 +141,10 @@ public class IncrementalArchivesList extends VLayout {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				if (record == null)
+				ListGridRecord rec = list.getSelectedRecord();
+				if (rec == null)
 					return;
-				ImpexService.Instance.get().loadIncremental(Long.parseLong(record.getAttributeAsString("id")),
+				ImpexService.Instance.get().loadIncremental(Long.parseLong(rec.getAttributeAsString("id")),
 						new AsyncCallback<GUIIncrementalArchive>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -184,31 +187,28 @@ public class IncrementalArchivesList extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImpexService.Instance.get().deleteIncremental(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImpexService.Instance.get().deleteIncremental(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -232,29 +232,29 @@ public class IncrementalArchivesList extends VLayout {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param incremental the archive to update
 	 */
 	public void updateRecord(GUIIncrementalArchive incremental) {
-		ListGridRecord record = list.getSelectedRecord();
-		if (record == null)
-			record = new ListGridRecord();
+		ListGridRecord rec = list.getSelectedRecord();
+		if (rec == null)
+			rec = new ListGridRecord();
 
-		record.setAttribute("prefix", incremental.getPrefix());
-		record.setAttribute("frequency", incremental.getFrequency());
-		record.setAttribute("type", incremental.getType());
-		record.setAttribute("typelabel", incremental.getType() == GUIArchive.TYPE_DEFAULT ? I18N.message("default")
+		rec.setAttribute(PREFIX, incremental.getPrefix());
+		rec.setAttribute(FREQUENCY, incremental.getFrequency());
+		rec.setAttribute("type", incremental.getType());
+		rec.setAttribute("typelabel", incremental.getType() == GUIArchive.TYPE_DEFAULT ? I18N.message("default")
 				: I18N.message("paperdematerialization"));
 
-		if (record.getAttributeAsString("id") != null
-				&& (incremental.getId() == Long.parseLong(record.getAttributeAsString("id")))) {
-			list.refreshRow(list.getRecordIndex(record));
+		if (rec.getAttributeAsString("id") != null
+				&& (incremental.getId() == Long.parseLong(rec.getAttributeAsString("id")))) {
+			list.refreshRow(list.getRecordIndex(rec));
 		} else {
-			// Append a new record
-			record.setAttribute("id", incremental.getId());
-			list.refreshRow(list.getRecordIndex(record));
-			list.selectRecord(record);
+			// Append a new rec
+			rec.setAttribute("id", incremental.getId());
+			list.refreshRow(list.getRecordIndex(rec));
+			list.selectRecord(rec);
 		}
 	}
 

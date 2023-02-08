@@ -38,7 +38,7 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 	 */
 	@Override
 	public List<DocumentLink> findByDocId(long docId, String type) {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("docId", docId);
 
 		StringBuilder query = new StringBuilder("(" + ENTITY + ".document1.id = :docId ");
@@ -52,7 +52,7 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 			return findByWhere(query.toString(), params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentLink>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -66,9 +66,10 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 				ENTITY + ".document1.id = :docId1 and " + ENTITY + ".document2.id = :docId2 ");
 		query.append(" and " + ENTITY + ".type = :type");
 
-		List<DocumentLink> links = new ArrayList<DocumentLink>();
+		List<DocumentLink> links = new ArrayList<>();
+		;
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("docId1", docId1);
 			params.put("docId2", docId2);
 			params.put("type", type);

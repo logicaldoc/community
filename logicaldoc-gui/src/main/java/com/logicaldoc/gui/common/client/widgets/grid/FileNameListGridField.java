@@ -15,10 +15,11 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class FileNameListGridField extends ColoredListGridField {
 
+	private static final String FILENAME = "filename";
 	private String iconFieldName = "icon";
 
 	public FileNameListGridField() {
-		this("filename", "icon", I18N.message("filename"), 210);
+		this(FILENAME, "icon", I18N.message(FILENAME), 210);
 	}
 
 	public FileNameListGridField(String name) {
@@ -26,7 +27,7 @@ public class FileNameListGridField extends ColoredListGridField {
 	}
 
 	public FileNameListGridField(String name, String iconFieldName, String title, int width) {
-		super(name, "color", title != null ? title : I18N.message("filename"), width);
+		super(name, "color", title != null ? title : I18N.message(FILENAME), width);
 		this.iconFieldName = iconFieldName;
 		setCellFormatter(new FileNameCellFormatter(16));
 		setCellAlign(Alignment.LEFT);
@@ -53,26 +54,26 @@ public class FileNameListGridField extends ColoredListGridField {
 		}
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
-			String val = super.format(value, record, rowNum, colNum);
+			String val = super.format(value, rec, rowNum, colNum);
 
-			String iconName = record.getAttributeAsString(iconFieldName);
+			String iconName = rec.getAttributeAsString(iconFieldName);
 			if (iconName == null || iconName.isEmpty())
 				return val != null ? val.toString() : "";
 
 			if (iconName.contains("folder") || iconName.contains("workspace"))
 				if (iconName.contains("alias"))
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_ALIAS, value.toString(), null),
-							record, rowNum, colNum);
+							rec, rowNum, colNum);
 				else if (iconName.contains("workspace"))
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_WORKSPACE, value.toString(), null),
-							record, rowNum, colNum);
+							rec, rowNum, colNum);
 				else
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_DEFAULT, value.toString(), null),
-							record, rowNum, colNum);
+							rec, rowNum, colNum);
 			else
 				return Util.iconWithFilename(iconName, val != null ? val.toString() : "");
 		}

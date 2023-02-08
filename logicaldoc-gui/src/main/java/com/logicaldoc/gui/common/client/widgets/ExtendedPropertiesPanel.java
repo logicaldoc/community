@@ -48,6 +48,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class ExtendedPropertiesPanel extends HLayout {
 
+	private static final String TEMPLATE = "template";
+
 	protected GUIExtensibleObject object;
 
 	protected ChangedHandler changedHandler;
@@ -66,11 +68,11 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected ValuesManager vm = new ValuesManager();
 
-	protected List<FormItem> standardItems = new ArrayList<FormItem>();
+	protected List<FormItem> standardItems = new ArrayList<>();
 
 	protected SelectItem templateItem = null;
 
-	protected List<FormItem> extendedItems = new ArrayList<FormItem>();
+	protected List<FormItem> extendedItems = new ArrayList<>();
 
 	private ClearDependantAttributes dependeciesHandler = new ClearDependantAttributes();
 
@@ -131,7 +133,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (templateForm != null)
 			templateForm.destroy();
 
-		if (contains(templateForm))
+		if (Boolean.TRUE.equals(contains(templateForm)))
 			removeChild(templateForm);
 		templateForm = new DynamicForm();
 		templateForm.setValuesManager(vm);
@@ -177,7 +179,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	private void putCustomIdField() {
 		if (isDocument()) {
-			TextItem customId = ItemFactory.newTextItem("customid", "customid", ((GUIDocument) object).getCustomId());
+			TextItem customId = ItemFactory.newTextItem("customid", ((GUIDocument) object).getCustomId());
 			if (changedHandler != null)
 				customId.addChangedHandler(changedHandler);
 			customId.setDisabled(!updateEnabled);
@@ -432,7 +434,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	 * @return the list of additional icons
 	 */
 	private List<FormItemIcon> prepareMultiValueIcons(GUIAttribute att) {
-		List<FormItemIcon> multiValIcons = new ArrayList<FormItemIcon>();
+		List<FormItemIcon> multiValIcons = new ArrayList<>();
 		if (att.isMultiple()) {
 			FormItemIcon add = new FormItemIcon();
 			add.setWidth(10);
@@ -517,7 +519,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
 
-		if (vm.hasErrors())
+		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
 
 		if (isDocument() && allowTemplateSelection)
@@ -536,10 +538,10 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return;
 
 		if (allowTemplateSelection) {
-			if (values.get("template") == null || values.get("template").toString().isEmpty())
+			if (values.get(TEMPLATE) == null || values.get(TEMPLATE).toString().isEmpty())
 				object.setTemplateId(null);
 			else {
-				object.setTemplateId(Long.parseLong(values.get("template").toString()));
+				object.setTemplateId(Long.parseLong(values.get(TEMPLATE).toString()));
 			}
 		}
 

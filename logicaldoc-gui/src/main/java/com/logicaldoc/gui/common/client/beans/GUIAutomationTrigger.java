@@ -57,7 +57,7 @@ public class GUIAutomationTrigger implements Serializable {
 			if (!events.contains(","))
 				return new String[] { events };
 			else {
-				ArrayList<String> buf = new ArrayList<String>();
+				ArrayList<String> buf = new ArrayList<>();
 				String[] tokens = events.split(",");
 				for (String token : tokens) {
 					if (!token.isEmpty())

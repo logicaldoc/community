@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
 import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -35,6 +34,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class SavedSearchesPanel extends VLayout {
 
+	private static final String DESCRIPTION = "description";
+
 	private ListGrid list;
 
 	private static SavedSearchesPanel instance;
@@ -52,7 +53,7 @@ public class SavedSearchesPanel extends VLayout {
 	public void onDraw() {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 100);
 		ListGridField type = new ListGridField("type", I18N.message("type"), 70);
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 
 		list = new ListGrid();
 		list.setWidth100();
@@ -67,8 +68,8 @@ public class SavedSearchesPanel extends VLayout {
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord record = event.getRecord();
-				SearchService.Instance.get().load(record.getAttributeAsString("name"),
+				ListGridRecord rec = event.getRecord();
+				SearchService.Instance.get().load(rec.getAttributeAsString("name"),
 						new AsyncCallback<GUISearchOptions>() {
 
 							@Override
@@ -126,9 +127,9 @@ public class SavedSearchesPanel extends VLayout {
 				ListGridRecord selection = list.getSelectedRecord();
 
 				final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
-				
+
 				final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
-				
+
 				LD.askForValues("sharesearch", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }),
 						350, new ValuesCallback() {
 							@Override
@@ -140,7 +141,8 @@ public class SavedSearchesPanel extends VLayout {
 							public void execute(Map<String, Object> values) {
 								LD.contactingServer();
 								SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
-										usersSelector.getUserIds(), groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+										usersSelector.getUserIds(), groupsSelector.getGroupIds(),
+										new AsyncCallback<Void>() {
 
 											@Override
 											public void onFailure(Throwable caught) {
@@ -170,22 +172,19 @@ public class SavedSearchesPanel extends VLayout {
 					names[i] = selection[i].getAttributeAsString("name");
 				}
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SearchService.Instance.get().delete(names, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						SearchService.Instance.get().delete(names, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+							}
+						});
 					}
 				});
 			}
@@ -202,10 +201,10 @@ public class SavedSearchesPanel extends VLayout {
 		// Incredible!!! Without this line we have a duplicated save search
 		// entry when the user saves the first search.
 		System.out.println("");
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("name", name);
-		record.setAttribute("description", description);
-		record.setAttribute("type", type);
-		list.addData(record);
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("name", name);
+		rec.setAttribute(DESCRIPTION, description);
+		rec.setAttribute("type", type);
+		list.addData(rec);
 	}
 }

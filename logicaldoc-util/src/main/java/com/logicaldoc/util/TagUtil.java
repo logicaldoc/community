@@ -30,41 +30,45 @@ public class TagUtil {
 	 * @return the collection of tags
 	 */
 	public static Set<String> extractTags(String tenantName, String words) {
-		Set<String> coll = new HashSet<String>();
+		Set<String> coll = new HashSet<>();
+		if (words == null)
+			return coll;
 
-		if (words != null)
-			try {
-				if (!words.contains(","))
-					words = "," + words + ",";
+		if (!words.contains(","))
+			words = "," + words + ",";
 
-				// Replace the escapes \, in _comma_ in order to include those
-				// tags with
-				// commas inside so the tokenization will work property
-				words = words.replace("\\,", "__comma__");
+		// Replace the escapes \, in _comma_ in order to include those
+		// tags with
+		// commas inside so the tokenization will work property
+		words = words.replace("\\,", "__comma__");
 
-				ContextProperties conf = new ContextProperties();
-				int minSize = conf.getInt(tenantName + ".tag.minsize");
-				int maxSize = conf.getInt(tenantName + ".tag.maxsize");
+		int minSize = 3;
+		int maxSize = 9;
 
-				StringTokenizer st = new StringTokenizer(words, ",", false);
-				while (st.hasMoreTokens()) {
-					String word = st.nextToken();
+		try {
+			ContextProperties conf = new ContextProperties();
+			minSize = conf.getInt(tenantName + ".tag.minsize");
+			maxSize = conf.getInt(tenantName + ".tag.maxsize");
+		} catch (IOException e) {
+			// Nothing to do
+		}
 
-					// Get back comma escapes into the , char
-					word = word.replace("__comma__", ",");
-					if (StringUtils.isNotEmpty(word)) {
-						word = word.trim();
-						if (word.length() >= minSize) {
-							if (word.length() > maxSize)
-								coll.add(word.substring(0, maxSize));
-							else
-								coll.add(word);
-						}
-					}
+		StringTokenizer st = new StringTokenizer(words, ",", false);
+		while (st.hasMoreTokens()) {
+			String word = st.nextToken();
+
+			// Get back comma escapes into the , char
+			word = word.replace("__comma__", ",");
+			if (StringUtils.isNotEmpty(word)) {
+				word = word.trim();
+				if (word.length() >= minSize) {
+					if (word.length() > maxSize)
+						coll.add(word.substring(0, maxSize));
+					else
+						coll.add(word);
 				}
-			} catch (IOException e) {
-				// Nothing to do
 			}
+		}
 
 		return coll;
 	}

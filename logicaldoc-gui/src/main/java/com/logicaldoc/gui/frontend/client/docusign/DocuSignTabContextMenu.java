@@ -52,7 +52,7 @@ public class DocuSignTabContextMenu extends AnnotationContextMenu {
 			}
 		});
 
-		final ComboBoxItem recipientEmail = ItemFactory.newEmailComboSelector("recipientEmail", "recipientemail");
+		final ComboBoxItem recipientEmail = ItemFactory.newEmailComboSelector("recipientemail", "recipientemail");
 		recipientEmail.setRequired(true);
 		recipientEmail.setWidth(250);
 		recipientEmail.setValue(note.getRecipientEmail());

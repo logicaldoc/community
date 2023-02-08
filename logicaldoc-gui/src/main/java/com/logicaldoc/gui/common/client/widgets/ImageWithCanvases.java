@@ -29,7 +29,7 @@ public class ImageWithCanvases extends Canvas {
 
 	private int imageHeight = 1;
 
-	private List<Canvas> canvases = new ArrayList<Canvas>();
+	private List<Canvas> canvases = new ArrayList<>();
 
 	public ImageWithCanvases(String imageUrl, Integer width, List<Canvas> canvases, CallBack loadImageCallback) {
 		if (canvases != null)

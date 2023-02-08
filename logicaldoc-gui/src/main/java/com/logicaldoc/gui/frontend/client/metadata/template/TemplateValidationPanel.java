@@ -52,7 +52,7 @@ public class TemplateValidationPanel extends HLayout {
 		if (form != null)
 			form.destroy();
 
-		if (contains(container))
+		if (Boolean.TRUE.equals(contains(container)))
 			removeMember(container);
 
 		container = new HLayout();
@@ -70,7 +70,7 @@ public class TemplateValidationPanel extends HLayout {
 		form.setWidth100();
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", "validation",
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", 
 				template.getValidation(), (!template.isReadonly() && template.isWrite()) ? changedHandler : null,
 				false);
 		validation.setDisabled(template.isReadonly() || !template.isWrite());
@@ -86,7 +86,7 @@ public class TemplateValidationPanel extends HLayout {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			template.setValidation((String) values.get("validation"));
 		}
 

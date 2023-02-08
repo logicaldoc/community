@@ -33,7 +33,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 	private static Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
 
-	private List<Authenticator> authenticators = new ArrayList<Authenticator>();
+	private List<Authenticator> authenticators = new ArrayList<>();
 
 	@Override
 	public final User authenticate(String username, String password) throws AuthenticationException {
@@ -57,7 +57,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		if (user != null)
 			return user;
 
-		List<AuthenticationException> errors = new ArrayList<AuthenticationException>();
+		List<AuthenticationException> errors = new ArrayList<>();
 		user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
 
 		/*
@@ -222,7 +222,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Authentication");
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}

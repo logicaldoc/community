@@ -38,7 +38,6 @@ import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -48,7 +47,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpacerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -59,6 +57,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 7.5
  */
 public class LoginPanel extends VLayout {
+
+	private static final String PASSWORD = "password";
+
+	private static final String ENTER = "enter";
+
+	private static final String LOGIN_FIELD = "login-field";
+
+	private static final String A_HREF = "<a href='";
 
 	protected static final int FORM_WIDTH = 280;
 
@@ -143,7 +149,7 @@ public class LoginPanel extends VLayout {
 		 */
 		String productInfoHtml = "<b>" + info.getBranding().getProductName() + " " + info.getRelease() + "</b>";
 		if (info.getBranding().getUrl() != null && !"-".equals(info.getBranding().getUrl()))
-			productInfoHtml = "<a href='" + info.getBranding().getUrl() + "' target='_blank' class='login-link'>"
+			productInfoHtml = A_HREF + info.getBranding().getUrl() + "' target='_blank' class='login-link'>"
 					+ productInfoHtml + "</a>";
 		HTMLFlow productInfo = new HTMLFlow(productInfoHtml);
 		productInfo.setHeight(16);
@@ -159,71 +165,11 @@ public class LoginPanel extends VLayout {
 		credentialsForm.setMargin(0);
 		credentialsForm.setCellPadding(0);
 
-		username.setTitle(I18N.message("username"));
-		username.setShowTitle(false);
-		username.setHint(I18N.message("username").toLowerCase());
-		username.setShowHintInField(true);
-		username.setWrapTitle(false);
-		username.setRequired(true);
-		username.setHeight(34);
-		username.setWidth(FORM_WIDTH);
-		username.setAlign(Alignment.LEFT);
-		username.setTextBoxStyle("login-field");
-		username.setColSpan(3);
-		username.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onSignin();
-			}
-		});
+		prepareUsername();
 
-		password = ItemFactory.newPasswordItem("password", "password", null);
-		password.setShowTitle(false);
-		password.setHint(I18N.message("password").toLowerCase());
-		password.setShowHintInField(true);
-		password.setRequired(true);
-		password.setHeight(34);
-		password.setWidth(FORM_WIDTH);
-		password.setTextBoxStyle("login-field");
-		password.setAlign(Alignment.LEFT);
-		password.setWrapTitle(false);
-		password.setColSpan(3);
-		password.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onSignin();
-			}
-		});
+		preparePassword();
 
-		language = ItemFactory.newLanguageSelector("language", true, true);
-		language.setShowTitle(false);
-		language.setDefaultValue("");
-		language.setControlStyle("login-language");
-		language.setWidth(FORM_WIDTH - 4);
-		language.setHeight(34);
-		language.setAlign(Alignment.LEFT);
-		language.setHint(I18N.message("chooseyourlanguage"));
-		language.setShowHintInField(true);
-		language.setControlStyle("login-language");
-		language.setTextBoxStyle("login-language-text");
-		language.setPickerIconStyle("login-language-picker");
-		language.setColSpan(3);
-		RequestInfo request = WindowUtils.getRequestInfo();
-
-		// If a parameter specifies a locale, we initialize the language
-		// selector
-		if (request.getParameter(Constants.LOCALE) != null && !request.getParameter(Constants.LOCALE).equals("")) {
-			String lang = request.getParameter(Constants.LOCALE);
-			Map<String, String> languages = I18N.getSupportedGuiLanguages(false);
-			for (String l : languages.keySet()) {
-				if (lang.equals(l)) {
-					language.setValue(l);
-					break;
-				}
-			}
-		}
+		prepareLanguage();
 
 		SpacerItem spacerItem12 = new SpacerItem();
 		spacerItem12.setHeight(12);
@@ -238,34 +184,15 @@ public class LoginPanel extends VLayout {
 		secretKeyForm.setMargin(0);
 		secretKeyForm.setCellPadding(0);
 
-		secretKey.setTitle(I18N.message("secretkey"));
-		secretKey.setShowTitle(true);
-		secretKey.setHint(I18N.message("secretkey").toLowerCase());
-		secretKey.setShowHintInField(true);
-		secretKey.setWrapTitle(true);
-		secretKey.setHeight(34);
-		secretKey.setWidth(FORM_WIDTH);
-		secretKey.setAlign(Alignment.LEFT);
-		secretKey.setTextBoxStyle("secretkey-field");
-		secretKey.setColSpan(3);
-		secretKey.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onSignin();
-			}
-		});
+		prepareSecretKey();
 
 		ButtonItem back = new ButtonItem(I18N.message("back"));
 		back.setHeight(34);
 		back.setAlign(Alignment.LEFT);
 		back.setColSpan(2);
 		back.setEndRow(false);
-		back.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				toggleInputForm();
-			}
+		back.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			toggleInputForm();
 		});
 
 		signIn.setBaseStyle("btn");
@@ -274,18 +201,15 @@ public class LoginPanel extends VLayout {
 		signIn.setAlign(Alignment.RIGHT);
 		signIn.setStartRow(false);
 		signIn.setWidth(120);
-		signIn.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				onSignin();
-			}
+		signIn.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+			onSignin();
 		});
 
 		rememberMe.setTitle(I18N.message("rememberme"));
 		rememberMe.setRequired(false);
 		rememberMe.setShowTitle(false);
 		rememberMe.setValue(CookiesManager.isSaveLogin());
-		rememberMe.setTextBoxStyle("login-field");
+		rememberMe.setTextBoxStyle(LOGIN_FIELD);
 		rememberMe.setAlign(Alignment.LEFT);
 		rememberMe.setEndRow(false);
 		rememberMe.setColSpan(2);
@@ -295,7 +219,7 @@ public class LoginPanel extends VLayout {
 		rememberMePlaceholder.setColSpan(2);
 		rememberMePlaceholder.setWidth(rememberMe.getWidth());
 
-		List<FormItem> formItems = new ArrayList<FormItem>();
+		List<FormItem> formItems = new ArrayList<>();
 		formItems.add(username);
 		formItems.add(spacerItem12);
 		formItems.add(password);
@@ -322,12 +246,8 @@ public class LoginPanel extends VLayout {
 		lostPassword.setLayoutAlign(Alignment.RIGHT);
 		lostPassword.setHoverDelay(0);
 		lostPassword.setMargin(0);
-		lostPassword.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				showLostDialog(info.getBranding().getProductName());
-			}
+		lostPassword.addClickHandler((ClickEvent event) -> {
+			showLostDialog(info.getBranding().getProductName());
 		});
 
 		/*
@@ -335,7 +255,7 @@ public class LoginPanel extends VLayout {
 		 */
 		String copyrightHtml = "<div>\u00A9 " + info.getYear() + " " + info.getBranding().getVendor();
 		if (info.getBranding().getUrl() != null && !"-".equals(info.getBranding().getUrl()))
-			copyrightHtml = "<a href='" + info.getBranding().getUrl()
+			copyrightHtml = A_HREF + info.getBranding().getUrl()
 					+ "' target='_blank' class='login-copyright-link'>" + copyrightHtml + "</a></div>";
 		String licenseeHtml = "";
 		if (info.getLicensee() != null && !"".equals(info.getLicensee().trim()))
@@ -397,11 +317,95 @@ public class LoginPanel extends VLayout {
 		prepareSwitchViewLink();
 
 		// If the case, initialize the credentials from client's cookies
-		if (saveLoginEnabled && rememberMe.getValueAsBoolean()) {
+		if (saveLoginEnabled && Boolean.TRUE.equals(rememberMe.getValueAsBoolean())) {
 			String[] credentials = CookiesManager.getSavedCredentials();
 			username.setValue(credentials[0]);
 			password.setValue(credentials[1]);
 		}
+	}
+
+	private void prepareSecretKey() {
+		secretKey.setTitle(I18N.message("secretkey"));
+		secretKey.setShowTitle(true);
+		secretKey.setHint(I18N.message("secretkey").toLowerCase());
+		secretKey.setShowHintInField(true);
+		secretKey.setWrapTitle(true);
+		secretKey.setHeight(34);
+		secretKey.setWidth(FORM_WIDTH);
+		secretKey.setAlign(Alignment.LEFT);
+		secretKey.setTextBoxStyle("secretkey-field");
+		secretKey.setColSpan(3);
+		secretKey.addKeyPressHandler((KeyPressEvent event) -> {
+			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
+				onSignin();
+		});
+	}
+
+	private void prepareLanguage() {
+		language = ItemFactory.newLanguageSelector("language", true, true);
+		language.setShowTitle(false);
+		language.setDefaultValue("");
+		language.setControlStyle("login-language");
+		language.setWidth(FORM_WIDTH - 4);
+		language.setHeight(34);
+		language.setAlign(Alignment.LEFT);
+		language.setHint(I18N.message("chooseyourlanguage"));
+		language.setShowHintInField(true);
+		language.setControlStyle("login-language");
+		language.setTextBoxStyle("login-language-text");
+		language.setPickerIconStyle("login-language-picker");
+		language.setColSpan(3);
+
+		RequestInfo request = WindowUtils.getRequestInfo();
+
+		// If a parameter specifies a locale, we initialize the language
+		// selector
+		if (request.getParameter(Constants.LOCALE) != null && !request.getParameter(Constants.LOCALE).equals("")) {
+			String lang = request.getParameter(Constants.LOCALE);
+			Map<String, String> languages = I18N.getSupportedGuiLanguages(false);
+			for (String l : languages.keySet()) {
+				if (lang.equals(l)) {
+					language.setValue(l);
+					break;
+				}
+			}
+		}
+	}
+
+	private void preparePassword() {
+		password = ItemFactory.newPasswordItem(PASSWORD, PASSWORD, null);
+		password.setShowTitle(false);
+		password.setHint(I18N.message(PASSWORD).toLowerCase());
+		password.setShowHintInField(true);
+		password.setRequired(true);
+		password.setHeight(34);
+		password.setWidth(FORM_WIDTH);
+		password.setTextBoxStyle(LOGIN_FIELD);
+		password.setAlign(Alignment.LEFT);
+		password.setWrapTitle(false);
+		password.setColSpan(3);
+		password.addKeyPressHandler((KeyPressEvent event) -> {
+			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
+				onSignin();
+		});
+	}
+
+	private void prepareUsername() {
+		username.setTitle(I18N.message("username"));
+		username.setShowTitle(false);
+		username.setHint(I18N.message("username").toLowerCase());
+		username.setShowHintInField(true);
+		username.setWrapTitle(false);
+		username.setRequired(true);
+		username.setHeight(34);
+		username.setWidth(FORM_WIDTH);
+		username.setAlign(Alignment.LEFT);
+		username.setTextBoxStyle(LOGIN_FIELD);
+		username.setColSpan(3);
+		username.addKeyPressHandler((KeyPressEvent event) -> {
+			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
+				onSignin();
+		});
 	}
 
 	protected void initGUI() {
@@ -419,7 +423,7 @@ public class LoginPanel extends VLayout {
 		/*
 		 * A link to the alternative login page
 		 */
-		HTMLFlow switchLink = new HTMLFlow("<a href='" + url + "' class='login-switchview'>" + label + "</a>");
+		HTMLFlow switchLink = new HTMLFlow(A_HREF + url + "' class='login-switchview'>" + label + "</a>");
 		switchLink.setHeight(16);
 		switchLink.setWidth(COLUMN_WIDTH + 20);
 		switchLink.setStyleName("login-switchview");
@@ -445,7 +449,7 @@ public class LoginPanel extends VLayout {
 	 * Prepares the panel to show messages
 	 */
 	protected void prepareAlerts() {
-		List<MessageLabel> messages = new ArrayList<MessageLabel>();
+		List<MessageLabel> messages = new ArrayList<>();
 		if (info.getAlerts() != null && info.getAlerts().length > 0) {
 			for (GUIMessage alert : info.getAlerts()) {
 				MessageLabel label = new MessageLabel(alert, info.getTenant().getId() == 1L);
@@ -513,7 +517,7 @@ public class LoginPanel extends VLayout {
 
 						@Override
 						public void onSuccess(Boolean required) {
-							if (required) {
+							if (Boolean.TRUE.equals(required)) {
 								LoginService.Instance.get().getUser(login, new AsyncCallback<GUIUser>() {
 
 									@Override
@@ -605,14 +609,7 @@ public class LoginPanel extends VLayout {
 				Util.contextPath() + "j_spring_security_check");
 		builder.setHeader("Content-type", "application/x-www-form-urlencoded");
 		try {
-			String data = "j_username=" + URL.encodeQueryString((String) username.getValue());
-			data += "&j_password=" + URL.encodeQueryString((String) password.getValue());
-			if (secretKey != null && secretKey.getValue() != null)
-				data += "&j_secretkey=" + URL.encodeQueryString((String) secretKey.getValue());
-			if (CookiesManager.getSavedDevice() != null)
-				data += "&device=" + URL.encodeQueryString(CookiesManager.getSavedDevice());
-//			data += "&" + PARAM_SUCCESSURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_SUCCESSURL));
-//			data += "&" + PARAM_FAILUREURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_FAILUREURL));
+			String data = prepareAuthenticationData();
 
 			lockInput();
 			builder.sendRequest(data, new RequestCallback() {
@@ -654,6 +651,18 @@ public class LoginPanel extends VLayout {
 		}
 	}
 
+	private String prepareAuthenticationData() {
+		String data = "j_username=" + URL.encodeQueryString((String) username.getValue());
+		data += "&j_password=" + URL.encodeQueryString((String) password.getValue());
+		if (secretKey != null && secretKey.getValue() != null)
+			data += "&j_secretkey=" + URL.encodeQueryString((String) secretKey.getValue());
+		if (CookiesManager.getSavedDevice() != null)
+			data += "&device=" + URL.encodeQueryString(CookiesManager.getSavedDevice());
+//			data += "&" + PARAM_SUCCESSURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_SUCCESSURL));
+//			data += "&" + PARAM_FAILUREURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_FAILUREURL));
+		return data;
+	}
+
 	public static void showLostDialog(String productName) {
 		ResetPassword pwdReset = new ResetPassword(productName);
 		pwdReset.show();
@@ -687,7 +696,7 @@ public class LoginPanel extends VLayout {
 
 											@Override
 											public void execute(Boolean choice) {
-												if (!choice) {
+												if (Boolean.FALSE.equals(choice)) {
 													Util.redirectToSuccessUrl(language.getValueAsString());
 												} else {
 													LD.askForString(I18N.message("trustdevice"),

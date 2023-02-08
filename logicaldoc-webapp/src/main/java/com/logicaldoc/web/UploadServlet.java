@@ -135,7 +135,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 		@SuppressWarnings("unchecked")
 		Map<String, File> uploadedFiles = (Map<String, File>) httpSession.getAttribute(RECEIVED_FILES);
 		if (uploadedFiles == null) {
-			uploadedFiles = new HashMap<String, File>();
+			uploadedFiles = new HashMap<>();
 			httpSession.setAttribute(RECEIVED_FILES, uploadedFiles);
 		}
 		return uploadedFiles;

@@ -15,7 +15,6 @@ import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -43,6 +42,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class ImportArchivesList extends VLayout {
+
+	private static final String DESCRIPTION = "description";
 
 	private Layout detailsContainer;
 
@@ -73,7 +74,7 @@ public class ImportArchivesList extends VLayout {
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 130);
 
-		ListGridField desdcription = new ListGridField("description", I18N.message("description"), 250);
+		ListGridField desdcription = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 250);
 		desdcription.setCanFilter(false);
 
 		ListGridField status = new ListGridField("statusicon", I18N.message("status"), 50);
@@ -141,9 +142,9 @@ public class ImportArchivesList extends VLayout {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
+				ListGridRecord rec = list.getSelectedRecord();
 				try {
-					showDetails(Long.parseLong(record.getAttribute("id")));
+					showDetails(Long.parseLong(rec.getAttribute("id")));
 				} catch (Throwable t) {
 					// Nothing to do
 				}
@@ -166,31 +167,28 @@ public class ImportArchivesList extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -229,8 +227,8 @@ public class ImportArchivesList extends VLayout {
 	}
 
 	public void updateRecord(GUIArchive result) {
-		ListGridRecord record = list.getSelectedRecord();
-		record.setAttribute("description", result.getDescription());
-		list.refreshRow(list.getRecordIndex(record));
+		ListGridRecord rec = list.getSelectedRecord();
+		rec.setAttribute(DESCRIPTION, result.getDescription());
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

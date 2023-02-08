@@ -20,7 +20,7 @@ public class DetectDuplicates {
 	public static void main(String[] args) throws FileNotFoundException {
 
 		File file = new File("src/main/resources/i18n/messages.properties");
-		Map<String, Integer> map = new HashMap<String, Integer>();
+		Map<String, Integer> map = new HashMap<>();
 
 		// Open the file that is the first command line parameter
 		FileInputStream fstream = new FileInputStream(file);

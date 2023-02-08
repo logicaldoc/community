@@ -148,7 +148,7 @@ public class UpdatePanel extends VLayout {
 		 */
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
@@ -176,7 +176,7 @@ public class UpdatePanel extends VLayout {
 		 */
 		if (extendedPropertiesPanel != null) {
 			extendedPropertiesPanel.destroy();
-			if (extendedPropertiesTabPanel.contains(extendedPropertiesPanel))
+			if (Boolean.TRUE.equals(extendedPropertiesTabPanel.contains(extendedPropertiesPanel)))
 				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
 		}
 		extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, nothingToDo, templateChangedHandler);
@@ -187,7 +187,7 @@ public class UpdatePanel extends VLayout {
 		 */
 		if (capturePanel != null) {
 			capturePanel.destroy();
-			if (captureTabPanel.contains(capturePanel))
+			if (Boolean.TRUE.equals(captureTabPanel.contains(capturePanel)))
 				captureTabPanel.removeMember(capturePanel);
 		}
 		capturePanel = new DocumentCapturePanel(document, nothingToDo, false);
@@ -198,7 +198,7 @@ public class UpdatePanel extends VLayout {
 		 */
 		if (retentionPoliciesPanel != null) {
 			retentionPoliciesPanel.destroy();
-			if (retentionPoliciesTabPanel.contains(retentionPoliciesPanel))
+			if (Boolean.TRUE.equals(retentionPoliciesTabPanel.contains(retentionPoliciesPanel)))
 				retentionPoliciesTabPanel.removeMember(retentionPoliciesPanel);
 		}
 		retentionPoliciesPanel = new PublishingPanel(document, nothingToDo);
@@ -209,7 +209,7 @@ public class UpdatePanel extends VLayout {
 		 */
 		if (notificationPanel != null) {
 			notificationPanel.destroy();
-			if (notificationTabPanel.contains(notificationPanel))
+			if (Boolean.TRUE.equals(notificationTabPanel.contains(notificationPanel)))
 				notificationTabPanel.removeMember(notificationPanel);
 		}
 		notificationPanel = new UpdateNotificationPanel(document);

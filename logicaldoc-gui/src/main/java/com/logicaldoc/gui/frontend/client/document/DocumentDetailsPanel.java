@@ -17,7 +17,6 @@ import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.document.note.NotesPanel;
 import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignaturePanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -383,7 +382,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		if (Feature.visible(Feature.AUDIT)) {
 			if (subscriptionsPanel != null) {
 				subscriptionsPanel.destroy();
-				if (subscriptionsTabPanel.contains(subscriptionsPanel))
+				if (Boolean.TRUE.equals(subscriptionsTabPanel.contains(subscriptionsPanel)))
 					subscriptionsTabPanel.removeMember(subscriptionsPanel);
 			}
 
@@ -404,7 +403,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareCalendarTab() {
 		if (calendarPanel != null) {
 			calendarPanel.destroy();
-			if (calendarTabPanel.contains(calendarPanel))
+			if (Boolean.TRUE.equals(calendarTabPanel.contains(calendarPanel)))
 				calendarTabPanel.removeMember(calendarPanel);
 		}
 		try {
@@ -418,7 +417,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void preparePreviewTab() {
 		if (previewPanel != null) {
 			previewPanel.destroy();
-			if (previewTabPanel.contains(previewPanel))
+			if (Boolean.TRUE.equals(previewTabPanel.contains(previewPanel)))
 				previewTabPanel.removeMember(previewPanel);
 		}
 		try {
@@ -432,7 +431,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareNotesTab() {
 		if (notesPanel != null) {
 			notesPanel.destroy();
-			if (notesTabPanel.contains(notesPanel))
+			if (Boolean.TRUE.equals(notesTabPanel.contains(notesPanel)))
 				notesTabPanel.removeMember(notesPanel);
 		}
 		try {
@@ -446,7 +445,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareSignatureTab() {
 		if (signaturePanel != null) {
 			signaturePanel.destroy();
-			if (signatureTabPanel.contains(signaturePanel))
+			if (Boolean.TRUE.equals(signatureTabPanel.contains(signaturePanel)))
 				signatureTabPanel.removeMember(signaturePanel);
 		}
 		try {
@@ -460,7 +459,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareLInksTab() {
 		if (linksPanel != null) {
 			linksPanel.destroy();
-			if (linksTabPanel.contains(linksPanel))
+			if (Boolean.TRUE.equals(linksTabPanel.contains(linksPanel)))
 				linksTabPanel.removeMember(linksPanel);
 		}
 
@@ -475,7 +474,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareAliasesTab() {
 		if (aliasesPanel != null) {
 			aliasesPanel.destroy();
-			if (aliasesTabPanel.contains(aliasesPanel))
+			if (Boolean.TRUE.equals(aliasesTabPanel.contains(aliasesPanel)))
 				aliasesTabPanel.removeMember(aliasesPanel);
 		}
 
@@ -495,7 +494,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareHistoryTab() {
 		if (historyPanel != null) {
 			historyPanel.destroy();
-			if (historyTabPanel.contains(historyPanel))
+			if (Boolean.TRUE.equals(historyTabPanel.contains(historyPanel)))
 				historyTabPanel.removeMember(historyPanel);
 		}
 		try {
@@ -509,7 +508,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareVersionsTab() {
 		if (versionsPanel != null) {
 			versionsPanel.destroy();
-			if (versionsTabPanel.contains(versionsPanel))
+			if (Boolean.TRUE.equals(versionsTabPanel.contains(versionsPanel)))
 				versionsTabPanel.removeMember(versionsPanel);
 		}
 		try {
@@ -523,7 +522,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareCaptureTab(ChangedHandler changeHandler) {
 		if (capturePanel != null) {
 			capturePanel.destroy();
-			if (captureTabPanel.contains(capturePanel))
+			if (Boolean.TRUE.equals(captureTabPanel.contains(capturePanel)))
 				captureTabPanel.removeMember(capturePanel);
 		}
 		try {
@@ -537,7 +536,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareStandardPropertiesTab(ChangedHandler changeHandler) {
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
@@ -552,7 +551,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareRetentionPoliciesTab(ChangedHandler changeHandler) {
 		if (retentionPoliciesPanel != null) {
 			retentionPoliciesPanel.destroy();
-			if (retentionPoliciesTabPanel.contains(retentionPoliciesPanel))
+			if (Boolean.TRUE.equals(retentionPoliciesTabPanel.contains(retentionPoliciesPanel)))
 				retentionPoliciesTabPanel.removeMember(retentionPoliciesPanel);
 		}
 		try {
@@ -566,7 +565,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	private void prepareExtendedPropertiesTab(ChangedHandler changeHandler) {
 		if (extendedPropertiesPanel != null) {
 			extendedPropertiesPanel.destroy();
-			if (extendedPropertiesTabPanel.contains(extendedPropertiesPanel))
+			if (Boolean.TRUE.equals(extendedPropertiesTabPanel.contains(extendedPropertiesPanel)))
 				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
 		}
 		ChangedHandler templateChangedHandler = (ChangedEvent event) -> {
@@ -625,13 +624,9 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			try {
 				// Check if the user has changed the extension and warn him
 				if (!originalExtension.equalsIgnoreCase(Util.getExtension(document.getFileName()))) {
-					LD.ask(I18N.message("filename"), I18N.message("extchangewarn"), new BooleanCallback() {
-
-						@Override
-						public void execute(Boolean value) {
-							if (value)
-								saveDocument();
-						}
+					LD.ask(I18N.message("filename"), I18N.message("extchangewarn"), (Boolean value) -> {
+						if (Boolean.TRUE.equals(value))
+							saveDocument();
 					});
 				} else {
 					saveDocument();

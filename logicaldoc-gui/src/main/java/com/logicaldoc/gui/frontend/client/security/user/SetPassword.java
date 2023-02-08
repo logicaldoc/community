@@ -90,7 +90,7 @@ public class SetPassword extends Window {
 		apply.setAutoFit(true);
 		apply.addClickHandler((ClickEvent event) -> {
 			vm.validate();
-			if (vm.hasErrors())
+			if (Boolean.TRUE.equals(vm.hasErrors()))
 				return;
 
 			apply.setDisabled(true);

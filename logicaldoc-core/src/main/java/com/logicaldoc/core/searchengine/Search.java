@@ -39,7 +39,7 @@ public abstract class Search {
 
 	protected SearchOptions options;
 
-	protected List<Hit> hits = new ArrayList<Hit>();
+	protected List<Hit> hits = new ArrayList<>();
 
 	protected long estimatedHitsNumber = 0;
 
@@ -50,7 +50,7 @@ public abstract class Search {
 	public static Search get(SearchOptions opt) {
 		// Acquire the 'Search' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
-		Collection<Extension> extensions = new ArrayList<Extension>();
+		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "Search");
 		} catch (Throwable e) {
@@ -80,7 +80,7 @@ public abstract class Search {
 	public static SearchOptions newOptions(int type) {
 		// Acquire the 'Search' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
-		Collection<Extension> extensions = new ArrayList<Extension>();
+		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "Search");
 		} catch (Throwable e) {
@@ -152,7 +152,7 @@ public abstract class Search {
 			log.debug("Start searching for extended attributes: {}", attrs);
 
 			// Search for extended attributes, key is docId-name
-			final Map<String, Attribute> extAtt = new HashMap<String, Attribute>();
+			final Map<String, Attribute> extAtt = new HashMap<>();
 
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			StringBuilder query = new StringBuilder();

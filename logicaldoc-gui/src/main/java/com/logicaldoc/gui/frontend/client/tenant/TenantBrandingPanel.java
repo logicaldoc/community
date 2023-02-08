@@ -13,21 +13,17 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -43,6 +39,26 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class TenantBrandingPanel extends HLayout {
+
+	private static final String FAVICON = "favicon";
+
+	private static final String LOGO_HEAD_OEM = "logo_head_oem";
+
+	private static final String LOGO_OEM = "logo_oem";
+
+	private static final String NAME = "name";
+
+	private static final String BANNER = "banner";
+
+	private static final String LOGO_MENU = "logo_menu";
+
+	private static final String LOGO_HEAD = "logo_head";
+
+	private static final String IMAGE = "image";
+
+	private static final String SALES = "sales";
+
+	private static final String SUPPORT = "support";
 
 	private DynamicForm form = new DynamicForm();
 
@@ -60,7 +76,7 @@ public class TenantBrandingPanel extends HLayout {
 
 	private ListGrid grid;
 
-	public TenantBrandingPanel(final GUITenant tenant, final ChangedHandler changedHandler) {
+	public TenantBrandingPanel(GUITenant tenant, final ChangedHandler changedHandler) {
 		if (tenant == null) {
 			setMembers(TenantsPanel.SELECT_TENANT);
 		} else {
@@ -74,165 +90,25 @@ public class TenantBrandingPanel extends HLayout {
 			toolStrip.setWidth100();
 			toolStrip.addSpacer(2);
 
-			ToolStripButton imp = new ToolStripButton();
-			imp.setTitle(I18N.message("iimport"));
-			imp.setDisabled(changedHandler == null);
-			toolStrip.addButton(imp);
-			imp.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					BrandingPackageUploader uploader = new BrandingPackageUploader(TenantBrandingPanel.this);
-					uploader.show();
-				}
-			});
-			ToolStripButton export = new ToolStripButton();
-			export.setTitle(I18N.message("export"));
-			toolStrip.addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					Util.download(Util.contextPath() + "exportbranding?tenantId=" + tenant.getId());
-				}
-			});
-			ToolStripButton reset = new ToolStripButton();
-			reset.setTitle(I18N.message("reset"));
-			toolStrip.addButton(reset);
-			reset.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					GUIBranding newBranding = new GUIBranding();
-					if (Feature.enabled(Feature.QUOTAS))
-						newBranding.setProductName("LogicalDOC Enterprise");
-					else
-						newBranding.setProductName("LogicalDOC Business");
-					tenant.setBranding(newBranding);
-					refresh();
-				}
-			});
+			addImportButton(changedHandler, toolStrip);
 
-			ToolStripButton css = new ToolStripButton(I18N.message("css"));
-			css.addClickHandler(new ClickHandler() {
+			addExportButton(tenant, toolStrip);
 
-				@Override
-				public void onClick(ClickEvent event) {
-					TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("css", I18N.message("customcss"),
-							tenant.getBranding().getCss(), null, false);
-					item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
-					LD.askForValue(I18N.message("customcss"), I18N.message("entercustomcss"),
-							tenant.getBranding().getCss(), item,
-							com.google.gwt.user.client.Window.getClientWidth() - 50, new ValueCallback() {
+			addResetButton(tenant, toolStrip);
 
-								@Override
-								public void execute(String value) {
-									tenant.getBranding().setCss(value);
-									if (changedHandler != null)
-										changedHandler.onChanged(null);
-								}
-							});
-				}
-			});
-
-			ToolStripButton head = new ToolStripButton(I18N.message("head"));
-			head.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("head", I18N.message("customhead"),
-							tenant.getBranding().getHead(), null, true);
-					item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
-					LD.askForValue(I18N.message("customhead"), I18N.message("entercustomhead"),
-							tenant.getBranding().getHead(), item,
-							com.google.gwt.user.client.Window.getClientWidth() - 50, new ValueCallback() {
-
-								@Override
-								public void execute(String value) {
-									tenant.getBranding().setHead(value);
-									if (changedHandler != null)
-										changedHandler.onChanged(null);
-								}
-							});
-				}
-			});
-
-			ToolStripButton top = new ToolStripButton(I18N.message("top"));
-			top.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("top", I18N.message("customtop"),
-							tenant.getBranding().getTop(), null, true);
-					item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
-					LD.askForValue(I18N.message("customtop"), I18N.message("entercustomtop"),
-							tenant.getBranding().getTop(), item,
-							com.google.gwt.user.client.Window.getClientWidth() - 50, new ValueCallback() {
-
-								@Override
-								public void execute(String value) {
-									tenant.getBranding().setTop(value);
-									if (changedHandler != null)
-										changedHandler.onChanged(null);
-								}
-							});
-				}
-			});
-
-			ToolStripButton bottom = new ToolStripButton(I18N.message("bottom"));
-			bottom.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("bottom", I18N.message("custombottom"),
-							tenant.getBranding().getBottom(), null, true);
-					item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
-					LD.askForValue(I18N.message("custombottom"), I18N.message("entercustombottom"),
-							tenant.getBranding().getBottom(), item,
-							com.google.gwt.user.client.Window.getClientWidth() - 50, new ValueCallback() {
-
-								@Override
-								public void execute(String value) {
-									tenant.getBranding().setBottom(value);
-									if (changedHandler != null)
-										changedHandler.onChanged(null);
-								}
-							});
-				}
-			});
-
-			ToolStripButton footer = new ToolStripButton(I18N.message("footer"));
-			footer.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("footer", I18N.message("customfooter"),
-							tenant.getBranding().getFooter(), null, true);
-					item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
-					LD.askForValue(I18N.message("customfooter"), I18N.message("entercustomfooter"),
-							tenant.getBranding().getFooter(), item,
-							com.google.gwt.user.client.Window.getClientWidth() - 50, new ValueCallback() {
-
-								@Override
-								public void execute(String value) {
-									tenant.getBranding().setFooter(value);
-									if (changedHandler != null)
-										changedHandler.onChanged(null);
-								}
-							});
-				}
-			});
-
-			skin = ItemFactory.newSkinSelector();
-			skin.addChangedHandler(changedHandler);
 			toolStrip.addSeparator();
-			toolStrip.addFormItem(skin);
 
-			if (Feature.enabled(Feature.BRANDING_FULL)) {
-				toolStrip.addButton(css);
-				toolStrip.addSeparator();
-				toolStrip.addButton(head);
-				toolStrip.addButton(top);
-				toolStrip.addButton(bottom);
-				toolStrip.addButton(footer);
-			}
+			addSkinSelector(changedHandler, toolStrip);
+
+			addCssButton(changedHandler, toolStrip);
+
+			addHeadButton(changedHandler, toolStrip);
+
+			addTopButton(changedHandler, toolStrip);
+
+			addBottomButton(changedHandler, toolStrip);
+
+			addFooterButton(changedHandler, toolStrip);
 
 			toolStrip.addFill();
 
@@ -241,6 +117,136 @@ public class TenantBrandingPanel extends HLayout {
 			panel.setMembers(toolStrip, layout);
 			addMember(panel);
 			refresh();
+		}
+	}
+
+	private void addSkinSelector(final ChangedHandler changedHandler, ToolStrip toolStrip) {
+		skin = ItemFactory.newSkinSelector();
+		skin.addChangedHandler(changedHandler);
+		toolStrip.addFormItem(skin);
+	}
+
+	private void addResetButton(GUITenant tenant, ToolStrip toolStrip) {
+		ToolStripButton reset = new ToolStripButton();
+		reset.setTitle(I18N.message("reset"));
+		toolStrip.addButton(reset);
+		reset.addClickHandler((ClickEvent event) -> {
+			GUIBranding newBranding = new GUIBranding();
+			if (Feature.enabled(Feature.QUOTAS))
+				newBranding.setProductName("LogicalDOC Enterprise");
+			else
+				newBranding.setProductName("LogicalDOC Business");
+			tenant.setBranding(newBranding);
+			refresh();
+		});
+	}
+
+	private void addExportButton(GUITenant tenant, ToolStrip toolStrip) {
+		ToolStripButton export = new ToolStripButton();
+		export.setTitle(I18N.message("export"));
+		toolStrip.addButton(export);
+		export.addClickHandler((ClickEvent event) -> {
+			Util.download(Util.contextPath() + "exportbranding?tenantId=" + tenant.getId());
+		});
+	}
+
+	private void addImportButton(final ChangedHandler changedHandler, ToolStrip toolStrip) {
+		ToolStripButton importButton = new ToolStripButton();
+		importButton.setTitle(I18N.message("iimport"));
+		importButton.setDisabled(changedHandler == null);
+		toolStrip.addButton(importButton);
+		importButton.addClickHandler((ClickEvent event) -> {
+			BrandingPackageUploader uploader = new BrandingPackageUploader(TenantBrandingPanel.this);
+			uploader.show();
+		});
+	}
+
+	private void addFooterButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
+		ToolStripButton footer = new ToolStripButton(I18N.message("footer"));
+		footer.addClickHandler((ClickEvent event) -> {
+			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("footer", I18N.message("customfooter"),
+					tenant.getBranding().getFooter(), null, true);
+			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
+			LD.askForValue(I18N.message("customfooter"), I18N.message("entercustomfooter"),
+					tenant.getBranding().getFooter(), item, com.google.gwt.user.client.Window.getClientWidth() - 50,
+					(String value) -> {
+						tenant.getBranding().setFooter(value);
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		if (Feature.enabled(Feature.BRANDING_FULL))
+			toolStrip.addButton(footer);
+	}
+
+	private void addBottomButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
+		ToolStripButton bottom = new ToolStripButton(I18N.message("bottom"));
+		bottom.addClickHandler((ClickEvent event) -> {
+			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("bottom", I18N.message("custombottom"),
+					tenant.getBranding().getBottom(), null, true);
+			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
+			LD.askForValue(I18N.message("custombottom"), I18N.message("entercustombottom"),
+					tenant.getBranding().getBottom(), item, com.google.gwt.user.client.Window.getClientWidth() - 50,
+					(String value) -> {
+						tenant.getBranding().setBottom(value);
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		if (Feature.enabled(Feature.BRANDING_FULL))
+			toolStrip.addButton(bottom);
+	}
+
+	private void addTopButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
+		ToolStripButton top = new ToolStripButton(I18N.message("top"));
+		top.addClickHandler((ClickEvent event) -> {
+			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("top", I18N.message("customtop"),
+					tenant.getBranding().getTop(), null, true);
+			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
+			LD.askForValue(I18N.message("customtop"), I18N.message("entercustomtop"), tenant.getBranding().getTop(),
+					item, com.google.gwt.user.client.Window.getClientWidth() - 50, (String value) -> {
+						tenant.getBranding().setTop(value);
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		if (Feature.enabled(Feature.BRANDING_FULL))
+			toolStrip.addButton(top);
+	}
+
+	private void addHeadButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
+		ToolStripButton head = new ToolStripButton(I18N.message("head"));
+		head.addClickHandler((ClickEvent event) -> {
+			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("head", I18N.message("customhead"),
+					tenant.getBranding().getHead(), null, true);
+			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
+			LD.askForValue(I18N.message("customhead"), I18N.message("entercustomhead"), tenant.getBranding().getHead(),
+					item, com.google.gwt.user.client.Window.getClientWidth() - 50, (String value) -> {
+						tenant.getBranding().setHead(value);
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		if (Feature.enabled(Feature.BRANDING_FULL))
+			toolStrip.addButton(head);
+	}
+
+	private void addCssButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
+		ToolStripButton css = new ToolStripButton(I18N.message("css"));
+		css.addClickHandler((ClickEvent event) -> {
+			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("css", I18N.message("customcss"),
+					tenant.getBranding().getCss(), null, false);
+			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
+			LD.askForValue(I18N.message("customcss"), I18N.message("entercustomcss"), tenant.getBranding().getCss(),
+					item, com.google.gwt.user.client.Window.getClientWidth() - 50, (String value) -> {
+						tenant.getBranding().setCss(value);
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		if (Feature.enabled(Feature.BRANDING_FULL)) {
+			toolStrip.addButton(css);
+			toolStrip.addSeparator();
 		}
 	}
 
@@ -253,9 +259,9 @@ public class TenantBrandingPanel extends HLayout {
 		if (form != null)
 			form.destroy();
 
-		if (layout.contains(form))
+		if (Boolean.TRUE.equals(layout.contains(form)))
 			layout.removeMember(form);
-		if (layout.contains(imagesPanel))
+		if (Boolean.TRUE.equals(layout.contains(imagesPanel)))
 			layout.removeMember(imagesPanel);
 
 		skin.setValue(tenant.getBranding().getSkin());
@@ -267,73 +273,74 @@ public class TenantBrandingPanel extends HLayout {
 
 		boolean fullBranding = Feature.enabled(Feature.BRANDING_FULL);
 
-		TextItem product = ItemFactory.newTextItem("product", "product", tenant.getBranding().getProduct());
+		boolean readonlyOrNotFullBranding = readonly || !fullBranding;
+
+		TextItem product = ItemFactory.newTextItem("product", tenant.getBranding().getProduct());
 		product.setWidth(180);
-		product.setDisabled(readonly || !fullBranding);
+		product.setDisabled(readonlyOrNotFullBranding);
 		product.addChangedHandler(changedHandler);
 
-		TextItem productName = ItemFactory.newTextItem("productName", "productname",
-				tenant.getBranding().getProductName());
+		TextItem productName = ItemFactory.newTextItem("productname", tenant.getBranding().getProductName());
 		productName.setWidth(180);
-		productName.setDisabled(readonly || !fullBranding);
+		productName.setDisabled(readonlyOrNotFullBranding);
 		productName.addChangedHandler(changedHandler);
 
-		TextItem vendor = ItemFactory.newTextItem("vendor", "vendor", tenant.getBranding().getVendor());
+		TextItem vendor = ItemFactory.newTextItem("vendor", tenant.getBranding().getVendor());
 		vendor.setWidth(180);
-		vendor.setDisabled(readonly || !fullBranding);
+		vendor.setDisabled(readonlyOrNotFullBranding);
 		vendor.addChangedHandler(changedHandler);
 
-		TextItem address = ItemFactory.newTextItem("address", "address", tenant.getBranding().getVendorAddress());
+		TextItem address = ItemFactory.newTextItem("address", tenant.getBranding().getVendorAddress());
 		address.setWidth(180);
-		address.setDisabled(readonly || !fullBranding);
+		address.setDisabled(readonlyOrNotFullBranding);
 		address.addChangedHandler(changedHandler);
 
-		TextItem postalCode = ItemFactory.newTextItem("postalCode", "postalcode", tenant.getBranding().getVendorCap());
+		TextItem postalCode = ItemFactory.newTextItem("postalcode", tenant.getBranding().getVendorCap());
 		postalCode.setWidth(180);
-		postalCode.setDisabled(readonly || !fullBranding);
+		postalCode.setDisabled(readonlyOrNotFullBranding);
 		postalCode.addChangedHandler(changedHandler);
 
-		TextItem city = ItemFactory.newTextItem("city", "city", tenant.getBranding().getVendorCity());
+		TextItem city = ItemFactory.newTextItem("city", tenant.getBranding().getVendorCity());
 		city.setWidth(180);
-		city.setDisabled(readonly || !fullBranding);
+		city.setDisabled(readonlyOrNotFullBranding);
 		city.addChangedHandler(changedHandler);
 
-		TextItem country = ItemFactory.newTextItem("country", "country", tenant.getBranding().getVendorCountry());
+		TextItem country = ItemFactory.newTextItem("country", tenant.getBranding().getVendorCountry());
 		country.setWidth(180);
-		country.setDisabled(readonly || !fullBranding);
+		country.setDisabled(readonlyOrNotFullBranding);
 		country.addChangedHandler(changedHandler);
 
-		TextItem support = ItemFactory.newEmailItem("support", "support", false);
+		TextItem support = ItemFactory.newEmailItem(SUPPORT, SUPPORT, false);
 		support.setValue(tenant.getBranding().getSupport());
-		support.setDisabled(readonly || !fullBranding);
+		support.setDisabled(readonlyOrNotFullBranding);
 		support.addChangedHandler(changedHandler);
 
-		TextItem sales = ItemFactory.newEmailItem("sales", "sales", false);
+		TextItem sales = ItemFactory.newEmailItem(SALES, SALES, false);
 		sales.setValue(tenant.getBranding().getSales());
 		sales.setEndRow(true);
-		sales.setDisabled(readonly || !fullBranding);
+		sales.setDisabled(readonlyOrNotFullBranding);
 		sales.addChangedHandler(changedHandler);
 
-		TextItem webSite = ItemFactory.newTextItem("website", "website", tenant.getBranding().getUrl());
-		webSite.setDisabled(readonly || !fullBranding);
+		TextItem webSite = ItemFactory.newTextItem("website", tenant.getBranding().getUrl());
+		webSite.setDisabled(readonlyOrNotFullBranding);
 		webSite.setColSpan(2);
 		webSite.setWidth(360);
 		webSite.addChangedHandler(changedHandler);
 
-		TextItem help = ItemFactory.newTextItem("help", "help", tenant.getBranding().getHelp());
-		help.setDisabled(readonly || !fullBranding);
+		TextItem help = ItemFactory.newTextItem("help", tenant.getBranding().getHelp());
+		help.setDisabled(readonlyOrNotFullBranding);
 		help.setColSpan(2);
 		help.setWidth(360);
 		help.addChangedHandler(changedHandler);
 
-		TextItem bugs = ItemFactory.newTextItem("bugs", "bugs", tenant.getBranding().getBugs());
-		bugs.setDisabled(readonly || !fullBranding);
+		TextItem bugs = ItemFactory.newTextItem("bugs", tenant.getBranding().getBugs());
+		bugs.setDisabled(readonlyOrNotFullBranding);
 		bugs.setColSpan(2);
 		bugs.setWidth(360);
 		bugs.addChangedHandler(changedHandler);
 
-		TextItem forum = ItemFactory.newTextItem("forum", "forum", tenant.getBranding().getForum());
-		forum.setDisabled(readonly || !fullBranding);
+		TextItem forum = ItemFactory.newTextItem("forum", tenant.getBranding().getForum());
+		forum.setDisabled(readonlyOrNotFullBranding);
 		forum.setColSpan(2);
 		forum.setWidth(360);
 		forum.addChangedHandler(changedHandler);
@@ -356,108 +363,102 @@ public class TenantBrandingPanel extends HLayout {
 		grid.setShowRecordComponentsByCell(true);
 		grid.setHeight100();
 
-		ListGridField name = new ListGridField("name", I18N.getAttributeLabel("image"), 100);
-		name.setCanFilter(false);
-		name.setCanSort(false);
+		ListGridField nameField = new ListGridField(NAME, I18N.getAttributeLabel(IMAGE), 100);
+		nameField.setCanFilter(false);
+		nameField.setCanSort(false);
 
-		ListGridField image = new ListGridField("image", " ", 300);
-		image.setWidth("*");
-		image.setCanFilter(false);
-		image.setCanSort(false);
-		image.setCellFormatter(new CellFormatter() {
+		ListGridField image = prepareImageField();
 
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					String html = "";
-					String name = record.getAttributeAsString("name");
-					if (name.equals("logo"))
-						html = tenant.getBranding().getLogoSrc();
-					else if (name.equals("logo_head"))
-						html = tenant.getBranding().getLogoHeadSrc();
-					else if (name.equals("logo_menu"))
-						html = tenant.getBranding().getLogoMenuSrc();
-					else if (name.equals("logo_oem"))
-						html = tenant.getBranding().getLogoOemSrc();
-					else if (name.equals("logo_head_oem"))
-						html = tenant.getBranding().getLogoHeadOemSrc();
-					else if (name.equals("banner"))
-						html = tenant.getBranding().getBannerSrc();
-					else if (name.equals("favicon"))
-						html = tenant.getBranding().getFaviconSrc();
+		grid.setFields(nameField, image);
 
-					if (html != null && !html.isEmpty()) {
-
-						html = "<img src='" + html + "' style='margin-top:4px; margin-bottom:4px;'/>";
-
-						// In chase of header logos, show the banner below
-						if (name.contains("_head")) {
-							html = "<div style=\" background-image: url('" + tenant.getBranding().getBannerSrc()
-									+ "'); width:100%; margin-top:4px; margin-bottom:4px; \">" + html + "</div>";
-						} else {
-							html = "<div style='width:100%; margin-top:4px; margin-bottom:4px;'>" + html + "</div>";
-						}
-					}
-					return html;
-				} catch (Throwable e) {
-					return "";
-				}
-			}
-		});
-
-		grid.setFields(name, image);
-
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 
 		ListGridRecord rec = new ListGridRecord();
-		rec.setAttribute("name", "logo");
-		rec.setAttribute("image", tenant.getBranding().getLogoSrc());
+		rec.setAttribute(NAME, "logo");
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_head");
-		rec.setAttribute("image", tenant.getBranding().getLogoHeadSrc());
+		rec.setAttribute(NAME, LOGO_HEAD);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHeadSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_menu");
-		rec.setAttribute("image", tenant.getBranding().getLogoMenuSrc());
+		rec.setAttribute(NAME, LOGO_MENU);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoMenuSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "banner");
-		rec.setAttribute("image", tenant.getBranding().getBannerSrc());
+		rec.setAttribute(NAME, BANNER);
+		rec.setAttribute(IMAGE, tenant.getBranding().getBannerSrc());
 		records.add(rec);
 
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_oem");
-		rec.setAttribute("image", tenant.getBranding().getLogoOemSrc());
+		rec.setAttribute(NAME, LOGO_OEM);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoOemSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "logo_head_oem");
-		rec.setAttribute("image", tenant.getBranding().getLogoHeadOemSrc());
+		rec.setAttribute(NAME, LOGO_HEAD_OEM);
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHeadOemSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
-		rec.setAttribute("name", "favicon");
-		rec.setAttribute("image", tenant.getBranding().getFaviconSrc());
+		rec.setAttribute(NAME, FAVICON);
+		rec.setAttribute(IMAGE, tenant.getBranding().getFaviconSrc());
 		records.add(rec);
 		grid.setRecords(records.toArray(new ListGridRecord[0]));
 
 		if (changedHandler != null)
-			grid.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
-					showImagesContextMenu();
-					event.cancel();
-				}
+			grid.addCellContextClickHandler((CellContextClickEvent event) -> {
+				showImagesContextMenu();
+				event.cancel();
 			});
 
 		return grid;
 	}
 
+	private ListGridField prepareImageField() {
+		ListGridField image = new ListGridField(IMAGE, " ", 300);
+		image.setWidth("*");
+		image.setCanFilter(false);
+		image.setCanSort(false);
+		image.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			String html = "";
+			String name = rec.getAttributeAsString(NAME);
+			if (name.equals("logo"))
+				html = tenant.getBranding().getLogoSrc();
+			else if (name.equals(LOGO_HEAD))
+				html = tenant.getBranding().getLogoHeadSrc();
+			else if (name.equals(LOGO_MENU))
+				html = tenant.getBranding().getLogoMenuSrc();
+			else if (name.equals(LOGO_OEM))
+				html = tenant.getBranding().getLogoOemSrc();
+			else if (name.equals(LOGO_HEAD_OEM))
+				html = tenant.getBranding().getLogoHeadOemSrc();
+			else if (name.equals(BANNER))
+				html = tenant.getBranding().getBannerSrc();
+			else if (name.equals(FAVICON))
+				html = tenant.getBranding().getFaviconSrc();
+
+			if (html != null && !html.isEmpty()) {
+
+				html = "<img src='" + html + "' style='margin-top:4px; margin-bottom:4px;'/>";
+
+				// In chase of header logos, show the banner below
+				if (name.contains("_head")) {
+					html = "<div style=\" background-image: url('" + tenant.getBranding().getBannerSrc()
+							+ "'); width:100%; margin-top:4px; margin-bottom:4px; \">" + html + "</div>";
+				} else {
+					html = "<div style='width:100%; margin-top:4px; margin-bottom:4px;'>" + html + "</div>";
+				}
+			}
+			return html;
+		});
+		return image;
+	}
+
 	private void showImagesContextMenu() {
-		final ListGridRecord record = grid.getSelectedRecord();
-		final String name = record.getAttributeAsString("name");
+		final ListGridRecord rec = grid.getSelectedRecord();
+		final String name = rec.getAttributeAsString(NAME);
 
 		if ((!Feature.enabled(Feature.BRANDING_LOGO) && !Feature.enabled(Feature.BRANDING_FULL))
-				&& !"logo_oem".equals(name) && !"logo_head_oem".equals(name))
+				&& !LOGO_OEM.equals(name) && !LOGO_HEAD_OEM.equals(name))
 			return;
 
 		Menu contextMenu = new Menu();
@@ -471,22 +472,22 @@ public class TenantBrandingPanel extends HLayout {
 				if ("logo".equals(name)) {
 					tenant.getBranding().setLogoSrc(model.getLogoSrc());
 					image = model.getLogo();
-				} else if ("logo_head".equals(name)) {
+				} else if (LOGO_HEAD.equals(name)) {
 					tenant.getBranding().setLogoHeadSrc(model.getLogoHeadSrc());
 					image = model.getLogoHead();
-				} else if ("logo_menu".equals(name)) {
+				} else if (LOGO_MENU.equals(name)) {
 					tenant.getBranding().setLogoMenuSrc(model.getLogoMenuSrc());
 					image = model.getLogoMenu();
-				} else if ("logo_oem".equals(name)) {
+				} else if (LOGO_OEM.equals(name)) {
 					tenant.getBranding().setLogoOemSrc(model.getLogoOemSrc());
 					image = model.getLogoOem();
-				} else if ("logo_head_oem".equals(name)) {
+				} else if (LOGO_HEAD_OEM.equals(name)) {
 					tenant.getBranding().setLogoHeadOemSrc(model.getLogoHeadOemSrc());
 					image = model.getLogoHeadOem();
-				} else if ("favicon".equals(name)) {
+				} else if (FAVICON.equals(name)) {
 					tenant.getBranding().setFaviconSrc(model.getFaviconSrc());
 					image = model.getFavicon();
-				} else if ("banner".equals(name)) {
+				} else if (BANNER.equals(name)) {
 					tenant.getBranding().setBannerSrc(model.getBannerSrc());
 					image = model.getBanner();
 				}
@@ -499,8 +500,7 @@ public class TenantBrandingPanel extends HLayout {
 		upload.setTitle(I18N.message("uploadnewimage"));
 		upload.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ImageUploader uploader = new ImageUploader(record.getAttributeAsString("name"),
-						TenantBrandingPanel.this);
+				ImageUploader uploader = new ImageUploader(rec.getAttributeAsString(NAME), TenantBrandingPanel.this);
 				uploader.show();
 			}
 		});
@@ -516,31 +516,31 @@ public class TenantBrandingPanel extends HLayout {
 
 		if (imageName.equals("logo"))
 			tenant.getBranding().setLogoSrc(content);
-		else if (imageName.equals("logo_head"))
+		else if (imageName.equals(LOGO_HEAD))
 			tenant.getBranding().setLogoHeadSrc(content);
-		else if (imageName.equals("logo_menu"))
+		else if (imageName.equals(LOGO_MENU))
 			tenant.getBranding().setLogoMenuSrc(content);
-		else if (imageName.equals("logo_oem"))
+		else if (imageName.equals(LOGO_OEM))
 			tenant.getBranding().setLogoOemSrc(content);
-		else if (imageName.equals("logo_head_oem"))
+		else if (imageName.equals(LOGO_HEAD_OEM))
 			tenant.getBranding().setLogoHeadOemSrc(content);
-		else if (imageName.equals("banner"))
+		else if (imageName.equals(BANNER))
 			tenant.getBranding().setBannerSrc(content);
-		else if (imageName.equals("favicon"))
+		else if (imageName.equals(FAVICON))
 			tenant.getBranding().setFaviconSrc(content);
 
-		Record record = null;
+		Record rec = null;
 
-		// Find the record the corresponds to the given document
+		// Find the rec the corresponds to the given document
 		Record[] records = grid.getRecords();
-		for (Record rec : records)
-			if (rec.getAttribute("name").equals(imageName))
-				record = rec;
+		for (Record recd : records)
+			if (recd.getAttribute(NAME).equals(imageName))
+				rec = recd;
 
-		if (record != null) {
-			record.setAttribute("image", content);
+		if (rec != null) {
+			rec.setAttribute(IMAGE, content);
 			grid.invalidateRecordComponents();
-			grid.refreshRecordComponent(grid.getRecordIndex(record));
+			grid.refreshRecordComponent(grid.getRecordIndex(rec));
 			grid.redraw();
 		}
 
@@ -550,22 +550,22 @@ public class TenantBrandingPanel extends HLayout {
 
 	public boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			if (Feature.enabled(Feature.BRANDING_FULL)) {
 				tenant.getBranding().setSkin(skin.getValueAsString());
 				tenant.getBranding().setProduct(vm.getValueAsString("product"));
-				tenant.getBranding().setProductName(vm.getValueAsString("productName"));
+				tenant.getBranding().setProductName(vm.getValueAsString("productname"));
 				tenant.getBranding().setVendor(vm.getValueAsString("vendor"));
 				tenant.getBranding().setVendorAddress(vm.getValueAsString("address"));
-				tenant.getBranding().setVendorCap(vm.getValueAsString("postalCode"));
+				tenant.getBranding().setVendorCap(vm.getValueAsString("postalcode"));
 				tenant.getBranding().setVendorCity(vm.getValueAsString("city"));
 				tenant.getBranding().setVendorCountry(vm.getValueAsString("country"));
 				tenant.getBranding().setUrl(vm.getValueAsString("website"));
 				tenant.getBranding().setBugs(vm.getValueAsString("bugs"));
 				tenant.getBranding().setForum(vm.getValueAsString("forum"));
 				tenant.getBranding().setHelp(vm.getValueAsString("help"));
-				tenant.getBranding().setSupport(vm.getValueAsString("support"));
-				tenant.getBranding().setSales(vm.getValueAsString("sales"));
+				tenant.getBranding().setSupport(vm.getValueAsString(SUPPORT));
+				tenant.getBranding().setSales(vm.getValueAsString(SALES));
 			}
 		}
 

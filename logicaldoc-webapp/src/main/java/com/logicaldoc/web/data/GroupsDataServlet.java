@@ -43,8 +43,8 @@ public class GroupsDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (Object record : records) {
-			Object[] cols = (Object[]) record;
+		for (Object gridRecord : records) {
+			Object[] cols = (Object[]) gridRecord;
 
 			writer.print("<group>");
 			writer.print("<id>" + cols[0] + "</id>");

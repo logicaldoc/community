@@ -15,12 +15,12 @@ import com.logicaldoc.core.searchengine.SearchOptions;
 public class FolderSearchOptions extends SearchOptions {
 	private static final long serialVersionUID = 1L;
 
-	private List<FolderCriterion> criteria = new ArrayList<FolderCriterion>();
+	private List<FolderCriterion> criteria = new ArrayList<>();
 
 	/**
 	 * List of order criteria eg: lastmodified asc, title desc
 	 */
-	private List<String> order = new ArrayList<String>();
+	private List<String> order = new ArrayList<>();
 
 	public List<FolderCriterion> getCriteria() {
 		return criteria;

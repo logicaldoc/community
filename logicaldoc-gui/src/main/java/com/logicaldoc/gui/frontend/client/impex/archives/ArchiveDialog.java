@@ -59,13 +59,13 @@ public class ArchiveDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", null);
+		TextItem name = ItemFactory.newSimpleTextItem("name", null);
 		name.setRequired(true);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", null);
+		TextItem description = ItemFactory.newTextItem("description", null);
 		description.setWidth(300);
 
-		StaticTextItem creator = ItemFactory.newStaticTextItem("creator", "creator", Session.get().getUser()
+		StaticTextItem creator = ItemFactory.newStaticTextItem("creator", Session.get().getUser()
 				.getFullName());
 
 		ButtonItem save = new ButtonItem();
@@ -74,7 +74,7 @@ public class ArchiveDialog extends Window {
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					GUIArchive archive = new GUIArchive();
 					archive.setType(ArchiveDialog.this.archivesPanel.getArchivesType());
 					archive.setName(vm.getValueAsString("name"));

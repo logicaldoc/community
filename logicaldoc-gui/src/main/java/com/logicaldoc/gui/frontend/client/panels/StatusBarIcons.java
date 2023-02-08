@@ -13,7 +13,6 @@ import com.logicaldoc.gui.frontend.client.clipboard.ClipboardObserver;
 import com.logicaldoc.gui.frontend.client.clipboard.ClipboardWindow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
@@ -23,9 +22,11 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class StatusBarIcons extends HLayout implements ClipboardObserver, UserObserver {
+	private static final String CLIPBOARD = "clipboard";
+
 	private static StatusBarIcons instance;
 
-	private Button clipboardCounter = AwesomeFactory.newIconButton("clipboard", "clipboard", "0");
+	private Button clipboardCounter = AwesomeFactory.newIconButton(CLIPBOARD, CLIPBOARD, "0");
 
 	private Button lockedCounter = AwesomeFactory.newIconButton("lock-alt", "event.lockeddocs", "0");
 
@@ -39,44 +40,32 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 
 	private StatusBarIcons() {
 
-		clipboardCounter.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (!Clipboard.getInstance().isEmpty())
-					ClipboardWindow.getInstance().show();
-			}
+		clipboardCounter.addClickHandler((ClickEvent event) -> {
+			if (!Clipboard.getInstance().isEmpty())
+				ClipboardWindow.getInstance().show();
 		});
 
-		lockedCounter.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				MainPanel.get().selectUserTab();
-			}
+		lockedCounter.addClickHandler((ClickEvent event) -> {
+			MainPanel.get().selectUserTab();
 		});
 
-		checkoutCounter.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				MainPanel.get().selectUserTab();
-			}
+		checkoutCounter.addClickHandler((ClickEvent event) -> {
+			MainPanel.get().selectUserTab();
 		});
 
-		messagesCounter.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (Menu.enabled(Menu.MESSAGES))
-					MainPanel.get().selectMessagesTab();
-			}
+		messagesCounter.addClickHandler((ClickEvent event) -> {
+			if (Menu.enabled(Menu.MESSAGES))
+				MainPanel.get().selectMessagesTab();
 		});
 
-		workflowsCounter.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (Feature.enabled(Feature.WORKFLOW))
-					MainPanel.get().selectWorkflowTab();
-			}
+		workflowsCounter.addClickHandler((ClickEvent event) -> {
+			if (Feature.enabled(Feature.WORKFLOW))
+				MainPanel.get().selectWorkflowTab();
 		});
 
-		eventsCounter.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (Menu.enabled(Menu.DASHBOARD_CALENDAR))
-					MainPanel.get().selectCalendarTab();
-			}
+		eventsCounter.addClickHandler((ClickEvent event) -> {
+			if (Menu.enabled(Menu.DASHBOARD_CALENDAR))
+				MainPanel.get().selectCalendarTab();
 		});
 
 		addMember(clipboardCounter);
@@ -114,7 +103,7 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 	@Override
 	public void onRemove(GUIDocument entry) {
 		clipboardCounter
-				.setTitle(AwesomeFactory.getIconHtml("clipboard", Integer.toString(Clipboard.getInstance().size())));
+				.setTitle(AwesomeFactory.getIconHtml(CLIPBOARD, Integer.toString(Clipboard.getInstance().size())));
 	}
 
 	@Override

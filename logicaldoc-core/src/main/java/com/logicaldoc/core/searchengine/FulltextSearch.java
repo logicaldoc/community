@@ -258,7 +258,7 @@ public class FulltextSearch extends Search {
 		}
 
 		// Now sort the hits by score desc
-		List<Hit> sortedHitsList = new ArrayList<Hit>(hitsMap.values());
+		List<Hit> sortedHitsList = new ArrayList<>(hitsMap.values());
 		Collections.sort(sortedHitsList);
 
 		// Populate the hits list discarding unexisting documents
@@ -266,7 +266,7 @@ public class FulltextSearch extends Search {
 	}
 
 	private Map<Long, Hit> buildHitsMap(FulltextSearchOptions opt, Hits results) {
-		Map<Long, Hit> hitsMap = new HashMap<Long, Hit>();
+		Map<Long, Hit> hitsMap = new HashMap<>();
 		while (results != null && results.hasNext()) {
 			Hit hit = results.next();
 			

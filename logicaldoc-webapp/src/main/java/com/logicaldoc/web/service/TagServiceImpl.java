@@ -33,7 +33,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 	public GUITag[] getTagCloud() throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
 		try {
-			ArrayList<GUITag> ret = new ArrayList<GUITag>();
+			ArrayList<GUITag> ret = new ArrayList<>();
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			List<TagCloud> list = dao.getTagCloud(session.getSid());
 
@@ -82,7 +82,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 		Session session = validateSession(getThreadLocalRequest());
 
 		ContextProperties conf = Context.get().getProperties();
-		List<GUIParameter> params = new ArrayList<GUIParameter>();
+		List<GUIParameter> params = new ArrayList<>();
 		for (Object name : conf.keySet()) {
 			if (name.toString().startsWith(session.getTenantName() + ".tag.")
 					|| name.toString().startsWith(session.getTenantName() + ".tagcloud."))

@@ -10,6 +10,8 @@ import javax.mail.internet.MimeUtility;
  */
 public abstract class CharsetUtil {
 
+	private static final String FILE_NAME_CHARSET = "fileNameCharset=";
+
 	private CharsetUtil() {
 	}
 
@@ -25,8 +27,8 @@ public abstract class CharsetUtil {
 
 		if (!mycc.endsWith(";"))
 			mycc += ";";
-		if (mycc.contains("fileNameCharset=")) {
-			mycc = mycc.substring(mycc.indexOf("fileNameCharset=") + "fileNameCharset=".length());
+		if (mycc.contains(FILE_NAME_CHARSET)) {
+			mycc = mycc.substring(mycc.indexOf(FILE_NAME_CHARSET) + FILE_NAME_CHARSET.length());
 			String mychs = mycc.substring(0, mycc.indexOf(";"));
 			String mychs2 = MimeUtility.javaCharset(mychs);
 			return mychs2;

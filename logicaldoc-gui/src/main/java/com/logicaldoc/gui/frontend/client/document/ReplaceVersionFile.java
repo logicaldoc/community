@@ -50,7 +50,7 @@ public class ReplaceVersionFile extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		TextItem commentItem = ItemFactory.newTextItem("comment", "comment", null);
+		TextItem commentItem = ItemFactory.newTextItem("comment", null);
 		commentItem.setRequired(true);
 		commentItem.setWidth(250);
 
@@ -80,7 +80,7 @@ public class ReplaceVersionFile extends Window {
 
 
 	public void onSave() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		if (uploader.getUploadedFile()==null) {

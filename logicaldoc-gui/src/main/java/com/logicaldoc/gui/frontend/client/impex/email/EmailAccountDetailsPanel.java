@@ -118,16 +118,12 @@ public class EmailAccountDetailsPanel extends VLayout {
 		 */
 		if (standardPanel != null) {
 			standardPanel.destroy();
-			if (standardTabPanel.contains(standardPanel))
+			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
 				standardTabPanel.removeMember(standardPanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
+		
 		standardPanel = new EmailAccountStandardProperties(account, changeHandler);
 		standardTabPanel.addMember(standardPanel);
 
@@ -136,7 +132,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 		 */
 		if (advancedPanel != null) {
 			advancedPanel.destroy();
-			if (advancedTabPanel.contains(advancedPanel))
+			if (Boolean.TRUE.equals(advancedTabPanel.contains(advancedPanel)))
 				advancedTabPanel.removeMember(advancedPanel);
 		}
 		advancedPanel = new EmailAccountAdvancedProperties(account, changeHandler);
@@ -147,7 +143,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 		 */
 		if (filtersPanel != null) {
 			filtersPanel.destroy();
-			if (filtersTabPanel.contains(filtersPanel))
+			if (Boolean.TRUE.equals(filtersTabPanel.contains(filtersPanel)))
 				filtersTabPanel.removeMember(filtersPanel);
 		}
 		filtersPanel = new EmailAccountFiltersPanel(account, changeHandler);
@@ -158,7 +154,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 		 */
 		if (automationPanel != null) {
 			automationPanel.destroy();
-			if (automationTabPanel.contains(automationPanel))
+			if (Boolean.TRUE.equals(automationTabPanel.contains(automationPanel)))
 				automationTabPanel.removeMember(automationPanel);
 		}
 		automationPanel = new EmailAccountAutomationPanel(account, changeHandler);

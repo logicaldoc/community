@@ -40,6 +40,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DashletEditor extends Window {
 
+	private static final String CONTENT = "content";
+
+	private static final String UNIQUE = "unique";
+
+	private static final String LABEL = "label";
+
 	private DynamicForm form = new DynamicForm();
 
 	private TextAreaItem content;
@@ -109,7 +115,7 @@ public class DashletEditor extends Window {
 	}
 
 	private VLayout prepareColumnsPanel() {
-		ListGridField attribute = new ListGridField("label", I18N.message("attribute"));
+		ListGridField attribute = new ListGridField(LABEL, I18N.message("attribute"));
 		attribute.setCanEdit(false);
 
 		columnsGrid = new ListGrid();
@@ -156,11 +162,11 @@ public class DashletEditor extends Window {
 							|| sel.getAttributeAsString("name").equals("score"))
 						continue;
 
-					Record record = columnsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (record == null) {
+					Record rec = columnsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+					if (rec == null) {
 						ListGridRecord newRec = new ListGridRecord();
 						newRec.setAttribute("name", sel.getAttributeAsString("name"));
-						newRec.setAttribute("label", sel.getAttributeAsString("label"));
+						newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
 						columnsGrid.addData(newRec);
 					}
 				}
@@ -173,11 +179,11 @@ public class DashletEditor extends Window {
 		columnsGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
 
 		for (String column : dashlet.getColumnsList()) {
-			ListGridRecord record = new ListGridRecord();
+			ListGridRecord rec = new ListGridRecord();
 			String n = column.trim();
-			record.setAttribute("name", n);
-			record.setAttribute("label", Session.get().getInfo().getAttributeLabel(n));
-			columnsGrid.addData(record);
+			rec.setAttribute("name", n);
+			rec.setAttribute(LABEL, Session.get().getInfo().getAttributeLabel(n));
+			columnsGrid.addData(rec);
 		}
 
 		VLayout columnsPanel = new VLayout();
@@ -186,15 +192,15 @@ public class DashletEditor extends Window {
 	}
 
 	private VLayout preparePropertiesPanel() {
-		TextItem title = ItemFactory.newTextItem("title", "title", dashlet.getTitle());
+		TextItem title = ItemFactory.newTextItem("title", dashlet.getTitle());
 		title.setRequired(true);
 		title.setDisabled(dashlet.isSystemDashlet());
 
-		max = ItemFactory.newSpinnerItem("max", "max", dashlet.getMax() != null ? dashlet.getMax() : 1);
+		max = ItemFactory.newSpinnerItem("max", dashlet.getMax() != null ? dashlet.getMax() : 1);
 		max.setMin(1);
 		max.setRequired(true);
 
-		unique = ItemFactory.newYesNoRadioItem("unique", "unique");
+		unique = ItemFactory.newYesNoRadioItem(UNIQUE, UNIQUE);
 		unique.setValue(dashlet.isUnique());
 		unique.setDisabled(dashlet.isSystemDashlet());
 		unique.setRequired(true);
@@ -210,10 +216,10 @@ public class DashletEditor extends Window {
 			}
 		});
 
-		content = ItemFactory.newTextAreaItemForAutomation("content", "content", dashlet.getContent(), null, true);
+		content = ItemFactory.newTextAreaItemForAutomation(CONTENT,  dashlet.getContent(), null, true);
 		content.setWidth("*");
 
-		query = ItemFactory.newTextAreaItemForAutomation("query", "query", dashlet.getQuery(), null, false);
+		query = ItemFactory.newTextAreaItemForAutomation("query", dashlet.getQuery(), null, false);
 		query.setWidth("*");
 
 		form.setWidth100();
@@ -228,7 +234,7 @@ public class DashletEditor extends Window {
 	}
 
 	private void onTypeChange(String newValue) {
-		if ("content".equals(newValue)) {
+		if (CONTENT.equals(newValue)) {
 			content.show();
 			query.hide();
 			unique.hide();
@@ -250,10 +256,10 @@ public class DashletEditor extends Window {
 
 	private void onSave() {
 		if (form.validate()) {
-			dashlet.setContent(form.getValueAsString("content"));
+			dashlet.setContent(form.getValueAsString(CONTENT));
 			dashlet.setQuery(form.getValueAsString("query"));
 			dashlet.setMax(Integer.parseInt(form.getValueAsString("max")));
-			dashlet.setUnique(Boolean.parseBoolean(form.getValueAsString("unique")));
+			dashlet.setUnique(Boolean.parseBoolean(form.getValueAsString(UNIQUE)));
 
 			if (!dashlet.isSystemDashlet()) {
 				dashlet.setType(form.getValueAsString("type"));
@@ -263,10 +269,10 @@ public class DashletEditor extends Window {
 			dashlet.setColumns("");
 			ListGridRecord[] records = columnsGrid.getRecords();
 			if (records != null && records.length > 0) {
-				for (ListGridRecord record : records) {
+				for (ListGridRecord rec : records) {
 					if (!dashlet.getColumns().isEmpty())
 						dashlet.setColumns(dashlet.getColumns() + ",");
-					dashlet.setColumns(dashlet.getColumns() + record.getAttributeAsString("name"));
+					dashlet.setColumns(dashlet.getColumns() + rec.getAttributeAsString("name"));
 				}
 			}
 

@@ -76,9 +76,9 @@ public class Automation {
 		try {
 			if (!RuntimeSingleton.isInitialized()) {
 				RuntimeSingleton.init();
-
-				log.info("Automation has been initialized");
+				log.info("Forced Automation initialization");
 			}
+			log.info("Automation has been initialized");
 		} catch (Throwable t) {
 			log.error("Unable to initialize the automation engine", t);
 		}
@@ -123,8 +123,8 @@ public class Automation {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
 		if (clientDictionary == null)
-			clientDictionary = new ConcurrentHashMap<String, Object>();
-		HashMap<String, Object> dictionary = new HashMap<String, Object>();
+			clientDictionary =  new ConcurrentHashMap<>();
+		HashMap<String, Object> dictionary = new HashMap<>();
 
 		/*
 		 * Scan the classpath to add all the @AutomationDictionary classes

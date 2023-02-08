@@ -60,7 +60,7 @@ public class SplitDialog extends Window {
 		SelectItem separator = ItemFactory.newSplitSeparatorHandlingSelector();
 		separator.setDisabled(true);
 		
-		TextItem expression = ItemFactory.newTextItem("expression", I18N.message("expression"), null);
+		TextItem expression = ItemFactory.newTextItem("expression", null);
 		expression.setDisabled(true);
 
 		SelectItem policy = ItemFactory.newSplittingPolicySelector();
@@ -108,7 +108,7 @@ public class SplitDialog extends Window {
 			public void onClick(ClickEvent event) {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					LD.contactingServer();
 					SplitService.Instance.get().split(document.getId(),
 							Integer.parseInt((String) values.get("splittingpolicy")),

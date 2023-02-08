@@ -23,7 +23,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -162,9 +161,9 @@ public class LDAPServersPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					LDAPService.Instance.get().get(record.getAttributeAsLong("id"), new AsyncCallback<GUILDAPServer>() {
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new AsyncCallback<GUILDAPServer>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -190,10 +189,10 @@ public class LDAPServersPanel extends AdminPanel {
 
 			@Override
 			public void onDropComplete(DropCompleteEvent event) {
-				List<Long> ids = new ArrayList<Long>();
+				List<Long> ids = new ArrayList<>();
 				if (list.getRecords() != null && list.getRecords().length > 0) {
-					for (ListGridRecord record : list.getRecords())
-						ids.add(record.getAttributeAsLong("id"));
+					for (ListGridRecord rec : list.getRecords())
+						ids.add(rec.getAttributeAsLong("id"));
 					LDAPService.Instance.get().reorder(ids.toArray(new Long[0]), new AsyncCallback<Void>() {
 
 						@Override
@@ -221,29 +220,26 @@ public class LDAPServersPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							LDAPService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						LDAPService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									refresh();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								refresh();
+							}
+						});
 					}
 				});
 			}
@@ -264,24 +260,24 @@ public class LDAPServersPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param server the LDAP server to updates
 	 */
 	public void updateRecord(GUILDAPServer server) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, server.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", server.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, server.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", server.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("url", server.getUrl());
+		rec.setAttribute("url", server.getUrl());
 
-		record.setAttribute("eenabled", server.isEnabled() ? "0" : "2");
+		rec.setAttribute("eenabled", server.isEnabled() ? "0" : "2");
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

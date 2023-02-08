@@ -34,7 +34,7 @@ public class SevenZipUtil {
 	}
 
 	public List<String> listEntries(File sevenZipFile) throws IOException {
-		List<String> entries = new ArrayList<String>();
+		List<String> entries = new ArrayList<>();
 
 		try (SevenZFile archiveFile = new SevenZFile(sevenZipFile);) {
 			SevenZArchiveEntry entry;

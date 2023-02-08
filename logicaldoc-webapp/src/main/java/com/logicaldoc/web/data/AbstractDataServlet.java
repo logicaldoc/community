@@ -1,6 +1,8 @@
 package com.logicaldoc.web.data;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServlet;
@@ -28,12 +30,20 @@ public abstract class AbstractDataServlet extends HttpServlet {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractDataServlet.class);
 
+	protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+	
+	
 	public AbstractDataServlet() {
 
 	}
 
 	protected boolean isSessionRequired() {
 		return true;
+	}
+	
+	protected DateFormat getDateFormat() {
+		DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+		return df;
 	}
 	
 	/**

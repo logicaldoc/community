@@ -54,6 +54,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class SearchServiceImpl extends AbstractRemoteService implements SearchService {
 
+	private static final String QUERIES = "queries";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -65,101 +67,31 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 		GUIResult result = new GUIResult();
 		try {
-			SearchOptions searchOptions = toSearchOptions(options);
-			searchOptions.setTenantId(session.getTenantId());
-
-			if (searchOptions instanceof FulltextSearchOptions) {
-				Locale exprLoc = LocaleUtil.toLocale(options.getExpressionLanguage());
-
-				Language lang = LanguageManager.getInstance().getLanguage(exprLoc);
-				if (lang == null) {
-					// Try to find another supported language
-					exprLoc = LocaleUtil.toLocale(exprLoc.getLanguage());
-					lang = LanguageManager.getInstance().getLanguage(exprLoc);
-
-					if (exprLoc != null)
-						((FulltextSearchOptions) searchOptions).setExpressionLanguage(exprLoc.getLanguage());
-				}
-			}
-
-			// Retrieve the search machinery
-			Search search = Search.get(searchOptions);
-
-			try {
-				log.info("Searching max {} hits", searchOptions.getMaxHits());
-				search.search();
-			} catch (Throwable e) {
-				log.error(e.getMessage(), e);
-			}
-
-			result.setEstimatedHits(search.getEstimatedHitsNumber());
-
-			List<Hit> hits = search.getHits();
-
-			result.setTime(search.getExecTime());
-			result.setHasMore(search.isMoreHitsPresent());
+			List<Hit> hits = doSearch(options, session, result);
 
 			BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 			List<Long> bookmarks = bDao.findBookmarkedDocs(session.getUserId());
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			List<GUIDocument> guiResults = new ArrayList<GUIDocument>();
+			List<GUIDocument> guiResults = new ArrayList<>();
 			for (Hit hit : hits) {
-				GUIDocument h = null;
+				GUIDocument guiHit = null;
 				if (hit.getType().startsWith("folder")) {
-					h = DocumentServiceImpl.fromDocument(hit, null, null);
-					h.setIcon(hit.getType());
+					guiHit = DocumentServiceImpl.fromDocument(hit, null, null);
+					guiHit.setIcon(hit.getType());
 				} else {
 					Document doc = docDao.findById(hit.getId());
 					if (doc != null) {
-						h = DocumentServiceImpl.fromDocument(doc, null, null);
+						guiHit = DocumentServiceImpl.fromDocument(doc, null, null);
 					} else {
 						log.debug("Unexisting document {}", hit.getId());
 						continue;
 					}
 				}
 
-				h.setScore(hit.getScore());
-				h.setSummary(hit.getSummary());
-				h.setBookmarked(bookmarks.contains(hit.getId()) || bookmarks.contains(hit.getDocRef()));
+				prepareHit(hit, guiHit, bookmarks);
 
-				/*
-				 * Apply the extended attributes. The template object in search
-				 * hits may have not been fully compiled so the
-				 * DocumentServiceImpl.fromDocument doesn't do the job
-				 */
-				List<GUIAttribute> extList = new ArrayList<GUIAttribute>();
-				for (String name : hit.getAttributeNames()) {
-					Attribute e = hit.getAttributes().get(name);
-					GUIAttribute ext = new GUIAttribute();
-					ext.setName(name);
-					ext.setHidden(e.getHidden() == 1);
-					ext.setReadonly(e.getReadonly() == 1);
-					ext.setMultiple(e.getMultiple() == 1);
-					ext.setSetId(e.getSetId());
-					ext.setDateValue(e.getDateValue());
-					ext.setStringValue(e.getStringValue());
-					ext.setIntValue(e.getIntValue());
-					ext.setDoubleValue(e.getDoubleValue());
-					ext.setBooleanValue(e.getBooleanValue());
-					ext.setType(e.getType());
-					ext.setParent(e.getParent());
-					ext.setStringValues(e.getStringValues());
-					if (e.getType() == Attribute.TYPE_USER)
-						ext.setUsername(ext.getStringValue());
-					extList.add(ext);
-				}
-				h.setAttributes(extList.toArray(new GUIAttribute[0]));
-
-				if ("folder".equals(hit.getType()))
-					h.setIcon("folder_closed");
-				else if ("folderalias".equals(hit.getType()))
-					h.setIcon("folder_alias_closed");
-				else if ("pdf".equals(hit.getDocRefType()))
-					h.setIcon("pdf");
-				else
-					h.setIcon(FileUtil.getBaseName(hit.getIcon()));
-				guiResults.add(h);
+				guiResults.add(guiHit);
 			}
 			result.setHits(guiResults.toArray(new GUIDocument[0]));
 
@@ -167,6 +99,90 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		} catch (Throwable t) {
 			return (GUIResult) throwServerException(session, log, t);
 		}
+	}
+
+	private void prepareHit(Hit hit, GUIDocument guiHit, List<Long> bookmarks) {
+		guiHit.setScore(hit.getScore());
+		guiHit.setSummary(hit.getSummary());
+		guiHit.setBookmarked(bookmarks.contains(hit.getId()) || bookmarks.contains(hit.getDocRef()));
+		if ("folder".equals(hit.getType()))
+			guiHit.setIcon("folder_closed");
+		else if ("folderalias".equals(hit.getType()))
+			guiHit.setIcon("folder_alias_closed");
+		else if ("pdf".equals(hit.getDocRefType()))
+			guiHit.setIcon("pdf");
+		else
+			guiHit.setIcon(FileUtil.getBaseName(hit.getIcon()));
+
+		/*
+		 * Apply the extended attributes. The template object in search hits may
+		 * have not been fully compiled so the DocumentServiceImpl.fromDocument
+		 * doesn't do the job
+		 */
+		List<GUIAttribute> extList = new ArrayList<>();
+		for (String name : hit.getAttributeNames()) {
+			Attribute e = hit.getAttributes().get(name);
+			GUIAttribute ext = new GUIAttribute();
+			ext.setName(name);
+			ext.setHidden(e.getHidden() == 1);
+			ext.setReadonly(e.getReadonly() == 1);
+			ext.setMultiple(e.getMultiple() == 1);
+			ext.setSetId(e.getSetId());
+			ext.setDateValue(e.getDateValue());
+			ext.setStringValue(e.getStringValue());
+			ext.setIntValue(e.getIntValue());
+			ext.setDoubleValue(e.getDoubleValue());
+			ext.setBooleanValue(e.getBooleanValue());
+			ext.setType(e.getType());
+			ext.setParent(e.getParent());
+			ext.setStringValues(e.getStringValues());
+			if (e.getType() == Attribute.TYPE_USER)
+				ext.setUsername(ext.getStringValue());
+			extList.add(ext);
+		}
+		guiHit.setAttributes(extList.toArray(new GUIAttribute[0]));
+	}
+
+	private List<Hit> doSearch(GUISearchOptions options, Session session, GUIResult result) {
+		SearchOptions searchOptions = prepareSearchOptions(options, session);
+
+		// Retrieve the search machinery
+		Search search = Search.get(searchOptions);
+
+		try {
+			log.info("Searching max {} hits", searchOptions.getMaxHits());
+			search.search();
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+		}
+
+		result.setEstimatedHits(search.getEstimatedHitsNumber());
+
+		List<Hit> hits = search.getHits();
+
+		result.setTime(search.getExecTime());
+		result.setHasMore(search.isMoreHitsPresent());
+		return hits;
+	}
+
+	private SearchOptions prepareSearchOptions(GUISearchOptions options, Session session) {
+		SearchOptions searchOptions = toSearchOptions(options);
+		searchOptions.setTenantId(session.getTenantId());
+
+		if (searchOptions instanceof FulltextSearchOptions) {
+			Locale exprLoc = LocaleUtil.toLocale(options.getExpressionLanguage());
+
+			Language lang = LanguageManager.getInstance().getLanguage(exprLoc);
+			if (lang == null) {
+				// Try to find another supported language
+				exprLoc = LocaleUtil.toLocale(exprLoc.getLanguage());
+				lang = LanguageManager.getInstance().getLanguage(exprLoc);
+
+				if (exprLoc != null)
+					((FulltextSearchOptions) searchOptions).setExpressionLanguage(exprLoc.getLanguage());
+			}
+		}
+		return searchOptions;
 	}
 
 	@Override
@@ -224,7 +240,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	 */
 	@Deprecated(forRemoval = true, since = "9.0")
 	private void legacyDelete(long userId, String[] names) {
-		File dir = UserUtil.getUserResource(userId, "queries");
+		File dir = UserUtil.getUserResource(userId, QUERIES);
 		for (String name : names) {
 			File file = new File(dir, name + ".ser");
 			try {
@@ -264,7 +280,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	 */
 	@Deprecated(forRemoval = true, since = "9.0")
 	private GUISearchOptions legacyLoad(long userId, String name) {
-		File dir = UserUtil.getUserResource(userId, "queries");
+		File dir = UserUtil.getUserResource(userId, QUERIES);
 		File file = new File(dir, name + ".ser");
 		SearchOptions opt = null;
 		try {
@@ -289,7 +305,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	public static List<SearchOptions> getSearches(Session session) throws PersistenceException, IOException {
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
-		Map<String, SearchOptions> map = new HashMap<String, SearchOptions>();
+		Map<String, SearchOptions> map = new HashMap<>();
 		List<com.logicaldoc.core.searchengine.saved.SavedSearch> searches = dao.findByUserId(session.getUserId());
 		for (com.logicaldoc.core.searchengine.saved.SavedSearch search : searches) {
 			try {
@@ -311,13 +327,13 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	@Deprecated(forRemoval = true, since = "9.0")
 	private static List<SearchOptions> legacyGetSearches(Session session) {
-		File file = UserUtil.getUserResource(session.getUserId(), "queries");
+		File file = UserUtil.getUserResource(session.getUserId(), QUERIES);
 		if (!file.exists()) {
 			return null;
 		}
 
 		// initiate the list
-		List<SearchOptions> queries = new ArrayList<SearchOptions>();
+		List<SearchOptions> queries = new ArrayList<>();
 
 		File[] searchesFiles = file.listFiles();
 		for (int i = 0; i < searchesFiles.length; i++) {
@@ -361,7 +377,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			op.setSizeMax(((FulltextSearchOptions) searchOptions).getSizeMax());
 			op.setSizeMin(((FulltextSearchOptions) searchOptions).getSizeMin());
 		} else if (searchOptions.getType() == SearchOptions.TYPE_FOLDERS) {
-			List<GUICriterion> criteria = new ArrayList<GUICriterion>();
+			List<GUICriterion> criteria = new ArrayList<>();
 			for (FolderCriterion crit : ((FolderSearchOptions) searchOptions).getCriteria()) {
 				GUICriterion criterion = new GUICriterion();
 				criterion.setField(crit.getField());
@@ -391,52 +407,68 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	@Override
 	public void shareSearch(String name, long[] userIds, long[] groupIds) throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
-		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
-			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(),
-					name);
-			if (search == null) {
-				// Perhaps the search is not already in the database
-				GUISearchOptions legacyOptions = legacyLoad(session.getUserId(), name);
-				if (legacyOptions != null) {
-					save(legacyOptions);
-					search = dao.findByUserIdAndName(session.getUserId(), name);
-				}
-			}
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = loadSavedSearch(name, session);
+			if (search == null)
+				return;
 
-			if (search != null) {
-				HashSet<Long> users = new HashSet<Long>();
-				if (userIds != null)
-					for (Long uId : userIds) {
-						if (!users.contains(uId))
-							users.add(uId);
-					}
-				if (groupIds != null) {
-					UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
-					for (Long gId : groupIds) {
-						Set<User> usrs = gDao.findByGroup(gId);
-						for (User user : usrs) {
-							if (!users.contains(user.getId()))
-								users.add(user.getId());
-						}
-					}
-				}
+			HashSet<Long> users = prepareUsersSet(userIds);
 
-				for (Long userId : users) {
-					try {
-						com.logicaldoc.core.searchengine.saved.SavedSearch clone = new com.logicaldoc.core.searchengine.saved.SavedSearch(
-								search);
-						clone.setUserId(userId);
-						dao.store(clone);
-					} catch (Throwable t) {
-						log.warn("Cannot save search {} for user {}", search.getName(), userId, t);
-					}
+			addUsersFromGroups(groupIds, users);
+
+			SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
+			for (Long userId : users) {
+				try {
+					com.logicaldoc.core.searchengine.saved.SavedSearch clone = new com.logicaldoc.core.searchengine.saved.SavedSearch(
+							search);
+					clone.setUserId(userId);
+					dao.store(clone);
+				} catch (Throwable t) {
+					log.warn("Cannot save search {} for user {}", search.getName(), userId, t);
 				}
 			}
 		} catch (Throwable t) {
 			throwServerException(session, log, t);
 		}
+	}
+
+	private void addUsersFromGroups(long[] groupIds, HashSet<Long> users) {
+		if (groupIds != null) {
+			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			for (Long gId : groupIds) {
+				Set<User> usrs = gDao.findByGroup(gId);
+				for (User user : usrs) {
+					if (!users.contains(user.getId()))
+						users.add(user.getId());
+				}
+			}
+		}
+	}
+
+	private HashSet<Long> prepareUsersSet(long[] userIds) {
+		HashSet<Long> users = new HashSet<>();
+		if (userIds != null)
+			for (Long uId : userIds) {
+				if (!users.contains(uId))
+					users.add(uId);
+			}
+		return users;
+	}
+
+	private com.logicaldoc.core.searchengine.saved.SavedSearch loadSavedSearch(String name, Session session)
+			throws PersistenceException, ServerException {
+		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
+		com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(), name);
+		if (search == null) {
+			// Perhaps the search is not already in the database
+			GUISearchOptions legacyOptions = legacyLoad(session.getUserId(), name);
+			if (legacyOptions != null) {
+				save(legacyOptions);
+				search = dao.findByUserIdAndName(session.getUserId(), name);
+			}
+		}
+		return search;
 	}
 
 	protected java.util.Date convertToJavaDate(Date source) {
@@ -474,7 +506,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			((FulltextSearchOptions) searchOptions).setSizeMax(options.getSizeMax());
 			((FulltextSearchOptions) searchOptions).setSizeMin(options.getSizeMin());
 		} else if (options.getType() == SearchOptions.TYPE_FOLDERS) {
-			List<FolderCriterion> criteria = new ArrayList<FolderCriterion>();
+			List<FolderCriterion> criteria = new ArrayList<>();
 			for (GUICriterion crit : options.getCriteria()) {
 				FolderCriterion c = new FolderCriterion();
 				c.setField(crit.getField());
@@ -503,14 +535,18 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			((FolderSearchOptions) searchOptions).setCriteria(criteria);
 		}
 
+		putFilterIdOptions(options, searchOptions);
+
+		return searchOptions;
+	}
+
+	private void putFilterIdOptions(GUISearchOptions options, SearchOptions searchOptions) {
 		if (options.getFilterIds() != null && options.getFilterIds().length > 0) {
-			Set<Long> ids = new HashSet<Long>();
+			Set<Long> ids = new HashSet<>();
 			for (Long id : options.getFilterIds()) {
 				ids.add(id);
 			}
 			searchOptions.setFilterIds(ids);
 		}
-
-		return searchOptions;
 	}
 }

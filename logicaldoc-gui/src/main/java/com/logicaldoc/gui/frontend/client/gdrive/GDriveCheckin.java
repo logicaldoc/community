@@ -27,6 +27,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 7.3
  */
 public class GDriveCheckin extends Window {
+	private static final String MAJORVERSION = "majorversion";
+
 	private SubmitItem checkin;
 
 	private ValuesManager vm;
@@ -47,10 +49,10 @@ public class GDriveCheckin extends Window {
 		form.setValuesManager(vm);
 
 		BooleanItem versionItem = new BooleanItem();
-		versionItem.setName("majorversion");
-		versionItem.setTitle(I18N.message("majorversion"));
+		versionItem.setName(MAJORVERSION);
+		versionItem.setTitle(I18N.message(MAJORVERSION));
 
-		TextItem commentItem = ItemFactory.newTextItem("comment", "comment", null);
+		TextItem commentItem = ItemFactory.newTextItem("comment", null);
 		commentItem.setRequired(true);
 		commentItem.setWidth(240);
 
@@ -70,11 +72,11 @@ public class GDriveCheckin extends Window {
 	}
 
 	public void onCheckin(final GUIDocument document, final GDriveEditor parentDialog) {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		LD.contactingServer();
 		GDriveService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
-				"true".equals(vm.getValueAsString("majorversion")), new AsyncCallback<GUIDocument>() {
+				"true".equals(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();

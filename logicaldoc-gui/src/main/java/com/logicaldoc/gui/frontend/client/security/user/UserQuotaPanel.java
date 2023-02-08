@@ -20,6 +20,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.1
  */
 public class UserQuotaPanel extends HLayout {
+	private static final String QUOTA = "quota";
+
 	private DynamicForm form1 = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -46,13 +48,13 @@ public class UserQuotaPanel extends HLayout {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 		form1 = new DynamicForm();
 		form1.setValuesManager(vm);
 		form1.setTitleOrientation(TitleOrientation.TOP);
 
-		IntegerItem quota = ItemFactory.newIntegerItem("quota", "quota", null);
+		IntegerItem quota = ItemFactory.newIntegerItem(QUOTA, QUOTA, null);
 		quota.setRequired(true);
 		quota.setWidth(120);
 		quota.setValue(user.getQuota() >= 0 ? user.getQuota() / (1024 * 1024) : -1);
@@ -60,7 +62,7 @@ public class UserQuotaPanel extends HLayout {
 		if (!readonly)
 			quota.addChangedHandler(changedHandler);
 
-		StaticTextItem quotaCount = ItemFactory.newStaticTextItem("quotaCount", "quotacount",
+		StaticTextItem quotaCount = ItemFactory.newStaticTextItem("quotaCount",
 				Util.formatSizeW7(user.getQuotaCount()));
 		quotaCount.setWrap(false);
 
@@ -72,12 +74,12 @@ public class UserQuotaPanel extends HLayout {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			long quota;
-			if (values.get("quota") instanceof String)
-				quota = Integer.parseInt((String) values.get("quota"));
+			if (values.get(QUOTA) instanceof String)
+				quota = Integer.parseInt((String) values.get(QUOTA));
 			else
-				quota = (Integer) values.get("quota");
+				quota = (Integer) values.get(QUOTA);
 			if (quota > 0)
 				user.setQuota(quota * (1024 * 1024));
 			else

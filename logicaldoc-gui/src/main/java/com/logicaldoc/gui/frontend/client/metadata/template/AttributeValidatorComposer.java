@@ -29,6 +29,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class AttributeValidatorComposer extends Window {
 
+	private static final String NUMBER_MAX = "number-max";
+
+	private static final String NUMBER_MIN = "number-min";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private FormItem sourceItem = null;
@@ -94,9 +98,9 @@ public class AttributeValidatorComposer extends Window {
 		if (attributeType == GUIAttribute.TYPE_DATE) {
 			composeDate(stringBuffer);
 		} else if (attributeType == GUIAttribute.TYPE_INT || attributeType == GUIAttribute.TYPE_DOUBLE) {
-			Float min = vm.getValueAsString("number-min") != null ? Float.valueOf(vm.getValueAsString("number-min"))
+			Float min = vm.getValueAsString(NUMBER_MIN) != null ? Float.valueOf(vm.getValueAsString(NUMBER_MIN))
 					: null;
-			Float max = vm.getValueAsString("number-max") != null ? Float.valueOf(vm.getValueAsString("number-max"))
+			Float max = vm.getValueAsString(NUMBER_MAX) != null ? Float.valueOf(vm.getValueAsString(NUMBER_MAX))
 					: null;
 
 			if (min != null) {
@@ -137,9 +141,9 @@ public class AttributeValidatorComposer extends Window {
 	}
 
 	private DynamicForm prepareNumbersForm() {
-		FloatItem min = ItemFactory.newFloatItem("number-min", "minimumvalue", null);
+		FloatItem min = ItemFactory.newFloatItem(NUMBER_MIN, "minimumvalue", null);
 		min.setWrapTitle(false);
-		FloatItem max = ItemFactory.newFloatItem("number-max", "maximumvalue", null);
+		FloatItem max = ItemFactory.newFloatItem(NUMBER_MAX, "maximumvalue", null);
 		max.setWrapTitle(false);
 
 		DynamicForm form = new DynamicForm();
@@ -171,7 +175,7 @@ public class AttributeValidatorComposer extends Window {
 		regexp.setWrapTitle(false);
 
 		SelectItem patterns = ItemFactory.newSelectItem("text-patterns", "commonexpressions");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$", I18N.message("email"));
 		opts.put("^(https?|ftps?|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]$", I18N.message("url"));
 		patterns.setValueMap(opts);

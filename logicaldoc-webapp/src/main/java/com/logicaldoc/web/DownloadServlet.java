@@ -67,7 +67,7 @@ public class DownloadServlet extends HttpServlet {
 				log.error(ex.getMessage(), ex);
 				ServletUtil.sendError(response, ex.getMessage());
 			}
-			
+
 		}
 	}
 
@@ -75,87 +75,155 @@ public class DownloadServlet extends HttpServlet {
 			throws FileNotFoundException, IOException, ServletException, PersistenceException {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		// Flag indicating to download only indexed text
 		String downloadText = request.getParameter("downloadText");
-		String docId = request.getParameter("docId");
-		String versionId = request.getParameter("versionId");
+
+		Long docId = getDocId(request);
+
+		Long versionId = getVersionId(request);
+
 		String ver = request.getParameter("version");
 		String fileVersion = request.getParameter("fileVersion");
-		String filename = "";
 		String suffix = request.getParameter("suffix");
 
-		Version version = null;
-		Document doc = null;
+		Document document = null;
 
-		if (StringUtils.isNotEmpty(docId)) {
-			try {
-				doc = docDao.findById(Long.parseLong(docId));
-			} catch (NumberFormatException e) {
-				log.error("Invalid document ID {}", docId);
-			}
+		if (docId != null) {
+			document = docDao.findById(docId);
 
-			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
-					doc.getFolder().getId(), session.getUserId()))
-				throw new IOException("You don't have the DOWNLOAD permission");
+			checkDownloadPermission(session, document);
 
 			/*
 			 * In case of alias to PDF, we have to serve the PDF conversion
 			 */
-			if (doc.getDocRef() != null && StringUtil.isEmpty(downloadText)
-					&& (doc.getDocRefType() != null && doc.getDocRefType().contains("pdf"))) {
-
-				// Generate the PDF conversion
-				FormatConverterManager manager = (FormatConverterManager) Context.get()
-						.getBean(FormatConverterManager.class);
-				try {
-					manager.convertToPdf(doc, fileVersion, session.getSid());
-				} catch (Exception e) {
-					log.error("Cannot convert to PDF the document {}", doc);
-				}
-
-				suffix = FormatConverterManager.PDF_CONVERSION_SUFFIX;
-			}
+			suffix = convertToPdf(session, downloadText, fileVersion, suffix, document);
 
 			/*
 			 * In case of alias we have to work on the real document
 			 */
-			if (doc.getDocRef() != null)
-				doc = docDao.findById(doc.getDocRef());
+			document = getReferencedDocument(docDao, document);
 		}
 
-		if (StringUtils.isNotEmpty(versionId)) {
-			try {
-				version = versDao.findById(Long.parseLong(versionId));
-			} catch (NumberFormatException e) {
-				log.error("Invalid version ID {}", versionId);
-			}
-
-			if (doc == null && version != null) {
-				doc = docDao.findDocument(version.getDocId());
-				if (!folderDao.isPermissionEnabled(Permission.DOWNLOAD, doc.getFolder().getId(), session.getUserId()))
-					throw new IOException("You don't have the DOWNLOAD permission");
+		Version version = null;
+		if (versionId != null) {
+			version = versDao.findById(versionId);
+			if (document == null && version != null) {
+				document = docDao.findDocument(version.getDocId());
+				checkDownloadPermission(session, document);
 			}
 		}
 
-		if (version == null && doc != null && StringUtils.isNotEmpty(ver))
-			version = versDao.findByVersion(doc.getId(), ver);
+		if (version == null && document != null && StringUtils.isNotEmpty(ver))
+			version = versDao.findByVersion(document.getId(), ver);
 
-		if (version == null && doc != null && StringUtils.isNotEmpty(fileVersion))
-			version = versDao.findByFileVersion(doc.getId(), fileVersion);
+		if (version == null && document != null && StringUtils.isNotEmpty(fileVersion))
+			version = versDao.findByFileVersion(document.getId(), fileVersion);
 
-		if (doc != null && doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
-			throw new IOException("The document is protected by a password");
-
-		if (version != null)
-			filename = version.getFileName();
-		else if (doc != null)
-			filename = doc.getFileName();
+		checkPasswordProtection(session, document);
 
 		/*
 		 * In case the client asks for a safe version of the HTML content
 		 */
+		processSafeHtml(suffix, version, document);
+		
+		String filename = getFilename(document, version);
+		
+		ServletUtil.setContentDisposition(request, response, filename);
+
+		if (StringUtils.isEmpty(fileVersion)) {
+			if (version != null)
+				fileVersion = version.getFileVersion();
+			else if (document != null)
+				fileVersion = document.getFileVersion();
+		}
+
+		if (StringUtils.isEmpty(suffix)) {
+			suffix = "";
+		}
+
+		download(request, response, session, downloadText, docId, fileVersion, filename, suffix, document);
+	}
+
+	private Document getReferencedDocument(DocumentDAO docDao, Document document) throws PersistenceException {
+		if (document.getDocRef() != null)
+			document = docDao.findById(document.getDocRef());
+		return document;
+	}
+
+	private String getFilename(Document document, Version version) {
+		String filename = "";
+		if (version != null)
+			filename = version.getFileName();
+		else if (document != null)
+			filename = document.getFileName();
+		return filename;
+	}
+
+	private Long getVersionId(HttpServletRequest request) {
+		Long versionId = null;
+		try {
+			versionId = Long.parseLong(request.getParameter("versionId"));
+		} catch (NumberFormatException e) {
+			log.error("Invalid version ID {}", versionId);
+		}
+		return versionId;
+	}
+
+	private Long getDocId(HttpServletRequest request) {
+		Long docId = null;
+		try {
+			docId = Long.parseLong(request.getParameter("docId"));
+		} catch (NumberFormatException e) {
+			log.error("Invalid document ID {}", docId);
+		}
+		return docId;
+	}
+
+	private void checkPasswordProtection(Session session, Document doc) throws IOException {
+		if (doc != null && doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
+			throw new IOException("The document is protected by a password");
+	}
+
+	private String convertToPdf(Session session, String downloadText, String fileVersion, String suffix, Document doc) {
+		if (doc.getDocRef() != null && StringUtil.isEmpty(downloadText)
+				&& (doc.getDocRefType() != null && doc.getDocRefType().contains("pdf"))) {
+
+			// Generate the PDF conversion
+			FormatConverterManager manager = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
+			try {
+				manager.convertToPdf(doc, fileVersion, session.getSid());
+			} catch (Exception e) {
+				log.error("Cannot convert to PDF the document {}", doc);
+			}
+
+			suffix = FormatConverterManager.PDF_CONVERSION_SUFFIX;
+		}
+		return suffix;
+	}
+
+	private void checkDownloadPermission(Session session, Document doc) throws PersistenceException, IOException {
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		if (!folderDao.isPermissionEnabled(Permission.DOWNLOAD, doc.getFolder().getId(), session.getUserId()))
+			throw new IOException("You don't have the DOWNLOAD permission");
+	}
+
+	private void download(HttpServletRequest request, HttpServletResponse response, Session session,
+			String downloadText, Long docId, String fileVersion, String filename, String suffix, Document doc)
+			throws FileNotFoundException, IOException, PersistenceException, ServletException {
+		if (doc != null)
+			if ("true".equals(downloadText)) {
+				ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());
+			} else {
+				ServletUtil.downloadDocument(request, response, session.getSid(), doc.getId(), fileVersion, filename,
+						suffix, session.getUser());
+			}
+		else
+			throw new FileNotFoundException("Cannot find document " + docId);
+	}
+
+	private void processSafeHtml(String suffix, Version version, Document doc) throws IOException {
 		if ("safe.html".equals(suffix)) {
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			if (doc != null) {
@@ -171,33 +239,5 @@ public class DownloadServlet extends HttpServlet {
 				}
 			}
 		}
-
-		ServletUtil.setContentDisposition(request, response, filename);
-
-		if (StringUtils.isEmpty(fileVersion)) {
-			if (version != null)
-				fileVersion = version.getFileVersion();
-			else if (doc != null)
-				fileVersion = doc.getFileVersion();
-		}
-
-		if (StringUtils.isEmpty(suffix)) {
-			suffix = "";
-		}
-
-		if (version != null)
-			log.debug("Download version id={}", versionId);
-		else
-			log.debug("Download document id={}", docId);
-
-		if (doc != null)
-			if ("true".equals(downloadText)) {
-				ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());
-			} else {
-				ServletUtil.downloadDocument(request, response, session.getSid(), doc.getId(), fileVersion, filename,
-						suffix, session.getUser());
-			}
-		else
-			throw new FileNotFoundException("Cannot find document " + docId);
 	}
 }

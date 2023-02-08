@@ -2574,7 +2574,7 @@ public class LDRepository {
 			return null;
 		}
 
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		for (String s : filter.split(",")) {
 			s = s.trim();
 			if (s.equals("*")) {

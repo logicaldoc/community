@@ -40,7 +40,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 			return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<AttributeSet>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -51,7 +51,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<AttributeSet>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -76,7 +76,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		if (!checkStoringAspect())
 			return;
 
-		AttributeSet set = (AttributeSet) findById(id);
+		AttributeSet set = findById(id);
 		if (set == null)
 			return;
 
@@ -98,7 +98,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 					ORDER_BY + ENTITY + ".name asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<AttributeSet>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -170,7 +170,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	@Override
 	public Map<Long, AttributeSet> load(long tenantId) {
-		Map<Long, AttributeSet> map = new HashMap<Long, AttributeSet>();
+		Map<Long, AttributeSet> map = new HashMap<>();
 		List<AttributeSet> all = findAll(tenantId);
 		for (AttributeSet set : all)
 			map.put(set.getId(), set);
@@ -182,7 +182,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	 */
 	@Override
 	public Map<String, Attribute> findAttributes(long tenantId, Long setId) {
-		List<AttributeSet> sets = new ArrayList<AttributeSet>();
+		List<AttributeSet> sets = new ArrayList<>();
 		if (setId != null)
 			try {
 				sets.add(findById(setId));
@@ -192,7 +192,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		else
 			sets.addAll(findAll(tenantId));
 
-		Map<String, Attribute> attributes = new TreeMap<String, Attribute>();
+		Map<String, Attribute> attributes = new TreeMap<>();
 		for (AttributeSet set : sets) {
 			initialize(set);
 			Map<String, Attribute> localAttributes = set.getAttributes();

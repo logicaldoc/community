@@ -47,21 +47,21 @@ public class EMail extends Message {
 	 */
 	private long accountId;
 
-	private Map<Integer, EMailAttachment> attachments = new HashMap<Integer, EMailAttachment>();
+	private Map<Integer, EMailAttachment> attachments = new HashMap<>();
 
 	private Recipient from;
 
-	private Set<Recipient> recipientsCC = new HashSet<Recipient>();
+	private Set<Recipient> recipientsCC = new HashSet<>();
 
-	private Set<Recipient> recipientsBCC = new HashSet<Recipient>();
+	private Set<Recipient> recipientsBCC = new HashSet<>();
 
-	private Set<Recipient> replyTo = new HashSet<Recipient>();
+	private Set<Recipient> replyTo = new HashSet<>();
 
 	/**
 	 * This images are added as part of the body, each image will be identified
 	 * with 'image_i'. Use an URL to reference them.
 	 */
-	private Set<String> images = new HashSet<String>();
+	private Set<String> images = new HashSet<>();
 
 	private int attachmentsCount = 0;
 
@@ -298,7 +298,7 @@ public class EMail extends Message {
 	 * @return the email addresses that will receive the message
 	 */
 	public Set<String> getAllRecipientsEmails() {
-		Set<String> emails = new HashSet<String>();
+		Set<String> emails = new HashSet<>();
 		emails.addAll(
 				getRecipients().stream().map(r -> r.getAddress().trim().toLowerCase()).collect(Collectors.toSet()));
 		emails.addAll(recipientsCC.stream().map(r -> r.getAddress().trim().toLowerCase()).collect(Collectors.toSet()));

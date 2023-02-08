@@ -127,22 +127,17 @@ public class TemplateDetailsPanel extends VLayout {
 	protected void refresh() {
 		disableSave();
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
 
 		/*
 		 * Prepare the standard properties tab
 		 */
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
-		propertiesPanel = new TemplatePropertiesPanel(template, changeHandler, this);
+		propertiesPanel = new TemplatePropertiesPanel(template, changeHandler);
 		propertiesTabPanel.addMember(propertiesPanel);
 
 		/*
@@ -150,7 +145,7 @@ public class TemplateDetailsPanel extends VLayout {
 		 */
 		if (validationPanel != null) {
 			validationPanel.destroy();
-			if (validationTabPanel.contains(validationPanel))
+			if (Boolean.TRUE.equals(validationTabPanel.contains(validationPanel)))
 				validationTabPanel.removeMember(validationPanel);
 		}
 		validationPanel = new TemplateValidationPanel(template, changeHandler, this);
@@ -161,7 +156,7 @@ public class TemplateDetailsPanel extends VLayout {
 		 */
 		if (securityPanel != null) {
 			securityPanel.destroy();
-			if (securityTabPanel.contains(securityPanel))
+			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
 				securityTabPanel.removeMember(securityPanel);
 		}
 		securityPanel = new TemplateSecurityPanel(template, changeHandler);

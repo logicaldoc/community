@@ -78,7 +78,7 @@ public class TaskDetailPanel extends VLayout {
 							}
 						});
 			}
-		}  );
+		});
 
 		Tab schedulingTab = new Tab(I18N.message("scheduling"));
 		schedulingTabPanel = new HLayout();
@@ -131,15 +131,10 @@ public class TaskDetailPanel extends VLayout {
 		 */
 		if (schedulingPanel != null) {
 			schedulingPanel.destroy();
-			if (schedulingTabPanel.contains(schedulingPanel))
+			if (Boolean.TRUE.equals(schedulingTabPanel.contains(schedulingPanel)))
 				schedulingTabPanel.removeMember(schedulingPanel);
 		}
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
 		schedulingPanel = new TaskSchedulingPanel(task, changeHandler);
 		schedulingTabPanel.addMember(schedulingPanel);
 
@@ -148,7 +143,7 @@ public class TaskDetailPanel extends VLayout {
 		 */
 		if (notificationPanel != null) {
 			notificationPanel.destroy();
-			if (notificationTabPanel.contains(notificationPanel))
+			if (Boolean.TRUE.equals(notificationTabPanel.contains(notificationPanel)))
 				notificationTabPanel.removeMember(notificationPanel);
 		}
 		notificationPanel = new TaskNotificationPanel(task, changeHandler);
@@ -159,7 +154,7 @@ public class TaskDetailPanel extends VLayout {
 		 */
 		if (logPanel != null) {
 			logPanel.destroy();
-			if (logTabPanel.contains(logPanel))
+			if (Boolean.TRUE.equals(logTabPanel.contains(logPanel)))
 				logTabPanel.removeMember(logPanel);
 		}
 		logPanel = new LogPanel(task.getName() + "_WEB");

@@ -148,7 +148,7 @@ public class CoreWorkBench {
 //		doc4.setFileName("doc004.pdf");
 //		doc4.setDate(df.parse("2020-05-21"));
 //		
-//		List<Document> docs = new ArrayList<Document>();
+//		List<Document> docs = new ArrayList<>();
 //		docs.add(doc1);
 //		docs.add(doc2);
 //		docs.add(doc3);
@@ -191,7 +191,7 @@ public class CoreWorkBench {
 	}
 
 	static void statsStuff() throws ClientProtocolException, IOException {
-		List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+		List<NameValuePair> postParams = new ArrayList<>();
 
 		// Add all statistics as parameters
 		postParams.add(new BasicNameValuePair("id", "pippo"));

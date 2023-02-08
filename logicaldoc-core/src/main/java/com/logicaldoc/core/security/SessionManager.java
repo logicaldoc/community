@@ -51,7 +51,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();
 
-	private transient List<SessionListener> listeners = new ArrayList<SessionListener>();
+	private transient List<SessionListener> listeners = new ArrayList<>();
 
 	private SessionManager() {
 		timeoutWatchDog.start();
@@ -294,7 +294,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return list of sessions
 	 */
 	public List<Session> getSessions() {
-		List<Session> sessions = new ArrayList<Session>(values());
+		List<Session> sessions = new ArrayList<>(values());
 		Collections.sort(sessions);
 		return sessions;
 	}
@@ -304,7 +304,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * {@value #MAX_CLOSED_SESSIONS}
 	 */
 	private void cleanClosedSessions() {
-		List<String> garbage = new ArrayList<String>();
+		List<String> garbage = new ArrayList<>();
 		int counter = 0;
 		for (Session session : getSessions()) {
 			if (getStatus(session.getSid()) != Session.STATUS_OPEN)
@@ -378,7 +378,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		else if (request.getAttribute(PARAM_SID) != null)
 			sid = (String) request.getAttribute(PARAM_SID);
 		else if (request.getParameter(PARAM_SID) != null)
-			sid = (String) request.getParameter(PARAM_SID);
+			sid = request.getParameter(PARAM_SID);
 		else {
 			Cookie cookies[] = request.getCookies();
 			if (cookies != null)

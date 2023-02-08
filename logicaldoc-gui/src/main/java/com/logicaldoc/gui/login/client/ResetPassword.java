@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  */
 public class ResetPassword extends Window {
 
+	private static final String EMAIL = "email";
+
 	protected LoginServiceAsync loginService = (LoginServiceAsync) GWT.create(LoginService.class);
 
 	private ValuesManager vm = new ValuesManager();
@@ -50,9 +52,9 @@ public class ResetPassword extends Window {
 		DynamicForm form = new DynamicForm();
 		form.setMargin(5);
 		form.setValuesManager(vm);
-		TextItem username = ItemFactory.newTextItem("username", "username", "");
+		TextItem username = ItemFactory.newTextItem("username", "");
 		username.setRequired(true);
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setRequired(true);
 		form.setFields(username, email);
 		addItem(form);
@@ -71,9 +73,9 @@ public class ResetPassword extends Window {
 			public void onClick(ClickEvent event) {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					final String userName = (String) values.get("username");
-					final String emailAddress = (String) values.get("email");
+					final String emailAddress = (String) values.get(EMAIL);
 					buttonForm.setDisabled(true);
 					loginService.resetPassword(userName, emailAddress, productName, new AsyncCallback<Void>() {
 

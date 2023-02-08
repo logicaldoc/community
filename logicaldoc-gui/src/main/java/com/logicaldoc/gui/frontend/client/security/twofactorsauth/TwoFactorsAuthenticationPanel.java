@@ -9,7 +9,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -20,6 +19,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 7.7.3
  */
 public class TwoFactorsAuthenticationPanel extends VLayout {
+
+	private static final String FACTOR = "factor";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -42,37 +43,33 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 		notify.setValue(false);
 		notify.setDisabled(true);
 
-		SelectItem method = ItemFactory.new2AFMethodSelector("factor", user.getSecondFactor(), true);
-		method.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				removeMember(setupPanel);
-				if (event.getValue() == null || event.getValue().toString().isEmpty()) {
-					setupPanel = new TwoFactorsAuthenticationSetup();
-					TwoFactorsAuthenticationPanel.this.user.setKey(null);
-					TwoFactorsAuthenticationPanel.this.user.setSecondFactor(null);
-					notify.setValue(false);
-					notify.setDisabled(true);
-				} else if (Constants.TWOFA_GOOGLE_AUTHENTICATOR.equals(event.getValue().toString())) {
-					setupPanel = new GoogleAuthenticatorSetup(TwoFactorsAuthenticationPanel.this.user);
-					notify.setValue(true);
-					notify.setDisabled(false);
-				} else if (Constants.TWOFA_YUBIKEY.equals(event.getValue().toString())) {
-					setupPanel = new YubiKeySetup(TwoFactorsAuthenticationPanel.this.user);
-					notify.setValue(false);
-					notify.setDisabled(true);
-				} else if (Constants.TWOFA_EMAIL_AUTHENTICATOR.equals(event.getValue().toString())) {
-					setupPanel = new EmailAuthenticatorSetup(TwoFactorsAuthenticationPanel.this.user);
-					notify.setValue(false);
-					notify.setDisabled(true);
-				} else if (Constants.TWOFA_DUO.equals(event.getValue().toString())) {
-					setupPanel = new DuoSetup(TwoFactorsAuthenticationPanel.this.user);
-					notify.setValue(false);
-					notify.setDisabled(true);
-				}
-				addMember(setupPanel);
+		SelectItem method = ItemFactory.new2AFMethodSelector(FACTOR, user.getSecondFactor(), true);
+		method.addChangedHandler((ChangedEvent event) -> {
+			removeMember(setupPanel);
+			if (event.getValue() == null || event.getValue().toString().isEmpty()) {
+				setupPanel = new TwoFactorsAuthenticationSetup();
+				TwoFactorsAuthenticationPanel.this.user.setKey(null);
+				TwoFactorsAuthenticationPanel.this.user.setSecondFactor(null);
+				notify.setValue(false);
+				notify.setDisabled(true);
+			} else if (Constants.TWOFA_GOOGLE_AUTHENTICATOR.equals(event.getValue().toString())) {
+				setupPanel = new GoogleAuthenticatorSetup(TwoFactorsAuthenticationPanel.this.user);
+				notify.setValue(true);
+				notify.setDisabled(false);
+			} else if (Constants.TWOFA_YUBIKEY.equals(event.getValue().toString())) {
+				setupPanel = new YubiKeySetup(TwoFactorsAuthenticationPanel.this.user);
+				notify.setValue(false);
+				notify.setDisabled(true);
+			} else if (Constants.TWOFA_EMAIL_AUTHENTICATOR.equals(event.getValue().toString())) {
+				setupPanel = new EmailAuthenticatorSetup(TwoFactorsAuthenticationPanel.this.user);
+				notify.setValue(false);
+				notify.setDisabled(true);
+			} else if (Constants.TWOFA_DUO.equals(event.getValue().toString())) {
+				setupPanel = new DuoSetup(TwoFactorsAuthenticationPanel.this.user);
+				notify.setValue(false);
+				notify.setDisabled(true);
 			}
+			addMember(setupPanel);
 		});
 
 		if (withNotify)
@@ -80,7 +77,7 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 		else
 			form.setItems(method);
 		setMembers(form);
-		
+
 		if (Constants.TWOFA_DUO.equals(user.getSecondFactor())) {
 			setupPanel = new DuoSetup(TwoFactorsAuthenticationPanel.this.user);
 			notify.setValue(false);
@@ -90,7 +87,7 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 	}
 
 	public String getFactor() {
-		return vm.getValueAsString("factor");
+		return vm.getValueAsString(FACTOR);
 	}
 
 	public boolean isNotify() {
@@ -106,8 +103,8 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 	}
 
 	public boolean validate() {
-		if (vm.validate() && setupPanel.validate()) {
-			user.setSecondFactor(vm.getValueAsString("factor"));
+		if (Boolean.TRUE.equals(vm.validate()) && setupPanel.validate()) {
+			user.setSecondFactor(vm.getValueAsString(FACTOR));
 			user.setKey(setupPanel.getKey());
 		}
 

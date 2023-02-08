@@ -25,6 +25,9 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ParametersPanel extends AdminPanel {
 
+	private static final String VALUE = "value";
+	private static final String PARAMETER = "parameter";
+
 	public ParametersPanel() {
 		super("parameters");
 
@@ -52,11 +55,11 @@ public class ParametersPanel extends AdminPanel {
 	}
 
 	private void initGUI(GUIParameter[] settings) {
-		ListGridField parameter = new ListGridField("parameter", I18N.message("parameter"));
+		ListGridField parameter = new ListGridField(PARAMETER, I18N.message(PARAMETER));
 		parameter.setAutoFitWidth(true);
 		parameter.setCanEdit(false);
 
-		ListGridField value = new ListGridField("value", I18N.message("value"));
+		ListGridField value = new ListGridField(VALUE, I18N.message(VALUE));
 		value.setWidth("*");
 		value.setCanEdit(true);
 
@@ -80,8 +83,8 @@ public class ParametersPanel extends AdminPanel {
 		int i = 0;
 		for (GUIParameter guiParameter : settings) {
 			records[i] = new ListGridRecord();
-			records[i].setAttribute("value", guiParameter.getValue());
-			records[i].setAttribute("parameter", guiParameter.getName());
+			records[i].setAttribute(VALUE, guiParameter.getValue());
+			records[i].setAttribute(PARAMETER, guiParameter.getName());
 			i++;
 		}
 		parametersGrid.setRecords(records);
@@ -90,11 +93,11 @@ public class ParametersPanel extends AdminPanel {
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				ArrayList<GUIParameter> params = new ArrayList<GUIParameter>();
+				ArrayList<GUIParameter> params = new ArrayList<>();
 				ListGridRecord[] records = parametersGrid.getRecords();
-				for (ListGridRecord record : records) {
-					GUIParameter param = new GUIParameter(record.getAttributeAsString("parameter"),
-							record.getAttributeAsString("value"));
+				for (ListGridRecord rec : records) {
+					GUIParameter param = new GUIParameter(rec.getAttributeAsString(PARAMETER),
+							rec.getAttributeAsString(VALUE));
 					Session.get().getInfo().setConfig(param.getName(), param.getValue());
 					params.add(param);
 				}

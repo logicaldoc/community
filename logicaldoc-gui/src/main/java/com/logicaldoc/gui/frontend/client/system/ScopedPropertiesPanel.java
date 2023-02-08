@@ -32,6 +32,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ScopedPropertiesPanel extends VLayout {
 
+	private static final String SCOPE = "scope";
 	private RefreshableListGrid list;
 
 	public ScopedPropertiesPanel() {
@@ -63,12 +64,12 @@ public class ScopedPropertiesPanel extends VLayout {
 		value.setCanFilter(true);
 		value.setCanSort(true);
 
-		ListGridField scope = new ListGridField("scope", I18N.message("scope"), 80);
+		ListGridField scope = new ListGridField(SCOPE, I18N.message(SCOPE), 80);
 		scope.setCanFilter(true);
 		scope.setCanSort(true);
 		scope.setCellFormatter(new CellFormatter() {
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				return I18N.message(value.toString());
 			}
 		});
@@ -127,7 +128,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		makelocal.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				LD.ask(I18N.message("question"), I18N.message("confirmmakelocal"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						ClusterService.Instance.get().makeLocal(selectedSettings, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -138,7 +139,7 @@ public class ScopedPropertiesPanel extends VLayout {
 							public void onSuccess(Void result) {
 								ListGridRecord[] selection = list.getSelectedRecords();
 								for (int i = 0; i < selectedSettings.length; i++) {
-									selection[i].setAttribute("scope", "local");
+									selection[i].setAttribute(SCOPE, "local");
 									list.refreshRow(list.getRecordIndex(selection[i]));
 								}
 							}
@@ -155,7 +156,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		makeglobal.setTitle(I18N.message("makeglobal"));
 		makeglobal.addClickHandler((MenuItemClickEvent event) -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmmakeglobal"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					ClusterService.Instance.get().makeGlobal(selectedSettings, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -166,7 +167,7 @@ public class ScopedPropertiesPanel extends VLayout {
 						public void onSuccess(Void result) {
 							ListGridRecord[] selection = list.getSelectedRecords();
 							for (int i = 0; i < selectedSettings.length; i++) {
-								selection[i].setAttribute("scope", "global");
+								selection[i].setAttribute(SCOPE, "global");
 								list.refreshRow(list.getRecordIndex(selection[i]));
 							}
 						}

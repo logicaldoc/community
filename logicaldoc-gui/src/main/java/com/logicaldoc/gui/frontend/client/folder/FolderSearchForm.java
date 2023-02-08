@@ -40,7 +40,6 @@ import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -53,6 +52,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.4.2
  */
 public abstract class FolderSearchForm extends VLayout {
+
+	private static final String TEMPLATE = "template";
+
+	private static final String TYPE = "type:";
+
+	private static final String CASESENSITIVE = "casesensitive";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -86,7 +91,7 @@ public abstract class FolderSearchForm extends VLayout {
 		vm.clearValues();
 		if (getMembers() != null)
 			removeMembers(getMembers());
-		
+
 		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders2"));
 		subfolders.setEndRow(true);
 
@@ -135,7 +140,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 		HLayout spacer = new HLayout();
 		spacer.setMinWidth(30);
-		
+
 		HLayout topLayout = new HLayout();
 		topLayout.setHeight(15);
 		topLayout.setWidth(1);
@@ -148,11 +153,11 @@ public abstract class FolderSearchForm extends VLayout {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
 
-		CheckboxItem casesensitive = new CheckboxItem("casesensitive", I18N.message("casesensitive"));
+		CheckboxItem casesensitive = new CheckboxItem(CASESENSITIVE, I18N.message(CASESENSITIVE));
 		casesensitive.setValue(true);
 		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
 
-		LinkedHashMap<String, String> matchMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> matchMap = new LinkedHashMap<>();
 		matchMap.put("and", I18N.message("matchall"));
 		matchMap.put("or", I18N.message("matchany"));
 		matchMap.put("not", I18N.message("matchnone"));
@@ -169,25 +174,22 @@ public abstract class FolderSearchForm extends VLayout {
 			SelectItem template = ItemFactory.newTemplateSelector(true, null);
 			template.setMultiple(false);
 			template.setEndRow(true);
-			template.addChangedHandler(new ChangedHandler() {
-				@Override
-				public void onChanged(ChangedEvent event) {
-					if (event.getValue() != null && !"".equals((String) event.getValue())) {
-						TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
-								new AsyncCallback<GUITemplate>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+			template.addChangedHandler((ChangedEvent event) -> {
+				if (event.getValue() != null && !"".equals((String) event.getValue())) {
+					TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
+							new AsyncCallback<GUITemplate>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-									@Override
-									public void onSuccess(GUITemplate result) {
-										selectedTemplate = result;
-									}
-								});
-					} else {
-						selectedTemplate = null;
-					}
+								@Override
+								public void onSuccess(GUITemplate result) {
+									selectedTemplate = result;
+								}
+							});
+				} else {
+					selectedTemplate = null;
 				}
 			});
 
@@ -254,7 +256,7 @@ public abstract class FolderSearchForm extends VLayout {
 	 * Prepare the search options.
 	 */
 	protected GUISearchOptions prepareOptions() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return null;
 
 		@SuppressWarnings("unchecked")
@@ -263,7 +265,7 @@ public abstract class FolderSearchForm extends VLayout {
 		GUISearchOptions options = new GUISearchOptions();
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
-		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString("casesensitive")) ? 1 : 0);
+		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString(CASESENSITIVE)) ? 1 : 0);
 
 		options.setType(GUISearchOptions.TYPE_FOLDERS);
 
@@ -273,7 +275,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
 
-		List<GUICriterion> criteria = new ArrayList<GUICriterion>();
+		List<GUICriterion> criteria = new ArrayList<>();
 		if (conditionsLayout.getMembers() != null)
 			for (Canvas canvas : conditionsLayout.getMembers()) {
 				ParameterConditionRow condition = (ParameterConditionRow) canvas;
@@ -289,31 +291,28 @@ public abstract class FolderSearchForm extends VLayout {
 
 	private void addCriterion(ParameterConditionRow condition, List<GUICriterion> criteria) {
 		GUICriterion criterion = new GUICriterion();
-		
+
 		String fieldName = condition.getAttributeFieldItem().getValueAsString();
 		fieldName = fieldName.replace(Constants.BLANK_PLACEHOLDER, " ");
-		
+
 		String fieldOperator = condition.getOperatorsFieldItem().getValueAsString();
 		Object fieldValue = getFieldValue(condition);
 
 		if (fieldName.startsWith("_"))
 			fieldName = fieldName.substring(1);
-		if (fieldName.endsWith("type:" + GUIAttribute.TYPE_INT)
-				|| fieldName.endsWith("type:" + GUIAttribute.TYPE_USER)
-				|| fieldName.endsWith("type:" + GUIAttribute.TYPE_FOLDER))
+		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER))
 			fieldValue = Long.parseLong(fieldValue.toString());
-		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DOUBLE))
+		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE))
 			fieldValue = Double.parseDouble(fieldValue.toString());
-		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN))
+		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN))
 			fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
-		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DATE))
+		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DATE))
 			fieldValue = (Date) fieldValue;
-		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
-			fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_PRESET,
-					"type:" + GUIAttribute.TYPE_STRING);
-		} else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_TEXTAREA)) {
-			fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_TEXTAREA,
-					"type:" + GUIAttribute.TYPE_STRING);
+		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
+			fieldName = fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_PRESET, TYPE + GUIAttribute.TYPE_STRING);
+		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA)) {
+			fieldName = fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA, TYPE + GUIAttribute.TYPE_STRING);
 		}
 		criterion.setField(fieldName);
 
@@ -391,11 +390,9 @@ public abstract class FolderSearchForm extends VLayout {
 	}
 
 	private void setTemplateOption(Map<String, Object> values, GUISearchOptions options) {
-		if (values.containsKey("template") && values.get("template") != null
-				&& !((String) values.get("template")).isEmpty())
-			options.setTemplate(Long.parseLong((String) values.get("template")));
+		if (values.containsKey(TEMPLATE) && values.get(TEMPLATE) != null && !((String) values.get(TEMPLATE)).isEmpty())
+			options.setTemplate(Long.parseLong((String) values.get(TEMPLATE)));
 	}
-
 
 	/**
 	 * Implementations must put here the search logic

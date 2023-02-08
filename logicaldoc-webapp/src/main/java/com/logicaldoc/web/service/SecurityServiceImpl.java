@@ -492,6 +492,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setEnforceWorkingTime(user.getEnforceWorkingTime() == 1);
 				guiUser.setMaxInactivity(user.getMaxInactivity());
 				guiUser.setTimeZone(user.getTimeZone());
+				guiUser.setSource(user.getSource());
 
 				GUIGroup[] grps = new GUIGroup[user.getGroups().size()];
 				int i = 0;

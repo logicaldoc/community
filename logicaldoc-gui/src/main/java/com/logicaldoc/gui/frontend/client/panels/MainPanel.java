@@ -40,6 +40,10 @@ import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
  */
 public class MainPanel extends VLayout implements SessionObserver {
 
+	private static final String SEARCH = "search";
+
+	private static final String DOCUMENT = "documents";
+
 	private TabSet tabSet = new TabSet();
 
 	private Tab documentsTab;
@@ -71,10 +75,10 @@ public class MainPanel extends VLayout implements SessionObserver {
 		setWidth100();
 		setHeight100();
 
-		documentsTab = new Tab(I18N.message("documents"));
-		documentsTab.setName("documents");
-		searchTab = new Tab(I18N.message("search"));
-		searchTab.setName("search");
+		documentsTab = new Tab(I18N.message(DOCUMENT));
+		documentsTab.setName(DOCUMENT);
+		searchTab = new Tab(I18N.message(SEARCH));
+		searchTab.setName(SEARCH);
 		dashboardTab = new Tab(I18N.message("dashboard"));
 		dashboardTab.setName("dashboard");
 		administrationTab = new Tab(I18N.message("administration"));
@@ -222,28 +226,28 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 	public void selectWorkflowTab() {
 		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.WORKFLOW_ID);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.WORKFLOW_ID);
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.WORKFLOW);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.WORKFLOW);
 	}
 
 	public void selectMessagesTab() {
 		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.MESSAGES_ID);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.MESSAGES_ID);
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.MESSAGES);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.MESSAGES);
 	}
 
 	public void selectCalendarTab() {
 		selectDashboardTab();
-		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR_ID);
-		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR_ID);
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR);
 	}
 
 	public boolean isOnDocumentsTab() {
-		return "documents".equals(tabSet.getSelectedTab().getName());
+		return DOCUMENT.equals(tabSet.getSelectedTab().getName());
 	}
 
 	public boolean isOnSearchTab() {
-		return "search".equals(tabSet.getSelectedTab().getName());
+		return SEARCH.equals(tabSet.getSelectedTab().getName());
 	}
 
 	public IncomingMessage getIncomingMessage() {

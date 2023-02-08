@@ -22,13 +22,10 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -44,6 +41,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 8.7
  */
 public class SubscriptionsReport extends ReportPanel implements FolderChangeListener {
+
+	private static final String USER_ID = "userId";
 
 	protected SelectItem userSelector;
 
@@ -76,22 +75,13 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		max.addChangedHandler((ChangedEvent event) -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate())
-					refresh();
-			}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refresh();
 		});
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
@@ -100,12 +90,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
-		userSelector.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		userSelector.addChangedHandler((ChangedEvent event) -> refresh());
 		toolStrip.addFormItem(userSelector);
 
 		folderSelector = new FolderSelector("folder", true);
@@ -115,23 +100,18 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		toolStrip.addFormItem(folderSelector);
 
 		typeSelector = ItemFactory.newSubscriptionTypeSelector();
-		typeSelector.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		typeSelector.addChangedHandler((ChangedEvent event) -> refresh());
 		toolStrip.addFormItem(typeSelector);
 	}
 
 	@Override
 	protected void prepareListGrid() {
-		ListGridField userId = new ColoredListGridField("userId", "userId");
+		ListGridField userId = new ColoredListGridField(USER_ID, USER_ID);
 		userId.setWidth(50);
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new UserListGridField("userName", "userId", "user");
+		ListGridField userName = new UserListGridField("userName", USER_ID, "user");
 		userName.setCanEdit(false);
 
 		ListGridField created = new DateListGridField("created", "subscription");
@@ -176,23 +156,20 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+							}
+						});
 					}
 				});
 			}
@@ -200,36 +177,29 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SubscriptionDialog dialog = new SubscriptionDialog(list);
-				dialog.show();
-			}
-		});
+		edit.addClickHandler((MenuItemClickEvent event) -> new SubscriptionDialog(list).show());
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				String type = record.getAttribute("type");
-				String id = record.getAttribute("objectid");
-				if ("folder".equals(type))
-					DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
-				else {
-					DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
+		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord rec = list.getSelectedRecord();
+			String type = rec.getAttribute("type");
+			String id = rec.getAttribute("objectid");
+			if ("folder".equals(type))
+				DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
+			else {
+				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIDocument result) {
-							DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());
-						}
-					});
-				}
+					@Override
+					public void onSuccess(GUIDocument result) {
+						DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());
+					}
+				});
 			}
 		});
 

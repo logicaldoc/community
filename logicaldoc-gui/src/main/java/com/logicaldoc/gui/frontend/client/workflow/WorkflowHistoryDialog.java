@@ -19,7 +19,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -48,6 +47,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class WorkflowHistoryDialog extends Window {
 
+	private static final String STARTDATE = "startdate";
+
 	private GUIWorkflow selectedWorkflow = null;
 
 	private ComboBoxItem user = null;
@@ -74,7 +75,7 @@ public class WorkflowHistoryDialog extends Window {
 		if (selectedWorkflow != null)
 			workflow.setValue(selectedWorkflow.getName());
 
-		final TextItem tagItem = ItemFactory.newTextItem("tag", "tag", null);
+		final TextItem tagItem = ItemFactory.newTextItem("tag", null);
 
 		max = ItemFactory.newSpinnerItem("max", "display", 50);
 		max.setMin(0);
@@ -117,22 +118,14 @@ public class WorkflowHistoryDialog extends Window {
 		ToolStripButton export = new ToolStripButton();
 		export.setAutoFit(true);
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(instancesGrid, true);
-			}
-		});
+		export.addClickHandler((ClickEvent event) -> 
+				GridUtil.exportCSV(instancesGrid, true));
 
 		ToolStripButton print = new ToolStripButton();
 		print.setAutoFit(true);
 		print.setTitle(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(instancesGrid);
-			}
-		});
+		print.addClickHandler((ClickEvent event) ->
+				GridUtil.print(instancesGrid));
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addFormItem(max);
@@ -161,7 +154,7 @@ public class WorkflowHistoryDialog extends Window {
 		addItem(body);
 
 		ListGridField id = new ListGridField("id", I18N.message("instance"), 70);
-		ListGridField startDate = new DateListGridField("startdate", "startdate", DateCellFormatter.FORMAT_LONG);
+		ListGridField startDate = new DateListGridField(STARTDATE, STARTDATE, DateCellFormatter.FORMAT_LONG);
 
 		ListGridField endDate = new DateListGridField("enddate", "enddate", DateCellFormatter.FORMAT_LONG);
 
@@ -184,7 +177,7 @@ public class WorkflowHistoryDialog extends Window {
 		instancesGrid.setHeight100();
 		instancesGrid.setWidth100();
 		instancesGrid.setBorder("1px solid #E1E1E1");
-		instancesGrid.sort("startdate", SortDirection.DESCENDING);
+		instancesGrid.sort(STARTDATE, SortDirection.DESCENDING);
 		instancesGrid.setFields(id, version, templateId, tag, startDate, endDate, documents, initiator, documentIds);
 
 		instancesGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -219,9 +212,9 @@ public class WorkflowHistoryDialog extends Window {
 	}
 
 	private void onInstanceSelected() {
-		Record record = instancesGrid.getSelectedRecord();
-		historiesPanel.setWfInstanceId(record.getAttributeAsLong("id"));
-		historiesPanel.setWfTemplateId(record.getAttributeAsLong("templateId"));
+		Record rec = instancesGrid.getSelectedRecord();
+		historiesPanel.setWfInstanceId(rec.getAttributeAsLong("id"));
+		historiesPanel.setWfTemplateId(rec.getAttributeAsLong("templateId"));
 		historiesPanel.refresh();
 	}
 
@@ -244,26 +237,23 @@ public class WorkflowHistoryDialog extends Window {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							WorkflowService.Instance.get().deleteInstance(selection.getAttributeAsString("id"),
-									new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						WorkflowService.Instance.get().deleteInstance(selection.getAttributeAsString("id"),
+								new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onSuccess(Void result) {
-											instancesGrid.removeSelectedData();
-											instancesGrid.deselectAllRecords();
-											historiesPanel.getHistoriesGrid().removeSelectedData();
-											historiesPanel.getHistoriesGrid().deselectAllRecords();
-										}
-									});
-						}
+									@Override
+									public void onSuccess(Void result) {
+										instancesGrid.removeSelectedData();
+										instancesGrid.deselectAllRecords();
+										historiesPanel.getHistoriesGrid().removeSelectedData();
+										historiesPanel.getHistoriesGrid().deselectAllRecords();
+									}
+								});
 					}
 				});
 			}
@@ -271,23 +261,21 @@ public class WorkflowHistoryDialog extends Window {
 
 		MenuItem completionDiagram = new MenuItem();
 		completionDiagram.setTitle(I18N.message("completiondiagram"));
-		completionDiagram.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
-						selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
-						new AsyncCallback<GUIWorkflow>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		completionDiagram.addClickHandler((MenuItemClickEvent event) -> {
+			WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
+					selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
+					new AsyncCallback<GUIWorkflow>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIWorkflow workflow) {
-								WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
-								diagramWindow.show();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(GUIWorkflow workflow) {
+							WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
+							diagramWindow.show();
+						}
+					});
 		});
 
 		contextMenu.setItems(completionDiagram, delete);

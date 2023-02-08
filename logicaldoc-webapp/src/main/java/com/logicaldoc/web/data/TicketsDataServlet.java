@@ -3,10 +3,8 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,8 +42,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 						+ session.getTenantId()
 						+ " and B.ld_deleted=0 and A.ld_docid=B.ld_id order by A.ld_creation desc");
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
 
 		SqlRowSet set = dao.queryForRowSet(query.toString(), null, max != null ? max : 100);
 

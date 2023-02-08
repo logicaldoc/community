@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
  */
 public class EasyX509TrustManager implements X509TrustManager {
 
+	private static final String LDOC_SSL_VALIDATE = "ldoc.ssl.validate";
+
 	private static Logger log = LoggerFactory.getLogger(EasyX509TrustManager.class);
 
 	private static X509TrustManager dafaultTrustManager = null;
@@ -44,19 +46,19 @@ public class EasyX509TrustManager implements X509TrustManager {
 
 	@Override
 	public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-		if ("true".equals(System.getProperty("ldoc.ssl.validate")) && dafaultTrustManager != null)
+		if ("true".equals(System.getProperty(LDOC_SSL_VALIDATE)) && dafaultTrustManager != null)
 			dafaultTrustManager.checkClientTrusted(arg0, arg1);
 	}
 
 	@Override
 	public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-		if ("true".equals(System.getProperty("ldoc.ssl.validate")) && dafaultTrustManager != null)
+		if ("true".equals(System.getProperty(LDOC_SSL_VALIDATE)) && dafaultTrustManager != null)
 			dafaultTrustManager.checkServerTrusted(arg0, arg1);
 	}
 
 	@Override
 	public X509Certificate[] getAcceptedIssuers() {
-		if ("true".equals(System.getProperty("ldoc.ssl.validate")) && dafaultTrustManager != null)
+		if ("true".equals(System.getProperty(LDOC_SSL_VALIDATE)) && dafaultTrustManager != null)
 			return dafaultTrustManager.getAcceptedIssuers();
 		else
 			return new X509Certificate[0];

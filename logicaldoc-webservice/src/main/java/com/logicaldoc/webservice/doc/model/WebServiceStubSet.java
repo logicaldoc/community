@@ -10,7 +10,7 @@ public class WebServiceStubSet {
 
 	private Class<?> webServiceClass;
 
-	private List<WebMethodStubSet> methodStubs = new ArrayList<WebMethodStubSet>();
+	private List<WebMethodStubSet> methodStubs = new ArrayList<>();
 
 	private String release;
 

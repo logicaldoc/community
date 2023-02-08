@@ -66,7 +66,7 @@ public class Registration extends Window {
 		apply.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					SettingService.Instance.get().saveRegistration(form.getValueAsString("reg_name"),
 							form.getValueAsString("reg_email"), form.getValueAsString("reg_organization"),
 							form.getValueAsString("reg_website"), new AsyncCallback<Void>() {

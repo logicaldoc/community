@@ -18,7 +18,7 @@ public class FolderController {
 
 	private static FolderController instance = new FolderController();
 
-	private Set<FolderObserver> observers = new HashSet<FolderObserver>();
+	private Set<FolderObserver> observers = new HashSet<>();
 
 	private GUIFolder currentFolder;
 	

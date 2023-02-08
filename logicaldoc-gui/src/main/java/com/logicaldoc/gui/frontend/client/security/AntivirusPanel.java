@@ -26,6 +26,12 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class AntivirusPanel extends VLayout {
 
+	private static final String ENABLED = "enabled";
+	private static final String ANTIVIRUS_EXCLUDES = ".antivirus.excludes";
+	private static final String ANTIVIRUS_INCLUDES = ".antivirus.includes";
+	private static final String ANTIVIRUS_TIMEOUT = ".antivirus.timeout";
+	private static final String ANTIVIRUS_ENABLED = ".antivirus.enabled";
+	private static final String ANTIVIRUS_COMMAND = "antivirus.command";
 	private DynamicForm form = new DynamicForm();
 
 	public AntivirusPanel() {
@@ -38,8 +44,8 @@ public class AntivirusPanel extends VLayout {
 	protected void onDraw() {
 		String tenant = Session.get().getTenantName();
 		SettingService.Instance.get()
-				.loadSettingsByNames(new String[] { "antivirus.command", tenant + ".antivirus.enabled",
-						tenant + ".antivirus.includes", tenant + ".antivirus.excludes", tenant + ".antivirus.timeout" },
+				.loadSettingsByNames(new String[] { ANTIVIRUS_COMMAND, tenant + ANTIVIRUS_ENABLED,
+						tenant + ANTIVIRUS_INCLUDES, tenant + ANTIVIRUS_EXCLUDES, tenant + ANTIVIRUS_TIMEOUT },
 						new AsyncCallback<GUIParameter[]>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -62,17 +68,17 @@ public class AntivirusPanel extends VLayout {
 		save.addClickHandler((ClickEvent event) -> {
 			if (form.validate()) {
 				GUIParameter[] params = new GUIParameter[Session.get().isDefaultTenant() ? 4 : 3];
-				params[0] = new GUIParameter(Session.get().getTenantName() + ".antivirus.enabled",
-						"" + ("yes".equals(form.getValueAsString("enabled"))));
-				params[1] = new GUIParameter(Session.get().getTenantName() + ".antivirus.excludes",
+				params[0] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_ENABLED,
+						"" + ("yes".equals(form.getValueAsString(ENABLED))));
+				params[1] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_EXCLUDES,
 						form.getValueAsString("excludes").trim());
-				params[2] = new GUIParameter(Session.get().getTenantName() + ".antivirus.includes",
+				params[2] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_INCLUDES,
 						form.getValueAsString("includes").trim());
-				params[3] = new GUIParameter(Session.get().getTenantName() + ".antivirus.timeout",
+				params[3] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_TIMEOUT,
 						form.getValueAsString("timeout").trim());
 
 				if (Session.get().isDefaultTenant())
-					params[4] = new GUIParameter("antivirus.command", form.getValueAsString("command").trim());
+					params[4] = new GUIParameter(ANTIVIRUS_COMMAND, form.getValueAsString("command").trim());
 
 				SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
 
@@ -105,7 +111,7 @@ public class AntivirusPanel extends VLayout {
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setAlign(Alignment.LEFT);
 
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("enabled", I18N.message("enabled"));
+		RadioGroupItem enabled = ItemFactory.newBooleanSelector(ENABLED, I18N.message(ENABLED));
 		enabled.setWrapTitle(false);
 		enabled.setRequired(true);
 
@@ -118,19 +124,19 @@ public class AntivirusPanel extends VLayout {
 		TextItem excludes = ItemFactory.newTextItem("excludes", "exclude", null);
 		excludes.setWidth(400);
 
-		TextItem timeout = ItemFactory.newSpinnerItem("timeout", "timeout", (Integer) null);
+		TextItem timeout = ItemFactory.newSpinnerItem("timeout", (Integer) null);
 		timeout.setHint(I18N.message("seconds"));
 
 		for (GUIParameter setting : settings) {
-			if ((Session.get().getTenantName() + ".antivirus.enabled").equals(setting.getName()))
+			if ((Session.get().getTenantName() + ANTIVIRUS_ENABLED).equals(setting.getName()))
 				enabled.setValue("true".equals(setting.getValue()) ? "yes" : "no");
-			else if ("antivirus.command".equals(setting.getName()))
+			else if (ANTIVIRUS_COMMAND.equals(setting.getName()))
 				command.setValue(setting.getValue());
-			else if ((Session.get().getTenantName() + ".antivirus.excludes").equals(setting.getName()))
+			else if ((Session.get().getTenantName() + ANTIVIRUS_EXCLUDES).equals(setting.getName()))
 				excludes.setValue(setting.getValue());
-			else if ((Session.get().getTenantName() + ".antivirus.includes").equals(setting.getName()))
+			else if ((Session.get().getTenantName() + ANTIVIRUS_INCLUDES).equals(setting.getName()))
 				includes.setValue(setting.getValue());
-			else if ((Session.get().getTenantName() + ".antivirus.timeout").equals(setting.getName()))
+			else if ((Session.get().getTenantName() + ANTIVIRUS_TIMEOUT).equals(setting.getName()))
 				timeout.setValue(Integer.parseInt(setting.getValue()));
 		}
 

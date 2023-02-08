@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class TenantPropertiesPanel extends HLayout {
+	private static final String EMAIL = "email";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -59,66 +61,45 @@ public class TenantPropertiesPanel extends HLayout {
 	}
 
 	public void refresh() {
-		boolean readonly = (changedHandler == null);
-		vm.clearValues();
-		vm.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
-
-		if (contains(form))
-			removeChild(form);
-
-		form = new DynamicForm();
-		form.setValuesManager(vm);
-		form.setWrapItemTitles(false);
-		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setNumCols(3);
-
-		layout.addMember(form, 1);
+		boolean readonly = prepareForm();
 
 		CheckboxItem enabled = new CheckboxItem("eenabled", I18N.message("enabled"));
 		enabled.setValue(tenant.isEnabled());
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", tenant.getName());
-		name.setRequired(true);
-		name.setSelectOnFocus(true);
-		name.setDisabled(readonly || (tenant.getId() != 0 && Constants.TENANT_DEFAULTNAME.equals(tenant.getName())));
-		if (!readonly)
-			name.addChangedHandler(changedHandler);
+		TextItem name = prepareNameItem(readonly);
 
-		TextItem displayName = ItemFactory.newTextItem("displayname", "displayname", tenant.getDisplayName());
+		TextItem displayName = ItemFactory.newTextItem("displayname", tenant.getDisplayName());
 		displayName.setRequired(true);
 		displayName.setDisabled(readonly);
 		if (!readonly)
 			displayName.addChangedHandler(changedHandler);
 
-		TextItem address = ItemFactory.newTextItem("address", "address", tenant.getStreet());
+		TextItem address = ItemFactory.newTextItem("address", tenant.getStreet());
 		address.setDisabled(readonly);
 		if (!readonly)
 			address.addChangedHandler(changedHandler);
 
-		TextItem postalcode = ItemFactory.newTextItem("postalcode", "postalcode", tenant.getPostalCode());
+		TextItem postalcode = ItemFactory.newTextItem("postalcode", tenant.getPostalCode());
 		postalcode.setDisabled(readonly);
 		if (!readonly)
 			postalcode.addChangedHandler(changedHandler);
 
-		TextItem city = ItemFactory.newTextItem("city", "city", tenant.getCity());
+		TextItem city = ItemFactory.newTextItem("city", tenant.getCity());
 		city.setDisabled(readonly);
 		if (!readonly)
 			city.addChangedHandler(changedHandler);
 
-		TextItem country = ItemFactory.newTextItem("country", "country", tenant.getCountry());
+		TextItem country = ItemFactory.newTextItem("country", tenant.getCountry());
 		country.setDisabled(readonly);
 		if (!readonly)
 			country.addChangedHandler(changedHandler);
 
-		TextItem state = ItemFactory.newTextItem("state", "state", tenant.getState());
+		TextItem state = ItemFactory.newTextItem("state", tenant.getState());
 		state.setDisabled(readonly);
 		if (!readonly)
 			state.addChangedHandler(changedHandler);
 
-		TextItem phone = ItemFactory.newTextItem("phone", "phone", tenant.getTelephone());
+		TextItem phone = ItemFactory.newTextItem("phone", tenant.getTelephone());
 		phone.setDisabled(readonly);
 		if (!readonly)
 			phone.addChangedHandler(changedHandler);
@@ -129,13 +110,13 @@ public class TenantPropertiesPanel extends HLayout {
 		if (!readonly)
 			expire.addChangedHandler(changedHandler);
 
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setDisabled(readonly);
 		email.setValue(tenant.getEmail());
 		if (!readonly)
 			email.addChangedHandler(changedHandler);
 
-		if (readonly || "default".equals(tenant.getName())) {
+		if (readonly || tenant.isDefault()) {
 			enabled.setDisabled(true);
 			expire.setDisabled(true);
 		} else {
@@ -147,11 +128,42 @@ public class TenantPropertiesPanel extends HLayout {
 		addMember(layout);
 	}
 
+	private TextItem prepareNameItem(boolean readonly) {
+		TextItem name = ItemFactory.newSimpleTextItem("name", tenant.getName());
+		name.setRequired(true);
+		name.setSelectOnFocus(true);
+		name.setDisabled(readonly || (tenant.getId() != 0 && Constants.TENANT_DEFAULTNAME.equals(tenant.getName())));
+		if (!readonly)
+			name.addChangedHandler(changedHandler);
+		return name;
+	}
+
+	private boolean prepareForm() {
+		boolean readonly = (changedHandler == null);
+		vm.clearValues();
+		vm.clearErrors(false);
+
+		if (form != null)
+			form.destroy();
+
+		if (Boolean.TRUE.equals(contains(form)))
+			removeChild(form);
+
+		form = new DynamicForm();
+		form.setValuesManager(vm);
+		form.setWrapItemTitles(false);
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setNumCols(3);
+
+		layout.addMember(form, 1);
+		return readonly;
+	}
+
 	@SuppressWarnings("unchecked")
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			if (values.get("name") != null)
 				tenant.setName((String) values.get("name"));
 
@@ -162,7 +174,7 @@ public class TenantPropertiesPanel extends HLayout {
 			tenant.setState((String) values.get("state"));
 			tenant.setPostalCode((String) values.get("postalcode"));
 			tenant.setTelephone((String) values.get("phone"));
-			tenant.setEmail((String) values.get("email"));
+			tenant.setEmail((String) values.get(EMAIL));
 			tenant.setEnabled(Boolean.valueOf(values.get("eenabled").toString()));
 			tenant.setExpire((Date) values.get("expire"));
 		}

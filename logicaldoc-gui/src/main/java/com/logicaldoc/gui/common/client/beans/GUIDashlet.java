@@ -158,7 +158,7 @@ public class GUIDashlet implements Serializable {
 	}
 
 	public List<String> getColumnsList() {
-		List<String> set = new ArrayList<String>();
+		List<String> set = new ArrayList<>();
 		if (columns != null && !columns.isEmpty()) {
 			if (!columns.contains(",")) {
 				set.add(columns.trim());
@@ -177,7 +177,7 @@ public class GUIDashlet implements Serializable {
 	 * @return the extended attribute names
 	 */
 	public List<String> getExtendedAttributes() {
-		List<String> set = new ArrayList<String>();
+		List<String> set = new ArrayList<>();
 		for (String column : getColumnsList()) {
 			if (column.startsWith("ext_"))
 				set.add(column.substring(4));

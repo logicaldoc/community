@@ -42,7 +42,7 @@ public abstract class AbstractStorer implements Storer {
 
 	protected int id = 1;
 
-	protected Map<String, String> parameters = new HashMap<String, String>();
+	protected Map<String, String> parameters = new HashMap<>();
 
 	public AbstractStorer() {
 	}

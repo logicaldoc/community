@@ -9,7 +9,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
@@ -120,14 +119,11 @@ public abstract class ZoneCanvas extends Label {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							zonePanel.getSelectedOcrTemplate().removeZone(zone.getName());
-							zonePanel.getSample().clearCanvases();
-							zonePanel.showZones();
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						zonePanel.getSelectedOcrTemplate().removeZone(zone.getName());
+						zonePanel.getSample().clearCanvases();
+						zonePanel.showZones();
 					}
 				});
 			}
@@ -135,11 +131,7 @@ public abstract class ZoneCanvas extends Label {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onEdit();
-			}
-		});
+		edit.addClickHandler((MenuItemClickEvent event) -> onEdit());
 
 		contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();

@@ -45,6 +45,10 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public class ApplicationListener implements ServletContextListener, HttpSessionListener {
 
+	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
+	private static final String JDBC_URL = "jdbc.url";
+
 	private static Logger log = LoggerFactory.getLogger(ApplicationListener.class);
 
 	private boolean pidCreated = false;
@@ -77,16 +81,16 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		 */
 		try {
 			ContextProperties config = new ContextProperties();
-			if (config.getProperty("jdbc.url").contains("jdbc:hsqldb")) {
+			if (config.getProperty(JDBC_URL).contains("jdbc:hsqldb")) {
 				DBInit dbInit = new DBInit();
 				dbInit.setDriver(config.getProperty("jdbc.driver"));
-				dbInit.setUrl(config.getProperty("jdbc.url"));
+				dbInit.setUrl(config.getProperty(JDBC_URL));
 				dbInit.setUsername(config.getProperty("jdbc.username"));
 				dbInit.setPassword(config.getProperty("jdbc.password"));
 
 				dbInit.executeSql("shutdown compact");
 				log.warn("Embedded database stopped");
-			} else if (config.getProperty("jdbc.url").contains("jdbc:mysql")) {
+			} else if (config.getProperty(JDBC_URL).contains("jdbc:mysql")) {
 				com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.uncheckedShutdown();
 			}
 		} catch (Throwable e) {
@@ -137,32 +141,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			ServletContext context = sce.getServletContext();
 
 			// Initialize logging
-			String log4jPath = null;
-			try {
-				URL configFile = null;
-				try {
-					configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
-				} catch (Throwable t) {
-					// Nothing to do
-				}
-
-				if (configFile == null)
-					configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
-
-				log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
-
-				// Setup the correct logs folder
-				ContextProperties config = new ContextProperties();
-				LoggingConfigurator lconf = new LoggingConfigurator();
-				lconf.setLogsRoot(config.getProperty("conf.logdir"));
-				lconf.write();
-
-				// Init the logs
-				System.out.println(String.format("Taking log configuration from %s", log4jPath));
-				Configurator.initialize(null, log4jPath);
-			} catch (Throwable e) {
-				System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
-			}
+			initializeLogging();
 
 			// Update the web descriptor with the correct transport guarantee
 			try {
@@ -184,41 +163,10 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 			// Reinitialize logging because some plugins may have added new
 			// categories
-			try {
-				final LoggerContextFactory factory = LogManager.getFactory();
-
-				if (factory instanceof Log4jContextFactory) {
-					Log4jContextFactory contextFactory = (Log4jContextFactory) factory;
-					((DefaultShutdownCallbackRegistry) contextFactory.getShutdownCallbackRegistry()).stop();
-				}
-			} catch (Throwable e) {
-				log.error(e.getMessage(), e);
-			}
+			initializeLoggingAfterPlugins();
 
 			// Clean some temporary folders
-			File tempDirToDelete = new File(context.getRealPath("upload"));
-			try {
-				if (tempDirToDelete.exists())
-					FileUtils.forceDelete(tempDirToDelete);
-			} catch (IOException e) {
-				log.warn(e.getMessage());
-			}
-
-			tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/upload");
-			try {
-				if (tempDirToDelete.exists())
-					FileUtils.forceDelete(tempDirToDelete);
-			} catch (IOException e) {
-				log.warn(e.getMessage());
-			}
-
-			tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/convertjpg");
-			try {
-				if (tempDirToDelete.exists())
-					FileUtils.forceDelete(tempDirToDelete);
-			} catch (IOException e) {
-				log.warn(e.getMessage());
-			}
+			cleanTemporaryFolders(context);
 
 			// Initialize the Automation
 			Automation.initialize();
@@ -237,6 +185,74 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			}
 		} finally {
 			writePidFile();
+		}
+	}
+
+	private void cleanTemporaryFolders(ServletContext context) {
+		File tempDirToDelete = new File(context.getRealPath("upload"));
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+
+		tempDirToDelete = new File(System.getProperty(JAVA_IO_TMPDIR) + "/upload");
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+
+		tempDirToDelete = new File(System.getProperty(JAVA_IO_TMPDIR) + "/convertjpg");
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+	}
+
+	private void initializeLoggingAfterPlugins() {
+		try {
+			final LoggerContextFactory factory = LogManager.getFactory();
+
+			if (factory instanceof Log4jContextFactory) {
+				Log4jContextFactory contextFactory = (Log4jContextFactory) factory;
+				((DefaultShutdownCallbackRegistry) contextFactory.getShutdownCallbackRegistry()).stop();
+			}
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	private void initializeLogging() {
+		String log4jPath = null;
+		try {
+			URL configFile = null;
+			try {
+				configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
+			} catch (Throwable t) {
+				// Nothing to do
+			}
+
+			if (configFile == null)
+				configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
+
+			log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
+
+			// Setup the correct logs folder
+			ContextProperties config = new ContextProperties();
+			LoggingConfigurator lconf = new LoggingConfigurator();
+			lconf.setLogsRoot(config.getProperty("conf.logdir"));
+			lconf.write();
+
+			// Init the logs
+			System.out.println(String.format("Taking log configuration from %s", log4jPath));
+			Configurator.initialize(null, log4jPath);
+		} catch (Throwable e) {
+			System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
 		}
 	}
 
@@ -307,7 +323,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		}
 
 		String sid = (String) session.getAttribute("sid");
-		File uploadDir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + sid);
+		File uploadDir = new File(System.getProperty(JAVA_IO_TMPDIR) + "/upload/" + sid);
 		try {
 			if (uploadDir.exists())
 				FileUtils.forceDelete(uploadDir);

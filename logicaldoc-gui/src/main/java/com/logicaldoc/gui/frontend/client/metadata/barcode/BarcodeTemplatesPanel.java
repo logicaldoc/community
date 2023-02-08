@@ -93,12 +93,12 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 			Record[] records = positionalGrid.getRecords();
 			GUIBarcodeZone[] patterns = new GUIBarcodeZone[records.length];
 			int i = 0;
-			for (Record record : records) {
+			for (Record rec : records) {
 				GUIBarcodeZone patt = new GUIBarcodeZone();
-				patt.setPatterns(record.getAttributeAsString("pattern"));
-				patt.setInclude(record.getAttributeAsString("include"));
-				patt.setExclude(record.getAttributeAsString("exclude"));
-				patt.setFormats(record.getAttributeAsString("formats"));
+				patt.setPatterns(rec.getAttributeAsString("pattern"));
+				patt.setInclude(rec.getAttributeAsString("include"));
+				patt.setExclude(rec.getAttributeAsString("exclude"));
+				patt.setFormats(rec.getAttributeAsString("formats"));
 				patterns[i++] = patt;
 				patt.setIndex(i);
 			}
@@ -133,33 +133,33 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
-		
+
 		addTemplateSelector(documentTemplateId);
 
 		addBarcodeTemplateSelector(documentTemplateId, barcodeTemplateId);
 
 		addNewTemplateButton();
-		
+
 		addSettingsButton();
-		
+
 		addSaveButton();
 
 		addAppendButton();
-		
+
 		addDeleteButton();
 
 		toolStrip.addSeparator();
-		
+
 		addZoomInButton();
-		
+
 		addZoomOutButton();
-		
+
 		addPrintButton();
-		
+
 		toolStrip.addSeparator();
-		
+
 		addCloseButton();
-		
+
 		toolStrip.addFill();
 
 		editorPanel = new HLayout();
@@ -213,11 +213,11 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		zoomOut = new ToolStripButton();
 		zoomOut.setTitle(I18N.message("zoomout"));
 		zoomOut.addClickHandler((ClickEvent zoomOutClick) -> {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(-100);
-					showZones();
-				}
+			if (sample != null) {
+				sample.clearCanvases();
+				sample.resize(-100);
+				showZones();
+			}
 		});
 		toolStrip.addButton(zoomOut);
 	}
@@ -226,11 +226,11 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		zoomIn = new ToolStripButton();
 		zoomIn.setTitle(I18N.message("zoomin"));
 		zoomIn.addClickHandler((ClickEvent zoomInClick) -> {
-				if (sample != null) {
-					sample.clearCanvases();
-					sample.resize(+100);
-					showZones();
-				}
+			if (sample != null) {
+				sample.clearCanvases();
+				sample.resize(+100);
+				showZones();
+			}
 		});
 		toolStrip.addButton(zoomIn);
 	}
@@ -241,7 +241,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((ClickEvent deleteClick) -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmdeletebarcodetemplate"), (Boolean yes) -> {
-				if (yes)
+				if (Boolean.TRUE.equals(yes))
 					BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
 
 						@Override
@@ -277,9 +277,9 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 				Canvas zoneCanvas = new BarcodeZoneCanvas(zone, BarcodeTemplatesPanel.this);
 				sample.addCanvas(zoneCanvas);
 			} else {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("pattern", "");
-				positionalGrid.getRecordList().add(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("pattern", "");
+				positionalGrid.getRecordList().add(rec);
 			}
 		});
 		toolStrip.addButton(append);
@@ -299,9 +299,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
 		settings.addClickHandler((ClickEvent settingsClick) -> {
-			BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this,
-					((GUIBarcodeTemplate) selectedOcrTemplate));
-			editor.show();
+			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, ((GUIBarcodeTemplate) selectedOcrTemplate)).show();
 		});
 		toolStrip.addButton(settings);
 	}
@@ -312,8 +310,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		newTemplate.addClickHandler((ClickEvent newTemplateClick) -> {
 			GUIBarcodeTemplate newTemplate = new GUIBarcodeTemplate();
 			newTemplate.setTemplate(selectedDocumentTemplate);
-			BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newTemplate);
-			editor.show();
+			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newTemplate).show();
 		});
 		toolStrip.addButton(newTemplate);
 	}
@@ -324,8 +321,8 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		barcodeTemplateSelector.setMultiple(false);
 		barcodeTemplateSelector.setEndRow(false);
 		barcodeTemplateSelector.addChangedHandler((ChangedEvent barcodeTemplateSelectorChanged) -> {
-			ListGridRecord record = barcodeTemplateSelector.getSelectedRecord();
-			BarcodeService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
+			ListGridRecord rec = barcodeTemplateSelector.getSelectedRecord();
+			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
 					new AsyncCallback<GUIBarcodeTemplate>() {
 
 						@Override
@@ -350,16 +347,15 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		templateSelector.addChangedHandler((ChangedEvent templateSelectorChanged) -> {
 			selectedOcrTemplate = null;
 
-			ListGridRecord record = templateSelector.getSelectedRecord();
-			if (record == null || record.getAttributeAsLong("id") == null
-					|| record.getAttributeAsLong("id").longValue() == 0L) {
+			ListGridRecord rec = templateSelector.getSelectedRecord();
+			if (rec == null || rec.getAttributeAsLong("id") == null || rec.getAttributeAsLong("id").longValue() == 0L) {
 				selectedDocumentTemplate = null;
 				refresh(null, null);
 			} else {
 				selectedDocumentTemplate = new GUITemplate();
-				selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
-				selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
-				selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
+				selectedDocumentTemplate.setId(rec.getAttributeAsLong("id"));
+				selectedDocumentTemplate.setName(rec.getAttributeAsString("name"));
+				selectedDocumentTemplate.setDescription(rec.getAttributeAsString("description"));
 				refresh(selectedDocumentTemplate.getId(), null);
 			}
 		});

@@ -185,7 +185,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		deleteZones.setTitle(I18N.message("deletezones"));
 		deleteZones.addClickHandler((ClickEvent event) -> {
 			LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), (Boolean yes) -> {
-				if (yes) {
+				if (Boolean.TRUE.equals(yes)) {
 					selectedOcrTemplate.setZones(new GUIZone[0]);
 					setSelectedOcrTemplate(selectedOcrTemplate);
 				}
@@ -201,7 +201,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		addZone.addClickHandler((ClickEvent event) -> {
 			FormItem select = new SelectItem("zone", I18N.message("zone"));
 
-			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+			LinkedHashMap<String, String> map = new LinkedHashMap<>();
 			for (GUIAttribute att : selectedOcrTemplate.getTemplate().getAttributes()) {
 				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null)
 					map.put(att.getName(), att.getName() + " (" + AttributeTypeFormatter.format(att.getType()) + ")");
@@ -252,7 +252,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		delete.addClickHandler((ClickEvent event) -> {
 			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L)
 				LD.ask(I18N.message("question"), I18N.message("confirmdeleteocrtemplate"), (Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						ZonalOCRService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -304,8 +304,8 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		ocrTemplateSelector.setMultiple(false);
 		ocrTemplateSelector.setEndRow(false);
 		ocrTemplateSelector.addChangedHandler((ChangedEvent event) -> {
-			ListGridRecord record = ocrTemplateSelector.getSelectedRecord();
-			ZonalOCRService.Instance.get().getTemplate(record.getAttributeAsLong("id"),
+			ListGridRecord rec = ocrTemplateSelector.getSelectedRecord();
+			ZonalOCRService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
 					new AsyncCallback<GUIOCRTemplate>() {
 
 						@Override
@@ -331,16 +331,16 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		templateSelector.addChangedHandler((ChangedEvent event) -> {
 			selectedOcrTemplate = null;
 
-			ListGridRecord record = templateSelector.getSelectedRecord();
-			if (record == null || record.getAttributeAsLong("id") == null
-					|| record.getAttributeAsLong("id").longValue() == 0L) {
+			ListGridRecord rec = templateSelector.getSelectedRecord();
+			if (rec == null || rec.getAttributeAsLong("id") == null
+					|| rec.getAttributeAsLong("id").longValue() == 0L) {
 				selectedDocumentTemplate = null;
 				refresh(null, null);
 			} else {
 				selectedDocumentTemplate = new GUITemplate();
-				selectedDocumentTemplate.setId(record.getAttributeAsLong("id"));
-				selectedDocumentTemplate.setName(record.getAttributeAsString("name"));
-				selectedDocumentTemplate.setDescription(record.getAttributeAsString("description"));
+				selectedDocumentTemplate.setId(rec.getAttributeAsLong("id"));
+				selectedDocumentTemplate.setName(rec.getAttributeAsString("name"));
+				selectedDocumentTemplate.setDescription(rec.getAttributeAsString("description"));
 				refresh(selectedDocumentTemplate.getId(), null);
 			}
 		});

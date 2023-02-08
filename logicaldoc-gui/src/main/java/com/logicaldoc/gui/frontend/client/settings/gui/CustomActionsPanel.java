@@ -17,7 +17,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
@@ -48,13 +47,19 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CustomActionsPanel extends VLayout {
 
+	private static final String ALLOWED = "allowed";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String EENABLED = "eenabled";
+
 	private ListGrid grid;
 
 	private ListGridRecord rollOverRecord;
 
 	private HLayout rollOverCanvas;
 
-	private List<GUIMenu> actions = new ArrayList<GUIMenu>();
+	private List<GUIMenu> actions = new ArrayList<>();
 
 	public CustomActionsPanel() {
 		setWidth100();
@@ -123,7 +128,7 @@ public class CustomActionsPanel extends VLayout {
 		toolStrip.addFill();
 		toolStrip.setWidth100();
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -142,10 +147,10 @@ public class CustomActionsPanel extends VLayout {
 		name.setWidth(100);
 		name.setRequired(true);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		description.setWidth(300);
 
-		ListGridField allowed = new ListGridField("allowed", I18N.message("allowedentities"));
+		ListGridField allowed = new ListGridField(ALLOWED, I18N.message("allowedentities"));
 		allowed.setWidth("*");
 
 		grid = new ListGrid() {
@@ -241,8 +246,8 @@ public class CustomActionsPanel extends VLayout {
 		int i = 1;
 		ListGridRecord[] records = grid.getRecords();
 		if (records != null)
-			for (ListGridRecord record : records) {
-				GUIMenu action = getAction(record.getAttributeAsLong("id"));
+			for (ListGridRecord rec : records) {
+				GUIMenu action = getAction(rec.getAttributeAsLong("id"));
 				if (action != null)
 					action.setPosition(i++);
 			}
@@ -271,27 +276,27 @@ public class CustomActionsPanel extends VLayout {
 		ListGridRecord[] records = new ListGridRecord[actions.size()];
 		int i = 0;
 		for (GUIMenu menu : actions) {
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("id", menu.getId());
-			record.setAttribute("name", menu.getName());
-			record.setAttribute("description", menu.getDescription());
-			record.setAttribute("eenabled", menu.isEnabled() ? "0" : "2");
-			record.setAttribute("allowed", Util.toString(menu.getRights()));
-			records[i++] = record;
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", menu.getId());
+			rec.setAttribute("name", menu.getName());
+			rec.setAttribute(DESCRIPTION, menu.getDescription());
+			rec.setAttribute(EENABLED, menu.isEnabled() ? "0" : "2");
+			rec.setAttribute(ALLOWED, Util.toString(menu.getRights()));
+			records[i++] = rec;
 		}
 		grid.setData(records);
 	}
 
 	public void update(GUIMenu action) {
-		Record record = grid.find(new AdvancedCriteria("id", OperatorId.EQUALS, action.getId()));
-		if (record != null) {
-			record.setAttribute("name", action.getName());
-			record.setAttribute("description", action.getDescription());
-			record.setAttribute("eenabled", action.isEnabled() ? "0" : "2");
-			record.setAttribute("allowed", Util.toString(action.getRights()));
+		Record rec = grid.find(new AdvancedCriteria("id", OperatorId.EQUALS, action.getId()));
+		if (rec != null) {
+			rec.setAttribute("name", action.getName());
+			rec.setAttribute(DESCRIPTION, action.getDescription());
+			rec.setAttribute(EENABLED, action.isEnabled() ? "0" : "2");
+			rec.setAttribute(ALLOWED, Util.toString(action.getRights()));
 
 			grid.invalidateRecordComponents();
-			grid.refreshRecordComponent(grid.getRecordIndex(record));
+			grid.refreshRecordComponent(grid.getRecordIndex(rec));
 			grid.refreshFields();
 		}
 	}
@@ -305,28 +310,25 @@ public class CustomActionsPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							long menuId = selectedRecord.getAttributeAsLong("id");
-							if (menuId == 0L) {
-								int index = grid.getRecordIndex(selectedRecord);
-								actions.remove(index);
-							} else {
-								SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
-										new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						long menuId = selectedRecord.getAttributeAsLong("id");
+						if (menuId == 0L) {
+							int index = grid.getRecordIndex(selectedRecord);
+							actions.remove(index);
+						} else {
+							SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
+									new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onSuccess(Void arg) {
-												reload();
-											}
-										});
-							}
+										@Override
+										public void onSuccess(Void arg) {
+											reload();
+										}
+									});
 						}
 					}
 				});

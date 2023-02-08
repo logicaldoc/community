@@ -135,7 +135,7 @@ public class AutomationDialog extends Window {
 		scriptForm.setTitleOrientation(TitleOrientation.TOP);
 		scriptForm.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation", null, null,
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", null, null,
 				false);
 		automation.setShowTitle(false);
 		automation.setStartRow(false);

@@ -32,7 +32,7 @@ public class GroupSelectorCombo extends MultiComboBoxItem {
 		setValueFormatter(new FormItemValueFormatter() {
 
 			@Override
-			public String formatValue(Object value, Record record, DynamicForm form, FormItem item) {
+			public String formatValue(Object value, Record rec, DynamicForm form, FormItem item) {
 				return AwesomeFactory.getIconHtml("user-friends") + "&nbsp;" + value;
 			}
 		});

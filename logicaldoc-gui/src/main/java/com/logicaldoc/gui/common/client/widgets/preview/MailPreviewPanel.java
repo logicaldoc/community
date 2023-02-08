@@ -50,7 +50,7 @@ public class MailPreviewPanel extends VLayout {
 		StaticTextItem from = prepareFromItem(mail);
 		from.setEndRow(true);
 
-		StaticTextItem subject = ItemFactory.newStaticTextItem("subject", "subject", mail.getSubject());
+		StaticTextItem subject = ItemFactory.newStaticTextItem("subject", mail.getSubject());
 		subject.setEndRow(true);
 
 		StaticTextItem replyto = prepareReplyToItem(mail);
@@ -72,7 +72,7 @@ public class MailPreviewPanel extends VLayout {
 		form.setItems(from, subject, replyto, to, cc, bcc, sent, received);
 
 		VLayout header = preparePreviewHeader(mail, document, form);
-		
+
 		Canvas body = null;
 		if (mail.getMessage().toLowerCase().startsWith("<html")
 				|| mail.getMessage().toLowerCase().startsWith("<body")) {
@@ -103,8 +103,7 @@ public class MailPreviewPanel extends VLayout {
 				html.setContents(contents);
 				body = html;
 			} else {
-				TextAreaItem contentItem = ItemFactory.newTextAreaItem("content", I18N.message("content"),
-						mail.getMessage());
+				TextAreaItem contentItem = ItemFactory.newTextAreaItem("content", mail.getMessage());
 				contentItem.setShowTitle(false);
 				contentItem.setWidth(width);
 				contentItem.setHeight("*");
@@ -121,9 +120,10 @@ public class MailPreviewPanel extends VLayout {
 	}
 
 	/**
-	 * Prepares the header that shows the most important informations about the email and the attachment buttons
+	 * Prepares the header that shows the most important informations about the
+	 * email and the attachment buttons
 	 * 
-	 * @param mail The email 
+	 * @param mail The email
 	 * @param document The document that represents the emil
 	 * @param form the form
 	 * 
@@ -179,7 +179,7 @@ public class MailPreviewPanel extends VLayout {
 					bccString += ", ";
 				bccString += contact.displayLink();
 			}
-		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", "bcc", bccString);
+		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", bccString);
 		bcc.setVisible(!bccString.isEmpty());
 		return bcc;
 	}
@@ -192,7 +192,7 @@ public class MailPreviewPanel extends VLayout {
 					ccString += ", ";
 				ccString += contact.displayLink();
 			}
-		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", "cc", ccString);
+		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", ccString);
 		cc.setVisible(!ccString.isEmpty());
 		return cc;
 	}
@@ -205,27 +205,27 @@ public class MailPreviewPanel extends VLayout {
 					toString += ", ";
 				toString += contact.displayLink();
 			}
-		StaticTextItem to = ItemFactory.newStaticTextItem("to", "to", toString);
+		StaticTextItem to = ItemFactory.newStaticTextItem("to", toString);
 		to.setVisible(!toString.isEmpty());
 		return to;
 	}
 
 	private StaticTextItem prepareReceivedItem(final GUIEmail mail) {
-		StaticTextItem received = ItemFactory.newStaticTextItem("receiveddate", "receiveddate",
+		StaticTextItem received = ItemFactory.newStaticTextItem("receiveddate",
 				mail.getReceived() != null ? I18N.formatDate(mail.getReceived()) : null);
 		received.setVisible(mail.getReceived() != null);
 		return received;
 	}
 
 	private StaticTextItem prepareSentItem(final GUIEmail mail) {
-		StaticTextItem sent = ItemFactory.newStaticTextItem("sentdate", "sentdate",
+		StaticTextItem sent = ItemFactory.newStaticTextItem("sentdate",
 				mail.getSent() != null ? I18N.formatDate(mail.getSent()) : null);
 		sent.setVisible(mail.getSent() != null);
 		return sent;
 	}
 
 	private StaticTextItem prepareFromItem(final GUIEmail mail) {
-		StaticTextItem from = ItemFactory.newStaticTextItem("from", "from",
+		StaticTextItem from = ItemFactory.newStaticTextItem("from",
 				mail.getFrom() != null ? mail.getFrom().displayLink() : "");
 		return from;
 	}
@@ -238,7 +238,7 @@ public class MailPreviewPanel extends VLayout {
 					replyToString += ", ";
 				replyToString += contact.displayLink();
 			}
-		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", "replyto", replyToString);
+		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", replyToString);
 		replyto.setVisible(!replyToString.isEmpty() && !replyToString.equals(mail.getFrom().getEmail()));
 		return replyto;
 	}

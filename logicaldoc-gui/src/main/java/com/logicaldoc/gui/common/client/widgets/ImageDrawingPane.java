@@ -122,7 +122,7 @@ public class ImageDrawingPane extends DrawPane {
 	 * @return the list of items
 	 */
 	public List<DrawItem> getItems() {
-		List<DrawItem> itms = new ArrayList<DrawItem>();
+		List<DrawItem> itms = new ArrayList<>();
 		for (DrawItem item : getDrawItems()) {
 			if (!item.equals(background))
 				itms.add(item);

@@ -53,41 +53,41 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 
 	@Override
 	public List<AttributeOption> findByAttributeAndCategory(long setId, String attribute, String category) {
-		List<AttributeOption> coll = new ArrayList<AttributeOption>();
+		List<AttributeOption> coll = new ArrayList<>();
 		try {
 			if (StringUtils.isEmpty(attribute)) {
 				if (StringUtils.isEmpty(category)) {
-					Map<String, Object> params = new HashMap<String, Object>();
+					Map<String, Object> params = new HashMap<>();
 					params.put(SET_ID, Long.valueOf(setId));
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId order by _opt.position asc",
 							params, null);
 				} else {
-					Map<String, Object> params = new HashMap<String, Object>();
+					Map<String, Object> params = new HashMap<>();
 					params.put(SET_ID, Long.valueOf(setId));
 					params.put("category", category);
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.category = :category order by _opt.position asc",
 							params, null);
 				}
 			} else {
 				if (StringUtils.isEmpty(category)) {
-					Map<String, Object> params = new HashMap<String, Object>();
+					Map<String, Object> params = new HashMap<>();
 					params.put(SET_ID, Long.valueOf(setId));
 					params.put("attribute", attribute);
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute order by _opt.position asc",
 							params, null);
 				} else {
-					Map<String, Object> params = new HashMap<String, Object>();
+					Map<String, Object> params = new HashMap<>();
 					params.put(SET_ID, Long.valueOf(setId));
 					params.put("category", category);
 					params.put("attribute", attribute);
 
-					coll = (List<AttributeOption>) findByQuery(
+					coll = findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute and _opt.category = :category order by _opt.position asc",
 							params, null);
 				}
@@ -136,7 +136,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 			}
 			buf.append(")");
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put(SET_ID, setId);
 
 			List<AttributeOption> options = findByQuery(

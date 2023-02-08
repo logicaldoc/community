@@ -13,7 +13,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -26,6 +25,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.4.2
  */
 public class FolderSearchDialog extends Window {
+	private static final String DESCRIPTION = "description";
+
 	private FolderSearchForm form;
 
 	private ListGridRecord[] lastResult = new ListGridRecord[0];
@@ -55,13 +56,12 @@ public class FolderSearchDialog extends Window {
 		};
 		form.setWidth100();
 		form.setHeight100();
-		
 
 		grid.setWidth100();
 		grid.setHeight100();
 		grid.setMinHeight(220);
 		ListGridField name = new ListGridField("name", I18N.message("name"));
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		grid.setFields(name, description);
 		grid.setSelectionType(SelectionStyle.SINGLE);
 		grid.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -71,25 +71,22 @@ public class FolderSearchDialog extends Window {
 		grid.setWrapCells(false);
 		grid.setData(lastResult);
 
-		grid.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				ListGridRecord selection = grid.getSelectedRecord();
-				onSelect(selection.getAttributeAsLong("id"), selection.getAttribute("name"));
-			}
+		grid.addDoubleClickHandler((DoubleClickEvent event) -> {
+			ListGridRecord selection = grid.getSelectedRecord();
+			onSelect(selection.getAttributeAsLong("id"), selection.getAttribute("name"));
 		});
 
-		VLayout formPanel=new VLayout();
+		VLayout formPanel = new VLayout();
 		formPanel.setWidth100();
 		formPanel.setHeight(300);
 		formPanel.setShowResizeBar(true);
 		formPanel.addMember(form);
-		
-		VLayout gridPanel=new VLayout();
+
+		VLayout gridPanel = new VLayout();
 		formPanel.setWidth100();
 		gridPanel.setHeight("*");
 		gridPanel.addMember(grid);
-		
+
 		addItem(formPanel);
 		addItem(gridPanel);
 	}
@@ -107,11 +104,11 @@ public class FolderSearchDialog extends Window {
 				lastResult = new ListGridRecord[result.getHits().length];
 				for (int i = 0; i < result.getHits().length; i++) {
 					GUIDocument hit = result.getHits()[i];
-					ListGridRecord record = new ListGridRecord();
-					lastResult[i] = record;
-					record.setAttribute("id", hit.getId());
-					record.setAttribute("name", hit.getFileName());
-					record.setAttribute("description", hit.getSummary());
+					ListGridRecord rec = new ListGridRecord();
+					lastResult[i] = rec;
+					rec.setAttribute("id", hit.getId());
+					rec.setAttribute("name", hit.getFileName());
+					rec.setAttribute(DESCRIPTION, hit.getSummary());
 				}
 
 				if (lastResult.length == 1) {

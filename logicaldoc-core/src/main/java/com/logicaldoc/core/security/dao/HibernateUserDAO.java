@@ -49,6 +49,12 @@ import com.logicaldoc.util.security.PasswordValidator;
  */
 public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> implements UserDAO {
 
+	private static final String ADMIN = "admin";
+
+	private static final String LOWER = "lower(";
+
+	private static final String USERNAME = "username";
+
 	private GenericDAO genericDAO;
 
 	private UserHistoryDAO userHistoryDAO;
@@ -71,13 +77,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public List<User> findByName(String name) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("name", name.toLowerCase());
 
-			return findByWhere("lower(" + ENTITY + ".name) like :name", params, null, null);
+			return findByWhere(LOWER + ENTITY + ".name) like :name", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<User>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -85,8 +91,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	public User findByUsername(String username) {
 		User user = null;
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("username", username);
+			Map<String, Object> params = new HashMap<>();
+			params.put(USERNAME, username);
 
 			List<User> coll = findByWhere(ENTITY + ".username = :username", params, null, null);
 			if (coll.size() > 0)
@@ -102,10 +108,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	public User findByUsernameIgnoreCase(String username) {
 		User user = null;
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("username", username.toLowerCase());
+			Map<String, Object> params = new HashMap<>();
+			params.put(USERNAME, username.toLowerCase());
 
-			List<User> coll = findByWhere("lower(" + ENTITY + ".username) = :username", params, null, null);
+			List<User> coll = findByWhere(LOWER + ENTITY + ".username) = :username", params, null, null);
 			if (coll.size() > 0)
 				user = coll.iterator().next();
 			initialize(user);
@@ -120,28 +126,28 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 */
 	public List<User> findByLikeUsername(String username) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("username", username);
+			Map<String, Object> params = new HashMap<>();
+			params.put(USERNAME, username);
 
 			return findByWhere(ENTITY + ".username like :username", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<User>();
+			return new ArrayList<>();
 		}
 	}
 
 	@Override
 	public List<User> findByUsernameAndName(String username, String name) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("username", username);
+			Map<String, Object> params = new HashMap<>();
+			params.put(USERNAME, username);
 			params.put("name", name.toLowerCase());
 
-			return findByWhere("lower(" + ENTITY + ".name) like :name and " + ENTITY + ".username like :username",
+			return findByWhere(LOWER + ENTITY + ".name) like :name and " + ENTITY + ".username like :username",
 					params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<User>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -149,7 +155,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		// Skip the tests in case of new tenant creation
 		if (user.getId() == 0L && user.getTenantId() != Tenant.DEFAULT_ID && "Administrator".equals(user.getFirstName())
-				&& user.getUsername().startsWith("admin") && "admin".equals(user.getDecodedPassword()))
+				&& user.getUsername().startsWith(ADMIN) && ADMIN.equals(user.getDecodedPassword()))
 			return;
 
 		// Without decoded password we cannot perform any test
@@ -238,7 +244,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		enforceReadOnlyUserGroups(user);
 
-		Map<String, Object> dictionary = new HashMap<String, Object>();
+		Map<String, Object> dictionary = new HashMap<>();
 
 		invokeListenersBefore(user, transaction, dictionary);
 
@@ -262,7 +268,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			user.setPasswordExpired(isPasswordExpired(user) ? 1 : 0);
 		}
 
-		if ("admin".equals(user.getUsername()) && user.getPassword() == null)
+		if (ADMIN.equals(user.getUsername()) && user.getPassword() == null)
 			throw new PersistenceException(
 					String.format("Trying to alter the %s user with null password", user.getUsername()));
 
@@ -379,7 +385,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @param user the current user
 	 */
 	private void updateAdminPasswordSetting(User user) {
-		if ("admin".equals(user.getUsername()) && user.getTenantId() == Tenant.DEFAULT_ID) {
+		if (ADMIN.equals(user.getUsername()) && user.getTenantId() == Tenant.DEFAULT_ID) {
 			log.info("Updated adminpasswd");
 			config.setProperty("adminpasswd", user.getPassword());
 			try {
@@ -404,7 +410,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			saveDefaultDashlets(user);
 
 			/*
-			 * Save an history to record the user creation
+			 * Save an history to gridRecord the user creation
 			 */
 			UserHistory createdHistory = new UserHistory();
 			if (transaction != null)
@@ -437,7 +443,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	/**
-	 * Saves an history to record the changes in the enabled status of a user
+	 * Saves an history to gridRecord the changes in the enabled status of a user
 	 * 
 	 * @param user The current user
 	 * @param transaction the current session
@@ -598,7 +604,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private boolean isPasswordExpired(User user) {
-		// Never consider changed the password of a user imported from another system
+		// Never consider changed the password of a user imported from another
+		// system
 		if (user == null || user.getSource() != User.SOURCE_DEFAULT)
 			return false;
 
@@ -820,7 +827,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		for (WorkingTime wt : user.getWorkingTimes())
 			log.debug("Initializing working time {}", wt.getLabel());
 
-		List<Long> groupIds = new ArrayList<Long>();
+		List<Long> groupIds = new ArrayList<>();
 		try {
 			groupIds = queryForList("select distinct ld_groupid from ld_usergroup where ld_userid=" + user.getId(),
 					Long.class);
@@ -851,7 +858,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public Map<String, Generic> findUserSettings(long userId, String namePrefix) {
 		List<Generic> generics = genericDAO.findByTypeAndSubtype("usersetting", namePrefix + "%", userId, null);
-		Map<String, Generic> map = new HashMap<String, Generic>();
+		Map<String, Generic> map = new HashMap<>();
 		for (Generic generic : generics) {
 			map.put(generic.getSubtype(), generic);
 		}
@@ -865,20 +872,20 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public User findAdminUser(String tenantName) {
 		if ("default".equals(tenantName))
-			return findByUsername("admin");
+			return findByUsername(ADMIN);
 		else
-			return findByUsername("admin" + StringUtils.capitalize(tenantName));
+			return findByUsername(ADMIN + StringUtils.capitalize(tenantName));
 	}
 
 	@Override
 	public Set<User> findByGroup(long groupId) {
-		List<Long> docIds = new ArrayList<Long>();
+		List<Long> docIds = new ArrayList<>();
 		try {
 			docIds = queryForList("select ld_userid from ld_usergroup where ld_groupid=" + groupId, Long.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
-		Set<User> set = new HashSet<User>();
+		Set<User> set = new HashSet<>();
 		if (!docIds.isEmpty()) {
 			String query = ENTITY + ".id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
 

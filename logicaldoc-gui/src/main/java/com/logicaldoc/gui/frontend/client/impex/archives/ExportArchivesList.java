@@ -17,7 +17,6 @@ import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -45,6 +44,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class ExportArchivesList extends VLayout {
+
+	private static final String STATUS = "status";
+
+	private static final String STATUSICON = "statusicon";
 
 	protected Layout detailsContainer;
 
@@ -88,7 +91,7 @@ public class ExportArchivesList extends VLayout {
 		ListGridField typeLabel = new ListGridField("typelabel", I18N.message("type"), 130);
 		typeLabel.setCanFilter(false);
 
-		ListGridField status = new ListGridField("statusicon", I18N.message("status"), 50);
+		ListGridField status = new ListGridField(STATUSICON, I18N.message(STATUS), 50);
 		status.setType(ListGridFieldType.IMAGE);
 		status.setCanSort(false);
 		status.setAlign(Alignment.CENTER);
@@ -174,10 +177,10 @@ public class ExportArchivesList extends VLayout {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
+				ListGridRecord rec = list.getSelectedRecord();
 				try {
-					showDetails(Long.parseLong(record.getAttribute("id")),
-							!Integer.toString(GUIArchive.STATUS_OPENED).equals(record.getAttribute("status")));
+					showDetails(Long.parseLong(rec.getAttribute("id")),
+							!Integer.toString(GUIArchive.STATUS_OPENED).equals(rec.getAttribute(STATUS)));
 				} catch (Throwable t) {
 					// Nothing to do
 				}
@@ -203,31 +206,28 @@ public class ExportArchivesList extends VLayout {
 	protected void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showDetails(null, true);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showDetails(null, true);
+							}
+						});
 					}
 				});
 			}
@@ -237,7 +237,7 @@ public class ExportArchivesList extends VLayout {
 		open.setTitle(I18N.message("open"));
 		open.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				openArchive(record);
+				openArchive(rec);
 			}
 		});
 
@@ -245,25 +245,22 @@ public class ExportArchivesList extends VLayout {
 		close.setTitle(I18N.message("close"));
 		close.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							onClosingArchive(record, id);
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						onClosingArchive(rec, id);
 					}
 				});
 			}
 		});
 
-		if (GUIArchive.STATUS_OPENED != Integer.parseInt(record.getAttributeAsString("status")))
+		if (GUIArchive.STATUS_OPENED != Integer.parseInt(rec.getAttributeAsString(STATUS)))
 			close.setEnabled(false);
 
-		if (GUIArchive.STATUS_ERROR != Integer.parseInt(record.getAttributeAsString("status")))
+		if (GUIArchive.STATUS_ERROR != Integer.parseInt(rec.getAttributeAsString(STATUS)))
 			open.setEnabled(false);
 
 		contextMenu.setItems(close, open, delete);
-		addUsefulMenuItem(record, contextMenu);
+		addUsefulMenuItem(rec, contextMenu);
 		contextMenu.showContextMenu();
 	}
 
@@ -281,9 +278,9 @@ public class ExportArchivesList extends VLayout {
 		return list;
 	}
 
-	protected void closeArchive(final ListGridRecord record) {
-		ImpexService.Instance.get().setStatus(Long.parseLong(record.getAttributeAsString("id")),
-				GUIArchive.STATUS_CLOSED, new AsyncCallback<Void>() {
+	protected void closeArchive(final ListGridRecord rec) {
+		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_CLOSED,
+				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -291,10 +288,10 @@ public class ExportArchivesList extends VLayout {
 
 					@Override
 					public void onSuccess(Void result) {
-						record.setAttribute("status", "1");
-						record.setAttribute("statusicon", "lock");
-						list.refreshRow(list.getRecordIndex(record));
-						showDetails(Long.parseLong(record.getAttributeAsString("id")), true);
+						rec.setAttribute(STATUS, "1");
+						rec.setAttribute(STATUSICON, "lock");
+						list.refreshRow(list.getRecordIndex(rec));
+						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
 					}
 				});
 	}
@@ -311,18 +308,18 @@ public class ExportArchivesList extends VLayout {
 	/**
 	 * This method is used only by the classes that extend this class.
 	 */
-	protected Menu addUsefulMenuItem(final ListGridRecord record, Menu contextMenu) {
+	protected Menu addUsefulMenuItem(final ListGridRecord rec, Menu contextMenu) {
 		// DO NOTHING
 		return contextMenu;
 	}
 
-	protected void onClosingArchive(final ListGridRecord record, final long id) {
-		closeArchive(record);
+	protected void onClosingArchive(final ListGridRecord rec, final long id) {
+		closeArchive(rec);
 	}
 
-	protected void openArchive(final ListGridRecord record) {
-		ImpexService.Instance.get().setStatus(Long.parseLong(record.getAttributeAsString("id")),
-				GUIArchive.STATUS_OPENED, new AsyncCallback<Void>() {
+	protected void openArchive(final ListGridRecord rec) {
+		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_OPENED,
+				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -330,10 +327,10 @@ public class ExportArchivesList extends VLayout {
 
 					@Override
 					public void onSuccess(Void result) {
-						record.setAttribute("status", "0");
-						record.setAttribute("statusicon", "lock_open");
-						list.refreshRow(list.getRecordIndex(record));
-						showDetails(Long.parseLong(record.getAttributeAsString("id")), true);
+						rec.setAttribute(STATUS, "0");
+						rec.setAttribute(STATUSICON, "lock_open");
+						list.refreshRow(list.getRecordIndex(rec));
+						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
 					}
 				});
 	}

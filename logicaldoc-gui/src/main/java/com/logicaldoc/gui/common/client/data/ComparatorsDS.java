@@ -13,6 +13,8 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class ComparatorsDS extends DataSource {
 
+	private static final String COMPARATOR = "comparator";
+
 	public ComparatorsDS(String inExt) {
 		setTitleField("comparators");
 		setRecordXPath("/list/comparator");
@@ -20,9 +22,9 @@ public class ComparatorsDS extends DataSource {
 		DataSourceTextField id = new DataSourceTextField("id", I18N.message("id"));
 		id.setPrimaryKey(true);
 		DataSourceTextField in = new DataSourceTextField("in", I18N.message("in"));
-		DataSourceTextField converter = new DataSourceTextField("comparator", I18N.message("comparator"));
+		DataSourceTextField converter = new DataSourceTextField(COMPARATOR, I18N.message(COMPARATOR));
 		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled", I18N.message("enabled"));
-		DataSourceTextField label = new DataSourceTextField("label", I18N.message("comparator"));
+		DataSourceTextField label = new DataSourceTextField("label", I18N.message(COMPARATOR));
 
 		setFields(id, in, converter, label, enabled);
 		setDataURL("data/comparators.xml?1=1" + (inExt != null ? "&in=" + inExt : ""));

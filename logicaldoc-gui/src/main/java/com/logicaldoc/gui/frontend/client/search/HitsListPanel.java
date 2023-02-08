@@ -42,6 +42,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class HitsListPanel extends VLayout implements SearchObserver, DocumentObserver, FolderObserver {
 
+	private static final String FOLDER = "folder";
+
 	protected DocumentsGrid grid = null;
 
 	private Cursor searchCursor;
@@ -131,7 +133,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				 * Context menu cannot be displayed for normal users in case of
 				 * multiple selection
 				 */
-				if (type == null || (!type.contains("folder") && DocumentController.get().getCurrentDocument() != null
+				if (type == null || (!type.contains(FOLDER) && DocumentController.get().getCurrentDocument() != null
 						&& DocumentController.get().getCurrentDocument().getId() == id)) {
 					showContextMenu(DocumentController.get().getCurrentDocument().getFolder(), true);
 				} else {
@@ -147,7 +149,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 						@Override
 						public void onSuccess(GUIFolder folder) {
-							showContextMenu(folder, !type.contains("folder"));
+							showContextMenu(folder, !type.contains(FOLDER));
 						}
 					});
 				}
@@ -213,7 +215,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 		final GUIDocument hit = grid.getSelectedDocument();
 		if (hit != null)
-			if (hit.getType().contains("folder"))
+			if (hit.getType().contains(FOLDER))
 				SearchPanel.get().onSelectedFolderHit(hit.getId());
 			else
 				SearchPanel.get().onSelectedDocumentHit(hit.getId());

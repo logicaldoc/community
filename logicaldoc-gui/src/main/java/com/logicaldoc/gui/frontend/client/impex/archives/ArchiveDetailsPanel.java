@@ -62,7 +62,7 @@ public class ArchiveDetailsPanel extends VLayout {
 		 */
 		if (versionsPanel != null) {
 			versionsPanel.destroy();
-			if (versionsTabPanel.contains(versionsPanel))
+			if (Boolean.TRUE.equals(versionsTabPanel.contains(versionsPanel)))
 				versionsTabPanel.removeMember(versionsPanel);
 		}
 		versionsPanel = new VersionsPanel(archivesList, archiveId, readonly);

@@ -35,6 +35,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public abstract class HistoryPanel extends VLayout {
 
+	private static final String COMMENT = "comment";
 	private boolean versionFields = false;
 
 	public HistoryPanel() {
@@ -51,7 +52,7 @@ public abstract class HistoryPanel extends VLayout {
 		ListGridField user = new UserListGridField("user", "userId", "user");
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
-		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
+		ListGridField comment = new ListGridField(COMMENT, I18N.message(COMMENT));
 		FileNameListGridField fileName = new FileNameListGridField();
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"));
@@ -89,8 +90,8 @@ public abstract class HistoryPanel extends VLayout {
 		list.addDoubleClickHandler(new DoubleClickHandler() {
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {
-				LD.askForValue(I18N.message("comment"), I18N.message("comment"),
-						list.getSelectedRecord().getAttributeAsString("comment"), new ValueCallback() {
+				LD.askForValue(I18N.message(COMMENT), I18N.message(COMMENT),
+						list.getSelectedRecord().getAttributeAsString(COMMENT), new ValueCallback() {
 							@Override
 							public void execute(final String value) {
 								// Nothing to do

@@ -310,22 +310,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.lastModified = lastModified;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-
-		if (this.getClass() != obj.getClass())
-			return false;
-
-		return getId() == ((GUIDocument) obj).getId();
-	}
-
-	@Override
-	public int hashCode() {
-		return Long.valueOf(getId()).hashCode();
-	}
-
 	public String getIcon() {
 		return icon;
 	}

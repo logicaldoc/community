@@ -77,15 +77,15 @@ public class UpdatePanel extends VLayout {
 							form.setWidth(300);
 							form.setTitleOrientation(TitleOrientation.LEFT);
 
-							StaticTextItem name = ItemFactory.newStaticTextItem("name", "name",
+							StaticTextItem name = ItemFactory.newStaticTextItem("name",
 									Util.getValue("name", parameters));
 							name.setRequired(true);
 
-							StaticTextItem date = ItemFactory.newStaticTextItem("date", "date",
+							StaticTextItem date = ItemFactory.newStaticTextItem("date",
 									Util.getValue("date", parameters));
 							date.setRequired(true);
 
-							StaticTextItem size = ItemFactory.newStaticTextItem("size", "size",
+							StaticTextItem size = ItemFactory.newStaticTextItem("size",
 									Util.formatSize(Long.parseLong(Util.getValue("size", parameters))));
 							size.setRequired(true);
 
@@ -188,8 +188,8 @@ public class UpdatePanel extends VLayout {
 
 								@Override
 								public void onSuccess(String path) {
-									ApplicationRestarting
-											.get(I18N.message("updaterunning", path.replace("\\\\", "/"))).show();
+									ApplicationRestarting.get(I18N.message("updaterunning", path.replace("\\\\", "/")))
+											.show();
 
 									final String tenant = Session.get().getUser().getTenant().getName();
 									Session.get().close();
@@ -283,11 +283,11 @@ public class UpdatePanel extends VLayout {
 				form.setColWidths("*");
 				form.setNumCols(1);
 
-				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", "changelog", infos[0]);
+				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos[0]);
 				changelog.setWidth("100%");
 				changelog.setHeight(220);
 
-				TextAreaItem updatenotes = ItemFactory.newTextAreaItem("updatenotes", "updatenotes", infos[1]);
+				TextAreaItem updatenotes = ItemFactory.newTextAreaItem("updatenotes", infos[1]);
 				updatenotes.setWidth("100%");
 				updatenotes.setHeight(220);
 

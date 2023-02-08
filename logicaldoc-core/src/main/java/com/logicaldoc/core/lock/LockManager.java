@@ -42,7 +42,7 @@ public class LockManager {
 					"select ld_string1 from ld_generic where ld_type='lock' and ld_string1 is not null", String.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 	}
 

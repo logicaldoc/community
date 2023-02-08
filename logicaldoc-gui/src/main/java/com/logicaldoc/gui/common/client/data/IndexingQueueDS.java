@@ -45,7 +45,7 @@ public class IndexingQueueDS extends DataSource {
 		DataSourceDateTimeField published = new DataSourceDateTimeField("published");
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
 		
-		List<DataSourceField> fields = new ArrayList<DataSourceField>();
+		List<DataSourceField> fields = new ArrayList<>();
 		fields.add(id);
 		fields.add(icon);
 		fields.add(filename);

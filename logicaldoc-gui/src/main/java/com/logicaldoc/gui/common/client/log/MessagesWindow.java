@@ -26,6 +26,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class MessagesWindow extends Window {
 
+	private static final String DETAIL = "detail";
+
+	private static final String SEVERITY = "severity";
+
 	private static MessagesWindow instance = new MessagesWindow();
 
 	private ListGrid grid;
@@ -52,10 +56,10 @@ public class MessagesWindow extends Window {
 		grid = new ListGrid() {
 
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (GUIEvent.ERROR.equals(record.getAttribute("severity")))
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				if (GUIEvent.ERROR.equals(rec.getAttribute(SEVERITY)))
 					return "color: #EF4A4A";
-				if (GUIEvent.WARNING.equals(record.getAttribute("severity")))
+				if (GUIEvent.WARNING.equals(rec.getAttribute(SEVERITY)))
 					return "color: #FF8723";
 				else
 					return "color: #577ED0";
@@ -70,11 +74,11 @@ public class MessagesWindow extends Window {
 
 		ListGridField date = new DateListGridField("date", "date");
 
-		ListGridField detail = new ListGridField("detail", I18N.message("detail"));
+		ListGridField detail = new ListGridField(DETAIL, I18N.message(DETAIL));
 		detail.setWidth("*");
 		detail.setCanSort(false);
 
-		ListGridField severityLabel = new ListGridField("severityLabel", I18N.message("severity"), 80);
+		ListGridField severityLabel = new ListGridField("severityLabel", I18N.message(SEVERITY), 80);
 
 		grid.setFields(date, severityLabel, detail);
 		grid.setCanResizeFields(true);
@@ -85,8 +89,8 @@ public class MessagesWindow extends Window {
 			
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {
-				LD.askForValue(I18N.message("detail"), I18N.message("detail"),
-						grid.getSelectedRecord().getAttributeAsString("detail"), new ValueCallback() {
+				LD.askForValue(I18N.message(DETAIL), I18N.message(DETAIL),
+						grid.getSelectedRecord().getAttributeAsString(DETAIL), new ValueCallback() {
 							@Override
 							public void execute(final String value) {
 								// Nothing to do
@@ -97,12 +101,12 @@ public class MessagesWindow extends Window {
 	}
 
 	public void addEvent(GUIEvent event) {
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("date", event.getDate());
-		record.setAttribute("detail", event.getDetail());
-		record.setAttribute("severity", event.getSeverity());
-		record.setAttribute("severityLabel", I18N.message(event.getSeverity()));
-		grid.addData(record);
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("date", event.getDate());
+		rec.setAttribute(DETAIL, event.getDetail());
+		rec.setAttribute(SEVERITY, event.getSeverity());
+		rec.setAttribute("severityLabel", I18N.message(event.getSeverity()));
+		grid.addData(rec);
 		grid.sort("date", SortDirection.DESCENDING);
 	}
 

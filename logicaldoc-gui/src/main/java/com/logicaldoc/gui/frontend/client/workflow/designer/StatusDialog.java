@@ -46,7 +46,7 @@ public class StatusDialog extends Window {
 		form.setNumCols(1);
 		form.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", widget.getTransition().getText());
+		TextItem name = ItemFactory.newTextItem("name", widget.getTransition().getText());
 		name.setRequired(true);
 
 		ButtonItem save = new ButtonItem("save", I18N.message("save"));
@@ -56,8 +56,8 @@ public class StatusDialog extends Window {
 			public void onClick(ClickEvent event) {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-				if (vm.validate()) {
-					if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
+					if (Boolean.TRUE.equals(vm.validate()))  {
 						StatusDialog.this.widget.getWfState().setName((String) values.get("name"));
 						StatusDialog.this.widget.setContents("<b>" + (String) values.get("name") + "</b>");
 						StatusDialog.this.widget.getDrawingPanel().getDiagramController().update();

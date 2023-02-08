@@ -20,7 +20,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -48,6 +47,14 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.9
  */
 public class TenantsPanel extends AdminPanel {
+
+	private static final String ENABLED_ICON = "enabledIcon";
+
+	private static final String ADDRESS = "address";
+
+	private static final String EMAIL = "email";
+
+	private static final String COUNTRY = "country";
 
 	private ListGrid list;
 
@@ -83,19 +90,19 @@ public class TenantsPanel extends AdminPanel {
 		ListGridField telephone = new ListGridField("telephone", I18N.message("phone"), 90);
 		telephone.setCanFilter(true);
 
-		ListGridField country = new ListGridField("country", I18N.message("country"), 90);
+		ListGridField country = new ListGridField(COUNTRY, I18N.message(COUNTRY), 90);
 		country.setCanFilter(true);
 
 		ListGridField city = new ListGridField("city", I18N.message("city"), 90);
 		city.setCanFilter(true);
 
-		ListGridField email = new ListGridField("email", I18N.message("email"), 200);
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 200);
 		email.setCanFilter(true);
 
-		ListGridField address = new ListGridField("address", I18N.message("address"), 150);
+		ListGridField address = new ListGridField(ADDRESS, I18N.message(ADDRESS), 150);
 		address.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField("enabledIcon", " ", 24);
+		ListGridField enabled = new ListGridField(ENABLED_ICON, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -155,9 +162,9 @@ public class TenantsPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					loadTenant(Long.parseLong(record.getAttributeAsString("id")));
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					loadTenant(Long.parseLong(rec.getAttributeAsString("id")));
 			}
 		});
 
@@ -185,40 +192,40 @@ public class TenantsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param tenant the tenant to update
 	 */
 	public void updateRecord(GUITenant tenant) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, tenant.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", tenant.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, tenant.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", tenant.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", tenant.getName());
-		record.setAttribute("displayName", tenant.getDisplayName());
-		record.setAttribute("email", tenant.getEmail());
-		record.setAttribute("telephone", tenant.getTelephone());
-		record.setAttribute("address", tenant.getStreet());
-		record.setAttribute("country", tenant.getCountry());
-		record.setAttribute("city", tenant.getCity());
-		record.setAttribute("postalCode", tenant.getPostalCode());
-		record.setAttribute("state", tenant.getState());
-		record.setAttribute("expire", tenant.getExpire());
+		rec.setAttribute("name", tenant.getName());
+		rec.setAttribute("displayName", tenant.getDisplayName());
+		rec.setAttribute(EMAIL, tenant.getEmail());
+		rec.setAttribute("telephone", tenant.getTelephone());
+		rec.setAttribute(ADDRESS, tenant.getStreet());
+		rec.setAttribute(COUNTRY, tenant.getCountry());
+		rec.setAttribute("city", tenant.getCity());
+		rec.setAttribute("postalCode", tenant.getPostalCode());
+		rec.setAttribute("state", tenant.getState());
+		rec.setAttribute("expire", tenant.getExpire());
 
 		if (tenant.isEnabled()) {
-			record.setAttribute("enabledIcon", "bullet_green");
-			record.setAttribute("eenabled", false);
+			rec.setAttribute(ENABLED_ICON, "bullet_green");
+			rec.setAttribute("eenabled", false);
 		} else {
-			record.setAttribute("enabledIcon", "bullet_red");
-			record.setAttribute("eenabled", false);
+			rec.setAttribute(ENABLED_ICON, "bullet_red");
+			rec.setAttribute("eenabled", false);
 		}
 
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 
 	public void showTenantDetails(GUITenant tenant) {
@@ -233,32 +240,29 @@ public class TenantsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							TenantService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						TenantService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									details = SELECT_TENANT;
-									detailsContainer.setMembers(details);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								details = SELECT_TENANT;
+								detailsContainer.setMembers(details);
+							}
+						});
 					}
 				});
 			}
@@ -266,12 +270,8 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));
-		password.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SetAdminPassword dialog = new SetAdminPassword(record.getAttributeAsString("name"));
-				dialog.show();
-			}
-		});
+		password.addClickHandler(
+				(MenuItemClickEvent event) -> new SetAdminPassword(rec.getAttributeAsString("name")).show());
 		password.setEnabled(!Session.get().isDemo());
 
 		if (id == Constants.TENANT_DEFAULTID) {

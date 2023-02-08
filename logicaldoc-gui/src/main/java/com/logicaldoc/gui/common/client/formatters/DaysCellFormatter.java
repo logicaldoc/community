@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class DaysCellFormatter implements CellFormatter {
 	@Override
-	public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+	public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 		if (value == null)
 			return null;
 		if (value instanceof Long)

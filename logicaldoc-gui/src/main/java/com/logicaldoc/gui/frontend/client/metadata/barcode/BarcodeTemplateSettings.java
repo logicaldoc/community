@@ -18,7 +18,6 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -27,7 +26,6 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -37,6 +35,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.4.2
  */
 public class BarcodeTemplateSettings extends Window {
+
+	private static final String ZONAL = "zonal";
 
 	private ValuesManager vm;
 
@@ -62,15 +62,6 @@ public class BarcodeTemplateSettings extends Window {
 		this.panel = panel;
 		this.template = template;
 
-		save = new IButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
-
 		prepareForm();
 
 		VLayout layout = new VLayout();
@@ -79,27 +70,28 @@ public class BarcodeTemplateSettings extends Window {
 
 		layout.addMember(form);
 		uploader = new Upload(save);
+		layout.addMember(uploader);
+
+		save = new IButton(I18N.message("save"));
+		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSave());
 		layout.addMember(save);
 
 		addItem(layout);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler((CloseClickEvent event) -> {
+			DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void result) {
-						destroy();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void result) {
+					destroy();
+				}
+			});
 		});
 
 		// Just to clean the upload folder
@@ -125,38 +117,33 @@ public class BarcodeTemplateSettings extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", template.getName());
+		TextItem name = ItemFactory.newTextItem("name", template.getName());
 		name.setRequired(true);
 		name.setDisabled(template.getId() != 0L);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", I18N.message("id"), "" + template.getId());
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + template.getId());
 		id.setVisible(template != null && template.getId() != 0L);
 
-		SelectItem type = ItemFactory.newSelectItem("type", "type");
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
-		opts.put("zonal", I18N.message("zonal").toLowerCase());
+		SelectItem type = ItemFactory.newSelectItem("type");
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
+		opts.put(ZONAL, I18N.message(ZONAL).toLowerCase());
 		opts.put("positional", I18N.message("positional").toLowerCase());
 		type.setValueMap(opts);
 		type.setRequired(true);
 		type.setDisabled(template.getId() != 0L || !Feature.enabled(Feature.ZONAL_BARCODE));
 		if (template.getId() != 0L)
-			type.setValue(template.isZonal() ? "zonal" : "positonal");
+			type.setValue(template.isZonal() ? ZONAL : "positonal");
 		if (!Feature.enabled(Feature.ZONAL_BARCODE))
 			type.setValue("positonal");
 
-		type.addChangedHandler(new ChangedHandler() {
+		type.addChangedHandler(
+				(ChangedEvent event) -> uploader.setVisible(ZONAL.equals(event.getValue().toString())));
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				uploader.setVisible("zonal".equals(event.getValue().toString()));
-			}
-		});
-
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", template.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setHeight(150);
 
 		// The optional batch
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch", template.getBatch());
+		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", template.getBatch());
 		batch.setRequired(true);
 		batch.setMin(1);
 		batch.setStep(10);
@@ -186,20 +173,20 @@ public class BarcodeTemplateSettings extends Window {
 	}
 
 	public void onSave() {
-		if ("zonal".equals(vm.getValueAsString("type")) && template.getId() == 0L
-				&& uploader.getUploadedFile()==null) {
+		if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L
+				&& uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}
 
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		template.setName(vm.getValueAsString("name"));
 		template.setDescription(vm.getValueAsString("description"));
 
 		if (Feature.enabled(Feature.ZONAL_BARCODE))
-			template.setZonal("zonal".equals(vm.getValueAsString("type")));
+			template.setZonal(ZONAL.equals(vm.getValueAsString("type")));
 		else
 			template.setZonal(false);
 

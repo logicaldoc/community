@@ -23,7 +23,7 @@ public class ValidationException extends PersistenceException {
 	 * A map of error descriptions: key is the attribute's name, value is the
 	 * error descriptor
 	 */
-	private Map<String, ValidationError> errors = new HashMap<String, ValidationError>();
+	private Map<String, ValidationError> errors = new HashMap<>();
 
 	/**
 	 * Creates a new session with the map of errors

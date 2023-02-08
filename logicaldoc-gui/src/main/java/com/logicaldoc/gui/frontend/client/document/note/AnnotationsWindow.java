@@ -5,10 +5,8 @@ import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -23,6 +21,18 @@ import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
  * @since 8.5
  */
 public class AnnotationsWindow extends AbstractAnnotationsWindow {
+
+	private static final String COMMENT_ALT = "comment-alt";
+
+	private static final String SQUARE2 = "square";
+
+	private static final String LABEL = "label";
+
+	private static final String CIRCLE = "circle";
+
+	private static final String COMMENT = "comment";
+
+	private static final String COMMENT_FLIPPED = "comment-flipped";
 
 	private NotesPanel notesPanel;
 
@@ -53,13 +63,10 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 				@Override
 				public void onClick(com.smartgwt.client.widgets.menu.events.MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-						@Override
-						public void execute(Boolean value) {
-							if (value) {
-								notes.remove(note);
-								drawItem.erase();
-							}
+					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
+							notes.remove(note);
+							drawItem.erase();
 						}
 					});
 				}
@@ -78,14 +85,14 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		newNote.setMessage("new note");
 		newNote.setShape(shape);
 
-		if (newNote.getShape().equals("comment") || newNote.getShape().equals("comment-flipped")) {
+		if (newNote.getShape().equals(COMMENT) || newNote.getShape().equals(COMMENT_FLIPPED)) {
 			newNote.setHeight(0.06);
-			newNote.setShape("comment");
-			if (shape.equals("comment-flipped"))
+			newNote.setShape(COMMENT);
+			if (shape.equals(COMMENT_FLIPPED))
 				newNote.setRotation(180.0);
-		} else if (newNote.getShape().equals("circle")) {
+		} else if (newNote.getShape().equals(CIRCLE)) {
 			newNote.setHeight(0.10);
-		} else if (newNote.getShape().equals("label")) {
+		} else if (newNote.getShape().equals(LABEL)) {
 			newNote.setLineWidth(25);
 			newNote.setLineColor("red");
 		} else if (newNote.getShape().equals("line") || newNote.getShape().equals("arrow")) {
@@ -100,14 +107,8 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 	@Override
 	protected void prepareAdditionalActions(ToolStrip toolStrip) {
 		if (editEnabled) {
-			ToolStripButton addLabel = AwesomeFactory.newToolStripButton("font", "label");
-			addLabel.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					addNewNote("label");
-				}
-			});
+			ToolStripButton addLabel = AwesomeFactory.newToolStripButton("font", LABEL);
+			addLabel.addClickHandler((ClickEvent event) -> addNewNote(LABEL));
 
 			toolStrip.addMenuButton(getPolygonMenuButton());
 			toolStrip.addMenuButton(getLineMenuButton());
@@ -117,12 +118,7 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 			ToolStripButton save = new ToolStripButton();
 			save.setTitle(I18N.message("save"));
-			save.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					onSave();
-				}
-			});
+			save.addClickHandler((ClickEvent event) -> onSave());
 			toolStrip.addButton(save);
 
 		}
@@ -134,35 +130,17 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		menu.setShadowDepth(3);
 
 		MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("arrow-alt-right"));
-		arrow.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+		arrow.addClickHandler((MenuItemClickEvent event) -> addNewNote("thickarrow"));
 
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				addNewNote("thickarrow");
-			}
-		});
+		MenuItem comment = new MenuItem(AwesomeFactory.getIconHtml(COMMENT_ALT));
+		comment.addClickHandler((MenuItemClickEvent event) -> addNewNote(COMMENT));
 
-		MenuItem comment = new MenuItem(AwesomeFactory.getIconHtml("comment-alt"));
-		comment.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				addNewNote("comment");
-			}
-		});
-
-		MenuItem commentFlipped = new MenuItem(AwesomeFactory.getIconHtml("comment-alt", "fa-rotate-180", null));
-		commentFlipped.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				addNewNote("comment-flipped");
-			}
-		});
+		MenuItem commentFlipped = new MenuItem(AwesomeFactory.getIconHtml(COMMENT_ALT, "fa-rotate-180", null));
+		commentFlipped.addClickHandler((MenuItemClickEvent event) -> addNewNote(COMMENT_FLIPPED));
 
 		menu.setData(comment, commentFlipped, arrow);
 
-		return AwesomeFactory.newToolStripToolStripMenuButton("comment-alt", null, null, "shape", menu);
+		return AwesomeFactory.newToolStripToolStripMenuButton(COMMENT_ALT, null, null, "shape", menu);
 	}
 
 	private ToolStripMenuButton getPolygonMenuButton() {
@@ -170,27 +148,15 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
 
-		MenuItem square = new MenuItem(AwesomeFactory.getIconHtml("square"));
-		square.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+		MenuItem square = new MenuItem(AwesomeFactory.getIconHtml(SQUARE2));
+		square.addClickHandler((MenuItemClickEvent event) -> addNewNote(SQUARE2));
 
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				addNewNote("square");
-			}
-		});
-
-		MenuItem circle = new MenuItem(AwesomeFactory.getIconHtml("circle"));
-		circle.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				addNewNote("circle");
-			}
-		});
+		MenuItem circle = new MenuItem(AwesomeFactory.getIconHtml(CIRCLE));
+		circle.addClickHandler((MenuItemClickEvent event) -> addNewNote(CIRCLE));
 
 		menu.setItems(square, circle);
 
-		return AwesomeFactory.newToolStripToolStripMenuButton("square", null, null, "polygon", menu);
+		return AwesomeFactory.newToolStripToolStripMenuButton(SQUARE2, null, null, "polygon", menu);
 	}
 
 	private ToolStripMenuButton getLineMenuButton() {
@@ -199,22 +165,10 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		menu.setShadowDepth(3);
 
 		MenuItem line = new MenuItem(AwesomeFactory.getIconHtml("horizontal-rule"));
-		line.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				addNewNote("line");
-			}
-		});
+		line.addClickHandler((MenuItemClickEvent event) -> addNewNote("line"));
 
 		MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("long-arrow-right"));
-		arrow.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				addNewNote("arrow");
-			}
-		});
+		arrow.addClickHandler((MenuItemClickEvent event) -> addNewNote("arrow"));
 
 		menu.setItems(line, arrow);
 

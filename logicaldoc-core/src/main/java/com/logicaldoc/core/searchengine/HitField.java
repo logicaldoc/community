@@ -26,7 +26,7 @@ public enum HitField {
 	}
 
 	public static Set<HitField> all() {
-		Set<HitField> fields = new HashSet<HitField>();
+		Set<HitField> fields = new HashSet<>();
 		fields.add(CONTENT);
 		fields.add(ID);
 		fields.add(FILENAME);

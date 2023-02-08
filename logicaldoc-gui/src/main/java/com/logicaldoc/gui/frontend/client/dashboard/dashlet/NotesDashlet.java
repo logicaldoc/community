@@ -51,7 +51,7 @@ public class NotesDashlet extends DocumentDashlet {
 
 	@Override
 	protected List<ListGridField> prepareGridFields(RefreshableListGrid grid) {
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 
 		ListGridField date = new DateListGridField("date", "date");
 		ListGridField title = new ColoredListGridField("title", I18N.message("note"));

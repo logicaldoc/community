@@ -200,7 +200,7 @@ public class ZipImport {
 		recipient.setAddress(user.getUsername());
 		recipient.setType(Recipient.TYPE_SYSTEM);
 		recipient.setMode("message");
-		Set<Recipient> recipients = new HashSet<Recipient>();
+		Set<Recipient> recipients = new HashSet<>();
 		recipients.add(recipient);
 		SystemMessage sysmess = new SystemMessage();
 		sysmess.setAuthor("SYSTEM");

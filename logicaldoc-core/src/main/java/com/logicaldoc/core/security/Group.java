@@ -56,7 +56,7 @@ public class Group extends PersistentObject implements Serializable {
 	/**
 	 * Not persistent
 	 */
-	private Set<User> users = new HashSet<User>();
+	private Set<User> users = new HashSet<>();
 
 	public int getType() {
 		return type;
@@ -93,12 +93,12 @@ public class Group extends PersistentObject implements Serializable {
 	public void reset() {
 		name = "";
 		descriprion = "";
-		users = new HashSet<User>();
+		users = new HashSet<>();
 	}
 
 	public void clearUsers() {
 		users.clear();
-		users = new HashSet<User>();
+		users = new HashSet<>();
 	}
 
 	public String toString() {
@@ -148,7 +148,7 @@ public class Group extends PersistentObject implements Serializable {
 	}
 
 	public boolean isAdmin() {
-		return "admin".equals(name);
+		return GROUP_ADMIN.equals(name);
 	}
 
 	public String getSource() {

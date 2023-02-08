@@ -35,6 +35,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class SearchPanel extends HLayout implements SearchObserver, DocumentObserver, FolderObserver {
 
+	private static final String NBSP = "&nbsp;";
+
+	private static final String SELECTAHIT = "selectahit";
+
 	private Layout listing = new VLayout();
 
 	private Layout details = new VLayout();
@@ -88,7 +92,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 		listing.addMember(listingPanel);
 
 		// Add a details panel under the listing one
-		detailPanel = new Label("&nbsp;" + I18N.message("selectahit"));
+		detailPanel = new Label(NBSP + I18N.message(SELECTAHIT));
 		details.setAlign(Alignment.CENTER);
 		details.addMember(detailPanel);
 
@@ -157,7 +161,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 				}
 			});
 		} else {
-			detailPanel = new Label("&nbsp;" + I18N.message("selectahit"));
+			detailPanel = new Label(NBSP + I18N.message(SELECTAHIT));
 			details.addMember(detailPanel);
 		}
 	}
@@ -203,11 +207,11 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 			return;
 
 		if (document == null || document.getId() < 1 || !(detailPanel instanceof DocumentDetailsPanel)) {
-			if (details.contains(detailPanel))
+			if (Boolean.TRUE.equals(details.contains(detailPanel)))
 				details.removeMember(detailPanel);
 			detailPanel.destroy();
 			if (document == null || document.getId() < 1) {
-				detailPanel = new Label("&nbsp;" + I18N.message("selectahit"));
+				detailPanel = new Label(NBSP + I18N.message(SELECTAHIT));
 				details.addMember(detailPanel);
 				return;
 			}

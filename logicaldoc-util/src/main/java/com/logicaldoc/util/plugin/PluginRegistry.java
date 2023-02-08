@@ -110,7 +110,7 @@ public abstract class PluginRegistry {
 
 	protected List<PluginManager.PluginLocation> locatePlugins(String pluginsDirectoryPath) {
 
-		List<PluginManager.PluginLocation> pluginLocations = new LinkedList<PluginManager.PluginLocation>();
+		List<PluginManager.PluginLocation> pluginLocations = new LinkedList<>();
 
 		// look for all zip files in plugin directory
 		File pluginDirectory = new File(pluginsDirectoryPath);
@@ -123,47 +123,44 @@ public abstract class PluginRegistry {
 			}
 		};
 
-		if (pluginDirectory.isDirectory()) {
+		if (!pluginDirectory.isDirectory()) {
+			System.out.println("No Plugins Found");
+		}
 
-			// find the plugins
-			List<String> pluginsList = Arrays.asList(pluginDirectory.list(filter));
+		// find the plugins
+		List<String> pluginsList = Arrays.asList(pluginDirectory.list(filter));
 
-			if (pluginsList.size() > 0) {
+		if (pluginsList.size() > 0) {
+			Iterator<String> i = pluginsList.iterator();
 
-				Iterator<String> i = pluginsList.iterator();
+			while (i.hasNext()) {
+				String pluginFilename = (String) i.next();
 
-				while (i.hasNext()) {
+				File pluginZIPFile = new File(pluginDirectory.getPath() + "/" + pluginFilename);
 
-					String pluginFilename = (String) i.next();
+				if (!pluginZIPFile.exists())
+					throw new RuntimeException("file not Found:" + pluginZIPFile.getAbsolutePath());
 
-					File pluginZIPFile = new File(pluginDirectory.getPath() + "/" + pluginFilename);
+				try {
 
-					if (!pluginZIPFile.exists())
-						throw new RuntimeException("file not Found:" + pluginZIPFile.getAbsolutePath());
+					final URL manifestURL = new URL("jar:file:" + pluginZIPFile.getAbsolutePath() + "!/plugin.xml");
 
-					try {
+					final URL contextURL = pluginZIPFile.toURL();
 
-						final URL manifestURL = new URL("jar:file:" + pluginZIPFile.getAbsolutePath() + "!/plugin.xml");
+					System.out.println("Found plugin file: " + pluginZIPFile.getName());
 
-						final URL contextURL = pluginZIPFile.toURL();
+					pluginLocations.add(new PluginManager.PluginLocation() {
+						public URL getManifestLocation() {
+							return manifestURL;
+						}
 
-						System.out.println("Found plugin file: " + pluginZIPFile.getName());
-
-						pluginLocations.add(new PluginManager.PluginLocation() {
-							public URL getManifestLocation() {
-								return manifestURL;
-							}
-
-							public URL getContextLocation() {
-								return contextURL;
-							}
-						});
-					} catch (MalformedURLException e) {
-						System.err.println(e.getMessage());
-					}
+						public URL getContextLocation() {
+							return contextURL;
+						}
+					});
+				} catch (MalformedURLException e) {
+					System.err.println(e.getMessage());
 				}
-			} else {
-				System.out.println("No Plugins Found");
 			}
 
 		} else {
@@ -184,7 +181,7 @@ public abstract class PluginRegistry {
 	 * @return List of connected extensions
 	 */
 	public Collection<Extension> getExtensions(String pluginId, String extensionPoint) {
-		Collection<Extension> exts = new ArrayList<Extension>();
+		Collection<Extension> exts = new ArrayList<>();
 		try {
 			PluginRegistry registry = PluginRegistry.getInstance();
 			if (registry != null) {
@@ -212,7 +209,7 @@ public abstract class PluginRegistry {
 		Collection<Extension> exts = getExtensions(pluginId, extensionPoint);
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}
@@ -245,7 +242,7 @@ public abstract class PluginRegistry {
 		if (registry != null)
 			return registry.getManager().getRegistry().getPluginDescriptors();
 		else
-			return new ArrayList<PluginDescriptor>();
+			return new ArrayList<>();
 	}
 
 	/**

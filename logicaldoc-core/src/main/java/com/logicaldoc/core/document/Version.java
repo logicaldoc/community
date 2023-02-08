@@ -230,7 +230,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 			version.setTemplateName(document.getTemplate().getName());
 		}
 
-		version.setAttributes(new HashMap<String, Attribute>());
+		version.setAttributes(new HashMap<>());
 		if (document.getAttributes() != null) {
 			try {
 				for (String name : document.getAttributeNames()) {

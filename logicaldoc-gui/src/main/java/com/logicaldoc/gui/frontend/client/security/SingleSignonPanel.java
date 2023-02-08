@@ -29,6 +29,26 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class SingleSignonPanel extends VLayout {
 
+	private static final String GROUP = "group";
+
+	private static final String ENABLED = "enabled";
+
+	private static final String CAS_APPURL = "cas.appurl";
+
+	private static final String CAS_LOGINURL = "cas.loginurl";
+
+	private static final String CAS_GROUP = "cas.group";
+
+	private static final String CAS_LANG = "cas.lang";
+
+	private static final String CAS_USER_TYPE = "cas.userType";
+
+	private static final String CAS_URL = "cas.url";
+
+	private static final String CAS_ID = "cas.id";
+
+	private static final String CAS_ENABLED = "cas.enabled";
+
 	public SingleSignonPanel() {
 		setWidth100();
 		setMembersMargin(5);
@@ -37,9 +57,8 @@ public class SingleSignonPanel extends VLayout {
 
 	@Override
 	protected void onDraw() {
-		SettingService.Instance.get().loadSettingsByNames(new String[] { "cas.enabled", "cas.id", "cas.url",
-				"cas.appurl", "cas.loginurl", "cas.group", "cas.lang", "cas.userType" },
-				new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadSettingsByNames(new String[] { CAS_ENABLED, CAS_ID, CAS_URL, CAS_APPURL,
+				CAS_LOGINURL, CAS_GROUP, CAS_LANG, CAS_USER_TYPE }, new AsyncCallback<GUIParameter[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -57,7 +76,7 @@ public class SingleSignonPanel extends VLayout {
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setAlign(Alignment.LEFT);
 
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("enabled", I18N.message("enablecas"));
+		RadioGroupItem enabled = ItemFactory.newBooleanSelector(ENABLED, I18N.message("enablecas"));
 		enabled.setWrapTitle(false);
 		enabled.setRequired(true);
 
@@ -71,7 +90,7 @@ public class SingleSignonPanel extends VLayout {
 		appUrl.setWrapTitle(false);
 		appUrl.setRequired(true);
 
-		TextItem casUrl = ItemFactory.newTextItem("casurl", "casurl", null);
+		TextItem casUrl = ItemFactory.newTextItem("casurl", null);
 		casUrl.setWidth(400);
 		casUrl.setWrapTitle(false);
 		casUrl.setRequired(true);
@@ -81,7 +100,7 @@ public class SingleSignonPanel extends VLayout {
 		casLoginUrl.setWrapTitle(false);
 		casLoginUrl.setRequired(true);
 
-		SelectItem group = ItemFactory.newGroupSelector("group", "group");
+		SelectItem group = ItemFactory.newGroupSelector(GROUP, GROUP);
 		group.setHint(I18N.message("casgrouphint"));
 		group.setWrapTitle(false);
 		group.setRequired(true);
@@ -117,21 +136,21 @@ public class SingleSignonPanel extends VLayout {
 	private void initValues(GUIParameter[] settings, RadioGroupItem enabled, TextItem id, TextItem appUrl,
 			TextItem casUrl, TextItem casLoginUrl, SelectItem group, SelectItem language, SelectItem userType) {
 		for (GUIParameter setting : settings) {
-			if ("cas.enabled".equals(setting.getName()))
+			if (CAS_ENABLED.equals(setting.getName()))
 				enabled.setValue("true".equals(setting.getValue()) ? "yes" : "no");
-			else if ("cas.id".equals(setting.getName()))
+			else if (CAS_ID.equals(setting.getName()))
 				id.setValue(setting.getValue());
-			else if ("cas.loginurl".equals(setting.getName()))
+			else if (CAS_LOGINURL.equals(setting.getName()))
 				casLoginUrl.setValue(setting.getValue());
-			else if ("cas.appurl".equals(setting.getName()))
+			else if (CAS_APPURL.equals(setting.getName()))
 				appUrl.setValue(setting.getValue());
-			else if ("cas.url".equals(setting.getName()))
+			else if (CAS_URL.equals(setting.getName()))
 				casUrl.setValue(setting.getValue());
-			else if ("cas.group".equals(setting.getName()))
+			else if (CAS_GROUP.equals(setting.getName()))
 				group.setValue(setting.getValue());
-			else if ("cas.lang".equals(setting.getName()))
+			else if (CAS_LANG.equals(setting.getName()))
 				language.setValue(setting.getValue());
-			else if ("cas.userType".equals(setting.getName()))
+			else if (CAS_USER_TYPE.equals(setting.getName()))
 				userType.setValue(setting.getValue());
 		}
 	}
@@ -144,14 +163,14 @@ public class SingleSignonPanel extends VLayout {
 				return;
 
 			GUIParameter[] params = new GUIParameter[8];
-			params[0] = new GUIParameter("cas.enabled", "" + ("yes".equals(form.getValueAsString("enabled"))));
-			params[1] = new GUIParameter("cas.id", form.getValueAsString("id").trim());
-			params[2] = new GUIParameter("cas.url", form.getValueAsString("casurl").trim());
-			params[3] = new GUIParameter("cas.appurl", form.getValueAsString("appurl").trim());
-			params[4] = new GUIParameter("cas.loginurl", form.getValueAsString("loginurl").trim());
-			params[5] = new GUIParameter("cas.group", form.getValueAsString("group").trim());
-			params[6] = new GUIParameter("cas.lang", form.getValueAsString("language").trim());
-			params[7] = new GUIParameter("cas.userType", form.getValueAsString("usertype").trim());
+			params[0] = new GUIParameter(CAS_ENABLED, "" + ("yes".equals(form.getValueAsString(ENABLED))));
+			params[1] = new GUIParameter(CAS_ID, form.getValueAsString("id").trim());
+			params[2] = new GUIParameter(CAS_URL, form.getValueAsString("casurl").trim());
+			params[3] = new GUIParameter(CAS_APPURL, form.getValueAsString("appurl").trim());
+			params[4] = new GUIParameter(CAS_LOGINURL, form.getValueAsString("loginurl").trim());
+			params[5] = new GUIParameter(CAS_GROUP, form.getValueAsString(GROUP).trim());
+			params[6] = new GUIParameter(CAS_LANG, form.getValueAsString("language").trim());
+			params[7] = new GUIParameter(CAS_USER_TYPE, form.getValueAsString("usertype").trim());
 
 			for (GUIParameter param : params)
 				Session.get().setConfig(param.getName(), param.getValue());
@@ -166,7 +185,7 @@ public class SingleSignonPanel extends VLayout {
 				@Override
 				public void onSuccess(Void ret) {
 					GuiLog.info(I18N.message("settingssaved"), null);
-					if ("yes".equals(form.getValueAsString("enabled")))
+					if ("yes".equals(form.getValueAsString(ENABLED)))
 						SC.say(I18N.message("settingssaved") + "\n" + I18N.message("suggestedtorestart"));
 				}
 			});

@@ -34,7 +34,7 @@ public class FolderSelector extends TextItem {
 
 	private Menu menu = new Menu();
 
-	private Collection<FolderChangeListener> listeners = new ArrayList<FolderChangeListener>();
+	private Collection<FolderChangeListener> listeners = new ArrayList<>();
 
 	public FolderSelector(String name, boolean clean) {
 		this(name, clean, null);
@@ -92,7 +92,7 @@ public class FolderSelector extends TextItem {
 		clear.setWidth(12);
 		clear.setHeight(12);
 
-		List<FormItemIcon> icons = new ArrayList<FormItemIcon>();
+		List<FormItemIcon> icons = new ArrayList<>();
 		icons.add(pick);
 		icons.add(search);
 		icons.add(clear);

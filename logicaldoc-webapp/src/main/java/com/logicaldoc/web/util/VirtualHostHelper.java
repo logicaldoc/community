@@ -94,59 +94,75 @@ public class VirtualHostHelper {
 		HttpServletRequest httpRequest = getHttpServletRequest(request);
 
 		if (httpRequest != null) {
-			// Detect LogicalDOC specific header for VH
-			String logicaldocVH = httpRequest.getHeader(VH_HEADER);
-			if (!local && logicaldocVH != null && logicaldocVH.contains("http")) {
-				log.debug("logicaldocVH.contains(http)");
-				log.debug("logicaldocVH: " + logicaldocVH);
-				baseURL = logicaldocVH;
-			} else {
-				// default values
-				String serverName = httpRequest.getServerName();
-				int serverPort = httpRequest.getServerPort();
-				String scheme = httpRequest.getScheme();
-
-				if (!local) {
-					String forwardedPort = httpRequest.getHeader(X_FORWARDED_PORT);
-
-					if (forwardedPort != null) {
-						log.info("forwardedPort != null");
-						try {
-							serverPort = Integer.parseInt(forwardedPort);
-							log.debug("forwardedPort != null; serverPort: " + serverPort);
-						} catch (NumberFormatException e) {
-							log.error("Unable to get forwarded port from header", e);
-						}
-					}
-
-					String forwardedProto = httpRequest.getHeader(X_FORWARDED_PROTO);
-					if (forwardedProto != null) {
-						scheme = forwardedProto;
-					}
-
-					// Detect virtual hosting based in standard header
-					String forwardedHost = httpRequest.getHeader(X_FORWARDED_HOST);
-					if (forwardedHost != null) {
-						log.debug("forwardedHost != null");
-						if (forwardedHost.contains(":")) {
-							serverName = forwardedHost.split(":")[0];
-							serverPort = Integer.valueOf(forwardedHost.split(":")[1]);
-							log.debug("forwardedHost contains ':', serverPort: " + serverPort);
-						} else {
-							log.debug("forwardedHost NOT contains ':', using fallback");
-							serverName = forwardedHost;
-							serverPort = HTTP_PORT_NUMBER; // fallback
-						}
-					}
-				}
-
-				baseURL = getServerURL(scheme, serverName, serverPort);
-			}
+			baseURL = getServerUrlFromRequest(local, httpRequest);
 		}
 		if (baseURL == null) {
 			log.warn("Could not retrieve base url correctly");
 		}
 		return baseURL;
+	}
+
+	private static String getServerUrlFromRequest(boolean local, HttpServletRequest httpRequest) {
+		String baseURL;
+		
+		// Detect LogicalDOC specific header for VH
+		String logicaldocVH = httpRequest.getHeader(VH_HEADER);
+		if (!local && logicaldocVH != null && logicaldocVH.contains("http")) {
+			log.debug("logicaldocVH.contains(http)");
+			log.debug("logicaldocVH: " + logicaldocVH);
+			baseURL = logicaldocVH;
+		} else {
+			// default values
+			String serverName = httpRequest.getServerName();
+			int serverPort = httpRequest.getServerPort();
+			String scheme = httpRequest.getScheme();
+
+			if (!local) {
+				serverPort = getForwardedPort(httpRequest, serverPort);
+
+				scheme = getForwardedProtocol(httpRequest, scheme);
+
+				// Detect virtual hosting based in standard header
+				String forwardedHost = httpRequest.getHeader(X_FORWARDED_HOST);
+				if (forwardedHost != null) {
+					log.debug("forwardedHost != null");
+					if (forwardedHost.contains(":")) {
+						serverName = forwardedHost.split(":")[0];
+						serverPort = Integer.valueOf(forwardedHost.split(":")[1]);
+						log.debug("forwardedHost contains ':', serverPort: " + serverPort);
+					} else {
+						log.debug("forwardedHost NOT contains ':', using fallback");
+						serverName = forwardedHost;
+						serverPort = HTTP_PORT_NUMBER; // fallback
+					}
+				}
+			}
+
+			baseURL = getServerURL(scheme, serverName, serverPort);
+		}
+		return baseURL;
+	}
+
+	private static String getForwardedProtocol(HttpServletRequest httpRequest, String scheme) {
+		String forwardedProto = httpRequest.getHeader(X_FORWARDED_PROTO);
+		if (forwardedProto != null) {
+			scheme = forwardedProto;
+		}
+		return scheme;
+	}
+
+	private static int getForwardedPort(HttpServletRequest httpRequest, int serverPort) {
+		String forwardedPort = httpRequest.getHeader(X_FORWARDED_PORT);
+		if (forwardedPort != null) {
+			log.info("forwardedPort != null");
+			try {
+				serverPort = Integer.parseInt(forwardedPort);
+				log.debug("forwardedPort != null; serverPort: " + serverPort);
+			} catch (NumberFormatException e) {
+				log.error("Unable to get forwarded port from header", e);
+			}
+		}
+		return serverPort;
 	}
 
 	/**

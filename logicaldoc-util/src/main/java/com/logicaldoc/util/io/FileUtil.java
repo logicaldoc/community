@@ -51,6 +51,10 @@ import com.logicaldoc.util.SystemUtil;
  * @version 4.0
  */
 public class FileUtil {
+	private static final String CANNOT_CREATE_FILE = "Cannot create file ";
+
+	private static final String UTF_8 = "UTF-8";
+
 	static final int BUFF_SIZE = 8192;
 
 	static final byte[] buffer = new byte[BUFF_SIZE];
@@ -95,7 +99,7 @@ public class FileUtil {
 
 	public static void writeFile(String text, String filepath) {
 		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filepath));) {
-			bos.write(text.getBytes("UTF-8"));
+			bos.write(text.getBytes(UTF_8));
 			bos.flush();
 		} catch (Throwable e) {
 			logError(e.getLocalizedMessage());
@@ -104,7 +108,7 @@ public class FileUtil {
 
 	public static String readFile(File file) throws IOException {
 		try (FileInputStream fisTargetFile = new FileInputStream(file);) {
-			return IOUtils.toString(fisTargetFile, "UTF-8");
+			return IOUtils.toString(fisTargetFile, UTF_8);
 		}
 	}
 
@@ -196,7 +200,7 @@ public class FileUtil {
 	 */
 	public static String computeDigest(String src) {
 		String digest = null;
-		try (InputStream is = IOUtils.toInputStream(src, "UTF-8");) {
+		try (InputStream is = IOUtils.toInputStream(src, UTF_8);) {
 			digest = computeDigest(is);
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -303,8 +307,8 @@ public class FileUtil {
 	 * @return the base name
 	 */
 	public static String getBaseName(String fileName) {
-		String name=getName(fileName);
-		
+		String name = getName(fileName);
+
 		try {
 			return FilenameUtils.getBaseName(name);
 		} catch (Exception e) {
@@ -334,7 +338,7 @@ public class FileUtil {
 				return fileName;
 		}
 	}
-	
+
 	/**
 	 * Gets the path part
 	 * 
@@ -438,21 +442,27 @@ public class FileUtil {
 	 */
 	public static boolean matches(String filename, String[] includes, String[] excludes) {
 		// First of all check if the filename must be excluded
-		if (excludes != null && excludes.length > 0)
-			for (String s : excludes)
-				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, filename, false))
-					return false;
+		boolean matchesEcludes = matchesFilters(filename, excludes);
+		if (matchesEcludes)
+			return false;
 
 		// Then check if the filename must can be included
-		if (includes != null && includes.length > 0)
-			for (String s : includes)
-				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, filename, false))
-					return true;
+		boolean matchesIncludes = matchesFilters(filename, includes);
+		if (matchesIncludes)
+			return true;
 
 		if (includes == null || includes.length == 0)
 			return true;
 		else
 			return false;
+	}
+
+	private static boolean matchesFilters(String str, String[] filters) {
+		if (filters != null && filters.length > 0)
+			for (String s : filters)
+				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, str, false))
+					return true;
+		return false;
 	}
 
 	/**
@@ -468,8 +478,8 @@ public class FileUtil {
 	 *         excludes
 	 */
 	public static boolean matches(String filename, String includes, String excludes) {
-		List<String> inc = new ArrayList<String>();
-		List<String> exc = new ArrayList<String>();
+		List<String> inc = new ArrayList<>();
+		List<String> exc = new ArrayList<>();
 
 		StringTokenizer st;
 
@@ -585,9 +595,8 @@ public class FileUtil {
 		File tmp = new File(sourcePath + ".tmp");
 		File file = new File(sourcePath);
 
-		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(new FileInputStream(sourcePath), "UTF-8"));
-				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp), "UTF-8");) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourcePath), UTF_8));
+				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp), UTF_8);) {
 			// Reading all the lines of input text file into oldContent
 			String line = reader.readLine();
 
@@ -655,18 +664,22 @@ public class FileUtil {
 		}
 
 		if (file != null && file.exists())
-			try {
-				log.debug("Delete file {} using OS command", file.getAbsolutePath());
-				if (SystemUtil.isWindows()) {
-					if (file.isDirectory())
-						java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
-					else
-						java.lang.Runtime.getRuntime().exec("cmd /C rmdir /S /Q \"" + file.getAbsolutePath() + "\"");
-				} else
-					java.lang.Runtime.getRuntime().exec("rm -rf \"" + file.getAbsolutePath() + "\"");
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
+			deleteUsingOSCommand(file);
+	}
+
+	private static void deleteUsingOSCommand(File file) {
+		try {
+			log.debug("Delete file {} using OS command", file.getAbsolutePath());
+			if (SystemUtil.isWindows()) {
+				if (file.isDirectory())
+					java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
+				else
+					java.lang.Runtime.getRuntime().exec("cmd /C rmdir /S /Q \"" + file.getAbsolutePath() + "\"");
+			} else
+				java.lang.Runtime.getRuntime().exec("rm -rf \"" + file.getAbsolutePath() + "\"");
+		} catch (IOException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	public static boolean isDirEmpty(final Path directory) throws IOException {
@@ -683,14 +696,14 @@ public class FileUtil {
 	public static void merge(List<File> files, File merged) throws IOException {
 		boolean created = merged.createNewFile();
 		if (!created)
-			throw new IOException("Cannot create file " + merged.getAbsolutePath());
+			throw new IOException(CANNOT_CREATE_FILE + merged.getAbsolutePath());
 
 		File tmp = new File(merged.getParent(), "tmp");
 
 		try {
 			created = tmp.createNewFile();
 			if (!created)
-				throw new IOException("Cannot create file " + tmp.getAbsolutePath());
+				throw new IOException(CANNOT_CREATE_FILE + tmp.getAbsolutePath());
 
 			for (File chunk : files) {
 				FileUtil.merge(merged, chunk, tmp);
@@ -702,7 +715,7 @@ public class FileUtil {
 				tmp = new File(merged.getParent(), "tmp");
 				created = tmp.createNewFile();
 				if (!created)
-					throw new IOException("Cannot create file " + tmp.getAbsolutePath());
+					throw new IOException(CANNOT_CREATE_FILE + tmp.getAbsolutePath());
 			}
 		} finally {
 			if (tmp != null && tmp.exists())
@@ -712,7 +725,7 @@ public class FileUtil {
 	}
 
 	public static List<File> split(File file, long chunkSize, File destDir) throws IOException {
-		List<File> chunks = new ArrayList<File>();
+		List<File> chunks = new ArrayList<>();
 		try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
 			long numSplits = file.length() / chunkSize;
 			long sourceSize = raf.length();

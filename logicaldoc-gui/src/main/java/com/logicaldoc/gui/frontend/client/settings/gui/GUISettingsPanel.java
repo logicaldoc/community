@@ -24,7 +24,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -35,6 +34,14 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 6.0
  */
 public class GUISettingsPanel extends AdminPanel {
+
+	private static final String CHARSET = "charset";
+
+	private static final String DOWNLOAD = "download";
+
+	private static final String PIXELS = "pixels";
+
+	private static final String SECONDS = "seconds";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -106,7 +113,7 @@ public class GUISettingsPanel extends AdminPanel {
 		SelectItem density = ItemFactory.newDensitySelector();
 		density.setValue(Util.getParameterValue(settings, "gui.density").trim());
 
-		RadioGroupItem saveLogin = ItemFactory.newBooleanSelector("savelogin", "savelogin");
+		RadioGroupItem saveLogin = ItemFactory.newBooleanSelector("savelogin");
 		saveLogin.setHint(I18N.message("saveloginhint"));
 		saveLogin.setWrapTitle(false);
 		saveLogin.setValue(yesNo(settings, "gui.savelogin"));
@@ -120,54 +127,47 @@ public class GUISettingsPanel extends AdminPanel {
 		previewSize.setMin(1);
 		previewSize.setStep(10);
 
-		SpinnerItem previewTimeout = ItemFactory.newSpinnerItem("previewtimeout", "previewtimeout",
+		SpinnerItem previewTimeout = ItemFactory.newSpinnerItem("previewtimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.timeout").trim()));
-		previewTimeout.setHint(I18N.message("seconds"));
+		previewTimeout.setHint(I18N.message(SECONDS));
 		previewTimeout.setWrapTitle(false);
 		previewTimeout.setRequired(true);
 		previewSize.setMin(1);
 		previewSize.setStep(10);
 
-		RadioGroupItem banner = ItemFactory.newBooleanSelector("banner", "banner");
+		RadioGroupItem banner = ItemFactory.newBooleanSelector("banner");
 		banner.setWrapTitle(false);
 		banner.setValue(yesNo(settings, "gui.banner"));
 
-		RadioGroupItem openPreviewPanel = ItemFactory.newBooleanSelector("openpreviewpanel", "openpreviewpanel");
+		RadioGroupItem openPreviewPanel = ItemFactory.newBooleanSelector("openpreviewpanel");
 		openPreviewPanel.setWrapTitle(false);
 		openPreviewPanel.setValue(yesNo(settings, "gui.preview.openpanel"));
 
-		RadioGroupItem reactToRemoteEvents = ItemFactory.newBooleanSelector("reacttoremoteevents",
-				"reacttoremoteevents");
+		RadioGroupItem reactToRemoteEvents = ItemFactory.newBooleanSelector("reacttoremoteevents");
 		reactToRemoteEvents.setWrapTitle(false);
 		reactToRemoteEvents.setValue(yesNo(settings, "gui.serverpush"));
 
-		RadioGroupItem showLicenseAlertsInLogin = ItemFactory.newBooleanSelector("showlicensealertsinlogin",
-				I18N.message("showlicensealertsinlogin"));
+		RadioGroupItem showLicenseAlertsInLogin = ItemFactory.newBooleanSelector("showlicensealertsinlogin");
 		showLicenseAlertsInLogin.setWrapTitle(false);
 		showLicenseAlertsInLogin.setValue(yesNo(settings, "gui.license.showloginalerts"));
 
-		RadioGroupItem showQuotaAlertsInLogin = ItemFactory.newBooleanSelector("showquotaalertsinlogin",
-				I18N.message("showquotaalertsinlogin"));
+		RadioGroupItem showQuotaAlertsInLogin = ItemFactory.newBooleanSelector("showquotaalertsinlogin");
 		showQuotaAlertsInLogin.setWrapTitle(false);
 		showQuotaAlertsInLogin.setValue(yesNo(settings, "gui.quota.showloginalerts"));
 
-		RadioGroupItem showUpdateAlertsInLogin = ItemFactory.newBooleanSelector("showupdatealertsinlogin",
-				I18N.message("showupdatealertsinlogin"));
+		RadioGroupItem showUpdateAlertsInLogin = ItemFactory.newBooleanSelector("showupdatealertsinlogin");
 		showUpdateAlertsInLogin.setWrapTitle(false);
 		showUpdateAlertsInLogin.setValue(yesNo(settings, "gui.update.showloginalerts"));
 
-		RadioGroupItem showVersionAlertsInLogin = ItemFactory.newBooleanSelector("showversionalertsinlogin",
-				I18N.message("showversionalertsinlogin"));
+		RadioGroupItem showVersionAlertsInLogin = ItemFactory.newBooleanSelector("showversionalertsinlogin");
 		showVersionAlertsInLogin.setWrapTitle(false);
 		showVersionAlertsInLogin.setValue(yesNo(settings, "gui.version.showloginalerts"));
 
-		RadioGroupItem showPatchAlertsInLogin = ItemFactory.newBooleanSelector("showpatchalertsinlogin",
-				I18N.message("showpatchalertsinlogin"));
+		RadioGroupItem showPatchAlertsInLogin = ItemFactory.newBooleanSelector("showpatchalertsinlogin");
 		showPatchAlertsInLogin.setWrapTitle(false);
 		showPatchAlertsInLogin.setValue(yesNo(settings, "gui.patch.showloginalerts"));
 
-		RadioGroupItem showLanguageInLogin = ItemFactory.newBooleanSelector("showlanguageinlogin",
-				I18N.message("showlanguageinlogin"));
+		RadioGroupItem showLanguageInLogin = ItemFactory.newBooleanSelector("showlanguageinlogin");
 		showLicenseAlertsInLogin.setWrapTitle(false);
 		showLanguageInLogin.setValue(yesNo(settings, "gui.login.lang"));
 
@@ -176,23 +176,21 @@ public class GUISettingsPanel extends AdminPanel {
 		showLostPassword.setWrapTitle(false);
 		showLostPassword.setValue(yesNo(settings, "gui.lostpassword.show"));
 
-		RadioGroupItem galleryEnabled = ItemFactory.newBooleanSelector("galleryenabled",
-				I18N.message("galleryenabled"));
+		RadioGroupItem galleryEnabled = ItemFactory.newBooleanSelector("galleryenabled");
 		galleryEnabled.setWrapTitle(false);
 		galleryEnabled.setValue(yesNo(settings, "gui.galleryenabled"));
 
-		RadioGroupItem allowNotesEditing = ItemFactory.newBooleanSelector("allownotesediting",
-				I18N.message("allownotesediting"));
+		RadioGroupItem allowNotesEditing = ItemFactory.newBooleanSelector("allownotesediting");
 		allowNotesEditing.setWrapTitle(false);
 		allowNotesEditing.setValue(yesNo(settings, "gui.notes.allowedit"));
 
-		RadioGroupItem saveInputs = ItemFactory.newBooleanSelector("saveinputs", I18N.message("saveinputs"));
+		RadioGroupItem saveInputs = ItemFactory.newBooleanSelector("saveinputs");
 		galleryEnabled.setWrapTitle(false);
 		saveInputs.setValue(yesNo(settings, "gui.saveinputs"));
 
 		SpinnerItem attrTextAreaW = ItemFactory.newSpinnerItem("textareaw", I18N.message("attrtextareaw"),
 				Integer.parseInt(Util.getParameterValue(settings, "gui.textarea.w").trim()));
-		attrTextAreaW.setHint("pixels");
+		attrTextAreaW.setHint(PIXELS);
 		attrTextAreaW.setRequired(true);
 		attrTextAreaW.setWrapTitle(false);
 		attrTextAreaW.setStep(50);
@@ -200,7 +198,7 @@ public class GUISettingsPanel extends AdminPanel {
 
 		SpinnerItem attrTextAreaH = ItemFactory.newSpinnerItem("textareah", I18N.message("attrtextareah"),
 				Integer.parseInt(Util.getParameterValue(settings, "gui.textarea.h").trim()));
-		attrTextAreaH.setHint("pixels");
+		attrTextAreaH.setHint(PIXELS);
 		attrTextAreaH.setRequired(true);
 		attrTextAreaH.setWrapTitle(false);
 		attrTextAreaH.setStep(50);
@@ -208,13 +206,13 @@ public class GUISettingsPanel extends AdminPanel {
 
 		SpinnerItem attrTextBoxW = ItemFactory.newSpinnerItem("textboxw", I18N.message("attrtextboxw"),
 				Integer.parseInt(Util.getParameterValue(settings, "gui.textbox.w").trim()));
-		attrTextBoxW.setHint("pixels");
+		attrTextBoxW.setHint(PIXELS);
 		attrTextBoxW.setRequired(true);
 		attrTextBoxW.setWrapTitle(false);
 		attrTextBoxW.setStep(50);
 		attrTextBoxW.setMin(50);
 
-		SpinnerItem noteMaxSize = ItemFactory.newSpinnerItem("notemaxsize", I18N.message("notemaxsize"),
+		SpinnerItem noteMaxSize = ItemFactory.newSpinnerItem("notemaxsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.note.maxlength").trim()));
 		noteMaxSize.setHint(I18N.message("chars").toLowerCase());
 		noteMaxSize.setRequired(true);
@@ -223,7 +221,7 @@ public class GUISettingsPanel extends AdminPanel {
 		noteMaxSize.setMin(0);
 		noteMaxSize.setWidth(70);
 
-		SpinnerItem emailMaxSize = ItemFactory.newSpinnerItem("emailmaxsize", "emailmaxsize",
+		SpinnerItem emailMaxSize = ItemFactory.newSpinnerItem("emailmaxsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.email.maxlength").trim()));
 		emailMaxSize.setHint(I18N.message("chars").toLowerCase());
 		emailMaxSize.setRequired(true);
@@ -232,15 +230,15 @@ public class GUISettingsPanel extends AdminPanel {
 		emailMaxSize.setMin(0);
 		emailMaxSize.setWidth(70);
 
-		SpinnerItem thumbSize = ItemFactory.newSpinnerItem("thumbsize", "thumbsize",
+		SpinnerItem thumbSize = ItemFactory.newSpinnerItem("thumbsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.size").trim()));
-		thumbSize.setHint("pixels");
+		thumbSize.setHint(PIXELS);
 		thumbSize.setRequired(true);
 		thumbSize.setWrapTitle(false);
 		thumbSize.setMin(10);
 		thumbSize.setStep(10);
 
-		SpinnerItem thumbQuality = ItemFactory.newSpinnerItem("thumbquality", "thumbquality",
+		SpinnerItem thumbQuality = ItemFactory.newSpinnerItem("thumbquality",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.quality").trim()));
 		thumbQuality.setHint("%");
 		thumbQuality.setRequired(true);
@@ -249,15 +247,15 @@ public class GUISettingsPanel extends AdminPanel {
 		thumbQuality.setStep(10);
 		thumbQuality.setMax(100);
 
-		SpinnerItem mobileSize = ItemFactory.newSpinnerItem("mobilesize", "mobilesize",
+		SpinnerItem mobileSize = ItemFactory.newSpinnerItem("mobilesize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.size").trim()));
-		mobileSize.setHint("pixels");
+		mobileSize.setHint(PIXELS);
 		mobileSize.setRequired(true);
 		mobileSize.setWrapTitle(false);
 		mobileSize.setMin(10);
 		mobileSize.setStep(10);
 
-		SpinnerItem mobileQuality = ItemFactory.newSpinnerItem("mobilequality", "mobilequality",
+		SpinnerItem mobileQuality = ItemFactory.newSpinnerItem("mobilequality",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.quality").trim()));
 		mobileQuality.setHint("%");
 		mobileQuality.setRequired(true);
@@ -265,14 +263,14 @@ public class GUISettingsPanel extends AdminPanel {
 		mobileQuality.setMin(1);
 		mobileQuality.setStep(10);
 
-		SpinnerItem tileSize = ItemFactory.newSpinnerItem("tilesize", "tilesize",
+		SpinnerItem tileSize = ItemFactory.newSpinnerItem("tilesize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.size").trim()));
-		tileSize.setHint("pixels");
+		tileSize.setHint(PIXELS);
 		tileSize.setRequired(true);
 		tileSize.setMin(1);
 		tileSize.setStep(10);
 
-		SpinnerItem tileQuality = ItemFactory.newSpinnerItem("tilequality", "tilequality",
+		SpinnerItem tileQuality = ItemFactory.newSpinnerItem("tilequality",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.quality").trim()));
 		tileQuality.setHint("%");
 		tileQuality.setRequired(true);
@@ -281,7 +279,7 @@ public class GUISettingsPanel extends AdminPanel {
 		tileQuality.setStep(10);
 		tileQuality.setMax(100);
 
-		SpinnerItem uploadMax = ItemFactory.newSpinnerItem("uploadmax", "uploadmax",
+		SpinnerItem uploadMax = ItemFactory.newSpinnerItem("uploadmax",
 				Integer.parseInt(Util.getParameterValue(settings, "upload.maxsize").trim()));
 		uploadMax.setHint("MB");
 		uploadMax.setRequired(true);
@@ -290,7 +288,7 @@ public class GUISettingsPanel extends AdminPanel {
 		uploadMax.setStep(10);
 		uploadMax.setWidth(70);
 
-		SpinnerItem previewMaxFileSize = ItemFactory.newSpinnerItem("previewmaxfilesize", "previewmaxfilesize",
+		SpinnerItem previewMaxFileSize = ItemFactory.newSpinnerItem("previewmaxfilesize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.maxfilesize").trim()));
 		previewMaxFileSize.setHint("MB");
 		previewMaxFileSize.setRequired(true);
@@ -305,75 +303,71 @@ public class GUISettingsPanel extends AdminPanel {
 		uploadDisallow.setRequired(false);
 		uploadDisallow.setWrapTitle(false);
 
-		TextItem textExtensions = ItemFactory.newTextItem("textextensions", "textextensions",
+		TextItem textExtensions = ItemFactory.newTextItem("textextensions",
 				Util.getParameterValue(settings, "gui.text.extensions"));
 		textExtensions.setHint(I18N.message("separatedcomma"));
 		textExtensions.setWidth(350);
 		textExtensions.setRequired(false);
 		textExtensions.setWrapTitle(false);
 
-		RadioGroupItem ondoubleclick = ItemFactory.newBooleanSelector("ondoubleclick", "ondoubleclick");
-		ondoubleclick.setValueMap("download", "preview");
+		RadioGroupItem ondoubleclick = ItemFactory.newBooleanSelector("ondoubleclick");
+		ondoubleclick.setValueMap(DOWNLOAD, "preview");
 		ondoubleclick.setValue(Util.getParameterValue(settings, "gui.doubleclick"));
 
-		RadioGroupItem docTab = ItemFactory.newBooleanSelector("doctab", "doctab");
+		RadioGroupItem docTab = ItemFactory.newBooleanSelector("doctab");
 		docTab.setValueMap("properties", "preview");
 		docTab.setValue(Util.getParameterValue(settings, "gui.document.tab"));
 
-		RadioGroupItem foldSorting = ItemFactory.newBooleanSelector("foldsorting", "foldsorting");
+		RadioGroupItem foldSorting = ItemFactory.newBooleanSelector("foldsorting");
 		foldSorting.setValueMap("name", "date");
 		foldSorting.setValue(Util.getParameterValue(settings, "gui.folder.sorting"));
 
-		RadioGroupItem downloadTicketBehavior = ItemFactory.newBooleanSelector("downloadticketbehavior",
-				I18N.message("downloadticketbehavior"));
-		downloadTicketBehavior.setValueMap("download", "display");
+		RadioGroupItem downloadTicketBehavior = ItemFactory.newBooleanSelector("downloadticketbehavior");
+		downloadTicketBehavior.setValueMap(DOWNLOAD, "display");
 		downloadTicketBehavior.setValue(Util.getParameterValue(settings, "downloadticket.behavior"));
 
-		RadioGroupItem webstartMode = ItemFactory.newBooleanSelector("webstartmode", I18N.message("webstartmode"));
-		webstartMode.setValueMap("webstart", "download");
+		RadioGroupItem webstartMode = ItemFactory.newBooleanSelector("webstartmode");
+		webstartMode.setValueMap("webstart", DOWNLOAD);
 		webstartMode.setValue(Util.getParameterValue(settings, "gui.webstart.mode"));
 
-		RadioGroupItem foldOpentree = ItemFactory.newBooleanSelector("foldopentree", I18N.message("openfolderstree"));
+		RadioGroupItem foldOpentree = ItemFactory.newBooleanSelector("foldopentree");
 		foldOpentree.setWrapTitle(false);
 		foldOpentree.setValue(yesNo(settings, "gui.folder.opentree"));
 
-		RadioGroupItem foldOpenSelect = ItemFactory.newBooleanSelector("foldopenselect",
-				I18N.message("foldopenselect"));
+		RadioGroupItem foldOpenSelect = ItemFactory.newBooleanSelector("foldopenselect");
 		foldOpenSelect.setWrapTitle(false);
 		foldOpenSelect.setValue(yesNo(settings, "gui.folder.openonselect"));
 
-		SpinnerItem foldMaxChildren = ItemFactory.newSpinnerItem("foldmaxchildren", I18N.message("foldmaxchildren"),
+		SpinnerItem foldMaxChildren = ItemFactory.newSpinnerItem("foldmaxchildren",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.folder.maxchildren").trim()));
 		foldMaxChildren.setWrapTitle(false);
 
-		SpinnerItem maxHistories = ItemFactory.newSpinnerItem("maxhistories", I18N.message("maxhistories"),
+		SpinnerItem maxHistories = ItemFactory.newSpinnerItem("maxhistories",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.maxhistories").trim()));
 		maxHistories.setStep(10);
 		maxHistories.setWrapTitle(false);
 
-		RadioGroupItem foldPagination = ItemFactory.newBooleanSelector("foldpagination", "foldpagination");
+		RadioGroupItem foldPagination = ItemFactory.newBooleanSelector("foldpagination");
 		foldPagination.setWrapTitle(false);
 		foldPagination.setValue(yesNo(settings, "gui.folder.pagination"));
 
-		RadioGroupItem autocloseFolderNodes = ItemFactory.newBooleanSelector("autoclosefoldernodes",
-				"autoclosefoldernodes");
+		RadioGroupItem autocloseFolderNodes = ItemFactory.newBooleanSelector("autoclosefoldernodes");
 		autocloseFolderNodes.setValue(yesNo(settings, "gui.folder.autoclose"));
 
-		RadioGroupItem securityOption = ItemFactory.newBooleanSelector("securityoption", "securityoption");
+		RadioGroupItem securityOption = ItemFactory.newBooleanSelector("securityoption");
 		securityOption.setWrapTitle(false);
-		securityOption.setValue(yesNo(settings, "security.inheritoption"));
+		securityOption.setValue(yesNo(settings, "gui.security.inheritoption"));
 
-		SelectItem securitySecurityOptionDefault = ItemFactory.newFolderSecurityOption("securityoptiondef",
-				"securityoptiondef");
+		SelectItem securitySecurityOptionDefault = ItemFactory.newFolderSecurityOption("securityoptiondef");
 		securitySecurityOptionDefault.setWrapTitle(false);
-		securitySecurityOptionDefault.setValue(Util.getParameterValue(settings, "security.inheritoption.default"));
+		securitySecurityOptionDefault.setValue(Util.getParameterValue(settings, "gui.security.inheritoption.default"));
 
-		TextItem webcontentFolders = ItemFactory.newTextItem("webcontentfolders", "webcontentfolders",
+		TextItem webcontentFolders = ItemFactory.newTextItem("webcontentfolders",
 				Util.getParameterValue(settings, "gui.webcontent.folders"));
 		webcontentFolders.setHint(I18N.message("commaseplistofids"));
 		webcontentFolders.setWidth(350);
 
-		SpinnerItem sessionTimeout = ItemFactory.newSpinnerItem("sessiontimeout", "sessiontimeout",
+		SpinnerItem sessionTimeout = ItemFactory.newSpinnerItem("sessiontimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "session.timeout").trim()));
 		sessionTimeout.setHint(I18N.message("minutes"));
 		sessionTimeout.setRequired(true);
@@ -381,7 +375,7 @@ public class GUISettingsPanel extends AdminPanel {
 		sessionTimeout.setMin(1);
 		sessionTimeout.setStep(5);
 
-		SpinnerItem rpcTimeout = ItemFactory.newSpinnerItem("rpctimeout", "rpctimeout",
+		SpinnerItem rpcTimeout = ItemFactory.newSpinnerItem("rpctimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.rpc.timeout").trim()));
 		rpcTimeout.setHint(I18N.message("minutes"));
 		rpcTimeout.setRequired(true);
@@ -389,63 +383,58 @@ public class GUISettingsPanel extends AdminPanel {
 		rpcTimeout.setMin(1);
 		rpcTimeout.setStep(1);
 
-		SpinnerItem sessionHeartbeat = ItemFactory.newSpinnerItem("sessionheartbeat", "sessionheartbeat",
+		SpinnerItem sessionHeartbeat = ItemFactory.newSpinnerItem("sessionheartbeat",
 				Integer.parseInt(Util.getParameterValue(settings, "session.heartbeat").trim()));
-		sessionHeartbeat.setHint(I18N.message("seconds"));
+		sessionHeartbeat.setHint(I18N.message(SECONDS));
 		sessionHeartbeat.setRequired(true);
 		sessionHeartbeat.setWrapTitle(false);
 		sessionHeartbeat.setMin(0);
 		sessionHeartbeat.setStep(10);
 
-		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout", "popuptimeout",
+		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.popup.timeout").trim()));
-		popupTimeout.setHint(I18N.message("seconds"));
+		popupTimeout.setHint(I18N.message(SECONDS));
 		popupTimeout.setRequired(true);
 		popupTimeout.setWrapTitle(false);
 		popupTimeout.setMin(1);
 		popupTimeout.setStep(1);
 
-		RadioGroupItem askVersionCommentOnSave = ItemFactory.newBooleanSelector("askversioncommentonsave",
-				"askversioncommentonsave");
+		RadioGroupItem askVersionCommentOnSave = ItemFactory.newBooleanSelector("askversioncommentonsave");
 		askVersionCommentOnSave.setWrapTitle(false);
 		askVersionCommentOnSave.setValue(yesNo(settings, "gui.onsave.askversioncomment"));
 
-		RadioGroupItem lockOnEditing = ItemFactory.newBooleanSelector("lockonediting", "lockonediting");
+		RadioGroupItem lockOnEditing = ItemFactory.newBooleanSelector("lockonediting");
 		lockOnEditing.setWrapTitle(false);
 		lockOnEditing.setValue(yesNo(settings, "gui.onedit.lock"));
 
-		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize", "avatarsize",
+		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.avatar.size").trim()));
-		avatarSize.setHint("pixels");
+		avatarSize.setHint(PIXELS);
 		avatarSize.setRequired(true);
 		avatarSize.setWrapTitle(false);
 		avatarSize.setStep(16);
 		avatarSize.setMin(16);
 
-		SpinnerItem wfDashletRows = ItemFactory.newSpinnerItem("wfDashletRows", "wfdashletrows",
+		SpinnerItem wfDashletRows = ItemFactory.newSpinnerItem("wfdashletrows",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.wf.dashlet.rows").trim()));
 		wfDashletRows.setRequired(true);
 		wfDashletRows.setWrapTitle(false);
 		wfDashletRows.setMin(5);
 		wfDashletRows.setStep(10);
 
-		RadioGroupItem showAvatarsInGrids = ItemFactory.newBooleanSelector("showavatarsingrids",
-				I18N.message("showavatasringrids"));
+		RadioGroupItem showAvatarsInGrids = ItemFactory.newBooleanSelector("showavatarsingrids");
 		showAvatarsInGrids.setWrapTitle(false);
 		showAvatarsInGrids.setValue(yesNo(settings, "gui.avatar.showingrids"));
 
-		SelectItem charset = ItemFactory.newCharsetSelector("charset");
-		charset.setValue(Util.getParameterValue(settings, "charset"));
+		SelectItem charset = ItemFactory.newCharsetSelector(CHARSET);
+		charset.setValue(Util.getParameterValue(settings, CHARSET));
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (!vm.validate())
-					return;
-
-				onSave();
-			}
+		save.addClickHandler((ClickEvent event) -> {
+			if (Boolean.FALSE.equals(vm.validate()))
+				return;
+			onSave();
 		});
 
 		parametersForm.setItems(welcome, density, banner, previewSize, previewTimeout, previewMaxFileSize, uploadMax,
@@ -483,12 +472,12 @@ public class GUISettingsPanel extends AdminPanel {
 
 	private List<GUIParameter> collectSettings() {
 
-		List<GUIParameter> params = new ArrayList<GUIParameter>();
+		List<GUIParameter> params = new ArrayList<>();
 
 		collectBooleanSwitches(params);
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.welcome", (String) values.get("welcome")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.density", (String) values.get("density")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.preview.size",
@@ -550,28 +539,27 @@ public class GUISettingsPanel extends AdminPanel {
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.avatar.size",
 				values.get("avatarsize").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.wf.dashlet.rows",
-				values.get("wfDashletRows").toString()));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".charset", values.get("charset").toString()));
+				values.get("wfdashletrows").toString()));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".charset", values.get(CHARSET).toString()));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption.default",
+				values.get("securityoptiondef").toString()));
 		return params;
 	}
 
 	private void collectBooleanSwitches(List<GUIParameter> params) {
-			params.add(new GUIParameter(Session.get().getTenantName() + ".gui.banner",
-					trueFalse("banner")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.savelogin",
-				trueFalse("savelogin")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.banner", trueFalse("banner")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.savelogin", trueFalse("savelogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.preview.openpanel",
 				trueFalse("openpreviewpanel")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.opentree",
-				trueFalse("foldopentree")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.opentree", trueFalse("foldopentree")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.openonselect",
 				trueFalse("foldopenselect")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.pagination",
 				trueFalse("foldpagination")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.autoclose",
 				trueFalse("autoclosefoldernodes")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.serverpush",
-				trueFalse("reacttoremoteevents")));
+		params.add(
+				new GUIParameter(Session.get().getTenantName() + ".gui.serverpush", trueFalse("reacttoremoteevents")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.license.showloginalerts",
 				trueFalse("showlicensealertsinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.quota.showloginalerts",
@@ -584,33 +572,28 @@ public class GUISettingsPanel extends AdminPanel {
 				trueFalse("showpatchalertsinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption",
 				trueFalse("securityoption")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption.default",
-				trueFalse("securityoptiondef").toString()));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.login.lang",
-				trueFalse("showlanguageinlogin")));
+		params.add(
+				new GUIParameter(Session.get().getTenantName() + ".gui.login.lang", trueFalse("showlanguageinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.lostpassword.show",
 				trueFalse("showlostpassword")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onsave.askversioncomment",
 				trueFalse("askversioncommentonsave")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onedit.lock",
-				trueFalse("lockonediting")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.galleryenabled",
-				trueFalse("galleryenabled")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onedit.lock", trueFalse("lockonediting")));
+		params.add(
+				new GUIParameter(Session.get().getTenantName() + ".gui.galleryenabled", trueFalse("galleryenabled")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.notes.allowedit",
 				trueFalse("allownotesediting")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.avatar.showingrids",
 				trueFalse("showavatarsingrids")));
-		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.saveinputs",
-				trueFalse("saveinputs")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.saveinputs", trueFalse("saveinputs")));
 	}
 
 	private String yesNo(GUIParameter[] settings, String name) {
-		return Util.getParameterValue(settings, name).equals("true") ? "yes" : "no";
+		String parameterValue = Util.getParameterValue(settings, name);
+		return parameterValue != null && parameterValue.equals("true") ? "yes" : "no";
 	}
 
 	private String trueFalse(String name) {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		return "yes".equals(values.get(name)) ? "true" : "false";
+		return "yes".equals(vm.getValues().get(name)) ? "true" : "false";
 	}
 }

@@ -38,7 +38,7 @@ public class YubiKeySetup extends TwoFactorsAuthenticationSetup {
 		this.user = user;
 
 		// Prepare the form with account informations
-		TextItem keyItem = ItemFactory.newTextItem("key", I18N.message("key"), null);
+		TextItem keyItem = ItemFactory.newTextItem("key", null);
 		keyItem.setWidth(300);
 		keyItem.addKeyPressHandler(new KeyPressHandler() {
 			@Override

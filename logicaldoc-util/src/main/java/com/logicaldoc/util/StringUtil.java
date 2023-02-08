@@ -27,6 +27,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class StringUtil {
 
+	private static final String UTF_8 = "UTF-8";
+
 	/**
 	 * Splits a string into tokens separated by a separator
 	 * 
@@ -56,7 +58,7 @@ public class StringUtil {
 	 * @return array of splitted tokens
 	 */
 	public static String[] split(String src, int tokenSize) {
-		ArrayList<String> buf = new ArrayList<String>();
+		ArrayList<String> buf = new ArrayList<>();
 		for (int i = 0; i < src.length(); i += tokenSize) {
 			int j = i + tokenSize;
 			if (j > src.length())
@@ -77,7 +79,7 @@ public class StringUtil {
 	 *         or if the string cannot be written
 	 */
 	public static String writeToString(Reader reader) throws IOException {
-		return writeToString(reader, "UTF-8");
+		return writeToString(reader, UTF_8);
 	}
 
 	/**
@@ -91,7 +93,7 @@ public class StringUtil {
 	 *         get the contents
 	 */
 	public static String writeToString(Reader reader, String targetEncoding) throws IOException {
-		String enc = "UTF-8";
+		String enc = UTF_8;
 		if (StringUtils.isNotEmpty(targetEncoding))
 			enc = targetEncoding;
 
@@ -111,7 +113,7 @@ public class StringUtil {
 	}
 
 	public static String writeToString(InputStream is, String targetEncoding) throws IOException {
-		String enc = "UTF-8";
+		String enc = UTF_8;
 		if (StringUtils.isNotEmpty(targetEncoding))
 			enc = targetEncoding;
 
@@ -165,21 +167,27 @@ public class StringUtil {
 			return true;
 
 		// First of all check if the string must be excluded
-		if (excludes != null && excludes.length > 0)
-			for (String s : excludes)
-				if (StringUtils.isNotEmpty(s) && str.matches(s))
-					return false;
+		boolean matchesExclusions = filtersCheck(str, excludes);
+		if (matchesExclusions)
+			return false;
 
 		// Then check if the string must can be included
-		if (includes != null && includes.length > 0)
-			for (String s : includes)
-				if (StringUtils.isNotEmpty(s) && str.matches(s))
-					return true;
+		boolean matchesInclusions = filtersCheck(str, includes);
+		if (matchesInclusions)
+			return true;
 
 		if (includes == null || includes.length == 0)
 			return true;
 		else
 			return false;
+	}
+
+	private static boolean filtersCheck(String str, String[] filters) {
+		if (filters != null && filters.length > 0)
+			for (String s : filters)
+				if (StringUtils.isNotEmpty(s) && str.matches(s))
+					return true;
+		return false;
 	}
 
 	/**

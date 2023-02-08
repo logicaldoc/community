@@ -21,7 +21,7 @@ public class DocumentController {
 
 	private static DocumentController instance = new DocumentController();
 
-	private Set<DocumentObserver> observers = new HashSet<DocumentObserver>();
+	private Set<DocumentObserver> observers = new HashSet<>();
 
 	/**
 	 * The currently selected document

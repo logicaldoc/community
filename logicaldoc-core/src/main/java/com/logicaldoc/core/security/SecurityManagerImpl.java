@@ -51,7 +51,7 @@ public class SecurityManagerImpl implements SecurityManager {
 
 	@Override
 	public Set<Group> getAllowedGroups(long menuId) {
-		Set<Group> groups = new HashSet<Group>();
+		Set<Group> groups = new HashSet<>();
 		try {
 			Menu menu = menuDAO.findById(menuId);
 			if (menu.getSecurityRef() != null)
@@ -178,7 +178,7 @@ public class SecurityManagerImpl implements SecurityManager {
 			log.error(e.getMessage(), e);
 		}
 		if (doc == null)
-			return new HashSet<Permission>();
+			return new HashSet<>();
 		else
 			return folderDAO.getEnabledPermissions(doc.getFolder().getId(), userId);
 	}

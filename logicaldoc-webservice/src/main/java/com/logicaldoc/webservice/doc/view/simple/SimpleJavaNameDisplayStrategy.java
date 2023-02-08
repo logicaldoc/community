@@ -19,7 +19,7 @@ import com.logicaldoc.webservice.doc.JavaNameDisplayStrategy;
 
 public class SimpleJavaNameDisplayStrategy extends JavaNameDisplayStrategy {
 
-	private static final Map<Class<?>, String> PRIMITIVE_TYPE_DISPLAY = new HashMap<Class<?>, String>();
+	private static final Map<Class<?>, String> PRIMITIVE_TYPE_DISPLAY = new HashMap<>();
 	static {
 		PRIMITIVE_TYPE_DISPLAY.put(String.class, "String");
 
@@ -52,7 +52,7 @@ public class SimpleJavaNameDisplayStrategy extends JavaNameDisplayStrategy {
 		else {
 			String[] words = StringUtils.split(elementName, "-");
 
-			List<String> capitalized = new ArrayList<String>();
+			List<String> capitalized = new ArrayList<>();
 			for (String word : words) {
 				capitalized.add(!capitalized.isEmpty() ? StringUtils.capitalize(word) : word);
 			}

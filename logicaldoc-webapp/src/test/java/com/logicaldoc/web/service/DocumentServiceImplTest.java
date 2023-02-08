@@ -1123,19 +1123,19 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		log.info(gmail.getFrom().getEmail());
 		gmail.setDocIds(new long[] { 5 });
 
-		List<GUIContact> tos = new ArrayList<GUIContact>();
+		List<GUIContact> tos = new ArrayList<>();
 		GUIContact gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
 		tos.add(gc);
 
 		GUIContact[] carr = new GUIContact[] {};
 		gmail.setTos(tos.toArray(carr));
 
-		tos = new ArrayList<GUIContact>();
+		tos = new ArrayList<>();
 		gc = new GUIContact("Riley", "Arnold", "riley-arnold@acme.com");
 		tos.add(gc);
 		gmail.setBccs(tos.toArray(carr));
 
-		tos = new ArrayList<GUIContact>();
+		tos = new ArrayList<>();
 		gc = new GUIContact("Scout", "Marsh", "s.marsh@acme.com");
 		tos.add(gc);
 		gmail.setCcs(tos.toArray(carr));
@@ -1150,7 +1150,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		log.info(gmail.getFrom().getEmail());
 		gmail.setDocIds(new long[] { 5 });
 
-		tos = new ArrayList<GUIContact>();
+		tos = new ArrayList<>();
 		gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
 		tos.add(gc);
 

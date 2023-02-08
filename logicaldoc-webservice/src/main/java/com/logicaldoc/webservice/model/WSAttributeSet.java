@@ -86,7 +86,7 @@ public class WSAttributeSet implements Serializable {
 	}
 
 	public Collection<String> listAttributeNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		for (WSAttribute att : getAttributes()) {
 			names.add(att.getName());
 		}
@@ -94,7 +94,7 @@ public class WSAttributeSet implements Serializable {
 	}
 
 	public void addAttribute(WSAttribute att) {
-		List<WSAttribute> buf = new ArrayList<WSAttribute>();
+		List<WSAttribute> buf = new ArrayList<>();
 		buf.addAll(Arrays.asList(getAttributes()));
 		buf.add(att);
 		setAttributes(buf.toArray(new WSAttribute[0]));

@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -38,6 +37,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
+	private static final String USER_ID = "userId";
+
 	private ListGrid list;
 
 	private VLayout container = new VLayout();
@@ -56,11 +57,11 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		if (list != null)
 			container.removeMember(list);
 
-		ListGridField userId = new ListGridField("userId", "userId", 50);
+		ListGridField userId = new ListGridField(USER_ID, USER_ID, 50);
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new UserListGridField("userName", "userId", "user");
+		ListGridField userName = new UserListGridField("userName", USER_ID, "user");
 		userName.setCanEdit(false);
 
 		DateListGridField created = new DateListGridField("created", "subscription");
@@ -170,23 +171,20 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+							}
+						});
 					}
 				});
 			}

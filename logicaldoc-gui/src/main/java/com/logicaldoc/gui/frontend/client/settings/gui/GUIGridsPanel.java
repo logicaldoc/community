@@ -42,6 +42,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class GUIGridsPanel extends VLayout {
 
+	private static final String LABEL = "label";
+
 	private ListGrid documentsFieldsGrid;
 
 	private ListGrid searchGrid;
@@ -81,7 +83,7 @@ public class GUIGridsPanel extends VLayout {
 	}
 
 	private SectionStack prepareDocumentsGrid() {
-		ListGridField attribute = new ListGridField("label", I18N.message("attribute"));
+		ListGridField attribute = new ListGridField(LABEL, I18N.message("attribute"));
 		attribute.setCanEdit(false);
 
 		documentsFieldsGrid = new ListGrid();
@@ -127,11 +129,11 @@ public class GUIGridsPanel extends VLayout {
 							|| sel.getAttributeAsString("name").equals("score"))
 						continue;
 
-					Record record = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (record == null) {
+					Record rec = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+					if (rec == null) {
 						ListGridRecord newRec = new ListGridRecord();
 						newRec.setAttribute("name", sel.getAttributeAsString("name"));
-						newRec.setAttribute("label", sel.getAttributeAsString("label"));
+						newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
 						documentsFieldsGrid.addData(newRec);
 					}
 				}
@@ -148,11 +150,11 @@ public class GUIGridsPanel extends VLayout {
 		if (columns != null) {
 			String[] attributes = columns.split("\\,");
 			for (String att : attributes) {
-				ListGridRecord record = new ListGridRecord();
+				ListGridRecord rec = new ListGridRecord();
 				String n = att.trim();
-				record.setAttribute("name", n);
-				record.setAttribute("label", Session.get().getInfo().getAttributeLabel(n));
-				documentsFieldsGrid.addData(record);
+				rec.setAttribute("name", n);
+				rec.setAttribute(LABEL, Session.get().getInfo().getAttributeLabel(n));
+				documentsFieldsGrid.addData(rec);
 			}
 		}
 
@@ -164,7 +166,7 @@ public class GUIGridsPanel extends VLayout {
 		section.setCanCollapse(false);
 		section.setExpanded(true);
 
-		pageSize = ItemFactory.newSpinnerItem("pagesize", I18N.message("pagesize"), Session.get().getConfigAsInt("gui.document.pagesize"));
+		pageSize = ItemFactory.newSpinnerItem("pagesize", Session.get().getConfigAsInt("gui.document.pagesize"));
 		pageSize.setRequired(true);
 		pageSize.setWrapTitle(false);
 		pageSize.setMin(5);
@@ -178,7 +180,7 @@ public class GUIGridsPanel extends VLayout {
 	}
 
 	private SectionStack prepareSearchGrid() {
-		ListGridField attribute = new ListGridField("label", I18N.message("attribute"));
+		ListGridField attribute = new ListGridField(LABEL, I18N.message("attribute"));
 		attribute.setCanEdit(false);
 
 		searchGrid = new ListGrid();
@@ -219,11 +221,11 @@ public class GUIGridsPanel extends VLayout {
 			public void onChanged(ChangedEvent event) {
 				ListGridRecord[] seletion = selector.getSelectedRecords();
 				for (ListGridRecord sel : seletion) {
-					Record record = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (record == null) {
+					Record rec = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+					if (rec == null) {
 						ListGridRecord newRec = new ListGridRecord();
 						newRec.setAttribute("name", sel.getAttributeAsString("name"));
-						newRec.setAttribute("label", sel.getAttributeAsString("label"));
+						newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
 						searchGrid.addData(newRec);
 					}
 				}
@@ -247,11 +249,11 @@ public class GUIGridsPanel extends VLayout {
 		if (columns != null) {
 			String[] attributes = columns.split("\\,");
 			for (String att : attributes) {
-				ListGridRecord record = new ListGridRecord();
+				ListGridRecord rec = new ListGridRecord();
 				String n = att.trim();
-				record.setAttribute("name", n);
-				record.setAttribute("label", I18N.message(Session.get().getInfo().getAttributeLabel(n)));
-				searchGrid.addData(record);
+				rec.setAttribute("name", n);
+				rec.setAttribute(LABEL, I18N.message(Session.get().getInfo().getAttributeLabel(n)));
+				searchGrid.addData(rec);
 			}
 		}
 
@@ -271,8 +273,8 @@ public class GUIGridsPanel extends VLayout {
 	}
 
 	private void onSave() {
-		List<String> extendedAttributes = new ArrayList<String>();
-		List<GUIParameter> parameters = new ArrayList<GUIParameter>();
+		List<String> extendedAttributes = new ArrayList<>();
+		List<GUIParameter> parameters = new ArrayList<>();
 		
 		/*
 		 * Prepare the list of columns for the documents screen

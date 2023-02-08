@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -97,18 +96,11 @@ public class GroupDetailsPanel extends VLayout {
 		 */
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
-
-		propertiesPanel = new GroupPropertiesPanel(group, changeHandler);
+		propertiesPanel = new GroupPropertiesPanel(group, (ChangedEvent event) -> onModified());
 		propertiesTabPanel.addMember(propertiesPanel);
 
 		/*
@@ -116,7 +108,7 @@ public class GroupDetailsPanel extends VLayout {
 		 */
 		if (usersPanel != null) {
 			usersPanel.destroy();
-			if (usersTabPanel.contains(usersPanel))
+			if (Boolean.TRUE.equals(usersTabPanel.contains(usersPanel)))
 				usersTabPanel.removeMember(usersPanel);
 		}
 		usersPanel = new GroupUsersPanel(group.getId());

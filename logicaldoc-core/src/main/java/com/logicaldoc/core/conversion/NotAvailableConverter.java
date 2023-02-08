@@ -41,12 +41,12 @@ public class NotAvailableConverter implements FormatConverter {
 
 	@Override
 	public List<String> getParameterNames() {
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 
 	@Override
 	public Map<String, String> getParameters() {
-		return new HashMap<String, String>();
+		return new HashMap<>();
 	}
 
 	@Override

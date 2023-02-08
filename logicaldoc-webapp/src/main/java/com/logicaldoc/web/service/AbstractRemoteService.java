@@ -310,83 +310,13 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
 
-		List<GUIAttribute> attributes = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
 			return new GUIAttribute[0];
 		try {
-			if (template != null) {
-				for (String attrName : template.getAttributeNames()) {
-					Attribute templateExtAttr = template.getAttributes().get(attrName);
-					GUIAttribute att = new GUIAttribute();
-					att.setName(attrName);
-					att.setSetId(templateExtAttr.getSetId());
-					att.setPosition(templateExtAttr.getPosition());
-					att.setLabel(templateExtAttr.getLabel());
-					att.setMandatory(templateExtAttr.getMandatory() == 1);
-					att.setHidden(templateExtAttr.getHidden() == 1);
-					att.setReadonly(templateExtAttr.getReadonly() == 1);
-					att.setMultiple(templateExtAttr.getMultiple() == 1);
-					att.setParent(templateExtAttr.getParent());
-					att.setStringValues(templateExtAttr.getStringValues());
-					att.setEditor(templateExtAttr.getEditor());
-					att.setStringValue(templateExtAttr.getStringValue());
-					att.setIntValue(templateExtAttr.getIntValue());
-					att.setBooleanValue(templateExtAttr.getBooleanValue());
-					att.setDoubleValue(templateExtAttr.getDoubleValue());
-					att.setDateValue(templateExtAttr.getDateValue());
-					att.setOptions(new String[] { templateExtAttr.getStringValue() });
-
-					if (extensibleObject != null) {
-						Attribute attribute = extensibleObject.getAttribute(attrName);
-						if (attribute != null) {
-							att.setStringValues(attribute.getStringValues());
-							att.setStringValue(attribute.getStringValue());
-							att.setIntValue(attribute.getIntValue());
-							att.setBooleanValue(attribute.getBooleanValue());
-							att.setDoubleValue(attribute.getDoubleValue());
-							att.setDateValue(attribute.getDateValue());
-						} else
-							att.setValue(templateExtAttr.getValue());
-					}
-
-					// Normalize dates
-					if (att.getValue() instanceof Date)
-						att.setValue(convertToDate((Date) att.getValue()));
-
-					att.setType(templateExtAttr.getType());
-					attributes.add(att);
-
-					if (att.isMultiple() && extensibleObject != null) {
-						// Get the other values
-						List<Attribute> values = extensibleObject.getValueAttributes(att.getName());
-						if (values.size() > 1) {
-							// Skip the parent attribute
-							values.remove(0);
-
-							// Create the GUI attributes for the values
-							for (Attribute valAttribute : values) {
-								GUIAttribute valAtt = new GUIAttribute(att);
-								valAtt.setName(valAttribute.getName());
-								valAtt.setParent(att.getName());
-								valAtt.setMultiple(false);
-								valAtt.setPosition(att.getPosition());
-								valAtt.setPosition(att.getPosition());
-								valAtt.setBooleanValue(valAttribute.getBooleanValue());
-								valAtt.setDateValue(valAttribute.getDateValue());
-								valAtt.setDoubleValue(valAttribute.getDoubleValue());
-								valAtt.setIntValue(valAttribute.getIntValue());
-								valAtt.setStringValue(valAttribute.getStringValue());
-								valAtt.setStringValues(null);
-
-								// Normalize dates
-								if (valAtt.getValue() instanceof Date)
-									valAtt.setValue(convertToDate((Date) valAtt.getValue()));
-								attributes.add(valAtt);
-							}
-						}
-					}
-				}
-			}
+			if (template != null)
+				for (String attrName : template.getAttributeNames())
+					attributes.add(prepareGUIAttribute(attrName, template, attributes, extensibleObject));
 
 			Collections.sort(attributes);
 			return attributes.toArray(new GUIAttribute[0]);
@@ -394,5 +324,80 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			log.error(t.getMessage(), t);
 			return null;
 		}
+	}
+
+	private GUIAttribute prepareGUIAttribute(String attrName, Template template, List<GUIAttribute> attributes,
+			ExtensibleObject extensibleObject) {
+		Attribute templateExtAttr = template.getAttributes().get(attrName);
+		GUIAttribute att = new GUIAttribute();
+		att.setName(attrName);
+		att.setSetId(templateExtAttr.getSetId());
+		att.setPosition(templateExtAttr.getPosition());
+		att.setLabel(templateExtAttr.getLabel());
+		att.setMandatory(templateExtAttr.getMandatory() == 1);
+		att.setHidden(templateExtAttr.getHidden() == 1);
+		att.setReadonly(templateExtAttr.getReadonly() == 1);
+		att.setMultiple(templateExtAttr.getMultiple() == 1);
+		att.setParent(templateExtAttr.getParent());
+		att.setStringValues(templateExtAttr.getStringValues());
+		att.setEditor(templateExtAttr.getEditor());
+		att.setStringValue(templateExtAttr.getStringValue());
+		att.setIntValue(templateExtAttr.getIntValue());
+		att.setBooleanValue(templateExtAttr.getBooleanValue());
+		att.setDoubleValue(templateExtAttr.getDoubleValue());
+		att.setDateValue(templateExtAttr.getDateValue());
+		att.setOptions(new String[] { templateExtAttr.getStringValue() });
+
+		if (extensibleObject != null) {
+			Attribute attribute = extensibleObject.getAttribute(attrName);
+			if (attribute != null) {
+				att.setStringValues(attribute.getStringValues());
+				att.setStringValue(attribute.getStringValue());
+				att.setIntValue(attribute.getIntValue());
+				att.setBooleanValue(attribute.getBooleanValue());
+				att.setDoubleValue(attribute.getDoubleValue());
+				att.setDateValue(attribute.getDateValue());
+			} else
+				att.setValue(templateExtAttr.getValue());
+		}
+
+		// Normalize dates
+		normalizeDate(att);
+
+		att.setType(templateExtAttr.getType());
+
+		if (att.isMultiple() && extensibleObject != null) {
+			// Get the other values
+			List<Attribute> values = extensibleObject.getValueAttributes(att.getName());
+			if (values.size() > 1) {
+				// Skip the parent attribute
+				values.remove(0);
+
+				// Create the GUI attributes for the values
+				for (Attribute valAttribute : values) {
+					GUIAttribute valAtt = new GUIAttribute(att);
+					valAtt.setName(valAttribute.getName());
+					valAtt.setParent(att.getName());
+					valAtt.setMultiple(false);
+					valAtt.setPosition(att.getPosition());
+					valAtt.setPosition(att.getPosition());
+					valAtt.setBooleanValue(valAttribute.getBooleanValue());
+					valAtt.setDateValue(valAttribute.getDateValue());
+					valAtt.setDoubleValue(valAttribute.getDoubleValue());
+					valAtt.setIntValue(valAttribute.getIntValue());
+					valAtt.setStringValue(valAttribute.getStringValue());
+					valAtt.setStringValues(null);
+
+					normalizeDate(valAtt);
+					attributes.add(valAtt);
+				}
+			}
+		}
+		return att;
+	}
+
+	private void normalizeDate(GUIAttribute att) {
+		if (att.getValue() instanceof Date)
+			att.setValue(convertToDate((Date) att.getValue()));
 	}
 }

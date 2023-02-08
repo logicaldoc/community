@@ -362,7 +362,7 @@ public abstract class Task implements Runnable {
 			email.setLocale(recipient.getLocale());
 
 			// Prepare the mail recipient
-			Set<Recipient> rec = new HashSet<Recipient>();
+			Set<Recipient> rec = new HashSet<>();
 			Recipient r = new Recipient();
 			r.setAddress(recipient.getEmail());
 			r.setType(Recipient.TYPE_EMAIL);
@@ -371,7 +371,7 @@ public abstract class Task implements Runnable {
 			email.setRecipients(rec);
 
 			// Prepare the arguments for the template
-			Map<String, Object> dictionary = new HashMap<String, Object>();
+			Map<String, Object> dictionary = new HashMap<>();
 			dictionary.put(Automation.LOCALE, recipient.getLocale());
 			dictionary.put("task", I18N.message("task.name." + name, recipient.getLocale()));
 			dictionary.put("started", scheduling.getPreviousFireTime());

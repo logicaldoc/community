@@ -33,6 +33,16 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class OutgoingEmailPanel extends AdminPanel {
 
+	private static final String NODISPLAY = "nodisplay";
+
+	private static final String USERASFROM = "userasfrom";
+
+	private static final String SENDEREMAIL = "senderemail";
+
+	private static final String PASSWORD = "password";
+
+	private static final String USERNAME = "username";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private GUIEmailSettings emailSettings;
@@ -52,7 +62,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		emailForm.setTitleOrientation(TitleOrientation.LEFT);
 
 		// SMTP Server
-		TextItem smtpServer = ItemFactory.newTextItem("smtpServer", "smtpserver", this.emailSettings.getSmtpServer());
+		TextItem smtpServer = ItemFactory.newTextItem("smtpserver", this.emailSettings.getSmtpServer());
 		smtpServer.setRequired(true);
 		smtpServer.setWidth(350);
 		smtpServer.setWrapTitle(false);
@@ -62,19 +72,19 @@ public class OutgoingEmailPanel extends AdminPanel {
 		port.setRequired(true);
 
 		// Username
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username",
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME,
 				this.emailSettings.getUsername());
 		username.setWidth(350);
 		username.setWrapTitle(false);
 
 		// Password
-		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password",
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD,
 				this.emailSettings.getPwd());
 		password.setWrapTitle(false);
 
 		// Connection Security
 		SelectItem connSecurity = new SelectItem();
-		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put(GUIEmailSettings.SECURITY_NONE, I18N.message("none"));
 		opts.put(GUIEmailSettings.SECURITY_STARTTLS, I18N.message("starttls"));
 		opts.put(GUIEmailSettings.SECURITY_TLS, I18N.message("tls"));
@@ -95,15 +105,15 @@ public class OutgoingEmailPanel extends AdminPanel {
 		secureAuth.setWrapTitle(false);
 
 		// Sender Email
-		TextItem senderEmail = ItemFactory.newEmailItem("senderEmail", "senderemail", false);
+		TextItem senderEmail = ItemFactory.newEmailItem(SENDEREMAIL, SENDEREMAIL, false);
 		senderEmail.setValue(this.emailSettings.getSenderEmail());
 		senderEmail.setWidth(350);
 		senderEmail.setWrapTitle(false);
 
 		// Use the user's email as sender
 		CheckboxItem userAsSender = new CheckboxItem();
-		userAsSender.setName("userasfrom");
-		userAsSender.setTitle(I18N.message("userasfrom"));
+		userAsSender.setName(USERASFROM);
+		userAsSender.setTitle(I18N.message(USERASFROM));
 		userAsSender.setRedrawOnChange(true);
 		userAsSender.setWidth(350);
 		userAsSender.setValue(emailSettings.isUserAsFrom());
@@ -118,7 +128,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		if (emailSettings.getTargetFolder() != null)
 			targetSelector.setFolder(emailSettings.getTargetFolder());
 
-		SelectItem foldering = ItemFactory.newEmailFolderingSelector("foldering", "foldering");
+		SelectItem foldering = ItemFactory.newEmailFolderingSelector();
 		foldering.setRequired(false);
 		foldering.setValue("" + emailSettings.getFoldering());
 
@@ -130,14 +140,13 @@ public class OutgoingEmailPanel extends AdminPanel {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
-				this.emailSettings.getUsername());
-		fakeUsername.setCellStyle("nodisplay");
-		fakeUsername.setTitleStyle("nodisplay");
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", this.emailSettings.getUsername());
+		fakeUsername.setCellStyle(NODISPLAY);
+		fakeUsername.setTitleStyle(NODISPLAY);
 		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
 				this.emailSettings.getPwd());
-		fakePassword.setCellStyle("nodisplay");
-		fakePassword.setTitleStyle("nodisplay");
+		fakePassword.setCellStyle(NODISPLAY);
+		fakePassword.setTitleStyle(NODISPLAY);
 
 		emailForm.setItems(smtpServer, port, fakeUsername, fakePassword, username, password, connSecurity, secureAuth,
 				senderEmail, userAsSender, targetSelector, foldering, save, test);
@@ -149,10 +158,10 @@ public class OutgoingEmailPanel extends AdminPanel {
 	private ButtonItem prepareTestButton() {
 		ButtonItem test = new ButtonItem("test", I18N.message("testconnection"));
 		test.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
-			LD.askForValue(I18N.message("email"), I18N.message("email"), (String) vm.getValueAsString("senderEmail"),
+			LD.askForValue(I18N.message("email"), I18N.message("email"), (String) vm.getValueAsString(SENDEREMAIL),
 					(String value) -> {
 						LD.contactingServer();
 						SettingService.Instance.get().testEmail(value, new AsyncCallback<Boolean>() {
@@ -163,9 +172,9 @@ public class OutgoingEmailPanel extends AdminPanel {
 							}
 
 							@Override
-							public void onSuccess(Boolean result) {
+							public void onSuccess(Boolean yes) {
 								LD.clearPrompt();
-								if (result.booleanValue())
+								if (yes.booleanValue())
 									SC.say(I18N.message("connectionestablished"));
 								else
 									SC.warn(I18N.message("connectionfailed"));
@@ -181,26 +190,26 @@ public class OutgoingEmailPanel extends AdminPanel {
 		save.setStartRow(true);
 		save.setEndRow(false);
 		save.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
-			if (!vm.validate())
+			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
 			@SuppressWarnings("unchecked")
 			Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpServer"));
+			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpserver"));
 			if (values.get("port") instanceof Integer)
 				OutgoingEmailPanel.this.emailSettings.setPort((Integer) values.get("port"));
 			else
 				OutgoingEmailPanel.this.emailSettings.setPort(Integer.parseInt(values.get("port").toString()));
 
-			OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get("username"));
-			OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get("password"));
+			OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get(USERNAME));
+			OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get(PASSWORD));
 			OutgoingEmailPanel.this.emailSettings.setConnSecurity((String) values.get("connSecurity"));
 			OutgoingEmailPanel.this.emailSettings
 					.setSecureAuth(values.get("secureAuth").toString().equals("true") ? true : false);
-			OutgoingEmailPanel.this.emailSettings.setSenderEmail((String) values.get("senderEmail"));
+			OutgoingEmailPanel.this.emailSettings.setSenderEmail((String) values.get(SENDEREMAIL));
 			OutgoingEmailPanel.this.emailSettings
-					.setUserAsFrom(values.get("userasfrom").toString().equals("true") ? true : false);
+					.setUserAsFrom(values.get(USERASFROM).toString().equals("true") ? true : false);
 			OutgoingEmailPanel.this.emailSettings.setFoldering(Integer.parseInt(values.get("foldering").toString()));
 			OutgoingEmailPanel.this.emailSettings.setTargetFolder(targetSelector.getFolder());
 

@@ -43,7 +43,7 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 	}
 
 	public DavResourceIterator getMembers() {
-		return new DavResourceIteratorImpl(new ArrayList<DavResource>());
+		return new DavResourceIteratorImpl(new ArrayList<>());
 	}
 
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
@@ -76,7 +76,7 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 
 		List<Resource> resourceVersions = resourceService.getHistory(resource);
 
-		List<VersionResource> versions = new ArrayList<VersionResource>();
+		List<VersionResource> versions = new ArrayList<>();
 
 		for (Resource resource : resourceVersions) {
 			DavResourceLocator loc = locator.getFactory().createResourceLocator(locator.getPrefix(),

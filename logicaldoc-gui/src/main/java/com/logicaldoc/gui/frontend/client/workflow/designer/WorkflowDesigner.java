@@ -128,7 +128,7 @@ public class WorkflowDesigner extends AdminPanel {
 	 */
 	public boolean saveModel() {
 		// Collect all the states as drawn in the designer.
-		List<GUIWFState> states = new ArrayList<GUIWFState>();
+		List<GUIWFState> states = new ArrayList<>();
 		Iterator<FunctionShape> iter = getDrawingPanel().getDiagramController().getShapes().iterator();
 		int i = 0;
 		while (iter.hasNext()) {
@@ -157,7 +157,7 @@ public class WorkflowDesigner extends AdminPanel {
 			StateWidget srcWidget = (StateWidget) shape.getWidget();
 
 			DrawableSet<Connection> connections = shape.getConnections();
-			List<GUITransition> transitions = new ArrayList<GUITransition>();
+			List<GUITransition> transitions = new ArrayList<>();
 			for (Connection connection : connections) {
 				StateWidget start = (StateWidget) ((FunctionShape) connection.getStartShape()).getWidget();
 				if (!start.equals(srcWidget))

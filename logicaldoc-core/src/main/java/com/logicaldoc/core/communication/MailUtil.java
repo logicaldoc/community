@@ -774,9 +774,9 @@ public class MailUtil {
 
 				Object cont = part.getContent();
 				if (cont instanceof Multipart) {
-					extractPartText((Multipart) cont, textBody);
+					extractPartText(cont, textBody);
 				} else {
-					extractPartText((Part) part, textBody);
+					extractPartText(part, textBody);
 				}
 			} catch (Throwable e) {
 				log.warn(e.getMessage(), e);

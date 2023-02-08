@@ -21,7 +21,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	@Override
 	public void deleteCurrentNodeSessions() {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("node", SystemInfo.get().getInstallationId());
 
 			bulkUpdate(" set deleted=1 where node = :node and deleted=0", params);
@@ -30,7 +30,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 		}
 
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("node", SystemInfo.get().getInstallationId());
 			params.put("status", Session.STATUS_OPEN);
 
@@ -60,7 +60,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	@Override
 	public Session findBySid(String sid) {
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("sid", sid);
 			List<Session> sessions = findByWhere(ENTITY + ".sid = :sid", params, null, null);
 			for (Session session : sessions) {
@@ -85,14 +85,14 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 				return findByWhere(" 1=1 ", (Map<String, Object>) null, "order by " + ENTITY + ".creation desc",
 						null);
 			else {
-				Map<String, Object> params = new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<>();
 				params.put("node", node);
 				return findByWhere(ENTITY + ".node = :node", params,
 						"order by " + ENTITY + ".creation desc", null);
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Session>();
+			return new ArrayList<>();
 		}
 	}
 

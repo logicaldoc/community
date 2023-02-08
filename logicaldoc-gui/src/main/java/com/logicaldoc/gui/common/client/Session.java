@@ -36,7 +36,7 @@ public class Session implements DocumentObserver {
 
 	private Long hiliteDocId;
 
-	private Set<SessionObserver> sessionObservers = new HashSet<SessionObserver>();
+	private Set<SessionObserver> sessionObservers = new HashSet<>();
 
 	private Timer timer;
 
@@ -166,7 +166,7 @@ public class Session implements DocumentObserver {
 					@Override
 					public void onSuccess(Boolean active) {
 						missedPingCount = 0;
-						if (!active)
+						if (Boolean.FALSE.equals(active))
 							onInvalidSession();
 					}
 				});

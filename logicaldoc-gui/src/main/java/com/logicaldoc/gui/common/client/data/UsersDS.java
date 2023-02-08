@@ -5,6 +5,7 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -37,9 +38,10 @@ public class UsersDS extends DataSource {
 		DataSourceTextField groups = new DataSourceTextField("groups");
 		DataSourceImageField avatar = new DataSourceImageField("avatar", I18N.message("avatar"), 16);
 		DataSourceDateField expire = new DataSourceDateField("expire");
+		DataSourceIntegerField source= new DataSourceIntegerField("source");
 
 		setFields(id, username, label, eenabled, enabled, name, firstName, email, phone, cell, groups, usergroup, guest,
-				expire, avatar, timeZone);
+				expire, avatar, timeZone, source);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="
 				+ required + "&skipdisabled=" + skipDisabled);
 		setClientOnly(true);

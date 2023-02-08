@@ -57,7 +57,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 	}
 
 	private void prepareForm() {
-		if (formContainer.contains(form)) {
+		if (Boolean.TRUE.equals(formContainer.contains(form))) {
 			formContainer.removeMember(form);
 			form.destroy();
 		}
@@ -70,7 +70,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 
 		usersItem.setDisabled(!updateEnabled);
 
-		TextAreaItem message = ItemFactory.newTextAreaItem("message", "message", null);
+		TextAreaItem message = ItemFactory.newTextAreaItem("message", null);
 		message.setWidth("*");
 		form.setItems(usersItem, message);
 	}
@@ -78,7 +78,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 	public boolean validate() {
 		vm.validate();
 
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			document.setNotifyUsers(usersItem.getUserIds());
 			document.setNotifyMessage(vm.getValueAsString("message"));
 		}

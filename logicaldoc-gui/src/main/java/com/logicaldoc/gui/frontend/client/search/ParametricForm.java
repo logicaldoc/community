@@ -50,6 +50,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class ParametricForm extends VLayout {
+	private static final String TEMPLATE = "template";
+
+	private static final String TYPE = "type:";
+
+	private static final String CASESENSITIVE = "casesensitive";
+
+	private static final String LANGUAGE = "language";
+
 	private static final String SEARCHINHITS = "searchinhits";
 
 	private static final String NO_LANGUAGE = "";
@@ -97,7 +105,7 @@ public class ParametricForm extends VLayout {
 		languageForm.setValuesManager(vm);
 		languageForm.setTitleOrientation(TitleOrientation.TOP);
 		languageForm.setNumCols(1);
-		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
+		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		language.setDefaultValue("");
 
 		languageForm.setItems(language);
@@ -145,7 +153,7 @@ public class ParametricForm extends VLayout {
 		folder.setEndRow(true);
 		folder.setWidth(200);
 
-		CheckboxItem casesensitive = new CheckboxItem("casesensitive", I18N.message("casesensitive"));
+		CheckboxItem casesensitive = new CheckboxItem(CASESENSITIVE, I18N.message(CASESENSITIVE));
 		casesensitive.setValue(true);
 		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
 		aliases.setValue(true);
@@ -156,7 +164,7 @@ public class ParametricForm extends VLayout {
 
 		CheckboxItem searchinhits = new CheckboxItem(SEARCHINHITS, I18N.message(SEARCHINHITS));
 
-		LinkedHashMap<String, String> matchMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> matchMap = new LinkedHashMap<>();
 		matchMap.put("and", I18N.message("matchall"));
 		matchMap.put("or", I18N.message("matchany"));
 		matchMap.put("not", I18N.message("matchnone"));
@@ -239,7 +247,7 @@ public class ParametricForm extends VLayout {
 
 	@SuppressWarnings("unchecked")
 	private void search() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		Map<String, Object> values = vm.getValues();
@@ -248,7 +256,7 @@ public class ParametricForm extends VLayout {
 
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
-		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString("casesensitive")) ? 1 : 0);
+		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString(CASESENSITIVE)) ? 1 : 0);
 
 		options.setType(GUISearchOptions.TYPE_PARAMETRIC);
 
@@ -260,16 +268,16 @@ public class ParametricForm extends VLayout {
 
 		setFolderCondition(options);
 
-		List<GUICriterion> criteria = new ArrayList<GUICriterion>();
+		List<GUICriterion> criteria = new ArrayList<>();
 		if (conditionsLayout.getMembers() != null)
 			addCriteria(criteria);
 
 		// Handle language condition as additional criterion
-		if (!NO_LANGUAGE.equals(vm.getValueAsString("language").trim())) {
+		if (!NO_LANGUAGE.equals(vm.getValueAsString(LANGUAGE).trim())) {
 			GUICriterion criterion = new GUICriterion();
-			criterion.setField("language");
+			criterion.setField(LANGUAGE);
 			criterion.setOperator("equals");
-			criterion.setStringValue(vm.getValueAsString("language"));
+			criterion.setStringValue(vm.getValueAsString(LANGUAGE));
 			criteria.add(criterion);
 		}
 
@@ -338,23 +346,23 @@ public class ParametricForm extends VLayout {
 			fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
    
 		String fieldName=criterion.getField();
-		if (fieldName.endsWith("type:" + GUIAttribute.TYPE_INT)
-				|| fieldName.endsWith("type:" + GUIAttribute.TYPE_USER)
-				|| fieldName.endsWith("type:" + GUIAttribute.TYPE_FOLDER))
+		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT)
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER))
 			fieldValue = Long.parseLong(fieldValue.toString());
-		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DOUBLE))
+		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE))
 			fieldValue = Double.parseDouble(fieldValue.toString());
-		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN))
+		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN))
 			fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
-		else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DATE))
+		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DATE))
 			fieldValue = (Date) fieldValue;
 
-		if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
-			criterion.setField(fieldName.replace("type:" + GUIAttribute.TYPE_STRING_PRESET,
-					"type:" + GUIAttribute.TYPE_STRING));
-		} else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_TEXTAREA)) {
-			criterion.setField(fieldName.replace("type:" + GUIAttribute.TYPE_STRING_TEXTAREA,
-					"type:" + GUIAttribute.TYPE_STRING));
+		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
+			criterion.setField(fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_PRESET,
+					TYPE + GUIAttribute.TYPE_STRING));
+		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA)) {
+			criterion.setField(fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA,
+					TYPE + GUIAttribute.TYPE_STRING));
 		}
 
 		setCriterionValue(fieldValue, criterion);
@@ -425,16 +433,16 @@ public class ParametricForm extends VLayout {
 	}
 
 	private void setTemplateCondition(Map<String, Object> values, GUISearchOptions options) {
-		if (values.containsKey("template") && values.get("template") != null
-				&& !((String) values.get("template")).isEmpty())
-			options.setTemplate(Long.parseLong((String) values.get("template")));
+		if (values.containsKey(TEMPLATE) && values.get(TEMPLATE) != null
+				&& !((String) values.get(TEMPLATE)).isEmpty())
+			options.setTemplate(Long.parseLong((String) values.get(TEMPLATE)));
 	}
 
 	private void setLanguageCondition(GUISearchOptions options) {
-		if (NO_LANGUAGE.equals(vm.getValueAsString("language")))
+		if (NO_LANGUAGE.equals(vm.getValueAsString(LANGUAGE)))
 			options.setLanguage(null);
 		else
-			options.setLanguage(vm.getValueAsString("language"));
+			options.setLanguage(vm.getValueAsString(LANGUAGE));
 		options.setExpressionLanguage(I18N.getLocale());
 	}
 

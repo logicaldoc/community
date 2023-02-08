@@ -81,7 +81,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		prepareForm1();
 
-		StaticTextItem idItem = ItemFactory.newStaticTextItem("id", "id", Long.toString(folder.getId()));
+		StaticTextItem idItem = ItemFactory.newStaticTextItem("id", Long.toString(folder.getId()));
 		if (folder.getFoldRef() != null)
 			idItem.setTooltip(I18N.message("thisisalias") + ": " + folder.getFoldRef());
 
@@ -102,7 +102,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		SpinnerItem maxVersions = prepareMaxVersionsItem();
 
-		TextItem description = ItemFactory.newTextItem("description", "description", folder.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", folder.getDescription());
 		description.setWidth(250);
 		if (folder.hasPermission(Constants.PERMISSION_RENAME))
 			description.addChangedHandler(changedHandler);
@@ -123,14 +123,14 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		barcode.setTitle(I18N.message("barcode"));
 		barcode.setValue(GWT.getHostPageBaseURL() + "barcode?code=" + folder.getId() + "&width=400&height=150");
 
-		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents", "documents",
+		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents", 
 				folder.getDocumentCount() > 0 ? Integer.toString(folder.getDocumentCount()) : "-");
 		documents.setIconHSpace(2);
 		documents.setIconWidth(16);
 		documents.setIconHeight(16);
 		documents.setWidth("1%");
 
-		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders", "folders",
+		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders", 
 				folder.getSubfolderCount() > 0 ? Integer.toString(folder.getSubfolderCount()) : "-");
 		subfolders.setIconHSpace(2);
 		subfolders.setIconWidth(16);
@@ -139,7 +139,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		addComputeStatsIcons(documents, subfolders);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 		items.addAll(Arrays.asList(new FormItem[] { idItem, pathItem, name, description, storage, maxVersions, creation,
 				documents, subfolders, barcode }));
 
@@ -162,8 +162,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private SpinnerItem prepareMaxVersionsItem() {
-		SpinnerItem maxVersions = ItemFactory.newSpinnerItem("maxVersions", I18N.message("maxversions"),
-				folder.getMaxVersions());
+		SpinnerItem maxVersions = ItemFactory.newSpinnerItem("maxversions", folder.getMaxVersions());
 		maxVersions.setWrapTitle(false);
 		maxVersions.setDisabled(!folder.isWrite());
 		boolean maxVersionsVisible = folder.isWorkspace() && folder.getFoldRef() == null;
@@ -177,7 +176,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 		form1 = new DynamicForm();
 		form1.setValuesManager(vm);
@@ -249,7 +248,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 				LD.ask(I18N.message("enforcementofstorage"),
 						I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"),
 						(Boolean yes) -> {
-							if (yes) {
+							if (Boolean.TRUE.equals(yes)) {
 								DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
 										new AsyncCallback<Void>() {
 
@@ -300,7 +299,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private TextItem prepareNameItem() {
-		TextItem name = ItemFactory.newTextItem("name", "name", folder.getName());
+		TextItem name = ItemFactory.newTextItem("name", folder.getName());
 		name.setWidth(200);
 		name.setRequired(true);
 		DoesntContainValidator validator = new DoesntContainValidator();
@@ -315,7 +314,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private void prepareRightForm() {
-		if (columns.contains(form2)) {
+		if (Boolean.TRUE.equals(columns.contains(form2))) {
 			columns.removeMember(form2);
 			form2.destroy();
 		}
@@ -330,7 +329,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		form2 = new DynamicForm();
 		form2.setAutoWidth();
 		form2.setValuesManager(vm);
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
@@ -378,12 +377,12 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private TextItem prepareNewTagItem(final TagsDS ds) {
-		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", null);
 		newTagItem.setRequired(false);
 		newTagItem.setEndRow(true);
 		newTagItem.setDisabled(!folder.isWrite());
 		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
-			if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
+			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null && event.getKeyName() != null
 					&& "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();
@@ -405,7 +404,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
 		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
 		boolean containsInvalid = false;
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
 			String t = token.trim();
 
@@ -426,10 +425,10 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 					tags.add(oldVal[i]);
 
 			// Put the new tag in the options
-			Record record = new Record();
-			record.setAttribute("index", t);
-			record.setAttribute("word", t);
-			ds.addData(record);
+			Record rec = new Record();
+			rec.setAttribute("index", t);
+			rec.setAttribute("word", t);
+			ds.addData(rec);
 		}
 
 		// Update the tag item and trigger the change
@@ -467,7 +466,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 	public boolean validate() {
 		vm.validate();
-		if (vm.hasErrors())
+		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
 
 		folder.setTags(tagItem.getValues());
@@ -484,13 +483,13 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		if (folder.isWorkspace())
 			try {
-				folder.setMaxVersions(Integer.parseInt(vm.getValueAsString("maxVersions")));
+				folder.setMaxVersions(Integer.parseInt(vm.getValueAsString("maxversions")));
 				if (folder.getMaxVersions() != null && folder.getMaxVersions() < 1)
 					folder.setMaxVersions(null);
 			} catch (Throwable t) {
 				folder.setMaxVersions(null);
 			}
-		
+
 		return !vm.hasErrors();
 	}
 }

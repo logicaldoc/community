@@ -31,21 +31,21 @@ public class FolderListGridField extends ColoredListGridField {
 		}
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
 			String val = value + "";
-			String color = record.getAttributeAsString(colorFieldName);
+			String color = rec.getAttributeAsString(colorFieldName);
 			val = DocUtil.getFolderIcon(
-					record.getAttributeAsBoolean("opened") != null && record.getAttributeAsBoolean("opened"),
-					record.getAttributeAsInt("type"), val, color);
+					rec.getAttributeAsBoolean("opened") != null && rec.getAttributeAsBoolean("opened"),
+					rec.getAttributeAsInt("type"), val, color);
 
 // Uncomment to have the name itself colored
 //			if (color != null) {
 //				val = DocUtil.getFolderIcon(
-//						record.getAttributeAsBoolean("opened") != null && record.getAttributeAsBoolean("opened"),
-//						record.getAttributeAsInt("type"), val);
+//						rec.getAttributeAsBoolean("opened") != null && rec.getAttributeAsBoolean("opened"),
+//						rec.getAttributeAsInt("type"), val);
 //				val = "<span style='color: " + color + "'>" + val + "</span>";
 //			}
 			return val;

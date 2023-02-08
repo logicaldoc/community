@@ -33,13 +33,13 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 			return findByWhere(ENTITY + USER_ID + userId, "order by " + ENTITY + ".position asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Bookmark>();
+			return new ArrayList<>();
 		}
 	}
 
 	@Override
 	public Bookmark findByUserIdAndDocId(long userId, long docId) {
-		List<Bookmark> list = new ArrayList<Bookmark>();
+		List<Bookmark> list = new ArrayList<>();
 
 		try {
 			list = findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + docId + AND
@@ -56,7 +56,7 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 
 	@Override
 	public Bookmark findByUserIdAndFolderId(long userId, long folderId) {
-		List<Bookmark> list = new ArrayList<Bookmark>();
+		List<Bookmark> list = new ArrayList<>();
 		try {
 			list = findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + folderId + AND
 					+ ENTITY + ".type=" + Bookmark.TYPE_FOLDER, null, null);
@@ -75,10 +75,10 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 		String sql = "select ld_docid from ld_bookmark where ld_type=" + Bookmark.TYPE_DOCUMENT
 				+ " and ld_deleted = 0 and ld_userid = " + userId;
 		try {
-			return (List<Long>) queryForList(sql, Long.class);
+			return queryForList(sql, Long.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 		}
 	}
 

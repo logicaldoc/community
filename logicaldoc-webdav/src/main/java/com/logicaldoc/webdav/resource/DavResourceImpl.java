@@ -67,6 +67,8 @@ import com.logicaldoc.webdav.web.AbstractWebdavServlet;
  */
 public class DavResourceImpl implements DavResource, Serializable {
 
+	private static final String RESOURCE_SERVICE = "ResourceService";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LoggerFactory.getLogger(DavResourceImpl.class);
@@ -102,7 +104,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		this.config = config;
 		this.session = session;
 
-		resourceService = (ResourceService) Context.get().getBean("ResourceService");
+		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
 		if (this.resource != null) {
 			this.isCollection = this.resource.isFolder();
 			this.resource.setRequestedPerson(Long.parseLong(session.getObject("id").toString()));
@@ -126,7 +128,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		this.locator = locator;
 		this.config = config;
 		this.session = session;
-		resourceService = (ResourceService) Context.get().getBean("ResourceService");
+		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
 	}
 
 	/**
@@ -144,7 +146,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			ResourceConfig config, boolean isCollection) throws DavException {
 		this(locator, factory, session, config);
 		this.isCollection = isCollection;
-		resourceService = (ResourceService) Context.get().getBean("ResourceService");
+		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
 	}
 
 	/**
@@ -287,16 +289,19 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (exists()) {
 			if (name.getNamespace().equals(namespace) && name.getName().equals("id")) {
 				if (!isCollection() && !resource.isFolder()) {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "d-" + resource.getID(), namespace);
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<>("id", "d-" + resource.getID(),
+							namespace);
 					properties.add(idProp);
 				} else {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "f-" + resource.getID(), namespace);
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<>("id", "f-" + resource.getID(),
+							namespace);
 					properties.add(idProp);
 				}
 			}
 
 			if (name.getName().equals("getetag")) {
-				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>(DavPropertyName.GETETAG, resource.getETag());
+				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<>(DavPropertyName.GETETAG,
+						resource.getETag());
 				properties.add(defaultDavProperty);
 			}
 			
@@ -361,16 +366,16 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 		// set (or reset) fundamental properties
 		if (getDisplayName() != null) {
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, getDisplayName()));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.DISPLAYNAME, getDisplayName()));
 		}
 		if (isCollection()) {
 			properties.add(new ResourceType(ResourceType.COLLECTION));
 			// Windows XP support
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.ISCOLLECTION, "1"));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.ISCOLLECTION, "1"));
 		} else {
 			properties.add(new ResourceType(ResourceType.DEFAULT_RESOURCE));
 			// Windows XP support
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.ISCOLLECTION, "0"));
+			properties.add(new DefaultDavProperty<>(DavPropertyName.ISCOLLECTION, "0"));
 		}
 
 		/*
@@ -384,7 +389,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		// supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
 		// properties.add(supportedLock);
 		properties
-				.add(new DefaultDavProperty<Long>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
+				.add(new DefaultDavProperty<>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
 
 		// Set Dav property LastModified
 		long lastmodTime = IOUtil.UNDEFINED_TIME;
@@ -393,7 +398,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		}
 
 		String lastModified = IOUtil.getLastModified(lastmodTime);
-		properties.add(new DefaultDavProperty<String>(DavPropertyName.GETLASTMODIFIED, lastModified));
+		properties.add(new DefaultDavProperty<>(DavPropertyName.GETLASTMODIFIED, lastModified));
 
 		// Set Dav property CreationDate
 		long creationTime = IOUtil.UNDEFINED_TIME;
@@ -401,7 +406,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			creationTime = this.resource.getCreationDate().getTime();
 		}
 		String creationDate = IOUtil.getCreated(creationTime);
-		properties.add(new DefaultDavProperty<String>(DavPropertyName.CREATIONDATE, creationDate));
+		properties.add(new DefaultDavProperty<>(DavPropertyName.CREATIONDATE, creationDate));
 
 		propsInitialized = true;
 	}
@@ -464,7 +469,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (list != null)
 			return new DavResourceIteratorImpl(list);
 
-		list = new ArrayList<DavResource>();
+		list = new ArrayList<>();
 		if (exists() && isCollection()) {
 			try {
 				String path = locator.getResourcePath() == null ? "/" : locator.getResourcePath() + "/";
@@ -511,15 +516,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 */
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
 
-		boolean isChunking = false;
-		boolean isChunkingComplete = false;
-
-		if (!exists()) {
-			throw new DavException(HttpServletResponse.SC_CONFLICT);
-		}
-		if (isLocked(this) || isLocked(member)) {
-			throw new DavException(DavServletResponse.SC_LOCKED);
-		}
+		checkConflictAndLocked(member);
 
 		try {
 			String memberName = Text.getName(member.getLocator().getResourcePath());
@@ -533,18 +530,10 @@ public class DavResourceImpl implements DavResource, Serializable {
 //			log.debug("ctx.getSystemId() {}", ctx.getSystemId());			
 
 			// Check Write permission on the target folder
-			if (!member.isCollection() && !ctx.getResource().isWriteEnabled()) {
-//				log.debug("Target folder is not write enabled");
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
-						"Write Access not allowed on the selected folder");
-			}
+			checkWritePermission(member, ctx);
 
-			// Check Write permission on the target folder
-			if (member.isCollection() && !ctx.getResource().isAddChildEnabled()) {
-//				log.debug("Target folder is not add-child enabled");
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
-						"Add Child not allowed on the selected folder");
-			}
+			// Check Add Child permission on the target folder
+			checkAddChildPermission(member, ctx);
 
 			/*
 			 * LD-Chunked: LD-Chunked LD-Chunk-Size: 1024000 LD-Total-Length:
@@ -561,6 +550,9 @@ public class DavResourceImpl implements DavResource, Serializable {
 //			log.debug("ContentLength {}", ctx.getContentLength());
 //			log.debug("MimeType {}", ctx.getMimeType());
 
+			boolean isChunking = false;
+			boolean isChunkingComplete = false;
+			
 			if (memberName.contains("chunking")) {
 
 				isChunking = true;
@@ -635,39 +627,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 						// Sort files by extension in ascending order.
 						Arrays.sort(chunkfiles, EXTENSION_COMPARATOR);
 
-						// Checking If The File Exists At The Specified Location
-						// Or Not
-						Path filePathObj = Files.createTempFile(webdavChunkingPath, null, "merged-" + chunkID);
-						try {
-							for (File file : chunkfiles) {
-								// Appending The New Data To The Existing File
-								Files.write(filePathObj, Files.readAllBytes(file.toPath()), StandardOpenOption.APPEND);
-
-							}
-							log.debug("! Data Successfully Appended !");
-
-							// Check that the file size of the merged chunks
-							// equals to LD-Total-Length
-
-							// Remove all the chunk parts
-							for (File toDelete : chunkfiles) {
-								FileUtils.deleteQuietly(toDelete);
-							}
-
-							String newResourceName = memberName.substring(0, memberName.indexOf("-chunking"));
-							log.debug("newResourceName {}", newResourceName);
-
-							// Update the ImportContext: systemId and
-							// inputStream
-							if (ctx instanceof ImportContextImpl) {
-								ImportContextImpl ici = (ImportContextImpl) ctx;
-								ici.setSystemId(newResourceName);
-								ici.setInputFile(filePathObj.toFile());
-							}
-
-						} catch (IOException ioExceptionObj) {
-							log.error("Problem Occured While Writing To The File= " + ioExceptionObj.getMessage());
-						}
+						mergeChunks(chunkfiles, webdavChunkingPath, memberName, chunkID, ctx);
 					}
 
 				} // end if (chunkPart == (chunkTotal-1)) {
@@ -677,16 +637,84 @@ public class DavResourceImpl implements DavResource, Serializable {
 			if (isChunking && !isChunkingComplete)
 				return;
 
-			if (!config.getIOManager().importContent(ctx, member)) {
-				// any changes should have been reverted in the importer
-				throw new DavException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+			checkSupportedMediaType(member, ctx);
+		} catch (Exception e) {
+			handleErrorDuringAddingMember(e);
+		}
+	}
+
+	private void handleErrorDuringAddingMember(Exception error) throws DavException {
+		if(error instanceof DavException)
+			throw (DavException) error;
+		
+		log.error(error.getMessage(), error);
+		throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, error.getMessage());
+	}
+
+	private void mergeChunks(File[] chunkfiles, Path webdavChunkingPath, String memberName, int chunkID,
+			ImportContext ctx) throws IOException {
+		// Checking If The File Exists At The Specified Location
+		// Or Not
+		Path filePathObj = Files.createTempFile(webdavChunkingPath, null, "merged-" + chunkID);
+		try {
+			for (File file : chunkfiles) {
+				// Appending The New Data To The Existing File
+				Files.write(filePathObj, Files.readAllBytes(file.toPath()), StandardOpenOption.APPEND);
+			}
+			log.debug("! Data Successfully Appended !");
+
+			// Check that the file size of the merged chunks
+			// equals to LD-Total-Length
+
+			// Remove all the chunk parts
+			for (File toDelete : chunkfiles) {
+				FileUtils.deleteQuietly(toDelete);
 			}
 
-		} catch (DavException dave) {
-			throw dave;
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			String newResourceName = memberName.substring(0, memberName.indexOf("-chunking"));
+			log.debug("newResourceName {}", newResourceName);
+
+			// Update the ImportContext: systemId and
+			// inputStream
+			if (ctx instanceof ImportContextImpl) {
+				ImportContextImpl ici = (ImportContextImpl) ctx;
+				ici.setSystemId(newResourceName);
+				ici.setInputFile(filePathObj.toFile());
+			}
+		} catch (IOException ioExceptionObj) {
+			log.error("Problem Occured While Writing To The File= " + ioExceptionObj.getMessage());
+		}
+	}
+
+	private void checkSupportedMediaType(DavResource member, ImportContext ctx) throws IOException, DavException {
+		if (!config.getIOManager().importContent(ctx, member)) {
+			// any changes should have been reverted in the importer
+			throw new DavException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+		}
+	}
+
+	private void checkAddChildPermission(DavResource member, ImportContext ctx) throws DavException {
+		if (member.isCollection() && !ctx.getResource().isAddChildEnabled()) {
+//				log.debug("Target folder is not add-child enabled");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN,
+					"Add Child not allowed on the selected folder");
+		}
+	}
+
+	private void checkWritePermission(DavResource member, ImportContext ctx) throws DavException {
+		if (!member.isCollection() && !ctx.getResource().isWriteEnabled()) {
+//				log.debug("Target folder is not write enabled");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN,
+					"Write Access not allowed on the selected folder");
+		}
+	}
+
+	private void checkConflictAndLocked(DavResource member) throws DavException {
+		if (!exists()) {
+			throw new DavException(HttpServletResponse.SC_CONFLICT);
+		}
+		if (isLocked(this) || isLocked(member)) {
+			throw new DavException(DavServletResponse.SC_LOCKED);
 		}
 	}
 

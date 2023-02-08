@@ -193,7 +193,7 @@ public class Menu {
 	
 	public static final long SCAN = 550;
 	
-	private static Set<Long> menus = new HashSet<Long>();
+	private static Set<Long> menus = new HashSet<>();
 
 	static public void init(GUIUser user) {
 		menus.clear();

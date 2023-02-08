@@ -133,22 +133,26 @@ public class ExportContextImpl extends AbstractExportContext {
 					}
 				}
 
-				if (outputCtx.hasStream() && outFile != null) {
-					OutputStream out = outputCtx.getOutputStream();
-					try {
-						// make sure the content-length is set
-						if (!hasContentLength) {
-							outputCtx.setContentLength(outFile.length());
-						}
-						FileInputStream in = new FileInputStream(outFile);
-						IOUtil.spool(in, out);
-					} catch (IOException e) {
-						log.error(e.toString());
-					}
-				}
+				writeFile(hasContentLength);
 			}
 		}
 		
 		FileUtil.strongDelete(outFile);
+	}
+
+	private void writeFile(boolean hasContentLength) {
+		if (outputCtx.hasStream() && outFile != null) {
+			OutputStream out = outputCtx.getOutputStream();
+			try {
+				// make sure the content-length is set
+				if (!hasContentLength) {
+					outputCtx.setContentLength(outFile.length());
+				}
+				FileInputStream in = new FileInputStream(outFile);
+				IOUtil.spool(in, out);
+			} catch (IOException e) {
+				log.error(e.toString());
+			}
+		}
 	}
 }

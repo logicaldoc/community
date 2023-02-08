@@ -50,7 +50,7 @@ public class FileSizeListGridField extends ColoredListGridField {
 		}
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
@@ -59,7 +59,7 @@ public class FileSizeListGridField extends ColoredListGridField {
 				val = Util.formatSizeW7(value);
 			else
 				val = Util.formatSizeKB(value);
-			return super.format(val, record, rowNum, colNum);
+			return super.format(val, rec, rowNum, colNum);
 		}
 	}
 }

@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -29,27 +28,31 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class PositionalBarcodesGrid extends ListGrid {
 
+	private static final String FORMATS = "formats";
+	private static final String EXCLUDE = "exclude";
+	private static final String INCLUDE = "include";
+
 	public PositionalBarcodesGrid(GUIBarcodeTemplate barcodeTemplate) {
 		ListGridField pattern = new ListGridField("pattern", I18N.message("patternscomma"));
 		pattern.setWidth(300);
 		pattern.setRequired(true);
 		pattern.setEscapeHTML(true);
 
-		ListGridField include = new ListGridField("include", I18N.message("include"));
+		ListGridField include = new ListGridField(INCLUDE, I18N.message(INCLUDE));
 		include.setWidth(200);
 		include.setRequired(false);
 		include.setEscapeHTML(true);
 
-		ListGridField exclude = new ListGridField("exclude", I18N.message("exclude"));
+		ListGridField exclude = new ListGridField(EXCLUDE, I18N.message(EXCLUDE));
 		exclude.setWidth(200);
 		exclude.setRequired(false);
 		exclude.setEscapeHTML(true);
 
-		ListGridField formats = new ListGridField("formats", I18N.message("formats"));
+		ListGridField formats = new ListGridField(FORMATS, I18N.message(FORMATS));
 		formats.setWidth(200);
 		formats.setRequired(false);
 		formats.setCanEdit(true);
-		formats.setEditorProperties(ItemFactory.newBarcodeFormatsComboBoxItem("formats", "formats", (String) null));
+		formats.setEditorProperties(ItemFactory.newBarcodeFormatsComboBoxItem((String) null));
 
 		setEmptyMessage(I18N.message("notitemstoshow"));
 		setShowAllRecords(true);
@@ -73,23 +76,23 @@ public class PositionalBarcodesGrid extends ListGrid {
 		});
 
 		if (barcodeTemplate != null) {
-			ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
+			ArrayList<ListGridRecord> records = new ArrayList<>();
 			if (barcodeTemplate.getZones() != null)
 				for (GUIZone pat : barcodeTemplate.getZones()) {
 					GUIBarcodeZone brcPat = (GUIBarcodeZone) pat;
-					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("pattern", brcPat.getPatterns());
-					record.setAttribute("include", brcPat.getInclude());
-					record.setAttribute("exclude", brcPat.getExclude());
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("pattern", brcPat.getPatterns());
+					rec.setAttribute(INCLUDE, brcPat.getInclude());
+					rec.setAttribute(EXCLUDE, brcPat.getExclude());
 
 					String frmts = brcPat.getFormats();
 					if (frmts == null || frmts.trim().isEmpty())
-						record.setAttribute("formats", (String) null);
+						rec.setAttribute(FORMATS, (String) null);
 					else if (!frmts.trim().contains(","))
-						record.setAttribute("formats", frmts.trim());
+						rec.setAttribute(FORMATS, frmts.trim());
 					else
-						record.setAttribute("formats", brcPat.getFormats().replace(" ", "").split(","));
-					records.add(record);
+						rec.setAttribute(FORMATS, brcPat.getFormats().replace(" ", "").split(","));
+					records.add(rec);
 				}
 			setRecords(records.toArray(new ListGridRecord[0]));
 		}
@@ -102,13 +105,9 @@ public class PositionalBarcodesGrid extends ListGrid {
 		clean.setTitle(I18N.message("ddelete"));
 		clean.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							removeData(getSelectedRecord());
-						}
-					}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value))
+						removeData(getSelectedRecord());
 				});
 			}
 		});

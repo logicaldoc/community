@@ -88,7 +88,7 @@ public class DashletContent extends HttpServlet {
 			else
 				response.setContentType("text/xml");
 
-			Map<String, Object> dashletDictionary = new HashMap<String, Object>();
+			Map<String, Object> dashletDictionary = new HashMap<>();
 			dashletDictionary.put(Automation.LOCALE, locale);
 			dashletDictionary.put(Automation.TENANT_ID, dashlet.getTenantId());
 			dashletDictionary.put("session", session);
@@ -132,7 +132,7 @@ public class DashletContent extends HttpServlet {
 		} else {
 			writer.write(LIST_TAG);
 
-			List<DocumentHistory> records = new ArrayList<DocumentHistory>();
+			List<DocumentHistory> records = new ArrayList<>();
 			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 			records = hdao.findByObjectQuery(query.trim(), (Map<String, Object>) null,
@@ -143,7 +143,7 @@ public class DashletContent extends HttpServlet {
 			/*
 			 * Retrieve documents the histories refer to
 			 */
-			Map<Long, Document> docsMap = new HashMap<Long, Document>();
+			Map<Long, Document> docsMap = new HashMap<>();
 			if (!uniqueRecords.isEmpty()) {
 				String docIds = uniqueRecords.stream().map(h -> Long.toString(h.getDocId()))
 						.collect(Collectors.joining(","));
@@ -247,7 +247,7 @@ public class DashletContent extends HttpServlet {
 			 * documentId-atttributeName, the value is the attribute value. This
 			 * fieldsMap is used to maximize the listing performances.
 			 */
-			Map<String, Object> extValues = new HashMap<String, Object>();
+			Map<String, Object> extValues = new HashMap<>();
 			retrieveExtendedAttributes(locale, dashlet, uniqueRecords, extValues, attrs);
 
 			printExtendedAttributes(df, writer, doc, attrs, extValues);
@@ -290,14 +290,14 @@ public class DashletContent extends HttpServlet {
 	}
 
 	private List<DocumentHistory> filterUniqueDocumentEvents(Dashlet dashlet, List<DocumentHistory> records) {
-		List<DocumentHistory> uniqueRecords = new ArrayList<DocumentHistory>();
+		List<DocumentHistory> uniqueRecords = new ArrayList<>();
 		if (dashlet.getUnique() == 1) {
 			log.debug("Ensure records uniqueness");
 
 			/*
 			 * Make sure to have just one entry per document
 			 */
-			Set<Long> docIds = new HashSet<Long>();
+			Set<Long> docIds = new HashSet<>();
 			for (DocumentHistory history : records) {
 				if (!docIds.contains(history.getDocId())) {
 					docIds.add(history.getDocId());
@@ -376,7 +376,7 @@ public class DashletContent extends HttpServlet {
 			 * documentId-atttributeName, the value is the attribute value. This
 			 * fieldsMap is used to maximize the listing performances.
 			 */
-			final Map<String, Object> extValues = new HashMap<String, Object>();
+			final Map<String, Object> extValues = new HashMap<>();
 
 			if (!attrs.isEmpty()) {
 				log.debug("Search for extended attributes {}", attrs);
@@ -464,14 +464,14 @@ public class DashletContent extends HttpServlet {
 	}
 
 	private List<Document> filterUniqueDocuments(Dashlet dashlet, List<Document> records) {
-		List<Document> uniqueRecords = new ArrayList<Document>();
+		List<Document> uniqueRecords = new ArrayList<>();
 		if (dashlet.getUnique() == 1) {
 			log.debug("Ensure records uniqueness");
 
 			/*
 			 * Make sure to have just one entry per document
 			 */
-			Set<Long> docIds = new HashSet<Long>();
+			Set<Long> docIds = new HashSet<>();
 			for (Document doc : records) {
 				if (!docIds.contains(doc.getId())) {
 					docIds.add(doc.getId());
@@ -496,7 +496,7 @@ public class DashletContent extends HttpServlet {
 	 * @return list of extended attribute names
 	 */
 	private List<String> getExtendedAttrsNamesInDasheltColumns(Dashlet dashlet) {
-		List<String> attrs = new ArrayList<String>();
+		List<String> attrs = new ArrayList<>();
 		if (StringUtils.isNotEmpty(dashlet.getColumns())) {
 			StringTokenizer st = new StringTokenizer(dashlet.getColumns().trim(), ",;");
 			while (st.hasMoreElements()) {
@@ -520,7 +520,7 @@ public class DashletContent extends HttpServlet {
 
 			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
-			List<DocumentNote> records = new ArrayList<DocumentNote>();
+			List<DocumentNote> records = new ArrayList<>();
 			try {
 				records = dao.findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
 			} catch (PersistenceException e) {
@@ -531,18 +531,18 @@ public class DashletContent extends HttpServlet {
 			 * Iterate over records composing the response XML document
 			 */
 			DateFormat df = getDateFormat();
-			for (DocumentNote record : records) {
+			for (DocumentNote note : records) {
 				writer.write("<post>");
-				printField("id", record.getId(), writer);
-				writer.write("<title><![CDATA[" + StringUtils.abbreviate(record.getMessage(), 100) + "]]></title>");
-				writer.write("<page>" + record.getPage() + "</page>");
-				writer.write("<user><![CDATA[" + record.getUsername() + "]]></user>");
-				writer.write("<date>" + (record.getDate() != null ? df.format(record.getDate()) : "") + "</date>");
-				writer.write("<message><![CDATA[" + record.getMessage() + "]]></message>");
-				writer.write("<docId>" + record.getDocId() + "</docId>");
-				writer.write("<filename><![CDATA[" + record.getFileName() + "]]></filename>");
-				printIcon(writer, record.getFileName());
-				writer.write("<userId><![CDATA[" + record.getUserId() + "]]></userId>");
+				printField("id", note.getId(), writer);
+				writer.write("<title><![CDATA[" + StringUtils.abbreviate(note.getMessage(), 100) + "]]></title>");
+				writer.write("<page>" + note.getPage() + "</page>");
+				writer.write("<user><![CDATA[" + note.getUsername() + "]]></user>");
+				writer.write("<date>" + (note.getDate() != null ? df.format(note.getDate()) : "") + "</date>");
+				writer.write("<message><![CDATA[" + note.getMessage() + "]]></message>");
+				writer.write("<docId>" + note.getDocId() + "</docId>");
+				writer.write("<filename><![CDATA[" + note.getFileName() + "]]></filename>");
+				printIcon(writer, note.getFileName());
+				writer.write("<userId><![CDATA[" + note.getUserId() + "]]></userId>");
 				writer.write("</post>");
 			}
 

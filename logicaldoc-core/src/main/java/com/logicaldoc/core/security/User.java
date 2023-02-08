@@ -84,7 +84,7 @@ public class User extends PersistentObject implements Serializable {
 	private int type = TYPE_DEFAULT;
 
 	// Not persisted
-	private Set<Group> groups = new HashSet<Group>();
+	private Set<Group> groups = new HashSet<>();
 
 	// Not persisted
 	private long[] groupIds;
@@ -148,7 +148,7 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	private String key;
 
-	private Set<UserGroup> userGroups = new HashSet<UserGroup>();
+	private Set<UserGroup> userGroups = new HashSet<>();
 
 	private Date creation;
 
@@ -208,7 +208,7 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * Collection of all the admitted working times
 	 */
-	private Set<WorkingTime> workingTimes = new HashSet<WorkingTime>();
+	private Set<WorkingTime> workingTimes = new HashSet<>();
 
 	private String timeZone;
 	
@@ -456,13 +456,13 @@ public class User extends PersistentObject implements Serializable {
 		telephone = "";
 		docsGrid = null;
 		hitsGrid = null;
-		groups = new HashSet<Group>();
+		groups = new HashSet<>();
 		groupIds = null;
 		passwordExpires = 0;
 		avatar = null;
 		expire = null;
 		enforceWorkingTime = 0;
-		workingTimes = new HashSet<WorkingTime>();
+		workingTimes = new HashSet<>();
 	}
 
 	public String toString() {

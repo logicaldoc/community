@@ -15,6 +15,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
  * @since 8.0
  */
 public class AwesomeFactory {
+	private static final String STYLE_COLOR = " style='color: ";
+	private static final String DIV_CLASS_STATUS_ICON = "<div class='statusIcon' ";
+	private static final String CLOSE_DIV = "</div>";
+	private static final String DIV_I_CLASS = "<div><i class='";
 	private static final String I_CLASS = "<i class='";
 	private static final String TITLE = "title='";
 
@@ -136,42 +140,42 @@ public class AwesomeFactory {
 		if (text == null || text.isEmpty())
 			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-spinner' aria-hidden='true'></i>";
 		else
-			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon
-					+ " fa-lg fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + I18N.message(text) + "</div>";
+			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon
+					+ " fa-lg fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + I18N.message(text) + CLOSE_DIV;
 	}
 
 	public static String getIconButtonHTML(String icon, String text, String tooltip, String color, String url) {
-		String button = "<div class='statusIcon' "
+		String button = DIV_CLASS_STATUS_ICON
 				+ (tooltip != null && !tooltip.isEmpty() ? TITLE + I18N.message(tooltip) + "'" : "")
-				+ (color != null && !color.isEmpty() ? " style='color: " + color + "'" : "")
+				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
 				+ (url != null && !url.isEmpty() ? " onclick=\"download('" + url + "')\"" : "") + " >";
 		button += getColoredIconHtml(icon, text, color);
-		button += "</div>";
+		button += CLOSE_DIV;
 
 		return button;
 	}
 
 	public static String getIndexedIconButtonHTML(long docId, boolean download, Integer indexed, String color) {
-		String button = "<div class='statusIcon' "
+		String button = DIV_CLASS_STATUS_ICON
 				+ (indexed != null && indexed != Constants.INDEX_SKIP ? TITLE + I18N.message("indexed") + "' " : "")
-				+ (color != null && !color.isEmpty() ? " style='color: " + color + "'" : "");
+				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "");
 		if (download)
 			button += " onclick=\"download('" + Util.downloadURL(docId) + "&downloadText=true')\"";
 		button += " >";
 		button += getIndexedIcon(indexed);
-		button += "</div>";
+		button += CLOSE_DIV;
 		return button;
 	}
 
 	public static String getLockedButtonHTML(Integer status, String user, String color) {
-		String button = "<div class='statusIcon' "
+		String button = DIV_CLASS_STATUS_ICON
 				+ (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED
 						? TITLE + I18N.message("lockedby") + " " + user + "' "
 						: "")
-				+ (color != null && !color.isEmpty() ? " style='color: " + color + "'" : "");
+				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "");
 		button += " >";
 		button += DocUtil.getLockedIcon(status);
-		button += "</div>";
+		button += CLOSE_DIV;
 		return button;
 	}
 	
@@ -196,9 +200,9 @@ public class AwesomeFactory {
 			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-lg' aria-hidden='true'  "
 					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i>";
 		else
-			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw' aria-hidden='true'"
+			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw' aria-hidden='true'"
 					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i> "
-					+ I18N.message(text) + "</div>";
+					+ I18N.message(text) + CLOSE_DIV;
 	}
 
 	public static String getIconHtml(String icon, String rotation, String text) {
@@ -206,7 +210,7 @@ public class AwesomeFactory {
 			return I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "")
 					+ " fa-lg' aria-hidden='true'></i>";
 		else
-			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "")
-					+ " fa-lg fa-fw' aria-hidden='true'></i> " + I18N.message(text) + "</div>";
+			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "")
+					+ " fa-lg fa-fw' aria-hidden='true'></i> " + I18N.message(text) + CLOSE_DIV;
 	}
 }

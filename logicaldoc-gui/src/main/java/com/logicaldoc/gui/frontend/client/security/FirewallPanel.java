@@ -29,6 +29,28 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class FirewallPanel extends VLayout {
 
+	private static final String FALSE = "false";
+
+	private static final String WHITELIST = "whitelist";
+
+	private static final String BLACKLIST = "blacklist";
+
+	private static final String FIREWALL_ALLOW_URL_ENCODED_PERIOD = "firewall.allowUrlEncodedPeriod";
+
+	private static final String FIREWALL_ALLOW_URL_ENCODED_SLASH = "firewall.allowUrlEncodedSlash";
+
+	private static final String FIREWALL_ALLOW_URL_ENCODED_PERCENT = "firewall.allowUrlEncodedPercent";
+
+	private static final String FIREWALL_ALLOW_BACK_SLASH = "firewall.allowBackSlash";
+
+	private static final String FIREWALL_ALLOW_SEMICOLON = "firewall.allowSemicolon";
+
+	private static final String FIREWALL_BLACKLIST = "firewall.blacklist";
+
+	private static final String FIREWALL_WHITELIST = "firewall.whitelist";
+
+	private static final String FIREWALL_ENABLED = "firewall.enabled";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private GUIUser user;
@@ -122,9 +144,9 @@ public class FirewallPanel extends VLayout {
 		form.setItems(enabled, whitelist, blacklist, allowSemicolon, allowBackSlash, allowUrlEncodedPercent,
 				allowUrlEncodedSlash, allowUrlEncodedPeriod);
 		SettingService.Instance.get()
-				.loadSettingsByNames(new String[] { "firewall.enabled", "firewall.whitelist", "firewall.blacklist",
-						"firewall.allowSemicolon", "firewall.allowBackSlash", "firewall.allowUrlEncodedPercent",
-						"firewall.allowUrlEncodedSlash", "firewall.allowUrlEncodedPeriod" },
+				.loadSettingsByNames(new String[] { FIREWALL_ENABLED, FIREWALL_WHITELIST, FIREWALL_BLACKLIST,
+						FIREWALL_ALLOW_SEMICOLON, FIREWALL_ALLOW_BACK_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERCENT,
+						FIREWALL_ALLOW_URL_ENCODED_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERIOD },
 						new AsyncCallback<GUIParameter[]>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -148,7 +170,7 @@ public class FirewallPanel extends VLayout {
 	private RadioGroupItem prepareAllowUrlEncodedPeriodSwitch() {
 		RadioGroupItem allowUrlEncodedPeriod = ItemFactory.newBooleanSelector("allowUrlEncodedPeriod",
 				"allowurlencodedperiod");
-		allowUrlEncodedPeriod.setValue(Session.get().getConfigAsBoolean("firewall.allowUrlEncodedPeriod"));
+		allowUrlEncodedPeriod.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_PERIOD));
 		allowUrlEncodedPeriod.setWrapTitle(false);
 		allowUrlEncodedPeriod.setRequired(true);
 		allowUrlEncodedPeriod.setDisabled(Session.get().isDemo());
@@ -160,7 +182,7 @@ public class FirewallPanel extends VLayout {
 	private RadioGroupItem prepareAllowUrlEncodedSlashSwitch() {
 		RadioGroupItem allowUrlEncodedSlash = ItemFactory.newBooleanSelector("allowUrlEncodedSlash",
 				"allowurlencodedslash");
-		allowUrlEncodedSlash.setValue(Session.get().getConfigAsBoolean("firewall.allowUrlEncodedSlash"));
+		allowUrlEncodedSlash.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_SLASH));
 		allowUrlEncodedSlash.setWrapTitle(false);
 		allowUrlEncodedSlash.setRequired(true);
 		allowUrlEncodedSlash.setDisabled(Session.get().isDemo());
@@ -172,7 +194,7 @@ public class FirewallPanel extends VLayout {
 	private RadioGroupItem prepareAllowUrlEncodedPercentSwitch() {
 		RadioGroupItem allowUrlEncodedPercent = ItemFactory.newBooleanSelector("allowUrlEncodedPercent",
 				"allowurlencodedpercent");
-		allowUrlEncodedPercent.setValue(Session.get().getConfigAsBoolean("firewall.allowUrlEncodedPercent"));
+		allowUrlEncodedPercent.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_PERCENT));
 		allowUrlEncodedPercent.setWrapTitle(false);
 		allowUrlEncodedPercent.setRequired(true);
 		allowUrlEncodedPercent.setDisabled(Session.get().isDemo());
@@ -183,7 +205,7 @@ public class FirewallPanel extends VLayout {
 
 	private RadioGroupItem prepareAllowBackSlashSwitch() {
 		RadioGroupItem allowBackSlash = ItemFactory.newBooleanSelector("allowBackSlash", "allowbackslash");
-		allowBackSlash.setValue(Session.get().getConfigAsBoolean("firewall.allowBackSlash"));
+		allowBackSlash.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_BACK_SLASH));
 		allowBackSlash.setWrapTitle(false);
 		allowBackSlash.setRequired(true);
 		allowBackSlash.setDisabled(Session.get().isDemo());
@@ -194,7 +216,7 @@ public class FirewallPanel extends VLayout {
 
 	private RadioGroupItem prepareAllowSemicolonSwitch() {
 		RadioGroupItem allowSemicolon = ItemFactory.newBooleanSelector("allowSemicolon", "allowsemicolon");
-		allowSemicolon.setValue(Session.get().getConfigAsBoolean("firewall.allowSemicolon"));
+		allowSemicolon.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_SEMICOLON));
 		allowSemicolon.setWrapTitle(false);
 		allowSemicolon.setRequired(true);
 		allowSemicolon.setDisabled(Session.get().isDemo());
@@ -204,7 +226,7 @@ public class FirewallPanel extends VLayout {
 	}
 
 	private TextAreaItem prepareBlackListItem() {
-		final TextAreaItem blacklist = ItemFactory.newTextAreaItem("blacklist", "blacklist", null);
+		final TextAreaItem blacklist = ItemFactory.newTextAreaItem(BLACKLIST, null);
 		blacklist.setHeight(120);
 		blacklist.setWidth(350);
 		blacklist.setHint(I18N.message("blacklisthint"));
@@ -215,7 +237,7 @@ public class FirewallPanel extends VLayout {
 	}
 
 	private TextAreaItem prepareWhiteListItem() {
-		final TextAreaItem whitelist = ItemFactory.newTextAreaItem("whitelist", "whitelist", null);
+		final TextAreaItem whitelist = ItemFactory.newTextAreaItem(WHITELIST, null);
 		whitelist.setHeight(120);
 		whitelist.setWidth(350);
 		whitelist.setHint(I18N.message("blacklisthint"));
@@ -227,7 +249,7 @@ public class FirewallPanel extends VLayout {
 
 	private RadioGroupItem prepareEnabledSwitch() {
 		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "enabled");
-		enabled.setValue(Session.get().getConfigAsBoolean("firewall.enabled"));
+		enabled.setValue(Session.get().getConfigAsBoolean(FIREWALL_ENABLED));
 		enabled.setWrapTitle(false);
 		enabled.setRequired(true);
 		enabled.setDisabled(Session.get().isDemo());
@@ -248,27 +270,27 @@ public class FirewallPanel extends VLayout {
 	}
 
 	public void onSave() {
-		String enabled = "yes".equals(vm.getValueAsString("eenabled")) ? "true" : "false";
-		String whitelist = vm.getValueAsString("whitelist");
-		String blacklist = vm.getValueAsString("blacklist");
+		String enabled = "yes".equals(vm.getValueAsString("eenabled")) ? "true" : FALSE;
+		String whitelist = vm.getValueAsString(WHITELIST);
+		String blacklist = vm.getValueAsString(BLACKLIST);
 
 		GUIParameter[] params = new GUIParameter[8];
 
-		params[0] = new GUIParameter("firewall.enabled", enabled);
-		params[1] = new GUIParameter("firewall.whitelist",
+		params[0] = new GUIParameter(FIREWALL_ENABLED, enabled);
+		params[1] = new GUIParameter(FIREWALL_WHITELIST,
 				whitelist != null ? whitelist.replace('\n', ',').replace(" ", "") : null);
-		params[2] = new GUIParameter("firewall.blacklist",
+		params[2] = new GUIParameter(FIREWALL_BLACKLIST,
 				blacklist != null ? blacklist.replace('\n', ',').replace(" ", "") : null);
-		params[3] = new GUIParameter("firewall.allowSemicolon",
-				"yes".equals(vm.getValueAsString("allowSemicolon")) ? "true" : "false");
-		params[4] = new GUIParameter("firewall.allowBackSlash",
-				"yes".equals(vm.getValueAsString("allowBackSlash")) ? "true" : "false");
-		params[5] = new GUIParameter("firewall.allowUrlEncodedPercent",
-				"yes".equals(vm.getValueAsString("allowUrlEncodedPercent")) ? "true" : "false");
-		params[6] = new GUIParameter("firewall.allowUrlEncodedSlash",
-				"yes".equals(vm.getValueAsString("allowUrlEncodedSlash")) ? "true" : "false");
-		params[7] = new GUIParameter("firewall.allowUrlEncodedPeriod",
-				"yes".equals(vm.getValueAsString("allowUrlEncodedPeriod")) ? "true" : "false");
+		params[3] = new GUIParameter(FIREWALL_ALLOW_SEMICOLON,
+				"yes".equals(vm.getValueAsString("allowSemicolon")) ? "true" : FALSE);
+		params[4] = new GUIParameter(FIREWALL_ALLOW_BACK_SLASH,
+				"yes".equals(vm.getValueAsString("allowBackSlash")) ? "true" : FALSE);
+		params[5] = new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERCENT,
+				"yes".equals(vm.getValueAsString("allowUrlEncodedPercent")) ? "true" : FALSE);
+		params[6] = new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_SLASH,
+				"yes".equals(vm.getValueAsString("allowUrlEncodedSlash")) ? "true" : FALSE);
+		params[7] = new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERIOD,
+				"yes".equals(vm.getValueAsString("allowUrlEncodedPeriod")) ? "true" : FALSE);
 
 		for (GUIParameter guiParameter : params)
 			Session.get().setConfig(guiParameter.getName(), guiParameter.getValue());
@@ -288,8 +310,8 @@ public class FirewallPanel extends VLayout {
 	}
 
 	public boolean validate() {
-		String whitelist = vm.getValueAsString("whitelist");
-		String blacklist = vm.getValueAsString("blacklist");
+		String whitelist = vm.getValueAsString(WHITELIST);
+		String blacklist = vm.getValueAsString(BLACKLIST);
 		user.setIpWhitelist(whitelist != null ? whitelist.replace('\n', ',').replace(" ", "") : null);
 		user.setIpBlacklist(blacklist != null ? blacklist.replace('\n', ',').replace(" ", "") : null);
 		return true;

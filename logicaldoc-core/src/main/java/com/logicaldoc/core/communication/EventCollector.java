@@ -33,13 +33,13 @@ public class EventCollector {
 
 	private static Logger log = LoggerFactory.getLogger(EventCollector.class);
 
-	private Set<EventListener> listeners = new HashSet<EventListener>();
+	private Set<EventListener> listeners = new HashSet<>();
 
 	private ContextProperties config;
 
 	// Maintain a fifos for the history IDs. Key is the class name, value is a
 	// FIFO queue
-	private Map<String, Queue<Long>> fifos = new HashMap<String, Queue<Long>>();
+	private Map<String, Queue<Long>> fifos = new HashMap<>();
 
 	public static EventCollector get() {
 		return (EventCollector) Context.get().getBean(EventCollector.class);
@@ -63,7 +63,7 @@ public class EventCollector {
 	private boolean rememberHistory(History history) {
 		Queue<Long> fifo = fifos.get(history.getClass().getName());
 		if (fifo == null) {
-			fifo = new CircularFifoQueue<Long>(FIFO_SIZE);
+			fifo = new CircularFifoQueue<>(FIFO_SIZE);
 			fifos.put(history.getClass().getName(), fifo);
 		}
 

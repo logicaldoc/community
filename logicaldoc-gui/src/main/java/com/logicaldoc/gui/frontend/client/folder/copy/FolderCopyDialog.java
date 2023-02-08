@@ -29,6 +29,9 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  * @since 7.1
  */
 public class FolderCopyDialog extends Dialog {
+	private static final String FOLDERS_ONLY = "foldersOnly";
+	private static final String SECURITY = "security";
+
 	public FolderCopyDialog() {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -60,10 +63,10 @@ public class FolderCopyDialog extends Dialog {
 				FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"));
 		name.setHidden(selectedSourceIds.length > 1);
 
-		SelectItem securityOption = ItemFactory.newFolderSecurityOption("security", "security");
+		SelectItem securityOption = ItemFactory.newFolderSecurityOption(SECURITY);
 		securityOption.setHidden(!securityOptionEnabled);
 
-		CheckboxItem foldersOnly = ItemFactory.newCheckbox("foldersOnly", "copyfoldersonly");
+		CheckboxItem foldersOnly = ItemFactory.newCheckbox(FOLDERS_ONLY, "copyfoldersonly");
 		foldersOnly.setValue(false);
 
 		ButtonItem copy = prepareCopyButton(folders, selectedSourceIds, securityOptionEnabled, form);
@@ -122,11 +125,11 @@ public class FolderCopyDialog extends Dialog {
 				I18N.message("copyask",
 						new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
 				(Boolean yes) -> {
-					if (yes) {
+					if (Boolean.TRUE.equals(yes)) {
 						FolderNavigator.get().copyTo(tagetFolderId,
-								"true".equals(form.getValueAsString("foldersOnly")),
+								"true".equals(form.getValueAsString(FOLDERS_ONLY)),
 								!securityOptionEnabled ? "inheritparentsec"
-										: form.getValueAsString("security"));
+										: form.getValueAsString(SECURITY));
 						hide();
 						destroy();
 					}
@@ -148,8 +151,8 @@ public class FolderCopyDialog extends Dialog {
 						sourceFolder.setPermissions(new String[] { "read", "write" });
 
 						FolderCopyDetailsDialog dialog = new FolderCopyDetailsDialog(sourceFolder,
-								tagetFolderId, form.getValueAsString("security"),
-								"true".equals(form.getValueAsString("foldersOnly")));
+								tagetFolderId, form.getValueAsString(SECURITY),
+								"true".equals(form.getValueAsString(FOLDERS_ONLY)));
 						dialog.show();
 						hide();
 						destroy();

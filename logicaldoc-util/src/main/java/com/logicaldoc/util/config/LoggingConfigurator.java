@@ -17,6 +17,14 @@ import org.jdom2.Element;
  */
 public class LoggingConfigurator {
 
+	private static final String ROOT = "${root}/";
+
+	private static final String FILE_NAME = "fileName";
+
+	private static final String ROLLING_FILE_NAME = "//RollingFile[@name='";
+
+	private static final String APPENDERS = "//Appenders";
+
 	private XMLBean xml;
 
 	public LoggingConfigurator() {
@@ -47,10 +55,10 @@ public class LoggingConfigurator {
 	 * @return collection of the log file paths
 	 */
 	public Collection<String> getLoggingFiles() {
-		Collection<String> result = new ArrayList<String>();
-		Element appenders = xml.findElement("//Appenders");
-		List list = appenders.getChildren("RollingFile");
-		Iterator iter = list.iterator();
+		Collection<String> result = new ArrayList<>();
+		Element appenders = xml.findElement(APPENDERS);
+		List<Element> list = appenders.getChildren("RollingFile");
+		Iterator<Element> iter = list.iterator();
 		while (iter.hasNext()) {
 			Element elem = (Element) iter.next();
 			result.add(elem.getAttributeValue("name"));
@@ -80,9 +88,9 @@ public class LoggingConfigurator {
 	 */
 	public String getFile(String appender, boolean replaceVariables) {
 		String result = null;
-		Element elem = xml.findElement("//RollingFile[@name='" + appender + "']");
+		Element elem = xml.findElement(ROLLING_FILE_NAME + appender + "']");
 		if (elem != null) {
-			result = elem.getAttributeValue("fileName");
+			result = elem.getAttributeValue(FILE_NAME);
 			if (result.contains("${root}"))
 				result = result.replace("${root}", getProperty("root"));
 
@@ -95,7 +103,7 @@ public class LoggingConfigurator {
 	}
 
 	public void addTextAppender(String name) {
-		if (xml.findElement("//RollingFile[@name='" + name + "']") != null)
+		if (xml.findElement(ROLLING_FILE_NAME + name + "']") != null)
 			return;
 
 		// Get the DMS appender and use it as a model
@@ -103,7 +111,7 @@ public class LoggingConfigurator {
 
 		// Clone the model and add to the appenders
 		Element newAppender = (Element) model.clone();
-		Element appenders = xml.findElement("//Appenders");
+		Element appenders = xml.findElement(APPENDERS);
 		appenders.addContent(0, newAppender);
 
 		// Setup the appender name
@@ -111,12 +119,12 @@ public class LoggingConfigurator {
 
 		// Now setup the file name
 		String logfile = name.trim().toLowerCase() + ".log";
-		newAppender.setAttribute("fileName", "${root}/" + logfile);
-		newAppender.setAttribute("filePattern", "${root}/" + logfile + ".%i");
+		newAppender.setAttribute(FILE_NAME, ROOT + logfile);
+		newAppender.setAttribute("filePattern", ROOT + logfile + ".%i");
 	}
 
 	public void addHtmlAppender(String name) {
-		if (xml.findElement("//RollingFile[@name='" + name + "']") != null)
+		if (xml.findElement(ROLLING_FILE_NAME + name + "']") != null)
 			return;
 
 		// Get the DMS appender and use it as a model
@@ -124,7 +132,7 @@ public class LoggingConfigurator {
 
 		// Clone the model and add to the appenders
 		Element newAppender = (Element) model.clone();
-		Element appenders = xml.findElement("//Appenders");
+		Element appenders = xml.findElement(APPENDERS);
 		appenders.addContent(0, newAppender);
 
 		// Setup the appender name
@@ -132,8 +140,8 @@ public class LoggingConfigurator {
 
 		// Now setup the file name
 		String logfile = name.trim().toLowerCase() + ".log.html";
-		newAppender.setAttribute("fileName", "${root}/" + logfile);
-		newAppender.setAttribute("filePattern", "${root}/" + logfile + ".%i");
+		newAppender.setAttribute(FILE_NAME, ROOT + logfile);
+		newAppender.setAttribute("filePattern", ROOT + logfile + ".%i");
 	}
 
 	public void addLogger(String name, String[] appenders) {

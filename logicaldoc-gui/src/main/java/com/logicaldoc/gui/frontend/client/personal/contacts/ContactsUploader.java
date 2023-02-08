@@ -64,7 +64,7 @@ public class ContactsUploader extends Window {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		ContactsImportSettings popup = new ContactsImportSettings();

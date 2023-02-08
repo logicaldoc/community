@@ -9,7 +9,6 @@ import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -87,17 +86,11 @@ public class AutomationTriggerDetailsPanel extends VLayout {
 		 */
 		if (standardPanel != null) {
 			standardPanel.destroy();
-			if (standardTabPanel.contains(standardPanel))
+			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
 				standardTabPanel.removeMember(standardPanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
-		standardPanel = new AutomationTriggerProperties(trigger, changeHandler);
+		standardPanel = new AutomationTriggerProperties(trigger, (ChangedEvent event) -> onModified());
 		standardTabPanel.addMember(standardPanel);
 	}
 

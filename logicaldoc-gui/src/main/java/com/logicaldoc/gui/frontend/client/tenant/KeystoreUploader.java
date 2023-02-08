@@ -113,7 +113,7 @@ public class KeystoreUploader extends Window {
 			return;
 		}
 
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		GUIKeystore keystore = new GUIKeystore();

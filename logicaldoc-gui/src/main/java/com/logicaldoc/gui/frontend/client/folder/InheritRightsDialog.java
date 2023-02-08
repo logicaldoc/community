@@ -8,7 +8,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -24,10 +23,12 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  */
 public class InheritRightsDialog extends Dialog {
 
+	private static final String INHERITRIGHTS = "inheritrights";
+
 	public InheritRightsDialog(final FolderSecurityPanel panel) {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("inheritrights"));
+		setTitle(I18N.message(INHERITRIGHTS));
 		setWidth(250);
 		setHeight(270);
 		setCanDragResize(true);
@@ -50,40 +51,35 @@ public class InheritRightsDialog extends Dialog {
 		buttons.setWidth100();
 		buttons.setHeight(30);
 
-		Button inheritRights = new Button(I18N.message("inheritrights"));
+		Button inheritRights = new Button(I18N.message(INHERITRIGHTS));
 		inheritRights.setAutoFit(true);
 		inheritRights.setMargin(1);
 		inheritRights.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				LD.ask(I18N.message("inheritrights"),
-						I18N.message("inheritrightsask", new String[] {
-								FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
-								folders.getSelectedRecord().getAttributeAsString("name") }), new BooleanCallback() {
+				LD.ask(I18N.message(INHERITRIGHTS),
+						I18N.message("inheritrightsask",
+								new String[] { FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
+										folders.getSelectedRecord().getAttributeAsString("name") }),
+						(Boolean value) -> {
+							if (Boolean.TRUE.equals(value)) {
+								FolderService.Instance.get().inheritRights(panel.getFolder().getId(),
+										Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
+										new AsyncCallback<GUIFolder>() {
 
-							@Override
-							public void execute(Boolean value) {
-								if (value) {
-									FolderService.Instance.get()
-											.inheritRights(
-													panel.getFolder().getId(),
-													Long.parseLong(folders.getSelectedRecord().getAttributeAsString(
-															"folderId")), new AsyncCallback<GUIFolder>() {
+											@Override
+											public void onFailure(Throwable caught) {
+												GuiLog.serverError(caught);
+												destroy();
+											}
 
-														@Override
-														public void onFailure(Throwable caught) {
-															GuiLog.serverError(caught);
-															destroy();
-														}
-
-														@Override
-														public void onSuccess(GUIFolder arg) {
-															panel.refresh(arg);
-															destroy();
-														}
-													});
-								}
-								destroy();
+											@Override
+											public void onSuccess(GUIFolder arg) {
+												panel.refresh(arg);
+												destroy();
+											}
+										});
 							}
+							destroy();
 						});
 			}
 		});

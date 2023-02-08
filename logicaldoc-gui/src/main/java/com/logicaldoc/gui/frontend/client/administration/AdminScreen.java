@@ -33,7 +33,7 @@ public class AdminScreen extends HLayout {
 
 	@Override
 	public void onDraw() {
-		// Prepare the collapsible menu
+		// Prepare the collapsable menu
 		AdminMenu leftMenu = AdminMenu.get();
 		leftMenu.setWidth(340);
 		leftMenu.setShowResizeBar(true);
@@ -46,7 +46,7 @@ public class AdminScreen extends HLayout {
 
 	public void setContent(Canvas content) {
 		if (this.content != null) {
-			if (rightPanel.contains(this.content))
+			if (Boolean.TRUE.equals(rightPanel.contains(this.content)))
 				rightPanel.removeChild(this.content);
 			this.content.destroy();
 		}

@@ -35,6 +35,8 @@ import com.logicaldoc.util.Context;
  */
 public class MessageServiceImpl extends AbstractRemoteService implements MessageService {
 
+	private static final String TEMPLATES_HAVE_NOT_BEEN_SAVED = "Templates have not been saved";
+
 	private static Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
 
 	private static final long serialVersionUID = 1L;
@@ -87,7 +89,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					recipient.setType(Recipient.TYPE_SYSTEM);
 					recipient.setRead(0);
 					recipient.setMode("");
-					Set<Recipient> recipients = new HashSet<Recipient>();
+					Set<Recipient> recipients = new HashSet<>();
 					recipients.add(recipient);
 					SystemMessage sysmess = new SystemMessage();
 					sysmess.setAuthor("SYSTEM");
@@ -143,7 +145,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			recipient.setAddress(user.getUsername());
 			recipient.setType(Recipient.TYPE_SYSTEM);
 			recipient.setMode("message");
-			Set<Recipient> recipients = new HashSet<Recipient>();
+			Set<Recipient> recipients = new HashSet<>();
 			recipients.add(recipient);
 			m.setRecipients(recipients);
 			m.setDateScope(message.getValidity());
@@ -165,10 +167,10 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		try {
 			MessageTemplateDAO dao = (MessageTemplateDAO) context.getBean(MessageTemplateDAO.class);
 
-			List<GUIMessageTemplate> buf = new ArrayList<GUIMessageTemplate>();
+			List<GUIMessageTemplate> buf = new ArrayList<>();
 
 			List<MessageTemplate> standardTemplates = dao.findByTypeAndLanguage(type, "en", session.getTenantId());
-			Map<String, MessageTemplate> templates = new HashMap<String, MessageTemplate>();
+			Map<String, MessageTemplate> templates = new HashMap<>();
 
 			List<MessageTemplate> tmp = dao.findByTypeAndLanguage(type, language, session.getTenantId());
 			for (MessageTemplate m : tmp) {
@@ -220,7 +222,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 				try {
 					dao.store(template);
 				} catch (Exception e) {
-					throw new Exception("Templates have not been saved");
+					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED);
 				}
 			}
 		} catch (Throwable t) {
@@ -242,7 +244,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					try {
 						dao.delete(id);
 					} catch (Exception e) {
-						throw new Exception("Templates have not been saved", e);
+						throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 					}
 				}
 			}
@@ -266,7 +268,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 				try {
 					dao.delete(template.getId());
 				} catch (Exception e) {
-					throw new Exception("Templates have not been saved", e);
+					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 				}
 			}
 		} catch (Throwable t) {

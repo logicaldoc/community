@@ -70,7 +70,7 @@ public class CertificateDialog extends Window {
 		form.setNumCols(2);
 		form.setMinWidth(450);
 
-		StaticTextItem details = ItemFactory.newStaticTextItem("details", "details", Session.get().getUser().getCertDN()
+		StaticTextItem details = ItemFactory.newStaticTextItem("details", Session.get().getUser().getCertDN()
 				+ " " + I18N.message("validtill") + ": " + I18N.formatDate(Session.get().getUser().getCertExpire()));
 		details.setColSpan(2);
 		details.setWrap(true);
@@ -84,7 +84,7 @@ public class CertificateDialog extends Window {
 		createNew.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (vm.validate()) {
+				if (Boolean.TRUE.equals(vm.validate()))  {
 					LD.contactingServer();
 					SignService.Instance.get().generateNewCertificate(new AsyncCallback<Void>() {
 						@Override
@@ -122,11 +122,8 @@ public class CertificateDialog extends Window {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				SC.ask(I18N.message("deletecertwarn"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
+				SC.ask(I18N.message("deletecertwarn"), (Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
 							LD.contactingServer();
 							SignService.Instance.get().deleteCertificate(new AsyncCallback<Void>() {
 								@Override
@@ -144,7 +141,6 @@ public class CertificateDialog extends Window {
 								}
 							});
 						}
-					}
 				});
 
 			}

@@ -97,9 +97,12 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 		String host = getHeader("Host");
 		String scheme = getScheme();
 		String uriPrefix = scheme + "://" + host + getContextPath();
-
 		String hrefPrefix = forDestination ? uriPrefix : getContextPath();
 
+		return createResourceLocator(forDestination, ref, hrefPrefix);
+	}
+
+	private DavResourceLocator createResourceLocator(boolean forDestination, String ref, String hrefPrefix) {
 		if (factory instanceof AbstractLocatorFactory) {
 			return ((AbstractLocatorFactory) factory).createResourceLocator(hrefPrefix, ref, forDestination);
 		} else {

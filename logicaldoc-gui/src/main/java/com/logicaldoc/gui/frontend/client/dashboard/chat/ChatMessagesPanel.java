@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.0.1
  */
 public class ChatMessagesPanel extends VLayout implements ChatObserver {
+	private static final String MESSAGE = "message";
+
 	private RefreshableListGrid messages = null;
 
 	private Timer timer;
@@ -40,7 +42,7 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 
 	@Override
 	public void onDraw() {
-		ListGridField message = new ListGridField("message", I18N.message("message"));
+		ListGridField message = new ListGridField(MESSAGE, I18N.message(MESSAGE));
 		message.setWidth("*");
 		message.setShowTitle(false);
 
@@ -107,25 +109,25 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 
 	@Override
 	public void onMessage(long id, Date date, String username, String message) {
-		Record record = messages.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
-		if (record == null) {
-			List<ListGridRecord> rec = new ArrayList<ListGridRecord>();
+		Record rec = messages.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
+		if (rec == null) {
+			List<ListGridRecord> recd = new ArrayList<>();
 
 			Record[] records = messages.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
 				for (Record r : records)
-					rec.add(new ListGridRecord(r));
+					recd.add(new ListGridRecord(r));
 			}
 
 			ListGridRecord r = new ListGridRecord();
 			r.setAttribute("id", id);
 			r.setAttribute("username", username);
 			r.setAttribute("date", date);
-			r.setAttribute("message", message);
-			rec.add(r);
+			r.setAttribute(MESSAGE, message);
+			recd.add(r);
 
-			messages.setRecords(rec.toArray(new ListGridRecord[0]));
-			messages.scrollToRow(rec.size() - 1);
+			messages.setRecords(recd.toArray(new ListGridRecord[0]));
+			messages.scrollToRow(recd.size() - 1);
 		}
 	}
 

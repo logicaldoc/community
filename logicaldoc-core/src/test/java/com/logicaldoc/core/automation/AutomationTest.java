@@ -20,7 +20,7 @@ public class AutomationTest extends AbstractCoreTCase {
 	@Test
 	public void testAutomation() throws Exception {
 		{
-			Map<String, Object> dict=new HashMap<String, Object>();
+			Map<String, Object> dict=new HashMap<>();
 			dict.put("testval","abc");
 			
 			Automation automation = new Automation();

@@ -46,12 +46,12 @@ public class GDriveCreate extends Window {
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", null);
+		TextItem fileName = ItemFactory.newTextItem("filename", null);
 		fileName.setRequired(true);
 		fileName.setWidth(200);
 
 		SelectItem type = ItemFactory.newSelectItem("type", I18N.message("type"));
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("doc", "doc");
 		map.put("docx", "docx");
 		map.put("txt", "txt");
@@ -79,13 +79,13 @@ public class GDriveCreate extends Window {
 	}
 
 	public void onCreate() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		hide();
 		LD.contactingServer();
 
 		final String type = vm.getValueAsString("type");
-		String filename = vm.getValueAsString("fileName");
+		String filename = vm.getValueAsString("filename");
 		if (!filename.toLowerCase().endsWith("." + type))
 			filename = filename + "." + type;
 		final String fn = filename;

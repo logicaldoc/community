@@ -213,7 +213,7 @@ public class Feature {
 	
 	public static final int DIGITAL_SIGNATURE_CLIENT = 100;
 
-	private static Set<String> features = new HashSet<String>();
+	private static Set<String> features = new HashSet<>();
 
 	static public void init(GUIInfo info) {
 		features.clear();

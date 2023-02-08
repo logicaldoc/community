@@ -32,7 +32,7 @@ public class NotifyingThread extends Thread {
 	/**
 	 * List of listeners
 	 */
-	private final Set<ThreadCompleteListener> listeners = new CopyOnWriteArraySet<ThreadCompleteListener>();
+	private final Set<ThreadCompleteListener> listeners = new CopyOnWriteArraySet<>();
 
 	private boolean useRunnable = false;
 

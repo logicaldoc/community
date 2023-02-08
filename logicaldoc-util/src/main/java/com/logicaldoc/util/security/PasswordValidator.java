@@ -99,6 +99,6 @@ public class PasswordValidator {
 		if (!result.isValid())
 			return validator.getMessages(result);
 		else
-			return new ArrayList<String>();
+			return new ArrayList<>();
 	}
 }

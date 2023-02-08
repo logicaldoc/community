@@ -51,6 +51,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class StandardPropertiesPanel extends DocumentDetailTab {
+	private static final String COLOR = "color";
+
 	private static final int DEFAULT_ITEM_WIDTH = 250;
 
 	private DynamicForm form1 = new DynamicForm();
@@ -85,7 +87,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	private void refresh() {
 		prepareForm1();
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(document.getId()));
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(document.getId()));
 		if (!Long.toString(document.getId()).equals(document.getCustomId())) {
 			id.setTooltip(Long.toString(document.getId()) + " (" + document.getCustomId() + ")");
 			id.setValue(Util.padLeft(Long.toString(document.getId()) + " (" + document.getCustomId() + ")", 35));
@@ -106,12 +108,12 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		published.setTooltip(
 				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
 
-		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size",
+		StaticTextItem size = ItemFactory.newStaticTextItem("size",
 				Util.formatSizeW7(document.getFileSize()) + " (" + Util.formatSizeBytes(document.getFileSize()) + ")");
 
 		StaticTextItem pages = preparePagesItem();
 
-		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", document.getFileName());
+		TextItem fileName = ItemFactory.newTextItem("filename", document.getFileName());
 		fileName.addChangedHandler(changedHandler);
 		fileName.setRequired(true);
 		fileName.setWidth(DEFAULT_ITEM_WIDTH);
@@ -123,7 +125,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		LinkItem folder = prepareFolderItem();
 
-		ColorItem color = ItemFactory.newColorItemPicker("color", "color", document.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorItemPicker(document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
 
 		String downloadUrl = Util.downloadURL(document.getId());
@@ -131,7 +133,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message("download") + "</a> | "
 				+ "<a href='" + displayUrl + "' target='_blank'>" + I18N.message("details") + "</a>";
 
-		StaticTextItem permaLink = ItemFactory.newStaticTextItem("permalink", "permalink", perma);
+		StaticTextItem permaLink = ItemFactory.newStaticTextItem("permalink", perma);
 
 		if (Feature.enabled(Feature.WORKFLOW))
 			form1.setItems(id, fileName, folder, size, pages, version, creation, published, wfStatus, color, permaLink);
@@ -182,10 +184,10 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (thumbnail != null)
 			thumbnail.destroy();
 
-		if (columns.contains(form1))
+		if (Boolean.TRUE.equals(columns.contains(form1)))
 			columns.removeMember(form1);
 
-		if (columns.contains(thumbnail))
+		if (Boolean.TRUE.equals(columns.contains(thumbnail)))
 			columns.removeChild(thumbnail);
 
 		form1 = new DynamicForm();
@@ -224,7 +226,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private StaticTextItem preparePagesItem() {
-		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", "pages", Util.formatInt(document.getPages()));
+		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", Util.formatInt(document.getPages()));
 		pages.setIconHSpace(2);
 		pages.setIconWidth(16);
 		pages.setIconHeight(16);
@@ -254,7 +256,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private void prepareRightForm() {
-		if (columns.contains(form2)) {
+		if (Boolean.TRUE.equals(columns.contains(form2))) {
 			columns.removeMember(form2);
 			form2.destroy();
 		}
@@ -262,7 +264,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		form2 = new DynamicForm();
 		form2.setValuesManager(vm);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
 		addRating(items);
 
@@ -324,12 +326,12 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private TextItem prepareNewTagItem(final TagsDS ds) {
-		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+		final TextItem newTagItem = ItemFactory.newTextItem("newtag", null);
 		newTagItem.setEndRow(true);
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
-			if (newTagItem.validate() && newTagItem.getValue() != null && event.getKeyName() != null
-					&& "enter".equals(event.getKeyName().toLowerCase())) {
+			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
+					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();
 
@@ -351,7 +353,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
 		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
 		boolean containsInvalid = false;
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
 			String t = token.trim();
 
@@ -372,10 +374,10 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 					tags.add(oldVal[i]);
 
 			// Put the new tag in the options
-			Record record = new Record();
-			record.setAttribute("index", t);
-			record.setAttribute("word", t);
-			ds.addData(record);
+			Record rec = new Record();
+			rec.setAttribute("index", t);
+			rec.setAttribute("word", t);
+			ds.addData(rec);
 		}
 
 		// Update the tag item and trigger the change
@@ -387,7 +389,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private void addRating(List<FormItem> items) {
-		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "rating",
+		StaticTextItem rating = ItemFactory.newStaticTextItem("rating",
 				document.getRating() > 0 ? DocUtil.getRatingIcon(document.getRating())
 						: I18N.message("ratethisdocument"));
 		rating.setEndRow(true);
@@ -417,11 +419,10 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	@Override
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
-		vm.validate();
-		if (!vm.hasErrors()) {
-			document.setFileName((String) values.get("fileName"));
+		if (Boolean.TRUE.equals(vm.validate())) {
+			document.setFileName((String) values.get("filename"));
 			document.setLanguage((String) values.get("language"));
-			document.setColor((String) values.get("color"));
+			document.setColor((String) values.get(COLOR));
 			document.setTags(tagItem.getValues());
 		}
 		return !vm.hasErrors();

@@ -28,7 +28,7 @@ public class WebServiceStubSetFactory {
 	}
 
 	private static List<Method> getWebMethods(Class<?> webServiceClass) {
-		List<Method> webMethods = new ArrayList<Method>();
+		List<Method> webMethods = new ArrayList<>();
 		for (Method method : webServiceClass.getMethods()) {
 			if (method.isAnnotationPresent(WebMethod.class)) {
 				webMethods.add(method);

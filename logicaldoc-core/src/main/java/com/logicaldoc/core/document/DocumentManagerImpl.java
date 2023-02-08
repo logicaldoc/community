@@ -175,7 +175,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				}
 			}
 
-			// Update the document's record
+			// Update the document's gridRecord
 			documentDAO.initialize(document);
 			document.setFileSize(fileSize);
 			if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
@@ -249,7 +249,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			countPages(file, document);
 
-			Map<String, Object> dictionary = new HashMap<String, Object>();
+			Map<String, Object> dictionary = new HashMap<>();
 
 			log.debug("Invoke listeners before checkin");
 			for (DocumentListener listener : listenerManager.getListeners())
@@ -787,7 +787,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			if (file != null)
 				transaction.setFile(file.getAbsolutePath());
 
-			// Create the record
+			// Create the gridRecord
 			transaction.setEvent(DocumentEvent.STORED.toString());
 			documentDAO.store(docVO, transaction);
 
@@ -1242,7 +1242,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException {
-		List<Long> docIds = new ArrayList<Long>();
+		List<Long> docIds = new ArrayList<>();
 		Folder root = folderDAO.findFolder(folderId);
 
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
@@ -1251,7 +1251,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			String where = " where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED
 					+ " and ld_folderid=" + fid;
 			@SuppressWarnings("unchecked")
-			List<Long> ids = (List<Long>) documentDAO.queryForList("select ld_id from ld_document " + where,
+			List<Long> ids = documentDAO.queryForList("select ld_id from ld_document " + where,
 					Long.class);
 			if (ids.isEmpty())
 				continue;
@@ -1268,7 +1268,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction.getUser() != null);
-		List<Long> idsList = new ArrayList<Long>();
+		List<Long> idsList = new ArrayList<>();
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
 				Permission.ARCHIVE, null, true);
@@ -1471,7 +1471,7 @@ public class DocumentManagerImpl implements DocumentManager {
 								.setComment(String.format("%d files moved to storage %d", movedFiles, targetStorage));
 						documentDAO.saveDocumentHistory(document, transaction);
 					} catch (Throwable t) {
-						log.warn("Cannot record history for document {}", document, t);
+						log.warn("Cannot gridRecord history for document {}", document, t);
 					}
 				}
 			}

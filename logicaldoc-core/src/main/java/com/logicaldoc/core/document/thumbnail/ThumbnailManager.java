@@ -43,7 +43,7 @@ public class ThumbnailManager {
 	private Storer storer;
 
 	// Key is the extension, value is the associated builder
-	private Map<String, ThumbnailBuilder> builders = new HashMap<String, ThumbnailBuilder>();
+	private Map<String, ThumbnailBuilder> builders = new HashMap<>();
 
 	/**
 	 * Creates the thumbnail for the specified document and file version. The

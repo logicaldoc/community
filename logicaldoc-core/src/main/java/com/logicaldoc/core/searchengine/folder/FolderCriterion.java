@@ -63,7 +63,7 @@ public class FolderCriterion implements Serializable {
 
 	private int type = Attribute.TYPE_INT;
 
-	private static Map<String, Integer> typeBinding = new HashMap<String, Integer>();
+	private static Map<String, Integer> typeBinding = new HashMap<>();
 
 	private boolean showFolderSelector = false;
 

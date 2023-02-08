@@ -14,10 +14,8 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -26,11 +24,8 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -44,6 +39,14 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 8.7.2
  */
 public class TemplateSecurityPanel extends VLayout {
+	private static final String WRITE = "write";
+
+	private static final String AVATAR = "avatar";
+
+	private static final String ENTITY = "entity";
+
+	private static final String ENTITY_ID = "entityId";
+
 	protected GUITemplate template;
 
 	protected ChangedHandler changedHandler;
@@ -75,12 +78,12 @@ public class TemplateSecurityPanel extends VLayout {
 	void refresh(GUITemplate template) {
 		removeMembers(getMembers());
 
-		ListGridField entityId = new ListGridField("entityId", "entityId");
+		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID);
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 		entityId.setAutoFitWidth(true);
 
-		ListGridField entity = new UserListGridField("entity", "avatar", "entity");
+		ListGridField entity = new UserListGridField(ENTITY, AVATAR, ENTITY);
 		entity.setCanEdit(false);
 		entity.setRotateTitle(false);
 
@@ -89,14 +92,14 @@ public class TemplateSecurityPanel extends VLayout {
 		read.setCanEdit(true);
 		read.setAutoFitWidth(true);
 
-		ListGridField write = new ListGridField("write", I18N.message("write"), 80);
+		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE), 80);
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
 
 		prepareList(template);
 
-		List<ListGridField> fields = new ArrayList<ListGridField>();
+		List<ListGridField> fields = new ArrayList<>();
 		fields.add(entityId);
 		fields.add(entity);
 		fields.add(read);
@@ -108,14 +111,14 @@ public class TemplateSecurityPanel extends VLayout {
 
 		if (template.isWrite()) {
 			list.addCellContextClickHandler((CellContextClickEvent event) -> {
-					if (event.getColNum() == 0) {
-						Menu contextMenu = setupContextMenu();
-						contextMenu.showContextMenu();
-					}
-					event.cancel();
+				if (event.getColNum() == 0) {
+					Menu contextMenu = setupContextMenu();
+					contextMenu.showContextMenu();
+				}
+				event.cancel();
 			});
 			list.addEditCompleteHandler((EditCompleteEvent event) -> {
-					changedHandler.onChanged(null);
+				changedHandler.onChanged(null);
 			});
 		}
 
@@ -128,7 +131,7 @@ public class TemplateSecurityPanel extends VLayout {
 		buttons.setWidth100();
 		buttons.setHeight(20);
 		addMember(buttons);
-		
+
 		// Prepare the combo and button for adding a new Group
 		final DynamicForm groupForm = new DynamicForm();
 		final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
@@ -145,19 +148,19 @@ public class TemplateSecurityPanel extends VLayout {
 				// table
 				ListGridRecord[] records = list.getRecords();
 				for (ListGridRecord test : records) {
-					if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("id"))) {
+					if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
 						group.clearValue();
 						return;
 					}
 				}
 
 				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-				record.setAttribute("avatar", "group");
-				record.setAttribute("entity", selectedRecord.getAttribute("name"));
-				record.setAttribute("read", true);
-				list.addData(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
+				rec.setAttribute(AVATAR, "group");
+				rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
+				rec.setAttribute("read", true);
+				list.addData(rec);
 				changedHandler.onChanged(null);
 				group.clearValue();
 			}
@@ -168,33 +171,32 @@ public class TemplateSecurityPanel extends VLayout {
 		userForm.setItems(user);
 
 		user.addChangedHandler((ChangedEvent event) -> {
-				ListGridRecord selectedRecord = user.getSelectedRecord();
-				if (selectedRecord == null)
+			ListGridRecord selectedRecord = user.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
+
+			/*
+			 * Check if the selected user is already present in the rights table
+			 */
+			ListGridRecord[] records = list.getRecords();
+			for (ListGridRecord test : records) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("usergroup"))) {
+					user.clearValue();
 					return;
-
-				/*
-				 * Check if the selected user is already present in the rights
-				 * table
-				 */
-				ListGridRecord[] records = list.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
-						user.clearValue();
-						return;
-					}
 				}
+			}
 
-				// Update the rights table
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-				record.setAttribute("avatar", selectedRecord.getAttribute("id"));
-				record.setAttribute("entity",
-						selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-				record.setAttribute("read", true);
+			// Update the rights table
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("usergroup"));
+			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
+			rec.setAttribute(ENTITY,
+					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
+			rec.setAttribute("read", true);
 
-				list.addData(record);
-				changedHandler.onChanged(null);
-				user.clearValue();
+			list.addData(rec);
+			changedHandler.onChanged(null);
+			user.clearValue();
 		});
 		if (template.isWrite())
 			buttons.addMember(userForm);
@@ -203,14 +205,14 @@ public class TemplateSecurityPanel extends VLayout {
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
 		exportButton.addClickHandler((ClickEvent event) -> {
-				GridUtil.exportCSV(list, true);
+			GridUtil.exportCSV(list, true);
 		});
 
 		Button printButton = new Button(I18N.message("print"));
 		printButton.setAutoFit(true);
 		buttons.addMember(printButton);
 		printButton.addClickHandler((ClickEvent event) -> {
-				GridUtil.print(list);
+			GridUtil.print(list);
 		});
 	}
 
@@ -227,7 +229,7 @@ public class TemplateSecurityPanel extends VLayout {
 		dataSource = new TemplateRightsDS(template.getId());
 		list.setDataSource(dataSource);
 		list.addDataArrivedHandler((DataArrivedEvent event) -> {
-				rightsInitialized = true;
+			rightsInitialized = true;
 		});
 	}
 
@@ -238,18 +240,18 @@ public class TemplateSecurityPanel extends VLayout {
 	 */
 	private GUIRight[] getRights() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIRight> tmp = new ArrayList<GUIRight>();
+		List<GUIRight> tmp = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
-			Record record = list.getRecordList().get(i);
-			if (!record.getAttributeAsBoolean("read"))
+			Record rec = list.getRecordList().get(i);
+			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("read")))
 				continue;
 
 			GUIRight right = new GUIRight();
 
-			right.setName(record.getAttributeAsString("entity"));
-			right.setEntityId(Long.parseLong(record.getAttribute("entityId")));
-			right.setWrite("true".equals(record.getAttributeAsString("write")));
+			right.setName(rec.getAttributeAsString(ENTITY));
+			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+			right.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
 
 			tmp.add(right);
 		}
@@ -289,13 +291,10 @@ public class TemplateSecurityPanel extends VLayout {
 		if (selection == null || selection.length == 0)
 			return;
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-			@Override
-			public void execute(Boolean value) {
-				if (value) {
-					list.removeSelectedData();
-					changedHandler.onChanged(null);
-				}
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+			if (Boolean.TRUE.equals(value)) {
+				list.removeSelectedData();
+				changedHandler.onChanged(null);
 			}
 		});
 	}

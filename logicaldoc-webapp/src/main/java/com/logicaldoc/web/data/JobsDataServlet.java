@@ -3,10 +3,8 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,14 +42,9 @@ public class JobsDataServlet extends AbstractDataServlet {
 
 		int maxRecords = max != null ? max : 100;
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
 		String group = request.getParameter("group");
 
 		boolean groupsonly = request.getParameter("groupsonly") != null;
-
-		JobManager jobManager = (JobManager) Context.get().getBean(JobManager.class);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -61,6 +54,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 		 */
 		if (groupsonly) {
 			try {
+				JobManager jobManager = (JobManager) Context.get().getBean(JobManager.class);
 				for (String name : jobManager.getGroups()) {
 					writer.print("<job>");
 					writer.print("<group><![CDATA[" + name + "]]></group>");
@@ -70,42 +64,51 @@ public class JobsDataServlet extends AbstractDataServlet {
 				logger.warn(e.getMessage(), e);
 			}
 		} else {
-			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-			Map<Long, String> tenants = tDao.findAll().stream()
-					.collect(Collectors.toMap(t -> t.getId(), t -> t.getName()));
-
-			int count = 0;
+			
 			try {
-				for (Trigger trigger : jobManager.getTriggers(group,
-						session.getTenantId() == Tenant.DEFAULT_ID ? null : session.getTenantId())) {
-					if (count++ >= maxRecords)
-						break;
-
-					writer.print("<job>");
-					writer.print("<name><![CDATA[" + trigger.getJobKey().getName() + "]]></name>");
-					writer.print("<group><![CDATA[" + trigger.getJobKey().getGroup() + "]]></group>");
-					writer.print("<trigger><![CDATA[" + trigger.getKey().getName() + "]]></trigger>");
-					if (trigger.getJobDataMap() != null && trigger.getJobDataMap().containsKey(JobManager.TENANT_ID)) {
-						writer.print(
-								"<tenantId>" + trigger.getJobDataMap().getLong(JobManager.TENANT_ID) + "</tenantId>");
-						writer.print("<tenant><![CDATA["
-								+ tenants.get(trigger.getJobDataMap().getLong(JobManager.TENANT_ID)) + "]]></tenant>");
-					}
-
-					JobDetail job = jobManager.getJob(trigger.getJobKey().getName(), trigger.getJobKey().getGroup());
-					if (job.getDescription() != null)
-						writer.print("<description><![CDATA[" + job.getDescription() + "]]></description>");
-
-					if (trigger.getPreviousFireTime() != null)
-						writer.print("<previousFire>" + df.format(trigger.getPreviousFireTime()) + "</previousFire>");
-					if (trigger.getNextFireTime() != null)
-						writer.print("<nextFire>" + df.format(trigger.getNextFireTime()) + "</nextFire>");
-					writer.print("</job>");
-				}
+				writeJobs(writer, session, maxRecords, group);
 			} catch (SchedulerException e) {
 				logger.warn(e.getMessage(), e);
 			}
 		}
 		writer.write("</list>");
+	}
+
+	private void writeJobs(PrintWriter writer, Session session, int maxRecords, String group) throws SchedulerException {
+		DateFormat df = getDateFormat();
+		
+		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		Map<Long, String> tenants = tDao.findAll().stream()
+				.collect(Collectors.toMap(t -> t.getId(), t -> t.getName()));
+
+		int count = 0;
+		
+		JobManager jobManager = (JobManager) Context.get().getBean(JobManager.class);
+		for (Trigger trigger : jobManager.getTriggers(group,
+				session.getTenantId() == Tenant.DEFAULT_ID ? null : session.getTenantId())) {
+			if (count++ >= maxRecords)
+				break;
+
+			writer.print("<job>");
+			writer.print("<name><![CDATA[" + trigger.getJobKey().getName() + "]]></name>");
+			writer.print("<group><![CDATA[" + trigger.getJobKey().getGroup() + "]]></group>");
+			writer.print("<trigger><![CDATA[" + trigger.getKey().getName() + "]]></trigger>");
+			if (trigger.getJobDataMap() != null && trigger.getJobDataMap().containsKey(JobManager.TENANT_ID)) {
+				writer.print(
+						"<tenantId>" + trigger.getJobDataMap().getLong(JobManager.TENANT_ID) + "</tenantId>");
+				writer.print("<tenant><![CDATA["
+						+ tenants.get(trigger.getJobDataMap().getLong(JobManager.TENANT_ID)) + "]]></tenant>");
+			}
+
+			JobDetail job = jobManager.getJob(trigger.getJobKey().getName(), trigger.getJobKey().getGroup());
+			if (job.getDescription() != null)
+				writer.print("<description><![CDATA[" + job.getDescription() + "]]></description>");
+
+			if (trigger.getPreviousFireTime() != null)
+				writer.print("<previousFire>" + df.format(trigger.getPreviousFireTime()) + "</previousFire>");
+			if (trigger.getNextFireTime() != null)
+				writer.print("<nextFire>" + df.format(trigger.getNextFireTime()) + "</nextFire>");
+			writer.print("</job>");
+		}
 	}
 }

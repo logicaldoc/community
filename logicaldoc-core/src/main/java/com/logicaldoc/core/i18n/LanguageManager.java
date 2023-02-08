@@ -31,7 +31,7 @@ public class LanguageManager {
 
 	private static LanguageManager languageManager;
 
-	private Map<Locale, Language> languages = new HashMap<Locale, Language>();
+	private Map<Locale, Language> languages = new HashMap<>();
 
 	private LanguageManager() {
 		init();
@@ -46,7 +46,7 @@ public class LanguageManager {
 		if (registry == null)
 			return;
 
-		Collection<Extension> extensions = new ArrayList<Extension>();
+		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "Language");
 		} catch (Throwable e) {
@@ -82,7 +82,7 @@ public class LanguageManager {
 	}
 
 	public Collection<Language> getLanguages() {
-		List<Language> langs = new ArrayList<Language>();
+		List<Language> langs = new ArrayList<>();
 		langs.addAll(languages.values());
 		Collections.sort(langs);
 		return langs;
@@ -93,7 +93,7 @@ public class LanguageManager {
 		if (config == null)
 			return getLanguages();
 
-		Collection<Language> actives = new ArrayList<Language>();
+		Collection<Language> actives = new ArrayList<>();
 		for (Language l : getLanguages()) {
 			if ("enabled".equals(config.getProperty(tenantName + ".lang." + l)))
 				actives.add(l);
@@ -117,7 +117,7 @@ public class LanguageManager {
 	}
 
 	public List<String> getLanguagesAsString(String tenantName) {
-		List<String> languages2 = new ArrayList<String>();
+		List<String> languages2 = new ArrayList<>();
 		for (Language lang : getActiveLanguages(tenantName)) {
 			languages2.add(lang.getLocale().toString());
 		}

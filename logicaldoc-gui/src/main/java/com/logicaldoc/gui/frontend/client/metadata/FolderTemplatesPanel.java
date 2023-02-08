@@ -9,7 +9,6 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -33,6 +32,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class FolderTemplatesPanel extends AdminPanel {
 
+	private static final String FOLDERS = "folders";
 	private ListGrid grid;
 
 	public FolderTemplatesPanel() {
@@ -91,13 +91,9 @@ public class FolderTemplatesPanel extends AdminPanel {
 		clean.setTitle(I18N.message("ddelete"));
 		clean.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value))
 							grid.removeData(grid.getSelectedRecord());
-						}
-					}
 				});
 			}
 		});
@@ -115,10 +111,10 @@ public class FolderTemplatesPanel extends AdminPanel {
 		GUIValue[] templates = new GUIValue[records != null ? records.length : 0];
 		int i = 0;
 		if (records != null)
-			for (Record record : records) {
+			for (Record rec : records) {
 				templates[i] = new GUIValue();
-				templates[i].setCode(record.getAttributeAsString("name"));
-				templates[i++].setValue(record.getAttributeAsString("folders"));
+				templates[i].setCode(rec.getAttributeAsString("name"));
+				templates[i++].setValue(rec.getAttributeAsString(FOLDERS));
 			}
 
 		FolderService.Instance.get().saveTemplates(templates, new AsyncCallback<Void>() {
@@ -138,7 +134,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 		if (grid != null)
 			body.removeMember(grid);
 
-		ListGridField folders = new ListGridField("folders", I18N.message("folders"));
+		ListGridField folders = new ListGridField(FOLDERS, I18N.message(FOLDERS));
 		folders.setWidth(400);
 		folders.setRequired(true);
 		folders.setEditorProperties(new TextAreaItem());
@@ -169,10 +165,10 @@ public class FolderTemplatesPanel extends AdminPanel {
 		ListGridRecord[] records = new ListGridRecord[templates.length];
 		int i = 0;
 		for (GUIValue template : templates) {
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("name", template.getCode());
-			record.setAttribute("folders", template.getValue());
-			records[i++] = record;
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("name", template.getCode());
+			rec.setAttribute(FOLDERS, template.getValue());
+			records[i++] = rec;
 		}
 		grid.setData(records);
 

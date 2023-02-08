@@ -39,6 +39,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class UserPropertiesPanel extends HLayout {
+	private static final String USERMUSTBELONGTOGROUP = "usermustbelongtogroup";
+
+	private static final String ADMIN = "admin";
+
+	private static final String READONLY = "readonly";
+
+	private static final String EMAIL = "email";
+
 	private DynamicForm form1 = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -86,7 +94,7 @@ public class UserPropertiesPanel extends HLayout {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 
 		form1 = new DynamicForm();
@@ -164,7 +172,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private ComboBoxItem prepareTimeZoneSelector(boolean readonly) {
-		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", "timezone", user.getTimeZone());
+		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector("timezone", user.getTimeZone());
 		timeZone.setRequired(false);
 		timeZone.setDisabled(readonly);
 		if (!readonly)
@@ -183,7 +191,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareEmailItem(boolean readonly) {
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setRequired(true);
 		email.setDisabled(readonly);
 		email.setValue(user.getEmail());
@@ -193,7 +201,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareCellItem(boolean readonly) {
-		TextItem cell = ItemFactory.newTextItem("cell", "cell", user.getCell());
+		TextItem cell = ItemFactory.newTextItem("cell", user.getCell());
 		cell.setDisabled(readonly);
 		if (!readonly)
 			cell.addChangedHandler(changedHandler);
@@ -201,7 +209,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem preparePhoneItem(boolean readonly) {
-		TextItem phone = ItemFactory.newTextItem("phone", "phone", user.getPhone());
+		TextItem phone = ItemFactory.newTextItem("phone", user.getPhone());
 		phone.setDisabled(readonly);
 		if (!readonly)
 			phone.addChangedHandler(changedHandler);
@@ -209,7 +217,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareStateItem(boolean readonly) {
-		TextItem state = ItemFactory.newTextItem("state", "state", user.getState());
+		TextItem state = ItemFactory.newTextItem("state", user.getState());
 		state.setDisabled(readonly);
 		if (!readonly)
 			state.addChangedHandler(changedHandler);
@@ -226,7 +234,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareCountry(boolean readonly) {
-		TextItem country = ItemFactory.newTextItem("country", "country", user.getCountry());
+		TextItem country = ItemFactory.newTextItem("country", user.getCountry());
 		country.setDisabled(readonly);
 		if (!readonly)
 			country.addChangedHandler(changedHandler);
@@ -234,7 +242,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareCity(boolean readonly) {
-		TextItem city = ItemFactory.newTextItem("city", "city", user.getCity());
+		TextItem city = ItemFactory.newTextItem("city", user.getCity());
 		city.setDisabled(readonly);
 		if (!readonly)
 			city.addChangedHandler(changedHandler);
@@ -242,7 +250,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem preparePostalcode(boolean readonly) {
-		TextItem postalcode = ItemFactory.newTextItem("postalcode", "postalcode", user.getPostalCode());
+		TextItem postalcode = ItemFactory.newTextItem("postalcode", user.getPostalCode());
 		postalcode.setDisabled(readonly);
 		if (!readonly)
 			postalcode.addChangedHandler(changedHandler);
@@ -250,7 +258,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareAddress(boolean readonly) {
-		TextItem address = ItemFactory.newTextItem("address", "address", user.getAddress());
+		TextItem address = ItemFactory.newTextItem("address", user.getAddress());
 		address.setDisabled(readonly);
 		if (!readonly)
 			address.addChangedHandler(changedHandler);
@@ -267,7 +275,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareFirstname(boolean readonly) {
-		TextItem firstname = ItemFactory.newTextItem("firstname", "firstname", user.getFirstName());
+		TextItem firstname = ItemFactory.newTextItem("firstname", user.getFirstName());
 		firstname.setRequired(true);
 		firstname.setDisabled(readonly);
 		if (!readonly)
@@ -276,7 +284,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private TextItem prepareUsername(boolean readonly) {
-		TextItem username = ItemFactory.newTextItem("username", "username", user.getUsername());
+		TextItem username = ItemFactory.newTextItem("username", user.getUsername());
 		username.setRequired(true);
 		username.setSelectOnFocus(true);
 		username.setDisabled(readonly || user.getId() != 0);
@@ -286,9 +294,9 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private CheckboxItem prepareGuestItem(boolean readonly) {
-		final CheckboxItem guest = new CheckboxItem("readonly", I18N.message("readonly"));
+		final CheckboxItem guest = new CheckboxItem(READONLY, I18N.message(READONLY));
 		guest.setValue(user.isReadOnly());
-		if (readonly || "admin".equals(user.getUsername())) {
+		if (readonly || ADMIN.equals(user.getUsername())) {
 			guest.setDisabled(true);
 		} else {
 			addGuestChangeHandlers(guest);
@@ -299,21 +307,21 @@ public class UserPropertiesPanel extends HLayout {
 	private void addGuestChangeHandlers(final CheckboxItem guest) {
 		guest.addChangedHandler(changedHandler);
 		guest.addChangedHandler((ChangedEvent event) -> {
-				if (guest.getValueAsBoolean()) {
-					groupsItem.clearValue();
-					Record[] records = groupsItem.getOptionDataSource().getCacheData();
-					if (records != null)
-						for (Record record : records) {
-							if (record.getAttributeAsString("name").equals(Constants.GROUP_GUEST)) {
-								groupsItem.setValues(record.getAttributeAsString("id"));
-							}
+			if (Boolean.TRUE.equals(guest.getValueAsBoolean())) {
+				groupsItem.clearValue();
+				Record[] records = groupsItem.getOptionDataSource().getCacheData();
+				if (records != null)
+					for (Record rec : records) {
+						if (rec.getAttributeAsString("name").equals(Constants.GROUP_GUEST)) {
+							groupsItem.setValues(rec.getAttributeAsString("id"));
 						}
-				}
+					}
+			}
 		});
 	}
 
 	private void prepareGroupsForm(boolean readOnly) {
-		List<String> groupIds = new ArrayList<String>();
+		List<String> groupIds = new ArrayList<>();
 		GUIGroup[] groups = user.getGroups();
 		if (groups != null && groups.length > 0) {
 			for (int i = 0; i < groups.length; i++)
@@ -323,8 +331,8 @@ public class UserPropertiesPanel extends HLayout {
 
 		groupsItem = ItemFactory.newMultiComboBoxItem("groups", "groups", new GroupsDS(),
 				groupIds.toArray(new String[0]));
-		groupsItem.setDisabled(readOnly || "admin".equals(user.getUsername())
-				|| ("admin" + Session.get().getTenantName()).equals(user.getUsername()));
+		groupsItem.setDisabled(readOnly || ADMIN.equals(user.getUsername())
+				|| (ADMIN + Session.get().getTenantName()).equals(user.getUsername()));
 		groupsItem.setValueField("id");
 		groupsItem.setDisplayField("name");
 		groupsItem.addChangedHandler(changedHandler);
@@ -340,7 +348,7 @@ public class UserPropertiesPanel extends HLayout {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			user.setUsername((String) values.get("username"));
 			user.setName((String) values.get("name"));
 			user.setFirstName((String) values.get("firstname"));
@@ -352,7 +360,7 @@ public class UserPropertiesPanel extends HLayout {
 			user.setLanguage((String) values.get("language"));
 			user.setPhone((String) values.get("phone"));
 			user.setCell((String) values.get("cell"));
-			user.setEmail((String) values.get("email"));
+			user.setEmail((String) values.get(EMAIL));
 			user.setEmail2((String) values.get("email2"));
 			user.setTimeZone((String) values.get("timezone"));
 
@@ -362,8 +370,8 @@ public class UserPropertiesPanel extends HLayout {
 
 		String[] ids = groupsItem.getValues();
 		if (ids == null || ids.length == 0) {
-			SC.warn(I18N.message("usermustbelongtogroup"));
-			GuiLog.warn(I18N.message("usermustbelongtogroup"), I18N.message("usermustbelongtogroup"));
+			SC.warn(I18N.message(USERMUSTBELONGTOGROUP));
+			GuiLog.warn(I18N.message(USERMUSTBELONGTOGROUP), I18N.message(USERMUSTBELONGTOGROUP));
 			return false;
 		}
 
@@ -375,7 +383,7 @@ public class UserPropertiesPanel extends HLayout {
 		}
 		user.setGroups(groups);
 
-		if (Boolean.parseBoolean(values.get("readonly").toString())) {
+		if (Boolean.parseBoolean(values.get(READONLY).toString())) {
 			user.setType(GUIUser.TYPE_READONLY);
 			user.setGroups(new GUIGroup[0]);
 		} else

@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -102,8 +101,8 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		list = new ListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				return super.getCellCSSText(record, rowNum, colNum);
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				return super.getCellCSSText(rec, rowNum, colNum);
 			}
 		};
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -136,25 +135,22 @@ public class WorkflowTriggersPanel extends VLayout {
 		deleteTrigger.setTitle(I18N.message("ddelete"));
 		deleteTrigger.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ListGridRecord record = list.getSelectedRecord();
-							WorkflowService.Instance.get().deleteTrigger(
-									Long.parseLong(record.getAttributeAsString("id")), new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ListGridRecord rec = list.getSelectedRecord();
+						WorkflowService.Instance.get().deleteTrigger(Long.parseLong(rec.getAttributeAsString("id")),
+								new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-										@Override
-										public void onSuccess(Void result) {
-											removeMember(list);
-											refresh();
-										}
-									});
-						}
+									@Override
+									public void onSuccess(Void result) {
+										removeMember(list);
+										refresh();
+									}
+								});
 					}
 				});
 			}
@@ -162,12 +158,7 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				TriggerDialog dialog = new TriggerDialog(WorkflowTriggersPanel.this);
-				dialog.show();
-			}
-		});
+		edit.addClickHandler((MenuItemClickEvent event) -> new TriggerDialog(WorkflowTriggersPanel.this).show());
 
 		contextMenu.setItems(edit, deleteTrigger);
 		contextMenu.showContextMenu();

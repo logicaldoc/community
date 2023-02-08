@@ -20,9 +20,9 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class DashboardPanel extends VLayout {
 
-	public static final String WORKFLOW_ID = "workflow";
+	public static final String WORKFLOW = "workflow";
 
-	public static final String MESSAGES_ID = "messages";
+	public static final String MESSAGES = "messages";
 
 	public static final String CHAT_ID = "chat";
 
@@ -30,7 +30,7 @@ public class DashboardPanel extends VLayout {
 
 	public static final String USER_ID = "user";
 
-	public static final String CALENDAR_ID = "calendar";
+	public static final String CALENDAR = "calendar";
 
 	private static DashboardPanel instance;
 
@@ -68,20 +68,20 @@ public class DashboardPanel extends VLayout {
 		tagsTab.setID(TAGS_ID);
 		tagsTab.setPane(new TagsDashboard());
 
-		messagesTab = new Tab(I18N.message("messages"));
-		messagesTab.setID(MESSAGES_ID);
+		messagesTab = new Tab(I18N.message(MESSAGES));
+		messagesTab.setID(MESSAGES);
 		messagesTab.setPane(new MessagesPanel());
 
 		chatTab = new Tab(I18N.message("chat"));
 		chatTab.setID(CHAT_ID);
 		chatTab.setPane(new ChatPanel());
 
-		workflowTab = new Tab(I18N.message("workflow"));
-		workflowTab.setID(WORKFLOW_ID);
+		workflowTab = new Tab(I18N.message(WORKFLOW));
+		workflowTab.setID(WORKFLOW);
 		workflowTab.setPane(new WorkflowDashboard());
 
-		calendarTab = new Tab(I18N.message("calendar"));
-		calendarTab.setID(CALENDAR_ID);
+		calendarTab = new Tab(I18N.message(CALENDAR));
+		calendarTab.setID(CALENDAR);
 		calendarTab.setPane(UserCalendarPanel.get());
 
 		tabSet.addTab(userTab);
@@ -186,13 +186,13 @@ public class DashboardPanel extends VLayout {
 	}
 
 	public void updateMessageTab() {
-		tabSet.setTabPane(MESSAGES_ID, new MessagesPanel());
-		tabSet.selectTab(MESSAGES_ID);
+		tabSet.setTabPane(MESSAGES, new MessagesPanel());
+		tabSet.selectTab(MESSAGES);
 	}
 
 	public void updateWorkflowTab() {
-		tabSet.setTabPane(WORKFLOW_ID, new WorkflowDashboard());
-		tabSet.selectTab(WORKFLOW_ID);
+		tabSet.setTabPane(WORKFLOW, new WorkflowDashboard());
+		tabSet.selectTab(WORKFLOW);
 	}
 
 	public String getDefaultOpenTab() {

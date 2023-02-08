@@ -19,7 +19,7 @@ public interface SearchDAO extends PersistentObjectDAO<SavedSearch> {
 	 * @param userId Identifier of the user
 	 * @param name The name of the search
 	 * 
-	 * @return the found search record, if any
+	 * @return the found search gridRecord, if any
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */

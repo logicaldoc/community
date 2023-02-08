@@ -20,7 +20,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -49,6 +48,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 7.3
  */
 public class StampsPanel extends AdminPanel {
+	private static final String EENABLED = "eenabled";
+
+	private static final String IMAGE = "image";
+
+	private static final String DESCRIPTION = "description";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -76,16 +81,16 @@ public class StampsPanel extends AdminPanel {
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"), 200);
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 200);
 
 		ListGridField text = new ListGridField("text", I18N.message("text"), 200);
 
-		ListGridField image = new ListGridField("image", I18N.message("image"), 300);
+		ListGridField image = new ListGridField(IMAGE, I18N.message(IMAGE), 300);
 		image.setCanFilter(false);
 		image.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				if (value != null && !value.toString().trim().equals(""))
 					return "<img height='60px' src='" + Util.contextPath() + "stampimage/" + value + "?random="
 							+ new Date().getTime() + "'/>";
@@ -94,7 +99,7 @@ public class StampsPanel extends AdminPanel {
 			}
 		});
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -159,9 +164,9 @@ public class StampsPanel extends AdminPanel {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					StampService.Instance.get().getStamp(Long.parseLong(record.getAttributeAsString("id")),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					StampService.Instance.get().getStamp(Long.parseLong(rec.getAttributeAsString("id")),
 							new AsyncCallback<GUIStamp>() {
 
 								@Override
@@ -200,31 +205,28 @@ public class StampsPanel extends AdminPanel {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = Long.parseLong(rec.getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							StampService.Instance.get().delete(id, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						StampService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-									showStampDetails(null);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showStampDetails(null);
+							}
+						});
 					}
 				});
 			}
@@ -232,47 +234,43 @@ public class StampsPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				StampService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler((MenuItemClickEvent event) -> {
+			StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "0");
-								list.refreshRow(list.getRecordIndex(record));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute(EENABLED, "0");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				StampService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), false,
-						new AsyncCallback<Void>() {
+		disable.addClickHandler((MenuItemClickEvent event) -> {
+			StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								record.setAttribute("eenabled", "2");
-								list.refreshRow(list.getRecordIndex(record));
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							rec.setAttribute(EENABLED, "2");
+							list.refreshRow(list.getRecordIndex(rec));
+						}
+					});
 		});
 
-		if ("0".equals(record.getAttributeAsString("eenabled")))
+		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable, delete);
 		else
 			contextMenu.setItems(enable, delete);
@@ -294,29 +292,29 @@ public class StampsPanel extends AdminPanel {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param stamp the stamp object
 	 */
 	public void updateRecord(GUIStamp stamp) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, stamp.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", stamp.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, stamp.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", stamp.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("name", stamp.getName());
-		record.setAttribute("description", "" + stamp.getDescription());
+		rec.setAttribute("name", stamp.getName());
+		rec.setAttribute(DESCRIPTION, "" + stamp.getDescription());
 		if (stamp.getType() == GUIStamp.TYPE_IMAGE) {
-			record.setAttribute("image", "" + stamp.getId());
-			record.setAttribute("text", "");
+			rec.setAttribute(IMAGE, "" + stamp.getId());
+			rec.setAttribute("text", "");
 		} else {
-			record.setAttribute("text", "" + stamp.getText());
-			record.setAttribute("image", "");
+			rec.setAttribute("text", "" + stamp.getText());
+			rec.setAttribute(IMAGE, "");
 		}
-		list.refreshRow(list.getRecordIndex(record));
+		list.refreshRow(list.getRecordIndex(rec));
 	}
 }

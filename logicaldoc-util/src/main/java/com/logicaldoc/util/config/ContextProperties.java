@@ -33,6 +33,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class ContextProperties extends OrderedProperties {
 
+	private static final String UNABLE_TO_READ_FROM = "Unable to read from {}";
+
 	private static final long serialVersionUID = 1L;
 
 	/** this points to an ordinary file */
@@ -76,7 +78,7 @@ public class ContextProperties extends OrderedProperties {
 		try (FileInputStream fis = new FileInputStream(this.file)) {
 			load(fis);
 		} catch (Throwable e) {
-			log.error("Unable to read from {}", filePath, e);
+			log.error(UNABLE_TO_READ_FROM, filePath, e);
 			throw e;
 		}
 
@@ -86,7 +88,7 @@ public class ContextProperties extends OrderedProperties {
 				load(fis);
 				log.info("Override settings defined in {}", overrideFile.getPath());
 			} catch (Throwable e) {
-				log.error("Unable to read from {}", overrideFile.getPath(), e);
+				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
 				throw e;
 			}
 		}
@@ -111,13 +113,13 @@ public class ContextProperties extends OrderedProperties {
 		try {
 			file = new File(URLDecoder.decode(fileUrl.getPath(), "UTF-8"));
 		} catch (Exception e) {
-			log.error("Unable to read from {}", file, e);
+			log.error(UNABLE_TO_READ_FROM, file, e);
 			throw e;
 		}
 		try (FileInputStream fis = new FileInputStream(file)) {
 			load(fis);
 		} catch (Exception e) {
-			log.error("Unable to read from {}", file, e);
+			log.error(UNABLE_TO_READ_FROM, file, e);
 			throw e;
 		}
 
@@ -127,7 +129,7 @@ public class ContextProperties extends OrderedProperties {
 				load(fis);
 				log.debug("Override settings defined in {}", overrideFile.getPath());
 			} catch (Throwable e) {
-				log.error("Unable to read from {}", overrideFile.getPath(), e);
+				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
 				throw e;
 			}
 		}
@@ -151,7 +153,7 @@ public class ContextProperties extends OrderedProperties {
 			try (FileInputStream fis = new FileInputStream(overrideFile)) {
 				load(fis);
 			} catch (Exception e) {
-				log.error("Unable to read from {}", overrideFile.getPath(), e);
+				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
 				throw e;
 			}
 		}
@@ -365,7 +367,7 @@ public class ContextProperties extends OrderedProperties {
 	 * @return the map property_name = property_value
 	 */
 	public Map<String, String> getProperties(String prefix) {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 		for (Object key : keySet()) {
 			String prop = key.toString();
 			if (prop.startsWith(prefix))
@@ -382,7 +384,7 @@ public class ContextProperties extends OrderedProperties {
 	public void removeTenantProperties(String tenant) {
 		if ("default".equals(tenant))
 			return;
-		List<String> toBeDeleted = new ArrayList<String>();
+		List<String> toBeDeleted = new ArrayList<>();
 		for (Object key : keySet()) {
 			String prop = key.toString();
 			if (prop.startsWith(tenant + "."))

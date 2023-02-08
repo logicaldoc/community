@@ -24,6 +24,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
  */
 public class SaveDialog extends Window {
 
+	private static final String DESCRIPTION = "description";
 	private ValuesManager vm = new ValuesManager();
 
 	public SaveDialog() {
@@ -45,12 +46,12 @@ public class SaveDialog extends Window {
 		form.setWidth(350);
 		form.setMargin(5);
 
-		TextItem name = ItemFactory.newTextItem("name", "name", null);
+		TextItem name = ItemFactory.newTextItem("name", null);
 		name.setRequired(true);
 		name.setValidators(new SimpleTextValidator());
 		name.setWidth(200);
 
-		TextItem description = ItemFactory.newTextItem("description", "description", null);
+		TextItem description = ItemFactory.newTextItem(DESCRIPTION, null);
 		description.setBrowserSpellCheck(true);
 		description.setWidth(300);
 
@@ -67,12 +68,12 @@ public class SaveDialog extends Window {
 
 	private void onSave() {
 		vm.validate();
-		if (vm.hasErrors())
+		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return;
 
 		final GUISearchOptions options = Search.get().getOptions();
 		options.setName(vm.getValueAsString("name"));
-		options.setDescription(vm.getValueAsString("description"));
+		options.setDescription(vm.getValueAsString(DESCRIPTION));
 		SearchService.Instance.get().save(Search.get().getOptions(), new AsyncCallback<Boolean>() {
 
 			@Override
@@ -82,13 +83,13 @@ public class SaveDialog extends Window {
 
 			@Override
 			public void onSuccess(Boolean b) {
-				if (!b)
+				if (Boolean.FALSE.equals(b))
 					SC.warn(I18N.message("duplicateelement"));
 				else {
 					try {
 						if (SavedSearchesPanel.get() != null)
 							SavedSearchesPanel.get().addEntry(vm.getValueAsString("name"),
-									vm.getValueAsString("description"),
+									vm.getValueAsString(DESCRIPTION),
 									options.getType() == GUISearchOptions.TYPE_FULLTEXT ? I18N.message("fulltext")
 											: I18N.message("parametric"));
 					} catch (Throwable t) {

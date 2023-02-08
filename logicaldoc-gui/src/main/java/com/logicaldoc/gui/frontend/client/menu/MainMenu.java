@@ -49,7 +49,6 @@ import com.logicaldoc.gui.frontend.client.textcontent.TextContentEditor;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentCreate;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentEditor;
 import com.logicaldoc.gui.frontend.client.zoho.ZohoMenuItem;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -72,6 +71,14 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class MainMenu extends ToolStrip implements FolderObserver, DocumentObserver {
+
+	private static final String WINDOW_SETTNGS = "location=no,status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes";
+
+	private static final String BLANK = "_blank";
+
+	private static final String SEARCH = "search";
+
+	private static final String FULLTEXT = "fulltext";
 
 	private ToolStripButton account;
 
@@ -196,7 +203,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		String field = searchType.getValueAsString();
 		String value = searchBox.getValueAsString().trim();
-		if ("fulltext".equals(field)) {
+		if (FULLTEXT.equals(field)) {
 			options.setType(GUISearchOptions.TYPE_FULLTEXT);
 			options.setExpression(value);
 			options.setExpressionLanguage(I18N.getLocale());
@@ -229,7 +236,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	private void addSearchBox() {
 
 		searchBox.setShowTitle(false);
-		searchBox.setDefaultValue(I18N.message("search") + "...");
+		searchBox.setDefaultValue(I18N.message(SEARCH) + "...");
 		searchBox.setWidth(160);
 		searchBox.addKeyPressHandler(new KeyPressHandler() {
 			@Override
@@ -244,21 +251,21 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		searchBox.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if ((I18N.message("search") + "...").equals(event.getItem().getValue())) {
+				if ((I18N.message(SEARCH) + "...").equals(event.getItem().getValue())) {
 					event.getItem().setValue("");
 				}
 			}
 		});
 
-		LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
-		valueMap.put("fulltext", I18N.message("fulltext"));
+		LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
+		valueMap.put(FULLTEXT, I18N.message(FULLTEXT));
 		valueMap.put("filename", I18N.message("filename"));
 		valueMap.put("id", I18N.message("id"));
 		valueMap.put("customId", I18N.message("customid"));
 		searchType.setWidth(130);
 		searchType.setShowTitle(false);
 		searchType.setValueMap(valueMap);
-		searchType.setValue("fulltext");
+		searchType.setValue(FULLTEXT);
 
 		addFormItem(searchBox);
 
@@ -266,7 +273,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			addFormItem(searchType);
 		}
 
-		ToolStripButton searchButton = AwesomeFactory.newToolStripButton("search", "search");
+		ToolStripButton searchButton = AwesomeFactory.newToolStripButton(SEARCH, SEARCH);
 		searchButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
 			@Override
@@ -339,41 +346,32 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		menu.setShadowDepth(3);
 
 		final MenuItem edit = new MenuItem(I18N.message("editdoc"));
-		edit.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				if (document == null)
-					return;
+		edit.addClickHandler((MenuItemClickEvent event) -> {
+			if (document == null)
+				return;
 
-				if (document.getStatus() == 0) {
-					// Need to checkout first
-					DocumentService.Instance.get().checkout(new long[] { document.getId() }, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			if (document.getStatus() == 0) {
+				// Need to checkout first
+				DocumentService.Instance.get().checkout(new long[] { document.getId() }, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							DocUtil.markCheckedOut(document);
-							TextContentEditor popup = new TextContentEditor(document, null);
-							popup.show();
-						}
-					});
-				} else {
-					SC.warn(I18N.message("event.locked"));
-				}
+					@Override
+					public void onSuccess(Void result) {
+						DocUtil.markCheckedOut(document);
+						TextContentEditor popup = new TextContentEditor(document, null);
+						popup.show();
+					}
+				});
+			} else {
+				SC.warn(I18N.message("event.locked"));
 			}
 		});
 
 		final MenuItem create = new MenuItem(I18N.message("createdoc"));
-		create.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				TextContentCreate tcCreate = new TextContentCreate();
-				tcCreate.show();
-			}
-		});
+		create.addClickHandler((MenuItemClickEvent event) -> new TextContentCreate().show());
 
 		menu.setItems(edit, create);
 		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
@@ -389,10 +387,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private MenuItem getDropboxMenuItem(GUIFolder folder, final GUIDocument document) {
 		final MenuItem exportTo = new MenuItem(I18N.message("exporttodropbox"));
-		exportTo.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				DropboxService.Instance.get().isConnected(new AsyncCallback<Boolean>() {
+		exportTo.addClickHandler(
+				(MenuItemClickEvent event) -> DropboxService.Instance.get().isConnected(new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -401,7 +397,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 					@Override
 					public void onSuccess(Boolean connected) {
-						if (!connected)
+						if (Boolean.FALSE.equals(connected))
 							DropboxService.Instance.get().startAuthorization(new AsyncCallback<String>() {
 
 								@Override
@@ -421,15 +417,11 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 							dialog.show();
 						}
 					}
-				});
-			}
-		});
+				}));
 
 		final MenuItem importFrom = new MenuItem(I18N.message("importfromdropbox"));
-		importFrom.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				DropboxService.Instance.get().isConnected(new AsyncCallback<Boolean>() {
+		importFrom.addClickHandler(
+				(MenuItemClickEvent event) -> DropboxService.Instance.get().isConnected(new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -438,7 +430,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 					@Override
 					public void onSuccess(Boolean connected) {
-						if (!connected)
+						if (Boolean.FALSE.equals(connected))
 							DropboxService.Instance.get().startAuthorization(new AsyncCallback<String>() {
 
 								@Override
@@ -458,9 +450,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 							dialog.show();
 						}
 					}
-				});
-			}
-		});
+				}));
 
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
@@ -479,19 +469,11 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private MenuItem getShareFileMenuItem(GUIFolder folder, final GUIDocument document) {
 		final MenuItem exportTo = new MenuItem(I18N.message("exporttosharefile"));
-		exportTo.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				ShareFileDialog dialog = new ShareFileDialog(true);
-				dialog.show();
-			}
-		});
+		exportTo.addClickHandler((MenuItemClickEvent event) -> new ShareFileDialog(true).show());
 
 		final MenuItem importFrom = new MenuItem(I18N.message("importfromsharefile"));
-		importFrom.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				ShareFileService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
+		importFrom.addClickHandler((MenuItemClickEvent event) -> ShareFileService.Instance.get()
+				.isAuthorized(new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -502,32 +484,19 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					@Override
 					public void onSuccess(Boolean authorized) {
 						LD.clearPrompt();
-						if (authorized) {
+						if (Boolean.TRUE.equals(authorized)) {
 							ShareFileDialog dialog = new ShareFileDialog(false);
 							dialog.show();
 						} else {
 							SC.say(I18N.message("youneedtoauthorizesharefile",
-									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
-
-										@Override
-										public void execute(Boolean value) {
-											new ShareFileSettings().show();
-										}
-									});
+									Session.get().getInfo().getBranding().getProduct()),
+									(Boolean value) -> new ShareFileSettings().show());
 						}
 					}
-				});
-
-			}
-		});
+				}));
 
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				new ShareFileSettings().show();
-			}
-		});
+		authorize.addClickHandler((MenuItemClickEvent event) -> new ShareFileSettings().show());
 
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
@@ -546,78 +515,57 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private MenuItem getDocuSignMenuItem(GUIFolder folder, final GUIDocument document) {
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				new DocuSignSettings().show();
-			}
-		});
+		authorize.addClickHandler((MenuItemClickEvent event) -> new DocuSignSettings().show());
 
 		final MenuItem sendEnvelope = new MenuItem(I18N.message("sendenvelope"));
-		sendEnvelope.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				LD.contactingServer();
-				DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
+		sendEnvelope.addClickHandler((MenuItemClickEvent event) -> {
+			LD.contactingServer();
+			DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						LD.clearPrompt();
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+					LD.clearPrompt();
+				}
+
+				@Override
+				public void onSuccess(Boolean authorized) {
+					LD.clearPrompt();
+					if (Boolean.TRUE.equals(authorized)) {
+						new EnvelopeDetails().show();
+					} else {
+						SC.say(I18N.message("youneedtoauthorizedocusign",
+								Session.get().getInfo().getBranding().getProduct()),
+								(Boolean value) -> new DocuSignSettings().show());
 					}
-
-					@Override
-					public void onSuccess(Boolean authorized) {
-						LD.clearPrompt();
-						if (authorized) {
-							new EnvelopeDetails().show();
-						} else {
-							SC.say(I18N.message("youneedtoauthorizedocusign",
-									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
-
-										@Override
-										public void execute(Boolean value) {
-											new DocuSignSettings().show();
-										}
-									});
-						}
-					}
-				});
-			}
+				}
+			});
 		});
 		sendEnvelope.setEnabled(document != null);
 
 		final MenuItem envelopes = new MenuItem(I18N.message("envelopes"));
-		envelopes.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				LD.contactingServer();
-				DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
+		envelopes.addClickHandler((MenuItemClickEvent event) -> {
+			LD.contactingServer();
+			DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						LD.clearPrompt();
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+					LD.clearPrompt();
+				}
+
+				@Override
+				public void onSuccess(Boolean authorized) {
+					LD.clearPrompt();
+					if (Boolean.TRUE.equals(authorized)) {
+						new Envelopes().show();
+					} else {
+						SC.say(I18N.message("youneedtoauthorizedocusign",
+								Session.get().getInfo().getBranding().getProduct()),
+								(Boolean value) -> new DocuSignSettings().show());
 					}
-
-					@Override
-					public void onSuccess(Boolean authorized) {
-						LD.clearPrompt();
-						if (authorized) {
-							new Envelopes().show();
-						} else {
-							SC.say(I18N.message("youneedtoauthorizedocusign",
-									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
-
-										@Override
-										public void execute(Boolean value) {
-											new DocuSignSettings().show();
-										}
-									});
-						}
-					}
-				});
-			}
+				}
+			});
 		});
 
 		sendEnvelope.setEnabled(Feature.enabled(Feature.DOCUSIGN));
@@ -665,13 +613,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private void addToolsButton(GUIFolder folder, GUIDocument document) {
 		tools = AwesomeFactory.newToolStripButton("toolbox", I18N.message("tools"), I18N.message("tools"));
-		tools.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				Menu menu = buildToolsMenu(folder, document);
-				menu.showContextMenu();
-			}
+		tools.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			Menu menu = buildToolsMenu(folder, document);
+			menu.showContextMenu();
 		});
 
 		addButton(tools, 2);
@@ -686,12 +630,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			folder = document.getFolder();
 
 		MenuItem develConsole = new MenuItem(I18N.message("develconsole"));
-		develConsole.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				SC.showConsole();
-			}
-		});
+		develConsole.addClickHandler((MenuItemClickEvent event) -> SC.showConsole());
 
 		if (document != null || folder != null)
 			addItemsWhenFolderOrDocumentSelected(folder, document, menu);
@@ -767,16 +706,12 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		if (CookiesManager.get(CookiesManager.COOKIE_DENSITY) != null)
 			dens = CookiesManager.get(CookiesManager.COOKIE_DENSITY);
 		density.setValue(dens);
-		density.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				String newDensity = event.getValue().toString();
-				Session.get().getInfo().setConfig(Session.get().getTenantName() + ".gui.density", newDensity);
-				CookiesManager.save(CookiesManager.COOKIE_DENSITY, newDensity);
-				Util.setupDensity(Session.get().getInfo());
-				Util.redirectToRoot();
-			}
+		density.addChangedHandler((ChangedEvent event) -> {
+			String newDensity = event.getValue().toString();
+			Session.get().getInfo().setConfig(Session.get().getTenantName() + ".gui.density", newDensity);
+			CookiesManager.save(CookiesManager.COOKIE_DENSITY, newDensity);
+			Util.setupDensity(Session.get().getInfo());
+			Util.redirectToRoot();
 		});
 		return density;
 	}
@@ -785,13 +720,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		Menu menu = buildSupportMenu();
 
 		ToolStripButton supportButton = AwesomeFactory.newToolStripButton("question-circle", "support");
-		supportButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				menu.showContextMenu();
-			}
-		});
+		supportButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> menu.showContextMenu());
 
 		addButton(supportButton);
 	}
@@ -819,60 +748,36 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		menu.setShadowDepth(3);
 
 		MenuItem manuals = new MenuItem(I18N.message("manuals"));
-		manuals.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				Window.open(Session.get().getInfo().getBranding().getHelp() + "?lang=" + I18N.getLocale(), "_blank",
-						"location=no,status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes");
-			}
-		});
+		manuals.addClickHandler((MenuItemClickEvent event) -> Window.open(
+				Session.get().getInfo().getBranding().getHelp() + "?lang=" + I18N.getLocale(), BLANK,
+				WINDOW_SETTNGS));
 		menu.addItem(manuals);
 
 		MenuItem bugReport = new MenuItem(I18N.message("bug.report"));
-		bugReport.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				Window.open(Session.get().getInfo().getBranding().getBugs(), "_blank",
-						"location=no,status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes");
-			}
-		});
+		bugReport.addClickHandler(
+				(MenuItemClickEvent event) -> Window.open(Session.get().getInfo().getBranding().getBugs(), BLANK,
+						WINDOW_SETTNGS));
 		if (Session.get().getInfo().getBranding().getBugs() != null
 				&& !"-".equals(Session.get().getInfo().getBranding().getBugs()))
 			menu.addItem(bugReport);
 
 		MenuItem forum = new MenuItem(I18N.message("forum"));
-		forum.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				Window.open(Session.get().getInfo().getBranding().getForum(), "_blank",
-						"location=no,status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes");
-			}
-		});
+		forum.addClickHandler(
+				(MenuItemClickEvent event) -> Window.open(Session.get().getInfo().getBranding().getForum(), BLANK,
+						WINDOW_SETTNGS));
 		if (Session.get().getInfo().getBranding().getForum() != null
 				&& !"-".equals(Session.get().getInfo().getBranding().getForum()))
 			menu.addItem(forum);
 
 		MenuItem about = new MenuItem(I18N.message("about") + " " + Session.get().getInfo().getBranding().getProduct());
-		about.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				AboutDialog dialog = new AboutDialog();
-				dialog.show();
-			}
-		});
+		about.addClickHandler((MenuItemClickEvent event) -> new AboutDialog().show());
 		menu.addItem(about);
 		return menu;
 	}
 
 	private void addLogoutButton() {
 		ToolStripButton logoutButton = AwesomeFactory.newToolStripButton("power-off", "logout");
-		logoutButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				Session.get().logout();
-			}
-		});
+		logoutButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> Session.get().logout());
 		addButton(logoutButton);
 	}
 

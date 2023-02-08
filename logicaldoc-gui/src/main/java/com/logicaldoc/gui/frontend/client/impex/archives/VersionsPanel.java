@@ -13,17 +13,13 @@ import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -64,16 +60,13 @@ public class VersionsPanel extends VLayout {
 		display.setTitle(I18N.message("display"));
 		toolbar.addButton(display);
 		toolbar.addFormItem(maxItem);
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (maxItem.validate() && maxItem.getValue() != null) {
-					if (maxItem.getValue() instanceof Integer)
-						max = (Integer) maxItem.getValue();
-					else
-						max = Integer.parseInt(maxItem.getValue().toString());
-					initListGrid(archiveId, readonly);
-				}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(maxItem.validate()) && maxItem.getValue() != null) {
+				if (maxItem.getValue() instanceof Integer)
+					max = (Integer) maxItem.getValue();
+				else
+					max = Integer.parseInt(maxItem.getValue().toString());
+				initListGrid(archiveId, readonly);
 			}
 		});
 		toolbar.addFill();
@@ -112,21 +105,15 @@ public class VersionsPanel extends VLayout {
 		listGrid.setFields(id, docid, customid, fileName, version, date, size, template);
 		addMember(listGrid, 1);
 
-		listGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord record = event.getRecord();
-				DocUtil.download(record.getAttributeAsLong("docid"), null, record.getAttribute("id"));
-			}
+		listGrid.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
+			ListGridRecord rec = event.getRecord();
+			DocUtil.download(rec.getAttributeAsLong("docid"), null, rec.getAttribute("id"));
 		});
 
-		listGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = setupContextMenu(archiveId, readonly);
-				contextMenu.showContextMenu();
-				event.cancel();
-			}
+		listGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+			Menu contextMenu = setupContextMenu(archiveId, readonly);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 	}
 
@@ -149,31 +136,28 @@ public class VersionsPanel extends VLayout {
 					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 				}
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							listGrid.removeSelectedData();
-							listGrid.deselectAllRecords();
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						listGrid.removeSelectedData();
+						listGrid.deselectAllRecords();
 
-							ImpexService.Instance.get().deleteVersions(archiveId, ids, new AsyncCallback<GUIArchive>() {
+						ImpexService.Instance.get().deleteVersions(archiveId, ids, new AsyncCallback<GUIArchive>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIArchive archive) {
+								ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
+								if (selectedRecord != null) {
+									selectedRecord.setAttribute("size", archive.getSize());
+									archivesList.getList()
+											.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
 								}
-
-								@Override
-								public void onSuccess(GUIArchive archive) {
-									ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
-									if (selectedRecord != null) {
-										selectedRecord.setAttribute("size", archive.getSize());
-										archivesList.getList()
-												.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
-									}
-								}
-							});
-						}
+							}
+						});
 					}
 				});
 			}

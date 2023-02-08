@@ -150,7 +150,7 @@ public class FSStorer extends AbstractStorer {
 
 	@Override
 	public List<String> listResources(long docId, final String fileVersion) {
-		List<String> resources = new ArrayList<String>();
+		List<String> resources = new ArrayList<>();
 		File container = getContainer(docId);
 		File[] buf = container.listFiles(new FilenameFilter() {
 			@Override
@@ -186,7 +186,7 @@ public class FSStorer extends AbstractStorer {
 
 	@Override
 	public List<String> getParameterNames() {
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 
 	@Override

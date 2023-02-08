@@ -19,7 +19,6 @@ import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -45,6 +44,18 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class BruteForcePanel extends AdminPanel {
 
+	private static final String ATTEMPTS = "attempts";
+
+	private static final String THROTTLE_IP_WAIT = "throttle.ip.wait";
+
+	private static final String THROTTLE_IP_MAX = "throttle.ip.max";
+
+	private static final String THROTTLE_USERNAME_WAIT = "throttle.username.wait";
+
+	private static final String THROTTLE_USERNAME_MAX = "throttle.username.max";
+
+	private static final String THROTTLE_ENABLED = "throttle.enabled";
+
 	private ValuesManager vm = new ValuesManager();
 
 	private ListGrid blockedEntities;
@@ -65,23 +76,24 @@ public class BruteForcePanel extends AdminPanel {
 
 		addMember(save);
 
-		SettingService.Instance.get().loadSettingsByNames(
-				new String[] { "throttle.enabled", "throttle.username.max", "throttle.username.wait",
-						"throttle.username.wait", "throttle.ip.max", "throttle.ip.wait" },
-				new AsyncCallback<GUIParameter[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		SettingService.Instance.get()
+				.loadSettingsByNames(
+						new String[] { THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
+								THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT },
+						new AsyncCallback<GUIParameter[]>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-					@Override
-					public void onSuccess(GUIParameter[] params) {
-						Map<String, String> p = new HashMap<String, String>();
-						for (GUIParameter par : params)
-							p.put(par.getName(), par.getValue());
-						initForm(p);
-					}
-				});
+							@Override
+							public void onSuccess(GUIParameter[] params) {
+								Map<String, String> p = new HashMap<>();
+								for (GUIParameter par : params)
+									p.put(par.getName(), par.getValue());
+								initForm(p);
+							}
+						});
 	}
 
 	private void initForm(Map<String, String> params) {
@@ -90,7 +102,7 @@ public class BruteForcePanel extends AdminPanel {
 		form.setTitleOrientation(TitleOrientation.LEFT);
 
 		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "bruteforcepreventionenabled");
-		enabled.setValue("true".equals(params.get("throttle.enabled")) ? "yes" : "no");
+		enabled.setValue("true".equals(params.get(THROTTLE_ENABLED)) ? "yes" : "no");
 		enabled.setWrapTitle(false);
 		enabled.setTitleOrientation(TitleOrientation.LEFT);
 
@@ -99,7 +111,7 @@ public class BruteForcePanel extends AdminPanel {
 		usernameMax.setMin(0);
 		usernameMax.setWrapTitle(false);
 		try {
-			usernameMax.setValue(Integer.parseInt(params.get("throttle.username.max")));
+			usernameMax.setValue(Integer.parseInt(params.get(THROTTLE_USERNAME_MAX)));
 		} catch (Throwable t) {
 			// Nothing to do
 		}
@@ -109,7 +121,7 @@ public class BruteForcePanel extends AdminPanel {
 		usernameWait.setHint(I18N.message("minutes"));
 		usernameWait.setWrapTitle(false);
 		try {
-			usernameWait.setValue(Integer.parseInt(params.get("throttle.username.wait")));
+			usernameWait.setValue(Integer.parseInt(params.get(THROTTLE_USERNAME_WAIT)));
 		} catch (Throwable t) {
 			// Nothing to do
 		}
@@ -118,7 +130,7 @@ public class BruteForcePanel extends AdminPanel {
 		ipMax.setMin(0);
 		ipMax.setWrapTitle(false);
 		try {
-			ipMax.setValue(Integer.parseInt(params.get("throttle.ip.max")));
+			ipMax.setValue(Integer.parseInt(params.get(THROTTLE_IP_MAX)));
 		} catch (Throwable t) {
 			// Nothing to do
 		}
@@ -128,7 +140,7 @@ public class BruteForcePanel extends AdminPanel {
 		ipWait.setWrapTitle(false);
 		ipWait.setHint(I18N.message("minutes"));
 		try {
-			ipWait.setValue(Integer.parseInt(params.get("throttle.ip.wait")));
+			ipWait.setValue(Integer.parseInt(params.get(THROTTLE_IP_WAIT)));
 		} catch (Throwable t) {
 			// Nothing to do
 		}
@@ -161,13 +173,13 @@ public class BruteForcePanel extends AdminPanel {
 		entity.setCellFormatter(new CellFormatter() {
 
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				String name = ((String) value).substring(((String) value).lastIndexOf('-') + 1);
 				return name;
 			}
 		});
 
-		ListGridField attempts = new ListGridField("attempts", I18N.message("attempts"));
+		ListGridField attempts = new ListGridField(ATTEMPTS, I18N.message(ATTEMPTS));
 		attempts.setWidth(80);
 		attempts.setAlign(Alignment.CENTER);
 
@@ -180,15 +192,15 @@ public class BruteForcePanel extends AdminPanel {
 		blockedEntities.setHeight100();
 		blockedEntities.setSelectionType(SelectionStyle.MULTIPLE);
 
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 		if (data != null)
 			for (GUISequence cid : data) {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("id", cid.getId());
-				record.setAttribute("entity", cid.getName());
-				record.setAttribute("attempts", cid.getValue());
-				record.setAttribute("lastmodified", cid.getLastModified());
-				records.add(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("id", cid.getId());
+				rec.setAttribute("entity", cid.getName());
+				rec.setAttribute(ATTEMPTS, cid.getValue());
+				rec.setAttribute("lastmodified", cid.getLastModified());
+				records.add(rec);
 			}
 		blockedEntities.setData(records.toArray(new ListGridRecord[0]));
 
@@ -217,22 +229,19 @@ public class BruteForcePanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									blockedEntities.removeSelectedData();
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Void result) {
+								blockedEntities.removeSelectedData();
+							}
+						});
 					}
 				});
 			}
@@ -243,18 +252,18 @@ public class BruteForcePanel extends AdminPanel {
 	}
 
 	public void onSave() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		GUIParameter[] params = new GUIParameter[5];
-		params[0] = new GUIParameter("throttle.enabled",
+		params[0] = new GUIParameter(THROTTLE_ENABLED,
 				"yes".equals(values.get("eenabled").toString()) ? "true" : "false");
-		params[1] = new GUIParameter("throttle.username.max", values.get("usernamemax").toString());
-		params[2] = new GUIParameter("throttle.username.wait", values.get("usernamewait").toString());
-		params[3] = new GUIParameter("throttle.ip.max", values.get("ipmax").toString());
-		params[4] = new GUIParameter("throttle.ip.wait", values.get("ipwait").toString());
+		params[1] = new GUIParameter(THROTTLE_USERNAME_MAX, values.get("usernamemax").toString());
+		params[2] = new GUIParameter(THROTTLE_USERNAME_WAIT, values.get("usernamewait").toString());
+		params[3] = new GUIParameter(THROTTLE_IP_MAX, values.get("ipmax").toString());
+		params[4] = new GUIParameter(THROTTLE_IP_WAIT, values.get("ipwait").toString());
 
 		SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
 

@@ -127,6 +127,8 @@ import com.logicaldoc.web.UploadServlet;
  */
 public class DocumentServiceImpl extends AbstractRemoteService implements DocumentService {
 
+	private static final String DOCUMENT_STR = "Document ";
+
 	private static final String UTF_8 = "UTF-8";
 
 	private static final String UNEXISTING_DOCUMENT = "Unexisting document";
@@ -270,10 +272,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			File file = entry.getValue();
 			try {
 				if (filename.toLowerCase().endsWith(".zip") && importZip) {
-					// Make a copy of the zip file in order to avoid it's deletion during import
+					// Make a copy of the zip file in order to avoid it's
+					// deletion during import
 					File tempZip = FileUtil.createTempFile("upload-", ".zip");
 					FileUtils.copyFile(file, tempZip);
-					
+
 					// Prepare the import thread
 					Thread zipImporter = new Thread(() -> importZip(charset, metadata, session, parent, tempZip));
 
@@ -338,13 +341,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		 */
 		try {
 			log.debug("zip file = {}", zipFile);
-			
+
 			Document doc = toDocument(metadata);
 			doc.setTenantId(session.getTenantId());
 			doc.setCreation(new Date());
-			
-			System.out.println("doc tanant: "+doc.getTenantId());
-			
+
+			System.out.println("doc tanant: " + doc.getTenantId());
+
 			InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
 			importer.process(zipFile, parent, session.getUserId(), session.getSid());
 		} catch (PersistenceException e) {
@@ -569,7 +572,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-				throw new PermissionException(session.getUsername(), "Document " + docId, Permission.WRITE);
+				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
 				throw new PermissionException("The document " + docId + " is locked");
@@ -1270,105 +1273,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			Template template = templateDao.findById(guiDocument.getTemplateId());
 			templateDao.initialize(template);
-
 			docVO.setTemplate(template);
+
 			if (guiDocument.getAttributes() != null && guiDocument.getAttributes().length > 0) {
-				for (GUIAttribute attr : guiDocument.getAttributes()) {
-					Attribute templateAttribute = template.getAttributes()
-							.get(attr.getParent() != null ? attr.getParent() : attr.getName());
-					// This control is necessary because, changing
-					// the template, the values of the old template
-					// attributes keys remains on the form value
-					// manager,
-					// so the GUIDocument contains also the old
-					// template attributes keys that must be
-					// skipped.
-					if (templateAttribute == null)
-						continue;
-
-					Attribute extAttr = new Attribute();
-					int templateType = templateAttribute.getType();
-					int extAttrType = attr.getType();
-
-					if (templateType != extAttrType) {
-						// This check is useful to avoid errors
-						// related to the old template
-						// attributes keys that remains on the form
-						// value manager
-						if (attr.getValue() != null && attr.getValue().toString().trim().isEmpty()
-								&& templateType != 0) {
-							if (templateType == Attribute.TYPE_INT || templateType == Attribute.TYPE_BOOLEAN) {
-								extAttr.setIntValue(null);
-							} else if (templateType == Attribute.TYPE_DOUBLE) {
-								extAttr.setDoubleValue(null);
-							} else if (templateType == Attribute.TYPE_DATE) {
-								extAttr.setDateValue(null);
-							}
-						} else if (templateType == GUIAttribute.TYPE_DOUBLE) {
-							extAttr.setValue(Double.parseDouble(attr.getValue().toString()));
-						} else if (templateType == GUIAttribute.TYPE_INT) {
-							extAttr.setValue(Long.parseLong(attr.getValue().toString()));
-						} else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
-							extAttr.setValue(attr.getBooleanValue());
-							extAttr.setType(Attribute.TYPE_BOOLEAN);
-						} else if (templateType == GUIAttribute.TYPE_USER || templateType == GUIAttribute.TYPE_FOLDER) {
-							extAttr.setIntValue(attr.getIntValue());
-							extAttr.setStringValue(attr.getStringValue());
-							extAttr.setType(templateType);
-						}
-					} else {
-						if (templateType == Attribute.TYPE_INT) {
-							if (attr.getValue() != null)
-								extAttr.setIntValue((Long) attr.getValue());
-							else
-								extAttr.setIntValue(null);
-						} else if (templateType == Attribute.TYPE_BOOLEAN) {
-							if (attr.getBooleanValue() != null)
-								extAttr.setValue(attr.getBooleanValue());
-							else
-								extAttr.setBooleanValue(null);
-						} else if (templateType == Attribute.TYPE_DOUBLE) {
-							if (attr.getValue() != null)
-								extAttr.setDoubleValue((Double) attr.getValue());
-							else
-								extAttr.setDoubleValue(null);
-						} else if (templateType == Attribute.TYPE_DATE) {
-							if (attr.getValue() != null)
-								extAttr.setDateValue((Date) attr.getValue());
-							else
-								extAttr.setDateValue(null);
-						} else if (templateType == Attribute.TYPE_STRING) {
-							if (attr.getValue() != null)
-								extAttr.setStringValue((String) attr.getValue());
-							else
-								extAttr.setStringValue(null);
-						} else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER) {
-							if (attr.getValue() != null) {
-								extAttr.setIntValue(attr.getIntValue());
-								extAttr.setStringValue(attr.getStringValue());
-							} else {
-								extAttr.setIntValue(null);
-								extAttr.setStringValue(null);
-							}
-							extAttr.setType(templateType);
-						}
-					}
-
-					extAttr.setParent(attr.getParent());
-					extAttr.setDependsOn(attr.getDependsOn());
-					extAttr.setStringValues(attr.getStringValues());
-					extAttr.setLabel(templateAttribute.getLabel());
-					extAttr.setType(templateType);
-					extAttr.setPosition(attr.getPosition());
-					extAttr.setMandatory(templateAttribute.getMandatory());
-					extAttr.setHidden(templateAttribute.getHidden());
-					extAttr.setStringValues(attr.getStringValues());
-					if (attr.getParent() == null)
-						extAttr.setMultiple(templateAttribute.getMultiple());
-					extAttr.setSetId(templateAttribute.getSetId());
-
-					docVO.getAttributes().put(attr.getName(), extAttr);
-				}
+				toAttributes(guiDocument, docVO, template);
 			}
 		}
 
@@ -1377,6 +1285,136 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (guiDocument.getFolder() != null)
 			docVO.setFolder(fdao.findById(guiDocument.getFolder().getId()));
 		return docVO;
+	}
+
+	private static void toAttributes(GUIDocument guiDocument, Document docVO, Template template) {
+		for (GUIAttribute attr : guiDocument.getAttributes()) {
+			Attribute templateAttribute = template.getAttributes()
+					.get(attr.getParent() != null ? attr.getParent() : attr.getName());
+			// This control is necessary because, changing
+			// the template, the values of the old template
+			// attributes keys remains on the form value
+			// manager,
+			// so the GUIDocument contains also the old
+			// template attributes keys that must be
+			// skipped.
+			if (templateAttribute == null)
+				continue;
+
+			Attribute extAttr = new Attribute();
+			int templateType = templateAttribute.getType();
+			int extAttrType = attr.getType();
+
+			if (templateType != extAttrType) {
+				updateAttributeValue1(attr, extAttr, templateType);
+			} else {
+				updateAttributeValue2(attr, extAttr, templateType);
+			}
+
+			extAttr.setParent(attr.getParent());
+			extAttr.setDependsOn(attr.getDependsOn());
+			extAttr.setStringValues(attr.getStringValues());
+			extAttr.setLabel(templateAttribute.getLabel());
+			extAttr.setType(templateType);
+			extAttr.setPosition(attr.getPosition());
+			extAttr.setMandatory(templateAttribute.getMandatory());
+			extAttr.setHidden(templateAttribute.getHidden());
+			extAttr.setStringValues(attr.getStringValues());
+			if (attr.getParent() == null)
+				extAttr.setMultiple(templateAttribute.getMultiple());
+			extAttr.setSetId(templateAttribute.getSetId());
+
+			docVO.getAttributes().put(attr.getName(), extAttr);
+		}
+	}
+
+	private static void updateAttributeValue2(GUIAttribute attr, Attribute extAttr, int templateType) {
+		if (templateType == Attribute.TYPE_INT) {
+			setIntValue(attr, extAttr);
+		} else if (templateType == Attribute.TYPE_BOOLEAN) {
+			setBooleanValue(attr, extAttr);
+		} else if (templateType == Attribute.TYPE_DOUBLE) {
+			setDoubleValue(attr, extAttr);
+		} else if (templateType == Attribute.TYPE_DATE) {
+			setDateValue(attr, extAttr);
+		} else if (templateType == Attribute.TYPE_STRING) {
+			setStringValue(attr, extAttr);
+		} else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER) {
+			setUserValue(attr, extAttr, templateType);
+		}
+	}
+
+	private static void setUserValue(GUIAttribute attr, Attribute extAttr, int templateType) {
+		if (attr.getValue() != null) {
+			extAttr.setIntValue(attr.getIntValue());
+			extAttr.setStringValue(attr.getStringValue());
+		} else {
+			extAttr.setIntValue(null);
+			extAttr.setStringValue(null);
+		}
+		extAttr.setType(templateType);
+	}
+
+	private static void setStringValue(GUIAttribute attr, Attribute extAttr) {
+		if (attr.getValue() != null)
+			extAttr.setStringValue((String) attr.getValue());
+		else
+			extAttr.setStringValue(null);
+	}
+
+	private static void setDateValue(GUIAttribute attr, Attribute extAttr) {
+		if (attr.getValue() != null)
+			extAttr.setDateValue((Date) attr.getValue());
+		else
+			extAttr.setDateValue(null);
+	}
+
+	private static void setDoubleValue(GUIAttribute attr, Attribute extAttr) {
+		if (attr.getValue() != null)
+			extAttr.setDoubleValue((Double) attr.getValue());
+		else
+			extAttr.setDoubleValue(null);
+	}
+
+	private static void setBooleanValue(GUIAttribute attr, Attribute extAttr) {
+		if (attr.getBooleanValue() != null)
+			extAttr.setValue(attr.getBooleanValue());
+		else
+			extAttr.setBooleanValue(null);
+	}
+
+	private static void setIntValue(GUIAttribute attr, Attribute extAttr) {
+		if (attr.getValue() != null)
+			extAttr.setIntValue((Long) attr.getValue());
+		else
+			extAttr.setIntValue(null);
+	}
+
+	private static void updateAttributeValue1(GUIAttribute attr, Attribute extAttr, int templateType) {
+		// This check is useful to avoid errors
+		// related to the old template
+		// attributes keys that remains on the form
+		// value manager
+		if (attr.getValue() != null && attr.getValue().toString().trim().isEmpty() && templateType != 0) {
+			if (templateType == Attribute.TYPE_INT || templateType == Attribute.TYPE_BOOLEAN) {
+				extAttr.setIntValue(null);
+			} else if (templateType == Attribute.TYPE_DOUBLE) {
+				extAttr.setDoubleValue(null);
+			} else if (templateType == Attribute.TYPE_DATE) {
+				extAttr.setDateValue(null);
+			}
+		} else if (templateType == GUIAttribute.TYPE_DOUBLE) {
+			extAttr.setValue(Double.parseDouble(attr.getValue().toString()));
+		} else if (templateType == GUIAttribute.TYPE_INT) {
+			extAttr.setValue(Long.parseLong(attr.getValue().toString()));
+		} else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
+			extAttr.setValue(attr.getBooleanValue());
+			extAttr.setType(Attribute.TYPE_BOOLEAN);
+		} else if (templateType == GUIAttribute.TYPE_USER || templateType == GUIAttribute.TYPE_FOLDER) {
+			extAttr.setIntValue(attr.getIntValue());
+			extAttr.setStringValue(attr.getStringValue());
+			extAttr.setType(templateType);
+		}
 	}
 
 	@Override
@@ -1922,66 +1960,73 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		 * Do the updates / inserts
 		 */
 		for (GUIDocumentNote guiNote : notesList) {
-			DocumentNote note = null;
-			try {
-				note = dao.findById(guiNote.getId());
-			} catch (PersistenceException e) {
-				// Unexisting note
-			}
-
-			if (note == null) {
-				note = new DocumentNote();
-				note.setTenantId(session.getTenantId());
-				note.setDocId(document.getId());
-				note.setUserId(session.getUserId());
-				note.setUsername(session.getUser().getFullName());
-				note.setDate(new Date());
-				note.setPage(guiNote.getPage());
-			}
-
-			note.setFileName(document.getFileName());
-			note.setFileVersion(document.getFileVersion());
-			note.setMessage(guiNote.getMessage());
-			note.setColor(guiNote.getColor());
-			note.setTop(guiNote.getTop());
-			note.setLeft(guiNote.getLeft());
-			note.setWidth(guiNote.getWidth());
-			note.setHeight(guiNote.getHeight());
-			note.setType(guiNote.getType());
-			note.setRecipient(guiNote.getRecipient());
-			note.setRecipientEmail(guiNote.getRecipientEmail());
-			note.setShape(guiNote.getShape());
-			note.setLineColor(guiNote.getLineColor());
-			note.setLineOpacity(guiNote.getLineOpacity());
-			note.setLineWidth(guiNote.getLineWidth());
-			note.setRotation(guiNote.getRotation());
-
-			saveNote(note, session);
-
-			/*
-			 * If the note specifies a recipient, update the user's address book
-			 */
-			if (StringUtils.isNotEmpty(note.getRecipientEmail())) {
-				ContactDAO cDao = (ContactDAO) Context.get().getBean(ContactDAO.class);
-				List<Contact> contacts = cDao.findByUser(session.getUserId(), note.getRecipientEmail());
-				if (contacts.isEmpty()) {
-					String firstName = note.getRecipient();
-					String lastName = null;
-					if (firstName.contains(" ")) {
-						firstName = firstName.substring(0, note.getRecipient().lastIndexOf(' ')).trim();
-						lastName = note.getRecipient().substring(note.getRecipient().lastIndexOf(' ')).trim();
-					}
-
-					Contact contact = new Contact();
-					contact.setUserId(session.getUserId());
-					contact.setFirstName(firstName);
-					contact.setLastName(lastName);
-					contact.setEmail(note.getRecipientEmail());
-					saveContact(contact);
-				}
-			}
+			saveNote(session, document, guiNote);
 		}
 
+	}
+
+	private void saveNote(Session session, Document document, GUIDocumentNote guiNote) throws ServerException {
+
+		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+
+		DocumentNote note = null;
+		try {
+			note = dao.findById(guiNote.getId());
+		} catch (PersistenceException e) {
+			// Unexisting note
+		}
+
+		if (note == null) {
+			note = new DocumentNote();
+			note.setTenantId(session.getTenantId());
+			note.setDocId(document.getId());
+			note.setUserId(session.getUserId());
+			note.setUsername(session.getUser().getFullName());
+			note.setDate(new Date());
+			note.setPage(guiNote.getPage());
+		}
+
+		note.setFileName(document.getFileName());
+		note.setFileVersion(document.getFileVersion());
+		note.setMessage(guiNote.getMessage());
+		note.setColor(guiNote.getColor());
+		note.setTop(guiNote.getTop());
+		note.setLeft(guiNote.getLeft());
+		note.setWidth(guiNote.getWidth());
+		note.setHeight(guiNote.getHeight());
+		note.setType(guiNote.getType());
+		note.setRecipient(guiNote.getRecipient());
+		note.setRecipientEmail(guiNote.getRecipientEmail());
+		note.setShape(guiNote.getShape());
+		note.setLineColor(guiNote.getLineColor());
+		note.setLineOpacity(guiNote.getLineOpacity());
+		note.setLineWidth(guiNote.getLineWidth());
+		note.setRotation(guiNote.getRotation());
+
+		saveNote(note, session);
+
+		/*
+		 * If the note specifies a recipient, update the user's address book
+		 */
+		if (StringUtils.isNotEmpty(note.getRecipientEmail())) {
+			ContactDAO cDao = (ContactDAO) Context.get().getBean(ContactDAO.class);
+			List<Contact> contacts = cDao.findByUser(session.getUserId(), note.getRecipientEmail());
+			if (contacts.isEmpty()) {
+				String firstName = note.getRecipient();
+				String lastName = null;
+				if (firstName.contains(" ")) {
+					firstName = firstName.substring(0, note.getRecipient().lastIndexOf(' ')).trim();
+					lastName = note.getRecipient().substring(note.getRecipient().lastIndexOf(' ')).trim();
+				}
+
+				Contact contact = new Contact();
+				contact.setUserId(session.getUserId());
+				contact.setFirstName(firstName);
+				contact.setLastName(lastName);
+				contact.setEmail(note.getRecipientEmail());
+				saveContact(contact);
+			}
+		}
 	}
 
 	private void saveNote(DocumentNote note, Session session) throws ServerException {
@@ -2038,66 +2083,79 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return updatedDocs.toArray(new GUIDocument[0]);
 	}
 
-	private GUIDocument bulkUpdateDocument(long docId, GUIDocument vo, boolean ignoreEmptyFields, Session session)
-			throws ServerException, PersistenceException {
-		GUIDocument buf = getById(docId);
+	private GUIDocument bulkUpdateDocument(long docId, GUIDocument guiDocument, boolean ignoreEmptyFields,
+			Session session) throws ServerException, PersistenceException {
+		GUIDocument document = getById(docId);
 
-		if (buf.getImmutable() == 1 || buf.getStatus() != AbstractDocument.DOC_UNLOCKED) {
+		if (document.getImmutable() == 1 || document.getStatus() != AbstractDocument.DOC_UNLOCKED) {
 			log.warn("Skip document {} because immutable or locked", docId);
 			return null;
 		}
 
 		try {
-			checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
+			checkPermission(Permission.WRITE, session.getUser(), document.getFolder().getId());
 		} catch (AccessDeniedException e) {
 			log.warn("Skip document {} because  user {} does not have write permission", docId, session.getUsername());
 			return null;
 		}
 
-		buf.setComment(vo.getComment() != null ? vo.getComment() : "");
+		document.setComment(guiDocument.getComment() != null ? guiDocument.getComment() : "");
 
-		if (vo.getPublished() > -1)
-			buf.setPublished(vo.getPublished());
-		if (vo.getStartPublishing() != null)
-			buf.setStartPublishing(vo.getStartPublishing());
-		if (vo.getStopPublishing() != null)
-			buf.setStopPublishing(vo.getStopPublishing());
-		if (StringUtils.isNotEmpty(vo.getLanguage()))
-			buf.setLanguage(vo.getLanguage());
-		if (vo.getTags() != null && vo.getTags().length > 0)
-			buf.setTags(vo.getTags());
+		if (guiDocument.getPublished() > -1)
+			document.setPublished(guiDocument.getPublished());
+		if (guiDocument.getStartPublishing() != null)
+			document.setStartPublishing(guiDocument.getStartPublishing());
+		if (guiDocument.getStopPublishing() != null)
+			document.setStopPublishing(guiDocument.getStopPublishing());
+		if (StringUtils.isNotEmpty(guiDocument.getLanguage()))
+			document.setLanguage(guiDocument.getLanguage());
+		if (guiDocument.getTags() != null && guiDocument.getTags().length > 0)
+			document.setTags(guiDocument.getTags());
 		else if (!ignoreEmptyFields)
-			buf.setTags(null);
-		if (vo.getTemplateId() != null)
-			buf.setTemplateId(vo.getTemplateId());
+			document.setTags(null);
+		if (guiDocument.getTemplateId() != null)
+			document.setTemplateId(guiDocument.getTemplateId());
 
-		if (vo.getOcrTemplateId() != null)
-			buf.setOcrTemplateId(vo.getOcrTemplateId());
-		else if (!ignoreEmptyFields)
-			buf.setOcrTemplateId(null);
+		setOcrTemplate(guiDocument, document, ignoreEmptyFields);
 
-		if (vo.getBarcodeTemplateId() != null)
-			buf.setBarcodeTemplateId(vo.getBarcodeTemplateId());
+		setBarcodeTemplate(guiDocument, ignoreEmptyFields, document);
+
+		setExtendedAttributes(guiDocument, ignoreEmptyFields, document);
+
+		return document;
+	}
+
+	private void setExtendedAttributes(GUIDocument guiDocument, boolean ignoreEmptyFields, GUIDocument document) {
+		if (guiDocument.getAttributes() == null || guiDocument.getAttributes().length < 1)
+			return;
+
+		if (ignoreEmptyFields) {
+			Map<String, GUIAttribute> attributes = new HashMap<>();
+			for (GUIAttribute att : document.getAttributes())
+				attributes.put(att.getName(), att);
+
+			for (GUIAttribute att : guiDocument.getAttributes()) {
+				if (att.getValue() != null && StringUtils.isNotEmpty(att.getValue().toString()))
+					attributes.put(att.getName(), att);
+			}
+			document.setAttributes(attributes.values().toArray(new GUIAttribute[0]));
+		} else {
+			document.setAttributes(guiDocument.getAttributes());
+		}
+	}
+
+	private void setBarcodeTemplate(GUIDocument guiDocument, boolean ignoreEmptyFields, GUIDocument buf) {
+		if (guiDocument.getBarcodeTemplateId() != null)
+			buf.setBarcodeTemplateId(guiDocument.getBarcodeTemplateId());
 		else if (!ignoreEmptyFields)
 			buf.setBarcodeTemplateId(null);
+	}
 
-		if (vo.getAttributes() != null && vo.getAttributes().length > 0) {
-			if (ignoreEmptyFields) {
-				Map<String, GUIAttribute> attributes = new HashMap<>();
-				for (GUIAttribute att : buf.getAttributes())
-					attributes.put(att.getName(), att);
-
-				for (GUIAttribute att : vo.getAttributes()) {
-					if (att.getValue() != null && StringUtils.isNotEmpty(att.getValue().toString()))
-						attributes.put(att.getName(), att);
-				}
-				buf.setAttributes(attributes.values().toArray(new GUIAttribute[0]));
-			} else {
-				buf.setAttributes(vo.getAttributes());
-			}
-		}
-
-		return buf;
+	private void setOcrTemplate(GUIDocument guiDocument, GUIDocument buf, boolean ignoreEmptyFields) {
+		if (guiDocument.getOcrTemplateId() != null)
+			buf.setOcrTemplateId(guiDocument.getOcrTemplateId());
+		else if (!ignoreEmptyFields)
+			buf.setOcrTemplateId(null);
 	}
 
 	protected static void checkPublished(User user, Document doc) throws PermissionException {
@@ -2432,7 +2490,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-				throw new PermissionException(session.getUsername(), "Document " + docId, Permission.WRITE);
+				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT || doc.getLockUserId() != session.getUserId())
 				throw new PermissionException("You have not checked out the file " + docId);
@@ -2567,7 +2625,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-				throw new PermissionException(session.getUsername(), "Document " + doc.getId(), Permission.WRITE);
+				throw new PermissionException(session.getUsername(), DOCUMENT_STR + doc.getId(), Permission.WRITE);
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 
@@ -2587,20 +2645,18 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public GUIEmail extractEmail(long docId, String fileVersion) throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
 
-		InputStream is = null;
-		try {
-			GUIDocument doc = getById(docId);
-			if (!doc.getFileName().toLowerCase().endsWith(".eml") && !doc.getFileName().toLowerCase().endsWith(".msg"))
-				throw new ServerException("Not an email file");
+		GUIDocument emailDocument = getById(docId);
+		if (!emailDocument.getFileName().toLowerCase().endsWith(".eml") && !emailDocument.getFileName().toLowerCase().endsWith(".msg"))
+			throw new ServerException("Not an email file");
 
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String resource = storer.getResourceName(docId, fileVersion, null);
-			is = storer.getStream(doc.getId(), resource);
+		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		String resource = storer.getResourceName(docId, fileVersion, null);
 
+		try (InputStream is = storer.getStream(emailDocument.getId(), resource)) {
 			EMail email = null;
 
 			try {
-				if (doc.getFileName().toLowerCase().endsWith(".eml"))
+				if (emailDocument.getFileName().toLowerCase().endsWith(".eml"))
 					email = MailUtil.messageToMail(is, true);
 				else
 					email = MailUtil.msgToMail(is, true);
@@ -2615,54 +2671,60 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					guiMail.setFrom(new GUIContact(email.getFrom().getName(), null, email.getFrom().getAddress()));
 
 				guiMail.setSent(email.getSentDate());
-				guiMail.setReceived(email.getReceivedDate() != null ? email.getReceivedDate() : doc.getCreation());
+				guiMail.setReceived(email.getReceivedDate() != null ? email.getReceivedDate() : emailDocument.getCreation());
 				guiMail.setSubject(email.getSubject());
 				guiMail.setMessage(
 						email.isHtml() ? HTMLSanitizer.sanitize(email.getMessageText()) : email.getMessageText());
 				guiMail.setSigned(email.isSigned());
 
-				Set<Recipient> recipients = email.getRecipients();
-				List<GUIContact> contacts = new ArrayList<>();
-				for (Recipient rec : recipients)
-					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-				guiMail.setTos(contacts.toArray(new GUIContact[0]));
+				setEmailRecipients(email, guiMail);
 
-				recipients = email.getRecipientsCC();
-				contacts = new ArrayList<>();
-				for (Recipient rec : recipients)
-					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-				guiMail.setCcs(contacts.toArray(new GUIContact[0]));
-
-				recipients = email.getRecipientsBCC();
-				contacts = new ArrayList<>();
-				for (Recipient rec : recipients)
-					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-				guiMail.setBccs(contacts.toArray(new GUIContact[0]));
-
-				recipients = email.getReplyTo();
-				contacts = new ArrayList<>();
-				for (Recipient rec : recipients)
-					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-				guiMail.setReplyTo(contacts.toArray(new GUIContact[0]));
-
-				List<GUIDocument> attachments = new ArrayList<>();
-				for (int i = 1; i <= email.getAttachmentsCount(); i++) {
-					EMailAttachment att = email.getAttachment(i);
-					GUIDocument d = new GUIDocument();
-					d.setFileName(att.getFileName());
-					d.setFileSize(att.getSize());
-					d.setIcon(IconSelector.selectIcon(att.getFileName()));
-					d.setFolder(doc.getFolder());
-					attachments.add(d);
-				}
-				guiMail.setAttachments(attachments.toArray(new GUIDocument[0]));
+				setEmailAttachments(emailDocument, email, guiMail);
 			}
 			return guiMail;
 		} catch (IOException e1) {
 			return (GUIEmail) throwServerException(session, log, e1);
-		} finally {
-			IOUtils.closeQuietly(is);
 		}
+	}
+
+	private void setEmailAttachments(GUIDocument emailDocument, EMail email, GUIEmail guiMail) {
+		List<GUIDocument> attachments = new ArrayList<>();
+		for (int i = 1; i <= email.getAttachmentsCount(); i++) {
+			EMailAttachment att = email.getAttachment(i);
+			GUIDocument d = new GUIDocument();
+			d.setFileName(att.getFileName());
+			d.setFileSize(att.getSize());
+			d.setIcon(IconSelector.selectIcon(att.getFileName()));
+			d.setFolder(emailDocument.getFolder());
+			attachments.add(d);
+		}
+		guiMail.setAttachments(attachments.toArray(new GUIDocument[0]));
+	}
+
+	private void setEmailRecipients(EMail email, GUIEmail guiMail) {
+		Set<Recipient> recipients = email.getRecipients();
+		List<GUIContact> contacts = new ArrayList<>();
+		for (Recipient rec : recipients)
+			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+		guiMail.setTos(contacts.toArray(new GUIContact[0]));
+
+		recipients = email.getRecipientsCC();
+		contacts = new ArrayList<>();
+		for (Recipient rec : recipients)
+			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+		guiMail.setCcs(contacts.toArray(new GUIContact[0]));
+
+		recipients = email.getRecipientsBCC();
+		contacts = new ArrayList<>();
+		for (Recipient rec : recipients)
+			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+		guiMail.setBccs(contacts.toArray(new GUIContact[0]));
+
+		recipients = email.getReplyTo();
+		contacts = new ArrayList<>();
+		for (Recipient rec : recipients)
+			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+		guiMail.setReplyTo(contacts.toArray(new GUIContact[0]));
 	}
 
 	@Override
@@ -2785,7 +2847,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					}, null);
 			log.info("Found {} duplicated files to deduplicate", duplications.size());
 
-			List<Document> currentDuplications = new ArrayList<Document>();
+			List<Document> currentDuplications = new ArrayList<>();
 			String currentDigest = null;
 			for (Document doc : duplications) {
 				if (currentDigest != null && !currentDigest.equals(doc.getDigest()))

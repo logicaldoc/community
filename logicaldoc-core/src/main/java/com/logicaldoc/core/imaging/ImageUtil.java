@@ -64,8 +64,8 @@ public class ImageUtil {
 		bis.close();
 
 		// write the image to a file
-		ImageIO.write(image,
-				file.getName().contains(".") ? FileUtil.getExtension(file.getName()).toLowerCase() : "jpg", file);
+		ImageIO.write(image, file.getName().contains(".") ? FileUtil.getExtension(file.getName()).toLowerCase() : "jpg",
+				file);
 	}
 
 	/**
@@ -116,10 +116,10 @@ public class ImageUtil {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 
-		int x = (int) (zone.getLeft() * (double) width);
-		int y = (int) (zone.getTop() * (double) height);
-		int w = (int) (zone.getWidth() * (double) width);
-		int h = (int) (zone.getHeight() * (double) height);
+		int x = (int) (zone.getLeft() * width);
+		int y = (int) (zone.getTop() * height);
+		int w = (int) (zone.getWidth() * width);
+		int h = (int) (zone.getHeight() * height);
 
 		BufferedImage subImgage = originalImage.getSubimage(x, y, w, h);
 		return subImgage;
@@ -137,8 +137,8 @@ public class ImageUtil {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 
-		int x = width < squareSize ? 0 : (int) ((double) (width / 2D)) - (int) ((double) (squareSize / 2D));
-		int y = height < squareSize ? 0 : (int) ((double) (height / 2D)) - (int) ((double) (squareSize / 2D));
+		int x = width < squareSize ? 0 : (int) ((width / 2D)) - (int) ((squareSize / 2D));
+		int y = height < squareSize ? 0 : (int) ((height / 2D)) - (int) ((squareSize / 2D));
 		int w = width < squareSize ? width : squareSize;
 		int h = height < squareSize ? height : squareSize;
 

@@ -16,7 +16,7 @@ public class PasswordWeakException extends AuthenticationException {
 	/**
 	 * The reasons to explain the weakness
 	 */
-	private List<String> messages = new ArrayList<String>();
+	private List<String> messages = new ArrayList<>();
 
 	public PasswordWeakException(List<String> messages) {
 		super("passwordweak");

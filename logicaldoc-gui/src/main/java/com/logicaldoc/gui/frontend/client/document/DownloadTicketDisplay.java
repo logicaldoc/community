@@ -34,11 +34,11 @@ public class DownloadTicketDisplay extends Window {
 		form.setMargin(4);
 		form.setTitleOrientation(TitleOrientation.LEFT);
 
-		StaticTextItem ticketIdItem = ItemFactory.newStaticTextItem("ticketid", I18N.message("ticketid"), ticketId);
+		StaticTextItem ticketIdItem = ItemFactory.newStaticTextItem("ticketid", ticketId);
 		ticketIdItem.setWrap(false);
 		ticketIdItem.setWrapTitle(false);
 
-		StaticTextItem sampleUrl1Item = ItemFactory.newStaticTextItem("sampleurl1", I18N.message("sampleurl"),
+		StaticTextItem sampleUrl1Item = ItemFactory.newStaticTextItem("sampleurl1", 
 				"<a href='" + sampleUrl1 + "' target='_blank'>" + sampleUrl1 + "</a>");
 		sampleUrl1Item.setWrap(false);
 		sampleUrl1Item.setWrapTitle(false);
@@ -48,7 +48,7 @@ public class DownloadTicketDisplay extends Window {
 		sampleUrl2Item.setWrap(false);
 		sampleUrl2Item.setWrapTitle(false);
 
-		StaticTextItem advice = ItemFactory.newStaticTextItem("advice", "advice",
+		StaticTextItem advice = ItemFactory.newStaticTextItem("advice", 
 				I18N.message("downloadticketdisplay", ticketId));
 		advice.setColSpan(2);
 		advice.setShowTitle(false);

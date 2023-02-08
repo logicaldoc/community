@@ -63,9 +63,9 @@ public class JobManager {
 	 */
 	public void schedule(AbstractJob job, Map<String, Object> dictionary, Object... triggers)
 			throws SchedulerException {
-		Map<Object, Map<String, Object>> trgs = new HashMap<Object, Map<String, Object>>();
+		Map<Object, Map<String, Object>> trgs = new HashMap<>();
 		for (Object trigger : triggers) {
-			trgs.put(trigger, new HashMap<String, Object>());
+			trgs.put(trigger, new HashMap<>());
 		}
 		schedule(job, dictionary, trgs);
 	}
@@ -97,7 +97,7 @@ public class JobManager {
 				.withDescription(job.getDescription() != null ? job.getDescription() : "")
 				.usingJobData(new JobDataMap(dictionary)).build();
 
-		Set<Trigger> trgs = new HashSet<Trigger>();
+		Set<Trigger> trgs = new HashSet<>();
 		for (Object triggerSpec : triggers.keySet()) {
 			Trigger trig = prepareTrigger(job, triggerSpec, triggers);
 			trgs.add(trig);
@@ -190,7 +190,7 @@ public class JobManager {
 		Set<JobKey> jobKeys = scheduler.getJobKeys(
 				StringUtils.isNotEmpty(group) ? GroupMatcher.groupEquals(group) : GroupMatcher.anyJobGroup());
 
-		List<JobDetail> jobs = new ArrayList<JobDetail>();
+		List<JobDetail> jobs = new ArrayList<>();
 		for (JobKey key : jobKeys) {
 			JobDetail job = getJob(key.getName(), key.getGroup());
 			if (tenantId == null || (tenantId != null && tenantId.equals(job.getJobDataMap().get(TENANT_ID))))
@@ -251,7 +251,7 @@ public class JobManager {
 				.getTriggerKeys(StringUtils.isNotEmpty(group) ? GroupMatcher.triggerGroupEquals(group)
 						: GroupMatcher.anyTriggerGroup());
 
-		List<Trigger> triggers = new ArrayList<Trigger>();
+		List<Trigger> triggers = new ArrayList<>();
 		for (TriggerKey key : triggerKeys) {
 			Trigger trigger = getTrigger(key.getName(), key.getGroup());
 			if (tenantId == null || (tenantId != null && tenantId.equals(trigger.getJobDataMap().get(TENANT_ID))))

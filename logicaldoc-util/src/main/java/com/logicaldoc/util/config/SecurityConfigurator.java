@@ -13,6 +13,8 @@ import org.jdom2.Element;
  */
 public class SecurityConfigurator {
 
+	private static final String VALUE = "value";
+
 	protected XMLBean xml;
 
 	public SecurityConfigurator(String resource) {
@@ -29,7 +31,7 @@ public class SecurityConfigurator {
 	public String getContentSecurityPolicy() {
 		Element header = getContentSecurityPolicyElement();
 		if (header != null)
-			return header.getAttributeValue("value");
+			return header.getAttributeValue(VALUE);
 		else
 			return null;
 	}
@@ -38,9 +40,9 @@ public class SecurityConfigurator {
 		Element header = getContentSecurityPolicyElement();
 		boolean modified = false;
 		if (header != null) {
-			String currentValue = header.getAttributeValue("value");
+			String currentValue = header.getAttributeValue(VALUE);
 			if (currentValue != null && !currentValue.equals(contentSecurityPolicy)) {
-				header.setAttribute("value", contentSecurityPolicy);
+				header.setAttribute(VALUE, contentSecurityPolicy);
 				modified = true;
 			}
 		}
@@ -50,7 +52,7 @@ public class SecurityConfigurator {
 	}
 
 	private Element getContentSecurityPolicyElement() {
-		Map<String, String> namespaces=new HashMap<String, String>();
+		Map<String, String> namespaces = new HashMap<>();
 		namespaces.put("security", "http://www.springframework.org/schema/security");
 		return xml.findElement("//security:header[@name='Content-Security-Policy']", namespaces);
 	}

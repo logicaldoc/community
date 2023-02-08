@@ -80,7 +80,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				if (types == null || types.isEmpty())
 					return findByWhere(ENTITY + ".docId = " + docId, null, null);
 				else {
-					Map<String, Object> params = new HashMap<String, Object>();
+					Map<String, Object> params = new HashMap<>();
 					params.put(DOC_ID, docId);
 					params.put("types", types);
 
@@ -88,13 +88,13 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 							params, null, null);
 				}
 			else if (types == null || types.isEmpty()) {
-				Map<String, Object> params = new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<>();
 				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
 				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion",
 						params, null, null);
 			} else {
-				Map<String, Object> params = new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<>();
 				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
 				params.put("types", types);
@@ -103,7 +103,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentNote>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -113,7 +113,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<DocumentNote>();
+			return new ArrayList<>();
 		}
 	}
 

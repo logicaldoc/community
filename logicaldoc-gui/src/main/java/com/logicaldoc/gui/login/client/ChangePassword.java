@@ -24,8 +24,6 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
@@ -86,13 +84,9 @@ public class ChangePassword extends Window {
 
 		generator.setSrc("[SKIN]/key.png");
 		generator.setPrompt(I18N.message("passwordgenerator"));
-		generator.addFormItemClickHandler(new FormItemClickHandler() {
-
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				PasswordGenerator generator = new PasswordGenerator(user.getUsername());
-				generator.show();
-			}
+		generator.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			PasswordGenerator pswGenerator = new PasswordGenerator(user.getUsername());
+			pswGenerator.show();
 		});
 		newPass.setIcons(generator);
 		newPass.setIconVAlign(VerticalAlignment.CENTER);
@@ -102,58 +96,7 @@ public class ChangePassword extends Window {
 		newPassAgain.setWrapTitle(false);
 		newPassAgain.setRequired(true);
 
-		ButtonItem apply = new ButtonItem();
-		apply.setTitle(I18N.message("apply"));
-		apply.setAutoFit(true);
-		apply.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (!vm.hasErrors()) {
-					if (vm.getValueAsString(PASSWORD).equals(vm.getValueAsString(NEWPASSWORD))) {
-						Map<String, String> errors = new HashMap<String, String>();
-						errors.put(NEWPASSWORD, I18N.message("useanotherpassword"));
-						vm.setErrors(errors, true);
-						return;
-					}
-
-					loginService.changePassword(user.getId(), vm.getValueAsString(PASSWORD),
-							vm.getValueAsString(NEWPASSWORD), new AsyncCallback<GUIValue>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									SC.warn(caught.getMessage());
-								}
-
-								@Override
-								public void onSuccess(GUIValue val) {
-									int ret = Integer.parseInt(val.getCode());
-									if (ret > 0) {
-										// Alert the user
-										if (ret == 1)
-											GuiLog.warn(I18N.message("wrongpassword"), null);
-										else if (ret == 2)
-											GuiLog.warn(I18N.message("passwdnotnotified"), null);
-										else if (ret == 3) {
-											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
-											newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
-										} else if (ret == 4) {
-											GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
-											newPass.setErrors(val.getValue());
-										} else
-											GuiLog.warn(I18N.message("genericerror"), null);
-									} else {
-										// Close the popup
-										ChangePassword.this.destroy();
-										SC.say(I18N.message("yourpasswordhaschanged"));
-										GuiLog.info(I18N.message("event.user.passwordchanged"), null);
-										if (loginPanel != null)
-											loginPanel.onPasswordChanged();
-									}
-								}
-							});
-				}
-			}
-		});
+		ButtonItem apply = prepareApplyButton(user, loginPanel, newPass, vm);
 
 		form.setFields(password, newPass, newPassAgain, apply);
 
@@ -169,5 +112,64 @@ public class ChangePassword extends Window {
 		addItem(label);
 
 		addItem(form);
+	}
+
+	private ButtonItem prepareApplyButton(final GUIUser user, LoginPanel loginPanel, PasswordItem newPass,
+			ValuesManager vm) {
+		ButtonItem apply = new ButtonItem();
+		apply.setTitle(I18N.message("apply"));
+		apply.setAutoFit(true);
+		apply.addClickHandler((ClickEvent event) -> {
+			if (Boolean.FALSE.equals(vm.validate()))
+				return;
+
+			if (vm.getValueAsString(PASSWORD).equals(vm.getValueAsString(NEWPASSWORD))) {
+				Map<String, String> errors = new HashMap<>();
+				errors.put(NEWPASSWORD, I18N.message("useanotherpassword"));
+				vm.setErrors(errors, true);
+				return;
+			}
+
+			doChangePassword(loginPanel, user.getId(), newPass, vm);
+		});
+		return apply;
+	}
+
+	private void doChangePassword(LoginPanel loginPanel, long userId, PasswordItem newPass, ValuesManager vm) {
+		loginService.changePassword(userId, vm.getValueAsString(PASSWORD), vm.getValueAsString(NEWPASSWORD),
+				new AsyncCallback<GUIValue>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						SC.warn(caught.getMessage());
+					}
+
+					@Override
+					public void onSuccess(GUIValue val) {
+						int ret = Integer.parseInt(val.getCode());
+						if (ret > 0) {
+							// Alert the user
+							if (ret == 1)
+								GuiLog.warn(I18N.message("wrongpassword"), null);
+							else if (ret == 2)
+								GuiLog.warn(I18N.message("passwdnotnotified"), null);
+							else if (ret == 3) {
+								GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
+								newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
+							} else if (ret == 4) {
+								GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
+								newPass.setErrors(val.getValue());
+							} else
+								GuiLog.warn(I18N.message("genericerror"), null);
+						} else {
+							// Close the popup
+							ChangePassword.this.destroy();
+							SC.say(I18N.message("yourpasswordhaschanged"));
+							GuiLog.info(I18N.message("event.user.passwordchanged"), null);
+							if (loginPanel != null)
+								loginPanel.onPasswordChanged();
+						}
+					}
+				});
 	}
 }

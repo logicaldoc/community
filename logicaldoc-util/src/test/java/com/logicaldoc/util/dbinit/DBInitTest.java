@@ -19,7 +19,7 @@ public class DBInitTest extends TestCase {
 	private DBInit dbinit;
 
 	public void setUp() throws Exception {
-		List<String> sqlList = new ArrayList<String>();
+		List<String> sqlList = new ArrayList<>();
 		sqlList.add("sql1.sql");
 		sqlList.add("sql2.sql");
 		dbinit = new DBInit(sqlList);

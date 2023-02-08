@@ -24,6 +24,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 7.6.1
  */
 public class TextContentCreate extends Window {
+	private static final String TEMPLATE = "template";
+
 	private SubmitItem create;
 
 	private ValuesManager vm;
@@ -43,7 +45,7 @@ public class TextContentCreate extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem filename = ItemFactory.newTextItem("filename", "filename", null);
+		TextItem filename = ItemFactory.newTextItem("filename", null);
 		filename.setRequired(true);
 		filename.setWidth(200);
 
@@ -64,7 +66,7 @@ public class TextContentCreate extends Window {
 	}
 
 	public void onCreate() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		String filename = vm.getValueAsString("filename").trim();
@@ -76,10 +78,10 @@ public class TextContentCreate extends Window {
 		}
 
 		GUIDocument vo = new GUIDocument();
-		if (vm.getValueAsString("template") == null || "".equals(vm.getValueAsString("template").toString()))
+		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE).toString()))
 			vo.setTemplateId(null);
 		else {
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString("template").toString()));
+			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE).toString()));
 		}
 
 		String ext = filename.substring(filename.indexOf('.') + 1);

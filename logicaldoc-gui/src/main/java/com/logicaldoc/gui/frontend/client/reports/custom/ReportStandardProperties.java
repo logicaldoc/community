@@ -66,28 +66,28 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		if (tile != null)
 			tile.destroy();
 
-		if (columns.contains(form))
+		if (Boolean.TRUE.equals(columns.contains(form)))
 			columns.removeChild(form);
 
-		if (columns.contains(tile))
+		if (Boolean.TRUE.equals(columns.contains(tile)))
 			columns.removeChild(tile);
 
 		form = new DynamicForm();
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(report.getId()));
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(report.getId()));
 
-		StaticTextItem name = ItemFactory.newStaticTextItem("name", "name", report.getName());
+		StaticTextItem name = ItemFactory.newStaticTextItem("name", report.getName());
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", report.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem("description", report.getDescription());
 		description.setWidth(250);
 		description.addChangedHandler(changedHandler);
 
 		SelectItem format = ItemFactory.newSelectItem("outputFormat", "format");
 		format.addChangedHandler(changedHandler);
 		format.setRequired(true);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("pdf", "pdf");
 		map.put("xlsx", "xlsx");
 		map.put("html", "html");
@@ -96,7 +96,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 
 		SelectItem updatePolicy = ItemFactory.newSelectItem("updatePolicy", "onupdate");
 		updatePolicy.addChangedHandler(changedHandler);
-		LinkedHashMap<String, String> map2 = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map2 = new LinkedHashMap<>();
 		map2.put("0", I18N.message("createnewversion"));
 		map2.put("1", I18N.message("createnewdoc"));
 		updatePolicy.setValueMap(map2);
@@ -106,7 +106,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		if (report.getOutputDocId() != null)
 			downloadUrl = Util.downloadURL(report.getOutputDocId());
 		String perma = "<a href='" + downloadUrl + "'>" + I18N.message("download") + "</a>";
-		StaticTextItem outputLink = ItemFactory.newStaticTextItem("output", "output", perma);
+		StaticTextItem outputLink = ItemFactory.newStaticTextItem("output", perma);
 
 		if (report.getOutputDocId() != null)
 			form.setItems(id, outputLink, name, outputFolderSelector, format, updatePolicy, description);
@@ -128,7 +128,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			report.setName((String) values.get("name"));
 			report.setDescription((String) values.get("description"));
 			report.setOutputFormat((String) values.get("outputFormat"));

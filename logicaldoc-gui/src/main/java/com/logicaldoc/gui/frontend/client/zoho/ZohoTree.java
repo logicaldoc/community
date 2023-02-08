@@ -53,10 +53,10 @@ public class ZohoTree extends TreeGrid {
 	}
 
 	@Override
-	protected String getIcon(Record record, boolean defaultState) {
-		if (!"folder".equals(record.getAttributeAsString("iicon"))) {
-			setCustomNodeIcon(record, Util.imageUrl(record.getAttribute("iicon") + ".png"));
+	protected String getIcon(Record rec, boolean defaultState) {
+		if (!"folder".equals(rec.getAttributeAsString("iicon"))) {
+			setCustomNodeIcon(rec, Util.imageUrl(rec.getAttribute("iicon") + ".png"));
 		}
-		return super.getIcon(record, defaultState);
+		return super.getIcon(rec, defaultState);
 	}
 }

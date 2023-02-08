@@ -9,10 +9,8 @@ import com.orange.links.client.connection.Connection;
 import com.orange.links.client.shapes.FunctionShape;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -55,68 +53,63 @@ public class StateWidget extends Label {
 		setAutoFit(true);
 		setAutoHeight();
 
-		addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				if (readonly)
-					return;
+		addDoubleClickHandler((DoubleClickEvent event) -> {
+			if (readonly)
+				return;
 
-				Menu contextMenu = new Menu();
+			onDoubleClick();
 
-				MenuItem edit = new MenuItem();
-				edit.setTitle(I18N.message("edit"));
-				edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						edit();
-					}
-				});
+			event.cancel();
+		});
+	}
 
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), new BooleanCallback() {
-							@Override
-							public void execute(Boolean value) {
-								if (value)
-									delete();
-							}
-						});
-					}
-				});
+	private void onDoubleClick() {
+		Menu contextMenu = new Menu();
 
-				MenuItem makeStart = new MenuItem();
-				makeStart.setTitle(I18N.message("startstate"));
-				makeStart.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						makeStartState();
-					}
-				});
+		MenuItem edit = new MenuItem();
+		edit.setTitle(I18N.message("edit"));
+		edit.addClickHandler((MenuItemClickEvent click) -> {
+			edit();
+		});
 
-				MenuItem straight = new MenuItem();
-				straight.setTitle(I18N.message("straight"));
-				straight.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						restoreStraight();
-					}
-				});
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler((MenuItemClickEvent click) -> {
+			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean yes) -> {
+				if (Boolean.TRUE.equals(yes))
+					delete();
+			});
+		});
 
-				if (isTask())
-					contextMenu.setItems(edit, makeStart, delete);
-				else if (isConnection()) {
-					StateWidget start = (StateWidget) ((FunctionShape) connection.getStartShape()).getWidget();
-					if (start.isFork())
-						// No edit in case the transition starts from a fork
-						// node
-						contextMenu.setItems(straight, delete);
-					else
-						contextMenu.setItems(edit, straight, delete);
-				} else
-					contextMenu.setItems(edit, delete);
-				contextMenu.showContextMenu();
-				event.cancel();
+		MenuItem makeStart = new MenuItem();
+		makeStart.setTitle(I18N.message("startstate"));
+		makeStart.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent click) {
+				makeStartState();
 			}
 		});
+
+		MenuItem straight = new MenuItem();
+		straight.setTitle(I18N.message("straight"));
+		straight.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent click) {
+				restoreStraight();
+			}
+		});
+
+		if (isTask())
+			contextMenu.setItems(edit, makeStart, delete);
+		else if (isConnection()) {
+			StateWidget start = (StateWidget) ((FunctionShape) connection.getStartShape()).getWidget();
+			if (start.isFork())
+				// No edit in case the transition starts from a fork
+				// node
+				contextMenu.setItems(straight, delete);
+			else
+				contextMenu.setItems(edit, straight, delete);
+		} else
+			contextMenu.setItems(edit, delete);
+		contextMenu.showContextMenu();
 	}
 
 	/**

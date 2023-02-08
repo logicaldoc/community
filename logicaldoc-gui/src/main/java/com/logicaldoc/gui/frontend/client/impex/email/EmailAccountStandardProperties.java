@@ -6,7 +6,6 @@ import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -25,6 +24,10 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
+	private static final String NODISPLAY = "nodisplay";
+
+	private static final String USERNAME = "username";
+
 	private DynamicForm form = new DynamicForm();
 
 	private HLayout formsContainer = new HLayout();
@@ -43,12 +46,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
 		if (account.getTarget() != null)
 			targetSelector.setFolder(account.getTarget());
-		targetSelector.addFolderChangeListener(new FolderChangeListener() {
-			@Override
-			public void onChanged(GUIFolder folder) {
-				changedHandler.onChanged(null);
-			}
-		});
+		targetSelector.addFolderChangeListener((GUIFolder folder) -> changedHandler.onChanged(null));
 
 		refresh();
 	}
@@ -60,7 +58,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (formsContainer.contains(form))
+		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);
 
 		form = new DynamicForm();
@@ -72,7 +70,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		mailaddress.addChangedHandler(changedHandler);
 		mailaddress.setRequired(true);
 
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", account.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME, account.getUsername());
 		username.addChangedHandler(changedHandler);
 		username.setWidth(180);
 
@@ -81,7 +79,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		language.setRequired(true);
 		language.setValue(account.getLanguage());
 
-		TextItem server = ItemFactory.newTextItem("server", "server", account.getHost());
+		TextItem server = ItemFactory.newTextItem("server", account.getHost());
 		server.setRequired(true);
 		server.setWidth(180);
 		server.addChangedHandler(changedHandler);
@@ -94,12 +92,12 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		ssl.setValue(account.isSsl() ? "yes" : "no");
 		ssl.addChangedHandler(changedHandler);
 
-		SelectItem protocol = ItemFactory.newEmailProtocolSelector("protocol", "protocol");
+		SelectItem protocol = ItemFactory.newEmailProtocolSelector();
 		protocol.addChangedHandler(changedHandler);
 		protocol.setRequired(true);
 		protocol.setValue(account.getProvider());
 
-		SelectItem foldering = ItemFactory.newEmailFolderingSelector("foldering", "foldering");
+		SelectItem foldering = ItemFactory.newEmailFolderingSelector();
 		foldering.addChangedHandler(changedHandler);
 		foldering.setRequired(true);
 		foldering.setValue("" + account.getFoldering());
@@ -108,13 +106,12 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", account.getUsername());
-		fakeUsername.setCellStyle("nodisplay");
-		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", "prevent_autofill",
-				account.getUsername());
-		fakeUsernameAgain.setCellStyle("nodisplay");
-		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden", account.getPassword());
-		hiddenPassword.setCellStyle("nodisplay");
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", account.getUsername());
+		fakeUsername.setCellStyle(NODISPLAY);
+		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", account.getUsername());
+		fakeUsernameAgain.setCellStyle(NODISPLAY);
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", account.getPassword());
+		hiddenPassword.setCellStyle(NODISPLAY);
 		hiddenPassword.addChangedHandler(changedHandler);
 		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"), account.getPassword(),
 				hiddenPassword, changedHandler);
@@ -131,10 +128,10 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			account.setMailAddress((String) values.get("mailaddress"));
 			account.setHost((String) values.get("server"));
-			account.setUsername((String) values.get("username"));
+			account.setUsername((String) values.get(USERNAME));
 			account.setTarget(targetSelector.getFolder());
 			account.setLanguage((String) values.get("language"));
 			account.setProvider((String) values.get("protocol"));

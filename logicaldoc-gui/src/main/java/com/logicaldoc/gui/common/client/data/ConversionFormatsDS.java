@@ -12,10 +12,12 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 7.6.4
  */
 public class ConversionFormatsDS extends DataSource {
+	private static final String EXTENSION = "extension";
+
 	public ConversionFormatsDS(String fileName) {
-		setTitleField("extension");
+		setTitleField(EXTENSION);
 		setRecordXPath("/list/format");
-		DataSourceTextField extension = new DataSourceTextField("extension", I18N.message("extension"));
+		DataSourceTextField extension = new DataSourceTextField(EXTENSION, I18N.message(EXTENSION));
 		extension.setPrimaryKey(true);
 
 		setFields(extension);

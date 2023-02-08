@@ -60,7 +60,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testFindByNameAndLanguage() {
-		Map<String, Object> dictionary = new HashMap<String, Object>();
+		Map<String, Object> dictionary = new HashMap<>();
 		dictionary.put("username", "pippo");
 		dictionary.put("xxx", "label");
 

@@ -30,6 +30,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class DownloadTicketDialog extends Window {
 
+	private static final String DUEDATENUMBER = "duedatenumber";
+
 	private IButton save;
 
 	private DynamicForm form;
@@ -102,20 +104,19 @@ public class DownloadTicketDialog extends Window {
 		date.setColSpan(4);
 		date.setWrapTitle(false);
 
-		SpinnerItem maxDownloads = ItemFactory.newSpinnerItem("maxDownloads", I18N.message("maxdownloads"),
-				(Integer) null);
+		SpinnerItem maxDownloads = ItemFactory.newSpinnerItem("maxdownloads", (Integer) null);
 		maxDownloads.setEndRow(true);
 		maxDownloads.setColSpan(4);
 		maxDownloads.setWrapTitle(false);
 		maxDownloads.setRequired(false);
 		maxDownloads.setMin(0);
 
-		SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem("duedateNumber", I18N.message("expiresin"), 24);
+		SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem(DUEDATENUMBER, I18N.message("expiresin"), 24);
 		duedateTimeItem.setWrapTitle(false);
 		duedateTimeItem.setDefaultValue(24);
 		duedateTimeItem.setMin(0);
-		SelectItem duedateTime = ItemFactory.newDueTimeSelector("duedateTime", "");
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		SelectItem duedateTime = ItemFactory.newDueTimeSelector("duedatetime", "");
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("hour", I18N.message("hours"));
 		map.put("day", I18N.message("ddays"));
 		duedateTime.setValueMap(map);
@@ -132,16 +133,16 @@ public class DownloadTicketDialog extends Window {
 		Date date = (Date) form.getValue("date");
 
 		Integer expireHours = null;
-		if (form.getValue("duedateNumber") != null)
-			expireHours = Integer.parseInt(form.getValueAsString("duedateNumber"));
-		if ("day".equals(form.getValueAsString("duedateTime")))
+		if (form.getValue(DUEDATENUMBER) != null)
+			expireHours = Integer.parseInt(form.getValueAsString(DUEDATENUMBER));
+		if ("day".equals(form.getValueAsString("duedatetime")))
 			expireHours = expireHours * 24;
 
 		if (date == null && (expireHours == null || expireHours.intValue() < 1))
 			SC.warn(I18N.message("providexepinfo"));
 
 		Integer maxDownloads = null;
-		String val = form.getValueAsString("maxDownloads");
+		String val = form.getValueAsString("maxdownloads");
 		if (val != null && !val.trim().isEmpty() && !"0".equals(val.trim()))
 			maxDownloads = Integer.parseInt(val.trim());
 

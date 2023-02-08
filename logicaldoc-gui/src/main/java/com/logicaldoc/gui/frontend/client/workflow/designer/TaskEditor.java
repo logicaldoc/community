@@ -38,14 +38,11 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -63,6 +60,10 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 6.0
  */
 public class TaskEditor extends Window {
+
+	private static final String AVATAR = "avatar";
+
+	private static final String LABEL = "label";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -109,15 +110,11 @@ public class TaskEditor extends Window {
 
 		Button save = new Button(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (vm.validate()) {
+		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+				if (Boolean.TRUE.equals(vm.validate())) {
 					onSave();
 					destroy();
 				}
-			}
 		});
 		save.setMargin(3);
 
@@ -170,7 +167,7 @@ public class TaskEditor extends Window {
 
 					@Override
 					public void onSuccess(GUIMessageTemplate[] templates) {
-						LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+						LinkedHashMap<String, String> map = new LinkedHashMap<>();
 						map.put("", "");
 						for (GUIMessageTemplate t : templates)
 							map.put("" + t.getName(), t.getName());
@@ -267,31 +264,190 @@ public class TaskEditor extends Window {
 
 		boolean isHumanInteraction = isHumanInteraction();
 
-		RadioGroupItem humanInteraction = ItemFactory.newBooleanSelector("humanInteraction", "humaninteraction");
-		humanInteraction.setValue(isHumanInteraction ? "yes" : "no");
-		humanInteraction.setDefaultValue(isHumanInteraction ? "yes" : "no");
-
-		if (state.getType() == GUIWFState.TYPE_TASK) {
-			taskForm.setNumCols(3);
-			taskForm.setFields(taskName, taskColor, humanInteraction, taskDescr);
-		} else
-			taskForm.setFields(taskName, taskColor, taskDescr);
-
 		VLayout propertiesPanel = new VLayout();
 		propertiesPanel.setWidth100();
 		propertiesPanel.setHeight100();
 		propertiesPanel.addMember(taskForm);
 
 		// The vertical panel that contains the participants
-		final VLayout participantsPanel = new VLayout();
+		VLayout participantsPanel = new VLayout();
 		propertiesPanel.addMember(participantsPanel);
 
 		// Horizontal panel that contains the forms related to the participants
 		HLayout formsPanel = new HLayout();
 		formsPanel.setMembersMargin(5);
 		formsPanel.setHeight(70);
+
+		RadioGroupItem humanInteraction = ItemFactory.newBooleanSelector("humanInteraction", "humaninteraction");
+		humanInteraction.setDefaultValue(isHumanInteraction ? "yes" : "no");
+		humanInteraction.setValue(isHumanInteraction);
+		humanInteraction.addChangedHandler((ChangedEvent event) -> {
+			if ("yes".equals(event.getValue())) {
+				participantsPanel.show();
+			} else
+				participantsPanel.hide();
+		});
+
+		if (state.getType() == GUIWFState.TYPE_TASK) {
+			taskForm.setNumCols(3);
+			taskForm.setFields(taskName, taskColor, humanInteraction, taskDescr);
+		} else
+			taskForm.setFields(taskName, taskColor, taskDescr);
 		participantsPanel.addMembers(formsPanel);
 
+		addTaskItems(formsPanel);
+
+		HTMLPane spacer = new HTMLPane();
+		spacer.setHeight(2);
+		spacer.setMargin(2);
+		spacer.setOverflow(Overflow.HIDDEN);
+		participantsPanel.addMember(spacer);
+
+		VLayout addUsersAndGroupsPanel = new VLayout();
+		addUsersAndGroupsPanel.setMargin(3);
+
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL));
+		label.setWidth("*");
+		label.setCanFilter(false);
+
+		ListGridField name = new ListGridField("name", I18N.message("name"), 50);
+		name.setCanFilter(false);
+		name.setHidden(true);
+
+		UserListGridField avatar = new UserListGridField();
+		participantsGrid = new RefreshableListGrid();
+		participantsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		participantsGrid.setCanFreezeFields(true);
+		participantsGrid.setAutoFetchData(true);
+		participantsGrid.setSelectionType(SelectionStyle.MULTIPLE);
+		participantsGrid.setFilterOnKeypress(true);
+		participantsGrid.setShowFilterEditor(false);
+		participantsGrid.setShowHeader(false);
+		participantsGrid.setFields(name, avatar, label);
+		participantsGrid.addCellContextClickHandler((CellContextClickEvent click) -> {
+			Menu contextMenu = new Menu();
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.addClickHandler((MenuItemClickEvent itemClick) -> {
+				participantsGrid.removeSelectedData();
+			});
+
+			contextMenu.setItems(delete);
+			contextMenu.showContextMenu();
+			click.cancel();
+		});
+
+		SectionStackSection participantsSection = new SectionStackSection(I18N.message("participants"));
+		participantsSection.setCanCollapse(false);
+		participantsSection.setExpanded(true);
+		participantsSection.setItems(participantsGrid);
+		SectionStack participantsStack = new SectionStack();
+		participantsStack.setWidth100();
+		participantsStack.setHeight(220);
+		participantsStack.setSections(participantsSection);
+
+		addUsersAndGroupsPanel.addMember(participantsStack);
+		addUsersAndGroupsPanel.addMember(prepareAddParticipantsForm());
+		participantsPanel.addMember(addUsersAndGroupsPanel);
+
+		initParticipantsList();
+
+		if (isHumanInteraction)
+			participantsPanel.show();
+		else
+			participantsPanel.hide();
+
+		return propertiesPanel;
+	}
+
+	private DynamicForm prepareAddParticipantsForm() {
+		// Prepare the combo and button for adding a new user
+		DynamicForm participantsEditForm = new DynamicForm();
+		participantsEditForm.setTitleOrientation(TitleOrientation.LEFT);
+		participantsEditForm.setNumCols(6);
+		participantsEditForm.setWidth(1);
+
+		SelectItem addUser = prepareAddUserSelector();
+
+		SelectItem addGroup = prepareAddGroupSelector();
+
+		// Prepare dynamic user participant
+		final TextItem addAttribute = prepareAddAttributeItem();
+
+		participantsEditForm.setItems(addUser, addGroup, addAttribute);
+		return participantsEditForm;
+	}
+
+	private TextItem prepareAddAttributeItem() {
+		final TextItem addAttribute = ItemFactory.newTextItem("attribute", "addattribute", null);
+		addAttribute.setWidth(110);
+		FormItemIcon addIcon = ItemFactory.newItemIcon("add.png");
+		addIcon.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			String val = addAttribute.getValueAsString();
+			if (val != null)
+				val = val.trim();
+			if (val == null || "".equals(val))
+				return;
+
+			// Check if the digited attribute user is already present in the
+			// participants list
+			if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS, "att." + val)) != null)
+				return;
+			else
+				addParticipant("att." + val, val);
+			addAttribute.clearValue();
+		});
+		addAttribute.setIcons(addIcon);
+		return addAttribute;
+	}
+
+	private SelectItem prepareAddGroupSelector() {
+		SelectItem addGroup = ItemFactory.newGroupSelector("group", "addgroup");
+		addGroup.setWidth(110);
+		addGroup.setRequired(false);
+		addGroup.addChangedHandler((ChangedEvent event) -> {
+			if (event.getValue() != null && !"".equals((String) event.getValue())) {
+				final ListGridRecord selectedRecord = addGroup.getSelectedRecord();
+				if (selectedRecord == null)
+					return;
+
+				// Check if the selected user is already present in the
+				// participants list
+				if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
+						"g." + selectedRecord.getAttribute("name"))) != null)
+					return;
+				else
+					addParticipant("g." + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
+				addGroup.clearValue();
+			}
+		});
+		return addGroup;
+	}
+
+	private SelectItem prepareAddUserSelector() {
+		SelectItem addUser = ItemFactory.newUserSelector("user", "adduser", null, false, false);
+		addUser.setWidth(110);
+		addUser.setRequired(false);
+		addUser.addChangedHandler((ChangedEvent event) -> {
+			if (event.getValue() != null && !"".equals((String) event.getValue())) {
+				final ListGridRecord selectedRecord = addUser.getSelectedRecord();
+				if (selectedRecord == null)
+					return;
+
+				// Check if the selected user is already present in the
+				// rights table
+				if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
+						selectedRecord.getAttribute("username"))) != null)
+					return;
+				else
+					addParticipant(selectedRecord.getAttribute("username"), selectedRecord.getAttribute(LABEL));
+				addUser.clearValue();
+			}
+		});
+		return addUser;
+	}
+
+	private void addTaskItems(HLayout formsPanel) {
 		if (state.getType() == GUIWFState.TYPE_TASK) {
 			SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem("duedateNumber", "duedate",
 					this.state.getDueDateNumber());
@@ -330,7 +486,7 @@ public class TaskEditor extends Window {
 			requiresNote.setWrapTitle(false);
 			requiresNote.setDefaultValue(this.state.isRequiresNote() ? "yes" : "no");
 
-			SpinnerItem minNoteSize = ItemFactory.newSpinnerItem("minNoteSize", "minnotesize",
+			SpinnerItem minNoteSize = ItemFactory.newSpinnerItem("minnotesize",
 					this.state.getMinNoteSize() != null && this.state.getMinNoteSize() > 0 ? this.state.getMinNoteSize()
 							: null);
 			minNoteSize.setMin(0);
@@ -350,152 +506,20 @@ public class TaskEditor extends Window {
 
 			formsPanel.setMembers(escalationForm, mandatoryNoteForm);
 		}
+	}
 
-		HTMLPane spacer = new HTMLPane();
-		spacer.setHeight(2);
-		spacer.setMargin(2);
-		spacer.setOverflow(Overflow.HIDDEN);
-		participantsPanel.addMember(spacer);
-
-		VLayout usergroupSelection = new VLayout();
-		usergroupSelection.setMargin(3);
-
-		// Prepare the combo and button for adding a new user
-		final DynamicForm participantsEditForm = new DynamicForm();
-		participantsEditForm.setTitleOrientation(TitleOrientation.LEFT);
-		participantsEditForm.setNumCols(6);
-		participantsEditForm.setWidth(1);
-		final SelectItem addUser = ItemFactory.newUserSelector("user", "adduser", null, false, false);
-		addUser.setWidth(110);
-		addUser.setRequired(false);
-		addUser.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue() != null && !"".equals((String) event.getValue())) {
-					final ListGridRecord selectedRecord = addUser.getSelectedRecord();
-					if (selectedRecord == null)
-						return;
-
-					// Check if the selected user is already present in the
-					// rights table
-					if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
-							selectedRecord.getAttribute("username"))) != null)
-						return;
-					else
-						addParticipant(selectedRecord.getAttribute("username"), selectedRecord.getAttribute("label"));
-					addUser.clearValue();
-				}
-			}
-		});
-
-		final SelectItem addGroup = ItemFactory.newGroupSelector("group", "addgroup");
-		addGroup.setWidth(110);
-		addGroup.setRequired(false);
-		addGroup.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue() != null && !"".equals((String) event.getValue())) {
-					final ListGridRecord selectedRecord = addGroup.getSelectedRecord();
-					if (selectedRecord == null)
-						return;
-
-					// Check if the selected user is already present in the
-					// participants list
-					if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
-							"g." + selectedRecord.getAttribute("name"))) != null)
-						return;
-					else
-						addParticipant("g." + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
-					addGroup.clearValue();
-				}
-			}
-		});
-
-		// Prepare dynamic user participant
-		final TextItem attr = ItemFactory.newTextItem("attribute", "addattribute", null);
-		attr.setWidth(110);
-		FormItemIcon addIcon = ItemFactory.newItemIcon("add.png");
-		addIcon.addFormItemClickHandler(new FormItemClickHandler() {
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				String val = attr.getValueAsString();
-				if (val != null)
-					val = val.trim();
-				if (val == null || "".equals(val))
-					return;
-
-				// Check if the digited attribute user is already present in the
-				// participants list
-				if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS, "att." + val)) != null)
-					return;
-				else
-					addParticipant("att." + val, val);
-				attr.clearValue();
-			}
-		});
-		attr.setIcons(addIcon);
-
-		participantsEditForm.setItems(addUser, addGroup, attr);
-
-		ListGridField label = new ListGridField("label", I18N.message("label"));
-		label.setWidth("*");
-		label.setCanFilter(false);
-
-		ListGridField name = new ListGridField("name", I18N.message("name"), 50);
-		name.setCanFilter(false);
-		name.setHidden(true);
-
-		UserListGridField avatar = new UserListGridField();
-		participantsGrid = new RefreshableListGrid();
-		participantsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		participantsGrid.setCanFreezeFields(true);
-		participantsGrid.setAutoFetchData(true);
-		participantsGrid.setSelectionType(SelectionStyle.MULTIPLE);
-		participantsGrid.setFilterOnKeypress(true);
-		participantsGrid.setShowFilterEditor(false);
-		participantsGrid.setShowHeader(false);
-		participantsGrid.setFields(name, avatar, label);
-		participantsGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new Menu();
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						participantsGrid.removeSelectedData();
-					}
-				});
-
-				contextMenu.setItems(delete);
-				contextMenu.showContextMenu();
-				event.cancel();
-			}
-		});
-
-		SectionStackSection participantsSection = new SectionStackSection(I18N.message("participants"));
-		participantsSection.setCanCollapse(false);
-		participantsSection.setExpanded(true);
-		participantsSection.setItems(participantsGrid);
-		SectionStack participantsStack = new SectionStack();
-		participantsStack.setWidth100();
-		participantsStack.setHeight(220);
-		participantsStack.setSections(participantsSection);
-
-		usergroupSelection.addMember(participantsStack);
-		usergroupSelection.addMember(participantsEditForm);
-		participantsPanel.addMember(usergroupSelection);
-
+	private void initParticipantsList() {
 		// Initialize the participants list
 		try {
 			if (this.state.getParticipants() != null) {
-				ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
+				ArrayList<ListGridRecord> records = new ArrayList<>();
 
 				for (GUIValue part : this.state.getParticipants()) {
 					if (part.getCode() == null || part.getValue() == null)
 						continue;
 
-					ListGridRecord record = createParticipantRecord(part.getCode(), part.getValue());
-					records.add(record);
+					ListGridRecord rec = createParticipantRecord(part.getCode(), part.getValue());
+					records.add(rec);
 				}
 
 				if (!records.isEmpty())
@@ -504,39 +528,19 @@ public class TaskEditor extends Window {
 		} catch (Throwable t) {
 			// Nothing to do
 		}
-
-		if (isHumanInteraction)
-			participantsPanel.show();
-		else
-			participantsPanel.hide();
-
-		humanInteraction.setValue(isHumanInteraction);
-		humanInteraction.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if ("yes".equals(event.getValue())) {
-					participantsPanel.show();
-				} else
-					participantsPanel.hide();
-
-			}
-		});
-
-		return propertiesPanel;
 	}
 
 	private ListGridRecord createParticipantRecord(String name, String label) {
-		ListGridRecord record = new ListGridRecord();
-		record.setAttribute("name", name);
-		record.setAttribute("label", label);
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("name", name);
+		rec.setAttribute(LABEL, label);
 		if (name.startsWith("g."))
-			record.setAttribute("avatar", "group");
+			rec.setAttribute(AVATAR, "group");
 		else if (name.startsWith("att."))
-			record.setAttribute("avatar", "attribute");
+			rec.setAttribute(AVATAR, "attribute");
 		else
-			record.setAttribute("avatar", name);
-		return record;
+			rec.setAttribute(AVATAR, name);
+		return rec;
 	}
 
 	/**
@@ -549,11 +553,10 @@ public class TaskEditor extends Window {
 
 	@SuppressWarnings("unchecked")
 	private void onSave() {
-		vm.validate();
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		boolean humanInteraction = "yes".equals(values.get("humanInteraction"));
 
-		if (!vm.validate() && humanInteraction)
+		if (Boolean.FALSE.equals(vm.validate()) && humanInteraction)
 			return;
 
 		TaskEditor.this.state.setName((String) values.get("taskName"));
@@ -566,7 +569,7 @@ public class TaskEditor extends Window {
 
 		if (state.getType() == GUIWFState.TYPE_TASK) {
 			TaskEditor.this.state.setRequiresNote("yes".equals(values.get("requiresNote")));
-			TaskEditor.this.state.setMinNoteSize((Integer) values.get("minNoteSize"));
+			TaskEditor.this.state.setMinNoteSize((Integer) values.get("minnotesize"));
 			TaskEditor.this.state.setDueDateNumber((Integer) values.get("duedateNumber"));
 			TaskEditor.this.state.setDueDateUnit((String) values.get("duedateTime"));
 			TaskEditor.this.state.setReminderNumber((Integer) values.get("remindtimeNumber"));
@@ -583,9 +586,9 @@ public class TaskEditor extends Window {
 			}
 		}
 
-		ArrayList<GUIValue> participants = new ArrayList<GUIValue>();
-		for (ListGridRecord record : participantsGrid.getRecords())
-			participants.add(new GUIValue(record.getAttributeAsString("name"), record.getAttributeAsString("label")));
+		ArrayList<GUIValue> participants = new ArrayList<>();
+		for (ListGridRecord rec : participantsGrid.getRecords())
+			participants.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString(LABEL)));
 		TaskEditor.this.state.setParticipants(participants.toArray(new GUIValue[0]));
 
 		if (humanInteraction && state.getType() == GUIWFState.TYPE_TASK

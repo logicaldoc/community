@@ -20,6 +20,8 @@ import com.smartgwt.client.types.OperatorId;
  */
 public class FolderFieldsDS extends DataSource {
 
+	private static final String TYPE = "type:";
+
 	public FolderFieldsDS(GUITemplate template) {
 		setClientOnly(true);
 
@@ -70,33 +72,33 @@ public class FolderFieldsDS extends DataSource {
 		if (attribute.getType() == GUIAttribute.TYPE_DATE) {
 			field = new DataSourceDateTimeField();
 			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN);
-			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DATE;
+			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_DATE;
 		} else if (attribute.getType() == GUIAttribute.TYPE_DOUBLE) {
 			field = new DataSourceFloatField();
 			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
 					OperatorId.NOT_EQUAL);
-			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_DOUBLE;
+			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_DOUBLE;
 		} else if (attribute.getType() == GUIAttribute.TYPE_INT) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
 					OperatorId.NOT_EQUAL);
-			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_INT;
+			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_INT;
 		} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS);
-			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_BOOLEAN;
+			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_BOOLEAN;
 		} else if (attribute.getType() == GUIAttribute.TYPE_USER || attribute.getType() == GUIAttribute.TYPE_FOLDER) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL, OperatorId.NOT_NULL);
-			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + "type:" + attribute.getType();
+			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + attribute.getType();
 		} else {
 			field = new DataSourceTextField();
 			field.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,
 					OperatorId.NOT_EQUAL);
 			if (attribute.getEditor() == GUIAttribute.EDITOR_DEFAULT)
-				fieldName = fieldName + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING;
+				fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_STRING;
 			else
-				fieldName = fieldName + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_STRING_PRESET;
+				fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_STRING_PRESET;
 		}
 
 		field.setName(fieldName);

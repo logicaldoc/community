@@ -48,6 +48,10 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 7.0
  */
 public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxService {
+	private static final String TOKEN = "token";
+
+	private static final String DROPBOX = "dropbox";
+
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(DropboxServiceImpl.class);
@@ -117,7 +121,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	 */
 	static String loadAccessToken(User user) {
 		GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		Generic generic = dao.findByAlternateKey("dropbox", "token", user.getId(), user.getTenantId());
+		Generic generic = dao.findByAlternateKey(DROPBOX, TOKEN, user.getId(), user.getTenantId());
 		if (generic == null)
 			return null;
 		else
@@ -130,9 +134,9 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	 */
 	protected void saveAccessToken(User user, String token, String account) {
 		GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		Generic generic = dao.findByAlternateKey("dropbox", "token", user.getId(), user.getTenantId());
+		Generic generic = dao.findByAlternateKey(DROPBOX, TOKEN, user.getId(), user.getTenantId());
 		if (generic == null)
-			generic = new Generic("dropbox", "token", user.getId(), user.getTenantId());
+			generic = new Generic(DROPBOX, TOKEN, user.getId(), user.getTenantId());
 		generic.setString1(token);
 		generic.setString2(account);
 
@@ -166,10 +170,10 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 			// Prepare a fieldsMap docId-path
-			Map<Long, String> documents = new HashMap<Long, String>();
+			Map<Long, String> documents = new HashMap<>();
 
 			// First of all put all single selected documents
-			List<Long> dIds = new ArrayList<Long>();
+			List<Long> dIds = new ArrayList<>();
 			for (int i = 0; i < docIds.length; i++)
 				dIds.add(docIds[i]);
 
@@ -181,7 +185,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			 */
 
 			// Prepare a fieldsMap folderId-basepath
-			Map<Long, String> folders = new HashMap<Long, String>();
+			Map<Long, String> folders = new HashMap<>();
 			for (long folderId : folderIds) {
 				Folder folder = folderDao.findFolder(folderId);
 				if (folder == null || !folderDao.isPermissionEnabled(Permission.DOWNLOAD, folder.getId(), user.getId()))
@@ -275,7 +279,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 			Folder root = fdao.findById(targetFolder);
 
-			Set<String> imported = new HashSet<String>();
+			Set<String> imported = new HashSet<>();
 			for (String path : paths) {
 				if (imported.contains(path))
 					continue;
@@ -292,8 +296,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		return count;
 	}
 
-	private void importEntry(Session session, Dropbox dbox, Folder root, Set<String> imported,
-			Metadata entry) throws Exception, DbxException, PersistenceException {
+	private void importEntry(Session session, Dropbox dbox, Folder root, Set<String> imported, Metadata entry)
+			throws Exception, DbxException, PersistenceException {
 		if (entry instanceof FileMetadata) {
 			importDocument(root, (FileMetadata) entry, dbox, session);
 			imported.add(entry.getPathDisplay());

@@ -25,6 +25,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  */
 public class ContactDetails extends Window {
 
+	private static final String EMAIL = "email";
+
 	public ContactDetails(final GUIContact contact, final Contacts parent) {
 		super();
 
@@ -44,15 +46,15 @@ public class ContactDetails extends Window {
 		form.setNumCols(3);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem firstName = ItemFactory.newTextItem("firstname", "firstname", contact.getFirstName());
-		TextItem lastName = ItemFactory.newTextItem("lastname", "lastname", contact.getLastName());
-		TextItem email = ItemFactory.newEmailItem("email", "email", false);
+		TextItem firstName = ItemFactory.newTextItem("firstname", contact.getFirstName());
+		TextItem lastName = ItemFactory.newTextItem("lastname", contact.getLastName());
+		TextItem email = ItemFactory.newEmailItem(EMAIL, EMAIL, false);
 		email.setRequired(true);
 		email.setValue(contact.getEmail());
-		TextItem address = ItemFactory.newTextItem("address", "address", contact.getAddress());
-		TextItem phone = ItemFactory.newTextItem("phone", "phone", contact.getPhone());
-		TextItem cell = ItemFactory.newTextItem("cell", "cell", contact.getMobile());
-		TextItem company = ItemFactory.newTextItem("company", "company", contact.getCompany());
+		TextItem address = ItemFactory.newTextItem("address", contact.getAddress());
+		TextItem phone = ItemFactory.newTextItem("phone", contact.getPhone());
+		TextItem cell = ItemFactory.newTextItem("cell", contact.getMobile());
+		TextItem company = ItemFactory.newTextItem("company", contact.getCompany());
 		company.setWidth(180);
 
 		ButtonItem save = new ButtonItem();
@@ -61,14 +63,14 @@ public class ContactDetails extends Window {
 		save.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 
 					GUIContact c = new GUIContact();
 					c.setId(contact.getId());
 					c.setUserId(Session.get().getUser().getId());
 					c.setFirstName(vm.getValueAsString("firstname"));
 					c.setLastName(vm.getValueAsString("lastname"));
-					c.setEmail(vm.getValueAsString("email"));
+					c.setEmail(vm.getValueAsString(EMAIL));
 					c.setAddress(vm.getValueAsString("address"));
 					c.setPhone(vm.getValueAsString("phone"));
 					c.setMobile(vm.getValueAsString("cell"));

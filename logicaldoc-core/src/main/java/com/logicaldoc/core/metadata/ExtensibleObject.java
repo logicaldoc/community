@@ -23,7 +23,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
-	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+	private Map<String, Attribute> attributes = new HashMap<>();
 
 	/**
 	 * Implementations may persist or not this attribute
@@ -82,7 +82,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 	 * different values
 	 */
 	private Set<String> getValueAttributesName(String name) {
-		TreeSet<String> attNames = new TreeSet<String>();
+		TreeSet<String> attNames = new TreeSet<>();
 		for (String n : attributes.keySet()) {
 			if (n.equals(name) || name.equals(getAttribute(n).getParent()))
 				attNames.add(n);
@@ -94,7 +94,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 		Set<String> valueNames = getValueAttributesName(name);
 
 		// The names are ordered
-		List<Attribute> values = new ArrayList<Attribute>();
+		List<Attribute> values = new ArrayList<>();
 		for (String n : valueNames) {
 			Attribute val = attributes.get(n);
 			val.setName(n);
@@ -125,14 +125,14 @@ public abstract class ExtensibleObject extends PersistentObject {
 	}
 
 	public List<String> getAttributeNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		if (attributes != null)
 			names.addAll(attributes.keySet());
 		return names;
 	}
 
 	public List<String> getAttributeNames(long setId) {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		if (attributes != null) {
 			for (String name : attributes.keySet()) {
 				Attribute att = getAttribute(name);
@@ -154,7 +154,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 	public Attribute getAttributeAtPosition(int position) {
 		if (position < 0)
 			return null;
-		List<Attribute> attrs = new ArrayList<Attribute>(attributes.values());
+		List<Attribute> attrs = new ArrayList<>(attributes.values());
 		if (position >= attrs.size())
 			return null;
 		Attribute attribute = null;
@@ -182,7 +182,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 
 		assert (values != null && values.length > 0);
 
-		List<Attribute> attrs = new ArrayList<Attribute>();
+		List<Attribute> attrs = new ArrayList<>();
 		Attribute master = setValue(name, values[0]);
 		attrs.add(master);
 

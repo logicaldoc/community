@@ -537,7 +537,7 @@ public class StandardSearchEngine implements SearchEngine {
 				QueryResponse rsp = server.query(query);
 				String nextCursorMark = rsp.getNextCursorMark();
 
-				List<Long> hitsToDelete = new ArrayList<Long>();
+				List<Long> hitsToDelete = new ArrayList<>();
 				SolrDocumentList docs = rsp.getResults();
 				for (SolrDocument doc : docs) {
 					long count = documentDao

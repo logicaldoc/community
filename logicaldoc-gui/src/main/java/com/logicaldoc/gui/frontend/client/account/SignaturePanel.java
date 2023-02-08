@@ -56,32 +56,32 @@ public class SignaturePanel extends StampProperties {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setValuesManager(vm);
 
-		TextItem exprx = ItemFactory.newTextItem("exprx", "exprx", stamp.getExprX());
+		TextItem exprx = ItemFactory.newTextItem("exprx", stamp.getExprX());
 		if (changedHandler != null)
 			exprx.addChangedHandler(changedHandler);
 		exprx.setWidth(300);
 
-		TextItem exprw = ItemFactory.newTextItem("exprw", "exprw", stamp.getExprW());
+		TextItem exprw = ItemFactory.newTextItem("exprw", stamp.getExprW());
 		if (changedHandler != null)
 			exprw.addChangedHandler(changedHandler);
 		exprw.setWidth(300);
 
-		TextItem expry = ItemFactory.newTextItem("expry", "expry", stamp.getExprY());
+		TextItem expry = ItemFactory.newTextItem("expry", stamp.getExprY());
 		if (changedHandler != null)
 			expry.addChangedHandler(changedHandler);
 		expry.setWidth(300);
 		expry.setColSpan(4);
 
-		TextItem exprh = ItemFactory.newTextItem("exprh", "exprh", stamp.getExprH());
+		TextItem exprh = ItemFactory.newTextItem("exprh", stamp.getExprH());
 		if (changedHandler != null)
 			exprh.addChangedHandler(changedHandler);
 		exprh.setWidth(300);
 		exprh.setColSpan(4);
 
-		text = ItemFactory.newTextAreaItemForAutomation("text", "text", stamp.getText(), changedHandler, false);
+		text = ItemFactory.newTextAreaItemForAutomation("text", stamp.getText(), changedHandler, false);
 		text.setWidth("*");
 
-		SpinnerItem rotation = ItemFactory.newSpinnerItem("rotation", "rotation", stamp.getRotation(), 0, 360);
+		SpinnerItem rotation = ItemFactory.newSpinnerItem("rotation", stamp.getRotation(), 0, 360);
 		if (changedHandler != null)
 			rotation.addChangedHandler(changedHandler);
 
@@ -92,7 +92,7 @@ public class SignaturePanel extends StampProperties {
 			pageSelection.addChangedHandler(changedHandler);
 
 		final RadioGroupItem pageOption = ItemFactory.newRadioGroup("pageOption", "stampin");
-		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<>();
 		pageOptions.put("" + GUIStamp.PAGE_OPT_ALL, I18N.message("allpages"));
 		pageOptions.put("" + GUIStamp.PAGE_OPT_FIRST, I18N.message("firstpage"));
 		pageOptions.put("" + GUIStamp.PAGE_OPT_LAST, I18N.message("lastpage"));
@@ -111,7 +111,7 @@ public class SignaturePanel extends StampProperties {
 			}
 		});
 
-		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity", stamp.getOpacity(), 1, 100);
+		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", stamp.getOpacity(), 1, 100);
 		opacity.setEndRow(true);
 		if (changedHandler != null)
 			opacity.addChangedHandler(changedHandler);

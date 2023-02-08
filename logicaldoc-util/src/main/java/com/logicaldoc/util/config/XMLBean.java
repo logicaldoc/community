@@ -445,7 +445,7 @@ public class XMLBean {
 	 */
 	@SuppressWarnings("rawtypes")
 	public List getAllChildren(String elemname, String attribute, String value) {
-		List<Element> list = new LinkedList<Element>();
+		List<Element> list = new LinkedList<>();
 		List elems = root.getChildren(elemname);
 		Iterator iter = elems.iterator();
 

@@ -26,12 +26,10 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DrawEvent;
-import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -39,13 +37,9 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.ViewStateChangedEvent;
-import com.smartgwt.client.widgets.grid.events.ViewStateChangedHandler;
 import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -58,6 +52,10 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.0
  */
 public class WorkflowDashlet extends Portlet {
+
+	private static final String STARTDATE = "startdate";
+
+	private static final String PROCESS_ID = "processId";
 
 	private RefreshableListGrid list;
 
@@ -121,7 +119,7 @@ public class WorkflowDashlet extends Portlet {
 		maxSelector.setNumCols(1);
 		maxSelector.setLayoutAlign(Alignment.CENTER);
 
-		max = ItemFactory.newSpinnerItem("max", "max", Session.get().getConfigAsInt("gui.wf.dashlet.rows"));
+		max = ItemFactory.newSpinnerItem("max", Session.get().getConfigAsInt("gui.wf.dashlet.rows"));
 		max.setMin(0);
 		max.setStep(10);
 		max.setShowHint(false);
@@ -142,7 +140,7 @@ public class WorkflowDashlet extends Portlet {
 		workflow.setHidden(true);
 		ListGridField id = new ListGridField("id", I18N.message("id"), 70);
 		id.setHidden(true);
-		ListGridField processId = new ListGridField("processId", I18N.message("processid"), 80);
+		ListGridField processId = new ListGridField(PROCESS_ID, I18N.message("processid"), 80);
 		processId.setHidden(true);
 		ListGridField name = new WorkflowTaskNameListGridField("name", "display", "task", 100);
 
@@ -156,7 +154,7 @@ public class WorkflowDashlet extends Portlet {
 		ListGridField tag = new ListGridField("tag", I18N.message("tag"), 120);
 		ListGridField lastnote = new ListGridField("lastnote", I18N.message("lastnote"), 120);
 
-		ListGridField startdate = new DateListGridField("startdate", "startdate");
+		ListGridField startdate = new DateListGridField(STARTDATE, STARTDATE);
 
 		ListGridField duedate = new DateListGridField("duedate", "duedate");
 
@@ -173,21 +171,72 @@ public class WorkflowDashlet extends Portlet {
 		list.setHeight100();
 		list.setBorder("0px");
 		list.setDataSource(new WorkflowTasksDS(type, null, max.getValueAsInteger()));
-		list.sort("startdate", SortDirection.ASCENDING);
+		list.sort(STARTDATE, SortDirection.ASCENDING);
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ALL
 				|| type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
-			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, name, id, processId, documents,
-					lastnote, documentIds, pooledAssignees);
+			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, name, id,
+					processId, documents, lastnote, documentIds, pooledAssignees);
 		else
-			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, id, processId, name, documents,
-					lastnote, documentIds);
+			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, id, processId,
+					name, documents, lastnote, documentIds);
 
-		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				Record record = event.getRecord();
-				WorkflowService.Instance.get().getWorkflowDetailsByTask(record.getAttributeAsString("id"),
-						new AsyncCallback<GUIWorkflow>() {
+		list.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
+			Record rec = event.getRecord();
+			WorkflowService.Instance.get().getWorkflowDetailsByTask(rec.getAttributeAsString("id"),
+					new AsyncCallback<GUIWorkflow>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIWorkflow result) {
+							if (result != null) {
+								TaskDetailsDialog workflowDetailsDialog = new TaskDetailsDialog(workflowDashboard,
+										result, type == WorkflowDashboard.TASKS_INVOLVED);
+								workflowDetailsDialog.show();
+							}
+						}
+					});
+		});
+
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu();
+			event.cancel();
+		});
+
+		/*
+		 * Save the layout of the grid at every change
+		 */
+		list.addViewStateChangedHandler((ViewStateChangedEvent event) -> {
+			gridState = list.getViewState();
+		});
+
+		/*
+		 * Restore any previously saved view state for this grid
+		 */
+		list.addDrawHandler((DrawEvent event) -> {
+			if (gridState != null)
+				list.setViewState(gridState);
+		});
+
+		if (type == WorkflowDashboard.TASKS_ASSIGNED)
+			countTotalAssignedTasksToCurrentUser();
+
+		addItem(list);
+	}
+
+	private void countTotalAssignedTasksToCurrentUser() {
+		// Count the total of user tasks
+		list.addDataArrivedHandler((DataArrivedEvent event) -> {
+			int total = list.getTotalRows();
+
+			// If the returned entries are a different total,
+			// recalculate the total assigned tasks
+			if (total != Session.get().getUser().getAssignedTasks()) {
+				WorkflowService.Instance.get().countAssignedTasks(Session.get().getUser().getUsername(),
+						new AsyncCallback<Integer>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -195,88 +244,26 @@ public class WorkflowDashlet extends Portlet {
 							}
 
 							@Override
-							public void onSuccess(GUIWorkflow result) {
-								if (result != null) {
-									TaskDetailsDialog workflowDetailsDialog = new TaskDetailsDialog(workflowDashboard,
-											result, type == WorkflowDashboard.TASKS_INVOLVED);
-									workflowDetailsDialog.show();
-								}
+							public void onSuccess(Integer total) {
+								Session.get().getUser().setAssignedTasks(total != null ? total.intValue() : 0);
+								UserController.get().changed(Session.get().getUser());
 							}
 						});
+
 			}
 		});
-
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
-		});
-
-		if (type == WorkflowDashboard.TASKS_ASSIGNED)
-			// Count the total of user tasks
-			list.addDataArrivedHandler(new DataArrivedHandler() {
-				@Override
-				public void onDataArrived(DataArrivedEvent event) {
-					int total = list.getTotalRows();
-
-					// If the returned entries are a different total,
-					// recalculate the total assigned tasks
-					if (total != Session.get().getUser().getAssignedTasks()) {
-						WorkflowService.Instance.get().countAssignedTasks(Session.get().getUser().getUsername(),
-								new AsyncCallback<Integer>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(Integer total) {
-										Session.get().getUser().setAssignedTasks(total != null ? total.intValue() : 0);
-										UserController.get().changed(Session.get().getUser());
-									}
-								});
-
-					}
-				}
-			});
-
-		/*
-		 * Save the layout of the grid at every change
-		 */
-		list.addViewStateChangedHandler(new ViewStateChangedHandler() {
-			@Override
-			public void onViewStateChanged(ViewStateChangedEvent event) {
-				gridState = list.getViewState();
-			}
-		});
-
-		/*
-		 * Restore any previously saved view state for this grid
-		 */
-		list.addDrawHandler(new DrawHandler() {
-			@Override
-			public void onDraw(DrawEvent event) {
-				if (gridState != null)
-					list.setViewState(gridState);
-			}
-		});
-
-		addItem(list);
 	}
 
 	public void refresh(String processId) {
 		if (processId == null || processId.isEmpty()
-				|| list.find(new AdvancedCriteria("processId", OperatorId.EQUALS, processId)) != null)
+				|| list.find(new AdvancedCriteria(PROCESS_ID, OperatorId.EQUALS, processId)) != null)
 			list.refresh(new WorkflowTasksDS(type, null, max.getValueAsInteger()));
 	}
 
 	public void onDeletedWorkflow(String processId) {
-		Record[] records = list.findAll(new AdvancedCriteria("processId", OperatorId.EQUALS, processId));
-		for (Record record : records)
-			list.removeData(record);
+		Record[] records = list.findAll(new AdvancedCriteria(PROCESS_ID, OperatorId.EQUALS, processId));
+		for (Record rec : records)
+			list.removeData(rec);
 	}
 
 	private void showContextMenu() {
@@ -294,16 +281,13 @@ public class WorkflowDashlet extends Portlet {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							ArrayList<String> ids = new ArrayList<String>();
-							ListGridRecord[] selectedRecords = list.getSelectedRecords();
-							for (ListGridRecord record : selectedRecords)
-								ids.add(record.getAttributeAsString("processId"));
-							workflowDashboard.killWorkflows(ids);
-						}
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ArrayList<String> ids = new ArrayList<>();
+						ListGridRecord[] selectedRecords = list.getSelectedRecords();
+						for (ListGridRecord rec : selectedRecords)
+							ids.add(rec.getAttributeAsString(PROCESS_ID));
+						workflowDashboard.killWorkflows(ids);
 					}
 				});
 			}

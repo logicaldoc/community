@@ -23,7 +23,7 @@ public abstract class AbstractShape implements Shape {
 
 	protected boolean allowSync = true;
 
-	private DrawableSet<Connection> connections = new DrawableSet<Connection>();
+	private DrawableSet<Connection> connections = new DrawableSet<>();
 
 	public AbstractShape(DiagramController controller, Widget widget) {
 		this.widget = widget;

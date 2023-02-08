@@ -105,28 +105,23 @@ public class StampDetailsPanel extends VLayout {
 
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
 		if (parametersPanel != null) {
 			parametersPanel.destroy();
-			if (parametersTabPanel.contains(parametersPanel))
+			if (Boolean.TRUE.equals(parametersTabPanel.contains(parametersPanel)))
 				parametersTabPanel.removeMember(parametersPanel);
 		}
 
 		if (usersPanel != null) {
 			usersPanel.destroy();
-			if (usersTabPanel.contains(usersPanel))
+			if (Boolean.TRUE.equals(usersTabPanel.contains(usersPanel)))
 				usersTabPanel.removeMember(usersPanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
 
 		propertiesPanel = new StampProperties(stamp, changeHandler);
 		propertiesTabPanel.addMember(propertiesPanel);

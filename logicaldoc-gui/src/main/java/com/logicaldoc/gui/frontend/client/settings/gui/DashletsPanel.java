@@ -44,13 +44,19 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DashletsPanel extends VLayout {
 
+	private static final String QUERY = "query";
+
+	private static final String TITLE = "title";
+
+	private static final String CONTENT = "content";
+
 	private ListGrid grid;
 
 	private ListGridRecord rollOverRecord;
 
 	private HLayout rollOverCanvas;
 
-	private List<GUIDashlet> dashlets = new ArrayList<GUIDashlet>();
+	private List<GUIDashlet> dashlets = new ArrayList<>();
 
 	public DashletsPanel() {
 		setWidth100();
@@ -77,7 +83,7 @@ public class DashletsPanel extends VLayout {
 					public void execute(String value) {
 						GUIDashlet dashlet = new GUIDashlet();
 						dashlet.setName(value);
-						dashlet.setType("content");
+						dashlet.setType(CONTENT);
 						dashlet.setId(-1L);
 						dashlets.add(dashlet);
 
@@ -117,11 +123,11 @@ public class DashletsPanel extends VLayout {
 		name.setWidth(100);
 		name.setRequired(true);
 
-		ListGridField title = new ListGridField("title", I18N.message("title"));
+		ListGridField title = new ListGridField(TITLE, I18N.message(TITLE));
 		title.setWidth(120);
 		title.setCellFormatter(new CellFormatter() {
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				return value != null ? I18N.message(value.toString()) : "";
 			}
 		});
@@ -130,7 +136,7 @@ public class DashletsPanel extends VLayout {
 		type.setWidth(125);
 		type.setCellFormatter(new CellFormatter() {
 			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 				return I18N.message("dashlet.type." + value);
 			}
 		});
@@ -140,10 +146,10 @@ public class DashletsPanel extends VLayout {
 		max.setWidth(50);
 		max.setAlign(Alignment.CENTER);
 
-		ListGridField content = new ListGridField("content", I18N.message("content"));
+		ListGridField content = new ListGridField(CONTENT, I18N.message(CONTENT));
 		content.setWidth("*");
 
-		ListGridField query = new ListGridField("query", I18N.message("query"));
+		ListGridField query = new ListGridField(QUERY, I18N.message(QUERY));
 		query.setWidth("*");
 
 		grid = new ListGrid() {
@@ -235,15 +241,15 @@ public class DashletsPanel extends VLayout {
 		ListGridRecord[] records = new ListGridRecord[dashlets.size()];
 		int i = 0;
 		for (GUIDashlet dashlet : dashlets) {
-			ListGridRecord record = new ListGridRecord();
-			record.setAttribute("id", dashlet.getId());
-			record.setAttribute("name", dashlet.getName());
-			record.setAttribute("type", dashlet.getType());
-			record.setAttribute("title", dashlet.getTitle());
-			record.setAttribute("max", dashlet.getMax());
-			record.setAttribute("query", dashlet.getQuery());
-			record.setAttribute("content", dashlet.getContent());
-			records[i++] = record;
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", dashlet.getId());
+			rec.setAttribute("name", dashlet.getName());
+			rec.setAttribute("type", dashlet.getType());
+			rec.setAttribute(TITLE, dashlet.getTitle());
+			rec.setAttribute("max", dashlet.getMax());
+			rec.setAttribute(QUERY, dashlet.getQuery());
+			rec.setAttribute(CONTENT, dashlet.getContent());
+			records[i++] = rec;
 		}
 		grid.setData(records);
 	}

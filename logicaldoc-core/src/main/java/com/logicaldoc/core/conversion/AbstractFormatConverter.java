@@ -26,7 +26,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 
 	private static Logger log = LoggerFactory.getLogger(AbstractFormatConverter.class);
 
-	protected Map<String, String> parameters = new HashMap<String, String>();
+	protected Map<String, String> parameters = new HashMap<>();
 
 	public AbstractFormatConverter() {
 		loadParameters();
@@ -115,7 +115,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 
 	@Override
 	public List<String> getParameterNames() {
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 
 	@Override

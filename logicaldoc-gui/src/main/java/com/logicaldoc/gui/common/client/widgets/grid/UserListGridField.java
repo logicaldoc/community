@@ -83,13 +83,13 @@ public class UserListGridField extends ColoredListGridField {
 		}
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if (value == null)
 				return "";
 
-			Object avatarId = getAvatarId(value, record);
+			Object avatarId = getAvatarId(value, rec);
 
-			String formattedValue = super.format(value, record, rowNum, colNum);
+			String formattedValue = super.format(value, rec, rowNum, colNum);
 			if (avatarId == null || !UserListGridField.this.displayAvatar)
 				return formattedValue != null ? formattedValue.toString() : "";
 
@@ -110,10 +110,10 @@ public class UserListGridField extends ColoredListGridField {
 			}
 		}
 
-		private Object getAvatarId(Object value, ListGridRecord record) {
+		private Object getAvatarId(Object value, ListGridRecord rec) {
 			Object avatarId = value;
 			if (avatarFieldName != null)
-				avatarId = record.getAttributeAsObject(avatarFieldName);
+				avatarId = rec.getAttributeAsObject(avatarFieldName);
 			return avatarId;
 		}
 

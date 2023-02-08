@@ -37,6 +37,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 8.0.1
  */
 public class OnlineUsersPanel extends VLayout implements UserObserver {
+	private static final String USERNAME = "username";
+
 	private RefreshableListGrid onlineUsers = null;
 
 	private Timer timer;
@@ -49,7 +51,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 
 	@Override
 	public void onDraw() {
-		ListGridField username = new ListGridField("username", I18N.message("onlineusers"), 150);
+		ListGridField username = new ListGridField(USERNAME, I18N.message("onlineusers"), 150);
 		username.setCanFilter(true);
 		username.setWidth("100%");
 
@@ -59,7 +61,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		onlineUsers.setEmptyMessage(I18N.message("nousers"));
 		onlineUsers.setAutoFetchData(true);
 		onlineUsers.setFields(avatar, username);
-		onlineUsers.setSortField("username");
+		onlineUsers.setSortField(USERNAME);
 
 		onlineUsers.addVisibilityChangedHandler(new VisibilityChangedHandler() {
 
@@ -111,40 +113,40 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 
 	@Override
 	public void onUserLogin(String username) {
-		Record record = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
-		if (record == null) {
-			List<ListGridRecord> rec = new ArrayList<ListGridRecord>();
+		Record rec = onlineUsers.find(new AdvancedCriteria(USERNAME, OperatorId.EQUALS, username));
+		if (rec == null) {
+			List<ListGridRecord> recds = new ArrayList<>();
 
 			Record[] records = onlineUsers.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
 				for (Record r : records)
-					rec.add(new ListGridRecord(r));
+					recds.add(new ListGridRecord(r));
 			}
 
 			ListGridRecord r = new ListGridRecord();
-			r.setAttribute("username", username);
-			rec.add(r);
+			r.setAttribute(USERNAME, username);
+			recds.add(r);
 
-			onlineUsers.setRecords(rec.toArray(new ListGridRecord[0]));
+			onlineUsers.setRecords(recds.toArray(new ListGridRecord[0]));
 		}
 	}
 
 	@Override
 	public void onUserLogout(String username) {
-		Record record = onlineUsers.find(new AdvancedCriteria("username", OperatorId.EQUALS, username));
-		if (record != null) {
-			List<ListGridRecord> rec = new ArrayList<ListGridRecord>();
+		Record rec = onlineUsers.find(new AdvancedCriteria(USERNAME, OperatorId.EQUALS, username));
+		if (rec != null) {
+			List<ListGridRecord> recds = new ArrayList<>();
 
 			Record[] records = onlineUsers.getDataAsRecordList().toArray();
 			if (records != null && records.length > 0) {
 				for (Record r : records) {
-					if (r.getAttributeAsString("username").equals(username))
+					if (r.getAttributeAsString(USERNAME).equals(username))
 						continue;
-					rec.add(new ListGridRecord(r));
+					recds.add(new ListGridRecord(r));
 				}
 			}
 
-			onlineUsers.setRecords(rec.toArray(new ListGridRecord[0]));
+			onlineUsers.setRecords(recds.toArray(new ListGridRecord[0]));
 		}
 	}
 
@@ -188,7 +190,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 					public void execute(String value) {
 						final String[] users = new String[selection.length];
 						for (int i = 0; i < selection.length; i++)
-							users[i] = selection[i].getAttributeAsString("username");
+							users[i] = selection[i].getAttributeAsString(USERNAME);
 
 						ChatService.Instance.get().invite(users, value, new AsyncCallback<Void>() {
 

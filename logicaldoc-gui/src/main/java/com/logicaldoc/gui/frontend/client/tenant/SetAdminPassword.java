@@ -70,7 +70,7 @@ public class SetAdminPassword extends Window {
 		apply.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				vm.validate();
-				if (!vm.hasErrors()) {
+				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					apply.setDisabled(true);
 					TenantService.Instance.get().changeAdminPassword(vm.getValueAsString(NEWPASSWORD).trim(),
 							tenantName, new AsyncCallback<Void>() {

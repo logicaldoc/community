@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class DigitalSignaturePanel extends DocumentDetailTab {
 
+	private static final String REASON = "reason";
+
 	private VLayout container = new VLayout();
 
 	private ListGrid list = null;
@@ -60,7 +62,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		ListGridField date = new DateListGridField("date", "date");
 		ListGridField signedBy = new UserListGridField("comment", "userId", "signedby");
 		signedBy.setWidth("*");
-		ListGridField reasonColumn = new ListGridField("reason", I18N.message("reason"));
+		ListGridField reasonColumn = new ListGridField(REASON, I18N.message(REASON));
 		reasonColumn.setWidth(250);
 
 		list = new ListGrid();
@@ -70,7 +72,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		list.setDataSource(new DocumentHistoryDS(null, document.getId(), "event.signed", null));
 		list.setFields(date, signedBy, reasonColumn);
 
-		TextItem reason = ItemFactory.newTextItem("reason", "reason", null);
+		TextItem reason = ItemFactory.newTextItem(REASON, null);
 		reason.setWidth(400);
 		reason.setRequired(true);
 		reason.setWrapTitle(false);
@@ -81,7 +83,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		visualPositioning.setDisabled(true);
 
 		String url = Util.contextPath() + "export-keystore?cert=true&tenantId=" + Session.get().getTenantId();
-		StaticTextItem rootCert = ItemFactory.newStaticTextItem("rootcertificate", "rootcertificate",
+		StaticTextItem rootCert = ItemFactory.newStaticTextItem("rootcertificate",
 				"<a href='" + url + "' target='_blank'>" + I18N.message("downloadrootcert") + "</a>");
 		rootCert.setRequired(true);
 		rootCert.setWrap(false);
@@ -104,14 +106,14 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 				if (!form.validate())
 					return;
 
-				if (visualPositioning.getValueAsBoolean()) {
+				if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
 					VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(
-							new long[] { document.getId() }, form.getValueAsString("reason"));
+							new long[] { document.getId() }, form.getValueAsString(REASON));
 					dialog.show();
 				} else {
 					LD.contactingServer();
 					SignService.Instance.get().signDocuments(new long[] { document.getId() },
-							form.getValueAsString("reason"), 1, null, null, null, new AsyncCallback<Void>() {
+							form.getValueAsString(REASON), 1, null, null, null, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
 									LD.clearPrompt();

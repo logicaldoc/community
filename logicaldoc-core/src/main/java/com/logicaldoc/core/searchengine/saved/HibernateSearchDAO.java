@@ -28,14 +28,14 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 	@Override
 	public List<SavedSearch> findByUserId(long userId) throws PersistenceException {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("userId", userId);
 		return findByWhere(ENTITY + ".userId = :userId", params, ENTITY + ".name asc", null);
 	}
 
 	@Override
 	public SavedSearch findByUserIdAndName(long userId, String name) throws PersistenceException {
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("userId", userId);
 		params.put("name", name);
 
@@ -52,7 +52,7 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 		if (!checkStoringAspect())
 			return;
 
-		SavedSearch search = (SavedSearch) findById(id);
+		SavedSearch search = findById(id);
 		if (search != null) {
 			search.setDeleted(code);
 			search.setName(search.getName() + "." + search.getId());
@@ -75,7 +75,7 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 		/*
 		 * These sets will contain the found collisions in the given user
 		 */
-		final Set<String> names = new HashSet<String>();
+		final Set<String> names = new HashSet<>();
 
 		StringBuilder query = new StringBuilder(
 				"select lower(ld_name) from ld_search where ld_deleted=0 and ld_userid=");

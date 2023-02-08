@@ -55,7 +55,7 @@ public class GUIExtensibleObject implements Serializable {
 	}
 
 	public String[] getAttributeNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		if (attributes != null)
 			for (GUIAttribute guiAttribute : attributes)
 				names.add(guiAttribute.getName());
@@ -105,7 +105,7 @@ public class GUIExtensibleObject implements Serializable {
 	 * @return the list of values
 	 */
 	public List<GUIAttribute> getValues(String name) {
-		List<GUIAttribute> values = new ArrayList<GUIAttribute>();
+		List<GUIAttribute> values = new ArrayList<>();
 
 		if (getAttributes() != null)
 			for (GUIAttribute att : getAttributes()) {
@@ -150,7 +150,7 @@ public class GUIExtensibleObject implements Serializable {
 	}
 
 	public void putAttributeAfter(String name, GUIAttribute att) {
-		ArrayList<GUIAttribute> attrs = new ArrayList<GUIAttribute>();
+		ArrayList<GUIAttribute> attrs = new ArrayList<>();
 		attrs.addAll(Arrays.asList(attributes));
 		int index = attrs.indexOf(getAttribute(name));
 		if (index < 0 || index == attrs.size() - 1)
@@ -163,7 +163,7 @@ public class GUIExtensibleObject implements Serializable {
 	}
 
 	public void addAttribute(GUIAttribute att) {
-		ArrayList<GUIAttribute> attrs = new ArrayList<GUIAttribute>();
+		ArrayList<GUIAttribute> attrs = new ArrayList<>();
 		if (attributes != null && attributes.length > 0)
 			attrs.addAll(Arrays.asList(attributes));
 		attrs.add(att);
@@ -175,7 +175,7 @@ public class GUIExtensibleObject implements Serializable {
 	public void sortAttributes() {
 		if (attributes == null || attributes.length < 1)
 			return;
-		ArrayList<GUIAttribute> attrs = new ArrayList<GUIAttribute>();
+		ArrayList<GUIAttribute> attrs = new ArrayList<>();
 		attrs.addAll(Arrays.asList(attributes));
 		attrs.sort(null);
 	}
@@ -185,7 +185,7 @@ public class GUIExtensibleObject implements Serializable {
 			return;
 
 		GUIAttribute attribute = getAttribute(name);
-		ArrayList<GUIAttribute> attrs = new ArrayList<GUIAttribute>();
+		ArrayList<GUIAttribute> attrs = new ArrayList<>();
 		attrs.addAll(Arrays.asList(attributes));
 		int index = attrs.indexOf(attribute);
 		if (index >= 0 && index < attrs.size())
@@ -274,5 +274,21 @@ public class GUIExtensibleObject implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+
+		if (this.getClass() != obj.getClass())
+			return false;
+
+		return getId() == ((GUIExtensibleObject) obj).getId();
+	}
+	
+	@Override
+	public int hashCode() {
+		return Long.valueOf(getId()).hashCode();
 	}
 }

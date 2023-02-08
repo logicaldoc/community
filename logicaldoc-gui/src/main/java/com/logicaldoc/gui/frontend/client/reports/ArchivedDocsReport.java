@@ -24,14 +24,10 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -48,6 +44,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ArchivedDocsReport extends ReportPanel implements FolderChangeListener {
 
+	private static final String FOLDER = "folder";
+
 	private FolderSelector folderSelector;
 
 	private SpinnerItem max;
@@ -62,28 +60,19 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		max.setHint(I18N.message("elements"));
 		max.setStep(10);
 		max.setShowTitle(false);
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		max.addChangedHandler((ChangedEvent event) -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate())
-					refresh();
-			}
+		display.addClickHandler((ClickEvent event) -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refresh();
 		});
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
 		toolStrip.addSeparator();
 
-		folderSelector = new FolderSelector("folder", true);
+		folderSelector = new FolderSelector(FOLDER, true);
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);
@@ -116,7 +105,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		ListGridField created = new DateListGridField("created", "createdon");
 
-		ListGridField folder = new ColoredListGridField("folder", I18N.message("folder"), 200);
+		ListGridField folder = new ColoredListGridField(FOLDER, I18N.message(FOLDER), 200);
 		folder.setAlign(Alignment.CENTER);
 		folder.setCanFilter(true);
 		folder.setCanGroupBy(true);
@@ -148,12 +137,8 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		list.setFields(filename, version, fileVersion, size, created, lastModified, folder, id, customId, type);
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null);
-			}
-		});
+		list.addDoubleClickHandler(
+				(DoubleClickEvent event) -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 	}
 
 	@Override
@@ -170,107 +155,91 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
+		preview.addClickHandler((MenuItemClickEvent event) -> {
+			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 
-				DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(GUIDocument doc) {
-						PreviewPopup iv = new PreviewPopup(doc);
-						iv.show();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					PreviewPopup iv = new PreviewPopup(doc);
+					iv.show();
+				}
+			});
 		});
 		preview.setEnabled(
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null);
-			}
-		});
+		download.addClickHandler((MenuItemClickEvent event) -> DocUtil
+				.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
 		MenuItem openFolder = new MenuItem();
 		openFolder.setTitle(I18N.message("openfolder"));
-		openFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-						Long.parseLong(record.getAttributeAsString("id")));
-			}
+		openFolder.addClickHandler((MenuItemClickEvent event) -> {
+			ListGridRecord rec = list.getSelectedRecord();
+			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+					Long.parseLong(rec.getAttributeAsString("id")));
 		});
 
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				long[] docIds = new long[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
-				DocumentService.Instance.get().unarchiveDocuments(docIds, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		restore.addClickHandler((MenuItemClickEvent event) -> {
+			long[] docIds = new long[selection.length];
+			for (int i = 0; i < selection.length; i++)
+				docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
+			DocumentService.Instance.get().unarchiveDocuments(docIds, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						list.removeSelectedData();
-						GuiLog.info(I18N.message("docsrestored"), null);
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void arg0) {
+					list.removeSelectedData();
+					GuiLog.info(I18N.message("docsrestored"), null);
+				}
+			});
 		});
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final long[] docIds = new long[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
+		delete.addClickHandler((MenuItemClickEvent event) -> {
+			final long[] docIds = new long[selection.length];
+			for (int i = 0; i < selection.length; i++)
+				docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							DocumentService.Instance.get().delete(docIds, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-								}
-							});
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					DocumentService.Instance.get().delete(docIds, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
 						}
-					}
-				});
-			}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+						}
+					});
+				}
+			});
 		});
 
 		MenuItem sendToExpArchive = new MenuItem();
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
-		sendToExpArchive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				long[] selectionIds = new long[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					selectionIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
-				SendToArchiveDialog archiveDialog = new SendToArchiveDialog(selectionIds, true);
-				archiveDialog.show();
-			}
+		sendToExpArchive.addClickHandler((MenuItemClickEvent event) -> {
+			long[] selectionIds = new long[selection.length];
+			for (int i = 0; i < selection.length; i++)
+				selectionIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
+			SendToArchiveDialog archiveDialog = new SendToArchiveDialog(selectionIds, true);
+			archiveDialog.show();
 		});
 
 		download.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);

@@ -62,7 +62,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	 * A cache of counters: key=countername-tenantId name value=actual total
 	 * calls
 	 */
-	private static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<Pair<String, Long>, AtomicLong>();
+	private static ConcurrentHashMap<Pair<String, Long>, AtomicLong> counters = new ConcurrentHashMap<>();
 
 	/**
 	 * Last time a database synchronization of the coutners has done
@@ -107,11 +107,11 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 		try {
 			if (RunLevel.current().aspectEnabled(WebserviceCall.ASPECT)
-					&& settings.getBoolean("webservice.call.record", false)) {
+					&& settings.getBoolean("webservice.call.gridRecord", false)) {
 				WebserviceCall call = new WebserviceCall();
 				call.setTenantId(Tenant.SYSTEM_ID);
 
-				if (Context.get().getProperties().getBoolean("webservice.call.record.payload", false)) {
+				if (Context.get().getProperties().getBoolean("webservice.call.gridRecord.payload", false)) {
 					/*
 					 * Retrieve the full payload
 					 */
@@ -253,7 +253,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	}
 
 	protected void increaseCounter(String counterName, long tenantId) {
-		Pair<String, Long> counterPair = new Pair<String, Long>(counterName, tenantId);
+		Pair<String, Long> counterPair = new Pair<>(counterName, tenantId);
 		AtomicLong counter = counters.get(counterPair);
 		if (counter == null) {
 			counter = new AtomicLong(0L);

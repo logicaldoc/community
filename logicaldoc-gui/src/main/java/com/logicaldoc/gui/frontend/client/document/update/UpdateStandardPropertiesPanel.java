@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.3
  */
 public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
+	private static final String LANGUAGE = "language";
+
 	private DynamicForm form = new DynamicForm();
 
 	private VLayout container = new VLayout();
@@ -73,7 +75,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	private void prepareForm() {
-		if (formsContainer.contains(form)) {
+		if (Boolean.TRUE.equals(formsContainer.contains(form))) {
 			formsContainer.removeMember(form);
 			form.destroy();
 		}
@@ -81,16 +83,16 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		form = new DynamicForm();
 		form.setValuesManager(vm);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
-		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
+		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		if (document.getLanguage() != null)
-			language = ItemFactory.newLanguageSelector("language", false, false);
+			language = ItemFactory.newLanguageSelector(LANGUAGE, false, false);
 		language.setDisabled(!updateEnabled);
 		language.setValue(document.getLanguage());
 		items.add(language);
 
-		ColorItem color = ItemFactory.newColorItemPicker("color", "color", document.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorItemPicker(document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
 		items.add(color);
 
@@ -144,7 +146,8 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler((KeyPressEvent newTagKeyPress) -> {
-			if (!newTagItem.validate() || newTagItem.getValue() == null || newTagKeyPress.getKeyName() == null
+			if (Boolean.FALSE.equals(newTagItem.validate()) || newTagItem.getValue() == null
+					|| newTagKeyPress.getKeyName() == null
 					|| !"enter".equals(newTagKeyPress.getKeyName().toLowerCase()))
 				return;
 
@@ -164,7 +167,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
 		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
 		boolean containsInvalid = false;
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
 			String t = token.trim();
 
@@ -176,10 +179,10 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			tags.add(t);
 
 			// Put the new tag in the options
-			Record record = new Record();
-			record.setAttribute("index", t);
-			record.setAttribute("word", t);
-			ds.addData(record);
+			Record rec = new Record();
+			rec.setAttribute("index", t);
+			rec.setAttribute("word", t);
+			ds.addData(rec);
 
 			// Add the old tags to the new ones
 			String[] oldVal = tagItem.getValues();
@@ -191,7 +194,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			tagItem.setValues((Object[]) tags.toArray(new String[0]));
 			changedHandler.onChanged(null);
 		}
-		
+
 		if (containsInvalid)
 			SC.warn(I18N.message("sometagaddedbecauseinvalid"));
 	}
@@ -200,8 +203,8 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
-			document.setLanguage((String) values.get("language"));
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
+			document.setLanguage((String) values.get(LANGUAGE));
 			document.setColor((String) values.get("color"));
 			document.setTags(tagItem.getValues());
 		}

@@ -19,7 +19,6 @@ import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -35,11 +34,15 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class UpdateDialog extends StickyWindow {
 
-	public final static String CONTEXT_CHECKIN = "checkin";
+	private static final String IGNOREEMPTYFIELDS = "ignoreemptyfields";
+
+	private static final String VERSIONCOMMENT = "versioncomment";
+
+	public final static String CHECKIN = "checkin";
 
 	public final static String CONTEXT_UPLOAD = "adddocuments";
 
-	public final static String CONTEXT_UPDATE = "bulkupdate";
+	public final static String BULKUPDATE = "bulkupdate";
 
 	private UpdatePanel bulkPanel;
 
@@ -84,17 +87,17 @@ public class UpdateDialog extends StickyWindow {
 		 * the editing enabled.
 		 */
 		int originalStatus = 0;
-		if (CONTEXT_CHECKIN.equals(context) && metadata != null) {
+		if (CHECKIN.equals(context) && metadata != null) {
 			originalStatus = metadata.getStatus();
 			metadata.setStatus(0);
 		}
 
-		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CONTEXT_CHECKIN.equals(context));
+		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CHECKIN.equals(context));
 		bulkPanel.setWidth100();
 		bulkPanel.setHeight("*");
 		bulkPanel.setShowResizeBar(false);
 
-		if (CONTEXT_CHECKIN.equals(context) && metadata != null)
+		if (CHECKIN.equals(context) && metadata != null)
 			metadata.setStatus(originalStatus);
 
 		HTMLPane spacer = new HTMLPane();
@@ -102,10 +105,10 @@ public class UpdateDialog extends StickyWindow {
 		spacer.setWidth("60%");
 		spacer.setOverflow(Overflow.HIDDEN);
 
-		TextItem versionComment = ItemFactory.newTextItem("versionComment", "versioncomment", null);
+		TextItem versionComment = ItemFactory.newTextItem(VERSIONCOMMENT, null);
 		versionComment.setWidth(350);
 
-		CheckboxItem ignoreEmptyFields = ItemFactory.newCheckbox("ignoreemptyfields", "ignoreemptyfields");
+		CheckboxItem ignoreEmptyFields = ItemFactory.newCheckbox(IGNOREEMPTYFIELDS, IGNOREEMPTYFIELDS);
 		ignoreEmptyFields.setValue(true);
 
 		final DynamicForm saveForm = new DynamicForm();
@@ -113,7 +116,7 @@ public class UpdateDialog extends StickyWindow {
 		saveForm.setTitleOrientation(TitleOrientation.LEFT);
 		saveForm.setNumCols(4);
 		saveForm.setShowResizeBar(false);
-		if (CONTEXT_UPDATE.equals(context))
+		if (BULKUPDATE.equals(context))
 			saveForm.setItems(versionComment, ignoreEmptyFields);
 		else
 			saveForm.setItems(versionComment);
@@ -122,7 +125,7 @@ public class UpdateDialog extends StickyWindow {
 
 		HLayout savePanel = new HLayout();
 		savePanel.addMember(saveButton);
-		if (!CONTEXT_CHECKIN.equals(context))
+		if (!CHECKIN.equals(context))
 			savePanel.addMember(saveForm);
 		savePanel.addMember(spacer);
 		savePanel.setWidth100();
@@ -141,43 +144,39 @@ public class UpdateDialog extends StickyWindow {
 	}
 
 	private Button prepareSaveButton(final DynamicForm saveForm) {
-		Button saveButton = new Button(
-				CONTEXT_CHECKIN.equals(context) ? I18N.message("checkin") : I18N.message("save"));
+		Button saveButton = new Button(CHECKIN.equals(context) ? I18N.message(CHECKIN) : I18N.message("save"));
 		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-		saveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (!bulkPanel.validate())
-					return;
+		saveButton.addClickHandler((ClickEvent event) -> {
+			if (!bulkPanel.validate())
+				return;
 
-				DocumentService.Instance.get().validate(metadata, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().validate(metadata, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						if (caught instanceof ServerValidationException)
-							bulkPanel.extendedPropertiesPanel.handleErrors((ServerValidationException) caught);
-						else
-							GuiLog.serverError(caught);
+				@Override
+				public void onFailure(Throwable caught) {
+					if (caught instanceof ServerValidationException)
+						bulkPanel.extendedPropertiesPanel.handleErrors((ServerValidationException) caught);
+					else
+						GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void arg0) {
+					if (CHECKIN.equals(context)) {
+						doCheckin();
+					} else if (ids != null && ids.length > 0)
+						doBulkUpdate(saveForm);
+					else {
+						doAddDocuments(saveForm);
 					}
-
-					@Override
-					public void onSuccess(Void arg0) {
-						if (CONTEXT_CHECKIN.equals(context)) {
-							doCheckin();
-						} else if (ids != null && ids.length > 0)
-							doBulkUpdate(saveForm);
-						else {
-							doAddDocuments(saveForm);
-						}
-					}
-				});
-			}
+				}
+			});
 		});
 		return saveButton;
 	}
 
 	private void doAddDocuments(final DynamicForm saveForm) {
-		bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
+		bulkPanel.getDocument().setComment(saveForm.getValueAsString(VERSIONCOMMENT));
 		LD.contactingServer();
 		hide();
 		DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing, bulkPanel.getDocument(),
@@ -203,12 +202,12 @@ public class UpdateDialog extends StickyWindow {
 	}
 
 	private void doBulkUpdate(final DynamicForm saveForm) {
-		LD.ask(I18N.message("bulkupdate"), I18N.message("bulkwarning"), (Boolean confirmBulkUpdate) -> {
-			if (confirmBulkUpdate) {
-				bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
+		LD.ask(I18N.message(BULKUPDATE), I18N.message("bulkwarning"), (Boolean yes) -> {
+			if (Boolean.TRUE.equals(yes)) {
+				bulkPanel.getDocument().setComment(saveForm.getValueAsString(VERSIONCOMMENT));
 				LD.contactingServer();
 				DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
-						"true".equals(saveForm.getValueAsString("ignoreemptyfields")),
+						"true".equals(saveForm.getValueAsString(IGNOREEMPTYFIELDS)),
 						new AsyncCallback<GUIDocument[]>() {
 							@Override
 							public void onFailure(Throwable error) {

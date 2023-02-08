@@ -16,7 +16,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -44,6 +43,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 7.5
  */
 public class AttributeSetsPanel extends VLayout {
+
+	private static final String DESCRIPTION = "description";
 
 	protected Layout detailsContainer;
 
@@ -81,7 +82,7 @@ public class AttributeSetsPanel extends VLayout {
 		name.setCanFilter(true);
 		name.setCanSort(true);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"), 300);
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 300);
 		description.setCanFilter(true);
 		description.setCanSort(false);
 
@@ -146,8 +147,8 @@ public class AttributeSetsPanel extends VLayout {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				ListGridRecord record = list.getSelectedRecord();
-				if (!"true".equals(record.getAttributeAsString("readonly"))) {
+				ListGridRecord rec = list.getSelectedRecord();
+				if (!"true".equals(rec.getAttributeAsString("readonly"))) {
 					showContextMenu();
 				}
 				event.cancel();
@@ -157,9 +158,9 @@ public class AttributeSetsPanel extends VLayout {
 		list.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
 			public void onSelectionChanged(SelectionEvent event) {
-				Record record = list.getSelectedRecord();
-				if (record != null)
-					AttributeSetService.Instance.get().getAttributeSet(record.getAttributeAsLong("id"),
+				Record rec = list.getSelectedRecord();
+				if (rec != null)
+					AttributeSetService.Instance.get().getAttributeSet(rec.getAttributeAsLong("id"),
 							new AsyncCallback<GUIAttributeSet>() {
 
 								@Override
@@ -191,17 +192,15 @@ public class AttributeSetsPanel extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord record = list.getSelectedRecord();
-		final long id = record.getAttributeAsLong("id");
+		final ListGridRecord rec = list.getSelectedRecord();
+		final long id = rec.getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"),(Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
 							AttributeSetService.Instance.get().delete(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
@@ -216,7 +215,6 @@ public class AttributeSetsPanel extends VLayout {
 								}
 							});
 						}
-					}
 				});
 			}
 		});
@@ -239,24 +237,24 @@ public class AttributeSetsPanel extends VLayout {
 	}
 
 	/**
-	 * Updates the selected record with new data
+	 * Updates the selected rec with new data
 	 * 
 	 * @param set the attribute set to update
 	 */
 	public void updateRecord(GUIAttributeSet set) {
-		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, set.getId()));
-		if (record == null) {
-			record = new ListGridRecord();
-			// Append a new record
-			record.setAttribute("id", set.getId());
-			list.addData(record);
-			list.selectRecord(record);
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, set.getId()));
+		if (rec == null) {
+			rec = new ListGridRecord();
+			// Append a new rec
+			rec.setAttribute("id", set.getId());
+			list.addData(rec);
+			list.selectRecord(rec);
 		}
 
-		record.setAttribute("readonly", "" + set.isReadonly());
-		record.setAttribute("name", set.getName());
-		record.setAttribute("description", set.getDescription());
-		list.refreshRow(list.getRecordIndex(record));
+		rec.setAttribute("readonly", "" + set.isReadonly());
+		rec.setAttribute("name", set.getName());
+		rec.setAttribute(DESCRIPTION, set.getDescription());
+		list.refreshRow(list.getRecordIndex(rec));
 
 	}
 

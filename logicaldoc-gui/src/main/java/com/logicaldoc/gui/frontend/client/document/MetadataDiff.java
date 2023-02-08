@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class MetadataDiff extends Window {
 
+	private static final String LABEL = "label";
+
 	public MetadataDiff(final GUIVersion version1, final GUIVersion version2) {
 		super();
 
@@ -41,7 +43,7 @@ public class MetadataDiff extends Window {
 		centerInPage();
 
 		// Prepare the records, each one is related to a version's attribute
-		ArrayList<DiffRecord> records = new ArrayList<DiffRecord>();
+		ArrayList<DiffRecord> records = new ArrayList<>();
 		records.add(new DiffRecord(I18N.message("versiondate"), I18N.message("versiondate"),
 				I18N.formatDate(version1.getVersionDate()), I18N.formatDate(version2.getVersionDate()), 0));
 		records.add(new DiffRecord(I18N.message("fileversion"), I18N.message("fileversion"), version1.getFileVersion(),
@@ -100,7 +102,7 @@ public class MetadataDiff extends Window {
 				version2.getTemplate(), 0));
 		printExtendedAttributes(records, version1, version2);
 
-		ListGridField label = new ListGridField("label", " ");
+		ListGridField label = new ListGridField(LABEL, " ");
 		ListGridField val1 = new ListGridField("val1", version1.getVersion());
 		ListGridField val2 = new ListGridField("val2", version2.getVersion());
 
@@ -135,7 +137,7 @@ public class MetadataDiff extends Window {
 		DateTimeFormat dateFormat = DateTimeFormat.getFormat(I18N.message("format_date"));
 		NumberFormat numberFormat = NumberFormat.getDecimalFormat();
 
-		List<DiffRecord> attributeRecords = new ArrayList<DiffRecord>();
+		List<DiffRecord> attributeRecords = new ArrayList<>();
 
 		List<String> names = prepareAttributeNames(version1, version2);
 
@@ -173,8 +175,8 @@ public class MetadataDiff extends Window {
 			val2 = extractValue(dateFormat, numberFormat, att2);
 		}
 
-		DiffRecord record = new DiffRecord(name, label, val1, val2, position);
-		attributeRecords.add(record);
+		DiffRecord rec = new DiffRecord(name, label, val1, val2, position);
+		attributeRecords.add(rec);
 	}
 
 	private String extractValue(DateTimeFormat dateFormat, NumberFormat numberFormat, GUIAttribute attribute) {
@@ -193,7 +195,7 @@ public class MetadataDiff extends Window {
 	}
 
 	private List<String> prepareAttributeNames(GUIVersion version1, GUIVersion version2) {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 
 		// Collect all attribute names from version1
 		for (GUIAttribute att : version1.getAttributes()) {
@@ -209,6 +211,7 @@ public class MetadataDiff extends Window {
 	}
 
 	public class DiffRecord extends ListGridRecord implements Comparable<DiffRecord> {
+		private static final String B_CLASS_DIFF = "<b class='diff'>";
 		private int position = 0;
 
 		public DiffRecord(String name, String label, String val1, String val2, int position) {
@@ -219,10 +222,10 @@ public class MetadataDiff extends Window {
 			setVal1(val1);
 			setVal2(val2);
 			if (isDifferent()) {
-				setName("<b class='diff'>" + getAttribute("name") + "</b>");
-				setLabel("<b class='diff'>" + getAttribute("label") + "</b>");
-				setVal1("<b class='diff'>" + getAttribute("val1") + "</b>");
-				setVal2("<b class='diff'>" + getAttribute("val2") + "</b>");
+				setName(B_CLASS_DIFF + getAttribute("name") + "</b>");
+				setLabel(B_CLASS_DIFF + getAttribute(LABEL) + "</b>");
+				setVal1(B_CLASS_DIFF + getAttribute("val1") + "</b>");
+				setVal2(B_CLASS_DIFF + getAttribute("val2") + "</b>");
 			}
 		}
 
@@ -235,7 +238,7 @@ public class MetadataDiff extends Window {
 		}
 
 		public void setLabel(String label) {
-			setAttribute("label", label != null ? label : "");
+			setAttribute(LABEL, label != null ? label : "");
 		}
 
 		public void setVal1(String val1) {

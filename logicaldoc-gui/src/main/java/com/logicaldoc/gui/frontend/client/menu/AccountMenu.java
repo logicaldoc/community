@@ -33,6 +33,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class AccountMenu extends Menu {
 
+	private static final String TWOFA_ENABLED = "2fa.enabled";
+
 	public AccountMenu() {
 		setShowShadow(true);
 		setShadowDepth(3);
@@ -99,7 +101,7 @@ public class AccountMenu extends Menu {
 			}
 		});
 
-		List<MenuItem> items = new ArrayList<MenuItem>();
+		List<MenuItem> items = new ArrayList<>();
 
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ACCOUNT)) {
 			items.add(profile);
@@ -170,7 +172,7 @@ public class AccountMenu extends Menu {
 				cp.show();
 			}
 		});
-		changePswd.setEnabled(!Session.get().isDemo());
+		changePswd.setEnabled(!Session.get().isDemo() && Session.get().getUser().getSource() == 0);
 
 		MenuItem lastLogins = new MenuItem(I18N.message("lastlogins"));
 		lastLogins.addClickHandler(new ClickHandler() {
@@ -191,7 +193,7 @@ public class AccountMenu extends Menu {
 			}
 		});
 		twofactorsauth.setEnabled(!Session.get().isDemo() && Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
-				&& Session.get().getTenantConfigAsBoolean("2fa.enabled"));
+				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED));
 
 		MenuItem trustedDevices = new MenuItem(I18N.message("trusteddevices"));
 		trustedDevices.addClickHandler(new ClickHandler() {
@@ -202,14 +204,14 @@ public class AccountMenu extends Menu {
 			}
 		});
 		trustedDevices.setEnabled(!Session.get().isDemo() && Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
-				&& Session.get().getTenantConfigAsBoolean("2fa.enabled"));
+				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED));
 
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
 
 		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
-				&& Session.get().getTenantConfigAsBoolean("2fa.enabled"))
+				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED))
 			menu.setItems(changePswd, lastLogins, twofactorsauth, trustedDevices);
 		else
 			menu.setItems(changePswd, lastLogins);

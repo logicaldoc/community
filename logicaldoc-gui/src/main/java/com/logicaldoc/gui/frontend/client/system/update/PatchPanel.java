@@ -36,12 +36,10 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -55,6 +53,14 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 8.2.1
  */
 public class PatchPanel extends VLayout {
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String RATING = "rating";
+
+	private static final String RESTART = "restart";
+
+	private static final String INSTALLED = "installed";
 
 	// Shows the install notes panel
 	VLayout notesPanel = new VLayout();
@@ -84,7 +90,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void switchListView(GUIPatch[] patches) {
-		if (contains(downloadPanel))
+		if (Boolean.TRUE.equals(contains(downloadPanel)))
 			removeMember(downloadPanel);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"), 100);
@@ -95,24 +101,20 @@ public class PatchPanel extends VLayout {
 
 		ListGridField name = new ListGridField("name", I18N.message("patch"), 110);
 
-		ListGridField installed = new ListGridField("installed", I18N.message("installed"), 110);
+		ListGridField installed = new ListGridField(INSTALLED, I18N.message(INSTALLED), 110);
 		installed.setType(ListGridFieldType.BOOLEAN);
 
-		ListGridField restart = new ListGridField("restart", I18N.message("requiresrestart"), 110);
+		ListGridField restart = new ListGridField(RESTART, I18N.message("requiresrestart"), 110);
 		restart.setType(ListGridFieldType.BOOLEAN);
 
-		ListGridField rating = new ListGridField("rating", I18N.message("severityrating"), 110);
-		rating.setCellFormatter(new CellFormatter() {
+		ListGridField rating = new ListGridField(RATING, I18N.message("severityrating"), 110);
+		rating.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+			int ratingVal = 0;
+			if (value != null)
+				ratingVal = Integer.parseInt(value.toString());
 
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				int rating = 0;
-				if (value != null)
-					rating = Integer.parseInt(value.toString());
-
-				return "<span style='color: " + GUIPatch.getColor(rating) + "'>"
-						+ I18N.message("severityrating." + rating) + "</span>";
-			}
+			return "<span style='color: " + GUIPatch.getColor(ratingVal) + "'>"
+					+ I18N.message("severityrating." + rating) + "</span>";
 		});
 
 		ListGridField date = new DateListGridField("date", I18N.message("date"), DateCellFormatter.FORMAT_SHORT);
@@ -123,9 +125,9 @@ public class PatchPanel extends VLayout {
 
 		final ListGrid list = new ListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (!record.getAttributeAsBoolean("installed"))
-					return super.getCellCSSText(record, rowNum, colNum);
+			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
+				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(INSTALLED)))
+					return super.getCellCSSText(rec, rowNum, colNum);
 				else
 					return "color: #888888; font-style: italic;";
 			}
@@ -138,31 +140,28 @@ public class PatchPanel extends VLayout {
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setCanExpandRecords(true);
 		list.setExpansionMode(ExpansionMode.DETAIL_FIELD);
-		list.setDetailField("description");
+		list.setDetailField(DESCRIPTION);
 		list.setFields(id, name, rating, date, size, installed, restart, file);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu(list);
-				event.cancel();
-			}
+		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			showContextMenu(list);
+			event.cancel();
 		});
 
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+		List<ListGridRecord> records = new ArrayList<>();
 		if (patches != null && patches.length > 0) {
 			for (GUIPatch patch : patches) {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("id", patch.getId());
-				record.setAttribute("name", patch.getName());
-				record.setAttribute("rating", patch.getRating());
-				record.setAttribute("file", patch.getFile());
-				record.setAttribute("date", patch.getDate());
-				record.setAttribute("size", patch.getSize());
-				record.setAttribute("description", patch.getDescription());
-				record.setAttribute("installed", patch.isInstalled());
-				record.setAttribute("restart", patch.isRestart());
-				records.add(record);
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("id", patch.getId());
+				rec.setAttribute("name", patch.getName());
+				rec.setAttribute(RATING, patch.getRating());
+				rec.setAttribute("file", patch.getFile());
+				rec.setAttribute("date", patch.getDate());
+				rec.setAttribute("size", patch.getSize());
+				rec.setAttribute(DESCRIPTION, patch.getDescription());
+				rec.setAttribute(INSTALLED, patch.isInstalled());
+				rec.setAttribute(RESTART, patch.isRestart());
+				records.add(rec);
 			}
 			list.setRecords(records.toArray(new ListGridRecord[0]));
 		}
@@ -175,7 +174,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void switchDownloadView(GUIPatch patch) {
-		if (contains(listPanel))
+		if (Boolean.TRUE.equals(contains(listPanel)))
 			removeMember(listPanel);
 
 		DynamicForm form = new DynamicForm();
@@ -184,30 +183,29 @@ public class PatchPanel extends VLayout {
 		form.setColWidths("1px", "*");
 		form.setTitleOrientation(TitleOrientation.LEFT);
 
-		StaticTextItem name = ItemFactory.newStaticTextItem("name", "name", patch.getName());
+		StaticTextItem name = ItemFactory.newStaticTextItem("name", patch.getName());
 		name.setRequired(true);
 		name.setWrapTitle(false);
 
-		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "severityrating", "<span style='color: "
+		StaticTextItem rating = ItemFactory.newStaticTextItem(RATING, "severityrating", "<span style='color: "
 				+ patch.getColor() + "'>" + I18N.message("severityrating." + patch.getRating()) + "</span>");
 		rating.setRequired(true);
 		rating.setWrapTitle(false);
 
-		StaticTextItem date = ItemFactory.newStaticTextItem("date", "date", I18N.formatDateShort(patch.getDate()));
+		StaticTextItem date = ItemFactory.newStaticTextItem("date", I18N.formatDateShort(patch.getDate()));
 		date.setRequired(true);
 		date.setWrapTitle(false);
 
-		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size", Util.formatSize(patch.getSize()));
+		StaticTextItem size = ItemFactory.newStaticTextItem("size", Util.formatSize(patch.getSize()));
 		size.setRequired(true);
 		size.setWrapTitle(false);
 
-		StaticTextItem restart = ItemFactory.newStaticTextItem("restart", "requiresrestart",
+		StaticTextItem restart = ItemFactory.newStaticTextItem(RESTART, "requiresrestart",
 				patch.isRestart() ? I18N.message("yes") : I18N.message("no"));
 		restart.setRequired(true);
 		restart.setWrapTitle(false);
 
-		StaticTextItem description = ItemFactory.newStaticTextItem("description", "description",
-				patch.getDescription());
+		StaticTextItem description = ItemFactory.newStaticTextItem(DESCRIPTION, patch.getDescription());
 		description.setWidth(500);
 		description.setRequired(true);
 		description.setWrapTitle(false);
@@ -309,8 +307,7 @@ public class PatchPanel extends VLayout {
 												.get(I18N.message("patchrunning", path.replace("\\\\", "/"))).show();
 									} else {
 										ApplicationRestarting
-												.get(I18N.message("patchrunning1", path.replace("\\\\", "/")))
-												.show();
+												.get(I18N.message("patchrunning1", path.replace("\\\\", "/"))).show();
 
 										final String tenant = Session.get().getUser().getTenant().getName();
 										Session.get().close();
@@ -416,11 +413,11 @@ public class PatchPanel extends VLayout {
 				form.setColWidths("*");
 				form.setNumCols(1);
 
-				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", "changelog", infos[0]);
+				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos[0]);
 				changelog.setWidth("100%");
 				changelog.setHeight(220);
 
-				TextAreaItem patchNotes = ItemFactory.newTextAreaItem("patchnotes", "patchnotes", infos[1]);
+				TextAreaItem patchNotes = ItemFactory.newTextAreaItem("patchnotes", infos[1]);
 				patchNotes.setWidth("100%");
 				patchNotes.setHeight(220);
 
@@ -432,15 +429,15 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void showContextMenu(ListGrid list) {
-		ListGridRecord record = list.getSelectedRecord();
+		ListGridRecord rec = list.getSelectedRecord();
 		final GUIPatch patch = new GUIPatch();
-		patch.setId(record.getAttribute("id"));
-		patch.setName(record.getAttribute("name"));
-		patch.setFile(record.getAttribute("file"));
-		patch.setDescription(record.getAttribute("description"));
-		patch.setSize(record.getAttributeAsLong("size"));
-		patch.setDate(record.getAttributeAsDate("date"));
-		patch.setInstalled(record.getAttributeAsBoolean("installed"));
+		patch.setId(rec.getAttribute("id"));
+		patch.setName(rec.getAttribute("name"));
+		patch.setFile(rec.getAttribute("file"));
+		patch.setDescription(rec.getAttribute(DESCRIPTION));
+		patch.setSize(rec.getAttributeAsLong("size"));
+		patch.setDate(rec.getAttributeAsDate("date"));
+		patch.setInstalled(rec.getAttributeAsBoolean(INSTALLED));
 
 		Menu contextMenu = new Menu();
 

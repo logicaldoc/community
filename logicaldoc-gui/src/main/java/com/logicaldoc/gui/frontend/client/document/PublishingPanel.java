@@ -21,6 +21,8 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
  * @since 6.0
  */
 public class PublishingPanel extends DocumentDetailTab {
+	private static final String PUBLISHED = "published";
+
 	private DynamicForm form1 = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -40,14 +42,14 @@ public class PublishingPanel extends DocumentDetailTab {
 		if (form1 != null)
 			form1.destroy();
 
-		if (contains(form1))
+		if (Boolean.TRUE.equals(contains(form1)))
 			removeChild(form1);
 		form1 = new DynamicForm();
 		form1.setValuesManager(vm);
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setWrapItemTitles(false);
 
-		RadioGroupItem published = ItemFactory.newBooleanSelector("published", "published");
+		RadioGroupItem published = ItemFactory.newBooleanSelector(PUBLISHED, PUBLISHED);
 		if (document.getPublished() != -1) {
 			published.setRequired(true);
 			published.setValue(document.getPublished() == 1 ? "yes" : "no");
@@ -55,7 +57,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		published.setEndRow(true);
 		published.addChangedHandler(changedHandler);
 
-		final DateItem startPublishing = ItemFactory.newDateItem("startpublishing", "startpublishing");
+		final DateItem startPublishing = ItemFactory.newDateItem("startpublishing");
 		startPublishing.setValue(document.getStartPublishing());
 		startPublishing.addChangedHandler(changedHandler);
 		startPublishing.setDisabled(!updateEnabled);
@@ -78,7 +80,7 @@ public class PublishingPanel extends DocumentDetailTab {
 			}
 		});
 
-		final DateItem stopPublishing = ItemFactory.newDateItem("stoppublishing", "stoppublishing");
+		final DateItem stopPublishing = ItemFactory.newDateItem("stoppublishing");
 		stopPublishing.setValue(document.getStopPublishing());
 		stopPublishing.addChangedHandler(changedHandler);
 		stopPublishing.setDisabled(!updateEnabled);
@@ -109,9 +111,9 @@ public class PublishingPanel extends DocumentDetailTab {
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();
-		if (!vm.hasErrors()) {
-			if (!"".equals(values.get("published")) && values.get("published") != null)
-				document.setPublished("yes".equals(values.get("published")) ? 1 : 0);
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
+			if (!"".equals(values.get(PUBLISHED)) && values.get(PUBLISHED) != null)
+				document.setPublished("yes".equals(values.get(PUBLISHED)) ? 1 : 0);
 			document.setStartPublishing((Date) values.get("startpublishing"));
 			document.setStopPublishing((Date) values.get("stoppublishing"));
 		}

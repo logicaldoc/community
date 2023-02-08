@@ -36,7 +36,7 @@ public class RarUtil {
 	}
 
 	public List<String> listEntries(File rarFile) throws IOException {
-		List<String> entries = new ArrayList<String>();
+		List<String> entries = new ArrayList<>();
 
 		try {
 			try (Archive archive = new Archive(rarFile)) {

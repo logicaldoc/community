@@ -161,6 +161,8 @@ public class GUIUser implements Serializable {
 	 */
 	private String lastLoginFailureReason;
 
+	private int source = 0;
+
 	public GUIUser() {
 		tenant = new GUITenant();
 		tenant.setId(Constants.TENANT_DEFAULTID);
@@ -673,7 +675,7 @@ public class GUIUser implements Serializable {
 	}
 
 	public List<String> orderedSearches() {
-		List<String> searches = new ArrayList<String>();
+		List<String> searches = new ArrayList<>();
 		if (searchPref != null && !searchPref.isEmpty()) {
 			searches = Arrays.asList(searchPref.replace(" ", "").split(","));
 		} else
@@ -727,5 +729,13 @@ public class GUIUser implements Serializable {
 
 	public void setTimeZone(String timeZone) {
 		this.timeZone = timeZone;
+	}
+
+	public int getSource() {
+		return source;
+	}
+
+	public void setSource(int source) {
+		this.source = source;
 	}
 }

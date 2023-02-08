@@ -34,6 +34,8 @@ import com.logicaldoc.web.util.ServletUtil;
 
 public class TicketDownload extends HttpServlet {
 
+	private static final String TICKET_ID = "ticketId";
+
 	private static final long serialVersionUID = 9088160958327454062L;
 
 	protected static Logger log = LoggerFactory.getLogger(TicketDownload.class);
@@ -55,47 +57,15 @@ public class TicketDownload extends HttpServlet {
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		String ticketId = request.getParameter("ticketId");
-
+		String ticketId = request.getParameter(TICKET_ID);
 		try {
-			HttpSession session = request.getSession();
+			ticketId = getTicketId(request);
 
-			if (StringUtils.isEmpty(ticketId)) {
-				ticketId = (String) request.getAttribute("ticketId");
-			}
+			Ticket ticket = getTicket(ticketId);
 
-			if (StringUtils.isEmpty(ticketId)) {
-				ticketId = (String) session.getAttribute("ticketId");
-			}
+			Document document = getDocument(ticket);
 
-			log.debug("Download ticket ticketId={}", ticketId);
-
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
-			FormatConverterManager converter = (FormatConverterManager) Context.get()
-					.getBean(FormatConverterManager.class);
-			Ticket ticket = ticketDao.findByTicketId(ticketId);
-			if (ticket == null || ticket.getDocId() == 0)
-				throw new IOException("Unexisting ticket");
-
-			if (ticket.isTicketExpired())
-				throw new IOException("Expired ticket");
-
-			Document doc = docDao.findById(ticket.getDocId());
-			if (doc.getDocRef() != null)
-				doc = docDao.findById(doc.getDocRef());
-
-			if (!doc.isPublishing())
-				throw new IOException("Document not published");
-
-			String suffix = ticket.getSuffix();
-			if ("pdf".equals(suffix))
-				suffix = "conversion.pdf";
-			if ("conversion.pdf".equals(suffix)) {
-				converter.convertToPdf(doc, null);
-				if ("pdf".equals(FileUtil.getExtension(doc.getFileName()).toLowerCase()))
-					suffix = null;
-			}
+			String suffix = getSuffix(ticket, document);
 
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			String tenantName = tenantDao.getTenantName(ticket.getTenantId());
@@ -103,8 +73,11 @@ public class TicketDownload extends HttpServlet {
 			request.setAttribute("open", Boolean.toString("display".equals(
 					Context.get().getProperties().getProperty(tenantName + ".downloadticket.behavior", "download"))));
 
-			downloadDocument(request, response, doc, null, suffix, ticketId);
+			downloadDocument(request, response, document, null, suffix, ticketId);
 			ticket.setCount(ticket.getCount() + 1);
+
+			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
+
 			ticketDao.store(ticket);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -116,6 +89,56 @@ public class TicketDownload extends HttpServlet {
 				// Nothing to do
 			}
 		}
+	}
+
+	private String getSuffix(Ticket ticket, Document document) throws IOException {
+		String suffix = ticket.getSuffix();
+		if ("pdf".equals(suffix))
+			suffix = "conversion.pdf";
+		if ("conversion.pdf".equals(suffix)) {
+			FormatConverterManager converter = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
+			converter.convertToPdf(document, null);
+			if ("pdf".equals(FileUtil.getExtension(document.getFileName()).toLowerCase()))
+				suffix = null;
+		}
+		return suffix;
+	}
+
+	private Document getDocument(Ticket ticket) throws PersistenceException, IOException {
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document doc = docDao.findById(ticket.getDocId());
+		if (doc.getDocRef() != null)
+			doc = docDao.findById(doc.getDocRef());
+		if (!doc.isPublishing())
+			throw new IOException("Document not published");
+		return doc;
+	}
+
+	private Ticket getTicket(String ticketId) throws IOException {
+		TicketDAO tktDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
+		Ticket ticket = tktDao.findByTicketId(ticketId);
+		if (ticket == null || ticket.getDocId() == 0)
+			throw new IOException("Unexisting ticket");
+
+		if (ticket.isTicketExpired())
+			throw new IOException("Expired ticket");
+		return ticket;
+	}
+
+	private String getTicketId(HttpServletRequest request) {
+		String ticketId = request.getParameter(TICKET_ID);
+		if (StringUtils.isEmpty(ticketId)) {
+			ticketId = (String) request.getAttribute(TICKET_ID);
+		}
+
+		if (StringUtils.isEmpty(ticketId)) {
+			HttpSession session = request.getSession();
+			ticketId = (String) session.getAttribute(TICKET_ID);
+		}
+
+		log.debug("Download ticket ticketId={}", ticketId);
+		return ticketId;
 	}
 
 	/**

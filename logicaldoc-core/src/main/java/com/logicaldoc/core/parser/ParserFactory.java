@@ -38,13 +38,13 @@ public class ParserFactory {
 	 * This is the map of registered parsers: key is the file extension, value
 	 * is the parser instance
 	 */
-	private static Map<String, Parser> parsers = new HashMap<String, Parser>();
+	private static Map<String, Parser> parsers = new HashMap<>();
 
 	/**
 	 * The map of aliases. Key is the alias, value is the registered extension.
 	 * (eg. test->odt(
 	 */
-	private static Map<String, String> aliases = new HashMap<String, String>();
+	private static Map<String, String> aliases = new HashMap<>();
 
 	/**
 	 * Registers all parsers from extension points

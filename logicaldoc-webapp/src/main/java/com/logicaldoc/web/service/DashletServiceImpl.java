@@ -71,7 +71,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			List<Dashlet> dashlets = dao.findAll(session.getTenantId());
-			ArrayList<GUIDashlet> guiDashlets = new ArrayList<GUIDashlet>();
+			ArrayList<GUIDashlet> guiDashlets = new ArrayList<>();
 			for (Dashlet dashlet : dashlets)
 				guiDashlets.add(fromDashlet(dashlet));
 			return guiDashlets.toArray(new GUIDashlet[0]);

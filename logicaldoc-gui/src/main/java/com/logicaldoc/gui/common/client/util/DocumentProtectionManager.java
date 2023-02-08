@@ -21,7 +21,7 @@ import com.smartgwt.client.util.SC;
 public class DocumentProtectionManager {
 
 	// Stores the doc's ID and the password used to un-protect it
-	private static Map<Long, String> unprotectedDocs = new HashMap<Long, String>();
+	private static Map<Long, String> unprotectedDocs = new HashMap<>();
 
 	public static boolean isUnprotected(long docId) {
 		return unprotectedDocs.containsKey(docId);
@@ -99,7 +99,7 @@ public class DocumentProtectionManager {
 
 					@Override
 					public void onSuccess(Boolean granted) {
-						if (granted) {
+						if (Boolean.TRUE.equals(granted)) {
 							saveProtectionPasswordAndNotify(docId, handler, result,
 									password);
 						} else if (handler != null) {

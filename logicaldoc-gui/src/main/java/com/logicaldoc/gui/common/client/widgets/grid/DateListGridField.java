@@ -51,7 +51,7 @@ public class DateListGridField extends ColoredListGridField {
 		private int format = FORMAT_DEFAULT;
 
 		@Override
-		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+		public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 			if(value==null)
 				return "";
 			
@@ -64,7 +64,7 @@ public class DateListGridField extends ColoredListGridField {
 				val = I18N.formatDate((Date) value);
 			
 			if (val != null)
-				return super.format(val, record, rowNum, colNum);
+				return super.format(val, rec, rowNum, colNum);
 			else
 				return "";
 		}

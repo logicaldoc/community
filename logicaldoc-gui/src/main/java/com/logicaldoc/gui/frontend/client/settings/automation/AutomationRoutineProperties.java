@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings.automation;
 
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
-import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -45,8 +44,8 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 		form2.setValuesManager(vm);
 		form2.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
-				routine.getAutomation(), changedHandler, false);
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", routine.getAutomation(),
+				changedHandler, false);
 		automation.setStartRow(false);
 		automation.setRequired(true);
 		automation.setWidth("*");
@@ -58,12 +57,11 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setValuesManager(vm);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", I18N.message("name"), routine.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", routine.getName());
 		name.addChangedHandler(changedHandler);
 		name.setDisabled(routine.getId() != 0L);
 
-		TextItem description = ItemFactory.newTextItem("description", I18N.message("description"),
-				routine.getDescription());
+		TextItem description = ItemFactory.newTextItem("description", routine.getDescription());
 		description.addChangedHandler(changedHandler);
 		description.setWidth(200);
 
@@ -74,7 +72,7 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 
 	boolean validate() {
 		vm.validate();
-		if (!vm.hasErrors()) {
+		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			routine.setName(vm.getValueAsString("name"));
 			routine.setDescription(vm.getValueAsString("description"));
 			routine.setAutomation(vm.getValueAsString("automation"));

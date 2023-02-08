@@ -95,13 +95,13 @@ public class SearchTool {
 		SearchEngine engine = (SearchEngine) Context.get().getBean(SearchEngine.class);
 		Hits result = engine.search(expression, filters.toArray(new String[0]), expressionLanguage, null);
 		
-		Map<Long, Hit> hitsMap = new HashMap<Long, Hit>();
+		Map<Long, Hit> hitsMap = new HashMap<>();
 		while (result.hasNext()) {
 			Hit hit = result.next();
 			hitsMap.put(hit.getId(), hit);
 		}
 
-		List<Hit> hits = new ArrayList<Hit>();
+		List<Hit> hits = new ArrayList<>();
 		if (!hitsMap.isEmpty()) {
 			
 			Set<Long> hitsIds = hitsMap.keySet();
@@ -156,7 +156,7 @@ public class SearchTool {
 			}
 
 			// Now sort the hits by score desc
-			hits = new ArrayList<Hit>(hitsMap.values());
+			hits = new ArrayList<>(hitsMap.values());
 			try {
 				Collections.sort(hits);
 			} catch (Throwable t) {

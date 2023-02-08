@@ -178,7 +178,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 
 	@Override
 	public String[] getLanguages(String tenantOrSid) throws Exception {
-		List<String> langs = new ArrayList<String>();
+		List<String> langs = new ArrayList<>();
 
 		String t = Tenant.DEFAULT_NAME;
 		if (tenantOrSid != null)

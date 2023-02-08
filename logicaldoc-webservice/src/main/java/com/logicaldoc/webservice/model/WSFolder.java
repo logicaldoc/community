@@ -106,7 +106,7 @@ public class WSFolder implements Serializable {
 	public void addTag(String tag) {
 		if (tags == null)
 			tags = new String[0];
-		List<String> buf = new ArrayList<String>();
+		List<String> buf = new ArrayList<>();
 		for (String tmp : tags)
 			buf.add(tmp);
 		if (!buf.contains(tag))
@@ -115,7 +115,7 @@ public class WSFolder implements Serializable {
 	}
 
 	public Collection<String> listAttributeNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		for (WSAttribute att : getAttributes()) {
 			names.add(att.getName());
 		}
@@ -162,37 +162,40 @@ public class WSFolder implements Serializable {
 			wsFolder.setTemplateId(folder.getTemplate().getId());
 
 		// Populate the attributes
-		if (withCollections) {
-			WSAttribute[] attributes = new WSAttribute[0];
-			if (folder.getTemplate() != null && folder.getAttributes() != null && folder.getAttributes().size() > 0) {
-				attributes = new WSAttribute[folder.getAttributeNames().size()];
-				int i = 0;
-				for (String name : folder.getAttributeNames()) {
-					Attribute attr = folder.getAttribute(name);
-					WSAttribute attribute = new WSAttribute();
-					attribute.setName(name);
-					attribute.setMandatory(attr.getMandatory());
-					attribute.setHidden(attr.getHidden());
-					attribute.setReadonly(attr.getReadonly());
-					attribute.setMultiple(attr.getMultiple());
-					attribute.setParent(attr.getParent());
-					attribute.setPosition(attr.getPosition());
-					WSAttribute.setValue(attribute, attr.getValue());
-					attribute.setStringValues(attr.getStringValues());
-
-					if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER) {
-						attribute.setIntValue(attr.getIntValue());
-						attribute.setStringValue(attr.getStringValue());
-					}
-
-					attribute.setType(attr.getType());
-					attributes[i++] = attribute;
-				}
-			}
-			wsFolder.setAttributes(attributes);
-		}
+		if (withCollections)
+			fillAttributes(folder, wsFolder);
 
 		return wsFolder;
+	}
+
+	private static void fillAttributes(Folder folder, WSFolder wsFolder) {
+		WSAttribute[] attributes = new WSAttribute[0];
+		if (folder.getTemplate() != null && folder.getAttributes() != null && folder.getAttributes().size() > 0) {
+			attributes = new WSAttribute[folder.getAttributeNames().size()];
+			int i = 0;
+			for (String name : folder.getAttributeNames()) {
+				Attribute attr = folder.getAttribute(name);
+				WSAttribute attribute = new WSAttribute();
+				attribute.setName(name);
+				attribute.setMandatory(attr.getMandatory());
+				attribute.setHidden(attr.getHidden());
+				attribute.setReadonly(attr.getReadonly());
+				attribute.setMultiple(attr.getMultiple());
+				attribute.setParent(attr.getParent());
+				attribute.setPosition(attr.getPosition());
+				WSAttribute.setValue(attribute, attr.getValue());
+				attribute.setStringValues(attr.getStringValues());
+
+				if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER) {
+					attribute.setIntValue(attr.getIntValue());
+					attribute.setStringValue(attr.getStringValue());
+				}
+
+				attribute.setType(attr.getType());
+				attributes[i++] = attribute;
+			}
+		}
+		wsFolder.setAttributes(attributes);
 	}
 
 	public void updateAttributes(Folder folder) throws PersistenceException {

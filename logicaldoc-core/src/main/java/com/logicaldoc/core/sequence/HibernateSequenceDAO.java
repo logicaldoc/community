@@ -22,6 +22,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence> implements SequenceDAO {
 
+	private static final String AND = " and ";
+
 	private HibernateSequenceDAO() {
 		super(Sequence.class);
 		super.log = LoggerFactory.getLogger(HibernateSequenceDAO.class);
@@ -86,13 +88,13 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 	@Override
 	public List<Sequence> findByName(String name, long tenantId) {
 		String query = " " + ENTITY + ".tenantId=" + tenantId;
-		query += " and " + ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "%' ";
+		query += AND + ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "%' ";
 
 		try {
 			return findByWhere(query, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Sequence>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -102,11 +104,11 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			Sequence sequence = null;
 
 			String query = " " + ENTITY + ".tenantId = :tenantId ";
-			query += " and " + ENTITY + ".objectId = :objectId ";
-			query += " and " + ENTITY + ".name = :name ";
-			List<Sequence> sequences = new ArrayList<Sequence>();
+			query += AND + ENTITY + ".objectId = :objectId ";
+			query += AND + ENTITY + ".name = :name ";
+			List<Sequence> sequences = new ArrayList<>();
 			try {
-				Map<String, Object> params = new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<>();
 				params.put("tenantId", tenantId);
 				params.put("objectId", objectId);
 				params.put("name", name);

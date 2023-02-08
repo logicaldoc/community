@@ -36,6 +36,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.7
  */
 public class WebservicesPanel extends VLayout {
+	private static final String FALSE = "false";
+
+	private static final String WS_TTL = "wsTtl";
+
 	private GUIParameter enabled = null;
 
 	private GUIParameter recCalls = null;
@@ -63,9 +67,9 @@ public class WebservicesPanel extends VLayout {
 		for (GUIParameter parameter : settings) {
 			if (parameter.getName().equals("webservice.enabled"))
 				enabled = parameter;
-			if (parameter.getName().equals("webservice.call.record"))
+			if (parameter.getName().equals("webservice.call.rec"))
 				recCalls = parameter;
-			if (parameter.getName().equals("webservice.call.record.payload"))
+			if (parameter.getName().equals("webservice.call.rec.payload"))
 				recCallsPayload = parameter;
 			if (parameter.getName().equals("webservice.call.ttl"))
 				callsTtl = parameter;
@@ -92,16 +96,16 @@ public class WebservicesPanel extends VLayout {
 		// Web Service Enabled
 		RadioGroupItem wsEnabled = prepareEnabledItem();
 
-		SpinnerItem ttl = ItemFactory.newSpinnerItem("wsTtl", "timetolive", Integer.parseInt(callsTtl.getValue()));
+		SpinnerItem ttl = ItemFactory.newSpinnerItem(WS_TTL, "timetolive", Integer.parseInt(callsTtl.getValue()));
 		ttl.setHint(I18N.message("days"));
 		ttl.setMin(1);
 		ttl.setStep(1);
-		ttl.setDisabled(recCalls.getValue().equals("false"));
+		ttl.setDisabled(recCalls.getValue().equals(FALSE));
 
-		// Flag to record webservice calls payload
+		// Flag to rec webservice calls payload
 		RadioGroupItem recordCallsPayload = prepareRecordCallsPayloadItem();
 
-		// Flag to record webservice calls
+		// Flag to rec webservice calls
 		RadioGroupItem recordCalls = ItemFactory.newBooleanSelector("wsRecordCalls", "recordcalls");
 		recordCalls.setRequired(true);
 		recordCalls.setValue(recCalls.getValue().equals("true") ? "yes" : "no");
@@ -211,16 +215,16 @@ public class WebservicesPanel extends VLayout {
 	}
 
 	public void save() {
-		enabled.setValue(webServiceForm.getValueAsString("wsEnabled").equals("yes") ? "true" : "false");
-		recCalls.setValue(webServiceForm.getValueAsString("wsRecordCalls").equals("yes") ? "true" : "false");
+		enabled.setValue(webServiceForm.getValueAsString("wsEnabled").equals("yes") ? "true" : FALSE);
+		recCalls.setValue(webServiceForm.getValueAsString("wsRecordCalls").equals("yes") ? "true" : FALSE);
 		recCallsPayload
-				.setValue(webServiceForm.getValueAsString("wsRecordCallsPayload").equals("yes") ? "true" : "false");
+				.setValue(webServiceForm.getValueAsString("wsRecordCallsPayload").equals("yes") ? "true" : FALSE);
 		callsTtl.setValue(
-				webServiceForm.getValueAsString("wsTtl") != null ? webServiceForm.getValueAsString("wsTtl") : "90");
+				webServiceForm.getValueAsString(WS_TTL) != null ? webServiceForm.getValueAsString(WS_TTL) : "90");
 	}
 
 	public List<GUIParameter> getSettings() {
-		List<GUIParameter> settings = new ArrayList<GUIParameter>();
+		List<GUIParameter> settings = new ArrayList<>();
 		settings.add(enabled);
 		settings.add(recCalls);
 		settings.add(recCallsPayload);

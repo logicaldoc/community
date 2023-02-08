@@ -28,6 +28,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.6
  */
 public class UserSearchDialog extends Window {
+	private static final String LASTNAME = "lastname";
+
+	private static final String FIRSTNAME = "firstname";
+
+	private static final String USERNAME = "username";
+
 	private ListGrid grid = new ListGrid();
 
 	private UserSelector selector;
@@ -46,7 +52,7 @@ public class UserSearchDialog extends Window {
 		setWidth(500);
 		setHeight(300);
 
-		final TextItem username = ItemFactory.newTextItem("username", "username", null);
+		final TextItem username = ItemFactory.newTextItem(USERNAME, null);
 		final SelectItem group = ItemFactory.newGroupSelector("group", "group");
 
 		ToolStripButton search = new ToolStripButton(I18N.message("search"));
@@ -68,9 +74,9 @@ public class UserSearchDialog extends Window {
 		toolStrip.addButton(search);
 
 		UserListGridField avatar = new UserListGridField();
-		ListGridField usernameField = new ListGridField("username", I18N.message("username"));
-		ListGridField nameField = new ListGridField("firstname", I18N.message("firstname"));
-		ListGridField lastnameField = new ListGridField("lastname", I18N.message("lastname"));
+		ListGridField usernameField = new ListGridField(USERNAME, I18N.message(USERNAME));
+		ListGridField nameField = new ListGridField(FIRSTNAME, I18N.message(FIRSTNAME));
+		ListGridField lastnameField = new ListGridField(LASTNAME, I18N.message(LASTNAME));
 
 		grid.setFields(avatar, usernameField, nameField, lastnameField);
 		grid.setWidth100();
@@ -106,13 +112,13 @@ public class UserSearchDialog extends Window {
 				lastResult = new ListGridRecord[result.length];
 				for (int i = 0; i < result.length; i++) {
 					GUIUser hit = result[i];
-					ListGridRecord record = new ListGridRecord();
-					lastResult[i] = record;
-					record.setAttribute("avatar", hit.getId());
-					record.setAttribute("id", hit.getId());
-					record.setAttribute("username", hit.getUsername());
-					record.setAttribute("firstname", hit.getFirstName());
-					record.setAttribute("lastname", hit.getName());
+					ListGridRecord rec = new ListGridRecord();
+					lastResult[i] = rec;
+					rec.setAttribute("avatar", hit.getId());
+					rec.setAttribute("id", hit.getId());
+					rec.setAttribute(USERNAME, hit.getUsername());
+					rec.setAttribute(FIRSTNAME, hit.getFirstName());
+					rec.setAttribute(LASTNAME, hit.getName());
 				}
 
 				if (lastResult.length == 1) {

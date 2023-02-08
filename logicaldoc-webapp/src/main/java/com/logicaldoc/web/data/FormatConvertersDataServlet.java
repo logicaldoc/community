@@ -30,11 +30,13 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class FormatConvertersDataServlet extends AbstractDataServlet {
 
+	private static final String CLOSE_ID = "]]></id>";
+	private static final String ID = "<id><![CDATA[";
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+			Locale locale) throws PersistenceException, IOException {
 
 		String in = request.getParameter("in");
 		String out = request.getParameter("out");
@@ -43,59 +45,78 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		boolean parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadEnable(1750, session.getUserId());
 
-		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
-		manager.getConverters();
-
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
 		if (!StringUtils.isEmpty(converterSpecification)) {
-			// Get all the possible associations of a specific converter
-			for (String inExt : manager.getAvailableInputFormats()) {
-				for (String outExt : manager.getAllOutputFormats(inExt)) {
-					String id = inExt + "-" + outExt;
-					List<FormatConverter> converters = manager.getConverters().get(id);
-					for (FormatConverter formatConverter : converters) {
-						if (converterSpecification.equals(formatConverter.getClass().getName())) {
-							FormatConverter associatedConverter = manager.getConverter(inExt, outExt);
-							writer.print("<association>");
-							writer.print("<id><![CDATA[" + id + "]]></id>");
-							writer.print("<in><![CDATA[" + inExt + "]]></in>");
-							writer.print("<out><![CDATA[" + outExt + "]]></out>");
-							writer.print("<converter><![CDATA[" + associatedConverter.getClass().getName()
-									+ "]]></converter>");
-							writer.print("<selected>"
-									+ converterSpecification.equals(associatedConverter.getClass().getName())
-									+ "</selected>");
-							writer.print("<eenabled>" + associatedConverter.isEnabled() + "</eenabled>");
-							writer.print("</association>");
-						}
+			printConverters(writer, converterSpecification);
+		} else if (!StringUtils.isEmpty(in) && !StringUtils.isEmpty(out)) {
+			writeConverters(writer, in, out, parameters);
+		} else {
+			writeConverters(writer, parameters);
+		}
+		writer.write("</list>");
+	}
+
+	private void printConverters(PrintWriter writer, String converterSpecification) {
+		FormatConverterManager manager = getManager();
+
+		// Get all the possible associations of a specific converter
+		for (String inExt : manager.getAvailableInputFormats()) {
+			for (String outExt : manager.getAllOutputFormats(inExt)) {
+				String id = inExt + "-" + outExt;
+				List<FormatConverter> converters = manager.getConverters().get(id);
+				for (FormatConverter formatConverter : converters) {
+					if (converterSpecification.equals(formatConverter.getClass().getName())) {
+						FormatConverter associatedConverter = manager.getConverter(inExt, outExt);
+						writer.print("<association>");
+						writer.print(ID + id + CLOSE_ID);
+						writer.print("<in><![CDATA[" + inExt + "]]></in>");
+						writer.print("<out><![CDATA[" + outExt + "]]></out>");
+						writer.print(
+								"<converter><![CDATA[" + associatedConverter.getClass().getName() + "]]></converter>");
+						writer.print(
+								"<selected>" + converterSpecification.equals(associatedConverter.getClass().getName())
+										+ "</selected>");
+						writer.print("<eenabled>" + associatedConverter.isEnabled() + "</eenabled>");
+						writer.print("</association>");
 					}
 				}
 			}
-		} else if (!StringUtils.isEmpty(in) && !StringUtils.isEmpty(out)) {
-			Collection<FormatConverter> converters = new ArrayList<FormatConverter>();
-			if (in.equals("-") && out.equals("-")) {
-				// Get all configured converters
-				converters = manager.getAllConverters();
-			} else {
-				// Get possible converters for a specific couple of formats
-				converters = manager.getAvailableConverters(in, out);
-			}
+		}
+	}
 
-			for (FormatConverter converter : converters) {
-				writeConverter(writer, in, out, converter, parameters);
-			}
+	private void writeConverters(PrintWriter writer, String in, String out, boolean parameters) {
+		FormatConverterManager manager = getManager();
+		Collection<FormatConverter> converters = new ArrayList<>();
+		if (in.equals("-") && out.equals("-")) {
+			// Get all configured converters
+			converters = manager.getAllConverters();
 		} else {
-			// Get the full list of associations
-			for (String inExt : manager.getAvailableInputFormats()) {
-				for (String outExt : manager.getAllOutputFormats(inExt)) {
-					FormatConverter converter = manager.getConverter(inExt, outExt);
-					writeConverter(writer, inExt, outExt, converter, parameters);
-				}
+			// Get possible converters for a specific couple of formats
+			converters = manager.getAvailableConverters(in, out);
+		}
+
+		for (FormatConverter converter : converters) {
+			writeConverter(writer, in, out, converter, parameters);
+		}
+	}
+
+	private FormatConverterManager getManager() {
+		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
+		manager.getConverters();
+		return manager;
+	}
+
+	private void writeConverters(PrintWriter writer, boolean parameters) {
+		FormatConverterManager manager = getManager();
+		// Get the full list of associations
+		for (String inExt : manager.getAvailableInputFormats()) {
+			for (String outExt : manager.getAllOutputFormats(inExt)) {
+				FormatConverter converter = manager.getConverter(inExt, outExt);
+				writeConverter(writer, inExt, outExt, converter, parameters);
 			}
 		}
-		writer.write("</list>");
 	}
 
 	private void writeConverter(PrintWriter writer, String inExt, String outExt, FormatConverter converter,
@@ -107,9 +128,9 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 
 		writer.print("<converter>");
 		if ("-".equals(inExt) && "-".equals(outExt))
-			writer.print("<id><![CDATA[" + converter.getClass().getName() + "]]></id>");
+			writer.print(ID + converter.getClass().getName() + CLOSE_ID);
 		else
-			writer.print("<id><![CDATA[" + inExt + "-" + outExt + "]]></id>");
+			writer.print(ID + inExt + "-" + outExt + CLOSE_ID);
 		writer.print("<in><![CDATA[" + inExt + "]]></in>");
 		writer.print("<out><![CDATA[" + outExt + "]]></out>");
 		writer.print("<converter><![CDATA[" + converter.getClass().getName() + "]]></converter>");

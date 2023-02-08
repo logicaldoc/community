@@ -47,7 +47,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		List<Hit> hitsList = lastSearch.getHits();
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<WSDocument> docs = new ArrayList<WSDocument>();
+		List<WSDocument> docs = new ArrayList<>();
 		for (Hit hit : hitsList) {
 			Document d = docDao.findById(hit.getId());
 			docDao.initialize(d);

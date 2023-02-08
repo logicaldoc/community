@@ -125,14 +125,14 @@ public class ComparatorAssociationsDialog extends Window {
 
 	protected void onApply() {
 		for (Record rec : associationsGrid.getRecordList().toArray()) {
-			if (rec.getAttributeAsBoolean("selected")) {
+			if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("selected"))) {
 				String id = rec.getAttributeAsString("id").trim();
 				String selectedComparator = selectItem.getValueAsString();
 
-				Record record = srcGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
-				if (record != null) {
-					record.setAttribute(comparatorAttributeName, selectedComparator);
-					srcGrid.updateData(record);
+				Record recd = srcGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
+				if (recd != null) {
+					recd.setAttribute(comparatorAttributeName, selectedComparator);
+					srcGrid.updateData(rec);
 				}
 			}
 		}

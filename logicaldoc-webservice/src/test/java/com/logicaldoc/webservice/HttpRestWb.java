@@ -203,7 +203,7 @@ public class HttpRestWb {
 
 		// CloseableHttpClient httpclient = HttpClients.createDefault();
 
-		List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+		List<NameValuePair> formparams = new ArrayList<>();
 		formparams.add(new BasicNameValuePair("parentId", String.valueOf(parentId)));
 		formparams.add(new BasicNameValuePair("path", path));
 
@@ -421,7 +421,7 @@ public class HttpRestWb {
 
 		// This will create a tree starting from the Root folder (not in the
 		// Default workspace)
-		List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+		List<NameValuePair> formparams = new ArrayList<>();
 		formparams.add(new BasicNameValuePair("folderPath", "/LogicalDOC/USA/NJ/Fair Lawn/createSimple"));
 
 		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);

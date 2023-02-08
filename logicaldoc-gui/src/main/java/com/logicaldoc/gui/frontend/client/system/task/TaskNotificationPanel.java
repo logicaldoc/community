@@ -45,7 +45,7 @@ public class TaskNotificationPanel extends VLayout {
 		notificationsForm.setColWidths(1, "*");
 		notificationsForm.setMargin(3);
 
-		List<FormItem> items = new ArrayList<FormItem>();
+		List<FormItem> items = new ArrayList<>();
 
 		// Enable/Disable notifications
 		CheckboxItem sendReport = new CheckboxItem();

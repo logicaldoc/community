@@ -25,7 +25,7 @@ public class DocumentListenerManager {
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
 
-	private List<DocumentListener> listeners = new ArrayList<DocumentListener>();
+	private List<DocumentListener> listeners = new ArrayList<>();
 
 	@SuppressWarnings("rawtypes")
 	public synchronized void init() {
@@ -37,7 +37,7 @@ public class DocumentListenerManager {
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "DocumentListener");
 
 		// Sort the extensions according to ascending position
-		List<Extension> sortedExts = new ArrayList<Extension>();
+		List<Extension> sortedExts = new ArrayList<>();
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}

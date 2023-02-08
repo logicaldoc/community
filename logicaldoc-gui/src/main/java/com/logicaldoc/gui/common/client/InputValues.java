@@ -14,7 +14,7 @@ import java.util.Map;
 public class InputValues {
 
 	// Item name - Inputed value
-	private static Map<String, List<Object>> savedInputs = new HashMap<String, List<Object>>();
+	private static Map<String, List<Object>> savedInputs = new HashMap<>();
 
 	public static void saveInput(String name, Object value) {
 		if (value == null || !Session.get().getConfigAsBoolean("gui.saveinputs"))
@@ -22,7 +22,7 @@ public class InputValues {
 
 		List<Object> inputs = savedInputs.get(name);
 		if (inputs == null) {
-			inputs = new ArrayList<Object>();
+			inputs = new ArrayList<>();
 			savedInputs.put(name, inputs);
 		}
 		if (!inputs.contains(value))
@@ -32,13 +32,13 @@ public class InputValues {
 	public static List<Object> getInputs(String name) {
 		List<Object> inputs = savedInputs.get(name);
 		if (inputs == null)
-			inputs = new ArrayList<Object>();
+			inputs = new ArrayList<>();
 		return inputs;
 	}
 
 	public static List<String> getInputsAsStrings(String name) {
 		List<Object> inputs = savedInputs.get(name);
-		List<String> str = new ArrayList<String>();
+		List<String> str = new ArrayList<>();
 		if (inputs != null) {
 			for (Object val : inputs) {
 				str.add((String) val.toString());

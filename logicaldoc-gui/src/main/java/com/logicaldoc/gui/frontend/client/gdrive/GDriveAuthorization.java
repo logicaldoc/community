@@ -41,12 +41,12 @@ public class GDriveAuthorization extends Window {
 
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		final TextItem clientId = ItemFactory.newTextItem("clientid", "clientid", null);
+		final TextItem clientId = ItemFactory.newTextItem("clientid", null);
 		clientId.setWidth(370);
 		clientId.setRequired(true);
 		clientId.setEndRow(true);
 
-		final TextItem clientSecret = ItemFactory.newTextItem("clientsecret", "clientsecret", null);
+		final TextItem clientSecret = ItemFactory.newTextItem("clientsecret", null);
 		clientSecret.setWidth(370);
 		clientSecret.setRequired(true);
 		clientSecret.setEndRow(true);

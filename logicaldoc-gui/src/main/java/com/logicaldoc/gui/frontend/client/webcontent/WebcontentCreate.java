@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @since 6.7
  */
 public class WebcontentCreate extends Window {
+	private static final String TEMPLATE = "template";
+
 	private SubmitItem create;
 
 	private ValuesManager vm;
@@ -48,7 +50,7 @@ public class WebcontentCreate extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem title = ItemFactory.newTextItem("title", "title", null);
+		TextItem title = ItemFactory.newTextItem("title", null);
 		title.setRequired(true);
 		title.setWidth(200);
 
@@ -69,17 +71,17 @@ public class WebcontentCreate extends Window {
 	}
 
 	public void onCreate() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		GUIDocument vo = new GUIDocument();
 		String title = vm.getValueAsString("title").trim();
 		if (title.lastIndexOf('.') != -1)
 			title = title.substring(0, title.lastIndexOf('.'));
 
-		if (vm.getValueAsString("template") == null || "".equals(vm.getValueAsString("template").toString()))
+		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE).toString()))
 			vo.setTemplateId(null);
 		else {
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString("template").toString()));
+			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE).toString()));
 		}
 
 		vo.setType("html");

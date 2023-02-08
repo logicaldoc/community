@@ -24,6 +24,7 @@ import com.logicaldoc.util.Context;
  */
 public class MenusDataServlet extends AbstractDataServlet {
 
+	private static final String PARENT = "parent";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -34,10 +35,10 @@ public class MenusDataServlet extends AbstractDataServlet {
 		MenuDAO dao = (MenuDAO) context.getBean(MenuDAO.class);
 		long parent = Menu.ROOT;
 
-		if ("/".equals(request.getParameter("parent")))
+		if ("/".equals(request.getParameter(PARENT)))
 			parent = Menu.ROOT;
-		else if (StringUtils.isNotEmpty(request.getParameter("parent")))
-			parent = Long.parseLong(request.getParameter("parent"));
+		else if (StringUtils.isNotEmpty(request.getParameter(PARENT)))
+			parent = Long.parseLong(request.getParameter(PARENT));
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

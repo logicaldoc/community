@@ -24,7 +24,7 @@ public class StorerManager {
 	protected static Logger log = LoggerFactory.getLogger(StorerManager.class);
 
 	// Key is the type, value is the associated builder
-	private Map<String, Storer> storers = new HashMap<String, Storer>();
+	private Map<String, Storer> storers = new HashMap<>();
 
 	private ContextProperties config;
 

@@ -52,7 +52,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	private final static String INFO = "INFO";
 
 	// Map docId - Password used to unprotect it
-	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<Long, String>());
+	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<>());
 
 	private Date creation = new Date();
 
@@ -92,9 +92,9 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 * Represents a dictionary of custom informations a client may save in the
 	 * session
 	 */
-	private transient Map<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
+	private transient Map<String, Object> dictionary =  new ConcurrentHashMap<>();
 
-	private transient List<Log> logs = new ArrayList<Log>();
+	private transient List<Log> logs = new ArrayList<>();
 
 	public Map<String, Object> getDictionary() {
 		return dictionary;
@@ -230,7 +230,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 				// Send an email alert to the user in case of new device
 				if (newDevice && Context.get().getProperties().getBoolean(tenantName + ".alertnewdevice", true)) {
-					Map<String, Object> dictionary = new HashMap<String, Object>();
+					Map<String, Object> dictionary = new HashMap<>();
 					dictionary.put("user", user);
 					dictionary.put("device", device);
 					dictionary.put("client", client);
@@ -252,7 +252,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 				}
 
 			} catch (PersistenceException e) {
-				log.warn("Cannot record the device {}", device);
+				log.warn("Cannot gridRecord the device {}", device);
 			}
 		}
 

@@ -40,14 +40,16 @@ import com.smartgwt.client.widgets.IButton;
  */
 public class MultipleUpload extends HorizontalPanel {
 
+	private static final String DROP_FILES_LABEL_HOVER = "dropFilesLabelHover";
+
 	private Uploader uploader = new Uploader();
 
-	private List<String> uploadedFiles = new ArrayList<String>();
+	private List<String> uploadedFiles = new ArrayList<>();
 
 	public MultipleUpload(IButton confirmButton) {
 		final VerticalPanel progressBarPanel = new VerticalPanel();
-		final Map<String, ProgressBar> progressBars = new LinkedHashMap<String, ProgressBar>();
-		final Map<String, Image> cancelButtons = new LinkedHashMap<String, Image>();
+		final Map<String, ProgressBar> progressBars = new LinkedHashMap<>();
+		final Map<String, Image> cancelButtons = new LinkedHashMap<>();
 		prepareUploader(confirmButton, progressBarPanel, progressBars, cancelButtons);
 
 		VerticalPanel verticalPanel = new VerticalPanel();
@@ -58,14 +60,14 @@ public class MultipleUpload extends HorizontalPanel {
 			dropFilesLabel.setStyleName("dropFilesLabel");
 			dropFilesLabel.addDragOverHandler((DragOverEvent event) -> {
 				if (!uploader.getButtonDisabled()) {
-					dropFilesLabel.addStyleName("dropFilesLabelHover");
+					dropFilesLabel.addStyleName(DROP_FILES_LABEL_HOVER);
 				}
 			});
 			dropFilesLabel.addDragLeaveHandler((DragLeaveEvent event) -> {
-				dropFilesLabel.removeStyleName("dropFilesLabelHover");
+				dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER);
 			});
 			dropFilesLabel.addDropHandler((DropEvent event) -> {
-				dropFilesLabel.removeStyleName("dropFilesLabelHover");
+				dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER);
 
 				if (uploader.getStats().getUploadsInProgress() <= 0) {
 					progressBarPanel.clear();

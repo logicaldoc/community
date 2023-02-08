@@ -24,7 +24,7 @@ public class Encodings {
 	}
 
 	public static List<String> enlistSupportedEncodings() {
-		List<String> encodings = new ArrayList<String>();
+		List<String> encodings = new ArrayList<>();
 
 		SortedMap m = Charset.availableCharsets();
 		Set k = m.keySet();

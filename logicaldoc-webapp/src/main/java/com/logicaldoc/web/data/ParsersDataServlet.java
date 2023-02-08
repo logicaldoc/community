@@ -36,7 +36,7 @@ public class ParsersDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 		int i = 0;
 		Set<String> keys = ParserFactory.getParsers().keySet();
-		List<String> sort = new ArrayList<String>();
+		List<String> sort = new ArrayList<>();
 		for (String ext : keys) {
 			sort.add(ext);
 		}

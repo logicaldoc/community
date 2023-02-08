@@ -29,6 +29,9 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class StoragesDataServlet extends AbstractDataServlet {
 
+	private static final String STORE = "store.";
+	private static final String CLOSE_STORAGE = "</storage>";
+	private static final String STORAGE = "<storage>";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -36,12 +39,6 @@ public class StoragesDataServlet extends AbstractDataServlet {
 			Locale locale) throws PersistenceException, IOException {
 
 		boolean types = "true".equals(request.getParameter("types"));
-
-		boolean parameters = "true".equals(request.getParameter("parameters"));
-		if (parameters) {
-			MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-			parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadEnable(105, session.getUserId());
-		}
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -53,55 +50,73 @@ public class StoragesDataServlet extends AbstractDataServlet {
 				if (!StorerManager.get().getDefinitions().get(type).isEnabled())
 					continue;
 
-				writer.print("<storage>");
+				writer.print(STORAGE);
 				writer.print("<id>" + type + "</id>");
 				writer.print("<name><![CDATA[" + I18N.message("storer." + type, locale) + "]]></name>");
 				writer.print("<type>" + type + "</type>");
-				writer.print("</storage>");
+				writer.print(CLOSE_STORAGE);
 			}
 		} else {
 			// List the storages
 			if ("true".equals(request.getParameter("empty"))) {
-				writer.print("<storage>");
+				writer.print(STORAGE);
 				writer.print("<id />");
 				writer.print("<name />");
 				writer.print("<path />");
 				writer.print("<write>blank</write>");
 				writer.print("<type>fs</type>");
-				writer.print("</storage>");
+				writer.print(CLOSE_STORAGE);
 			}
 
-			ContextProperties conf = Context.get().getProperties();
-
 			// Prepare the stores
-			for (int i = 1; i <= 99; i++) {
-				String path = conf.getProperty("store." + i + ".dir");
-				if (StringUtils.isNotEmpty(path)) {
-					writer.print("<storage>");
-					writer.print("<id>" + i + "</id>");
-					writer.print("<name>Storage " + i + "</name>");
-					writer.print("<path><![CDATA[" + path + "]]></path>");
-					writer.print(
-							"<write>" + (conf.getInt("store.write") == i ? "database_edit" : "blank") + "</write>");
-					String type = conf.getProperty("store." + i + ".type");
-					if (StringUtils.isEmpty(type))
-						type = "fs";
-					writer.print("<type>" + type + "</type>");
+			printStorages(writer, request, session);
+		}
+		writer.write("</list>");
+	}
 
-					if (parameters) {
-						Storer st = StorerManager.get().getDefinitions().get(type);
-						if (st != null) {
-							for (String name : st.getParameterNames()) {
-								String value = conf.getPropertyWithSubstitutions("store." + i + "." + name, "");
-								writer.print("<" + name + "><![CDATA[" + value + "]]></" + name + ">");
-							}
-						}
-					}
+	private void printStorages(PrintWriter writer, HttpServletRequest request, Session session) {
+		ContextProperties conf = Context.get().getProperties();
+		for (int i = 1; i <= 99; i++) {
+			String path = conf.getProperty(STORE + i + ".dir");
+			if (StringUtils.isEmpty(path))
+				continue;
 
-					writer.print("</storage>");
+			writer.print(STORAGE);
+			writer.print("<id>" + i + "</id>");
+			writer.print("<name>Storage " + i + "</name>");
+			writer.print("<path><![CDATA[" + path + "]]></path>");
+			writer.print("<write>" + (conf.getInt("store.write") == i ? "database_edit" : "blank") + "</write>");
+			String type = conf.getProperty(STORE + i + ".type");
+			if (StringUtils.isEmpty(type))
+				type = "fs";
+			writer.print("<type>" + type + "</type>");
+
+			printParameters(writer, request, session, i, type);
+			
+			writer.print(CLOSE_STORAGE);
+
+		}
+	}
+
+	private void printParameters(PrintWriter writer, HttpServletRequest request, Session session, int i, String type) {
+		ContextProperties conf = Context.get().getProperties();
+		if (isParameters(request, session)) {
+			Storer st = StorerManager.get().getDefinitions().get(type);
+			if (st != null) {
+				for (String name : st.getParameterNames()) {
+					String value = conf.getPropertyWithSubstitutions(STORE + i + "." + name, "");
+					writer.print("<" + name + "><![CDATA[" + value + "]]></" + name + ">");
 				}
 			}
 		}
-		writer.write("</list>");
+	}
+
+	private boolean isParameters(HttpServletRequest request, Session session) {
+		boolean parameters = "true".equals(request.getParameter("parameters"));
+		if (parameters) {
+			MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+			parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadEnable(105, session.getUserId());
+		}
+		return parameters;
 	}
 }

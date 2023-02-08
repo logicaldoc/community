@@ -38,6 +38,8 @@ import com.logicaldoc.util.security.PasswordGenerator;
  */
 public class PswRecovery extends HttpServlet {
 
+	private static final String TICKET_ID = "ticketId";
+
 	private static final long serialVersionUID = 9088160958327454062L;
 
 	protected static Logger log = LoggerFactory.getLogger(PswRecovery.class);
@@ -62,18 +64,18 @@ public class PswRecovery extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			HttpSession session = request.getSession();
-			String ticketId = request.getParameter("ticketId");
+			String ticketId = request.getParameter(TICKET_ID);
 			String userId = request.getParameter("userId");
 			String tenant = request.getParameter("tenant");
 			if (tenant == null)
 				tenant = Tenant.DEFAULT_NAME;
 
 			if (StringUtils.isEmpty(ticketId)) {
-				ticketId = (String) request.getAttribute("ticketId");
+				ticketId = (String) request.getAttribute(TICKET_ID);
 			}
 
 			if (StringUtils.isEmpty(ticketId)) {
-				ticketId = (String) session.getAttribute("ticketId");
+				ticketId = (String) session.getAttribute(TICKET_ID);
 			}
 
 			log.debug("Recover password for ticket with ticketId={}", ticketId);
@@ -126,7 +128,7 @@ public class PswRecovery extends HttpServlet {
 					/*
 					 * Prepare the template
 					 */
-					Map<String, Object> dictionary = new HashMap<String, Object>();
+					Map<String, Object> dictionary = new HashMap<>();
 					String address = request.getScheme() + "://" + request.getServerName() + ":"
 							+ request.getServerPort() + request.getContextPath();
 					dictionary.put("url", address);

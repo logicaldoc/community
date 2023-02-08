@@ -27,6 +27,10 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 7.5
  */
 public class AdminAuthenticationProvider implements AuthenticationProvider {
+	private static final String BADCREDENTIALS = "badcredentials";
+
+	private static final String ADMIN = "admin";
+
 	public AdminAuthenticationProvider() {
 		super();
 	}
@@ -37,11 +41,11 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		String username = String.valueOf(auth.getPrincipal());
 		String password = String.valueOf(auth.getCredentials());
 
-		if (!"admin".equals(username))
-			throw new BadCredentialsException("badcredentials");
+		if (!ADMIN.equals(username))
+			throw new BadCredentialsException(BADCREDENTIALS);
 
 		User user = new User();
-		user.setUsername("admin");
+		user.setUsername(ADMIN);
 
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
@@ -79,15 +83,15 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		}
 
 		if (adminPasswd == null || adminPasswd.isEmpty())
-			throw new BadCredentialsException("badcredentials");
+			throw new BadCredentialsException(BADCREDENTIALS);
 
 		user.setDecodedPassword(password);
 
 		if (!user.getPassword().equals(adminPasswd))
-			throw new BadCredentialsException("badcredentials");
+			throw new BadCredentialsException(BADCREDENTIALS);
 
-		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority("admin"));
+		Collection<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority(ADMIN));
 
 		// Return an authenticated token, containing user data and
 		// authorities

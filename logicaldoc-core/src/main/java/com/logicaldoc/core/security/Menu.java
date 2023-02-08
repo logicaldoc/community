@@ -100,7 +100,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	 */
 	private String automation;
 
-	private Set<MenuGroup> menuGroups = new HashSet<MenuGroup>();
+	private Set<MenuGroup> menuGroups = new HashSet<>();
 
 	public long getId() {
 		return id;
@@ -124,7 +124,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	public void clearMenuGroups() {
 		menuGroups.clear();
-		menuGroups = new HashSet<MenuGroup>();
+		menuGroups = new HashSet<>();
 	}
 
 	public void setId(long id) {

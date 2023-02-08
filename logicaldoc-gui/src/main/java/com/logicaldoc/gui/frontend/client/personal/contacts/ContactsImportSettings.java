@@ -28,6 +28,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  */
 public class ContactsImportSettings extends Window {
 
+	private static final String COLUMNINDEX = "columnindex";
 	private DynamicForm form;
 
 	public ContactsImportSettings() {
@@ -42,66 +43,66 @@ public class ContactsImportSettings extends Window {
 
 		form = new DynamicForm();
 
-		SelectItem separated = ItemFactory.newSelectItem("separatedby", "separatedby");
+		SelectItem separated = ItemFactory.newSelectItem("separatedby");
 		separated.setWidth(80);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put(",", ",");
 		map.put(";", ";");
 		separated.setValueMap(map);
 		separated.setValue(",");
 
-		SelectItem delimiter = ItemFactory.newSelectItem("textdelimiter", "textdelimiter");
+		SelectItem delimiter = ItemFactory.newSelectItem("textdelimiter");
 		delimiter.setWidth(80);
-		LinkedHashMap<String, String> map2 = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map2 = new LinkedHashMap<>();
 		map2.put("\"", "\"");
 		map2.put("'", "'");
 		delimiter.setValueMap(map2);
 		delimiter.setValue("\"");
 
-		RadioGroupItem skip = ItemFactory.newBooleanSelector("skipfirstrow", "skipfirstrow");
+		RadioGroupItem skip = ItemFactory.newBooleanSelector("skipfirstrow");
 		skip.setValue("yes");
 
-		SpinnerItem firstName = ItemFactory.newSpinnerItem("firstname", "firstname", 1);
+		SpinnerItem firstName = ItemFactory.newSpinnerItem("firstname", 1);
 		firstName.setRequired(true);
 		firstName.setWidth(60);
 		firstName.setMin(1);
-		firstName.setHint(I18N.message("columnindex"));
+		firstName.setHint(I18N.message(COLUMNINDEX));
 
-		SpinnerItem lastName = ItemFactory.newSpinnerItem("lastname", "lastname", 2);
+		SpinnerItem lastName = ItemFactory.newSpinnerItem("lastname", 2);
 		lastName.setRequired(true);
 		lastName.setWidth(60);
 		lastName.setMin(1);
-		lastName.setHint(I18N.message("columnindex"));
+		lastName.setHint(I18N.message(COLUMNINDEX));
 
-		SpinnerItem email = ItemFactory.newSpinnerItem("email", "email", 3);
+		SpinnerItem email = ItemFactory.newSpinnerItem("email", 3);
 		email.setRequired(true);
 		email.setWidth(60);
 		email.setMin(1);
-		email.setHint(I18N.message("columnindex"));
+		email.setHint(I18N.message(COLUMNINDEX));
 
-		SpinnerItem company = ItemFactory.newSpinnerItem("company", "company", 4);
+		SpinnerItem company = ItemFactory.newSpinnerItem("company", 4);
 		company.setRequired(true);
 		company.setWidth(60);
 		company.setMin(1);
-		company.setHint(I18N.message("columnindex"));
+		company.setHint(I18N.message(COLUMNINDEX));
 
-		SpinnerItem phone = ItemFactory.newSpinnerItem("phone", "phone", 5);
+		SpinnerItem phone = ItemFactory.newSpinnerItem("phone", 5);
 		phone.setRequired(true);
 		phone.setWidth(60);
 		phone.setMin(1);
-		phone.setHint(I18N.message("columnindex"));
+		phone.setHint(I18N.message(COLUMNINDEX));
 
 		SpinnerItem mobile = ItemFactory.newSpinnerItem("mobile", "cell", 6);
 		mobile.setRequired(true);
 		mobile.setWidth(60);
 		mobile.setMin(1);
-		mobile.setHint(I18N.message("columnindex"));
+		mobile.setHint(I18N.message(COLUMNINDEX));
 
-		SpinnerItem address = ItemFactory.newSpinnerItem("address", "address", 7);
+		SpinnerItem address = ItemFactory.newSpinnerItem("address", 7);
 		address.setRequired(true);
 		address.setWidth(60);
 		address.setMin(1);
-		address.setHint(I18N.message("columnindex"));
+		address.setHint(I18N.message(COLUMNINDEX));
 
 		SubmitItem importButton = new SubmitItem();
 		importButton.setTitle(I18N.message("iimport"));

@@ -39,24 +39,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		User user = validateSession(sid);
 
 		try {
-			List<WSUser> users = new ArrayList<WSUser>();
-			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-			if (StringUtils.isEmpty(group)) {
-				for (User usr : dao.findAll(user.getTenantId())) {
-					dao.initialize(user);
-					if (usr.getType() != User.TYPE_SYSTEM)
-						users.add(WSUser.fromUser(usr));
-				}
-			} else {
-				GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-				Group grp = gDao.findByName(group, user.getTenantId());
-				gDao.initialize(grp);
-				for (User usr : grp.getUsers()) {
-					dao.initialize(user);
-					if (usr.getType() != User.TYPE_SYSTEM)
-						users.add(WSUser.fromUser(usr));
-				}
-			}
+			List<WSUser> users = collectUsers(group, user);
 
 			// Remove sensible informations in case of non admin user
 			if (!user.isMemberOf(Group.GROUP_ADMIN)) {
@@ -80,13 +63,35 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		}
 	}
 
+	private List<WSUser> collectUsers(String group, User user) {
+		List<WSUser> users = new ArrayList<>();
+		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
+		if (StringUtils.isEmpty(group)) {
+			for (User usr : dao.findAll(user.getTenantId())) {
+				dao.initialize(user);
+				if (usr.getType() != User.TYPE_SYSTEM)
+					users.add(WSUser.fromUser(usr));
+			}
+		} else {
+			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			Group grp = gDao.findByName(group, user.getTenantId());
+			gDao.initialize(grp);
+			for (User usr : grp.getUsers()) {
+				dao.initialize(user);
+				if (usr.getType() != User.TYPE_SYSTEM)
+					users.add(WSUser.fromUser(usr));
+			}
+		}
+		return users;
+	}
+
 	@Override
 	public WSGroup[] listGroups(String sid) throws Exception {
 		checkAdministrator(sid);
 		User user = validateSession(sid);
 
 		try {
-			List<WSGroup> groups = new ArrayList<WSGroup>();
+			List<WSGroup> groups = new ArrayList<>();
 			GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			for (Group grp : dao.findAll(user.getTenantId())) {
 				if (grp.getType() == Group.TYPE_DEFAULT) {
@@ -158,14 +163,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setDecodedPassword(user.getDecodedPassword());
 			}
 
-			if (StringUtils.isEmpty(usr.getUsername()))
-				throw new Exception("Missing mandatory value 'UserName'");
-			else if (StringUtils.isEmpty(usr.getEmail()))
-				throw new Exception("Missing mandatory value 'Email'");
-			else if (StringUtils.isEmpty(usr.getName()))
-				throw new Exception("Missing mandatory value 'Name'");
-			else if (StringUtils.isEmpty(usr.getFirstName()))
-				throw new Exception("Missing mandatory value 'FirstName'");
+			validateMandatoryFields(usr);
 
 			dao.store(usr);
 
@@ -181,6 +179,17 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
 		}
+	}
+
+	private void validateMandatoryFields(User usr) throws Exception {
+		if (StringUtils.isEmpty(usr.getUsername()))
+			throw new Exception("Missing mandatory value 'UserName'");
+		else if (StringUtils.isEmpty(usr.getEmail()))
+			throw new Exception("Missing mandatory value 'Email'");
+		else if (StringUtils.isEmpty(usr.getName()))
+			throw new Exception("Missing mandatory value 'Name'");
+		else if (StringUtils.isEmpty(usr.getFirstName()))
+			throw new Exception("Missing mandatory value 'FirstName'");
 	}
 
 	@Override

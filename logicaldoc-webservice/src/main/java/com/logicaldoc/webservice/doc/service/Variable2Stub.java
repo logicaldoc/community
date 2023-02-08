@@ -59,7 +59,7 @@ public class Variable2Stub {
 
 	private static LinkedList<FieldsOfSubType> getFieldsOfSubTypes(Class<?> thisType,
 			StubTypeTreeRepository typeTreeRepository) {
-		LinkedList<FieldsOfSubType> fieldsOfAllSubTypes = new LinkedList<FieldsOfSubType>();
+		LinkedList<FieldsOfSubType> fieldsOfAllSubTypes = new LinkedList<>();
 
 		if (!thisType.isAnnotationPresent(XmlSeeAlso.class)) {
 			return fieldsOfAllSubTypes;
@@ -90,7 +90,7 @@ public class Variable2Stub {
 	}
 
 	private static List<Class<?>> getSubTypes(Class<?> thisType) {
-		List<Class<?>> subTypes = new ArrayList<Class<?>>();
+		List<Class<?>> subTypes = new ArrayList<>();
 		for (Class<?> subType : thisType.getAnnotation(XmlSeeAlso.class).value()) {
 			if (thisType.isAssignableFrom(subType)) {
 				subTypes.add(subType);
@@ -102,7 +102,7 @@ public class Variable2Stub {
 	private static final class FieldsOfSubType {
 		private Class<?> subType;
 
-		private List<Field> fields = new ArrayList<Field>();
+		private List<Field> fields = new ArrayList<>();
 
 		private FieldsOfSubType(Class<?> subType) {
 			super();

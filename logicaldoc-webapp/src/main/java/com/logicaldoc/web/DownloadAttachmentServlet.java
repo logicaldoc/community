@@ -1,9 +1,11 @@
 package com.logicaldoc.web;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.cms.CMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +51,8 @@ public class DownloadAttachmentServlet extends HttpServlet {
 	 * 
 	 * @param request the request send by the client to the server
 	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
 	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		File tmp = null;
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
@@ -65,7 +65,6 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			String filename = request.getParameter("attachmentFileName");
 
 			Version version = null;
-			tmp = FileUtil.createTempFile("attdown", null);
 
 			Document doc = docDao.findById(docId);
 			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
@@ -84,35 +83,46 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			if (doc != null && doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
 				throw new IOException("The document is protected by a password");
 
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String resource = storer.getResourceName(docId, fileVersion, null);
-			try (InputStream is = storer.getStream(docId, resource);) {
-				EMail email = null;
-
-				if (doc != null && doc.getFileName().toLowerCase().endsWith(".eml"))
-					email = MailUtil.messageToMail(is, true);
-				else
-					email = MailUtil.msgToMail(is, true);
-
-				EMailAttachment attachment = null;
-				if (email.getAttachments().size() > 0)
-					for (EMailAttachment att : email.getAttachments().values()) {
-						if (filename.equals(att.getFileName())) {
-							attachment = att;
-							break;
-						}
-					}
-				if (attachment == null || attachment.getData() == null)
-					throw new IOException("Attachment not found");
-
-				FileUtils.writeByteArrayToFile(tmp, attachment.getData());
-				ServletUtil.downloadFile(request, response, tmp, filename);
-			}
+			download(request, response, docId, fileVersion, filename, doc);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			ServletUtil.sendError(response, e.getMessage());
-		} finally {
-			FileUtil.strongDelete(tmp);
+		}
+	}
+
+	private void download(HttpServletRequest request, HttpServletResponse response, long docId, String fileVersion,
+			String filename, Document doc)
+			throws MessagingException, IOException, CMSException, FileNotFoundException, ServletException {
+		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		String resource = storer.getResourceName(docId, fileVersion, null);
+
+		try (InputStream is = storer.getStream(docId, resource)) {
+			EMail email = null;
+
+			if (doc != null && doc.getFileName().toLowerCase().endsWith(".eml"))
+				email = MailUtil.messageToMail(is, true);
+			else
+				email = MailUtil.msgToMail(is, true);
+
+			EMailAttachment attachment = null;
+			if (email.getAttachments().size() > 0)
+				for (EMailAttachment att : email.getAttachments().values()) {
+					if (filename.equals(att.getFileName())) {
+						attachment = att;
+						break;
+					}
+				}
+			if (attachment == null || attachment.getData() == null)
+				throw new IOException("Attachment not found");
+
+			File tmp = null;
+			try {
+				tmp = FileUtil.createTempFile("attdown", null);
+				FileUtils.writeByteArrayToFile(tmp, attachment.getData());
+				ServletUtil.downloadFile(request, response, tmp, filename);
+			} finally {
+				FileUtil.strongDelete(tmp);
+			}
 		}
 	}
 }

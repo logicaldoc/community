@@ -23,6 +23,8 @@ import com.logicaldoc.util.MimeType;
  */
 public class HttpUpload {
 
+	private static final String UTF_8 = "UTF-8";
+
 	private static final int TIMEOUT = 20;
 
 	private String url;
@@ -44,10 +46,10 @@ public class HttpUpload {
 
 		FileBody filePart = null;
 		if (listener != null)
-			filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), "UTF-8"), name,
+			filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name,
 					listener);
 		else
-			filePart = new FileBody(file, ContentType.create(MimeType.getByFilename(f), "UTF-8"), name);
+			filePart = new FileBody(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name);
 
 		HttpEntity reqEntity = MultipartEntityBuilder.create().addPart(name, filePart).build();
 		filePost.setEntity(reqEntity);
@@ -59,7 +61,7 @@ public class HttpUpload {
 			String respBody = "";
 			HttpEntity rent = response.getEntity();
 			if (rent != null)
-				respBody = EntityUtils.toString(rent, "UTF-8");
+				respBody = EntityUtils.toString(rent, UTF_8);
 
 			if (status == HttpStatus.SC_OK) {
 				System.out.println("Upload complete, response= " + respBody);

@@ -17,7 +17,7 @@ public abstract class StickyWindow extends Window {
 	/**
 	 * The key is a class name while the value is it's descriptor
 	 */
-	protected static Map<String, WindowStatus> statuses = new HashMap<String, WindowStatus>();
+	protected static Map<String, WindowStatus> statuses = new HashMap<>();
 
 	public StickyWindow(String title) {
 

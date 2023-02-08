@@ -32,6 +32,10 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class UserDetailsPanel extends VLayout implements UserObserver {
 
+	private static final String USERNAMEALREADYINUSE = "usernamealreadyinuse";
+
+	private static final String ADMIN = "admin";
+
 	private static final String TABID_USERINTERFACE = "userinterface";
 
 	private static final String TABID_SECURITY = "security";
@@ -235,7 +239,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 	private void addHistoryTab() {
 		if (historyPanel != null) {
 			historyPanel.destroy();
-			if (historyTabPanel.contains(historyPanel))
+			if (Boolean.TRUE.equals(historyTabPanel.contains(historyPanel)))
 				historyTabPanel.removeMember(historyPanel);
 		}
 		historyPanel = new UserHistoryPanel(user.getId());
@@ -245,7 +249,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 	private void addGuiTab(ChangedHandler changeHandler) {
 		if (guiPanel != null) {
 			guiPanel.destroy();
-			if (guiTabPanel.contains(guiPanel))
+			if (Boolean.TRUE.equals(guiTabPanel.contains(guiPanel)))
 				guiTabPanel.removeMember(guiPanel);
 		}
 		guiPanel = new UserInterfacePanel(user, changeHandler);
@@ -256,7 +260,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 		if (Feature.enabled(Feature.FIREWALL)) {
 			if (firewallPanel != null) {
 				firewallPanel.destroy();
-				if (firewallTabPanel.contains(firewallPanel))
+				if (Boolean.TRUE.equals(firewallTabPanel.contains(firewallPanel)))
 					firewallTabPanel.removeMember(firewallPanel);
 			}
 			firewallPanel = new FirewallPanel(user, changeHandler);
@@ -268,7 +272,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 		if (Feature.enabled(Feature.QUOTAS)) {
 			if (quotaPanel != null) {
 				quotaPanel.destroy();
-				if (quotaTabPanel.contains(quotaPanel))
+				if (Boolean.TRUE.equals(quotaTabPanel.contains(quotaPanel)))
 					quotaTabPanel.removeMember(quotaPanel);
 			}
 			quotaPanel = new UserQuotaPanel(user, changeHandler);
@@ -279,18 +283,18 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 	private void addWorkingTimeTab(ChangedHandler changeHandler) {
 		if (workingTimePanel != null) {
 			workingTimePanel.destroy();
-			if (workingTimeTabPanel.contains(workingTimePanel))
+			if (Boolean.TRUE.equals(workingTimeTabPanel.contains(workingTimePanel)))
 				workingTimeTabPanel.removeMember(workingTimePanel);
 		}
 		workingTimePanel = new WorkingTimePanel(user, changeHandler);
 		workingTimeTabPanel.addMember(workingTimePanel);
-		workingTimePanel.setDisabled("admin".equals(user.getUsername()));
+		workingTimePanel.setDisabled(ADMIN.equals(user.getUsername()));
 	}
 
 	private void addSecurityTab(ChangedHandler changeHandler) {
 		if (securityPanel != null) {
 			securityPanel.destroy();
-			if (securityTabPanel.contains(securityPanel))
+			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
 				securityTabPanel.removeMember(securityPanel);
 		}
 		securityPanel = new UserSecurityPanel(user, changeHandler);
@@ -300,7 +304,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 	private void addPropertiesTab(ChangedHandler changeHandler) {
 		if (propertiesPanel != null) {
 			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 		propertiesPanel = new UserPropertiesPanel(user, changeHandler, usersPanel);
@@ -308,12 +312,11 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 	}
 
 	private ChangedHandler prepareChangeHandler() {
-		ChangedHandler changeHandler = (ChangedEvent event) -> {
-			onModified();
-		};
+		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
+		
 		// Admin only can change the 'admin' user
-		if (user.getUsername().equalsIgnoreCase("admin")
-				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
+		if (user.getUsername().equalsIgnoreCase(ADMIN)
+				&& !Session.get().getUser().getUsername().equalsIgnoreCase(ADMIN))
 			changeHandler = null;
 		return changeHandler;
 	}
@@ -329,8 +332,8 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 
 	public void onModified() {
 		// Admin only can change the admin user
-		if (user.getUsername().equalsIgnoreCase("admin")
-				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
+		if (user.getUsername().equalsIgnoreCase(ADMIN)
+				&& !Session.get().getUser().getUsername().equalsIgnoreCase(ADMIN))
 			tabSet.hideSave();
 		else
 			tabSet.displaySave();
@@ -385,8 +388,8 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 					LD.clearPrompt();
 					tabSet.hideSave();
 					if (createNew && user.getWelcomeScreen() == -99) {
-						GuiLog.warn(I18N.message("usernamealreadyinuse"), I18N.message("usernamealreadyinuse"));
-						SC.warn(I18N.message("usernamealreadyinuse"));
+						GuiLog.warn(I18N.message(USERNAMEALREADYINUSE), I18N.message(USERNAMEALREADYINUSE));
+						SC.warn(I18N.message(USERNAMEALREADYINUSE));
 						return;
 					}
 

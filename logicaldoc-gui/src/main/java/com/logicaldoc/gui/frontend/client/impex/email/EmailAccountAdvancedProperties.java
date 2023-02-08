@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
+	private static final String DELETE = "delete";
+
 	private DynamicForm form = new DynamicForm();
 
 	private HLayout formsContainer = new HLayout();
@@ -45,24 +47,24 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (formsContainer.contains(form))
+		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);
 
 		form = new DynamicForm();
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem include = ItemFactory.newTextItem("include", "include", account.getIncludes());
+		TextItem include = ItemFactory.newTextItem("include", account.getIncludes());
 		include.addChangedHandler(changedHandler);
 
-		TextItem exclude = ItemFactory.newTextItem("exclude", "exclude", account.getExcludes());
+		TextItem exclude = ItemFactory.newTextItem("exclude", account.getExcludes());
 		exclude.addChangedHandler(changedHandler);
 
-		TextItem folder = ItemFactory.newTextItem("mailfolder", "mailfolder", account.getMailFolder());
+		TextItem folder = ItemFactory.newTextItem("mailfolder", account.getMailFolder());
 		folder.addChangedHandler(changedHandler);
 
-		SelectItem format = ItemFactory.newSelectItem("format", "format");
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		SelectItem format = ItemFactory.newSelectItem("format");
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("multiplefiles"));
 		map.put("1", I18N.message("singleeml"));
 		format.setValueMap(map);
@@ -70,7 +72,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		format.setValue(Integer.toString(account.getFormat()));
 
 		CheckboxItem deleteFomMailbox = new CheckboxItem();
-		deleteFomMailbox.setName("delete");
+		deleteFomMailbox.setName(DELETE);
 		deleteFomMailbox.setTitle(I18N.message("deletefrommailbox"));
 		deleteFomMailbox.setRedrawOnChange(true);
 		deleteFomMailbox.setWidth(50);
@@ -87,7 +89,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| "delete".equals(event.getKeyName().toLowerCase())) {
+						|| DELETE.equals(event.getKeyName().toLowerCase())) {
 					startDate.clearValue();
 					startDate.setValue((Date) null);
 					changedHandler.onChanged(null);
@@ -106,10 +108,10 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			account.setIncludes((String) values.get("include"));
 			account.setExcludes((String) values.get("exclude"));
-			account.setDeleteFromMailbox(Boolean.parseBoolean(values.get("delete").toString()));
+			account.setDeleteFromMailbox(Boolean.parseBoolean(values.get(DELETE).toString()));
 			account.setMailFolder((String) values.get("mailfolder"));
 			account.setFormat(Integer.parseInt((String) values.get("format")));
 			account.setStartDate((Date) values.get("startdate"));

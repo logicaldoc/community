@@ -3,11 +3,9 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +30,8 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class SessionsDataServlet extends AbstractDataServlet {
 
+	private static final String CLOSE_STATUS_LABEL = "</statusLabel>";
+	private static final String STATUS_LABEL = "<statusLabel>";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -57,8 +57,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			// Just listing the sessions
 			SessionDAO sessionDao = (SessionDAO) Context.get().getBean(SessionDAO.class);
 			List<Session> sessions = sessionDao.findByNode(node);
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			df.setTimeZone(TimeZone.getTimeZone("UTC"));
+
 
 			boolean csvFormat = "true".equals(request.getParameter("csv"));
 
@@ -75,15 +74,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 					tenant = currentSession.getTenantName();
 			}
 
-			User currentUser = null;
-			if (currentSession != null)
-				currentUser = currentSession.getUser();
-			else
-				try {
-					currentUser = ServletUtil.getSessionUser(request);
-				} catch (Throwable t) {
-					// Nothing to do
-				}
+			User currentUser = getCurrentUser(request, currentSession);
 
 			/*
 			 * The current user must be enabled to see the sessions.
@@ -96,73 +87,104 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			if (!csvFormat)
 				writer.print("<list>");
 
-			for (Session sess : sessions) {
-				if (tenant != null && !tenant.equals(sess.getTenantName()))
-					continue;
-				if (status != null && status != sess.getStatus())
-					continue;
-
-				if (csvFormat) {
-					writer.print(showSid ? sess.getSid() : "--");
-					writer.print(",");
-					if (showSid)
-						if (SessionManager.get().getStatus(sess.getSid()) == Session.STATUS_OPEN)
-							writer.print(I18N.message("opened", locale));
-						else if (SessionManager.get().getStatus(sess.getSid()) == Session.STATUS_CLOSED)
-							writer.print(I18N.message("closed", locale));
-						else if (SessionManager.get().getStatus(sess.getSid()) == Session.STATUS_EXPIRED)
-							writer.print(I18N.message("expired", locale));
-					writer.print(",");
-					if (showSid)
-						writer.print(sess.getUsername());
-					writer.print(",");
-					if (showSid)
-						writer.print(sess.getClient() != null ? sess.getClient() : "");
-					writer.print(",");
-					writer.print(sess.getTenantName());
-					writer.print(",");
-					writer.print(df.format((Date) sess.getCreation()));
-					writer.print(",");
-					if (showSid)
-						if (SessionManager.get().get(sess.getSid()) != null)
-							writer.print(SessionManager.get().get(sess.getSid()).getLastRenew());
-						else
-							writer.print(df.format((Date) sess.getLastRenew()));
-					writer.print(",");
-					if (showSid)
-						writer.print(sess.getNode());
-					writer.print("\n");
-				} else {
-					writer.print("<session>");
-					writer.print("<sid><![CDATA[" + (showSid ? sess.getSid() : "--") + "]]></sid>");
-					writer.print("<status>" + (showSid ? sess.getStatus() : "") + "</status>");
-					if (showSid) {
-						if (SessionManager.get().getStatus(sess.getSid()) == Session.STATUS_OPEN)
-							writer.print("<statusLabel>" + I18N.message("opened", locale) + "</statusLabel>");
-						else if (SessionManager.get().getStatus(sess.getSid()) == Session.STATUS_CLOSED)
-							writer.print("<statusLabel>" + I18N.message("closed", locale) + "</statusLabel>");
-						else if (SessionManager.get().getStatus(sess.getSid()) == Session.STATUS_EXPIRED)
-							writer.print("<statusLabel>" + I18N.message("expired", locale) + "</statusLabel>");
-					} else {
-						writer.print("<statusLabel></statusLabel>");
-					}
-					writer.print("<username><![CDATA[" + (showSid ? sess.getUsername() : "") + "]]></username>");
-					writer.print("<node><![CDATA[" + (showSid ? sess.getNode() : "") + "]]></node>");
-					writer.print("<client><![CDATA["
-							+ (showSid ? (sess.getClient() != null ? sess.getClient() : "") : "") + "]]></client>");
-					writer.print("<tenant><![CDATA[" + sess.getTenantName() + "]]></tenant>");
-					writer.print("<created>" + df.format((Date) sess.getCreation()) + "</created>");
-					if (SessionManager.get().get(sess.getSid()) != null)
-						writer.print("<renew>" + df.format(SessionManager.get().get(sess.getSid()).getLastRenew())
-								+ "</renew>");
-					else
-						writer.print("<renew>" + df.format((Date) sess.getLastRenew()) + "</renew>");
-					writer.print("</session>");
-				}
-			}
-
-			if (!csvFormat)
-				writer.print("</list>");
+			printSessions(locale, status, sessions, csvFormat, tenant, showSid, writer);
 		}
+	}
+
+	private void printSessions(Locale locale, Integer status, List<Session> sessions, boolean csvFormat, String tenant,
+			boolean showSid, PrintWriter writer) {
+			
+		for (Session session : sessions) {
+			if (tenant != null && !tenant.equals(session.getTenantName()))
+				continue;
+			if (status != null && status != session.getStatus())
+				continue;
+
+			if (csvFormat) {
+				printSessionCsv(writer, session, locale, showSid);
+			} else {
+				printSessionXml(writer, session, locale, showSid);
+			}
+		}
+
+		if (!csvFormat)
+			writer.print("</list>");
+	}
+
+	private void printSessionCsv(PrintWriter writer, Session session, Locale locale, boolean showSid) {
+		DateFormat df = getDateFormat();
+		
+		writer.print(showSid ? session.getSid() : "--");
+		writer.print(",");
+		if (showSid)
+			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
+				writer.print(I18N.message("opened", locale));
+			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
+				writer.print(I18N.message("closed", locale));
+			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_EXPIRED)
+				writer.print(I18N.message("expired", locale));
+		writer.print(",");
+		if (showSid)
+			writer.print(session.getUsername());
+		writer.print(",");
+		if (showSid)
+			writer.print(session.getClient() != null ? session.getClient() : "");
+		writer.print(",");
+		writer.print(session.getTenantName());
+		writer.print(",");
+		writer.print(df.format((Date) session.getCreation()));
+		writer.print(",");
+		if (showSid)
+			if (SessionManager.get().get(session.getSid()) != null)
+				writer.print(SessionManager.get().get(session.getSid()).getLastRenew());
+			else
+				writer.print(df.format((Date) session.getLastRenew()));
+		writer.print(",");
+		if (showSid)
+			writer.print(session.getNode());
+		writer.print("\n");
+	}
+
+	private void printSessionXml(PrintWriter writer, Session session, Locale locale, boolean showSid) {
+		DateFormat df = getDateFormat();
+		
+		writer.print("<session>");
+		writer.print("<sid><![CDATA[" + (showSid ? session.getSid() : "--") + "]]></sid>");
+		writer.print("<status>" + (showSid ? session.getStatus() : "") + "</status>");
+		if (showSid) {
+			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
+				writer.print(STATUS_LABEL + I18N.message("opened", locale) + CLOSE_STATUS_LABEL);
+			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
+				writer.print(STATUS_LABEL + I18N.message("closed", locale) + CLOSE_STATUS_LABEL);
+			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_EXPIRED)
+				writer.print(STATUS_LABEL + I18N.message("expired", locale) + CLOSE_STATUS_LABEL);
+		} else {
+			writer.print("<statusLabel></statusLabel>");
+		}
+		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
+		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
+		writer.print("<client><![CDATA["
+				+ (showSid ? (session.getClient() != null ? session.getClient() : "") : "") + "]]></client>");
+		writer.print("<tenant><![CDATA[" + session.getTenantName() + "]]></tenant>");
+		writer.print("<created>" + df.format((Date) session.getCreation()) + "</created>");
+		if (SessionManager.get().get(session.getSid()) != null)
+			writer.print("<renew>" + df.format(SessionManager.get().get(session.getSid()).getLastRenew())
+					+ "</renew>");
+		else
+			writer.print("<renew>" + df.format((Date) session.getLastRenew()) + "</renew>");
+		writer.print("</session>");
+	}
+
+	private User getCurrentUser(HttpServletRequest request, Session currentSession) {
+		User currentUser = null;
+		if (currentSession != null)
+			currentUser = currentSession.getUser();
+		else
+			try {
+				currentUser = ServletUtil.getSessionUser(request);
+			} catch (Throwable t) {
+				// Nothing to do
+			}
+		return currentUser;
 	}
 }

@@ -50,7 +50,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Template>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -60,7 +60,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Template>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -87,7 +87,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		if (!checkStoringAspect())
 			return;
 
-		Template template = (Template) findById(id);
+		Template template = findById(id);
 
 		if (countDocs(id) > 0)
 			throw new PersistenceException(String.format("Some documents are referencing the template %s (%d)",
@@ -130,7 +130,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 					ORDER_BY + ENTITY + ".name asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Template>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -171,11 +171,11 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(") and " + ENTITY + ".id = :templateId");
 
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("templateId", Long.valueOf(templateId));
 
 			@SuppressWarnings("unchecked")
-			List<TemplateGroup> coll = (List<TemplateGroup>) findByQuery(query.toString(), params, null);
+			List<TemplateGroup> coll = findByQuery(query.toString(), params, null);
 			result = coll.size() > 0;
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
@@ -198,7 +198,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 	@Override
 	public Set<Permission> getEnabledPermissions(long templateId, long userId) {
-		Set<Permission> permissions = new HashSet<Permission>();
+		Set<Permission> permissions = new HashSet<>();
 
 		try {
 			User user = userDAO.findById(userId);

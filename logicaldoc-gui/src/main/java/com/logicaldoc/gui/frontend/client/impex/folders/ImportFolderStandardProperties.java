@@ -26,6 +26,16 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
+	private static final String PASSWORD = "password";
+
+	private static final String BATCH = "batch";
+
+	private static final String USERNAME = "username";
+
+	private static final String SERVER = "server";
+
+	private static final String DOMAIN = "domain";
+
 	private DynamicForm form = new DynamicForm();
 
 	private HLayout formsContainer = new HLayout();
@@ -61,7 +71,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		if (form != null)
 			form.destroy();
 
-		if (formsContainer.contains(form))
+		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);
 
 		form = new DynamicForm();
@@ -77,16 +87,16 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		path.setWidth(250);
 		path.setRequired(true);
 
-		TextItem domain = ItemFactory.newTextItem("domain", "domain", importFolder.getDomain());
+		TextItem domain = ItemFactory.newTextItem(DOMAIN, importFolder.getDomain());
 		domain.addChangedHandler(changedHandler);
 
-		TextItem server = ItemFactory.newTextItem("server", "server", importFolder.getHost());
+		TextItem server = ItemFactory.newTextItem(SERVER, importFolder.getHost());
 		server.addChangedHandler(changedHandler);
 
 		IntegerItem port = ItemFactory.newIntegerItem("port", "port", importFolder.getPort());
 		port.addChangedHandler(changedHandler);
 
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username",
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME,
 				importFolder.getUsername());
 		username.addChangedHandler(changedHandler);
 
@@ -95,13 +105,13 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		language.setRequired(true);
 		language.setValue(importFolder.getLanguage());
 
-		TextItem include = ItemFactory.newTextItem("include", "include", importFolder.getIncludes());
+		TextItem include = ItemFactory.newTextItem("include", importFolder.getIncludes());
 		include.addChangedHandler(changedHandler);
 
-		TextItem exclude = ItemFactory.newTextItem("exclude", "exclude", importFolder.getExcludes());
+		TextItem exclude = ItemFactory.newTextItem("exclude", importFolder.getExcludes());
 		exclude.addChangedHandler(changedHandler);
 
-		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch", importFolder.getBatch());
+		SpinnerItem batch = ItemFactory.newSpinnerItem(BATCH, importFolder.getBatch());
 		batch.setMin(1);
 		batch.setStep(1000);
 		batch.setRequired(true);
@@ -112,14 +122,12 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
-				importFolder.getUsername());
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", importFolder.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
-		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden",
-				importFolder.getPassword());
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", importFolder.getPassword());
 		hiddenPassword.setCellStyle("nodisplay");
 		hiddenPassword.addChangedHandler(changedHandler);
-		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
+		FormItem password = ItemFactory.newSafePasswordItem(PASSWORD, I18N.message(PASSWORD),
 				importFolder.getPassword(), hiddenPassword, changedHandler);
 		password.addChangedHandler(changedHandler);
 
@@ -135,21 +143,21 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 	boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
-		if (!form.hasErrors()) {
+		if (Boolean.FALSE.equals(form.hasErrors())) {
 			importFolder.setProvider((String) values.get("provider"));
 			importFolder.setPath((String) values.get("path"));
-			importFolder.setUsername((String) values.get("username"));
-			importFolder.setDomain((String) values.get("domain"));
+			importFolder.setUsername((String) values.get(USERNAME));
+			importFolder.setDomain((String) values.get(DOMAIN));
 			importFolder.setTarget(targetSelector.getFolder());
 			importFolder.setLanguage((String) values.get("language"));
 			importFolder.setIncludes((String) values.get("include"));
 			importFolder.setExcludes((String) values.get("exclude"));
-			importFolder.setHost((String) values.get("server"));
+			importFolder.setHost((String) values.get(SERVER));
 			importFolder.setPort((Integer) values.get("port"));
-			if (values.get("batch") instanceof Long)
-				importFolder.setBatch((Long) values.get("batch"));
+			if (values.get(BATCH) instanceof Long)
+				importFolder.setBatch((Long) values.get(BATCH));
 			else
-				importFolder.setBatch(Long.valueOf(values.get("batch").toString()));
+				importFolder.setBatch(Long.valueOf(values.get(BATCH).toString()));
 
 			importFolder.setPassword((String) values.get("password_hidden"));
 		}
@@ -157,22 +165,22 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 	}
 
 	private void onProviderChanged(String provider) {
-		form.hideItem("server");
+		form.hideItem(SERVER);
 		form.hideItem("port");
-		form.hideItem("username");
-		form.hideItem("password");
-		form.hideItem("domain");
+		form.hideItem(USERNAME);
+		form.hideItem(PASSWORD);
+		form.hideItem(DOMAIN);
 
 		if (provider.equals(GUIImportFolder.PROVIDER_FTP) || provider.equals(GUIImportFolder.PROVIDER_FTPS)
 				|| provider.equals(GUIImportFolder.PROVIDER_SFTP)) {
-			form.showItem("server");
+			form.showItem(SERVER);
 			form.showItem("port");
-			form.showItem("username");
-			form.showItem("password");
+			form.showItem(USERNAME);
+			form.showItem(PASSWORD);
 		} else if (provider.startsWith(GUIImportFolder.PROVIDER_SMB)) {
-			form.showItem("domain");
-			form.showItem("username");
-			form.showItem("password");
+			form.showItem(DOMAIN);
+			form.showItem(USERNAME);
+			form.showItem(PASSWORD);
 		}
 	}
 

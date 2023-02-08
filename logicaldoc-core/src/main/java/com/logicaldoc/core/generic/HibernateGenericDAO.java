@@ -78,7 +78,7 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 			return findByWhere(query, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Generic>();
+			return new ArrayList<>();
 		}
 	}
 
