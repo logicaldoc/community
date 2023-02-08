@@ -71,7 +71,6 @@ public class RangeResourceImpl extends DavResourceImpl {
 				contentRangeResponseHeader(range.getLeft(), range.getRight(), contentLength));
 		log.debug("Content-Range: bytes {}-{}/{}", range.getLeft(), range.getRight(), contentLength);
 
-		// outputContext.setContentType(CONTENT_TYPE_VALUE);
 		outputContext.setProperty(CONTENT_DISPOSITION_HEADER, CONTENT_DISPOSITION_VALUE);
 		outputContext.setProperty(X_CONTENT_TYPE_OPTIONS_HEADER, X_CONTENT_TYPE_OPTIONS_VALUE);
 

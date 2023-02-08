@@ -67,6 +67,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 
 			DavResource resource;
 
+			log.debug("createResource resourcePath: {}", resourcePath);
 			Resource repositoryResource = resourceService.getResource(resourcePath, session);
 
 			if (repositoryResource == null) {

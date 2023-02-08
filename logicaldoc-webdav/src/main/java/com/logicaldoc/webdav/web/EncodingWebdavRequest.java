@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * @since 8.8
  */
 public class EncodingWebdavRequest extends WebdavRequestImpl {
+	
 	protected static Logger log = LoggerFactory.getLogger(EncodingWebdavRequest.class);
 
 	private HttpServletRequest request;
@@ -57,10 +58,9 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 			// RFC4918, so it is either an absolute URI
 			// or an absolute path
 			try {
-				// This is our customiation
-				URI uri = new URI(ref.replace(" ", "%20")).normalize(); // normalize
-				// path (see
-				// JCR-3174)
+				// This is our customization
+				// normalize path (see JCR-3174)
+				URI uri = new URI(ref.replace(" ", "%20")).normalize(); 				
 				String auth = uri.getAuthority();
 				ref = uri.getRawPath();
 				if (auth == null) {
@@ -76,6 +76,7 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 					// we can't find out, we have to reject anyway.
 					// Better use absolute paths in DAV:href
 					// elements!
+					// TODO enable or disable the comment below while testing
 					throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 				}
 			} catch (URISyntaxException e) {

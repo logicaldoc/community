@@ -186,7 +186,8 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource getResource(String requestPath, WebdavSession session) throws DavException {
-		log.trace("Find DAV resource: {}", requestPath);
+		//log.trace("Find DAV resource: {}", requestPath);
+		log.debug("getResource: {}", requestPath);
 
 		if (session == null)
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No WebDAV session");
@@ -304,8 +305,21 @@ public class ResourceServiceImpl implements ResourceService {
 			Folder folder = null;
 			if ("/".equals(resourcePath.trim()) && "".equals(name))
 				folder = folderDAO.findRoot(tenantId);
-			else
-				folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
+			else {
+				log.debug("resourcePath: {}", resourcePath);
+				log.debug("name: {}", name);				
+//				if (resourcePath.endsWith("/") || name.startsWith("/")) {
+//					log.debug("Looking for resource {}{}", resourcePath, name);
+//					folder = folderDAO.findByPathExtended(resourcePath + name, tenantId);
+//				} else {
+//					log.debug("Looking for resource {}/{}", resourcePath, name);
+//					folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
+//				}
+				String folderToFind = resourcePath + "/" + name;
+				folderToFind = folderToFind.replaceAll("//", "/");
+				log.debug("folderToFind: {}", folderToFind);
+				folder = folderDAO.findByPathExtended(folderToFind, tenantId);
+			}
 			return marshallFolder(folder, userId, session);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

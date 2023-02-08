@@ -322,6 +322,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	private void spoolResource(WebdavRequest request, WebdavResponse response, DavResource resource,
 			boolean sendContent) throws IOException, DavException {
+		
+		log.debug("spoolResource sendContent:{}", sendContent);
 
 		if (!resource.exists()) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -336,8 +338,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			// time lost the milli-second precision
 			if (modTime != UNDEFINED_TIME && (modTime / 1000 * 1000) <= modSince) {
 				// resource has not been modified since the time indicated in
-				// the
-				// 'If-Modified-Since' header.
+				// the 'If-Modified-Since' header.
 				response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 				return;
 			}
@@ -350,14 +351,14 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			if (resource instanceof DavResourceImpl) {
 				log.debug("resource instanceof DavResourceImpl");
-				DavResourceImpl dri = (DavResourceImpl) resource;
+				DavResourceImpl dri = (DavResourceImpl) resource;				
 
 				// Enforce download permission
 				ExportContext exportCtx = dri.getExportContext(oc);
 				if (!exportCtx.getResource().isDownloadEnabled()) {
 					throw new DavException(HttpServletResponse.SC_FORBIDDEN,
 							"Download permission not granted to this user");
-				}
+				}				
 
 				// Deals with ranges
 				String rangeHeader = request.getHeader(HttpHeaders.RANGE);
@@ -378,6 +379,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 					response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+				}
+				
+				String userAgent = request.getHeader("User-Agent");
+				if (userAgent != null && userAgent.contains("LogicalDOCApp")) {
+					response.setHeader("LD-ETag", exportCtx.getResource().getETag());
 				}
 			}
 
@@ -718,13 +724,19 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		try {
 			DavResource destResource = null;
 			try {
+				log.debug("Destination: {}", request.getHeader("Destination"));
+//				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getResourcePath());
+//				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getHref(false));
+//				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getHref(true));
 				destResource = getResourceFactory().createResource(request.getDestinationLocator(), request, session);
 			} catch (Throwable e) {
+//				log.error("Failure computing destination", e);
 				destResource = resource.getCollection();
 			}
 
+			log.debug("before validateDestination");
 			int status = validateDestination(destResource, request);
-			log.debug("status = " + status);
+			log.debug("status = {}", status);
 
 			if (status > HttpServletResponse.SC_NO_CONTENT) {
 				log.debug("status > HttpServletResponse.SC_NO_CONTENT");

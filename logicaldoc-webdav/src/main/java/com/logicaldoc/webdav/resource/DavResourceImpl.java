@@ -274,30 +274,61 @@ public class DavResourceImpl implements DavResource, Serializable {
 		initProperties();
 
 		/*
-		 * log.debug("getProperty() {}", name); log.debug("isCollection() {}",
-		 * isCollection()); log.debug("resource.isFolder() {}",
-		 * resource.isFolder());
+		 * log.debug("getProperty() {}", name); 
+		 * log.debug("isCollection() {}",isCollection()); 
+		 * log.debug("resource.isFolder() {}", resource.isFolder());
 		 */
+		
+		//log.info("getProperty() {}", name);
 
 		Namespace namespace = Namespace.getNamespace("http://logicaldoc.com/ns");
+		Namespace ocns = Namespace.getNamespace("oc", "http://logicaldoc.com/ns");
 
 		if (exists()) {
 			if (name.getNamespace().equals(namespace) && name.getName().equals("id")) {
 				if (!isCollection() && !resource.isFolder()) {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "d-" + resource.getID(),
-							namespace);
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "d-" + resource.getID(), namespace);
 					properties.add(idProp);
 				} else {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "f-" + resource.getID(),
-							namespace);
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "f-" + resource.getID(), namespace);
 					properties.add(idProp);
 				}
 			}
 
 			if (name.getName().equals("getetag")) {
-				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>(DavPropertyName.GETETAG,
-						resource.getETag());
+				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>(DavPropertyName.GETETAG, resource.getETag());
 				properties.add(defaultDavProperty);
+			}
+			
+			if (name.getNamespace().equals(ocns)) {
+				
+				// required
+				if (name.getName().equals("id")) {				 
+					String val = "f-" + resource.getID();
+					if (!isCollection() && !resource.isFolder()) {
+						val = "d-" + resource.getID();
+					} 				
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", val, ocns);
+					properties.add(idProp);				
+				}
+				
+				// optional
+				if (name.getName().equals("permissions")) {				 
+					String val = "RDNVCK";
+					if (!isCollection() && !resource.isFolder()) {
+						val = "RDNVW";
+					} 				
+					DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>("permissions", val, ocns);
+					properties.add(defaultDavProperty);
+				}				
+				
+				// optional
+				if (name.getName().equals("size")) {				 
+					if (!isCollection() && !resource.isFolder()) {
+						DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("size", resource.getContentLength(), ocns);
+						properties.add(defaultDavProperty);
+					} 				
+				}				
 			}
 		}
 
@@ -704,7 +735,9 @@ public class DavResourceImpl implements DavResource, Serializable {
 				resourceService.move(this.resource, parentResource, session);
 			} else {
 				String name = destination.getLocator().getResourcePath();
+				log.debug("name before: {}", name);
 				name = name.substring(name.lastIndexOf("/") + 1, name.length()).replace("/default", "");
+				log.debug("name after: {}", name);
 
 				Resource parentResource = resourceService.getParentResource(destination.getLocator().getResourcePath(),
 						this.resource.getRequestedPerson(), session);
