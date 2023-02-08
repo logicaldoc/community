@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.document.Tag;
-import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.util.Context;
 
@@ -132,6 +130,8 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	 */
 	private Long barcodeTemplateId = null;
 
+	private String tile;
+
 	public Folder() {
 	}
 
@@ -166,6 +166,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		this.grid = source.grid;
 		this.ocrTemplateId = source.ocrTemplateId;
 		this.barcodeTemplateId = source.barcodeTemplateId;
+		this.tile = source.tile;
 
 		setTemplate(source.getTemplate());
 		setTemplateId(source.getTemplateId());
@@ -638,5 +639,13 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public void setStorages(Map<String, Integer> storages) {
 		this.storages = storages;
+	}
+
+	public String getTile() {
+		return tile;
+	}
+
+	public void setTile(String tile) {
+		this.tile = tile;
 	}
 }

@@ -159,6 +159,8 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		 */
 		prepareRightForm();
 
+		
+		columns.addMember(new FolderTile(folder, changedHandler));
 	}
 
 	private SpinnerItem prepareMaxVersionsItem() {

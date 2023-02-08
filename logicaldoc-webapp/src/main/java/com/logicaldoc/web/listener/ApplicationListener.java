@@ -19,11 +19,8 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.impl.Log4jContextFactory;
-import org.apache.logging.log4j.core.util.DefaultShutdownCallbackRegistry;
-import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +49,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	private static Logger log = LoggerFactory.getLogger(ApplicationListener.class);
 
 	private boolean pidCreated = false;
-	
+
 	private static boolean restartRequired = false;
 
 	public static boolean isRestartRequired() {
@@ -161,10 +158,6 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			// Initialize plugins
 			PluginRegistry.getInstance().init(pluginsDir);
 
-			// Reinitialize logging because some plugins may have added new
-			// categories
-			initializeLoggingAfterPlugins();
-
 			// Clean some temporary folders
 			cleanTemporaryFolders(context);
 
@@ -214,19 +207,6 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		}
 	}
 
-	private void initializeLoggingAfterPlugins() {
-		try {
-			final LoggerContextFactory factory = LogManager.getFactory();
-
-			if (factory instanceof Log4jContextFactory) {
-				Log4jContextFactory contextFactory = (Log4jContextFactory) factory;
-				((DefaultShutdownCallbackRegistry) contextFactory.getShutdownCallbackRegistry()).stop();
-			}
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-		}
-	}
-
 	private void initializeLogging() {
 		String log4jPath = null;
 		try {
@@ -250,7 +230,9 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 			// Init the logs
 			System.out.println(String.format("Taking log configuration from %s", log4jPath));
-			Configurator.initialize(null, log4jPath);
+			LoggerContext lContext = Configurator.initialize(null, log4jPath);
+			if (lContext == null)
+				throw new Exception("Null logger context");
 		} catch (Throwable e) {
 			System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
 		}

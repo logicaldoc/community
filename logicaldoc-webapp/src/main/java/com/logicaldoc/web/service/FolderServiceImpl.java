@@ -1,15 +1,18 @@
 package com.logicaldoc.web.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +46,9 @@ import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
+import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.data.FoldersDataServlet;
 
 /**
@@ -155,34 +160,35 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		dao.initialize(folder);
 
-		GUIFolder f = new GUIFolder();
-		f.setId(folder.getId());
-		f.setName(folder.getId() != Constants.DOCUMENTS_FOLDERID ? folder.getName() : "/");
-		f.setParentId(folder.getParentId());
-		f.setDescription(folder.getDescription());
-		f.setCreation(folder.getCreation());
-		f.setCreator(folder.getCreator());
-		f.setCreatorId(folder.getCreatorId());
-		f.setType(folder.getType());
-		f.setPosition(folder.getPosition());
-		f.setQuotaDocs(folder.getQuotaDocs());
-		f.setQuotaSize(folder.getQuotaSize());
-		f.setFoldRef(folder.getFoldRef());
-		f.setStorage(folder.getStorage());
-		f.setMaxVersions(folder.getMaxVersions());
-		f.setColor(folder.getColor());
-		f.setGrid(folder.getGrid());
-		f.setQuotaThreshold(folder.getQuotaThreshold());
-		f.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList().toArray(new String[0]));
-		f.setOcrTemplateId(folder.getOcrTemplateId());
-		f.setBarcodeTemplateId(folder.getBarcodeTemplateId());
+		GUIFolder guiFolder = new GUIFolder();
+		guiFolder.setId(folder.getId());
+		guiFolder.setName(folder.getId() != Constants.DOCUMENTS_FOLDERID ? folder.getName() : "/");
+		guiFolder.setParentId(folder.getParentId());
+		guiFolder.setDescription(folder.getDescription());
+		guiFolder.setCreation(folder.getCreation());
+		guiFolder.setCreator(folder.getCreator());
+		guiFolder.setCreatorId(folder.getCreatorId());
+		guiFolder.setType(folder.getType());
+		guiFolder.setPosition(folder.getPosition());
+		guiFolder.setQuotaDocs(folder.getQuotaDocs());
+		guiFolder.setQuotaSize(folder.getQuotaSize());
+		guiFolder.setFoldRef(folder.getFoldRef());
+		guiFolder.setStorage(folder.getStorage());
+		guiFolder.setMaxVersions(folder.getMaxVersions());
+		guiFolder.setColor(folder.getColor());
+		guiFolder.setTile(folder.getTile());
+		guiFolder.setGrid(folder.getGrid());
+		guiFolder.setQuotaThreshold(folder.getQuotaThreshold());
+		guiFolder.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList().toArray(new String[0]));
+		guiFolder.setOcrTemplateId(folder.getOcrTemplateId());
+		guiFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 		if (computePath)
-			f.setPathExtended(dao.computePathExtended(folder.getId()));
+			guiFolder.setPathExtended(dao.computePathExtended(folder.getId()));
 
-		if (f.isWorkspace()) {
+		if (guiFolder.isWorkspace()) {
 			SequenceDAO seqDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
-			f.setDocumentsTotal(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
-			f.setSizeTotal(seqDao.getCurrentValue("wssize", folder.getId(), folder.getTenantId()));
+			guiFolder.setDocumentsTotal(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
+			guiFolder.setSizeTotal(seqDao.getCurrentValue("wssize", folder.getId(), folder.getTenantId()));
 		}
 
 		if (folder.getSecurityRef() != null) {
@@ -190,24 +196,24 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			secRef.setId(folder.getSecurityRef());
 			if (computePath)
 				secRef.setPathExtended(dao.computePathExtended(folder.getSecurityRef()));
-			f.setSecurityRef(secRef);
+			guiFolder.setSecurityRef(secRef);
 		}
 
 		if (folder.getTemplate() != null) {
-			f.setTemplateId(folder.getTemplate().getId());
-			f.setTemplate(folder.getTemplate().getName());
-			f.setTemplateLocked(folder.getTemplateLocked());
+			guiFolder.setTemplateId(folder.getTemplate().getId());
+			guiFolder.setTemplate(folder.getTemplate().getName());
+			guiFolder.setTemplateLocked(folder.getTemplateLocked());
 			GUIAttribute[] attributes = prepareGUIAttributes(folder.getTemplate(), folder);
-			f.setAttributes(attributes);
+			guiFolder.setAttributes(attributes);
 		}
 
 		if (folder.getTags() != null && !folder.getTags().isEmpty())
-			f.setTags(folder.getTagsAsWords().toArray(new String[folder.getTags().size()]));
+			guiFolder.setTags(folder.getTagsAsWords().toArray(new String[folder.getTags().size()]));
 		else
-			f.setTags(new String[0]);
+			guiFolder.setTags(new String[0]);
 
-		f.setColor(folder.getColor());
-		return f;
+		guiFolder.setColor(folder.getColor());
+		return guiFolder;
 	}
 
 	@Override
@@ -267,6 +273,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				guiFolder.setName(test.getName());
 				guiFolder.setDescription(test.getDescription());
 				guiFolder.setColor(test.getColor());
+				guiFolder.setTile(test.getTile());
 				guiFolder.setPosition(test.getPosition());
 				guiFolder.setFoldRef(test.getFoldRef());
 				guiFolder.setId(test.getId());
@@ -563,9 +570,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 			if (guiFolder.getFoldRef() != null) {
 				// The user is editing an alias
-				folder.setDescription(guiFolder.getDescription());
-				folder.setPosition(guiFolder.getPosition());
-				folder.setColor(guiFolder.getColor());
 				folder.setName(folderName);
 				folderDao.store(folder);
 
@@ -573,9 +577,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				folderDao.initialize(folder);
 			} else {
 				// The user is editing a real folder
-				folder.setColor(guiFolder.getColor());
-				folder.setDescription(guiFolder.getDescription());
-				folder.setPosition(guiFolder.getPosition());
 				folder.setType(guiFolder.getType());
 				folder.setStorage(guiFolder.getStorage());
 
@@ -592,6 +593,10 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				}
 			}
 
+			folder.setDescription(guiFolder.getDescription());
+			folder.setPosition(guiFolder.getPosition());
+			folder.setColor(guiFolder.getColor());
+			folder.setTile(guiFolder.getTile());
 			folder.setTemplateLocked(guiFolder.getTemplateLocked());
 			folder.setQuotaDocs(guiFolder.getQuotaDocs());
 			folder.setQuotaSize(guiFolder.getQuotaSize());
@@ -1287,5 +1292,30 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				log.error(e.getMessage(), e);
 			}
 		}, session);
+	}
+
+	@Override
+	public String readImage() throws ServerException {
+		final Session session = validateSession(getThreadLocalRequest());
+		List<String> allowedExts = Arrays.asList("png", "gif", "jpg", "jpeg", "webp", "jfif");
+
+		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
+		for (Map.Entry<String, File> entry : uploadedFilesMap.entrySet()) {
+			String ext = FileUtil.getExtension(entry.getKey()).toLowerCase();
+			if (!allowedExts.contains(ext))
+				continue;
+			StringBuilder sb = new StringBuilder("data:image/");
+			sb.append(ext);
+			sb.append(";base64,");
+
+			try {
+				sb.append(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(entry.getValue())));
+			} catch (IOException e) {
+				throwServerException(session, log, e);
+			}
+			return sb.toString();
+		}
+
+		throw new ServerException(I18N.message("unsupportedformat", session.getUser().getLocale()));
 	}
 }

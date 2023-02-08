@@ -57,4 +57,6 @@ public interface FolderServiceAsync {
 	void applyStorage(long parentId, AsyncCallback<Void> callback);
 
 	void merge(long[] folderIds, long targetId, AsyncCallback<Void> callback);
+
+	void readImage(AsyncCallback<String> callback);
 }

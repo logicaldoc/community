@@ -45,8 +45,8 @@ public class PreviewTile extends HLayout {
 		if (Session.get().isShowThumbnail()) {
 			String html = "<img border='0' alt='' title='' src='" + Util.thumbnailUrl(docId, null) + "' height='"
 					+ Session.get().getConfig("gui.thumbnail.size") + "px' style='float:body;' align='body'/>";
-			HTMLFlow tileImage = new HTMLFlow(html);
-			tileImage.addClickHandler(new ClickHandler() {
+			HTMLFlow thumbnailImage = new HTMLFlow(html);
+			thumbnailImage.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
@@ -57,9 +57,9 @@ public class PreviewTile extends HLayout {
 				}
 			});
 
-			Img closeTileImage = new Img("[SKIN]/headerIcons/close.gif", 16, 16);
-			closeTileImage.setShowRollOver(true);
-			closeTileImage.addClickHandler(new ClickHandler() {
+			Img closeThumbnailImage = new Img("[SKIN]/headerIcons/close.gif", 16, 16);
+			closeThumbnailImage.setShowRollOver(true);
+			closeThumbnailImage.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
@@ -69,7 +69,7 @@ public class PreviewTile extends HLayout {
 				}
 			});
 
-			setMembers(tileImage, closeTileImage);
+			setMembers(thumbnailImage, closeThumbnailImage);
 		} else {
 			IButton showThumbnail = new IButton(I18N.message("showthumbnail"));
 			showThumbnail.addClickHandler(new ClickHandler() {

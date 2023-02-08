@@ -238,6 +238,10 @@
 			<artifactId>hibernate-ehcache</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-web</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
@@ -445,11 +449,11 @@
 			<artifactId>azure-identity</artifactId> <version>1.3.7</version> </dependency> 
 			<dependency> <groupId>com.microsoft.azure</groupId> <artifactId>msal4j</artifactId> 
 			<version>1.13.0</version> </dependency -->
-		
+
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-core</artifactId>
-		    <scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -569,13 +573,15 @@
 									dest="target/war" />
 								<delete
 									dir="target/war/WEB-INF/classes/com/logicaldoc/gui" />
-								<delete dir="target/war/work" />						
+								<delete dir="target/war/work" />
 								<delete>
-  									<fileset dir="target/war/META-INF" includes="**" excludes="context.xml" />
+									<fileset dir="target/war/META-INF" includes="**"
+										excludes="context.xml" />
 								</delete>
-                                <delete>
-  									<fileset dir="target/war/WEB-INF/classes" includes="context.properties.*" />
-								</delete>															
+								<delete>
+									<fileset dir="target/war/WEB-INF/classes"
+										includes="context.properties.*" />
+								</delete>
 								<delete>
 									<fileset dir="target/war/WEB-INF/lib"
 										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*,guava-16*,log4j-1.*,slf4j-simple*" />

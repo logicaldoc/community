@@ -49,7 +49,7 @@ public class ParameterConditionRow extends HLayout {
 
 	private static final String NOTNULL = "notnull";
 
-	private static final String VALUE = "value";
+	private static final String VALUE_STR = "value";
 
 	private ImgButton removeImg = null;
 
@@ -137,7 +137,7 @@ public class ParameterConditionRow extends HLayout {
 		if (fieldSelected != null && !fieldSelected.trim().isEmpty()) {
 			value = valueItemFor(fieldSelected);
 		} else {
-			value = ItemFactory.newTextItem(VALUE, null);
+			value = ItemFactory.newTextItem(VALUE_STR, null);
 		}
 		value.setRequired(true);
 		value.setEndRow(true);
@@ -200,11 +200,11 @@ public class ParameterConditionRow extends HLayout {
 
 	private void onOperatorChanged(String valueOperator) {
 		if (valueOperator == null || "null".equals(valueOperator) || NOTNULL.equals(valueOperator)) {
-			form.hideItem(VALUE);
+			form.hideItem(VALUE_STR);
 			if (value != null)
 				value.setVisible(false);
 		} else {
-			form.showItem(VALUE);
+			form.showItem(VALUE_STR);
 			if (value != null)
 				value.setVisible(true);
 		}
@@ -271,40 +271,40 @@ public class ParameterConditionRow extends HLayout {
 				|| criteriaField.equals("rating") || criteriaField.equals("template")
 				|| criteriaField.equals("published") || criteriaField.equals("indexed")
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT)) {
-			return ItemFactory.newIntegerItem(VALUE, "integer", null);
+			return ItemFactory.newIntegerItem(VALUE_STR, "integer", null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
-			return ItemFactory.newFloatItem(VALUE, "double", null);
+			return ItemFactory.newFloatItem(VALUE_STR, "double", null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {
-			FormItem item = ItemFactory.newBooleanSelector(VALUE, "boolean");
+			FormItem item = ItemFactory.newBooleanSelector(VALUE_STR, "boolean");
 			item.setValue("yes");
 			return item;
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			FormItem item = ItemFactory.newStringItemForAttribute(template.getAttribute(attributeName));
-			item.setName(VALUE);
+			item.setName(VALUE_STR);
 			return item;
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_USER)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
-			FormItem item = ItemFactory.newUserSelectorForAttribute(VALUE, att.getLabel(),
+			FormItem item = ItemFactory.newUserSelectorForAttribute(VALUE_STR, att.getLabel(),
 					(att.getOptions() != null && att.getOptions().length > 0) ? att.getOptions()[0] : null, null);
-			item.setName(VALUE);
+			item.setName(VALUE_STR);
 			return item;
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
-			FormItem item = ItemFactory.newFolderSelectorForAttribute(VALUE, att.getLabel(), false, null);
-			item.setName(VALUE);
+			FormItem item = ItemFactory.newFolderSelectorForAttribute(VALUE_STR, att.getLabel(), false, null);
+			item.setName(VALUE_STR);
 			return item;
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
 				|| criteriaField.equals("date") || criteriaField.equals("creation")
 				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DATE)) {
-			return ItemFactory.newDateItem(VALUE, "date");
+			return ItemFactory.newDateItem(VALUE_STR, "date");
 		} else if (criteriaField.equals("tags")) {
-			return ItemFactory.newTagsMultiplePickList(VALUE, "tags", new TagsDS(null, false, null, null), null);
+			return ItemFactory.newTagsMultiplePickList(VALUE_STR, "tags", new TagsDS(null, false, null, null), null);
 		} else {
-			return ItemFactory.newTextItem(VALUE, null);
+			return ItemFactory.newTextItem(VALUE_STR, null);
 		}
 	}
 
