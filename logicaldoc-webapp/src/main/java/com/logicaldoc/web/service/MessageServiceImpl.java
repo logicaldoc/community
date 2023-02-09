@@ -26,6 +26,7 @@ import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.html.HTMLSanitizer;
 
 /**
  * Implementation of the MessageService
@@ -136,8 +137,8 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			m.setStatus(SystemMessage.STATUS_NEW);
 			m.setType(Message.TYPE_SYSTEM);
 			m.setLastNotified(new Date());
-			m.setMessageText(message.getMessage());
-			m.setSubject(message.getSubject());
+			m.setMessageText(HTMLSanitizer.sanitize(message.getMessage()));
+			m.setSubject(HTMLSanitizer.sanitize(message.getSubject()));
 			Recipient recipient = new Recipient();
 			recipient.setName(user.getUsername());
 			recipient.setAddress(user.getUsername());
