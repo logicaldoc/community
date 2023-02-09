@@ -100,4 +100,23 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTCase {
 		bookmark = dao.findByUserIdAndDocId(1, 2);
 		Assert.assertNotNull(bookmark);
 	}
+	
+	@Test
+	public void testDelete() throws PersistenceException {
+		
+		Bookmark bmark = new Bookmark();
+		bmark.setType(Bookmark.TYPE_DOCUMENT);
+		bmark.setTitle("Photo-2022-07-13-21-18-28_1495.jpg");
+		bmark.setFileType("jpg");
+		bmark.setUserId(1);
+		bmark.setTargetId(244);
+			
+		dao.store(bmark);
+		long bkmID = bmark.getId();
+		System.out.println(bkmID);
+		
+		dao.delete(bkmID);
+		bmark = dao.findByUserIdAndDocId(1, bkmID);
+		Assert.assertNull(bmark);
+	}	
 }
