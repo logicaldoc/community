@@ -95,6 +95,8 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	 */
 	private Long barcodeTemplateId = null;
 
+	private String tile;
+
 	public GUIFolder() {
 
 	}
@@ -520,5 +522,13 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	public void setBarcodeTemplateId(Long barcodeTemplateId) {
 		this.barcodeTemplateId = barcodeTemplateId;
+	}
+	
+	public String getTile() {
+		return tile;
+	}
+
+	public void setTile(String tile) {
+		this.tile = tile;
 	}
 }

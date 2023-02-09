@@ -29,7 +29,7 @@ public class TaskSchedulingPanel extends VLayout {
 
 	private static final String REPEAT_INTERVAL = "repeatInterval";
 
-	private static final String INITIALDELAY = "initialdelay";
+	private static final String INITIALDELAY_STR = "initialdelay";
 
 	private static final String SIMPLE = "simple";
 
@@ -102,7 +102,7 @@ public class TaskSchedulingPanel extends VLayout {
 		maxDuration.addChangedHandler(changedHandler);
 
 		// Initial delay
-		initialDelay = ItemFactory.newSpinnerItem(INITIALDELAY, task.getScheduling().getDelay());
+		initialDelay = ItemFactory.newSpinnerItem(INITIALDELAY_STR, task.getScheduling().getDelay());
 		initialDelay.setWidth(80);
 		initialDelay.setVisible(simplePolicy);
 		initialDelay.setStep(10);
@@ -173,10 +173,10 @@ public class TaskSchedulingPanel extends VLayout {
 
 		if (task.getScheduling().isSimple() || ((String) values.get(SIMPLE)).equals("true")) {
 			long longValue = 0;
-			if (values.get(INITIALDELAY) instanceof String)
-				longValue = Long.parseLong((String) values.get(INITIALDELAY));
+			if (values.get(INITIALDELAY_STR) instanceof String)
+				longValue = Long.parseLong((String) values.get(INITIALDELAY_STR));
 			else
-				longValue = ((Integer) values.get(INITIALDELAY)).longValue();
+				longValue = ((Integer) values.get(INITIALDELAY_STR)).longValue();
 			task.getScheduling().setDelay(longValue);
 
 			if (values.get(REPEAT_INTERVAL) instanceof String)

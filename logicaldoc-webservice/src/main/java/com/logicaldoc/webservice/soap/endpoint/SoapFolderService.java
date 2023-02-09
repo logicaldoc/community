@@ -44,16 +44,16 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	protected static Logger log = LoggerFactory.getLogger(SoapFolderService.class);
 
 	@Override
-	public WSFolder create(String sid, WSFolder folder)
+	public WSFolder create(String sid, WSFolder wsFolder)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		Folder parentFolder = folderDao.findById(folder.getParentId());
+		Folder parentFolder = folderDao.findById(wsFolder.getParentId());
 		if (parentFolder == null)
 			throw new WebserviceException(
-					String.format("A parent folder with id %s was not found.", folder.getParentId()));
-		checkPermission(Permission.ADD, user, folder.getParentId());
+					String.format("A parent folder with id %s was not found.", wsFolder.getParentId()));
+		checkPermission(Permission.ADD, user, wsFolder.getParentId());
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -62,30 +62,31 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		Folder folderVO = new Folder();
 		folderVO.setTenantId(user.getTenantId());
-		folderVO.setName(folder.getName());
-		folderVO.setDescription(folder.getDescription());
-		folderVO.setType(folder.getType());
-		folderVO.setPosition(folder.getPosition());
-		folderVO.setTemplateLocked(folder.getTemplateLocked());
-		folderVO.setHidden(folder.getHidden());
-		folderVO.setFoldRef(folder.getFoldRef());
-		folderVO.setStorage(folder.getStorage());
-		folderVO.setMaxVersions(folder.getMaxVersions());
-		folderVO.setSecurityRef(folder.getSecurityRef());
-		folderVO.setFoldRef(folder.getFoldRef());
-		folderVO.setOcrTemplateId(folder.getOcrTemplateId());
-		folderVO.setBarcodeTemplateId(folder.getBarcodeTemplateId());
-		folderVO.setColor(folder.getColor());
+		folderVO.setName(wsFolder.getName());
+		folderVO.setDescription(wsFolder.getDescription());
+		folderVO.setType(wsFolder.getType());
+		folderVO.setPosition(wsFolder.getPosition());
+		folderVO.setTemplateLocked(wsFolder.getTemplateLocked());
+		folderVO.setHidden(wsFolder.getHidden());
+		folderVO.setFoldRef(wsFolder.getFoldRef());
+		folderVO.setStorage(wsFolder.getStorage());
+		folderVO.setMaxVersions(wsFolder.getMaxVersions());
+		folderVO.setSecurityRef(wsFolder.getSecurityRef());
+		folderVO.setFoldRef(wsFolder.getFoldRef());
+		folderVO.setOcrTemplateId(wsFolder.getOcrTemplateId());
+		folderVO.setBarcodeTemplateId(wsFolder.getBarcodeTemplateId());
+		folderVO.setColor(wsFolder.getColor());
+		folderVO.setTile(wsFolder.getTile());
 
 		Set<String> tagsSet = new TreeSet<>();
-		if (folder.getTags() != null) {
-			for (int i = 0; i < folder.getTags().length; i++) {
-				tagsSet.add(folder.getTags()[i]);
+		if (wsFolder.getTags() != null) {
+			for (int i = 0; i < wsFolder.getTags().length; i++) {
+				tagsSet.add(wsFolder.getTags()[i]);
 			}
 		}
 		folderVO.setTagsFromWords(tagsSet);
 
-		folder.updateAttributes(folderVO);
+		wsFolder.updateAttributes(folderVO);
 
 		Folder f = folderDao.create(parentFolder, folderVO, true, transaction);
 
@@ -483,12 +484,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public void update(String sid, WSFolder folder)
+	public void update(String sid, WSFolder wsFolder)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		long folderId = folder.getId();
-		String name = folder.getName();
+		long folderId = wsFolder.getId();
+		String name = wsFolder.getName();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!folderDao.isPermissionEnabled(Permission.RENAME, folderId, user.getId()))
@@ -497,44 +498,45 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		if (folderId == folderDao.findRoot(user.getTenantId()).getId())
 			throw new PermissionException("cannot update the root folder");
 
-		Folder fld = folderDao.findById(folderId);
-		if (fld == null)
+		Folder folder = folderDao.findById(folderId);
+		if (folder == null)
 			throw new WebserviceException(String.format("cannot find folder %s", folderId));
 
-		List<Folder> folders = folderDao.findByNameAndParentId(name, fld.getParentId());
-		if (folders.size() > 0 && folders.get(0).getId() != fld.getId()) {
+		List<Folder> folders = folderDao.findByNameAndParentId(name, folder.getParentId());
+		if (folders.size() > 0 && folders.get(0).getId() != folder.getId()) {
 			throw new WebserviceException(String.format("duplicate folder name %s", name));
 		} else {
-			folderDao.initialize(fld);
+			folderDao.initialize(folder);
 
-			fld.setName(name);
-			fld.setColor(folder.getColor());
-			fld.setDescription(folder.getDescription());
-			fld.setTemplateLocked(folder.getTemplateLocked());
-			fld.setPosition(folder.getPosition());
-			fld.setSecurityRef(folder.getSecurityRef());
-			fld.setFoldRef(folder.getFoldRef());
-			fld.setOcrTemplateId(folder.getOcrTemplateId());
-			fld.setBarcodeTemplateId(folder.getBarcodeTemplateId());
-			fld.setStorage(folder.getStorage());
-			fld.setMaxVersions(folder.getMaxVersions());
+			folder.setName(name);
+			folder.setColor(wsFolder.getColor());
+			folder.setTile(wsFolder.getTile());
+			folder.setDescription(wsFolder.getDescription());
+			folder.setTemplateLocked(wsFolder.getTemplateLocked());
+			folder.setPosition(wsFolder.getPosition());
+			folder.setSecurityRef(wsFolder.getSecurityRef());
+			folder.setFoldRef(wsFolder.getFoldRef());
+			folder.setOcrTemplateId(wsFolder.getOcrTemplateId());
+			folder.setBarcodeTemplateId(wsFolder.getBarcodeTemplateId());
+			folder.setStorage(wsFolder.getStorage());
+			folder.setMaxVersions(wsFolder.getMaxVersions());
 
 			Set<String> tagsSet = new TreeSet<>();
-			if (folder.getTags() != null) {
-				for (int i = 0; i < folder.getTags().length; i++) {
-					tagsSet.add(folder.getTags()[i]);
+			if (wsFolder.getTags() != null) {
+				for (int i = 0; i < wsFolder.getTags().length; i++) {
+					tagsSet.add(wsFolder.getTags()[i]);
 				}
 			}
-			fld.setTagsFromWords(tagsSet);
+			folder.setTagsFromWords(tagsSet);
 
-			folder.updateAttributes(fld);
+			wsFolder.updateAttributes(folder);
 
 			// Add a folder history entry
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(user);
 			transaction.setEvent(FolderEvent.RENAMED.toString());
 			transaction.setSessionId(sid);
-			folderDao.store(fld, transaction);
+			folderDao.store(folder, transaction);
 		}
 	}
 

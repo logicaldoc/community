@@ -40,6 +40,8 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 	private static final String POSITION = "position";
 
+	private FolderTile tile;
+	
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -68,6 +70,9 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
+		
+		if (Boolean.TRUE.equals(contains(tile)))
+			removeChild(tile);
 
 		form = new DynamicForm();
 		form.setValuesManager(vm);
@@ -124,6 +129,12 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 		docsGrid.setIcons(saveCurrentLayout, applyToSubFolders, editLayout, clear);
 
+		form.setItems(position, color, docsGrid);
+		addMember(form);
+		
+		tile=new FolderTile(folder, changedHandler);
+		addMember(tile);
+		
 		if (folder.isWrite()) {
 			if (changedHandler != null) {
 				color.addChangedHandler(changedHandler);
@@ -136,9 +147,6 @@ public class FolderInterfacePanel extends FolderDetailTab {
 			position.setDisabled(true);
 			docsGrid.setDisabled(true);
 		}
-
-		form.setItems(position, color, docsGrid);
-		addMember(form);
 	}
 
 	private FormItemIcon prepareEditLayout() {

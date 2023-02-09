@@ -81,7 +81,7 @@ public class TaskDetailsDialog extends Window {
 
 	private static final String USER_ID = "userId";
 
-	private static final String WORKFLOW = "workflow";
+	private static final String WORKFLOW_STR = "workflow";
 
 	private GUIWorkflow workflow = null;
 
@@ -136,7 +136,7 @@ public class TaskDetailsDialog extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-		setTitle(I18N.message(WORKFLOW));
+		setTitle(I18N.message(WORKFLOW_STR));
 		setWidth(760);
 		setHeight(650);
 		setCanDragResize(true);
@@ -148,7 +148,7 @@ public class TaskDetailsDialog extends Window {
 		tabs.setWidth100();
 		tabs.setHeight100();
 
-		workflowTab = new Tab(I18N.message(WORKFLOW));
+		workflowTab = new Tab(I18N.message(WORKFLOW_STR));
 		tabs.addTab(workflowTab, 0);
 
 		buttonsPanel = new VLayout();
@@ -330,7 +330,7 @@ public class TaskDetailsDialog extends Window {
 		workflowForm.setColWidths(60, "*");
 
 		StaticTextItem workflowTitle = ItemFactory.newStaticTextItem("workflowTitle", "",
-				"<b>" + I18N.message(WORKFLOW) + "</b>");
+				"<b>" + I18N.message(WORKFLOW_STR) + "</b>");
 		workflowTitle.setShouldSaveValue(false);
 		workflowTitle.setWrapTitle(false);
 		workflowTitle.setShowTitle(false);

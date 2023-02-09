@@ -281,6 +281,16 @@ public interface FolderService extends RemoteService {
 	 */
 	public void applyGridLayout(long folderId) throws ServerException;
 
+	
+	/**
+	 * Read the uploaded image and converts it into Base64 
+	 * 
+	 * @return the string conversion of the uploaded image
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public String readImage() throws ServerException;
+	
 	public static class Instance {
 		private static FolderServiceAsync instance;
 

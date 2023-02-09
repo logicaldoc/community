@@ -200,6 +200,6 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 
 	@Override
 	public void onError(WebSocket webSocket) {
-		GuiLog.warn("Server link error", null);
+		GuiLog.warn("Server connection error", null);
 	}
 }

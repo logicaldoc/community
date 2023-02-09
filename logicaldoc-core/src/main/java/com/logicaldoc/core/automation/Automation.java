@@ -66,19 +66,17 @@ public class Automation {
 	private Locale automationLocale = Locale.ENGLISH;
 
 	private long tenantId = Tenant.DEFAULT_ID;
-	
+
 	/**
-	 * A transient and system-wide dictionary used to store keys among automation executions 
+	 * A transient and system-wide dictionary used to store keys among
+	 * automation executions
 	 */
 	private static final Map<String, Object> systemDictionary = new ConcurrentHashMap<>();
 
 	public static synchronized void initialize() {
 		try {
-			if (!RuntimeSingleton.isInitialized()) {
-				RuntimeSingleton.init();
-				log.info("Forced Automation initialization");
-			}
-			log.info("Automation has been initialized");
+			RuntimeSingleton.init();
+			log.info("Automation initialized");
 		} catch (Throwable t) {
 			log.error("Unable to initialize the automation engine", t);
 		}
@@ -123,7 +121,7 @@ public class Automation {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
 		if (clientDictionary == null)
-			clientDictionary =  new ConcurrentHashMap<>();
+			clientDictionary = new ConcurrentHashMap<>();
 		HashMap<String, Object> dictionary = new HashMap<>();
 
 		/*
@@ -186,10 +184,9 @@ public class Automation {
 
 		putServerUrl(clientDictionary);
 
-		
 		// Put the system dictionary
 		dictionary.put(SYSTEM_DICTIONARY, systemDictionary);
-		
+
 		/*
 		 * Merge the client dictionary
 		 */

@@ -12,7 +12,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -44,11 +43,7 @@ public class AutomationDialog extends Window {
 	private TabSet tabSet = new TabSet();
 
 	public AutomationDialog(final Long folderId, final long[] docIds) {
-		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, (ClickEvent event) -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
 		setTitle(I18N.message("executeautomation"));
@@ -135,8 +130,7 @@ public class AutomationDialog extends Window {
 		scriptForm.setTitleOrientation(TitleOrientation.TOP);
 		scriptForm.setNumCols(1);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", null, null,
-				false);
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", null, null, false);
 		automation.setShowTitle(false);
 		automation.setStartRow(false);
 		automation.setRequired(true);

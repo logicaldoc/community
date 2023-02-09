@@ -40,9 +40,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DashletEditor extends Window {
 
-	private static final String CONTENT = "content";
+	private static final String CONTENT_STR = "content";
 
-	private static final String UNIQUE = "unique";
+	private static final String UNIQUE_STR = "unique";
 
 	private static final String LABEL = "label";
 
@@ -200,7 +200,7 @@ public class DashletEditor extends Window {
 		max.setMin(1);
 		max.setRequired(true);
 
-		unique = ItemFactory.newYesNoRadioItem(UNIQUE, UNIQUE);
+		unique = ItemFactory.newYesNoRadioItem(UNIQUE_STR, UNIQUE_STR);
 		unique.setValue(dashlet.isUnique());
 		unique.setDisabled(dashlet.isSystemDashlet());
 		unique.setRequired(true);
@@ -216,7 +216,7 @@ public class DashletEditor extends Window {
 			}
 		});
 
-		content = ItemFactory.newTextAreaItemForAutomation(CONTENT,  dashlet.getContent(), null, true);
+		content = ItemFactory.newTextAreaItemForAutomation(CONTENT_STR,  dashlet.getContent(), null, true);
 		content.setWidth("*");
 
 		query = ItemFactory.newTextAreaItemForAutomation("query", dashlet.getQuery(), null, false);
@@ -234,7 +234,7 @@ public class DashletEditor extends Window {
 	}
 
 	private void onTypeChange(String newValue) {
-		if (CONTENT.equals(newValue)) {
+		if (CONTENT_STR.equals(newValue)) {
 			content.show();
 			query.hide();
 			unique.hide();
@@ -256,10 +256,10 @@ public class DashletEditor extends Window {
 
 	private void onSave() {
 		if (form.validate()) {
-			dashlet.setContent(form.getValueAsString(CONTENT));
+			dashlet.setContent(form.getValueAsString(CONTENT_STR));
 			dashlet.setQuery(form.getValueAsString("query"));
 			dashlet.setMax(Integer.parseInt(form.getValueAsString("max")));
-			dashlet.setUnique(Boolean.parseBoolean(form.getValueAsString(UNIQUE)));
+			dashlet.setUnique(Boolean.parseBoolean(form.getValueAsString(UNIQUE_STR)));
 
 			if (!dashlet.isSystemDashlet()) {
 				dashlet.setType(form.getValueAsString("type"));

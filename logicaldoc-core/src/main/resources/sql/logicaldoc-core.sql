@@ -152,7 +152,7 @@ create table ld_folder (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_quotadocs bigint, ld_quotasize bigint, ld_hidden int not null, ld_foldref bigint, 
                         ld_level int, ld_maxversions int, ld_color varchar(255), ld_tgs varchar(1000),
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_path varchar(255), ld_grid varchar(4000), 
-                        ld_ocrtemplateid bigint, ld_barcodetemplateid bigint, primary key (ld_id));
+                        ld_ocrtemplateid bigint, ld_barcodetemplateid bigint, ld_tile varchar(10000), primary key (ld_id));
 create table ld_folder_ext (ld_folderid bigint not null, ld_mandatory int not null, ld_type int not null, ld_editor int not null,
                             ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                             ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, 

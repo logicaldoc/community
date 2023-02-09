@@ -97,6 +97,9 @@ public class WSFolder implements Serializable {
 	@WSDoc(required = false, description = "optional color assigned to the folder")
 	private String color;
 	
+	@WSDoc(required = false, description = "optional tile image(Base64 encoded) of the folder")
+	private String tile;
+	
 	public void addAttribute(WSAttribute att) {
 		List<WSAttribute> buf = (List<WSAttribute>) Arrays.asList(getAttributes());
 		buf.add(att);
@@ -154,6 +157,7 @@ public class WSFolder implements Serializable {
 		wsFolder.setOcrTemplateId(folder.getOcrTemplateId());
 		wsFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 		wsFolder.setColor(folder.getColor());
+		wsFolder.setTile(folder.getTile());
 
 		if (withCollections && folder.getTags() != null)
 			wsFolder.setTags(folder.getTagsAsWords().toArray(new String[0]));
@@ -395,5 +399,13 @@ public class WSFolder implements Serializable {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public String getTile() {
+		return tile;
+	}
+
+	public void setTile(String tile) {
+		this.tile = tile;
 	}
 }

@@ -58,7 +58,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class LoginPanel extends VLayout {
 
-	private static final String PASSWORD = "password";
+	private static final String PASSWORD_STR = "password";
 
 	private static final String ENTER = "enter";
 
@@ -373,9 +373,9 @@ public class LoginPanel extends VLayout {
 	}
 
 	private void preparePassword() {
-		password = ItemFactory.newPasswordItem(PASSWORD, PASSWORD, null);
+		password = ItemFactory.newPasswordItem(PASSWORD_STR, PASSWORD_STR, null);
 		password.setShowTitle(false);
-		password.setHint(I18N.message(PASSWORD).toLowerCase());
+		password.setHint(I18N.message(PASSWORD_STR).toLowerCase());
 		password.setShowHintInField(true);
 		password.setRequired(true);
 		password.setHeight(34);

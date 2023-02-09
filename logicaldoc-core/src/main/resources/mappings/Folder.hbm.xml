@@ -38,6 +38,8 @@
 		<property name="grid" type="string" column="ld_grid" not-null="false" />
 		<property name="ocrTemplateId" type="long" column="ld_ocrtemplateid" />
 		<property name="barcodeTemplateId" type="long" column="ld_barcodetemplateid" />
+
+		<property name="tile" type="text" column="ld_tile" />
 		
 		<set name="folderGroups" table="ld_foldergroup" cascade="all" lazy="true">
 			<key column="ld_folderid" />

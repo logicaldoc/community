@@ -519,6 +519,8 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				@Override
 				public void onSuccess(GUIFolder folder) {
 					disableSave();
+					FolderDetailsPanel.this.folder = folder;
+
 					GUIFolder current = FolderController.get().getCurrentFolder();
 					current.setTemplate(folder.getTemplate());
 					current.setTemplateId(folder.getTemplateId());
@@ -526,7 +528,9 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 					current.setOcrTemplateId(folder.getOcrTemplateId());
 					current.setColor(folder.getColor());
 					current.setGrid(folder.getGrid());
-					FolderController.get().modified(folder);
+					current.setTile(folder.getTile());
+					current.setId(folder.getId());
+					current.setAttributes(folder.getAttributes());
 				}
 			});
 		}

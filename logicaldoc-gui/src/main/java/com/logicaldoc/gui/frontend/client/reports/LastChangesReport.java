@@ -72,7 +72,7 @@ public class LastChangesReport extends AdminPanel {
 
 	private static final String DOC_ID = "docId";
 
-	private static final String FOLDER = "folder";
+	private static final String FOLDER_STR = "folder";
 
 	private static final String USER_ID = "userId";
 
@@ -236,7 +236,7 @@ public class LastChangesReport extends AdminPanel {
 		FileNameListGridField name = new FileNameListGridField("name", "icon", I18N.message("name"), 150);
 		name.setCanFilter(true);
 
-		ListGridField folder = new ListGridField(FOLDER, I18N.message(FOLDER), 100);
+		ListGridField folder = new ListGridField(FOLDER_STR, I18N.message(FOLDER_STR), 100);
 		folder.setCanFilter(true);
 
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"), 250);
@@ -415,7 +415,7 @@ public class LastChangesReport extends AdminPanel {
 								rec.setAttribute("date", result[i].getDate());
 								rec.setAttribute("user", result[i].getUsername());
 								rec.setAttribute("name", result[i].getFileName());
-								rec.setAttribute(FOLDER, result[i].getPath());
+								rec.setAttribute(FOLDER_STR, result[i].getPath());
 								rec.setAttribute("sid", result[i].getSessionId());
 								rec.setAttribute(DOC_ID, result[i].getDocId());
 								rec.setAttribute(FOLDER_ID, result[i].getFolderId());

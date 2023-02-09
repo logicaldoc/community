@@ -49,7 +49,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 	private static final String LANGUAGE = "language";
 
-	private static final String EXPRESSION = "expression";
+	private static final String EXPRESSION_STR = "expression";
 
 	private static final String SEARCHINHITS = "searchinhits";
 
@@ -101,7 +101,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			}
 		});
 
-		expression = ItemFactory.newTextItem(EXPRESSION, I18N.message("search") + "...");
+		expression = ItemFactory.newTextItem(EXPRESSION_STR, I18N.message("search") + "...");
 		expression.setWidth("*");
 		expression.setColSpan(3);
 		expression.setRequired(true);
@@ -194,7 +194,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setType(GUISearchOptions.TYPE_FULLTEXT);
-		options.setExpression(vm.getValueAsString(EXPRESSION));
+		options.setExpression(vm.getValueAsString(EXPRESSION_STR));
 
 		setLanguageCondition(options);
 		setSizeCondition(options);
@@ -357,7 +357,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	@Override
 	public void onOptionsChanged(GUISearchOptions newOptions) {
 		if (newOptions.getType() == GUISearchOptions.TYPE_FULLTEXT) {
-			vm.setValue(EXPRESSION, newOptions.getExpression());
+			vm.setValue(EXPRESSION_STR, newOptions.getExpression());
 			folder.setFolder(newOptions.getFolder(), newOptions.getFolderName());
 		}
 	}
