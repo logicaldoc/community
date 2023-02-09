@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.webdav.DavException;
 import org.slf4j.Logger;
@@ -19,11 +20,13 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
+import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.Version;
+import com.logicaldoc.core.document.dao.BookmarkDAO;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -172,7 +175,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 	private boolean isFolderAccessible(Resource parentResource, final Long folderID)
 			throws PersistenceException {
-		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		//FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
 
@@ -971,5 +974,74 @@ public class ResourceServiceImpl implements ResourceService {
 
 	public void setStorer(Storer storer) {
 		this.storer = storer;
+	}
+
+	@Override
+	public void addBookmark(Resource resource, WebdavSession session) {
+        try {
+			User user = userDAO.findById(resource.getRequestedPerson());
+			
+			BookmarkDAO bdao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+			
+			Bookmark bmark = new Bookmark();
+			if (resource.isFolder()) {
+				bmark.setType(Bookmark.TYPE_FOLDER);
+				bmark.setTitle(resource.getName());
+				bmark.setFileType("folder");
+				bmark.setUserId(user.getId());
+				bmark.setTargetId(Long.parseLong(resource.getID()));
+			} else {
+				bmark.setType(Bookmark.TYPE_DOCUMENT);
+				bmark.setTitle(resource.getName());
+				// get the file extension
+			    String fileType = FilenameUtils.getExtension(resource.getName());
+				bmark.setFileType(fileType);
+				bmark.setUserId(user.getId());
+				bmark.setTargetId(Long.parseLong(resource.getID()));		
+			}
+							
+			bdao.store(bmark);
+			
+		} catch (NumberFormatException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		} catch (IllegalArgumentException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void deleteBookmark(Resource resource, WebdavSession session) {
+		log.info("deleteBookmark");
+        try {
+			User user = userDAO.findById(resource.getRequestedPerson());		
+			
+			BookmarkDAO bdao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);		
+
+			Bookmark bkm = null;
+			if (resource.isFolder()) {
+				bkm = bdao.findByUserIdAndFolderId(user.getId(), Long.parseLong(resource.getID()));
+			} else {	
+				bkm = bdao.findByUserIdAndDocId(user.getId(), Long.parseLong(resource.getID()));		
+			}
+							
+			if (bkm != null) {
+				bdao.delete(bkm.getId());
+			} 
+			
+		} catch (NumberFormatException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		} catch (IllegalArgumentException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		}	
 	}
 }
