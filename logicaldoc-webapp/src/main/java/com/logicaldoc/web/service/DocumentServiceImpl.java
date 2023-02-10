@@ -272,7 +272,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				if (filename.toLowerCase().endsWith(".zip") && importZip) {
 					File tempZip = FileUtil.createTempFile("upload-", ".zip");
 					FileUtils.copyFile(file, tempZip);
-					
+
 					// Prepare the import thread
 					Thread zipImporter = new Thread(() -> importZip(charset, metadata, session, parent, tempZip));
 
@@ -337,7 +337,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		 */
 		try {
 			log.debug("zip file = {}", zipFile);
-			
+
 			Document doc = toDocument(metadata);
 			doc.setTenantId(session.getTenantId());
 			doc.setCreation(new Date());
@@ -1233,8 +1233,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (guiDocument.getTags() != null && guiDocument.getTags().length > 0)
 			docVO.setTagsFromWords(new HashSet<>(Arrays.asList(guiDocument.getTags())));
 
-		docVO.setCustomId(guiDocument.getCustomId());
-		docVO.setFileName(guiDocument.getFileName());
+		docVO.setCustomId(HTMLSanitizer.sanitizeSimpleText(guiDocument.getCustomId()));
+		docVO.setFileName(HTMLSanitizer.sanitizeSimpleText(guiDocument.getFileName()));
 		docVO.setVersion(guiDocument.getVersion());
 		docVO.setCreation(guiDocument.getCreation());
 		docVO.setCreator(guiDocument.getCreator());
@@ -1245,7 +1245,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		docVO.setFileSize(guiDocument.getFileSize());
 
 		docVO.setRating(guiDocument.getRating());
-		docVO.setComment(guiDocument.getComment());
+		docVO.setComment(HTMLSanitizer.sanitizeSimpleText(guiDocument.getComment()));
 		docVO.setWorkflowStatus(guiDocument.getWorkflowStatus());
 		docVO.setWorkflowStatusDisplay(guiDocument.getWorkflowStatusDisplay());
 		docVO.setColor(guiDocument.getColor());
@@ -1335,7 +1335,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 								extAttr.setDateValue(null);
 						} else if (templateType == Attribute.TYPE_STRING) {
 							if (attr.getValue() != null)
-								extAttr.setStringValue((String) attr.getValue());
+								extAttr.setStringValue(HTMLSanitizer.sanitizeSimpleText((String) attr.getValue()));
 							else
 								extAttr.setStringValue(null);
 						} else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER) {
