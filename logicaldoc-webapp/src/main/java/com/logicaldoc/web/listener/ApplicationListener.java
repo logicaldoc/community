@@ -20,10 +20,8 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.impl.Log4jContextFactory;
-import org.apache.logging.log4j.core.util.DefaultShutdownCallbackRegistry;
-import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,34 +134,13 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		try {
 			ServletContext context = sce.getServletContext();
 
+			log.warn("AA1");
+			
 			// Initialize logging
-			String log4jPath = null;
-			try {
-				URL configFile = null;
-				try {
-					configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
-				} catch (Throwable t) {
-					// Nothing to do
-				}
+			initializeLogging();
 
-				if (configFile == null)
-					configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
-
-				log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
-
-				// Setup the correct logs folder
-				ContextProperties config = new ContextProperties();
-				LoggingConfigurator lconf = new LoggingConfigurator();
-				lconf.setLogsRoot(config.getProperty("conf.logdir"));
-				lconf.write();
-
-				// Init the logs
-				System.out.println(String.format("Taking log configuration from %s", log4jPath));
-				Configurator.initialize(null, log4jPath);
-			} catch (Throwable e) {
-				System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
-			}
-
+			log.warn("AA2");
+			
 			// Update the web descriptor with the correct transport guarantee
 			try {
 				ContextProperties conf = new ContextProperties();
@@ -176,52 +153,43 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				log.error(e.getMessage(), e);
 			}
 
+			log.warn("AA3");
+			
 			// Prepare the plugins dir
 			String pluginsDir = context.getRealPath("/WEB-INF/lib");
 
 			// Initialize plugins
 			PluginRegistry.getInstance().init(pluginsDir);
 
-			// Reinitialize logging because some plugins may have added new
-			// categories
-			try {
-				final LoggerContextFactory factory = LogManager.getFactory();
-
-				if (factory instanceof Log4jContextFactory) {
-					Log4jContextFactory contextFactory = (Log4jContextFactory) factory;
-					((DefaultShutdownCallbackRegistry) contextFactory.getShutdownCallbackRegistry()).stop();
-				}
-			} catch (Throwable e) {
-				log.error(e.getMessage(), e);
-			}
+			log.warn("AA4");
+			
+//			// Reinitialize logging because some plugins may have added new
+//			// categories
+//			try {
+//				final LoggerContextFactory factory = LogManager.getFactory();
+//
+//				if (factory instanceof Log4jContextFactory) {
+//					Log4jContextFactory contextFactory = (Log4jContextFactory) factory;
+//					((DefaultShutdownCallbackRegistry) contextFactory.getShutdownCallbackRegistry()).stop();
+//				}
+//			} catch (Throwable e) {
+//				log.error(e.getMessage(), e);
+//			}
 
 			// Clean some temporary folders
-			File tempDirToDelete = new File(context.getRealPath("upload"));
-			try {
-				if (tempDirToDelete.exists())
-					FileUtils.forceDelete(tempDirToDelete);
-			} catch (IOException e) {
-				log.warn(e.getMessage());
-			}
+			cleanTemporaryFolders(context);
 
-			tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/upload");
-			try {
-				if (tempDirToDelete.exists())
-					FileUtils.forceDelete(tempDirToDelete);
-			} catch (IOException e) {
-				log.warn(e.getMessage());
-			}
-
-			tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/convertjpg");
-			try {
-				if (tempDirToDelete.exists())
-					FileUtils.forceDelete(tempDirToDelete);
-			} catch (IOException e) {
-				log.warn(e.getMessage());
-			}
-
+			log.warn("AA5");
+			
+			
+			initializeLogging();
+			
+			log.warn("AA6");
+			
 			// Initialize the Automation
 			Automation.initialize();
+	
+			log.warn("AA7");
 
 			// Try to unpack new plugins
 			try {
@@ -230,13 +198,74 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				log.warn(e.getMessage());
 			}
 
+			log.warn("AA8");
+			
 			if (PluginRegistry.getInstance().isRestartRequired()) {
 				restartRequired();
 				log.warn("The application has to be restarted");
 				System.out.println("The application has to be restarted");
 			}
+			
+			log.warn("AA9");
 		} finally {
 			writePidFile();
+		}
+	}
+
+	private void cleanTemporaryFolders(ServletContext context) {
+		File tempDirToDelete = new File(context.getRealPath("upload"));
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+
+		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/upload");
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+
+		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/convertjpg");
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+	}
+
+	private void initializeLogging() {
+		String log4jPath = null;
+		try {
+			URL configFile = null;
+			try {
+				configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
+			} catch (Throwable t) {
+				// Nothing to do
+			}
+
+			if (configFile == null)
+				configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
+
+			log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
+
+			// Setup the correct logs folder
+			ContextProperties config = new ContextProperties();
+			LoggingConfigurator lconf = new LoggingConfigurator();
+			lconf.setLogsRoot(config.getProperty("conf.logdir"));
+			lconf.write();
+
+			// Init the logs
+			System.out.println(String.format("Taking log configuration from %s", log4jPath));
+			LoggerContext lContext = Configurator.initialize(null, log4jPath);
+			if(lContext==null)
+				throw new Exception("Null logger context");
+		} catch (Throwable e) {
+			System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
 		}
 	}
 
