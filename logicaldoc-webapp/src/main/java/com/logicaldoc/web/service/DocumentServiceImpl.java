@@ -283,7 +283,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					DocumentHistory transaction = new DocumentHistory();
 					transaction.setSession(session);
 					transaction.setEvent(DocumentEvent.STORED.toString());
-					transaction.setComment(metadata.getComment());
+					transaction.setComment(HTMLSanitizer.sanitizeSimpleText(metadata.getComment()));
 
 					/*
 					 * Prepare the Master document used to create the new one
@@ -378,7 +378,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
 		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
-		transaction.setComment(document.getComment());
+		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(document.getComment()));
 
 		Document doc;
 		try {
@@ -621,7 +621,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
 		transaction.setEvent(DocumentEvent.LOCKED.toString());
-		transaction.setComment(comment);
+		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 
 		try {
 			for (long id : docIds) {
@@ -1069,7 +1069,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					// Create the document history event
 					DocumentHistory transaction = new DocumentHistory();
 					transaction.setSession(session);
-					transaction.setComment(comment);
+					transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 
 					manager.makeImmutable(id, transaction);
 				}
@@ -1146,7 +1146,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 			transaction.setEvent(
 					document.getId() == 0L ? DocumentEvent.CHANGED.toString() : DocumentEvent.STORED.toString());
-			transaction.setComment(document.getComment());
+			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(document.getComment()));
 
 			Validator validator = new Validator();
 			validator.validate(object, object.getTemplate(), transaction);
@@ -1208,7 +1208,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 			transaction.setEvent(DocumentEvent.CHANGED.toString());
-			transaction.setComment(guiDocument.getComment());
+			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(guiDocument.getComment()));
 
 			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			documentManager.update(document, docVO, transaction);
@@ -1568,8 +1568,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				history.setSession(session);
 				history.setDocument(doc);
 				history.setEvent(DocumentEvent.SENT.toString());
-				history.setComment(
-						StringUtils.abbreviate(StringUtil.collectionToString(mail.getRecipients(), ", "), 4000));
+				history.setComment(HTMLSanitizer.sanitizeSimpleText(
+						StringUtils.abbreviate(StringUtil.collectionToString(mail.getRecipients(), ", "), 4000)));
 				history.setFilename(doc.getFileName());
 				history.setVersion(doc.getVersion());
 				history.setFileVersion(doc.getFileVersion());
@@ -2248,7 +2248,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
-		transaction.setComment(comment);
+		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 		try {
 			return manager.archiveFolder(folderId, transaction);
 		} catch (PersistenceException e) {
@@ -2472,7 +2472,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new IOException("The document is locked");
 
 			DocumentHistory transaction = new DocumentHistory();
-			transaction.setComment(comment);
+			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
