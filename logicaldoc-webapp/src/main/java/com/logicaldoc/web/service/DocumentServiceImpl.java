@@ -287,7 +287,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					DocumentHistory transaction = new DocumentHistory();
 					transaction.setSession(session);
 					transaction.setEvent(DocumentEvent.STORED.toString());
-					transaction.setComment(metadata.getComment());
+					transaction.setComment(HTMLSanitizer.sanitizeSimpleText(metadata.getComment()));
 
 					/*
 					 * Prepare the Master document used to create the new one
@@ -384,7 +384,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
 		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
-		transaction.setComment(document.getComment());
+		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(document.getComment()));
 
 		Document doc;
 		try {
@@ -627,7 +627,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
 		transaction.setEvent(DocumentEvent.LOCKED.toString());
-		transaction.setComment(comment);
+		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 
 		try {
 			for (long id : docIds) {
@@ -1076,7 +1076,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					// Create the document history event
 					DocumentHistory transaction = new DocumentHistory();
 					transaction.setSession(session);
-					transaction.setComment(comment);
+					transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 
 					manager.makeImmutable(id, transaction);
 				}
@@ -1153,7 +1153,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 			transaction.setEvent(
 					document.getId() == 0L ? DocumentEvent.CHANGED.toString() : DocumentEvent.STORED.toString());
-			transaction.setComment(document.getComment());
+			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(document.getComment()));
 
 			Validator validator = new Validator();
 			validator.validate(object, object.getTemplate(), transaction);
@@ -1215,7 +1215,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 			transaction.setEvent(DocumentEvent.CHANGED.toString());
-			transaction.setComment(guiDocument.getComment());
+			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(guiDocument.getComment()));
 
 			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			documentManager.update(document, docVO, transaction);
@@ -1240,8 +1240,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (guiDocument.getTags() != null && guiDocument.getTags().length > 0)
 			docVO.setTagsFromWords(new HashSet<>(Arrays.asList(guiDocument.getTags())));
 
-		docVO.setCustomId(guiDocument.getCustomId());
-		docVO.setFileName(guiDocument.getFileName());
+		docVO.setCustomId(HTMLSanitizer.sanitizeSimpleText(guiDocument.getCustomId()));
+		docVO.setFileName(HTMLSanitizer.sanitizeSimpleText(guiDocument.getFileName()));
 		docVO.setVersion(guiDocument.getVersion());
 		docVO.setCreation(guiDocument.getCreation());
 		docVO.setCreator(guiDocument.getCreator());
@@ -1252,7 +1252,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		docVO.setFileSize(guiDocument.getFileSize());
 
 		docVO.setRating(guiDocument.getRating());
-		docVO.setComment(guiDocument.getComment());
+		docVO.setComment(HTMLSanitizer.sanitizeSimpleText(guiDocument.getComment()));
 		docVO.setWorkflowStatus(guiDocument.getWorkflowStatus());
 		docVO.setWorkflowStatusDisplay(guiDocument.getWorkflowStatusDisplay());
 		docVO.setColor(guiDocument.getColor());
@@ -1357,7 +1357,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private static void setStringValue(GUIAttribute attr, Attribute extAttr) {
 		if (attr.getValue() != null)
-			extAttr.setStringValue((String) attr.getValue());
+			extAttr.setStringValue(HTMLSanitizer.sanitizeSimpleText((String) attr.getValue()));
 		else
 			extAttr.setStringValue(null);
 	}
@@ -2099,7 +2099,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return null;
 		}
 
-		document.setComment(guiDocument.getComment() != null ? guiDocument.getComment() : "");
+		document.setComment(HTMLSanitizer.sanitizeSimpleText(guiDocument.getComment() != null ? guiDocument.getComment() : ""));
 
 		if (guiDocument.getPublished() > -1)
 			document.setPublished(guiDocument.getPublished());
@@ -2310,7 +2310,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
-		transaction.setComment(comment);
+		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 		try {
 			return manager.archiveFolder(folderId, transaction);
 		} catch (PersistenceException e) {
@@ -2534,7 +2534,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new IOException("The document is locked");
 
 			DocumentHistory transaction = new DocumentHistory();
-			transaction.setComment(comment);
+			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -2646,7 +2646,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession(getThreadLocalRequest());
 
 		GUIDocument emailDocument = getById(docId);
-		if (!emailDocument.getFileName().toLowerCase().endsWith(".eml") && !emailDocument.getFileName().toLowerCase().endsWith(".msg"))
+		if (!emailDocument.getFileName().toLowerCase().endsWith(".eml")
+				&& !emailDocument.getFileName().toLowerCase().endsWith(".msg"))
 			throw new ServerException("Not an email file");
 
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
@@ -2671,7 +2672,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					guiMail.setFrom(new GUIContact(email.getFrom().getName(), null, email.getFrom().getAddress()));
 
 				guiMail.setSent(email.getSentDate());
-				guiMail.setReceived(email.getReceivedDate() != null ? email.getReceivedDate() : emailDocument.getCreation());
+				guiMail.setReceived(
+						email.getReceivedDate() != null ? email.getReceivedDate() : emailDocument.getCreation());
 				guiMail.setSubject(email.getSubject());
 				guiMail.setMessage(
 						email.isHtml() ? HTMLSanitizer.sanitize(email.getMessageText()) : email.getMessageText());
