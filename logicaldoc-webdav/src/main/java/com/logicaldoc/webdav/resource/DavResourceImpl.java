@@ -42,6 +42,7 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
+import org.apache.jackrabbit.webdav.property.PropEntry;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 import org.slf4j.Logger;
@@ -275,14 +276,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 		initProperties();
 
-		/*
-		 * log.debug("getProperty() {}", name); 
-		 * log.debug("isCollection() {}",isCollection()); 
-		 * log.debug("resource.isFolder() {}", resource.isFolder());
-		 */
-		
-		//log.info("getProperty() {}", name);
-
 		Namespace namespace = Namespace.getNamespace("http://logicaldoc.com/ns");
 		Namespace ocns = Namespace.getNamespace("oc", "http://logicaldoc.com/ns");
 
@@ -426,9 +419,44 @@ public class DavResourceImpl implements DavResource, Serializable {
 		throw new UnsupportedOperationException();
 	}
 
-	@SuppressWarnings("rawtypes")
-	public MultiStatusResponse alterProperties(List changeList) throws DavException {
-		throw new UnsupportedOperationException();
+
+	public MultiStatusResponse alterProperties(List<? extends PropEntry> changeList) throws DavException {
+		
+		log.debug("alterProperties");
+		
+		MultiStatusResponse msr = new MultiStatusResponse(getHref(), null);
+
+		Namespace ldns = Namespace.getNamespace("oc", "http://logicaldoc.com/ns");
+		
+		  Iterator<? extends PropEntry> it = changeList.iterator();
+		  while (it.hasNext()) {
+		    Object o = it.next();
+		    
+		    int statusForbidden = DavServletResponse.SC_FORBIDDEN;
+		    int statusOK = DavServletResponse.SC_OK;
+		    int statusNoContent = DavServletResponse.SC_NO_CONTENT;
+		    
+		    if (o instanceof DavProperty) {
+		    	log.debug("o instanceof DavProperty");
+		    	DavProperty<?> x = (DavProperty<?>) o;		    		    	
+		    	if (x.getName().getName().contains("favorite") && x.getName().getNamespace().equals(ldns)) {
+		    		msr.add(x.getName(), statusOK);
+		    		// add bookmark
+		    		resourceService.addBookmark(this.resource, session);
+		    	} else
+		    		msr.add(x.getName(), statusForbidden);
+		    } else {
+		    	log.debug("o instanceof DavPropertyName");
+		    	DavPropertyName zzz = (DavPropertyName) o;
+		    	if (zzz.getName().equals("favorite") && (zzz.getNamespace().equals(ldns))) {
+		    		msr.add(zzz, statusNoContent);
+		    		// remove bookmark
+		    		resourceService.deleteBookmark(this.resource, session);
+		    	} else
+		    		msr.add(zzz, statusForbidden);
+		    }
+		  }
+		  return msr;
 	}
 
 	/**

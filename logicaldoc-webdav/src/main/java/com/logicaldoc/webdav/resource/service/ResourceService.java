@@ -215,4 +215,8 @@ public interface ResourceService extends Serializable {
 	 * @param session the current session
 	 */
 	public void uncheckout(Resource resource, WebdavSession session);
+
+	public void addBookmark(Resource resource, WebdavSession session);
+
+	public void deleteBookmark(Resource resource, WebdavSession session);
 }
