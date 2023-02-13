@@ -1,7 +1,10 @@
 package com.logicaldoc.gui.common.client.websockets;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.realityforge.gwt.websockets.client.WebSocket;
@@ -20,6 +23,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.UserController;
+import com.logicaldoc.gui.common.client.util.LimitedQueue;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatController;
 import com.smartgwt.client.types.EdgeName;
@@ -38,6 +42,10 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 
 	private static Set<String> moniteredEvents = new HashSet<>();
 
+	// Maintain a fifos for the history IDs. Key is the class name, value is a
+	// FIFO queue
+	private Map<String, Queue<Long>> fifos = new HashMap<>();
+
 	static {
 		moniteredEvents.addAll(Arrays.asList("event.changed", "event.renamed", "event.checkedin", "event.checkedout",
 				"event.locked", "event.unlocked", "event.immutable", "event.signed", "event.stamped", "event.indexed",
@@ -45,6 +53,27 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 				"event.deleted", "event.folder.renamed", "event.folder.changed", "event.folder.deleted",
 				"event.folder.created", "event.folder.moved", "event.workflowstatus", "event.user.messagereceived",
 				"event.chat.newmessage", "event.user.login", "event.user.logout", "event.user.timeout", COMMAND));
+	}
+
+	/**
+	 * Puts the history in the relative FIFO
+	 * 
+	 * @param event
+	 * @return true if it was not remembered already, false otherwise
+	 */
+	private boolean rememberHistory(WebsocketMessage event) {
+		Queue<Long> fifo = fifos.get(event.getEvent());
+		if (fifo == null) {
+			fifo = new LimitedQueue<Long>(1000);
+			fifos.put(event.getEvent(), fifo);
+		}
+
+		if (fifo.contains(event.getId()))
+			return false;
+		else {
+			fifo.add(event.getId());
+			return true;
+		}
 	}
 
 	/**
@@ -87,6 +116,9 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		if (!moniteredEvents.contains(event.getEvent()))
 			return;
 
+		if (!rememberHistory(event))
+			return;
+		
 		if (isDocumentModifiedEvent(event)) {
 			handleDocumentModifiedEvent(event);
 		} else if ("event.stored".equals(event.getEvent())) {

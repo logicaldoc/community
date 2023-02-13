@@ -1,10 +1,14 @@
 package com.logicaldoc.gui.frontend.client.security.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
+import com.logicaldoc.gui.common.client.data.GroupsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -18,6 +22,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -74,6 +79,8 @@ public class LDAPServerDetailsPanel extends VLayout {
 	private static final String EENABLED = "eenabled";
 
 	private ValuesManager vm = new ValuesManager();
+
+	private MultiComboBoxItem defaultGroupsItem;
 
 	private TabSet tabs = new TabSet();
 
@@ -205,10 +212,9 @@ public class LDAPServerDetailsPanel extends VLayout {
 		RadioGroupItem keepMembership = ItemFactory.newBooleanSelector(KEEPMEMBERSHIP, "keepmembershiplocalgroups");
 		keepMembership.setValue(this.server.isKeepLocalMemberships() ? "yes" : "no");
 		keepMembership.setRequired(true);
-		keepMembership.setEndRow(true);
 
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation(VALIDATION, 
-				this.server.getValidation(), null, false);
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation(VALIDATION, this.server.getValidation(),
+				null, false);
 		validation.setHeight(150);
 		validation.setWidth(400);
 		validation.setWrapTitle(false);
@@ -230,10 +236,24 @@ public class LDAPServerDetailsPanel extends VLayout {
 		password.setCellStyle("warn");
 		password.setWidth(300);
 
+		// Default groups
+		List<String> defaultGroupsIds = new ArrayList<>();
+		GUIGroup[] defaultGroups = server.getDefaultGroups();
+		if (defaultGroups != null && defaultGroups.length > 0) {
+			for (int i = 0; i < defaultGroups.length; i++)
+				if (defaultGroups[i].getType() == 0)
+					defaultGroupsIds.add(Long.toString(defaultGroups[i].getId()));
+		}
+
+		defaultGroupsItem = ItemFactory.newMultiComboBoxItem("defaultGroups", "defaultassignedgroups", new GroupsDS(),
+				defaultGroupsIds.toArray(new String[0]));
+		defaultGroupsItem.setValueField("id");
+		defaultGroupsItem.setDisplayField("name");
+
 		ldapForm.setItems(enabled, url, fakeUsername, hiddenPassword, username, password, anon, syncTtl, pageSize,
-				timeout, language, userType, keepMembership, userIdentifierAttr, grpIdentifierAttr, userClass,
-				groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude, groupExclude,
-				logonAttr, realm, validation);
+				timeout, language, userType, keepMembership, defaultGroupsItem, userIdentifierAttr, grpIdentifierAttr,
+				userClass, groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude,
+				groupExclude, logonAttr, realm, validation);
 
 		ldapTab.setPane(ldapForm);
 
@@ -298,6 +318,15 @@ public class LDAPServerDetailsPanel extends VLayout {
 			LDAPServerDetailsPanel.this.server.setTimeout(Integer.parseInt(values.get("timeout").toString()));
 
 			LDAPServerDetailsPanel.this.server.setPassword((String) values.get(PASSWORD_HIDDEN));
+
+			String[] ids = defaultGroupsItem.getValues();
+			GUIGroup[] groups = new GUIGroup[ids.length];
+			for (int i = 0; i < ids.length; i++) {
+				GUIGroup group = new GUIGroup();
+				group.setId(Long.parseLong(ids[i]));
+				groups[i] = group;
+			}
+			LDAPServerDetailsPanel.this.server.setDefaultGroups(groups);
 
 			LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server, new AsyncCallback<GUILDAPServer>() {
 

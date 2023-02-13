@@ -13,9 +13,9 @@ public class GUIGroup implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private long id;
-	
+
 	private String name = "";
-	
+
 	private String source;
 
 	private String description = "";
@@ -23,11 +23,18 @@ public class GUIGroup implements Serializable {
 	public static int TYPE_DEFAULT = 0;
 
 	public static int TYPE_USER = 1;
-	
+
 	private int type = TYPE_DEFAULT;
 
 	// Optional group from which to import policies
 	private Long inheritGroupId;
+
+	public GUIGroup() {
+	}
+
+	public GUIGroup(long id) {
+		this.id = id;
+	}
 
 	public long getId() {
 		return id;

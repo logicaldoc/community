@@ -631,49 +631,49 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		disallowEditingOfOtherUsers(guiUser, session);
 
 		try {
-			User usr = getOrCreateUser(guiUser);
+			User user = getOrCreateUser(guiUser);
 
-			createNew = usr.getId() == 0L;
+			createNew = user.getId() == 0L;
 
-			usr.setTenantId(session.getTenantId());
-			usr.setCity(guiUser.getCity());
-			usr.setCountry(guiUser.getCountry());
-			usr.setEmail(guiUser.getEmail());
-			usr.setEmail2(guiUser.getEmail2());
-			usr.setFirstName(guiUser.getFirstName());
-			usr.setName(guiUser.getName());
-			usr.setLanguage(guiUser.getLanguage());
-			usr.setPostalcode(guiUser.getPostalCode());
-			usr.setState(guiUser.getState());
-			usr.setStreet(guiUser.getAddress());
-			usr.setTelephone(guiUser.getPhone());
-			usr.setTelephone2(guiUser.getCell());
-			usr.setUsername(guiUser.getUsername());
-			usr.setEnabled(guiUser.isEnabled() ? 1 : 0);
-			usr.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
-			usr.setPasswordExpired(guiUser.isPasswordExpired() ? 1 : 0);
-			usr.setWelcomeScreen(guiUser.getWelcomeScreen());
-			usr.setIpWhiteList(guiUser.getIpWhitelist());
-			usr.setIpBlackList(guiUser.getIpBlacklist());
-			usr.setEmailSignature(guiUser.getEmailSignature());
-			usr.setDefaultWorkspace(guiUser.getDefaultWorkspace());
-			usr.setQuota(guiUser.getQuota());
-			usr.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
-			usr.setKey(guiUser.getKey());
-			usr.setType(guiUser.getType());
-			usr.setDocsGrid(guiUser.getDocsGrid());
-			usr.setHitsGrid(guiUser.getHitsGrid());
-			usr.setDateFormat(guiUser.getDateFormat());
-			usr.setDateFormatShort(guiUser.getDateFormatShort());
-			usr.setDateFormatLong(guiUser.getDateFormatLong());
-			usr.setSearchPref(guiUser.getSearchPref());
-			usr.setEnforceWorkingTime(guiUser.isEnforceWorkingTime() ? 1 : 0);
-			usr.setSecondFactor(guiUser.getSecondFactor());
-			usr.setMaxInactivity(guiUser.getMaxInactivity() == null || guiUser.getMaxInactivity() == 0 ? null
+			user.setTenantId(session.getTenantId());
+			user.setCity(guiUser.getCity());
+			user.setCountry(guiUser.getCountry());
+			user.setEmail(guiUser.getEmail());
+			user.setEmail2(guiUser.getEmail2());
+			user.setFirstName(guiUser.getFirstName());
+			user.setName(guiUser.getName());
+			user.setLanguage(guiUser.getLanguage());
+			user.setPostalcode(guiUser.getPostalCode());
+			user.setState(guiUser.getState());
+			user.setStreet(guiUser.getAddress());
+			user.setTelephone(guiUser.getPhone());
+			user.setTelephone2(guiUser.getCell());
+			user.setUsername(guiUser.getUsername());
+			user.setEnabled(guiUser.isEnabled() ? 1 : 0);
+			user.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
+			user.setPasswordExpired(guiUser.isPasswordExpired() ? 1 : 0);
+			user.setWelcomeScreen(guiUser.getWelcomeScreen());
+			user.setIpWhiteList(guiUser.getIpWhitelist());
+			user.setIpBlackList(guiUser.getIpBlacklist());
+			user.setEmailSignature(guiUser.getEmailSignature());
+			user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
+			user.setQuota(guiUser.getQuota());
+			user.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
+			user.setKey(guiUser.getKey());
+			user.setType(guiUser.getType());
+			user.setDocsGrid(guiUser.getDocsGrid());
+			user.setHitsGrid(guiUser.getHitsGrid());
+			user.setDateFormat(guiUser.getDateFormat());
+			user.setDateFormatShort(guiUser.getDateFormatShort());
+			user.setDateFormatLong(guiUser.getDateFormatLong());
+			user.setSearchPref(guiUser.getSearchPref());
+			user.setEnforceWorkingTime(guiUser.isEnforceWorkingTime() ? 1 : 0);
+			user.setSecondFactor(guiUser.getSecondFactor());
+			user.setMaxInactivity(guiUser.getMaxInactivity() == null || guiUser.getMaxInactivity() == 0 ? null
 					: guiUser.getMaxInactivity());
-			usr.setTimeZone(guiUser.getTimeZone());
+			user.setTimeZone(guiUser.getTimeZone());
 
-			setExpire(usr, guiUser);
+			setExpire(user, guiUser);
 
 			if (createNew) {
 				User existingUser = userDao.findByUsername(guiUser.getUsername());
@@ -691,25 +691,25 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 						config.getInt(tenant + PASSWORD_UPPERCASE, 2), config.getInt(tenant + PASSWORD_LOWERCASE, 2),
 						config.getInt(tenant + PASSWORD_DIGIT, 1), config.getInt(tenant + PASSWORD_SPECIAL, 1),
 						config.getInt(tenant + PASSWORD_SEQUENCE, 4), config.getInt(tenant + PASSWORD_OCCURRENCE, 3));
-				usr.setDecodedPassword(password);
-				usr.setPasswordExpired(1);
-				usr.setPasswordChanged(new Date());
+				user.setDecodedPassword(password);
+				user.setPasswordExpired(1);
+				user.setPasswordChanged(new Date());
 			}
 
-			saveWorkingTimes(usr, guiUser.getWorkingTimes());
+			saveWorkingTimes(user, guiUser.getWorkingTimes());
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
 			transaction.setEvent(UserEvent.UPDATED.toString());
-			userDao.store(usr, transaction);
+			userDao.store(user, transaction);
 
-			guiUser.setId(usr.getId());
+			guiUser.setId(user.getId());
 
-			setGroups(usr, guiUser);
+			setGroups(user, guiUser);
 
 			// Notify the user by email
 			if (createNew && guiUser.isNotifyCredentials())
-				notifyAccount(usr, usr.getDecodedPassword());
+				notifyAccount(user, user.getDecodedPassword());
 		} catch (PersistenceException e) {
 			return (GUIUser) throwServerException(session, log, e);
 		} catch (MessagingException me) {
@@ -725,24 +725,24 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 	}
 
-	private void setGroups(User usr, GUIUser guiUser) throws PersistenceException {
+	private void setGroups(User user, GUIUser guiUser) throws PersistenceException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-		usr.removeGroupMemberships(null);
+		user.removeGroupMemberships(null);
 		long[] ids = new long[guiUser.getGroups().length];
 		for (int i = 0; i < guiUser.getGroups().length; i++) {
 			ids[i] = guiUser.getGroups()[i].getId();
-			usr.addGroup(groupDao.findById(ids[i]));
+			user.addGroup(groupDao.findById(ids[i]));
 		}
 
-		Group adminGroup = groupDao.findByName(ADMIN, usr.getTenantId());
+		Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
 		groupDao.initialize(adminGroup);
 
 		// The admin user must be always member of admin group
 		if (ADMIN.equals(guiUser.getUsername()) && !guiUser.isMemberOf(Group.GROUP_ADMIN))
-			usr.addGroup(adminGroup);
+			user.addGroup(adminGroup);
 
-		userDao.store(usr);
+		userDao.store(user);
 	}
 
 	private void setExpire(User usr, GUIUser guiUser) {

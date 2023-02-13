@@ -563,8 +563,10 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			Folder folder = folderDao.findById(guiFolder.getId());
 			folderDao.initialize(folder);
 
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
+			FolderHistory saveTransaction = new FolderHistory();
+			saveTransaction.setSession(session);
+
+			FolderHistory renameTransaction = null;
 
 			String folderName = guiFolder.getName().replace("/", "");
 
@@ -584,13 +586,20 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					folder.setMaxVersions(guiFolder.getMaxVersions());
 				}
 
-				if (folder.getName().trim().equals(folderName)) {
+				saveTransaction.setEvent(FolderEvent.CHANGED.toString());
+
+				if (!folder.getName().trim().equals(folderName)) {
 					folder.setName(folderName.trim());
-					transaction.setEvent(FolderEvent.CHANGED.toString());
-				} else {
-					folder.setName(folderName.trim());
-					transaction.setEvent(FolderEvent.RENAMED.toString());
+
+					renameTransaction = new FolderHistory();
+					renameTransaction.setEvent(FolderEvent.RENAMED.toString());
+					renameTransaction.setFilenameOld(folder.getName());
+					renameTransaction.setPathOld(folderDao.computePathExtended(folder.getId()));
+					renameTransaction.setSession(session);
+					renameTransaction.setNotifyEvent(true);
 				}
+				
+				folder.setName(folderName);
 			}
 
 			folder.setDescription(guiFolder.getDescription());
@@ -613,7 +622,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			else
 				folder.getTags().clear();
 
-			folderDao.store(folder, transaction);
+			folderDao.store(folder, saveTransaction);
+			if (renameTransaction != null)
+				folderDao.saveFolderHistory(folder, renameTransaction);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}

@@ -139,8 +139,8 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			m.setStatus(SystemMessage.STATUS_NEW);
 			m.setType(Message.TYPE_SYSTEM);
 			m.setLastNotified(new Date());
-			m.setMessageText(HTMLSanitizer.sanitize(message.getMessage()));
-			m.setSubject(HTMLSanitizer.sanitize(message.getSubject()));
+			m.setMessageText(HTMLSanitizer.sanitizeSimpleText(message.getMessage()));
+			m.setSubject(HTMLSanitizer.sanitizeSimpleText(message.getSubject()));
 			Recipient recipient = new Recipient();
 			recipient.setName(user.getUsername());
 			recipient.setAddress(user.getUsername());

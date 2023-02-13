@@ -77,7 +77,7 @@ public class MessageDialog extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("sendmessage"));
 		setWidth(580);
-		setHeight(570);
+		setHeight(590);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -221,7 +221,7 @@ public class MessageDialog extends Window {
 			}
 		});
 
-		final SelectItem userSelector = ItemFactory.newUserSelector("users", "users", null, true, true);
+		final SelectItem userSelector = ItemFactory.newUserSelector("users", "users", null, false, true);
 		userSelector.setWidth(150);
 		userSelector.setMultiple(true);
 		userSelector.addChangedHandler(new ChangedHandler() {

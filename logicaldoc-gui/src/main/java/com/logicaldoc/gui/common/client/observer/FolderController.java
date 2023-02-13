@@ -45,7 +45,7 @@ public class FolderController {
 		this.currentFolder = folder;
 		
 		WindowUtils.setTitle(Session.get().getInfo(), folder!=null && folder.getPathExtended() != null ? folder.getPathExtended() : "");
-		
+
 		synchronized (observers) {
 			for (FolderObserver observer : observers)
 				try {

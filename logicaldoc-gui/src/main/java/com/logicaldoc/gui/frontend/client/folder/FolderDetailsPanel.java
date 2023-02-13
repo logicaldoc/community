@@ -522,6 +522,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 					FolderDetailsPanel.this.folder = folder;
 
 					GUIFolder current = FolderController.get().getCurrentFolder();
+					current.setName(folder.getName());
 					current.setTemplate(folder.getTemplate());
 					current.setTemplateId(folder.getTemplateId());
 					current.setAttributes(folder.getAttributes());
@@ -547,9 +548,9 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
-		if (this.folder != null && this.folder.getId() == folder.getId()) {
-			setFolder(folder);
-		}
+//		if (this.folder != null && this.folder.getId() == folder.getId()) {
+//			setFolder(folder);
+//		}
 	}
 
 	@Override

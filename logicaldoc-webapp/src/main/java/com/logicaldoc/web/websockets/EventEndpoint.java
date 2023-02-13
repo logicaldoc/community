@@ -2,7 +2,10 @@ package com.logicaldoc.web.websockets;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import javax.websocket.OnClose;
@@ -12,6 +15,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +50,12 @@ import com.logicaldoc.web.service.FolderServiceImpl;
 @ServerEndpoint(value = "/wk-event")
 public class EventEndpoint implements EventListener {
 
+	private static final int FIFO_SIZE = 1000;
+
+	// Maintain a fifos for the history IDs. Key is the class name, value is a
+	// FIFO queue
+	private Map<String, Queue<Long>> fifos = new HashMap<>();
+
 	private static Logger log = LoggerFactory.getLogger(EventEndpoint.class);
 
 	private static Set<String> MONITORED_EVENTS = new HashSet<>(Arrays.asList(new String[] {
@@ -55,15 +65,35 @@ public class EventEndpoint implements EventListener {
 			DocumentEvent.MOVED.toString(), DocumentEvent.DELETED.toString(), DocumentEvent.RENAMED.toString(),
 			DocumentEvent.INDEXED.toString(), DocumentEvent.RESTORED.toString(),
 			DocumentEvent.PASSWORD_PROTECTED.toString(), DocumentEvent.MOVED.toString(),
-			DocumentEvent.PASSWORD_UNPROTECTED.toString(), 
-			FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(), FolderEvent.CHANGED.toString(),
-			FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(), UserEvent.MESSAGE_RECEIVED.toString(),
-			UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(), UserEvent.TIMEOUT.toString(),
-			"event.chat.newmessage" }));
+			DocumentEvent.PASSWORD_UNPROTECTED.toString(), FolderEvent.RENAMED.toString(),
+			FolderEvent.CREATED.toString(), FolderEvent.CHANGED.toString(), FolderEvent.MOVED.toString(),
+			FolderEvent.DELETED.toString(), UserEvent.MESSAGE_RECEIVED.toString(), UserEvent.LOGIN.toString(),
+			UserEvent.LOGOUT.toString(), UserEvent.TIMEOUT.toString(), "event.chat.newmessage" }));
 
 	private static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
 
 	private boolean registered = false;
+
+	/**
+	 * Puts the history in the relative FIFO
+	 * 
+	 * @param history
+	 * @return true if it was not remembered already, false otherwise
+	 */
+	private boolean rememberHistory(History history) {
+		Queue<Long> fifo = fifos.get(history.getClass().getName());
+		if (fifo == null) {
+			fifo = new CircularFifoQueue<>(FIFO_SIZE);
+			fifos.put(history.getClass().getName(), fifo);
+		}
+
+		if (fifo.contains(history.getId()))
+			return false;
+		else {
+			fifo.add(history.getId());
+			return true;
+		}
+	}
 
 	@OnOpen
 	public void onOpen(final Session session) {
@@ -95,7 +125,6 @@ public class EventEndpoint implements EventListener {
 
 	@Override
 	public void newEvent(History event) {
-
 		ContextProperties config = Context.get().getProperties();
 
 		if (event.getTenant() == null) {
@@ -105,6 +134,9 @@ public class EventEndpoint implements EventListener {
 
 		if (EventCollector.isEnabled() && config.getBoolean(event.getTenant() + ".gui.serverpush", false)
 				&& MONITORED_EVENTS.contains(event.getEvent()) && event.isNotifyEvent()) {
+
+			if (!rememberHistory(event))
+				return;
 
 			try {
 				WebsocketMessage message = prepareMessage(event);

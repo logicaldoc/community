@@ -1190,7 +1190,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 							public void onSuccess(Void v) {
 								selectedNode.setAttribute("name", val);
 								refreshRow(getRecordIndex(selectedNode));
-								selectFolder(folderId);
+//								selectFolder(folderId);
 							}
 						});
 					}
@@ -1427,7 +1427,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
 		TreeNode folderNode = getTree().find(FOLDER_ID, Long.toString(folder.getId()));
-
+		
 		if (folderNode != null) {
 			folderNode.setTitle(folder.getName());
 			folderNode.setName(folder.getName());

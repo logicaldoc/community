@@ -217,8 +217,6 @@
             access="isAuthenticated()" />
         <security:intercept-url pattern="/mobile/**"
             access="isAuthenticated()" />
-        <security:intercept-url pattern="/display/**"
-            access="isAuthenticated()" />
         <security:intercept-url pattern="/download/**"
             access="isAuthenticated()" />
                 

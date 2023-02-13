@@ -61,9 +61,11 @@ public class GUILDAPServer implements Serializable {
 	private int position = 1;
 
 	private int timeout = 10;
-	
+
 	private String validation;
-	
+
+	private GUIGroup[] defaultGroups = new GUIGroup[0];
+
 	public int getPosition() {
 		return position;
 	}
@@ -278,5 +280,13 @@ public class GUILDAPServer implements Serializable {
 
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
+	}
+
+	public GUIGroup[] getDefaultGroups() {
+		return defaultGroups;
+	}
+
+	public void setDefaultGroups(GUIGroup[] defaultGroups) {
+		this.defaultGroups = defaultGroups;
 	}
 }
