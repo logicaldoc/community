@@ -50,6 +50,7 @@ import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.Context;
@@ -171,7 +172,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (version.getFileVersion().equals(fileVersion)) {
 					versionDAO.initialize(version);
 					version.setFileSize(fileSize);
-					versionDAO.store(version);
+					storeVersion(version);
 				}
 			}
 
@@ -314,7 +315,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			version.setFileSize(document.getFileSize());
 			version.setDigest(null);
-			versionDAO.store(version);
+			storeVersion(version);
 
 			log.debug("Stored version {}", version.getVersion());
 			log.debug("Invoke listeners after checkin");
@@ -618,7 +619,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				documentDAO.store(document, transaction);
 			}
 
-			versionDAO.store(version);
+			storeVersion(version);
 
 			markAliasesToIndex(document.getId());
 		} else {
@@ -738,7 +739,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				documentDAO.store(doc, transaction);
 
-				versionDAO.store(version);
+				storeVersion(version);
 			}
 		} else {
 			throw new PersistenceException(DOCUMENT_IS_IMMUTABLE);
@@ -802,14 +803,67 @@ public class DocumentManagerImpl implements DocumentManager {
 					throw new PersistenceException(message, e);
 				}
 
-			// Store the initial version (default 1.0)
-			Version vers = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
+			// The document record has been written, now store the initial
+			// version (default 1.0)
+			Version version = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
 					DocumentEvent.STORED.toString(), true);
-			versionDAO.store(vers);
-			log.debug("Stored version {}", vers.getVersion());
+
+			storeVersion(version);
+
 			return docVO;
 		}
 
+	}
+
+	private void storeVersion(Version version) throws PersistenceException {
+		try {
+			versionDAO.store(version);
+			if (log.isDebugEnabled())
+				log.debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
+		} catch (Exception e) {
+			log.warn("Got error {} trying to save the version, perhaps the document record has not been written yet",
+					e.getMessage(), e);
+			storeVersionAsync(version);
+		}
+	}
+
+	/**
+	 * Saves a version in another thread waiting for the referenced document to
+	 * be available into the database.
+	 * 
+	 * @param version the version to save
+	 */
+	void storeVersionAsync(Version version) {
+		/*
+		 * Probably the document's record has not been written yet, we should
+		 * fork a thread to wait for it's write.
+		 */
+		ThreadPools.get().schedule(() -> {
+			try {
+				// Wait for the document's record write
+				String documentWriteCheckQuery = "select count(*) from ld_document where ld_id=" + version.getDocId();
+				int count = 0;
+				int tests = 0;
+				while (count == 0 && tests < 100) {
+					count = documentDAO.queryForInt(documentWriteCheckQuery);
+					try {
+						Thread.sleep(1000L);
+					} catch (Throwable ie) {
+						break;
+					}
+					tests++;
+				}
+
+				if (log.isDebugEnabled() && count > 0)
+					log.debug("Record of document {} has been written", version.getDocId());
+
+				versionDAO.store(version);
+				if (log.isDebugEnabled())
+					log.debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
+			} catch (PersistenceException ex) {
+				log.error(ex.getMessage(), ex);
+			}
+		}, "VersionSave", 100L);
 	}
 
 	private void setAtributesForCreation(File file, Document docVO, DocumentHistory transaction) {
@@ -1012,7 +1066,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 						DocumentEvent.RENAMED.toString(), false);
-				versionDAO.store(version);
+				storeVersion(version);
 
 				transaction.setEvent(DocumentEvent.RENAMED.toString());
 				documentDAO.store(document, transaction);
@@ -1251,8 +1305,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			String where = " where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED
 					+ " and ld_folderid=" + fid;
 			@SuppressWarnings("unchecked")
-			List<Long> ids = documentDAO.queryForList("select ld_id from ld_document " + where,
-					Long.class);
+			List<Long> ids = documentDAO.queryForList("select ld_id from ld_document " + where, Long.class);
 			if (ids.isEmpty())
 				continue;
 			docIds.addAll(ids);

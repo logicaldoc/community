@@ -1,5 +1,8 @@
 package com.logicaldoc.core.document;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -94,8 +97,9 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		documentManager.update(doc, newDoc, transaction);
 		Assert.assertEquals("pluto(1)", doc.getFileName());
 		Assert.assertEquals("1.1", doc.getVersion());
-		
-		Assert.assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid="+doc.getId()+" and ld_version='"+doc.getVersion()+"'"));
+
+		Assert.assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid="
+				+ doc.getId() + " and ld_version='" + doc.getVersion() + "'"));
 	}
 
 	@Test
@@ -452,6 +456,70 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		docDao.initialize(mergedDoc);
 
 		Assert.assertEquals(56, documentManager.countPages(mergedDoc));
+	}
+
+	@Test
+	public void testStoreVersionAsync() throws PersistenceException {
+		// A new document will have ID=101 so we prepare a fake document with
+		// that ID and create a version.
+		Document doc = docDao.findById(1);
+		doc = new Document(doc);
+		doc.setId(101L);
+
+		User user = userDao.findByUsername("admin");
+
+		Version version = Version.create(doc, user, null, DocumentEvent.STORED.toString(), false);
+
+		assertTrue(version.getId() == 0L);
+		assertTrue(version.getDocId() == doc.getId());
+		assertTrue(null == docDao.findById(version.getDocId()));
+
+		// Prepare a separate thread that creates the document
+		Thread createDoc = new Thread() {
+
+			@Override
+			public void run() {
+				try {
+					try {
+						Thread.sleep(2000L);
+					} catch (InterruptedException e) {
+						// Nothing to do
+					}
+
+					Document doc = docDao.findById(1);
+					doc = new Document(doc);
+					DocumentHistory transaction = new DocumentHistory();
+					transaction.setFolderId(103L);
+					transaction.setUser(user);
+					transaction.setDocId(doc.getId());
+					transaction.setUserId(1L);
+					transaction.setNotified(0);
+					transaction.setComment("pippo_reason");
+					doc.setCustomId("xxxxxxxxxx");
+					doc.setId(0L);
+					docDao.store(doc, transaction);
+				} catch (Exception e) {
+					// Nothing to do
+				}
+			}
+		};
+		createDoc.start();
+
+		// This starts a new thread waiting for the referenced document to be
+		// written. This fails some times because the referenced document has
+		// not already available.
+		DocumentManagerImpl docMan = (DocumentManagerImpl) documentManager;
+		docMan.storeVersionAsync(version);
+
+		try {
+			Thread.sleep(4000L);
+		} catch (InterruptedException e) {
+			// Nothing to do
+		}
+
+		assertTrue(version.getId() != 0L);
+		assertTrue(version.getDocId() == 101L);
+		assertNotNull(docDao.findById(version.getDocId()));
 	}
 
 	@Test

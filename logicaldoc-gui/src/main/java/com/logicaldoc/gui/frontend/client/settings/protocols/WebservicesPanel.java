@@ -67,9 +67,9 @@ public class WebservicesPanel extends VLayout {
 		for (GUIParameter parameter : settings) {
 			if (parameter.getName().equals("webservice.enabled"))
 				enabled = parameter;
-			if (parameter.getName().equals("webservice.call.rec"))
+			if (parameter.getName().equals("webservice.call.record"))
 				recCalls = parameter;
-			if (parameter.getName().equals("webservice.call.rec.payload"))
+			if (parameter.getName().equals("webservice.call.record.payload"))
 				recCallsPayload = parameter;
 			if (parameter.getName().equals("webservice.call.ttl"))
 				callsTtl = parameter;
@@ -93,15 +93,15 @@ public class WebservicesPanel extends VLayout {
 				GWT.getHostPageBaseURL() + "services/rest");
 		restUrl.setColSpan(4);
 
+		
 		// Web Service Enabled
 		RadioGroupItem wsEnabled = prepareEnabledItem();
-
 		SpinnerItem ttl = ItemFactory.newSpinnerItem(WS_TTL, "timetolive", Integer.parseInt(callsTtl.getValue()));
 		ttl.setHint(I18N.message("days"));
 		ttl.setMin(1);
 		ttl.setStep(1);
-		ttl.setDisabled(recCalls.getValue().equals(FALSE));
-
+		ttl.setDisabled(FALSE.equals(recCalls.getValue()));
+		
 		// Flag to rec webservice calls payload
 		RadioGroupItem recordCallsPayload = prepareRecordCallsPayloadItem();
 

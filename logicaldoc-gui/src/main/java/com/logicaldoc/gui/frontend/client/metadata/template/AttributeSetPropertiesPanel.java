@@ -57,7 +57,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class AttributeSetPropertiesPanel extends HLayout {
 
-	private static final String ATTRIBUTE_NAME = "attributeName";
+	private static final String ATTRIBUTE_NAME = "attributename";
 
 	private static final String EDITOR_STR	= "editor";
 

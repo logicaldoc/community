@@ -27,6 +27,8 @@ import com.logicaldoc.util.config.ContextProperties;
  * <li>threadpool.<b>pool_name</b>.keepalive: this is the maximum time(in
  * seconds) that excess idle threads will wait for new tasks before terminating
  * (defalut value: 5)</li>
+ * <li>threadpool.<b>pool_name</b>.type: this is the type default or
+ * scheduled(default value: default), default means</li>
  * </ul>
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -72,13 +74,13 @@ public class ThreadPools {
 			int core = config.getInt(THREADPOOL + name + ".core", 5);
 			int max = config.getInt(THREADPOOL + name + ".max", 10);
 			int keepalive = config.getInt(THREADPOOL + name + ".keepalive", 5);
-			String type = config.getString(THREADPOOL + name + ".type", TYPE_SCHEDULED);
+			String type = config.getString(THREADPOOL + name + ".type", TYPE_DEFAULT);
+			assert type.equals(TYPE_DEFAULT) || type.equals(TYPE_SCHEDULED) : "Unknown type " + type;
 
 			if (TYPE_DEFAULT.equals(type))
 				pool = new ScheduledThreadPoolExecutor(core, new NamedThreadFactory(name));
 			else
-				pool = new ThreadPoolExecutor(core, max, keepalive, TimeUnit.SECONDS,
-						new LinkedBlockingQueue<>());
+				pool = new ThreadPoolExecutor(core, max, keepalive, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 			pools.put(name, pool);
 		}
 
