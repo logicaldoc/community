@@ -60,7 +60,7 @@ public abstract class AbstractParser implements Parser {
 		Locale lcl = getLocale(locale);
 		String tnt = getTenant(locale, tenant);
 
-		long timeout = Context.get().getProperties().getInt(tenant + ".parser.timeout", 120);
+		long timeout = getTimeout(tenant);
 
 		if (timeout <= 0) {
 			parseInCurrentThread(input, filename, encoding, document, fileVersion, content, lcl, tnt);
@@ -71,6 +71,15 @@ public abstract class AbstractParser implements Parser {
 		if (log.isDebugEnabled())
 			log.debug("Parse Finished");
 		return content.toString();
+	}
+
+	private int getTimeout(String tenant) {
+		try {
+			Context context = Context.get();
+			return context != null ? Context.get().getProperties().getInt(tenant + ".parser.timeout", 120) : 120;
+		} catch (Exception e) {
+			return 120;
+		}
 	}
 
 	private void parseInNewThread(final InputStream input, String filename, String encoding, Document document,

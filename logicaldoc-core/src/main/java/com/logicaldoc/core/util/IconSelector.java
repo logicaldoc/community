@@ -34,13 +34,13 @@ public class IconSelector {
 		ext = normalizeExtension(ext);
 
 		String icon = checkOffice(ext);
-		if(StringUtils.isNotEmpty(icon))
+		if (StringUtils.isNotEmpty(icon))
 			return icon;
-		
+
 		icon = checkMultimedia(ext);
-		if(StringUtils.isNotEmpty(icon))
+		if (StringUtils.isNotEmpty(icon))
 			return icon;
-		
+
 		if (StringUtils.isEmpty(ext))
 			icon = "generic.png";
 		else if (ext.equals("pdf"))
@@ -72,7 +72,7 @@ public class IconSelector {
 
 		return icon;
 	}
-	
+
 	private static String checkOffice(String ext) {
 		String icon = "";
 		if (isWord(ext))
@@ -87,7 +87,7 @@ public class IconSelector {
 			icon = "project.png";
 		return icon;
 	}
-	
+
 	private static String checkMultimedia(String ext) {
 		String icon = "";
 		if (isPicture(ext))
@@ -160,13 +160,14 @@ public class IconSelector {
 
 	private static boolean isWord(String ext) {
 		return ext.equals("doc") || ext.equals("docm") || ext.equals("docx") || ext.equals("docxm")
-				|| ext.equals("dotm") || ext.equals("odt") || ext.equals("rtf") || ext.equals("ott")
-				|| ext.equals("sxw") || ext.equals("wpd") || ext.equals("kwd") || ext.equals("dot");
+				|| ext.equals("dotx") || ext.equals("dotm") || ext.equals("odt") || ext.equals("rtf")
+				|| ext.equals("ott") || ext.equals("sxw") || ext.equals("wpd") || ext.equals("kwd")
+				|| ext.equals("dot");
 	}
 
 	private static boolean isPowerPoint(String ext) {
-		return ext.equals("ppt") || ext.equals("pptm") || ext.equals("pptx") || ext.equals("pptxm")
-				|| ext.equals("odp") || ext.equals("pps") || ext.equals("otp") || ext.equals("pot") || ext.equals("sxi")
+		return ext.equals("ppt") || ext.equals("pptm") || ext.equals("pptx") || ext.equals("pptxm") || ext.equals("odp")
+				|| ext.equals("pps") || ext.equals("otp") || ext.equals("pot") || ext.equals("sxi")
 				|| ext.equals("kpr");
 	}
 
