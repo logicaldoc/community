@@ -970,7 +970,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
 		download.setEnabled(false);
-		download.addClickHandler((MenuItemClickEvent event) -> DocUtil.download(selectedDocument.getId(), null));
+		download.addClickHandler(event -> DocUtil.download(selectedDocument.getId(), null));
 		return download;
 	}
 
@@ -978,7 +978,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(false);
-		preview.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
+		preview.addClickHandler(event -> DocumentService.Instance.get()
 				.getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
 
 					@Override

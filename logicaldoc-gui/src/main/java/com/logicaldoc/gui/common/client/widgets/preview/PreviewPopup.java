@@ -6,10 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -53,13 +49,10 @@ public class PreviewPopup extends Window {
 		centerInPage();
 		setMargin(2);
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				if (previewPanel != null)
-					previewPanel.destroy();
-				destroy();
-			}
+		addCloseClickHandler(event -> {
+			if (previewPanel != null)
+				previewPanel.destroy();
+			destroy();
 		});
 
 		previewSlot.setWidth100();
@@ -88,16 +81,12 @@ public class PreviewPopup extends Window {
 		prev.setShowDisabled(true);
 		prev.setShowDown(true);
 		prev.setIcon("[SKIN]/headerIcons/arrow_left.gif");
-		prev.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				if (currentIndex <= 0)
-					currentIndex = PreviewPopup.this.docs.length - 1;
-				else
-					currentIndex--;
-				reloadPreview(PreviewPopup.this.docs[currentIndex]);
-			}
+		prev.addClickHandler(event -> {
+			if (currentIndex <= 0)
+				currentIndex = PreviewPopup.this.docs.length - 1;
+			else
+				currentIndex--;
+			reloadPreview(PreviewPopup.this.docs[currentIndex]);
 		});
 
 		IButton next = new IButton("");
@@ -107,16 +96,12 @@ public class PreviewPopup extends Window {
 		next.setShowDisabled(true);
 		next.setShowDown(true);
 		next.setIcon("[SKIN]/headerIcons/arrow_right.gif");
-		next.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
+		next.addClickHandler(event -> {
 				if (currentIndex >= PreviewPopup.this.docs.length)
 					currentIndex = 0;
 				else
 					currentIndex++;
 				reloadPreview(PreviewPopup.this.docs[currentIndex]);
-			}
 		});
 
 		layout.setMembers(prev, previewSlot, next);

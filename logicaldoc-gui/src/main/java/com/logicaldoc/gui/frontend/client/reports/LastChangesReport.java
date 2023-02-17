@@ -7,9 +7,11 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIHistory;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -18,8 +20,10 @@ import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
@@ -46,7 +50,6 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel is used to show the last changes events.
@@ -55,6 +58,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.0
  */
 public class LastChangesReport extends AdminPanel {
+
+	private static final String NAME = "name";
 
 	private static final String DISPLAYMAX = "displaymax";
 
@@ -233,7 +238,7 @@ public class LastChangesReport extends AdminPanel {
 		userField.setCanFilter(true);
 		userField.setAlign(Alignment.CENTER);
 
-		FileNameListGridField name = new FileNameListGridField("name", "icon", I18N.message("name"), 150);
+		FileNameListGridField name = new FileNameListGridField(NAME, "icon", I18N.message(NAME), 150);
 		name.setCanFilter(true);
 
 		ListGridField folder = new ListGridField(FOLDER_STR, I18N.message(FOLDER_STR), 100);
@@ -414,7 +419,7 @@ public class LastChangesReport extends AdminPanel {
 								rec.setAttribute(EVENT, I18N.message(result[i].getEvent()));
 								rec.setAttribute("date", result[i].getDate());
 								rec.setAttribute("user", result[i].getUsername());
-								rec.setAttribute("name", result[i].getFileName());
+								rec.setAttribute(NAME, result[i].getFileName());
 								rec.setAttribute(FOLDER_STR, result[i].getPath());
 								rec.setAttribute("sid", result[i].getSessionId());
 								rec.setAttribute(DOC_ID, result[i].getDocId());
@@ -456,24 +461,43 @@ public class LastChangesReport extends AdminPanel {
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocumentsPanel.get().openInFolder(docId);
-			}
-		});
+		openInFolder.addClickHandler(event -> DocumentsPanel.get().openInFolder(docId));
+
+		MenuItem preview = preparePreviewItem(docId);
+
+		MenuItem download = new MenuItem();
+		download.setTitle(I18N.message("download"));
+		download.addClickHandler(event -> DocUtil.download(docId, null));
 
 		MenuItem openFolder = new MenuItem();
 		openFolder.setTitle(I18N.message("openfolder"));
-		openFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocumentsPanel.get().openInFolder(folderId, null);
-			}
-		});
+		openFolder.addClickHandler(event -> DocumentsPanel.get().openInFolder(folderId, null));
 
 		if (docId != null)
-			contextMenu.setItems(openInFolder);
+			contextMenu.setItems(download, preview, openInFolder);
 		else if (folderId != null)
 			contextMenu.setItems(openFolder);
 		contextMenu.showContextMenu();
+	}
+
+	private MenuItem preparePreviewItem(final Long docId) {
+		MenuItem preview = new MenuItem();
+		preview.setTitle(I18N.message("preview"));
+		if (docId != null)
+			preview.addClickHandler(
+					event -> DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIDocument doc) {
+							PreviewPopup iv = new PreviewPopup(doc);
+							iv.show();
+						}
+					}));
+		return preview;
 	}
 }
