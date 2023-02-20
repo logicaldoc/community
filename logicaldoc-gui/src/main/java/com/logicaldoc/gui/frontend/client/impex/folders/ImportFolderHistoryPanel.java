@@ -17,7 +17,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -43,7 +42,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 
 	private static final String DOC_ID = "docId";
+
 	private static final String CLOSE_SPAN = "</span>";
+
 	private CheckboxItem recordHistory;
 
 	public ImportFolderHistoryPanel(GUIImportFolder importFolder, final ChangedHandler changedHandler) {
@@ -148,7 +149,7 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		});
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		refresh.addClickHandler((ClickEvent evnt) -> list.refresh(
+		refresh.addClickHandler(evnt -> list.refresh(
 				new ImportFolderHistoryDS(importFolder.getId(), Integer.parseInt(maxItem.getValueAsString()))));
 
 		buttons.addButton(refresh);
@@ -157,16 +158,16 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		buttons.addButton(export);
-		export.addClickHandler((ClickEvent evnt) -> GridUtil.exportCSV(list, true));
+		export.addClickHandler(evnt -> GridUtil.exportCSV(list, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		buttons.addButton(print);
-		print.addClickHandler((ClickEvent evnt) -> GridUtil.print(list));
+		print.addClickHandler(evnt -> GridUtil.print(list));
 
 		buttons.addSeparator();
 
 		recordHistory = ItemFactory.newCheckbox("recordHistory", "enablehistory");
-		recordHistory.setValue(importFolder.getRecordHistory() == 1);
+		recordHistory.setValue(importFolder.isRecordHistory());
 		recordHistory.addChangedHandler(changedHandler);
 		buttons.addFormItem(recordHistory);
 
@@ -178,7 +179,7 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 	}
 
 	boolean validate() {
-		importFolder.setRecordHistory(Boolean.TRUE.equals(recordHistory.getValueAsBoolean()) ? 1 : 0);
+		importFolder.setRecordHistory(Boolean.TRUE.equals(recordHistory.getValueAsBoolean()));
 		return true;
 	}
 }

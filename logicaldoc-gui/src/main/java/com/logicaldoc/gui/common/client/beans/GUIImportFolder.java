@@ -73,13 +73,15 @@ public class GUIImportFolder implements Serializable {
 
 	private boolean inheritRights = true;
 
+	private boolean preventDuplications = false;
+
+	private boolean recordHistory = false;
+	
 	private Integer port = null;
 
 	private String host;
 
 	private Long batch = 10000L;
-
-	private int recordHistory = 0;
 
 	public GUIImportFolder() {
 		super();
@@ -323,11 +325,19 @@ public class GUIImportFolder implements Serializable {
 		this.barcodeTemplateId = barcodeTemplateId;
 	}
 
-	public int getRecordHistory() {
+	public boolean isPreventDuplications() {
+		return preventDuplications;
+	}
+
+	public void setPreventDuplications(boolean preventDuplications) {
+		this.preventDuplications = preventDuplications;
+	}
+
+	public boolean isRecordHistory() {
 		return recordHistory;
 	}
 
-	public void setRecordHistory(int recordHistory) {
+	public void setRecordHistory(boolean recordHistory) {
 		this.recordHistory = recordHistory;
 	}
 }

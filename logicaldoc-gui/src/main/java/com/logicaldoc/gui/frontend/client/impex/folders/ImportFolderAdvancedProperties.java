@@ -19,8 +19,6 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
@@ -130,6 +128,14 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		inheritRights.setValue(importFolder.isInheritRights());
 		inheritRights.addChangedHandler(changedHandler);
 
+		CheckboxItem preventDuplications = new CheckboxItem();
+		preventDuplications.setName("preventduplications");
+		preventDuplications.setTitle(I18N.message("preventduplications"));
+		preventDuplications.setRedrawOnChange(true);
+		preventDuplications.setWidth(50);
+		preventDuplications.setValue(importFolder.isPreventDuplications());
+		preventDuplications.addChangedHandler(changedHandler);
+
 		TextItem tags = ItemFactory.newTextItem("tags", importFolder.getTags());
 		tags.addChangedHandler(changedHandler);
 
@@ -139,16 +145,13 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		startDate.setUseMask(false);
 		startDate.setShowPickerIcon(true);
 		startDate.setDateFormatter(DateDisplayFormat.TOEUROPEANSHORTDATE);
-		startDate.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if ("delete".equals(event.getKeyName().toLowerCase())) {
-					startDate.clearValue();
-					startDate.setValue((Date) null);
-					changedHandler.onChanged(null);
-				} else {
-					changedHandler.onChanged(null);
-				}
+		startDate.addKeyPressHandler(event -> {
+			if ("delete".equals(event.getKeyName().toLowerCase())) {
+				startDate.clearValue();
+				startDate.setValue((Date) null);
+				changedHandler.onChanged(null);
+			} else {
+				changedHandler.onChanged(null);
 			}
 		});
 
@@ -161,7 +164,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		updatePolicy.setValue(Integer.toString(importFolder.getUpdatePolicy()));
 
 		form.setItems(depth, size, startDate, template, ocrTemplate, barcodeTemplate, tags, updatePolicy, importEmpty,
-				inheritRights, delImport);
+				preventDuplications, inheritRights, delImport);
 
 		formsContainer.addMember(form);
 
@@ -183,6 +186,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		importFolder.setDelImport((Boolean) values.get("delImport"));
 		importFolder.setInheritRights((Boolean) values.get("inheritRights"));
 		importFolder.setImportEmpty((Boolean) values.get("importEmpty"));
+		importFolder.setPreventDuplications((Boolean) values.get("preventduplications"));
 
 		collectTags(values);
 
