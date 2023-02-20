@@ -35,14 +35,7 @@ public class OrderedProperties extends Properties {
 	 * @exception IOException when things go wrong
 	 */
 	public void store(OutputStream out, String header) throws IOException {
-		Vector keys = new Vector();
-
-		for (Enumeration e = this.propertyNames(); e.hasMoreElements();) {
-			keys.addElement((String) (e.nextElement()));
-		}
-
-		// sort them
-		Collections.sort(keys);
+		List<String> keys = getKeys();
 
 		// write the header
 		DataOutputStream dataoutputstream = new DataOutputStream(out);
@@ -58,7 +51,7 @@ public class OrderedProperties extends Properties {
 		String thevalue;
 
 		for (int i = 0; i < keys.size(); i++) {
-			thekey = (String) keys.elementAt(i);
+			thekey = (String) keys.get(i);
 			thevalue = (String) this.getProperty(thekey);
 			thevalue = doubleSlash(thevalue);
 
@@ -93,7 +86,7 @@ public class OrderedProperties extends Properties {
 	/**
 	 * All the keys but alphabetically ordered
 	 * 
-	 * @return the ordered collection of all the keys 
+	 * @return the ordered collection of all the keys
 	 */
 	public List<String> getKeys() {
 		Vector<String> keys = new Vector<>();
