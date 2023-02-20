@@ -9,10 +9,11 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 
 public class WorkflowsDS extends DataSource {
 	public WorkflowsDS(boolean retrieveDefinitions, boolean deployedOnly, Long userId) {
-		this(null, retrieveDefinitions, deployedOnly, userId);
+		this(null, retrieveDefinitions, deployedOnly, false, userId);
 	}
 
-	public WorkflowsDS(String workflowName, boolean retrieveDefinitions, boolean deployedOnly, Long userId) {
+	public WorkflowsDS(String workflowName, boolean retrieveDefinitions, boolean deployedOnly,
+			boolean checkDeployExists, Long userId) {
 		setTitleField("name");
 		setRecordXPath("/list/workflow");
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -27,7 +28,12 @@ public class WorkflowsDS extends DataSource {
 		setFields(id, name, label, version, date, deployed, description);
 		setDataURL("data/workflows.xml?locale=" + I18N.getLocale()
 				+ (retrieveDefinitions ? "&retrievedefinitions=true" : "") + (deployedOnly ? "&deployedOnly=true" : "")
-				+ (workflowName != null ? "&name=" + workflowName : "") + (userId != null ? "&userId=" + userId : ""));
+				+ (workflowName != null ? "&name=" + workflowName : "") + (userId != null ? "&userId=" + userId : "")
+				+ (checkDeployExists ? "&checkDeployExists=true" : "") + (checkDeployExists ? "&checkDeployExists=true" : ""));
 		setClientOnly(true);
+	}
+
+	public WorkflowsDS(Long userId) {
+		this(null, false, false, true, userId);
 	}
 }

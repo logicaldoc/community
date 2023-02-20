@@ -2150,11 +2150,11 @@ public class ItemFactory {
 		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"));
+		ListGridField name = new ListGridField("name");
 		name.setWidth(150);
 		name.setHidden(true);
 
-		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
+		ListGridField description = new ListGridField(DESCRIPTION);
 		description.setWidth(500);
 
 		item.setWidth(250);
@@ -2164,6 +2164,36 @@ public class ItemFactory {
 		item.setValueField("id");
 		item.setWrapTitle(false);
 		item.setOptionDataSource(new WorkflowsDS(false, deployedOnly, userId));
+		if (!Feature.enabled(Feature.WORKFLOW))
+			item.setDisabled(true);
+		return item;
+	}
+
+	public static SelectItem newWorkflowSelectorForAdministration(Long userId) {
+		SelectItem item = new SelectItem(WORKFLOW, I18N.message(WORKFLOW));
+		item.setShowHintInField(true);
+		item.setHint(I18N.message("workflowselect") + "...");
+		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
+		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
+		label.setWidth(150);
+
+		ListGridField name = new ListGridField("name");
+		name.setWidth(150);
+		name.setHidden(true);
+
+		ListGridField deployed = new ListGridField("deployed");
+		deployed.setAutoFitWidth(true);
+
+		ListGridField description = new ListGridField(DESCRIPTION);
+		description.setWidth(500);
+
+		item.setWidth(250);
+		item.setPickListWidth(500);
+		item.setPickListFields(label, deployed, description, name);
+		item.setDisplayField(LABEL);
+		item.setValueField("id");
+		item.setWrapTitle(false);
+		item.setOptionDataSource(new WorkflowsDS(userId));
 		if (!Feature.enabled(Feature.WORKFLOW))
 			item.setDisabled(true);
 		return item;

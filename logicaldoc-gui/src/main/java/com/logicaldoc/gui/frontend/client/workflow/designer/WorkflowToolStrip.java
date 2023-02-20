@@ -14,12 +14,10 @@ import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -174,24 +172,21 @@ public class WorkflowToolStrip extends ToolStrip {
 	private void addDeleteButton() {
 		delete = new ToolStripButton(I18N.message("ddelete"));
 		delete.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-				@Override
-				public void execute(Boolean yes) {
-					if (Boolean.TRUE.equals(yes)) {
-						WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
+				if (Boolean.TRUE.equals(yes)) {
+					WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								currentWorkflow = new GUIWorkflow();
-								AdminScreen.get().setContent(new WorkflowDesigner(currentWorkflow));
-								update();
-							}
-						});
-					}
+						@Override
+						public void onSuccess(Void result) {
+							currentWorkflow = new GUIWorkflow();
+							AdminScreen.get().setContent(new WorkflowDesigner(currentWorkflow));
+							update();
+						}
+					});
 				}
 			});
 		});
@@ -219,6 +214,7 @@ public class WorkflowToolStrip extends ToolStrip {
 							GuiLog.info(I18N.message("workflowundeployed", currentWorkflow.getName()));
 							update();
 							reload(currentWorkflow.getName());
+							workflowSelector.getSelectedRecord().setAttribute("deployed", false);
 						}
 					});
 			});
@@ -265,6 +261,7 @@ public class WorkflowToolStrip extends ToolStrip {
 					GuiLog.info(I18N.message("workflowdeployed", currentWorkflow.getName()));
 					currentWorkflow = result;
 					reload(currentWorkflow.getName());
+					workflowSelector.getSelectedRecord().setAttribute("deployed", true);
 				}
 			});
 		}
@@ -407,8 +404,8 @@ public class WorkflowToolStrip extends ToolStrip {
 	}
 
 	private void addWorkflowSelector() {
-		workflowSelector = ItemFactory.newWorkflowSelector(Session.get().getUser().getId(), false);
-		workflowSelector.addChangedHandler((ChangedEvent event) -> {
+		workflowSelector = ItemFactory.newWorkflowSelectorForAdministration(Session.get().getUser().getId());
+		workflowSelector.addChangedHandler(event -> {
 			if (event.getValue() != null && !"".equals((String) event.getValue())) {
 				WorkflowService.Instance.get().get(workflowSelector.getSelectedRecord().getAttributeAsString("name"),
 						null, new AsyncCallback<GUIWorkflow>() {
@@ -511,7 +508,7 @@ public class WorkflowToolStrip extends ToolStrip {
 
 	protected void updateVersionSelect() {
 		versionSelector.setOptionDataSource(
-				new WorkflowsDS(currentWorkflow.getName(), false, false, Session.get().getUser().getId()));
+				new WorkflowsDS(currentWorkflow.getName(), false, false, false, Session.get().getUser().getId()));
 		versionSelector.setValue(currentWorkflow.getVersion());
 	}
 
