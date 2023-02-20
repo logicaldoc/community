@@ -181,6 +181,7 @@
         <module>logicaldoc-i18n</module>
         <module>logicaldoc-gui</module>
         <module>logicaldoc-android</module>
+        <module>logicaldoc-ios</module>
         <module>logicaldoc-webapp</module>
         <!--
         <module>logicaldoc-webservicesamples</module>

@@ -551,6 +551,15 @@
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/war/</outputDirectory>
 								</artifactItem>
+								<artifactItem>
+									<groupId>com.logicaldoc</groupId>
+									<artifactId>logicaldoc-ios</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+									<classifier>plugin</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/war/</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 					</execution>
