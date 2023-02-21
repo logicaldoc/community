@@ -18,8 +18,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -113,6 +111,9 @@ public class ExportArchivesList extends VLayout {
 		ListGridField aosManager = new ListGridField("aosmanager", I18N.message("aosmanager"), 110);
 		aosManager.setCanFilter(true);
 
+		ListGridField pathOnServer = new ListGridField("pathonserver", I18N.message("pathonserver"));
+		pathOnServer.setCanFilter(false);
+
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
@@ -120,9 +121,9 @@ public class ExportArchivesList extends VLayout {
 		list.setWidth100();
 		list.setHeight100();
 		if (this.archivesType == GUIArchive.TYPE_STORAGE)
-			list.setFields(id, created, name, size, status, creator, closer, aosManager);
+			list.setFields(id, created, name, size, status, creator, closer, aosManager, pathOnServer);
 		else
-			list.setFields(id, created, name, size, status, creator, closer);
+			list.setFields(id, created, name, size, status, creator, closer, pathOnServer);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -148,21 +149,13 @@ public class ExportArchivesList extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton addArchive = new ToolStripButton();
 		addArchive.setTitle(I18N.message("addarchive"));
-		addArchive.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onAddingArchive();
-				event.cancel();
-			}
+		addArchive.addClickHandler(event -> {
+			onAddingArchive();
+			event.cancel();
 		});
 		toolStrip.addButton(addArchive);
 
@@ -190,7 +183,8 @@ public class ExportArchivesList extends VLayout {
 		list.addDataArrivedHandler(new DataArrivedHandler() {
 			@Override
 			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showarchives", Integer.toString(list.getTotalRows())));
+				infoPanel.setMessage(I18N.message("showarchives", Integer.toString(list.getTotalRows()),
+						Session.get().getConfig("conf.exportdir")));
 			}
 		});
 

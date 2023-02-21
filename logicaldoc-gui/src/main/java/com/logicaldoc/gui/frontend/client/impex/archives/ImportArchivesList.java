@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.impex.archives;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -23,8 +24,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -95,13 +94,16 @@ public class ImportArchivesList extends VLayout {
 		size.setType(ListGridFieldType.INTEGER);
 		size.setCanFilter(false);
 
+		ListGridField pathOnServer = new ListGridField("pathonserver", I18N.message("pathonserver"));
+		pathOnServer.setCanFilter(false);
+
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, created, name, desdcription, size, status, creator);
+		list.setFields(id, created, name, desdcription, size, status, creator, pathOnServer);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -151,12 +153,8 @@ public class ImportArchivesList extends VLayout {
 			}
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showarchives", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(event -> infoPanel.setMessage(I18N.message("showarchives",
+				Integer.toString(list.getTotalRows()), Session.get().getConfig("conf.importdir"))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);

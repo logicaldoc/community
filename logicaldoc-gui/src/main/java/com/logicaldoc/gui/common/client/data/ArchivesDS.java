@@ -34,8 +34,10 @@ public class ArchivesDS extends DataSource {
 		DataSourceTextField creator = new DataSourceTextField("creator");
 		DataSourceTextField closer = new DataSourceTextField("closer");
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
+		DataSourceTextField pathonserver = new DataSourceTextField("pathonserver");
 
-		setFields(id, name, description, size, closer, creator, ttype, typelabel, stat, statusicon, created);
+		setFields(id, name, description, size, closer, creator, ttype, typelabel, stat, statusicon, created,
+				pathonserver);
 		setClientOnly(true);
 		setDataURL("data/archives.xml?mode=" + mode + "&locale=" + I18N.getLocale()
 				+ (status != null ? "&status=" + status : "") + (type != null ? "&type=" + type : "")

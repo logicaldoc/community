@@ -22,6 +22,7 @@ public class FormInvitationDialog extends AbstractEmailDialog {
 		super();
 		this.formId = formId;
 		setTitle(I18N.message("invitationtofillform"));
+		defaultMessage=I18N.message("invitedyoutofillform");
 	}
 
 	@Override

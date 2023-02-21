@@ -20,7 +20,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**
- * This servlet simply download the document it is a PDF.
+ * This servlet simply download the document if it is a PDF.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.4.2
