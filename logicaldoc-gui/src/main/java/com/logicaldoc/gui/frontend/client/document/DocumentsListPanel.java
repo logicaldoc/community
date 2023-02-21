@@ -19,11 +19,6 @@ import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 
@@ -64,39 +59,35 @@ public class DocumentsListPanel extends VLayout {
 	}
 
 	private void registerGridHandlers() {
-		grid.registerDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				GUIDocument doc = grid.getSelectedDocument();
-				long id = doc.getId();
+		grid.registerDoubleClickHandler(event -> {
+			GUIDocument doc = grid.getSelectedDocument();
+			long id = doc.getId();
 
-				if (FolderController.get().getCurrentFolder().isDownload()
-						&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-					try {
-						DocUtil.download(id, null);
-					} catch (Throwable t) {
-						// Nothing to do
-					}
-				else {
-					if (doc.getDocRef() != null) {
-						/*
-						 * re the co * in case of alias the data servlet inverts
-						 * the docId and the docRef so in order to have the
-						 * preview to do the right security checks we have to
-						 * restorrect ids
-						 */
-						long aliasId = doc.getDocRef();
-						doc.setDocRef(doc.getId());
-						doc.setId(aliasId);
-					}
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+			if (FolderController.get().getCurrentFolder().isDownload()
+					&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
+				try {
+					DocUtil.download(id, null);
+				} catch (Throwable t) {
+					// Nothing to do
 				}
-				event.cancel();
+			else {
+				if (doc.getDocRef() != null) {
+					/*
+					 * re the co * in case of alias the data servlet inverts the
+					 * docId and the docRef so in order to have the preview to
+					 * do the right security checks we have to restorrect ids
+					 */
+					long aliasId = doc.getDocRef();
+					doc.setDocRef(doc.getId());
+					doc.setId(aliasId);
+				}
+				PreviewPopup iv = new PreviewPopup(doc);
+				iv.show();
 			}
+			event.cancel();
 		});
 
-		grid.registerSelectionChangedHandler((SelectionEvent event) -> {
+		grid.registerSelectionChangedHandler(event -> {
 			// Avoid server load in case of multiple selections
 			if (grid.getSelectedCount() != 1)
 				return;
@@ -114,7 +105,7 @@ public class DocumentsListPanel extends VLayout {
 					});
 		});
 
-		grid.registerCellContextClickHandler((CellContextClickEvent event) -> {
+		grid.registerCellContextClickHandler(event -> {
 			Menu contextMenu = new ContextMenu(FolderController.get().getCurrentFolder(), grid);
 			contextMenu.showContextMenu();
 			if (event != null)
@@ -125,13 +116,9 @@ public class DocumentsListPanel extends VLayout {
 	private void addCursor(GUIFolder folder) {
 		// Prepare a panel containing a title and the documents list
 		cursor = new Cursor(true, false);
-		cursor.setTotalRecords(folder.getDocumentCount());
-		cursor.registerPageSizeChangedHandler((ChangedEvent event) -> {
-			DocumentsPanel.get().changePageSize(cursor.getPageSize());
-		});
-		cursor.registerPageChangedHandler((ChangedEvent event) -> {
-			DocumentsPanel.get().changePageSize(cursor.getPageSize());
-		});
+		cursor.setTotalRecords((int) folder.getDocumentCount());
+		cursor.registerPageSizeChangedHandler(event -> DocumentsPanel.get().changePageSize(cursor.getPageSize()));
+		cursor.registerPageChangedHandler(event -> DocumentsPanel.get().changePageSize(cursor.getPageSize()));
 		addMember(cursor);
 	}
 

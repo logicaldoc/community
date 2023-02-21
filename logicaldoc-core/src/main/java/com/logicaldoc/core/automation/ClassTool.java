@@ -3,6 +3,8 @@ package com.logicaldoc.core.automation;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility functions for manipulating classes and resources and for other
@@ -13,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 @AutomationDictionary
 public class ClassTool {
+
+	protected static Logger log = LoggerFactory.getLogger(ClassTool.class);
 
 	/**
 	 * Creates a new instance of a class whose constructor does not have
@@ -61,7 +65,30 @@ public class ClassTool {
 	public boolean isNull(Object instance) {
 		return instance == null;
 	}
-	
+
+	/**
+	 * Makes a copy(clone) of a given object instance.<br />
+	 * <p>
+	 * <b>Attention:</b> for security reasons it will not be used the cloned()
+	 * method of the given objet but a new instance of the given object's class
+	 * is invoked by passing the same instance. As a result they may be copied
+	 * only those objects that define a public construction that accepts the
+	 * same class as single argument.
+	 * </p>
+	 * 
+	 * @param instance the object to clone
+	 * 
+	 * @return the cloned object
+	 */
+	public Object copy(Object instance) {
+		try {
+			return instance.getClass().getDeclaredConstructor(instance.getClass()).newInstance(instance);
+		} catch (Exception e) {
+			log.error("Cannot make a copy of {}", instance, e);
+			return null;
+		}
+	}
+
 	/**
 	 * Checks if a given string is null
 	 * 

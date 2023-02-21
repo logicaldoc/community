@@ -427,16 +427,15 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 								if (result.getGrid() != null && !result.getGrid().isEmpty())
 									FolderCursor.get().setPageSizeAndTotalRecords(
 											DocumentGridUtil.getFolderPageSizeFromSpec(result.getGrid()),
-											result.getSubfolderCount());
+											(int) result.getSubfolderCount());
 								else if (Session.get().getUser().getDocsGrid() != null
 										&& !Session.get().getUser().getDocsGrid().isEmpty())
-									FolderCursor.get()
-											.setPageSizeAndTotalRecords(
-													DocumentGridUtil.getFolderPageSizeFromSpec(
-															Session.get().getUser().getDocsGrid()),
-													result.getSubfolderCount());
+									FolderCursor.get().setPageSizeAndTotalRecords(
+											DocumentGridUtil
+													.getFolderPageSizeFromSpec(Session.get().getUser().getDocsGrid()),
+											(int) result.getSubfolderCount());
 								else
-									FolderCursor.get().setTotalRecords(result.getSubfolderCount());
+									FolderCursor.get().setTotalRecords((int) result.getSubfolderCount());
 							}
 						}
 					}
@@ -1427,7 +1426,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
 		TreeNode folderNode = getTree().find(FOLDER_ID, Long.toString(folder.getId()));
-		
+
 		if (folderNode != null) {
 			folderNode.setTitle(folder.getName());
 			folderNode.setName(folder.getName());

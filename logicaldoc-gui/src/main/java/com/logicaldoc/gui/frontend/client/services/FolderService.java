@@ -253,11 +253,11 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @param folderId identifier of the folder
 	 * 
-	 * @return the statistics
+	 * @return the statistics (total number of documents, total number of subfolders, total size
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public int[] computeStats(long folderId) throws ServerException;
+	public long[] computeStats(long folderId) throws ServerException;
 
 	/**
 	 * Sets the pagination informations for the visualization of the folders

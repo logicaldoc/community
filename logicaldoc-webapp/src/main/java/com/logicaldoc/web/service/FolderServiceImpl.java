@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
@@ -217,22 +218,60 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public int[] computeStats(long folderId) throws ServerException {
+	public long[] computeStats(long folderId) throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
 		try {
-			return new int[] { countDocs(folderId), countChildren(folderId) };
+			long[] docs = countDocsInTree(folderId);
+			return new long[] { docs[0], countSubfoldersInTree(folderId), docs[1] };
 		} catch (PersistenceException e) {
-			return (int[]) throwServerException(session, log, e);
+			return (long[]) throwServerException(session, log, e);
 		}
 	}
 
-	private static int countDocs(long folderId) throws PersistenceException {
+	/**
+	 * Counts the documents inside a tree and also calculate the total size
+	 * 
+	 * @param folderId identifier of the tree's root
+	 * 
+	 * @return first element is the documents count, second element is the total
+	 *         size
+	 * 
+	 * @throws PersistenceException Error in the database layer
+	 */
+	private static long[] countDocsInTree(long folderId) throws PersistenceException {
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		Folder root = dao.findById(folderId);
+		String pathPrefix = root.getPath();
+
+		SqlRowSet resultSet = dao.queryForRowSet(
+				"select count(D.ld_id), sum(D.ld_filesize) from ld_document D, ld_folder F where D.ld_deleted=0 and F.ld_deleted=0 and D.ld_folderid=F.ld_id and (F.ld_id="
+						+ folderId + " or F.ld_path like '" + pathPrefix + "/%') " + " and not ld_status="
+						+ AbstractDocument.DOC_ARCHIVED,
+				null, null);
+		long[] stats = new long[] { 0L, 0L };
+		if (resultSet.next()) {
+			stats[0] = resultSet.getLong(1);
+			stats[1] = resultSet.getLong(2);
+		}
+		return stats;
+	}
+
+	private static long countSubfoldersInTree(long folderId) throws PersistenceException {
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		Folder root = dao.findById(folderId);
+		String pathPrefix = root.getPath();
+
+		return dao.queryForLong("select count(ld_id) from ld_folder where ld_deleted=0 and (ld_parentid=" + folderId
+				+ " or ld_path like '" + pathPrefix + "/%')");
+	}
+
+	private static int countDirectDocs(long folderId) throws PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		return dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid=" + folderId
 				+ " and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
 	}
 
-	private static int countChildren(long folderId) throws PersistenceException {
+	private static int countDirectSubfolders(long folderId) throws PersistenceException {
 		int count = 0;
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		count = dao.queryForInt(
@@ -365,9 +404,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 		try {
 			if (computeDocs)
-				folder.setDocumentCount(countDocs(folder.getId()));
+				folder.setDocumentCount(countDirectDocs(folder.getId()));
 			if (computeSubfolders)
-				folder.setSubfolderCount(countChildren(folder.getId()));
+				folder.setSubfolderCount(countDirectSubfolders(folder.getId()));
 			if (computePath)
 				folder.setPath(computePath(folderId, session.getTenantId(), computeSubfolders));
 			return folder;
@@ -397,7 +436,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				f.setName("/");
 				f.setParentId(parent.getId());
 				if (computeSubfolders)
-					f.setSubfolderCount(countChildren(f.getId()));
+					f.setSubfolderCount(countDirectSubfolders(f.getId()));
 				path[j] = f;
 			} else
 				path[j] = getFolder(parent.getId(), false, false, computeSubfolders);
@@ -598,7 +637,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					renameTransaction.setSession(session);
 					renameTransaction.setNotifyEvent(true);
 				}
-				
+
 				folder.setName(folderName);
 			}
 

@@ -134,7 +134,7 @@ public class ParserFactory {
 			try {
 				Class clazz = Class.forName(className);
 				// Try to instantiate the parser
-				Object parser = clazz.newInstance();
+				Object parser = clazz.getDeclaredConstructor().newInstance();
 				if (!(parser instanceof Parser))
 					throw new Exception(
 							String.format("The specified parser %s doesn't implement Parser interface", className));

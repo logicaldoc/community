@@ -46,7 +46,7 @@ public interface FolderServiceAsync {
 
 	void applyTags(long parentId, AsyncCallback<Void> callback);
 
-	void computeStats(long folerId, AsyncCallback<int[]> callback);
+	void computeStats(long folerId, AsyncCallback<long[]> callback);
 
 	void setFolderPagination(long folderId, Integer startRecord, Integer pageSize, AsyncCallback<Void> callback);
 

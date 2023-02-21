@@ -1113,7 +1113,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		if (getGridCursor() != null) {
 			getGridCursor().setPageSize(pageSize);
 			if (folder != null)
-				getGridCursor().setTotalRecords(folder.getDocumentCount());
+				getGridCursor().setTotalRecords((int)folder.getDocumentCount());
 		}
 
 		/*

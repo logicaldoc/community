@@ -45,10 +45,12 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	private Date creation;
 
-	// Total number of documents direct children of the folder
-	private int documentCount;
+	// Total number of contained documents
+	private long documentCount;
 
-	private int subfolderCount;
+	private long subfolderCount;
+
+	private long size;
 
 	private int type;
 
@@ -244,19 +246,19 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.creation = creation;
 	}
 
-	public int getDocumentCount() {
+	public long getDocumentCount() {
 		return documentCount;
 	}
 
-	public void setDocumentCount(int documentCount) {
+	public void setDocumentCount(long documentCount) {
 		this.documentCount = documentCount;
 	}
 
-	public int getSubfolderCount() {
+	public long getSubfolderCount() {
 		return subfolderCount;
 	}
 
-	public void setSubfolderCount(int subfolderCount) {
+	public void setSubfolderCount(long subfolderCount) {
 		this.subfolderCount = subfolderCount;
 	}
 
@@ -523,12 +525,20 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	public void setBarcodeTemplateId(Long barcodeTemplateId) {
 		this.barcodeTemplateId = barcodeTemplateId;
 	}
-	
+
 	public String getTile() {
 		return tile;
 	}
 
 	public void setTile(String tile) {
 		this.tile = tile;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
 	}
 }

@@ -128,13 +128,13 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		FolderPagination pagination = paginations.get(folder.getId());
 		if (pagination == null) {
 			pagination = new FolderPagination(folder.getId(), Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN),
-					folder.getSubfolderCount(), 1);
+					(int)folder.getSubfolderCount(), 1);
 			// Save it only if there are more than one page
 			if (pagination.getTotalPages() >= 2)
 				paginations.put(folder.getId(), pagination);
 			currentPagination = pagination;
 		} else {
-			pagination.setTotalElements(folder.getSubfolderCount());
+			pagination.setTotalElements((int)folder.getSubfolderCount());
 			currentPagination = pagination;
 
 			// Remove from client and server if there are less than two pages

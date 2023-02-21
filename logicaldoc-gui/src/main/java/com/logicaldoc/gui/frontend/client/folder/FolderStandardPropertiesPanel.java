@@ -123,25 +123,32 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		barcode.setTitle(I18N.message("barcode"));
 		barcode.setValue(GWT.getHostPageBaseURL() + "barcode?code=" + folder.getId() + "&width=400&height=150");
 
-		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents", 
-				folder.getDocumentCount() > 0 ? Integer.toString(folder.getDocumentCount()) : "-");
+		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents",
+				folder.getDocumentCount() > 0 ? Util.formatLong(folder.getDocumentCount()) : "-");
 		documents.setIconHSpace(2);
 		documents.setIconWidth(16);
 		documents.setIconHeight(16);
 		documents.setWidth("1%");
 
-		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders", 
-				folder.getSubfolderCount() > 0 ? Integer.toString(folder.getSubfolderCount()) : "-");
+		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders",
+				folder.getSubfolderCount() > 0 ? Util.formatLong(folder.getSubfolderCount()) : "-");
 		subfolders.setIconHSpace(2);
 		subfolders.setIconWidth(16);
 		subfolders.setIconHeight(16);
 		subfolders.setWidth("1%");
 
-		addComputeStatsIcons(documents, subfolders);
+		final StaticTextItem size = ItemFactory.newStaticTextItem("size",
+				folder.getSize() > 0 ? Util.formatSize(folder.getSize()) : "-");
+		size.setIconHSpace(2);
+		size.setIconWidth(16);
+		size.setIconHeight(16);
+		size.setWidth("1%");
+
+		addComputeStatsIcons(documents, subfolders, size);
 
 		List<FormItem> items = new ArrayList<>();
 		items.addAll(Arrays.asList(new FormItem[] { idItem, pathItem, name, description, storage, maxVersions, creation,
-				documents, subfolders, barcode }));
+				documents, subfolders, size, barcode }));
 
 		if (!Feature.enabled(Feature.BARCODES))
 			items.remove(barcode);
@@ -159,7 +166,6 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		 */
 		prepareRightForm();
 
-		
 		columns.addMember(new FolderTile(folder, changedHandler));
 	}
 
@@ -185,11 +191,11 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		form1.setTitleOrientation(TitleOrientation.LEFT);
 	}
 
-	private void addComputeStatsIcons(final StaticTextItem documents, final StaticTextItem subfolders) {
+	private void addComputeStatsIcons(StaticTextItem documents, StaticTextItem subfolders, StaticTextItem size) {
 		PickerIcon computeStats = new PickerIcon(PickerIconName.REFRESH,
 				(final FormItemIconClickEvent computeStatsClick) -> {
 					computeStatsClick.getItem().setValue(I18N.message("computing") + "...");
-					FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<int[]>() {
+					FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<long[]>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -197,11 +203,13 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 						}
 
 						@Override
-						public void onSuccess(int[] stats) {
+						public void onSuccess(long[] stats) {
 							folder.setDocumentCount(stats[0]);
 							documents.setValue(Util.formatLong(stats[0]));
 							folder.setSubfolderCount(stats[1]);
 							subfolders.setValue(Util.formatLong(stats[1]));
+							folder.setSize(stats[2]);
+							size.setValue(Util.formatSize(stats[2]));
 						}
 					});
 				});
@@ -209,6 +217,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		documents.setIcons(computeStats);
 		subfolders.setIcons(computeStats);
+		size.setIcons(computeStats);
 	}
 
 	private LinkItem preparePathItem() {
@@ -384,8 +393,8 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		newTagItem.setEndRow(true);
 		newTagItem.setDisabled(!folder.isWrite());
 		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
-			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null && event.getKeyName() != null
-					&& "enter".equals(event.getKeyName().toLowerCase())) {
+			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
+					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();
 

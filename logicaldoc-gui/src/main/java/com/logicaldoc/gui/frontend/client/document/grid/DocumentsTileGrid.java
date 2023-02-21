@@ -470,7 +470,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		if (getGridCursor() != null) {
 			getGridCursor().setPageSize(pageSize);
 			if (folder != null)
-				getGridCursor().setTotalRecords(folder.getDocumentCount());
+				getGridCursor().setTotalRecords((int)folder.getDocumentCount());
 		}
 
 		return pageSize;
