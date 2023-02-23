@@ -23,4 +23,6 @@ public interface UpdateServiceAsync {
 	void getPatchNotes(String patchFileName, AsyncCallback<String[]> callback);
 
 	void downloadPatch(String userNo, String id, String fileName, long fileSize, AsyncCallback<Void> callback);
+	
+	void loadUpdate(AsyncCallback<String> callback);
 }

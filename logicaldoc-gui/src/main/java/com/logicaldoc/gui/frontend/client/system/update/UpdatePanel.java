@@ -19,11 +19,10 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -39,16 +38,36 @@ import com.smartgwt.client.widgets.layout.VLayout;
 public class UpdatePanel extends VLayout {
 
 	// Shows the install notes panel
-	VLayout notesPanel = new VLayout();
+	VLayout notesPanel;
 
-	private IButton download = new IButton(I18N.message("download"));
+	private IButton download;
+	
+	private IButton upload;
+
+	private IButton confirmUpdate;
 
 	public UpdatePanel() {
-		setMembersMargin(3);
+		setMembersMargin(3);	
 	}
 
 	@Override
 	public void onDraw() {
+		refresh();
+	}
+
+	void refresh() {
+		Util.removeChildren(this);
+		
+		notesPanel = new VLayout();
+		
+		download = new IButton(I18N.message("download"));
+		
+		upload = new IButton(I18N.message("uploadupdatepackage"));
+		upload.setAutoFit(true);
+		upload.addClickHandler(event -> new UpdateUploader(this).show());
+		
+		confirmUpdate = new IButton(I18N.message("confirmupdate"));
+		
 		if (!Feature.enabled(Feature.UPDATES)) {
 			setMembers(new FeatureDisabled(Feature.UPDATES));
 			return;
@@ -104,7 +123,7 @@ public class UpdatePanel extends VLayout {
 							message.setLayoutAlign(VerticalAlignment.TOP);
 							message.setHeight(20);
 
-							VLayout download = prepareDownloadProgress(parameters);
+							VLayout download = prepareActionsBar(parameters);
 
 							VLayout infoPanel = new VLayout();
 							infoPanel.setMembersMargin(10);
@@ -126,12 +145,13 @@ public class UpdatePanel extends VLayout {
 		Label label = new Label(I18N.message("updatepackagenotfound"));
 		label.setPadding(10);
 		label.setWrap(false);
-		label.setIcon("[SKIN]/Dialog/stop.png");
+		label.setIcon("[SKIN]/actions/accept.png");
 		label.setShowEdges(true);
 		label.setValign(VerticalAlignment.CENTER);
 		label.setAlign(Alignment.LEFT);
 		label.setWrap(true);
 		addMember(label);
+		addMember(upload);
 	}
 
 	private void onUpdateTemporarilyUnavailable(String reason) {
@@ -139,40 +159,31 @@ public class UpdatePanel extends VLayout {
 				I18N.message("updatepackagetemporarilynotavailable." + reason)));
 		label.setPadding(10);
 		label.setWrap(false);
-		label.setIcon("[SKIN]/Dialog/warn.png");
+		label.setIcon("[SKIN]/actions/help.png");
 		label.setShowEdges(true);
 		label.setValign(VerticalAlignment.CENTER);
 		label.setAlign(Alignment.LEFT);
 		label.setWrap(true);
 		addMember(label);
+		addMember(upload);
 	}
 
-	private VLayout prepareDownloadProgress(final GUIParameter[] parameters) {
+	private VLayout prepareActionsBar(final GUIParameter[] parameters) {
 
 		final String fileName = Util.getValue("file", parameters);
-
-		VLayout layout = new VLayout(4);
-		layout.setWidth100();
 
 		final Label barLabel = new Label(I18N.message("downloadprogress"));
 		barLabel.setHeight(16);
 		barLabel.setWrap(false);
-		layout.addMember(barLabel);
 
 		final Progressbar bar = new Progressbar();
 		bar.setHeight(24);
 		bar.setVertical(false);
 		bar.setLength(300);
-		layout.addMember(bar);
 
-		final IButton confirmUpdate = new IButton(I18N.message("confirmupdate"));
 		confirmUpdate.setAutoFit(true);
-		confirmUpdate.setVisible(false);
-		confirmUpdate.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				SC.ask(I18N.message("confirmupdate"), I18N.message("confirmupdatequestion"), new BooleanCallback() {
+		confirmUpdate.addClickHandler(event -> SC.ask(I18N.message("confirmupdate"),
+				I18N.message("confirmupdatequestion"), new BooleanCallback() {
 
 					@Override
 					public void execute(Boolean choice) {
@@ -205,67 +216,79 @@ public class UpdatePanel extends VLayout {
 							});
 						}
 					}
-				});
-			}
-		});
+				}));
 
 		download = new IButton(I18N.message("download"));
 		download.setAutoFit(true);
-		download.addClickHandler(new ClickHandler() {
+		download.addClickHandler(event -> {
+			bar.setPercentDone(0);
+			download.setDisabled(true);
+			UpdateService.Instance.get().downloadUpdate(Session.get().getInfo().getUserNo(),
+					Util.getValue("id", parameters), fileName, Long.parseLong(Util.getValue("size", parameters)),
+					new AsyncCallback<Void>() {
 
-			@Override
-			public void onClick(ClickEvent event) {
-				bar.setPercentDone(0);
-				download.setDisabled(true);
-				UpdateService.Instance.get().downloadUpdate(Session.get().getInfo().getUserNo(),
-						Util.getValue("id", parameters), fileName, Long.parseLong(Util.getValue("size", parameters)),
-						new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+							download.setDisabled(false);
+						}
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								download.setDisabled(false);
-							}
+						@Override
+						public void onSuccess(Void arg) {
+							confirmUpdate.setVisible(false);
 
-							@Override
-							public void onSuccess(Void arg) {
-								confirmUpdate.setVisible(false);
+							new Timer() {
+								public void run() {
+									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<int[]>() {
 
-								new Timer() {
-									public void run() {
-										UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<int[]>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+										@Override
+										public void onSuccess(int[] status) {
+											bar.setPercentDone(status[1]);
 
-											@Override
-											public void onSuccess(int[] status) {
-												bar.setPercentDone(status[1]);
-
-												if (status[1] == 100) {
-													download.setDisabled(false);
-													confirmUpdate.setVisible(true);
-													displayNotes(fileName);
-												} else
-													schedule(50);
-											}
-										});
-									}
-								}.schedule(50);
-							}
-						});
-			}
+											if (status[1] == 100)
+												onUpdatePackageLocallyAvailable(fileName);
+											else
+												schedule(50);
+										}
+									});
+								}
+							}.schedule(50);
+						}
+					});
 		});
 
+		boolean uploadFileAlreadyAvailableLocally = Util.getValue("updateFile", parameters) != null;
+		download.setVisible(!uploadFileAlreadyAvailableLocally);
+		confirmUpdate.setVisible(uploadFileAlreadyAvailableLocally);
+		
+		VLayout layout = new VLayout(4);
+		layout.setWidth100();
+		
+		if (!uploadFileAlreadyAvailableLocally) {
+			layout.addMember(barLabel);
+			layout.addMember(bar);
+		}
+		
 		HLayout buttonCanvas = new HLayout();
 		buttonCanvas.setMembersMargin(6);
-		buttonCanvas.setMembers(download, confirmUpdate);
-
+		buttonCanvas.setMembers(download, upload, confirmUpdate);
 		layout.addMember(buttonCanvas);
 
+		if (uploadFileAlreadyAvailableLocally)
+			onUpdatePackageLocallyAvailable(fileName);
+		
 		return layout;
+	}
+
+	private void onUpdatePackageLocallyAvailable(String fileName) {
+		download.setVisible(false);
+		confirmUpdate.setVisible(true);
+		displayNotes(fileName);
 	}
 
 	private void displayNotes(String fileName) {

@@ -30,6 +30,7 @@ import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.layout.Layout;
 
 /**
  * General utilities container for the GUI
@@ -1172,6 +1173,14 @@ public abstract class Util {
 				return param.getValue();
 		}
 		return null;
+	}
+
+	public static void removeChildren(Layout container) {
+		Canvas[] members = container.getMembers();
+		if (members != null)
+			for (Canvas member : members) {
+				container.removeChild(member);
+			}
 	}
 
 	public static native String getJavascriptVariable(String jsVar)/*-{

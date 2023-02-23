@@ -93,6 +93,11 @@ public interface UpdateService extends RemoteService {
 	 * @return download status code and download progress
 	 */
 	public int[] checkDownloadStatus();
+	
+	/**
+	 * Loads a new update package
+	 */
+	public String loadUpdate() throws ServerException;
 
 	public static class Instance {
 		private static UpdateServiceAsync instance;

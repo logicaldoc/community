@@ -1,6 +1,8 @@
 package com.logicaldoc.core.security;
 
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -173,7 +175,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		Session session = get(sid);
 		if (session != null) {
 			session.setClosed();
-			log.warn("Killed session {}", sid);
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			log.warn("Killed session {} of user {} started at {}", sid, session.getUsername(),
+					df.format(session.getCreation()));
 			storeSession(session);
 			for (SessionListener listener : listeners)
 				try {

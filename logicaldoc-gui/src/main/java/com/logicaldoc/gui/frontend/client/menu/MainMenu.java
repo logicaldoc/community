@@ -749,35 +749,32 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		MenuItem manuals = new MenuItem(I18N.message("manuals"));
 		manuals.addClickHandler((MenuItemClickEvent event) -> Window.open(
-				Session.get().getInfo().getBranding().getHelp() + "?lang=" + I18N.getLocale(), BLANK,
-				WINDOW_SETTNGS));
+				Session.get().getInfo().getBranding().getHelp() + "?lang=" + I18N.getLocale(), BLANK, WINDOW_SETTNGS));
 		menu.addItem(manuals);
 
 		MenuItem bugReport = new MenuItem(I18N.message("bug.report"));
-		bugReport.addClickHandler(
-				(MenuItemClickEvent event) -> Window.open(Session.get().getInfo().getBranding().getBugs(), BLANK,
-						WINDOW_SETTNGS));
+		bugReport.addClickHandler((MenuItemClickEvent event) -> Window
+				.open(Session.get().getInfo().getBranding().getBugs(), BLANK, WINDOW_SETTNGS));
 		if (Session.get().getInfo().getBranding().getBugs() != null
 				&& !"-".equals(Session.get().getInfo().getBranding().getBugs()))
 			menu.addItem(bugReport);
 
 		MenuItem forum = new MenuItem(I18N.message("forum"));
-		forum.addClickHandler(
-				(MenuItemClickEvent event) -> Window.open(Session.get().getInfo().getBranding().getForum(), BLANK,
-						WINDOW_SETTNGS));
+		forum.addClickHandler((MenuItemClickEvent event) -> Window
+				.open(Session.get().getInfo().getBranding().getForum(), BLANK, WINDOW_SETTNGS));
 		if (Session.get().getInfo().getBranding().getForum() != null
 				&& !"-".equals(Session.get().getInfo().getBranding().getForum()))
 			menu.addItem(forum);
 
 		MenuItem about = new MenuItem(I18N.message("about") + " " + Session.get().getInfo().getBranding().getProduct());
-		about.addClickHandler((MenuItemClickEvent event) -> new AboutDialog().show());
+		about.addClickHandler(event -> new AboutDialog().show());
 		menu.addItem(about);
 		return menu;
 	}
 
 	private void addLogoutButton() {
 		ToolStripButton logoutButton = AwesomeFactory.newToolStripButton("power-off", "logout");
-		logoutButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> Session.get().logout());
+		logoutButton.addClickHandler(event -> Session.get().logout());
 		addButton(logoutButton);
 	}
 

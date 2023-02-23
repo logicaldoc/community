@@ -170,7 +170,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 		if (session == null) {
 			// No SID already associated to the current session, so do it
-			session = request.getSession();
+			session = request.getSession(true);
 			if (sid != null)
 				LDSecurityContextRepository.bindServletSession(sid, request);
 		}

@@ -519,6 +519,9 @@
     <Logger name="org.hibernate" level="error" additivity="true">
       <AppenderRef ref="DB" />
     </Logger>
+    <Logger name="org.hibernate.cache" level="warn" additivity="true">
+      <AppenderRef ref="DB" />
+    </Logger>    
     <Logger name="com.logicaldoc.core" level="info" additivity="true" />
     <Logger name="com.logicaldoc.web" level="info" additivity="true" />
     <Logger name="com.logicaldoc.webdav" level="info" additivity="true" />
@@ -530,6 +533,7 @@
     <Logger name="org.apache.pdfbox" level="error" additivity="true" />
     <Logger name="org.apache.solr" level="error" additivity="true" />
     <Logger name="org.jgroups.protocols" level="error" additivity="true" />
+    <Logger name="org.hibernate.cache" level="warn" additivity="true" />
     <Logger name="com.logicaldoc.core.searchengine.IndexerTask" level="info" additivity="false">
       <Appender-Ref ref="IndexerTask" />
       <Appender-Ref ref="IndexerTask_WEB" />
