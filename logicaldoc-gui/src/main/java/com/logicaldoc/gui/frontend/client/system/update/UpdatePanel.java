@@ -19,7 +19,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
@@ -41,13 +40,13 @@ public class UpdatePanel extends VLayout {
 	VLayout notesPanel;
 
 	private IButton download;
-	
+
 	private IButton upload;
 
 	private IButton confirmUpdate;
 
 	public UpdatePanel() {
-		setMembersMargin(3);	
+		setMembersMargin(3);
 	}
 
 	@Override
@@ -57,17 +56,17 @@ public class UpdatePanel extends VLayout {
 
 	void refresh() {
 		Util.removeChildren(this);
-		
+
 		notesPanel = new VLayout();
-		
+
 		download = new IButton(I18N.message("download"));
-		
+
 		upload = new IButton(I18N.message("uploadupdatepackage"));
 		upload.setAutoFit(true);
 		upload.addClickHandler(event -> new UpdateUploader(this).show());
-		
+
 		confirmUpdate = new IButton(I18N.message("confirmupdate"));
-		
+
 		if (!Feature.enabled(Feature.UPDATES)) {
 			setMembers(new FeatureDisabled(Feature.UPDATES));
 			return;
@@ -265,15 +264,15 @@ public class UpdatePanel extends VLayout {
 		boolean uploadFileAlreadyAvailableLocally = Util.getValue("updateFile", parameters) != null;
 		download.setVisible(!uploadFileAlreadyAvailableLocally);
 		confirmUpdate.setVisible(uploadFileAlreadyAvailableLocally);
-		
+
 		VLayout layout = new VLayout(4);
 		layout.setWidth100();
-		
+
 		if (!uploadFileAlreadyAvailableLocally) {
 			layout.addMember(barLabel);
 			layout.addMember(bar);
 		}
-		
+
 		HLayout buttonCanvas = new HLayout();
 		buttonCanvas.setMembersMargin(6);
 		buttonCanvas.setMembers(download, upload, confirmUpdate);
@@ -281,7 +280,7 @@ public class UpdatePanel extends VLayout {
 
 		if (uploadFileAlreadyAvailableLocally)
 			onUpdatePackageLocallyAvailable(fileName);
-		
+
 		return layout;
 	}
 
