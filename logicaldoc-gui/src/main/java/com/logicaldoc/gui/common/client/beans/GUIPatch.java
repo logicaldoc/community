@@ -31,6 +31,8 @@ public class GUIPatch implements Serializable {
 
 	private int rating = 0;
 
+	private boolean local = false;
+
 	public String getId() {
 		return id;
 	}
@@ -119,5 +121,13 @@ public class GUIPatch implements Serializable {
 
 	public String getColor() {
 		return getColor(rating);
+	}
+
+	public boolean isLocal() {
+		return local;
+	}
+
+	public void setLocal(boolean local) {
+		this.local = local;
 	}
 }

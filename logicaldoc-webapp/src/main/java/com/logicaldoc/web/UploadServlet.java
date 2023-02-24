@@ -117,10 +117,18 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 *         value is the real file
 	 */
 	public static Map<String, File> getReceivedFiles(String sid) {
-		HttpSession session = SessionManager.get().getServletSession(sid);
-		if (session == null)
+		Session session = SessionManager.get().get(sid);
+
+		if (session != null && session.isOpen()) {
+			@SuppressWarnings("unchecked")
+			Map<String, File> uploadedFiles = (Map<String, File>) session.getDictionary().get(RECEIVED_FILES);
+			if (uploadedFiles == null) {
+				uploadedFiles = new HashMap<>();
+				session.getDictionary().put(RECEIVED_FILES, uploadedFiles);
+			}
+			return uploadedFiles;
+		} else
 			return null;
-		return getReceivedFiles(session);
 	}
 
 	/**
@@ -148,9 +156,8 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 */
 	public static void cleanReceivedFiles(String sid) {
 		FileUtil.strongDelete(getUploadDir(sid));
-		Map<String, File> uploadedFiles = getReceivedFiles(sid);
-		if (uploadedFiles != null)
-			uploadedFiles.clear();
+		if (getReceivedFiles(sid) != null)
+			getReceivedFiles(sid).clear();
 	}
 
 	/**
@@ -195,13 +202,12 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 		try {
 			String tenant = "default";
 			String sid = getSid(request);
-			
-			if (StringUtils.isEmpty(sid)) {
-				sid = "tmp";
-			} else {
+			File uploadDir;
+			if (StringUtils.isNotEmpty(sid)) {
 				tenant = SessionManager.get().get(sid).getTenantName();
-			}
-			File uploadDir = getUploadDir(sid);
+				uploadDir = getUploadDir(sid);
+			} else
+				uploadDir = getUploadDir(request.getSession(true));
 
 			// Check that we have a file upload request
 			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -234,7 +240,8 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			// maximum file size to be uploaded (in bytes)
 			upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
 
-			Map<String, File> uploadedFiles = "tmp".equals(sid) ? getReceivedFiles(request.getSession(true)) : getReceivedFiles(sid);
+			Map<String, File> uploadedFiles = StringUtils.isNotEmpty(sid) ? getReceivedFiles(sid)
+					: getReceivedFiles(request.getSession(true));
 
 			// Parse the request to get uploaded file items.
 			List<FileItem> fileItems = upload.parseRequest(request);

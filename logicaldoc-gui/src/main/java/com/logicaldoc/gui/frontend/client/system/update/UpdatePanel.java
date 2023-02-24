@@ -73,71 +73,68 @@ public class UpdatePanel extends VLayout {
 		}
 
 		LD.contactingServer();
-		UpdateService.Instance.get().checkUpdate(Session.get().getInfo().getUserNo(),
-				Session.get().getInfo().getRelease(), new AsyncCallback<GUIParameter[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-						onUpdateUnavailable();
-					}
+		UpdateService.Instance.get().checkUpdate(new AsyncCallback<GUIParameter[]>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				LD.clearPrompt();
+				GuiLog.serverError(caught);
+				onUpdateUnavailable();
+			}
 
-					@Override
-					public void onSuccess(GUIParameter[] parameters) {
-						LD.clearPrompt();
+			@Override
+			public void onSuccess(GUIParameter[] parameters) {
+				LD.clearPrompt();
 
-						if (parameters == null) {
-							onUpdateUnavailable();
-						} else if (parameters.length == 1 && parameters[0].getName().equals("error")) {
-							onUpdateTemporarilyUnavailable(parameters[0].getValue());
-						} else if (parameters != null) {
-							DynamicForm form = new DynamicForm();
-							form.setWidth(300);
-							form.setTitleOrientation(TitleOrientation.LEFT);
+				if (parameters == null) {
+					onUpdateUnavailable();
+				} else if (parameters.length == 1 && parameters[0].getName().equals("error")) {
+					onUpdateTemporarilyUnavailable(parameters[0].getValue());
+				} else if (parameters != null) {
+					DynamicForm form = new DynamicForm();
+					form.setWidth(300);
+					form.setTitleOrientation(TitleOrientation.LEFT);
 
-							StaticTextItem name = ItemFactory.newStaticTextItem("name",
-									Util.getValue("name", parameters));
-							name.setRequired(true);
+					StaticTextItem name = ItemFactory.newStaticTextItem("name", Util.getValue("name", parameters));
+					name.setRequired(true);
 
-							StaticTextItem date = ItemFactory.newStaticTextItem("date",
-									Util.getValue("date", parameters));
-							date.setRequired(true);
+					StaticTextItem date = ItemFactory.newStaticTextItem("date", Util.getValue("date", parameters));
+					date.setRequired(true);
 
-							StaticTextItem size = ItemFactory.newStaticTextItem("size",
-									Util.formatSize(Long.parseLong(Util.getValue("size", parameters))));
-							size.setRequired(true);
+					StaticTextItem size = ItemFactory.newStaticTextItem("size",
+							Util.formatSize(Long.parseLong(Util.getValue("size", parameters))));
+					size.setRequired(true);
 
-							StaticTextItem target = ItemFactory.newStaticTextItem("target", "updatesto",
-									Util.getValue("target", parameters));
-							target.setRequired(true);
+					StaticTextItem target = ItemFactory.newStaticTextItem("target", "updatesto",
+							Util.getValue("target", parameters));
+					target.setRequired(true);
 
-							form.setItems(name, date, size, target);
+					form.setItems(name, date, size, target);
 
-							Label message = new Label();
-							message.setContents(I18N.message("updatepackagefound"));
-							message.setWrap(false);
-							message.setAlign(Alignment.LEFT);
-							message.setStyleName("updateavailable");
-							message.setLayoutAlign(Alignment.LEFT);
-							message.setLayoutAlign(VerticalAlignment.TOP);
-							message.setHeight(20);
+					Label message = new Label();
+					message.setContents(I18N.message("updatepackagefound"));
+					message.setWrap(false);
+					message.setAlign(Alignment.LEFT);
+					message.setStyleName("updateavailable");
+					message.setLayoutAlign(Alignment.LEFT);
+					message.setLayoutAlign(VerticalAlignment.TOP);
+					message.setHeight(20);
 
-							VLayout download = prepareActionsBar(parameters);
+					VLayout download = prepareActionsBar(parameters);
 
-							VLayout infoPanel = new VLayout();
-							infoPanel.setMembersMargin(10);
-							infoPanel.setMembers(form, download);
+					VLayout infoPanel = new VLayout();
+					infoPanel.setMembersMargin(10);
+					infoPanel.setMembers(form, download);
 
-							HLayout body = new HLayout();
-							body.setWidth100();
-							body.setMembersMargin(50);
-							notesPanel.setWidth100();
-							body.setMembers(infoPanel, notesPanel);
+					HLayout body = new HLayout();
+					body.setWidth100();
+					body.setMembersMargin(50);
+					notesPanel.setWidth100();
+					body.setMembers(infoPanel, notesPanel);
 
-							setMembers(message, body);
-						}
-					}
-				});
+					setMembers(message, body);
+				}
+			}
+		});
 	}
 
 	private void onUpdateUnavailable() {
@@ -222,9 +219,8 @@ public class UpdatePanel extends VLayout {
 		download.addClickHandler(event -> {
 			bar.setPercentDone(0);
 			download.setDisabled(true);
-			UpdateService.Instance.get().downloadUpdate(Session.get().getInfo().getUserNo(),
-					Util.getValue("id", parameters), fileName, Long.parseLong(Util.getValue("size", parameters)),
-					new AsyncCallback<Void>() {
+			UpdateService.Instance.get().downloadUpdate(Util.getValue("id", parameters), fileName,
+					Long.parseLong(Util.getValue("size", parameters)), new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

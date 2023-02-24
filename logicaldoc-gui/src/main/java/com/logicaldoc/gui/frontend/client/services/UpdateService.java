@@ -22,27 +22,21 @@ public interface UpdateService extends RemoteService {
 	/**
 	 * Check if the current installation has an update package available
 	 * 
-	 * @param userNo The current UserNo
-	 * @param currentRelease The actual release
-	 * 
 	 * @return List of informations about the available update package or null
 	 */
-	public GUIParameter[] checkUpdate(String userNo, String currentRelease);
+	public GUIParameter[] checkUpdate();
 
 	/**
 	 * Check if the current installation has patches available
 	 * 
-	 * @param userNo The current UserNo
-	 * @param currentRelease The actual release
-	 * 
 	 * @return List of available patches
 	 */
-	public GUIPatch[] checkPatch(String userNo, String currentRelease);
+	public GUIPatch[] checkPatch();
 
-	void downloadUpdate(String userNo, String id, String fileName, long fileSize);
+	void downloadUpdate(String id, String fileName, long fileSize);
 
-	void downloadPatch(String userNo, String id, String fileName, long fileSize);
-	
+	void downloadPatch(String id, String fileName, long fileSize);
+
 	/**
 	 * Confirms an update package
 	 * 
@@ -86,18 +80,23 @@ public interface UpdateService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public String[] getPatchNotes(String patchFileName) throws ServerException;
-	
+
 	/**
 	 * Checks the status of the current download process
 	 * 
 	 * @return download status code and download progress
 	 */
 	public int[] checkDownloadStatus();
-	
+
 	/**
 	 * Loads a new update package
 	 */
 	public String loadUpdate() throws ServerException;
+
+	/**
+	 * Loads a new package
+	 */
+	public String loadPatch() throws ServerException;
 
 	public static class Instance {
 		private static UpdateServiceAsync instance;

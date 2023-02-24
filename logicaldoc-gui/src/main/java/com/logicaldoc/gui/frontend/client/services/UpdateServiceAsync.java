@@ -6,9 +6,9 @@ import com.logicaldoc.gui.common.client.beans.GUIPatch;
 
 public interface UpdateServiceAsync {
 
-	void checkUpdate(String userNo, String currentRelease, AsyncCallback<GUIParameter[]> callback);
+	void checkUpdate(AsyncCallback<GUIParameter[]> callback);
 
-	void downloadUpdate(String userNo, String id, String fileName, long fileSize, AsyncCallback<Void> callback);
+	void downloadUpdate(String id, String fileName, long fileSize, AsyncCallback<Void> callback);
 
 	void checkDownloadStatus(AsyncCallback<int[]> callback);
 
@@ -16,13 +16,15 @@ public interface UpdateServiceAsync {
 
 	void confirmUpdate(String updateFileName, AsyncCallback<String> callback);
 
-	void checkPatch(String userNo, String currentRelease, AsyncCallback<GUIPatch[]> callback);
+	void checkPatch(AsyncCallback<GUIPatch[]> callback);
 
 	void confirmPatch(String updateFileName, AsyncCallback<String> callback);
 
 	void getPatchNotes(String patchFileName, AsyncCallback<String[]> callback);
 
-	void downloadPatch(String userNo, String id, String fileName, long fileSize, AsyncCallback<Void> callback);
+	void downloadPatch(String id, String fileName, long fileSize, AsyncCallback<Void> callback);
 	
 	void loadUpdate(AsyncCallback<String> callback);
+	
+	void loadPatch(AsyncCallback<String> callback);
 }
