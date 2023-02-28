@@ -28,6 +28,7 @@ import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LoggingConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
+import com.logicaldoc.util.config.WebContextConfigurator;
 import com.logicaldoc.util.dbinit.DBInit;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
@@ -146,6 +147,18 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				String policy = "true".equals(conf.getProperty("ssl.required")) ? "CONFIDENTIAL" : "NONE";
 				WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
 				if (configurator.setTransportGuarantee(policy)) {
+					PluginRegistry.getInstance().setRestartRequired();
+				}
+			} catch (Throwable e) {
+				log.error(e.getMessage(), e);
+			}
+
+			// Update the cookies processor with the correct sameSite
+			try {
+				ContextProperties conf = new ContextProperties();
+				WebContextConfigurator configurator = new WebContextConfigurator(
+						context.getRealPath("/META-INF/context.xml"));
+				if (configurator.setSameSiteCookies(conf.getProperty("cookies.samesite", "unset"))) {
 					PluginRegistry.getInstance().setRestartRequired();
 				}
 			} catch (Throwable e) {

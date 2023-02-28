@@ -84,6 +84,7 @@ import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.SecurityConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
+import com.logicaldoc.util.config.WebContextConfigurator;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.sql.SqlUtil;
@@ -102,6 +103,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	private static final String SSL_REQUIRED = "ssl.required";
 
 	private static final String COOKIES_SECURE = "cookies.secure";
+
+	private static final String COOKIES_SAMESITE = "cookies.samesite";
 
 	private static final String ANONYMOUS_USER = ".anonymous.user";
 
@@ -262,7 +265,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	public GUISession getSession(String locale, String sid) {
 		try {
 			Session sess = null;
-			if(StringUtils.isEmpty(sid))
+			if (StringUtils.isEmpty(sid))
 				sess = validateSession(getThreadLocalRequest());
 			else
 				sess = validateSession(sid);
@@ -1002,6 +1005,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			securitySettings.setForceSsl("true".equals(pbean.getProperty(SSL_REQUIRED)));
 		if (StringUtils.isNotEmpty(pbean.getProperty(COOKIES_SECURE)))
 			securitySettings.setCookiesSecure("true".equals(pbean.getProperty(COOKIES_SECURE)));
+		securitySettings.setCookiesSameSite(pbean.getProperty(COOKIES_SAMESITE, "unset"));
 
 		securitySettings.setAlertNewDevice(pbean.getBoolean(session.getTenantName() + ".alertnewdevice", true));
 
@@ -1035,12 +1039,18 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			conf.setProperty(SECURITY_GEOLOCATION_APIKEY,
 					settings.getGeolocationKey() != null ? settings.getGeolocationKey() : "");
 
-			// Update the web.xml
 			try {
+				// Update the WEB-INF/web.xml
 				ServletContext context = getServletContext();
 				String policy = "true".equals(conf.getProperty(SSL_REQUIRED)) ? "CONFIDENTIAL" : "NONE";
 				WebConfigurator webConfigurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
 				restartRequired = webConfigurator.setTransportGuarantee(policy);
+
+				// Update the META-INF/context.xml
+				conf.setProperty(COOKIES_SAMESITE, settings.getCookiesSameSite());
+				WebContextConfigurator webContextConfigurator = new WebContextConfigurator(
+						context.getRealPath("/META-INF/context.xml"));
+				restartRequired = webContextConfigurator.setSameSiteCookies(settings.getCookiesSameSite());
 
 				// Update the context-security.xml
 				SecurityConfigurator secConfigurator = new SecurityConfigurator();

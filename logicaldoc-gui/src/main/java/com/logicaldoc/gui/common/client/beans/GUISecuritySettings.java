@@ -27,7 +27,7 @@ public class GUISecuritySettings implements Serializable {
 	private int pwdSpecial = 1;
 
 	private int pwdSequence = 3;
-	
+
 	private int pwdOccurrence = 3;
 
 	private Integer maxInactivity;
@@ -39,6 +39,8 @@ public class GUISecuritySettings implements Serializable {
 	private boolean enableAnonymousLogin = false;
 
 	private boolean cookiesSecure = false;
+
+	private String cookiesSameSite = "unset";
 
 	private boolean forceSsl = false;
 
@@ -246,12 +248,20 @@ public class GUISecuritySettings implements Serializable {
 	public void setPwdOccurrence(int pwdOccurrence) {
 		this.pwdOccurrence = pwdOccurrence;
 	}
-	
+
 	public boolean isCookiesSecure() {
 		return cookiesSecure;
 	}
 
 	public void setCookiesSecure(boolean cookiesSecure) {
 		this.cookiesSecure = cookiesSecure;
+	}
+
+	public String getCookiesSameSite() {
+		return cookiesSameSite;
+	}
+
+	public void setCookiesSameSite(String cookiesSameSite) {
+		this.cookiesSameSite = cookiesSameSite;
 	}
 }

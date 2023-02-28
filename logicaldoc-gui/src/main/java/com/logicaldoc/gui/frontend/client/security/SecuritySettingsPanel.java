@@ -30,7 +30,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -191,6 +190,15 @@ public class SecuritySettingsPanel extends AdminPanel {
 		allowSid.setRequired(true);
 		allowSid.setDisabled(Session.get().isDemo());
 
+		final SelectItem cookiesSameSite = ItemFactory.newSelectItem("cookiessamesite");
+		cookiesSameSite.setHint(I18N.message("cookiessamesitehint"));
+		cookiesSameSite.setWidth(90);
+		cookiesSameSite.setWrapTitle(false);
+		cookiesSameSite.setRequired(true);
+		cookiesSameSite.setDisabled(Session.get().isDemo());
+		cookiesSameSite.setValueMap("unset", "none", "lax", "strict");
+		cookiesSameSite.setValue(settings.getCookiesSameSite());
+
 		final RadioGroupItem secureCookies = ItemFactory.newBooleanSelector("secureCookies",
 				I18N.message("usesecurecookies"));
 		secureCookies.setValue(settings.isCookiesSecure() ? "yes" : "no");
@@ -210,8 +218,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 		contentSecurityPolicy.setWidth(400);
 
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, secureCookies,
-					forceSsl, contentSecurityPolicy);
+			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, cookiesSameSite,
+					secureCookies, forceSsl, contentSecurityPolicy);
 		else
 			securityForm.setFields(maxInactivity, savelogin, alertnewdevice);
 
@@ -288,6 +296,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 					.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes") ? true : false);
 			SecuritySettingsPanel.this.settings
 					.setCookiesSecure(values.get("secureCookies").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setCookiesSameSite(values.get("cookiessamesite").toString());
+
 			SecuritySettingsPanel.this.settings.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
 			SecuritySettingsPanel.this.settings.setContentSecurityPolicy(
 					values.get(CONTENTSECURITYPOLICY) != null ? values.get(CONTENTSECURITYPOLICY).toString() : null);
@@ -416,7 +426,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		TextItem anonymousKey = ItemFactory.newSimpleTextItem("anonymousKey", "key", settings.getAnonymousKey());
 		anonymousKey.setHintStyle("hint");
 		anonymousKey.setRequired(true);
-		anonymousKey.addChangedHandler((ChangedEvent event) -> {
+		anonymousKey.addChangedHandler(event -> {
 			if (event.getValue() != null)
 				url.setValue(Util.contextPath() + "frontend.jsp?anonymous=login&tenant=" + Session.get().getTenantName()
 						+ "&key=" + event.getValue().toString());
@@ -425,7 +435,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		anonymousUser = ItemFactory.newUserSelector("anonymousUser", "user", null, false, false);
 		anonymousUser.setHint(I18N.message("anonymoususerhint"));
 		anonymousUser.setHintStyle("hint");
-		anonymousUser.addChangedHandler((ChangedEvent event) -> {
+		anonymousUser.addChangedHandler(event -> {
 			if (anonymousUser.getSelectedRecord() == null) {
 				SecuritySettingsPanel.this.settings.setAnonymousUser(null);
 			} else {
