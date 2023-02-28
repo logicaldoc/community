@@ -67,6 +67,17 @@ public class ClassTool {
 	}
 
 	/**
+	 * Checks if a given string is null or empty
+	 * 
+	 * @param str the string to evaluate
+	 * 
+	 * @return true only if the passed string is null or empty
+	 */
+	public boolean isEmpty(String str) {
+		return StringUtils.isEmpty(str);
+	}
+
+	/**
 	 * Makes a copy(clone) of a given object instance.<br />
 	 * <p>
 	 * <b>Attention:</b> for security reasons it will not be used the cloned()
@@ -87,16 +98,5 @@ public class ClassTool {
 			log.error("Cannot make a copy of {}", instance, e);
 			return null;
 		}
-	}
-
-	/**
-	 * Checks if a given string is null
-	 * 
-	 * @param str the string to evaluate
-	 * 
-	 * @return true only if the passed string is null
-	 */
-	public boolean isEmptyStrin(String str) {
-		return StringUtils.isEmpty(str);
 	}
 }
