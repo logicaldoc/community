@@ -314,6 +314,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			// Use unique filename in the same folder
 			setUniqueFilename(doc);
 
+			if(doc.getTemplate()!=null)
+				merge(doc.getTemplate());
+			
 			// Save the document
 			saveOrUpdate(doc);
 			flush();

@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.widgets.preview;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -125,7 +126,7 @@ public class MailPreviewPanel extends VLayout {
 						@Override
 						public void onClick(ClickEvent event) {
 							String url = Util.downloadAttachmentURL(document.getId(), document.getFileVersion(),
-									doc.getFileName());
+									URL.encodeQueryString(doc.getFileName()));
 							Util.download(url);
 						}
 					});

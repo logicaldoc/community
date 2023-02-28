@@ -59,6 +59,8 @@ public abstract class AbstractEmailDialog extends Window {
 
 	protected IButton sendButton = new IButton();
 
+	protected String defaultMessage = null;
+
 	public AbstractEmailDialog() {
 		super();
 
@@ -84,7 +86,7 @@ public abstract class AbstractEmailDialog extends Window {
 		List<FormItem> fields = new ArrayList<FormItem>();
 		fields.add(from);
 
-		message = ItemFactory.newRichTextItemForEmail("message", "message", I18N.message("invitedyoutofillform"), null);
+		message = ItemFactory.newRichTextItemForEmail("message", "message", defaultMessage, null);
 		message.setWidth("*");
 		message.setHeight(200);
 		message.setBrowserSpellCheck(true);

@@ -237,7 +237,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					document.setFolder(originalFolder);
 					document.setVersion(originalVersion);
 					document.setFileVersion(originalFileVersion);
-					if(StringUtils.isNotEmpty(filename))
+					if (StringUtils.isNotEmpty(filename))
 						document.setFileName(filename);
 					else
 						document.setFileName(originalFileName);
@@ -803,11 +803,31 @@ public class DocumentManagerImpl implements DocumentManager {
 					throw new PersistenceException(message, e);
 				}
 
-			// Store the initial version (default 1.0)
+			// The document record has been written, now store the initial
+			// version (default 1.0)
 			Version vers = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
 					DocumentEvent.STORED.toString(), true);
+
+			// Wait for the document's record write
+			String documentWriteCheckQuery = "select count(*) from ld_document where ld_id=" + vers.getDocId();
+			int count = documentDAO.queryForInt(documentWriteCheckQuery);
+			int tests = 0;
+			while (count == 0 && tests < 100) {
+				count = documentDAO.queryForInt(documentWriteCheckQuery);
+				try {
+					Thread.sleep(100L);
+				} catch (InterruptedException e) {
+					// Nothing to do
+				}
+				tests++;
+			}
+
+			if (log.isDebugEnabled() && count > 0)
+				log.debug("Record of document {} has been written", docVO.getId());
+
 			versionDAO.store(vers);
-			log.debug("Stored version {}", vers.getVersion());
+			if (log.isDebugEnabled())
+				log.debug("Stored version {}", vers.getVersion());
 			return docVO;
 		}
 

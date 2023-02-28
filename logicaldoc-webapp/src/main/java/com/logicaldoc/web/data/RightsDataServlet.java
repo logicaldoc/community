@@ -86,7 +86,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder(
 				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_add, A.ld_security, A.ld_immutable, A.ld_delete, A.ld_rename, A.ld_import, A.ld_export, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download, ");
 		query.append(
-				" A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation, A.ld_storage from ld_foldergroup as A, ld_group B where A.ld_folderid = ");
+				" A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation, A.ld_storage from ld_foldergroup A, ld_group B where A.ld_folderid = ");
 		query.append("" + ref.getId());
 		query.append(" and B.ld_tenantid = " + ref.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
@@ -157,7 +157,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the folder group in join with groups
 		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type from ld_menugroup as A, ld_group B where A.ld_menuid = ");
+				"select A.ld_groupid, B.ld_name, B.ld_type from ld_menugroup A, ld_group B where A.ld_menuid = ");
 		query.append("" + menu.getId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + tenantId);
 		query.append(" order by B.ld_type asc, B.ld_name asc");
