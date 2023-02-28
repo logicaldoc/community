@@ -433,4 +433,13 @@ public class LD {
 		properties.setBodyStyle("contactingserver");
 		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("contactingserver")), properties);
 	}
+
+	public static void updatingServer() {
+		Dialog properties = new Dialog();
+		properties.setShowHeader(false);
+		properties.setShowHeaderBackground(false);
+		properties.setMembersMargin(0);
+		properties.setBodyStyle("contactingserver");
+		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("systemupdating")), properties);
+	}
 }

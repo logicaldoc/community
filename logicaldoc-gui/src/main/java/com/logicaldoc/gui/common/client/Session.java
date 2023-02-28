@@ -43,6 +43,9 @@ public class Session implements DocumentObserver {
 	private boolean showThumbnail = true;
 
 	private int missedPingCount = 0;
+	
+	// Flag indicating that the system is installing a update or patch
+	private boolean updating;
 
 	public static Session get() {
 		if (instance == null)
@@ -183,8 +186,9 @@ public class Session implements DocumentObserver {
 	
 	public void onInvalidSession() {
 		timer.cancel();
-		SessionTimeout.get().show();
 		Util.uninstallCloseWindowAlert();
+		if(!isUpdating())
+		SessionTimeout.get().show();
 	}
 
 	public void addObserver(SessionObserver observer) {
@@ -368,4 +372,13 @@ public class Session implements DocumentObserver {
 	public void setHiliteDocId(Long hiliteDocId) {
 		this.hiliteDocId = hiliteDocId;
 	}
+
+	public boolean isUpdating() {
+		return updating;
+	}
+
+	public void setUpdating(boolean updating) {
+		this.updating = updating;
+	}
+
 }

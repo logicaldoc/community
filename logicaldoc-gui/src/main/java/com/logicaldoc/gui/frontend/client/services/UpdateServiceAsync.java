@@ -27,4 +27,6 @@ public interface UpdateServiceAsync {
 	void loadUpdate(AsyncCallback<String> callback);
 	
 	void loadPatch(AsyncCallback<String> callback);
+	
+	void getStatus(String fileName, AsyncCallback<String[]> callback);
 }

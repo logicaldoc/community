@@ -16,8 +16,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to handle Google Drive settings.
@@ -53,13 +51,7 @@ public class GDriveAuthorization extends Window {
 
 		ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
 		authorize.setAutoFit(true);
-		authorize.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onAuthenticate();
-			}
-		});
+		authorize.addClickHandler(event -> onAuthenticate());
 		authorize.setEnableWhen(new AdvancedCriteria("acceptPrivacyPolicy", OperatorId.EQUALS, true));
 
 		String policyUrl = Session.get().getConfig("policy.google");
@@ -68,8 +60,6 @@ public class GDriveAuthorization extends Window {
 		CheckboxItem acceptPrivacyPolicy = ItemFactory.newCheckbox("acceptPrivacyPolicy",
 				"<a href='" + policyUrl + "' target='_blank'>" + I18N.message("havereadprivacypolicy") + "</a>");
 		acceptPrivacyPolicy.setRequired(true);
-
-//		acceptPrivacyPolicy.setHint("<a href='"+policyUrl+"' target='_blank'>"+ "I have read the privacy policy and authorize the processing of personal data" +"</a>");
 
 		form.setFields(clientId, clientSecret, acceptPrivacyPolicy, authorize);
 

@@ -316,8 +316,8 @@ public class ComparatorsPanel extends AdminPanel {
 	}
 
 	protected boolean isParameterAttribute(String name) {
-		if ("id".equals(name) || gridAttributeName.equals(name) || "in".equals(name) || LABEL.equals(name)
-				|| EENABLED.equals(name) || name.startsWith("_"))
+		if ("id".equals(name) || gridAttributeName.equals(name) || "out".equals(name) || "in".equals(name)
+				|| LABEL.equals(name) || EENABLED.equals(name) || name.startsWith("_"))
 			return false;
 		else
 			return true;

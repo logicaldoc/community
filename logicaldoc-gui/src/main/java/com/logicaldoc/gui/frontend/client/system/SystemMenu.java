@@ -78,8 +78,8 @@ public class SystemMenu extends VLayout {
 		final Button restart = new Button(I18N.message("restart"));
 		restart.setWidth100();
 		restart.setHeight(25);
-		restart.addClickHandler((ClickEvent event) -> SC.ask(I18N.message("restartalert"), (Boolean yes) -> {
-			if (Boolean.TRUE.equals(yes)) {
+		restart.addClickHandler(event -> SC.ask(I18N.message("restartalert"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
 				SystemService.Instance.get().restart(new AsyncCallback<Void>() {
 
 					@Override
@@ -160,7 +160,7 @@ public class SystemMenu extends VLayout {
 		Button updates = new Button(I18N.message("updatesandpatches"));
 		updates.setWidth100();
 		updates.setHeight(25);
-		updates.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new UpdateAndPatchPanel()));
+		updates.addClickHandler(event -> AdminScreen.get().setContent(new UpdateAndPatchPanel()));
 		addMember(updates);
 		updates.setDisabled(Session.get().isDemo());
 		updates.setVisible(Session.get().isDefaultTenant());
@@ -171,7 +171,7 @@ public class SystemMenu extends VLayout {
 		Button tenants = new Button(I18N.message("tenants"));
 		tenants.setWidth100();
 		tenants.setHeight(25);
-		tenants.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new TenantsPanel()));
+		tenants.addClickHandler(event -> AdminScreen.get().setContent(new TenantsPanel()));
 		if (Feature.visible(Feature.MULTI_TENANT) && Menu.enabled(Menu.TENANTS) && Session.get().isDefaultTenant()) {
 			addMember(tenants);
 			if (!Feature.enabled(Feature.MULTI_TENANT))
@@ -185,7 +185,7 @@ public class SystemMenu extends VLayout {
 		Button clustering = new Button(I18N.message("clustering"));
 		clustering.setWidth100();
 		clustering.setHeight(25);
-		clustering.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ClusteringPanel()));
+		clustering.addClickHandler(event -> AdminScreen.get().setContent(new ClusteringPanel()));
 		if (Feature.visible(Feature.CLUSTERING) && Menu.enabled(Menu.CLUSTERING) && Session.get().isDefaultTenant()) {
 			addMember(clustering);
 			if (!Feature.enabled(Feature.CLUSTERING))
@@ -204,8 +204,7 @@ public class SystemMenu extends VLayout {
 		Button branding = new Button(I18N.message("branding"));
 		branding.setWidth100();
 		branding.setHeight(25);
-		branding.addClickHandler(
-				(ClickEvent event) -> AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId())));
+		branding.addClickHandler(event -> AdminScreen.get().setContent(new BrandingPanel(Session.get().getTenantId())));
 		if (Feature.visible(Feature.BRANDING_STANDARD) && Menu.enabled(Menu.BRANDING)) {
 			addMember(branding);
 			if (!Feature.enabled(Feature.BRANDING_STANDARD))
@@ -218,7 +217,7 @@ public class SystemMenu extends VLayout {
 		Button tasks = new Button(I18N.message("scheduledtasks"));
 		tasks.setWidth100();
 		tasks.setHeight(25);
-		tasks.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new TasksPanel()));
+		tasks.addClickHandler(event -> AdminScreen.get().setContent(new TasksPanel()));
 		addMember(tasks);
 	}
 

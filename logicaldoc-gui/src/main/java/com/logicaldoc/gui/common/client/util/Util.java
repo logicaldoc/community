@@ -28,6 +28,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.widgets.ApplicationRestarting;
 import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -1063,7 +1064,9 @@ public abstract class Util {
 
 	public static void waitForUpAndRunning(String tenant, String locale) {
 		final String url = Util.getJavascriptVariable("j_loginurl") + "?tenant=" + tenant + AND_LOCALE_EQUAL + locale;
-
+		
+		LD.contactingServer();
+		
 		RequestBuilder checkRequest = new RequestBuilder(RequestBuilder.HEAD, url);
 		checkRequest.setCallback(new RequestCallback() {
 			@Override
@@ -1071,8 +1074,9 @@ public abstract class Util {
 				if (response.getStatusCode() > 199 && response.getStatusCode() < 300) {
 					Timer timer = new Timer() {
 						public void run() {
+							LD.clearPrompt();
 							CookiesManager.removeSid();
-							Util.redirect(url);
+							ApplicationRestarting.get(I18N.message("applicationisupagainpleaseclose")).show();
 						}
 					};
 					timer.schedule(5000);

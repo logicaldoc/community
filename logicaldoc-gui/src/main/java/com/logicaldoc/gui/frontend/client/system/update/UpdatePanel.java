@@ -1,8 +1,9 @@
 package com.logicaldoc.gui.frontend.client.system.update;
 
+import java.util.Date;
+
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -17,12 +18,12 @@ import com.logicaldoc.gui.frontend.client.services.UpdateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -44,6 +45,16 @@ public class UpdatePanel extends VLayout {
 	private IButton upload;
 
 	private IButton confirmUpdate;
+
+	private TextAreaItem log;
+
+	private ButtonItem ok;
+
+	private Date lastConfirmed = null;
+
+	private static long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
+
+	private String updateFileName;
 
 	public UpdatePanel() {
 		setMembersMargin(3);
@@ -90,6 +101,8 @@ public class UpdatePanel extends VLayout {
 				} else if (parameters.length == 1 && parameters[0].getName().equals("error")) {
 					onUpdateTemporarilyUnavailable(parameters[0].getValue());
 				} else if (parameters != null) {
+					updateFileName = Util.getValue("file", parameters);
+
 					DynamicForm form = new DynamicForm();
 					form.setWidth(300);
 					form.setTitleOrientation(TitleOrientation.LEFT);
@@ -165,9 +178,6 @@ public class UpdatePanel extends VLayout {
 	}
 
 	private VLayout prepareActionsBar(final GUIParameter[] parameters) {
-
-		final String fileName = Util.getValue("file", parameters);
-
 		final Label barLabel = new Label(I18N.message("downloadprogress"));
 		barLabel.setHeight(16);
 		barLabel.setWrap(false);
@@ -178,48 +188,14 @@ public class UpdatePanel extends VLayout {
 		bar.setLength(300);
 
 		confirmUpdate.setAutoFit(true);
-		confirmUpdate.addClickHandler(event -> SC.ask(I18N.message("confirmupdate"),
-				I18N.message("confirmupdatequestion"), new BooleanCallback() {
-
-					@Override
-					public void execute(Boolean choice) {
-						if (choice.booleanValue()) {
-							confirmUpdate.setVisible(false);
-							download.setVisible(false);
-							UpdateService.Instance.get().confirmUpdate(fileName, new AsyncCallback<String>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(String path) {
-									ApplicationRestarting.get(I18N.message("updaterunning", path.replace("\\\\", "/")))
-											.show();
-
-									final String tenant = Session.get().getUser().getTenant().getName();
-									Session.get().close();
-									CookiesManager.removeSid();
-
-									Timer timer = new Timer() {
-										public void run() {
-											Util.waitForUpAndRunning(tenant, I18N.getLocale());
-										}
-									};
-									timer.schedule(30000);
-								}
-							});
-						}
-					}
-				}));
+		confirmUpdate.addClickHandler(event -> onConfirm());
 
 		download = new IButton(I18N.message("download"));
 		download.setAutoFit(true);
 		download.addClickHandler(event -> {
 			bar.setPercentDone(0);
 			download.setDisabled(true);
-			UpdateService.Instance.get().downloadUpdate(Util.getValue("id", parameters), fileName,
+			UpdateService.Instance.get().downloadUpdate(Util.getValue("id", parameters), updateFileName,
 					Long.parseLong(Util.getValue("size", parameters)), new AsyncCallback<Void>() {
 
 						@Override
@@ -246,7 +222,7 @@ public class UpdatePanel extends VLayout {
 											bar.setPercentDone(status[1]);
 
 											if (status[1] == 100)
-												onUpdatePackageLocallyAvailable(fileName);
+												onUpdatePackageLocallyAvailable(updateFileName);
 											else
 												schedule(50);
 										}
@@ -275,7 +251,7 @@ public class UpdatePanel extends VLayout {
 		layout.addMember(buttonCanvas);
 
 		if (uploadFileAlreadyAvailableLocally)
-			onUpdatePackageLocallyAvailable(fileName);
+			onUpdatePackageLocallyAvailable(updateFileName);
 
 		return layout;
 	}
@@ -312,6 +288,93 @@ public class UpdatePanel extends VLayout {
 				form.setItems(updatenotes, changelog);
 
 				notesPanel.addMember(form);
+			}
+		});
+	}
+
+	private void switchLogView() {
+		Util.removeChildren(this);
+
+		DynamicForm form = new DynamicForm();
+		form.setWidth100();
+		form.setHeight100();
+		form.setAlign(Alignment.LEFT);
+		form.setColWidths("*");
+		form.setTitleOrientation(TitleOrientation.TOP);
+
+		log = ItemFactory.newTextAreaItem("log", "");
+		log.setWidth("*");
+
+		ok = new ButtonItem("ok", I18N.message("ok"));
+		ok.addClickHandler(event -> Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale()));
+		ok.setDisabled(true);
+
+		form.setItems(log, ok);
+
+		addMember(form);
+
+		getStatus();
+	}
+
+	private void getStatus() {
+		LD.updatingServer();
+		UpdateService.Instance.get().getStatus(updateFileName, new AsyncCallback<String[]>() {
+
+			@Override
+			public void onFailure(Throwable caugtht) {
+				scheduleGetStatus();
+			}
+
+			@Override
+			public void onSuccess(String[] status) {
+				log.setValue(status[1]);
+
+				Date now = new Date();
+				long elapsedTime = now.getTime() - lastConfirmed.getTime();
+
+				String statusLabel = status[0];
+
+				if ("processed".equals(statusLabel)) {
+					LD.clearPrompt();
+					ok.setDisabled(false);
+					GuiLog.info(I18N.message("updateinstalled"));
+				} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
+					LD.clearPrompt();
+					ApplicationRestarting.get(I18N.message("updatenotstarted", status[2])).show();
+				} else {
+					scheduleGetStatus();
+				}
+			}
+		});
+	}
+
+	private void scheduleGetStatus() {
+		new Timer() {
+			public void run() {
+				getStatus();
+			}
+		}.schedule(500);
+	}
+
+	private void onConfirm() {
+		SC.ask(I18N.message("confirmupdate"), I18N.message("confirmupdatequestion"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				confirmUpdate.setVisible(false);
+				download.setVisible(false);
+				UpdateService.Instance.get().confirmUpdate(updateFileName, new AsyncCallback<String>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(String path) {
+						Session.get().setUpdating(true);
+						switchLogView();
+						lastConfirmed = new Date();
+					}
+				});
 			}
 		});
 	}

@@ -130,79 +130,65 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		ListGridField read = new ListGridField("read", I18N.message("read"));
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
-		read.setAutoFitWidth(true);
 
 		ListGridField print = new ListGridField(PRINT, I18N.message(PRINT));
 		print.setType(ListGridFieldType.BOOLEAN);
 		print.setCanEdit(true);
-		print.setAutoFitWidth(true);
 
 		ListGridField download = new ListGridField(DOWNLOAD, I18N.message(DOWNLOAD));
 		download.setType(ListGridFieldType.BOOLEAN);
 		download.setCanEdit(true);
-		download.setAutoFitWidth(true);
 
 		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
-		write.setAutoFitWidth(true);
 
 		ListGridField add = new ListGridField("add", I18N.message("addfolder"));
 		add.setType(ListGridFieldType.BOOLEAN);
 		add.setCanEdit(true);
-		add.setAutoFitWidth(true);
 
 		ListGridField security = new ListGridField(SECURITY, I18N.message(SECURITY));
 		security.setType(ListGridFieldType.BOOLEAN);
 		security.setCanEdit(true);
-		security.setAutoFitWidth(true);
 
 		ListGridField immutable = new ListGridField(IMMUTABLE, I18N.message(IMMUTABLE));
 		immutable.setType(ListGridFieldType.BOOLEAN);
 		immutable.setCanEdit(true);
-		immutable.setAutoFitWidth(true);
 
 		ListGridField delete = new ListGridField(DELETE, I18N.message("ddelete"));
 		delete.setType(ListGridFieldType.BOOLEAN);
 		delete.setCanEdit(true);
-		delete.setAutoFitWidth(true);
 
 		ListGridField rename = new ListGridField(RENAME, I18N.message(RENAME));
 		rename.setType(ListGridFieldType.BOOLEAN);
 		rename.setCanEdit(true);
-		rename.setAutoFitWidth(true);
 
 		ListGridField iimport = new ListGridField(IMPORT, I18N.message("iimport"));
 		iimport.setType(ListGridFieldType.BOOLEAN);
 		iimport.setCanEdit(true);
-		iimport.setAutoFitWidth(true);
 
 		ListGridField export = new ListGridField(EXPORT, I18N.message("eexport"));
 		export.setType(ListGridFieldType.BOOLEAN);
 		export.setCanEdit(true);
-		export.setAutoFitWidth(true);
 
 		ListGridField password = new ListGridField(PASSWORD, I18N.message(PASSWORD));
 		password.setType(ListGridFieldType.BOOLEAN);
 		password.setCanEdit(true);
-		password.setAutoFitWidth(true);
 
 		ListGridField move = new ListGridField("move", I18N.message("move"));
 		move.setType(ListGridFieldType.BOOLEAN);
 		move.setCanEdit(true);
-		move.setAutoFitWidth(true);
 
 		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
 		email.setType(ListGridFieldType.BOOLEAN);
 		email.setCanEdit(true);
-		email.setAutoFitWidth(true);
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setAutoFetchData(true);
-		list.setRotateHeaderTitles(true);
+		list.setRotateHeaderTitles(!"ja".equals(I18N.getLocale()));
 		list.setHeaderHeight(100);
 		dataSource = new RightsDS(folder.getId(), true);
 		list.setDataSource(dataSource);
@@ -479,7 +465,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			ListGridField calendar = new ListGridField(CALENDAR, I18N.message(CALENDAR));
 			calendar.setType(ListGridFieldType.BOOLEAN);
 			calendar.setCanEdit(true);
-			calendar.setAutoFitWidth(true);
 			fields.add(calendar);
 		}
 	}
@@ -489,7 +474,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			ListGridField workflow = new ListGridField(WORKFLOW, I18N.message(WORKFLOW));
 			workflow.setType(ListGridFieldType.BOOLEAN);
 			workflow.setCanEdit(true);
-			workflow.setAutoFitWidth(true);
 			fields.add(workflow);
 		}
 	}
@@ -499,7 +483,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			ListGridField archive = new ListGridField(ARCHIVE, I18N.message(ARCHIVE));
 			archive.setType(ListGridFieldType.BOOLEAN);
 			archive.setCanEdit(true);
-			archive.setAutoFitWidth(true);
 			fields.add(archive);
 		}
 	}
@@ -509,7 +492,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			ListGridField sign = new ListGridField("sign", I18N.message("sign"));
 			sign.setType(ListGridFieldType.BOOLEAN);
 			sign.setCanEdit(true);
-			sign.setAutoFitWidth(true);
 			fields.add(sign);
 		}
 	}

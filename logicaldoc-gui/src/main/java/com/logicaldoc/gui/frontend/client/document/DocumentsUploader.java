@@ -58,7 +58,7 @@ public class DocumentsUploader extends Window {
 		setAutoSize(true);
 
 		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSend());
+		sendButton.addClickHandler(event -> onSend());
 		sendButton.setDisabled(true);
 
 		prepareForm();

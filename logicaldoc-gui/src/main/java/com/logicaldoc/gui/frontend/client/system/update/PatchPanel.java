@@ -1,11 +1,11 @@
 package com.logicaldoc.gui.frontend.client.system.update;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIPatch;
@@ -26,7 +26,6 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -34,6 +33,7 @@ import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -44,7 +44,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Patches check panel
@@ -78,6 +77,14 @@ public class PatchPanel extends VLayout {
 	private IButton confirmPatch = new IButton(I18N.message("confirmpatch"));
 
 	private IButton upload = new IButton(I18N.message("uploadpatch"));
+
+	private ButtonItem ok;
+
+	private TextAreaItem log;
+
+	private Date lastConfirmed = null;
+
+	private static long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
 
 	public PatchPanel() {
 		setMembersMargin(3);
@@ -187,8 +194,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void switchDetailView(GUIPatch patch) {
-		if (Boolean.TRUE.equals(contains(listPanel)))
-			removeMember(listPanel);
+		Util.removeChildren(this);
 
 		DynamicForm form = new DynamicForm();
 		form.setWidth100();
@@ -218,12 +224,7 @@ public class PatchPanel extends VLayout {
 		restart.setRequired(true);
 		restart.setWrapTitle(false);
 
-		StaticTextItem description = ItemFactory.newStaticTextItem(DESCRIPTION, patch.getDescription());
-		description.setWidth(500);
-		description.setRequired(true);
-		description.setWrapTitle(false);
-
-		form.setItems(name, date, size, restart, description);
+		form.setItems(name, date, size, restart);
 
 		Label message = new Label();
 		message.setContents(I18N.message("installpatch", patch.getName()));
@@ -252,6 +253,37 @@ public class PatchPanel extends VLayout {
 		downloadPanel.setMembers(message, body);
 
 		addMember(downloadPanel);
+	}
+
+	private void switchLogView(GUIPatch patch) {
+		Util.removeChildren(this);
+
+		DynamicForm form = new DynamicForm();
+		form.setWidth100();
+		form.setHeight100();
+		form.setAlign(Alignment.LEFT);
+		form.setColWidths("*");
+		form.setTitleOrientation(TitleOrientation.TOP);
+
+		log = ItemFactory.newTextAreaItem("log", "");
+		log.setWidth("*");
+
+		ok = new ButtonItem("back", I18N.message("ok"));
+		ok.addClickHandler(event -> onOk(patch));
+		ok.setDisabled(true);
+
+		form.setItems(log, ok);
+
+		addMember(form);
+
+		getStatus(patch);
+	}
+
+	private void onOk(GUIPatch patch) {
+		if (patch.isRestart())
+			Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
+		else
+			showList();
 	}
 
 	public void showList() {
@@ -309,8 +341,8 @@ public class PatchPanel extends VLayout {
 				bar.setPercentDone(0);
 				download.setDisabled(true);
 
-				UpdateService.Instance.get().downloadPatch(patch.getId(), fileName,
-						patch.getSize(), new AsyncCallback<Void>() {
+				UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
+						new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -337,7 +369,6 @@ public class PatchPanel extends VLayout {
 
 												if (status[1] == 100) {
 													download.setDisabled(false);
-
 													confirmPatch.setVisible(true);
 													displayNotes(fileName);
 												} else
@@ -356,6 +387,9 @@ public class PatchPanel extends VLayout {
 		buttonCanvas.setMembers(cancel, download, confirmPatch);
 
 		layout.addMember(buttonCanvas);
+
+		if (patch.isLocal())
+			displayNotes(fileName);
 
 		return layout;
 	}
@@ -406,11 +440,7 @@ public class PatchPanel extends VLayout {
 
 		MenuItem install = new MenuItem();
 		install.setTitle(I18N.message("install"));
-		install.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				switchDetailView(patch);
-			}
-		});
+		install.addClickHandler(event -> switchDetailView(patch));
 		install.setEnabled(!patch.isInstalled());
 
 		contextMenu.setItems(install);
@@ -418,46 +448,66 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void onConfirm(GUIPatch patch) {
-		SC.ask(I18N.message("confirmpatch"), I18N.message("confirmpatchquestion"), new BooleanCallback() {
+		SC.ask(I18N.message("confirmpatch"), I18N.message("confirmpatchquestion"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				confirmPatch.setVisible(false);
+				download.setVisible(false);
+				UpdateService.Instance.get().confirmPatch(patch.getFile(), new AsyncCallback<String>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(String path) {
+						Session.get().setUpdating(true);
+						cancel.setVisible(false);
+						switchLogView(patch);
+						lastConfirmed = new Date();
+					}
+				});
+			}
+		});
+	}
+
+	private void getStatus(GUIPatch patch) {
+		LD.updatingServer();
+		UpdateService.Instance.get().getStatus(patch.getFile(), new AsyncCallback<String[]>() {
 
 			@Override
-			public void execute(Boolean choice) {
-				if (choice.booleanValue()) {
-					confirmPatch.setVisible(false);
-					download.setVisible(false);
-					UpdateService.Instance.get().confirmPatch(patch.getFile(), new AsyncCallback<String>() {
+			public void onFailure(Throwable caugtht) {
+				scheduleGetStatus(patch);
+			}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			@Override
+			public void onSuccess(String[] status) {
+				log.setValue(status[1]);
 
-						@Override
-						public void onSuccess(String path) {
-							cancel.setVisible(false);
+				Date now = new Date();
+				long elapsedTime = now.getTime() - lastConfirmed.getTime();
 
-							if (!patch.isRestart()) {
-								ApplicationRestarting.get(I18N.message("patchrunning", path.replace("\\\\", "/")))
-										.show();
-							} else {
-								ApplicationRestarting.get(I18N.message("patchrunning1", path.replace("\\\\", "/")))
-										.show();
+				String statusLabel = status[0];
 
-								final String tenant = Session.get().getUser().getTenant().getName();
-								Session.get().close();
-								CookiesManager.removeSid();
-
-								Timer timer = new Timer() {
-									public void run() {
-										Util.waitForUpAndRunning(tenant, I18N.getLocale());
-									}
-								};
-								timer.schedule(30000);
-							}
-						}
-					});
+				if ("processed".equals(statusLabel)) {
+					LD.clearPrompt();
+					ok.setDisabled(patch.isRestart());
+					GuiLog.info(I18N.message("patchinstalled"));
+				} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
+					LD.clearPrompt();
+					ApplicationRestarting.get(I18N.message("patchnotstarted", status[2])).show();
+				} else {
+					scheduleGetStatus(patch);
 				}
 			}
 		});
+	}
+
+	private void scheduleGetStatus(GUIPatch patch) {
+		new Timer() {
+			public void run() {
+				getStatus(patch);
+			}
+		}.schedule(500);
 	}
 }
