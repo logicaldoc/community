@@ -326,7 +326,13 @@ public class DavResourceImpl implements DavResource, Serializable {
 						DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("size", resource.getContentLength(), ocns);
 						properties.add(defaultDavProperty);
 					} 				
-				}				
+				}
+				
+				// optional
+//				if (name.getName().equals("favorite")) {				 
+//					DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("favorite", 1L, ocns);
+//					properties.add(defaultDavProperty);			
+//				}				
 			}
 		}
 
