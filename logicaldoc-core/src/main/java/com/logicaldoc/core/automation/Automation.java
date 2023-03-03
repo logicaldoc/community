@@ -1,6 +1,7 @@
 package com.logicaldoc.core.automation;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -73,11 +75,30 @@ public class Automation {
 	 */
 	private static final Map<String, Object> systemDictionary = new ConcurrentHashMap<>();
 
-	public static synchronized void initialize() {
+	public static synchronized void initialize() {		
+		if(RuntimeSingleton.isInitialized())
+				return;
+		
+		Properties settings = null;
+		try (InputStream is = Automation.class.getResourceAsStream("/automation.properties")) {
+			if (is != null) {
+				settings = new Properties();
+				settings.load(is);
+			}
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
+			settings = null;
+		}
+
 		try {
-			RuntimeSingleton.init();
-			log.info("Automation initialized");
-		} catch (Throwable t) {
+			if (settings != null) {
+				RuntimeSingleton.init(settings);
+				log.info("Automation initialized with settings taken from automation.properties");
+			} else {
+				RuntimeSingleton.init();
+				log.info("Automation initialized with default settings");
+			}
+		} catch (Exception t) {
 			log.error("Unable to initialize the automation engine", t);
 		}
 	}
@@ -232,11 +253,9 @@ public class Automation {
 
 	private VelocityContext prepareContext(Map<String, Object> extendedDictionary) {
 		initialize();
-
 		VelocityContext context = new VelocityContext();
 		if (extendedDictionary != null)
 			context = new VelocityContext(extendedDictionary);
-
 		return context;
 	}
 

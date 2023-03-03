@@ -19,14 +19,12 @@ public class AutomationTest extends AbstractCoreTCase {
 
 	@Test
 	public void testAutomation() throws Exception {
-		{
-			Map<String, Object> dict=new HashMap<>();
-			dict.put("testval","abc");
-			
-			Automation automation = new Automation();
-			String output = automation.evaluate("pippo $testval", dict);
-			
-			Assert.assertEquals("pippo abc", output);
-		}
+		Map<String, Object> dict = new HashMap<>();
+		dict.put("testval", "abc");
+		
+		Automation automation = new Automation();
+		String output = automation.evaluate("pippo $testval", dict);
+
+		Assert.assertEquals("pippo abc", output);
 	}
 }

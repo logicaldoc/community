@@ -1454,20 +1454,19 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			List<Folder> childs = findByName(folder, name, folder.getTenantId(), true);
-			Folder dir = null;
-			if (childs.isEmpty()) {
+			long child = queryForLong("select ld_id from ld_folder where ld_parentid="+folder.getId()+" and ld_name='"+name+"' and ld_tenantid="+folder.getTenantId());
+			
+			if (child==0L) {
 				Folder folderVO = new Folder();
 				folderVO.setName(name);
 				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
-				dir = create(folder, folderVO, inheritSecurity,
+				folder = create(folder, folderVO, inheritSecurity,
 						transaction != null ? new FolderHistory(transaction) : null);
 				flush();
 			} else {
-				dir = childs.iterator().next();
-				initialize(dir);
+				folder=findById(child);
+				initialize(folder);
 			}
-			folder = dir;
 		}
 		return folder;
 	}
