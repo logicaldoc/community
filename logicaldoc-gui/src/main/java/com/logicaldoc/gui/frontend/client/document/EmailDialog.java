@@ -236,6 +236,9 @@ public class EmailDialog extends AbstractEmailDialog {
 		if (!currentMessage.endsWith("<br />"))
 			currentMessage += "<br /><br />";
 
-		message.setValue(currentMessage + SIGNATURE_SEPARATOR + "<br />" + (sgn != null ? sgn : ""));
+		if (sgn != null && !"".equals(sgn.trim()))
+			message.setValue(currentMessage + SIGNATURE_SEPARATOR + "<br />" + sgn);
+		else
+			message.setValue(currentMessage);
 	}
 }

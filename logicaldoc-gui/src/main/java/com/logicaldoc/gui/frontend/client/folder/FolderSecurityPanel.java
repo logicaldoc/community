@@ -108,6 +108,10 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		refresh(folder);
 	}
 
+	private String prepareHeaderLabel(String labelKey) {
+		return I18N.message(labelKey);
+	}
+
 	void refresh(GUIFolder folder) {
 		super.folder = folder;
 
@@ -127,59 +131,59 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		entity.setAutoFitWidth(true);
 		entity.setRotateTitle(false);
 
-		ListGridField read = new ListGridField("read", I18N.message("read"));
+		ListGridField read = new ListGridField("read", prepareHeaderLabel("read"));
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
 
-		ListGridField print = new ListGridField(PRINT, I18N.message(PRINT));
+		ListGridField print = new ListGridField(PRINT, prepareHeaderLabel(PRINT));
 		print.setType(ListGridFieldType.BOOLEAN);
 		print.setCanEdit(true);
 
-		ListGridField download = new ListGridField(DOWNLOAD, I18N.message(DOWNLOAD));
+		ListGridField download = new ListGridField(DOWNLOAD, prepareHeaderLabel(DOWNLOAD));
 		download.setType(ListGridFieldType.BOOLEAN);
 		download.setCanEdit(true);
 
-		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE));
+		ListGridField write = new ListGridField(WRITE, prepareHeaderLabel(WRITE));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 
-		ListGridField add = new ListGridField("add", I18N.message("addfolder"));
+		ListGridField add = new ListGridField("add", prepareHeaderLabel("addfolder"));
 		add.setType(ListGridFieldType.BOOLEAN);
 		add.setCanEdit(true);
 
-		ListGridField security = new ListGridField(SECURITY, I18N.message(SECURITY));
+		ListGridField security = new ListGridField(SECURITY, prepareHeaderLabel(SECURITY));
 		security.setType(ListGridFieldType.BOOLEAN);
 		security.setCanEdit(true);
 
-		ListGridField immutable = new ListGridField(IMMUTABLE, I18N.message(IMMUTABLE));
+		ListGridField immutable = new ListGridField(IMMUTABLE, prepareHeaderLabel(IMMUTABLE));
 		immutable.setType(ListGridFieldType.BOOLEAN);
 		immutable.setCanEdit(true);
 
-		ListGridField delete = new ListGridField(DELETE, I18N.message("ddelete"));
+		ListGridField delete = new ListGridField(DELETE, prepareHeaderLabel("ddelete"));
 		delete.setType(ListGridFieldType.BOOLEAN);
 		delete.setCanEdit(true);
 
-		ListGridField rename = new ListGridField(RENAME, I18N.message(RENAME));
+		ListGridField rename = new ListGridField(RENAME, prepareHeaderLabel(RENAME));
 		rename.setType(ListGridFieldType.BOOLEAN);
 		rename.setCanEdit(true);
 
-		ListGridField iimport = new ListGridField(IMPORT, I18N.message("iimport"));
+		ListGridField iimport = new ListGridField(IMPORT, prepareHeaderLabel("iimport"));
 		iimport.setType(ListGridFieldType.BOOLEAN);
 		iimport.setCanEdit(true);
 
-		ListGridField export = new ListGridField(EXPORT, I18N.message("eexport"));
+		ListGridField export = new ListGridField(EXPORT, prepareHeaderLabel("eexport"));
 		export.setType(ListGridFieldType.BOOLEAN);
 		export.setCanEdit(true);
 
-		ListGridField password = new ListGridField(PASSWORD, I18N.message(PASSWORD));
+		ListGridField password = new ListGridField(PASSWORD, prepareHeaderLabel(PASSWORD));
 		password.setType(ListGridFieldType.BOOLEAN);
 		password.setCanEdit(true);
 
-		ListGridField move = new ListGridField("move", I18N.message("move"));
+		ListGridField move = new ListGridField("move", prepareHeaderLabel("move"));
 		move.setType(ListGridFieldType.BOOLEAN);
 		move.setCanEdit(true);
 
-		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
+		ListGridField email = new ListGridField(EMAIL, prepareHeaderLabel(EMAIL));
 		email.setType(ListGridFieldType.BOOLEAN);
 		email.setCanEdit(true);
 
@@ -188,7 +192,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		list.setCanFreezeFields(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setAutoFetchData(true);
-		list.setRotateHeaderTitles(!"ja".equals(I18N.getLocale()));
+		list.setRotateHeaderTitles(true);
 		list.setHeaderHeight(100);
 		dataSource = new RightsDS(folder.getId(), true);
 		list.setDataSource(dataSource);
@@ -273,7 +277,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addStorage(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.MULTI_STORAGE)) {
-			ListGridField storage = new ListGridField(STORAGE, I18N.message(STORAGE));
+			ListGridField storage = new ListGridField(STORAGE, prepareHeaderLabel(STORAGE));
 			storage.setType(ListGridFieldType.BOOLEAN);
 			storage.setCanEdit(true);
 			storage.setAutoFitWidth(true);
@@ -283,7 +287,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addAutomation(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.AUTOMATION)) {
-			ListGridField automation = new ListGridField(AUTOMATION, I18N.message(AUTOMATION));
+			ListGridField automation = new ListGridField(AUTOMATION, prepareHeaderLabel(AUTOMATION));
 			automation.setType(ListGridFieldType.BOOLEAN);
 			automation.setCanEdit(true);
 			automation.setAutoFitWidth(true);
@@ -293,13 +297,50 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addSubscription(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.AUDIT)) {
-			ListGridField subscription = new ListGridField(SUBSCRIPTION, I18N.message(SUBSCRIPTION));
+			ListGridField subscription = new ListGridField(SUBSCRIPTION, prepareHeaderLabel(SUBSCRIPTION));
 			subscription.setType(ListGridFieldType.BOOLEAN);
 			subscription.setCanEdit(true);
 			subscription.setAutoFitWidth(true);
 			fields.add(subscription);
 		}
 	}
+	
+	private void addCalendar(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.CALENDAR)) {
+			ListGridField calendar = new ListGridField(CALENDAR, prepareHeaderLabel(CALENDAR));
+			calendar.setType(ListGridFieldType.BOOLEAN);
+			calendar.setCanEdit(true);
+			fields.add(calendar);
+		}
+	}
+
+	private void addWorkflow(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.WORKFLOW)) {
+			ListGridField workflow = new ListGridField(WORKFLOW,prepareHeaderLabel(WORKFLOW));
+			workflow.setType(ListGridFieldType.BOOLEAN);
+			workflow.setCanEdit(true);
+			fields.add(workflow);
+		}
+	}
+
+	private void addArchive(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.ARCHIVING) || Feature.enabled(Feature.IMPEX)) {
+			ListGridField archive = new ListGridField(ARCHIVE, prepareHeaderLabel(ARCHIVE));
+			archive.setType(ListGridFieldType.BOOLEAN);
+			archive.setCanEdit(true);
+			fields.add(archive);
+		}
+	}
+
+	private void addSign(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.DIGITAL_SIGNATURE)) {
+			ListGridField sign = new ListGridField("sign",prepareHeaderLabel("sign"));
+			sign.setType(ListGridFieldType.BOOLEAN);
+			sign.setCanEdit(true);
+			fields.add(sign);
+		}
+	}
+	
 
 	private void addButtons(GUIFolder folder) {
 		HLayout buttons = new HLayout();
@@ -457,42 +498,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 				}
 				contextClick.cancel();
 			});
-		}
-	}
-
-	private void addCalendar(List<ListGridField> fields) {
-		if (Feature.enabled(Feature.CALENDAR)) {
-			ListGridField calendar = new ListGridField(CALENDAR, I18N.message(CALENDAR));
-			calendar.setType(ListGridFieldType.BOOLEAN);
-			calendar.setCanEdit(true);
-			fields.add(calendar);
-		}
-	}
-
-	private void addWorkflow(List<ListGridField> fields) {
-		if (Feature.enabled(Feature.WORKFLOW)) {
-			ListGridField workflow = new ListGridField(WORKFLOW, I18N.message(WORKFLOW));
-			workflow.setType(ListGridFieldType.BOOLEAN);
-			workflow.setCanEdit(true);
-			fields.add(workflow);
-		}
-	}
-
-	private void addArchive(List<ListGridField> fields) {
-		if (Feature.enabled(Feature.ARCHIVING) || Feature.enabled(Feature.IMPEX)) {
-			ListGridField archive = new ListGridField(ARCHIVE, I18N.message(ARCHIVE));
-			archive.setType(ListGridFieldType.BOOLEAN);
-			archive.setCanEdit(true);
-			fields.add(archive);
-		}
-	}
-
-	private void addSign(List<ListGridField> fields) {
-		if (Feature.enabled(Feature.DIGITAL_SIGNATURE)) {
-			ListGridField sign = new ListGridField("sign", I18N.message("sign"));
-			sign.setType(ListGridFieldType.BOOLEAN);
-			sign.setCanEdit(true);
-			fields.add(sign);
 		}
 	}
 
