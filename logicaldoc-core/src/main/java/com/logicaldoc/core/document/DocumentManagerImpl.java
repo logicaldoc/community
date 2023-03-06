@@ -172,7 +172,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (version.getFileVersion().equals(fileVersion)) {
 					versionDAO.initialize(version);
 					version.setFileSize(fileSize);
-					storeVersion(version);
+					storeVersionAsync(version);
 				}
 			}
 
@@ -315,7 +315,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			version.setFileSize(document.getFileSize());
 			version.setDigest(null);
-			storeVersion(version);
+			storeVersionAsync(version);
 
 			log.debug("Stored version {}", version.getVersion());
 			log.debug("Invoke listeners after checkin");
@@ -619,7 +619,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				documentDAO.store(document, transaction);
 			}
 
-			storeVersion(version);
+			storeVersionAsync(version);
 
 			markAliasesToIndex(document.getId());
 		} else {
@@ -739,7 +739,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				documentDAO.store(doc, transaction);
 
-				storeVersion(version);
+				storeVersionAsync(version);
 			}
 		} else {
 			throw new PersistenceException(DOCUMENT_IS_IMMUTABLE);
@@ -808,23 +808,11 @@ public class DocumentManagerImpl implements DocumentManager {
 			Version version = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
 					DocumentEvent.STORED.toString(), true);
 
-			storeVersion(version);
+			storeVersionAsync(version);
 
 			return docVO;
 		}
 
-	}
-
-	private void storeVersion(Version version) throws PersistenceException {
-		try {
-			versionDAO.store(version);
-			if (log.isDebugEnabled())
-				log.debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
-		} catch (Exception e) {
-			log.warn("Got error {} trying to save the version, perhaps the document record has not been written yet",
-					e.getMessage(), e);
-			storeVersionAsync(version);
-		}
 	}
 
 	/**
@@ -1066,7 +1054,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 						DocumentEvent.RENAMED.toString(), false);
-				storeVersion(version);
+				storeVersionAsync(version);
 
 				transaction.setEvent(DocumentEvent.RENAMED.toString());
 				documentDAO.store(document, transaction);
