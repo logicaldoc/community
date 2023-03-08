@@ -410,7 +410,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		tDao.initialize(template);
+		tDao.initializeAttributes(template);
 
 		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 
@@ -421,7 +421,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		try {
 			Template currentTemplate = loadExtensibleObjectTemplate(template, extensibleObject);
 
-			initializeExtensibleObkectValues(template, currentTemplate, extensibleObject, sessionUser);
+			initializeExtensibleObjectValues(template, currentTemplate, extensibleObject, sessionUser);
 
 			Map<Long, AttributeSet> sets = setDao.load(template.getTenantId());
 
@@ -549,7 +549,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		}
 	}
 
-	private void initializeExtensibleObkectValues(Template template, Template currentTemplate,
+	private void initializeExtensibleObjectValues(Template template, Template currentTemplate,
 			ExtensibleObject extensibleObject, User sessionUser) {
 		if (extensibleObject != null && (extensibleObject.getId() == 0L || !template.equals(currentTemplate))) {
 			// Probably the GUI did not fill the attributes map at this

@@ -40,7 +40,7 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * @return Template with given type
 	 */
 	public List<Template> findByType(int type, long tenantId);
-	
+
 	/**
 	 * Finds all permissions of a user enabled on the specified template
 	 * 
@@ -50,7 +50,7 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * @return Collection of enabled permissions
 	 */
 	public Set<Permission> getEnabledPermissions(long templateId, long userId);
-	
+
 	/**
 	 * Returns if a template is writable for a user
 	 * 
@@ -70,4 +70,11 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * @return if the user can access the template
 	 */
 	public boolean isReadEnable(long templateId, long userId);
+
+	/**
+	 * Initializes the extended attributes only
+	 * 
+	 * @param template the instance to process
+	 */
+	public void initializeAttributes(Template template);
 }
