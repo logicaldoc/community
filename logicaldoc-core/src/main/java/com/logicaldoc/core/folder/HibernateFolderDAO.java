@@ -1454,20 +1454,19 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			List<Folder> childs = findByName(folder, name, folder.getTenantId(), true);
-			Folder dir = null;
-			if (childs.isEmpty()) {
+			long child = queryForLong("select ld_id from ld_folder where ld_parentid="+folder.getId()+" and ld_name='"+name+"' and ld_tenantid="+folder.getTenantId());
+			
+			if (child==0L) {
 				Folder folderVO = new Folder();
 				folderVO.setName(name);
 				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
-				dir = create(folder, folderVO, inheritSecurity,
+				folder = create(folder, folderVO, inheritSecurity,
 						transaction != null ? new FolderHistory(transaction) : null);
 				flush();
 			} else {
-				dir = childs.iterator().next();
-				initialize(dir);
+				folder=findById(child);
+				initialize(folder);
 			}
-			folder = dir;
 		}
 		return folder;
 	}
@@ -1892,10 +1891,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return new ArrayList<>();
 		long rootId = root.getId();
 
-		return findByWhere(
-				" (not " + ENTITY + ".id=" + rootId + ") " + AND + ENTITY + PARENTID_EQUAL + rootId + AND + ENTITY
-						+ ".type=" + Folder.TYPE_WORKSPACE + AND + ENTITY + TENANT_ID_EQUAL + tenantId,
-				"order by lower(" + ENTITY + ".name)", null);
+		
+		// We do this way because if using the HQL we will have all the collections initialized
+		@SuppressWarnings("unchecked")
+		List<Long> wsIds = (List<Long>)queryForList("select ld_id from ld_folder where (not ld_id="+rootId+") and ld_deleted=0 and ld_parentid="+rootId+" and ld_type="+Folder.TYPE_WORKSPACE+ " and ld_tenantid="+tenantId+ " order by lower(ld_name)", Long.class);
+		ArrayList<Folder> workspaces = new ArrayList<>();
+		for (Long wsId : wsIds) 
+			workspaces.add(findById(wsId));
+		return workspaces;
 	}
 
 	@Override

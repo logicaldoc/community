@@ -1511,15 +1511,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			FileUtil.strongDelete(zipFile);
 		}
 	}
-
+	
 	private void writeMessageWithThumbnail(EMail mail, Document doc, String message, Session session) {
 		File thumbnailFile = null;
 		try {
 			thumbnailFile = createTile(doc, session.getSid());
-			if (thumbnailFile != null) {
-				String thumb = thumbnailFile.toURI().toURL().toString();
-				mail.getImages().add(thumb);
-				message += "<p><img src='cid:image_1'/></p>";
+			if (thumbnailFile != null && thumbnailFile.length() > 0) {
+				message += "<p><img src='data:image/png;base64," + ImageUtil.encodeImage(thumbnailFile) + "'/></p>";
 			}
 			mail.setMessageText("<html><head><meta charset='utf-8' /></head><body>" + message + "<rl /></body></html>");
 		} catch (IOException ioe) {

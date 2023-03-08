@@ -50,6 +50,7 @@ import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.Context;
@@ -169,7 +170,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (version.getFileVersion().equals(fileVersion)) {
 					versionDAO.initialize(version);
 					version.setFileSize(fileSize);
-					versionDAO.store(version);
+					storeVersionAsync(version);
 				}
 			}
 
@@ -310,7 +311,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				version.setFileSize(document.getFileSize());
 				version.setDigest(null);
-				versionDAO.store(version);
+				storeVersionAsync(version);
 
 				log.debug("Stored version {}", version.getVersion());
 				log.debug("Invoke listeners after checkin");
@@ -619,7 +620,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				documentDAO.store(document, transaction);
 			}
 
-			versionDAO.store(version);
+			storeVersionAsync(version);
 
 			markAliasesToIndex(document.getId());
 		} else {
@@ -739,7 +740,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				documentDAO.store(doc, transaction);
 
-				versionDAO.store(version);
+				storeVersionAsync(version);
 			}
 		} else {
 			throw new PersistenceException(DOCUMENT_IS_IMMUTABLE);
@@ -825,12 +826,48 @@ public class DocumentManagerImpl implements DocumentManager {
 			if (log.isDebugEnabled() && count > 0)
 				log.debug("Record of document {} has been written", docVO.getId());
 
-			versionDAO.store(vers);
-			if (log.isDebugEnabled())
-				log.debug("Stored version {}", vers.getVersion());
+			storeVersionAsync(vers);
+			
 			return docVO;
 		}
 
+	}
+
+	/**
+	 * Saves a version in another thread waiting for the referenced document to
+	 * be available into the database.
+	 * 
+	 * @param version the version to save
+	 */
+	void storeVersionAsync(Version version) {
+		/*
+		 * Probably the document's record has not been written yet, we should
+		 * fork a thread to wait for it's write.
+		 */
+		ThreadPools.get().schedule(() -> {
+			try {
+				// Wait for the document's record write
+				String documentWriteCheckQuery = "select count(*) from ld_document where ld_id=" + version.getDocId();
+				int count = 0;
+				int tests = 0;
+				while (count == 0 && tests < 100) {
+					count = documentDAO.queryForInt(documentWriteCheckQuery);
+					try {
+						Thread.sleep(1000L);
+					} catch (Throwable ie) {
+						break;
+					}
+					tests++;
+				}
+
+				if (log.isDebugEnabled() && count > 0)
+					log.debug("Record of document {} has been written", version.getDocId());
+
+				versionDAO.store(version);
+			} catch (PersistenceException ex) {
+				log.error(ex.getMessage(), ex);
+			}
+		}, "VersionSave", 100L);
 	}
 
 	private void setAtributesForCreation(File file, Document docVO, DocumentHistory transaction) {
@@ -1033,7 +1070,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 						DocumentEvent.RENAMED.toString(), false);
-				versionDAO.store(version);
+				storeVersionAsync(version);
 
 				transaction.setEvent(DocumentEvent.RENAMED.toString());
 				documentDAO.store(document, transaction);

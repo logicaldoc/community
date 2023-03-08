@@ -385,7 +385,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		tDao.initialize(template);
+		tDao.initializeAttributes(template);
 
 		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 
