@@ -117,10 +117,18 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 *         value is the real file
 	 */
 	public static Map<String, File> getReceivedFiles(String sid) {
-		HttpSession session = SessionManager.get().getServletSession(sid);
-		if (session == null)
+		Session session = SessionManager.get().get(sid);
+
+		if (session != null && session.isOpen()) {
+			@SuppressWarnings("unchecked")
+			Map<String, File> uploadedFiles = (Map<String, File>) session.getDictionary().get(receivedFiles);
+			if (uploadedFiles == null) {
+				uploadedFiles = new HashMap<>();
+				session.getDictionary().put(receivedFiles, uploadedFiles);
+			}
+			return uploadedFiles;
+		} else
 			return null;
-		return getReceivedFiles(session);
 	}
 
 	/**
@@ -135,7 +143,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 		@SuppressWarnings("unchecked")
 		Map<String, File> uploadedFiles = (Map<String, File>) httpSession.getAttribute(receivedFiles);
 		if (uploadedFiles == null) {
-			uploadedFiles = new HashMap<String, File>();
+			uploadedFiles = new HashMap<>();
 			httpSession.setAttribute(receivedFiles, uploadedFiles);
 		}
 		return uploadedFiles;
@@ -234,7 +242,8 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			// maximum file size to be uploaded (in bytes)
 			upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
 
-			Map<String, File> uploadedFiles = "tmp".equals(sid) ? getReceivedFiles(request.getSession(true)) : getReceivedFiles(sid);
+			Map<String, File> uploadedFiles = StringUtils.isNotEmpty(sid) ? getReceivedFiles(sid)
+					: getReceivedFiles(request.getSession(true));
 
 			// Parse the request to get uploaded file items.
 			List<FileItem> fileItems = upload.parseRequest(request);
