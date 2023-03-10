@@ -638,23 +638,28 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive)
 			throws PersistenceException {
-		StringBuilder query = null;
+		
+		StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted = 0 and ");
 		if (caseSensitive)
-			query = new StringBuilder(ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "' ");
+			query.append("ld_name like '" + SqlUtil.doubleQuotes(name) + "' ");
 		else
-			query = new StringBuilder(
-					"lower(" + ENTITY + ".name) like '" + SqlUtil.doubleQuotes(name.toLowerCase()) + "' ");
+			query.append("lower(ld_name) like '" + SqlUtil.doubleQuotes(name.toLowerCase()) + "' ");
 
 		if (parent != null) {
-			query.append(AND + ENTITY + PARENTID_EQUAL + parent.getId());
+			query.append(AND + " ld_parentid=" + parent.getId());
 			if (tenantId == null)
-				query.append(AND + ENTITY + ".tenantId = " + parent.getTenantId());
+				query.append(AND + "ld_tenantid = " + parent.getTenantId());
 		}
 
 		if (tenantId != null)
-			query.append(AND + ENTITY + ".tenantId = " + tenantId);
+			query.append(AND + "ld_tenantid = " + tenantId);
 
-		return findByWhere(query.toString(), null, null);
+		@SuppressWarnings("unchecked")
+		List<Long> ids = (List<Long>) queryForList(query.toString(), Long.class);
+		List<Folder> folders = new ArrayList<Folder>();
+		for (Long id : ids)
+			folders.add(findById(id));
+		return folders;
 	}
 
 	@Override
