@@ -238,7 +238,7 @@ public class DocumentGridUtil {
 		} else {
 			rec.setAttribute(SUMMARY, rec.getAttribute(SUMMARY));
 
-			updateDocRef(doc, rec);
+			updateId(doc, rec);
 
 			rec.setAttribute(FILENAME, doc.getFileName());
 			rec.setAttribute("size", doc.getFileSize());
@@ -323,14 +323,9 @@ public class DocumentGridUtil {
 			rec.setAttribute("icon", doc.getIcon() + "-sc");
 	}
 
-	private static void updateDocRef(GUIDocument doc, Record rec) {
-		if (rec.getAttribute(DOCREF) == null || rec.getAttribute(DOCREF).isEmpty()) {
-			rec.setAttribute(DOCREF, doc.getDocRef());
-			rec.setAttribute("id", doc.getId());
-		} else {
-			rec.setAttribute("id", doc.getDocRef());
-			rec.setAttribute(DOCREF, doc.getId());
-		}
+	private static void updateId(GUIDocument doc, Record rec) {
+		rec.setAttribute("id", doc.getId());
+		rec.setAttribute(DOCREF, doc.getDocRef());
 		rec.setAttribute("docrefType", doc.getDocRefType());
 	}
 

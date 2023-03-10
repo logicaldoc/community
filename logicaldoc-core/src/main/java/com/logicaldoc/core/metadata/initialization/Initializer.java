@@ -55,7 +55,7 @@ public class Initializer {
 
 		try {
 			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			tDao.initialize(template);
+			tDao.initializeAttributes(template);
 			for (String attributeName : template.getAttributeNames()) {
 				try {
 					Attribute attribute = object.getAttribute(attributeName);
@@ -63,7 +63,6 @@ public class Initializer {
 					if (attribute != null && templateAttribute != null)
 						if (attribute.getValue() == null
 								&& StringUtils.isNotEmpty(templateAttribute.getInitialization())) {
-
 							executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
 						}
 				} catch (Throwable e) {
@@ -84,7 +83,9 @@ public class Initializer {
 		fieldValidationDictionary.put("attribute", attribute);
 
 		Automation script = new Automation("initializer-" + attributeName,
-				transaction!=null && transaction.getUser() != null ? transaction.getUser().getLocale() : Locale.getDefault(), object.getTenantId());
+				transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
+						: Locale.getDefault(),
+				object.getTenantId());
 		script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
 	}
 

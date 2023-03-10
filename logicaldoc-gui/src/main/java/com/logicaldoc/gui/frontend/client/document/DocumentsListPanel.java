@@ -91,7 +91,8 @@ public class DocumentsListPanel extends VLayout {
 			// Avoid server load in case of multiple selections
 			if (grid.getSelectedCount() != 1)
 				return;
-			DocumentService.Instance.get().getById(grid.getSelectedDocument().getId(),
+			GUIDocument selectedDocument = grid.getSelectedDocument();
+			DocumentService.Instance.get().getById(selectedDocument.getId(),
 					new AsyncCallback<GUIDocument>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -99,7 +100,7 @@ public class DocumentsListPanel extends VLayout {
 						}
 
 						@Override
-						public void onSuccess(GUIDocument doc) {
+						public void onSuccess(GUIDocument doc) {					
 							DocumentController.get().setCurrentDocument(doc);
 						}
 					});
