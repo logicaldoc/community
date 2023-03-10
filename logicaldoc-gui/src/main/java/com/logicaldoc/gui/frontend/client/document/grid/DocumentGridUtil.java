@@ -27,7 +27,7 @@ public class DocumentGridUtil {
 			ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
 		return ids;
 	}
-	
+
 	static public Long[] getIdsAsLong(Record[] records) {
 		Long[] ids = new Long[records.length];
 		for (int i = 0; i < records.length; i++)
@@ -61,7 +61,7 @@ public class DocumentGridUtil {
 				document.setVersion(record.getAttribute("version"));
 				document.setFileVersion(record.getAttribute("fileVersion"));
 				document.setLanguage(record.getAttribute("language"));
-				if(record.getAttribute("tenantId")!=null)
+				if (record.getAttribute("tenantId") != null)
 					document.setTenantId(record.getAttributeAsLong("tenantId"));
 
 				document.setPublisher(record.getAttributeAsString("publisher"));
@@ -162,15 +162,11 @@ public class DocumentGridUtil {
 			record.setAttribute("tenantId", doc.getTenantId());
 		} else {
 			record.setAttribute("summary", record.getAttribute("summary"));
-			if (record.getAttribute("docref") == null || record.getAttribute("docref").isEmpty()) {
-				record.setAttribute("docref", doc.getDocRef());
-				record.setAttribute("id", doc.getId());
-			} else {
-				record.setAttribute("id", doc.getDocRef());
-				record.setAttribute("docref", doc.getId());
-			}
 
+			record.setAttribute("id", doc.getId());
+			record.setAttribute("docref", doc.getDocRef());
 			record.setAttribute("docrefType", doc.getDocRefType());
+
 			record.setAttribute("filename", doc.getFileName());
 			record.setAttribute("size", doc.getFileSize());
 			record.setAttribute("pages", doc.getPages());
