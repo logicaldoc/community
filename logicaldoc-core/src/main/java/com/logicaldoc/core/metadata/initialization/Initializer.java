@@ -1,5 +1,7 @@
 package com.logicaldoc.core.metadata.initialization;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -7,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
@@ -54,8 +57,7 @@ public class Initializer {
 		setUser(transaction);
 
 		try {
-			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			tDao.initializeAttributes(template);
+			loadTemplateAttributes(template);
 			for (String attributeName : template.getAttributeNames()) {
 				try {
 					Attribute attribute = object.getAttribute(attributeName);
@@ -72,6 +74,42 @@ public class Initializer {
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}
+	}
+	
+	private void loadTemplateAttributes(Template template) throws PersistenceException {
+		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		tDao.query("SELECT ld_name,ld_label,ld_mandatory,ld_type,ld_position,ld_stringvalue,ld_intvalue,ld_doublevalue,"
+				+ "ld_datevalue,ld_editor,ld_setid,ld_hidden,ld_multiple,ld_parent,ld_stringvalues,ld_validation,"
+				+ "ld_initialization,ld_dependson, ld_readonly FROM ld_template_ext where ld_templateid = " + template.getId(), null,
+				new RowMapper<Attribute>() {
+
+					@Override
+					public Attribute mapRow(ResultSet rs, int row) throws SQLException {
+						Attribute attribute = new Attribute();
+						attribute.setName(rs.getString(1));
+						attribute.setLabel(rs.getString(2));
+						attribute.setMandatory(rs.getInt(3));
+						attribute.setType(rs.getInt(4));
+						attribute.setPosition(rs.getInt(5));
+						attribute.setStringValue(rs.getString(6));
+						attribute.setIntValue(rs.getLong(7));
+						attribute.setDoubleValue(rs.getDouble(8));
+						attribute.setDateValue(rs.getDate(9));
+						attribute.setEditor(rs.getInt(10));
+						attribute.setSetId(rs.getLong(11));
+						attribute.setHidden(rs.getInt(12));
+						attribute.setMultiple(rs.getInt(13));
+						attribute.setParent(rs.getString(14));
+						attribute.setStringValues(rs.getString(15));
+						attribute.setValidation(rs.getString(16));
+						attribute.setInitialization(rs.getString(17));
+						attribute.setDependsOn(rs.getString(18));
+						attribute.setReadonly(rs.getInt(19));
+
+						template.setAttribute(attribute.getName(), attribute);
+						return attribute;
+					}
+				}, null);
 	}
 
 	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,
