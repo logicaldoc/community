@@ -60,7 +60,7 @@ public class Validator {
 		Map<String, String> errors = new HashMap<>();
 
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		tDao.initialize(template);
+		tDao.initializeAttributes(template);
 		
 		// Validate each attribute
 		validateAttributes(object, template, transaction, errors);

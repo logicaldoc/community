@@ -77,4 +77,6 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * @param template the instance to process
 	 */
 	public void initializeAttributes(Template template);
+	
+	public void initialize(Template template);
 }

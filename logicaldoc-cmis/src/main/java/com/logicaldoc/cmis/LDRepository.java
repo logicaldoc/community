@@ -2072,7 +2072,7 @@ public class LDRepository {
 		if (template == null)
 			return;
 
-		templateDao.initialize(template);
+		templateDao.initializeAttributes(template);
 
 		String attributeName = p.getId().substring(TypeManager.PROP_EXT.length());
 		String stringValue = (String) p.getFirstValue();
