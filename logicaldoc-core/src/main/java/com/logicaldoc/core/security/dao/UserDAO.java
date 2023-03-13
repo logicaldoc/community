@@ -95,25 +95,6 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	public List<User> findByUsernameAndName(String username, String name);
 
 	/**
-	 * Validates an username and a password
-	 * 
-	 * @param username Username of the User to be validated
-	 * @param password Password of the User to be validated
-	 * 
-	 * @return True if User is valid and authenticated.
-	 */
-	public boolean validateUser(String username, String password);
-
-	/**
-	 * Validates an username only (the password content is not inspected).
-	 * 
-	 * @param username Username of the User to be validated.
-	 * 
-	 * @return True if User is valid.
-	 */
-	public boolean validateUser(String username);
-
-	/**
 	 * Is password expired.
 	 * 
 	 * @param username Username of the User to be validated.

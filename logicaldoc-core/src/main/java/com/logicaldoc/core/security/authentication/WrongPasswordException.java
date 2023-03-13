@@ -12,6 +12,10 @@ public class WrongPasswordException extends AuthenticationException {
 
 	private static final long serialVersionUID = 1L;
 
+	public WrongPasswordException() {
+		super(CODE);
+	}
+
 	public WrongPasswordException(Authenticator authenticator) {
 		super(authenticator, CODE);
 	}

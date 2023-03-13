@@ -38,7 +38,6 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.security.PasswordValidator;
 
 /**
@@ -143,8 +142,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			params.put(USERNAME, username);
 			params.put("name", name.toLowerCase());
 
-			return findByWhere(LOWER + ENTITY + ".name) like :name and " + ENTITY + ".username like :username",
-					params, null, null);
+			return findByWhere(LOWER + ENTITY + ".name) like :name and " + ENTITY + ".username like :username", params,
+					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -443,7 +442,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	/**
-	 * Saves an history to gridRecord the changes in the enabled status of a user
+	 * Saves an history to gridRecord the changes in the enabled status of a
+	 * user
 	 * 
 	 * @param user The current user
 	 * @param transaction the current session
@@ -544,63 +544,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			}
 			genericDAO.store(dash);
 		}
-	}
-
-	/**
-	 * @see com.logicaldoc.core.security.dao.UserDAO#validateUser(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public boolean validateUser(String username, String password) {
-		boolean result = true;
-
-		try {
-			User user = null;
-			if (ignoreCaseLogin())
-				user = findByUsernameIgnoreCase(username);
-			else
-				user = findByUsername(username);
-
-			if (!validateUser(user))
-				return false;
-
-			// Check the password match
-			if (user.getPassword() == null || !user.getPassword().equals(CryptUtil.cryptString(password)))
-				result = false;
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
-		}
-		return result;
-	}
-
-	@Override
-	public boolean validateUser(String username) {
-		boolean result = true;
-		try {
-			if (ignoreCaseLogin())
-				result = validateUser(findByUsername(username));
-			else
-				result = validateUser(findByUsernameIgnoreCase(username));
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
-		}
-		return result;
-	}
-
-	private boolean validateUser(User user) {
-		// Check the password match
-		if (user == null || (user.getType() != User.TYPE_DEFAULT && user.getType() != User.TYPE_READONLY))
-			return false;
-
-		// Check if the user is enabled
-		if (user != null && user.getEnabled() == 0)
-			return false;
-
-		if (isPasswordExpired(user.getUsername()))
-			return false;
-
-		return true;
 	}
 
 	private boolean isPasswordExpired(User user) {
