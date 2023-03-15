@@ -121,7 +121,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		emailSender = mock(EMailSender.class);
 		doNothing().when(emailSender).send(any(EMail.class));
 		DocumentServiceImpl.setEmailSender(emailSender);
-		
+
 		activateCorePlugin();
 	}
 
@@ -136,16 +136,16 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	private void activateCorePlugin() throws JpfException, IOException {
 		File pluginsDir = new File("target/tests-plugins");
 		pluginsDir.mkdir();
-		 		
+
 		File corePluginFile = new File(pluginsDir, "logicaldoc-core-plugin.jar");
-		
+
 		// copy plugin file to target resources
 		copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile.getAbsolutePath());
-		
-		PluginRegistry registry = PluginRegistry.getInstance();		
+
+		PluginRegistry registry = PluginRegistry.getInstance();
 		registry.init(pluginsDir.getAbsolutePath());
 	}
-	
+
 	private void prepareUploadedFiles() throws IOException {
 		File file3 = new File(repositoryDir.getPath() + "/docs/3/doc/1.0");
 		file3.getParentFile().mkdirs();
@@ -169,7 +169,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		uploadedFiles.put("file6.msg", file6);
 		uploadedFiles.put("file7.eml", file7);
 
-		servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
+		session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -385,7 +385,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(doc.getFileName(), tmpFile);
 
-			servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
+			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 			service.replaceFile(doc.getId(), doc.getFileVersion(), "replace");
 			Assert.assertTrue(service.getContentAsString(7).contains("replaced contents"));
 		} finally {
@@ -494,7 +494,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Map<String, File> uploadedFiles = new HashMap<>();
 		File file3 = new File("target/repository/docs/3/doc/1.0");
 		uploadedFiles.put("test.zip", file3);
-		servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
+		session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 		GUIDocument doc = service.getById(7);
 		Assert.assertEquals("1.0", doc.getVersion());
@@ -546,7 +546,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		// Remove the uploaded files
 		@SuppressWarnings("unchecked")
-		Map<String, File> uploadedFiles = (Map<String, File>) servletSession.getAttribute(UploadServlet.RECEIVED_FILES);
+		Map<String, File> uploadedFiles = (Map<String, File>) session.getDictionary().get(UploadServlet.RECEIVED_FILES);
 		uploadedFiles.clear();
 
 		doc.setId(0L);
@@ -563,12 +563,15 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		// Try with a user without permissions
 		prepareUploadedFiles();
+		
 		doc = service.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);
 		doc.setIndexed(0);
 		doc.setFolder(new FolderServiceImpl().getFolder(1201, false, false, false));
 		prepareSession("boss", "admin");
+		prepareUploadedFiles();
+		
 		createdDocs = service.addDocuments(true, UTF_8, false, doc);
 		Assert.assertEquals(0, createdDocs.length);
 
@@ -606,7 +609,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			uploadedFiles.put(pdf1.getName(), pdf1);
 			uploadedFiles.put(pdf2.getName(), pdf2);
 
-			servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
+			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			Assert.assertEquals(2, createdDocs.length);
@@ -636,7 +639,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(pdf2.getName(), pdf2);
 
-			servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
+			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			Assert.assertEquals(1, createdDocs.length);
@@ -697,7 +700,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertNotNull(conversion);
 		Assert.assertTrue(conversion.getFileName().endsWith(".pdf"));
 	}
-	
+
 	@Test
 	public void testIndex() throws ServerException, IOException {
 		searchEngine.init();
@@ -1172,8 +1175,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		retvalue = service.sendAsEmail(gmail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);
-		
-		
+
 		// Send the email with attached file as pdf conversion
 		gmail.setPdfConversion(true);
 		retvalue = service.sendAsEmail(gmail, "en-US");

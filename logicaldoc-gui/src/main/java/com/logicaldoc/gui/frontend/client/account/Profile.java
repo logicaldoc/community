@@ -138,6 +138,9 @@ public class Profile extends Window {
 		signature.setWidth(getWidth() - 60);
 		signature.setHeight(180);
 
+		PickerIcon clearSignature = new PickerIcon(PickerIcon.CLEAR, event -> event.getItem().setValue(""));
+		signature.setIcons(clearSignature);
+
 		emailForm.setFields(email, signature);
 
 		final DynamicForm emailForm2 = new DynamicForm();
@@ -158,19 +161,22 @@ public class Profile extends Window {
 		signature2.setWidth(getWidth() - 60);
 		signature2.setHeight(180);
 
+		PickerIcon clearSignature2 = new PickerIcon(PickerIcon.CLEAR, event -> event.getItem().setValue(""));
+		signature2.setIcons(clearSignature2);
+
 		emailForm2.setFields(email2, signature2);
 
 		SelectItem welcomeScreen = ItemFactory.newWelcomeScreenSelector(user.getWelcomeScreen());
 		SelectItem defaultWorkspace = ItemFactory.newWorkspaceSelector(user.getDefaultWorkspace());
 
-		PickerIcon clearDocsGrid = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+		PickerIcon clearDocsGrid = new PickerIcon(PickerIcon.CLEAR, event -> {
 			event.getItem().setValue(I18N.message(NOTCUSTOMIZED));
 			user.setDocsGrid(null);
 		});
 		clearDocsGrid.setWidth(12);
 		clearDocsGrid.setHeight(12);
 
-		PickerIcon clearHitsGrid = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+		PickerIcon clearHitsGrid = new PickerIcon(PickerIcon.CLEAR, event -> {
 			event.getItem().setValue(I18N.message(NOTCUSTOMIZED));
 			user.setHitsGrid(null);
 		});

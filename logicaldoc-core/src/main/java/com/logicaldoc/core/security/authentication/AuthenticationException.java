@@ -46,4 +46,8 @@ public class AuthenticationException extends RuntimeException {
 			return authenticator.getClass().getSimpleName() + " > " + baseString;
 
 	}
+
+	public void setAuthenticator(Authenticator authenticator) {
+		this.authenticator = authenticator;
+	}
 }

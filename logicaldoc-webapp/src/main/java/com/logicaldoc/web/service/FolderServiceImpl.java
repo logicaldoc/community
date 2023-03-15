@@ -1107,7 +1107,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		Template template = templateDao.findById(f.getTemplateId());
-		templateDao.initialize(template);
+		templateDao.initializeAttributes(template);
 
 		folder.setTemplate(template);
 		folder.setTemplateLocked(f.getTemplateLocked());

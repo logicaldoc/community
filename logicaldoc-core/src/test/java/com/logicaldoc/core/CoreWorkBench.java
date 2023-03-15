@@ -7,13 +7,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
@@ -30,17 +31,25 @@ import org.apache.http.message.BasicNameValuePair;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
-import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.io.ZipUtil;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
+
+import junit.framework.Assert;
 
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
+		URL url = new URL("http://www.example.com/collo");
+		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+
+		int responseCode = huc.getResponseCode();
+
+		System.out.println(""+responseCode);
 		
+		Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, responseCode);
+
 //		StringBuilder sb = new StringBuilder();
 //		Exec.exec("wmic cpu get loadpercentage", null, null, sb, 20);
 //		

@@ -7,6 +7,7 @@ import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.HibernateUserDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.util.crypt.CryptUtil;
 
 /**
  * This is the basic authentication mechanism, that searches for the user in the
@@ -35,14 +36,10 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			throws AuthenticationException {
 		User user = pickUser(username);
 
-		if (user == null) {
-			log.debug("User {} not found in local database", username);
-			throw new AccountNotFoundException(this);
-		}
-
 		validateUser(user);
 
-		if (!userDAO.validateUser(username, password))
+		// Check the password match
+		if (user.getPassword() == null || !user.getPassword().equals(CryptUtil.cryptString(password)))
 			throw new WrongPasswordException(this);
 
 		return user;
@@ -67,8 +64,16 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 	 * @throws AuthenticationException I something did not pass
 	 */
 	public void validateUser(User user) throws AuthenticationException {
-		if (user == null)
-			throw new AccountNotFoundException();
+		if (user == null) {
+			throw new AccountNotFoundException(this);
+		}
+
+		// Check the type
+		if ((user.getType() != User.TYPE_DEFAULT && user.getType() != User.TYPE_READONLY))
+			throw new AccountTypeNotAllowedException();
+
+		if (userDAO.isPasswordExpired(user.getUsername()))
+			throw new PasswordExpiredException(this);
 
 		userDAO.initialize(user);
 

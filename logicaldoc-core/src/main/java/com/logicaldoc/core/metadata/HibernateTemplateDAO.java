@@ -148,7 +148,19 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			// Nothing to do
 		}
 	}
+	
+	@Override
+	public void initializeAttributes(Template template) {
+		try {
+			refresh(template);
 
+			if (template.getAttributes() != null)
+				log.trace("Initialized {} attributes", template.getAttributes().keySet().size());
+		} catch (Throwable t) {
+			// Nothing to do
+		}		
+	}
+	
 	private boolean isWriteOrReadEnable(long templateId, long userId, boolean write) {
 		boolean result = true;
 		try {

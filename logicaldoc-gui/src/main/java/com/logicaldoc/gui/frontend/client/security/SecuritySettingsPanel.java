@@ -196,7 +196,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		cookiesSameSite.setWrapTitle(false);
 		cookiesSameSite.setRequired(true);
 		cookiesSameSite.setDisabled(Session.get().isDemo());
-		cookiesSameSite.setValueMap("unset", "none", "lax", "strict");
+		cookiesSameSite.setValueMap("unset", "lax", "strict");
 		cookiesSameSite.setValue(settings.getCookiesSameSite());
 
 		final RadioGroupItem secureCookies = ItemFactory.newBooleanSelector("secureCookies",

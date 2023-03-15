@@ -244,7 +244,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testStorePasswordChanged() throws PersistenceException {
-		
+
 		User user = dao.findById(1L);
 		dao.initialize(user);
 		Assert.assertEquals(0, user.getPasswordExpired());
@@ -265,7 +265,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(0, user.getPasswordExpired());
 		Assert.assertEquals(0, user.getPasswordExpires());
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
-		
+
 		try {
 			dao.store(user);
 			Assert.fail("an exception should have been raised at this point");
@@ -284,14 +284,6 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 
 		PasswordHistoryDAO pDao = (PasswordHistoryDAO) Context.get().getBean(PasswordHistoryDAO.class);
 		Assert.assertEquals(6, pDao.findByUserId(user.getId(), null).size());
-	}
-
-	@Test
-	public void testValidateUser() {
-		Assert.assertTrue(dao.validateUser("admin", "admin"));
-		Assert.assertFalse(dao.validateUser("admin", "adminPWD"));
-		Assert.assertFalse(dao.validateUser("xxxx", "admin"));
-		Assert.assertFalse(dao.validateUser("test", "admin"));
 	}
 
 	@Test

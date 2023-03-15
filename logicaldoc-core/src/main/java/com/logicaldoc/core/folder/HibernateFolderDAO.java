@@ -638,23 +638,28 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive)
 			throws PersistenceException {
-		StringBuilder query = null;
+		
+		StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted = 0 and ");
 		if (caseSensitive)
-			query = new StringBuilder(ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "' ");
+			query.append("ld_name like '" + SqlUtil.doubleQuotes(name) + "' ");
 		else
-			query = new StringBuilder(
-					"lower(" + ENTITY + ".name) like '" + SqlUtil.doubleQuotes(name.toLowerCase()) + "' ");
+			query.append("lower(ld_name) like '" + SqlUtil.doubleQuotes(name.toLowerCase()) + "' ");
 
 		if (parent != null) {
-			query.append(AND + ENTITY + PARENTID_EQUAL + parent.getId());
+			query.append(AND + " ld_parentid=" + parent.getId());
 			if (tenantId == null)
-				query.append(AND + ENTITY + ".tenantId = " + parent.getTenantId());
+				query.append(AND + "ld_tenantid = " + parent.getTenantId());
 		}
 
 		if (tenantId != null)
-			query.append(AND + ENTITY + ".tenantId = " + tenantId);
+			query.append(AND + "ld_tenantid = " + tenantId);
 
-		return findByWhere(query.toString(), null, null);
+		@SuppressWarnings("unchecked")
+		List<Long> ids = (List<Long>) queryForList(query.toString(), Long.class);
+		List<Folder> folders = new ArrayList<Folder>();
+		for (Long id : ids)
+			folders.add(findById(id));
+		return folders;
 	}
 
 	@Override
@@ -1454,20 +1459,20 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			List<Folder> childs = findByName(folder, name, folder.getTenantId(), true);
-			Folder dir = null;
-			if (childs.isEmpty()) {
+			long child = queryForLong("select ld_id from ld_folder where ld_parentid=" + folder.getId()
+					+ " and ld_name='" + name + "' and ld_tenantid=" + folder.getTenantId());
+
+			if (child == 0L) {
 				Folder folderVO = new Folder();
 				folderVO.setName(name);
 				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
-				dir = create(folder, folderVO, inheritSecurity,
+				folder = create(folder, folderVO, inheritSecurity,
 						transaction != null ? new FolderHistory(transaction) : null);
 				flush();
 			} else {
-				dir = childs.iterator().next();
-				initialize(dir);
+				folder = findById(child);
+				initialize(folder);
 			}
-			folder = dir;
 		}
 		return folder;
 	}
@@ -1892,10 +1897,16 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return new ArrayList<>();
 		long rootId = root.getId();
 
-		return findByWhere(
-				" (not " + ENTITY + ".id=" + rootId + ") " + AND + ENTITY + PARENTID_EQUAL + rootId + AND + ENTITY
-						+ ".type=" + Folder.TYPE_WORKSPACE + AND + ENTITY + TENANT_ID_EQUAL + tenantId,
-				"order by lower(" + ENTITY + ".name)", null);
+		// We do this way because if using the HQL we will have all the
+		// collections initialized
+		@SuppressWarnings("unchecked")
+		List<Long> wsIds = (List<Long>) queryForList("select ld_id from ld_folder where (not ld_id=" + rootId
+				+ ") and ld_deleted=0 and ld_parentid=" + rootId + " and ld_type=" + Folder.TYPE_WORKSPACE
+				+ " and ld_tenantid=" + tenantId + " order by lower(ld_name)", Long.class);
+		ArrayList<Folder> workspaces = new ArrayList<>();
+		for (Long wsId : wsIds)
+			workspaces.add(findById(wsId));
+		return workspaces;
 	}
 
 	@Override
@@ -2193,7 +2204,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
-		
+
 		transaction.setEvent(FolderEvent.CHANGED.toString());
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
@@ -2210,7 +2221,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			store(folder, tr);
 			flush();
-			
+
 			applyOCRToTree(folder.getId(), transaction);
 		}
 	}

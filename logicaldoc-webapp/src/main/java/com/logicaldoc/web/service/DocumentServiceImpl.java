@@ -228,7 +228,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public GUIDocument[] addDocuments(boolean importZip, String charset, boolean immediateIndexing,
 			final GUIDocument metadata) throws ServerException {
 		final Session session = validateSession(getThreadLocalRequest());
-
+		
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 
 		List<GUIDocument> createdDocs = new ArrayList<>();

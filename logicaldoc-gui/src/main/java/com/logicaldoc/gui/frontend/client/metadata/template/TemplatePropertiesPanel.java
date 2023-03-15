@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -369,14 +371,28 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareInitializationItem() {
 		MenuItem initialization = new MenuItem();
 		initialization.setTitle(I18N.message(INITIALIZATION));
-		initialization.addClickHandler((MenuItemClickEvent event) -> {
+		initialization.addClickHandler(event -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
+			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+
 			TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation(INITIALIZATION, null, null,
 					false);
 			initializationItem.setWidth(600);
 			initializationItem.setHeight(400);
 
-			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+			FormItemIcon initializationComposer = new FormItemIcon();
+			initializationComposer.setName("composer");
+			initializationComposer.setWidth(16);
+			initializationComposer.setHeight(16);
+			initializationComposer.setSrc("[SKIN]/cog.png");
+			initializationComposer.setPrompt(I18N.message("openinitializatorcomposer"));
+			initializationComposer.addFormItemClickHandler(
+					initializationComposerClick -> new AttributeInitializerComposer(initializationItem,
+							attribute.getType()).show());
+			List<FormItemIcon> initializationIcons = new ArrayList<>();
+			initializationIcons.addAll(Arrays.asList(initializationItem.getIcons()));
+			initializationIcons.add(initializationComposer);
+			initializationItem.setIcons(initializationIcons.toArray(new FormItemIcon[0]));
 
 			LD.askForValue(I18N.message(INITIALIZATION), I18N.message(INITIALIZATION), attribute.getInitialization(),
 					initializationItem, 600, (String initializationScript) -> {
@@ -406,13 +422,27 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareValidationItem() {
 		MenuItem validation = new MenuItem();
 		validation.setTitle(I18N.message(VALIDATION));
-		validation.addClickHandler((MenuItemClickEvent event) -> {
+		validation.addClickHandler(event -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
+			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+			
 			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation(VALIDATION, null, null, false);
 			validationItem.setWidth(600);
 			validationItem.setHeight(400);
 
-			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+			FormItemIcon validationComposer = new FormItemIcon();
+			validationComposer.setName("composer");
+			validationComposer.setWidth(16);
+			validationComposer.setHeight(16);
+			validationComposer.setSrc("[SKIN]/cog.png");
+			validationComposer.setPrompt(I18N.message("openvalidatorcomposer"));
+			validationComposer.addFormItemClickHandler(
+					validationComposerClick -> new AttributeValidatorComposer(validationItem, attribute.getType())
+							.show());
+			List<FormItemIcon> validationIcons = new ArrayList<>();
+			validationIcons.addAll(Arrays.asList(validationItem.getIcons()));
+			validationIcons.add(validationComposer);
+			validationItem.setIcons(validationIcons.toArray(new FormItemIcon[0]));
 
 			LD.askForValue(I18N.message(VALIDATION), I18N.message(VALIDATION), attribute.getValidation(),
 					validationItem, 600, (String validationScript) -> {

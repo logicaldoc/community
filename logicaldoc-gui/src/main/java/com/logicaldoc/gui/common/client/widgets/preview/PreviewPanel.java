@@ -65,7 +65,7 @@ public class PreviewPanel extends VLayout {
 
 	public PreviewPanel(final GUIDocument document) {
 		this.document = document;
-		this.docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
+		this.docId = document.getId();
 
 		if (!Menu.enabled(Menu.PREVIEW)) {
 			showDisabledPanel();

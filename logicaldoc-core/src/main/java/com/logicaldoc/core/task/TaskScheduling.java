@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.quartz.Scheduler;
+import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.utils.Key;
 import org.slf4j.Logger;
@@ -74,20 +75,10 @@ public class TaskScheduling {
 
 	public Date getNextFireTime() {
 		Object trigger = (Object) Context.get().getBean(taskName + "Trigger");
-		if (!(trigger instanceof TaskTrigger))
-			return null;
 
-		// The following loop 'while' is needed to update the next execution
-		// time of the task into the Task list page
-		if (TaskTrigger.MODE_CRON.equals(getMode())) {
-			return ((TaskTrigger) trigger).getObject().getFireTimeAfter(previousFireTime);
-		} else {
-			if (previousFireTime != null) {
-				long next = previousFireTime.getTime() + this.getInterval();
-				return new Date(next);
-			} else
-				return null;
-		}
+		if (!(trigger instanceof Trigger))
+			return null;
+		else return ((Trigger)trigger).getNextFireTime();
 	}
 
 	public boolean isEnabled() {

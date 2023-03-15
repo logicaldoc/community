@@ -92,7 +92,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 		} else {
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			Template template = dao.findById(templateId);
-			dao.initialize(template);
+			dao.initializeAttributes(template);
 			List<String> names = template.getAttributeNames();
 			for (String name : names)
 				attributes.put(name, template.getAttribute(name));
