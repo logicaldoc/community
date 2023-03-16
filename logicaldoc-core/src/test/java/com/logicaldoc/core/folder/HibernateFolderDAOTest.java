@@ -1,5 +1,7 @@
 package com.logicaldoc.core.folder;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Collection;
@@ -101,7 +103,22 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 				null);
 		Assert.assertNotNull(folder);
 		Assert.assertEquals("research  development", folder.getName());
+		
+		folder = dao.createPath(docsFolder, "/Capo d'Orlando 05-35632/Comunicazioni ingresso", true, null);
+		Assert.assertNotNull(folder);
+		folder = dao.findById(folder.getParentId());
+		Assert.assertEquals("Capo d'Orlando 05-35632", folder.getName());
 	}
+	
+	@Test
+	public void testCount() throws PersistenceException {
+		int docCount = dao.count(false);
+		System.out.println("Deleted Documents count: " + docCount);
+		int docCountDelete = dao.count(true);
+		System.out.println("Total Documents count: " + docCountDelete);
+		assertEquals(4, docCount);
+		assertEquals(7, docCountDelete);
+	}	
 
 	@Test
 	public void testFind() throws PersistenceException {
@@ -125,7 +142,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testCountDocuments() throws PersistenceException {
+	public void testCountDocsInTree() throws PersistenceException {
 		/*
 		 * Make sure to compute all the paths
 		 */
