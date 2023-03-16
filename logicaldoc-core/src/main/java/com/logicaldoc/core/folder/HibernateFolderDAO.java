@@ -1459,8 +1459,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			long child = queryForLong("select ld_id from ld_folder where ld_parentid=" + folder.getId()
-					+ " and ld_name='" + name + "' and ld_tenantid=" + folder.getTenantId());
+			long child = queryForLong("SELECT ld_id FROM ld_folder WHERE ld_parentid=? AND ld_name=? AND ld_tenantid=?", 
+					folder.getId(), name, folder.getTenantId());
 
 			if (child == 0L) {
 				Folder folderVO = new Folder();
@@ -1883,7 +1883,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public int count(boolean computeDeleted) {
 		try {
 			return queryForInt(
-					"SELECT COUNT(A.ld_id) FROM ld_document A " + (computeDeleted ? "" : "where A.ld_deleted = 0 "));
+					"SELECT COUNT(A.ld_id) FROM ld_document A " + (computeDeleted ? "" : "WHERE A.ld_deleted = 0 "));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return 0;
