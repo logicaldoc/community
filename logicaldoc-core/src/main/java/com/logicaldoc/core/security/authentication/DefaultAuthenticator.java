@@ -1,8 +1,5 @@
 package com.logicaldoc.core.security.authentication;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.HibernateUserDAO;
@@ -17,8 +14,6 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @since 4.5
  */
 public class DefaultAuthenticator extends AbstractAuthenticator {
-
-	private static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
 	protected UserDAO userDAO;
 
