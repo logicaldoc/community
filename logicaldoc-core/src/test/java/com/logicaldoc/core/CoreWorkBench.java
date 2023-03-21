@@ -163,7 +163,7 @@ public class CoreWorkBench {
 //		docs.add(doc3);
 //		docs.add(doc4);
 //
-//		Collections.sort(docs, DocumentComparator.getComparator("filename desc, date asc"));
+//		Collections.sort(docs, DocumentComparator.getComparator("fileName desc, date asc"));
 //		for (Document doc : docs) {
 //			System.out.println(doc.getFileName()+" > "+df.format(doc.getDate()));
 //		}
