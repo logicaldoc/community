@@ -15,6 +15,7 @@ import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
@@ -23,7 +24,6 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.layout.VStack;
@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.layout.VStack;
  * @since 6.1
  */
 public class LD {
+
+	private static final String VALUE = "value";
 
 	/**
 	 * Show a dialog to confirm a operation
@@ -134,27 +136,13 @@ public class LD {
 	 */
 	public static void askForValue(String title, String message, String defaultValue, Integer width,
 			ValueCallback callback) {
-		TextItem textItem = ItemFactory.newTextItem("value", message, defaultValue);
+		TextItem textItem = ItemFactory.newTextItem(VALUE, message, defaultValue);
 		askForValue(title, message, defaultValue, textItem, width, callback);
 	}
 
 	public static void askForDocumentPassword(String title, String message, Integer width,
 			final ValueCallback callback) {
-		final Window dialog = new Window();
-		dialog.setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		dialog.setAutoCenter(true);
-		dialog.setAutoSize(true);
-		dialog.setIsModal(true);
-		dialog.setShowModalMask(true);
-		dialog.setShowHeader(true);
-		dialog.setCanDragResize(false);
-		dialog.setCanDrag(true);
-		dialog.centerInPage();
-		dialog.setTitle(title);
-		if (width != null)
-			dialog.setWidth(width);
-		else
-			dialog.setWidth(300);
+		final Window dialog = prepareDialogForDocumentPassword(title, width);
 
 		VStack container = new VStack();
 		container.setWidth100();
@@ -169,20 +157,17 @@ public class LD {
 		form.setWrapItemTitles(false);
 		form.setNumCols(1);
 
-		PasswordItem item = ItemFactory.newPasswordItem("value", message, null);
+		PasswordItem item = ItemFactory.newPasswordItem(VALUE, message, null);
 		item.setWidth("100%");
-		item.setName("value");
+		item.setName(VALUE);
 		item.setTitle(I18N.message(message));
 		item.setWrapTitle(false);
-		item.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (form.validate() && event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
-					if (callback != null) {
-						dialog.close();
-						callback.execute(form.getValue("value").toString());
-						dialog.destroy();
-					}
+		item.addKeyPressHandler((KeyPressEvent event) -> {
+			if (form.validate() && event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
+				if (callback != null) {
+					dialog.close();
+					callback.execute(form.getValue(VALUE).toString());
+					dialog.destroy();
 				}
 			}
 		});
@@ -192,39 +177,33 @@ public class LD {
 		IButton ok = new IButton(I18N.message("ok"));
 		ok.setAutoFit(true);
 		ok.setMinWidth(70);
-		ok.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (form.validate() && callback != null) {
-					dialog.close();
-					callback.execute(form.getValue("value").toString());
-					dialog.destroy();
-				}
+		ok.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			if (form.validate() && callback != null) {
+				dialog.close();
+				callback.execute(form.getValue(VALUE).toString());
+				dialog.destroy();
 			}
 		});
 
 		IButton cancel = new IButton(I18N.message("cancel"));
 		cancel.setAutoFit(true);
 		cancel.setMinWidth(70);
-		cancel.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (callback != null) {
-					dialog.close();
-					callback.execute(null);
-					dialog.destroy();
-				}
+		cancel.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			if (callback != null) {
+				dialog.close();
+				callback.execute(null);
+				dialog.destroy();
 			}
 		});
 
 		IButton unset = new IButton(I18N.message("unsetpassword"));
 		unset.setAutoFit(true);
 		unset.setMinWidth(70);
-		unset.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (callback != null) {
-					dialog.close();
-					callback.execute("--unset--");
-					dialog.destroy();
-				}
+		unset.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+			if (callback != null) {
+				dialog.close();
+				callback.execute("--unset--");
+				dialog.destroy();
 			}
 		});
 
@@ -249,6 +228,25 @@ public class LD {
 		form.focus();
 	}
 
+	private static Window prepareDialogForDocumentPassword(String title, Integer width) {
+		final Window dialog = new Window();
+		dialog.setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+		dialog.setAutoCenter(true);
+		dialog.setAutoSize(true);
+		dialog.setIsModal(true);
+		dialog.setShowModalMask(true);
+		dialog.setShowHeader(true);
+		dialog.setCanDragResize(false);
+		dialog.setCanDrag(true);
+		dialog.centerInPage();
+		dialog.setTitle(title);
+		if (width != null)
+			dialog.setWidth(width);
+		else
+			dialog.setWidth(300);
+		return dialog;
+	}
+
 	public static void askForValue(String title, String message, String defaultValue, ValueCallback callback) {
 		askForValue(title, message, defaultValue, (Integer) null, callback);
 	}
@@ -262,25 +260,11 @@ public class LD {
 	 * @param items the items used to input the values
 	 * @param width width of the dialog box
 	 * @param callback call back used when the user confirms the input
+	 * @param cancelCallback call back used when the user cancels the input
 	 */
 	public static void askForValues(String title, String message, List<FormItem> items, Integer width,
-			final ValueCallback callback) {
-		final Window dialog = new Window();
-
-		dialog.setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		dialog.setAutoCenter(true);
-		dialog.setAutoSize(true);
-		dialog.setIsModal(true);
-		dialog.setShowModalMask(true);
-		dialog.setShowHeader(true);
-		dialog.setCanDragResize(false);
-		dialog.setCanDrag(true);
-		dialog.centerInPage();
-		dialog.setTitle(I18N.message(title));
-		if (width != null)
-			dialog.setWidth(width);
-		else
-			dialog.setWidth(300);
+			final ValueCallback callback, final ClickHandler cancelCallback) {
+		final Window dialog = prepareDialogForAskValues(title, width);
 
 		VStack container = new VStack();
 		container.setWidth100();
@@ -295,62 +279,31 @@ public class LD {
 		form.setWrapItemTitles(false);
 		form.setNumCols(1);
 
-		for (FormItem item : items) {
-			if (items.size() == 1)
-				item.setName("value");
-
-			item.setWidth("100%");
-			if (message == null)
-				item.setShowTitle(false);
-			else
-				item.setTitle(I18N.message(message));
-			item.setWrapTitle(false);
-			if (!(item instanceof TextAreaItem) && !(item instanceof RichTextItem) && items.size() == 1)
-				/*
-				 * In case of simple input item, when the user presses the Enter
-				 * key, we consider he wants to confirm the input
-				 */
-				item.addKeyPressHandler(new KeyPressHandler() {
-					@Override
-					public void onKeyPress(KeyPressEvent event) {
-						if (form.validate() && event.getKeyName() != null
-								&& "enter".equals(event.getKeyName().toLowerCase())) {
-							if (callback != null) {
-								dialog.close();
-								callback.execute(form.getValue("value").toString());
-								dialog.destroy();
-							}
-						}
-					}
-				});
-		}
-
+		prepareItemsForAskValues(message, items, callback, dialog, form);
 		form.setFields(items.toArray(new FormItem[0]));
 
 		IButton ok = new IButton(I18N.message("ok"));
 		ok.setAutoFit(true);
 		ok.setMinWidth(70);
-		ok.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (form.validate() && callback != null) {
-					dialog.close();
-					if (callback instanceof ValuesCallback) {
-						((ValuesCallback) callback).execute(form.getValues());
-					} else
-						callback.execute(form.getValue("value") != null ? form.getValue("value").toString() : null);
-					dialog.destroy();
-				}
+		ok.addClickHandler(event -> {
+			if (form.validate() && callback != null) {
+				dialog.close();
+				if (callback instanceof ValuesCallback) {
+					((ValuesCallback) callback).execute(form.getValues());
+				} else
+					callback.execute(form.getValue(VALUE) != null ? form.getValue(VALUE).toString() : null);
+				dialog.destroy();
 			}
 		});
 
 		IButton cancel = new IButton(I18N.message("cancel"));
 		cancel.setAutoFit(true);
 		cancel.setMinWidth(70);
-		cancel.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				dialog.close();
-				dialog.destroy();
-			}
+		cancel.addClickHandler(event -> {
+			dialog.close();
+			dialog.destroy();
+			if(cancelCallback!=null)
+				cancelCallback.onClick(event);
 		});
 
 		HLayout buttons = new HLayout();
@@ -371,9 +324,75 @@ public class LD {
 		form.setAutoFocus(true);
 		form.focus();
 	}
+	
+	/**
+	 * Show a dialog asking for a set of values to complete an operation. The
+	 * provided form items will be used
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box
+	 * @param items the items used to input the values
+	 * @param width width of the dialog box
+	 * @param callback call back used when the user confirms the input
+	 */
+	public static void askForValues(String title, String message, List<FormItem> items, Integer width,
+			final ValueCallback callback) {
+		askForValues(title, message, items, width, callback, null);
+	}
+
+	private static void prepareItemsForAskValues(String message, List<FormItem> items, final ValueCallback callback,
+			final Window dialog, final DynamicForm form) {
+		for (FormItem item : items) {
+			if (items.size() == 1)
+				item.setName(VALUE);
+
+			item.setWidth("100%");
+			if (message == null)
+				item.setShowTitle(false);
+			else
+				item.setTitle(I18N.message(message));
+
+			item.setWrapTitle(false);
+			if (!(item instanceof TextAreaItem) && !(item instanceof RichTextItem) && items.size() == 1
+					&& callback != null) {
+				/*
+				 * In case of simple input item, when the user presses the Enter
+				 * key, we consider he wants to confirm the input
+				 */
+				item.addKeyPressHandler((KeyPressEvent event) -> {
+					if (form.validate() && event.getKeyName() != null
+							&& "enter".equals(event.getKeyName().toLowerCase())) {
+						dialog.close();
+						callback.execute(form.getValue(VALUE).toString());
+						dialog.destroy();
+					}
+				});
+			}
+		}
+	}
+
+	private static Window prepareDialogForAskValues(String title, Integer width) {
+		final Window dialog = new Window();
+
+		dialog.setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+		dialog.setAutoCenter(true);
+		dialog.setAutoSize(true);
+		dialog.setIsModal(true);
+		dialog.setShowModalMask(true);
+		dialog.setShowHeader(true);
+		dialog.setCanDragResize(false);
+		dialog.setCanDrag(true);
+		dialog.centerInPage();
+		dialog.setTitle(I18N.message(title));
+		if (width != null)
+			dialog.setWidth(width);
+		else
+			dialog.setWidth(300);
+		return dialog;
+	}
 
 	/**
-	 * Show a dialog asking for a value to complete an operation. The provided
+	 * Shows a dialog asking for a value to complete an operation. The provided
 	 * form item will be used
 	 * 
 	 * @param title title of the dialog box
@@ -385,7 +404,24 @@ public class LD {
 	 */
 	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
 			final ValueCallback callback) {
-		askForValues(title, message, Arrays.asList(new FormItem[] { item }), width, callback);
+		askForValue(title, message, defaultValue, item, width, callback, null);
+	}
+	
+	/**
+	 * Shows a dialog asking for a value to complete an operation. The provided
+	 * form item will be used
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box
+	 * @param defaultValue default value
+	 * @param item the item used to input the value
+	 * @param width width of the dialog box
+	 * @param callback call back used when the user confirms the input
+	 * @param cancelCallback call back used when the user cancels the input
+	 */
+	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
+			final ValueCallback callback, final ClickHandler cancelCallback) {
+		askForValues(title, message, Arrays.asList(new FormItem[] { item }), width, callback, cancelCallback);
 
 		if (defaultValue != null) {
 			item.setValue(defaultValue);
@@ -432,5 +468,14 @@ public class LD {
 		properties.setMembersMargin(0);
 		properties.setBodyStyle("contactingserver");
 		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("contactingserver")), properties);
+	}
+
+	public static void updatingServer() {
+		Dialog properties = new Dialog();
+		properties.setShowHeader(false);
+		properties.setShowHeaderBackground(false);
+		properties.setMembersMargin(0);
+		properties.setBodyStyle("contactingserver");
+		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("systemupdating")), properties);
 	}
 }
