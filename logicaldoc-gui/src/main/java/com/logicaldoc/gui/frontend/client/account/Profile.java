@@ -188,7 +188,7 @@ public class Profile extends Window {
 		showDocsDefinition.setPrompt(I18N.message("editlayout"));
 		showDocsDefinition.setWidth(12);
 		showDocsDefinition.setHeight(12);
-		showDocsDefinition.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+		showDocsDefinition.addFormItemClickHandler( event -> {
 			TextAreaItem textArea = ItemFactory.newTextAreaItem(DOCSGRIDLAYOUT, null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message(DOCSGRIDLAYOUT), I18N.message(DOCSGRIDLAYOUT),
@@ -202,7 +202,7 @@ public class Profile extends Window {
 		showHitsDefinition.setPrompt(I18N.message("editlayout"));
 		showHitsDefinition.setWidth(12);
 		showHitsDefinition.setHeight(12);
-		showHitsDefinition.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+		showHitsDefinition.addFormItemClickHandler( event -> {
 			TextAreaItem textArea = ItemFactory.newTextAreaItem(HITSGRIDLAYOUT, null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message(HITSGRIDLAYOUT), I18N.message(HITSGRIDLAYOUT),

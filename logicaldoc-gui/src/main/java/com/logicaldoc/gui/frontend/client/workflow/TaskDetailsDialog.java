@@ -37,7 +37,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
@@ -129,6 +128,8 @@ public class TaskDetailsDialog extends Window {
 
 	private boolean readOnly = false;
 
+	private List<ButtonItem> transitionButtons = new ArrayList<>();
+
 	public TaskDetailsDialog(final WorkflowDashboard dashboard, GUIWorkflow wfl, boolean readOnly) {
 		this.workflow = wfl;
 		this.workflowDashboard = dashboard;
@@ -209,7 +210,7 @@ public class TaskDetailsDialog extends Window {
 
 			if (workflow.getSelectedTask().getTaskState().equals("started")
 					&& workflow.getSelectedTask().getOwner() != null) {
-				addTransitionButtons();
+				prepareTransitionButtons();
 			}
 		} else {
 			DynamicForm taskEndedForm = new DynamicForm();
@@ -241,13 +242,12 @@ public class TaskDetailsDialog extends Window {
 		refreshHistoryTab();
 	}
 
-	private void addTransitionButtons() {
+	private void prepareTransitionButtons() {
 		DynamicForm transitionsForm = new DynamicForm();
 		transitionsForm.setWidth(150);
 		transitionsForm.setIsGroup(true);
 		transitionsForm.setGroupTitle(I18N.message("actions"));
 
-		List<FormItem> items = new ArrayList<>();
 		// Add Transitions buttons
 		if (workflow.getSelectedTask().getTransitions() != null)
 			for (GUITransition transition : workflow.getSelectedTask().getTransitions()) {
@@ -257,7 +257,8 @@ public class TaskDetailsDialog extends Window {
 
 				ButtonItem transitionButton = new ButtonItem(transition.getText());
 				transitionButton.setAutoFit(true);
-				transitionButton.addClickHandler((ClickEvent event) -> {
+				transitionButton.addClickHandler(event -> {
+					toggleTransitionButtons();
 					if (workflow.getSelectedTask().isRequiresNote()) {
 						/*
 						 * This task requires a note at completion, so we
@@ -268,12 +269,17 @@ public class TaskDetailsDialog extends Window {
 						onEndTask(getWorkflow().getSelectedTask(), transitionName);
 					}
 				});
-				items.add(transitionButton);
+				transitionButtons.add(transitionButton);
 			}
-		transitionsForm.setItems(items.toArray(new FormItem[0]));
+		transitionsForm.setItems(transitionButtons.toArray(new FormItem[0]));
 
 		if (!readOnly)
 			buttonsPanel.addMember(transitionsForm);
+	}
+
+	private void toggleTransitionButtons() {
+		for (FormItem transitionButton : transitionButtons)
+			transitionButton.setDisabled(!transitionButton.isDisabled());
 	}
 
 	private void prepareTaskSection() {
@@ -978,8 +984,8 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(false);
-		preview.addClickHandler(event -> DocumentService.Instance.get()
-				.getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+		preview.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocument.getId(),
+				new AsyncCallback<GUIDocument>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -1032,26 +1038,23 @@ public class TaskDetailsDialog extends Window {
 			}
 		});
 
-		LD.askForValue("providenotetocomplete", "note", null, noteInput, 500, new ValueCallback() {
+		LD.askForValue("providenotetocomplete", "note", null, noteInput, 500, value -> {
+			if (Boolean.TRUE.equals(noteInput.validate()))
+				WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(), value,
+						new AsyncCallback<Long>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+								toggleTransitionButtons();
+							}
 
-			@Override
-			public void execute(String value) {
-				if (Boolean.TRUE.equals(noteInput.validate()))
-					WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(), value,
-							new AsyncCallback<Long>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Long noteId) {
-									destroy();
-									onEndTask(getWorkflow().getSelectedTask(), transition);
-								}
-							});
-			}
-		});
+							@Override
+							public void onSuccess(Long noteId) {
+								destroy();
+								onEndTask(getWorkflow().getSelectedTask(), transition);
+							}
+						});
+		}, event -> toggleTransitionButtons());
 	}
 
 	/**
@@ -1065,6 +1068,7 @@ public class TaskDetailsDialog extends Window {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
+				toggleTransitionButtons();
 			}
 
 			@Override

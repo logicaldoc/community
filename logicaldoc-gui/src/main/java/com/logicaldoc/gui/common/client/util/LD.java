@@ -15,6 +15,7 @@ import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
@@ -259,9 +260,10 @@ public class LD {
 	 * @param items the items used to input the values
 	 * @param width width of the dialog box
 	 * @param callback call back used when the user confirms the input
+	 * @param cancelCallback call back used when the user cancels the input
 	 */
 	public static void askForValues(String title, String message, List<FormItem> items, Integer width,
-			final ValueCallback callback) {
+			final ValueCallback callback, final ClickHandler cancelCallback) {
 		final Window dialog = prepareDialogForAskValues(title, width);
 
 		VStack container = new VStack();
@@ -283,7 +285,7 @@ public class LD {
 		IButton ok = new IButton(I18N.message("ok"));
 		ok.setAutoFit(true);
 		ok.setMinWidth(70);
-		ok.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+		ok.addClickHandler(event -> {
 			if (form.validate() && callback != null) {
 				dialog.close();
 				if (callback instanceof ValuesCallback) {
@@ -297,9 +299,11 @@ public class LD {
 		IButton cancel = new IButton(I18N.message("cancel"));
 		cancel.setAutoFit(true);
 		cancel.setMinWidth(70);
-		cancel.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
+		cancel.addClickHandler(event -> {
 			dialog.close();
 			dialog.destroy();
+			if(cancelCallback!=null)
+				cancelCallback.onClick(event);
 		});
 
 		HLayout buttons = new HLayout();
@@ -319,6 +323,21 @@ public class LD {
 		form.focusInItem(items.get(0));
 		form.setAutoFocus(true);
 		form.focus();
+	}
+	
+	/**
+	 * Show a dialog asking for a set of values to complete an operation. The
+	 * provided form items will be used
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box
+	 * @param items the items used to input the values
+	 * @param width width of the dialog box
+	 * @param callback call back used when the user confirms the input
+	 */
+	public static void askForValues(String title, String message, List<FormItem> items, Integer width,
+			final ValueCallback callback) {
+		askForValues(title, message, items, width, callback, null);
 	}
 
 	private static void prepareItemsForAskValues(String message, List<FormItem> items, final ValueCallback callback,
@@ -373,7 +392,7 @@ public class LD {
 	}
 
 	/**
-	 * Show a dialog asking for a value to complete an operation. The provided
+	 * Shows a dialog asking for a value to complete an operation. The provided
 	 * form item will be used
 	 * 
 	 * @param title title of the dialog box
@@ -385,7 +404,24 @@ public class LD {
 	 */
 	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
 			final ValueCallback callback) {
-		askForValues(title, message, Arrays.asList(new FormItem[] { item }), width, callback);
+		askForValue(title, message, defaultValue, item, width, callback, null);
+	}
+	
+	/**
+	 * Shows a dialog asking for a value to complete an operation. The provided
+	 * form item will be used
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box
+	 * @param defaultValue default value
+	 * @param item the item used to input the value
+	 * @param width width of the dialog box
+	 * @param callback call back used when the user confirms the input
+	 * @param cancelCallback call back used when the user cancels the input
+	 */
+	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
+			final ValueCallback callback, final ClickHandler cancelCallback) {
+		askForValues(title, message, Arrays.asList(new FormItem[] { item }), width, callback, cancelCallback);
 
 		if (defaultValue != null) {
 			item.setValue(defaultValue);
