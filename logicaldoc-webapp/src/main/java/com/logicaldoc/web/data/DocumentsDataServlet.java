@@ -161,7 +161,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		writer.print("<document>");
 		writer.print("<id>" + document.getId() + "</id>");
 
-		printFolder(writer, document);
+		printFolderAndDocRef(writer, document);
 
 		writer.print("<icon>" + FileUtil.getBaseName(document.getIcon()) + "</icon>");
 		writer.print("<version>" + document.getVersion() + "</version>");
@@ -276,7 +276,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			writer.print("<lockUser><![CDATA[" + document.getLockUser() + "]]></lockUser>");
 	}
 
-	private void printFolder(PrintWriter writer, Document document) {
+	private void printFolderAndDocRef(PrintWriter writer, Document document) {
 		if (document.getFolder() != null)
 			writer.print("<folderId>" + document.getFolder().getId() + "</folderId>");
 		writer.print("<customId><![CDATA[" + (document.getCustomId() != null ? document.getCustomId() : "")

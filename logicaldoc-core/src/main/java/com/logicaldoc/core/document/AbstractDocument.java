@@ -12,7 +12,6 @@ import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.TransactionalObject;
 import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.LocaleUtil;

@@ -35,11 +35,11 @@ public class IconSelector {
 
 		String icon = checkOffice(ext);
 		if (StringUtils.isNotEmpty(icon))
-			return icon;
+			return adaptIfShortcut(shortcut, icon);
 
 		icon = checkMultimedia(ext);
 		if (StringUtils.isNotEmpty(icon))
-			return icon;
+			return adaptIfShortcut(shortcut, icon);
 
 		if (StringUtils.isEmpty(ext))
 			icon = "generic.png";
@@ -68,9 +68,7 @@ public class IconSelector {
 		else
 			icon = "generic.png";
 
-		icon = adaptIfShortcut(shortcut, icon);
-
-		return icon;
+		return adaptIfShortcut(shortcut, icon);
 	}
 
 	private static String checkOffice(String ext) {
