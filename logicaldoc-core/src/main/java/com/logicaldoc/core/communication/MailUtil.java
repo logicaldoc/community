@@ -335,6 +335,10 @@ public class MailUtil {
 				BodyPart bp = mp.getBodyPart(i);
 				addAttachments(bp, email, extractAttachmentContent);
 			}
+		} else if (NO_BODY.equals(email.getMessageText())) {
+			// This is not a multipart message and if there is no text, perhaps
+			// the unique part is a file and we treat it as attachment
+			addAttachment(msg, email);
 		}
 
 		return email;
@@ -468,14 +472,13 @@ public class MailUtil {
 		}
 	}
 
-	private static void addAttachment(BodyPart bp, EMail email)
-			throws UnsupportedEncodingException, MessagingException {
-		String fileName = bp.getFileName();
+	private static void addAttachment(Part part, EMail email) throws UnsupportedEncodingException, MessagingException {
+		String fileName = part.getFileName();
 		String disposition = "";
-		if (bp.getContentType().equalsIgnoreCase("message/rfc822")) {
+		if (part.getContentType().equalsIgnoreCase("message/rfc822")) {
 			// The part is another email (may happen in case of forwards).
-			try (InputStream is = bp.getInputStream()) {
-				EMail embeddedEmail = messageToMail(bp.getInputStream(), false);
+			try (InputStream is = part.getInputStream()) {
+				EMail embeddedEmail = messageToMail(part.getInputStream(), false);
 				fileName = embeddedEmail.getSubject() + ".eml";
 				disposition = "attachment";
 			} catch (Throwable t) {
@@ -487,22 +490,24 @@ public class MailUtil {
 		if (StringUtils.isEmpty(fileName))
 			return;
 
-		// Skip part that is not an attachment
-		String[] values = bp.getHeader("Content-Disposition");
-		if (values != null && values.length > 0)
+		String[] values = part.getHeader("Content-Disposition");
+		if (values != null && values.length > 0) {
+			// Skip part that specifies a Content-Disposition but it is not
+			// 'attachment'
 			disposition = new ContentDisposition(values[0]).getDisposition();
-		if (!disposition.contains("attachment"))
-			return;
+			if (!disposition.contains("attachment"))
+				return;
+		}
 
 		fileName = MimeUtility.decodeText(fileName);
 		fileName = FileUtil.getName(fileName);
 
 		EMailAttachment attachment = new EMailAttachment();
 		attachment.setFileName(fileName);
-		attachment.setMimeType(bp.getContentType());
-		attachment.setSize(bp.getSize());
+		attachment.setMimeType(part.getContentType());
+		attachment.setSize(part.getSize());
 
-		try (InputStream is = bp.getInputStream()) {
+		try (InputStream is = part.getInputStream()) {
 			byte[] bytes = IOUtils.toByteArray(is);
 			attachment.setData(bytes);
 			attachment.setSize(bytes.length);

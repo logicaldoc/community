@@ -25,19 +25,17 @@ public class MailUtilTest extends AbstractCoreTCase {
 
 	@Test
 	public void testMsgToMail() throws Exception {
-		{
-			EMail mail = MailUtil.msgToMail(new File("src/test/resources/test.msg"), true);
+		EMail mail = MailUtil.msgToMail(new File("src/test/resources/test.msg"), true);
 
-			Assert.assertNotNull(mail);
-			Assert.assertEquals("Re: Fwd: Offer for Customizations on LogicalDOC", mail.getSubject());
-			Assert.assertTrue(mail.getMessageText().contains("Stefan"));
-			Assert.assertEquals(1, mail.getAttachmentsCount());
-			Assert.assertEquals("erich.widmer@olig.ch", mail.getFrom().getAddress());
+		Assert.assertNotNull(mail);
+		Assert.assertEquals("Re: Fwd: Offer for Customizations on LogicalDOC", mail.getSubject());
+		Assert.assertTrue(mail.getMessageText().contains("Stefan"));
+		Assert.assertEquals(1, mail.getAttachmentsCount());
+		Assert.assertEquals("erich.widmer@olig.ch", mail.getFrom().getAddress());
 
-			Assert.assertNotNull(mail.getSentDate());
-			Assert.assertNotNull(mail.getReceivedDate());
-			assertEquals(mail.getSentDate(), mail.getReceivedDate());
-		}
+		Assert.assertNotNull(mail.getSentDate());
+		Assert.assertNotNull(mail.getReceivedDate());
+		assertEquals(mail.getSentDate(), mail.getReceivedDate());
 	}
 
 	@Test
@@ -128,11 +126,10 @@ public class MailUtilTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testExtractMessageText() throws MessagingException, IOException  {
+	public void testExtractMessageText() throws MessagingException, IOException {
 		MimeMessage mail = MailUtil.readMime(this.getClass().getResourceAsStream("/parche 2.eml"));
 		Assert.assertNotNull(mail);
-		
-		System.out.println(MailUtil.extractMessageText(mail));
+
 		Assert.assertTrue(MailUtil.extractMessageText(mail).startsWith("Hola Marco, el parche 2"));
 	}
 }
