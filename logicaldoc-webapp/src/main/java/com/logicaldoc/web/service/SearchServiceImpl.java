@@ -347,6 +347,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		op.setFolder(searchOptions.getFolderId());
 		op.setSearchInSubPath(searchOptions.isSearchInSubPath());
 		op.setTemplate(searchOptions.getTemplate());
+		op.setCaseSensitive(searchOptions.isCaseSensitive() ? 1 : 0);
+		op.setRetrieveAliases(searchOptions.isRetrieveAliases() ? 1 : 0);		
 
 		if (searchOptions.getType() == SearchOptions.TYPE_FULLTEXT) {
 			op.setDateFrom(((FulltextSearchOptions) searchOptions).getDateFrom());
