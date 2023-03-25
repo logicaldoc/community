@@ -335,6 +335,10 @@ public class MailUtil {
 				BodyPart bp = mp.getBodyPart(i);
 				addAttachments(bp, email, extractAttachmentContent);
 			}
+		} else if (NO_BODY.equals(email.getMessageText())) {
+			// This is not a multipart message and if there is no text, perhaps
+			// the unique part is a file and we treat it as attachment
+			addAttachment(msg, email);
 		}
 
 		return email;
@@ -468,14 +472,13 @@ public class MailUtil {
 		}
 	}
 
-	private static void addAttachment(BodyPart bp, EMail email)
-			throws UnsupportedEncodingException, MessagingException {
-		String fileName = bp.getFileName();
+	private static void addAttachment(Part part, EMail email) throws UnsupportedEncodingException, MessagingException {
+		String fileName = part.getFileName();
 		String disposition = "";
-		if (bp.getContentType().equalsIgnoreCase("message/rfc822")) {
+		if (part.getContentType().equalsIgnoreCase("message/rfc822")) {
 			// The part is another email (may happen in case of forwards).
-			try (InputStream is = bp.getInputStream()) {
-				EMail embeddedEmail = messageToMail(bp.getInputStream(), false);
+			try (InputStream is = part.getInputStream()) {
+				EMail embeddedEmail = messageToMail(part.getInputStream(), false);
 				fileName = embeddedEmail.getSubject() + ".eml";
 				disposition = "attachment";
 			} catch (Throwable t) {
@@ -487,22 +490,24 @@ public class MailUtil {
 		if (StringUtils.isEmpty(fileName))
 			return;
 
-		// Skip part that is not an attachment
-		String[] values = bp.getHeader("Content-Disposition");
-		if (values != null && values.length > 0)
+		String[] values = part.getHeader("Content-Disposition");
+		if (values != null && values.length > 0) {
+			// Skip part that specifies a Content-Disposition but it is not
+			// 'attachment'
 			disposition = new ContentDisposition(values[0]).getDisposition();
-		if (!disposition.contains("attachment"))
-			return;
+			if (!disposition.contains("attachment"))
+				return;
+		}
 
 		fileName = MimeUtility.decodeText(fileName);
 		fileName = FileUtil.getName(fileName);
 
 		EMailAttachment attachment = new EMailAttachment();
 		attachment.setFileName(fileName);
-		attachment.setMimeType(bp.getContentType());
-		attachment.setSize(bp.getSize());
+		attachment.setMimeType(part.getContentType());
+		attachment.setSize(part.getSize());
 
-		try (InputStream is = bp.getInputStream()) {
+		try (InputStream is = part.getInputStream()) {
 			byte[] bytes = IOUtils.toByteArray(is);
 			attachment.setData(bytes);
 			attachment.setSize(bytes.length);
@@ -745,7 +750,10 @@ public class MailUtil {
 	private static void extractPartText(Object content, StringBuilder textBody) throws MessagingException, IOException {
 		if (content instanceof String) {
 			textBody.append("\n" + content.toString());
-		} else if (content instanceof Part) {
+			return;
+		}
+
+		if (content instanceof Part) {
 			Part part = (Part) content;
 			String disposition = part.getDisposition();
 			String contentType = part.getContentType();
@@ -755,21 +763,28 @@ public class MailUtil {
 					textBody.append(part.getContent());
 				}
 			}
-		} else if (content instanceof Multipart) {
-			Multipart multipart = (Multipart) content;
-			for (int i = 0, n = multipart.getCount(); i < n; i++) {
-				try {
-					BodyPart part = multipart.getBodyPart(i);
+			return;
+		}
 
-					Object cont = part.getContent();
-					if (cont instanceof Multipart) {
-						extractPartText((Multipart) cont, textBody);
-					} else {
-						extractPartText((Part) part, textBody);
-					}
-				} catch (Throwable e) {
-					log.warn(e.getMessage(), e);
+		if (content instanceof Multipart) {
+			extractPartTextFromMultipart((Multipart) content, textBody);
+		}
+	}
+
+	private static void extractPartTextFromMultipart(Multipart multipart, StringBuilder textBody)
+			throws MessagingException {
+		for (int i = 0, n = multipart.getCount(); i < n; i++) {
+			try {
+				BodyPart part = multipart.getBodyPart(i);
+
+				Object cont = part.getContent();
+				if (cont instanceof Multipart) {
+					extractPartText(cont, textBody);
+				} else {
+					extractPartText(part, textBody);
 				}
+			} catch (Throwable e) {
+				log.warn(e.getMessage(), e);
 			}
 		}
 	}
