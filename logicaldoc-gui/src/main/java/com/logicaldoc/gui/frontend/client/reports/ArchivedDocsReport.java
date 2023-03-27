@@ -15,7 +15,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -23,16 +22,11 @@ import com.logicaldoc.gui.frontend.client.document.SendToArchiveDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -60,11 +54,11 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		max.setHint(I18N.message("elements"));
 		max.setStep(10);
 		max.setShowTitle(false);
-		max.addChangedHandler((ChangedEvent event) -> refresh());
+		max.addChangedHandler(event -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler((ClickEvent event) -> {
+		display.addClickHandler(event -> {
 			if (Boolean.TRUE.equals(max.validate()))
 				refresh();
 		});
@@ -125,20 +119,9 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		type.setHidden(true);
 		type.setCanGroupBy(false);
 
-		list = new RefreshableListGrid();
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setCanFreezeFields(false);
-		list.setAutoFetchData(true);
-		list.setFilterOnKeypress(true);
-		list.setShowFilterEditor(true);
-		list.setSelectionType(SelectionStyle.MULTIPLE);
-
 		list.setFields(filename, version, fileVersion, size, created, lastModified, folder, id, customId, type);
 
-		list.addDoubleClickHandler(
-				(DoubleClickEvent event) -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+		list.addDoubleClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 	}
 
 	@Override
@@ -155,7 +138,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler((MenuItemClickEvent event) -> {
+		preview.addClickHandler(event -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 
 			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
@@ -177,12 +160,11 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler((MenuItemClickEvent event) -> DocUtil
-				.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+		download.addClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
 		MenuItem openFolder = new MenuItem();
 		openFolder.setTitle(I18N.message("openfolder"));
-		openFolder.addClickHandler((MenuItemClickEvent event) -> {
+		openFolder.addClickHandler(event -> {
 			ListGridRecord rec = list.getSelectedRecord();
 			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
 					Long.parseLong(rec.getAttributeAsString("id")));
@@ -190,7 +172,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler((MenuItemClickEvent event) -> {
+		restore.addClickHandler(event -> {
 			long[] docIds = new long[selection.length];
 			for (int i = 0; i < selection.length; i++)
 				docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
@@ -210,7 +192,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
+		delete.addClickHandler(event -> {
 			final long[] docIds = new long[selection.length];
 			for (int i = 0; i < selection.length; i++)
 				docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
@@ -234,7 +216,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem sendToExpArchive = new MenuItem();
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
-		sendToExpArchive.addClickHandler((MenuItemClickEvent event) -> {
+		sendToExpArchive.addClickHandler(event -> {
 			long[] selectionIds = new long[selection.length];
 			for (int i = 0; i < selection.length; i++)
 				selectionIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
