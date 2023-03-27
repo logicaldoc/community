@@ -15,7 +15,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -23,15 +22,8 @@ import com.logicaldoc.gui.frontend.client.document.SendToArchiveDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -62,22 +54,13 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		max.setHint(I18N.message("elements"));
 		max.setStep(10);
 		max.setShowTitle(false);
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		max.addChangedHandler(event -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (max.validate())
-					refresh();
-			}
+		display.addClickHandler(event -> {
+			if (max.validate())
+				refresh();
 		});
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
@@ -136,24 +119,9 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		type.setHidden(true);
 		type.setCanGroupBy(false);
 
-		list = new RefreshableListGrid();
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setCanFreezeFields(false);
-		list.setAutoFetchData(true);
-		list.setFilterOnKeypress(true);
-		list.setShowFilterEditor(true);
-		list.setSelectionType(SelectionStyle.MULTIPLE);
-
 		list.setFields(filename, version, fileVersion, size, created, lastModified, folder, id, customId, type);
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null);
-			}
-		});
+		list.addDoubleClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 	}
 
 	@Override
