@@ -779,7 +779,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void saveHistoryInParentFolder(Folder parent, Folder folder, FolderHistory transaction,
 			String pathExtended) {
-		FolderHistory parentHistory = new FolderHistory();
+		FolderHistory parentHistory = new FolderHistory(transaction);
 		parentHistory.setFolderId(parent.getId());
 		parentHistory.setFilename(folder.getName());
 		parentHistory.setPath(pathExtended);
