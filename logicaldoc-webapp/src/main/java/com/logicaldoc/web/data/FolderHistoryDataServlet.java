@@ -78,7 +78,7 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 			writer.print("<userId>" + cols[12] + "</userId>");
 
 			if (cols[13] != null)
-				writer.print("<geolocation><![CDATA[" + cols[13] + "]]></geolocation>");
+				writer.print("<color><![CDATA[" + cols[13] + "]]></color>");
 			writer.print("</history>");
 		}
 		writer.write("</list>");
