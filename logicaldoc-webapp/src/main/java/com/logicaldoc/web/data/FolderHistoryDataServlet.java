@@ -77,16 +77,19 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		writer.print("<reason><![CDATA[" + (cols[8] == null ? "" : cols[8]) + "]]></reason>");
 		writer.print("<ip><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></ip>");
 		writer.print("<device><![CDATA[" + (cols[10] == null ? "" : cols[10]) + "]]></device>");
-		writer.print("<geolocation><![CDATA[" + (cols[11] == null ? "" : cols[11]) + "]]></geolocation>");
 		writer.print("<userId>" + cols[12] + "</userId>");
 
 		printGeolocation(writer, cols);
+		
+		if(cols[13]!=null)
+			writer.print("<color>" + cols[12] + "</color>");	
+		
 		writer.print("</history>");
 	}
 
 	private void printGeolocation(PrintWriter writer, Object[] cols) {
-		if (cols[13] != null)
-			writer.print("<geolocation><![CDATA[" + cols[13] + "]]></geolocation>");
+		if (cols[11] != null)
+			writer.print("<geolocation><![CDATA[" + cols[11] + "]]></geolocation>");
 	}
 
 	private void printSid(PrintWriter writer, Object[] cols, boolean showSid) {

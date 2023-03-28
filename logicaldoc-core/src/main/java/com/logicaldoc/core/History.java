@@ -461,5 +461,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setDevice(source.getDevice());
 		setGeolocation(source.getGeolocation());
 		setFileSize(source.getFileSize());
+		setColor(source.getColor());
 	}
 }
