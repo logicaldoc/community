@@ -1065,8 +1065,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Date now = new Date();
 
 		@SuppressWarnings("unchecked")
-		Collection<Long> buf = queryForList(query.toString(), new Object[] { now, now }, Long.class,
-				null);
+		Collection<Long> buf = queryForList(query.toString(), new Object[] { now, now }, Long.class, null);
 		Set<Long> ids = new HashSet<>();
 		for (Long id : buf) {
 			if (!ids.contains(id))
@@ -1095,18 +1094,18 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void cleanUnexistingUniqueTags() throws PersistenceException {
 		try {
-			StringBuilder deleteStatement = new StringBuilder("delete from ld_uniquetag UT where ");
+			StringBuilder deleteStatement = new StringBuilder("DELETE FROM ld_uniquetag	WHERE ");
 
 			// tags no more existing in the ld_tag table or that belong to
 			// deleted
 			// documents
 			deleteStatement.append(
-					" not UT.ld_tag in (select distinct(B.ld_tag) from ld_tag B, ld_document C where UT.ld_tenantid=B.ld_tenantid and UT.ld_tag=B.ld_tag and C.ld_id=B.ld_docid and C.ld_deleted=0) ");
+					" ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT t.ld_tag	FROM ld_tag t JOIN ld_document d ON d.ld_id = t.ld_docid WHERE ld_uniquetag.ld_tenantid = t.ld_tenantid AND ld_uniquetag.ld_tag = t.ld_tag AND d.ld_deleted = 0 ) ");
 
 			// tags no more existing in the ld_foldertag table or that belong to
 			// deleted folders
 			deleteStatement.append(
-					" and not UT.ld_tag in (select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where UT.ld_tenantid=D.ld_tenantid and UT.ld_tag=D.ld_tag and E.ld_id=D.ld_folderid and E.ld_deleted=0) ");
+					" AND ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT ft.ld_tag FROM ld_foldertag ft JOIN ld_folder f ON f.ld_id = ft.ld_folderid WHERE ld_uniquetag.ld_tenantid = ft.ld_tenantid AND ld_uniquetag.ld_tag = ft.ld_tag AND f.ld_deleted = 0 ); ");
 
 			jdbcUpdate(deleteStatement.toString());
 		} catch (PersistenceException e) {

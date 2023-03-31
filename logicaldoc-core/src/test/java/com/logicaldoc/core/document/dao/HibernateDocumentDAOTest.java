@@ -741,14 +741,14 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void cleanUnexistingUniqueTags() throws PersistenceException {
+	public void testCleanUnexistingUniqueTags() throws PersistenceException {
 		Assert.assertEquals(2, dao.queryForInt("select count(*) from ld_uniquetag"));
 		dao.cleanUnexistingUniqueTags();
 		Assert.assertEquals(0, dao.queryForInt("select count(*) from ld_uniquetag"));
 	}
 
 	@Test
-	public void cleanUnexistingUniqueTagsOneByOne() throws PersistenceException {
+	public void testCleanUnexistingUniqueTagsOneByOne() throws PersistenceException {
 		Assert.assertEquals(2, dao.queryForInt("select count(*) from ld_uniquetag"));
 		dao.cleanUnexistingUniqueTagsOneByOne();
 		Assert.assertEquals(0, dao.queryForInt("select count(*) from ld_uniquetag"));
