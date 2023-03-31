@@ -638,7 +638,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive)
 			throws PersistenceException {
-		
+
 		StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted = 0 and ");
 		if (caseSensitive)
 			query.append("ld_name like '" + SqlUtil.doubleQuotes(name) + "' ");
@@ -1459,9 +1459,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			long child = queryForLong("select ld_id from ld_folder where ld_parentid="+folder.getId()+" and ld_name='"+name+"' and ld_tenantid="+folder.getTenantId());
-			
-			if (child==0L) {
+			long child = queryForLong("SELECT ld_id FROM ld_folder WHERE ld_parentid=? AND ld_name=? AND ld_tenantid=?",
+					folder.getId(), name, folder.getTenantId());
+
+			if (child == 0L) {
 				Folder folderVO = new Folder();
 				folderVO.setName(name);
 				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
@@ -1469,7 +1470,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 						transaction != null ? new FolderHistory(transaction) : null);
 				flush();
 			} else {
-				folder=findById(child);
+				folder = findById(child);
 				initialize(folder);
 			}
 		}
@@ -1896,12 +1897,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return new ArrayList<>();
 		long rootId = root.getId();
 
-		
-		// We do this way because if using the HQL we will have all the collections initialized
+		// We do this way because if using the HQL we will have all the
+		// collections initialized
 		@SuppressWarnings("unchecked")
-		List<Long> wsIds = (List<Long>)queryForList("select ld_id from ld_folder where (not ld_id="+rootId+") and ld_deleted=0 and ld_parentid="+rootId+" and ld_type="+Folder.TYPE_WORKSPACE+ " and ld_tenantid="+tenantId+ " order by lower(ld_name)", Long.class);
+		List<Long> wsIds = (List<Long>) queryForList("select ld_id from ld_folder where (not ld_id=" + rootId
+				+ ") and ld_deleted=0 and ld_parentid=" + rootId + " and ld_type=" + Folder.TYPE_WORKSPACE
+				+ " and ld_tenantid=" + tenantId + " order by lower(ld_name)", Long.class);
 		ArrayList<Folder> workspaces = new ArrayList<>();
-		for (Long wsId : wsIds) 
+		for (Long wsId : wsIds)
 			workspaces.add(findById(wsId));
 		return workspaces;
 	}
@@ -2201,7 +2204,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
-		
+
 		transaction.setEvent(FolderEvent.CHANGED.toString());
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
@@ -2218,7 +2221,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			store(folder, tr);
 			flush();
-			
+
 			applyOCRToTree(folder.getId(), transaction);
 		}
 	}
