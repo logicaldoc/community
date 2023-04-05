@@ -139,11 +139,11 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		try {
 			refresh(template);
 
-			if (template.getAttributes() != null)
-				log.trace("Initialized {} attributes", template.getAttributes().keySet().size());
-
 			if (template.getTemplateGroups() != null)
 				log.trace("Initialized {} template groups", template.getTemplateGroups().size());
+			
+			if (template.getAttributes() != null)
+				log.trace("Initialized {} attributes", template.getAttributes().keySet().size());
 		} catch (Throwable t) {
 			// Nothing to do
 		}
