@@ -3,7 +3,7 @@ package com.logicaldoc.util.config;
 import org.jdom2.Element;
 
 /**
- * Configurator class for the META-INF/context.properties
+ * Configurator class for the META-INF/context.xml
  * 
  * @author Marco Meschieri
  * @since 8.8.4
