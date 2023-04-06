@@ -32,6 +32,5 @@ public class WebContextConfigurator {
 			return true;
 		} else
 			return false;
-
 	}
 }

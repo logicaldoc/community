@@ -158,7 +158,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				ContextProperties conf = new ContextProperties();
 				WebContextConfigurator configurator = new WebContextConfigurator(
 						context.getRealPath("/META-INF/context.xml"));
-				if (configurator.setSameSiteCookies(conf.getProperty("cookies.samesite", "unset"))) {
+				if (configurator.setSameSiteCookies(conf.getProperty("cookies.samesite", "lax"))) {
 					PluginRegistry.getInstance().setRestartRequired();
 				}
 			} catch (Throwable e) {

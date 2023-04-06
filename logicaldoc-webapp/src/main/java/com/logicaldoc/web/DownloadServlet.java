@@ -126,9 +126,9 @@ public class DownloadServlet extends HttpServlet {
 		 * In case the client asks for a safe version of the HTML content
 		 */
 		processSafeHtml(suffix, version, document);
-		
+
 		String filename = getFilename(document, version);
-		
+
 		ServletUtil.setContentDisposition(request, response, filename);
 
 		if (StringUtils.isEmpty(fileVersion)) {
@@ -163,9 +163,10 @@ public class DownloadServlet extends HttpServlet {
 	private Long getVersionId(HttpServletRequest request) {
 		Long versionId = null;
 		try {
-			versionId = Long.parseLong(request.getParameter("versionId"));
+			if (request.getParameter("versionId") != null)
+				versionId = Long.parseLong(request.getParameter("versionId"));
 		} catch (NumberFormatException e) {
-			log.error("Invalid version ID {}", versionId);
+			log.warn("Invalid version ID: {}", versionId);
 		}
 		return versionId;
 	}
@@ -175,7 +176,7 @@ public class DownloadServlet extends HttpServlet {
 		try {
 			docId = Long.parseLong(request.getParameter("docId"));
 		} catch (NumberFormatException e) {
-			log.error("Invalid document ID {}", docId);
+			log.error("Invalid document ID: {}", docId);
 		}
 		return docId;
 	}

@@ -445,7 +445,7 @@ public class WSUtil {
 			wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
 
 			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			templateDao.initializeAttributes(template);
+			templateDao.initialize(template);
 			wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
 
 			// Populate extended attributes

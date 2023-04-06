@@ -117,5 +117,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 
 		Assert.assertFalse(dao.isReadEnable(1L, 5L));
 		Assert.assertFalse(dao.isWriteEnable(1L, 5L));
+		
+		Assert.assertFalse(dao.isReadEnable(1L, 99L));
 	}
 }
