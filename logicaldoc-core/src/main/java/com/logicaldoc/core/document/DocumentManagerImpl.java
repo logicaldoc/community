@@ -827,7 +827,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				log.debug("Record of document {} has been written", docVO.getId());
 
 			storeVersionAsync(vers);
-			
+
 			return docVO;
 		}
 
@@ -864,7 +864,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					log.debug("Record of document {} has been written", version.getDocId());
 
 				versionDAO.store(version);
-			} catch (PersistenceException ex) {
+			} catch (Exception ex) {
 				log.error(ex.getMessage(), ex);
 			}
 		}, "VersionSave", 100L);

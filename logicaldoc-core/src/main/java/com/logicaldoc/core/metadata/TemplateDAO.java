@@ -70,11 +70,4 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * @return if the user can access the template
 	 */
 	public boolean isReadEnable(long templateId, long userId);
-
-	/**
-	 * Initializes the extended attributes only
-	 * 
-	 * @param template the instance to process
-	 */
-	public void initializeAttributes(Template template);
 }

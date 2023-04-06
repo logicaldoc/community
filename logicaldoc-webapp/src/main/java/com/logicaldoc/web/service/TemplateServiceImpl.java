@@ -113,8 +113,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)
 						&& (template.getRights() == null || template.getRights().length == 0)) {
 					// At least the current user must have write permission to
-					// this
-					// template
+					// this template
 					TemplateGroup wg = new TemplateGroup(session.getUser().getUserGroup().getId());
 					wg.setWrite(1);
 					templ.addTemplateGroup(wg);

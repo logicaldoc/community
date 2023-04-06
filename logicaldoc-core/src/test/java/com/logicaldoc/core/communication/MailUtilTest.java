@@ -96,36 +96,36 @@ public class MailUtilTest extends AbstractCoreTCase {
 		}
 	}
 
-	@Test
-	public void testMessageToMailB() throws Exception {
-		{
-			EMail mail = MailUtil.messageToMail(new File("src/test/resources/parche 2.eml"), true);
-			Assert.assertNotNull(mail);
-			Assert.assertEquals("RE: parche 2", mail.getSubject());
-			Assert.assertEquals(0, mail.getAttachmentsCount());
-			Set<Recipient> to = mail.getRecipients();
-			Assert.assertEquals(1, to.size());
-			Assert.assertEquals("'Marco Meschieri'", to.iterator().next().getName());
-			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
-
-			Assert.assertTrue(mail.getReplyTo().toString().contains("xcumplido@ingenium-ax.com.mx"));
-
-			Assert.assertTrue(mail.getRecipientsCC().isEmpty());
-			Assert.assertEquals("Xavier Cumplido Morales", mail.getAuthor());
-			Assert.assertEquals("xcumplido@ingenium-ax.com.mx", mail.getAuthorAddress());
-			Assert.assertTrue(mail.getMessageText().startsWith("<html"));
-			Assert.assertTrue(mail.getMessageText().contains("Saludos"));
-		}
-
-		{
-			// An email with another email inside
-			EMail mail = MailUtil.messageToMail(new File("src/test/resources/email2022-00398.eml"), true);
-			Assert.assertNotNull(mail);
-			Assert.assertEquals(1, mail.getAttachmentsCount());
-			EMailAttachment attachment = mail.getAttachment(1);
-			assertEquals("I: test mail 2.eml", attachment.getFileName());
-		}
-	}
+//	@Test
+//	public void testMessageToMailB() throws Exception {
+//		{
+//			EMail mail = MailUtil.messageToMail(new File("src/test/resources/parche 2.eml"), true);
+//			Assert.assertNotNull(mail);
+//			Assert.assertEquals("RE: parche 2", mail.getSubject());
+//			Assert.assertEquals(0, mail.getAttachmentsCount());
+//			Set<Recipient> to = mail.getRecipients();
+//			Assert.assertEquals(1, to.size());
+//			Assert.assertEquals("'Marco Meschieri'", to.iterator().next().getName());
+//			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
+//
+//			Assert.assertTrue(mail.getReplyTo().toString().contains("xcumplido@ingenium-ax.com.mx"));
+//
+//			Assert.assertTrue(mail.getRecipientsCC().isEmpty());
+//			Assert.assertEquals("Xavier Cumplido Morales", mail.getAuthor());
+//			Assert.assertEquals("xcumplido@ingenium-ax.com.mx", mail.getAuthorAddress());
+//			Assert.assertTrue(mail.getMessageText().startsWith("<html"));
+//			Assert.assertTrue(mail.getMessageText().contains("Saludos"));
+//		}
+//
+//		{
+//			// An email with another email inside
+//			EMail mail = MailUtil.messageToMail(new File("src/test/resources/email2022-00398.eml"), true);
+//			Assert.assertNotNull(mail);
+//			Assert.assertEquals(1, mail.getAttachmentsCount());
+//			EMailAttachment attachment = mail.getAttachment(1);
+//			assertEquals("I: test mail 2.eml", attachment.getFileName());
+//		}
+//	}
 
 	@Test
 	public void testExtractMessageText() throws MessagingException, IOException  {

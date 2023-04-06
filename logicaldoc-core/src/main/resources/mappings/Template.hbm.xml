@@ -19,13 +19,7 @@
 		<property name="readonly" type="int" column="ld_readonly" not-null="true" />
 		<property name="type" type="int" column="ld_type" not-null="true" />
 		<property name="validation" type="string" column="ld_validation" />
-		<set name="templateGroups" table="ld_templategroup" lazy="true" cascade="all">
-			<key column="ld_templateid" />
-			<composite-element class="com.logicaldoc.core.metadata.TemplateGroup">
-				<property name="groupId" type="long" column="ld_groupid" not-null="true" />
-				<property name="write" type="int" column="ld_write" not-null="true" />
-			</composite-element>
-		</set>		
+				
 		<map name="attributes" table="ld_template_ext" lazy="true" cascade="all"
 			order-by="ld_position asc, ld_name asc">
 			<key column="ld_templateid" />

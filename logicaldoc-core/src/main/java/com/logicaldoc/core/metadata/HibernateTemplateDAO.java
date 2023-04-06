@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -53,8 +54,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "order by " + ENTITY + ".name",
-					null);
+			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "order by " + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Template>();
@@ -66,8 +66,9 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		Template template = null;
 
 		try {
-			List<Template> coll = findByWhere(ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and "
-					+ ENTITY + ".tenantId=" + tenantId, null, null);
+			List<Template> coll = findByWhere(
+					ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + ".tenantId=" + tenantId,
+					null, null);
 			if (coll.size() > 0)
 				template = coll.iterator().next();
 			if (template != null && template.getDeleted() == 1)
@@ -76,6 +77,18 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			log.error(e.getMessage(), e);
 		}
 		return template;
+	}
+
+	@Override
+	public void store(Template template) throws PersistenceException {
+		super.store(template);
+
+		jdbcUpdate("delete from ld_templategroup where ld_templateid=" + template.getId());
+		if (template.getTemplateGroups() != null)
+			for (TemplateGroup tg : template.getTemplateGroups()) {
+				jdbcUpdate("insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) values ("
+						+ template.getId() + ", " + tg.getGroupId() + ", " + tg.getWrite() + ")");
+			}
 	}
 
 	@Override
@@ -138,25 +151,21 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			if (template.getAttributes() != null)
 				log.trace("Initialized {} attributes", template.getAttributes().keySet().size());
 
-			if (template.getTemplateGroups() != null)
-				log.trace("Initialized {} template groups", template.getTemplateGroups().size());
+			// Manually initialize the collegtion of templateGroups
+			template.getTemplateGroups().clear();
+			SqlRowSet groupSet = queryForRowSet(
+					"select ld_groupid,ld_write from ld_templategroup where ld_templateid=" + template.getId(), null,
+					null);
+			while (groupSet.next()) {
+				TemplateGroup tg = new TemplateGroup(groupSet.getLong(1));
+				tg.setWrite(groupSet.getInt(2));
+				template.getTemplateGroups().add(tg);
+			}
 		} catch (Throwable t) {
 			// Nothing to do
 		}
 	}
 
-	@Override
-	public void initializeAttributes(Template template) {
-		try {
-			refresh(template);
-
-			if (template.getAttributes() != null)
-				log.trace("Initialized {} attributes", template.getAttributes().keySet().size());
-		} catch (Throwable t) {
-			// Nothing to do
-		}		
-	}
-	
 	private boolean isWriteOrReadEnable(long templateId, long userId, boolean write) {
 		boolean result = true;
 		try {
@@ -170,8 +179,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			if (groups.isEmpty())
 				return false;
 
-			StringBuilder query = new StringBuilder(
-					"select distinct(" + ENTITY + ") from Template " + ENTITY + "  ");
+			StringBuilder query = new StringBuilder("select distinct(" + ENTITY + ") from Template " + ENTITY + "  ");
 			query.append(" left join " + ENTITY + ".templateGroups as _group ");
 			query.append(" where ");
 			if (write)
