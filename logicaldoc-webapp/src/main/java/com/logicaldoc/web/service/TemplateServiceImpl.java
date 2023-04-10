@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.LazyInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -304,7 +305,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
 
 			GUIAttribute guiAttribute = toGuiAttribute(attrName, templateExtAttr, setExtAttr, aSet);
-			
+
 			attributes[i] = guiAttribute;
 			i++;
 		}
@@ -409,8 +410,20 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	}
 
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
-		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		tDao.initialize(template);
+		try {
+			template.getAttributeNames().size();
+		} catch (LazyInitializationException e) {
+			// If an error happens here it means that the collection could not
+			// be loaded, so load the bean again and initialize it.
+			log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
+			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			try {
+				template = tDao.findById(template.getId());
+				tDao.initialize(template);
+			} catch (PersistenceException pe) {
+				log.warn(pe.getMessage(), pe);
+			}
+		}
 
 		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 

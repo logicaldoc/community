@@ -323,9 +323,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	protected void refresh(Object entity) {
-		if(entity==null)
+		if (entity == null)
 			return;
-		
+
 		try {
 			if (!sessionFactory.getCurrentSession().contains(entity)) {
 				sessionFactory.getCurrentSession().refresh(entity);
