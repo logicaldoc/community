@@ -66,12 +66,12 @@ public class Automation {
 	private long tenantId = Tenant.DEFAULT_ID;
 
 	public static synchronized void initialize() {
-		try {
-			
-				RuntimeSingleton.init();
+		if (RuntimeSingleton.isInitialized())
+			return;
 
-				log.info("Automation has been initialized");
-			
+		try {
+			RuntimeSingleton.init();
+			log.info("Automation has been initialized");
 		} catch (Throwable t) {
 			log.error("Unable to initialize the automation engine", t);
 		}

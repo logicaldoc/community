@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.LazyInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +54,27 @@ public class Initializer {
 
 		setUser(transaction);
 
+		if (template != null) {
+			try {
+				template.getAttributes().size();
+			} catch (LazyInitializationException e) {
+				// If an error happens here it means that the collection could
+				// not
+				// be loaded, so load the bean again and initialize it.
+				log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
+				TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+				try {
+					template = tDao.findById(template.getId());
+					tDao.initialize(template);
+				} catch (PersistenceException pe) {
+					log.warn(pe.getMessage(), pe);
+				}
+			}
+		}
+
 		try {
-			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			tDao.initialize(template);
+			// We access the collection as is without initializing the bean
+			// because that would lead to hibernate errors
 			for (String attributeName : template.getAttributeNames()) {
 				try {
 					Attribute attribute = object.getAttribute(attributeName);

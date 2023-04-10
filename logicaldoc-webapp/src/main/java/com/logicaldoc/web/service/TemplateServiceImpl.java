@@ -1,7 +1,5 @@
 package com.logicaldoc.web.service;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,9 +13,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.LazyInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
@@ -386,47 +384,27 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		}
 	}
 
-	private void loadTemplateAttributes(Template template) throws PersistenceException {
-		if(template==null)
-			return;
-		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		tDao.query("SELECT ld_name,ld_label,ld_mandatory,ld_type,ld_position,ld_stringvalue,ld_intvalue,ld_doublevalue,"
-				+ "ld_datevalue,ld_editor,ld_setid,ld_hidden,ld_multiple,ld_parent,ld_stringvalues,ld_validation,"
-				+ "ld_initialization,ld_dependson FROM ld_template_ext where ld_templateid = " + template.getId(), null,
-				new RowMapper<Attribute>() {
-
-					@Override
-					public Attribute mapRow(ResultSet rs, int row) throws SQLException {
-						Attribute attribute = new Attribute();
-						attribute.setName(rs.getString(1));
-						attribute.setLabel(rs.getString(2));
-						attribute.setMandatory(rs.getInt(3));
-						attribute.setType(rs.getInt(4));
-						attribute.setPosition(rs.getInt(5));
-						attribute.setStringValue(rs.getString(6));
-						attribute.setIntValue(rs.getLong(7));
-						attribute.setDoubleValue(rs.getDouble(8));
-						attribute.setDateValue(rs.getDate(9));
-						attribute.setEditor(rs.getInt(10));
-						attribute.setSetId(rs.getLong(11));
-						attribute.setHidden(rs.getInt(12));
-						attribute.setMultiple(rs.getInt(13));
-						attribute.setParent(rs.getString(14));
-						attribute.setStringValues(rs.getString(15));
-						attribute.setValidation(rs.getString(16));
-						attribute.setInitialization(rs.getString(17));
-						attribute.setDependsOn(rs.getString(18));
-
-						template.setAttribute(attribute.getName(), attribute);
-						return attribute;
-					}
-				}, null);
-	}
-
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
-		try {
-			loadTemplateAttributes(template);			
 
+		if (template != null) {
+			try {
+				template.getAttributes().size();
+			} catch (LazyInitializationException e) {
+				// If an error happens here it means that the collection could
+				// not
+				// be loaded, so load the bean again and initialize it.
+				log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
+				TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+				try {
+					template = tDao.findById(template.getId());
+					tDao.initialize(template);
+				} catch (PersistenceException pe) {
+					log.warn(pe.getMessage(), pe);
+				}
+			}
+		}
+
+		try {
 			AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 
 			List<GUIAttribute> attributes = new ArrayList<GUIAttribute>();
