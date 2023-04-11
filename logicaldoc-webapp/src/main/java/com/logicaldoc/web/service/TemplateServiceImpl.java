@@ -410,18 +410,21 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	}
 
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
-		try {
-			template.getAttributeNames().size();
-		} catch (LazyInitializationException e) {
-			// If an error happens here it means that the collection could not
-			// be loaded, so load the bean again and initialize it.
-			log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		if (template != null) {
 			try {
-				template = tDao.findById(template.getId());
-				tDao.initialize(template);
-			} catch (PersistenceException pe) {
-				log.warn(pe.getMessage(), pe);
+				template.getAttributes().size();
+			} catch (LazyInitializationException e) {
+				// If an error happens here it means that the collection could
+				// not
+				// be loaded, so load the bean again and initialize it.
+				log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
+				TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+				try {
+					template = tDao.findById(template.getId());
+					tDao.initialize(template);
+				} catch (PersistenceException pe) {
+					log.warn(pe.getMessage(), pe);
+				}
 			}
 		}
 
