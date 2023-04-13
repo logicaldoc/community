@@ -743,15 +743,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			DocumentGridUtil.updateRecord(document, rec);
 			refreshRow(rec);
 		}
-
-		// Now consider the aliases
-		if (document.getDocRef() != null) {
-			rec = findRecord(document.getDocRef());
-			if (rec != null) {
-				DocumentGridUtil.updateRecord(document, rec);
-				refreshRow(rec);
-			}
-		}
 	}
 
 	private void refreshRow(Record rec) {
