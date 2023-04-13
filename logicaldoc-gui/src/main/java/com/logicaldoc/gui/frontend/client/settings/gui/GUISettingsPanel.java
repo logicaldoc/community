@@ -330,7 +330,7 @@ public class GUISettingsPanel extends AdminPanel {
 		webstartMode.setValueMap("webstart", DOWNLOAD);
 		webstartMode.setValue(Util.getParameterValue(settings, "gui.webstart.mode"));
 
-		RadioGroupItem foldOpentree = ItemFactory.newBooleanSelector("foldopentree");
+		RadioGroupItem foldOpentree = ItemFactory.newBooleanSelector("foldopentree","openfolderstree");
 		foldOpentree.setWrapTitle(false);
 		foldOpentree.setValue(yesNo(settings, "gui.folder.opentree"));
 

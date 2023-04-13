@@ -412,7 +412,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
 		if (template != null) {
 			try {
-				template.getAttributes().size();
+				if (template.getAttributes() != null)
+					template.getAttributes().size();
 			} catch (LazyInitializationException e) {
 				// If an error happens here it means that the collection could
 				// not

@@ -518,7 +518,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		MenuItem pasteAsAlias = new MenuItem();
 		pasteAsAlias.setTitle(I18N.message("pasteasalias"));
-		pasteAsAlias.addClickHandler((MenuItemClickEvent pasteAliasClick) -> onPasteAsAlias());
+		pasteAsAlias.addClickHandler(pasteAliasClick -> onPasteAsAlias());
 
 		MenuItem exportZip = prepareExportZipMenuItem(selectedFolder);
 

@@ -308,9 +308,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	protected void refresh() {
 		hideSave();
 
-		ChangedHandler changeHandler = (ChangedEvent event) -> {
-			displaySave();
-		};
+		ChangedHandler changeHandler = event -> displaySave();
 
 		/*
 		 * Prepare the standard properties tab

@@ -142,10 +142,10 @@ public class EventEndpoint implements EventListener {
 				WebsocketMessage message = prepareMessage(event);
 				distributeMessage(message);
 			} catch (Throwable e) {
-				if (e instanceof java.lang.IllegalStateException)
-					log.debug(e.getMessage(), e);
+				if (log.isDebugEnabled())
+					log.debug("Skip sending the websocket message related to the event {}", event, e);
 				else
-					log.error(e.getMessage(), e);
+					log.warn("Skip sending the websocket message related to the event {}", event);
 			}
 		}
 	}

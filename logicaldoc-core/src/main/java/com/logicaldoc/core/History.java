@@ -463,4 +463,9 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setFileSize(source.getFileSize());
 		setColor(source.getColor());
 	}
+
+	@Override
+	public String toString() {
+		return getId() +" - " + event;
+	}
 }
