@@ -34,7 +34,10 @@ public class HTMLParser extends AbstractParser {
 			String body = doc.body().text();
 			content.append(title + "\n" + body);
 		} catch (Exception e) {
-			log.warn("Failed to extract HTML text content", e);
+			if (log.isDebugEnabled())
+				log.debug("Failed to extract HTML text content", e);
+			else
+				log.warn("Failed to extract HTML text content");
 		}
 	}
 }
