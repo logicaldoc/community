@@ -141,11 +141,9 @@ public class EventEndpoint implements EventListener {
 			try {
 				WebsocketMessage message = prepareMessage(event);
 				distributeMessage(message);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Skip sending the websocket message related to the event {}", event, e);
-				else
-					log.warn("Skip sending the websocket message related to the event {}", event);
 			}
 		}
 	}
