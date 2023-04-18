@@ -109,8 +109,10 @@ public class ZipUtil {
 			setCharset(zFile);
 
 			List<FileHeader> fileHeaders = zFile.getFileHeaders();
-			for (FileHeader fileHeader : fileHeaders)
+			for (FileHeader fileHeader : fileHeaders) {
 				files.add(fileHeader.getFileName());
+			}
+			
 		} catch (Throwable e) {
 			logError(e.getMessage());
 		}

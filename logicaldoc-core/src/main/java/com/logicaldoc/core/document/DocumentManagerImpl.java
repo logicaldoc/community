@@ -772,6 +772,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public Document create(File file, Document docVO, DocumentHistory transaction) throws PersistenceException {
 		assert transaction != null : "Empty transaction";
 		assert docVO != null : "No value object provided";
+		assert file.length()>0L : "cannot store 0 bytes file";
 
 		setAtributesForCreation(file, docVO, transaction);
 

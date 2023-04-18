@@ -87,7 +87,7 @@ public class InMemoryZipImport extends ZipImport {
 
 					docManager.create(zipUtil.getEntryStream(zipsource, entry), doc, history);
 				} catch (Exception e) {
-					logger.warn("InMemoryZipImport unable to import ZIP entry " + entry, e);
+					logger.warn("InMemoryZipImport unable to import ZIP entry {}", entry, e);
 				}
 			}
 		} catch (Throwable e) {
