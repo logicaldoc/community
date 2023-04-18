@@ -386,7 +386,7 @@ public class Exec {
 		boolean allowed = allowedCommands.contains(cmdLine);
 		if (!allowed) {
 			for (String row : allowedCommands) {
-				if ("*".equals(row) || cmdLine.startsWith(row)) {
+				if ("*".equals(row) || row.startsWith(commandLine)) {
 					allowed = true;
 					break;
 				}
