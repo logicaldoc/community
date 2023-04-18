@@ -112,21 +112,26 @@ public class PDFParser extends AbstractParser {
 	 */
 	private void parseForm(PDDocument pdfDocument, StringBuilder content) throws IOException {
 		PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
+		if (docCatalog == null)
+			return;
+
 		PDAcroForm acroForm = docCatalog.getAcroForm();
 
 		if (acroForm == null)
 			return;
 
-		content.append("\n");
-
 		List<PDField> fields = acroForm.getFields();
-		log.debug("{} top-level fields were found on the form", fields.size());
+		if (fields != null && !fields.isEmpty()) {
+			content.append("\n");
+			
+			log.debug("{} top-level fields were found on the form", fields.size());
 
-		for (PDField field : fields) {
-			content.append(field.getPartialName());
-			content.append(" = ");
-			content.append(field.getValueAsString());
-			content.append(" \n ");
+			for (PDField field : fields) {
+				content.append(field.getPartialName());
+				content.append(" = ");
+				content.append(field.getValueAsString());
+				content.append(" \n ");
+			}
 		}
 	}
 
