@@ -192,7 +192,8 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 					|| name.startsWith("firewall.") || name.contains(".2fa.") || name.startsWith("ftp.")
 					|| name.startsWith("cas.") || name.startsWith("cache.") || name.startsWith("jdbc.")
 					|| name.startsWith("comparator.") || name.contains(".via.") || name.contains(".downloadticket.")
-					|| name.startsWith("zonalocr.") || name.endsWith(CHARSET) || name.startsWith("policy."))
+					|| name.startsWith("zonalocr.") || name.endsWith(CHARSET) || name.startsWith("policy.")
+					|| name.startsWith("cookies."))
 				continue;
 
 			sortedSet.add(key.toString());
@@ -265,8 +266,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			/*
 			 * This is a setting we save into the database
 			 */
-			Generic setting = genericDao.findByAlternateKey(GUISETTING, GUI_TAG_VOCABULARY, 0L,
-					session.getTenantId());
+			Generic setting = genericDao.findByAlternateKey(GUISETTING, GUI_TAG_VOCABULARY, 0L, session.getTenantId());
 			if (setting == null)
 				setting = new Generic(GUISETTING, GUI_TAG_VOCABULARY, 0L, session.getTenantId());
 			setting.setString1(settings[settingIndex].getValue());
