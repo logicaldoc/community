@@ -52,15 +52,4 @@ public class DocumentComparatorTest extends AbstractCoreTCase {
 		Document lstDoc = docs.get(3);
 		assertEquals("context.xml", lstDoc.getFileName());
 	}
-	
-	@Test
-	public void testGetComparatorListOfDocumentComparator() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetComparatorDocumentComparatorArray() {
-		fail("Not yet implemented");
-	}
-
 }

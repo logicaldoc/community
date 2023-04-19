@@ -42,8 +42,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Override
 	public List<Version> findByDocId(long docId) {
 		try {
-			return findByWhere(" " + ENTITY + DOC_ID + docId, "order by " + ENTITY + ".versionDate desc",
-					null);
+			return findByWhere(" " + ENTITY + DOC_ID + docId, "order by " + ENTITY + ".versionDate desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -55,8 +54,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	public Version findByVersion(long docId, String version) {
 		List<Version> versions = new ArrayList<>();
 		try {
-			versions = findByWhere(
-					" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version='" + version + "'",
+			versions = findByWhere(" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version='" + version + "'",
 					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -72,8 +70,9 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	public Version findByFileVersion(long docId, String fileVersion) {
 		List<Version> versions = new ArrayList<>();
 		try {
-			versions = findByWhere(" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion='"
-					+ fileVersion + "'", "order by " + ENTITY + ".date asc", null);
+			versions = findByWhere(
+					" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion='" + fileVersion + "'",
+					"order by " + ENTITY + ".date asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -194,13 +193,13 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	@Override
 	public void delete(long versionId, int delCode) throws PersistenceException {
-		assert delCode != 0 : "delCode cannot be 0";
+		if (delCode == 0)
+			throw new IllegalArgumentException("delCode cannot be 0");
 
 		if (!checkStoringAspect())
 			return;
 
 		Version ver = findById(versionId);
-		assert ver != null : "Unezisting version with ID=" + versionId;
 		if (ver != null) {
 			ver.setDeleted(delCode);
 			ver.setVersion(StringUtils.right(versionId + "." + ver.getVersion(), 10));

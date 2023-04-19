@@ -185,7 +185,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	Session(User user, String password, String key, Client client) {
 		super();
-		assert (user != null);
+		
+		if (user == null)
+			throw new IllegalArgumentException("user cannot be null");
+		
 		this.sid = UUID.randomUUID().toString();
 		this.tenantId = user.getTenantId();
 		this.user = user;

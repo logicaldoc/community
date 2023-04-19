@@ -209,8 +209,10 @@ public class MailTool {
 	 * @throws Exception the email cannot be correctly analyzed
 	 */
 	public EMail documentToEMail(Document document, boolean extractAttachments) throws Exception {
-		assert (document.getFileName().toLowerCase().endsWith(".eml")
-				|| document.getFileName().toLowerCase().endsWith(".msg"));
+		if (!(document.getFileName().toLowerCase().endsWith(".eml")
+				|| document.getFileName().toLowerCase().endsWith(".msg")))
+			throw new IllegalArgumentException("Filename must end with .msg or .eml");
+
 		EMail email = null;
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		if (document.getFileName().toLowerCase().endsWith(".eml"))
@@ -239,7 +241,6 @@ public class MailTool {
 			throws Exception {
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user = uDao.findByUsername(recipient);
-		assert (user != null);
 
 		SystemMessage m = new SystemMessage();
 		m.setTenantId(user.getTenantId());

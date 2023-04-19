@@ -98,6 +98,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals("pluto(1)", doc.getFileName());
 		Assert.assertEquals("1.1", doc.getVersion());
 
+		Thread.sleep(2000L);
 		Assert.assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid="
 				+ doc.getId() + " and ld_version='" + doc.getVersion() + "'"));
 	}
@@ -268,6 +269,8 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		String store2Root = Context.get().getProperties().getPropertyWithSubstitutions("store.2.dir");
 
 		Assert.assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
+		int count = new File(storeRoot + "/1/doc/").list().length;
+		Assert.assertEquals(1, count);
 
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
@@ -523,7 +526,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testCreate() throws PersistenceException, FileNotFoundException {
+	public void testCreate() throws PersistenceException, FileNotFoundException, InterruptedException {
 		User user = userDao.findByUsername("admin");
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
@@ -544,6 +547,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals("1.0", newDoc.getVersion());
 		Assert.assertEquals("1.0", newDoc.getFileVersion());
 
+		Thread.sleep(2000L);
 		Version ver = verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
 		Assert.assertNotNull(ver);
 

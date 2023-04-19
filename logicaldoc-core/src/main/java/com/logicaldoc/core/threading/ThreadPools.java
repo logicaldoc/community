@@ -75,7 +75,6 @@ public class ThreadPools {
 			int max = config.getInt(THREADPOOL + name + ".max", 10);
 			int keepalive = config.getInt(THREADPOOL + name + ".keepalive", 5);
 			String type = config.getString(THREADPOOL + name + ".type", TYPE_DEFAULT);
-			assert type.equals(TYPE_DEFAULT) || type.equals(TYPE_SCHEDULED) : "Unknown type " + type;
 
 			if (TYPE_DEFAULT.equals(type))
 				pool = new ScheduledThreadPoolExecutor(core, new NamedThreadFactory(name));

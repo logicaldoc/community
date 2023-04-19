@@ -638,7 +638,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive)
 			throws PersistenceException {
-		
+
 		StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted = 0 and ");
 		if (caseSensitive)
 			query.append("ld_name like '" + SqlUtil.doubleQuotes(name) + "' ");
@@ -1459,7 +1459,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			long child = queryForLong("SELECT ld_id FROM ld_folder WHERE ld_parentid=? AND ld_name=? AND ld_tenantid=?", 
+			long child = queryForLong("SELECT ld_id FROM ld_folder WHERE ld_parentid=? AND ld_name=? AND ld_tenantid=?",
 					folder.getId(), name, folder.getTenantId());
 
 			if (child == 0L) {
@@ -1552,15 +1552,21 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internalCopy(Folder source, Folder target, String newName, boolean foldersOnly,
 			String securityOption, FolderHistory transaction) throws PersistenceException {
-		assert (securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption));
-		assert source != null : "Source folder cannot be null";
-		assert target != null : "Target folder cannot be null";
-		assert transaction != null : "Transaction cannot be null";
-		assert (transaction.getUser() != null);
+		if(!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
+			throw new IllegalArgumentException("Invalid security option "+securityOption);
+		if(source==null)
+			throw new IllegalArgumentException("Source folder cannot be null");
+		if(target==null)
+			throw new IllegalArgumentException("Target folder cannot be null");
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
+		if (transaction.getUser() == null)
+			throw new IllegalArgumentException("transaction user cannot be null");
 
 		target = findFolder(target);
 
-		assert !isInPath(source.getId(), target.getId()) : "Cannot copy a folder inside the same path";
+		if (isInPath(source.getId(), target.getId()))
+			throw new IllegalArgumentException("Cannot copy a folder inside the same path");
 
 		// Create the same folder in the target
 		Folder newFolder = null;

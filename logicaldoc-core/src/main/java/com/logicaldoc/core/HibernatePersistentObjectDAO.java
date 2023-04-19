@@ -67,7 +67,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	public void delete(long id, int code) throws PersistenceException {
-		assert (code != 0);
+		if(code==0)
+			throw new IllegalArgumentException("code cannot be 0");
 
 		if (!checkStoringAspect())
 			return;

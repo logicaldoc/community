@@ -27,7 +27,8 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 
 	@Override
 	public void delete(long genericId, int code) throws PersistenceException {
-		assert (code != 0);
+		if(code==0)
+			throw new IllegalArgumentException("code cannot be 0");
 
 		if (!checkStoringAspect())
 			return;

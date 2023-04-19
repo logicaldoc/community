@@ -132,9 +132,8 @@ public class RegexTester extends Applet implements ActionListener, TextListener 
             } else if (source == resetButton) {
                 resetMatcher();
                 return;
-            } else {
-                assert false : "Unrecognized button";
-            }
+            } 
+            
             if (success) {
                 showResult();
             } else {

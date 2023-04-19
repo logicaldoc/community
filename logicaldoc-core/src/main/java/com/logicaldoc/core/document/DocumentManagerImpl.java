@@ -130,7 +130,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public void replaceFile(long docId, String fileVersion, InputStream content, DocumentHistory transaction)
 			throws IOException, PersistenceException {
-		assert (transaction != null);
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
 
 		// Write content to temporary file, then delete it
 		File tmp = FileUtil.createTempFile("replacefile", "");
@@ -147,7 +148,9 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void replaceFile(long docId, String fileVersion, File newFile, DocumentHistory transaction)
 			throws PersistenceException, IOException {
 		validateTransaction(transaction);
-		assert transaction.getComment() != null : NO_COMMENT_IN_TRANSACTION;
+
+		if (transaction.getComment() == null)
+			throw new IllegalArgumentException(NO_COMMENT_IN_TRANSACTION);
 
 		transaction.setEvent(DocumentEvent.VERSION_REPLACED.toString());
 		transaction.setComment(String.format("file version %s - %s", fileVersion, transaction.getComment()));
@@ -192,16 +195,22 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	private void validateTransaction(DocumentHistory transaction) {
-		assert transaction != null : "No transaction";
-		assert transaction.getUser() != null : "No user in transaction";
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
+		if (transaction.getUser() == null)
+			throw new IllegalArgumentException("transaction user cannot be null");
 	}
 
 	@Override
 	public void checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
-		assert transaction.getComment() != null : NO_COMMENT_IN_TRANSACTION;
-		assert filename != null : "File name is mandatory";
+
+		if (transaction.getComment() == null)
+			throw new IllegalArgumentException(NO_COMMENT_IN_TRANSACTION);
+
+		if (filename == null)
+			throw new IllegalArgumentException("File name is mandatory");
 
 		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
 
@@ -343,7 +352,9 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws IOException, PersistenceException {
 		validateTransaction(transaction);
-		assert transaction.getComment() != null : NO_COMMENT_IN_TRANSACTION;
+
+		if (transaction.getComment() == null)
+			throw new IllegalArgumentException(NO_COMMENT_IN_TRANSACTION);
 
 		// Write content to temporary file, then delete it
 		File tmp = FileUtil.createTempFile("checkin", "");
@@ -477,7 +488,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	public long reindex(long docId, String content, DocumentHistory transaction)
 			throws PersistenceException, ParseException {
 		Document doc = documentDAO.findById(docId);
-		assert doc != null : "Unexisting document with ID: " + docId;
+		if (doc == null)
+			throw new IllegalArgumentException("Unexisting document with ID: " + docId);
 
 		log.debug("Reindexing document {} - {}", docId, doc.getFileName());
 
@@ -545,8 +557,12 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public void update(Document document, Document docVO, DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
-		assert (document != null);
-		assert (docVO != null);
+		if (document == null)
+			throw new IllegalArgumentException("No document has been provided");
+
+		if (docVO == null)
+			throw new IllegalArgumentException("No value object has been provided");
+
 		try {
 			/*
 			 * Better to synchronize this block because under high
@@ -749,8 +765,11 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public Document create(InputStream content, Document docVO, DocumentHistory transaction)
 			throws PersistenceException {
-		assert (transaction != null);
-		assert (docVO != null);
+		if (transaction == null)
+			throw new IllegalArgumentException("No transaction has been specified");
+
+		if (docVO == null)
+			throw new IllegalArgumentException("No value object has been provided");
 
 		// Write content to temporary file, then delete it
 		File tmp = null;
@@ -770,15 +789,20 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public Document create(File file, Document docVO, DocumentHistory transaction) throws PersistenceException {
-		assert transaction != null : "Empty transaction";
-		assert docVO != null : "No value object provided";
-		assert file.length()>0L : "cannot store 0 bytes file";
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
+
+		if (docVO == null)
+			throw new IllegalArgumentException("No value object has been provided");
+
+		if (!(file != null && file.length() > 0))
+			throw new IllegalArgumentException("Cannot create 0 bytes document");
 
 		setAtributesForCreation(file, docVO, transaction);
 
 		/*
 		 * Better to synchronize this block because under high multi-threading
-		 * may lead to hibernate's sessions rollbacks
+		 * it may lead to hibernate's sessions rollbacks
 		 */
 		synchronized (this) {
 			countPages(file, docVO);
@@ -1099,8 +1123,10 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public Document createAlias(Document doc, Folder folder, String aliasType, DocumentHistory transaction)
 			throws PersistenceException {
-		assert (doc != null);
-		assert (folder != null);
+		if (doc == null)
+			throw new IllegalArgumentException("No document has been provided");
+		if (folder == null)
+			throw new IllegalArgumentException("No folder has been provided");
 		validateTransaction(transaction);
 
 		try {
@@ -1157,8 +1183,6 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void changeIndexingStatus(Document doc, int status) {
-		assert (status != AbstractDocument.INDEX_INDEXED);
-
 		if (status == AbstractDocument.INDEX_SKIP && doc.getIndexed() == AbstractDocument.INDEX_SKIP)
 			return;
 		if (status == AbstractDocument.INDEX_TO_INDEX && doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX)
@@ -1189,12 +1213,14 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public Version deleteVersion(long versionId, DocumentHistory transaction) throws PersistenceException {
 		Version versionToDelete = versionDAO.findById(versionId);
-		assert versionToDelete != null : "Unexisting version " + versionId;
+		if (versionToDelete == null)
+			throw new IllegalArgumentException("Unexisting version " + versionId);
 
 		String versionToDeleteSpec = versionToDelete.getVersion();
 
 		Document document = documentDAO.findById(versionToDelete.getDocId());
-		assert document != null : "Unexisting referenced document " + versionToDelete.getDocId();
+		if (document == null)
+			throw new IllegalArgumentException("Unexisting referenced document " + versionToDelete.getDocId());
 
 		List<Version> versions = versionDAO.findByDocId(versionToDelete.getDocId());
 
@@ -1309,7 +1335,9 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction.getUser() != null);
+		if (transaction.getUser() == null)
+			throw new IllegalArgumentException("transaction user cannot be null");
+
 		List<Long> idsList = new ArrayList<>();
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),

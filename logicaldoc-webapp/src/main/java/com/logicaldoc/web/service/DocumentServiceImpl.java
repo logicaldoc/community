@@ -346,8 +346,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			doc.setTenantId(session.getTenantId());
 			doc.setCreation(new Date());
 
-			System.out.println("doc tanant: " + doc.getTenantId());
-
 			InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
 			importer.process(zipFile, parent, session.getUserId(), session.getSid());
 		} catch (PersistenceException e) {

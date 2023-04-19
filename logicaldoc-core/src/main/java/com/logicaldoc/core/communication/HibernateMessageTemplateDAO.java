@@ -65,13 +65,15 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 			lang = "en";
 
 		try {
-			List<MessageTemplate> buf = findByWhere(" " + ENTITY + LANGUAGE + lang + AND + ENTITY + NAME
-					+ name + AND + ENTITY + TENANT_ID + tenantId, null, null);
+			List<MessageTemplate> buf = findByWhere(
+					" " + ENTITY + LANGUAGE + lang + AND + ENTITY + NAME + name + AND + ENTITY + TENANT_ID + tenantId,
+					null, null);
 			if (buf != null && !buf.isEmpty())
 				return buf.get(0);
 
-			buf = findByWhere(" " + ENTITY + ".language='en' and " + ENTITY + NAME + name + AND
-					+ ENTITY + TENANT_ID + tenantId, null, null);
+			buf = findByWhere(
+					" " + ENTITY + ".language='en' and " + ENTITY + NAME + name + AND + ENTITY + TENANT_ID + tenantId,
+					null, null);
 			if (buf != null && !buf.isEmpty())
 				return buf.get(0);
 		} catch (PersistenceException e) {
@@ -86,7 +88,8 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 		if (!checkStoringAspect())
 			return;
 
-		assert (code != 0);
+		if (code == 0)
+			throw new IllegalArgumentException("code cannot be 0");
 
 		MessageTemplate template = findById(id);
 		if (template != null) {
@@ -99,8 +102,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	@Override
 	public List<MessageTemplate> findByName(String name, long tenantId) {
 		try {
-			return findByWhere(
-					" " + ENTITY + NAME + SqlUtil.doubleQuotes(name) + AND + ENTITY + TENANT_ID + tenantId,
+			return findByWhere(" " + ENTITY + NAME + SqlUtil.doubleQuotes(name) + AND + ENTITY + TENANT_ID + tenantId,
 					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

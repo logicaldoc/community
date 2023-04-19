@@ -145,9 +145,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void delete(long docId, int delCode, DocumentHistory transaction) throws PersistenceException {
-		assert (delCode != 0);
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		if (delCode == 0)
+			throw new IllegalArgumentException("delCode cannot be 0");
+
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
+		if (transaction.getUser() == null)
+			throw new IllegalArgumentException("transaction user cannot be null");
 
 		if (!checkStoringAspect())
 			return;
@@ -1260,8 +1264,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void setPassword(long docId, String password, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUsername() != null);
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
+		if (transaction.getUsername() == null)
+			throw new IllegalArgumentException("transaction username cannot be null");
+
 		transaction.setEvent(DocumentEvent.PASSWORD_PROTECTED.toString());
 
 		Document doc = findDocument(docId);
@@ -1284,8 +1291,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void unsetPassword(long docId, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUsername() != null);
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
+		if (transaction.getUsername() == null)
+			throw new IllegalArgumentException("transaction username cannot be null");
+
 		transaction.setEvent(DocumentEvent.PASSWORD_UNPROTECTED.toString());
 
 		Document doc = findDocument(docId);

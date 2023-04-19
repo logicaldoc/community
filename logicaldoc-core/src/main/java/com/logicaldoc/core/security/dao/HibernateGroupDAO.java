@@ -36,7 +36,8 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	}
 
 	public void delete(long groupId, int code) throws PersistenceException {
-		assert (code != 0);
+		if(code==0)
+			throw new IllegalArgumentException("code cannot be 0");
 		Group group = findById(groupId);
 		refresh(group);
 

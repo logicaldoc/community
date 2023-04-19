@@ -490,13 +490,21 @@ public class MailUtil {
 		if (StringUtils.isEmpty(fileName))
 			return;
 
-		String[] values = part.getHeader("Content-Disposition");
-		if (values != null && values.length > 0) {
+		String[] contentDispositionValues = part.getHeader("Content-Disposition");
+		if (contentDispositionValues != null && contentDispositionValues.length > 0) {
 			// Skip part that specifies a Content-Disposition but it is not
 			// 'attachment'
-			disposition = new ContentDisposition(values[0]).getDisposition();
+			disposition = new ContentDisposition(contentDispositionValues[0]).getDisposition();
 			if (!disposition.contains("attachment"))
 				return;
+		}
+
+		String[] contentIdValues = part.getHeader("Content-ID");
+		if (contentIdValues != null && contentIdValues.length > 0) {
+			// This is not an attachment but a content referenced by the body,
+			// like an image in the signature. We do not consider such part as
+			// an attachment
+			return;
 		}
 
 		fileName = MimeUtility.decodeText(fileName);

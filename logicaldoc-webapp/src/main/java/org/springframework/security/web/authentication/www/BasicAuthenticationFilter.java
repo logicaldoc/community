@@ -66,15 +66,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * remoting protocol clients (such as Hessian and SOAP) as well as standard user
  * agents (such as Internet Explorer and Netscape).
  * <p>
- * If authentication is successful, the resulting Authentication object
- * will be placed into the <code>SecurityContextHolder</code>.
+ * If authentication is successful, the resulting Authentication object will be
+ * placed into the <code>SecurityContextHolder</code>.
  *
  * <p>
  * If authentication fails and <code>ignoreFailure</code> is <code>false</code>
  * (the default), an {@link AuthenticationEntryPoint} implementation is called
  * (unless the <b>ignoreFailure</b> property is set to <b>true</b>). Usually
- * this should be BasicAuthenticationEntryPoint, which will prompt the
- * user to authenticate again via BASIC authentication.
+ * this should be BasicAuthenticationEntryPoint, which will prompt the user to
+ * authenticate again via BASIC authentication.
  *
  * <p>
  * Basic authentication is an attractive protocol because it is simple and
@@ -167,13 +167,14 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 
 		try {
 			String[] tokens = extractAndDecodeHeader(header, request);
-			assert tokens.length == 2;
+
+			if (tokens.length != 2)
+				throw new IndexOutOfBoundsException("tokens must be exactly two");
 
 			String username = tokens[0];
 
-			if (debug) {
+			if (debug)
 				this.logger.debug("Basic Authentication Authorization header found for user '" + username + "'");
-			}
 
 			if (authenticationIsRequired(username)) {
 				UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username,
@@ -249,14 +250,15 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	/**
 	 * @LOGICALDOC
 	 * 
-	 * Decodes the header into a username and password.
+	 *             Decodes the header into a username and password.
 	 *
 	 * @throws BadCredentialsException if the Basic header is not present or is
 	 *         not valid Base64
 	 */
 	private String[] extractAndDecodeHeader(String header, HttpServletRequest request) throws IOException {
 		String userAgent = request.getHeader("user-agent");
-		if (userAgent!=null && userAgent.contains("Chrome")) { // checking if Chrome
+		if (userAgent != null && userAgent.contains("Chrome")) { // checking if
+																	// Chrome
 			return extractAndDecodeHeaderChrome(header, request);
 		} else {
 			return extractAndDecodeHeaderAll(header, request);
@@ -266,7 +268,8 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	/**
 	 * @LOGICALDOC
 	 * 
-	 * Decodes the header into a username and password. It assumes Chrome.
+	 *             Decodes the header into a username and password. It assumes
+	 *             Chrome.
 	 *
 	 * @throws BadCredentialsException if the Basic header is not present or is
 	 *         not valid Base64
@@ -293,8 +296,8 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	/**
 	 * @LOGICALDOC
 	 * 
-	 * Decodes the header into a username and password. All the browsers other
-	 * than Chrome
+	 *             Decodes the header into a username and password. All the
+	 *             browsers other than Chrome
 	 *
 	 * @throws BadCredentialsException if the Basic header is not present or is
 	 *         not valid Base64

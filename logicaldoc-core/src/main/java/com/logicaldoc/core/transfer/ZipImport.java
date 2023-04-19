@@ -84,8 +84,8 @@ public class ZipImport {
 			File[] files = dir.listFiles();
 
 			for (int i = 0; i < files.length; i++) {
-				if (files[i].length() > 0 && StringUtils.isNotEmpty(files[i].getName())
-						&& StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
+				if (StringUtils.isNotEmpty(files[i].getName())
+						|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
 					try {
 						addEntry(files[i], parent);
 					} catch (PersistenceException e) {
@@ -163,10 +163,10 @@ public class ZipImport {
 			File[] files = file.listFiles();
 
 			for (int i = 0; i < files.length; i++)
-				if (files[i].length() > 0 && StringUtils.isNotEmpty(files[i].getName())
-						&& StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
+				if (StringUtils.isNotEmpty(files[i].getName())
+						|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
 					addEntry(files[i], folder);
-		} else {
+		} else if (file.length() > 0L) {
 			// creates a document
 			DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			try {

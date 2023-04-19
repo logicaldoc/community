@@ -419,7 +419,6 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 *         requested range is not supported.
 	 */
 	private Pair<String, String> parseRangeRequestHeader(String rangeHeader) throws DavException {
-		assert rangeHeader != null;
 		if (!rangeHeader.startsWith(RANGE_BYTE_PREFIX)) {
 			throw new DavException(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
 		}

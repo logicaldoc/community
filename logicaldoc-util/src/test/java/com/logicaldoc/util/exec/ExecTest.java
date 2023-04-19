@@ -44,6 +44,7 @@ public class ExecTest {
 				log.info("retval: {}", retval);
 				assertEquals(0, retval);
 			} catch (IOException e) {
+				e.printStackTrace();
 				fail("Unexpected exception was thrown");
 			}
 		}

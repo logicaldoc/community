@@ -180,7 +180,8 @@ public abstract class ExtensibleObject extends PersistentObject {
 			removeAttribute(n);
 		}
 
-		assert (values != null && values.length > 0);
+		if (!(values != null && values.length > 0))
+			throw new IllegalArgumentException("no values have been specified");
 
 		List<Attribute> attrs = new ArrayList<>();
 		Attribute master = setValue(name, values[0]);

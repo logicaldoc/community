@@ -20,8 +20,12 @@ public class LimitedInputStream extends FilterInputStream {
 
 	public LimitedInputStream(InputStream in, long limit) {
 		super(in);
-		assert (in != null);
-		assert (limit >= 0);
+		
+		if (in == null)
+			throw new IllegalArgumentException("no input stream");
+		if (limit < 0)
+			throw new IndexOutOfBoundsException("negative limit");
+		
 		left = limit;
 	}
 
@@ -116,7 +120,8 @@ public class LimitedInputStream extends FilterInputStream {
 	public static void readFully(InputStream in, byte[] b, int off, int len) throws IOException {
 		int read = read(in, b, off, len);
 		if (read != len) {
-			throw new EOFException("reached end of stream after reading " + read + " bytes; " + len + " bytes expected");
+			throw new EOFException(
+					"reached end of stream after reading " + read + " bytes; " + len + " bytes expected");
 		}
 	}
 
@@ -134,8 +139,8 @@ public class LimitedInputStream extends FilterInputStream {
 	public static void skipFully(InputStream in, long n) throws IOException {
 		long skipped = skipUpTo(in, n);
 		if (skipped < n) {
-			throw new EOFException("reached end of stream after skipping " + skipped + " bytes; " + n
-					+ " bytes expected");
+			throw new EOFException(
+					"reached end of stream after skipping " + skipped + " bytes; " + n + " bytes expected");
 		}
 	}
 
@@ -220,11 +225,14 @@ public class LimitedInputStream extends FilterInputStream {
 	// Sometimes you don't care how many bytes you actually read, I guess.
 	// (You know that it's either going to read len bytes or stop at EOF.)
 	public static int read(InputStream in, byte[] b, int off, int len) throws IOException {
-		assert (in != null);
-		assert (b != null);
-		if (len < 0) {
+		
+		if (in == null)
+			throw new IndexOutOfBoundsException("no input stream has been specified");
+		if (b == null)
+			throw new IndexOutOfBoundsException("no bytes have been specified");
+		if (len < 0)
 			throw new IndexOutOfBoundsException("len is negative");
-		}
+		
 		int total = 0;
 		while (total < len) {
 			int result = in.read(b, off + total, len - total);
