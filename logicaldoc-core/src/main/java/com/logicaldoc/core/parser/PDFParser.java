@@ -70,7 +70,7 @@ public class PDFParser extends AbstractParser {
 				if (pdfDocument != null)
 					pdfDocument.close();
 			} catch (Throwable e) {
-				log.error(e.getMessage(), e);
+				log.warn(e.getMessage(), e);
 			}
 		}
 	}

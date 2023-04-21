@@ -228,7 +228,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public GUIDocument[] addDocuments(boolean importZip, String charset, boolean immediateIndexing,
 			final GUIDocument metadata) throws ServerException {
 		final Session session = validateSession(getThreadLocalRequest());
-		
+
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 
 		List<GUIDocument> createdDocs = new ArrayList<>();
@@ -465,8 +465,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				mail.setSubject(template.getFormattedSubject(dictionary));
 				mail.setMessageText("<html><body>" + template.getFormattedBody(dictionary) + "</html></body>");
 
-				if (log.isInfoEnabled())
+				if (mail != null && !mail.getRecipients().isEmpty())
 					log.info("Notify the new documents {} to {}", docs, mail.getRecipients());
+
 				EMailSender sender = getEmailSender(session);
 				sender.send(mail);
 

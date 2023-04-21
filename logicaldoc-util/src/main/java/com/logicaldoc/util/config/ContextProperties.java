@@ -324,6 +324,18 @@ public class ContextProperties extends OrderedProperties {
 			return Double.parseDouble(v.trim());
 	}
 
+	public float getFloat(String property) {
+		return getFloat(property, 0F);
+	}
+
+	public float getFloat(String property, float defaultValue) {
+		String v = getProperty(property);
+		if (v == null || v.trim().isEmpty())
+			return defaultValue;
+		else
+			return Float.parseFloat(v.trim());
+	}
+
 	/**
 	 * Gets the property value replacing all variable references
 	 * 

@@ -20,11 +20,13 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.FloatItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.validator.FloatRangeValidator;
 
 /**
  * This panel shows the OCR settings.
@@ -111,7 +113,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		SpinnerItem resolutionThreshold = prepareResolutionThresholdSpinner(params);
 
-		SpinnerItem textThreshold = prepareTextThresholdSpinner(params);
+		FloatItem textThreshold = prepareTextThresholdSpinner(params);
 
 		TextItem includes = ItemFactory.newTextItem("ocr_includes", "include",
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.includes"));
@@ -252,16 +254,21 @@ public class OCRSettingsPanel extends AdminPanel {
 		return timeout;
 	}
 
-	private SpinnerItem prepareTextThresholdSpinner(GUIParameter[] params) {
-		SpinnerItem textThreshold = ItemFactory.newSpinnerItem(OCR_TEXT_THRESHOLD, I18N.message("textthreshold"),
-				Integer.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
+	private FloatItem prepareTextThresholdSpinner(GUIParameter[] params) {
+		FloatItem textThreshold = ItemFactory.newFloatItem(OCR_TEXT_THRESHOLD, I18N.message("textthreshold"),
+				Float.parseFloat(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
 						OCR_DOT_TEXT_DOT_THRESHOLD)));
+
 		textThreshold.setRequired(true);
 		textThreshold.setWrapTitle(false);
 		textThreshold.setHint("%");
-		textThreshold.setMin(1);
-		textThreshold.setMax(100);
-		textThreshold.setStep(1);
+		textThreshold.setWidth(60);
+		FloatRangeValidator rangeValidator = new FloatRangeValidator();
+		rangeValidator.setMin(0);
+		rangeValidator.setMax(100);
+		rangeValidator.setErrorMessage(I18N.message("percentageerror"));
+		textThreshold.setValidators(rangeValidator);
+
 		return textThreshold;
 	}
 
@@ -326,13 +333,9 @@ public class OCRSettingsPanel extends AdminPanel {
 		params.add(
 				new GUIParameter(Session.get().getTenantName() + ".ocr.excludes", (String) values.get("ocr_excludes")));
 
-		if (values.get(OCR_TEXT_THRESHOLD) instanceof Integer)
-			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
-					((Integer) values.get(OCR_TEXT_THRESHOLD)).toString()));
-		else
-			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
-					(String) values.get(OCR_TEXT_THRESHOLD)));
-
+		params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
+					values.get(OCR_TEXT_THRESHOLD).toString()));
+		
 		if (values.get(OCR_RESOLUTION_THRESHOLD) instanceof Integer)
 			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
 					((Integer) values.get(OCR_RESOLUTION_THRESHOLD)).toString()));

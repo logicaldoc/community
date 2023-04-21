@@ -713,10 +713,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			// Notify the user by email
 			if (createNew && guiUser.isNotifyCredentials())
 				notifyAccount(user, user.getDecodedPassword());
-		} catch (PersistenceException e) {
-			return (GUIUser) throwServerException(session, log, e);
 		} catch (MessagingException me) {
 			log.warn(me.getMessage(), me);
+		} catch (Exception e) {
+			return (GUIUser) throwServerException(session, log, e);
 		}
 
 		return getUser(guiUser.getId());

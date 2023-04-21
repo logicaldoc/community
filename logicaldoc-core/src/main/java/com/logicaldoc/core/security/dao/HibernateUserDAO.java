@@ -32,6 +32,7 @@ import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.UserListener;
 import com.logicaldoc.core.security.UserListenerManager;
 import com.logicaldoc.core.security.WorkingTime;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.i18n.I18N;
@@ -283,7 +284,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		// Save the password history to track the password change
 		recordPasswordChange(user, transaction, passwordChanged);
 
-		infokeListenersAfter(user, transaction, dictionary);
+		invokeListenersAfter(user, transaction, dictionary);
 
 		saveHistory(user, transaction, newUser);
 
@@ -467,23 +468,29 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 	}
 
-	private void infokeListenersAfter(User user, UserHistory transaction, Map<String, Object> dictionary) {
+	private void invokeListenersAfter(User user, UserHistory transaction, Map<String, Object> dictionary)
+			throws AuthenticationException {
 		log.debug("Invoke listeners after store");
 		for (UserListener listener : userListenerManager.getListeners())
 			try {
 				listener.afterStore(user, transaction, dictionary);
-			} catch (Exception e1) {
-				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
+			} catch (AuthenticationException ae) {
+				throw ae;
+			} catch (Exception e) {
+				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
 			}
 	}
-
-	private void invokeListenersBefore(User user, UserHistory transaction, Map<String, Object> dictionary) {
+	
+	private void invokeListenersBefore(User user, UserHistory transaction, Map<String, Object> dictionary)
+			throws AuthenticationException {
 		log.debug("Invoke listeners before store");
 		for (UserListener listener : userListenerManager.getListeners())
 			try {
 				listener.beforeStore(user, transaction, dictionary);
-			} catch (Exception e1) {
-				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
+			} catch (AuthenticationException ae) {
+				throw ae;
+			} catch (Exception e) {
+				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
 			}
 	}
 
