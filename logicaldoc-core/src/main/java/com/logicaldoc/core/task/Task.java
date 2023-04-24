@@ -241,7 +241,7 @@ public abstract class Task implements Runnable {
 		}
 	}
 
-	public boolean isInterrupted() {
+	public synchronized boolean isInterrupted() {
 		return getStatus() == STATUS_IDLE;
 	}
 
@@ -303,8 +303,8 @@ public abstract class Task implements Runnable {
 	 *
 	 * @return true if the task is running({@link #STATUS_RUNNING})
 	 */
-	public boolean isRunning() {
-		return status == STATUS_RUNNING;
+	public synchronized boolean isRunning() {
+		return getStatus() == STATUS_RUNNING;
 	}
 
 	/**
