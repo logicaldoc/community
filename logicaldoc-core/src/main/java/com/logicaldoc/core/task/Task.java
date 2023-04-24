@@ -233,9 +233,11 @@ public abstract class Task implements Runnable {
 		}
 	}
 
-	public void interrupt() {
-		interruptRequested = true;
-		setStatus(STATUS_STOPPING);
+	public synchronized void interrupt() {
+		if (isRunning()) {
+			interruptRequested = true;
+			setStatus(STATUS_STOPPING);
+		}
 	}
 
 	public boolean isInterrupted() {

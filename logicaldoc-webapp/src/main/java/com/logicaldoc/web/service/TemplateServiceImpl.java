@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
+import org.hibernate.exception.GenericJDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -388,8 +389,9 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 		if (template != null) {
 			try {
-				template.getAttributes().size();
-			} catch (LazyInitializationException e) {
+				if (template.getAttributes() != null)
+					template.getAttributes().size();
+			} catch (GenericJDBCException | LazyInitializationException e) {
 				// If an error happens here it means that the collection could
 				// not
 				// be loaded, so load the bean again and initialize it.

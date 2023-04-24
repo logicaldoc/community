@@ -5,16 +5,23 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
+import org.hibernate.exception.GenericJDBCException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.TransactionalObject;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.io.FileUtil;
@@ -41,6 +48,8 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 4.5
  */
 public abstract class AbstractDocument extends ExtensibleObject implements TransactionalObject {
+
+	protected static Logger log = LoggerFactory.getLogger(AbstractDocument.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -979,21 +988,30 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setColor(docVO.getColor());
 
 		setAttributes(new HashMap<String, Attribute>());
-		try {
-			for (String name : docVO.getAttributes().keySet()) {
-				getAttributes().put(name, docVO.getAttributes().get(name));
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
+		setTags(new HashSet<Tag>());
 
 		try {
-			setTags(new HashSet<Tag>());
-			for (Tag tag : docVO.getTags()) {
+			for (Entry<String, Attribute> entry : docVO.getAttributes().entrySet())
+				getAttributes().put(entry.getKey(), entry.getValue());
+			for (Tag tag : docVO.getTags())
 				getTags().add(tag);
+		} catch (GenericJDBCException | LazyInitializationException ex) {
+			log.debug("Got error when trying to copy collections from document {}", docVO, ex);
+
+			// load again the provided doc
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			try {
+				Document testDocVO = docDao.findById(docVO.getId());
+				if (testDocVO != null) {
+					docDao.initialize(testDocVO);
+					for (Entry<String, Attribute> entry : testDocVO.getAttributes().entrySet())
+						getAttributes().put(entry.getKey(), entry.getValue());
+					for (Tag tag : testDocVO.getTags())
+						getTags().add(tag);
+				}
+			} catch (PersistenceException e) {
+				log.warn("Cannot copy collections from document {}", docVO, e);
 			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
 		}
 	}
 }
