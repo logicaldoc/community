@@ -18,6 +18,7 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
    
+   
 	<bean id="HttpFirewall" class="com.logicaldoc.web.firewall.HttpFirewall">
 	    <property name="unsafeAllowAnyHttpMethod" value="true"/>
     	<property name="allowSemicolon" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowSemicolon}')}"/>
@@ -27,6 +28,61 @@
     	<property name="allowUrlEncodedPeriod" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowUrlEncodedPeriod}')}"/>
 	</bean>
 	<security:http-firewall ref="HttpFirewall"/>   
+   
+    <!-- 2FA -->
+    
+    <bean id="TwoFactorsAuthenticationProvider" class="com.logicaldoc.enterprise.security.twofactorsauth.TwoFactorsAuthenticationProvider" />
+    <security:authentication-manager id="AuthenticationManager2FA">
+        <security:authentication-provider ref='TwoFactorsAuthenticationProvider' />
+    </security:authentication-manager>
+    
+    <!-- 2FA -->
+    
+    
+    <!-- CAS -->
+    
+    <security:authentication-manager id="CasAuthenticationManager">
+		<security:authentication-provider ref="CasAuthenticationProvider" />
+	</security:authentication-manager>	
+    
+	<bean id="ServiceProperties"
+			class="org.springframework.security.cas.ServiceProperties">
+		<property name="service" value="${cas.appurl}/login/cas" />		
+		<property name="sendRenew" value="false" />
+	</bean>
+    
+	<bean id="CasAuthenticationEntryPoint" class="com.logicaldoc.enterprise.security.cas.CasAuthenticationEntryPoint">
+		<property name="loginUrl" value="${cas.loginurl}" />
+		<property name="serviceProperties" ref="ServiceProperties" />
+	</bean>
+		
+	<bean id="CasAuthenticationFilter" class="com.logicaldoc.enterprise.security.cas.CasAuthenticationFilter">
+		<property name="authenticationManager" ref="CasAuthenticationManager" />
+	</bean>
+		
+	<bean id="CasAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+		<property name="authenticationUserDetailsService">
+			<bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+				<constructor-arg ref="CasUserDetailsService" />
+			</bean>
+		</property>
+		<property name="serviceProperties" ref="ServiceProperties" />
+		<property name="ticketValidator">
+			<bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+				<constructor-arg index="0" value="${cas.url}" />
+			</bean>
+		</property>
+		<property name="key" value="${cas.id}" />
+	</bean>
+	
+	<bean id="CasUserDetailsService" class="com.logicaldoc.enterprise.security.cas.CasUserDetailsService">
+	   <property name="config" ref="ContextProperties" />
+       <property name="userDao" ref="UserDAO" />
+       <property name="groupDao" ref="GroupDAO" />
+       <property name="authenticationChain" ref="AuthenticationChain" />
+	</bean>
+	
+    <!-- CAS -->  
    
     <bean id="LDBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
       <property name="realmName" value="Security Realm" />
@@ -202,7 +258,7 @@
             <!-- security:header name="Content-Security-Policy" value="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src http://localhost:9080 'unsafe-inline' 'unsafe-eval'; frame-ancestors *; style-src * 'unsafe-inline';" / -->
             <!-- security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; object-src none; img-src * data: blob: 'unsafe-inline'; frame-src 'self' https://*.google.com https://*.zoho.com ; frame-ancestors *; style-src * 'unsafe-inline';" / -->
             <!-- security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; object-src none; img-src * data: blob: 'unsafe-inline'; frame-src 'self' https://*.google.com https://*.zoho.com ; frame-ancestors *; style-src * 'unsafe-inline'; frame-ancestors * 'unsafe-inline'; form-action * 'unsafe-inline'; " / -->
-            <security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' blob: data: https://*.google.com https://*.zoho.com; img-src 'self' blob: data:; font-src 'self' data:; frame-ancestors 'self' blob: data:; form-action 'self';" />
+            <security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' blob: data: https://*.google.com https://*.zoho.com; img-src 'self' blob: data: https://*.googleapis.com; font-src 'self' data:; frame-ancestors 'self' blob: data:; form-action 'self';" />
             <security:frame-options policy="SAMEORIGIN"/>
             <security:xss-protection block="true"/>
         </security:headers>
