@@ -378,7 +378,7 @@ public class DashletContent extends HttpServlet {
 			 */
 			final Map<String, Object> extValues = new HashMap<>();
 
-			if (!attrs.isEmpty()) {
+			if (!attrs.isEmpty() && !uniqueRecords.isEmpty()) {
 				log.debug("Search for extended attributes {}", attrs);
 
 				StringBuilder qry = new StringBuilder(
