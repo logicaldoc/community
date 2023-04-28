@@ -797,11 +797,19 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			public void onSuccess(Void result) {
 				LD.clearPrompt();
 
+				for (long id : selectedIds) {
+					TreeNode node = getTree().find(FOLDER_ID, Long.toString(id));
+					if(node!=null)
+						getTree().remove(node);
+				}
+				
 				if (parentNode == null || "/".equals(getTree().getPath(parentNode))) {
 					// In case of a workspace we close the whole tree and select
 					// first workspace
 					getTree().closeAll();
 					selectFolder(Long.parseLong(firstNode.getAttributeAsString(FOLDER_ID)));
+					getTree().openFolder(firstNode);
+					selectRecord(0);
 				} else {
 					selectFolder(Long.parseLong(parentNode.getAttributeAsString(FOLDER_ID)));
 					reloadParentsOfSelection();
