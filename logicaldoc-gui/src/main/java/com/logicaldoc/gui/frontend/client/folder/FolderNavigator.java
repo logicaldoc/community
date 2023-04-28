@@ -46,10 +46,6 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.util.EventHandler;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.events.DragStartEvent;
-import com.smartgwt.client.widgets.events.DropEvent;
-import com.smartgwt.client.widgets.events.KeyDownEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
@@ -61,7 +57,6 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
-import com.smartgwt.client.widgets.tree.events.FolderClosedEvent;
 import com.smartgwt.client.widgets.tree.events.FolderOpenedEvent;
 import com.smartgwt.client.widgets.tree.events.FolderOpenedHandler;
 
@@ -128,11 +123,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		FolderController.get().addObserver(this);
 
-		addDragStartHandler((DragStartEvent ev) -> {
+		addDragStartHandler(event -> {
 			if (EventHandler.getDragTarget() instanceof FolderNavigator) {
 				// Workspaces cannot be moved
 				if ("1".equals(getDragData()[0].getAttributeAsString("type"))) {
-					ev.cancel();
+					event.cancel();
 					return;
 				}
 			}
@@ -149,29 +144,24 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		/*
 		 * To refresh the folder's decoration
 		 */
-		addFolderClosedHandler((FolderClosedEvent folderClosedEvent) -> {
-			folderClosedEvent.getNode().setAttribute(OPENED, false);
-			updateData(folderClosedEvent.getNode());
+		addFolderClosedHandler(event -> {
+			event.getNode().setAttribute(OPENED, false);
+			updateData(event.getNode());
 		});
 
 		// Used to expand root folder after login or to open in folder
-		addDataArrivedHandler((DataArrivedEvent dataArrivedEvent) -> {
-			FolderNavigator.this.onDataArrived(dataArrivedEvent);
-		});
+		addDataArrivedHandler(
+				(DataArrivedEvent dataArrivedEvent) -> FolderNavigator.this.onDataArrived(dataArrivedEvent));
 
-		FolderCursor.get().registerMaxChangedHandler((ChangedEvent maxChangedEvent) -> {
-			reloadChildren();
-		});
+		FolderCursor.get().registerMaxChangedHandler(event -> reloadChildren());
 
-		FolderCursor.get().registerPageChangedHandler((ChangedEvent changedEvent) -> {
-			reloadChildren();
-		});
+		FolderCursor.get().registerPageChangedHandler(event -> reloadChildren());
 
 		/*
 		 * A listener of the keypress to automatically collect a string typed by
 		 * the user to quickly select the folder
 		 */
-		addKeyDownHandler((KeyDownEvent keyDown) -> {
+		addKeyDownHandler(keyDown -> {
 			String key = EventHandler.getKey();
 			if ("space".equals(key.toLowerCase())) {
 				selectFolder(getSelectedFolderId());
@@ -191,7 +181,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	private void addDropHandler() {
-		addDropHandler((final DropEvent dropEvent) -> {
+		addDropHandler(dropEvent -> {
 			if (EventHandler.getDragTarget() instanceof FolderNavigator) {
 				// Workspaces cannot be moved
 				if ("1".equals(getDragData()[0].getAttributeAsString("type"))) {
@@ -450,28 +440,28 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private Menu prepateContextMenu() {
 		MenuItem move = new MenuItem();
 		move.setTitle(I18N.message("move"));
-		move.addClickHandler((MenuItemClickEvent event) -> {
+		move.addClickHandler(event -> {
 			MoveDialog dialog = new MoveDialog();
 			dialog.show();
 		});
 
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler((MenuItemClickEvent event) -> {
+		copy.addClickHandler(event -> {
 			FolderCopyDialog dialog = new FolderCopyDialog();
 			dialog.show();
 		});
 
 		MenuItem merge = new MenuItem();
 		merge.setTitle(I18N.message("merge"));
-		merge.addClickHandler((MenuItemClickEvent event) -> {
+		merge.addClickHandler(event -> {
 			MergeDialog dialog = new MergeDialog();
 			dialog.show();
 		});
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> onDelete());
+		delete.addClickHandler(event -> onDelete());
 
 		Menu contextMenu = new Menu();
 		contextMenu.setItems(move, copy, merge, delete);
@@ -500,11 +490,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		MenuItem createWorkspace = new MenuItem();
 		createWorkspace.setTitle(I18N.message("newworkspace"));
-		createWorkspace.addClickHandler((MenuItemClickEvent nwClick) -> onCreateWorkspace());
+		createWorkspace.addClickHandler(click -> onCreateWorkspace());
 
 		MenuItem reload = new MenuItem();
 		reload.setTitle(I18N.message("reload"));
-		reload.addClickHandler((MenuItemClickEvent reloadClick) -> reload());
+		reload.addClickHandler(click -> reload());
 
 		MenuItem move = prepareMoveMenuItem(selectedFolder);
 
@@ -514,17 +504,17 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		MenuItem paste = new MenuItem();
 		paste.setTitle(I18N.message("paste"));
-		paste.addClickHandler((MenuItemClickEvent pasteClick) -> onPaste());
+		paste.addClickHandler(click -> onPaste());
 
 		MenuItem pasteAsAlias = new MenuItem();
 		pasteAsAlias.setTitle(I18N.message("pasteasalias"));
-		pasteAsAlias.addClickHandler(pasteAliasClick -> onPasteAsAlias());
+		pasteAsAlias.addClickHandler(click -> onPasteAsAlias());
 
 		MenuItem exportZip = prepareExportZipMenuItem(selectedFolder);
 
 		MenuItem addBookmark = new MenuItem();
 		addBookmark.setTitle(I18N.message("addbookmark"));
-		addBookmark.addClickHandler((MenuItemClickEvent bookmarkClick) -> onAddBookmark());
+		addBookmark.addClickHandler(click -> onAddBookmark());
 
 		if (!selectedFolder.hasPermission(Constants.PERMISSION_WRITE) || Clipboard.getInstance().isEmpty()) {
 			paste.setEnabled(false);
@@ -789,14 +779,16 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	private void doDelete(final long[] selectedIds) {
+		TreeNode parentNode = getTree().getParent(getSelectedRecord());
+		TreeNode firstNode = getTree().getChildren(parentNode)[0];
+
 		FolderService.Instance.get().delete(selectedIds, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
 
-				if (caught instanceof RequestTimeoutException) {
+				if (caught instanceof RequestTimeoutException)
 					SC.say("timeout");
-				}
 
 				GuiLog.serverError(caught);
 			}
@@ -804,13 +796,16 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			@Override
 			public void onSuccess(Void result) {
 				LD.clearPrompt();
-				TreeNode node = getTree().find(FOLDER_ID, (Object) getSelectedRecord().getAttributeAsString(FOLDER_ID));
-				TreeNode parent = getTree().getParent(node);
 
-				if (parent.getAttributeAsString(FOLDER_ID) != null)
-					selectFolder(Long.parseLong(parent.getAttributeAsString(FOLDER_ID)));
-
-				reloadParentsOfSelection();
+				if (parentNode == null || "/".equals(getTree().getPath(parentNode))) {
+					// In case of a workspace we close the whole tree and select
+					// first workspace
+					getTree().closeAll();
+					selectFolder(Long.parseLong(firstNode.getAttributeAsString(FOLDER_ID)));
+				} else {
+					selectFolder(Long.parseLong(parentNode.getAttributeAsString(FOLDER_ID)));
+					reloadParentsOfSelection();
+				}
 			}
 		});
 	}
