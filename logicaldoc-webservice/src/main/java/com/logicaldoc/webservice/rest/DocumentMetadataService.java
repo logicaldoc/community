@@ -58,10 +58,9 @@ public interface DocumentMetadataService {
 	 */
 	@POST
 	@Path("/setAttributeOptionsPOST")
-	public void setAttributeOptionsPOST(@FormParam("setId")
-	long setId, @FormParam("attribute")
-	String attribute, @FormParam("options")
-	WSAttributeOption[] options) throws Exception;
+	public void setAttributeOptionsPOST(@FormParam("setId") long setId, 
+			@FormParam("attribute")	String attribute, 
+			@FormParam("options") WSAttributeOption[] options) throws Exception;
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the

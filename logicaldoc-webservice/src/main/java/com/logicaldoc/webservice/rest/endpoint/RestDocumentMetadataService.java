@@ -35,17 +35,30 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@PUT
 	@Path("/setAttributeOptions")
-	//@ApiOperation(value = "Save attribute options", notes = "Updates the options for the given attribute")
 	@Operation(summary = "Save attribute options", description = "Updates the options for the given attribute")
 	public void setAttributeOptions(@QueryParam("setId") long setId, @QueryParam("attribute") String attribute, @QueryParam("options") WSAttributeOption[] options) throws Exception {
+		
+//		log.debug("setAttributeOptions");
+		
 		String sid = validateSession();
+		
+//		log.debug("setId: {}", setId);
+//		log.debug("attribute: {}", attribute);
+//		log.debug("options: {}", (Object[])options);
+//		
+//		if (options != null) {
+//			for (WSAttributeOption wsao : options) {
+//				log.debug("wsao.getValue(): {}", wsao.getValue());
+//				log.debug("wsao.getCategory(): {}", wsao.getCategory());
+//			}
+//		}
+		
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 
 	@Override
 	@POST
 	@Path("/storeAttributeSet")
-	//@ApiOperation(value = "Create/Update an attribute set", notes = "Create/Update an attribute set. You can completely customize the attribute set through a value object containing the attribute set's metadata")
 	@Operation(summary = "Create/Update an attribute set", description = "Create/Update an attribute set. You can completely customize the attribute set through a value object containing the attribute set's metadata")	
 	public long storeAttributeSet(WSAttributeSet attributeSet) throws Exception {
 		String sid = validateSession();
@@ -55,7 +68,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@POST
 	@Path("/storeTemplate")
-	//@ApiOperation(value = "Create/Update a template", notes = "Create/Update a template. You can completely customize the template through a value object")
 	@Operation(summary = "Create/Update a template", description = "Create/Update a template. You can completely customize the template through a value object")	
 	public long storeTemplate(WSTemplate template) throws Exception {
 		String sid = validateSession();
@@ -65,7 +77,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@GET
 	@Path("/getAttributeSetById")
-	//@ApiOperation(value = "Gets attribute set's metadata", notes = "Gets attribute set's metadata. Returns a value object containing the attribute set's metadata")
 	@Operation(summary = "Gets attribute set's metadata", description = "Gets attribute set's metadata. Returns a value object containing the attribute set's metadata")		
 	public WSAttributeSet getAttributeSetById(@Parameter(description = "Attribute set identifier (ID)") @QueryParam("setId") long setId) throws Exception {
 		String sid = validateSession();
@@ -75,7 +86,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@GET
 	@Path("/getAttributeSet")
-	//@ApiOperation(value = "Gets an attribute set by name", notes = "Gets an attribute set by name. Returns a value object containing the attribute set's metadata")
 	@Operation(summary = "Gets an attribute set by name", description = "Gets an attribute set by name. Returns a value object containing the attribute set's metadata")		
 	public WSAttributeSet getAttributeSet(@Parameter(description = "The attribute set's name") @QueryParam("name") String name) throws Exception {
 		String sid = validateSession();
@@ -85,7 +95,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@GET
 	@Path("/getTemplate")
-	//@ApiOperation(value = "Gets template's metadata", notes = "Gets an existing template by it's name")
 	@Operation(summary = "Gets template's metadata", description = "Gets an existing template by its name")	
 	public WSTemplate getTemplate(@Parameter(description = "The template name") @QueryParam("name") String name) throws Exception {
 		String sid = validateSession();
@@ -95,7 +104,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@GET
 	@Path("/getTemplateById")
-	//@ApiOperation(value = "Gets template's metadata", notes = "Gets an existing template by it's identifier")
 	@Operation(summary = "Gets template's metadata", description = "Gets an existing template by its identifier")	
 	public WSTemplate getTemplateById(@Parameter(description = "The template identifier (ID)") @QueryParam("templateId") long templateId) throws Exception {
 		String sid = validateSession();
@@ -105,7 +113,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@GET
 	@Path("/getAttributeOptions")
-	//@ApiOperation(value = "Retrieves the options for the given attribute", notes = "Returns the list of all the attribute's options")
 	@Operation(summary = "Retrieves the options for the given attribute", description = "Returns the list of all the attribute's options")
 	public String[] getAttributeOptions(@Parameter(description = "Attribute set identifier (ID)") @QueryParam("setId") long setId, @Parameter(description = "The attribute's name")  @QueryParam("attribute") String attribute) throws Exception {
 		String sid = validateSession();
@@ -114,20 +121,16 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 
 	@Override
 	@GET
-	@Path("/listAttributeSets")
-	//@ApiOperation(value = "Lists the attribute sets", notes = "Gets metadata of all existing attribute sets")	
+	@Path("/listAttributeSets")	
 	@Operation(summary = "Lists the attribute sets", description = "Gets metadata of all existing attribute sets")	
 	public WSAttributeSet[] listAttributeSets() throws Exception {
 		String sid = validateSession();
 		return super.listAttributeSets(sid);
 	}
-
-	
 	
 	@Override
 	@DELETE
 	@Path("/deleteAttributeSet")
-	//@ApiOperation(value = "Deletes an attribute set", notes = "Deletes an existing attribute set with the given identifier")
 	@Operation(summary = "Deletes an attribute set", description = "GDeletes an existing attribute set with the given identifier")		
 	public void deleteAttributeSet(@Parameter(description = "Attribute set identifier (ID)") @QueryParam("setId") long setId) throws Exception {
 		String sid = validateSession();
@@ -137,7 +140,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@DELETE
 	@Path("/deleteTemplate")	
-	//@ApiOperation(value = "Deletes a template", notes = "Deletes an existing template with the given identifier")
 	@Operation(summary = "Deletes a template", description = "Deletes an existing template with the given identifier")	
 	public void deleteTemplate(@Parameter(description = "A template ID") @QueryParam("templateId") long templateId) throws Exception {
 		String sid = validateSession();
@@ -147,7 +149,6 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Override
 	@GET
 	@Path("/listTemplates")
-	//@ApiOperation(value = "Lists all the templates", notes = "Gets metadata of all existing templates")
 	@Operation(summary = "Lists all the templates", description = "Gets metadata of all existing templates")		
 	public WSTemplate[] listTemplates() throws Exception {
 		String sid = validateSession();
@@ -158,8 +159,23 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@POST
 	@Path("/setAttributeOptionsPOST")
 	@Operation(summary = "Save attribute options with a POST method", description = "Saves the options for the given attribute with a POST method. This is useful for very large lists of values")
-	public void setAttributeOptionsPOST(@FormParam("setId") long setId, @FormParam("attribute") String attribute, @FormParam("values") WSAttributeOption[] options) throws Exception {
+	public void setAttributeOptionsPOST(@FormParam("setId") long setId, @FormParam("attribute") String attribute, @FormParam("options") WSAttributeOption[] options) throws Exception {
+		
+//		log.debug("setAttributeOptionsPOST");
+		
 		String sid = validateSession();
+		
+//		log.debug("setId: {}", setId);
+//		log.debug("attribute: {}", attribute);
+//		log.debug("options: {}", (Object[])options);
+//		
+//		if (options != null) {
+//			for (WSAttributeOption wsao : options) {
+//				log.debug("wsao.getValue(): {}", wsao.getValue());
+//				log.debug("wsao.getCategory(): {}", wsao.getCategory());
+//			}
+//		}		
+		
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 }
