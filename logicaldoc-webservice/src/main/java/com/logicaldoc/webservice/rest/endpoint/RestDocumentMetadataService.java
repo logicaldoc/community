@@ -155,20 +155,20 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 			@Multipart(value = "options", type = "application/json") WSAttributeOption[] options) 
 					throws Exception {
 		
-		log.debug("setAttributeOptionsPOST");
+//		log.debug("setAttributeOptionsPOST");
 		
 		String sid = validateSession();
 		
-		log.debug("setId: {}", setId);
-		log.debug("attribute: {}", attribute);
-		log.debug("options: {}", (Object[])options);
-		
-		if (options != null) {
-			for (WSAttributeOption wso : options) {
-				log.debug("getValue: {}", wso.getValue());
-				log.debug("getCategory: {}", wso.getCategory());
-			}
-		}
+//		log.debug("setId: {}", setId);
+//		log.debug("attribute: {}", attribute);
+//		log.debug("options: {}", (Object[])options);
+//		
+//		if (options != null) {
+//			for (WSAttributeOption wso : options) {
+//				log.debug("getValue: {}", wso.getValue());
+//				log.debug("getCategory: {}", wso.getCategory());
+//			}
+//		}
 			
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
