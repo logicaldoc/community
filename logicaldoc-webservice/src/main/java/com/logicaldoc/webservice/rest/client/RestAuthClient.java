@@ -34,17 +34,17 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	}
 
 	@Override
-	public String loginPost(String username, String password) throws Exception {
-		return proxy.loginPost(username, password);
-	}
-
-	@Override
 	public String loginPostJSON(String username, String password) throws Exception {
 		return proxy.loginPostJSON(username, password);
 	}
-	
+
 	@Override
 	public String getSid() {
 		return proxy.getSid();
-	}	
+	}
+
+	@Override
+	public String loginForm(String username, String password) throws Exception {
+		return proxy.loginForm(username, password);
+	}
 }

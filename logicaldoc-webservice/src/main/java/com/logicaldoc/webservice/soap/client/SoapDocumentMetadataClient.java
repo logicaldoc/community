@@ -123,4 +123,10 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 	public WSRight[] getGrantedGroups(String sid, long groupId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException  {
 		return client.getGrantedGroups(sid, groupId);
 	}
+
+	@Override
+	public void addAttributeOption(String sid, long setId, String attribute, WSAttributeOption wsoption)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+		client.addAttributeOption(sid, setId, attribute, wsoption);
+	}
 }
