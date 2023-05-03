@@ -78,7 +78,7 @@ public class ClassTool {
 	}
 
 	/**
-	 * Makes a copy(clone) of a given object instance.<br />
+	 * Makes a copy(clone) of a given object instance.<br>
 	 * <p>
 	 * <b>Attention:</b> for security reasons it will not be used the cloned()
 	 * method of the given objet but a new instance of the given object's class

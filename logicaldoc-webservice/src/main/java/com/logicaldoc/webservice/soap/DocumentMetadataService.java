@@ -412,5 +412,5 @@ public interface DocumentMetadataService {
 			@WebParam(name = "sid") String sid, 
 			@WebParam(name = "setId") long setId, 
 			@WebParam(name = "attribute") String attribute, 
-			@WebParam(name = "option") WSAttributeOption wsoption) throws AuthenticationException, WebserviceException, PersistenceException;
+			@WebParam(name = "option") WSAttributeOption option) throws AuthenticationException, WebserviceException, PersistenceException;
 }

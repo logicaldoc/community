@@ -1564,7 +1564,6 @@ public class ItemFactory {
 	 * Creates a new TextItem that validates a simple text
 	 * 
 	 * @param name The item name (mandatory)
-	 * @param title The item title (mandatory)
 	 * @param value The item value (optional)
 	 * 
 	 * @return the new item

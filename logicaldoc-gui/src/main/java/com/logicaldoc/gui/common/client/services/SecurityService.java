@@ -24,7 +24,7 @@ public interface SecurityService extends RemoteService {
 	 * Logs-in a user by an existing session ID (session reuse)
 	 * 
 	 * @param locale the currently used language specification
-	 * @sid the session ID (optional), if not provided it is taken by cookies
+	 * @param sid the session ID (optional), if not provided it is taken by cookies
 	 * 
 	 * @return session informations
 	 */

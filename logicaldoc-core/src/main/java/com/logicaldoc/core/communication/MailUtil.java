@@ -738,6 +738,8 @@ public class MailUtil {
 	 * 
 	 * @throws MessagingException Error in traversing the part
 	 * @throws IOException generic I/O error
+	 * 
+	 * @return the message text
 	 */
 	public static String extractMessageText(Message message) throws MessagingException, IOException {
 		StringBuilder messageText = new StringBuilder();
