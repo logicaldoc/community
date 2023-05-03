@@ -33,7 +33,7 @@ public class WSAttributeOption implements Serializable {
 		this.value = value;
 		this.category = category;
 	}
-	
+
 	public WSAttributeOption(String value) {
 		super();
 		this.value = value;

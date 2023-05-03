@@ -196,6 +196,8 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 
 		List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
+		
+		
 		return options.stream().map(o -> new WSAttributeOption(o.getValue(), o.getCategory()))
 				.collect(Collectors.toList()).toArray(new WSAttributeOption[0]);
 	}
@@ -384,4 +386,19 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 		return getGranted(sid, templateId, false);
 	}
+
+	@Override
+	public void addAttributeOption(String sid, long setId, String attribute, WSAttributeOption wsoption) throws AuthenticationException, WebserviceException, PersistenceException {
+
+		validateSession(sid);
+	
+		if (wsoption == null)
+			return;
+
+		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+		
+		AttributeOption option = new AttributeOption(setId, attribute, wsoption.getValue(), wsoption.getCategory());
+		dao.store(option);
+	}
+	
 }

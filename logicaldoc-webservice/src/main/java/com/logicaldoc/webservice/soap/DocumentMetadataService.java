@@ -392,4 +392,25 @@ public interface DocumentMetadataService {
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
 	long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+
+	
+	/**
+	 * Add a new option for the given attribute
+	 * 
+	 * @param sid Session identifier
+	 * @param setId Attribute set ID
+	 * @param attribute Attribute name
+	 * @param option Attribute option
+	 *
+	 * @throws AuthenticationException Invalid session 
+	 * @throws WebserviceException Error in the webservice
+	 * @throws PersistenceException Error in the database
+	 */
+	@WebMethod
+	@WSDoc(description = "Adds a new option for the given attribute")	
+	public void addAttributeOption(
+			@WebParam(name = "sid") String sid, 
+			@WebParam(name = "setId") long setId, 
+			@WebParam(name = "attribute") String attribute, 
+			@WebParam(name = "option") WSAttributeOption wsoption) throws AuthenticationException, WebserviceException, PersistenceException;
 }

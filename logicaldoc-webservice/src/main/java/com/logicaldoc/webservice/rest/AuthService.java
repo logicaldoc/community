@@ -25,14 +25,14 @@ public interface AuthService {
 	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws Exception;
 
 	@POST
-    @Path("/login")
+    @Path("/loginForm")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public String loginPost(@FormParam("username") String username, @FormParam("password") String password) throws Exception;
+	public String loginForm(@FormParam("username") String username, @FormParam("password") String password) throws Exception;
 
 	@POST
     @Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String loginPostJSON(String jsonstr) throws Exception;
+	public String loginPostJSON(@FormParam("username") String username, @FormParam("password") String password) throws Exception;
 
 	@DELETE
     @Path("/logout")

@@ -39,8 +39,8 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	}
 
 	@Override
-	public String loginPostJSON(String jsonstr) throws Exception {
-		return proxy.loginPostJSON(jsonstr);
+	public String loginPostJSON(String username, String password) throws Exception {
+		return proxy.loginPostJSON(username, password);
 	}
 	
 	@Override

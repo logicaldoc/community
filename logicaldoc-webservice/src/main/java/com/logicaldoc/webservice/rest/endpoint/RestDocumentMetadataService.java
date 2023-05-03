@@ -37,22 +37,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Path("/setAttributeOptions")
 	@Operation(summary = "Save attribute options", description = "Updates the options for the given attribute")
 	public void setAttributeOptions(@QueryParam("setId") long setId, @QueryParam("attribute") String attribute, @QueryParam("options") WSAttributeOption[] options) throws Exception {
-		
-//		log.debug("setAttributeOptions");
-		
 		String sid = validateSession();
-		
-//		log.debug("setId: {}", setId);
-//		log.debug("attribute: {}", attribute);
-//		log.debug("options: {}", (Object[])options);
-//		
-//		if (options != null) {
-//			for (WSAttributeOption wsao : options) {
-//				log.debug("wsao.getValue(): {}", wsao.getValue());
-//				log.debug("wsao.getCategory(): {}", wsao.getCategory());
-//			}
-//		}
-		
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 
@@ -160,22 +145,28 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Path("/setAttributeOptionsPOST")
 	@Operation(summary = "Save attribute options with a POST method", description = "Saves the options for the given attribute with a POST method. This is useful for very large lists of values")
 	public void setAttributeOptionsPOST(@FormParam("setId") long setId, @FormParam("attribute") String attribute, @FormParam("options") WSAttributeOption[] options) throws Exception {
+		String sid = validateSession();
+		super.setAttributeOptions(sid, setId, attribute, options);
+	}
+
+	@Override
+	@PUT
+	@Path("/addAttributeOption")
+	@Operation(summary = "Adds a new attribute option with a POST method", description = "Adds the new option for the given attribute with a POST method.")
+	public void addAttributeOption(@QueryParam("setId") long setId, @QueryParam("attribute") String attribute, @QueryParam("option")  WSAttributeOption option) throws Exception {
 		
-//		log.debug("setAttributeOptionsPOST");
+//		log.debug("addAttributeOption");
 		
 		String sid = validateSession();
 		
 //		log.debug("setId: {}", setId);
 //		log.debug("attribute: {}", attribute);
-//		log.debug("options: {}", (Object[])options);
 //		
-//		if (options != null) {
-//			for (WSAttributeOption wsao : options) {
-//				log.debug("wsao.getValue(): {}", wsao.getValue());
-//				log.debug("wsao.getCategory(): {}", wsao.getCategory());
-//			}
-//		}		
+//		if (option != null) {
+//			log.debug("value: {}", option.getValue());
+//			log.debug("category: {}", option.getCategory());
+//		}
 		
-		super.setAttributeOptions(sid, setId, attribute, options);
+		super.addAttributeOption(sid, setId, attribute, option);
 	}
 }

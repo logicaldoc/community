@@ -29,6 +29,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path("/")
 @Tag(name = "documentMetadata")
 public interface DocumentMetadataService {
+	
+	/**
+	 * Add a new option for the given attribute
+	 * 
+	 * @param setId Attribute set ID
+	 * @param attribute Attribute name
+	 * @param option Attribute option
+	 * 
+	 * @throws Exception error in the server application
+	 */
+	@PUT
+	@Path("/addAttributeOption")
+	public void addAttributeOption(
+			@QueryParam("setId") long setId, 
+			@QueryParam("attribute")
+			String attribute, @QueryParam("option") WSAttributeOption option) 
+					throws Exception;	
 
 	/**
 	 * Saves the options for the given attribute
