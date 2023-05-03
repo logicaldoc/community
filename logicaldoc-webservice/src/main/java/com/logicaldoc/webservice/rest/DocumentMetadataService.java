@@ -2,7 +2,6 @@ package com.logicaldoc.webservice.rest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -10,6 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
@@ -74,10 +75,13 @@ public interface DocumentMetadataService {
 	 * @throws Exception error in the server application
 	 */
 	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)		
 	@Path("/setAttributeOptionsPOST")
-	public void setAttributeOptionsPOST(@FormParam("setId") long setId, 
-			@FormParam("attribute")	String attribute, 
-			@FormParam("options") WSAttributeOption[] options) throws Exception;
+	public void setAttributeOptionsPOST(
+			@Multipart(value = "setId") Long setId, 
+			@Multipart(value = "attribute") String attribute, 
+			@Multipart(value = "options", type = "application/json") WSAttributeOption[] options) throws Exception;
+	
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the

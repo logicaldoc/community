@@ -2,7 +2,6 @@ package com.logicaldoc.webservice.rest.endpoint;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -11,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +22,9 @@ import com.logicaldoc.webservice.soap.endpoint.SoapDocumentMetadataService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/")
@@ -141,13 +144,45 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	}
 
 	@Override
-	@POST
+	@POST	
+	@Consumes(MediaType.MULTIPART_FORM_DATA)	
 	@Path("/setAttributeOptionsPOST")
 	@Operation(summary = "Save attribute options with a POST method", description = "Saves the options for the given attribute with a POST method. This is useful for very large lists of values")
-	public void setAttributeOptionsPOST(@FormParam("setId") long setId, @FormParam("attribute") String attribute, @FormParam("options") WSAttributeOption[] options) throws Exception {
+	@RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = SetAttributeOptionsMultipartRequest.class)))
+	public void setAttributeOptionsPOST(
+			@Multipart(value = "setId") Long setId, 
+			@Multipart(value = "attribute") String attribute, 
+			@Multipart(value = "options", type = "application/json") WSAttributeOption[] options) 
+					throws Exception {
+		
+		log.debug("setAttributeOptionsPOST");
+		
 		String sid = validateSession();
+		
+		log.debug("setId: {}", setId);
+		log.debug("attribute: {}", attribute);
+		log.debug("options: {}", (Object[])options);
+		
+		if (options != null) {
+			for (WSAttributeOption wso : options) {
+				log.debug("getValue: {}", wso.getValue());
+				log.debug("getCategory: {}", wso.getCategory());
+			}
+		}
+			
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
+	
+	public class SetAttributeOptionsMultipartRequest {
+
+		@Schema(type = "integer", required = true, format = "int64", description = "Attribute set ID")
+		public String setId;
+
+		@Schema(type = "string", required = true, description = "Attribute name")
+		public String attribute;
+
+		public WSAttributeOption[] options;
+	}	
 
 	@Override
 	@PUT
