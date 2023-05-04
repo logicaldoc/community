@@ -2,6 +2,7 @@ package com.logicaldoc.webservice.rest.endpoint;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -171,7 +172,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 //		}
 			
 		super.setAttributeOptions(sid, setId, attribute, options);
-	}
+	}	
 	
 	public class SetAttributeOptionsMultipartRequest {
 
@@ -185,10 +186,11 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	}	
 
 	@Override
-	@PUT
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Path("/addAttributeOption")
 	@Operation(summary = "Adds a new attribute option with a POST method", description = "Adds the new option for the given attribute with a POST method.")
-	public void addAttributeOption(@QueryParam("setId") long setId, @QueryParam("attribute") String attribute, @QueryParam("option")  WSAttributeOption option) throws Exception {
+	public void addAttributeOption(@FormParam("setId") long setId, @FormParam("attribute") String attribute, @FormParam("option")  WSAttributeOption option) throws Exception {
 		
 //		log.debug("addAttributeOption");
 		

@@ -2,6 +2,7 @@ package com.logicaldoc.webservice.rest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -40,12 +41,13 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	@PUT
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Path("/addAttributeOption")
 	public void addAttributeOption(
-			@QueryParam("setId") long setId, 
-			@QueryParam("attribute")
-			String attribute, @QueryParam("option") WSAttributeOption option) 
+			@FormParam("setId") long setId, 
+			@FormParam("attribute") String attribute, 
+			@FormParam("option") WSAttributeOption option) 
 					throws Exception;	
 
 	/**
@@ -63,7 +65,7 @@ public interface DocumentMetadataService {
 	long setId, @QueryParam("attribute")
 	String attribute, @QueryParam("options")
 	WSAttributeOption[] options) throws Exception;
-
+	
 	/**
 	 * Saves the options for the given attribute with a POST method. This is
 	 * useful for very large lists of values
@@ -80,8 +82,7 @@ public interface DocumentMetadataService {
 	public void setAttributeOptionsPOST(
 			@Multipart(value = "setId") Long setId, 
 			@Multipart(value = "attribute") String attribute, 
-			@Multipart(value = "options", type = "application/json") WSAttributeOption[] options) throws Exception;
-	
+			@Multipart(value = "options", type = "application/json") WSAttributeOption[] options) throws Exception;	
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the
