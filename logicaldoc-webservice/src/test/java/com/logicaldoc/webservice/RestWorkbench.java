@@ -46,12 +46,12 @@ public class RestWorkbench {
 
 	private static RestBookmarkClient bookmarkClient = null;
 
-	private static String BASE_PATH = "http://localhost:1000";
+	private static String BASE_PATH = "http://localhost:9080";
 
 	public static void main(String[] args) throws Exception {
-		String test1="<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Body><checkin xmlns=\"http://ws.logicaldoc.com\"><sid xmlns=\"\">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX2a84c8</sid><docId xmlns=\"\">723651853</docId><filename xmlns=\"\">17.01.11 - F33OC2Z.doc</filename><release xmlns=\"\">false</release><content xmlns=\"\">e1xydGYxXGFkZWZsYW5nMTAyNVx</content>";
+		//String test1="<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Body><checkin xmlns=\"http://ws.logicaldoc.com\"><sid xmlns=\"\">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX2a84c8</sid><docId xmlns=\"\">723651853</docId><filename xmlns=\"\">17.01.11 - F33OC2Z.doc</filename><release xmlns=\"\">false</release><content xmlns=\"\">e1xydGYxXGFkZWZsYW5nMTAyNVx</content>";
 		
-		System.out.println(test1.replaceAll("<content[^>]*>.*</content>", "<content>...</content>"));
+		//System.out.println(test1.replaceAll("<content[^>]*>.*</content>", "<content>...</content>"));
 
 //		String username = "admin";
 //		String password = "12345678";

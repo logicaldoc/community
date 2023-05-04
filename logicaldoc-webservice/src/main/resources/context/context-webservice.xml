@@ -195,6 +195,7 @@
             </bean>
         </jaxrs:serviceBeans>
     </jaxrs:server>
+
     <jaxrs:server id="restDocument" address="/rest/document">
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />

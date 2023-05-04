@@ -1,12 +1,68 @@
 package com.logicaldoc.webservice.mobile;
 
-//import org.apache.commons.httpclient.Header;
-//import org.apache.commons.httpclient.HttpClient;
-//import org.apache.commons.httpclient.HttpStatus;
-//import org.apache.commons.httpclient.methods.GetMethod;
-//import org.apache.commons.httpclient.methods.PostMethod;
-//import org.apache.commons.httpclient.methods.StringRequestEntity;
-//import org.codehaus.jackson.map.ObjectMapper;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+
+import org.apache.commons.io.IOUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.logicaldoc.webservice.model.WSBookmark;
+import com.logicaldoc.webservice.model.WSDocument;
+import com.logicaldoc.webservice.model.WSFolder;
+import com.logicaldoc.webservice.model.WSNote;
+import com.logicaldoc.webservice.model.WSRating;
+import com.logicaldoc.webservice.model.WSSearchOptions;
+import com.logicaldoc.webservice.model.WSSearchResult;
+import com.logicaldoc.webservice.rest.client.RestAuthClient;
+import com.logicaldoc.webservice.rest.client.RestBookmarkClient;
+import com.logicaldoc.webservice.rest.client.RestDocumentClient;
+import com.logicaldoc.webservice.rest.client.RestDocumentMetadataClient;
+import com.logicaldoc.webservice.rest.client.RestFolderClient;
+import com.logicaldoc.webservice.rest.client.RestSearchClient;
+import com.logicaldoc.webservice.rest.client.RestTagClient;
+
+
+import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 /**
  * Created by IntelliJ IDEA. User: Niraj Singh Date: 3/13/13 Time: 4:15 PM To
@@ -201,49 +257,50 @@ public class CommentsRestClient {
 
 	public void addCommentForm(String docId) throws Exception {
 
-//		String output = null;
-//		try {
-//			String url = "http://localhost:8080/services/commentservice/addcommentform/";
-//			url = url + URLEncoder.encode(docId, "UTF-8");
-//
-//			HttpClient client = new HttpClient();
-//			PostMethod mPost = new PostMethod(url);
-//
-//			mPost.addParameter("title", "title");
-//			mPost.addParameter("content", "content");
-//
-//			Header mtHeader = new Header();
-//			mtHeader.setName("content-type");
-//			mtHeader.setValue("application/x-www-form-urlencoded");
-//			mPost.addRequestHeader(mtHeader);
-//
-//			mtHeader = new Header();
-//			mtHeader.setName("accept");
-//			// mtHeader.setValue("application/xml");
-//			mtHeader.setValue("application/json");
-//			mPost.addRequestHeader(mtHeader);
-//
-//			for (Header header : mPost.getRequestHeaders()) {
-//				System.out.println(header.getName() + ": " + header.getValue());
-//			}
-//
-//			System.out.println(" mPost.getRequestEntity(): " + mPost.getRequestEntity().getContentLength());
-//			System.out.println(" mPostgetContentType(): " + mPost.getRequestEntity().getContentType());
-//
-//			int statusCode = client.executeMethod(mPost);
-//			System.out.println("statusCode: " + statusCode);
-//
-//			if (statusCode != HttpStatus.SC_OK) {
-//				System.err.println("Method failed: " + mPost.getStatusLine());
-//			}
-//
-//			output = mPost.getResponseBodyAsString();
-//			mPost.releaseConnection();
-//			System.out.println("output : " + output);
-//		} catch (Exception e) {
-//			throw new Exception("Exception in adding bucket : " + e);
-//		}
-//
+		/*
+		String output = null;
+		try {
+			String url = "http://localhost:9080/services/commentservice/addcommentform/";
+			url = url + URLEncoder.encode(docId, "UTF-8");
+
+			HttpClient client = new HttpClient();
+			PostMethod mPost = new PostMethod(url);
+
+			mPost.addParameter("title", "title");
+			mPost.addParameter("content", "content");
+
+			Header mtHeader = new Header();
+			mtHeader.setName("content-type");
+			mtHeader.setValue("application/x-www-form-urlencoded");
+			mPost.addRequestHeader(mtHeader);
+
+			mtHeader = new Header();
+			mtHeader.setName("accept");
+			// mtHeader.setValue("application/xml");
+			mtHeader.setValue("application/json");
+			mPost.addRequestHeader(mtHeader);
+
+			for (Header header : mPost.getRequestHeaders()) {
+				System.out.println(header.getName() + ": " + header.getValue());
+			}
+
+			System.out.println(" mPost.getRequestEntity(): " + mPost.getRequestEntity().getContentLength());
+			System.out.println(" mPostgetContentType(): " + mPost.getRequestEntity().getContentType());
+
+			int statusCode = client.executeMethod(mPost);
+			System.out.println("statusCode: " + statusCode);
+
+			if (statusCode != HttpStatus.SC_OK) {
+				System.err.println("Method failed: " + mPost.getStatusLine());
+			}
+
+			output = mPost.getResponseBodyAsString();
+			mPost.releaseConnection();
+			System.out.println("output : " + output);
+		} catch (Exception e) {
+			throw new Exception("Exception in adding bucket : " + e);
+		}
+*/
 	}
 
 }

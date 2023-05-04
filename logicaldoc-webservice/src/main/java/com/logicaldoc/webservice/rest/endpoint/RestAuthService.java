@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
+import java.util.HashMap;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -15,6 +17,8 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.rest.AuthService;
 import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
@@ -57,7 +61,16 @@ public class RestAuthService extends SoapAuthService implements AuthService {
     @Path("/login")
 	@Operation(operationId = "loginPostJSON", summary = "Login with POST in JSON format", description = "Login posting the credentials in JSON format")
 	@Consumes(MediaType.APPLICATION_JSON)	
-	public String loginPostJSON(@FormParam("username") String username, @FormParam("password") String password) throws Exception {
+	public String loginPostJSON(String jsonstr) throws Exception {
+		log.debug("loginPostJSON({})", jsonstr);
+
+		ObjectMapper mapper = new ObjectMapper();
+		TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {};
+		HashMap<String, String> hm = mapper.readValue(jsonstr, typeRef);
+
+		String username = hm.get("username");
+		String password = hm.get("password");
+
 		return super.login(username, password);
 	}
 

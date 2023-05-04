@@ -32,7 +32,7 @@ public interface AuthService {
 	@POST
     @Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String loginPostJSON(@FormParam("username") String username, @FormParam("password") String password) throws Exception;
+	public String loginPostJSON(String jsonstr) throws Exception;
 
 	@DELETE
     @Path("/logout")
