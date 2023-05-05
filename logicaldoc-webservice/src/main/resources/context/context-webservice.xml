@@ -194,6 +194,9 @@
                 <aop:scoped-proxy />
             </bean>
         </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider" />
+        </jaxrs:providers>
     </jaxrs:server>
 
     <jaxrs:server id="restDocument" address="/rest/document">

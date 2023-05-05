@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.model.WSCredentials;
 import com.logicaldoc.webservice.rest.AuthService;
 
 /**
@@ -34,8 +35,8 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	}
 
 	@Override
-	public String loginPostJSON(String jsonstr) throws Exception {
-		return proxy.loginPostJSON(jsonstr);
+	public String loginPostJSON(WSCredentials wscred) throws Exception {
+		return proxy.loginPostJSON(wscred);
 	}
 
 	@Override
@@ -47,4 +48,5 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	public String loginForm(String username, String password) throws Exception {
 		return proxy.loginForm(username, password);
 	}
+
 }

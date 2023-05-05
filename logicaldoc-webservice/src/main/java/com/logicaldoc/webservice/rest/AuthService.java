@@ -10,6 +10,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.logicaldoc.webservice.model.WSCredentials;
+
 /**
  * Auth Web Service definition interface for Rest Services
  * 
@@ -32,7 +34,7 @@ public interface AuthService {
 	@POST
     @Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String loginPostJSON(String jsonstr) throws Exception;
+	public String loginPostJSON(WSCredentials wscred) throws Exception;	
 
 	@DELETE
     @Path("/logout")
