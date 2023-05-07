@@ -4,10 +4,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -169,35 +167,15 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			// Nothing to do
 		}
 	}
-	
+
 	private boolean isWriteOrReadEnable(long templateId, long userId, boolean write) {
 		boolean result = true;
 		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return false;
-			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return true;
-
-			Set<Group> groups = user.getGroups();
-			if (groups.isEmpty())
-				return false;
-
-			StringBuilder query = new StringBuilder("select distinct(" + ENTITY + ") from Template " + ENTITY + "  ");
-			query.append(" left join " + ENTITY + ".templateGroups as _group ");
-			query.append(" where ");
+			Set<Permission> permissions = getEnabledPermissions(templateId, userId);
 			if (write)
-				query.append(" _group.write=1 and ");
-			query.append(" _group.groupId in (");
-			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
-			query.append(") and " + ENTITY + ".id = :templateId");
-
-			Map<String, Object> params = new HashMap<>();
-			params.put("templateId", Long.valueOf(templateId));
-
-			@SuppressWarnings("unchecked")
-			List<TemplateGroup> coll = findByQuery(query.toString(), params, null);
-			result = coll.size() > 0;
+				return permissions.contains(Permission.WRITE);
+			else
+				return permissions.contains(Permission.READ);
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
@@ -242,7 +220,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(" and ld_groupid in (");
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(")");
-
+			
 			/**
 			 * IMPORTANT: the connection MUST be explicitly closed, otherwise it
 			 * is probable that the connection pool will leave open it
