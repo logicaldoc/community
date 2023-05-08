@@ -77,13 +77,11 @@ public class MailPreviewPanel extends VLayout {
 		Canvas body = null;
 		if (mail.getMessage().toLowerCase().startsWith("<html")
 				|| mail.getMessage().toLowerCase().startsWith("<body")) {
-			HTMLPane htmlBody = new HTMLPane();
-			htmlBody.setShowEdges(true);
-			htmlBody.setWidth100();
-			htmlBody.setHeight100();
-			htmlBody.setContents(mail.getMessage());
-			htmlBody.setShowEdges(false);
-			body = htmlBody;
+			HTMLPane html = new HTMLPane();
+			html.setWidth100();
+			html.setHeight100();
+			html.setContents("<iframe style='border:0px solid white; width:100%; height:100%;' sandbox srcdoc='"+mail.getMessage()+"'></iframe>");
+			body = html;
 		} else {
 			if (document.getFileName().toLowerCase().endsWith(".msg") && mail.getMessage().contains("\\rtf1")) {
 				HTMLPane html = new HTMLPane();
@@ -97,7 +95,7 @@ public class MailPreviewPanel extends VLayout {
 							+ "&locale=" + I18N.getLocale();
 					html.setIFrameURL(url);
 					contents = "<iframe src='" + url
-							+ "' style='border:0px solid white; width:100%; height:100%; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";
+							+ "' style='border:0px solid white; width:100%; height:100%; overflow:hidden;' scrolling='no' seamless='seamless'></iframe>";
 				} catch (Throwable t) {
 					// Nothing to do
 				}
