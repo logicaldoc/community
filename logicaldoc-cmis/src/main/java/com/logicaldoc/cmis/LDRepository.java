@@ -1860,7 +1860,7 @@ public class LDRepository {
 
 		Template template = getTemplate(doc);
 
-		if (template == null || !(doc instanceof Hit)) {
+		if (template == null) {
 			addPropertyString(result, typeId, filter, TypeManager.PROP_TEMPLATE, null);
 			return;
 		}
