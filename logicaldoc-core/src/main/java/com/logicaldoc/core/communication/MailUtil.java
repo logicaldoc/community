@@ -24,7 +24,6 @@ import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.URLName;
-import javax.mail.internet.ContentDisposition;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MailDateFormat;
 import javax.mail.internet.MimeMessage;
@@ -328,7 +327,7 @@ public class MailUtil {
 
 		setReplyTo(msg, email);
 
-		if (msg.isMimeType(MULTIPART_STAR) && (msg.getContent() instanceof Multipart)) {
+		if (msg.getContent() instanceof Multipart) {
 			Multipart mp = (Multipart) msg.getContent();
 			int count = mp.getCount();
 			for (int i = 1; i < count; i++) {
@@ -456,14 +455,15 @@ public class MailUtil {
 
 	private static void addAttachments(BodyPart p, EMail email, boolean extractAttachmentContent)
 			throws UnsupportedEncodingException, MessagingException, IOException {
-		if (p.isMimeType(MULTIPART_STAR)) {
+		if (p.getContent() instanceof Multipart) {
 			Multipart mp = (Multipart) p.getContent();
 			int count = mp.getCount();
-			for (int i = 1; i < count; i++) {
+
+			for (int i = 0; i < count; i++) {
 				BodyPart bp = mp.getBodyPart(i);
 				if (bp.getFileName() != null && extractAttachmentContent) {
 					addAttachment(bp, email);
-				} else if (bp.isMimeType(MULTIPART_STAR)) {
+				} else if (p.getContent() instanceof Multipart) {
 					addAttachments(bp, email, extractAttachmentContent);
 				}
 			}
@@ -474,13 +474,11 @@ public class MailUtil {
 
 	private static void addAttachment(Part part, EMail email) throws UnsupportedEncodingException, MessagingException {
 		String fileName = part.getFileName();
-		String disposition = "";
 		if (part.getContentType().equalsIgnoreCase("message/rfc822")) {
 			// The part is another email (may happen in case of forwards).
 			try (InputStream is = part.getInputStream()) {
 				EMail embeddedEmail = messageToMail(part.getInputStream(), false);
 				fileName = embeddedEmail.getSubject() + ".eml";
-				disposition = "attachment";
 			} catch (Throwable t) {
 				log.warn(t.getMessage(), t);
 			}
@@ -490,13 +488,12 @@ public class MailUtil {
 		if (StringUtils.isEmpty(fileName))
 			return;
 
-		String[] values = part.getHeader("Content-Disposition");
-		if (values != null && values.length > 0) {
-			// Skip part that specifies a Content-Disposition but it is not
-			// 'attachment'
-			disposition = new ContentDisposition(values[0]).getDisposition();
-			if (!disposition.contains("attachment"))
-				return;
+		String[] contentIdValues = part.getHeader("Content-ID");
+		if (contentIdValues != null && contentIdValues.length > 0) {
+			// This is not an attachment but a content referenced by the body,
+			// like an image in the signature. We do not consider such part as
+			// an attachment
+			return;
 		}
 
 		fileName = MimeUtility.decodeText(fileName);
@@ -730,6 +727,8 @@ public class MailUtil {
 	 * 
 	 * @throws MessagingException Error in traversing the part
 	 * @throws IOException generic I/O error
+	 * 
+	 * @return the message text
 	 */
 	public static String extractMessageText(Message message) throws MessagingException, IOException {
 		StringBuilder messageText = new StringBuilder();
