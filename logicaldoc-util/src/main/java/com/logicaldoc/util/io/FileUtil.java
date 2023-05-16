@@ -649,9 +649,6 @@ public class FileUtil {
 	}
 
 	public static void strongDelete(File file) {
-		
-		System.out.println("file: "+file.getAbsolutePath());
-		
 		try {
 			if (file != null && file.exists())
 				FileUtils.forceDelete(file);
@@ -659,21 +656,14 @@ public class FileUtil {
 			log.warn(e.getMessage());
 		}
 
-		System.out.println("file2: "+file.getAbsolutePath());
-		
 		try {
 			if (file != null && file.exists())
 				Files.deleteIfExists(file.toPath());
 		} catch (IOException e) {
 			log.warn(e.getMessage());
 		}
-
-		System.out.println("file3: "+file.getAbsolutePath());
-		
 		if (file != null && file.exists())
 			deleteUsingOSCommand(file);
-		
-		System.out.println("file4: "+file.getAbsolutePath());
 	}
 
 	private static void deleteUsingOSCommand(File file) {
