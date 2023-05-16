@@ -88,7 +88,7 @@
 <!ELEMENT value (#PCDATA)>
 ]>
 
-<plugin id="logicaldoc-core" version="8.8.4" class="com.logicaldoc.core.CorePlugin">
+<plugin id="logicaldoc-core" version="8.8.5" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
     <parameter-def id="name" />
     <parameter-def id="sqlFile" />
