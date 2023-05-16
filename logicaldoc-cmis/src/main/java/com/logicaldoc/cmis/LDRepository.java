@@ -553,7 +553,7 @@ public class LDRepository {
 
 			User user = getSessionUser();
 			assert (user != null);
-
+			
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
 			if (name == null)
@@ -562,13 +562,11 @@ public class LDRepository {
 			String fileName = getStringProperty(properties, PropertyIds.CONTENT_STREAM_FILE_NAME);
 			if (fileName == null)
 				fileName = getStringProperty(properties, "Filename");
-			if (fileName == null) {
+			if (fileName == null)
 				fileName = name;
-				if (fileName.lastIndexOf('.') > 0)
-					fileName = fileName.substring(0, name.lastIndexOf('.'));
-			}
 			if (!isValidName(fileName))
 				throw new CmisNameConstraintViolationException("File name is not valid!");
+			
 
 			Document document = new Document();
 			updateDocumentMetadata(document, properties, true);
