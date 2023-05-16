@@ -12,8 +12,6 @@ import java.util.Map;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -46,7 +44,6 @@ public class SampleClient {
 		Folder root = connect();
 		root.getName();
 
-
 		CmisObject object = session.getObjectByPath(TEST_FOLDER_PATH);
 		System.out.println(object.getId() + " " + object.getName());
 		//
@@ -62,9 +59,8 @@ public class SampleClient {
 //		for (QueryResult r : result) {
 //			System.out.println("result: " + r.getPropertyById("ldoc:tags"));
 //		}
-		
-		
-		createDocument((Folder)object, "pippo.txt");
+
+		createDocument((Folder) object, "pippo.txt");
 	}
 
 	public static void main1(String[] args) throws IOException {
@@ -86,12 +82,12 @@ public class SampleClient {
 	private static void checkoutCheckin() throws IOException {
 
 		// Folder root = connect("admin", "admin");
-		
+
 		// user solely in group author
-		// Folder root = connect("manager", "12345678"); 
-		
+		// Folder root = connect("manager", "12345678");
+
 		// user in groups author and admin
-		Folder root = connect("admin", "12345678"); 
+		Folder root = connect("admin", "12345678");
 		root.getName();
 
 		CmisObject object = session.getObjectByPath(TEST_FOLDER_PATH);
@@ -101,7 +97,7 @@ public class SampleClient {
 		System.out.println(object.getId() + " " + object.getProperty(PropertyIds.NAME).getValues().get(0));
 
 		Document pwc = (Document) object;
-		
+
 		// default values if the document has no content
 		String filename = "test.txt";
 		String mimetype = "text/plain; fileNameCharset=UTF-8";
@@ -116,10 +112,10 @@ public class SampleClient {
 				input);
 
 		boolean major = false;
-				// Check in the pwc
+		// Check in the pwc
 		try {
 			Map<String, Object> properties = new HashMap<String, Object>();
-			properties.put("cmis:name","test-doc.txt");
+			properties.put("cmis:name", "test-doc.txt");
 
 			pwc.checkIn(major, properties, contentStream, "minor version");
 			System.out.println("checkin completed!");
