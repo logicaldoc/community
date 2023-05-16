@@ -294,8 +294,7 @@ public class LDCmisService extends AbstractCmisService {
 	public String create(String repositoryId, Properties properties, String folderId, ContentStream contentStream,
 			VersioningState versioningState, List<String> policies, ExtensionsData extension) {
 		validateSession();
-		ObjectData object = getRepository().create(getCallContext(), properties, folderId, contentStream,
-				versioningState, this);
+		ObjectData object = getRepository().create(getCallContext(), properties, folderId, contentStream, this);
 		return object.getId();
 	}
 
@@ -304,7 +303,7 @@ public class LDCmisService extends AbstractCmisService {
 			ContentStream contentStream, VersioningState versioningState, List<String> policies, Acl addAces,
 			Acl removeAces, ExtensionsData extension) {
 		validateSession();
-		return getRepository().createDocument(getCallContext(), properties, folderId, contentStream, versioningState);
+		return getRepository().createDocument(getCallContext(), properties, folderId, contentStream);
 	}
 
 	@Override

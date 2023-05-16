@@ -41,7 +41,7 @@ public class SampleClient {
 
 	private static final String TEST_DOCUMENT_NAME_1 = "migrazione_adam01.txt";
 
-	public static void main1(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 
 		Folder root = connect();
 		root.getName();
@@ -57,14 +57,17 @@ public class SampleClient {
 
 		// checkoutCheckin();
 
-		ItemIterable<QueryResult> result = session
-				.query("SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE ldoc:tags = '12345'", true);
-		for (QueryResult r : result) {
-			System.out.println("result: " + r.getPropertyById("ldoc:tags"));
-		}
+//		ItemIterable<QueryResult> result = session
+//				.query("SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE ldoc:tags = '12345'", true);
+//		for (QueryResult r : result) {
+//			System.out.println("result: " + r.getPropertyById("ldoc:tags"));
+//		}
+		
+		
+		createDocument((Folder)object, "pippo.txt");
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main1(String[] args) throws IOException {
 
 //		Folder root = connect();
 //		root.getName();

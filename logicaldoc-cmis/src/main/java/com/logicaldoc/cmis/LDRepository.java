@@ -61,7 +61,6 @@ import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
 import org.apache.chemistry.opencmis.commons.enums.SupportedPermissions;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
-import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
@@ -494,13 +493,12 @@ public class LDRepository {
 	 * @param properties the properties
 	 * @param folderId identifier of the parent folder
 	 * @param contentStream stream of the document to create
-	 * @param versioningState state of the version
 	 * @param objectInfos informations
 	 * 
 	 * @return the newly created object
 	 */
 	public ObjectData create(CallContext context, Properties properties, String folderId, ContentStream contentStream,
-			VersioningState versioningState, ObjectInfoHandler objectInfos) {
+			ObjectInfoHandler objectInfos) {
 		debug("create " + folderId);
 		validatePermission(folderId, context, Permission.WRITE);
 
@@ -512,7 +510,7 @@ public class LDRepository {
 
 		String objectId = null;
 		if (type.getBaseTypeId() == BaseTypeId.CMIS_DOCUMENT) {
-			objectId = createDocument(context, properties, folderId, contentStream, versioningState);
+			objectId = createDocument(context, properties, folderId, contentStream);
 			return compileObjectType(context, getDocument(objectId), null, false, false, objectInfos);
 		} else if (type.getBaseTypeId() == BaseTypeId.CMIS_FOLDER) {
 			objectId = createFolder(context, properties, folderId);
@@ -529,12 +527,11 @@ public class LDRepository {
 	 * @param properties the folder's properties
 	 * @param folderId identifier of the parent folder
 	 * @param contentStream binary content of the file to create
-	 * @param versioningState state of the version
 	 * 
 	 * @return the new document's identifier
 	 */
 	public String createDocument(CallContext context, Properties properties, String folderId,
-			ContentStream contentStream, VersioningState versioningState) {
+			ContentStream contentStream) {
 
 		log.debug("createDocument {}", folderId);
 
