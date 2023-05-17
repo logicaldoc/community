@@ -26,7 +26,9 @@ import javax.mail.Transport;
 import javax.mail.URLName;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MailDateFormat;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.io.FileUtils;
@@ -42,6 +44,8 @@ import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.P7M;
+
+import net.markenwerk.utils.mail.smime.SmimeUtil;
 
 /**
  * Utility methods for handling emails
@@ -327,11 +331,16 @@ public class MailUtil {
 
 		setReplyTo(msg, email);
 
-		if (msg.getContent() instanceof Multipart) {
-			Multipart mp = (Multipart) msg.getContent();
-			int count = mp.getCount();
+		if (msg.getContent() instanceof MimeMultipart) {
+			MimeMultipart multipart = (MimeMultipart) msg.getContent();
+			int count = multipart.getCount();
 			for (int i = 1; i < count; i++) {
-				BodyPart bp = mp.getBodyPart(i);
+				BodyPart bp = multipart.getBodyPart(i);
+				
+				if(bp.getFileName()!=null && bp.getFileName().toLowerCase().contains(".p7s")) {
+					MimeBodyPart smimeBody =   SmimeUtil.getSignedContent(multipart);
+					addAttachments(smimeBody, email, extractAttachmentContent);
+				}else
 				addAttachments(bp, email, extractAttachmentContent);
 			}
 		} else if (NO_BODY.equals(email.getMessageText())) {
@@ -342,7 +351,7 @@ public class MailUtil {
 
 		return email;
 	}
-
+	
 	private static void setReplyTo(javax.mail.Message msg, EMail email) throws MessagingException {
 		Address[] addresses = msg.getReplyTo();
 		if (addresses != null) {
@@ -487,14 +496,6 @@ public class MailUtil {
 		// Skip part without a filename
 		if (StringUtils.isEmpty(fileName))
 			return;
-
-		String[] contentIdValues = part.getHeader("Content-ID");
-		if (contentIdValues != null && contentIdValues.length > 0) {
-			// This is not an attachment but a content referenced by the body,
-			// like an image in the signature. We do not consider such part as
-			// an attachment
-			return;
-		}
 
 		fileName = MimeUtility.decodeText(fileName);
 		fileName = FileUtil.getName(fileName);
