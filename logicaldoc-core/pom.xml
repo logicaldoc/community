@@ -559,7 +559,12 @@
 		    <groupId>org.mockito</groupId>
 		    <artifactId>mockito-core</artifactId>
 		    <scope>test</scope>
-		</dependency>			
+		</dependency>
+		<dependency>
+			<groupId>net.markenwerk</groupId>
+			<artifactId>utils-mail-smime</artifactId>
+			<version>1.0.8</version>
+		</dependency>					
 	</dependencies>
 	<build>
 		<plugins>
@@ -646,6 +651,7 @@
 									<exclude name="*caffeine*" />
 									<exclude name="*msgparser*" />
 									<exclude name="commons-math*" />
+									<exclude name="*smime*" />
 								</delete>
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="opencv-*-android-*" />
