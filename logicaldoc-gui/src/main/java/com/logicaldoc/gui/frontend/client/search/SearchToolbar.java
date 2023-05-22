@@ -34,7 +34,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class SearchToolbar extends ToolStrip {
 
 	private static final String TOGGLE_OFF = "toggle-off";
+
 	private static final String CLOSESELEFTPANEL = "closeseleftpanel";
+
 	private static final String TOGGLE_ON = "toggle-on";
 
 	public SearchToolbar(final HitsListPanel hitsPanel) {
@@ -206,7 +208,7 @@ public class SearchToolbar extends ToolStrip {
 		ToolStripButton togglePreview = AwesomeFactory.newToolStripButton(TOGGLE_ON, "closepreview");
 		// Retrieve the saved preview width
 		String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
-		if (Integer.parseInt(w) <= 0) {
+		if (w != null && !w.isEmpty() && Integer.parseInt(w) <= 0) {
 			togglePreview.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
 			togglePreview.setTooltip(I18N.message("openpreview"));
 		}
@@ -247,6 +249,7 @@ public class SearchToolbar extends ToolStrip {
 
 	private void addListButton(HitsListPanel hitsPanel) {
 		ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
+		list.setActionType(SelectionType.RADIO);
 		list.setRadioGroup("mode");
 		list.addClickHandler((ClickEvent event) -> {
 			CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_LIST);
