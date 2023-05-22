@@ -42,7 +42,7 @@ public class Dashlet extends PersistentObject {
 	public Dashlet() {
 	}
 
-	protected Dashlet(Dashlet source) {
+	public Dashlet(Dashlet source) {
 		super();
 		this.type = source.type;
 		this.query = source.query;
