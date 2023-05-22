@@ -8,9 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -41,11 +39,7 @@ import com.smartgwt.client.widgets.drawing.events.MovedEvent;
 import com.smartgwt.client.widgets.drawing.events.MovedHandler;
 import com.smartgwt.client.widgets.drawing.events.ResizedEvent;
 import com.smartgwt.client.widgets.drawing.events.ResizedHandler;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SliderItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -217,35 +211,21 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		toolStrip.addSpacer(2);
 
 		ToolStripButton close = new ToolStripButton(I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DrawItem[] items = pageDrawingPane.getDrawItems();
-				if (items != null)
-					for (DrawItem item : items)
-						item.hideAllKnobs();
-				showPrintPreview(pageDrawingPane);
-			}
+		print.addClickHandler(event -> {
+			DrawItem[] items = pageDrawingPane.getDrawItems();
+			if (items != null)
+				for (DrawItem item : items)
+					item.hideAllKnobs();
+			showPrintPreview(pageDrawingPane);
 		});
 
 		pageCursor = ItemFactory.newSliderItem("page", "page", 1.0, 1.0,
 				document.getPreviewPages() > 0 ? document.getPreviewPages() : 1.0);
 		pageCursor.setNumValues(document.getPreviewPages() > 0 ? document.getPreviewPages() : 1);
-		pageCursor.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				showCurrentPage();
-			}
-		});
+		pageCursor.addChangedHandler(event -> showCurrentPage());
 
 		toolStrip.addFormItem(pageCursor);
 
@@ -254,13 +234,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		zoomItem.setNumValues(600);
 		zoomItem.setRoundValues(false);
 		zoomItem.setRoundPrecision(2);
-		zoomItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				pageDrawingPane.zoom((Double) event.getValue());
-			}
-		});
+		zoomItem.addChangedHandler(event -> pageDrawingPane.zoom((Double) event.getValue()));
 		toolStrip.addFormItem(zoomItem);
 
 		toolStrip.addSeparator();
@@ -301,34 +275,30 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			bottom.removeMembers(bottom.getMembers());
 		}
 
-		pageDrawingPane = new ImageDrawingPane(getPageUrl(page), null, new CallBack() {
+		pageDrawingPane = new ImageDrawingPane(getPageUrl(page), null, imageElements -> {
+			// Reload the document to update the pages count
+			if (document.getPreviewPages() <= 1)
+				DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
 
-			@Override
-			public void onImagesLoaded(ImageElement[] imageElements) {
-				// Reload the document to update the pages count
-				if (document.getPreviewPages() <= 1)
-					DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onSuccess(GUIDocument dc) {
+						document.setPages(dc.getPreviewPages());
+						pageCursor.setMaxValue((double) document.getPreviewPages());
+						pageCursor.setNumValues(document.getPreviewPages());
+					}
+				});
 
-						@Override
-						public void onSuccess(GUIDocument dc) {
-							document.setPages(dc.getPreviewPages());
-							pageCursor.setMaxValue((double) document.getPreviewPages());
-							pageCursor.setNumValues(document.getPreviewPages());
-						}
-					});
+			showAnnotations(page);
 
-				showAnnotations(page);
-
-				// Calculate the zoom to see the complete page without scroll
-				double zoom = (double) bottom.getHeight() / (double) pageDrawingPane.getImageHeight();
-				zoomItem.setValue(zoom);
-				pageDrawingPane.zoom(zoom);
-			}
+			// Calculate the zoom to see the complete page without scroll
+			double zoom = (double) bottom.getHeight() / (double) pageDrawingPane.getImageHeight();
+			zoomItem.setValue(zoom);
+			pageDrawingPane.zoom(zoom);
 		});
 		bottom.addMember(pageDrawingPane);
 	}

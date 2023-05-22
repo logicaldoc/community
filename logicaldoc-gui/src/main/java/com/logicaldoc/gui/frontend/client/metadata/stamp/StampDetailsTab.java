@@ -16,7 +16,7 @@ public abstract class StampDetailsTab extends HLayout {
 
 	protected ChangedHandler changedHandler;
 
-	public StampDetailsTab(GUIStamp stamp, ChangedHandler changedHandler) {
+	protected StampDetailsTab(GUIStamp stamp, ChangedHandler changedHandler) {
 		super();
 		this.stamp = stamp;
 		this.changedHandler = changedHandler;

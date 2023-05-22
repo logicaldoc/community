@@ -11,8 +11,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 
 /**
  * Shows document's publishing options.
@@ -66,17 +64,14 @@ public class PublishingPanel extends DocumentDetailTab {
 		startPublishing.setShowPickerIcon(true);
 		startPublishing.setWrapTitle(false);
 		startPublishing.setEndRow(true);
-		startPublishing.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| "delete".equals(event.getKeyName().toLowerCase())) {
-					startPublishing.clearValue();
-					startPublishing.setValue((Date) null);
-					changedHandler.onChanged(null);
-				} else {
-					changedHandler.onChanged(null);
-				}
+		startPublishing.addKeyPressHandler(event -> {
+			if ("backspace".equals(event.getKeyName().toLowerCase())
+					|| "delete".equals(event.getKeyName().toLowerCase())) {
+				startPublishing.clearValue();
+				startPublishing.setValue((Date) null);
+				changedHandler.onChanged(null);
+			} else {
+				changedHandler.onChanged(null);
 			}
 		});
 
@@ -89,17 +84,14 @@ public class PublishingPanel extends DocumentDetailTab {
 		stopPublishing.setShowPickerIcon(true);
 		stopPublishing.setEndRow(true);
 		stopPublishing.setWrapTitle(false);
-		stopPublishing.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| "delete".equals(event.getKeyName().toLowerCase())) {
-					stopPublishing.clearValue();
-					stopPublishing.setValue((Date) null);
-					changedHandler.onChanged(null);
-				} else {
-					changedHandler.onChanged(null);
-				}
+		stopPublishing.addKeyPressHandler(event -> {
+			if ("backspace".equals(event.getKeyName().toLowerCase())
+					|| "delete".equals(event.getKeyName().toLowerCase())) {
+				stopPublishing.clearValue();
+				stopPublishing.setValue((Date) null);
+				changedHandler.onChanged(null);
+			} else {
+				changedHandler.onChanged(null);
 			}
 		});
 

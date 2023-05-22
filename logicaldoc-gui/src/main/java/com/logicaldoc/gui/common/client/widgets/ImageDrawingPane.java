@@ -3,7 +3,6 @@ package com.logicaldoc.gui.common.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.widgetideas.graphics.client.ImageLoader;
 import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
 import com.smartgwt.client.types.Cursor;
@@ -11,10 +10,6 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.drawing.DrawImage;
 import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.drawing.DrawPane;
-import com.smartgwt.client.widgets.drawing.events.ClickEvent;
-import com.smartgwt.client.widgets.drawing.events.ClickHandler;
-import com.smartgwt.client.widgets.drawing.events.DrawEndEvent;
-import com.smartgwt.client.widgets.drawing.events.DrawEndHandler;
 
 /**
  * Displays an image with drawings over it
@@ -41,24 +36,20 @@ public class ImageDrawingPane extends DrawPane {
 		setOverflow(Overflow.AUTO);
 		setBackgroundColor("papayawhip");
 
-		ImageLoader.loadImages(new String[] { imageUrl }, new CallBack() {
+		ImageLoader.loadImages(new String[] { imageUrl }, imageElements -> {
+			imageWidth = imageElements[0].getWidth();
+			imageHeight = imageElements[0].getHeight();
 
-			@Override
-			public void onImagesLoaded(ImageElement[] imageElements) {
-				imageWidth = imageElements[0].getWidth();
-				imageHeight = imageElements[0].getHeight();
+			setWidth(imageWidth);
+			setHeight(imageHeight);
 
-				setWidth(imageWidth);
-				setHeight(imageHeight);
+			for (DrawItem item : getDrawItems())
+				item.setDrawPane(ImageDrawingPane.this);
 
-				for (DrawItem item : getDrawItems())
-					item.setDrawPane(ImageDrawingPane.this);
+			initDrawings();
 
-				initDrawings();
-
-				if (loadImageCallback != null)
-					loadImageCallback.onImagesLoaded(imageElements);
-			}
+			if (loadImageCallback != null)
+				loadImageCallback.onImagesLoaded(imageElements);
 		});
 	}
 
@@ -80,28 +71,20 @@ public class ImageDrawingPane extends DrawPane {
 		background.setDrawPane(this);
 		background.draw();
 
-		background.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				for (DrawItem item : getDrawItems()) {
-					item.hideAllKnobs();
-					item.setCanDrag(false);
-				}
+		background.addClickHandler(event -> {
+			for (DrawItem item : getDrawItems()) {
+				item.hideAllKnobs();
+				item.setCanDrag(false);
 			}
 		});
 
 		/*
 		 * Draw the annotations once the background has been drawn
 		 */
-		background.addDrawEndHandler(new DrawEndHandler() {
-
-			@Override
-			public void onDrawEnd(DrawEndEvent event) {
-				for (DrawItem item : getDrawItems()) {
-					item.setDrawPane(ImageDrawingPane.this);
-					item.draw();
-				}
+		background.addDrawEndHandler(event -> {
+			for (DrawItem item : getDrawItems()) {
+				item.setDrawPane(ImageDrawingPane.this);
+				item.draw();
 			}
 		});
 

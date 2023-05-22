@@ -14,13 +14,9 @@ import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Portlet;
 
@@ -48,12 +44,7 @@ public class MostUsedTagsPortlet extends Portlet {
 	private void initGUI() {
 		setTitle(AwesomeFactory.getIconHtml("tag", I18N.message("mostusedtags")));
 
-		HeaderControl refresh = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		HeaderControl refresh = new HeaderControl(HeaderControl.REFRESH, event -> refresh());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, refresh);
 
@@ -80,12 +71,9 @@ public class MostUsedTagsPortlet extends Portlet {
 
 		addItem(container);
 
-		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord rec = event.getRecord();
-				TagsForm.searchTag(rec.getAttributeAsString("word"), false);
-			}
+		list.addCellDoubleClickHandler(event -> {
+			ListGridRecord rec = event.getRecord();
+			TagsForm.searchTag(rec.getAttributeAsString("word"), false);
 		});
 
 		refresh();

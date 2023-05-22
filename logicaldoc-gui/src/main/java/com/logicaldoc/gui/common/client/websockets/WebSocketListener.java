@@ -119,6 +119,10 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		if (!rememberHistory(event))
 			return;
 		
+		handleEvent(event);
+	}
+
+	private void handleEvent(WebsocketMessage event) {
 		if (isDocumentModifiedEvent(event)) {
 			handleDocumentModifiedEvent(event);
 		} else if ("event.stored".equals(event.getEvent())) {

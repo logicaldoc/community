@@ -67,7 +67,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 	private VLayout conditionsLayout = null;
 
-	public FolderSearchForm() {
+	protected FolderSearchForm() {
 		setHeight100();
 		setWidth100();
 		setMargin(3);

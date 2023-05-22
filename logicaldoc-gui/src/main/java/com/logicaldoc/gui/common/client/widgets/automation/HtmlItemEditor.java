@@ -8,10 +8,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -38,12 +34,8 @@ public class HtmlItemEditor extends Window {
 		this.item = item;
 		this.handler = handler;
 
-		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				onClose();
-			}
-		});
-		
+		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> onClose());
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
 		setTitle(item.getTitle());
 
@@ -54,12 +46,7 @@ public class HtmlItemEditor extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				onClose();
-			}
-		});
+		addCloseClickHandler(event -> onClose());
 
 		layout = new VLayout();
 		layout.setWidth100();
@@ -91,12 +78,7 @@ public class HtmlItemEditor extends Window {
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
 		toolStrip.addButton(close);
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onClose();
-			}
-		});
+		close.addClickHandler(event -> onClose());
 
 		layout.setMembers(toolStrip, editorPanel);
 	}

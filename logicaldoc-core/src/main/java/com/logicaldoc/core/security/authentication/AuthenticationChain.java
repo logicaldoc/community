@@ -3,7 +3,6 @@ package com.logicaldoc.core.security.authentication;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.java.plugin.registry.Extension;
@@ -45,9 +44,9 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			throws AuthenticationException {
 
 		init();
-		
+
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		
+
 		User user = null;
 		try {
 			user = checkAnonymousLogin(username, key, client);
@@ -75,7 +74,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			user = null;
 		}
 
-		
 		log.debug("Collected authentication errors: {}", errors);
 
 		if (user != null) {
@@ -145,7 +143,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 	@Override
 	public User pickUser(String username) {
-		
+
 		init();
 
 		User user = null;
@@ -226,17 +224,15 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}
-		Collections.sort(sortedExts, new Comparator<Extension>() {
-			public int compare(Extension e1, Extension e2) {
-				int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
-				if (position1 < position2)
-					return -1;
-				else if (position1 > position2)
-					return 1;
-				else
-					return 0;
-			}
+		Collections.sort(sortedExts, (e1, e2) -> {
+			int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
+			int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
+			if (position1 < position2)
+				return -1;
+			else if (position1 > position2)
+				return 1;
+			else
+				return 0;
 		});
 
 		for (Extension extension : sortedExts) {

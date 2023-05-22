@@ -3,7 +3,6 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Constants;
@@ -30,12 +29,12 @@ public class GUITemplate implements Serializable {
 
 	private int type = TYPE_DEFAULT;
 
-	private String validation; 
-	
+	private String validation;
+
 	private GUIAttribute[] attributes;
 
 	private GUIRight[] rights = new GUIRight[] {};
-	
+
 	private String[] permissions = new String[] {};
 
 	public long getId() {
@@ -110,12 +109,8 @@ public class GUITemplate implements Serializable {
 		if (attributes == null)
 			return null;
 
-		Arrays.sort(attributes, new Comparator<GUIAttribute>() {
-
-			@Override
-			public int compare(GUIAttribute arg0, GUIAttribute arg1) {
-				return Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition()));
-			}
+		Arrays.sort(attributes, (GUIAttribute arg0, GUIAttribute arg1) -> {
+			return Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition()));
 		});
 		return attributes;
 	}

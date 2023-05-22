@@ -5,10 +5,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.tree.TreeGrid;
-import com.smartgwt.client.widgets.tree.events.FolderClosedEvent;
-import com.smartgwt.client.widgets.tree.events.FolderClosedHandler;
-import com.smartgwt.client.widgets.tree.events.FolderOpenedEvent;
-import com.smartgwt.client.widgets.tree.events.FolderOpenedHandler;
 
 /**
  * TreeGrid showing the folders
@@ -35,22 +31,9 @@ public class FolderTree extends TreeGrid {
 		ListGridField name = new FolderListGridField();
 		setFields(name);
 
-		addFolderOpenedHandler(new FolderOpenedHandler() {
+		addFolderOpenedHandler(event -> event.getNode().setAttribute("opened", true));
 
-			@Override
-			public void onFolderOpened(FolderOpenedEvent event) {
-				event.getNode().setAttribute("opened", true);
-			}
-
-		});
-
-		addFolderClosedHandler(new FolderClosedHandler() {
-
-			@Override
-			public void onFolderClosed(FolderClosedEvent event) {
-				event.getNode().setAttribute("opened", false);
-			}
-		});
+		addFolderClosedHandler(event -> event.getNode().setAttribute("opened", false));
 	}
 
 	@Override

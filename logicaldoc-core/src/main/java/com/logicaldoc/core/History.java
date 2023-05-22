@@ -107,7 +107,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private String color;
 
-	public History() {
+	protected History() {
 	}
 
 	public String getVersion() {

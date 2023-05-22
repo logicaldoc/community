@@ -21,7 +21,7 @@ public abstract class FolderDetailTab extends DetailTab {
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        folder
 	 */
-	public FolderDetailTab(GUIFolder folder, ChangedHandler changedHandler) {
+	protected FolderDetailTab(GUIFolder folder, ChangedHandler changedHandler) {
 		super(changedHandler);
 		this.folder = folder;
 	}

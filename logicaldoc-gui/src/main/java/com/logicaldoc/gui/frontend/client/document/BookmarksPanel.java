@@ -14,17 +14,12 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.ListGridEditEvent;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the current user's bookmarks
@@ -80,33 +75,25 @@ public class BookmarksPanel extends VLayout {
 		list.setCanEdit(false);
 		addMember(list);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				final ListGridRecord rec = list.getSelectedRecord();
-				FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false,
-						false, false, new AsyncCallback<GUIFolder>() {
+		list.addCellContextClickHandler(event -> {
+			final ListGridRecord rec = list.getSelectedRecord();
+			FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false, false,
+					false, new AsyncCallback<GUIFolder>() {
 
-							@Override
-							public void onSuccess(GUIFolder folder) {
-								showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
-							}
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
+						}
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-						});
-				event.cancel();
-			}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+					});
+			event.cancel();
 		});
 
-		list.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onBookmarkSelected();
-			}
-		});
+		list.addClickHandler(event -> onBookmarkSelected());
 	}
 
 	private void showContextMenu(GUIFolder folder, boolean isDocument) {
@@ -114,62 +101,50 @@ public class BookmarksPanel extends VLayout {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord rec = list.getSelectedRecord();
-				GUIBookmark bookmark = new GUIBookmark();
-				bookmark.setId(Long.parseLong(rec.getAttributeAsString("id")));
-				bookmark.setName(rec.getAttributeAsString("name"));
-				bookmark.setDescription(rec.getAttributeAsString("description"));
-				BookmarkDialog dialog = new BookmarkDialog(bookmark);
-				dialog.show();
-			}
+		edit.addClickHandler(event -> {
+			ListGridRecord rec = list.getSelectedRecord();
+			GUIBookmark bookmark = new GUIBookmark();
+			bookmark.setId(Long.parseLong(rec.getAttributeAsString("id")));
+			bookmark.setName(rec.getAttributeAsString("name"));
+			bookmark.setDescription(rec.getAttributeAsString("description"));
+			BookmarkDialog dialog = new BookmarkDialog(bookmark);
+			dialog.show();
 		});
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				download();
-			}
-		});
+		download.addClickHandler(event -> download());
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onBookmarkSelected();
-			}
-		});
+		openInFolder.addClickHandler(event -> onBookmarkSelected());
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				final ListGridRecord[] selection = list.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final long[] ids = new long[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-				}
-
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-							}
-						});
-					}
-				});
+		delete.addClickHandler(event -> {
+			final ListGridRecord[] selection = list.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final long[] ids = new long[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 			}
+
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+						}
+					});
+				}
+			});
 		});
 
 		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {

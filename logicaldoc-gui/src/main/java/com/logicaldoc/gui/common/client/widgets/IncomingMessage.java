@@ -9,7 +9,6 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -59,24 +58,18 @@ public class IncomingMessage extends HLayout {
 		spacer.setOverflow(Overflow.HIDDEN);
 
 		addMember(spacer);
-		
+
 		Button close = AwesomeFactory.newIconButton("times", "close");
 		close.setLayoutAlign(Alignment.RIGHT);
 		close.setHeight("16px");
 		close.setTooltip(I18N.message("close"));
 		close.setLayoutAlign(VerticalAlignment.CENTER);
-		
+
 		if (clickHandler != null)
 			close.addClickHandler(clickHandler);
 		else
-			close.addClickHandler(new ClickHandler() {
+			close.addClickHandler(event -> destroy());
 
-				@Override
-				public void onClick(ClickEvent event) {
-					destroy();
-				}
-			});
-		
 		addMember(close);
 	}
 

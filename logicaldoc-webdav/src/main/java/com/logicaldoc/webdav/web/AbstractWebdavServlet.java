@@ -365,7 +365,6 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		OutputContext oc = getOutputContext(response, outX);
 
 		if (!resource.isCollection() && (resource instanceof DavResourceImpl)) {
-
 			log.debug("resource instanceof DavResourceImpl");
 			DavResourceImpl dri = (DavResourceImpl) resource;
 
@@ -396,13 +395,17 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				response.setHeader(HttpHeaders.PRAGMA, "no-cache");
 			}
 			
-			String userAgent = request.getHeader("User-Agent");
-			if (userAgent != null && userAgent.contains("LogicalDOCApp")) {
-				response.setHeader("LD-ETag", exportCtx.getResource().getETag());
-			}
+			setETagHeader(request, response, exportCtx);
 		}
 
 		resource.spool(oc);
+	}
+
+	private void setETagHeader(WebdavRequest request, WebdavResponse response, ExportContext exportCtx) {
+		String userAgent = request.getHeader("User-Agent");
+		if (userAgent != null && userAgent.contains("LogicalDOCApp")) {
+			response.setHeader("LD-ETag", exportCtx.getResource().getETag());
+		}
 	}
 
 	/**

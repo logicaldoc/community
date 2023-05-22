@@ -390,7 +390,7 @@ public class TypeManager {
 			result = new PropertyUriDefinitionImpl();
 			break;
 		default:
-			throw new RuntimeException("Unknown datatype! Spec change?");
+			throw new IllegalArgumentException("Unknown datatype! Spec change?");
 		}
 
 		result.setId(id);
@@ -417,13 +417,11 @@ public class TypeManager {
 	 * @return if the type has been added
 	 */
 	public boolean addType(TypeDefinition type) {
-		if (type == null) {
+		if (type == null)
 			return false;
-		}
 
-		if (type.getBaseTypeId() == null) {
+		if (type.getBaseTypeId() == null)
 			return false;
-		}
 
 		// find base type
 		TypeDefinition baseType = null;
@@ -450,7 +448,7 @@ public class TypeManager {
 		// add it
 		addTypeInteral(newType);
 
-		log.info("Added type '" + newType.getId() + "'.");
+		log.info("Added type '{}'", newType.getId());
 
 		return true;
 	}
@@ -584,13 +582,11 @@ public class TypeManager {
 
 		result.setTypeDefinition(type);
 
-		if (depth != 0) {
-			if (tc.getChildren() != null) {
-				result.setChildren(new ArrayList<TypeDefinitionContainer>());
-				for (TypeDefinitionContainer tdc : tc.getChildren()) {
-					result.getChildren()
-							.add(getTypesDescendants(depth < 0 ? -1 : depth - 1, tdc, includePropertyDefinitions));
-				}
+		if (depth != 0 && tc.getChildren() != null) {
+			result.setChildren(new ArrayList<TypeDefinitionContainer>());
+			for (TypeDefinitionContainer tdc : tc.getChildren()) {
+				result.getChildren()
+						.add(getTypesDescendants(depth < 0 ? -1 : depth - 1, tdc, includePropertyDefinitions));
 			}
 		}
 

@@ -60,7 +60,7 @@ public abstract class CSVFile {
 	/**
 	 * CSVFile constructor with the default field separator and text qualifier.
 	 */
-  public CSVFile() {
+  protected CSVFile() {
     this(DEFAULT_FIELD_SEPARATOR, DEFAULT_TEXT_QUALIFIER);
   }
 
@@ -69,7 +69,7 @@ public abstract class CSVFile {
 	 *
 	 * @param sep The field separator to be used; overwrites the default one
 	 */
-  public CSVFile(char sep) {
+  protected CSVFile(char sep) {
     this(sep, DEFAULT_TEXT_QUALIFIER);
   }
 
@@ -79,7 +79,7 @@ public abstract class CSVFile {
 	 * @param sep  The field separator to be used; overwrites the default one
 	 * @param qual The text qualifier to be used; overwrites the default one
 	 */
-  public CSVFile(char sep, char qual) {
+  protected CSVFile(char sep, char qual) {
     setFieldSeparator(sep);
     setTextQualifier(qual);
   }

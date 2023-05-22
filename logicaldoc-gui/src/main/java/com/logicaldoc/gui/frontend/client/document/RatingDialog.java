@@ -20,17 +20,11 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -47,12 +41,7 @@ public class RatingDialog extends Window {
 		super();
 		this.rating = rat;
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("rating"));
@@ -86,50 +75,40 @@ public class RatingDialog extends Window {
 		totalVotes.setEndRow(true);
 		totalVotes.setAlign(Alignment.LEFT);
 		totalVotes.setPrompt(I18N.message("showvoters"));
-		totalVotes.addClickHandler(new ClickHandler() {
+		totalVotes.addClickHandler(event -> {
+			ListGridField vote = new ListGridField("vote", I18N.message("vote"), 94);
+			vote.setAlign(Alignment.CENTER);
+			vote.setCellFormatter(new CellFormatter() {
 
-			@Override
-			public void onClick(ClickEvent event) {
-				ListGridField vote = new ListGridField("vote", I18N.message("vote"), 94);
-				vote.setAlign(Alignment.CENTER);
-				vote.setCellFormatter(new CellFormatter() {
+				@Override
+				public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
+					return DocUtil.getRatingIcon((Integer) value);
+				}
+			});
 
-					@Override
-					public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-						return DocUtil.getRatingIcon((Integer) value);
-					}
-				});
+			ListGridField user = new ListGridField("user", I18N.message("user"), 140);
+			ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_SHORT);
 
-				ListGridField user = new ListGridField("user", I18N.message("user"), 140);
-				ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_SHORT);
+			ListGrid votesGrid = new ListGrid();
+			votesGrid.setWidth100();
+			votesGrid.setHeight100();
+			votesGrid.setAutoFetchData(true);
+			votesGrid.setDataSource(new RatingsDS(rating.getDocId()));
+			votesGrid.setFields(date, user, vote);
 
-				ListGrid votesGrid = new ListGrid();
-				votesGrid.setWidth100();
-				votesGrid.setHeight100();
-				votesGrid.setAutoFetchData(true);
-				votesGrid.setDataSource(new RatingsDS(rating.getDocId()));
-				votesGrid.setFields(date, user, vote);
+			final Window dialog = new Window();
+			dialog.setAutoCenter(true);
+			dialog.setIsModal(true);
+			dialog.setShowHeader(false);
+			dialog.setShowEdges(false);
+			dialog.setWidth(340);
+			dialog.setHeight(200);
+			dialog.setCanDragResize(true);
+			dialog.setDismissOnEscape(true);
+			dialog.addItem(votesGrid);
+			dialog.addDoubleClickHandler(evt -> dialog.destroy());
 
-				final Window dialog = new Window();
-				dialog.setAutoCenter(true);
-				dialog.setIsModal(true);
-				dialog.setShowHeader(false);
-				dialog.setShowEdges(false);
-				dialog.setWidth(340);
-				dialog.setHeight(200);
-				dialog.setCanDragResize(true);
-				dialog.setDismissOnEscape(true);
-				dialog.addItem(votesGrid);
-				dialog.addDoubleClickHandler(new DoubleClickHandler() {
-
-					@Override
-					public void onDoubleClick(DoubleClickEvent event) {
-						dialog.destroy();
-					}
-				});
-
-				dialog.show();
-			}
+			dialog.show();
 		});
 
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -146,30 +125,28 @@ public class RatingDialog extends Window {
 		ButtonItem vote = new ButtonItem();
 		vote.setTitle(I18N.message("vote"));
 		vote.setAutoFit(true);
-		vote.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (Boolean.FALSE.equals(vm.hasErrors())) {
-					RatingDialog.this.rating.setUserId(Session.get().getUser().getId());
-					RatingDialog.this.rating.setVote(Integer.parseInt(vm.getValueAsString("stars")));
+		vote.addClickHandler(event -> {
+			vm.validate();
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
+				RatingDialog.this.rating.setUserId(Session.get().getUser().getId());
+				RatingDialog.this.rating.setVote(Integer.parseInt(vm.getValueAsString("stars")));
 
-					DocumentService.Instance.get().saveRating(RatingDialog.this.rating, new AsyncCallback<Integer>() {
+				DocumentService.Instance.get().saveRating(RatingDialog.this.rating, new AsyncCallback<Integer>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-							destroy();
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						destroy();
+					}
 
-						@Override
-						public void onSuccess(Integer rating) {
-							GuiLog.info(I18N.message("votesaved"), null);
-							afterSaveOrDelete(rating);
-						}
-					});
-				}
-				destroy();
+					@Override
+					public void onSuccess(Integer rating) {
+						GuiLog.info(I18N.message("votesaved"), null);
+						afterSaveOrDelete(rating);
+					}
+				});
 			}
+			destroy();
 		});
 
 		ratingForm.setItems(actualRating, totalVotes, yourVote, vote);
@@ -203,29 +180,24 @@ public class RatingDialog extends Window {
 					alreadyVotedForm.setItems(alreadyVoted);
 
 					ButtonItem delete = new ButtonItem("delete", I18N.message("deleteyourvote"));
-					delete.addClickHandler(new ClickHandler() {
+					delete.addClickHandler(event -> {
+						DocumentService.Instance.get().deleteRating(vote.getId(), new AsyncCallback<Integer>() {
 
-						@Override
-						public void onClick(ClickEvent event) {
-							DocumentService.Instance.get().deleteRating(vote.getId(), new AsyncCallback<Integer>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Integer rating) {
-									afterSaveOrDelete(rating);
-								}
-							});
-						}
+							@Override
+							public void onSuccess(Integer rating) {
+								afterSaveOrDelete(rating);
+							}
+						});
 					});
 
 					alreadyVotedForm.setItems(alreadyVoted, delete);
 					layout.addMember(alreadyVotedForm);
 				}
-
 			}
 		});
 

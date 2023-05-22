@@ -11,8 +11,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to send documents or folders to an archive.
@@ -51,12 +49,7 @@ public class SendToArchiveDialog extends Window {
 		send.setStartRow(false);
 		send.setTitle(I18N.message("sendtoexparchive"));
 		send.setAutoFit(true);
-		send.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSend(ids, document);
-			}
-		});
+		send.addClickHandler(event -> onSend(ids, document));
 
 		form.setFields(archive, send);
 		addItem(form);

@@ -111,15 +111,12 @@ public class EventCollector {
 			history.setDocument(clone);
 		}
 
-		Runnable notifier = new Runnable() {
-			@Override
-			public void run() {
+		Runnable notifier = () -> {
 				log.debug("Notify history {}", history);
 				for (EventListener listener : listeners) {
 					listener.newEvent(history);
 				}
 				log.debug("Finished notification of history {}", history);
-			}
 		};
 
 		ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);

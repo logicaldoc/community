@@ -324,7 +324,7 @@ public class ResourceServiceImpl implements ResourceService {
 //					folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
 //				}
 				String folderToFind = resourcePath + "/" + name;
-				folderToFind = folderToFind.replaceAll("//", "/");
+				folderToFind = folderToFind.replace("//", "/");
 				log.debug("folderToFind: {}", folderToFind);
 				folder = folderDAO.findByPathExtended(folderToFind, tenantId);
 			}

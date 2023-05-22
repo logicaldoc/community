@@ -38,8 +38,7 @@ public class UserListenerManager {
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}
-		Collections.sort(sortedExts, new Comparator<Extension>() {
-			public int compare(Extension e1, Extension e2) {
+		Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
 				int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
 				int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
 				if (position1 < position2)
@@ -48,7 +47,6 @@ public class UserListenerManager {
 					return 1;
 				else
 					return 0;
-			}
 		});
 
 		for (Extension ext : sortedExts) {

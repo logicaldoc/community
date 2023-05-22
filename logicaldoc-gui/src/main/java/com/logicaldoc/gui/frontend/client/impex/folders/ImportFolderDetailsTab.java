@@ -21,7 +21,7 @@ public abstract class ImportFolderDetailsTab extends HLayout {
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        importFolder
 	 */
-	public ImportFolderDetailsTab(GUIImportFolder importFolder, ChangedHandler changedHandler) {
+	protected ImportFolderDetailsTab(GUIImportFolder importFolder, ChangedHandler changedHandler) {
 		super();
 		this.importFolder = importFolder;
 		this.changedHandler = changedHandler;

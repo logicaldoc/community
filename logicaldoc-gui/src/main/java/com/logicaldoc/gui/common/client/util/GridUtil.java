@@ -67,69 +67,7 @@ public class GridUtil {
 	 * @param listGrid Grid containing the data
 	 */
 	public static void print(ListGrid listGrid) {
-		scrollGrid(listGrid, new EndScrollListener() {
-
-			@Override
-			public void endScroll(ListGrid listGrid) {
-				Canvas.showPrintPreview(listGrid);
-
-//              Uncomment to realize the preview page by our own
-//
-//				LD.contactingServer();
-//				listGrid.getPrintHTML(null, new PrintHTMLCallback() {
-//
-//					@Override
-//					public void setHTML(String html) {
-//						LD.clearPrompt();
-//
-//						String title = listGrid.getTitle() != null ? listGrid.getTitle() : I18N.message("print");
-//
-//						StringBuilder content = new StringBuilder("<html><head>\n");
-//
-//						// Prepare the header
-//						content.append("<title>" + title + "</title>");
-//						content.append("\n<style>\n");
-//						content.append(".cell, .cellDarkAltCol, .cellDark{white-space: nowrap;}\n ");
-//						content.append(
-//								".printHeader{white-space: nowrap; font-weight: bold; border:0px solid white;}\n");
-//						content.append("\n</style>\n");
-//
-//						content.append(
-//								"<link href='" + Util.contextPath() + "fontawesome/css/all.css' rel='stylesheet' />\n");
-//
-//						content.append("<link REL='STYLESHEET' HREF='" + GWT.getModuleBaseURL() + "sc/skins/"
-//								+ Util.currentSkin() + "/style.css' TYPE='text/css' />");
-//
-//						content.append(
-//								"\n<script type='text/javascript'>function printPage(){document.getElementById('printPanel').style.display='none'; window.print(); window.close();}</script>\n");
-//
-//						content.append("</head><body>\n");
-//
-//						// Put the panel with the buttons
-//						content.append(
-//								"<div id='printPanel' class='printPanel default'><ul><li><a href='javascript:printPage();' id='printButton'>"
-//										+ I18N.message("print")
-//										+ "</a></li><li><a href='javascript:window.close();' id='printClose'>"
-//										+ I18N.message("close") + "</a></li></ul></div>");
-//
-//						// Get the HTML of the grid(a <table>) and manipulate
-//						// some details
-//						String html2 = html.replaceAll("text-overflow:ellipsis;", "").replaceAll("OVERFLOW:hidden;",
-//								"");
-//						content.append(html2);
-//
-//						// Some scripts and styles at the end of the document
-//						content.append("\n<link rel='stylesheet' type='text/css' href='" + Util.contextPath()
-//								+ "skin/css?tenant=" + Session.get().getTenantName() + "' />\n");
-//
-//						content.append("\n</body>\n");
-//						content.append("\n</html>");
-//
-//						WindowUtils.openHtmlInWindow(title, content.toString());
-//					}
-//				});
-			}
-		});
+		scrollGrid(listGrid, lg -> Canvas.showPrintPreview(lg));
 	}
 
 	/**
@@ -140,13 +78,8 @@ public class GridUtil {
 	 *        extracted
 	 */
 	public static void exportCSV(ListGrid listGrid, boolean allFields) {
-		scrollGrid(listGrid, new EndScrollListener() {
+		scrollGrid(listGrid, lg -> exportCSVAfterDataCollected(lg, allFields));
 
-			@Override
-			public void endScroll(ListGrid listGrid) {
-				exportCSVAfterDataCollected(listGrid, allFields);
-			}
-		});
 	}
 
 	private static void exportCSVAfterDataCollected(ListGrid listGrid, boolean allFields) {

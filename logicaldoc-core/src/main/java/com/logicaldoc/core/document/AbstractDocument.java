@@ -212,7 +212,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 */
 	private int ocrd = 0;
 
-	public AbstractDocument() {
+	protected AbstractDocument() {
 		super();
 	}
 

@@ -21,8 +21,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to convert a document in different formats
@@ -63,12 +61,7 @@ public class ConversionDialog extends Window {
 		convert.setStartRow(false);
 		convert.setTitle(I18N.message("convert"));
 		convert.setAutoFit(true);
-		convert.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onConvert();
-			}
-		});
+		convert.addClickHandler(event -> onConvert());
 
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
 				new AsyncCallback<GUIFolder>() {

@@ -98,40 +98,25 @@ public class NotesPanel extends DocumentDetailTab {
 		buttons.setWidth100();
 
 		addNote = new ToolStripButton(I18N.message("addnote"));
-		addNote.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		addNote.addClickHandler(event -> {
 				NoteUpdateDialog note = new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this);
 				note.show();
-			}
 		});
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
-		annotations.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		annotations.addClickHandler(event -> {
 				AnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(
 						document, null, NotesPanel.this, true);
 				dialog.show();
-			}
 		});
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(notesGrid, true);
-			}
-		});
+		export.addClickHandler(event ->
+				GridUtil.exportCSV(notesGrid, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(notesGrid);
-			}
-		});
+		print.addClickHandler(event ->
+				GridUtil.print(notesGrid));
 
 		if (document.getFolder().isWrite()) {
 			buttons.addButton(addNote);
@@ -152,15 +137,13 @@ public class NotesPanel extends DocumentDetailTab {
 		container.addMember(notesGrid);
 		container.addMember(buttons);
 
-		notesGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
+		notesGrid.addCellContextClickHandler( event -> {
 				Menu contextMenu = new Menu();
 				MenuItem delete = new MenuItem();
 				delete.setTitle(I18N.message("ddelete"));
 				delete.setEnabled(false);
 				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
+					public void onClick(MenuItemClickEvent clickEvent) {
 						onDelete();
 					}
 				});
@@ -168,23 +151,19 @@ public class NotesPanel extends DocumentDetailTab {
 				MenuItem edit = new MenuItem();
 				edit.setTitle(I18N.message("edit"));
 				edit.setEnabled(false);
-				edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
+				edit.addClickHandler(clickEvent -> {
 						NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
 								notesGrid.getSelectedRecord().getAttributeAsLong("id"),
 								notesGrid.getSelectedRecord().getAttribute(MESSAGE), NotesPanel.this);
 						note.show();
-					}
 				});
 
-				MenuItem print = new MenuItem();
-				print.setTitle(I18N.message("print"));
-				print.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
+				MenuItem prnt = new MenuItem();
+				prnt.setTitle(I18N.message("print"));
+				prnt.addClickHandler(clickEvent -> {
 						HTMLPane printContainer = new HTMLPane();
 						printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
 						Canvas.showPrintPreview(printContainer);
-					}
 				});
 
 				ListGridRecord[] selection = notesGrid.getSelectedRecords();
@@ -193,17 +172,16 @@ public class NotesPanel extends DocumentDetailTab {
 					delete.setEnabled(selection.length > 0);
 					edit.setEnabled(selection.length == 1);
 				} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {
-					long userId = Long.parseLong(selection[0].getAttribute(USER_ID));
-					delete.setEnabled(selection.length == 1 && userId == Session.get().getUser().getId());
-					edit.setEnabled(selection.length == 1 && userId == Session.get().getUser().getId());
+					long usrId = Long.parseLong(selection[0].getAttribute(USER_ID));
+					delete.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
+					edit.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
 				}
 
-				print.setEnabled(selection.length == 1);
+				prnt.setEnabled(selection.length == 1);
 
-				contextMenu.setItems(edit, print, delete);
+				contextMenu.setItems(edit, prnt, delete);
 				contextMenu.showContextMenu();
 				event.cancel();
-			}
 		});
 	}
 
@@ -215,8 +193,8 @@ public class NotesPanel extends DocumentDetailTab {
 		for (int i = 0; i < selection.length; i++)
 			ids[i] = selection[i].getAttributeAsLong("id");
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-			if (Boolean.TRUE.equals(value)) {
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
 				DocumentService.Instance.get().deleteNotes(ids, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {

@@ -68,6 +68,8 @@ import com.logicaldoc.webdav.web.AbstractWebdavServlet;
  */
 public class DavResourceImpl implements DavResource, Serializable {
 
+	private static final String HTTP_LOGICALDOC_COM_NS = "http://logicaldoc.com/ns";
+
 	private static final String RESOURCE_SERVICE = "ResourceService";
 
 	private static final long serialVersionUID = 1L;
@@ -273,70 +275,69 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * @see DavResource#getProperty(org.apache.jackrabbit.webdav.property.DavPropertyName)
 	 */
 	public DavProperty<?> getProperty(DavPropertyName name) {
-
 		initProperties();
 
-		Namespace namespace = Namespace.getNamespace("http://logicaldoc.com/ns");
-		Namespace ocns = Namespace.getNamespace("oc", "http://logicaldoc.com/ns");
+		Namespace namespace = Namespace.getNamespace(HTTP_LOGICALDOC_COM_NS);
+		Namespace ocns = Namespace.getNamespace("oc", HTTP_LOGICALDOC_COM_NS);
 
-		if (exists()) {
-			if (name.getNamespace().equals(namespace) && name.getName().equals("id")) {
-				if (!isCollection() && !resource.isFolder()) {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<>("id", "d-" + resource.getID(),
-							namespace);
-					properties.add(idProp);
-				} else {
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<>("id", "f-" + resource.getID(),
-							namespace);
-					properties.add(idProp);
-				}
-			}
+		if (!exists())
+			return properties.get(name);
 
-			if (name.getName().equals("getetag")) {
-				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<>(DavPropertyName.GETETAG,
-						resource.getETag());
-				properties.add(defaultDavProperty);
-			}
-			
-			if (name.getNamespace().equals(ocns)) {
-				
-				// required
-				if (name.getName().equals("id")) {				 
-					String val = "f-" + resource.getID();
-					if (!isCollection() && !resource.isFolder()) {
-						val = "d-" + resource.getID();
-					} 				
-					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", val, ocns);
-					properties.add(idProp);				
-				}
-				
-				// optional
-				if (name.getName().equals("permissions")) {				 
-					String val = "RDNVCK";
-					if (!isCollection() && !resource.isFolder()) {
-						val = "RDNVW";
-					} 				
-					DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>("permissions", val, ocns);
-					properties.add(defaultDavProperty);
-				}				
-				
-				// optional
-				if (name.getName().equals("size")) {				 
-					if (!isCollection() && !resource.isFolder()) {
-						DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("size", resource.getContentLength(), ocns);
-						properties.add(defaultDavProperty);
-					} 				
-				}
-				
-				// optional
-//				if (name.getName().equals("favorite")) {				 
-//					DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("favorite", 1L, ocns);
-//					properties.add(defaultDavProperty);			
-//				}				
-			}
+		if (name.getNamespace().equals(namespace) && name.getName().equals("id")) {
+			addIdProperty(namespace);
 		}
 
+		if (name.getName().equals("getetag")) {
+			DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<>(DavPropertyName.GETETAG,
+					resource.getETag());
+			properties.add(defaultDavProperty);
+		}
+
+		if (name.getNamespace().equals(ocns)) {
+			// required
+			if (name.getName().equals("id"))
+				addIdProperty(ocns);
+
+			// optional
+			addPermissionsProperty(name, ocns);
+
+			// optional
+			addSizeProperty(name, ocns);
+		}
+		
 		return properties.get(name);
+	}
+
+	private void addPermissionsProperty(DavPropertyName name, Namespace nameSpace) {
+		if (name.getName().equals("permissions")) {
+			String val = "RDNVCK";
+			if (!isCollection() && !resource.isFolder()) {
+				val = "RDNVW";
+			}
+			DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>("permissions", val,
+					nameSpace);
+			properties.add(defaultDavProperty);
+		}
+	}
+
+	private void addSizeProperty(DavPropertyName name, Namespace nameSpace) {
+		if (name.getName().equals("size")) {
+			if (!isCollection() && !resource.isFolder()) {
+				DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("size",
+						resource.getContentLength(), nameSpace);
+				properties.add(defaultDavProperty);
+			}
+		}
+	}
+
+	private void addIdProperty(Namespace nameSpace) {
+		String val = "f-" + resource.getID();
+		if (!isCollection() && !resource.isFolder()) {
+			val = "d-" + resource.getID();
+		}
+		
+		DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", val, nameSpace);
+		properties.add(idProp);
 	}
 
 	/**
@@ -387,8 +388,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		// SupportedLock supportedLock = new SupportedLock();
 		// supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
 		// properties.add(supportedLock);
-		properties
-				.add(new DefaultDavProperty<>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
+		properties.add(new DefaultDavProperty<>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
 
 		// Set Dav property LastModified
 		long lastmodTime = IOUtil.UNDEFINED_TIME;
@@ -425,44 +425,39 @@ public class DavResourceImpl implements DavResource, Serializable {
 		throw new UnsupportedOperationException();
 	}
 
-
 	public MultiStatusResponse alterProperties(List<? extends PropEntry> changeList) throws DavException {
-		
+
 		log.debug("alterProperties");
-		
+
 		MultiStatusResponse msr = new MultiStatusResponse(getHref(), null);
 
-		Namespace ldns = Namespace.getNamespace("oc", "http://logicaldoc.com/ns");
-		
-		  Iterator<? extends PropEntry> it = changeList.iterator();
-		  while (it.hasNext()) {
-		    Object o = it.next();
-		    
-		    int statusForbidden = DavServletResponse.SC_FORBIDDEN;
-		    int statusOK = DavServletResponse.SC_OK;
-		    int statusNoContent = DavServletResponse.SC_NO_CONTENT;
-		    
-		    if (o instanceof DavProperty) {
-		    	log.debug("o instanceof DavProperty");
-		    	DavProperty<?> x = (DavProperty<?>) o;		    		    	
-		    	if (x.getName().getName().contains("favorite") && x.getName().getNamespace().equals(ldns)) {
-		    		msr.add(x.getName(), statusOK);
-		    		// add bookmark
-		    		resourceService.addBookmark(this.resource, session);
-		    	} else
-		    		msr.add(x.getName(), statusForbidden);
-		    } else {
-		    	log.debug("o instanceof DavPropertyName");
-		    	DavPropertyName zzz = (DavPropertyName) o;
-		    	if (zzz.getName().equals("favorite") && (zzz.getNamespace().equals(ldns))) {
-		    		msr.add(zzz, statusNoContent);
-		    		// remove bookmark
-		    		resourceService.deleteBookmark(this.resource, session);
-		    	} else
-		    		msr.add(zzz, statusForbidden);
-		    }
-		  }
-		  return msr;
+		Namespace ldns = Namespace.getNamespace("oc", HTTP_LOGICALDOC_COM_NS);
+
+		Iterator<? extends PropEntry> it = changeList.iterator();
+		while (it.hasNext()) {
+			Object o = it.next();
+
+			if (o instanceof DavProperty) {
+				log.debug("o instanceof DavProperty");
+				DavProperty<?> x = (DavProperty<?>) o;
+				if (x.getName().getName().contains("favorite") && x.getName().getNamespace().equals(ldns)) {
+					msr.add(x.getName(), HttpServletResponse.SC_OK);
+					// add bookmark
+					resourceService.addBookmark(this.resource, session);
+				} else
+					msr.add(x.getName(), HttpServletResponse.SC_FORBIDDEN);
+			} else {
+				log.debug("o instanceof DavPropertyName");
+				DavPropertyName zzz = (DavPropertyName) o;
+				if (zzz.getName().equals("favorite") && (zzz.getNamespace().equals(ldns))) {
+					msr.add(zzz, HttpServletResponse.SC_NO_CONTENT);
+					// remove bookmark
+					resourceService.deleteBookmark(this.resource, session);
+				} else
+					msr.add(zzz, HttpServletResponse.SC_FORBIDDEN);
+			}
+		}
+		return msr;
 	}
 
 	/**
@@ -586,7 +581,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 			boolean isChunking = false;
 			boolean isChunkingComplete = false;
-			
+
 			if (memberName.contains("chunking")) {
 
 				isChunking = true;
@@ -678,9 +673,9 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	private void handleErrorDuringAddingMember(Exception error) throws DavException {
-		if(error instanceof DavException)
+		if (error instanceof DavException)
 			throw (DavException) error;
-		
+
 		log.error(error.getMessage(), error);
 		throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, error.getMessage());
 	}
@@ -730,16 +725,14 @@ public class DavResourceImpl implements DavResource, Serializable {
 	private void checkAddChildPermission(DavResource member, ImportContext ctx) throws DavException {
 		if (member.isCollection() && !ctx.getResource().isAddChildEnabled()) {
 //				log.debug("Target folder is not add-child enabled");
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN,
-					"Add Child not allowed on the selected folder");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Add Child not allowed on the selected folder");
 		}
 	}
 
 	private void checkWritePermission(DavResource member, ImportContext ctx) throws DavException {
 		if (!member.isCollection() && !ctx.getResource().isWriteEnabled()) {
 //				log.debug("Target folder is not write enabled");
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN,
-					"Write Access not allowed on the selected folder");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Write Access not allowed on the selected folder");
 		}
 	}
 

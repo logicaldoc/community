@@ -11,8 +11,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -30,12 +28,7 @@ public class BookmarkDialog extends Window {
 	public BookmarkDialog(GUIBookmark bookmk) {
 		this.bookmark = bookmk;
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("bookmark"));

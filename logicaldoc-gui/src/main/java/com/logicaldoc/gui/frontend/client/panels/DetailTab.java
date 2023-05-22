@@ -16,15 +16,15 @@ public abstract class DetailTab extends HLayout {
 
 	protected ChangedHandler changedHandler;
 
-	public DetailTab() {
+	protected DetailTab() {
 		super();
 	}
 
-	public DetailTab(ChangedHandler changedHandler) {
+	protected DetailTab(ChangedHandler changedHandler) {
 		this.changedHandler = changedHandler;
 	}
 
-	public DetailTab(int membersMargin) {
+	protected DetailTab(int membersMargin) {
 		super(membersMargin);
 	}
 

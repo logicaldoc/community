@@ -44,9 +44,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 
 		setEvent(guiDashlet);
 
-		HeaderControl markAsRead = new HeaderControl(HeaderControl.TRASH, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent e) {
+		HeaderControl markAsRead = new HeaderControl(HeaderControl.TRASH, e -> {
 				LD.contactingServer();
 				DocumentService.Instance.get().markHistoryAsRead(event, new AsyncCallback<Void>() {
 
@@ -67,7 +65,6 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 						setTitle(I18N.message(guiDashlet.getTitle(), Integer.toString(list.getTotalRows())));
 					}
 				});
-			}
 		});
 		markAsRead.setTooltip(I18N.message("maskallasread"));
 

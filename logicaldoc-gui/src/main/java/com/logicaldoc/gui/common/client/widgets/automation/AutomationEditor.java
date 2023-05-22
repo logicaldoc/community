@@ -1,11 +1,9 @@
 package com.logicaldoc.gui.common.client.widgets.automation;
 
 import org.wisepersist.gwt.ace.client.AceEditor;
-import org.wisepersist.gwt.ace.client.AceEditorCallback;
 import org.wisepersist.gwt.ace.client.AceEditorMode;
 import org.wisepersist.gwt.ace.client.AceEditorTheme;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
@@ -63,13 +61,9 @@ public class AutomationEditor extends VStack {
 		if (text != null)
 			editor.setText(text);
 
-		editor.addOnChangeHandler(new AceEditorCallback() {
-
-			@Override
-			public void invokeAceCallback(JavaScriptObject obj) {
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
+		editor.addOnChangeHandler(obj -> {
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
 		});
 	}
 

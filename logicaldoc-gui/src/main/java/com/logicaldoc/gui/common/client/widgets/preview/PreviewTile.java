@@ -10,8 +10,6 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Img;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
@@ -46,40 +44,28 @@ public class PreviewTile extends HLayout {
 			String html = "<img border='0' alt='' title='' src='" + Util.thumbnailUrl(docId, null) + "' height='"
 					+ Session.get().getConfig("gui.thumbnail.size") + "px' style='float:body;' align='body'/>";
 			HTMLFlow thumbnailImage = new HTMLFlow(html);
-			thumbnailImage.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					if (Session.get().isShowThumbnail()) {
-						ImageLightbox lightbox = new ImageLightbox(docId, title);
-						lightbox.show();
-					}
+			thumbnailImage.addClickHandler(event -> {
+				if (Session.get().isShowThumbnail()) {
+					ImageLightbox lightbox = new ImageLightbox(docId, title);
+					lightbox.show();
 				}
 			});
 
 			Img closeThumbnailImage = new Img("[SKIN]/headerIcons/close.gif", 16, 16);
 			closeThumbnailImage.setShowRollOver(true);
-			closeThumbnailImage.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					Session.get().setShowThumbnail(false);
-					initGUI();
-					event.cancel();
-				}
+			closeThumbnailImage.addClickHandler(event -> {
+				Session.get().setShowThumbnail(false);
+				initGUI();
+				event.cancel();
 			});
 
 			setMembers(thumbnailImage, closeThumbnailImage);
 		} else {
 			IButton showThumbnail = new IButton(I18N.message("showthumbnail"));
-			showThumbnail.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					Session.get().setShowThumbnail(true);
-					initGUI();
-					event.cancel();
-				}
+			showThumbnail.addClickHandler(event -> {
+				Session.get().setShowThumbnail(true);
+				initGUI();
+				event.cancel();
 			});
 			setMembers(showThumbnail);
 		}

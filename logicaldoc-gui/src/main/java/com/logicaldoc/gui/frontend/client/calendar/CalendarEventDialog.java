@@ -33,7 +33,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
@@ -43,7 +42,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -51,8 +49,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.TimeItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridEditorContext;
-import com.smartgwt.client.widgets.grid.ListGridEditorCustomizer;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
@@ -258,29 +254,27 @@ public class CalendarEventDialog extends Window {
 		remindersGrid.setShowRecordComponentsByCell(true);
 		remindersGrid.setFields(value, unit, ddelete);
 
-		remindersGrid.setEditorCustomizer(new ListGridEditorCustomizer() {
-			public FormItem getEditor(ListGridEditorContext context) {
-				ListGridField field = context.getEditField();
-				if (field.getName().equals(VALUE)) {
-					SpinnerItem remindValue = new SpinnerItem();
-					remindValue.setDefaultValue(0);
-					remindValue.setMin(0);
-					remindValue.setStep(1);
-					remindValue.setWidth(50);
-					remindValue.setRequired(true);
-					return remindValue;
-				} else if (field.getName().equals("unit")) {
-					SelectItem unitSelector = ItemFactory.newDueTimeSelector("remindUnit", "");
-					LinkedHashMap<String, String> map = new LinkedHashMap<>();
-					map.put("minute", I18N.message("minutes"));
-					map.put("hour", I18N.message("hours"));
-					map.put("day", I18N.message("ddays"));
-					unitSelector.setValueMap(map);
-					unitSelector.setRequired(true);
-					return unitSelector;
-				} else
-					return null;
-			}
+		remindersGrid.setEditorCustomizer(context -> {
+			ListGridField field = context.getEditField();
+			if (field.getName().equals(VALUE)) {
+				SpinnerItem remindValue = new SpinnerItem();
+				remindValue.setDefaultValue(0);
+				remindValue.setMin(0);
+				remindValue.setStep(1);
+				remindValue.setWidth(50);
+				remindValue.setRequired(true);
+				return remindValue;
+			} else if (field.getName().equals("unit")) {
+				SelectItem unitSelector = ItemFactory.newDueTimeSelector("remindUnit", "");
+				LinkedHashMap<String, String> map = new LinkedHashMap<>();
+				map.put("minute", I18N.message("minutes"));
+				map.put("hour", I18N.message("hours"));
+				map.put("day", I18N.message("ddays"));
+				unitSelector.setValueMap(map);
+				unitSelector.setRequired(true);
+				return unitSelector;
+			} else
+				return null;
 		});
 	}
 
@@ -798,29 +792,14 @@ public class CalendarEventDialog extends Window {
 			return;
 		}
 
-		LD.ask(I18N.message("delevent"), I18N.message("deleventconfirm"), new BooleanCallback() {
-			@Override
-			public void execute(Boolean confirmToDelete) {
-				if (Boolean.FALSE.equals(confirmToDelete))
-					return;
+		LD.ask(I18N.message("delevent"), I18N.message("deleventconfirm"), confirmToDelete -> {
+			if (Boolean.FALSE.equals(confirmToDelete))
+				return;
 
-				if (calendarEvent.getParentId() != null) {
-					LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), (Boolean answer) -> {
-						Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
-						CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void arg) {
-								destroy();
-							}
-						});
-					});
-				} else
-					CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<Void>() {
+			if (calendarEvent.getParentId() != null) {
+				LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), (Boolean answer) -> {
+					Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
+					CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -829,11 +808,23 @@ public class CalendarEventDialog extends Window {
 						@Override
 						public void onSuccess(Void arg) {
 							destroy();
-							if (onChangedCallback != null)
-								onChangedCallback.onSuccess(arg);
 						}
 					});
-			}
+				});
+			} else
+				CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void arg) {
+						destroy();
+						if (onChangedCallback != null)
+							onChangedCallback.onSuccess(arg);
+					}
+				});
 		});
 	}
 

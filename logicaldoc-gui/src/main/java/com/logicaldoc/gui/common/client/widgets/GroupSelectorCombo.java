@@ -3,10 +3,6 @@ package com.logicaldoc.gui.common.client.widgets;
 import com.logicaldoc.gui.common.client.data.GroupsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.FormItemValueFormatter;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 
 /**
@@ -29,12 +25,8 @@ public class GroupSelectorCombo extends MultiComboBoxItem {
 
 		setWidth("*");
 
-		setValueFormatter(new FormItemValueFormatter() {
-
-			@Override
-			public String formatValue(Object value, Record rec, DynamicForm form, FormItem item) {
-				return AwesomeFactory.getIconHtml("user-friends") + "&nbsp;" + value;
-			}
+		setValueFormatter((value, rec, form, item) -> {
+			return AwesomeFactory.getIconHtml("user-friends") + "&nbsp;" + value;
 		});
 	}
 

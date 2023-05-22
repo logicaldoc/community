@@ -45,12 +45,7 @@ public class FillRoutineParams extends Window {
 		IButton execute = new IButton();
 		execute.setTitle(I18N.message("execute"));
 		execute.setAutoFit(true);
-		execute.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onExecute();
-			}
-		});
+		execute.addClickHandler(event -> onExecute());
 
 		HLayout buttonsBar = new HLayout();
 		buttonsBar.setWidth100();

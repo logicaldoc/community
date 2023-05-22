@@ -7,13 +7,8 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -37,12 +32,7 @@ public class MessagesWindow extends Window {
 	public MessagesWindow() {
 		super();
 
-		HeaderControl trash = new HeaderControl(HeaderControl.TRASH, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				grid.setData(new ListGridRecord[0]);
-			}
-		});
+		HeaderControl trash = new HeaderControl(HeaderControl.TRASH, event -> grid.setData(new ListGridRecord[0]));
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, trash, HeaderControls.CLOSE_BUTTON);
 		setTitle(AwesomeFactory.getIconHtml("clipboard-list", "lastevents"));
@@ -83,20 +73,12 @@ public class MessagesWindow extends Window {
 		grid.setFields(date, severityLabel, detail);
 		grid.setCanResizeFields(true);
 		addItem(grid);
-		
-		
-		grid.addDoubleClickHandler(new DoubleClickHandler() {
-			
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				LD.askForValue(I18N.message(DETAIL), I18N.message(DETAIL),
-						grid.getSelectedRecord().getAttributeAsString(DETAIL), new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								// Nothing to do
-							}
-						});	
-			}
+
+		grid.addDoubleClickHandler(event -> {
+			LD.askForValue(I18N.message(DETAIL), I18N.message(DETAIL),
+					grid.getSelectedRecord().getAttributeAsString(DETAIL), value -> {
+						// Nothing to do
+					});
 		});
 	}
 

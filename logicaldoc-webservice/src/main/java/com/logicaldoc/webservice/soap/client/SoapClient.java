@@ -35,7 +35,7 @@ public abstract class SoapClient<T> {
 	 * @param log True if you want the requests to be logged
 	 * @param timeout Timeout for the SOAP requests (in seconds, default 60)
 	 */
-	public SoapClient(String endpoint, Class<T> serviceClass, int gzipThreshold, boolean log, int timeout) {
+	protected SoapClient(String endpoint, Class<T> serviceClass, int gzipThreshold, boolean log, int timeout) {
 		this.endpoint = endpoint;
 		initClient(serviceClass, gzipThreshold, log);
 

@@ -4,8 +4,6 @@ import com.google.gwt.user.client.Window;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 
 /**
  * Simple label showing a warning message.
@@ -32,12 +30,7 @@ public class MessageLabel extends Label {
 			setIcon("[SKIN]/Dialog/warn.png");
 		if (showLinks && message.getUrl() != null && !message.getUrl().isEmpty()) {
 			setCursor(Cursor.HAND);
-			addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					Window.open(message.getUrl(), "_self", "");
-				}
-			});
+			addClickHandler(event -> Window.open(message.getUrl(), "_self", ""));
 		}
 	}
 }

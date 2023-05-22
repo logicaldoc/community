@@ -7,10 +7,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 
 public abstract class StickyWindow extends Window {
 
@@ -19,14 +15,9 @@ public abstract class StickyWindow extends Window {
 	 */
 	protected static Map<String, WindowStatus> statuses = new HashMap<>();
 
-	public StickyWindow(String title) {
+	protected StickyWindow(String title) {
 
-		HeaderControl restore = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				restoreDefaultStatus();
-			}
-		});
+		HeaderControl restore = new HeaderControl(HeaderControl.REFRESH, event -> restoreDefaultStatus());
 		restore.setTooltip(I18N.message("refresh"));
 
 		if (getDefaultStatus() != null)
@@ -42,13 +33,7 @@ public abstract class StickyWindow extends Window {
 		restoreCurrentStatus();
 
 		if (getDefaultStatus() != null) {
-			addResizedHandler(new ResizedHandler() {
-
-				@Override
-				public void onResized(ResizedEvent event) {
-					saveWindowStatus();
-				}
-			});
+			addResizedHandler(event -> saveWindowStatus());
 		} else
 			setAutoSize(getAutoSize());
 	}

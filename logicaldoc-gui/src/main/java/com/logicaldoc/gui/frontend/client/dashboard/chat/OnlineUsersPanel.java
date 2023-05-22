@@ -12,23 +12,17 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.observer.UserObserver;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.ChatService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
-import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.events.VisibilityChangedEvent;
-import com.smartgwt.client.widgets.events.VisibilityChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Displays the online users
@@ -63,25 +57,18 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		onlineUsers.setFields(avatar, username);
 		onlineUsers.setSortField(USERNAME);
 
-		onlineUsers.addVisibilityChangedHandler(new VisibilityChangedHandler() {
-
-			@Override
-			public void onVisibilityChanged(VisibilityChangedEvent event) {
-				if (timer != null) {
-					if (!event.getIsVisible())
-						stopTimer();
-					else if (!timer.isRunning())
-						startTimer();
-				}
+		onlineUsers.addVisibilityChangedHandler(event -> {
+			if (timer != null) {
+				if (!event.getIsVisible())
+					stopTimer();
+				else if (!timer.isRunning())
+					startTimer();
 			}
 		});
 
-		onlineUsers.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				prepareContextMenu().showContextMenu();
-				event.cancel();
-			}
+		onlineUsers.addCellContextClickHandler(event -> {
+			prepareContextMenu().showContextMenu();
+			event.cancel();
 		});
 
 		setMembers(onlineUsers);
@@ -182,31 +169,25 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		Menu contextMenu = new Menu();
 		MenuItem inviteToChat = new MenuItem();
 		inviteToChat.setTitle(I18N.message("invitetochat"));
-		inviteToChat.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.askForValue(I18N.message("invitetochat"), I18N.message("message"), null, new ValueCallback() {
+		inviteToChat.addClickHandler(event -> {
+			LD.askForValue(I18N.message("invitetochat"), I18N.message("message"), null, value -> {
+				final String[] users = new String[selection.length];
+				for (int i = 0; i < selection.length; i++)
+					users[i] = selection[i].getAttributeAsString(USERNAME);
+
+				ChatService.Instance.get().invite(users, value, new AsyncCallback<Void>() {
 
 					@Override
-					public void execute(String value) {
-						final String[] users = new String[selection.length];
-						for (int i = 0; i < selection.length; i++)
-							users[i] = selection[i].getAttributeAsString(USERNAME);
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						ChatService.Instance.get().invite(users, value, new AsyncCallback<Void>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void arg) {
-								GuiLog.info(I18N.message("invitationsent"));
-							}
-						});
+					@Override
+					public void onSuccess(Void arg) {
+						GuiLog.info(I18N.message("invitationsent"));
 					}
 				});
-			}
+			});
 		});
 
 		contextMenu.setItems(inviteToChat);

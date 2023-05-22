@@ -9,8 +9,6 @@ import com.logicaldoc.gui.frontend.client.dashboard.TagCloud;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
@@ -42,12 +40,7 @@ public class TagCloudDashlet extends Dashlet {
 
 			refresh();
 
-			addResizedHandler(new ResizedHandler() {
-				@Override
-				public void onResized(ResizedEvent event) {
-					refresh();
-				}
-			});
+			addResizedHandler(event -> refresh());
 		} else
 			addItem(new FeatureDisabled());
 	}

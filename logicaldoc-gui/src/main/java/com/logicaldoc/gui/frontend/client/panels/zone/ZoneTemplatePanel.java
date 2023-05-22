@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.panels.zone;
 
 import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
 import com.logicaldoc.gui.common.client.beans.GUIZone;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -19,7 +18,7 @@ public abstract class ZoneTemplatePanel extends VLayout {
 
 	protected GUIOCRTemplate selectedOcrTemplate;
 
-	public ZoneTemplatePanel() {
+	protected ZoneTemplatePanel() {
 		super();
 	}
 
@@ -30,14 +29,14 @@ public abstract class ZoneTemplatePanel extends VLayout {
 	public GUIOCRTemplate getSelectedOcrTemplate() {
 		return selectedOcrTemplate;
 	}
-	
+
 	public void setSelectedOcrTemplate(GUIOCRTemplate selectedOcrTemplate) {
 		this.selectedOcrTemplate = selectedOcrTemplate;
 	}
 
 	public void showZones() {
 		if (selectedOcrTemplate.getZones() != null)
-			for (GUIZone zone : selectedOcrTemplate.getZones()) {		
+			for (GUIZone zone : selectedOcrTemplate.getZones()) {
 				zone.setTemplateId(selectedOcrTemplate.getId());
 				ZoneCanvas zoneCanvas = newZoneCanvas(zone);
 				sample.addCanvas(zoneCanvas);

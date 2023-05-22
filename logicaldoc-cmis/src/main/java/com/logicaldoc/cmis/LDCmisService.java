@@ -507,8 +507,8 @@ public class LDCmisService extends AbstractCmisService {
 	public ObjectList getContentChanges(String repositoryId, Holder<String> changeLogToken, Boolean includeProperties,
 			String filter, Boolean includePolicyIds, Boolean includeAcl, BigInteger maxItems,
 			ExtensionsData extension) {
-		log.debug("getContentChanges " + changeLogToken.getValue() + "|" + filter + " | "
-				+ new Date(Long.parseLong(changeLogToken.getValue())));
+		log.debug("getContentChanges {} | {} | {}", changeLogToken.getValue(), filter,
+				new Date(Long.parseLong(changeLogToken.getValue())));
 
 		validateSession();
 

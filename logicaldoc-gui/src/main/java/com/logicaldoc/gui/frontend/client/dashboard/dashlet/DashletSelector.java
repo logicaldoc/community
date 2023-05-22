@@ -12,8 +12,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.PortalLayout;
 import com.smartgwt.client.widgets.layout.Portlet;
 
@@ -52,43 +50,41 @@ public class DashletSelector extends Window {
 		ButtonItem select = new ButtonItem();
 		select.setTitle(I18N.message("add"));
 		select.setAutoFit(true);
-		select.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				// Compute each column size (number of dashlets)
-				int[] size = new int[DashletSelector.this.portal.getNumColumns()];
-				for (int i = 0; i < size.length; i++)
-					size[i] = 0;
-				Portlet[][][] portlets = DashletSelector.this.portal.getPortletArray();
-				for (int column = 0; column < portlets.length; column++)
-					for (int row = 0; row < portlets[column].length; row++)
-						size[column] += portlets[column][row].length;
+		select.addClickHandler(event -> {
+			// Compute each column size (number of dashlets)
+			int[] size = new int[DashletSelector.this.portal.getNumColumns()];
+			for (int i = 0; i < size.length; i++)
+				size[i] = 0;
+			Portlet[][][] portlets = DashletSelector.this.portal.getPortletArray();
+			for (int column = 0; column < portlets.length; column++)
+				for (int row = 0; row < portlets[column].length; row++)
+					size[column] += portlets[column][row].length;
 
-				DashletService.Instance.get().get(form.getValueAsString("dashlet"), new AsyncCallback<GUIDashlet>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-					
-					@Override
-					public void onSuccess(GUIDashlet guiDashlet) {
-						// Find the column with less dashlets
-						int smallerColumn = 0;
-						int smallerSize = 9999;
-						for (int i = 0; i < size.length; i++) {
-							if (size[i] < smallerSize) {
-								smallerColumn = i;
-								smallerSize = size[i];
-							}
+			DashletService.Instance.get().get(form.getValueAsString("dashlet"), new AsyncCallback<GUIDashlet>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIDashlet guiDashlet) {
+					// Find the column with less dashlets
+					int smallerColumn = 0;
+					int smallerSize = 9999;
+					for (int i = 0; i < size.length; i++) {
+						if (size[i] < smallerSize) {
+							smallerColumn = i;
+							smallerSize = size[i];
 						}
-						
-						guiDashlet.setColumn(smallerColumn);
-						guiDashlet.setIndex(0);
-						guiDashlet.setRow(0);
-						Dashlet dashlet = Dashlet.getDashlet(guiDashlet);
-						DashletSelector.this.portal.addPortlet(dashlet, smallerColumn, 0);	
 					}
-				});
-			}
+
+					guiDashlet.setColumn(smallerColumn);
+					guiDashlet.setIndex(0);
+					guiDashlet.setRow(0);
+					Dashlet dashlet = Dashlet.getDashlet(guiDashlet);
+					DashletSelector.this.portal.addPortlet(dashlet, smallerColumn, 0);
+				}
+			});
 		});
 
 		form.setItems(dashlet, select);

@@ -9,8 +9,6 @@ import com.logicaldoc.gui.frontend.client.dashboard.dashlet.Dashlet;
 import com.logicaldoc.gui.frontend.client.dashboard.dashlet.DashletSelector;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.PortalLayout;
 import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -44,26 +42,18 @@ public class UserDashboard extends VLayout {
 		ToolStripButton addDashlet = new ToolStripButton();
 		addDashlet.setTitle(I18N.message("adddashlet"));
 		toolStrip.addButton(addDashlet);
-		addDashlet.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DashletSelector selector = new DashletSelector(portal);
-				selector.show();
-			}
+		addDashlet.addClickHandler(event -> {
+			DashletSelector selector = new DashletSelector(portal);
+			selector.show();
 		});
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
 		toolStrip.addButton(save);
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				save();
-			}
-		});
+		save.addClickHandler(event -> save());
 
 		toolStrip.addFill();
-		
+
 		portal = new PortalLayout();
 		portal.setShowColumnMenus(false);
 		portal.setShowEdges(false);
@@ -77,7 +67,7 @@ public class UserDashboard extends VLayout {
 		int maxCol = 0;
 		int maxRow = 0;
 		int maxIndex = 0;
-		
+
 		for (GUIDashlet gd : Session.get().getUser().getDashlets()) {
 			if (maxCol < gd.getColumn())
 				maxCol = gd.getColumn();
@@ -124,7 +114,7 @@ public class UserDashboard extends VLayout {
 			for (int row = 0; row < portlets[column].length; row++)
 				for (int i = 0; i < portlets[column][row].length; i++) {
 					Dashlet dashlet = (Dashlet) portlets[column][row][i];
-					GUIDashlet guiDashlet=dashlet.getGuiDashlet();
+					GUIDashlet guiDashlet = dashlet.getGuiDashlet();
 					guiDashlet.setColumn(column);
 					guiDashlet.setRow(row);
 					guiDashlet.setIndex(i);

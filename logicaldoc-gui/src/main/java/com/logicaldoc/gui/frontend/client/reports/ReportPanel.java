@@ -26,7 +26,7 @@ abstract class ReportPanel extends AdminPanel {
 
 	protected String infoLabel;
 
-	public ReportPanel(String title, String infoLabel) {
+	protected ReportPanel(String title, String infoLabel) {
 		super(title);
 		this.infoLabel = infoLabel;
 		this.list = createListGrid();

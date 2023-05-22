@@ -44,7 +44,7 @@ public abstract class AbstractStorer implements Storer {
 
 	protected Map<String, String> parameters = new HashMap<>();
 
-	public AbstractStorer() {
+	protected AbstractStorer() {
 	}
 
 	public ContextProperties getConfig() {

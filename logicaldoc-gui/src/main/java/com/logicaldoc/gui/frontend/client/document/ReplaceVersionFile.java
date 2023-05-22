@@ -16,7 +16,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
-
 /**
  * This popup window is used to upload a new version's file.
  * 
@@ -44,7 +43,6 @@ public class ReplaceVersionFile extends Window {
 		setShowModalMask(true);
 		centerInPage();
 		setAutoSize(true);
-		
 
 		DynamicForm form = new DynamicForm();
 		vm = new ValuesManager();
@@ -57,13 +55,7 @@ public class ReplaceVersionFile extends Window {
 		form.setItems(commentItem);
 
 		saveButton = new IButton(I18N.message("save"));
-		saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		saveButton.addClickHandler(event -> onSave());
 		saveButton.setDisabled(true);
 
 		VLayout layout = new VLayout();
@@ -78,16 +70,15 @@ public class ReplaceVersionFile extends Window {
 		addItem(layout);
 	}
 
-
 	public void onSave() {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}
-		
+
 		DocumentService.Instance.get().replaceFile(document.getId(), fileVersion, vm.getValueAsString("comment"),
 				new AsyncCallback<Void>() {
 					@Override

@@ -336,12 +336,13 @@ public class MailUtil {
 			int count = multipart.getCount();
 			for (int i = 1; i < count; i++) {
 				BodyPart bp = multipart.getBodyPart(i);
-				
-				if(bp.getFileName()!=null && bp.getFileName().toLowerCase().contains(".p7s")) {
-					MimeBodyPart smimeBody =   SmimeUtil.getSignedContent(multipart);
+
+				if (bp.getFileName() != null && bp.getFileName().toLowerCase().contains(".p7s")) {
+					MimeBodyPart smimeBody = SmimeUtil.getSignedContent(multipart);
 					addAttachments(smimeBody, email, extractAttachmentContent);
-				}else
-				addAttachments(bp, email, extractAttachmentContent);
+				} else {
+					addAttachments(bp, email, extractAttachmentContent);
+				}
 			}
 		} else if (NO_BODY.equals(email.getMessageText())) {
 			// This is not a multipart message and if there is no text, perhaps
@@ -351,7 +352,7 @@ public class MailUtil {
 
 		return email;
 	}
-	
+
 	private static void setReplyTo(javax.mail.Message msg, EMail email) throws MessagingException {
 		Address[] addresses = msg.getReplyTo();
 		if (addresses != null) {

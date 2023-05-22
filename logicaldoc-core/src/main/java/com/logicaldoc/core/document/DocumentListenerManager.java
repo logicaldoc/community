@@ -3,7 +3,6 @@ package com.logicaldoc.core.document;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.java.plugin.registry.Extension;
@@ -20,7 +19,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 4.0
  */
 public class DocumentListenerManager {
-	
+
 	private static final String POSITION = "position";
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
@@ -41,17 +40,15 @@ public class DocumentListenerManager {
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}
-		Collections.sort(sortedExts, new Comparator<Extension>() {
-			public int compare(Extension e1, Extension e2) {
-				int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
-				if (position1 < position2)
-					return -1;
-				else if (position1 > position2)
-					return 1;
-				else
-					return 0;
-			}
+		Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
+			int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
+			int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
+			if (position1 < position2)
+				return -1;
+			else if (position1 > position2)
+				return 1;
+			else
+				return 0;
 		});
 
 		for (Extension ext : sortedExts) {

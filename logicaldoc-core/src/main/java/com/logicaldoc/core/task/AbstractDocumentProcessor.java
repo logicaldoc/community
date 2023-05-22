@@ -28,7 +28,7 @@ abstract public class AbstractDocumentProcessor extends Task {
 
 	protected DocumentDAO documentDao;
 
-	public AbstractDocumentProcessor(String name) {
+	protected AbstractDocumentProcessor(String name) {
 		super(name);
 	}
 

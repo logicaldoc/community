@@ -337,30 +337,26 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	}
 
 	public static Comparator<AbstractDocument> getComparator(List<DocumentComparator> multipleOptions) {
-		return new Comparator<AbstractDocument>() {
-			public int compare(AbstractDocument d1, AbstractDocument d2) {
-				for (DocumentComparator option : multipleOptions) {
-					int result = option.compare(d1, d2);
-					if (result != 0) {
-						return result;
-					}
+		return (d1, d2) -> {
+			for (DocumentComparator option : multipleOptions) {
+				int result = option.compare(d1, d2);
+				if (result != 0) {
+					return result;
 				}
-				return 0;
 			}
+			return 0;
 		};
 	}
 
 	public static Comparator<AbstractDocument> getComparator(final DocumentComparator... multipleOptions) {
-		return new Comparator<AbstractDocument>() {
-			public int compare(AbstractDocument d1, AbstractDocument d2) {
-				for (DocumentComparator option : multipleOptions) {
-					int result = option.compare(d1, d2);
-					if (result != 0) {
-						return result;
-					}
+		return (d1, d2) -> {
+			for (DocumentComparator option : multipleOptions) {
+				int result = option.compare(d1, d2);
+				if (result != 0) {
+					return result;
 				}
-				return 0;
 			}
+			return 0;
 		};
 	}
 }

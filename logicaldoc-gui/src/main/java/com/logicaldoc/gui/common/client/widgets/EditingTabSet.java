@@ -4,7 +4,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.TabBarControls;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -35,13 +34,7 @@ public class EditingTabSet extends TabSet {
 		cancelButton.setAutoFit(true);
 		cancelButton.setMargin(1);
 		cancelButton.setLayoutAlign(VerticalAlignment.CENTER);
-		cancelButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				hideSave();
-			}
-		});
+		cancelButton.addClickHandler(event -> hideSave());
 		if (cancelHandler != null)
 			cancelButton.addClickHandler(cancelHandler);
 

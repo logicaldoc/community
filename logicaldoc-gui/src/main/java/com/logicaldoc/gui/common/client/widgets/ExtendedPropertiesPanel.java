@@ -21,21 +21,15 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.FormItemCriteriaFunction;
-import com.smartgwt.client.widgets.form.fields.FormItemFunctionContext;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -92,13 +86,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		setMembersMargin(20);
 		refresh();
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				adaptForms();
-			}
-		});
+		addResizedHandler(event -> adaptForms());
 	}
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler, boolean updateEnabled,
@@ -441,26 +429,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 			add.setHeight(10);
 			add.setSrc("[SKIN]/add.png");
 			add.setPrompt(I18N.message("addvalue"));
-			add.addFormItemClickHandler(new FormItemClickHandler() {
-
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					onValueAdd(att);
-				}
-			});
+			add.addFormItemClickHandler(event -> onValueAdd(att));
 
 			FormItemIcon down = new FormItemIcon();
 			down.setSrc("[SKIN]/down.png");
 			down.setWidth(10);
 			down.setHeight(10);
 			down.setPrompt(I18N.message("movedown"));
-			down.addFormItemClickHandler(new FormItemClickHandler() {
-
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					onValueShift(att, false);
-				}
-			});
+			down.addFormItemClickHandler(event -> onValueShift(att, false));
 
 			multiValIcons.add(add);
 			multiValIcons.add(down);
@@ -472,39 +448,21 @@ public class ExtendedPropertiesPanel extends HLayout {
 			delete.setWidth(10);
 			delete.setHeight(10);
 			delete.setPrompt(I18N.message("remove"));
-			delete.addFormItemClickHandler(new FormItemClickHandler() {
-
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					onValueDelete(att);
-				}
-			});
+			delete.addFormItemClickHandler(event -> onValueDelete(att));
 
 			FormItemIcon up = new FormItemIcon();
 			up.setSrc("[SKIN]/up.png");
 			up.setWidth(10);
 			up.setHeight(10);
 			up.setPrompt(I18N.message("moveup"));
-			up.addFormItemClickHandler(new FormItemClickHandler() {
-
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					onValueShift(att, true);
-				}
-			});
+			up.addFormItemClickHandler(event -> onValueShift(att, true));
 
 			FormItemIcon down = new FormItemIcon();
 			down.setSrc("[SKIN]/down.png");
 			down.setWidth(10);
 			down.setHeight(10);
 			down.setPrompt(I18N.message("movedown"));
-			down.addFormItemClickHandler(new FormItemClickHandler() {
-
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					onValueShift(att, false);
-				}
-			});
+			down.addFormItemClickHandler(event -> onValueShift(att, false));
 
 			multiValIcons.add(delete);
 			multiValIcons.add(up);
@@ -789,23 +747,17 @@ public class ExtendedPropertiesPanel extends HLayout {
 				FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));
 				if (item instanceof SelectItem) {
 					SelectItem select = (SelectItem) item;
-					select.setPickListFilterCriteriaFunction(new FormItemCriteriaFunction() {
-						@Override
-						public Criteria getCriteria(FormItemFunctionContext itemContext) {
-							String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
-							Criteria criteria = new Criteria("category", category);
-							return criteria;
-						}
+					select.setPickListFilterCriteriaFunction(itemContext -> {
+						String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
+						Criteria criteria = new Criteria("category", category);
+						return criteria;
 					});
 				} else if (item instanceof ComboBoxItem) {
 					ComboBoxItem combo = (ComboBoxItem) item;
-					combo.setPickListFilterCriteriaFunction(new FormItemCriteriaFunction() {
-						@Override
-						public Criteria getCriteria(FormItemFunctionContext itemContext) {
-							String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
-							Criteria criteria = new Criteria("category", category);
-							return criteria;
-						}
+					combo.setPickListFilterCriteriaFunction(itemContext -> {
+						String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
+						Criteria criteria = new Criteria("category", category);
+						return criteria;
 					});
 				}
 			}

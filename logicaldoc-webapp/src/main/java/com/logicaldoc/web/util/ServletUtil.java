@@ -768,7 +768,7 @@ public class ServletUtil {
 	private static boolean accepts(String acceptHeader, String toAccept) {
 		// Limit the size of the interpreted string in order to avoid DoS
 		// attacks
-		String[] acceptValues = StringUtils.left(acceptHeader, 100).split("\\s*(,|;)\\s*");
+		String[] acceptValues = StringUtils.left(acceptHeader, 100).split("\\s*(,;)\\s*");
 		Arrays.sort(acceptValues);
 		return Arrays.binarySearch(acceptValues, toAccept) > -1
 				|| Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1

@@ -8,10 +8,6 @@ import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -48,23 +44,13 @@ public class LastLogins extends com.smartgwt.client.widgets.Window {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		toolStrip.addSeparator();
 
 		ToolStripButton export = new ToolStripButton();
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		export.addClickHandler(event -> GridUtil.exportCSV(list, true));
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			toolStrip.addButton(export);
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -108,13 +94,7 @@ public class LastLogins extends com.smartgwt.client.widgets.Window {
 		list.setDataSource(new UserHistoryDS(Session.get().getUser().getId(), "event.user.login", 300));
 		list.setFields(id, date, ip, device, geolocation);
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				list.setHeight(getHeight() - 68);
-			}
-		});
+		addResizedHandler(event ->list.setHeight(getHeight() - 68));
 	}
 
 	public void refresh() {

@@ -25,7 +25,7 @@ public abstract class AbstractShape implements Shape {
 
 	private DrawableSet<Connection> connections = new DrawableSet<>();
 
-	public AbstractShape(DiagramController controller, Widget widget) {
+	protected AbstractShape(DiagramController controller, Widget widget) {
 		this.widget = widget;
 		this.controller = controller;
 	}

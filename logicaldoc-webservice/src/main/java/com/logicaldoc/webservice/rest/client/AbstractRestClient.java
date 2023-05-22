@@ -31,7 +31,7 @@ public abstract class AbstractRestClient {
 	 * @param username the username 
 	 * @param password the password
 	 */
-	public AbstractRestClient(String endpoint, String username, String password) {
+	protected AbstractRestClient(String endpoint, String username, String password) {
 		this.endpoint = endpoint;
 		if (username != null && password != null) {
 			this.credentials = username + ":" +password;
@@ -46,7 +46,7 @@ public abstract class AbstractRestClient {
 	 * @param password the password
 	 * @param timeout Timeout for the RESTful requests
 	 */	
-	public AbstractRestClient(String endpoint, String username, String password, int timeout) {
+	protected AbstractRestClient(String endpoint, String username, String password, int timeout) {
 		this(endpoint, username, password);
 		this.timeout = timeout;
 	}

@@ -197,15 +197,11 @@ public class JobManager {
 				jobs.add(job);
 		}
 
-		jobs.sort(new Comparator<JobDetail>() {
-
-			@Override
-			public int compare(JobDetail o1, JobDetail o2) {
+		jobs.sort((JobDetail o1, JobDetail o2) -> {
 				int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
 				if (cmp == 0)
 					cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
 				return cmp;
-			}
 		});
 		return jobs;
 	}
@@ -258,15 +254,11 @@ public class JobManager {
 				triggers.add(trigger);
 		}
 
-		triggers.sort(new Comparator<Trigger>() {
-
-			@Override
-			public int compare(Trigger o1, Trigger o2) {
+		triggers.sort((Trigger o1, Trigger o2) -> {
 				int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
 				if (cmp == 0)
 					cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
 				return cmp;
-			}
 		});
 		return triggers;
 	}

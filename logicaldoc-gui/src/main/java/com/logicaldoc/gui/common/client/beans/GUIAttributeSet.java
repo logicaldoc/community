@@ -3,7 +3,6 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public class GUIAttributeSet implements Serializable {
@@ -56,12 +55,8 @@ public class GUIAttributeSet implements Serializable {
 		if (attributes == null)
 			return null;
 
-		Arrays.sort(attributes, new Comparator<GUIAttribute>() {
-
-			@Override
-			public int compare(GUIAttribute arg0, GUIAttribute arg1) {
-				return Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition()));
-			}
+		Arrays.sort(attributes, (arg0, arg1) -> {
+			return Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition()));
 		});
 		return attributes;
 	}

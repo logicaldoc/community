@@ -11,8 +11,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to create a new document based on a selected form.
@@ -46,12 +44,7 @@ public class AddDocumentUsingForm extends Window {
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);

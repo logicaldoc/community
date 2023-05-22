@@ -1552,21 +1552,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internalCopy(Folder source, Folder target, String newName, boolean foldersOnly,
 			String securityOption, FolderHistory transaction) throws PersistenceException {
-		if(!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
-			throw new IllegalArgumentException("Invalid security option "+securityOption);
-		if(source==null)
-			throw new IllegalArgumentException("Source folder cannot be null");
-		if(target==null)
-			throw new IllegalArgumentException("Target folder cannot be null");
-		if (transaction == null)
-			throw new IllegalArgumentException("transaction cannot be null");
-		if (transaction.getUser() == null)
-			throw new IllegalArgumentException("transaction user cannot be null");
-
-		target = findFolder(target);
-
-		if (isInPath(source.getId(), target.getId()))
-			throw new IllegalArgumentException("Cannot copy a folder inside the same path");
+		target = internatlCopyValidation(source, target, securityOption, transaction);
 
 		// Create the same folder in the target
 		Folder newFolder = null;
@@ -1630,6 +1616,26 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		return newFolder;
+	}
+
+	private Folder internatlCopyValidation(Folder source, Folder target, String securityOption,
+			FolderHistory transaction) throws PersistenceException {
+		if(!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
+			throw new IllegalArgumentException("Invalid security option "+securityOption);
+		if(source==null)
+			throw new IllegalArgumentException("Source folder cannot be null");
+		if(target==null)
+			throw new IllegalArgumentException("Target folder cannot be null");
+		if (transaction == null)
+			throw new IllegalArgumentException("transaction cannot be null");
+		if (transaction.getUser() == null)
+			throw new IllegalArgumentException("transaction user cannot be null");
+
+		target = findFolder(target);
+
+		if (isInPath(source.getId(), target.getId()))
+			throw new IllegalArgumentException("Cannot copy a folder inside the same path");
+		return target;
 	}
 
 	private void replicateSecurityPolicies(Folder source, String securityOption, Folder newFolder)

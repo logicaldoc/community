@@ -3,7 +3,6 @@ package com.logicaldoc.core.store;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -152,16 +151,13 @@ public class FSStorer extends AbstractStorer {
 	public List<String> listResources(long docId, final String fileVersion) {
 		List<String> resources = new ArrayList<>();
 		File container = getContainer(docId);
-		File[] buf = container.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				if (name.startsWith("."))
-					return false;
-				else if (StringUtils.isNotEmpty(fileVersion)) {
-					return name.startsWith(fileVersion);
-				}
-				return true;
+		File[] buf = container.listFiles((dir, name) -> {
+			if (name.startsWith("."))
+				return false;
+			else if (StringUtils.isNotEmpty(fileVersion)) {
+				return name.startsWith(fileVersion);
 			}
+			return true;
 		});
 		if (buf != null)
 			for (File file : buf) {

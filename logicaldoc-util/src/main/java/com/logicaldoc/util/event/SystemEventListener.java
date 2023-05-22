@@ -4,7 +4,7 @@ public abstract class SystemEventListener {
 	
 	private SystemEventStatus systemStatus;
 	
-	public SystemEventListener(SystemEventStatus status) {
+	protected SystemEventListener(SystemEventStatus status) {
 		if(status == null)
 			throw new RuntimeException("A valid SystemEventStatus must be registered");
 		

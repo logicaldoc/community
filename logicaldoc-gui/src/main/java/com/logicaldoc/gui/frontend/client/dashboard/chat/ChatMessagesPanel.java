@@ -13,12 +13,8 @@ import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.VisibilityChangedEvent;
-import com.smartgwt.client.widgets.events.VisibilityChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -60,25 +56,16 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 		messages.setFields(date, username, message);
 		messages.setSortField("date");
 
-		messages.addVisibilityChangedHandler(new VisibilityChangedHandler() {
-			@Override
-			public void onVisibilityChanged(VisibilityChangedEvent event) {
-				if (timer != null) {
-					if (!event.getIsVisible())
-						stopTimer();
-					else if (!timer.isRunning())
-						startTimer();
-				}
+		messages.addVisibilityChangedHandler(event -> {
+			if (timer != null) {
+				if (!event.getIsVisible())
+					stopTimer();
+				else if (!timer.isRunning())
+					startTimer();
 			}
 		});
 
-		messages.addDataArrivedHandler(new DataArrivedHandler() {
-
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				messages.scrollToRow(messages.getTotalRows() - 1);
-			}
-		});
+		messages.addDataArrivedHandler(event -> messages.scrollToRow(messages.getTotalRows() - 1));
 
 		setMembers(messages);
 		startTimer();

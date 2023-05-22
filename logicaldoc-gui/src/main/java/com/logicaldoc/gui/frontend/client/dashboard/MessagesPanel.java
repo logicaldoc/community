@@ -22,21 +22,12 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -115,49 +106,40 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		grid.sort("sent", SortDirection.DESCENDING);
 
 		// Count the total unread messages
-		grid.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				Record[] records = grid.getRecordList().toArray();
-				int unread = 0;
-				for (Record rec : records) {
-					if ("false".equals(rec.getAttributeAsString("read")))
-						unread++;
-				}
-
-				Session.get().getUser().setUnreadMessages(unread);
+		grid.addDataArrivedHandler(event -> {
+			Record[] records = grid.getRecordList().toArray();
+			int unread = 0;
+			for (Record rec : records) {
+				if ("false".equals(rec.getAttributeAsString("read")))
+					unread++;
 			}
+
+			Session.get().getUser().setUnreadMessages(unread);
 		});
 
-		grid.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				final Record rec = grid.getSelectedRecord();
-				if (rec != null)
-					MessageService.Instance.get().getMessage(Long.parseLong(rec.getAttributeAsString("id")), true,
-							new AsyncCallback<GUIMessage>() {
+		grid.addSelectionChangedHandler(event -> {
+			final Record rec = grid.getSelectedRecord();
+			if (rec != null)
+				MessageService.Instance.get().getMessage(Long.parseLong(rec.getAttributeAsString("id")), true,
+						new AsyncCallback<GUIMessage>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIMessage message) {
-									rec.setAttribute("read", "true");
-									grid.refreshRow(grid.getRecordIndex(rec));
-									body.setContents(grid.getSelectedRecord().getAttributeAsString("text"));
-								}
-							});
-			}
+							@Override
+							public void onSuccess(GUIMessage message) {
+								rec.setAttribute("read", "true");
+								grid.refreshRow(grid.getRecordIndex(rec));
+								body.setContents(grid.getSelectedRecord().getAttributeAsString("text"));
+							}
+						});
 		});
 
-		grid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		grid.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		ToolStrip toolStrip = new ToolStrip();
@@ -167,21 +149,15 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("sendmessage"));
 		toolStrip.addButton(add);
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				MessageDialog dialog = new MessageDialog();
-				dialog.show();
-			}
+		add.addClickHandler(nevent -> {
+			MessageDialog dialog = new MessageDialog();
+			dialog.show();
 		});
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
+		refresh.addClickHandler(event -> {
+			refresh();
 		});
 		toolStrip.addFill();
 
@@ -213,24 +189,22 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						MessageService.Instance.get().delete(ids, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler(event -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					MessageService.Instance.get().delete(ids, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								grid.removeSelectedData();
-							}
-						});
-					}
-				});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							grid.removeSelectedData();
+						}
+					});
+				}
+			});
 		});
 
 		contextMenu.setItems(delete);

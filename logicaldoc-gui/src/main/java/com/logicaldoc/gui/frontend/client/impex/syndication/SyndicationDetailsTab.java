@@ -21,7 +21,7 @@ public abstract class SyndicationDetailsTab extends HLayout {
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        syndication
 	 */
-	public SyndicationDetailsTab(GUISyndication syndication, ChangedHandler changedHandler) {
+	protected SyndicationDetailsTab(GUISyndication syndication, ChangedHandler changedHandler) {
 		super();
 		this.syndication = syndication;
 		this.changedHandler = changedHandler;

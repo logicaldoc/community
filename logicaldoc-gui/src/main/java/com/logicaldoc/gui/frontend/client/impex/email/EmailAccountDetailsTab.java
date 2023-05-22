@@ -22,7 +22,7 @@ public abstract class EmailAccountDetailsTab extends VLayout {
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        importFolder
 	 */
-	public EmailAccountDetailsTab(GUIEmailAccount account, ChangedHandler changedHandler) {
+	protected EmailAccountDetailsTab(GUIEmailAccount account, ChangedHandler changedHandler) {
 		super();
 		this.account = account;
 		this.changedHandler = changedHandler;

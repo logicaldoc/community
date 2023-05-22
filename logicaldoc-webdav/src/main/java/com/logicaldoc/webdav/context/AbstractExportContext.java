@@ -23,14 +23,14 @@ public abstract class AbstractExportContext implements ExportContext {
 
 	protected boolean completed;
 
+	protected AbstractExportContext(Resource resource, boolean hasStream) {
+		this.resource = resource;
+		this.hasStream = hasStream;
+	}
+	
 	@Override
 	public IOListener getIOListener() {
 		return null;
-	}
-
-	public AbstractExportContext(Resource resource, boolean hasStream) {
-		this.resource = resource;
-		this.hasStream = hasStream;
 	}
 
 	public Resource getResource() {

@@ -13,8 +13,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -100,15 +98,11 @@ public class SignaturePanel extends StampProperties {
 		pageOption.setValueMap(pageOptions);
 		pageOption.setValue("" + stamp.getPageOption());
 		pageOption.setWrap(false);
-		pageOption.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue().equals("" + GUIStamp.PAGE_OPT_SEL))
-					pageSelection.show();
-				else
-					pageSelection.hide();
-			}
+		pageOption.addChangedHandler(event -> {
+			if (event.getValue().equals("" + GUIStamp.PAGE_OPT_SEL))
+				pageSelection.show();
+			else
+				pageSelection.hide();
 		});
 
 		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", stamp.getOpacity(), 1, 100);

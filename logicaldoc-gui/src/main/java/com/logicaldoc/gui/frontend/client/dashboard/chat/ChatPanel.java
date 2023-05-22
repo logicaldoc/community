@@ -9,8 +9,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -63,22 +61,12 @@ public class ChatPanel extends VLayout {
 
 		setMembers(body, postForm);
 
-		postMessage.addKeyPressHandler(new KeyPressHandler() {
-
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onPost(postForm.getValueAsString("post"));
-			}
-		});
-
-		postButton.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+		postMessage.addKeyPressHandler(event -> {
+			if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
 				onPost(postForm.getValueAsString("post"));
-			}
 		});
+
+		postButton.addClickHandler(event -> onPost(postForm.getValueAsString("post")));
 	}
 
 	protected void onPost(String message) {

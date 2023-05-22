@@ -28,7 +28,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 
 	protected Map<String, String> parameters = new HashMap<>();
 
-	public AbstractFormatConverter() {
+	protected AbstractFormatConverter() {
 		loadParameters();
 	}
 

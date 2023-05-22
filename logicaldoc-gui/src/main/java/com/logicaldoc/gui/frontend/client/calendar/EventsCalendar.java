@@ -13,10 +13,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.smartgwt.client.types.TimeDisplayFormat;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.calendar.Calendar;
-import com.smartgwt.client.widgets.calendar.events.CalendarEventClick;
-import com.smartgwt.client.widgets.calendar.events.EventClickHandler;
 
 /**
  * Represents a calendar containing events related to documents.
@@ -57,59 +54,51 @@ public class EventsCalendar extends Calendar {
 		else
 			setChosenDate(new Date());
 
-		addEventClickHandler(new EventClickHandler() {
+		addEventClickHandler(event -> {
+			CalendarService.Instance.get().getEvent(Long.parseLong(event.getEvent().getAttribute("eventId")),
+					new AsyncCallback<GUICalendarEvent>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-			@Override
-			public void onEventClick(final CalendarEventClick event) {
-				CalendarService.Instance.get().getEvent(Long.parseLong(event.getEvent().getAttribute("eventId")),
-						new AsyncCallback<GUICalendarEvent>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
+						@Override
+						public void onSuccess(final GUICalendarEvent ev) {
+							long creatorId = Long.parseLong(event.getEvent().getAttribute("creatorId"));
+							GUIUser currentUser = Session.get().getUser();
+
+							if (ev.getParentId() != null && (currentUser.getId() == creatorId
+									|| currentUser.isMemberOf(Constants.GROUP_ADMIN))) {
+								LD.ask(I18N.message("editevent"), I18N.message("douwantmodifyalloccurrences"),
+										editAllOccurrences -> {
+											if (Boolean.FALSE.equals(editAllOccurrences)) {
+												CalendarEventDialog eventDialog = new CalendarEventDialog(ev,
+														onChangeCallback);
+												eventDialog.show();
+											} else {
+												CalendarService.Instance.get().getEvent(
+														Long.parseLong(event.getEvent().getAttribute("parentId")),
+														new AsyncCallback<GUICalendarEvent>() {
+															public void onFailure(Throwable caught) {
+																GuiLog.serverError(caught);
+															}
+
+															@Override
+															public void onSuccess(GUICalendarEvent calEv) {
+																CalendarEventDialog eventDialog = new CalendarEventDialog(
+																		calEv, onChangeCallback);
+																eventDialog.show();
+															}
+														});
+											}
+										});
+							} else {
+								CalendarEventDialog eventDialog = new CalendarEventDialog(ev, onChangeCallback);
+								eventDialog.show();
 							}
-
-							@Override
-							public void onSuccess(final GUICalendarEvent ev) {
-								long creatorId = Long.parseLong(event.getEvent().getAttribute("creatorId"));
-								GUIUser currentUser = Session.get().getUser();
-
-								if (ev.getParentId() != null && (currentUser.getId() == creatorId
-										|| currentUser.isMemberOf(Constants.GROUP_ADMIN))) {
-									LD.ask(I18N.message("editevent"), I18N.message("douwantmodifyalloccurrences"),
-											new BooleanCallback() {
-												@Override
-												public void execute(final Boolean editAllOccurrences) {
-													if (Boolean.FALSE.equals(editAllOccurrences)) {
-														CalendarEventDialog eventDialog = new CalendarEventDialog(ev,
-																onChangeCallback);
-														eventDialog.show();
-													} else {
-														CalendarService.Instance.get().getEvent(
-																Long.parseLong(
-																		event.getEvent().getAttribute("parentId")),
-																new AsyncCallback<GUICalendarEvent>() {
-																	public void onFailure(Throwable caught) {
-																		GuiLog.serverError(caught);
-																	}
-
-																	@Override
-																	public void onSuccess(GUICalendarEvent calEv) {
-																		CalendarEventDialog eventDialog = new CalendarEventDialog(
-																				calEv, onChangeCallback);
-																		eventDialog.show();
-																	}
-																});
-													}
-												}
-											});
-								} else {
-									CalendarEventDialog eventDialog = new CalendarEventDialog(ev, onChangeCallback);
-									eventDialog.show();
-								}
-							}
-						});
-				event.cancel();
-			}
+						}
+					});
+			event.cancel();
 		});
 	}
 }

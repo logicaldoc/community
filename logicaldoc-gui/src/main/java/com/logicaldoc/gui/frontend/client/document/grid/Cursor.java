@@ -6,7 +6,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
@@ -51,13 +50,7 @@ public class Cursor extends ToolStrip {
 		pageSizeItem.setStep(20);
 		pageSizeItem.setSaveOnEnter(true);
 		pageSizeItem.setImplicitSave(true);
-		pageSizeItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onPageSizeChange();
-			}
-		});
+		pageSizeItem.addChangedHandler(event -> onPageSizeChange());
 		if (compactView) {
 			pageSizeItem.setShowTitle(false);
 		} else {

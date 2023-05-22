@@ -42,12 +42,9 @@ public class DocumentsPreviewPanel extends VLayout {
 		setInitialSize();
 		reset();
 
-		addResizedHandler(new ResizedHandler() {
-			@Override
-			public void onResized(ResizedEvent event) {
+		addResizedHandler(event -> {
 				if (getWidth() > 1)
 					Offline.put(widthCookieName, getWidthAsString());
-			}
 		});
 	}
 

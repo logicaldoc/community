@@ -4,10 +4,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VStack;
@@ -34,23 +30,11 @@ public class AutomationItemEditor extends Window {
 		this.item = item;
 		this.handler = handler;
 
-		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				maximize();
-			}
-		});
+		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE, event -> maximize());
 
-		HeaderControl minimize = new HeaderControl(HeaderControl.MINIMIZE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				resetDimensions();
-			}
-		});
+		HeaderControl minimize = new HeaderControl(HeaderControl.MINIMIZE, event -> resetDimensions());
 
-		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, maximize, minimize, closeIcon);
 		setTitle(item.getTitle());
@@ -62,22 +46,14 @@ public class AutomationItemEditor extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-				destroy();
-			}
+		save.addClickHandler(event -> {
+			onSave();
+			destroy();
 		});
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -91,13 +67,7 @@ public class AutomationItemEditor extends Window {
 
 		addItem(automationPanel);
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				prepareAutomationPanel();
-			}
-		});
+		addResizedHandler(event -> prepareAutomationPanel());
 
 		prepareAutomationPanel();
 	}

@@ -65,6 +65,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @since 3.0
  */
 public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document> implements DocumentDAO {
+	private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
+
 	private static final String AND = " and ";
 
 	private static final String AND_LD_TENANTID = " and ld_tenantid=";
@@ -149,7 +151,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			throw new IllegalArgumentException("delCode cannot be 0");
 
 		if (transaction == null)
-			throw new IllegalArgumentException("transaction cannot be null");
+			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 		if (transaction.getUser() == null)
 			throw new IllegalArgumentException("transaction user cannot be null");
 
@@ -1098,13 +1100,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void cleanUnexistingUniqueTags() throws PersistenceException {
 		try {
-			StringBuilder deleteStatement = new StringBuilder("DELETE FROM ld_uniquetag	WHERE ");
+			StringBuilder deleteStatement = new StringBuilder("DELETE FROM ld_uniquetag WHERE ");
 
 			// tags no more existing in the ld_tag table or that belong to
-			// deleted
-			// documents
-			deleteStatement.append(
-					" ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT t.ld_tag	FROM ld_tag t JOIN ld_document d ON d.ld_id = t.ld_docid WHERE ld_uniquetag.ld_tenantid = t.ld_tenantid AND ld_uniquetag.ld_tag = t.ld_tag AND d.ld_deleted = 0 ) ");
+			// deleted documents
+			deleteStatement.append(" ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT t.ld_tag FROM ld_tag t JOIN ld_document d ON d.ld_id = t.ld_docid WHERE ld_uniquetag.ld_tenantid = t.ld_tenantid AND ld_uniquetag.ld_tag = t.ld_tag AND d.ld_deleted = 0 ) ");
 
 			// tags no more existing in the ld_foldertag table or that belong to
 			// deleted folders
@@ -1265,7 +1265,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void setPassword(long docId, String password, DocumentHistory transaction) throws PersistenceException {
 		if (transaction == null)
-			throw new IllegalArgumentException("transaction cannot be null");
+			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 		if (transaction.getUsername() == null)
 			throw new IllegalArgumentException("transaction username cannot be null");
 
@@ -1292,7 +1292,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void unsetPassword(long docId, DocumentHistory transaction) throws PersistenceException {
 		if (transaction == null)
-			throw new IllegalArgumentException("transaction cannot be null");
+			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 		if (transaction.getUsername() == null)
 			throw new IllegalArgumentException("transaction username cannot be null");
 

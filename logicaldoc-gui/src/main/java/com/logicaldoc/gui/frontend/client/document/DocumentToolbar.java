@@ -34,8 +34,6 @@ import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -204,25 +202,22 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		} catch (Throwable t) {
 			// Nothing to do
 		}
-		togglePreview.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (DocumentsPanel.get().getPreviewPanel().isVisible()
-						&& DocumentsPanel.get().getPreviewPanel().getWidth() > 1) {
-					DocumentsPanel.get().getPreviewPanel().setWidth(0);
-					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
-					togglePreview.setTooltip(I18N.message("openpreview"));
-				} else {
-					try {
-						String w = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_PREV_W);
-						DocumentsPanel.get().getPreviewPanel().setWidth(Integer.parseInt(w));
-					} catch (Throwable t) {
-						DocumentsPanel.get().getPreviewPanel().setWidth(350);
-					}
-					DocumentsPanel.get().getPreviewPanel().setDocument(document);
-					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-					togglePreview.setTooltip(I18N.message("closepreview"));
+		togglePreview.addClickHandler(event -> {
+			if (DocumentsPanel.get().getPreviewPanel().isVisible()
+					&& DocumentsPanel.get().getPreviewPanel().getWidth() > 1) {
+				DocumentsPanel.get().getPreviewPanel().setWidth(0);
+				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
+				togglePreview.setTooltip(I18N.message("openpreview"));
+			} else {
+				try {
+					String w = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_PREV_W);
+					DocumentsPanel.get().getPreviewPanel().setWidth(Integer.parseInt(w));
+				} catch (Throwable t) {
+					DocumentsPanel.get().getPreviewPanel().setWidth(350);
 				}
+				DocumentsPanel.get().getPreviewPanel().setDocument(document);
+				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
+				togglePreview.setTooltip(I18N.message("closepreview"));
 			}
 		});
 		addButton(togglePreview);
@@ -231,24 +226,16 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	private void addFilter() {
 		filter.setActionType(SelectionType.CHECKBOX);
 		addButton(filter);
-		filter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsPanel.get().toggleFilters();
-			}
-		});
+		filter.addClickHandler(event -> DocumentsPanel.get().toggleFilters());
 	}
 
 	private void addGallery() {
 		gallery.setActionType(SelectionType.RADIO);
 		gallery.setRadioGroup("mode");
-		gallery.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (FolderController.get().getCurrentFolder() != null)
-					CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_GALLERY);
-				DocumentsPanel.get().refresh(DocumentsGrid.MODE_GALLERY);
-			}
+		gallery.addClickHandler(event -> {
+			if (FolderController.get().getCurrentFolder() != null)
+				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_GALLERY);
+			DocumentsPanel.get().refresh(DocumentsGrid.MODE_GALLERY);
 		});
 		gallery.setDisabled(FolderController.get().getCurrentFolder() == null
 				|| !Session.get().getConfigAsBoolean("gui.galleryenabled"));
@@ -259,36 +246,23 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	private void addList() {
 		list.setActionType(SelectionType.RADIO);
 		list.setRadioGroup("mode");
-		list.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_LIST);
-				DocumentsPanel.get().refresh(DocumentsGrid.MODE_LIST);
-			}
+		list.addClickHandler(event -> {
+			CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_LIST);
+			DocumentsPanel.get().refresh(DocumentsGrid.MODE_LIST);
 		});
 		list.setDisabled(FolderController.get().getCurrentFolder() == null);
 		addButton(list);
 	}
 
 	private void addSaveLayout() {
-		saveLayout.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				saveGridState();
-			}
-		});
+		saveLayout.addClickHandler(event -> saveGridState());
 		addButton(saveLayout);
 	}
 
 	private void addExport() {
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentsPanel.get().export();
-				}
-			});
+			export.addClickHandler(event -> DocumentsPanel.get().export());
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
 				setFeatureDisabled(export);
 			}
@@ -297,12 +271,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	private void addPrint() {
 		addButton(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsPanel.get().printPreview();
-			}
-		});
+		print.addClickHandler(event -> DocumentsPanel.get().printPreview());
 	}
 
 	private void addCalendar() {
@@ -312,33 +281,30 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.CALENDAR))
 				setFeatureDisabled(addCalendarEvent);
 
-			addCalendarEvent.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+			addCalendarEvent.addClickHandler(event -> {
+				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 
-					GUIDocument[] docs = grid.getSelectedDocuments();
+				GUIDocument[] docs = grid.getSelectedDocuments();
 
-					GUICalendarEvent calEvent = new GUICalendarEvent();
-					calEvent.setCreator(Session.get().getUser().getFullName());
-					calEvent.setCreatorId(Session.get().getUser().getId());
-					GUIUser user = new GUIUser();
-					user.setId(Session.get().getUser().getId());
-					user.setUsername(Session.get().getUser().getUsername());
-					user.setFirstName(Session.get().getUser().getFirstName());
-					user.setName(Session.get().getUser().getName());
-					calEvent.addParticipant(user);
+				GUICalendarEvent calEvent = new GUICalendarEvent();
+				calEvent.setCreator(Session.get().getUser().getFullName());
+				calEvent.setCreatorId(Session.get().getUser().getId());
+				GUIUser user = new GUIUser();
+				user.setId(Session.get().getUser().getId());
+				user.setUsername(Session.get().getUser().getUsername());
+				user.setFirstName(Session.get().getUser().getFirstName());
+				user.setName(Session.get().getUser().getName());
+				calEvent.addParticipant(user);
 
-					if (docs != null && docs.length > 0) {
-						calEvent.setDocuments(docs);
-						calEvent.setTitle(Util.getBaseName(docs[0].getFileName()));
-						calEvent.setType(docs[0].getTemplate());
-					}
-
-					calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
-					CalendarEventDialog eventDialog = new CalendarEventDialog(calEvent, null);
-					eventDialog.show();
+				if (docs != null && docs.length > 0) {
+					calEvent.setDocuments(docs);
+					calEvent.setTitle(Util.getBaseName(docs[0].getFileName()));
+					calEvent.setType(docs[0].getTemplate());
 				}
+
+				calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
+				CalendarEventDialog eventDialog = new CalendarEventDialog(calEvent, null);
+				eventDialog.show();
 			});
 		}
 	}
@@ -350,16 +316,13 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.WORKFLOW))
 				setFeatureDisabled(startWorkflow);
 
-			startWorkflow.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-					if (grid.getSelectedCount() == 0)
-						return;
+			startWorkflow.addClickHandler(event -> {
+				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+				if (grid.getSelectedCount() == 0)
+					return;
 
-					StartWorkflowDialog workflowDialog = new StartWorkflowDialog(grid.getSelectedIds());
-					workflowDialog.show();
-				}
+				StartWorkflowDialog workflowDialog = new StartWorkflowDialog(grid.getSelectedIds());
+				workflowDialog.show();
 			});
 		}
 	}
@@ -371,16 +334,13 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.DIGITAL_SIGNATURE))
 				setFeatureDisabled(sign);
 
-			sign.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-					if (grid.getSelectedCount() == 0)
-						return;
+			sign.addClickHandler(event -> {
+				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+				if (grid.getSelectedCount() == 0)
+					return;
 
-					DigitalSignatureDialog dialog = new DigitalSignatureDialog(grid.getSelectedIds());
-					dialog.show();
-				}
+				DigitalSignatureDialog dialog = new DigitalSignatureDialog(grid.getSelectedIds());
+				dialog.show();
 			});
 		}
 	}
@@ -393,16 +353,13 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.STAMP))
 				setFeatureDisabled(stamp);
 
-			stamp.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-					if (grid.getSelectedCount() == 0)
-						return;
+			stamp.addClickHandler(event -> {
+				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+				if (grid.getSelectedCount() == 0)
+					return;
 
-					StampDialog dialog = new StampDialog(grid);
-					dialog.show();
-				}
+				StampDialog dialog = new StampDialog(grid);
+				dialog.show();
 			});
 		}
 	}
@@ -413,20 +370,17 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.BULK_CHECKOUT))
 				setFeatureDisabled(bulkCheckout);
 
-			bulkCheckout.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-					if (grid.getSelectedCount() == 0)
-						return;
+			bulkCheckout.addClickHandler(event -> {
+				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+				if (grid.getSelectedCount() == 0)
+					return;
 
-					GUIDocument docs[] = grid.getSelectedDocuments();
-					List<Long> unlockedIds = new ArrayList<>();
-					for (GUIDocument doc : docs)
-						if (doc.getStatus() == 0 && doc.getImmutable() == 0)
-							unlockedIds.add(doc.getId());
-					Util.openBulkCheckout(unlockedIds);
-				}
+				GUIDocument docs[] = grid.getSelectedDocuments();
+				List<Long> unlockedIds = new ArrayList<>();
+				for (GUIDocument doc : docs)
+					if (doc.getStatus() == 0 && doc.getImmutable() == 0)
+						unlockedIds.add(doc.getId());
+				Util.openBulkCheckout(unlockedIds);
 			});
 		}
 	}
@@ -437,7 +391,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.BULK_UPDATE))
 				setFeatureDisabled(bulkUpdate);
 
-			bulkUpdate.addClickHandler((ClickEvent event) -> {
+			bulkUpdate.addClickHandler(event -> {
 				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 				if (grid.getSelectedCount() == 0)
 					return;
@@ -456,7 +410,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.IMPEX))
 				setFeatureDisabled(archive);
 
-			archive.addClickHandler((ClickEvent event) -> {
+			archive.addClickHandler(event -> {
 				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 				if (grid.getSelectedCount() == 0)
 					return;
@@ -474,7 +428,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				setFeatureDisabled(subscribe);
 
 			subscribe.setDisabled(true);
-			subscribe.addClickHandler((ClickEvent event) -> {
+			subscribe.addClickHandler(event -> {
 				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 				if (grid.getSelectedCount() == 0)
 					return;
@@ -490,7 +444,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.FORM))
 				setFeatureDisabled(addForm);
 
-			addForm.addClickHandler((ClickEvent event) -> new AddDocumentUsingForm().show());
+			addForm.addClickHandler(event -> new AddDocumentUsingForm().show());
 		}
 	}
 
@@ -500,12 +454,12 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.SCAN))
 				setFeatureDisabled(scan);
 
-			scan.addClickHandler((ClickEvent event) -> Util.openScan());
+			scan.addClickHandler(event -> Util.openScan());
 		}
 	}
 
 	private void addUpload() {
-		add.addClickHandler((ClickEvent event) -> {
+		add.addClickHandler(event -> {
 			DocumentsUploader uploader = new DocumentsUploader();
 			uploader.show();
 			event.cancel();
@@ -519,7 +473,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.DROP_SPOT))
 				setFeatureDisabled(dropSpot);
 
-			dropSpot.addClickHandler((ClickEvent event) -> DropSpotPopup.openDropSpot());
+			dropSpot.addClickHandler(event -> DropSpotPopup.openDropSpot());
 		}
 	}
 
@@ -528,7 +482,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			addButton(office);
 			office.setTooltip(I18N.message("editwithoffice"));
 			office.setTitle("<i class='fab fa-windows fa-lg fa-lg' aria-hidden='true'></i>");
-			office.addClickHandler((ClickEvent event) -> {
+			office.addClickHandler(event -> {
 				if (document == null)
 					return;
 				Util.openEditWithOffice(document.getId());
@@ -552,7 +506,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.PDF))
 				setFeatureDisabled(convert);
 
-			convert.addClickHandler((ClickEvent event) -> {
+			convert.addClickHandler(event -> {
 				new ConversionDialog(document).show();
 				event.cancel();
 			});
@@ -566,7 +520,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.PDF))
 				setFeatureDisabled(pdf);
 
-			pdf.addClickHandler((ClickEvent event) -> {
+			pdf.addClickHandler(event -> {
 				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 				if (grid.getSelectedCount() == 0)
 					return;
@@ -586,7 +540,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	private void addDownload() {
 		addButton(download);
-		download.addClickHandler((ClickEvent event) -> {
+		download.addClickHandler(event -> {
 			DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 			if (grid.getSelectedCount() == 0)
 				return;
@@ -611,7 +565,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	}
 
 	private void addRefresh() {
-		refresh.addClickHandler((ClickEvent event) -> {
+		refresh.addClickHandler(event -> {
 			if (FolderController.get().getCurrentFolder() != null)
 				FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 		});

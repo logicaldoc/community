@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.drawing.DrawGroup;
 import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.drawing.DrawLabel;
@@ -26,10 +25,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.MenuItemIfFunction;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * The context menu used to edit an annotation
@@ -62,19 +59,15 @@ public class AnnotationContextMenu extends Menu {
 		MenuItem moveOrResize = new MenuItem(I18N.message("moveorresize"));
 		moveOrResize.setIconHeight(16);
 		moveOrResize.setIconWidth(16);
-		moveOrResize.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (Boolean.TRUE.equals(drawItem.getCanDrag()))
-					AbstractAnnotationsWindow.hideKnowbs(drawItem);
-				else
-					AbstractAnnotationsWindow.showKnowbs(drawItem);
-			}
+		moveOrResize.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(drawItem.getCanDrag()))
+				AbstractAnnotationsWindow.hideKnowbs(drawItem);
+			else
+				AbstractAnnotationsWindow.showKnowbs(drawItem);
 		});
 
-		moveOrResize.setCheckIfCondition(new MenuItemIfFunction() {
-			public boolean execute(Canvas target, Menu menu, MenuItem item) {
-				return drawItem.getCanDrag();
-			}
+		moveOrResize.setCheckIfCondition((target, menu, item) -> {
+			return drawItem.getCanDrag();
 		});
 
 		MenuItem fillMenuItem = prepareFillMenuItem();
@@ -129,13 +122,9 @@ public class AnnotationContextMenu extends Menu {
 		fillOpacity.setMin(0);
 		fillOpacity.setMax(100);
 		fillOpacity.setDisabled(!editEnabled);
-		fillOpacity.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
+		fillOpacity.addChangedHandler( event -> {
 				note.setOpacity(Integer.parseInt(event.getValue().toString()));
 				drawItem.setFillOpacity((float) note.getOpacity() / 100f);
-			}
 		});
 
 		final DynamicForm fillForm = new DynamicForm();
@@ -168,10 +157,7 @@ public class AnnotationContextMenu extends Menu {
 		form.setTitleOrientation(TitleOrientation.RIGHT);
 
 		FormItem contentArea = ItemFactory.newTextAreaItemForNote(CONTENT, I18N.message(CONTENT), note.getMessage(),
-				new ChangedHandler() {
-
-					@Override
-					public void onChanged(ChangedEvent event) {
+				event -> { 
 						form.setValue(CONTENT, (String) event.getValue());
 						note.setMessage((String) event.getValue());
 
@@ -181,7 +167,6 @@ public class AnnotationContextMenu extends Menu {
 							drawItem.setTitle(Util.strip(note.getMessage()));
 
 						drawItem.setPrompt(note.getMessage());
-					}
 				}, true);
 		contentArea.setRequired(false);
 		contentArea.setShowTitle(false);
@@ -205,13 +190,9 @@ public class AnnotationContextMenu extends Menu {
 
 	private MenuItem prepareLineMenuItem() {
 		ColorPickerItem lineColor = ItemFactory.newColorItemPicker("lineColor", I18N.message("color"),
-				note.getLineColor(), false, new ChangedHandler() {
-
-					@Override
-					public void onChanged(ChangedEvent event) {
+				note.getLineColor(), false, event -> {
 						note.setLineColor((String) event.getValue());
 						drawItem.setLineColor((String) event.getValue());
-					}
 				});
 		lineColor.setRequired(true);
 		lineColor.setDisabled(!editEnabled);
@@ -220,13 +201,9 @@ public class AnnotationContextMenu extends Menu {
 		opacity.setRequired(true);
 		opacity.setMin(0);
 		opacity.setMax(100);
-		opacity.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
+		opacity.addChangedHandler( event -> {
 				note.setLineOpacity(Integer.parseInt(event.getValue().toString()));
 				drawItem.setLineOpacity((float) note.getLineOpacity() / 100f);
-			}
 		});
 		opacity.setVisible(!(drawItem instanceof DrawLabel));
 		opacity.setDisabled(!editEnabled);
@@ -236,17 +213,13 @@ public class AnnotationContextMenu extends Menu {
 		width.setMin(1);
 		width.setMax(100);
 		width.setDisabled(!editEnabled);
-		width.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
+		width.addChangedHandler(event -> {
 				note.setLineWidth(Integer.parseInt(event.getValue().toString()));
 
 				if (drawItem instanceof DrawLabel)
 					((DrawLabel) drawItem).setFontSize(note.getLineWidth());
 				else
 					drawItem.setLineWidth(note.getLineWidth());
-			}
 		});
 
 		final DynamicForm lineForm = new DynamicForm();

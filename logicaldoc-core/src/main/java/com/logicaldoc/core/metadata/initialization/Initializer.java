@@ -54,20 +54,7 @@ public class Initializer {
 
 		setUser(transaction);
 
-		try {
-			template.getAttributeNames().size();
-		} catch (LazyInitializationException e) {
-			// If an error happens here it means that the collection could not
-			// be loaded, so load the bean again and initialize it.
-			log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			try {
-				template = tDao.findById(template.getId());
-				tDao.initialize(template);
-			} catch (PersistenceException pe) {
-				log.warn(pe.getMessage(), pe);
-			}
-		}
+		template = initializeAttributes(template);
 
 		try {
 			// We access the collection as is without initializing the bean
@@ -88,6 +75,26 @@ public class Initializer {
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}
+	}
+
+	private Template initializeAttributes(Template template) {
+		try {
+			int attributesCount = template.getAttributeNames().size();
+			if (log.isDebugEnabled())
+				log.debug("Initialized {} attributes", attributesCount);
+		} catch (LazyInitializationException e) {
+			// If an error happens here it means that the collection could not
+			// be loaded, so load the bean again and initialize it.
+			log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
+			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			try {
+				template = tDao.findById(template.getId());
+				tDao.initialize(template);
+			} catch (PersistenceException pe) {
+				log.warn(pe.getMessage(), pe);
+			}
+		}
+		return template;
 	}
 
 	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,

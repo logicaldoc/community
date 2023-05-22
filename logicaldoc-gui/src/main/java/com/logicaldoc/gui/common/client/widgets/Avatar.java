@@ -16,13 +16,10 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Displays an Avatar
@@ -71,31 +68,25 @@ public class Avatar extends HLayout {
 	private Menu prepareContextMenu() {
 		MenuItem reset = new MenuItem();
 		reset.setTitle(I18N.message("reset"));
-		reset.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SecurityService.Instance.get().resetAvatar(userId, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void arg) {
-						Avatar.this.initGUI();
-						if (callback != null)
-							callback.onSuccess(null);
-					}
-				});
+		reset.addClickHandler(event -> SecurityService.Instance.get().resetAvatar(userId, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
 			}
-		});
+
+			@Override
+			public void onSuccess(Void arg) {
+				Avatar.this.initGUI();
+				if (callback != null)
+					callback.onSuccess(null);
+			}
+		}));
 
 		MenuItem update = new MenuItem();
 		update.setTitle(I18N.message("update"));
-		update.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				Uploader uploader = new Uploader(userId);
-				uploader.show();
-			}
+		update.addClickHandler(event -> {
+			Uploader uploader = new Uploader(userId);
+			uploader.show();
 		});
 
 		Menu contextMenu = new Menu();
@@ -124,13 +115,7 @@ public class Avatar extends HLayout {
 			setAutoSize(true);
 
 			saveButton = new IButton(I18N.message("save"));
-			saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-				@Override
-				public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-					onSave();
-				}
-			});
+			saveButton.addClickHandler(event -> onSave());
 
 			Label hint = new Label(I18N.message("avatarhint", Session.get().getConfig(GUI_AVATAR_SIZE),
 					Session.get().getConfig(GUI_AVATAR_SIZE)));
@@ -148,10 +133,8 @@ public class Avatar extends HLayout {
 			layout.addMember(uploader);
 			layout.addMember(saveButton);
 
-			addCloseClickHandler(new CloseClickHandler() {
-				@Override
-				public void onCloseClick(CloseClickEvent event) {
-					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+			addCloseClickHandler(
+					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -162,15 +145,13 @@ public class Avatar extends HLayout {
 						public void onSuccess(Void result) {
 							destroy();
 						}
-					});
-				}
-			});
+					}));
 
 			addItem(layout);
 		}
 
 		public void onSave() {
-			if (uploader.getUploadedFile()==null) {
+			if (uploader.getUploadedFile() == null) {
 				SC.warn(I18N.message("filerequired"));
 				return;
 			}

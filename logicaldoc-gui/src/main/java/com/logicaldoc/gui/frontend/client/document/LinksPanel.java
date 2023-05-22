@@ -25,13 +25,8 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -48,6 +43,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 public class LinksPanel extends DocumentDetailTab {
 
 	private static final String DOCUMENT_ID = "documentId";
+
 	private TreeGrid treeGrid;
 
 	public LinksPanel(final GUIDocument document) {
@@ -78,39 +74,33 @@ public class LinksPanel extends DocumentDetailTab {
 
 		prepareContextMenu();
 
-		treeGrid.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				treeGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-					@Override
-					public void onCellDoubleClick(CellDoubleClickEvent event) {
-						final ListGridRecord rec = event.getRecord();
+		treeGrid.addDoubleClickHandler(event -> {
+			treeGrid.addCellDoubleClickHandler(evnt -> {
+				final ListGridRecord rec = evnt.getRecord();
 
-						FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
-								new AsyncCallback<GUIFolder>() {
+				FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
+						new AsyncCallback<GUIFolder>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(GUIFolder fld) {
-										if (fld.isDownload() && "download"
-												.equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-											onDownload(rec);
-										else
-											onPreview(rec);
-									}
-								});
-					}
-				});
-			}
+							@Override
+							public void onSuccess(GUIFolder fld) {
+								if (fld.isDownload()
+										&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
+									onDownload(rec);
+								else
+									onPreview(rec);
+							}
+						});
+			});
 		});
 	}
 
 	private void prepareContextMenu() {
-		treeGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+		treeGrid.addCellContextClickHandler(event -> {
 			final Menu contextMenu = new Menu();
 
 			final ListGridRecord[] selection = treeGrid.getSelectedRecords();

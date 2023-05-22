@@ -38,11 +38,11 @@ public abstract class HistoryPanel extends VLayout {
 	private static final String COMMENT = "comment";
 	private boolean versionFields = false;
 
-	public HistoryPanel() {
+	protected HistoryPanel() {
 		setMembersMargin(3);
 	}
 
-	public HistoryPanel(boolean versionFields) {
+	protected HistoryPanel(boolean versionFields) {
 		this();
 		this.versionFields = versionFields;
 	}

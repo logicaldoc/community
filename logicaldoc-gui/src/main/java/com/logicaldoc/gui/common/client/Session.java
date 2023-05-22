@@ -188,7 +188,7 @@ public class Session implements DocumentObserver {
 		timer.cancel();
 		Util.uninstallCloseWindowAlert();
 		if(!isUpdating())
-		SessionTimeout.get().show();
+			SessionTimeout.get().show();
 	}
 
 	public void addObserver(SessionObserver observer) {

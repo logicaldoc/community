@@ -45,12 +45,7 @@ public class FillForm extends Window {
 	protected void onDraw() {
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		ToolStrip buttonsBar = new ToolStrip();
 		buttonsBar.setWidth100();
@@ -88,7 +83,7 @@ public class FillForm extends Window {
 					public void onSuccess(GUIDocument doc) {
 						LD.clearPrompt();
 						DocumentsPanel.get().refresh();
-						destroy();						
+						destroy();
 					}
 				});
 	}

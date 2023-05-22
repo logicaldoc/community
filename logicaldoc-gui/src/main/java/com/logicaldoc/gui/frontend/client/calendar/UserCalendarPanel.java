@@ -52,12 +52,8 @@ public class UserCalendarPanel extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event ->
+				refresh());
 		toolStrip.addFill();
 		addMember(toolStrip);
 

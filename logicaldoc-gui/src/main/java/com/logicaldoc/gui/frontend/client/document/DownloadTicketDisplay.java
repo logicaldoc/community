@@ -9,8 +9,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.RowSpacerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -38,7 +36,7 @@ public class DownloadTicketDisplay extends Window {
 		ticketIdItem.setWrap(false);
 		ticketIdItem.setWrapTitle(false);
 
-		StaticTextItem sampleUrl1Item = ItemFactory.newStaticTextItem("sampleurl1", 
+		StaticTextItem sampleUrl1Item = ItemFactory.newStaticTextItem("sampleurl1",
 				"<a href='" + sampleUrl1 + "' target='_blank'>" + sampleUrl1 + "</a>");
 		sampleUrl1Item.setWrap(false);
 		sampleUrl1Item.setWrapTitle(false);
@@ -48,20 +46,14 @@ public class DownloadTicketDisplay extends Window {
 		sampleUrl2Item.setWrap(false);
 		sampleUrl2Item.setWrapTitle(false);
 
-		StaticTextItem advice = ItemFactory.newStaticTextItem("advice", 
+		StaticTextItem advice = ItemFactory.newStaticTextItem("advice",
 				I18N.message("downloadticketdisplay", ticketId));
 		advice.setColSpan(2);
 		advice.setShowTitle(false);
 		advice.setTitleOrientation(TitleOrientation.TOP);
 
 		ButtonItem close = new ButtonItem("close", I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				DownloadTicketDisplay.this.destroy();
-			}
-		});
+		close.addClickHandler(event -> DownloadTicketDisplay.this.destroy());
 
 		if (sampleUrl1.equalsIgnoreCase(sampleUrl2))
 			form.setItems(advice, new RowSpacerItem(), ticketIdItem, sampleUrl1Item, close);

@@ -19,8 +19,6 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
  * This is the form used to send emails and download tickets
@@ -65,31 +63,27 @@ public class EmailDialog extends AbstractEmailDialog {
 		subject.setWidth(350);
 
 		messageTemplate = ItemFactory.newSelectItem("template", "messagetemplate");
-		messageTemplate.addChangedHandler(new ChangedHandler() {
+		messageTemplate.addChangedHandler(event -> {
+			if (messageTemplate.getValueAsString() != null && !"".equals(messageTemplate.getValueAsString())) {
+				MessageService.Instance.get().getTemplate(Long.parseLong(messageTemplate.getValueAsString()),
+						new AsyncCallback<GUIMessageTemplate>() {
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (messageTemplate.getValueAsString() != null && !"".equals(messageTemplate.getValueAsString())) {
-					MessageService.Instance.get().getTemplate(Long.parseLong(messageTemplate.getValueAsString()),
-							new AsyncCallback<GUIMessageTemplate>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onSuccess(GUIMessageTemplate t) {
+								GuiLog.info(t.getSubject());
 
-								@Override
-								public void onSuccess(GUIMessageTemplate t) {
-									GuiLog.info(t.getSubject());
-
-									subject.setValue(t.getSubject());
-									message.setValue(t.getBody());
-									updateSignature();
-								}
-							});
-				} else {
-					subject.setValue(docTitle);
-				}
+								subject.setValue(t.getSubject());
+								message.setValue(t.getBody());
+								updateSignature();
+							}
+						});
+			} else {
+				subject.setValue(docTitle);
 			}
 		});
 
@@ -101,18 +95,14 @@ public class EmailDialog extends AbstractEmailDialog {
 		ticket = new CheckboxItem("sendticket");
 		ticket.setTitle(I18N.message("sendticket"));
 		ticket.setColSpan(2);
-		ticket.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if ((ticket.getValue() != null && ticket.getValueAsBoolean()) || !Feature.enabled(Feature.PDF)) {
-					pdf.setValue(false);
-					pdf.hide();
-					appendDownloadTicketPlaceholder();
-				} else {
-					pdf.show();
-					removeDownloadTicketPlaceholder();
-				}
+		ticket.addChangedHandler(event -> {
+			if ((ticket.getValue() != null && ticket.getValueAsBoolean()) || !Feature.enabled(Feature.PDF)) {
+				pdf.setValue(false);
+				pdf.hide();
+				appendDownloadTicketPlaceholder();
+			} else {
+				pdf.show();
+				removeDownloadTicketPlaceholder();
 			}
 		});
 
@@ -143,13 +133,7 @@ public class EmailDialog extends AbstractEmailDialog {
 	public void onDraw() {
 		super.onDraw();
 
-		from.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				updateSignature();
-			}
-		});
+		from.addChangedHandler(event -> updateSignature());
 
 		updateSignature();
 

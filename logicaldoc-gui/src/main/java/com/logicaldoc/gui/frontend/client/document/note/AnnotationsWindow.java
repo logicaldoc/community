@@ -59,17 +59,13 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		DrawItem drawItem = newAnnotationItem(note);
 		if (editEnabled && drawItem != null) {
 			AnnotationContextMenu contextMenu = new AnnotationContextMenu(drawItem, note);
-			contextMenu.addDeleteClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-				@Override
-				public void onClick(com.smartgwt.client.widgets.menu.events.MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-						if (Boolean.TRUE.equals(value)) {
-							notes.remove(note);
-							drawItem.erase();
-						}
-					});
-				}
+			contextMenu.addDeleteClickHandler(event -> {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean confirm) -> {
+					if (Boolean.TRUE.equals(confirm)) {
+						notes.remove(note);
+						drawItem.erase();
+					}
+				});
 			});
 			drawItem.setContextMenu(contextMenu);
 		}

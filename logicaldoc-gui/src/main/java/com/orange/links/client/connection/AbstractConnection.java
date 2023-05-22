@@ -48,7 +48,7 @@ public abstract class AbstractConnection implements Connection {
 	private boolean sync;
 	private boolean allowSync = true;
 
-	public AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
+	protected AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
 		this.startShape = startShape;
 		this.endShape = endShape;
 		this.segmentSet = new HashSet<>();

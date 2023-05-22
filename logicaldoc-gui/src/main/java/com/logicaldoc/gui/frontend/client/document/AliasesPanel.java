@@ -4,8 +4,6 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.DocumentAliasesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
@@ -45,14 +43,9 @@ public class AliasesPanel extends DocumentDetailTab {
 		listGrid.setFields(id, filename, path, folderId);
 		addMember(listGrid);
 
-		listGrid.addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				DocumentsPanel.get().openInFolder(listGrid.getSelectedRecord().getAttributeAsLong("folderId"),
-						listGrid.getSelectedRecord().getAttributeAsLong("id"));
-			}
-		});
+		listGrid.addDoubleClickHandler(
+				event -> DocumentsPanel.get().openInFolder(listGrid.getSelectedRecord().getAttributeAsLong("folderId"),
+						listGrid.getSelectedRecord().getAttributeAsLong("id")));
 	}
 
 	@Override

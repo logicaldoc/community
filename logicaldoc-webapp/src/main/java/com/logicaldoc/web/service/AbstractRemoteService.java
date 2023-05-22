@@ -64,11 +64,11 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 
 	protected final String USER = "user";
 
-	public AbstractRemoteService() {
+	protected AbstractRemoteService() {
 		super();
 	}
 
-	public AbstractRemoteService(Object delegate) {
+	protected AbstractRemoteService(Object delegate) {
 		super(delegate);
 	}
 

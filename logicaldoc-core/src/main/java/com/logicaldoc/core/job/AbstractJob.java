@@ -17,19 +17,19 @@ public abstract class AbstractJob implements org.quartz.Job {
 
 	private Long tenantId;
 
-	public AbstractJob(String name, String group) {
+	protected AbstractJob(String name, String group) {
 		this(name, group, null, null);
 	}
 
-	public AbstractJob(String name, String group, Long tenantId) {
+	protected AbstractJob(String name, String group, Long tenantId) {
 		this(name, group, null, tenantId);
 	}
 
-	public AbstractJob(String name, String group, String description) {
+	protected AbstractJob(String name, String group, String description) {
 		this(name, group, description, null);
 	}
 
-	public AbstractJob(String name, String group, String description, Long tenantId) {
+	protected AbstractJob(String name, String group, String description, Long tenantId) {
 		super();
 		this.name = name;
 		this.group = group;

@@ -39,26 +39,11 @@ public class NoteUpdateDialog extends Window {
 		this.noteId = noteId;
 		this.docId = docId;
 
-		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE,
-				new com.smartgwt.client.widgets.events.ClickHandler() {
-					public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-						maximize();
-					}
-				});
+		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE, event -> maximize());
 
-		HeaderControl minimize = new HeaderControl(HeaderControl.MINIMIZE,
-				new com.smartgwt.client.widgets.events.ClickHandler() {
-					public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-						resetDimensions();
-					}
-				});
+		HeaderControl minimize = new HeaderControl(HeaderControl.MINIMIZE, event -> resetDimensions());
 
-		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE,
-				new com.smartgwt.client.widgets.events.ClickHandler() {
-					public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-						NoteUpdateDialog.this.destroy();
-					}
-				});
+		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> NoteUpdateDialog.this.destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, maximize, minimize, closeIcon);
 		setTitle(I18N.message("note"));
@@ -78,21 +63,9 @@ public class NoteUpdateDialog extends Window {
 			removeItem(toolStrip);
 
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 		ToolStripButton close = new ToolStripButton(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		toolStrip = new ToolStrip();
 		toolStrip.setWidth100();

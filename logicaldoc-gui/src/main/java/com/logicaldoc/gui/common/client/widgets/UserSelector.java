@@ -11,8 +11,6 @@ import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -53,23 +51,17 @@ public class UserSelector extends SelectItem {
 		setOptionDataSource(new UsersDS(groupIdOrName, allowNull, skipDisabled));
 		setHintStyle("hint");
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				clearValue();
-				setValue((String) null);
-				fireEvent(new ChangedEvent(getJsObj()));
-			}
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
+			clearValue();
+			setValue((String) null);
+			fireEvent(new ChangedEvent(getJsObj()));
 		});
 		clear.setWidth(12);
 		clear.setHeight(12);
 
-		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				UserSearchDialog dialog = new UserSearchDialog(UserSelector.this);
-				dialog.show();
-			}
+		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, event -> {
+			UserSearchDialog dialog = new UserSearchDialog(UserSelector.this);
+			dialog.show();
 		});
 		search.setWidth(12);
 		search.setHeight(12);
@@ -81,10 +73,6 @@ public class UserSelector extends SelectItem {
 		if (additionalIcons != null && !additionalIcons.isEmpty())
 			icons.addAll(additionalIcons);
 		setIcons(icons.toArray(new FormItemIcon[0]));
-
-		// If we use a formatter here, then the user is not able to use the
-		// keyboard to search among the elements of the picklist
-//		setValueFormatter(new AvatarFormItemValueFormatter());
 	}
 
 	public GUIUser getUser() {
@@ -97,14 +85,4 @@ public class UserSelector extends SelectItem {
 		}
 		return user;
 	}
-
-//	private class AvatarFormItemValueFormatter implements FormItemValueFormatter {
-//		@Override
-//		public String formatValue(Object value, Record rec, DynamicForm form, FormItem item) {
-//			if (value == null)
-//				return "";
-//			else
-//				return Util.avatarWithText(value.toString(), value.toString());
-//		}
-//	}
 }

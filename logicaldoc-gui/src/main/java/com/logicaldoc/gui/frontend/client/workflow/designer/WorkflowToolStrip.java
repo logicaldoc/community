@@ -31,6 +31,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class WorkflowToolStrip extends ToolStrip {
 
+	private static final String DEPLOYED = "deployed";
+
 	private static final String VERSION = "version";
 
 	private GUIWorkflow currentWorkflow = null;
@@ -214,7 +216,7 @@ public class WorkflowToolStrip extends ToolStrip {
 							GuiLog.info(I18N.message("workflowundeployed", currentWorkflow.getName()));
 							update();
 							reload(currentWorkflow.getName());
-							workflowSelector.getSelectedRecord().setAttribute("deployed", false);
+							workflowSelector.getSelectedRecord().setAttribute(DEPLOYED, false);
 						}
 					});
 			});
@@ -261,7 +263,7 @@ public class WorkflowToolStrip extends ToolStrip {
 					GuiLog.info(I18N.message("workflowdeployed", currentWorkflow.getName()));
 					currentWorkflow = result;
 					reload(currentWorkflow.getName());
-					workflowSelector.getSelectedRecord().setAttribute("deployed", true);
+					workflowSelector.getSelectedRecord().setAttribute(DEPLOYED, true);
 				}
 			});
 		}
@@ -377,7 +379,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		versionSelector.setWrapTitle(false);
 		ListGridField version = new ListGridField(VERSION);
 		ListGridField date = new ListGridField("date");
-		ListGridField deployed = new ListGridField("deployed");
+		ListGridField deployed = new ListGridField(DEPLOYED);
 		versionSelector.setValueField(VERSION);
 		versionSelector.setDisplayField(VERSION);
 		versionSelector.setPickListWidth(200);

@@ -1,15 +1,12 @@
 package com.logicaldoc.gui.common.client.log;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEvent;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.notify.Notify;
 import com.smartgwt.client.widgets.notify.NotifySettings;
@@ -35,13 +32,10 @@ public class EventPanel extends HLayout {
 		setMembersMargin(2);
 
 		Button log = AwesomeFactory.newIconButton("clipboard-list", "lastevents");
-		log.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				MessagesWindow.get().show();
-				if (statusLabel != null)
-					statusLabel.setContents("");
-			}
+		log.addClickHandler(event -> {
+			MessagesWindow.get().show();
+			if (statusLabel != null)
+				statusLabel.setContents("");
 		});
 
 		addMember(log);
@@ -72,12 +66,9 @@ public class EventPanel extends HLayout {
 
 		statusLabel.setStyleName(style);
 		statusLabel.setWrap(false);
-		statusLabel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				MessagesWindow.get().show();
-				statusLabel.setContents("");
-			}
+		statusLabel.addClickHandler(event -> {
+			MessagesWindow.get().show();
+			statusLabel.setContents("");
 		});
 
 		int popupTimeout = Session.get().getConfigAsInt("gui.popup.timeout") * 1000;
@@ -91,14 +82,10 @@ public class EventPanel extends HLayout {
 			settings.setMessagePriority(Notify.WARN);
 
 		Notify.addMessage(text, null, null, settings);
-		
-		Scheduler.get().scheduleFixedDelay(new RepeatingCommand() {
 
-			@Override
-			public boolean execute() {
-				statusLabel.setContents("");
-				return false;
-			}
+		Scheduler.get().scheduleFixedDelay(() -> {
+			statusLabel.setContents("");
+			return false;
 		}, popupTimeout);
 	}
 

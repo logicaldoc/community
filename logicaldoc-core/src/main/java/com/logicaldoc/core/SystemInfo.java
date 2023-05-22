@@ -95,7 +95,8 @@ public class SystemInfo {
 				@SuppressWarnings("unchecked")
 				Object tmp = clazz.getDeclaredConstructor().newInstance();
 				if (!(tmp instanceof SystemInfo))
-					throw new Exception("The specified info " + className + " doesn't implement SystemInfo interface");
+					throw new ClassNotFoundException(
+							"The specified info " + className + " doesn't implement SystemInfo interface");
 
 				info = (SystemInfo) tmp;
 				info.setTenantId(tenantId);

@@ -86,7 +86,7 @@ public abstract class Task implements Runnable {
 
 	private Random random = new Random();
 
-	public Task(String name) {
+	protected Task(String name) {
 		this.name = name;
 	}
 

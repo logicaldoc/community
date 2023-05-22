@@ -23,16 +23,9 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Portlet specialized in listing documents
@@ -47,20 +40,11 @@ public class DocumentDashlet extends Dashlet {
 
 	protected int status;
 
-	protected HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
-		@Override
-		public void onClick(ClickEvent event) {
-			GridUtil.exportCSV(list, true);
-		}
-	});
+	protected HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE,
+			event -> GridUtil.exportCSV(list, true));
 
-	protected HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
-		@Override
-		public void onClick(ClickEvent event) {
-			GridUtil.print(list);
-		}
-	});
-	
+	protected HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, event -> GridUtil.print(list));
+
 	public DocumentDashlet(GUIDashlet guiDashlet) {
 		super(guiDashlet);
 
@@ -102,46 +86,40 @@ public class DocumentDashlet extends Dashlet {
 	}
 
 	public void prepareClickHandlers(RefreshableListGrid ret, String docIdAttribute) {
-		ret.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				event.cancel();
-				Record rec = event.getRecord();
-				DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
-						new AsyncCallback<GUIDocument>() {
+		ret.addCellContextClickHandler(event -> {
+			event.cancel();
+			Record rec = event.getRecord();
+			DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
+					new AsyncCallback<GUIDocument>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIDocument document) {
-								Menu contextMenu = prepareContextMenu(document);
-								contextMenu.showContextMenu();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(GUIDocument document) {
+							Menu contextMenu = prepareContextMenu(document);
+							contextMenu.showContextMenu();
+						}
+					});
 		});
 
-		ret.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				Record rec = event.getRecord();
-				if (rec.getAttribute("folderId") != null)
-					DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
-							Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
-				else
-					DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
-			}
+		ret.addCellDoubleClickHandler(event -> {
+			Record rec = event.getRecord();
+			if (rec.getAttribute("folderId") != null)
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+						Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
+			else
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
 		});
 	}
 
 	@Override
 	protected void onDraw() {
-		if(list!=null)
+		if (list != null)
 			removeItem(list);
-		
+
 		list = getListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
@@ -193,22 +171,20 @@ public class DocumentDashlet extends Dashlet {
 		if (document.getStatus() == Constants.DOC_LOCKED || document.getStatus() == Constants.DOC_CHECKED_OUT) {
 			MenuItem unlock = new MenuItem();
 			unlock.setTitle(I18N.message("unlock"));
-			unlock.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-				public void onClick(MenuItemClickEvent event) {
-					DocumentService.Instance.get().unlock(new long[] { document.getId() }, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			unlock.addClickHandler(event -> {
+				DocumentService.Instance.get().unlock(new long[] { document.getId() }, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							Session.get().getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
-							list.removeSelectedData();
-							list.refresh(getDataSource());
-						}
-					});
-				}
+					@Override
+					public void onSuccess(Void result) {
+						Session.get().getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
+						list.removeSelectedData();
+						list.refresh(getDataSource());
+					}
+				});
 			});
 			contextMenu.addItem(unlock);
 		}

@@ -53,6 +53,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class PatchPanel extends VLayout {
 
+	private static final String LOCAL = "local";
+
 	private static final String DESCRIPTION = "description";
 
 	private static final String RATING = "rating";
@@ -131,7 +133,7 @@ public class PatchPanel extends VLayout {
 
 		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 
-		ListGridField local = new ListGridField("local", I18N.message("local"), 70);
+		ListGridField local = new ListGridField(LOCAL, I18N.message(LOCAL), 70);
 		local.setType(ListGridFieldType.BOOLEAN);
 		local.setHidden(true);
 
@@ -175,7 +177,7 @@ public class PatchPanel extends VLayout {
 				rec.setAttribute(DESCRIPTION, patch.getDescription());
 				rec.setAttribute(INSTALLED, patch.isInstalled());
 				rec.setAttribute(RESTART, patch.isRestart());
-				rec.setAttribute("local", patch.isLocal());
+				rec.setAttribute(LOCAL, patch.isLocal());
 				records.add(rec);
 			}
 			list.setRecords(records.toArray(new ListGridRecord[0]));
@@ -434,7 +436,7 @@ public class PatchPanel extends VLayout {
 		patch.setSize(rec.getAttributeAsLong("size"));
 		patch.setDate(rec.getAttributeAsDate("date"));
 		patch.setInstalled(rec.getAttributeAsBoolean(INSTALLED));
-		patch.setLocal(rec.getAttributeAsBoolean("local"));
+		patch.setLocal(rec.getAttributeAsBoolean(LOCAL));
 
 		Menu contextMenu = new Menu();
 

@@ -16,7 +16,7 @@ public abstract class AutomationTriggerDetailsTab extends HLayout {
 
 	protected ChangedHandler changedHandler;
 
-	public AutomationTriggerDetailsTab(GUIAutomationTrigger trigger, ChangedHandler changedHandler) {
+	protected AutomationTriggerDetailsTab(GUIAutomationTrigger trigger, ChangedHandler changedHandler) {
 		super();
 		this.trigger = trigger;
 		this.changedHandler = changedHandler;

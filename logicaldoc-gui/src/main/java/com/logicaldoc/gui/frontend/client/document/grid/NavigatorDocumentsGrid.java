@@ -8,11 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.DrawEvent;
-import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.events.SortChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SortEvent;
 
 /**
  * Grid of documents displayed in the Navigator
@@ -57,32 +53,23 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 		/*
 		 * Restore any previously saved view state for this grid
 		 */
-		addDrawHandler(new DrawHandler() {
-			@Override
-			public void onDraw(DrawEvent event) {
-				loadGridLayout(folder);
-			}
-		});
+		addDrawHandler(event -> loadGridLayout(folder));
 
-		addSortChangedHandler(new SortChangedHandler() {
-
-			@Override
-			public void onSortChanged(SortEvent event) {
-				/*
-				 * Check if the folder has been changes since the last sorting
-				 * and check if we have more than one page
-				 */
-				if (lastChangedSortFolder == getFolder().getId() && getGridCursor().getTotalPages() > 1) {
-					// if we have more pages, it is required to retrieve again
-					// the recodrs from the server using the right sorting
-					DocumentsDS dataSource = new DocumentsDS(getFolder(), null, getGridCursor().getPageSize(),
-							getGridCursor().getCurrentPage(), null, false, false,
-							DocumentGridUtil.getSortSpec(event.getSortSpecifiers()));
-					refresh(dataSource);
-				} else {
-					// save the current folder's ID
-					lastChangedSortFolder = getFolder().getId();
-				}
+		addSortChangedHandler(event -> {
+			/*
+			 * Check if the folder has been changes since the last sorting and
+			 * check if we have more than one page
+			 */
+			if (lastChangedSortFolder == getFolder().getId() && getGridCursor().getTotalPages() > 1) {
+				// if we have more pages, it is required to retrieve again
+				// the recodrs from the server using the right sorting
+				DocumentsDS ds = new DocumentsDS(getFolder(), null, getGridCursor().getPageSize(),
+						getGridCursor().getCurrentPage(), null, false, false,
+						DocumentGridUtil.getSortSpec(event.getSortSpecifiers()));
+				refresh(ds);
+			} else {
+				// save the current folder's ID
+				lastChangedSortFolder = getFolder().getId();
 			}
 		});
 

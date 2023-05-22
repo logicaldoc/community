@@ -12,7 +12,7 @@ public abstract class WebMethodDisplayEngine {
 
     public abstract String displayWebMethod(WebMethodStubSet methodStubSet);
 
-    public WebMethodDisplayEngine(JavaNameDisplayStrategy nameDisplayingStrategy) {
+    protected WebMethodDisplayEngine(JavaNameDisplayStrategy nameDisplayingStrategy) {
         super();
         this.nameDisplayingStrategy = nameDisplayingStrategy;
     }

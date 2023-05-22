@@ -24,8 +24,6 @@ import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.ResizedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -300,13 +298,7 @@ public class PreviewPanel extends VLayout {
 		IButton reloadButton = new IButton(I18N.message("reload"));
 		reloadButton.setAutoFit(true);
 		reloadButton.setSnapTo("C");
-		reloadButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				redraw();
-			}
-		});
+		reloadButton.addClickHandler(event -> redraw());
 
 		reload = new Canvas();
 		reload.setWidth100();

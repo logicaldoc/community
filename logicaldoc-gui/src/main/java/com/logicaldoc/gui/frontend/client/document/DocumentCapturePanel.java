@@ -18,10 +18,7 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * Shows document's data capture options.
@@ -58,7 +55,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 
 		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
-		
+
 		form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
@@ -69,25 +66,22 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processOcr.setEndRow(true);
 		processOcr.setDisabled(!updateEnabled || document.getOcrTemplateId() == null);
 		processOcr.setColSpan(1);
-		processOcr.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.contactingServer();
-				ZonalOCRService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
+		processOcr.addClickHandler(event -> {
+			LD.contactingServer();
+			ZonalOCRService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(GUIDocument result) {
-						LD.clearPrompt();
-						DocumentController.get().modified(result);
-					}
-				});
-			}
+				@Override
+				public void onSuccess(GUIDocument result) {
+					LD.clearPrompt();
+					DocumentController.get().modified(result);
+				}
+			});
 		});
 
 		SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
@@ -95,37 +89,28 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		ocrTemplate.setWrapTitle(false);
 		ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) || documentTemplateId == null);
 		ocrTemplate.addChangedHandler(changedHandler);
-		ocrTemplate.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				processOcr.setDisabled(true);
-			}
-		});
+		ocrTemplate.addChangedHandler(event -> processOcr.setDisabled(true));
 
 		ButtonItem processBarcode = new ButtonItem(I18N.message("process"));
 		processBarcode.setAutoFit(true);
 		processBarcode.setEndRow(true);
 		processBarcode.setDisabled(!updateEnabled || document.getBarcodeTemplateId() == null);
 		processBarcode.setColSpan(1);
-		processBarcode.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.contactingServer();
-				BarcodeService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+		processBarcode.addClickHandler(event -> {
+			LD.contactingServer();
+			BarcodeService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(GUIDocument result) {
-						LD.clearPrompt();
-						DocumentController.get().modified(result);
-					}
-				});
-			}
+				@Override
+				public void onSuccess(GUIDocument result) {
+					LD.clearPrompt();
+					DocumentController.get().modified(result);
+				}
+			});
 		});
 
 		SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, documentTemplateId,
@@ -133,13 +118,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		barcodeTemplate.setWrapTitle(false);
 		barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
 		barcodeTemplate.addChangedHandler(changedHandler);
-		barcodeTemplate.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				processOcr.setDisabled(true);
-			}
-		});
+		barcodeTemplate.addChangedHandler(event -> processOcr.setDisabled(true));
 
 		StaticTextItem ocrProcessed = ItemFactory.newStaticTextItem("zonalocrprocessed", "processedbyzonalocr",
 				document.getOcrd() == 1 ? I18N.message("yes") : I18N.message("no"));

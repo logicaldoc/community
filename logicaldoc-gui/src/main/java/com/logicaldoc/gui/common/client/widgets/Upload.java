@@ -1,16 +1,6 @@
 package com.logicaldoc.gui.common.client.widgets;
 
 import org.wisepersist.gwt.uploader.client.Uploader;
-import org.wisepersist.gwt.uploader.client.events.FileDialogCompleteEvent;
-import org.wisepersist.gwt.uploader.client.events.FileDialogCompleteHandler;
-import org.wisepersist.gwt.uploader.client.events.FileQueueErrorEvent;
-import org.wisepersist.gwt.uploader.client.events.FileQueueErrorHandler;
-import org.wisepersist.gwt.uploader.client.events.UploadErrorEvent;
-import org.wisepersist.gwt.uploader.client.events.UploadErrorHandler;
-import org.wisepersist.gwt.uploader.client.events.UploadProgressEvent;
-import org.wisepersist.gwt.uploader.client.events.UploadProgressHandler;
-import org.wisepersist.gwt.uploader.client.events.UploadSuccessEvent;
-import org.wisepersist.gwt.uploader.client.events.UploadSuccessHandler;
 
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -50,62 +40,52 @@ public class Upload extends VerticalPanel {
 		uploader.setUploadURL(Util.contextPath() + "upload").setButtonText(I18N.message("clicktoupload"))
 				.setButtonHeight(22).setFileSizeLimit(Session.get().getConfig("upload.maxsize") + " MB")
 				.setButtonCursor(Uploader.Cursor.HAND).setButtonAction(Uploader.ButtonAction.SELECT_FILE)
-				.setUploadProgressHandler(new UploadProgressHandler() {
-					public boolean onUploadProgress(UploadProgressEvent uploadProgressEvent) {
-						progressLabel.setText(NumberFormat.getPercentFormat()
-								.format(uploadProgressEvent.getBytesComplete() / (double) uploadProgressEvent.getBytesTotal()));
-						return true;
-					}
-				}).setUploadSuccessHandler(new UploadSuccessHandler() {
-					public boolean onUploadSuccess(UploadSuccessEvent uploadSuccessEvent) {
-						resetText();
-						String fileName = uploadSuccessEvent.getFile().getName();
-						String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+				.setUploadProgressHandler(uploadProgressEvent -> {
+					progressLabel.setText(NumberFormat.getPercentFormat().format(
+							uploadProgressEvent.getBytesComplete() / (double) uploadProgressEvent.getBytesTotal()));
+					return true;
+				}).setUploadSuccessHandler(uploadSuccessEvent -> {
+					resetText();
+					String fileName = uploadSuccessEvent.getFile().getName();
+					String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
 
-						if (!Util.isAllowedForUpload(fileName)) {
-							uploader.cancelUpload(uploadSuccessEvent.getFile().getId(), false);
-							fileName = null;
-							SC.warn(I18N.message("disallowedext", fileExtension));
-							return false;
-						}
+					if (!Util.isAllowedForUpload(fileName)) {
+						uploader.cancelUpload(uploadSuccessEvent.getFile().getId(), false);
+						fileName = null;
+						SC.warn(I18N.message("disallowedext", fileExtension));
+						return false;
+					}
 
-						progressLabel.setText(fileName);
-						uploadedFile = fileName;
+					progressLabel.setText(fileName);
+					uploadedFile = fileName;
 
-						if (confirmButton != null)
-							confirmButton.setDisabled(false);
-						if (submitButton != null)
-							submitButton.setDisabled(false);
+					if (confirmButton != null)
+						confirmButton.setDisabled(false);
+					if (submitButton != null)
+						submitButton.setDisabled(false);
 
-						return true;
+					return true;
+				}).setFileDialogCompleteHandler(fileDialogCompleteEvent -> {
+					if (fileDialogCompleteEvent.getTotalFilesInQueue() > 0
+							&& uploader.getStats().getUploadsInProgress() <= 0) {
+						progressLabel.setText("0%");
+						uploader.startUpload();
 					}
-				}).setFileDialogCompleteHandler(new FileDialogCompleteHandler() {
-					public boolean onFileDialogComplete(FileDialogCompleteEvent fileDialogCompleteEvent) {
-						if (fileDialogCompleteEvent.getTotalFilesInQueue() > 0
-								&& uploader.getStats().getUploadsInProgress() <= 0) {
-							progressLabel.setText("0%");
-							uploader.startUpload();
-						}
-						return true;
-					}
-				}).setFileQueueErrorHandler(new FileQueueErrorHandler() {
-					public boolean onFileQueueError(FileQueueErrorEvent fileQueueErrorEvent) {
-						resetText();
-						SC.warn(I18N.message("uploadoffile") + " " + fileQueueErrorEvent.getFile().getName() + " "
-								+ I18N.message("failedueto") + " [" + fileQueueErrorEvent.getErrorCode().toString()
-								+ "]: " + fileQueueErrorEvent.getMessage());
-						uploadedFile = null;
-						return true;
-					}
-				}).setUploadErrorHandler(new UploadErrorHandler() {
-					public boolean onUploadError(UploadErrorEvent uploadErrorEvent) {
-						resetText();
-						SC.warn(I18N.message("uploadoffile") + " " + uploadErrorEvent.getFile().getName() + " "
-								+ I18N.message("failedueto") + " [" + uploadErrorEvent.getErrorCode().toString() + "]: "
-								+ uploadErrorEvent.getMessage());
-						uploadedFile = null;
-						return true;
-					}
+					return true;
+				}).setFileQueueErrorHandler(fileQueueErrorEvent -> {
+					resetText();
+					SC.warn(I18N.message("uploadoffile") + " " + fileQueueErrorEvent.getFile().getName() + " "
+							+ I18N.message("failedueto") + " [" + fileQueueErrorEvent.getErrorCode().toString() + "]: "
+							+ fileQueueErrorEvent.getMessage());
+					uploadedFile = null;
+					return true;
+				}).setUploadErrorHandler(uploadErrorEvent -> {
+					resetText();
+					SC.warn(I18N.message("uploadoffile") + " " + uploadErrorEvent.getFile().getName() + " "
+							+ I18N.message("failedueto") + " [" + uploadErrorEvent.getErrorCode().toString() + "]: "
+							+ uploadErrorEvent.getMessage());
+					uploadedFile = null;
+					return true;
 				});
 
 		add(uploader);

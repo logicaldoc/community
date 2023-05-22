@@ -28,6 +28,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
+	private static final String PREVENTDUPLICATIONS = "preventduplications";
+
 	private static final String BARCODETEMPLATE = "barcodetemplate";
 
 	private static final String OCRTEMPLATE = "ocrtemplate";
@@ -129,8 +131,8 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		inheritRights.addChangedHandler(changedHandler);
 
 		CheckboxItem preventDuplications = new CheckboxItem();
-		preventDuplications.setName("preventduplications");
-		preventDuplications.setTitle(I18N.message("preventduplications"));
+		preventDuplications.setName(PREVENTDUPLICATIONS);
+		preventDuplications.setTitle(I18N.message(PREVENTDUPLICATIONS));
 		preventDuplications.setRedrawOnChange(true);
 		preventDuplications.setWidth(50);
 		preventDuplications.setValue(importFolder.isPreventDuplications());
@@ -186,7 +188,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		importFolder.setDelImport((Boolean) values.get("delImport"));
 		importFolder.setInheritRights((Boolean) values.get("inheritRights"));
 		importFolder.setImportEmpty((Boolean) values.get("importEmpty"));
-		importFolder.setPreventDuplications((Boolean) values.get("preventduplications"));
+		importFolder.setPreventDuplications((Boolean) values.get(PREVENTDUPLICATIONS));
 
 		collectTags(values);
 

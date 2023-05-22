@@ -14,8 +14,6 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -119,13 +117,9 @@ public class MetadataDiff extends Window {
 
 		IButton compareContent = new IButton(I18N.message("comparecontent"));
 		compareContent.setWidth100();
-		compareContent.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				ComparisonWindow diff = new ComparisonWindow(version1, version2);
-				diff.show();
-			}
+		compareContent.addClickHandler(event -> {
+			ComparisonWindow diff = new ComparisonWindow(version1, version2);
+			diff.show();
 		});
 		if (Feature.visible(Feature.COMPARISON)) {
 			addItem(compareContent);
@@ -212,6 +206,7 @@ public class MetadataDiff extends Window {
 
 	public class DiffRecord extends ListGridRecord implements Comparable<DiffRecord> {
 		private static final String B_CLASS_DIFF = "<b class='diff'>";
+
 		private int position = 0;
 
 		public DiffRecord(String name, String label, String val1, String val2, int position) {

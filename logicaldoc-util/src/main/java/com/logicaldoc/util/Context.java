@@ -39,13 +39,13 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static HashMap<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new HashMap<>();
 
 	// Singleton instance
-	private static Context instance;
+	private static Context instance = new Context();
 
 	// The Spring's application context
 	private ApplicationContext applicationContext;
 
 	private Context() {
-		Context.instance = this;
+		
 	}
 
 	public static Context get() {

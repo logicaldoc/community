@@ -35,16 +35,12 @@ public class ImageCropper extends Canvas {
 	public ImageCropper(String imageUrl, int initialSelectionWidth, double selectionAspectRatio) {
 		setSelectionAspectRatio(selectionAspectRatio);
 
-		ImageLoader.loadImages(new String[] { imageUrl }, new CallBack() {
-
-			@Override
-			public void onImagesLoaded(ImageElement[] imageElements) {
+		ImageLoader.loadImages(new String[] { imageUrl },  imageElements -> {
 				imageWidth = imageElements[0].getWidth();
 				imageHeight = imageElements[0].getHeight();
 
 				img.setHeight(getHeight());
 				img.setWidth((int) ((double) getHeight() * getImageAspectRatio()));
-			}
 		});
 
 		img = new Img(imageUrl);
@@ -63,10 +59,7 @@ public class ImageCropper extends Canvas {
 		selection.setHeight(
 				selectionAspectRatio > 0 ? (int) ((double) initialSelectionWidth / selectionAspectRatio) : 40);
 		selection.setOpacity(60);
-		selection.addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
+		selection.addResizedHandler( event -> {
 				if (maintainSelectionAspectRatio)
 					selection.setHeight((int) ((double) selection.getWidth() / selectionAspectRatio));
 
@@ -75,13 +68,9 @@ public class ImageCropper extends Canvas {
 
 				if (selection.getTop() + selection.getHeight() > img.getHeight())
 					selection.setHeight(img.getHeight() - selection.getTop());
-			}
 		});
 
-		selection.addMovedHandler(new MovedHandler() {
-
-			@Override
-			public void onMoved(MovedEvent event) {
+		selection.addMovedHandler(event -> {
 				if (selection.getLeft() + selection.getWidth() > img.getWidth())
 					selection.setLeft(img.getWidth() - selection.getWidth());
 				if (selection.getTop() + selection.getHeight() > img.getHeight())
@@ -91,7 +80,6 @@ public class ImageCropper extends Canvas {
 					selection.setLeft(0);
 				if (selection.getTop() < 0)
 					selection.setTop(0);
-			}
 		});
 
 		addChild(img);

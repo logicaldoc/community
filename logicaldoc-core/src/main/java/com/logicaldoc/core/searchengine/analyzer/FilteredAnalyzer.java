@@ -4,7 +4,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -121,8 +120,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 	}
 
 	private TokenStream intantiateFilterClass(@SuppressWarnings("rawtypes")
-	Class aClass, TokenStream ts,
-			Map<String, String> configs) {
+	Class aClass, TokenStream ts, Map<String, String> configs) {
 		if (aClass != null) {
 			try {
 				@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -147,8 +145,8 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 			} catch (NoSuchMethodException nse) {
 				log.warn("constructor (Map<String, String>) not found for {}", aClass.getName());
 			} catch (Throwable e) {
-				log.warn("constructor (Map<String, String>) of {} raised an error: {}", aClass.getName(), e.getMessage(),
-						e);
+				log.warn("constructor (Map<String, String>) of {} raised an error: {}", aClass.getName(),
+						e.getMessage(), e);
 			}
 		}
 		return ts;
@@ -197,15 +195,10 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 					names.add(name);
 			}
 		}
-		names.sort(new Comparator<String>() {
-
-			@Override
-			public int compare(String name1, String name2) {
+		names.sort((String name1, String name2) -> {
 				Integer pos1 = config.getInt(INDEX_TOKENFILTER + name1 + ".position", 1);
 				Integer pos2 = config.getInt(INDEX_TOKENFILTER + name2 + ".position", 1);
 				return pos1.compareTo(pos2);
-			}
-
 		});
 
 		return names;

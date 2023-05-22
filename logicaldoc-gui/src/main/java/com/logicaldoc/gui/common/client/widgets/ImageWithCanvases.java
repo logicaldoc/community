@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.widgetideas.graphics.client.ImageLoader;
 import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
 import com.smartgwt.client.types.Overflow;
@@ -35,32 +34,28 @@ public class ImageWithCanvases extends Canvas {
 		if (canvases != null)
 			this.canvases.addAll(canvases);
 
-		ImageLoader.loadImages(new String[] { imageUrl }, new CallBack() {
+		ImageLoader.loadImages(new String[] { imageUrl }, imageElements -> {
+			imageWidth = imageElements[0].getWidth();
+			imageHeight = imageElements[0].getHeight();
 
-			@Override
-			public void onImagesLoaded(ImageElement[] imageElements) {
-				imageWidth = imageElements[0].getWidth();
-				imageHeight = imageElements[0].getHeight();
-
-				if (width == null) {
-					img.setHeight(getHeight());
-					img.setWidth((int) ((double) getHeight() * getImageAspectRatio()));
-				} else {
-					img.setWidth(width);
-					img.setHeight((int) ((double) width / getImageAspectRatio()));
-				}
-
-				for (Canvas canvas : ImageWithCanvases.this.canvases) {
-					canvas.setOverflow(Overflow.HIDDEN);
-					canvas.setSmoothFade(true);
-					canvas.addResizedHandler(new CanvasResizedHandler(canvas));
-					canvas.addMovedHandler(new CamvasMovedHandler(canvas));
-					addChild(canvas);
-				}
-
-				if (loadImageCallback != null)
-					loadImageCallback.onImagesLoaded(imageElements);
+			if (width == null) {
+				img.setHeight(getHeight());
+				img.setWidth((int) ((double) getHeight() * getImageAspectRatio()));
+			} else {
+				img.setWidth(width);
+				img.setHeight((int) ((double) width / getImageAspectRatio()));
 			}
+
+			for (Canvas canvas : ImageWithCanvases.this.canvases) {
+				canvas.setOverflow(Overflow.HIDDEN);
+				canvas.setSmoothFade(true);
+				canvas.addResizedHandler(new CanvasResizedHandler(canvas));
+				canvas.addMovedHandler(new CamvasMovedHandler(canvas));
+				addChild(canvas);
+			}
+
+			if (loadImageCallback != null)
+				loadImageCallback.onImagesLoaded(imageElements);
 		});
 
 		img = new Img(imageUrl);
@@ -117,7 +112,7 @@ public class ImageWithCanvases extends Canvas {
 	public double getImageAspectRatio() {
 		return (double) imageWidth / (double) imageHeight;
 	}
-	
+
 	@Override
 	public Canvas setWidth(Integer width) {
 		Canvas canvas = super.setWidth(width);

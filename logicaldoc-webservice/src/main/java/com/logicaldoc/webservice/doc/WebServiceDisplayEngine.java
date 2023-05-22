@@ -11,7 +11,7 @@ public abstract class WebServiceDisplayEngine {
 
 	public abstract String displayWebService(WebServiceStubSet serviceStubSet);
 
-	public WebServiceDisplayEngine(JavaNameDisplayStrategy nameDisplayingStrategy) {
+	protected WebServiceDisplayEngine(JavaNameDisplayStrategy nameDisplayingStrategy) {
 		super();
 		this.nameDisplayingStrategy = nameDisplayingStrategy;
 	}

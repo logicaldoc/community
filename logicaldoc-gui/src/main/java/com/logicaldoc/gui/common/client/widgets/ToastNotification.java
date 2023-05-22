@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.common.client.widgets;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
@@ -52,13 +51,9 @@ public class ToastNotification extends Window {
 
 		addItem(message);
 
-		Scheduler.get().scheduleFixedDelay(new RepeatingCommand() {
-
-			@Override
-			public boolean execute() {
-				ToastNotification.this.destroy();
-				return false;
-			}
+		Scheduler.get().scheduleFixedDelay(() -> {
+			ToastNotification.this.destroy();
+			return false;
 		}, Session.get().getConfigAsInt("gui.popup.timeout") * 1000);
 	}
 

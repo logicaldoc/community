@@ -18,9 +18,6 @@ import com.logicaldoc.gui.frontend.client.document.note.NotesPanel;
 import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignaturePanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -226,32 +223,24 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	protected void prepareTabset() {
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// We have to reload the document because the tags may be
-				// reverted to the original tags list.
-				// This 'if condition' is necessary to know if the close image
-				// has been selected into the Documents list panel or into the
-				// Search list panel.
-				DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
+		tabSet = new EditingTabSet(event -> onSave(), event -> {
+			// We have to reload the document because the tags may be
+			// reverted to the original tags list.
+			// This 'if condition' is necessary to know if the close image
+			// has been selected into the Documents list panel or into the
+			// Search list panel.
+			DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(GUIDocument doc) {
-						DocumentController.get().selected(doc);
-					}
-				});
-			}
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					DocumentController.get().selected(doc);
+				}
+			});
 		});
 
 		tabSet.addTab(propertiesTab);
@@ -637,13 +626,9 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	private void saveDocument() {
 		if (Session.get().getConfigAsBoolean("gui.onsave.askversioncomment")) {
-			LD.askForString(I18N.message("versioncomment"), I18N.message("versioncomment"), null, new ValueCallback() {
-
-				@Override
-				public void execute(String comment) {
-					document.setComment(comment);
-					save();
-				}
+			LD.askForString(I18N.message("versioncomment"), I18N.message("versioncomment"), null, comment -> {
+				document.setComment(comment);
+				save();
 			});
 		} else {
 			save();

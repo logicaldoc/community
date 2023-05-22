@@ -119,7 +119,11 @@ public class SearchHitsGrid extends DocumentsListGrid {
 	}
 
 	private void getSearchColumns() {
-		String[] searchColumns = Session.get().getInfo().getConfig("gui.search.columns").split(",");
+		String srcColsSpec = Session.get().getInfo().getConfig("gui.search.columns");
+		if(srcColsSpec==null || srcColsSpec.isEmpty())
+			return;
+		
+		String[] searchColumns = srcColsSpec.split(",");
 		for (String col : searchColumns) {
 			ListGridField field = fieldsMap.get(col);
 			if (field != null) {

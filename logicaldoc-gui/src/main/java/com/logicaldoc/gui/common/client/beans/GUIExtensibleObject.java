@@ -3,7 +3,6 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import com.google.gwt.i18n.client.NumberFormat;
@@ -116,11 +115,8 @@ public class GUIExtensibleObject implements Serializable {
 				}
 			}
 
-		values.sort(new Comparator<GUIAttribute>() {
-			@Override
-			public int compare(GUIAttribute arg0, GUIAttribute arg1) {
-				return arg0.getName().compareTo(arg1.getName());
-			}
+		values.sort((GUIAttribute arg0, GUIAttribute arg1) -> {
+			return arg0.getName().compareTo(arg1.getName());
 		});
 
 		return values;
@@ -286,7 +282,7 @@ public class GUIExtensibleObject implements Serializable {
 
 		return getId() == ((GUIExtensibleObject) obj).getId();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Long.valueOf(getId()).hashCode();

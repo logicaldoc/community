@@ -36,6 +36,8 @@ import com.smartgwt.client.widgets.layout.VStack;
  */
 public class LD {
 
+	private static final String CONTACTINGSERVER = "contactingserver";
+
 	private static final String VALUE = "value";
 
 	/**
@@ -84,25 +86,21 @@ public class LD {
 
 		IButton yes = new IButton(I18N.message("yes"));
 		yes.setWidth(70);
-		yes.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (callback != null) {
-					dialog.close();
-					callback.execute(true);
-					dialog.destroy();
-				}
+		yes.addClickHandler(event -> {
+			if (callback != null) {
+				dialog.close();
+				callback.execute(true);
+				dialog.destroy();
 			}
 		});
 
 		IButton no = new IButton(I18N.message("no"));
 		no.setWidth(70);
-		no.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (callback != null) {
-					dialog.close();
-					callback.execute(false);
-					dialog.destroy();
-				}
+		no.addClickHandler(event -> {
+			if (callback != null) {
+				dialog.close();
+				callback.execute(false);
+				dialog.destroy();
 			}
 		});
 
@@ -302,7 +300,7 @@ public class LD {
 		cancel.addClickHandler(event -> {
 			dialog.close();
 			dialog.destroy();
-			if(cancelCallback!=null)
+			if (cancelCallback != null)
 				cancelCallback.onClick(event);
 		});
 
@@ -324,7 +322,7 @@ public class LD {
 		form.setAutoFocus(true);
 		form.focus();
 	}
-	
+
 	/**
 	 * Show a dialog asking for a set of values to complete an operation. The
 	 * provided form items will be used
@@ -406,7 +404,7 @@ public class LD {
 			final ValueCallback callback) {
 		askForValue(title, message, defaultValue, item, width, callback, null);
 	}
-	
+
 	/**
 	 * Shows a dialog asking for a value to complete an operation. The provided
 	 * form item will be used
@@ -466,8 +464,8 @@ public class LD {
 		properties.setShowHeader(false);
 		properties.setShowHeaderBackground(false);
 		properties.setMembersMargin(0);
-		properties.setBodyStyle("contactingserver");
-		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("contactingserver")), properties);
+		properties.setBodyStyle(CONTACTINGSERVER);
+		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message(CONTACTINGSERVER)), properties);
 	}
 
 	public static void updatingServer() {
@@ -475,7 +473,7 @@ public class LD {
 		properties.setShowHeader(false);
 		properties.setShowHeaderBackground(false);
 		properties.setMembersMargin(0);
-		properties.setBodyStyle("contactingserver");
+		properties.setBodyStyle(CONTACTINGSERVER);
 		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("systemupdating")), properties);
 	}
 }

@@ -24,8 +24,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.VisibilityChangedEvent;
-import com.smartgwt.client.widgets.events.VisibilityChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -126,13 +124,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 		setMembers(documentsMenu, body);
 
-		previewPanel.addVisibilityChangedHandler(new VisibilityChangedHandler() {
-
-			@Override
-			public void onVisibilityChanged(VisibilityChangedEvent event) {
-				if (detailPanel instanceof DocumentDetailsPanel)
-					previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
-			}
+		previewPanel.addVisibilityChangedHandler(event -> {
+			if (detailPanel instanceof DocumentDetailsPanel)
+				previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
 		});
 
 		initialized = true;

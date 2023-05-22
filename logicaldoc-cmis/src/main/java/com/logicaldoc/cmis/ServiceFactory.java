@@ -47,7 +47,7 @@ public class ServiceFactory extends AbstractServiceFactory {
 		if (session != null) {
 			if (context.getRepositoryId() != null)
 				session.getDictionary().put(KEY_REPO_ID, context.getRepositoryId());
-			log.debug("Using session " + session.getSid() + " for user " + session.getUsername());
+			log.debug("Using session {} for user {}", session.getSid(), session.getUsername());
 			wrapperService = new ConformanceCmisServiceWrapper(new LDCmisService(context, session.getSid()),
 					DEFAULT_MAX_ITEMS_TYPES,
 					BigInteger.valueOf(Context.get().getProperties().getInt("cmis.maxitems", 200)),

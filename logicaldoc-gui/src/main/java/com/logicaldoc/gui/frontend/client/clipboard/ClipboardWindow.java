@@ -8,8 +8,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -29,22 +27,19 @@ public class ClipboardWindow extends Window {
 	public ClipboardWindow() {
 		super();
 
-		HeaderControl trash = new HeaderControl(HeaderControl.TRASH, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ListGridRecord[] selection = grid.getSelection();
-				if (selection == null || selection.length == 0) {
-					Clipboard.getInstance().clear();
-				} else {
-					for (ListGridRecord rec : selection) {
-						GUIDocument doc = new GUIDocument();
-						doc.setId(Long.parseLong(rec.getAttribute("id")));
-						Clipboard.getInstance().remove(doc);
-					}
+		HeaderControl trash = new HeaderControl(HeaderControl.TRASH, event -> {
+			ListGridRecord[] selection = grid.getSelectedRecords();
+			if (selection == null || selection.length == 0) {
+				Clipboard.getInstance().clear();
+			} else {
+				for (ListGridRecord rec : selection) {
+					GUIDocument doc = new GUIDocument();
+					doc.setId(Long.parseLong(rec.getAttribute("id")));
+					Clipboard.getInstance().remove(doc);
 				}
-
-				refresh();
 			}
+
+			refresh();
 		});
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, trash, HeaderControls.CLOSE_BUTTON);

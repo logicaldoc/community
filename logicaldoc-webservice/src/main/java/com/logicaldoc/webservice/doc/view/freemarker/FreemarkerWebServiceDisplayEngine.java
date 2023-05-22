@@ -12,7 +12,7 @@ public abstract class FreemarkerWebServiceDisplayEngine extends WebServiceDispla
 
 	protected Configuration configuration;
 
-	public FreemarkerWebServiceDisplayEngine(JavaNameDisplayStrategy nameDisplayingStrategy) {
+	protected FreemarkerWebServiceDisplayEngine(JavaNameDisplayStrategy nameDisplayingStrategy) {
 		super(nameDisplayingStrategy);
 		configuration = new Configuration();
 		configuration.setLocalizedLookup(false);

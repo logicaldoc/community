@@ -11,8 +11,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -57,13 +55,7 @@ public class UserSearchDialog extends Window {
 
 		ToolStripButton search = new ToolStripButton(I18N.message("search"));
 		search.setAutoFit(true);
-		search.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				search(username.getValueAsString(), group.getValueAsString());
-			}
-		});
+		search.addClickHandler(event -> search(username.getValueAsString(), group.getValueAsString()));
 
 		final ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -87,12 +79,9 @@ public class UserSearchDialog extends Window {
 		grid.setAutoFetchData(true);
 		grid.setData(lastResult);
 
-		grid.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				ListGridRecord selection = grid.getSelectedRecord();
-				onSelect(selection.getAttributeAsLong("id"));
-			}
+		grid.addDoubleClickHandler(event -> {
+			ListGridRecord selection = grid.getSelectedRecord();
+			onSelect(selection.getAttributeAsLong("id"));
 		});
 
 		addItem(toolStrip);

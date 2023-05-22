@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +65,10 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  * @since 3.5
  */
 public class DocumentManagerImpl implements DocumentManager {
+
+	private static final String NO_VALUE_OBJECT_HAS_BEEN_PROVIDED = "No value object has been provided";
+
+	private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
 
 	private static final String NO_COMMENT_IN_TRANSACTION = "No comment in transaction";
 
@@ -131,7 +134,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void replaceFile(long docId, String fileVersion, InputStream content, DocumentHistory transaction)
 			throws IOException, PersistenceException {
 		if (transaction == null)
-			throw new IllegalArgumentException("transaction cannot be null");
+			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 
 		// Write content to temporary file, then delete it
 		File tmp = FileUtil.createTempFile("replacefile", "");
@@ -196,7 +199,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	private void validateTransaction(DocumentHistory transaction) {
 		if (transaction == null)
-			throw new IllegalArgumentException("transaction cannot be null");
+			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 		if (transaction.getUser() == null)
 			throw new IllegalArgumentException("transaction user cannot be null");
 	}
@@ -526,11 +529,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 
 		// This may take time
-		try {
-			indexer.addHit(doc, cont);
-		} catch (Exception e) {
-			throw new ParseException(e.getMessage(), e);
-		}
+		addHIt(doc, cont);
 
 		// For additional safety update the DB directly
 		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
@@ -549,6 +548,14 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	}
 
+	private void addHIt(Document doc, String cont) throws ParseException {
+		try {
+			indexer.addHit(doc, cont);
+		} catch (Exception e) {
+			throw new ParseException(e.getMessage(), e);
+		}
+	}
+
 	private void markAliasesToIndex(long referencedDocId) throws PersistenceException {
 		documentDAO.jdbcUpdate("update ld_document set ld_indexed=" + AbstractDocument.INDEX_TO_INDEX
 				+ " where ld_docref=" + referencedDocId + " and not ld_id = " + referencedDocId);
@@ -561,7 +568,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throw new IllegalArgumentException("No document has been provided");
 
 		if (docVO == null)
-			throw new IllegalArgumentException("No value object has been provided");
+			throw new IllegalArgumentException(NO_VALUE_OBJECT_HAS_BEEN_PROVIDED);
 
 		try {
 			/*
@@ -769,7 +776,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throw new IllegalArgumentException("No transaction has been specified");
 
 		if (docVO == null)
-			throw new IllegalArgumentException("No value object has been provided");
+			throw new IllegalArgumentException(NO_VALUE_OBJECT_HAS_BEEN_PROVIDED);
 
 		// Write content to temporary file, then delete it
 		File tmp = null;
@@ -790,10 +797,10 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public Document create(File file, Document docVO, DocumentHistory transaction) throws PersistenceException {
 		if (transaction == null)
-			throw new IllegalArgumentException("transaction cannot be null");
+			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 
 		if (docVO == null)
-			throw new IllegalArgumentException("No value object has been provided");
+			throw new IllegalArgumentException(NO_VALUE_OBJECT_HAS_BEEN_PROVIDED);
 
 		if (!(file != null && file.length() > 0))
 			throw new IllegalArgumentException("Cannot create 0 bytes document");
@@ -861,8 +868,8 @@ public class DocumentManagerImpl implements DocumentManager {
 					count = documentDAO.queryForInt(documentWriteCheckQuery);
 					try {
 						Thread.sleep(1000L);
-					} catch (Throwable ie) {
-						break;
+					} catch (InterruptedException ie) {
+						Thread.currentThread().interrupt();
 					}
 					tests++;
 				}
@@ -1586,11 +1593,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			// Now collect and sort each PDF
 			File[] pdfs = tempDir.listFiles();
 
-			Arrays.sort(pdfs, new Comparator<File>() {
-				@Override
-				public int compare(File o1, File o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
+			Arrays.sort(pdfs, (File o1, File o2) -> {
+				return o1.getName().compareTo(o2.getName());
 			});
 
 			// Merge all the PDFs

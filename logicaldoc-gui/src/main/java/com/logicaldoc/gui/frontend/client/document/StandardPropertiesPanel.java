@@ -205,7 +205,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		copyPath.setSrc("[SKIN]/page_white_paste.png");
 		copyPath.setWidth(16);
 		copyPath.setHeight(16);
-		copyPath.addFormItemClickHandler((final FormItemIconClickEvent event) -> {
+		copyPath.addFormItemClickHandler(event -> {
 			LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
 				@Override
 				public void execute(final String value) {
@@ -303,7 +303,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		editTags.setSrc("[SKIN]/actions/edit.png");
 		editTags.setWidth(16);
 		editTags.setHeight(16);
-		editTags.addFormItemClickHandler((final FormItemIconClickEvent event) -> {
+		editTags.addFormItemClickHandler(event -> {
 			tagsString.setVisible(false);
 			tagItem.setVisible(true);
 			tagItem.setEndRow(true);
@@ -329,7 +329,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		final TextItem newTagItem = ItemFactory.newTextItem("newtag", null);
 		newTagItem.setEndRow(true);
 		newTagItem.setRequired(false);
-		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
+		newTagItem.addKeyPressHandler(event -> {
 			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
 					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();

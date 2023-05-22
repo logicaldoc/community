@@ -67,7 +67,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	public void delete(long id, int code) throws PersistenceException {
-		if(code==0)
+		if (code == 0)
 			throw new IllegalArgumentException("code cannot be 0");
 
 		if (!checkStoringAspect())
@@ -137,10 +137,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				return null;
 			return entity;
 		} catch (Throwable e) {
-			if (e instanceof PersistenceException)
-				throw (PersistenceException) e;
-			else
-				throw new PersistenceException(e);
+			throw new PersistenceException(e);
 		}
 	}
 
@@ -500,8 +497,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	private void applyParamsAndLimit(Map<String, Object> values, Integer max, @SuppressWarnings("rawtypes")
 	Query queryObject) {
 		if (values != null)
-			for (String name : values.keySet())
-				queryObject.setParameter(name, values.get(name));
+			for (Map.Entry<String, Object> entry : values.entrySet())
+				queryObject.setParameter(entry.getKey(), entry.getValue());
 
 		if (max != null && max > 0)
 			queryObject.setMaxResults(max);

@@ -16,7 +16,7 @@ public abstract class AutomationRoutineDetailsTab extends HLayout {
 
 	protected ChangedHandler changedHandler;
 
-	public AutomationRoutineDetailsTab(GUIAutomationRoutine routine, ChangedHandler changedHandler) {
+	protected AutomationRoutineDetailsTab(GUIAutomationRoutine routine, ChangedHandler changedHandler) {
 		super();
 		this.routine = routine;
 		this.changedHandler = changedHandler;

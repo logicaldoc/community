@@ -13,8 +13,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -52,12 +50,7 @@ public class StartWorkflowDialog extends Window {
 		ButtonItem start = new ButtonItem();
 		start.setTitle(I18N.message("startworkflow"));
 		start.setAutoFit(true);
-		start.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onStart(ids);
-			}
-		});
+		start.addClickHandler(event -> onStart(ids));
 
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setFields(workflow, tag, start);

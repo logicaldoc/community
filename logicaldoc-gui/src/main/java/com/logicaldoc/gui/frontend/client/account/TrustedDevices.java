@@ -11,17 +11,11 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.CellSavedEvent;
-import com.smartgwt.client.widgets.grid.events.CellSavedHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the list of the user's trusted devices.
@@ -48,7 +42,7 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 
 		prepareGrid();
 		addItem(list);
-		
+
 		list.fetchData();
 	}
 
@@ -59,25 +53,22 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 
 		ListGridField label = new ListGridField("label", I18N.message("label"), 150);
 		label.setCanEdit(true);
-		label.addCellSavedHandler(new CellSavedHandler() {
-			
-			@Override
-			public void onCellSaved(CellSavedEvent event) {
-				SecurityService.Instance.get().updateDeviceLabel(event.getRecord().getAttributeAsLong("id"), event.getNewValue()!=null ? event.getNewValue().toString():null, new AsyncCallback<Void>() {
+		label.addCellSavedHandler(event -> {
+			SecurityService.Instance.get().updateDeviceLabel(event.getRecord().getAttributeAsLong("id"),
+					event.getNewValue() != null ? event.getNewValue().toString() : null, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-					@Override
-					public void onSuccess(Void arg) {
-						// Nothing to do
-					}
-				});
-			}
+						@Override
+						public void onSuccess(Void arg) {
+							// Nothing to do
+						}
+					});
 		});
-		
+
 		ListGridField deviceId = new ListGridField("deviceId", I18N.message("deviceid"), 150);
 		deviceId.setHidden(true);
 		deviceId.setCanEdit(false);
@@ -114,12 +105,9 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		list.setFields(id, label, deviceId, browser, os, type, lastlogin, creation);
 		list.sort("date", SortDirection.ASCENDING);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 	}
 
@@ -135,25 +123,23 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-						if (Boolean.TRUE.equals(value)) {
-							SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-								}
-							});
+		delete.addClickHandler(event -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
 						}
-				});
-			}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+						}
+					});
+				}
+			});
 		});
 
 		contextMenu.setItems(delete);

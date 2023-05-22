@@ -20,8 +20,6 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -80,12 +78,9 @@ public class TrashPanel extends VLayout {
 		addMember(list);
 
 		if (FolderController.get().getCurrentFolder() != null && FolderController.get().getCurrentFolder().isWrite())
-			list.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
-					showContextMenu();
-					event.cancel();
-				}
+			list.addCellContextClickHandler(event -> {
+				showContextMenu();
+				event.cancel();
 			});
 	}
 
@@ -143,8 +138,7 @@ public class TrashPanel extends VLayout {
 
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler((MenuItemClickEvent event) -> {
-
+		restore.addClickHandler(event -> {
 			if ("document".equals(records[0].getAttribute("type")))
 				restoreDocument(Long.parseLong(records[0].getAttribute("id")));
 			else
@@ -164,9 +158,7 @@ public class TrashPanel extends VLayout {
 	private MenuItem prepareEmptyTrashItem() {
 		MenuItem emptyTrash = new MenuItem();
 		emptyTrash.setTitle(I18N.message("emptytrash"));
-		emptyTrash.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-			public void onClick(MenuItemClickEvent event) {
+		emptyTrash.addClickHandler( event -> {
 				LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), (Boolean response) -> {
 					if (Boolean.TRUE.equals(response)) {
 						DocumentService.Instance.get().emptyTrash(new AsyncCallback<Void>() {
@@ -183,7 +175,6 @@ public class TrashPanel extends VLayout {
 						});
 					}
 				});
-			}
 		});
 		return emptyTrash;
 	}

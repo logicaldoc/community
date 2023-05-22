@@ -58,23 +58,7 @@ public class Validator {
 
 		setUser(transaction);
 
-		if (template != null) {
-			try {
-				template.getAttributes().size();
-			} catch (LazyInitializationException e) {
-				// If an error happens here it means that the collection could
-				// not
-				// be loaded, so load the bean again and initialize it.
-				log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-				TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-				try {
-					template = tDao.findById(template.getId());
-					tDao.initialize(template);
-				} catch (PersistenceException pe) {
-					log.warn(pe.getMessage(), pe);
-				}
-			}
-		}
+		template = initializeAttributes(template);
 
 		Map<String, String> errors = new HashMap<>();
 
@@ -96,6 +80,29 @@ public class Validator {
 
 			throw new ValidationException(errorsList);
 		}
+	}
+
+	private Template initializeAttributes(Template template) {
+		if (template != null) {
+			try {
+				int attributesCount = template.getAttributes().size();
+				if (log.isDebugEnabled())
+					log.debug("Initialized {} attributes", attributesCount);
+			} catch (LazyInitializationException e) {
+				// If an error happens here it means that the collection could
+				// not
+				// be loaded, so load the bean again and initialize it.
+				log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
+				TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+				try {
+					template = tDao.findById(template.getId());
+					tDao.initialize(template);
+				} catch (PersistenceException pe) {
+					log.warn(pe.getMessage(), pe);
+				}
+			}
+		}
+		return template;
 	}
 
 	private void validateAttributes(ExtensibleObject object, Template template, History transaction,

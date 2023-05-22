@@ -118,6 +118,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ItemFactory {
 
+	private static final String WORKFLOWSELECT = "workflowselect";
+
 	private static final String CHARSET = "charset";
 
 	private static final String FIELDREQUIRED = "fieldrequired";
@@ -2144,7 +2146,7 @@ public class ItemFactory {
 	public static SelectItem newWorkflowSelector(Long userId, boolean deployedOnly) {
 		SelectItem item = new SelectItem(WORKFLOW, I18N.message(WORKFLOW));
 		item.setShowHintInField(true);
-		item.setHint(I18N.message("workflowselect") + "...");
+		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
@@ -2171,7 +2173,7 @@ public class ItemFactory {
 	public static SelectItem newWorkflowSelectorForAdministration(Long userId) {
 		SelectItem item = new SelectItem(WORKFLOW, I18N.message(WORKFLOW));
 		item.setShowHintInField(true);
-		item.setHint(I18N.message("workflowselect") + "...");
+		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
@@ -2201,7 +2203,7 @@ public class ItemFactory {
 	public static ComboBoxItem newWorkflowCombo(Long userId) {
 		ComboBoxItem item = new ComboBoxItem(WORKFLOW, I18N.message(WORKFLOW));
 		item.setShowHintInField(true);
-		item.setHint(I18N.message("workflowselect") + "...");
+		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setWidth(200);
 		item.setWrapTitle(false);
 		ListGridField name = new ListGridField("name");

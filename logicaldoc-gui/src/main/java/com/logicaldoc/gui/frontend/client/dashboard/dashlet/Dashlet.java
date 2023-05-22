@@ -10,12 +10,9 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * A small window inside the dashboard.
@@ -52,12 +49,7 @@ public abstract class Dashlet extends Portlet {
 
 		setCloseConfirmationMessage(I18N.message("closedashletconfirm"));
 
-		refreshControl = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refreshControl = new HeaderControl(HeaderControl.REFRESH, event -> refresh());
 		refreshControl.setTooltip(I18N.message("refresh"));
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, refreshControl, HeaderControls.MINIMIZE_BUTTON,
@@ -103,30 +95,22 @@ public abstract class Dashlet extends Portlet {
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocUtil.download(document.getId(), null);
-			}
-		});
+		download.addClickHandler(event -> DocUtil.download(document.getId(), null));
 		download.setEnabled(document.getFolder().isDownload());
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				PreviewPopup iv = new PreviewPopup(document);
-				iv.show();
-			}
+		preview.addClickHandler(event -> {
+			PreviewPopup iv = new PreviewPopup(document);
+			iv.show();
 		});
-		preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+		preview.setEnabled(
+				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocumentsPanel.get().openInFolder(document.getFolder().getId(), document.getId());
-			}
-		});
+		openInFolder.addClickHandler(
+				event -> DocumentsPanel.get().openInFolder(document.getFolder().getId(), document.getId()));
 
 		contextMenu.setItems(preview, download, openInFolder);
 

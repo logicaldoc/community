@@ -8,12 +8,8 @@ import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.folder.FolderCursor;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigatorPanel;
 import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
-import com.smartgwt.client.widgets.layout.events.SectionHeaderClickEvent;
-import com.smartgwt.client.widgets.layout.events.SectionHeaderClickHandler;
 
 /**
  * The left menu
@@ -58,24 +54,18 @@ public class DocumentsMenu extends SectionStack {
 
 		addTrash(showTrash);
 
-		addSectionHeaderClickHandler(new SectionHeaderClickHandler() {
-			@Override
-			public void onSectionHeaderClick(SectionHeaderClickEvent event) {
-				if (event.getSection() != null) {
-					refresh(event.getSection().getAttributeAsString("name"));
-				}
+		addSectionHeaderClickHandler(event -> {
+			if (event.getSection() != null) {
+				refresh(event.getSection().getAttributeAsString("name"));
 			}
 		});
 
-		addResizedHandler(new ResizedHandler() {
-			@Override
-			public void onResized(ResizedEvent event) {
-				if (initialized) {
-					// Save the new width in a cookie
-					CookiesManager.save(CookiesManager.COOKIE_DOCSMENU_W, getWidthAsString());
-				} else
-					initialized = true;
-			}
+		addResizedHandler(event -> {
+			if (initialized) {
+				// Save the new width in a cookie
+				CookiesManager.save(CookiesManager.COOKIE_DOCSMENU_W, getWidthAsString());
+			} else
+				initialized = true;
 		});
 	}
 

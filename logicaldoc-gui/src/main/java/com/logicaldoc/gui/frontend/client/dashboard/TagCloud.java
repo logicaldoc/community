@@ -3,8 +3,6 @@ package com.logicaldoc.gui.frontend.client.dashboard;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITag;
 import com.logicaldoc.gui.frontend.client.services.TagService;
-import com.smartgwt.client.widgets.events.VisibilityChangedEvent;
-import com.smartgwt.client.widgets.events.VisibilityChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -22,13 +20,7 @@ public class TagCloud extends VLayout {
 	private Layout layout = null;
 
 	public TagCloud() {
-		addVisibilityChangedHandler(new VisibilityChangedHandler() {
-
-			@Override
-			public void onVisibilityChanged(VisibilityChangedEvent event) {
-				refresh();
-			}
-		});
+		addVisibilityChangedHandler(event -> refresh());
 	}
 
 	public void refresh() {

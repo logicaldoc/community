@@ -34,7 +34,7 @@ public abstract class ZoneCanvas extends Label {
 
 	protected ZoneTemplatePanel zonePanel;
 
-	public ZoneCanvas(GUIZone zone, ZoneTemplatePanel zonePanel) {
+	protected ZoneCanvas(GUIZone zone, ZoneTemplatePanel zonePanel) {
 		this.zone = zone;
 		this.zonePanel = zonePanel;
 

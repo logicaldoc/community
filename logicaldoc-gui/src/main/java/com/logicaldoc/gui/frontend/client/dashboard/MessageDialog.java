@@ -17,30 +17,21 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This is the form used to send messages to other users
@@ -67,12 +58,7 @@ public class MessageDialog extends Window {
 	public MessageDialog() {
 		super();
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("sendmessage"));
@@ -85,7 +71,7 @@ public class MessageDialog extends Window {
 		setPadding(5);
 		setAutoSize(false);
 
-		int formColumns=2;
+		int formColumns = 2;
 		form.setWidth100();
 		form.setMargin(3);
 		form.setTitleOrientation(TitleOrientation.TOP);
@@ -120,42 +106,40 @@ public class MessageDialog extends Window {
 		send.setTitle(I18N.message("send"));
 		send.setAutoFit(true);
 		send.setMargin(3);
-		send.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				form.validate();
-				if (Boolean.FALSE.equals(form.hasErrors())) {
-					GUIMessage message = new GUIMessage();
-					message.setSubject(form.getValueAsString("subject"));
-					message.setMessage(form.getValueAsString("message"));
-					message.setConfirmation("true".equals(form.getValueAsString(CONFIRMATION)));
-					if (form.getValueAsString(VALIDITY) != null)
-						message.setValidity(Integer.parseInt(form.getValueAsString(VALIDITY)));
-					message.setPriority(Integer.parseInt(form.getValue(PRIORITY).toString()));
+		send.addClickHandler(event -> {
+			form.validate();
+			if (Boolean.FALSE.equals(form.hasErrors())) {
+				GUIMessage msg = new GUIMessage();
+				msg.setSubject(form.getValueAsString("subject"));
+				msg.setMessage(form.getValueAsString("message"));
+				msg.setConfirmation("true".equals(form.getValueAsString(CONFIRMATION)));
+				if (form.getValueAsString(VALIDITY) != null)
+					msg.setValidity(Integer.parseInt(form.getValueAsString(VALIDITY)));
+				msg.setPriority(Integer.parseInt(form.getValue(PRIORITY).toString()));
 
-					if (recipientsGrid.getRecords() == null || recipientsGrid.getRecords().length < 1) {
-						SC.warn(I18N.message("noselectedrecipients"));
-						return;
+				if (recipientsGrid.getRecords() == null || recipientsGrid.getRecords().length < 1) {
+					SC.warn(I18N.message("noselectedrecipients"));
+					return;
+				}
+
+				long[] ids = new long[recipientsGrid.getRecords().length];
+				for (int i = 0; i < ids.length; i++)
+					ids[i] = recipientsGrid.getRecords()[i].getAttributeAsLong("id");
+
+				MessageService.Instance.get().save(msg, ids, new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						destroy();
 					}
 
-					long[] ids = new long[recipientsGrid.getRecords().length];
-					for (int i = 0; i < ids.length; i++)
-						ids[i] = recipientsGrid.getRecords()[i].getAttributeAsLong("id");
-
-					MessageService.Instance.get().save(message, ids, new AsyncCallback<Void>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-							destroy();
-						}
-
-						@Override
-						public void onSuccess(Void result) {
-							EventPanel.get().info(I18N.message("messagesent"), null);
-							destroy();
-						}
-					});
-				}
+					@Override
+					public void onSuccess(Void result) {
+						EventPanel.get().info(I18N.message("messagesent"), null);
+						destroy();
+					}
+				});
 			}
 		});
 		form.setFields(subject, confirmation, validity, priority, message);
@@ -183,7 +167,7 @@ public class MessageDialog extends Window {
 		section.setExpanded(true);
 
 		UserListGridField avatar = new UserListGridField();
-		
+
 		ListGridField name = new ListGridField(LABEL, I18N.message("name"));
 		name.setCanFilter(true);
 
@@ -202,69 +186,55 @@ public class MessageDialog extends Window {
 		recipientsGrid.setEditEvent(ListGridEditEvent.CLICK);
 		recipientsGrid.setFields(id, avatar, name);
 
-		recipientsGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						recipientsGrid.removeSelectedData();
-					}
-				});
+		recipientsGrid.addCellContextClickHandler(event -> {
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.addClickHandler(evt ->
+					recipientsGrid.removeSelectedData());
 
-				Menu contextMenu = new Menu();
-				contextMenu.setItems(delete);
-				contextMenu.showContextMenu();
+			Menu contextMenu = new Menu();
+			contextMenu.setItems(delete);
+			contextMenu.showContextMenu();
 
-				event.cancel();
-			}
+			event.cancel();
 		});
 
 		final SelectItem userSelector = ItemFactory.newUserSelector("users", "users", null, false, true);
 		userSelector.setWidth(150);
 		userSelector.setMultiple(true);
-		userSelector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				addRecipients(userSelector.getSelectedRecords());
-				userSelector.clearValue();
-			}
+		userSelector.addChangedHandler(event -> {
+			addRecipients(userSelector.getSelectedRecords());
+			userSelector.clearValue();
 		});
 
 		final SelectItem groupSelector = ItemFactory.newGroupSelector("groups", "groups");
 		groupSelector.setWidth(150);
 		groupSelector.setMultiple(false);
-		groupSelector.addChangedHandler(new ChangedHandler() {
+		groupSelector.addChangedHandler(event -> {
+			String groupId = groupSelector.getSelectedRecord().getAttributeAsString("id");
+			SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<GUIUser[]>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				String groupId = groupSelector.getSelectedRecord().getAttributeAsString("id");
-				SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<GUIUser[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+				@Override
+				public void onSuccess(GUIUser[] users) {
+					if (users == null || users.length < 1)
+						return;
+
+					ListGridRecord[] records = new ListGridRecord[users.length];
+					for (int i = 0; i < users.length; i++) {
+						records[i] = new ListGridRecord();
+						records[i].setAttribute("id", users[i].getId());
+						records[i].setAttribute(AVATAR, users[i].getId());
+						records[i].setAttribute(LABEL, users[i].getFullName());
 					}
 
-					@Override
-					public void onSuccess(GUIUser[] users) {
-						if (users == null || users.length < 1)
-							return;
-
-						ListGridRecord[] records = new ListGridRecord[users.length];
-						for (int i = 0; i < users.length; i++) {
-							records[i] = new ListGridRecord();
-							records[i].setAttribute("id", users[i].getId());
-							records[i].setAttribute(AVATAR, users[i].getId());
-							records[i].setAttribute(LABEL, users[i].getFullName());
-						}
-
-						addRecipients(records);
-						groupSelector.clearValue();
-					}
-				});
-			}
+					addRecipients(records);
+					groupSelector.clearValue();
+				}
+			});
 		});
 
 		DynamicForm selectionForm = new DynamicForm();

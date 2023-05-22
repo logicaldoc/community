@@ -49,31 +49,31 @@ public class SearchToolbar extends ToolStrip {
 
 		addSeparator();
 
-		addPrintButton(hitsPanel);
+		addPrint(hitsPanel);
 
-		addExportButton(hitsPanel);
+		addExport(hitsPanel);
 
-		addSaveLayoutButton();
-
-		addSeparator();
-
-		addDownloadButton();
-
-		addBulkUpdateButton(hitsPanel);
+		addSaveLayout();
 
 		addSeparator();
 
-		addToggleLeftPanelButton();
+		addDownload();
+
+		addBulkUpdate(hitsPanel);
 
 		addSeparator();
 
-		addListButton(hitsPanel);
-
-		addGalleryButton(hitsPanel);
+		addToggleLeftPanel();
 
 		addSeparator();
 
-		addTogglePreviewButton(hitsPanel);
+		addList(hitsPanel);
+
+		addGallery(hitsPanel);
+
+		addSeparator();
+
+		addTogglePreview(hitsPanel);
 
 		addFill();
 	}
@@ -103,7 +103,7 @@ public class SearchToolbar extends ToolStrip {
 		button.setTooltip(I18N.message("featuredisabled"));
 	}
 
-	private void addPrintButton(final HitsListPanel hitsPanel) {
+	private void addPrint(final HitsListPanel hitsPanel) {
 		ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
 		print.addClickHandler((ClickEvent event) -> {
 			if (hitsPanel.getGrid() instanceof ListGrid)
@@ -114,7 +114,7 @@ public class SearchToolbar extends ToolStrip {
 		addButton(print);
 	}
 
-	private void addExportButton(final HitsListPanel hitsPanel) {
+	private void addExport(final HitsListPanel hitsPanel) {
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
 			addButton(export);
@@ -124,13 +124,13 @@ public class SearchToolbar extends ToolStrip {
 		}
 	}
 
-	private void addSaveLayoutButton() {
+	private void addSaveLayout() {
 		ToolStripButton saveLayout = AwesomeFactory.newToolStripButton("save", "savelayoutinuserprofile");
 		saveLayout.addClickHandler((ClickEvent event) -> saveGridState());
 		addButton(saveLayout);
 	}
 
-	private void addDownloadButton() {
+	private void addDownload() {
 		ToolStripButton download = AwesomeFactory.newToolStripButton("download", "download");
 		addButton(download);
 		download.addClickHandler((ClickEvent event) -> {
@@ -147,7 +147,7 @@ public class SearchToolbar extends ToolStrip {
 		});
 	}
 
-	private void addBulkUpdateButton(final HitsListPanel hitsPanel) {
+	private void addBulkUpdate(final HitsListPanel hitsPanel) {
 		if (Feature.visible(Feature.BULK_UPDATE)) {
 			addSeparator();
 			ToolStripButton bulkUpdate = AwesomeFactory.newToolStripButton("edit", "bulkupdate");
@@ -179,7 +179,7 @@ public class SearchToolbar extends ToolStrip {
 		}
 	}
 
-	private void addToggleLeftPanelButton() {
+	private void addToggleLeftPanel() {
 		ToolStripButton toggle = AwesomeFactory.newToolStripButton(TOGGLE_ON, CLOSESELEFTPANEL);
 		if (SearchMenu.get().getWidth() > 0) {
 			toggle.setTitle(AwesomeFactory.getIconHtml(TOGGLE_ON));
@@ -202,11 +202,11 @@ public class SearchToolbar extends ToolStrip {
 		addButton(toggle);
 	}
 
-	private void addTogglePreviewButton(HitsListPanel hitsPanel) {
+	private void addTogglePreview(HitsListPanel hitsPanel) {
 		ToolStripButton togglePreview = AwesomeFactory.newToolStripButton(TOGGLE_ON, "closepreview");
 		// Retrieve the saved preview width
 		String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
-		if (Integer.parseInt(w) <= 0) {
+		if (w != null && !w.isEmpty() && Integer.parseInt(w) <= 0) {
 			togglePreview.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
 			togglePreview.setTooltip(I18N.message("openpreview"));
 		}
@@ -230,7 +230,7 @@ public class SearchToolbar extends ToolStrip {
 		addButton(togglePreview);
 	}
 
-	private void addGalleryButton(HitsListPanel hitsPanel) {
+	private void addGallery(HitsListPanel hitsPanel) {
 		ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
 		gallery.setActionType(SelectionType.RADIO);
 		gallery.setRadioGroup("mode");
@@ -245,8 +245,9 @@ public class SearchToolbar extends ToolStrip {
 		addButton(gallery);
 	}
 
-	private void addListButton(HitsListPanel hitsPanel) {
+	private void addList(HitsListPanel hitsPanel) {
 		ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
+		list.setActionType(SelectionType.RADIO);
 		list.setRadioGroup("mode");
 		list.addClickHandler((ClickEvent event) -> {
 			CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_LIST);

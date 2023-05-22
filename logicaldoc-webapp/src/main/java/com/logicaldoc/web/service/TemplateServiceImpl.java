@@ -410,10 +410,46 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	}
 
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
+		Map<String, Attribute> attrs = template.getAttributes();
+		template = initializeTemplateAttributes(template, attrs);
+
+		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+
+		List<GUIAttribute> attributes = new ArrayList<>();
+		if (template == null || attrs == null || attrs.isEmpty())
+			return new GUIAttribute[0];
+
+		try {
+			Template currentTemplate = loadExtensibleObjectTemplate(template, extensibleObject);
+
+			initializeExtensibleObjectValues(template, currentTemplate, extensibleObject, sessionUser);
+
+			Map<Long, AttributeSet> sets = setDao.load(template.getTenantId());
+
+			for (String attrName : template.getAttributeNames()) {
+				Attribute templateExtAttr = attrs.get(attrName);
+				AttributeSet aSet = sets.get(templateExtAttr.getSetId());
+				Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
+
+				addGuiAttribute(extensibleObject, attrName, attributes, templateExtAttr, setExtAttr);
+			}
+
+			Collections.sort(attributes);
+			return attributes.toArray(new GUIAttribute[0]);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			return null;
+		}
+	}
+
+	private Template initializeTemplateAttributes(Template template, Map<String, Attribute> attrs) {
 		if (template != null) {
 			try {
-				if (template.getAttributes() != null)
-					template.getAttributes().size();
+				if (attrs != null) {
+					int attrsCount = attrs.size();
+					if (log.isDebugEnabled())
+						log.debug("Initialized {} attributes", attrsCount);
+				}
 			} catch (LazyInitializationException e) {
 				// If an error happens here it means that the collection could
 				// not
@@ -428,34 +464,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				}
 			}
 		}
-
-		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
-
-		List<GUIAttribute> attributes = new ArrayList<>();
-		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
-			return new GUIAttribute[0];
-
-		try {
-			Template currentTemplate = loadExtensibleObjectTemplate(template, extensibleObject);
-
-			initializeExtensibleObjectValues(template, currentTemplate, extensibleObject, sessionUser);
-
-			Map<Long, AttributeSet> sets = setDao.load(template.getTenantId());
-
-			for (String attrName : template.getAttributeNames()) {
-				Attribute templateExtAttr = template.getAttributes().get(attrName);
-				AttributeSet aSet = sets.get(templateExtAttr.getSetId());
-				Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
-
-				addGuiAttribute(extensibleObject, attrName, attributes, templateExtAttr, setExtAttr);
-			}
-
-			Collections.sort(attributes);
-			return attributes.toArray(new GUIAttribute[0]);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			return null;
-		}
+		return template;
 	}
 
 	private void addGuiAttribute(ExtensibleObject extensibleObject, String attrName, List<GUIAttribute> attributes,

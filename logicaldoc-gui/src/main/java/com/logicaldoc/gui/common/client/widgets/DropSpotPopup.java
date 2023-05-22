@@ -12,10 +12,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 
 /**
  * Displays the DropSpot
@@ -47,23 +43,13 @@ public class DropSpotPopup extends Window {
 				+ "px; overflow:hidden;' scrolling='auto' seamless='seamless'></iframe>");
 		addMember(panel);
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				Element element = DOM.getElementById("dropboxframe");
-				element.getStyle().setProperty("height", (getHeight() - 1) + "px");
-				element.getStyle().setProperty("width", (getWidth() - 1) + "px");
-			}
+		addResizedHandler(event -> {
+			Element element = DOM.getElementById("dropboxframe");
+			element.getStyle().setProperty("height", (getHeight() - 1) + "px");
+			element.getStyle().setProperty("width", (getWidth() - 1) + "px");
 		});
 
-		addCloseClickHandler(new CloseClickHandler() {
-
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				FolderNavigator.get().reload();
-			}
-		});
+		addCloseClickHandler(event -> FolderNavigator.get().reload());
 
 		declareClose(this);
 	}

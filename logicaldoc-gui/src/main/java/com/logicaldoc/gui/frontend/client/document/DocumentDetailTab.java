@@ -25,7 +25,7 @@ public abstract class DocumentDetailTab extends DetailTab {
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        document
 	 */
-	public DocumentDetailTab(GUIDocument document, ChangedHandler changedHandler) {
+	protected DocumentDetailTab(GUIDocument document, ChangedHandler changedHandler) {
 		super();
 		this.document = document;
 		this.changedHandler = changedHandler;

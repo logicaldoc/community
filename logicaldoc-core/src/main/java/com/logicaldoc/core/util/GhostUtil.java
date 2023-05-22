@@ -2,7 +2,6 @@ package com.logicaldoc.core.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,8 +27,11 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class GhostUtil {
 	private static final String S_OUTPUT_FILE = "-sOutputFile=";
+
 	private static final String D_NOPAUSE = "-dNOPAUSE";
+
 	private static final String D_BATCH = "-dBATCH";
+
 	protected static Logger log = LoggerFactory.getLogger(GhostUtil.class);
 
 	/**
@@ -51,9 +53,8 @@ public class GhostUtil {
 		String[] cmd = null;
 		if (page != null) {
 			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
-				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE,
-						"-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi, S_OUTPUT_FILE + dst.getPath(),
-						srcPdf.getPath() };
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", D_BATCH, D_NOPAUSE, "-dFirstPage=" + page,
+						"-dLastPage=" + page, "-r" + dpi, S_OUTPUT_FILE + dst.getPath(), srcPdf.getPath() };
 			else
 				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", D_BATCH,
 						D_NOPAUSE, "-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi,
@@ -107,12 +108,8 @@ public class GhostUtil {
 
 		if (page == null) {
 			File root = dst.getParentFile();
-			File[] children = root.listFiles(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.startsWith(FileUtil.getBaseName(dst.getName()));
-				}
+			File[] children = root.listFiles((File dir, String name) -> {
+				return name.startsWith(FileUtil.getBaseName(dst.getName()));
 			});
 			pages.addAll(Arrays.asList(children));
 		}

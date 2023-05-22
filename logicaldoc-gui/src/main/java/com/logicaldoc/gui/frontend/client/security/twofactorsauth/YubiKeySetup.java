@@ -17,6 +17,8 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class YubiKeySetup extends TwoFactorsAuthenticationSetup {
 
+	private static final String SECRETKEY = "secretkey";
+
 	private DynamicForm form;
 
 	public YubiKeySetup(GUIUser user) {
@@ -35,8 +37,8 @@ public class YubiKeySetup extends TwoFactorsAuthenticationSetup {
 		TextItem clientId = ItemFactory.newTextItem("clientid", settings[0]);
 		clientId.setWidth(80);
 		clientId.setRequired(true);
-		
-		TextItem secretKey = ItemFactory.newPasswordItem("secretkey", "secretkey", settings[1]);
+
+		TextItem secretKey = ItemFactory.newPasswordItem(SECRETKEY, SECRETKEY, settings[1]);
 		secretKey.setWidth(220);
 		secretKey.setStartRow(true);
 		secretKey.setRequired(true);
@@ -48,7 +50,7 @@ public class YubiKeySetup extends TwoFactorsAuthenticationSetup {
 
 		Label hint = new Label(I18N.message(Constants.TWOFA_YUBIKEY + ".hint1"));
 		hint.setAutoHeight();
-		
+
 		setMembers(hint, form);
 	}
 
@@ -56,7 +58,7 @@ public class YubiKeySetup extends TwoFactorsAuthenticationSetup {
 	public boolean validate() {
 		boolean valid = form.validate();
 		if (valid)
-			super.key = form.getValueAsString("clientid") + "|" + form.getValueAsString("secretkey");
+			super.key = form.getValueAsString("clientid") + "|" + form.getValueAsString(SECRETKEY);
 		return valid;
 	}
 }

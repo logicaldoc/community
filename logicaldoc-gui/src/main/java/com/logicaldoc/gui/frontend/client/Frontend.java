@@ -4,7 +4,6 @@ import org.realityforge.gwt.websockets.client.WebSocket;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -64,14 +63,10 @@ public class Frontend implements EntryPoint {
 		if (RootPanel.get("loadingwrapper-frontend") == null)
 			return;
 
-		GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			@Override
-			public void onUncaughtException(Throwable caught) {
-				// Log unhandled errors only when in devel mode
-				if (Session.get().isDevel())
-					GuiLog.error(caught.getMessage(), null, caught);
-			}
-
+		GWT.setUncaughtExceptionHandler(caught -> {
+			// Log unhandled errors only when in devel mode
+			if (Session.get().isDevel())
+				GuiLog.error(caught.getMessage(), null, caught);
 		});
 
 		// Tries to capture locale parameter
@@ -175,7 +170,7 @@ public class Frontend implements EntryPoint {
 	 */
 	public void connectWebsockets() {
 		if (Session.get().isServerPushEnabled()) {
-			websocket= WebSocket.newWebSocketIfSupported();			
+			websocket = WebSocket.newWebSocketIfSupported();
 			websocket.setListener(new WebSocketListener());
 			websocket.connect(Util.websocketUrl());
 		}
