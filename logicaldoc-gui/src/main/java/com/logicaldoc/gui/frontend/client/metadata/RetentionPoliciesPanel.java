@@ -20,20 +20,13 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -135,17 +128,12 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton addPolicy = new ToolStripButton();
 		addPolicy.setTitle(I18N.message("addpolicy"));
 		toolStrip.addButton(addPolicy);
-		addPolicy.addClickHandler((ClickEvent addPolicyClick) -> {
+		addPolicy.addClickHandler(addPolicyClick -> {
 			list.deselectAllRecords();
 			GUIRetentionPolicy policy = new GUIRetentionPolicy();
 			showPolicyDetails(policy);
@@ -160,12 +148,12 @@ public class RetentionPoliciesPanel extends AdminPanel {
 	}
 
 	private void addListHandlers(final InfoPanel infoPanel) {
-		list.addCellContextClickHandler((CellContextClickEvent listClick) -> {
+		list.addCellContextClickHandler(listClick -> {
 			showContextMenu();
 			listClick.cancel();
 		});
 
-		list.addSelectionChangedHandler((SelectionEvent listChanged) -> {
+		list.addSelectionChangedHandler(listChanged -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				RetentionPoliciesService.Instance.get().getPolicy(Long.parseLong(rec.getAttributeAsString("id")),
@@ -183,11 +171,10 @@ public class RetentionPoliciesPanel extends AdminPanel {
 						});
 		});
 
-		list.addDataArrivedHandler((DataArrivedEvent listArrived) -> {
-			infoPanel.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows())));
-		});
+		list.addDataArrivedHandler(listArrived -> infoPanel
+				.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows()))));
 
-		list.addDropCompleteHandler((DropCompleteEvent listDropCompleted) -> {
+		list.addDropCompleteHandler(listDropCompleted -> {
 			ListGridRecord[] records = list.getRecords();
 			long[] ids = new long[records.length];
 			for (int i = 0; i < ids.length; i++)
@@ -247,66 +234,56 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value))
-						RetentionPoliciesService.Instance.get().delete(id, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm))
+				RetentionPoliciesService.Instance.get().delete(id, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								showPolicyDetails(null);
-							}
-						});
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showPolicyDetails(null);
+					}
 				});
-			}
-		});
+		}));
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				RetentionPoliciesService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")),
-						true, new AsyncCallback<Void>() {
+		enable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute(EENABLED, "0");
-								list.refreshRow(list.getRecordIndex(rec));
-							}
-						});
-			}
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "0");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler((MenuItemClickEvent event) -> {
-			RetentionPoliciesService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
-					new AsyncCallback<Void>() {
+		disable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							rec.setAttribute(EENABLED, "2");
-							list.refreshRow(list.getRecordIndex(rec));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "2");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 
 		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable, delete);

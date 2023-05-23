@@ -47,13 +47,7 @@ public class ZoneEditor extends Window {
 		this.zone = zone;
 
 		IButton save = new IButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		prepareForm();
 
@@ -92,8 +86,7 @@ public class ZoneEditor extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		StaticTextItem type = ItemFactory.newStaticTextItem("type", 
-				AttributeTypeFormatter.format(zone.getType()));
+		StaticTextItem type = ItemFactory.newStaticTextItem("type", AttributeTypeFormatter.format(zone.getType()));
 
 		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", zone.getSampleText());
 		sample.setVisible(zone.getSampleText() != null && !zone.getSampleText().isEmpty());
@@ -116,8 +109,7 @@ public class ZoneEditor extends Window {
 		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
 		language.setValue(zone.getLanguage());
 
-		TextAreaItem parsing = ItemFactory.newTextAreaItemForAutomation("parsing", zone.getParsing(), null,
-				false);
+		TextAreaItem parsing = ItemFactory.newTextAreaItemForAutomation("parsing", zone.getParsing(), null, false);
 		parsing.setHeight(100);
 		parsing.setWidth(300);
 

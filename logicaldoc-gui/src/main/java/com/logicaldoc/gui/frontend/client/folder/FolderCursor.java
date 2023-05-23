@@ -15,7 +15,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SpacerItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
@@ -49,20 +48,14 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		setHeight(1);
 		setAlign(Alignment.RIGHT);
 
-		maxItem = ItemFactory.newSpinnerItem("max", "display", Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN),
-				2, (Integer) null);
+		maxItem = ItemFactory.newSpinnerItem("max", "display", Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN), 2,
+				(Integer) null);
 		maxItem.setWidth(60);
 		maxItem.setStep(20);
 		maxItem.setSaveOnEnter(true);
 		maxItem.setImplicitSave(true);
 		maxItem.setShowTitle(false);
-		maxItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onMaxChange();
-			}
-		});
+		maxItem.addChangedHandler(event -> onMaxChange());
 
 		pageItem = ItemFactory.newSpinnerItem("page", "page", 1, 1, 1);
 		pageItem.setHint("");
@@ -71,13 +64,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		pageItem.setShowTitle(false);
 		pageItem.setWidth(45);
 		pageItem.setMinHintWidth(1);
-		pageItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onPageChange();
-			}
-		});
+		pageItem.addChangedHandler(event -> onPageChange());
 		pageItem.setHint("/" + (currentPagination.getTotalPages() > 0 ? currentPagination.getTotalPages() : 1));
 
 		SpacerItem spacer2 = new SpacerItem("spc2");
@@ -128,13 +115,13 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		FolderPagination pagination = paginations.get(folder.getId());
 		if (pagination == null) {
 			pagination = new FolderPagination(folder.getId(), Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN),
-					(int)folder.getSubfolderCount(), 1);
+					(int) folder.getSubfolderCount(), 1);
 			// Save it only if there are more than one page
 			if (pagination.getTotalPages() >= 2)
 				paginations.put(folder.getId(), pagination);
 			currentPagination = pagination;
 		} else {
-			pagination.setTotalElements((int)folder.getSubfolderCount());
+			pagination.setTotalElements((int) folder.getSubfolderCount());
 			currentPagination = pagination;
 
 			// Remove from client and server if there are less than two pages

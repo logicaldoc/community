@@ -6,8 +6,6 @@ import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
@@ -44,24 +42,22 @@ public class MoveDialog extends Dialog {
 		Button move = new Button(I18N.message("move"));
 		move.setAutoFit(true);
 		move.setMargin(1);
-		move.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				String shownName = FolderNavigator.get().getSelectedRecord().getAttributeAsString("name");
-				long[] selection = FolderNavigator.get().getSelectedIds();
-				if (selection.length > 1)
-					shownName = selection.length + " " + I18N.message("folders").toLowerCase();
+		move.addClickHandler(event -> {
+			String shownName = FolderNavigator.get().getSelectedRecord().getAttributeAsString("name");
+			long[] selection = FolderNavigator.get().getSelectedIds();
+			if (selection.length > 1)
+				shownName = selection.length + " " + I18N.message("folders").toLowerCase();
 
-				LD.ask(I18N.message("move"),
-						I18N.message("moveask",
-								new String[] { shownName, folders.getSelectedRecord().getAttributeAsString("name") }),
-						(Boolean value) -> {
-							if (Boolean.TRUE.equals(value)) {
-								FolderNavigator.get().moveTo(
-										Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
-								destroy();
-							}
-						});
-			}
+			LD.ask(I18N.message("move"),
+					I18N.message("moveask",
+							new String[] { shownName, folders.getSelectedRecord().getAttributeAsString("name") }),
+					(Boolean value) -> {
+						if (Boolean.TRUE.equals(value)) {
+							FolderNavigator.get().moveTo(
+									Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
+							destroy();
+						}
+					});
 		});
 
 		buttons.setMembers(move);

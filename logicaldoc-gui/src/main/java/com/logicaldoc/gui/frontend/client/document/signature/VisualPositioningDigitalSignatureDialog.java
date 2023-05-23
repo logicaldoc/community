@@ -19,11 +19,7 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -106,40 +102,24 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 
 		ToolStripButton sign = new ToolStripButton();
 		sign.setTitle(I18N.message("sign"));
-		sign.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSign();
-			}
-		});
+		sign.addClickHandler(event -> onSign());
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStripButton zoomIn = new ToolStripButton();
 		zoomIn.setTitle(I18N.message("zoomin"));
-		zoomIn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (cropper != null)
-					cropper.resize(100);
-			}
+		zoomIn.addClickHandler(event -> {
+			if (cropper != null)
+				cropper.resize(100);
 		});
 
 		ToolStripButton zoomOut = new ToolStripButton();
 		zoomOut.setTitle(I18N.message("zoomout"));
-		zoomOut.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (cropper != null)
-					cropper.resize(-100);
-			}
+		zoomOut.addClickHandler(event -> {
+			if (cropper != null)
+				cropper.resize(-100);
 		});
 
 		pageCursor = ItemFactory.newSpinnerItem("page", "page", 1, 1,
@@ -147,12 +127,8 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 		pageCursor.setHint("/" + (firstSelectedDoc.getPreviewPages() > 0 ? firstSelectedDoc.getPreviewPages() : 1));
 		pageCursor.setSaveOnEnter(true);
 		pageCursor.setImplicitSave(true);
-		pageCursor.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				showPage((Integer) pageCursor.getValue());
-			}
+		pageCursor.addChangedHandler(event -> {
+			showPage((Integer) pageCursor.getValue());
 		});
 
 		toolStrip.addFormItem(pageCursor);

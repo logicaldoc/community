@@ -54,10 +54,7 @@ public class RestoreDialog extends Dialog {
 		Button restore = new Button(I18N.message("restore"));
 		restore.setAutoFit(true);
 		restore.setMargin(1);
-		restore.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(final ClickEvent event) {
+		restore.addClickHandler(event -> {
 				if (docIds != null)
 					DocumentService.Instance.get().restore(docIds,
 							Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
@@ -95,7 +92,6 @@ public class RestoreDialog extends Dialog {
 							});
 
 				close();
-			}
 		});
 
 		buttons.setMembers(restore);

@@ -2,11 +2,9 @@ package com.logicaldoc.gui.frontend.client.impex.folders;
 
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -54,12 +52,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		targetSelector.setTitle(I18N.message("targetfolder"));
 		if (importFolder.getTarget() != null)
 			targetSelector.setFolder(importFolder.getTarget());
-		targetSelector.addFolderChangeListener(new FolderChangeListener() {
-			@Override
-			public void onChanged(GUIFolder folder) {
-				changedHandler.onChanged(null);
-			}
-		});
+		targetSelector.addFolderChangeListener(folder -> changedHandler.onChanged(null));
 
 		refresh();
 	}
@@ -96,8 +89,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		IntegerItem port = ItemFactory.newIntegerItem("port", "port", importFolder.getPort());
 		port.addChangedHandler(changedHandler);
 
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME,
-				importFolder.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME, importFolder.getUsername());
 		username.addChangedHandler(changedHandler);
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);

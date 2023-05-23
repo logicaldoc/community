@@ -11,8 +11,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.note.AbstractAnnotationsWindow;
 import com.smartgwt.client.widgets.drawing.DrawItem;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -42,17 +40,13 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
 				|| note.getUserId() == Session.get().getUser().getId()) {
 			DocuSignTabContextMenu contextMenu = new DocuSignTabContextMenu(drawItem, note);
-			contextMenu.addDeleteClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-				@Override
-				public void onClick(com.smartgwt.client.widgets.menu.events.MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-						if (Boolean.TRUE.equals(value)) {
-							notes.remove(note);
-							drawItem.erase();
-						}
-					});
-				}
+			contextMenu.addDeleteClickHandler(event -> {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						notes.remove(note);
+						drawItem.erase();
+					}
+				});
 			});
 			drawItem.setContextMenu(contextMenu);
 		}
@@ -63,41 +57,30 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 	protected void prepareAdditionalActions(ToolStrip toolStrip) {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addtab"));
-		add.addClickHandler(new ClickHandler() {
+		add.addClickHandler(event -> new DocuSignNewTabDialog(new AsyncCallback<GUIDocumentNote>() {
+
 			@Override
-			public void onClick(ClickEvent event) {
-				DocuSignNewTabDialog dialog = new DocuSignNewTabDialog(new AsyncCallback<GUIDocumentNote>() {
+			public void onSuccess(GUIDocumentNote newNote) {
+				newNote.setUsername(Session.get().getUser().getFullName());
+				newNote.setMessage(I18N.message("annotation.type." + newNote.getType()));
+				newNote.setDocId(document.getId());
+				newNote.setFileVersion(fileVersion);
+				newNote.setPage((Integer) pageCursor.getValue());
+				newNote.setShowKnobs(true);
+				notes.add(newNote);
 
-					@Override
-					public void onSuccess(GUIDocumentNote newNote) {
-						newNote.setUsername(Session.get().getUser().getFullName());
-						newNote.setMessage(I18N.message("annotation.type." + newNote.getType()));
-						newNote.setDocId(document.getId());
-						newNote.setFileVersion(fileVersion);
-						newNote.setPage((Integer) pageCursor.getValue());
-						newNote.setShowKnobs(true);
-						notes.add(newNote);
-
-						showCurrentPage();
-					}
-
-					@Override
-					public void onFailure(Throwable arg0) {
-						// Nothing to do
-					}
-				});
-				dialog.show();
+				showCurrentPage();
 			}
-		});
+
+			@Override
+			public void onFailure(Throwable arg0) {
+				// Nothing to do
+			}
+		}).show());
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		toolStrip.addButton(add);
 		toolStrip.addSeparator();

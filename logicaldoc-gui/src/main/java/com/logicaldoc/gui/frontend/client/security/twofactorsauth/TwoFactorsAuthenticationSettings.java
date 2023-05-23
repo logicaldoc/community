@@ -16,8 +16,6 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
@@ -187,33 +185,31 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 	private IButton prepareSaveButton() {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (Boolean.FALSE.equals(vm.validate()))
-					return;
+		save.addClickHandler(event -> {
+			if (Boolean.FALSE.equals(vm.validate()))
+				return;
 
-				String tenant = Session.get().getTenantName();
-				final List<GUIParameter> params = new ArrayList<>();
-				params.add(new GUIParameter(tenant + ".2fa.enabled",
-						vm.getValueAsString("enable2fa").equals("yes") ? "true" : FALSE));
-				params.add(new GUIParameter(tenant + ".2fa.allowtrusted",
-						vm.getValueAsString(ALLOWTRUSTED).equals("yes") ? "true" : FALSE));
-				params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED,
-						vm.getValueAsString("enableGoolge").equals("yes") ? "true" : FALSE));
-				params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_YUBIKEY + ENABLED,
-						vm.getValueAsString("enableYubikey").equals("yes") ? "true" : FALSE));
-				params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_EMAIL_AUTHENTICATOR + ENABLED,
-						vm.getValueAsString("enableEmail").equals("yes") ? "true" : FALSE));
-				params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ENABLED,
-						vm.getValueAsString("enableDuo").equals("yes") ? "true" : FALSE));
-				params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".integrationkey",
-						vm.getValueAsString("duoIntegrationKey")));
-				params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".secretkey",
-						vm.getValueAsString("duoSecretKey")));
-				params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".apihost",
-						vm.getValueAsString("duoApiHostname")));
-				doSaveSettings(params);
-			}
+			String tenant = Session.get().getTenantName();
+			final List<GUIParameter> params = new ArrayList<>();
+			params.add(new GUIParameter(tenant + ".2fa.enabled",
+					vm.getValueAsString("enable2fa").equals("yes") ? "true" : FALSE));
+			params.add(new GUIParameter(tenant + ".2fa.allowtrusted",
+					vm.getValueAsString(ALLOWTRUSTED).equals("yes") ? "true" : FALSE));
+			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ENABLED,
+					vm.getValueAsString("enableGoolge").equals("yes") ? "true" : FALSE));
+			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_YUBIKEY + ENABLED,
+					vm.getValueAsString("enableYubikey").equals("yes") ? "true" : FALSE));
+			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_EMAIL_AUTHENTICATOR + ENABLED,
+					vm.getValueAsString("enableEmail").equals("yes") ? "true" : FALSE));
+			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ENABLED,
+					vm.getValueAsString("enableDuo").equals("yes") ? "true" : FALSE));
+			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".integrationkey",
+					vm.getValueAsString("duoIntegrationKey")));
+			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".secretkey",
+					vm.getValueAsString("duoSecretKey")));
+			params.add(new GUIParameter(tenant + TWOFA + Constants.TWOFA_DUO + ".apihost",
+					vm.getValueAsString("duoApiHostname")));
+			doSaveSettings(params);
 		});
 		return save;
 	}

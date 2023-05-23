@@ -14,8 +14,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to upload a new options file to the server.
@@ -54,12 +52,7 @@ public class OptionsUploader extends Window {
 		sendButton.setTitle(I18N.message("send"));
 		sendButton.setDisabled(true);
 		sendButton.setAlign(Alignment.RIGHT);
-		sendButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSend();
-			}
-		});
+		sendButton.addClickHandler(event -> onSend());
 
 		form.setItems(sendButton);
 
@@ -69,7 +62,7 @@ public class OptionsUploader extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

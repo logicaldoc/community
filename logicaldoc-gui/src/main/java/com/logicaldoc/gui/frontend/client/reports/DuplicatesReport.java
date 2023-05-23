@@ -28,22 +28,15 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.grid.GroupNode;
-import com.smartgwt.client.widgets.grid.GroupTitleRenderer;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -123,28 +116,24 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 			maintain.setValue(NEWEST);
 
 			LD.askForValue(I18N.message("deduplicate"), I18N.message("deduplicatequestion"), NEWEST, maintain, null,
-					new ValueCallback() {
+					value -> {
+						if (value != null) {
+							LD.contactingServer();
+							DocumentService.Instance.get().deDuplicate(folderSelector.getFolderId(),
+									NEWEST.equals(value), new AsyncCallback<Void>() {
 
-						@Override
-						public void execute(String value) {
-							if (value != null) {
-								LD.contactingServer();
-								DocumentService.Instance.get().deDuplicate(folderSelector.getFolderId(),
-										NEWEST.equals(value), new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											LD.clearPrompt();
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onFailure(Throwable caught) {
-												LD.clearPrompt();
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void arg) {
-												LD.clearPrompt();
-												refresh();
-											}
-										});
-							}
+										@Override
+										public void onSuccess(Void arg) {
+											LD.clearPrompt();
+											refresh();
+										}
+									});
 						}
 					});
 		});
@@ -203,33 +192,24 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		list.setGroupStartOpen(GroupStartOpen.ALL);
 		list.setGroupByField(DIGEST);
 
-		filename.setGroupTitleRenderer(new GroupTitleRenderer() {
-			public String getGroupTitle(Object groupValue, GroupNode groupNode, ListGridField field, String fieldName,
-					ListGrid grid) {
-				String baseTitle = I18N.message(FILENAME) + ": " + groupValue.toString();
-				return baseTitle;
-			}
+		filename.setGroupTitleRenderer((groupValue, groupNode, field, fieldName, grid) -> {
+			String baseTitle = I18N.message(FILENAME) + ": " + groupValue.toString();
+			return baseTitle;
 		});
 
-		digest.setGroupTitleRenderer(new GroupTitleRenderer() {
-			public String getGroupTitle(Object groupValue, GroupNode groupNode, ListGridField field, String fieldName,
-					ListGrid grid) {
-				String baseTitle = I18N.message(DIGEST) + ": " + groupValue.toString();
-				return baseTitle;
-			}
+		digest.setGroupTitleRenderer((groupValue, groupNode, field, fieldName, grid) -> {
+			String baseTitle = I18N.message(DIGEST) + ": " + groupValue.toString();
+			return baseTitle;
 		});
 
 		list.setCanDrag(true);
 		list.setCanDragRecordsOut(true);
 		list.setFields(filename, folderName, lastModified, size, version, publisher, customId, digest, type);
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				String id = list.getSelectedRecord().getAttribute("id");
-				if (FolderController.get().getCurrentFolder().isDownload())
-					DocUtil.download(Long.parseLong(id), null);
-			}
+		list.addDoubleClickHandler(event -> {
+			String _id = list.getSelectedRecord().getAttribute("id");
+			if (FolderController.get().getCurrentFolder().isDownload())
+				DocUtil.download(Long.parseLong(_id), null);
 		});
 	}
 
@@ -251,14 +231,14 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler((MenuItemClickEvent event) -> {
+		download.addClickHandler(event -> {
 			Long id = list.getSelectedRecord().getAttributeAsLong("id");
 			WindowUtils.openUrl(Util.downloadURL(id));
 		});
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+		openInFolder.addClickHandler(event -> {
 			ListGridRecord rec = list.getSelectedRecord();
 			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
 					Long.parseLong(rec.getAttributeAsString("id")));
@@ -285,7 +265,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
-		preview.addClickHandler((MenuItemClickEvent event) -> {
+		preview.addClickHandler(event -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
 
@@ -307,7 +287,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 	private MenuItem prepareDeleteContextMenuItem(final ListGridRecord[] selection) {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
+		delete.addClickHandler(event -> {
 			if (selection == null || selection.length == 0)
 				return;
 			final long[] ids = new long[selection.length];
@@ -316,7 +296,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 			}
 
 			if (ids.length > 0)
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
 					if (Boolean.TRUE.equals(yes)) {
 						DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 							@Override

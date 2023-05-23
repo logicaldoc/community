@@ -3,9 +3,7 @@ package com.logicaldoc.gui.frontend.client.metadata.zonalocr;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
-import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
@@ -332,8 +330,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 			selectedOcrTemplate = null;
 
 			ListGridRecord rec = templateSelector.getSelectedRecord();
-			if (rec == null || rec.getAttributeAsLong("id") == null
-					|| rec.getAttributeAsLong("id").longValue() == 0L) {
+			if (rec == null || rec.getAttributeAsLong("id") == null || rec.getAttributeAsLong("id").longValue() == 0L) {
 				selectedDocumentTemplate = null;
 				refresh(null, null);
 			} else {
@@ -354,14 +351,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		if (selectedOcrTemplate != null && selectedOcrTemplate.getSample() != null) {
 			String url = Util.contextPath() + "ocrtemplateimage/" + selectedOcrTemplate.getId() + "?random="
 					+ new Date().getTime();
-			sample = new ImageWithCanvases(url, getWidth().intValue() - 50, null, new CallBack() {
-
-				@Override
-				public void onImagesLoaded(ImageElement[] imageElements) {
-					showZones();
-				}
-			});
-
+			sample = new ImageWithCanvases(url, getWidth().intValue() - 50, null, imageElements -> showZones());
 			editorPanel.addMember(sample);
 		}
 	}

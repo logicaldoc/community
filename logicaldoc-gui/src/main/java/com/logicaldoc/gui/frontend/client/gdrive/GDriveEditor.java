@@ -17,12 +17,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -58,40 +52,32 @@ public class GDriveEditor extends Window {
 		centerInPage();
 		setMargin(2);
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				if (document.getId() != 0)
-					destroy();
-				else {
-					// Creating a new document document, so delete the temporary
-					// doc in Google Drive
-					LD.contactingServer();
-					GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
-							new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-									destroy();
-								}
+		addCloseClickHandler(event -> {
+			if (document.getId() != 0)
+				destroy();
+			else {
+				// Creating a new document document, so delete the temporary
+				// doc in Google Drive
+				LD.contactingServer();
+				GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+								destroy();
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									LD.clearPrompt();
-									destroy();
-								}
-							});
-				}
+							@Override
+							public void onSuccess(Void result) {
+								LD.clearPrompt();
+								destroy();
+							}
+						});
 			}
 		});
 
-		addResizedHandler(new ResizedHandler() {
-			@Override
-			public void onResized(ResizedEvent event) {
-				reloadBody();
-			}
-		});
+		addResizedHandler(event -> reloadBody());
 
 		layout = new VLayout();
 		layout.setMargin(1);
@@ -111,7 +97,7 @@ public class GDriveEditor extends Window {
 		if (Util.isSpreadsheetFile(document.getFileName()))
 			url = "https://docs.google.com/spreadsheets/d/" + document.getExtResId() + "/edit?hl="
 					+ Session.get().getUser().getLanguage();
-		
+
 		String iframe = "<iframe src='" + url + "' style='border: 0px solid white; width:" + (getWidth() - 18)
 				+ "px; height:" + (getHeight() - 68) + "px' scrolling='no'></iframe>";
 		html.setContents(iframe);
@@ -132,97 +118,83 @@ public class GDriveEditor extends Window {
 		close.setTitle(I18N.message("close"));
 		toolStrip.addButton(close);
 		toolStrip.addSeparator();
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStripButton cancel = new ToolStripButton();
 		cancel.setTitle(I18N.message("cancel"));
 		toolStrip.addButton(cancel);
 		toolStrip.addSeparator();
-		cancel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentService.Instance.get().unlock(new long[] { GDriveEditor.this.document.getId() },
+		cancel.addClickHandler(event -> DocumentService.Instance.get()
+				.unlock(new long[] { GDriveEditor.this.document.getId() }, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						destroy();
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						DocUtil.markUnlocked(document);
+						DocumentController.get().setCurrentDocument(document);
+						LD.contactingServer();
+						GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
+								new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+										destroy();
+									}
+
+									@Override
+									public void onSuccess(Void result) {
+										LD.clearPrompt();
+										destroy();
+									}
+								});
+					}
+				}));
+
+		ToolStripButton checkin = new ToolStripButton();
+		checkin.setTitle(document.getId() != 0 ? I18N.message("checkin") : I18N.message("save"));
+		toolStrip.addButton(checkin);
+		checkin.addClickHandler(event -> {
+			if (document.getId() != 0) {
+				new GDriveCheckin(document, GDriveEditor.this).show();
+			} else {
+				LD.contactingServer();
+				GDriveService.Instance.get().importDocuments(new String[] { document.getExtResId() },
+						FolderController.get().getCurrentFolder().getId(), document.getType(),
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
 								GuiLog.serverError(caught);
 								destroy();
 							}
 
 							@Override
 							public void onSuccess(Void result) {
-								DocUtil.markUnlocked(document);
-								DocumentController.get().setCurrentDocument(document);
-								LD.contactingServer();
-								GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
-										new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												LD.clearPrompt();
-												GuiLog.serverError(caught);
-												destroy();
-											}
+								DocumentsPanel.get().refresh();
 
-											@Override
-											public void onSuccess(Void result) {
-												LD.clearPrompt();
-												destroy();
-											}
-										});
+								// Delete the temporary resource in GDrive
+								GDriveService.Instance.get().delete(document.getExtResId(), new AsyncCallback<Void>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+										destroy();
+									}
+
+									@Override
+									public void onSuccess(Void ret) {
+										LD.clearPrompt();
+										destroy();
+									}
+								});
 							}
 						});
-			}
-		});
-
-		ToolStripButton checkin = new ToolStripButton();
-		checkin.setTitle(document.getId() != 0 ? I18N.message("checkin") : I18N.message("save"));
-		toolStrip.addButton(checkin);
-		checkin.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (document.getId() != 0) {
-					GDriveCheckin checkin = new GDriveCheckin(document, GDriveEditor.this);
-					checkin.show();
-				} else {
-					LD.contactingServer();
-					GDriveService.Instance.get().importDocuments(new String[] { document.getExtResId() },
-							FolderController.get().getCurrentFolder().getId(), document.getType(), new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-									destroy();
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-									DocumentsPanel.get().refresh();
-
-									// Delete the temporary resource in GDrive
-									GDriveService.Instance.get().delete(document.getExtResId(),
-											new AsyncCallback<Void>() {
-
-												@Override
-												public void onFailure(Throwable caught) {
-													LD.clearPrompt();
-													GuiLog.serverError(caught);
-													destroy();
-												}
-
-												@Override
-												public void onSuccess(Void ret) {
-													LD.clearPrompt();
-													destroy();
-												}
-											});
-								}
-							});
-				}
 			}
 		});
 

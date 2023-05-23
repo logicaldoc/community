@@ -15,23 +15,11 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -67,12 +55,7 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		maxItem = ItemFactory.newSpinnerItem("max", "display", 20, 2, (Integer) null);
 		maxItem.setHint(I18N.message("elements"));
@@ -81,13 +64,7 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 		maxItem.setMin(10);
 		maxItem.setSaveOnEnter(true);
 		maxItem.setImplicitSave(true);
-		maxItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		maxItem.addChangedHandler(event -> refresh());
 
 		toolStrip.addButton(refresh);
 		toolStrip.addFormItem(maxItem);
@@ -96,13 +73,7 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 
 		initGrid();
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				list.setHeight(getHeight() - 68);
-			}
-		});
+		addResizedHandler(event -> list.setHeight(getHeight() - 68));
 	}
 
 	private void initGrid() {
@@ -140,52 +111,39 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 		list.setFields(id, subject, status, created, updated, expire);
 		list.sort("created", SortDirection.DESCENDING);
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				LD.askForValue(I18N.message("id"), I18N.message("id"),
-						list.getSelectedRecord().getAttributeAsString("id"), 300, new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								// Nothing to do
-							}
-						});
-				event.cancel();
-			}
+		list.addDoubleClickHandler(event -> {
+			LD.askForValue(I18N.message("id"), I18N.message("id"), list.getSelectedRecord().getAttributeAsString("id"),
+					300, value -> {
+						// Nothing to do
+					});
+			event.cancel();
 		});
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
+		list.addCellContextClickHandler(event -> {
 
-				MenuItem inviteToChat = new MenuItem();
-				inviteToChat.setTitle(I18N.message("signers"));
-				inviteToChat.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						DocuSignService.Instance.get().getSigners(list.getSelectedRecord().getAttributeAsString("id"),
-								new AsyncCallback<Collection<String>>() {
+			MenuItem inviteToChat = new MenuItem();
+			inviteToChat.setTitle(I18N.message("signers"));
+			inviteToChat.addClickHandler(evnt -> DocuSignService.Instance.get().getSigners(
+					list.getSelectedRecord().getAttributeAsString("id"), new AsyncCallback<Collection<String>>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-									@Override
-									public void onSuccess(Collection<String> signers) {
-										String message = "";
-										for (String signer : signers)
-											message += "\n" + signer;
-										SC.say(I18N.message("signers"), message);
-									}
-								});
-					}
-				});
+						@Override
+						public void onSuccess(Collection<String> signers) {
+							String message = "";
+							for (String signer : signers)
+								message += "\n" + signer;
+							SC.say(I18N.message("signers"), message);
+						}
+					}));
 
-				Menu contextMenu = new Menu();
-				contextMenu.setItems(inviteToChat);
-				contextMenu.showContextMenu();
-				event.cancel();
-			}
+			Menu contextMenu = new Menu();
+			contextMenu.setItems(inviteToChat);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 
 		addItem(list);

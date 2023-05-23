@@ -12,14 +12,10 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -44,12 +40,7 @@ public class DropboxAuthorizationWizard extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 
 		setTitle(I18N.message("authorizelogicaldoc", Session.get().getInfo().getBranding().getProduct()));
 		setWidth100();
@@ -74,12 +65,7 @@ public class DropboxAuthorizationWizard extends Window {
 		submit = new SubmitItem();
 		submit.setTitle(I18N.message("submit"));
 		submit.setAlign(Alignment.RIGHT);
-		submit.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSubmit();
-			}
-		});
+		submit.addClickHandler(event -> onSubmit());
 
 		form.setItems(code, submit);
 
@@ -98,21 +84,22 @@ public class DropboxAuthorizationWizard extends Window {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(), new AsyncCallback<String>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(),
+				new AsyncCallback<String>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-			@Override
-			public void onSuccess(String account) {
-				if (account != null) {
-					destroy();
-					SC.say(I18N.message("correctlyauthorized", new String[] { Session.get().getInfo().getBranding().getProductName(),
-							account }));
-				} else
-					SC.warn(I18N.message("unabletoauthorize"));
-			}
-		});
+					@Override
+					public void onSuccess(String account) {
+						if (account != null) {
+							destroy();
+							SC.say(I18N.message("correctlyauthorized",
+									new String[] { Session.get().getInfo().getBranding().getProductName(), account }));
+						} else
+							SC.warn(I18N.message("unabletoauthorize"));
+					}
+				});
 	}
 }

@@ -23,7 +23,6 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -127,40 +126,38 @@ public class VersionsPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null || selection.length == 0)
-					return;
-				final Long[] ids = new Long[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-				}
-
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						listGrid.removeSelectedData();
-						listGrid.deselectAllRecords();
-
-						ImpexService.Instance.get().deleteVersions(archiveId, ids, new AsyncCallback<GUIArchive>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIArchive archive) {
-								ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
-								if (selectedRecord != null) {
-									selectedRecord.setAttribute("size", archive.getSize());
-									archivesList.getList()
-											.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
-								}
-							}
-						});
-					}
-				});
+		delete.addClickHandler(event -> {
+			if (selection == null || selection.length == 0)
+				return;
+			final Long[] ids = new Long[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 			}
+
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					listGrid.removeSelectedData();
+					listGrid.deselectAllRecords();
+
+					ImpexService.Instance.get().deleteVersions(archiveId, ids, new AsyncCallback<GUIArchive>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIArchive archive) {
+							ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
+							if (selectedRecord != null) {
+								selectedRecord.setAttribute("size", archive.getSize());
+								archivesList.getList()
+										.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
+							}
+						}
+					});
+				}
+			});
 		});
 
 		if (readonly)

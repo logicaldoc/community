@@ -18,7 +18,6 @@ import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
@@ -52,13 +51,7 @@ public class GDriveMenuItem extends MenuItem {
 
 	private MenuItem prepareGDriveCreateMenuItem(GUIFolder folder) {
 		final MenuItem create = new MenuItem(I18N.message("createdoc"));
-		create.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				GDriveCreate popup = new GDriveCreate();
-				popup.show();
-			}
-		});
+		create.addClickHandler(event -> new GDriveCreate().show());
 		create.setEnabled(folder != null && folder.isWrite() && Feature.enabled(Feature.GDRIVE)
 				&& MainPanel.get().isOnDocumentsTab());
 		return create;

@@ -19,19 +19,12 @@ import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -77,42 +70,33 @@ public class ZonalOCRQueuePanel extends VLayout {
 		toolStrip.setWidth100();
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (Boolean.TRUE.equals(max.validate())) {
-					maxRecords = (Integer) max.getValue();
-					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, false, true, null));
-				}
+		display.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(max.validate())) {
+				maxRecords = (Integer) max.getValue();
+				list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, false, true, null));
 			}
 		});
 
 		ToolStripButton reschedule = new ToolStripButton();
 		reschedule.setTitle(I18N.message("rescheduleallprocessing"));
-		reschedule.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.ask(I18N.message("rescheduleallprocessing"), I18N.message("rescheduleallprocessingask"),
-						(Boolean value) -> {
-							if (Boolean.TRUE.equals(value))
-								ZonalOCRService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
+		reschedule.addClickHandler(event -> LD.ask(I18N.message("rescheduleallprocessing"),
+				I18N.message("rescheduleallprocessingask"), confirm -> {
+					if (Boolean.TRUE.equals(confirm))
+						ZonalOCRService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(Void ret) {
-										GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
-										maxRecords = (Integer) max.getValue();
-										list.refresh(
-												new DocumentsDS(null, null, maxRecords, 1, null, false, true, null));
-									}
-								});
+							@Override
+							public void onSuccess(Void ret) {
+								GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
+								maxRecords = (Integer) max.getValue();
+								list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, false, true, null));
+							}
 						});
-			}
-		});
+				}));
 
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
@@ -196,20 +180,13 @@ public class ZonalOCRQueuePanel extends VLayout {
 		};
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showndocuments", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showndocuments", Integer.toString(list.getTotalRows()))));
 
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -231,41 +208,37 @@ public class ZonalOCRQueuePanel extends VLayout {
 		Menu contextMenu = new Menu();
 		MenuItem markUnprocessable = new MenuItem();
 		markUnprocessable.setTitle(I18N.message("markunprocessable"));
-		markUnprocessable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null)
-					return;
-				final long[] ids = new long[selection.length];
-				for (int j = 0; j < selection.length; j++) {
-					ids[j] = Long.parseLong(selection[j].getAttribute("id"));
+		markUnprocessable.addClickHandler(event -> {
+			if (selection == null)
+				return;
+			final long[] ids = new long[selection.length];
+			for (int j = 0; j < selection.length; j++) {
+				ids[j] = Long.parseLong(selection[j].getAttribute("id"));
+			}
+
+			ZonalOCRService.Instance.get().markUnprocessable(ids, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
 				}
 
-				ZonalOCRService.Instance.get().markUnprocessable(ids, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+				@Override
+				public void onSuccess(Void result) {
+					for (ListGridRecord rec : selection) {
+						list.removeData(rec);
 					}
-
-					@Override
-					public void onSuccess(Void result) {
-						for (ListGridRecord rec : selection) {
-							list.removeData(rec);
-						}
-					}
-				});
-			}
+				}
+			});
 		});
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord rec = list.getSelectedRecord();
-				if (rec == null)
-					return;
+		openInFolder.addClickHandler(event -> {
+			ListGridRecord rec = list.getSelectedRecord();
+			if (rec == null)
+				return;
 
-				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
-			}
+			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("id"));
 		});
 
 		contextMenu.setItems(markUnprocessable, openInFolder);

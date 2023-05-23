@@ -12,17 +12,11 @@ import com.logicaldoc.gui.frontend.client.services.SplitService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * Dialog to ask the user the splitting policy
@@ -34,12 +28,7 @@ public class SplitDialog extends Window {
 	private ValuesManager vm = new ValuesManager();
 
 	public SplitDialog(GUIDocument document) {
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("split") + " - " + document.getFileName());
@@ -59,43 +48,40 @@ public class SplitDialog extends Window {
 
 		SelectItem separator = ItemFactory.newSplitSeparatorHandlingSelector();
 		separator.setDisabled(true);
-		
+
 		TextItem expression = ItemFactory.newTextItem("expression", null);
 		expression.setDisabled(true);
 
 		SelectItem policy = ItemFactory.newSplittingPolicySelector();
-		policy.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				int policy = Integer.parseInt(event.getValue().toString());
-				switch (policy) {
-				case SplitService.POLICY_ALLPAGES:
-					separator.setDisabled(true);
-					expression.setDisabled(true);
-					expression.setHint("");
-					break;
-				case SplitService.POLICY_SELECTION:
-					separator.setDisabled(true);
-					expression.setDisabled(false);
-					expression.setHint(I18N.message("pagesselhint"));
-					break;
-				case SplitService.POLICY_BLANKPAGE:
-					separator.setDisabled(false);
-					expression.setDisabled(true);
-					expression.setHint("");
-					break;
-				case SplitService.POLICY_BARCODE:
-					separator.setDisabled(false);
-					expression.setDisabled(false);
-					expression.setHint(I18N.message("regularexpression"));
-					break;
-				case SplitService.POLICY_TEXT:
-				default:
-					separator.setDisabled(false);
-					expression.setDisabled(false);
-					expression.setHint(I18N.message("regularexpression"));
-					break;
-				}
+		policy.addChangedHandler(event -> {
+			int plcy = Integer.parseInt(event.getValue().toString());
+			switch (plcy) {
+			case SplitService.POLICY_ALLPAGES:
+				separator.setDisabled(true);
+				expression.setDisabled(true);
+				expression.setHint("");
+				break;
+			case SplitService.POLICY_SELECTION:
+				separator.setDisabled(true);
+				expression.setDisabled(false);
+				expression.setHint(I18N.message("pagesselhint"));
+				break;
+			case SplitService.POLICY_BLANKPAGE:
+				separator.setDisabled(false);
+				expression.setDisabled(true);
+				expression.setHint("");
+				break;
+			case SplitService.POLICY_BARCODE:
+				separator.setDisabled(false);
+				expression.setDisabled(false);
+				expression.setHint(I18N.message("regularexpression"));
+				break;
+			case SplitService.POLICY_TEXT:
+			default:
+				separator.setDisabled(false);
+				expression.setDisabled(false);
+				expression.setHint(I18N.message("regularexpression"));
+				break;
 			}
 		});
 
@@ -103,30 +89,28 @@ public class SplitDialog extends Window {
 		split.setTitle(I18N.message("split"));
 		split.setAutoFit(true);
 
-		split.addClickHandler(new ClickHandler() {
+		split.addClickHandler(event -> {
 			@SuppressWarnings("unchecked")
-			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
-				vm.validate();
-				if (Boolean.FALSE.equals(vm.hasErrors())) {
-					LD.contactingServer();
-					SplitService.Instance.get().split(document.getId(),
-							Integer.parseInt((String) values.get("splittingpolicy")),
-							Integer.parseInt((String) values.get("separatorhandling")),
-							(String) values.get("expression"), new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
+			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+			vm.validate();
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
+				LD.contactingServer();
+				SplitService.Instance.get().split(document.getId(),
+						Integer.parseInt((String) values.get("splittingpolicy")),
+						Integer.parseInt((String) values.get("separatorhandling")), (String) values.get("expression"),
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void ret) {
-									LD.clearPrompt();
-									destroy();
-								}
-							});
-				}
+							@Override
+							public void onSuccess(Void ret) {
+								LD.clearPrompt();
+								destroy();
+							}
+						});
 			}
 		});
 

@@ -13,8 +13,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -44,32 +42,22 @@ public class DocuSignTabContextMenu extends AnnotationContextMenu {
 		final TextItem recipient = ItemFactory.newTextItem("recipient", "name", note.getRecipient());
 		recipient.setRequired(true);
 		recipient.setWidth(250);
-		recipient.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				note.setRecipient((String) event.getValue());
-			}
-		});
+		recipient.addChangedHandler(event -> note.setRecipient((String) event.getValue()));
 
 		final ComboBoxItem recipientEmail = ItemFactory.newEmailComboSelector("recipientemail", "recipientemail");
 		recipientEmail.setRequired(true);
 		recipientEmail.setWidth(250);
 		recipientEmail.setValue(note.getRecipientEmail());
-		recipientEmail.addChangedHandler(new ChangedHandler() {
+		recipientEmail.addChangedHandler(event -> {
+			ListGridRecord selection = recipientEmail.getSelectedRecord();
+			String firstName = selection.getAttributeAsString("firstName");
+			String lastName = selection.getAttributeAsString("lastName");
+			String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+			if (!fullName.isEmpty())
+				recipient.setValue(fullName);
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord selection = recipientEmail.getSelectedRecord();
-				String firstName = selection.getAttributeAsString("firstName");
-				String lastName = selection.getAttributeAsString("lastName");
-				String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
-				if (!fullName.isEmpty())
-					recipient.setValue(fullName);
-
-				note.setRecipient(fullName);
-				note.setRecipientEmail((String) event.getValue());
-			}
+			note.setRecipient(fullName);
+			note.setRecipientEmail((String) event.getValue());
 		});
 
 		final DynamicForm form = new DynamicForm();
@@ -94,13 +82,7 @@ public class DocuSignTabContextMenu extends AnnotationContextMenu {
 	private MenuItem prepareTypeItem() {
 		SelectItem type = ItemFactory.newDocuSignTabType(note.getType());
 		type.setRequired(true);
-		type.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				note.setType((String) event.getValue());
-			}
-		});
+		type.addChangedHandler(event -> note.setType((String) event.getValue()));
 
 		final DynamicForm form = new DynamicForm();
 		form.setSnapTo("TR");

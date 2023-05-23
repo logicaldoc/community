@@ -30,7 +30,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -154,9 +153,8 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
 							@Override
@@ -171,17 +169,15 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 							}
 						});
 					}
-				});
-			}
-		});
+				}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler((MenuItemClickEvent event) -> new SubscriptionDialog(list).show());
+		edit.addClickHandler(event -> new SubscriptionDialog(list).show());
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+		openInFolder.addClickHandler(event -> {
 			ListGridRecord rec = list.getSelectedRecord();
 			String type = rec.getAttribute("type");
 			String id = rec.getAttribute("objectid");

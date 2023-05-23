@@ -15,7 +15,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -57,55 +56,42 @@ public class AutomationDialog extends Window {
 
 		ToolStripButton execute = new ToolStripButton();
 		execute.setTitle(I18N.message("execute"));
-		execute.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onExecute(folderId, docIds);
-			}
-		});
+		execute.addClickHandler(event -> onExecute(folderId, docIds));
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		tabSet.addTab(prepareScriptTab());
 		tabSet.addTab(prepareParametersTab());
 		tabSet.disableTab(1);
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event == null
-						|| (event != null && (event.getValue() == null || event.getValue().toString().isEmpty()))) {
-					tabSet.enableTab(0);
-					tabSet.selectTab(0);
-					tabSet.disableTab(1);
-					routine = new GUIAutomationRoutine();
-				} else {
-					AutomationService.Instance.get().getRoutine(Long.parseLong(event.getValue().toString()),
-							new AsyncCallback<GUIAutomationRoutine>() {
+		ChangedHandler changeHandler = event -> {
+			if (event == null
+					|| (event != null && (event.getValue() == null || event.getValue().toString().isEmpty()))) {
+				tabSet.enableTab(0);
+				tabSet.selectTab(0);
+				tabSet.disableTab(1);
+				routine = new GUIAutomationRoutine();
+			} else {
+				AutomationService.Instance.get().getRoutine(Long.parseLong(event.getValue().toString()),
+						new AsyncCallback<GUIAutomationRoutine>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIAutomationRoutine rt) {
-									routine = rt;
-									tabSet.enableTab(1);
-									tabSet.selectTab(1);
-									tabSet.disableTab(0);
-									propertiesPanel = new ExtendedPropertiesPanel(routine, null, true, true, false);
-									tabSet.getTab(1).setPane(propertiesPanel);
-								}
-							});
-				}
+							@Override
+							public void onSuccess(GUIAutomationRoutine rt) {
+								routine = rt;
+								tabSet.enableTab(1);
+								tabSet.selectTab(1);
+								tabSet.disableTab(0);
+								propertiesPanel = new ExtendedPropertiesPanel(routine, null, true, true, false);
+								tabSet.getTab(1).setPane(propertiesPanel);
+							}
+						});
 			}
 		};
 		routineSelector = ItemFactory.newAutomationRoutineSelector("routine", null, changeHandler, true);

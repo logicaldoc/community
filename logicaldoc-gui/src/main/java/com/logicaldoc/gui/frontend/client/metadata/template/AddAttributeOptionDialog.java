@@ -10,8 +10,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -49,21 +47,18 @@ public class AddAttributeOptionDialog extends Window {
 		SubmitItem save = new SubmitItem();
 		save.setTitle(I18N.message("save"));
 		save.setAlign(Alignment.RIGHT);
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (Boolean.FALSE.equals(vm.validate()))
-					return;
+		save.addClickHandler(event -> {
+			if (Boolean.FALSE.equals(vm.validate()))
+				return;
 
-				Record rec = new ListGridRecord();
-				rec.setAttribute(VALUE, vm.getValueAsString(VALUE).trim());
-				if (vm.getValueAsString(CATEGORY) != null)
-					rec.setAttribute(CATEGORY, vm.getValueAsString(CATEGORY).trim());
-				rec.setAttribute("setId", Long.toString(setId));
-				rec.setAttribute("attribute", attribute);
-				options.addData(rec);
-				AddAttributeOptionDialog.this.destroy();
-			}
+			Record rec = new ListGridRecord();
+			rec.setAttribute(VALUE, vm.getValueAsString(VALUE).trim());
+			if (vm.getValueAsString(CATEGORY) != null)
+				rec.setAttribute(CATEGORY, vm.getValueAsString(CATEGORY).trim());
+			rec.setAttribute("setId", Long.toString(setId));
+			rec.setAttribute("attribute", attribute);
+			options.addData(rec);
+			AddAttributeOptionDialog.this.destroy();
 		});
 
 		DynamicForm form = new DynamicForm();

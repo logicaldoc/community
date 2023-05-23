@@ -10,15 +10,11 @@ import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This is the form used to create a new Archive
@@ -35,12 +31,7 @@ public class ArchiveDialog extends Window {
 	public ArchiveDialog(ExportArchivesList archivesPanel) {
 		this.archivesPanel = archivesPanel;
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("addarchive"));
@@ -65,41 +56,38 @@ public class ArchiveDialog extends Window {
 		TextItem description = ItemFactory.newTextItem("description", null);
 		description.setWidth(300);
 
-		StaticTextItem creator = ItemFactory.newStaticTextItem("creator", Session.get().getUser()
-				.getFullName());
+		StaticTextItem creator = ItemFactory.newStaticTextItem("creator", Session.get().getUser().getFullName());
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (Boolean.FALSE.equals(vm.hasErrors())) {
-					GUIArchive archive = new GUIArchive();
-					archive.setType(ArchiveDialog.this.archivesPanel.getArchivesType());
-					archive.setName(vm.getValueAsString("name"));
-					archive.setDescription(vm.getValueAsString("description"));
-					archive.setCreatorId(Session.get().getUser().getId());
-					archive.setCreatorName(Session.get().getUser().getFullName());
-					archive.setMode(GUIArchive.MODE_EXPORT);
+		save.addClickHandler(event -> {
+			vm.validate();
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
+				GUIArchive archive = new GUIArchive();
+				archive.setType(ArchiveDialog.this.archivesPanel.getArchivesType());
+				archive.setName(vm.getValueAsString("name"));
+				archive.setDescription(vm.getValueAsString("description"));
+				archive.setCreatorId(Session.get().getUser().getId());
+				archive.setCreatorName(Session.get().getUser().getFullName());
+				archive.setMode(GUIArchive.MODE_EXPORT);
 
-					ImpexService.Instance.get().save(archive, new AsyncCallback<GUIArchive>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-							destroy();
-						}
+				ImpexService.Instance.get().save(archive, new AsyncCallback<GUIArchive>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						destroy();
+					}
 
-						@Override
-						public void onSuccess(GUIArchive result) {
-							destroy();
-							// We can reload the archives list with the saved
-							// archive, because all archives of the same list
-							// have the same type
-							ArchiveDialog.this.archivesPanel.refresh(result.getType(), false);
-						}
-					});
-				}
+					@Override
+					public void onSuccess(GUIArchive result) {
+						destroy();
+						// We can reload the archives list with the saved
+						// archive, because all archives of the same list
+						// have the same type
+						ArchiveDialog.this.archivesPanel.refresh(result.getType(), false);
+					}
+				});
 			}
 		});
 

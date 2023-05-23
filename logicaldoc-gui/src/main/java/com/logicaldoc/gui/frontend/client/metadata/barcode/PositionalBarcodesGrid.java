@@ -13,11 +13,8 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This grids displays the positional barcode definitions of a positional
@@ -29,7 +26,9 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 public class PositionalBarcodesGrid extends ListGrid {
 
 	private static final String FORMATS = "formats";
+
 	private static final String EXCLUDE = "exclude";
+
 	private static final String INCLUDE = "include";
 
 	public PositionalBarcodesGrid(GUIBarcodeTemplate barcodeTemplate) {
@@ -67,12 +66,9 @@ public class PositionalBarcodesGrid extends ListGrid {
 		setCanDragRecordsOut(true);
 		setCanAcceptDroppedRecords(true);
 		setDragDataAction(DragDataAction.MOVE);
-		addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		if (barcodeTemplate != null) {
@@ -103,14 +99,10 @@ public class PositionalBarcodesGrid extends ListGrid {
 
 		MenuItem clean = new MenuItem();
 		clean.setTitle(I18N.message("ddelete"));
-		clean.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value))
-						removeData(getSelectedRecord());
-				});
-			}
-		});
+		clean.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm))
+				removeData(getSelectedRecord());
+		}));
 
 		contextMenu.setItems(clean);
 		contextMenu.showContextMenu();

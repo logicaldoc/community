@@ -15,8 +15,6 @@ import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
@@ -85,17 +83,14 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		startDate.setUseMask(false);
 		startDate.setShowPickerIcon(true);
 		startDate.setDateFormatter(DateDisplayFormat.TOEUROPEANSHORTDATE);
-		startDate.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| DELETE.equals(event.getKeyName().toLowerCase())) {
-					startDate.clearValue();
-					startDate.setValue((Date) null);
-					changedHandler.onChanged(null);
-				} else {
-					changedHandler.onChanged(null);
-				}
+		startDate.addKeyPressHandler(event -> {
+			if ("backspace".equals(event.getKeyName().toLowerCase())
+					|| DELETE.equals(event.getKeyName().toLowerCase())) {
+				startDate.clearValue();
+				startDate.setValue((Date) null);
+				changedHandler.onChanged(null);
+			} else {
+				changedHandler.onChanged(null);
 			}
 		});
 

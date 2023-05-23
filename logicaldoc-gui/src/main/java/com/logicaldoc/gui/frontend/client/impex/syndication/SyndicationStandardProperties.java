@@ -17,8 +17,6 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
@@ -143,16 +141,13 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		startDate.setUseMask(false);
 		startDate.setShowPickerIcon(true);
 		startDate.setDateFormatter(DateDisplayFormat.TOEUROPEANSHORTDATE);
-		startDate.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if ("delete".equals(event.getKeyName().toLowerCase())) {
-					startDate.clearValue();
-					startDate.setValue((Date) null);
-					changedHandler.onChanged(null);
-				} else {
-					changedHandler.onChanged(null);
-				}
+		startDate.addKeyPressHandler(event -> {
+			if ("delete".equals(event.getKeyName().toLowerCase())) {
+				startDate.clearValue();
+				startDate.setValue((Date) null);
+				changedHandler.onChanged(null);
+			} else {
+				changedHandler.onChanged(null);
 			}
 		});
 

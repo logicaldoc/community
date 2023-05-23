@@ -14,8 +14,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -58,13 +56,7 @@ public class ZonalOCRTemplateSettings extends Window {
 		this.ocrPanel = ocrPanel;
 
 		save = new IButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		prepareForm();
 
@@ -79,23 +71,18 @@ public class ZonalOCRTemplateSettings extends Window {
 		layout.addMember(save);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(new CloseClickHandler() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+
 			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						destroy();
-					}
-				});
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
 			}
-		});
+
+			@Override
+			public void onSuccess(Void result) {
+				destroy();
+			}
+		}));
 
 		addItem(layout);
 
@@ -130,15 +117,14 @@ public class ZonalOCRTemplateSettings extends Window {
 		name.setRequired(true);
 		name.setDisabled(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", 
-				"" + ocrPanel.getSelectedOcrTemplate().getId());
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + ocrPanel.getSelectedOcrTemplate().getId());
 		id.setVisible(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
 		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt("zonalocr.batch"));
 		batch.setStep(50);
 		batch.setMin(1);
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", 
+		TextAreaItem description = ItemFactory.newTextAreaItem("description",
 				ocrPanel.getSelectedOcrTemplate().getDescription());
 		description.setHeight(200);
 
@@ -178,18 +164,4 @@ public class ZonalOCRTemplateSettings extends Window {
 			}
 		});
 	}
-
-//	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-//		public void onFinish(IUploader uploader) {
-//			if (uploader.getStatus() == Status.SUCCESS) {
-//				save.setDisabled(false);
-//			}
-//		}
-//	};
-//
-//	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-//		public void onStart(IUploader uploader) {
-//			save.setDisabled(true);
-//		}
-//	};
 }

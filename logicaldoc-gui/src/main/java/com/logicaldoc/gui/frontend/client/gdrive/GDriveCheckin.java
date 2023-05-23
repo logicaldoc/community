@@ -16,8 +16,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.BooleanItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to perform the checkin of a Google Drive document
@@ -59,12 +57,7 @@ public class GDriveCheckin extends Window {
 		checkin = new SubmitItem();
 		checkin.setTitle(I18N.message("checkin"));
 		checkin.setAlign(Alignment.RIGHT);
-		checkin.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onCheckin(document, parentDialog);
-			}
-		});
+		checkin.addClickHandler(event -> onCheckin(document, parentDialog));
 
 		form.setItems(versionItem, commentItem, checkin);
 

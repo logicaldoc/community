@@ -6,8 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
@@ -52,13 +50,8 @@ public class AliasesPanel extends FolderDetailTab {
 		listGrid.setFields(id, icon, name, path);
 		addMember(listGrid);
 
-		listGrid.addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				FolderNavigator.get().openFolder(listGrid.getSelectedRecord().getAttributeAsLong("id"));
-			}
-		});
+		listGrid.addDoubleClickHandler(
+				event -> FolderNavigator.get().openFolder(listGrid.getSelectedRecord().getAttributeAsLong("id")));
 	}
 
 	@Override

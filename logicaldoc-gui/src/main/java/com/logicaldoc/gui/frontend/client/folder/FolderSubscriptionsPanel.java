@@ -17,18 +17,13 @@ import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the subscriptions on a folder.
@@ -81,12 +76,9 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 		list.setAutoFetchData(true);
 		list.setDataSource(new SubscriptionsDS(folder.getId(), null));
 		list.setFields(userId, userName, created, option, events);
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		container.addMember(list, 0);
@@ -111,54 +103,48 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 		groupForm.setItems(group);
 		buttons.addMember(groupForm);
 
-		group.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord selectedRecord = group.getSelectedRecord();
-				if (selectedRecord == null)
-					return;
-				long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
-				AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.AUDIT_DEFAULT_EVENTS, null,
-						groupId, new AsyncCallback<Void>() {
+		group.addChangedHandler(event -> {
+			ListGridRecord selectedRecord = group.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
+			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
+			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.AUDIT_DEFAULT_EVENTS, null,
+					groupId, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void arg0) {
-								refreshList();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void arg0) {
+							refreshList();
+						}
+					});
 		});
 
 		final DynamicForm userForm = new DynamicForm();
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
-		user.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord selectedRecord = user.getSelectedRecord();
-				if (selectedRecord == null)
-					return;
-				long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
-				AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.AUDIT_DEFAULT_EVENTS,
-						userId, null, new AsyncCallback<Void>() {
+		user.addChangedHandler(event -> {
+			ListGridRecord selectedRecord = user.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
+			long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
+			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.AUDIT_DEFAULT_EVENTS, userId,
+					null, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void arg0) {
-								refreshList();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void arg0) {
+							refreshList();
+						}
+					});
 		});
 
 		buttons.addMember(userForm);
@@ -177,33 +163,28 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler(event -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-							}
-						});
-					}
-				});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+						}
+					});
+				}
+			});
 		});
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler((MenuItemClickEvent event) -> {
-			SubscriptionDialog dialog = new SubscriptionDialog(list);
-			dialog.show();
-		});
+		edit.addClickHandler(event -> new SubscriptionDialog(list).show());
 
 		contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();

@@ -12,8 +12,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This is the form used to change registration data.
@@ -63,25 +61,23 @@ public class Registration extends Window {
 		ButtonItem apply = new ButtonItem();
 		apply.setTitle(I18N.message("apply"));
 		apply.setAutoFit(true);
-		apply.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (Boolean.FALSE.equals(vm.hasErrors())) {
-					SettingService.Instance.get().saveRegistration(form.getValueAsString("reg_name"),
-							form.getValueAsString("reg_email"), form.getValueAsString("reg_organization"),
-							form.getValueAsString("reg_website"), new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									SC.warn(caught.getMessage());
-								}
+		apply.addClickHandler(event -> {
+			vm.validate();
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
+				SettingService.Instance.get().saveRegistration(form.getValueAsString("reg_name"),
+						form.getValueAsString("reg_email"), form.getValueAsString("reg_organization"),
+						form.getValueAsString("reg_website"), new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								SC.warn(caught.getMessage());
+							}
 
-								@Override
-								public void onSuccess(Void ret) {
-									afterSave();
-									Registration.this.destroy();
-								}
-							});
-				}
+							@Override
+							public void onSuccess(Void ret) {
+								afterSave();
+								Registration.this.destroy();
+							}
+						});
 			}
 		});
 

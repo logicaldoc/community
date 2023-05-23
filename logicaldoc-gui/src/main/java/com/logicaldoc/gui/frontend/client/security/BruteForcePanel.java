@@ -20,21 +20,15 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the settings for the brute force attack countermeasures.
@@ -66,13 +60,7 @@ public class BruteForcePanel extends AdminPanel {
 		IButton save = new IButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		addMember(save);
 
@@ -170,13 +158,9 @@ public class BruteForcePanel extends AdminPanel {
 
 		ListGridField entity = new ListGridField("entity", I18N.message("blockedusernameip"));
 		entity.setWidth(200);
-		entity.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				String name = ((String) value).substring(((String) value).lastIndexOf('-') + 1);
-				return name;
-			}
+		entity.setCellFormatter((value, rec, rowNum, colNum) -> {
+			String name = ((String) value).substring(((String) value).lastIndexOf('-') + 1);
+			return name;
 		});
 
 		ListGridField attempts = new ListGridField(ATTEMPTS, I18N.message(ATTEMPTS));
@@ -206,12 +190,9 @@ public class BruteForcePanel extends AdminPanel {
 
 		blockedEntities.setFields(id, entity, attempts, lastAttempt);
 
-		blockedEntities.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		blockedEntities.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		body.addMember(blockedEntities);
@@ -227,25 +208,21 @@ public class BruteForcePanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								blockedEntities.removeSelectedData();
-							}
-						});
+					@Override
+					public void onSuccess(Void result) {
+						blockedEntities.removeSelectedData();
 					}
 				});
 			}
-		});
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

@@ -6,7 +6,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
 
@@ -42,12 +41,9 @@ public class DropboxTree extends TreeGrid {
 			setSelectionAppearance(SelectionAppearance.CHECKBOX);
 		}
 
-		addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
+		addDataArrivedHandler((DataArrivedEvent event) -> {
 				TreeNode node = getTree().getChildren(getTree().getRoot())[0];
 				getTree().openFolder(node);
-			}
 		});
 
 	}

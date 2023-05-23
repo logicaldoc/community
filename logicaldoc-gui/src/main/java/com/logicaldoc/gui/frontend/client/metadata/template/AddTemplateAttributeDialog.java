@@ -11,13 +11,7 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -47,12 +41,7 @@ public class AddTemplateAttributeDialog extends Window {
 		centerInPage();
 		setAutoSize(true);
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 	}
 
 	@Override
@@ -106,15 +95,11 @@ public class AddTemplateAttributeDialog extends Window {
 
 		SelectItem setSelector = ItemFactory.newAttributeSetSelector();
 		toolStrip.addFormItem(setSelector);
-		setSelector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue() == null)
-					fillSetAttributesList(null);
-				else
-					fillSetAttributesList(Long.parseLong(event.getValue().toString()));
-			}
+		setSelector.addChangedHandler(event -> {
+			if (event.getValue() == null)
+				fillSetAttributesList(null);
+			else
+				fillSetAttributesList(Long.parseLong(event.getValue().toString()));
 		});
 
 		toolStrip.addSeparator();
@@ -122,25 +107,17 @@ public class AddTemplateAttributeDialog extends Window {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addselection"));
 		toolStrip.addButton(add);
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (setAttributesList.getSelectedRecords() == null || setAttributesList.getSelectedRecords().length < 1)
-					SC.warn(I18N.message("pleaseselectanattribute"));
-				else
-					propertiesPanel.addAttributes(setAttributesList.getSelectedRecords());
-			}
+		add.addClickHandler(event -> {
+			if (setAttributesList.getSelectedRecords() == null || setAttributesList.getSelectedRecords().length < 1)
+				SC.warn(I18N.message("pleaseselectanattribute"));
+			else
+				propertiesPanel.addAttributes(setAttributesList.getSelectedRecords());
 		});
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
 		toolStrip.addButton(close);
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 		toolStrip.addFill();
 
 		addItem(toolStrip);

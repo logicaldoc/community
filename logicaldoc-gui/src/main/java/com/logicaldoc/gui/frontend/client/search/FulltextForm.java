@@ -28,14 +28,6 @@ import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -89,16 +81,10 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setNumCols(3);
 
-		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				search();
-			}
-		});
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				vm.clearValues();
-				prepareFields(null);
-			}
+		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, event -> search());
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
+			vm.clearValues();
+			prepareFields(null);
 		});
 
 		expression = ItemFactory.newTextItem(EXPRESSION_STR, I18N.message("search") + "...");
@@ -106,21 +92,15 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		expression.setColSpan(3);
 		expression.setRequired(true);
 		expression.setIcons(searchPicker, clear);
-		expression.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() == null)
-					return;
-				if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase()))
-					search();
-			}
+		expression.addKeyPressHandler(event -> {
+			if (event.getKeyName() == null)
+				return;
+			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase()))
+				search();
 		});
-		expression.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if ((I18N.message("search") + "...").equals(event.getItem().getValue())) {
-					event.getItem().setValue("");
-				}
+		expression.addClickHandler(event -> {
+			if ((I18N.message("search") + "...").equals(event.getItem().getValue())) {
+				event.getItem().setValue("");
 			}
 		});
 
@@ -134,14 +114,11 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		SelectItem template = ItemFactory.newTemplateSelector(true, null);
 		template.setMultiple(false);
 		template.setColSpan(3);
-		template.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event.getValue() != null && !"".equals((String) event.getValue()))
-					prepareFields(Long.parseLong((String) event.getValue()));
-				else
-					prepareFields(null);
-			}
+		template.addChangedHandler(event -> {
+			if (event.getValue() != null && !"".equals((String) event.getValue()))
+				prepareFields(Long.parseLong((String) event.getValue()));
+			else
+				prepareFields(null);
 		});
 
 		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders"));
@@ -255,6 +232,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	}
 
 	private void setPublicationDateCondition(Map<String, Object> values, GUISearchOptions options) {
+		@SuppressWarnings("rawtypes")
 		Map range = (Map) values.get(PUBLICATION_DATE_RANGE);
 		if (range != null) {
 			Date start = (Date) range.get("start");
@@ -268,6 +246,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	}
 
 	private void setCreationDateCondition(Map<String, Object> values, GUISearchOptions options) {
+		@SuppressWarnings("rawtypes")
 		Map range = (Map) values.get(CREATION_DATE_RANGE);
 		if (range != null) {
 			Date start = (Date) range.get("start");

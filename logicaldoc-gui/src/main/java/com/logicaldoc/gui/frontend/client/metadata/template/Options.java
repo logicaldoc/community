@@ -16,19 +16,12 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -76,43 +69,25 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addoption"));
 		toolStrip.addButton(add);
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AddAttributeOptionDialog addAttribute = new AddAttributeOptionDialog(setId, attribute, list);
-				addAttribute.show();
-			}
-		});
+		add.addClickHandler(event -> new AddAttributeOptionDialog(setId, attribute, list).show());
 		add.setDisabled(readOnly);
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
 		toolStrip.addButton(save);
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 		save.setDisabled(readOnly);
 
 		ToolStripButton importCsv = new ToolStripButton();
 		importCsv.setTitle(I18N.message("iimport"));
 		importCsv.setTooltip(I18N.message("importfromcsv"));
-		importCsv.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		importCsv.addClickHandler(
+				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -124,21 +99,14 @@ public class Options extends com.smartgwt.client.widgets.Window {
 						OptionsUploader uploader = new OptionsUploader(Options.this);
 						uploader.show();
 					}
-				});
-			}
-		});
+				}));
 
 		toolStrip.addSeparator();
 		toolStrip.addButton(importCsv);
 
 		ToolStripButton export = new ToolStripButton();
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, false);
-			}
-		});
+		export.addClickHandler(event -> GridUtil.exportCSV(list, false));
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			toolStrip.addButton(export);
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -198,21 +166,12 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		list.sort("position", SortDirection.ASCENDING);
 
 		if (!readOnly)
-			list.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
-					showContextMenu();
-					event.cancel();
-				}
+			list.addCellContextClickHandler(event -> {
+				showContextMenu();
+				event.cancel();
 			});
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				list.setHeight(getHeight() - 68);
-			}
-		});
+		addResizedHandler(event -> list.setHeight(getHeight() - 68));
 	}
 
 	/**
@@ -276,15 +235,11 @@ public class Options extends com.smartgwt.client.widgets.Window {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						onDelete();
-					}
-				});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				onDelete();
 			}
-		});
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

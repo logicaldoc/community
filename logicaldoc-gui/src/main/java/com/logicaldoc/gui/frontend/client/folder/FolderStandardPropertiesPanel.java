@@ -23,7 +23,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -37,10 +36,7 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.validator.DoesntContainValidator;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -229,12 +225,9 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		copyPath.setSrc("[SKIN]/page_white_paste.png");
 		copyPath.setWidth(16);
 		copyPath.setHeight(16);
-		copyPath.addFormItemClickHandler((final FormItemIconClickEvent copyPathClick) -> {
-			LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
-				@Override
-				public void execute(final String value) {
-					// Nothing to do
-				}
+		copyPath.addFormItemClickHandler(copyPathClick -> {
+			LD.askForValue(I18N.message("path"), I18N.message("path"), path, value -> {
+				// Nothing to do
 			});
 			copyPathClick.cancel();
 		});
@@ -254,30 +247,27 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		enforceStorage.setSrc("[SKIN]/data_into.png");
 		enforceStorage.setWidth(16);
 		enforceStorage.setHeight(16);
-		enforceStorage.addFormItemClickHandler(new FormItemClickHandler() {
-			public void onFormItemClick(final FormItemIconClickEvent event) {
-				LD.ask(I18N.message("enforcementofstorage"),
-						I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"),
-						(Boolean yes) -> {
-							if (Boolean.TRUE.equals(yes)) {
-								DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
-										new AsyncCallback<Void>() {
+		enforceStorage.addFormItemClickHandler(event -> {
+			LD.ask(I18N.message("enforcementofstorage"),
+					I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"), yes -> {
+						if (Boolean.TRUE.equals(yes)) {
+							DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
+									new AsyncCallback<Void>() {
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onSuccess(Void v) {
-												GuiLog.info(I18N.message("processstartedwillbenotified"));
-											}
-										});
-							}
-						});
+										@Override
+										public void onSuccess(Void v) {
+											GuiLog.info(I18N.message("processstartedwillbenotified"));
+										}
+									});
+						}
+					});
 
-				event.cancel();
-			}
+			event.cancel();
 		});
 		return enforceStorage;
 	}
@@ -288,24 +278,23 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyStorageToSubfolders.setSrc("[SKIN]/page_save.png");
 		applyStorageToSubfolders.setWidth(16);
 		applyStorageToSubfolders.setHeight(16);
-		applyStorageToSubfolders
-				.addFormItemClickHandler((final FormItemIconClickEvent applyStorageToSubfoldersClick) -> {
-					LD.contactingServer();
-					FolderService.Instance.get().applyStorage(folder.getId(), new AsyncCallback<Void>() {
+		applyStorageToSubfolders.addFormItemClickHandler(applyStorageToSubfoldersClick -> {
+			LD.contactingServer();
+			FolderService.Instance.get().applyStorage(folder.getId(), new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(Void v) {
-							LD.clearPrompt();
-						}
-					});
-					applyStorageToSubfoldersClick.cancel();
-				});
+				@Override
+				public void onSuccess(Void v) {
+					LD.clearPrompt();
+				}
+			});
+			applyStorageToSubfoldersClick.cancel();
+		});
 		return applyStorageToSubfolders;
 	}
 
@@ -361,7 +350,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		editTags.setSrc("[SKIN]/actions/edit.png");
 		editTags.setWidth(16);
 		editTags.setHeight(16);
-		editTags.addFormItemClickHandler((final FormItemIconClickEvent editTagClick) -> {
+		editTags.addFormItemClickHandler(editTagClick -> {
 			tagsString.setVisible(false);
 			tagItem.setVisible(true);
 			tagItem.setEndRow(true);
@@ -392,7 +381,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		newTagItem.setRequired(false);
 		newTagItem.setEndRow(true);
 		newTagItem.setDisabled(!folder.isWrite());
-		newTagItem.addKeyPressHandler((KeyPressEvent event) -> {
+		newTagItem.addKeyPressHandler(event -> {
 			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
 					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
 				String input = newTagItem.getValueAsString().trim();
@@ -456,7 +445,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyTags.setEndRow(true);
 		applyTags.setColSpan(2);
 		applyTags.setDisabled(!folder.isWrite());
-		applyTags.addClickHandler((ClickEvent event) -> {
+		applyTags.addClickHandler(event -> {
 			LD.contactingServer();
 			FolderService.Instance.get().applyTags(folder.getId(), new AsyncCallback<Void>() {
 

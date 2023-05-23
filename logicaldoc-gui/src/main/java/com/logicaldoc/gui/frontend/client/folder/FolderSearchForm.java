@@ -12,13 +12,11 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.frontend.client.search.ParameterConditionRow;
@@ -31,15 +29,12 @@ import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.JSOHelper;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -75,15 +70,11 @@ public abstract class FolderSearchForm extends VLayout {
 		setAlign(Alignment.LEFT);
 		setOverflow(Overflow.AUTO);
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				if (conditionsLayout.getMembers() != null)
-					for (Canvas row : conditionsLayout.getMembers()) {
-						row.setWidth(FolderSearchForm.this.getWidth() - 10);
-					}
-			}
+		addResizedHandler(event -> {
+			if (conditionsLayout.getMembers() != null)
+				for (Canvas row : conditionsLayout.getMembers()) {
+					row.setWidth(FolderSearchForm.this.getWidth() - 10);
+				}
 		});
 	}
 
@@ -99,15 +90,11 @@ public abstract class FolderSearchForm extends VLayout {
 		folder.setTitle(I18N.message("parent"));
 		folder.setEndRow(true);
 		folder.setWidth(160);
-		folder.addFolderChangeListener(new FolderChangeListener() {
-
-			@Override
-			public void onChanged(GUIFolder folder) {
-				if (folder != null)
-					subfolders.setValue(true);
-				else
-					subfolders.setValue(false);
-			}
+		folder.addFolderChangeListener(folder -> {
+			if (folder != null)
+				subfolders.setValue(true);
+			else
+				subfolders.setValue(false);
 		});
 
 		final DynamicForm folderForm = new DynamicForm();
@@ -119,24 +106,12 @@ public abstract class FolderSearchForm extends VLayout {
 		IButton search = new IButton(I18N.message("search"));
 		search.setAutoFit(true);
 		search.setMargin(8);
-		search.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				search();
-			}
-		});
+		search.addClickHandler(event -> search());
 
 		IButton reset = new IButton(I18N.message("reset"));
 		reset.setMargin(8);
 		reset.setAutoFit(true);
-		reset.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				initGUI();
-			}
-		});
+		reset.addClickHandler(event -> initGUI());
 
 		HLayout spacer = new HLayout();
 		spacer.setMinWidth(30);
@@ -174,7 +149,7 @@ public abstract class FolderSearchForm extends VLayout {
 			SelectItem template = ItemFactory.newTemplateSelector(true, null);
 			template.setMultiple(false);
 			template.setEndRow(true);
-			template.addChangedHandler((ChangedEvent event) -> {
+			template.addChangedHandler(event -> {
 				if (event.getValue() != null && !"".equals((String) event.getValue())) {
 					TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
 							new AsyncCallback<GUITemplate>() {
@@ -201,13 +176,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 		IButton add = new IButton(I18N.message("addcondition"));
 		add.setAutoFit(true);
-		add.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				addCondition();
-			}
-		});
+		add.addClickHandler(event -> addCondition());
 		addMember(add);
 
 		conditionsLayout = new VLayout(3);

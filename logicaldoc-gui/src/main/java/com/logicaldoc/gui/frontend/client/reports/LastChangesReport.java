@@ -29,8 +29,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -38,13 +36,9 @@ import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -150,21 +144,11 @@ public class LastChangesReport extends AdminPanel {
 		searchButton.setTitle(I18N.message("search"));
 		searchButton.setAutoFit(true);
 		searchButton.setEndRow(false);
-		searchButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSearch();
-			}
-		});
+		searchButton.addClickHandler(event -> onSearch());
 
 		ButtonItem resetButton = new ButtonItem();
 		resetButton.setTitle(I18N.message("reset"));
-		resetButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				vm.clearValues();
-			}
-		});
+		resetButton.addClickHandler(event -> vm.clearValues());
 		resetButton.setColSpan(2);
 		resetButton.setAutoFit(true);
 		resetButton.setEndRow(true);
@@ -172,24 +156,14 @@ public class LastChangesReport extends AdminPanel {
 
 		ButtonItem print = new ButtonItem();
 		print.setTitle(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(histories);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(histories));
 		print.setAutoFit(true);
 		print.setEndRow(true);
 		print.setStartRow(false);
 
 		ButtonItem export = new ButtonItem();
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(histories, false);
-			}
-		});
+		export.addClickHandler(event -> GridUtil.exportCSV(histories, false));
 		if (!Feature.enabled(Feature.EXPORT_CSV)) {
 			export.setDisabled(true);
 			export.setTooltip(I18N.message("featuredisabled"));
@@ -294,12 +268,9 @@ public class LastChangesReport extends AdminPanel {
 		histories.setFilterOnKeypress(true);
 		histories.setAutoFetchData(true);
 		histories.sort("date", SortDirection.DESCENDING);
-		histories.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		histories.addCellContextClickHandler(evn -> {
+			showContextMenu();
+			evn.cancel();
 		});
 
 		results.addMember(histories);
@@ -314,12 +285,8 @@ public class LastChangesReport extends AdminPanel {
 
 		body.setMembers(lastchanges);
 
-		histories.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				vm.setValue("sid", histories.getSelectedRecord().getAttributeAsString("sid"));
-			}
-		});
+		histories.addDoubleClickHandler(
+				evn -> vm.setValue("sid", histories.getSelectedRecord().getAttributeAsString("sid")));
 	}
 
 	/**
@@ -329,7 +296,6 @@ public class LastChangesReport extends AdminPanel {
 	 */
 	public SelectItem[] getEventTypes() {
 		List<SelectItem> items = new ArrayList<>();
-
 		return items.toArray(new SelectItem[0]);
 	}
 

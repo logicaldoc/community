@@ -7,9 +7,6 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.smartgwt.client.types.Side;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -23,7 +20,7 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 7.5
  */
 public class AttributeSetDetailsPanel extends VLayout {
-	
+
 	protected GUIAttributeSet attributeSet;
 
 	protected Layout propertiesTabPanel;
@@ -42,30 +39,22 @@ public class AttributeSetDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (attributeSet.getId() != 0) {
-					AttributeSetService.Instance.get().getAttributeSet(attributeSet.getId(),
-							new AsyncCallback<GUIAttributeSet>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (attributeSet.getId() != 0) {
+				AttributeSetService.Instance.get().getAttributeSet(attributeSet.getId(),
+						new AsyncCallback<GUIAttributeSet>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIAttributeSet set) {
-									setAttributeSet(set);
-								}
-							});
-				} else {
-					setAttributeSet(new GUIAttributeSet());
-				}
+							@Override
+							public void onSuccess(GUIAttributeSet set) {
+								setAttributeSet(set);
+							}
+						});
+			} else {
+				setAttributeSet(new GUIAttributeSet());
 			}
 		});
 		tabSet.setTabBarPosition(Side.TOP);
@@ -95,12 +84,7 @@ public class AttributeSetDetailsPanel extends VLayout {
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = event -> onModified();
 
 		propertiesPanel = new AttributeSetPropertiesPanel(attributeSet, changeHandler, this);
 		propertiesTabPanel.addMember(propertiesPanel);

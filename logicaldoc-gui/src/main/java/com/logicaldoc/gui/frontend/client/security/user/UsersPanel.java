@@ -31,21 +31,12 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -97,38 +88,27 @@ public class UsersPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.refresh(new UsersDS(null, true, false));
-				details = SELECT_USER;
-				detailsContainer.removeMembers(detailsContainer.getMembers());
-				detailsContainer.setMembers(details);
-			}
+		refresh.addClickHandler(event -> {
+			list.refresh(new UsersDS(null, true, false));
+			details = SELECT_USER;
+			detailsContainer.removeMembers(detailsContainer.getMembers());
+			detailsContainer.setMembers(details);
 		});
 		toolStrip.addSeparator();
 
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("adduser"));
 		toolStrip.addButton(add);
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				showUserDetails(new GUIUser());
-			}
+		add.addClickHandler(event -> {
+			list.deselectAllRecords();
+			showUserDetails(new GUIUser());
 		});
 		toolStrip.addSeparator();
 
 		ToolStripButton export = new ToolStripButton();
 		export.setTitle(I18N.message("export"));
 		toolStrip.addButton(export);
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		export.addClickHandler(event -> GridUtil.exportCSV(list, true));
 		if (!Feature.enabled(Feature.EXPORT_CSV)) {
 			export.setDisabled(true);
 			export.setTooltip(I18N.message("featuredisabled"));
@@ -138,12 +118,7 @@ public class UsersPanel extends AdminPanel {
 		ToolStripButton print = new ToolStripButton();
 		print.setTitle(I18N.message("print"));
 		toolStrip.addButton(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(list));
 		toolStrip.addFill();
 
 		final Layout listing = new VLayout();
@@ -221,8 +196,8 @@ public class UsersPanel extends AdminPanel {
 		source.setCanFilter(true);
 		source.setHidden(true);
 		source.setAlign(Alignment.CENTER);
-		source.setCellFormatter((Object value, ListGridRecord rec, int rowNum,
-				int colNum) -> "0".equals(value.toString()) ? "" : I18N.message("ldap"));
+		source.setCellFormatter(
+				(value, rec, rowNum, colNum) -> "0".equals(value.toString()) ? "" : I18N.message("ldap"));
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -242,29 +217,19 @@ public class UsersPanel extends AdminPanel {
 		details = SELECT_USER;
 		detailsContainer.addMember(details);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record rec = list.getSelectedRecord();
-				if (rec != null)
-					onSelectUser(rec.getAttributeAsLong("id"));
-			}
+		list.addSelectionChangedHandler(event -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				onSelectUser(rec.getAttributeAsLong("id"));
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showusers", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showusers", Integer.toString(list.getTotalRows()))));
 
 		body.addMembers(toolStrip, listing, detailsContainer);
 	}
@@ -402,7 +367,7 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem prepareDisableUserMenuItem() {
 		MenuItem disableUser = new MenuItem();
 		disableUser.setTitle(I18N.message("disable"));
-		disableUser.addClickHandler((MenuItemClickEvent event) -> {
+		disableUser.addClickHandler(event -> {
 			SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false,
 					new AsyncCallback<Void>() {
 						@Override
@@ -425,7 +390,7 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem prepareEnableUserMenuItem() {
 		MenuItem enableUser = new MenuItem();
 		enableUser.setTitle(I18N.message("enable"));
-		enableUser.addClickHandler((MenuItemClickEvent event) -> {
+		enableUser.addClickHandler(event -> {
 			SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true,
 					new AsyncCallback<Void>() {
 						@Override
@@ -448,7 +413,7 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem prepareTwoFactorsAuth(final ListGridRecord[] selectedUsers) {
 		MenuItem twoTactorsAuth = new MenuItem();
 		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
-		twoTactorsAuth.addClickHandler((MenuItemClickEvent event) -> {
+		twoTactorsAuth.addClickHandler(event -> {
 			SecurityService.Instance.get().getUser(selectedUsers[0].getAttributeAsLong("id"),
 					new AsyncCallback<GUIUser>() {
 
@@ -470,7 +435,7 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem prepareReplicateMenuItem(final ListGridRecord[] selectedUsers) {
 		MenuItem replicate = new MenuItem();
 		replicate.setTitle(I18N.message("replicatesettings"));
-		replicate.addClickHandler((MenuItemClickEvent event) -> {
+		replicate.addClickHandler(event -> {
 			List<Long> selectedIds = new ArrayList<>();
 			for (ListGridRecord rec : selectedUsers)
 				selectedIds.add(rec.getAttributeAsLong("id"));
@@ -483,7 +448,7 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem preparePasswordMenuItem(final ListGridRecord[] selectedUsers) {
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));
-		password.addClickHandler((MenuItemClickEvent event) -> {
+		password.addClickHandler(event -> {
 			SetPassword dialog = new SetPassword(Long.parseLong(selectedUsers[0].getAttributeAsString("id")));
 			dialog.show();
 		});
@@ -493,25 +458,24 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem prepareDeleteMenuItem(final long selectedUserId) {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
-				I18N.message("confirmdelete"), (Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						SecurityService.Instance.get().deleteUser(selectedUserId, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								details = SELECT_USER;
-								detailsContainer.setMembers(details);
-							}
-						});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
+			if (Boolean.TRUE.equals(yes)) {
+				SecurityService.Instance.get().deleteUser(selectedUserId, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
 					}
-				}));
+
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						details = SELECT_USER;
+						detailsContainer.setMembers(details);
+					}
+				});
+			}
+		}));
 		return delete;
 	}
 

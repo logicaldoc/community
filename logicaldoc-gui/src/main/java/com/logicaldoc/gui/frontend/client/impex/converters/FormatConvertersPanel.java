@@ -10,17 +10,9 @@ import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
-import com.smartgwt.client.widgets.grid.ListGridEditorContext;
-import com.smartgwt.client.widgets.grid.ListGridEditorCustomizer;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -49,13 +41,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		ToolStripButton aliases = new ToolStripButton();
 		aliases.setTitle(I18N.message("extensionaliases"));
 		aliases.setDisabled(Session.get().isDemo());
-		aliases.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ExtensionAliasesDialog dialog = new ExtensionAliasesDialog();
-				dialog.show();
-			}
-		});
+		aliases.addClickHandler(event -> new ExtensionAliasesDialog().show());
 		aliases.setDisabled(Session.get().isDemo());
 
 		toolStrip.addSeparator();
@@ -73,48 +59,38 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		ListGridField converter = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		converter.setWidth("*");
 		converter.setCanEdit(!Session.get().isDemo());
-		converter.setCellFormatter(new CellFormatter() {
+		converter.setCellFormatter((value, rec, rowNum, colNum) -> {
+			String label = getConverterShortName(value != null ? value.toString() : null);
+			boolean enabled = rec.getAttributeAsBoolean(EENABLED);
+			if (!enabled)
+				label = "<span style='color:red;'>" + label + "</span>";
 
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				String label = getConverterShortName(value != null ? value.toString() : null);
-				boolean enabled = rec.getAttributeAsBoolean(EENABLED);
-				if (!enabled)
-					label = "<span style='color:red;'>" + label + "</span>";
-
-				return label;
-			}
+			return label;
 		});
 		converter.setFilterEditorProperties(ItemFactory.newFormatConverterSelector());
 
 		ListGridField out = new ListGridField("out", I18N.message("out"), 50);
 		associationsGrid.setFields(in, out, converter);
 
-		associationsGrid.setEditorCustomizer(new ListGridEditorCustomizer() {
-			public FormItem getEditor(ListGridEditorContext context) {
-				ListGridField field = context.getEditField();
+		associationsGrid.setEditorCustomizer(context -> {
+			ListGridField field = context.getEditField();
 
-				if (field.getName().equals(gridAttributeName)) {
-					final ListGridRecord selectedRecord = associationsGrid.getSelectedRecord();
-					final SelectItem editorItem = ItemFactory.newFormatConverterSelector(
-							selectedRecord.getAttributeAsString("in"), selectedRecord.getAttributeAsString("out"));
-					editorItem.setWidth("*");
-					return editorItem;
-				} else
-					return context.getDefaultProperties();
-			}
+			if (field.getName().equals(gridAttributeName)) {
+				final ListGridRecord selectedRecord = associationsGrid.getSelectedRecord();
+				final SelectItem editorItem = ItemFactory.newFormatConverterSelector(
+						selectedRecord.getAttributeAsString("in"), selectedRecord.getAttributeAsString("out"));
+				editorItem.setWidth("*");
+				return editorItem;
+			} else
+				return context.getDefaultProperties();
 		});
 
-		associationsGrid.addEditCompleteHandler(new EditCompleteHandler() {
-
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
-				Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
-						associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
-				if (converterRecord != null)
-					associationsGrid.getSelectedRecord().setAttribute(EENABLED,
-							converterRecord.getAttributeAsBoolean(EENABLED));
-			}
+		associationsGrid.addEditCompleteHandler(event -> {
+			Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
+					associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
+			if (converterRecord != null)
+				associationsGrid.getSelectedRecord().setAttribute(EENABLED,
+						converterRecord.getAttributeAsBoolean(EENABLED));
 		});
 	}
 
@@ -127,7 +103,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 	protected DataSource getSettingsDataSource() {
 		return new FormatConvertersDS("-", "-");
 	}
-	
+
 	@Override
 	protected DataSource getAssociationsDataSource() {
 		return new FormatConvertersDS(null, null);

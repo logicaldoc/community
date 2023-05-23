@@ -17,8 +17,6 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -74,25 +72,25 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 		Img closeImage = ItemFactory.newImgIcon("delete.png");
 		closeImage.setHeight("16px");
 		closeImage.addClickHandler((ClickEvent event) -> {
-				if (getIncremental().getId() != 0) {
-					ImpexService.Instance.get().loadIncremental(getIncremental().getId(),
-							new AsyncCallback<GUIIncrementalArchive>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+			if (getIncremental().getId() != 0) {
+				ImpexService.Instance.get().loadIncremental(getIncremental().getId(),
+						new AsyncCallback<GUIIncrementalArchive>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIIncrementalArchive incremental) {
-									setIncremental(incremental);
-								}
-							});
-				} else {
-					GUIIncrementalArchive archive = new GUIIncrementalArchive();
-					archive.setType(IncrementalDetailsPanel.this.incremental.getType());
-					setIncremental(archive);
-				}
-				savePanel.setVisible(false);
+							@Override
+							public void onSuccess(GUIIncrementalArchive incremental) {
+								setIncremental(incremental);
+							}
+						});
+			} else {
+				GUIIncrementalArchive archive = new GUIIncrementalArchive();
+				archive.setType(IncrementalDetailsPanel.this.incremental.getType());
+				setIncremental(archive);
+			}
+			savePanel.setVisible(false);
 		});
 		closeImage.setCursor(Cursor.HAND);
 		closeImage.setTooltip(I18N.message("close"));
@@ -135,12 +133,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 		if (savePanel != null)
 			savePanel.setVisible(false);
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changeHandler = event -> onModified();
 
 		/*
 		 * Prepare the versions tab

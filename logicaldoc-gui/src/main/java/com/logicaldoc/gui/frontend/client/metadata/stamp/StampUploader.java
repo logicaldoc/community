@@ -10,10 +10,7 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-
 
 /**
  * This popup window is used to upload a new stamp
@@ -45,46 +42,35 @@ public class StampUploader extends Window {
 		centerInPage();
 
 		saveButton = new IButton(I18N.message("save"));
-		saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		saveButton.addClickHandler(event -> onSave());
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
 		layout.setMargin(2);
 
-		uploader=new Upload(saveButton);
+		uploader = new Upload(saveButton);
 		uploader.setFileTypes("*.png");
 		layout.addMember(uploader);
 		layout.addMember(saveButton);
 
-		addCloseClickHandler(new CloseClickHandler() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+
 			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						destroy();
-					}
-				});
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
 			}
-		});
+
+			@Override
+			public void onSuccess(Void result) {
+				destroy();
+			}
+		}));
 
 		addItem(layout);
 	}
 
 	public void onSave() {
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

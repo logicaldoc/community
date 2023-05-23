@@ -16,10 +16,6 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -54,23 +50,14 @@ public class FormImageTile extends HLayout {
 				removeChild(canvas);
 
 		IButton upload = new IButton(I18N.message("uploadheader"));
-		upload.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Uploader uploader = new Uploader(form);
-				uploader.show();
-			}
-		});
+		upload.addClickHandler(event -> new Uploader(form).show());
 		upload.setDisabled(form.getId() == 0L);
 
 		IButton clear = new IButton(I18N.message("clear"));
-		clear.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				form.setHeaderImage(null);
-				changedHandler.onChanged(null);
-				initGUI();
-			}
+		clear.addClickHandler(event -> {
+			form.setHeaderImage(null);
+			changedHandler.onChanged(null);
+			initGUI();
 		});
 
 		HLayout buttons = new HLayout();
@@ -115,13 +102,7 @@ public class FormImageTile extends HLayout {
 			centerInPage();
 
 			saveButton = new IButton(I18N.message("save"));
-			saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-				@Override
-				public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-					onSave();
-				}
-			});
+			saveButton.addClickHandler(event -> onSave());
 
 			VLayout layout = new VLayout();
 			layout.setMembersMargin(5);
@@ -132,10 +113,8 @@ public class FormImageTile extends HLayout {
 			layout.addMember(uploader);
 			layout.addMember(saveButton);
 
-			addCloseClickHandler(new CloseClickHandler() {
-				@Override
-				public void onCloseClick(CloseClickEvent event) {
-					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+			addCloseClickHandler(
+					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -146,15 +125,13 @@ public class FormImageTile extends HLayout {
 						public void onSuccess(Void result) {
 							destroy();
 						}
-					});
-				}
-			});
+					}));
 
 			addItem(layout);
 		}
 
 		public void onSave() {
-			if (uploader.getUploadedFile()==null) {
+			if (uploader.getUploadedFile() == null) {
 				SC.warn(I18N.message("filerequired"));
 				return;
 			}

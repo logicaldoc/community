@@ -6,8 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -40,14 +38,10 @@ public class ImportDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		tabSet = new EditingTabSet(saveEvent ->
+				onSave()
+				,
+				cancelEvent ->
 				ImpexService.Instance.get().load(getArchive().getId(), new AsyncCallback<GUIArchive>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -59,9 +53,7 @@ public class ImportDetailsPanel extends VLayout {
 						setArchive(archive);
 						tabSet.hideSave();
 					}
-				});
-			}
-		});
+				}));
 
 		Tab versionsTab = new Tab(I18N.message("settings"));
 		settingsTabPanel = new HLayout();

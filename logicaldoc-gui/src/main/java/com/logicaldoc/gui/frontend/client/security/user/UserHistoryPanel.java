@@ -7,11 +7,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -47,7 +43,7 @@ public class UserHistoryPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setDataSource(new UserHistoryDS(userId));
 		list.setFields(event, date, ip, geolocation, device, sid, comment);
-		
+
 		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();
 
@@ -59,35 +55,19 @@ public class UserHistoryPanel extends VLayout {
 		maxItem.setImplicitSave(true);
 		maxItem.setHint(I18N.message("elements"));
 		buttons.addFormItem(maxItem);
-		maxItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				list.refresh(new UserHistoryDS(userId, Integer.parseInt(maxItem.getValueAsString())));
-			}
-		});
+		maxItem.addChangedHandler(
+				evn -> list.refresh(new UserHistoryDS(userId, Integer.parseInt(maxItem.getValueAsString()))));
 
 		buttons.addSeparator();
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		buttons.addButton(export);
-		export.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		export.addClickHandler(evn -> GridUtil.exportCSV(list, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		buttons.addButton(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
-		
+		print.addClickHandler(evn -> GridUtil.print(list));
+
 		addMember(list);
 		addMember(buttons);
 	}

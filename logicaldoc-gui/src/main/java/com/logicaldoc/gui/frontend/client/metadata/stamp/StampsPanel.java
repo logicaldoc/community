@@ -21,23 +21,13 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -87,16 +77,12 @@ public class StampsPanel extends AdminPanel {
 
 		ListGridField image = new ListGridField(IMAGE, I18N.message(IMAGE), 300);
 		image.setCanFilter(false);
-		image.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				if (value != null && !value.toString().trim().equals(""))
-					return "<img height='60px' src='" + Util.contextPath() + "stampimage/" + value + "?random="
-							+ new Date().getTime() + "'/>";
-				else
-					return "";
-			}
+		image.setCellFormatter((value, rec, rowNum, colNum) -> {
+			if (value != null && !value.toString().trim().equals(""))
+				return "<img height='60px' src='" + Util.contextPath() + "stampimage/" + value + "?random="
+						+ new Date().getTime() + "'/>";
+			else
+				return "";
 		});
 
 		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
@@ -134,60 +120,42 @@ public class StampsPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton addStamp = new ToolStripButton();
 		addStamp.setTitle(I18N.message("addstamp"));
 		toolStrip.addButton(addStamp);
-		addStamp.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				GUIStamp stamp = new GUIStamp();
-				showStampDetails(stamp);
-			}
+		addStamp.addClickHandler(event -> {
+			list.deselectAllRecords();
+			GUIStamp stamp = new GUIStamp();
+			showStampDetails(stamp);
 		});
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record rec = list.getSelectedRecord();
-				if (rec != null)
-					StampService.Instance.get().getStamp(Long.parseLong(rec.getAttributeAsString("id")),
-							new AsyncCallback<GUIStamp>() {
+		list.addSelectionChangedHandler(event -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				StampService.Instance.get().getStamp(Long.parseLong(rec.getAttributeAsString("id")),
+						new AsyncCallback<GUIStamp>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIStamp stamp) {
-									showStampDetails(stamp);
-								}
-							});
-			}
+							@Override
+							public void onSuccess(GUIStamp stamp) {
+								showStampDetails(stamp);
+							}
+						});
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showstamps", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showstamps", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -210,10 +178,9 @@ public class StampsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean confirm) -> {
+					if (Boolean.TRUE.equals(confirm)) {
 						StampService.Instance.get().delete(id, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -228,47 +195,41 @@ public class StampsPanel extends AdminPanel {
 							}
 						});
 					}
-				});
-			}
-		});
+				}));
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler((MenuItemClickEvent event) -> {
-			StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
-					new AsyncCallback<Void>() {
+		enable.addClickHandler(event -> StampService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							rec.setAttribute(EENABLED, "0");
-							list.refreshRow(list.getRecordIndex(rec));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "0");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler((MenuItemClickEvent event) -> {
-			StampService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
-					new AsyncCallback<Void>() {
+		disable.addClickHandler(event -> StampService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							rec.setAttribute(EENABLED, "2");
-							list.refreshRow(list.getRecordIndex(rec));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "2");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 
 		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable, delete);

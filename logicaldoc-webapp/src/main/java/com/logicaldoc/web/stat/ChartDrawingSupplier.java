@@ -22,10 +22,10 @@ public class ChartDrawingSupplier extends DefaultDrawingSupplier {
 
 	public int fillPaintIndex;
 
-	{
+	public ChartDrawingSupplier() {
 		paintSequence = new Paint[] { new Color(128, 255, 128), new Color(128, 128, 255), new Color(255, 128, 128),
 				new Color(242, 179, 235), new Color(13, 0, 255), new Color(242, 255, 0), new Color(157, 157, 157),
-				new Color(156, 49, 25), new Color(174, 255, 0), new Color(255, 238, 8)};
+				new Color(156, 49, 25), new Color(174, 255, 0), new Color(255, 238, 8) };
 	}
 
 	@Override

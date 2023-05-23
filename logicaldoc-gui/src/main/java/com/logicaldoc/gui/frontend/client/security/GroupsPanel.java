@@ -20,18 +20,13 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -67,38 +62,27 @@ public class GroupsPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.refresh(new GroupsDS());
-				detailsContainer.removeMembers(detailsContainer.getMembers());
-				details = SELECT_GROUP;
-				detailsContainer.setMembers(details);
-			}
+		refresh.addClickHandler(event -> {
+			list.refresh(new GroupsDS());
+			detailsContainer.removeMembers(detailsContainer.getMembers());
+			details = SELECT_GROUP;
+			detailsContainer.setMembers(details);
 		});
 		toolStrip.addSeparator();
 
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addgroup"));
 		toolStrip.addButton(add);
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				showGroupDetails(new GUIGroup());
-			}
+		add.addClickHandler(event -> {
+			list.deselectAllRecords();
+			showGroupDetails(new GUIGroup());
 		});
 		toolStrip.addSeparator();
 
 		ToolStripButton export = new ToolStripButton();
 		export.setTitle(I18N.message("export"));
 		toolStrip.addButton(export);
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		export.addClickHandler(event -> GridUtil.exportCSV(list, true));
 		if (!Feature.enabled(Feature.EXPORT_CSV)) {
 			export.setDisabled(true);
 			export.setTooltip(I18N.message("featuredisabled"));
@@ -108,12 +92,7 @@ public class GroupsPanel extends AdminPanel {
 		ToolStripButton print = new ToolStripButton();
 		print.setTitle(I18N.message("print"));
 		toolStrip.addButton(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(list));
 		toolStrip.addFill();
 
 		detailsContainer = new VLayout();
@@ -152,12 +131,12 @@ public class GroupsPanel extends AdminPanel {
 		listing.addMember(infoPanel);
 		listing.addMember(list);
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+		list.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
 		});
 
-		list.addSelectionChangedHandler((SelectionEvent event) -> {
+		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				SecurityService.Instance.get().getGroup(Long.parseLong(rec.getAttributeAsString("id")),
@@ -221,8 +200,8 @@ public class GroupsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
-				I18N.message("confirmdelete"), (Boolean value) -> {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						SecurityService.Instance.get().deleteGroup(id, new AsyncCallback<Void>() {
 							@Override

@@ -12,12 +12,9 @@ import com.logicaldoc.gui.frontend.client.search.SearchPanel;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
@@ -63,13 +60,11 @@ public class DropboxDialog extends Dialog {
 		Button select = new Button(I18N.message("select"));
 		select.setAutoFit(true);
 		select.setMargin(1);
-		select.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (DropboxDialog.this.export)
-					onExport();
-				else
-					onImport();
-			}
+		select.addClickHandler(event -> {
+			if (DropboxDialog.this.export)
+				onExport();
+			else
+				onImport();
 		});
 
 		buttons.setMembers(select);
@@ -83,42 +78,39 @@ public class DropboxDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final long[] docIds = MainPanel.get().isOnDocumentsTab() ? DocumentsPanel.get().getDocumentsGrid()
-				.getSelectedIds() : SearchPanel.get().getDocumentsGrid().getSelectedIds();
+		final long[] docIds = MainPanel.get().isOnDocumentsTab()
+				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
+				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.length == 0 ? I18N.message("exportdirtodbox", FolderController.get().getCurrentFolder().getName()) : I18N
-				.message("exportdocstodbox"), new BooleanCallback() {
+		SC.ask(docIds.length == 0 ? I18N.message("exportdirtodbox", FolderController.get().getCurrentFolder().getName())
+				: I18N.message("exportdocstodbox"), choice -> {
+					if (choice.booleanValue()) {
+						String targetPath = selection.getAttributeAsString("path");
+						long[] folderIds = new long[0];
+						if (docIds.length == 0 && FolderController.get().getCurrentFolder() != null)
+							folderIds[0] = FolderController.get().getCurrentFolder().getId();
 
-			@Override
-			public void execute(Boolean choice) {
-				if (choice.booleanValue()) {
-					String targetPath = selection.getAttributeAsString("path");
-					long[] folderIds = new long[0];
-					if (docIds.length == 0 && FolderController.get().getCurrentFolder() != null)
-						folderIds[0] = FolderController.get().getCurrentFolder().getId();
+						LD.contactingServer();
+						DropboxService.Instance.get().exportDocuments(targetPath, folderIds, docIds,
+								new AsyncCallback<Boolean>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+									}
 
-					LD.contactingServer();
-					DropboxService.Instance.get().exportDocuments(targetPath, folderIds, docIds,
-							new AsyncCallback<Boolean>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Boolean result) {
-									LD.clearPrompt();
-									if (result.booleanValue()) {
-										SC.say(I18N.message("dboxexportok"));
-										DropboxDialog.this.destroy();
-									} else
-										SC.say(I18N.message("dboxexportko"));
-								}
-							});
-				}
-			}
-		});
+									@Override
+									public void onSuccess(Boolean result) {
+										LD.clearPrompt();
+										if (result.booleanValue()) {
+											SC.say(I18N.message("dboxexportok"));
+											DropboxDialog.this.destroy();
+										} else
+											SC.say(I18N.message("dboxexportko"));
+									}
+								});
+					}
+				});
 	}
 
 	private void onImport() {
@@ -130,29 +122,25 @@ public class DropboxDialog extends Dialog {
 		for (int i = 0; i < selection.length; i++)
 			paths[i] = selection[i].getAttributeAsString("path");
 
-		SC.ask(I18N.message("importfromdbox", FolderController.get().getCurrentFolder().getName()), new BooleanCallback() {
+		SC.ask(I18N.message("importfromdbox", FolderController.get().getCurrentFolder().getName()), choice -> {
+			if (choice.booleanValue()) {
+				DropboxDialog.this.destroy();
+				LD.contactingServer();
+				DropboxService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(), paths,
+						new AsyncCallback<Integer>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+							}
 
-			@Override
-			public void execute(Boolean choice) {
-				if (choice.booleanValue()) {
-					DropboxDialog.this.destroy();
-					LD.contactingServer();
-					DropboxService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(), paths,
-							new AsyncCallback<Integer>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Integer count) {
-									LD.clearPrompt();
-									FolderNavigator.get().reload();
-									SC.say(I18N.message("importeddocs2", count.toString()));
-								}
-							});
-				}
+							@Override
+							public void onSuccess(Integer count) {
+								LD.clearPrompt();
+								FolderNavigator.get().reload();
+								SC.say(I18N.message("importeddocs2", count.toString()));
+							}
+						});
 			}
 		});
 	}

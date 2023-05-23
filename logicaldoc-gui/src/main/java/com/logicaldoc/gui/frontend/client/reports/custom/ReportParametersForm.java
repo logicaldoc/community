@@ -24,8 +24,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -102,14 +100,11 @@ public class ReportParametersForm extends Window {
 			} else if (att.getType() == GUIAttribute.TYPE_DATE) {
 				final DateItem item = ItemFactory.newDateItemForAttribute(att.getName(), att.getLabel());
 				item.setRequired(att.isMandatory());
-				item.addKeyPressHandler(new KeyPressHandler() {
-					@Override
-					public void onKeyPress(KeyPressEvent event) {
-						if ("backspace".equals(event.getKeyName().toLowerCase())
-								|| "delete".equals(event.getKeyName().toLowerCase())) {
-							item.clearValue();
-							item.setValue((Date) null);
-						}
+				item.addKeyPressHandler(event -> {
+					if ("backspace".equals(event.getKeyName().toLowerCase())
+							|| "delete".equals(event.getKeyName().toLowerCase())) {
+						item.clearValue();
+						item.setValue((Date) null);
 					}
 				});
 				items.add(item);
@@ -119,9 +114,7 @@ public class ReportParametersForm extends Window {
 		IButton execute = new IButton();
 		execute.setTitle(I18N.message("execute"));
 		execute.setAutoFit(true);
-		execute.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-			onExecute();
-		});
+		execute.addClickHandler(event -> onExecute());
 
 		HLayout buttonsBar = new HLayout();
 		buttonsBar.setWidth100();

@@ -6,8 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.EmailAccountService;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -52,31 +50,23 @@ public class EmailAccountDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (account.getId() != 0) {
-					EmailAccountService.Instance.get().get(account.getId(), new AsyncCallback<GUIEmailAccount>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (account.getId() != 0) {
+				EmailAccountService.Instance.get().get(account.getId(), new AsyncCallback<GUIEmailAccount>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIEmailAccount account) {
-							setAccount(account);
-						}
-					});
-				} else {
-					setAccount(new GUIEmailAccount());
-				}
-				tabSet.hideSave();
+					@Override
+					public void onSuccess(GUIEmailAccount account) {
+						setAccount(account);
+					}
+				});
+			} else {
+				setAccount(new GUIEmailAccount());
 			}
+			tabSet.hideSave();
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
@@ -123,7 +113,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 		}
 
 		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
-		
+
 		standardPanel = new EmailAccountStandardProperties(account, changeHandler);
 		standardTabPanel.addMember(standardPanel);
 

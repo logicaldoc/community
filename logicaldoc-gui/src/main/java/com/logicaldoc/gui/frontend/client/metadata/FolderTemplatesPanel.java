@@ -10,17 +10,12 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.HTMLFlow;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -33,6 +28,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class FolderTemplatesPanel extends AdminPanel {
 
 	private static final String FOLDERS = "folders";
+
 	private ListGrid grid;
 
 	public FolderTemplatesPanel() {
@@ -44,23 +40,15 @@ public class FolderTemplatesPanel extends AdminPanel {
 		ToolStripButton save = new ToolStripButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				saveTemplates();
-			}
-		});
+		save.addClickHandler(event -> saveTemplates());
 
 		ToolStripButton append = new ToolStripButton();
 		append.setAutoFit(true);
 		append.setTitle(I18N.message("appendtemplate"));
-		append.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute("pattern", "");
-				grid.getRecordList().add(rec);
-			}
+		append.addClickHandler(event -> {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("pattern", "");
+			grid.getRecordList().add(rec);
 		});
 
 		ToolStrip toolStrip = new ToolStrip();
@@ -89,14 +77,10 @@ public class FolderTemplatesPanel extends AdminPanel {
 
 		MenuItem clean = new MenuItem();
 		clean.setTitle(I18N.message("ddelete"));
-		clean.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value))
-							grid.removeData(grid.getSelectedRecord());
-				});
-			}
-		});
+		clean.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm))
+				grid.removeData(grid.getSelectedRecord());
+		}));
 
 		contextMenu.setItems(clean);
 		contextMenu.showContextMenu();
@@ -153,12 +137,9 @@ public class FolderTemplatesPanel extends AdminPanel {
 		grid.setModalEditing(true);
 		grid.setFields(name, folders);
 
-		grid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		grid.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		body.removeMember(grid);

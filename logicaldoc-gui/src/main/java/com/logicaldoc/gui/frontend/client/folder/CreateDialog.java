@@ -13,10 +13,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeNode;
 
@@ -54,26 +50,19 @@ public class CreateDialog extends Dialog {
 		inheritSecurity.setTitle(I18N.message("inheritparentsec"));
 		inheritSecurity.setHidden(!inheritOptionEnabled);
 
-		TextItem name = ItemFactory.newTextItem("name", folder.getType() == 0 ? I18N.message("newfolder") : I18N.message("newworkspace"));
+		TextItem name = ItemFactory.newTextItem("name",
+				folder.getType() == 0 ? I18N.message("newfolder") : I18N.message("newworkspace"));
 		name.setWidth(250);
 		name.setRequired(true);
-		name.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onCreate(folder);
-			}
+		name.addKeyPressHandler(event -> {
+			if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
+				onCreate(folder);
 		});
 
 		SubmitItem create = new SubmitItem();
 		create.setTitle(I18N.message("create"));
 		create.setAutoFit(true);
-		create.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onCreate(folder);
-			}
-		});
+		create.addClickHandler(event -> onCreate(folder));
 
 		form.setItems(name, inheritSecurity, create);
 		inheritSecurity.setValue("inherit".equals(Session.get().getConfig("gui.security.inheritoption.default")));

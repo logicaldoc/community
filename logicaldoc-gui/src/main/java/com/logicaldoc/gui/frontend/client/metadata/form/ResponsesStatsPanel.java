@@ -10,18 +10,12 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.FormService;
-import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import com.smartgwt.client.widgets.viewer.DetailFormatter;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 /**
@@ -47,34 +41,25 @@ public class ResponsesStatsPanel extends VLayout {
 
 		SpinnerItem tileWidth = ItemFactory.newSpinnerItem("tilesize", "tilesize", form.getStatChartWidth(), 150, null);
 		tileWidth.setStep(10);
-		tileWidth.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh((Integer) tileWidth.getValue());
-			}
-		});
+		tileWidth.addChangedHandler(event -> refresh((Integer) tileWidth.getValue()));
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (Boolean.TRUE.equals(tileWidth.validate())) {
-					form.setStatChartWidth((Integer) tileWidth.getValue());
-					FormService.Instance.get().save(form, new AsyncCallback<GUIForm>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		save.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(tileWidth.validate())) {
+				form.setStatChartWidth((Integer) tileWidth.getValue());
+				FormService.Instance.get().save(form, new AsyncCallback<GUIForm>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIForm frm) {
-							form.setId(frm.getId());
-							refresh(form.getStatChartWidth());
-						}
-					});
-				}
+					@Override
+					public void onSuccess(GUIForm frm) {
+						form.setId(frm.getId());
+						refresh(form.getStatChartWidth());
+					}
+				});
 			}
 		});
 
@@ -105,23 +90,18 @@ public class ResponsesStatsPanel extends VLayout {
 		grid.setDataSource(new AttributesDS(form.getTemplateId()));
 
 		DetailViewerField chart = new DetailViewerField("name");
-		chart.setDetailFormatter(new DetailFormatter() {
+		chart.setDetailFormatter((value, rec, field) -> {
+			if (value == null)
+				return "";
 
-			@Override
-			public String format(Object value, Record rec, DetailViewerField field) {
-				if (value == null)
-					return "";
+			String attributeName = value.toString();
+			if (attributeName.startsWith("ext_"))
+				attributeName = attributeName.substring(4);
 
-				String attributeName = value.toString();
-				if (attributeName.startsWith("ext_"))
-					attributeName = attributeName.substring(4);
-
-				String chartUrl = Util.contextPath() + "formchart?formId=" + form.getId() + "&attribute="
-						+ attributeName + "&locale=" + I18N.getLocale() + "&width=" + tileWidth + "&random="
-						+ new Date().getTime();
-				return "<img border='0' align='absmidle' alt='" + value + "' title='" + value + "' src='" + chartUrl
-						+ "' />";
-			}
+			String chartUrl = Util.contextPath() + "formchart?formId=" + form.getId() + "&attribute=" + attributeName
+					+ "&locale=" + I18N.getLocale() + "&width=" + tileWidth + "&random=" + new Date().getTime();
+			return "<img border='0' align='absmidle' alt='" + value + "' title='" + value + "' src='" + chartUrl
+					+ "' />";
 		});
 		grid.setFields(chart);
 

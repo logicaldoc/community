@@ -23,14 +23,10 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -189,40 +185,24 @@ public class VisualPositioningStampDialog extends Window {
 
 		ToolStripButton apply = new ToolStripButton();
 		apply.setTitle(I18N.message("apply"));
-		apply.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onApply();
-			}
-		});
+		apply.addClickHandler(event -> onApply());
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStripButton zoomIn = new ToolStripButton();
 		zoomIn.setTitle(I18N.message("zoomin"));
-		zoomIn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (cropper != null)
-					cropper.resize(100);
-			}
+		zoomIn.addClickHandler(event -> {
+			if (cropper != null)
+				cropper.resize(100);
 		});
 
 		ToolStripButton zoomOut = new ToolStripButton();
 		zoomOut.setTitle(I18N.message("zoomout"));
-		zoomOut.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (cropper != null)
-					cropper.resize(-100);
-			}
+		zoomOut.addClickHandler(event -> {
+			if (cropper != null)
+				cropper.resize(-100);
 		});
 
 		pageCursor = ItemFactory.newSpinnerItem("page", "page", 1, 1,
@@ -230,24 +210,14 @@ public class VisualPositioningStampDialog extends Window {
 		pageCursor.setHint("/" + (firstSelectedDoc.getPreviewPages() > 0 ? firstSelectedDoc.getPreviewPages() : 1));
 		pageCursor.setSaveOnEnter(true);
 		pageCursor.setImplicitSave(true);
-		pageCursor.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				showPage((Integer) pageCursor.getValue());
-			}
-		});
+		pageCursor.addChangedHandler(event -> showPage((Integer) pageCursor.getValue()));
 
 		maintainAspectRatio = ItemFactory.newCheckbox("maintainaspectratio", "maintainaspectratio");
 		maintainAspectRatio.setVisible(stamp.getType() != GUIStamp.TYPE_TEXT);
 		maintainAspectRatio.setValue(stamp.getType() != GUIStamp.TYPE_TEXT);
-		maintainAspectRatio.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (cropper != null)
-					cropper.setMaintainSelectionAspectRatio((Boolean) event.getValue());
-			}
+		maintainAspectRatio.addChangedHandler(event -> {
+			if (cropper != null)
+				cropper.setMaintainSelectionAspectRatio((Boolean) event.getValue());
 		});
 
 		pageOption = ItemFactory.newRadioGroup("pageOption", "stampin");

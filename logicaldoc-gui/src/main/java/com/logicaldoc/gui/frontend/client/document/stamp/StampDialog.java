@@ -19,8 +19,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -38,18 +36,18 @@ public class StampDialog extends StickyWindow {
 	private SelectItem stampSelector;
 
 	protected DocumentsGrid sourceGrid;
-	
+
 	public StampDialog(DocumentsGrid sourceGrid) {
 		super("applystamp");
-		this.sourceGrid=sourceGrid;
-		
+		this.sourceGrid = sourceGrid;
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		setAutoSize(true);
 		centerInPage();
-		
+
 		stampSelector = ItemFactory.newStampSelector();
 		stampSelector.setTitle(I18N.message("choosestamp"));
 		stampSelector.setWrapTitle(false);
@@ -62,12 +60,7 @@ public class StampDialog extends StickyWindow {
 		ButtonItem apply = new ButtonItem();
 		apply.setTitle(I18N.message("apply"));
 		apply.setAutoFit(true);
-		apply.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onApply(sourceGrid);
-			}
-		});
+		apply.addClickHandler(event -> onApply(sourceGrid));
 
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setFields(stampSelector, visualPositioning, apply);
@@ -94,11 +87,11 @@ public class StampDialog extends StickyWindow {
 			@Override
 			public void onSuccess(GUIStamp stamp) {
 				LD.clearPrompt();
-				
+
 				Boolean visualPositioningFlag = visualPositioning.getValueAsBoolean();
 				if (stamp.getTemplateId() != null) {
 					// Display the for for filling the form parameters
-					FillStamp fillStamp=new FillStamp(sourceGrid, stamp, visualPositioningFlag);
+					FillStamp fillStamp = new FillStamp(sourceGrid, stamp, visualPositioningFlag);
 					fillStamp.show();
 					destroy();
 				} else {
@@ -107,7 +100,7 @@ public class StampDialog extends StickyWindow {
 			}
 		});
 	}
-		
+
 	static void applyStamp(GUIStamp stamp, Boolean visualPositioningFlag, Window popup, DocumentsGrid sourceGrid) {
 		if (Boolean.TRUE.equals(visualPositioningFlag)) {
 			VisualPositioningStampDialog dialog = new VisualPositioningStampDialog(sourceGrid, stamp);
@@ -115,39 +108,37 @@ public class StampDialog extends StickyWindow {
 			popup.destroy();
 		} else {
 			LD.contactingServer();
-			StampService.Instance.get().applyStamp(sourceGrid.getSelectedIds(), stamp,
-					new AsyncCallback<Void>() {
+			StampService.Instance.get().applyStamp(sourceGrid.getSelectedIds(), stamp, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(Void result) {
-							LD.clearPrompt();
-							GuiLog.info(I18N.message("event.stamped"), null);
-							GUIDocument[] docs = sourceGrid.getSelectedDocuments();
-							for (GUIDocument doc : docs) {
-								DocumentService.Instance.get().getById(doc.getId(),
-										new AsyncCallback<GUIDocument>() {
+				@Override
+				public void onSuccess(Void result) {
+					LD.clearPrompt();
+					GuiLog.info(I18N.message("event.stamped"), null);
+					GUIDocument[] docs = sourceGrid.getSelectedDocuments();
+					for (GUIDocument doc : docs) {
+						DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<GUIDocument>() {
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(GUIDocument document) {
-												sourceGrid.updateDocument(document);
-												DocumentController.get().modified(document);
-											}
-										});
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
 							}
-							popup.destroy();
-						}
-					});
+
+							@Override
+							public void onSuccess(GUIDocument document) {
+								sourceGrid.updateDocument(document);
+								DocumentController.get().modified(document);
+							}
+						});
+					}
+					popup.destroy();
+				}
+			});
 		}
 	}
 }

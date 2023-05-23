@@ -14,8 +14,6 @@ import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.security.FirewallPanel;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -91,31 +89,23 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (user.getId() != 0) {
-					SecurityService.Instance.get().getUser(user.getId(), new AsyncCallback<GUIUser>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), canceEvent -> {
+			if (user.getId() != 0) {
+				SecurityService.Instance.get().getUser(user.getId(), new AsyncCallback<GUIUser>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIUser user) {
-							setUser(user);
-						}
-					});
-				} else {
-					setUser(new GUIUser());
-				}
-				tabSet.hideSave();
+					@Override
+					public void onSuccess(GUIUser user) {
+						setUser(user);
+					}
+				});
+			} else {
+				setUser(new GUIUser());
 			}
+			tabSet.hideSave();
 		});
 
 		Tab propertiesTab = new Tab(I18N.message(TABID_PROPERTIES));
@@ -313,7 +303,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 
 	private ChangedHandler prepareChangeHandler() {
 		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
-		
+
 		// Admin only can change the 'admin' user
 		if (user.getUsername().equalsIgnoreCase(ADMIN)
 				&& !Session.get().getUser().getUsername().equalsIgnoreCase(ADMIN))

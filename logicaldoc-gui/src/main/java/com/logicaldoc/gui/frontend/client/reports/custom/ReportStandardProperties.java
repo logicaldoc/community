@@ -3,12 +3,10 @@ package com.logicaldoc.gui.frontend.client.reports.custom;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewTile;
 import com.smartgwt.client.types.TitleOrientation;
@@ -49,12 +47,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		outputFolderSelector.setTitle(I18N.message("outputfolder"));
 		if (report.getOutputFolder() != null)
 			outputFolderSelector.setFolder(report.getOutputFolder());
-		outputFolderSelector.addFolderChangeListener(new FolderChangeListener() {
-			@Override
-			public void onChanged(GUIFolder folder) {
-				changedHandler.onChanged(null);
-			}
-		});
+		outputFolderSelector.addFolderChangeListener(folder -> changedHandler.onChanged(null));
 
 		refresh();
 	}

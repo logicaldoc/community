@@ -6,7 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
@@ -138,15 +137,12 @@ public class UserInterfacePanel extends HLayout {
 			TextAreaItem textArea = ItemFactory.newTextAreaItem(DOCSGRIDLAYOUT, null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message(DOCSGRIDLAYOUT), I18N.message(DOCSGRIDLAYOUT),
-					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, new ValueCallback() {
-						@Override
-						public void execute(final String value) {
-							if (!readonly) {
-								user.setDocsGrid(value);
-								changedHandler.onChanged(null);
-								docsGrid.setValue(value != null && !value.isEmpty() ? I18N.message(CUSTOMIZED)
-										: I18N.message(NOTCUSTOMIZED));
-							}
+					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, value -> {
+						if (!readonly) {
+							user.setDocsGrid(value);
+							changedHandler.onChanged(null);
+							docsGrid.setValue(value != null && !value.isEmpty() ? I18N.message(CUSTOMIZED)
+									: I18N.message(NOTCUSTOMIZED));
 						}
 					});
 			event.cancel();

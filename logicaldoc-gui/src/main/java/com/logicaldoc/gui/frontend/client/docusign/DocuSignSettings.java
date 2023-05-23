@@ -14,8 +14,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to handle DocuSign settings.
@@ -60,8 +58,7 @@ public class DocuSignSettings extends Window {
 		accountId.setRequired(true);
 		accountId.setWidth(300);
 
-		TextItem integrationKey = ItemFactory.newTextItem("integrationkey", 
-				settings.getIntegrationKey());
+		TextItem integrationKey = ItemFactory.newTextItem("integrationkey", settings.getIntegrationKey());
 		integrationKey.setRequired(true);
 		integrationKey.setWidth(300);
 
@@ -74,7 +71,7 @@ public class DocuSignSettings extends Window {
 		authBaseUrl.setRequired(true);
 		authBaseUrl.setValueMap("https://account.docusign.com", "https://account-d.docusign.com");
 		authBaseUrl.setWidth(300);
-		
+
 		TextItem accountBaseUrl = ItemFactory.newTextItem("accountbaseurl", settings.getApiBaseUrl());
 		accountBaseUrl.setRequired(true);
 		accountBaseUrl.setWidth(300);
@@ -87,13 +84,7 @@ public class DocuSignSettings extends Window {
 		ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
 		authorize.setAutoFit(true);
 
-		authorize.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onAuthorize();
-			}
-		});
+		authorize.addClickHandler(event -> onAuthorize());
 
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setFields(authBaseUrl, accountBaseUrl, callbackUrl, accountId, integrationKey, secretKey, authorize);

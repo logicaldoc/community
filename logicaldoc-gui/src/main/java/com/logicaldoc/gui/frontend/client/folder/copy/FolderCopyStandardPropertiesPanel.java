@@ -22,10 +22,6 @@ import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.form.validator.DoesntContainValidator;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -107,13 +103,13 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 
 		if (Feature.enabled(Feature.TAGS))
 			fillTagsForm();
-		
+
 		rows.addMember(form2);
 	}
 
 	private void fillTagsForm() {
 		List<FormItem> items = new ArrayList<>();
-		
+
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
 
@@ -124,17 +120,14 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		final TextItem newTagItem = ItemFactory.newTextItem("newtag", null);
 		newTagItem.setRequired(false);
 		newTagItem.setEndRow(true);
-		newTagItem.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null && event.getKeyName() != null
-						&& "enter".equals(event.getKeyName().toLowerCase())) {
-					String input = newTagItem.getValueAsString().trim();
-					newTagItem.clearValue();
+		newTagItem.addKeyPressHandler(event -> {
+			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
+					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
+				String input = newTagItem.getValueAsString().trim();
+				newTagItem.clearValue();
 
-					if (!"".equals(input))
-						addTagFromInput(ds, input);
-				}
+				if (!"".equals(input))
+					addTagFromInput(ds, input);
 			}
 		});
 
@@ -146,17 +139,15 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		editTags.setSrc("[SKIN]/actions/edit.png");
 		editTags.setWidth(16);
 		editTags.setHeight(16);
-		editTags.addFormItemClickHandler(new FormItemClickHandler() {
-			public void onFormItemClick(final FormItemIconClickEvent event) {
-				tagsString.setVisible(false);
-				tagItem.setVisible(true);
-				tagItem.setEndRow(true);
-				if (items.contains(newTagItem)) {
-					newTagItem.setVisible(true);
-					newTagItem.setEndRow(true);
-				}
-				form2.redraw();
+		editTags.addFormItemClickHandler(event -> {
+			tagsString.setVisible(false);
+			tagItem.setVisible(true);
+			tagItem.setEndRow(true);
+			if (items.contains(newTagItem)) {
+				newTagItem.setVisible(true);
+				newTagItem.setEndRow(true);
 			}
+			form2.redraw();
 		});
 
 		tagsString.setIcons(editTags);
@@ -167,10 +158,10 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		newTagItem.setVisible(false);
 		if ("free".equals(mode) && folder.isWrite())
 			items.add(newTagItem);
-		
+
 		form2.setItems(items.toArray(new FormItem[0]));
 	}
-	
+
 	private void addTagFromInput(final TagsDS ds, String input) {
 		// replace the escapes \, with a string so the
 		// tokenizer will work propertly

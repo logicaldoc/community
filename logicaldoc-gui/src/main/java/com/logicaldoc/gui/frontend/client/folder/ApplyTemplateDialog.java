@@ -10,8 +10,6 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -46,15 +44,15 @@ public class ApplyTemplateDialog extends Dialog {
 		folders.setWidth100();
 		folders.setHeight100();
 
-		final boolean inheritOptionEnabled = "true".equals(Session.get().getInfo()
-				.getConfig("gui.security.inheritoption"));
+		final boolean inheritOptionEnabled = "true"
+				.equals(Session.get().getInfo().getConfig("gui.security.inheritoption"));
 
 		final DynamicForm form = new DynamicForm();
 
 		CheckboxItem inheritSecurity = new CheckboxItem();
 		inheritSecurity.setName("inheritSecurity");
 		inheritSecurity.setTitle(I18N.message("inheritparentsec"));
-		
+
 		SelectItem templateSelector = ItemFactory.newFolderTemplateSelector();
 
 		if (inheritOptionEnabled)
@@ -65,32 +63,30 @@ public class ApplyTemplateDialog extends Dialog {
 		Button apply = new Button(I18N.message("apply"));
 		apply.setAutoFit(true);
 		apply.setMargin(1);
-		apply.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (!form.validate())
-					return;
+		apply.addClickHandler(event -> {
+			if (!form.validate())
+				return;
 
-				final TreeNode selectedNode = (TreeNode) FolderNavigator.get().getSelectedRecord();
-				final long folderId = Long.parseLong(selectedNode.getAttributeAsString("folderId"));
-				long templateId = Long.parseLong(form.getValueAsString("foldertemplate"));
+			final TreeNode selectedNode = (TreeNode) FolderNavigator.get().getSelectedRecord();
+			final long folderId = Long.parseLong(selectedNode.getAttributeAsString("folderId"));
+			long templateId = Long.parseLong(form.getValueAsString("foldertemplate"));
 
-				FolderService.Instance.get().applyTemplate(folderId, templateId,
-						inheritOptionEnabled && "true".equals(form.getValueAsString("inheritSecurity")),
-						new AsyncCallback<Void>() {
+			FolderService.Instance.get().applyTemplate(folderId, templateId,
+					inheritOptionEnabled && "true".equals(form.getValueAsString("inheritSecurity")),
+					new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void arg0) {
-								FolderNavigator.get().getTree().reloadChildren(selectedNode);
-								GuiLog.info(I18N.message("templateapplied"), null);
-								destroy();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void arg0) {
+							FolderNavigator.get().getTree().reloadChildren(selectedNode);
+							GuiLog.info(I18N.message("templateapplied"), null);
+							destroy();
+						}
+					});
 		});
 
 		content.setMembers(form, apply);

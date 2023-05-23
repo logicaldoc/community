@@ -17,8 +17,6 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to upload a new contacts file to the server.
@@ -29,6 +27,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 public class ContactsImportSettings extends Window {
 
 	private static final String COLUMNINDEX = "columnindex";
+
 	private DynamicForm form;
 
 	public ContactsImportSettings() {
@@ -107,12 +106,7 @@ public class ContactsImportSettings extends Window {
 		SubmitItem importButton = new SubmitItem();
 		importButton.setTitle(I18N.message("iimport"));
 		importButton.setEndRow(true);
-		importButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onImport();
-			}
-		});
+		importButton.addClickHandler(event -> onImport());
 
 		form.setItems(separated, delimiter, skip, firstName, lastName, email, company, phone, mobile, address,
 				importButton);

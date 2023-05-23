@@ -15,19 +15,12 @@ import com.logicaldoc.gui.frontend.client.services.SchemeService;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.HTMLFlow;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -148,38 +141,32 @@ public class CustomIdPanel extends AdminPanel {
 		else
 			customIds.setFields(template, scheme, evaluateAtCheckin, evaluateAtUpdate);
 
-		customIds.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showSchemeContextMenu(customIds);
-				event.cancel();
-			}
+		customIds.addCellContextClickHandler(event -> {
+			showSchemeContextMenu(customIds);
+			event.cancel();
 		});
 
-		customIds.addEditCompleteHandler(new EditCompleteHandler() {
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
-				GUIScheme cid = new GUIScheme();
-				ListGridRecord rec = customIds.getRecord(event.getRowNum());
-				cid.setTemplateId(Long.parseLong(rec.getAttribute(TEMPLATE_ID)));
-				cid.setEvaluateAtCheckin(rec.getAttributeAsBoolean(EVALUATE_AT_CHECKIN));
-				cid.setEvaluateAtUpdate(rec.getAttributeAsBoolean(EVALUATE_AT_UPDATE));
-				cid.setScheme(rec.getAttributeAsString(SCHEME));
-				cid.setType(rec.getAttributeAsString("type"));
+		customIds.addEditCompleteHandler(event -> {
+			GUIScheme cid = new GUIScheme();
+			ListGridRecord rec = customIds.getRecord(event.getRowNum());
+			cid.setTemplateId(Long.parseLong(rec.getAttribute(TEMPLATE_ID)));
+			cid.setEvaluateAtCheckin(rec.getAttributeAsBoolean(EVALUATE_AT_CHECKIN));
+			cid.setEvaluateAtUpdate(rec.getAttributeAsBoolean(EVALUATE_AT_UPDATE));
+			cid.setScheme(rec.getAttributeAsString(SCHEME));
+			cid.setType(rec.getAttributeAsString("type"));
 
-				SchemeService.Instance.get().save(cid, new AsyncCallback<Void>() {
+			SchemeService.Instance.get().save(cid, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void ret) {
-						// Nothing to do
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void ret) {
+					// Nothing to do
+				}
+			});
 		});
 
 		VLayout sc = new VLayout();
@@ -198,11 +185,7 @@ public class CustomIdPanel extends AdminPanel {
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
 		refresh.setAutoFit(true);
-		refresh.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				refreshSequences();
-			}
-		});
+		refresh.addClickHandler(event -> refreshSequences());
 		toolStrip.addButton(refresh);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"));
@@ -237,31 +220,25 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.setModalEditing(true);
 		sequences.setFields(id, frequency, template, folder, value);
 
-		sequences.addEditCompleteHandler(new EditCompleteHandler() {
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
-				ListGridRecord rec = sequences.getRecord(event.getRowNum());
-				SchemeService.Instance.get().resetSequence(Long.parseLong(rec.getAttribute("id")),
-						(Integer) rec.getAttributeAsInt(VALUE), new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		sequences.addEditCompleteHandler(event -> {
+			ListGridRecord rec = sequences.getRecord(event.getRowNum());
+			SchemeService.Instance.get().resetSequence(Long.parseLong(rec.getAttribute("id")),
+					(Integer) rec.getAttributeAsInt(VALUE), new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void ret) {
-								// Nothing to do
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void ret) {
+							// Nothing to do
+						}
+					});
 		});
 
-		sequences.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showSequencesContextMenu();
-				event.cancel();
-			}
+		sequences.addCellContextClickHandler(event -> {
+			showSequencesContextMenu();
+			event.cancel();
 		});
 
 		sequencesPanel = new VLayout();
@@ -303,10 +280,9 @@ public class CustomIdPanel extends AdminPanel {
 
 		MenuItem clean = new MenuItem();
 		clean.setTitle(I18N.message("clean"));
-		clean.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmclean"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+		clean.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmclean"), (Boolean confirm) -> {
+					if (Boolean.TRUE.equals(confirm)) {
 						final ListGridRecord rec = schemes.getSelectedRecord();
 						SchemeService.Instance.get().delete(Long.parseLong(rec.getAttributeAsString(TEMPLATE_ID)),
 								rec.getAttributeAsString("type"), new AsyncCallback<Void>() {
@@ -325,9 +301,7 @@ public class CustomIdPanel extends AdminPanel {
 									}
 								});
 					}
-				});
-			}
-		});
+				}));
 
 		contextMenu.setItems(clean);
 		contextMenu.showContextMenu();
@@ -341,10 +315,9 @@ public class CustomIdPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean confirm) -> {
+					if (Boolean.TRUE.equals(confirm)) {
 						SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -358,9 +331,7 @@ public class CustomIdPanel extends AdminPanel {
 							}
 						});
 					}
-				});
-			}
-		});
+				}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

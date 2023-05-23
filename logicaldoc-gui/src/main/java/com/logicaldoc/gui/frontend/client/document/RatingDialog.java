@@ -25,10 +25,8 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 public class RatingDialog extends Window {
@@ -78,12 +76,8 @@ public class RatingDialog extends Window {
 		totalVotes.addClickHandler(event -> {
 			ListGridField vote = new ListGridField("vote", I18N.message("vote"), 94);
 			vote.setAlign(Alignment.CENTER);
-			vote.setCellFormatter(new CellFormatter() {
-
-				@Override
-				public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-					return DocUtil.getRatingIcon((Integer) value);
-				}
+			vote.setCellFormatter((value, rec, rowNum, colNum) -> {
+				return DocUtil.getRatingIcon((Integer) value);
 			});
 
 			ListGridField user = new ListGridField("user", I18N.message("user"), 140);

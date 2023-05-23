@@ -11,8 +11,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 
 /**
  * This is the dialog used to quickly associate a converter to formats
@@ -23,7 +21,9 @@ import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 public class ExtensionAliasesDialog extends Window {
 
 	private static final String ALIASES = "aliases";
+
 	private static final String EXTENSION = "extension";
+
 	private ListGrid extensionsGrid;
 
 	public ExtensionAliasesDialog() {
@@ -60,28 +60,25 @@ public class ExtensionAliasesDialog extends Window {
 		extensionsGrid.setDataSource(new ExtensionAliasesDS());
 		extensionsGrid.setFields(extension, aliases);
 
-		extensionsGrid.addEditCompleteHandler(new EditCompleteHandler() {
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
-				ListGridRecord rec = extensionsGrid.getRecord(event.getRowNum());
+		extensionsGrid.addEditCompleteHandler(event -> {
+			ListGridRecord rec = extensionsGrid.getRecord(event.getRowNum());
 
-				String extension = rec.getAttributeAsString(EXTENSION);
-				String aliases = (String) event.getNewValues().get(ALIASES);
-				aliases = aliases.trim().toLowerCase().replace(" ", "");
+			String extn = rec.getAttributeAsString(EXTENSION);
+			String als = (String) event.getNewValues().get(ALIASES);
+			als = als.trim().toLowerCase().replace(" ", "");
 
-				SettingService.Instance.get().saveExtensionAliases(extension, aliases, new AsyncCallback<Void>() {
+			SettingService.Instance.get().saveExtensionAliases(extn, als, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						GuiLog.info(I18N.message("settingssaved"), null);
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void arg0) {
+					GuiLog.info(I18N.message("settingssaved"), null);
+				}
+			});
 		});
 
 		addItem(extensionsGrid);

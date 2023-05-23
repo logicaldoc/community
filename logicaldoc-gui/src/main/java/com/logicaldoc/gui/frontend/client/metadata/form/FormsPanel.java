@@ -21,7 +21,6 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -83,16 +82,12 @@ public class FormsPanel extends AdminPanel {
 		ListGridField webEnabled = new ListGridField(WEB_ENABLED, I18N.message("web"), 50);
 
 		ListGridField permaLink = new ListGridField(PREVIEW, I18N.message(PREVIEW), 90);
-		permaLink.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(WEB_ENABLED))) {
-					return "<a href='" + webformURL(rec.getAttributeAsString(FORM_ID)) + "' target='_blank'>"
-							+ I18N.message(PREVIEW) + "</a>";
-				} else
-					return "";
-			}
+		permaLink.setCellFormatter((value, rec, rowNum, colNum) -> {
+			if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(WEB_ENABLED))) {
+				return "<a href='" + webformURL(rec.getAttributeAsString(FORM_ID)) + "' target='_blank'>"
+						+ I18N.message(PREVIEW) + "</a>";
+			} else
+				return "";
 		});
 
 		list = new RefreshableListGrid();
@@ -178,23 +173,23 @@ public class FormsPanel extends AdminPanel {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((MenuItemClickEvent event) -> {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				if (Boolean.TRUE.equals(value)) {
+					FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								showFormDetails(null);
-							}
-						});
-					}
-				});
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+							showFormDetails(null);
+						}
+					});
+				}
+			});
 		});
 
 		MenuItem edit = new MenuItem();

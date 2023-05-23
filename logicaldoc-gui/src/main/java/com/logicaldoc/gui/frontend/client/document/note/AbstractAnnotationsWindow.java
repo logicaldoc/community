@@ -35,10 +35,6 @@ import com.smartgwt.client.widgets.drawing.DrawShape;
 import com.smartgwt.client.widgets.drawing.LineToCommand;
 import com.smartgwt.client.widgets.drawing.MoveToCommand;
 import com.smartgwt.client.widgets.drawing.Point;
-import com.smartgwt.client.widgets.drawing.events.MovedEvent;
-import com.smartgwt.client.widgets.drawing.events.MovedHandler;
-import com.smartgwt.client.widgets.drawing.events.ResizedEvent;
-import com.smartgwt.client.widgets.drawing.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.fields.SliderItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -413,20 +409,8 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		if (note.isShowKnobs())
 			showKnowbs(drawItem);
 
-		drawItem.addMovedHandler(new MovedHandler() {
-
-			@Override
-			public void onMoved(MovedEvent event) {
-				note.setMovedOrResized(true);
-			}
-		});
-		drawItem.addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				note.setMovedOrResized(true);
-			}
-		});
+		drawItem.addMovedHandler(event -> note.setMovedOrResized(true));
+		drawItem.addResizedHandler(event -> note.setMovedOrResized(true));
 
 		return drawItem;
 	}

@@ -11,21 +11,15 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.gui.frontend.client.services.TagService;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the tags list with each tag count.
@@ -46,13 +40,10 @@ public class TagsPreset extends VLayout {
 
 		final SelectItem mode = ItemFactory.newTagInputMode("mode", "inputmode");
 		mode.setValue(tagMode);
-		mode.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				SettingService.Instance.get().saveSettings(
-						new GUIParameter[] { new GUIParameter(Session.get().getTenantName() + ".tag.mode", mode
-								.getValueAsString()) }, new AsyncCallback<Void>() {
+		mode.addChangedHandler(event -> SettingService.Instance.get()
+				.saveSettings(new GUIParameter[] {
+						new GUIParameter(Session.get().getTenantName() + ".tag.mode", mode.getValueAsString()) },
+						new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable t) {
@@ -61,42 +52,31 @@ public class TagsPreset extends VLayout {
 
 							@Override
 							public void onSuccess(Void arg) {
-								Session.get()
-										.getInfo()
-										.setConfig(Session.get().getTenantName() + ".tag.mode", mode.getValueAsString());
+								Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.mode",
+										mode.getValueAsString());
 								GuiLog.info(I18N.message("settingssaved"), null);
 							}
-						});
-			}
-		});
+						}));
 
 		addTag = new ButtonItem();
 		addTag.setTitle(I18N.message("addtag"));
 		addTag.setAutoFit(true);
 		addTag.setRequired(true);
-		addTag.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				LD.askForValue(I18N.message("addtag"), I18N.message("tag"), "", new ValueCallback() {
+		addTag.addClickHandler(event -> LD.askForValue(I18N.message("addtag"), I18N.message("tag"), "", value -> {
+			if (value != null && !"".equals(value))
+				TagService.Instance.get().addTag(value, new AsyncCallback<Void>() {
 					@Override
-					public void execute(String value) {
-						if (value != null && !"".equals(value))
-							TagService.Instance.get().addTag(value, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-								@Override
-								public void onSuccess(Void arg0) {
-									GuiLog.info(I18N.message("settingssaved"), null);
-									reloadTags();
-								}
-							});
+					@Override
+					public void onSuccess(Void arg0) {
+						GuiLog.info(I18N.message("settingssaved"), null);
+						reloadTags();
 					}
 				});
-			}
-		});
+		}));
 
 		form.setItems(mode, addTag);
 		addMember(form);
@@ -120,12 +100,9 @@ public class TagsPreset extends VLayout {
 		tags.setFields(index, word);
 		tags.setDataSource(new TagsDS("preset", true, null, null));
 		tags.setAutoFetchData(true);
-		tags.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		tags.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		addMember(tags);
@@ -136,22 +113,20 @@ public class TagsPreset extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("delete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = tags.getSelectedRecord();
-				TagService.Instance.get().removeTag(selection.getAttributeAsString("word"), new AsyncCallback<Void>() {
+		delete.addClickHandler(event -> {
+			ListGridRecord selection = tags.getSelectedRecord();
+			TagService.Instance.get().removeTag(selection.getAttributeAsString("word"), new AsyncCallback<Void>() {
 
-					@Override
-					public void onSuccess(Void arg0) {
-						tags.removeSelectedData();
-					}
+				@Override
+				public void onSuccess(Void arg0) {
+					tags.removeSelectedData();
+				}
 
-					@Override
-					public void onFailure(Throwable arg0) {
-						GuiLog.serverError(arg0);
-					}
-				});
-			}
+				@Override
+				public void onFailure(Throwable arg0) {
+					GuiLog.serverError(arg0);
+				}
+			});
 		});
 		contextMenu.addItem(delete);
 

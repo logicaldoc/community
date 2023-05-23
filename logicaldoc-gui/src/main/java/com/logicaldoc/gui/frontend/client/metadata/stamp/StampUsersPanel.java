@@ -16,19 +16,12 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the list of users assigned to a stamp.
@@ -60,33 +53,29 @@ public class StampUsersPanel extends VLayout {
 		final DynamicForm userForm = new DynamicForm();
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		user.setMultiple(true);
-		user.addChangedHandler(new ChangedHandler() {
+		user.addChangedHandler(event -> {
+			ListGridRecord[] selection = user.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord[] selection = user.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
+			long ids[] = new long[selection.length];
+			for (int i = 0; i < ids.length; i++)
+				ids[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
 
-				long ids[] = new long[selection.length];
-				for (int i = 0; i < ids.length; i++)
-					ids[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
+			StampService.Instance.get().addUsers(ids, stampId, new AsyncCallback<Void>() {
 
-				StampService.Instance.get().addUsers(ids, stampId, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+					user.clearValue();
+				}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						user.clearValue();
-					}
-
-					@Override
-					public void onSuccess(Void ret) {
-						list.refresh(new StampUsersDS(stampId));
-						user.clearValue();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void ret) {
+					list.refresh(new StampUsersDS(stampId));
+					user.clearValue();
+				}
+			});
 		});
 
 		userForm.setItems(user);
@@ -136,19 +125,12 @@ public class StampUsersPanel extends VLayout {
 		list.setDataSource(new StampUsersDS(stampId));
 		list.setFields(id, enabled, avatar, username, firstName, name, email, cell, phone);
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showusers", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showusers", Integer.toString(list.getTotalRows()))));
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		setMembers(infoPanel, list, buttons);
@@ -161,31 +143,29 @@ public class StampUsersPanel extends VLayout {
 
 		MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("remove"));
-		remove.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null || selection.length == 0)
-					return;
-				final long[] ids = new long[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
+		remove.addClickHandler(event -> {
+			if (selection == null || selection.length == 0)
+				return;
+			final long[] ids = new long[selection.length];
+			for (int i = 0; i < selection.length; i++)
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						StampService.Instance.get().removeUsers(ids, stampId, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+				if (Boolean.TRUE.equals(confirm)) {
+					StampService.Instance.get().removeUsers(ids, stampId, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-							}
-						});
-					}
-				});
-			}
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+						}
+					});
+				}
+			});
 		});
 
 		if (selection == null || selection.length < 1)

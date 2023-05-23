@@ -15,9 +15,6 @@ import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.DropMoveEvent;
-import com.smartgwt.client.widgets.events.DropMoveHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -25,14 +22,9 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Shows the set of filters associated to the curent account
@@ -43,10 +35,15 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 	private static final String TARGET_NAME = "targetName";
+
 	private static final String TARGET_ID = "targetId";
+
 	private static final String CONDITION = "condition";
+
 	private static final String FIELD = "field";
+
 	private static final String EXPRESSION = "expression";
+
 	private ListGrid list;
 
 	public EmailAccountFiltersPanel(GUIEmailAccount account, ChangedHandler changedHandler) {
@@ -90,27 +87,14 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 		list.setFields(field, condition, expression, target);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addDropMoveHandler(new DropMoveHandler() {
-			@Override
-			public void onDropMove(DropMoveEvent event) {
-				changedHandler.onChanged(null);
-			}
-		});
+		list.addDropMoveHandler(event -> changedHandler.onChanged(null));
 
-		list.addEditCompleteHandler(new EditCompleteHandler() {
-			@Override
-			public void onEditComplete(EditCompleteEvent event) {
-				changedHandler.onChanged(null);
-			}
-		});
+		list.addEditCompleteHandler(event -> changedHandler.onChanged(null));
 
 		formsContainer.setMembers(list);
 		setMembers(formsContainer, addRule);
@@ -167,7 +151,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		final ListGridField target = new ListGridField(TARGET_NAME, I18N.message("targetfolder"));
 		target.setWidth(150);
 		target.setCanEdit(false);
-		target.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		target.setCellFormatter((value, rec, rowNum, colNum) -> {
 			return "";
 		});
 		return target;
@@ -184,7 +168,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		conditionSelect.setValueMap(map2);
 		condition.setEditorType(conditionSelect);
 		conditionSelect.addChangedHandler(changedHandler);
-		condition.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		condition.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if ("0".equals(value))
 				return I18N.message("contains");
 			else if ("1".equals(value))
@@ -201,7 +185,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		SelectItem fieldSelect = ItemFactory.newEmailFields(FIELD, FIELD);
 		field.setEditorType(fieldSelect);
 		fieldSelect.addChangedHandler(changedHandler);
-		field.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		field.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if ("0".equals(value))
 				return I18N.message("subject");
 			else if ("1".equals(value))
@@ -217,7 +201,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 	private IButton prepareAddRuleButton() {
 		IButton addRule = new IButton(I18N.message("addrule"));
 		addRule.setHeight(25);
-		addRule.addClickHandler((ClickEvent addRuleClick) -> {
+		addRule.addClickHandler(addRuleClick -> {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute(FIELD, "0");
 			rec.setAttribute(CONDITION, "0");
@@ -267,16 +251,12 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						list.removeSelectedData();
-						changedHandler.onChanged(null);
-					}
-				});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				list.removeSelectedData();
+				changedHandler.onChanged(null);
 			}
-		});
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

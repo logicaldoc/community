@@ -2,9 +2,7 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import java.util.Date;
 
-import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
@@ -369,13 +367,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		if (selectedOcrTemplate != null && selectedOcrTemplate.getSample() != null) {
 			String url = Util.contextPath() + "barcodetemplateimage/" + selectedOcrTemplate.getId() + "?random="
 					+ new Date().getTime();
-			sample = new ImageWithCanvases(url, getWidth().intValue() - 50, null, new CallBack() {
-
-				@Override
-				public void onImagesLoaded(ImageElement[] imageElements) {
-					showZones();
-				}
-			});
+			sample = new ImageWithCanvases(url, getWidth().intValue() - 50, null, imageElements -> showZones());
 
 			editorPanel.addMember(sample);
 		}

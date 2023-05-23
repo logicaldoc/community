@@ -8,14 +8,10 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -35,12 +31,9 @@ public class DocuSignNewTabDialog extends Window {
 		super();
 		this.callback = callback;
 
-		HeaderControl close = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent e) {
-				if (form.validate())
-					destroy();
-			}
+		HeaderControl close = new HeaderControl(HeaderControl.CLOSE, e -> {
+			if (form.validate())
+				destroy();
 		});
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, close);
@@ -79,40 +72,28 @@ public class DocuSignNewTabDialog extends Window {
 		final ComboBoxItem recipientEmail = ItemFactory.newEmailComboSelector("recipientEmail", "recipientemail");
 		recipientEmail.setRequired(true);
 		recipientEmail.setWidth(300);
-		recipientEmail.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord selection = recipientEmail.getSelectedRecord();
-				String firstName = selection.getAttributeAsString("firstName");
-				String lastName = selection.getAttributeAsString("lastName");
-				String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
-				if (!fullName.isEmpty())
-					recipient.setValue(fullName);
-			}
+		recipientEmail.addChangedHandler(event -> {
+			ListGridRecord selection = recipientEmail.getSelectedRecord();
+			String firstName = selection.getAttributeAsString("firstName");
+			String lastName = selection.getAttributeAsString("lastName");
+			String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+			if (!fullName.isEmpty())
+				recipient.setValue(fullName);
 		});
 
 		form.setItems(type, recipient, recipientEmail);
 
 		IButton save = new IButton(I18N.message("add"));
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				if (form.validate()) {
-					onSave();
-				}
+		save.addClickHandler(event -> {
+			if (form.validate()) {
+				onSave();
 			}
 		});
 
 		IButton close = new IButton(I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				if (form.validate()) {
-					destroy();
-				}
+		close.addClickHandler(event -> {
+			if (form.validate()) {
+				destroy();
 			}
 		});
 

@@ -6,8 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -42,31 +40,23 @@ public class GroupDetailsPanel extends VLayout {
 		setHeight100();
 		setWidth100();
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (group.getId() != 0) {
-					SecurityService.Instance.get().getGroup(group.getId(), new AsyncCallback<GUIGroup>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (group.getId() != 0) {
+				SecurityService.Instance.get().getGroup(group.getId(), new AsyncCallback<GUIGroup>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIGroup group) {
-							setGroup(group);
-						}
-					});
-				} else {
-					setGroup(new GUIGroup());
-				}
-				tabSet.hideSave();
+					@Override
+					public void onSuccess(GUIGroup group) {
+						setGroup(group);
+					}
+				});
+			} else {
+				setGroup(new GUIGroup());
 			}
+			tabSet.hideSave();
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));

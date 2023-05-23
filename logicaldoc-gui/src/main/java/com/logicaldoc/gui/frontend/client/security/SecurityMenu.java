@@ -15,7 +15,6 @@ import com.logicaldoc.gui.frontend.client.security.user.UsersPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -76,12 +75,7 @@ public class SecurityMenu extends VLayout {
 		Button groups = new Button(I18N.message("groups"));
 		groups.setWidth100();
 		groups.setHeight(25);
-		groups.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new GroupsPanel());
-			}
-		});
+		groups.addClickHandler(event -> AdminScreen.get().setContent(new GroupsPanel()));
 		addMember(groups);
 	}
 

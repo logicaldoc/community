@@ -5,8 +5,6 @@ import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
@@ -47,12 +45,10 @@ public class CreateAliasDialog extends Dialog {
 		Button create = new Button(I18N.message("create"));
 		create.setAutoFit(true);
 		create.setMargin(1);
-		create.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				FolderNavigator.get().createAlias(
-						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
-				destroy();
-			}
+		create.addClickHandler(event -> {
+			FolderNavigator.get()
+					.createAlias(Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
+			destroy();
 		});
 
 		buttons.setMembers(create);

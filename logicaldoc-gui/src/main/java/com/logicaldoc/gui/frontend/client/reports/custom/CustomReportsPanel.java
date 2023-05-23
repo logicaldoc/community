@@ -27,22 +27,13 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -136,22 +127,13 @@ public class CustomReportsPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton newReport = new ToolStripButton();
 		newReport.setTitle(I18N.message("newreport"));
-		newReport.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				ReportUploader dialog = new ReportUploader(CustomReportsPanel.this, null);
-				dialog.show();
-			}
+		newReport.addClickHandler(event -> {
+			list.deselectAllRecords();
+			new ReportUploader(CustomReportsPanel.this, null).show();
 		});
 
 		/**
@@ -165,27 +147,15 @@ public class CustomReportsPanel extends AdminPanel {
 
 		body.setMembers(toolStrip, listing, detailsContainer);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				onSelectedReport();
-			}
-		});
+		list.addSelectionChangedHandler(event -> onSelectedReport());
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showreports", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showreports", Integer.toString(list.getTotalRows()))));
 
 		refresh();
 
@@ -273,9 +243,8 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem execute = new MenuItem();
 		execute.setTitle(I18N.message("execute"));
-		execute.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ReportService.Instance.get().getReport(selectedId, false, new AsyncCallback<GUIReport>() {
+		execute.addClickHandler(
+				event -> ReportService.Instance.get().getReport(selectedId, false, new AsyncCallback<GUIReport>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -283,12 +252,9 @@ public class CustomReportsPanel extends AdminPanel {
 
 					@Override
 					public void onSuccess(GUIReport report) {
-						ReportParametersForm form = new ReportParametersForm(report, CustomReportsPanel.this);
-						form.show();
+						new ReportParametersForm(report, CustomReportsPanel.this).show();
 					}
-				});
-			}
-		});
+				}));
 
 		if (GUIReport.STATUS_IDLE != list.getSelectedRecord().getAttributeAsInt("status")
 				|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
@@ -296,22 +262,18 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem upload = new MenuItem();
 		upload.setTitle(I18N.message("uploadnewdesign"));
-		upload.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				GUIReport report = new GUIReport();
-				report.setId(selectedId);
-				report.setName(rec.getAttributeAsString("name"));
-				ReportUploader uploader = new ReportUploader(CustomReportsPanel.this, report);
-				uploader.show();
-			}
+		upload.addClickHandler(event -> {
+			GUIReport report = new GUIReport();
+			report.setId(selectedId);
+			report.setName(rec.getAttributeAsString("name"));
+			new ReportUploader(CustomReportsPanel.this, report).show();
 		});
 		upload.setEnabled(canUploadDesign());
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value))
 						ReportService.Instance.get().delete(selectedId, new AsyncCallback<Void>() {
 							@Override
@@ -326,13 +288,11 @@ public class CustomReportsPanel extends AdminPanel {
 								showReportDetails(null);
 							}
 						});
-				});
-			}
-		});
+				}));
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler((MenuItemClickEvent event) -> ReportService.Instance.get()
+		enable.addClickHandler(event -> ReportService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
 
 					@Override
@@ -351,7 +311,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler((MenuItemClickEvent event) -> ReportService.Instance.get()
+		disable.addClickHandler(event -> ReportService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
 
 					@Override
@@ -370,17 +330,16 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(
-				(MenuItemClickEvent event) -> DocumentsPanel.get().openInFolder(outputFolderId, outputDocId));
+		openInFolder.addClickHandler(event -> DocumentsPanel.get().openInFolder(outputFolderId, outputDocId));
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler((MenuItemClickEvent event) -> Util.downloadDoc(outputDocId));
+		download.addClickHandler(event -> Util.downloadDoc(outputDocId));
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get().getById(outputDocId,
-				new AsyncCallback<GUIDocument>() {
+		preview.addClickHandler(
+				event -> DocumentService.Instance.get().getById(outputDocId, new AsyncCallback<GUIDocument>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -396,7 +355,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem export = new MenuItem();
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler((MenuItemClickEvent event) -> Util.download(
+		export.addClickHandler(event -> Util.download(
 				Util.contextPath() + "report/controller?command=export&reportId=" + rec.getAttributeAsString("id")));
 
 		if (outputDocId != null)

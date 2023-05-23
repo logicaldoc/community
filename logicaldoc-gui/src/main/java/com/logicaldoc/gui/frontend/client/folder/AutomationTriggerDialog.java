@@ -11,13 +11,10 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -47,11 +44,7 @@ public class AutomationTriggerDialog extends Window {
 		this.trigger = trigger;
 		this.automationPanel = automationPanel;
 
-		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
 		setTitle(I18N.message("automationtrigger"));
@@ -70,21 +63,11 @@ public class AutomationTriggerDialog extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		DynamicForm form2 = new DynamicForm();
 		form2.setWidth100();
@@ -102,14 +85,11 @@ public class AutomationTriggerDialog extends Window {
 		automation.setDisabled(trigger.getRoutine() != null);
 		form2.setItems(automation);
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event == null) {
-					automation.setDisabled(false);
-				} else {
-					automation.setDisabled(event.getValue() != null && !event.getValue().toString().isEmpty());
-				}
+		ChangedHandler changeHandler = event -> {
+			if (event == null) {
+				automation.setDisabled(false);
+			} else {
+				automation.setDisabled(event.getValue() != null && !event.getValue().toString().isEmpty());
 			}
 		};
 		routine = ItemFactory.newAutomationRoutineSelector("routine",

@@ -44,13 +44,7 @@ public class ZoneEditor extends Window {
 		this.zone = zone;
 
 		IButton save = new IButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		prepareForm();
 

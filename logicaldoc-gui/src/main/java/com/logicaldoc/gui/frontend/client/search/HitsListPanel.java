@@ -24,15 +24,9 @@ import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows a list of search results in a tabular way.
@@ -75,12 +69,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		else
 			grid = new SearchHitsGrid();
 
-		grid.registerSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				onHitSelected();
-			}
-		});
+		grid.registerSelectionChangedHandler(event -> onHitSelected());
 
 		setContextClickHandler();
 
@@ -94,7 +83,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	}
 
 	private void setDoubleClickHandler() {
-		grid.registerDoubleClickHandler((DoubleClickEvent event) -> {
+		grid.registerDoubleClickHandler(event -> {
 			if (Search.get().getOptions().getType() != GUISearchOptions.TYPE_FOLDERS) {
 				final GUIDocument doc = grid.getSelectedDocument();
 
@@ -123,7 +112,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	}
 
 	private void setContextClickHandler() {
-		grid.registerCellContextClickHandler((CellContextClickEvent event) -> {
+		grid.registerCellContextClickHandler(event -> {
 			GUIDocument doc = grid.getSelectedDocument();
 			final String type = doc.getType();
 			long id = doc.getFolder().getId();
@@ -168,7 +157,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		if (pageSize == null)
 			pageSize = Session.get().getConfigAsInt("search.hits");
 		searchCursor.setPageSize(pageSize);
-		searchCursor.registerPageSizeChangedHandler((ChangedEvent event) -> {
+		searchCursor.registerPageSizeChangedHandler(event -> {
 			GUISearchOptions opt = Search.get().getOptions();
 			opt.setMaxHits(searchCursor.getPageSize());
 			Search.get().setMaxHits(searchCursor.getPageSize());
@@ -229,11 +218,9 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
 				MenuItem openInFolder = new MenuItem();
 				openInFolder.setTitle(I18N.message("openinfolder"));
-				openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						GUIDocument doc = grid.getSelectedDocument();
-						DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
-					}
+				openInFolder.addClickHandler(event -> {
+					GUIDocument doc = grid.getSelectedDocument();
+					DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
 				});
 				contextMenu.addItem(openInFolder);
 			}
@@ -241,11 +228,9 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
 				MenuItem openInFolder = new MenuItem();
 				openInFolder.setTitle(I18N.message("openfolder"));
-				openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						GUIDocument doc = grid.getSelectedDocument();
-						DocumentsPanel.get().openInFolder(doc.getFolder().getId(), null);
-					}
+				openInFolder.addClickHandler(event -> {
+					GUIDocument doc = grid.getSelectedDocument();
+					DocumentsPanel.get().openInFolder(doc.getFolder().getId(), null);
 				});
 				contextMenu.addItem(openInFolder);
 			}

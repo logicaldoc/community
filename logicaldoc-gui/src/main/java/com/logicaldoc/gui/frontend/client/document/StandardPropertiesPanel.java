@@ -24,7 +24,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ColorItem;
@@ -39,7 +38,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -206,11 +204,8 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		copyPath.setWidth(16);
 		copyPath.setHeight(16);
 		copyPath.addFormItemClickHandler(event -> {
-			LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
-				@Override
-				public void execute(final String value) {
-					// Nothing to do
-				}
+			LD.askForValue(I18N.message("path"), I18N.message("path"), path, value -> {
+				// Nothing to do
 			});
 			event.cancel();
 		});

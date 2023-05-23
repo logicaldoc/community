@@ -11,9 +11,6 @@ import com.smartgwt.client.types.Side;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -57,12 +54,7 @@ public class TemplateDetailsPanel extends VLayout {
 		Button saveButton = new Button(I18N.message("save"));
 		saveButton.setAutoFit(true);
 		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		saveButton.addClickHandler(event -> onSave());
 		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
 
 		HTMLPane spacer = new HTMLPane();
@@ -70,29 +62,21 @@ public class TemplateDetailsPanel extends VLayout {
 		spacer.setWidth("70%");
 		spacer.setOverflow(Overflow.HIDDEN);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (template.getId() != 0) {
-					TemplateService.Instance.get().getTemplate(template.getId(), new AsyncCallback<GUITemplate>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (template.getId() != 0) {
+				TemplateService.Instance.get().getTemplate(template.getId(), new AsyncCallback<GUITemplate>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUITemplate template) {
-							setTemplate(template);
-						}
-					});
-				} else {
-					setTemplate(new GUITemplate());
-				}
+					@Override
+					public void onSuccess(GUITemplate template) {
+						setTemplate(template);
+					}
+				});
+			} else {
+				setTemplate(new GUITemplate());
 			}
 		});
 		tabSet.setTabBarPosition(Side.TOP);
@@ -127,7 +111,7 @@ public class TemplateDetailsPanel extends VLayout {
 	protected void refresh() {
 		disableSave();
 
-		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
+		ChangedHandler changeHandler = event -> onModified();
 
 		/*
 		 * Prepare the standard properties tab

@@ -14,20 +14,13 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the automation triggers of a folder.
@@ -81,20 +74,11 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		list.setAutoFetchData(true);
 		list.setDataSource(new AutomationTriggersDS(folder.getId(), null));
 		list.setFields(id, events, routine, automation);
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				onEdit();
-			}
-		});
+		list.addDoubleClickHandler(event -> onEdit());
 
 		container.addMember(list, 0);
 	}
@@ -115,37 +99,32 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		Button add = new Button(I18N.message("addautomationtrigger"));
 		add.setAutoFit(true);
 		add.setMargin(1);
-		add.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				GUIAutomationTrigger trigger = new GUIAutomationTrigger();
-				trigger.setFolder(folder);
-				AutomationTriggerDialog dialog = new AutomationTriggerDialog(trigger, FolderAutomationPanel.this);
-				dialog.show();
-			}
+		add.addClickHandler(event -> {
+			GUIAutomationTrigger trigger = new GUIAutomationTrigger();
+			trigger.setFolder(folder);
+			AutomationTriggerDialog dialog = new AutomationTriggerDialog(trigger, FolderAutomationPanel.this);
+			dialog.show();
 		});
 
 		Button applyToSubfolders = new Button(I18N.message("applytosubfolders"));
 		applyToSubfolders.setAutoFit(true);
 		buttons.addMember(applyToSubfolders);
 
-		applyToSubfolders.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.contactingServer();
-				AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<Void>() {
+		applyToSubfolders.addClickHandler(event -> {
+			LD.contactingServer();
+			AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg) {
-						LD.clearPrompt();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void arg) {
+					LD.clearPrompt();
+				}
+			});
 		});
 
 		buttons.setMembers(add, applyToSubfolders);
@@ -164,10 +143,9 @@ public class FolderAutomationPanel extends FolderDetailTab {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirmation -> {
+					if (Boolean.TRUE.equals(confirmation)) {
 						AutomationService.Instance.get().deleteTriggers(ids, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -181,17 +159,11 @@ public class FolderAutomationPanel extends FolderDetailTab {
 							}
 						});
 					}
-				});
-			}
-		});
+				}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onEdit();
-			}
-		});
+		edit.addClickHandler(event -> onEdit());
 
 		contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();

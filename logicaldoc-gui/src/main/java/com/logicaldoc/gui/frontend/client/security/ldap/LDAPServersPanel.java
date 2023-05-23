@@ -24,25 +24,14 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DropCompleteEvent;
-import com.smartgwt.client.widgets.events.DropCompleteHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -116,23 +105,15 @@ public class LDAPServersPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton addServer = new ToolStripButton();
 		addServer.setTitle(I18N.message("addserver"));
-		addServer.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				GUILDAPServer server = new GUILDAPServer();
-				server.setLanguage(Session.get().getUser().getLanguage());
-				showServerDetails(server);
-			}
+		addServer.addClickHandler(event -> {
+			list.deselectAllRecords();
+			GUILDAPServer server = new GUILDAPServer();
+			server.setLanguage(Session.get().getUser().getLanguage());
+			showServerDetails(server);
 		});
 		if (Feature.visible(Feature.LDAP))
 			toolStrip.addButton(addServer);
@@ -150,62 +131,48 @@ public class LDAPServersPanel extends AdminPanel {
 
 		body.setMembers(hBody);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record rec = list.getSelectedRecord();
-				if (rec != null)
-					LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new AsyncCallback<GUILDAPServer>() {
+		list.addSelectionChangedHandler(event -> {
+			Record rec = list.getSelectedRecord();
+			if (rec != null)
+				LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new AsyncCallback<GUILDAPServer>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUILDAPServer server) {
-							showServerDetails(server);
-						}
-					});
-			}
+					@Override
+					public void onSuccess(GUILDAPServer server) {
+						showServerDetails(server);
+					}
+				});
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showservers", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showservers", Integer.toString(list.getTotalRows()))));
 
-		list.addDropCompleteHandler(new DropCompleteHandler() {
+		list.addDropCompleteHandler(event -> {
+			List<Long> ids = new ArrayList<>();
+			if (list.getRecords() != null && list.getRecords().length > 0) {
+				for (ListGridRecord rec : list.getRecords())
+					ids.add(rec.getAttributeAsLong("id"));
+				LDAPService.Instance.get().reorder(ids.toArray(new Long[0]), new AsyncCallback<Void>() {
 
-			@Override
-			public void onDropComplete(DropCompleteEvent event) {
-				List<Long> ids = new ArrayList<>();
-				if (list.getRecords() != null && list.getRecords().length > 0) {
-					for (ListGridRecord rec : list.getRecords())
-						ids.add(rec.getAttributeAsLong("id"));
-					LDAPService.Instance.get().reorder(ids.toArray(new Long[0]), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void arg) {
-							// Nothing to do
-						}
-					});
-				}
+					@Override
+					public void onSuccess(Void arg) {
+						// Nothing to do
+					}
+				});
 			}
 		});
 	}
@@ -225,9 +192,8 @@ public class LDAPServersPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						LDAPService.Instance.get().delete(id, new AsyncCallback<Void>() {
 							@Override
@@ -241,9 +207,7 @@ public class LDAPServersPanel extends AdminPanel {
 							}
 						});
 					}
-				});
-			}
-		});
+				}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

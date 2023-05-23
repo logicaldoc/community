@@ -10,8 +10,6 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
@@ -54,35 +52,31 @@ public class InheritRightsDialog extends Dialog {
 		Button inheritRights = new Button(I18N.message(INHERITRIGHTS));
 		inheritRights.setAutoFit(true);
 		inheritRights.setMargin(1);
-		inheritRights.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				LD.ask(I18N.message(INHERITRIGHTS),
-						I18N.message("inheritrightsask",
-								new String[] { FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
-										folders.getSelectedRecord().getAttributeAsString("name") }),
-						(Boolean value) -> {
-							if (Boolean.TRUE.equals(value)) {
-								FolderService.Instance.get().inheritRights(panel.getFolder().getId(),
-										Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-										new AsyncCallback<GUIFolder>() {
+		inheritRights.addClickHandler(event -> LD.ask(I18N.message(INHERITRIGHTS),
+				I18N.message("inheritrightsask",
+						new String[] { FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
+								folders.getSelectedRecord().getAttributeAsString("name") }),
+				confirm -> {
+					if (Boolean.TRUE.equals(confirm)) {
+						FolderService.Instance.get().inheritRights(panel.getFolder().getId(),
+								Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
+								new AsyncCallback<GUIFolder>() {
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-												destroy();
-											}
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+										destroy();
+									}
 
-											@Override
-											public void onSuccess(GUIFolder arg) {
-												panel.refresh(arg);
-												destroy();
-											}
-										});
-							}
-							destroy();
-						});
-			}
-		});
+									@Override
+									public void onSuccess(GUIFolder arg) {
+										panel.refresh(arg);
+										destroy();
+									}
+								});
+					}
+					destroy();
+				}));
 
 		buttons.setMembers(inheritRights);
 

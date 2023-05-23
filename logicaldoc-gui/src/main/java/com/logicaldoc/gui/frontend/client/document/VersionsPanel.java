@@ -27,8 +27,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -122,7 +120,7 @@ public class VersionsPanel extends DocumentDetailTab {
 	}
 
 	private void addListHandlers() {
-		list.addCellDoubleClickHandler((CellDoubleClickEvent clickEvent) -> {
+		list.addCellDoubleClickHandler(clickEvent -> {
 			ListGridRecord rec = clickEvent.getRecord();
 			if (FolderController.get().getCurrentFolder().isDownload()
 					&& DOWNLOAD.equals(Session.get().getInfo().getConfig("gui.doubleclick")))
@@ -131,7 +129,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				onPreview(document, rec);
 		});
 
-		list.addCellContextClickHandler((CellContextClickEvent contextClickEvent) -> {
+		list.addCellContextClickHandler(contextClickEvent -> {
 			ListGridField field = list.getField(contextClickEvent.getColNum());
 			if (!PERMALINK.equals(field.getName())) {
 				prepareContextMenu().showContextMenu();

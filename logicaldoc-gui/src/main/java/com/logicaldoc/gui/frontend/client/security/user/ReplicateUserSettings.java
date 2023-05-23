@@ -15,8 +15,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This is the form used to replicate some user settings to the selected users.
@@ -53,30 +51,28 @@ public class ReplicateUserSettings extends Window {
 		final ButtonItem confirm = new ButtonItem();
 		confirm.setTitle(I18N.message("confirm"));
 		confirm.setAutoFit(true);
-		confirm.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (Boolean.FALSE.equals(vm.hasErrors())) {
-					long masterUserId = Long.parseLong(vm.getValueAsString("user"));
-					LD.contactingServer();
-					SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds.toArray(new Long[0]),
-							userInterface.getValueAsBoolean(), groups.getValueAsBoolean(), new AsyncCallback<Void>() {
+		confirm.addClickHandler(event -> {
+			vm.validate();
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
+				long masterUserId = Long.parseLong(vm.getValueAsString("user"));
+				LD.contactingServer();
+				SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds.toArray(new Long[0]),
+						userInterface.getValueAsBoolean(), groups.getValueAsBoolean(), new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void arg0) {
-									LD.clearPrompt();
-									GuiLog.info(I18N.message("userssaved"));
-									destroy();
-									panel.refresh();
-								}
-							});
-				}
+							@Override
+							public void onSuccess(Void arg0) {
+								LD.clearPrompt();
+								GuiLog.info(I18N.message("userssaved"));
+								destroy();
+								panel.refresh();
+							}
+						});
 			}
 		});
 

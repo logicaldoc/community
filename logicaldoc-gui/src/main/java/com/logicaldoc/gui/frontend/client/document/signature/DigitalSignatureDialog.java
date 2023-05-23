@@ -11,8 +11,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -75,12 +73,7 @@ public class DigitalSignatureDialog extends Window {
 
 		IButton sign = new IButton(I18N.message("sign"));
 		sign.setAutoFit(true);
-		sign.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSign();
-			}
-		});
+		sign.addClickHandler(event -> onSign());
 
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(5);

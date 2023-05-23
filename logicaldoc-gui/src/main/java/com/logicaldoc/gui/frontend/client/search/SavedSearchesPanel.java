@@ -17,14 +17,9 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the saved searches of the user
@@ -65,33 +60,26 @@ public class SavedSearchesPanel extends VLayout {
 		list.setFields(name, type, description);
 		addMember(list);
 
-		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord rec = event.getRecord();
-				SearchService.Instance.get().load(rec.getAttributeAsString("name"),
-						new AsyncCallback<GUISearchOptions>() {
+		list.addCellDoubleClickHandler(event -> {
+			ListGridRecord rec = event.getRecord();
+			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new AsyncCallback<GUISearchOptions>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-							@Override
-							public void onSuccess(GUISearchOptions options) {
-								Search.get().setOptions(options);
-								Search.get().search();
-							}
-						});
-			}
+				@Override
+				public void onSuccess(GUISearchOptions options) {
+					Search.get().setOptions(options);
+					Search.get().search();
+				}
+			});
 		});
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 	}
 
@@ -100,94 +88,88 @@ public class SavedSearchesPanel extends VLayout {
 
 		MenuItem execute = new MenuItem();
 		execute.setTitle(I18N.message("execute"));
-		execute.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = list.getSelectedRecord();
-				SearchService.Instance.get().load(selection.getAttributeAsString("name"),
-						new AsyncCallback<GUISearchOptions>() {
+		execute.addClickHandler(event -> {
+			ListGridRecord selection = list.getSelectedRecord();
+			SearchService.Instance.get().load(selection.getAttributeAsString("name"),
+					new AsyncCallback<GUISearchOptions>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUISearchOptions options) {
-								Search.get().setOptions(options);
-								Search.get().search();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(GUISearchOptions options) {
+							Search.get().setOptions(options);
+							Search.get().search();
+						}
+					});
 		});
 
 		MenuItem share = new MenuItem();
 		share.setTitle(I18N.message("sharesearch"));
-		share.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = list.getSelectedRecord();
+		share.addClickHandler(event -> {
+			ListGridRecord selection = list.getSelectedRecord();
 
-				final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
+			final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
 
-				final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
+			final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
 
-				LD.askForValues("sharesearch", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }),
-						350, new ValuesCallback() {
-							@Override
-							public void execute(String value) {
-								// Nothing to do
-							}
+			LD.askForValues("sharesearch", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }), 350,
+					new ValuesCallback() {
+						@Override
+						public void execute(String value) {
+							// Nothing to do
+						}
 
-							@Override
-							public void execute(Map<String, Object> values) {
-								LD.contactingServer();
-								SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
-										usersSelector.getUserIds(), groupsSelector.getGroupIds(),
-										new AsyncCallback<Void>() {
+						@Override
+						public void execute(Map<String, Object> values) {
+							LD.contactingServer();
+							SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
+									usersSelector.getUserIds(), groupsSelector.getGroupIds(),
+									new AsyncCallback<Void>() {
 
-											@Override
-											public void onFailure(Throwable caught) {
-												LD.clearPrompt();
-												GuiLog.serverError(caught);
-											}
+										@Override
+										public void onFailure(Throwable caught) {
+											LD.clearPrompt();
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onSuccess(Void arg0) {
-												LD.clearPrompt();
-											}
-										});
-							}
-						});
-			}
+										@Override
+										public void onSuccess(Void arg0) {
+											LD.clearPrompt();
+										}
+									});
+						}
+					});
 		});
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] selection = list.getSelectedRecords();
-				if (selection == null || selection.length == 0)
-					return;
-				final String[] names = new String[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					names[i] = selection[i].getAttributeAsString("name");
-				}
-
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						SearchService.Instance.get().delete(names, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-							}
-						});
-					}
-				});
+		delete.addClickHandler(event -> {
+			ListGridRecord[] selection = list.getSelectedRecords();
+			if (selection == null || selection.length == 0)
+				return;
+			final String[] names = new String[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				names[i] = selection[i].getAttributeAsString("name");
 			}
+
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
+				if (Boolean.TRUE.equals(value)) {
+					SearchService.Instance.get().delete(names, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+						}
+					});
+				}
+			});
 		});
 
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHARE_SEARCH))

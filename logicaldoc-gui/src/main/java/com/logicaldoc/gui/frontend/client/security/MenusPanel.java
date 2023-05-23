@@ -15,8 +15,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
@@ -79,25 +77,22 @@ public class MenusPanel extends VLayout {
 
 		setMembers(listing, rightsContainer);
 
-		menus.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				Record rec = menus.getSelectedRecord();
-				if (rec != null)
-					SecurityService.Instance.get().getMenu(Long.parseLong(rec.getAttributeAsString("id")),
-							I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+		menus.addSelectionChangedHandler(event -> {
+			Record rec = menus.getSelectedRecord();
+			if (rec != null)
+				SecurityService.Instance.get().getMenu(Long.parseLong(rec.getAttributeAsString("id")), I18N.getLocale(),
+						new AsyncCallback<GUIMenu>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIMenu menu) {
-									showRights(menu);
-								}
-							});
-			}
+							@Override
+							public void onSuccess(GUIMenu menu) {
+								showRights(menu);
+							}
+						});
 		});
 	}
 

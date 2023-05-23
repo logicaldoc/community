@@ -19,7 +19,6 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 
 /**
@@ -41,7 +40,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 	private static final String POSITION = "position";
 
 	private FolderTile tile;
-	
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -70,7 +69,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
-		
+
 		if (Boolean.TRUE.equals(contains(tile)))
 			removeChild(tile);
 
@@ -97,7 +96,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		applyToSubFolders.setPrompt(I18N.message("applytosubfolders"));
 		applyToSubFolders.setWidth(12);
 		applyToSubFolders.setHeight(12);
-		applyToSubFolders.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+		applyToSubFolders.addFormItemClickHandler(event -> {
 			LD.contactingServer();
 			FolderService.Instance.get().applyGridLayout(folder.getId(), new AsyncCallback<Void>() {
 				@Override
@@ -114,15 +113,12 @@ public class FolderInterfacePanel extends FolderDetailTab {
 			});
 		});
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				folder.setGrid(null);
-				event.getItem().setValue(I18N.message(NOTCUSTOMIZED));
-				applyToSubFolders.setDisabled(true);
-				if (changedHandler != null)
-					changedHandler.onChanged(null);
-			}
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
+			folder.setGrid(null);
+			event.getItem().setValue(I18N.message(NOTCUSTOMIZED));
+			applyToSubFolders.setDisabled(true);
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
 		});
 		clear.setWidth(12);
 		clear.setHeight(12);
@@ -131,10 +127,10 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 		form.setItems(position, color, docsGrid);
 		addMember(form);
-		
-		tile=new FolderTile(folder, changedHandler);
+
+		tile = new FolderTile(folder, changedHandler);
 		addMember(tile);
-		
+
 		if (folder.isWrite()) {
 			if (changedHandler != null) {
 				color.addChangedHandler(changedHandler);

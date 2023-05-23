@@ -15,20 +15,13 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the list of users in a group.
@@ -120,47 +113,43 @@ public class GroupUsersPanel extends VLayout {
 		// Prepare the list for adding a new user
 		final DynamicForm userForm = new DynamicForm();
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, false, false);
-		user.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				final ListGridRecord selectedRecord = user.getSelectedRecord();
-				if (selectedRecord == null)
+		user.addChangedHandler(event -> {
+			final ListGridRecord selectedRecord = user.getSelectedRecord();
+			if (selectedRecord == null)
+				return;
+
+			// Check if the selected user is already present in the members
+			ListGridRecord[] records = list.getRecords();
+			for (ListGridRecord test : records) {
+				if (test.getAttribute("id").equals(selectedRecord.getAttribute("id"))) {
 					return;
-
-				// Check if the selected user is already present in the members
-				ListGridRecord[] records = list.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute("id").equals(selectedRecord.getAttribute("id"))) {
-						return;
-					}
 				}
-
-				SecurityService.Instance.get().addUserToGroup(groupId,
-						Long.parseLong(selectedRecord.getAttribute("id")), new AsyncCallback<Void>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void ret) {
-								// Update the users table
-								ListGridRecord rec = new ListGridRecord();
-								rec.setAttribute("id", selectedRecord.getAttribute("id"));
-								rec.setAttribute(USERNAME, selectedRecord.getAttribute(USERNAME));
-								rec.setAttribute("name", selectedRecord.getAttribute("name"));
-								rec.setAttribute(FIRST_NAME, selectedRecord.getAttribute(FIRST_NAME));
-								rec.setAttribute(EMAIL, selectedRecord.getAttribute(EMAIL));
-								rec.setAttribute(PHONE, selectedRecord.getAttribute(PHONE));
-								rec.setAttribute("cell", selectedRecord.getAttribute("cell"));
-								rec.setAttribute(EENABLED, selectedRecord.getAttribute(EENABLED));
-								list.addData(rec);
-								user.clearValue();
-							}
-						});
 			}
 
+			SecurityService.Instance.get().addUserToGroup(groupId, Long.parseLong(selectedRecord.getAttribute("id")),
+					new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void ret) {
+							// Update the users table
+							ListGridRecord rec = new ListGridRecord();
+							rec.setAttribute("id", selectedRecord.getAttribute("id"));
+							rec.setAttribute(USERNAME, selectedRecord.getAttribute(USERNAME));
+							rec.setAttribute("name", selectedRecord.getAttribute("name"));
+							rec.setAttribute(FIRST_NAME, selectedRecord.getAttribute(FIRST_NAME));
+							rec.setAttribute(EMAIL, selectedRecord.getAttribute(EMAIL));
+							rec.setAttribute(PHONE, selectedRecord.getAttribute(PHONE));
+							rec.setAttribute("cell", selectedRecord.getAttribute("cell"));
+							rec.setAttribute(EENABLED, selectedRecord.getAttribute(EENABLED));
+							list.addData(rec);
+							user.clearValue();
+						}
+					});
 		});
 
 		userForm.setItems(user);
@@ -168,19 +157,12 @@ public class GroupUsersPanel extends VLayout {
 
 		setMembers(infoPanel, list, buttons);
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showusers", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showusers", Integer.toString(list.getTotalRows()))));
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 	}
 
@@ -191,32 +173,30 @@ public class GroupUsersPanel extends VLayout {
 
 		MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("removefromgroup"));
-		remove.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null || selection.length == 0)
-					return;
-				final long[] ids = new long[selection.length];
-				for (int i = 0; i < selection.length; i++) {
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-				}
-
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-							}
-						});
-					}
-				});
+		remove.addClickHandler(event -> {
+			if (selection == null || selection.length == 0)
+				return;
+			final long[] ids = new long[selection.length];
+			for (int i = 0; i < selection.length; i++) {
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 			}
+
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+				if (Boolean.TRUE.equals(confirm)) {
+					SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+							list.deselectAllRecords();
+						}
+					});
+				}
+			});
 		});
 
 		if (selection == null || selection.length < 1)

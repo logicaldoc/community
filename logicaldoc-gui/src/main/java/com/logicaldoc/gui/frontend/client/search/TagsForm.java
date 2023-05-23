@@ -17,28 +17,18 @@ import com.logicaldoc.gui.frontend.client.services.TagService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the tags list with each tag count.
@@ -93,12 +83,7 @@ public class TagsForm extends VLayout {
 			final StaticTextItem item = ItemFactory.newStaticTextItem("" + i, "", "" + str.charAt(i));
 			item.setShowTitle(false);
 			item.setWidth(12);
-			item.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					onLetterSelect((String) item.getValue());
-				}
-			});
+			item.addClickHandler(event -> onLetterSelect((String) item.getValue()));
 			items.add(item);
 		}
 		vocabularyForm.setItems(items.toArray(new FormItem[0]));
@@ -106,12 +91,10 @@ public class TagsForm extends VLayout {
 		otherCharForm = new DynamicForm();
 		otherCharForm.setWidth(1);
 
-		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				if (!otherCharForm.validate())
-					return;
-				onLetterSelect(otherCharForm.getValueAsString("otherchar"));
-			}
+		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, event -> {
+			if (!otherCharForm.validate())
+				return;
+			onLetterSelect(otherCharForm.getValueAsString("otherchar"));
 		});
 
 		TextItem otherChar = ItemFactory.newTextItem("otherchar", null);
@@ -153,20 +136,11 @@ public class TagsForm extends VLayout {
 		tags.setDataSource(new TagsDS(letter, false, null, null));
 		addMember(tags);
 
-		tags.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-			@Override
-			public void onCellDoubleClick(CellDoubleClickEvent event) {
-				ListGridRecord rec = event.getRecord();
-				executeSearch(rec);
-			}
-		});
+		tags.addCellDoubleClickHandler(event -> executeSearch(event.getRecord()));
 
-		tags.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu(admin);
-				event.cancel();
-			}
+		tags.addCellContextClickHandler(event -> {
+			showContextMenu(admin);
+			event.cancel();
 		});
 	}
 
@@ -179,72 +153,55 @@ public class TagsForm extends VLayout {
 
 		MenuItem search = new MenuItem();
 		search.setTitle(I18N.message("search"));
-		search.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = tags.getSelectedRecord();
-				executeSearch(selection);
-			}
-		});
+		search.addClickHandler(event -> executeSearch(tags.getSelectedRecord()));
 		contextMenu.addItem(search);
 
 		if (admin) {
 			MenuItem rename = new MenuItem();
 			rename.setTitle(I18N.message("rename"));
-			rename.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			rename.addClickHandler(
+					event -> LD.askForValue(I18N.message("rename"), I18N.message("newtag"), "", value -> {
+						if (value == null || "".equals(value.trim()))
+							return;
 
-				public void onClick(MenuItemClickEvent event) {
-					LD.askForValue(I18N.message("rename"), I18N.message("newtag"), "", new ValueCallback() {
-						@Override
-						public void execute(final String value) {
-							if (value == null || "".equals(value.trim()))
-								return;
+						ListGridRecord selection = tags.getSelectedRecord();
+						TagService.Instance.get().rename(selection.getAttribute("word"), value,
+								new AsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-							ListGridRecord selection = tags.getSelectedRecord();
-							TagService.Instance.get().rename(selection.getAttribute("word"), value,
-									new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(Void arg) {
-											GuiLog.info(I18N.message("procinexecution"),
-													I18N.message("taginexecution"));
-											ListGridRecord selection = tags.getSelectedRecord();
-											selection.setAttribute("word", value);
-											onLetterSelect(value.substring(0, 1));
-										}
-									});
-						}
-					});
-				}
-			});
+									@Override
+									public void onSuccess(Void arg) {
+										GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
+										ListGridRecord selection = tags.getSelectedRecord();
+										selection.setAttribute("word", value);
+										onLetterSelect(value.substring(0, 1));
+									}
+								});
+					}));
 			contextMenu.addItem(rename);
 
 			MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-				public void onClick(MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-						if (Boolean.TRUE.equals(value)) {
-							ListGridRecord selection = tags.getSelectedRecord();
-							TagService.Instance.get().delete(selection.getAttribute("word"), new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+			delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+				if (Boolean.TRUE.equals(confirm)) {
+					ListGridRecord selection = tags.getSelectedRecord();
+					TagService.Instance.get().delete(selection.getAttribute("word"), new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(Void arg) {
-									GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
-									tags.removeSelectedData();
-								}
-							});
+						@Override
+						public void onSuccess(Void arg) {
+							GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
+							tags.removeSelectedData();
 						}
 					});
 				}
-			});
+			}));
 			contextMenu.addItem(delete);
 		}
 

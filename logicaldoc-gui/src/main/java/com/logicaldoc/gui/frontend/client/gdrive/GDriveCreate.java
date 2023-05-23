@@ -18,8 +18,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to create a new document in Google Drive.
@@ -66,12 +64,7 @@ public class GDriveCreate extends Window {
 		create = new SubmitItem();
 		create.setTitle(I18N.message("create"));
 		create.setAlign(Alignment.RIGHT);
-		create.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onCreate();
-			}
-		});
+		create.addClickHandler(event -> onCreate());
 
 		form.setItems(fileName, type, create);
 
@@ -89,7 +82,7 @@ public class GDriveCreate extends Window {
 		if (!filename.toLowerCase().endsWith("." + type))
 			filename = filename + "." + type;
 		final String fn = filename;
-		
+
 		GDriveService.Instance.get().create(filename, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {

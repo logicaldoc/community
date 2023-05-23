@@ -45,9 +45,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		applyMetadata.setEndRow(true);
 		applyMetadata.setDisabled(!folder.isWrite());
 		applyMetadata.setColSpan(1);
-		applyMetadata.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		applyMetadata.addClickHandler( event -> {
 				LD.contactingServer();
 				FolderService.Instance.get().applyMetadata(folder.getId(), new AsyncCallback<Void>() {
 
@@ -62,7 +60,6 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 						LD.clearPrompt();
 					}
 				});
-			}
 		});
 
 		form1 = new DynamicForm();

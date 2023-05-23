@@ -27,8 +27,6 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -58,13 +56,7 @@ public class EnvelopeDetails extends Window {
 				: SearchPanel.get().getDocumentsGrid().getSelectedDocuments();
 
 		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSend();
-			}
-		});
+		sendButton.addClickHandler(event -> onSend());
 
 		prepareForm();
 
@@ -110,12 +102,7 @@ public class EnvelopeDetails extends Window {
 			editTabs.setPrompt(I18N.message("edittabs"));
 			editTabs.setWidth(12);
 			editTabs.setHeight(12);
-			editTabs.addFormItemClickHandler(new FormItemClickHandler() {
-				@Override
-				public void onFormItemClick(FormItemIconClickEvent event) {
-					new DocuSignTabsEditor(document).show();
-				}
-			});
+			editTabs.addFormItemClickHandler(event -> new DocuSignTabsEditor(document).show());
 			docItem.setIcons(editTabs);
 
 			items.add(docItem);

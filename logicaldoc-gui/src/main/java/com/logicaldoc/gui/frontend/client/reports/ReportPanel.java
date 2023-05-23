@@ -8,8 +8,6 @@ import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -91,11 +89,7 @@ abstract class ReportPanel extends AdminPanel {
 		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
 		print.setTooltip(I18N.message("print"));
 		print.setAutoFit(true);
-		print.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(list));
 		toolStrip.addSeparator();
 		toolStrip.addButton(print);
 
@@ -106,12 +100,7 @@ abstract class ReportPanel extends AdminPanel {
 			export.setTooltip(I18N.message("export"));
 			export.setAutoFit(true);
 			toolStrip.addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					GridUtil.exportCSV(list, false);
-				}
-			});
+			export.addClickHandler(event -> GridUtil.exportCSV(list, false));
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
 				export.setDisabled(true);
 				export.setTooltip(I18N.message("featuredisabled"));

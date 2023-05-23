@@ -80,9 +80,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		if (importFolder.getTemplateId() != null)
 			template.setValue(importFolder.getTemplateId().toString());
 
-		ChangedHandler changeTemplateHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
+		ChangedHandler changeTemplateHandler = event -> {
 				if (form.getValue(TEMPLATE) == null || "".equals(form.getValueAsString(TEMPLATE)))
 					importFolder.setTemplateId(null);
 				else
@@ -90,7 +88,6 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 				importFolder.setOcrTemplateId(null);
 				importFolder.setBarcodeTemplateId(null);
 				refresh();
-			}
 		};
 		template.addChangedHandler(changeTemplateHandler);
 

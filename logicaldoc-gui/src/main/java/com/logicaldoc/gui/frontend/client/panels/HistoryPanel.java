@@ -14,14 +14,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -36,6 +29,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public abstract class HistoryPanel extends VLayout {
 
 	private static final String COMMENT = "comment";
+
 	private boolean versionFields = false;
 
 	protected HistoryPanel() {
@@ -87,18 +81,12 @@ public abstract class HistoryPanel extends VLayout {
 				list.setFields(user, event, date, comment, fileName, path);
 		}
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				LD.askForValue(I18N.message(COMMENT), I18N.message(COMMENT),
-						list.getSelectedRecord().getAttributeAsString(COMMENT), new ValueCallback() {
-							@Override
-							public void execute(final String value) {
-								// Nothing to do
-							}
-						});
-				event.cancel();
-			}
+		list.addDoubleClickHandler(evnt -> {
+			LD.askForValue(I18N.message(COMMENT), I18N.message(COMMENT),
+					list.getSelectedRecord().getAttributeAsString(COMMENT), value -> {
+						// Nothing to do
+					});
+			evnt.cancel();
 		});
 
 		ToolStrip buttons = new ToolStrip();
@@ -112,34 +100,17 @@ public abstract class HistoryPanel extends VLayout {
 		maxItem.setImplicitSave(true);
 		maxItem.setHint(I18N.message("elements"));
 		buttons.addFormItem(maxItem);
-		maxItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				list.refresh(getDataSource(Integer.parseInt(maxItem.getValueAsString())));
-			}
-		});
+		maxItem.addChangedHandler(evnt -> list.refresh(getDataSource(Integer.parseInt(maxItem.getValueAsString()))));
 
 		buttons.addSeparator();
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		buttons.addButton(export);
-		export.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		export.addClickHandler(evnt -> GridUtil.exportCSV(list, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		buttons.addButton(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		print.addClickHandler(evnt -> GridUtil.print(list));
 
 		addMember(list);
 		addMember(buttons);

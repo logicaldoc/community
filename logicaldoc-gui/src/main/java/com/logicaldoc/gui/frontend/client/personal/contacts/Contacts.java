@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.data.ContactsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
-import com.logicaldoc.gui.common.client.util.GridUtil.EndScrollListener;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
@@ -21,18 +20,10 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -80,47 +71,23 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton selectAll = new ToolStripButton();
 		selectAll.setTitle(I18N.message("selectall"));
 		toolStrip.addButton(selectAll);
-		selectAll.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.scrollGrid(list, new EndScrollListener() {
-
-					@Override
-					public void endScroll(ListGrid listGrid) {
-						list.selectAllRecords();
-					}
-				});
-			}
-		});
+		selectAll.addClickHandler(event -> GridUtil.scrollGrid(list, listGrid -> list.selectAllRecords()));
 
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addcontact"));
 		toolStrip.addButton(add);
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ContactDetails details = new ContactDetails(new GUIContact(), Contacts.this);
-				details.show();
-			}
-		});
+		add.addClickHandler(event -> new ContactDetails(new GUIContact(), Contacts.this).show());
 
 		ToolStripButton importCsv = new ToolStripButton();
 		importCsv.setTitle(I18N.message("iimport"));
 		importCsv.setTooltip(I18N.message("importfromcsv"));
-		importCsv.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		importCsv.addClickHandler(
+				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -132,21 +99,14 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 						ContactsUploader uploader = new ContactsUploader();
 						uploader.show();
 					}
-				});
-			}
-		});
+				}));
 
 		toolStrip.addSeparator();
 		toolStrip.addButton(importCsv);
 
 		ToolStripButton export = new ToolStripButton();
 		export.setTitle(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		export.addClickHandler(event -> GridUtil.exportCSV(list, true));
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			toolStrip.addButton(export);
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -213,28 +173,14 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		list.setFields(id, email, firstName, lastName, company, phone, mobile, address);
 		list.sort(EMAIL, SortDirection.ASCENDING);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				onEdit();
-			}
-		});
+		list.addDoubleClickHandler(event -> onEdit());
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				list.setHeight(getHeight() - 68);
-			}
-		});
+		addResizedHandler(event -> list.setHeight(getHeight() - 68));
 	}
 
 	public void refresh() {
@@ -256,25 +202,21 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value))
-						ContactService.Instance.get().delete(ids, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm))
+				ContactService.Instance.get().delete(ids, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-							}
-						});
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+					}
 				});
-			}
-		});
+		}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));

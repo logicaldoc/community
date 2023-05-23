@@ -15,16 +15,11 @@ import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
@@ -45,7 +40,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 
 	@Override
 	protected void prepareListGrid() {
-		
+
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 		id.setCanGroupBy(false);
@@ -92,12 +87,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
-		userSelector.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		userSelector.addChangedHandler(event -> refresh());
 		toolStrip.addFormItem(userSelector);
 
 		folderSelector = new FolderSelector("folder", true);
@@ -123,22 +113,14 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null || selection.length == 0)
-					return;
-				final Long[] ids = new Long[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
+		restore.addClickHandler(event -> {
+			if (selection == null || selection.length == 0)
+				return;
+			final Long[] ids = new Long[selection.length];
+			for (int i = 0; i < selection.length; i++)
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 
-				final RestoreDialog dialog = new RestoreDialog(ids, null, new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						refresh();
-					}
-				});
-				dialog.show();
-			}
+			new RestoreDialog(ids, null, evt -> refresh()).show();
 		});
 
 		contextMenu.setItems(restore);

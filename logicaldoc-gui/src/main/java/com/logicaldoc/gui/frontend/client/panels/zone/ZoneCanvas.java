@@ -10,17 +10,8 @@ import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.events.MovedEvent;
-import com.smartgwt.client.widgets.events.MovedHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
-import com.smartgwt.client.widgets.events.RightMouseDownEvent;
-import com.smartgwt.client.widgets.events.RightMouseDownHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * A generic panel displaying a zone
@@ -61,37 +52,13 @@ public abstract class ZoneCanvas extends Label {
 		setWidth(sample.computeWidthPixels(zone.getWidth()));
 		setHeight(sample.computeHeightPixels(zone.getHeight()));
 
-		addDoubleClickHandler(new DoubleClickHandler() {
+		addDoubleClickHandler(event -> showContextMenu());
 
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				showContextMenu();
-			}
-		});
+		addRightMouseDownHandler(event -> showContextMenu());
 
-		addRightMouseDownHandler(new RightMouseDownHandler() {
+		addMovedHandler(event -> captureZonePosition());
 
-			@Override
-			public void onRightMouseDown(RightMouseDownEvent event) {
-				showContextMenu();
-			}
-		});
-
-		addMovedHandler(new MovedHandler() {
-
-			@Override
-			public void onMoved(MovedEvent event) {
-				captureZonePosition();
-			}
-		});
-
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				captureZonePosition();
-			}
-		});
+		addResizedHandler(event -> captureZonePosition());
 	}
 
 	protected void captureZonePosition() {
@@ -117,21 +84,17 @@ public abstract class ZoneCanvas extends Label {
 		Menu contextMenu = new Menu();
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						zonePanel.getSelectedOcrTemplate().removeZone(zone.getName());
-						zonePanel.getSample().clearCanvases();
-						zonePanel.showZones();
-					}
-				});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				zonePanel.getSelectedOcrTemplate().removeZone(zone.getName());
+				zonePanel.getSample().clearCanvases();
+				zonePanel.showZones();
 			}
-		});
+		}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler((MenuItemClickEvent event) -> onEdit());
+		edit.addClickHandler(event -> onEdit());
 
 		contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();

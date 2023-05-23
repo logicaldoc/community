@@ -3,13 +3,11 @@ package com.logicaldoc.gui.frontend.client.document.note;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -71,22 +69,14 @@ public class VersionNotesWindow extends Window {
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStripButton annotations = new ToolStripButton();
 		annotations.setTitle(I18N.message("annotations"));
-		annotations.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AnnotationsWindow annotationWnd = new AnnotationsWindow(doc,
-						fileVer != null ? fileVer : doc.getFileVersion(), null, false);
-				annotationWnd.show();
-			}
+		annotations.addClickHandler(event -> {
+			AnnotationsWindow annotationWnd = new AnnotationsWindow(doc,
+					fileVer != null ? fileVer : doc.getFileVersion(), null, false);
+			annotationWnd.show();
 		});
 
 		toolStrip.addButton(annotations);

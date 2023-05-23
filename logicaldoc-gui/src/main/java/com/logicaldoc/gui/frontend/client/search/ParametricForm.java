@@ -28,18 +28,12 @@ import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.JSOHelper;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -84,15 +78,11 @@ public class ParametricForm extends VLayout {
 		setMembersMargin(3);
 		setAlign(Alignment.LEFT);
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				if (conditionsLayout.getMembers() != null)
-					for (Canvas row : conditionsLayout.getMembers()) {
-						row.setWidth(ParametricForm.this.getWidth() - 10);
-					}
-			}
+		addResizedHandler(event -> {
+			if (conditionsLayout.getMembers() != null)
+				for (Canvas row : conditionsLayout.getMembers()) {
+					row.setWidth(ParametricForm.this.getWidth() - 10);
+				}
 		});
 	}
 
@@ -113,24 +103,12 @@ public class ParametricForm extends VLayout {
 		IButton search = new IButton(I18N.message("search"));
 		search.setAutoFit(true);
 		search.setMargin(8);
-		search.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				search();
-			}
-		});
+		search.addClickHandler(event -> search());
 
 		IButton reset = new IButton(I18N.message("reset"));
 		reset.setMargin(8);
 		reset.setAutoFit(true);
-		reset.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				initGUI();
-			}
-		});
+		reset.addClickHandler(event -> initGUI());
 
 		HLayout spacer = new HLayout();
 		spacer.setMinWidth(30);
@@ -181,25 +159,22 @@ public class ParametricForm extends VLayout {
 			SelectItem template = ItemFactory.newTemplateSelector(true, null);
 			template.setMultiple(false);
 			template.setEndRow(true);
-			template.addChangedHandler(new ChangedHandler() {
-				@Override
-				public void onChanged(ChangedEvent event) {
-					if (event.getValue() != null && !"".equals((String) event.getValue())) {
-						TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
-								new AsyncCallback<GUITemplate>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+			template.addChangedHandler(event -> {
+				if (event.getValue() != null && !"".equals((String) event.getValue())) {
+					TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
+							new AsyncCallback<GUITemplate>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-									@Override
-									public void onSuccess(GUITemplate result) {
-										selectedTemplate = result;
-									}
-								});
-					} else {
-						selectedTemplate = null;
-					}
+								@Override
+								public void onSuccess(GUITemplate result) {
+									selectedTemplate = result;
+								}
+							});
+				} else {
+					selectedTemplate = null;
 				}
 			});
 
@@ -212,13 +187,7 @@ public class ParametricForm extends VLayout {
 
 		IButton add = new IButton(I18N.message("addcondition"));
 		add.setAutoFit(true);
-		add.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				addCondition();
-			}
-		});
+		add.addClickHandler(event -> addCondition());
 		addMember(add);
 
 		conditionsLayout = new VLayout(3);
@@ -230,15 +199,11 @@ public class ParametricForm extends VLayout {
 	}
 
 	public void addCondition() {
-		ParameterConditionRow row = new ParameterConditionRow(selectedTemplate, true, new KeyPressHandler() {
-
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() == null)
-					return;
-				if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase()))
-					search();
-			}
+		ParameterConditionRow row = new ParameterConditionRow(selectedTemplate, true, event -> {
+			if (event.getKeyName() == null)
+				return;
+			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase()))
+				search();
 		});
 		row.setWidth(getWidth() - 10);
 		row.reload();
@@ -324,7 +289,6 @@ public class ParametricForm extends VLayout {
 	private GUICriterion prepareCriterion(ParameterConditionRow condition) {
 		String fieldOperator = condition.getOperatorsFieldItem().getValueAsString().toLowerCase();
 		Object fieldValue = condition.getValueFieldItem() != null ? condition.getValueFieldItem().getValue() : null;
-		
 
 		GUICriterion criterion = new GUICriterion();
 		criterion.setField(getFieldName(condition));
@@ -344,10 +308,9 @@ public class ParametricForm extends VLayout {
 			fieldValue = ((UserSelector) condition.getValueFieldItem()).getUser().getId();
 		if (condition.getValueFieldItem() instanceof FolderSelector)
 			fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
-   
-		String fieldName=criterion.getField();
-		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT)
-				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
+
+		String fieldName = criterion.getField();
+		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
 				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER))
 			fieldValue = Long.parseLong(fieldValue.toString());
 		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE))
@@ -358,11 +321,11 @@ public class ParametricForm extends VLayout {
 			fieldValue = (Date) fieldValue;
 
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
-			criterion.setField(fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_PRESET,
-					TYPE + GUIAttribute.TYPE_STRING));
+			criterion.setField(
+					fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_PRESET, TYPE + GUIAttribute.TYPE_STRING));
 		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA)) {
-			criterion.setField(fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA,
-					TYPE + GUIAttribute.TYPE_STRING));
+			criterion.setField(
+					fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA, TYPE + GUIAttribute.TYPE_STRING));
 		}
 
 		setCriterionValue(fieldValue, criterion);
@@ -433,8 +396,7 @@ public class ParametricForm extends VLayout {
 	}
 
 	private void setTemplateCondition(Map<String, Object> values, GUISearchOptions options) {
-		if (values.containsKey(TEMPLATE) && values.get(TEMPLATE) != null
-				&& !((String) values.get(TEMPLATE)).isEmpty())
+		if (values.containsKey(TEMPLATE) && values.get(TEMPLATE) != null && !((String) values.get(TEMPLATE)).isEmpty())
 			options.setTemplate(Long.parseLong((String) values.get(TEMPLATE)));
 	}
 

@@ -11,8 +11,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ColorItem;
@@ -101,8 +99,7 @@ public class StampProperties extends StampDetailsTab {
 
 		prepareTextItem();
 
-		final ColorItem color = ItemFactory.newColorItemPicker(stamp.getColor(), true,
-				changedHandler);
+		final ColorItem color = ItemFactory.newColorItemPicker(stamp.getColor(), true, changedHandler);
 
 		final RadioGroupItem barcodeLabel = prepareBarcodeLabelSelector();
 
@@ -385,17 +382,12 @@ public class StampProperties extends StampDetailsTab {
 		img.setHeight(getHeight() - 60);
 
 		IButton uploadStamp = new IButton(I18N.message("uploadstamp"));
-		uploadStamp.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				StampUploader uploader = new StampUploader(stamp.getId(), StampProperties.this);
-				uploader.show();
-			}
-		});
+		uploadStamp.addClickHandler(event -> new StampUploader(stamp.getId(), StampProperties.this).show());
 		uploadStamp.setDisabled(stamp.getId() == 0L);
 
 		image.setMembers(uploadStamp, img);
 		formsContainer.addMember(image);
+
 	}
 
 	public static String stampImageUrl(long stampId) {

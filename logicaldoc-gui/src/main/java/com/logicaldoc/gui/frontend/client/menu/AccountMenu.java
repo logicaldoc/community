@@ -22,8 +22,6 @@ import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuth
 import com.logicaldoc.gui.frontend.client.subscription.PersonalSubscriptions;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Collects various actions for the user's account
@@ -40,10 +38,8 @@ public class AccountMenu extends Menu {
 		setShadowDepth(3);
 
 		MenuItem profile = new MenuItem(I18N.message("profile"));
-		profile.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new AsyncCallback<GUIUser>() {
+		profile.addClickHandler(event -> SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
+				new AsyncCallback<GUIUser>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -55,51 +51,34 @@ public class AccountMenu extends Menu {
 						Profile profile = new Profile(user);
 						profile.show();
 					}
-				});
-			}
-		});
+				}));
 
 		MenuItem contacts = new MenuItem(I18N.message("contacts"));
-		contacts.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				Contacts.get().show();
-			}
-		});
+		contacts.addClickHandler(event -> Contacts.get().show());
 
 		MenuItem removeCookies = new MenuItem(I18N.message("removecookies"));
-		removeCookies.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				Session.get().getUser().setDocsGrid(null);
-				Session.get().getUser().setHitsGrid(null);
+		removeCookies.addClickHandler(event -> {
+			Session.get().getUser().setDocsGrid(null);
+			Session.get().getUser().setHitsGrid(null);
 
-				Session.get().getUser().setDocsGrid(null);
-				SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(),
-						new AsyncCallback<GUIUser>() {
-							@Override
-							public void onFailure(Throwable e) {
-								GuiLog.serverError(e);
-							}
+			Session.get().getUser().setDocsGrid(null);
+			SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<GUIUser>() {
+				@Override
+				public void onFailure(Throwable e) {
+					GuiLog.serverError(e);
+				}
 
-							@Override
-							public void onSuccess(GUIUser usr) {
-								CookiesManager.removeAllCookies();
-								GuiLog.info(I18N.message("cookiesremoved"), null);
-								Session.get().logout();
-							}
-						});
-			}
+				@Override
+				public void onSuccess(GUIUser usr) {
+					CookiesManager.removeAllCookies();
+					GuiLog.info(I18N.message("cookiesremoved"), null);
+					Session.get().logout();
+				}
+			});
 		});
 
 		MenuItem subscriptions = new MenuItem(I18N.message("subscriptions"));
-		subscriptions.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				PersonalSubscriptions s = new PersonalSubscriptions();
-				s.show();
-			}
-		});
+		subscriptions.addClickHandler(event -> new PersonalSubscriptions().show());
 
 		List<MenuItem> items = new ArrayList<>();
 
@@ -126,12 +105,7 @@ public class AccountMenu extends Menu {
 		}
 
 		MenuItem logout = new MenuItem(I18N.message("logout"));
-		logout.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				Session.get().logout();
-			}
-		});
+		logout.addClickHandler(event -> Session.get().logout());
 		items.add(logout);
 
 		setItems(items.toArray(new MenuItem[0]));
@@ -139,70 +113,32 @@ public class AccountMenu extends Menu {
 
 	private MenuItem getDigitalSignatureMenu() {
 		MenuItem certificate = new MenuItem(I18N.message("certificate"));
-		certificate.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				CertificateDialog cert = new CertificateDialog();
-				cert.show();
-			}
-		});
-
+		certificate.addClickHandler(event -> new CertificateDialog().show());
 		return certificate;
 	}
 
 	private MenuItem getSignatureMenu() {
 		MenuItem signature = new MenuItem(I18N.message("signature"));
-		signature.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				SignatureDialog sig = new SignatureDialog();
-				sig.show();
-			}
-		});
-
+		signature.addClickHandler(event -> new SignatureDialog().show());
 		return signature;
 	}
 
 	private MenuItem getSecurityMenuItem() {
 		MenuItem changePswd = new MenuItem(I18N.message("changepassword"));
-		changePswd.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				ChangePassword cp = new ChangePassword();
-				cp.show();
-			}
-		});
+		changePswd.addClickHandler(event -> new ChangePassword().show());
 		changePswd.setEnabled(!Session.get().isDemo() && Session.get().getUser().getSource() == 0);
 
 		MenuItem lastLogins = new MenuItem(I18N.message("lastlogins"));
-		lastLogins.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				LastLogins ll = new LastLogins();
-				ll.show();
-			}
-		});
+		lastLogins.addClickHandler(event -> new LastLogins().show());
 
 		MenuItem twofactorsauth = new MenuItem(I18N.message("twofactorsauth"));
-		twofactorsauth.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(Session.get().getUser(),
-						false);
-				dialog.show();
-			}
-		});
+		twofactorsauth
+				.addClickHandler(event -> new TwoFactorsAuthenticationDialog(Session.get().getUser(), false).show());
 		twofactorsauth.setEnabled(!Session.get().isDemo() && Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
 				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED));
 
 		MenuItem trustedDevices = new MenuItem(I18N.message("trusteddevices"));
-		trustedDevices.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				TrustedDevices td = new TrustedDevices();
-				td.show();
-			}
-		});
+		trustedDevices.addClickHandler(event -> new TrustedDevices().show());
 		trustedDevices.setEnabled(!Session.get().isDemo() && Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
 				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED));
 

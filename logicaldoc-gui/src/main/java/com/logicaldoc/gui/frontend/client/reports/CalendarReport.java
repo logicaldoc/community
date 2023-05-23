@@ -20,7 +20,6 @@ import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -28,7 +27,6 @@ import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -129,12 +127,7 @@ public class CalendarReport extends AdminPanel {
 		searchButton.setAutoFit(true);
 		searchButton.setEndRow(true);
 		searchButton.setColSpan(2);
-		searchButton.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				onSearch();
-			}
-		});
+		searchButton.addClickHandler(event -> onSearch());
 
 		form.setItems(fromDate, toDate, deadLineFrom, deadLineTo, title, statusSelector, type, subtype,
 				frequencySelector, displayMax, searchButton);
@@ -169,50 +162,42 @@ public class CalendarReport extends AdminPanel {
 		frequency.setType(ListGridFieldType.INTEGER);
 		frequency.setAlign(Alignment.CENTER);
 		frequency.setCanFilter(false);
-		frequency.setCellFormatter(new CellFormatter() {
+		frequency.setCellFormatter((value, rec, rowNum, colNum) -> {
+			String v = value.toString();
 
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				String v = value.toString();
-
-				if ("1".equals(v)) {
-					return I18N.message("daily");
-				} else if ("7".equals(v)) {
-					return I18N.message("weekly");
-				} else if ("15".equals(v)) {
-					return I18N.message("biweekly");
-				} else if ("30".equals(v)) {
-					return I18N.message("monthly");
-				} else if ("180".equals(v)) {
-					return I18N.message("sixmonthly");
-				} else if ("365".equals(v)) {
-					return I18N.message("yearly");
-				}
-
-				return null;
+			if ("1".equals(v)) {
+				return I18N.message("daily");
+			} else if ("7".equals(v)) {
+				return I18N.message("weekly");
+			} else if ("15".equals(v)) {
+				return I18N.message("biweekly");
+			} else if ("30".equals(v)) {
+				return I18N.message("monthly");
+			} else if ("180".equals(v)) {
+				return I18N.message("sixmonthly");
+			} else if ("365".equals(v)) {
+				return I18N.message("yearly");
 			}
+
+			return null;
 		});
 
 		ListGridField status = new ListGridField(STATUS, I18N.message(STATUS), 90);
 		status.setType(ListGridFieldType.INTEGER);
 		status.setAlign(Alignment.CENTER);
 		status.setCanFilter(false);
-		status.setCellFormatter(new CellFormatter() {
+		status.setCellFormatter((value, rec, rowNum, colNum) -> {
+			String v = value.toString();
 
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				String v = value.toString();
-
-				if ("1".equals(v)) {
-					return I18N.message("working");
-				} else if ("2".equals(v)) {
-					return I18N.message("completed");
-				} else if ("3".equals(v)) {
-					return I18N.message("canceled");
-				}
-
-				return null;
+			if ("1".equals(v)) {
+				return I18N.message("working");
+			} else if ("2".equals(v)) {
+				return I18N.message("completed");
+			} else if ("3".equals(v)) {
+				return I18N.message("canceled");
 			}
+
+			return null;
 		});
 
 		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
@@ -248,12 +233,7 @@ public class CalendarReport extends AdminPanel {
 		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
 		print.setTooltip(I18N.message("print"));
 		print.setAutoFit(true);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(list));
 		toolStrip.addButton(print);
 
 		if (Feature.visible(Feature.EXPORT_CSV)) {
@@ -263,12 +243,7 @@ public class CalendarReport extends AdminPanel {
 			export.setTooltip(I18N.message("export"));
 			export.setAutoFit(true);
 			toolStrip.addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-					GridUtil.exportCSV(list, true);
-				}
-			});
+			export.addClickHandler(event -> GridUtil.exportCSV(list, true));
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
 				export.setDisabled(true);
 				export.setTooltip(I18N.message("featuredisabled"));

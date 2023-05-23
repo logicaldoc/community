@@ -18,8 +18,6 @@ import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SpacerItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -63,27 +61,17 @@ public class AttributeInitializerComposer extends Window {
 
 	private void initGUI(int attributeType) {
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (sourceItem != null && vm.validate()) {
-					sourceItem.clearErrors();
-					sourceItem.setValue(composeAutomation());
-					destroy();
-				}
+		save.addClickHandler(event -> {
+			if (sourceItem != null && vm.validate()) {
+				sourceItem.clearErrors();
+				sourceItem.setValue(composeAutomation());
+				destroy();
 			}
 		});
 		save.setDisabled(sourceItem == null || sourceItem.isDisabled());
 
 		ToolStripButton close = new ToolStripButton(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
@@ -182,15 +170,9 @@ public class AttributeInitializerComposer extends Window {
 		CheckboxItem currentDate = ItemFactory.newCheckbox(CURRENTDATE, CURRENTDATE);
 		currentDate.setWrapTitle(false);
 		currentDate.setValue(true);
-		currentDate.addChangedHandler(new ChangedHandler() {
+		currentDate.addChangedHandler(event -> date.setDisabled(currentDate.getValueAsBoolean()));
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				date.setDisabled(currentDate.getValueAsBoolean());
-			}
-		});
-
-		SpinnerItem offset = ItemFactory.newSpinnerItem(OFFSET,  0);
+		SpinnerItem offset = ItemFactory.newSpinnerItem(OFFSET, 0);
 		offset.setWrapTitle(false);
 		offset.setMin(Integer.MIN_VALUE);
 		offset.setHint(I18N.message("days"));

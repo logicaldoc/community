@@ -48,7 +48,7 @@ public class ClassTool {
 
 		try {
 			return Class.forName(className).getDeclaredConstructor().newInstance();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// The classname as is was not found, so try to prefix with our root
 			// package
 			return Class.forName("com.logicaldoc." + className).getDeclaredConstructor().newInstance();

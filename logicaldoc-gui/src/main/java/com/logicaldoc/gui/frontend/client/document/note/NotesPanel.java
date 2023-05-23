@@ -17,18 +17,13 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -99,24 +94,22 @@ public class NotesPanel extends DocumentDetailTab {
 
 		addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(event -> {
-				NoteUpdateDialog note = new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this);
-				note.show();
+			NoteUpdateDialog note = new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this);
+			note.show();
 		});
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
 		annotations.addClickHandler(event -> {
-				AnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(
-						document, null, NotesPanel.this, true);
-				dialog.show();
+			AnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document,
+					null, NotesPanel.this, true);
+			dialog.show();
 		});
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
-		export.addClickHandler(event ->
-				GridUtil.exportCSV(notesGrid, true));
+		export.addClickHandler(event -> GridUtil.exportCSV(notesGrid, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(event ->
-				GridUtil.print(notesGrid));
+		print.addClickHandler(event -> GridUtil.print(notesGrid));
 
 		if (document.getFolder().isWrite()) {
 			buttons.addButton(addNote);
@@ -137,51 +130,47 @@ public class NotesPanel extends DocumentDetailTab {
 		container.addMember(notesGrid);
 		container.addMember(buttons);
 
-		notesGrid.addCellContextClickHandler( event -> {
-				Menu contextMenu = new Menu();
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.setEnabled(false);
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent clickEvent) {
-						onDelete();
-					}
-				});
+		notesGrid.addCellContextClickHandler(event -> {
+			Menu contextMenu = new Menu();
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.setEnabled(false);
+			delete.addClickHandler(clickEvent -> onDelete());
 
-				MenuItem edit = new MenuItem();
-				edit.setTitle(I18N.message("edit"));
-				edit.setEnabled(false);
-				edit.addClickHandler(clickEvent -> {
-						NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
-								notesGrid.getSelectedRecord().getAttributeAsLong("id"),
-								notesGrid.getSelectedRecord().getAttribute(MESSAGE), NotesPanel.this);
-						note.show();
-				});
+			MenuItem edit = new MenuItem();
+			edit.setTitle(I18N.message("edit"));
+			edit.setEnabled(false);
+			edit.addClickHandler(clickEvent -> {
+				NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
+						notesGrid.getSelectedRecord().getAttributeAsLong("id"),
+						notesGrid.getSelectedRecord().getAttribute(MESSAGE), NotesPanel.this);
+				note.show();
+			});
 
-				MenuItem prnt = new MenuItem();
-				prnt.setTitle(I18N.message("print"));
-				prnt.addClickHandler(clickEvent -> {
-						HTMLPane printContainer = new HTMLPane();
-						printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
-						Canvas.showPrintPreview(printContainer);
-				});
+			MenuItem prnt = new MenuItem();
+			prnt.setTitle(I18N.message("print"));
+			prnt.addClickHandler(clickEvent -> {
+				HTMLPane printContainer = new HTMLPane();
+				printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
+				Canvas.showPrintPreview(printContainer);
+			});
 
-				ListGridRecord[] selection = notesGrid.getSelectedRecords();
+			ListGridRecord[] selection = notesGrid.getSelectedRecords();
 
-				if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-					delete.setEnabled(selection.length > 0);
-					edit.setEnabled(selection.length == 1);
-				} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {
-					long usrId = Long.parseLong(selection[0].getAttribute(USER_ID));
-					delete.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
-					edit.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
-				}
+			if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
+				delete.setEnabled(selection.length > 0);
+				edit.setEnabled(selection.length == 1);
+			} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {
+				long usrId = Long.parseLong(selection[0].getAttribute(USER_ID));
+				delete.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
+				edit.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
+			}
 
-				prnt.setEnabled(selection.length == 1);
+			prnt.setEnabled(selection.length == 1);
 
-				contextMenu.setItems(edit, prnt, delete);
-				contextMenu.showContextMenu();
-				event.cancel();
+			contextMenu.setItems(edit, prnt, delete);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 	}
 

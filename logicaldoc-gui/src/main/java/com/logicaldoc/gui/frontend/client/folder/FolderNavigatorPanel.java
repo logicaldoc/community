@@ -8,8 +8,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.frontend.client.document.DocumentsUploader;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -39,32 +37,19 @@ public class FolderNavigatorPanel extends VLayout implements FolderObserver {
 
 	private FolderNavigatorPanel() {
 		newFolder = new ToolStripButton(I18N.message("newfolder"));
-		newFolder.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				FolderNavigator.get().onCreate(FolderNavigator.get().getSelectedIds()[0]);
-			}
-		});
+		newFolder.addClickHandler(event -> FolderNavigator.get().onCreate(FolderNavigator.get().getSelectedIds()[0]));
 		newFolder.setDisabled(true);
 
 		newWorkspace = new ToolStripButton(I18N.message("newworkspace"));
-		newWorkspace.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				FolderNavigator.get().onCreateWorkspace();
-			}
-		});
+		newWorkspace.addClickHandler(event -> FolderNavigator.get().onCreateWorkspace());
 		newWorkspace.setDisabled(true);
 		newWorkspace.setVisible(false);
 
 		addDocuments = new ToolStripButton(I18N.message("adddocuments"));
-		addDocuments.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsUploader uploader = new DocumentsUploader();
-				uploader.show();
-				event.cancel();
-			}
+		addDocuments.addClickHandler(event -> {
+			DocumentsUploader uploader = new DocumentsUploader();
+			uploader.show();
+			event.cancel();
 		});
 		addDocuments.setDisabled(true);
 

@@ -14,8 +14,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This is the form used to edit contact's details.
@@ -60,36 +58,34 @@ public class ContactDetails extends Window {
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (Boolean.FALSE.equals(vm.hasErrors())) {
+		save.addClickHandler(event -> {
+			vm.validate();
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
 
-					GUIContact c = new GUIContact();
-					c.setId(contact.getId());
-					c.setUserId(Session.get().getUser().getId());
-					c.setFirstName(vm.getValueAsString("firstname"));
-					c.setLastName(vm.getValueAsString("lastname"));
-					c.setEmail(vm.getValueAsString(EMAIL));
-					c.setAddress(vm.getValueAsString("address"));
-					c.setPhone(vm.getValueAsString("phone"));
-					c.setMobile(vm.getValueAsString("cell"));
-					c.setCompany(vm.getValueAsString("company"));
+				GUIContact c = new GUIContact();
+				c.setId(contact.getId());
+				c.setUserId(Session.get().getUser().getId());
+				c.setFirstName(vm.getValueAsString("firstname"));
+				c.setLastName(vm.getValueAsString("lastname"));
+				c.setEmail(vm.getValueAsString(EMAIL));
+				c.setAddress(vm.getValueAsString("address"));
+				c.setPhone(vm.getValueAsString("phone"));
+				c.setMobile(vm.getValueAsString("cell"));
+				c.setCompany(vm.getValueAsString("company"));
 
-					ContactService.Instance.get().save(c, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							SC.warn(caught.getMessage());
-						}
+				ContactService.Instance.get().save(c, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						SC.warn(caught.getMessage());
+					}
 
-						@Override
-						public void onSuccess(Void ret) {
-							ContactDetails.this.destroy();
-							if (parent != null)
-								parent.refresh();
-						}
-					});
-				}
+					@Override
+					public void onSuccess(Void ret) {
+						ContactDetails.this.destroy();
+						if (parent != null)
+							parent.refresh();
+					}
+				});
 			}
 		});
 

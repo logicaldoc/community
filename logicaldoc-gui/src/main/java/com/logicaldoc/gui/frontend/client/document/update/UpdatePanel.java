@@ -14,7 +14,6 @@ import com.logicaldoc.gui.frontend.client.document.PublishingPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.Side;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -155,20 +154,14 @@ public class UpdatePanel extends VLayout {
 		propertiesPanel = new UpdateStandardPropertiesPanel(document);
 		propertiesTabPanel.addMember(propertiesPanel);
 
-		ChangedHandler nothingToDo = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				// Nothing to do
-			}
+		ChangedHandler nothingToDo = event -> {
+			// Nothing to do
 		};
 
-		ChangedHandler templateChangedHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				document.setOcrTemplateId(null);
-				document.setBarcodeTemplateId(null);
-				capturePanel.refresh(document.getTemplateId());
-			}
+		ChangedHandler templateChangedHandler = event -> {
+			document.setOcrTemplateId(null);
+			document.setBarcodeTemplateId(null);
+			capturePanel.refresh(document.getTemplateId());
 		};
 
 		/*

@@ -6,9 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.ImportFolderService;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -48,34 +45,26 @@ public class ImportFolderDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (importFolder.getId() != 0) {
-					ImportFolderService.Instance.get().getImportFolder(importFolder.getId(),
-							new AsyncCallback<GUIImportFolder>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (importFolder.getId() != 0) {
+				ImportFolderService.Instance.get().getImportFolder(importFolder.getId(),
+						new AsyncCallback<GUIImportFolder>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(GUIImportFolder share) {
-									setShare(share);
-								}
-							});
-				} else {
-					GUIImportFolder newshare = new GUIImportFolder();
-					newshare.setProvider(importFolder.getProvider());
-					setShare(newshare);
-				}
-				tabSet.hideSave();
+							@Override
+							public void onSuccess(GUIImportFolder share) {
+								setShare(share);
+							}
+						});
+			} else {
+				GUIImportFolder newshare = new GUIImportFolder();
+				newshare.setProvider(importFolder.getProvider());
+				setShare(newshare);
 			}
+			tabSet.hideSave();
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
@@ -114,7 +103,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 				standardTabPanel.removeMember(standardPanel);
 		}
 
-		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
+		ChangedHandler changeHandler = event -> onModified();
 
 		standardPanel = new ImportFolderStandardProperties(importFolder, changeHandler);
 		standardTabPanel.addMember(standardPanel);

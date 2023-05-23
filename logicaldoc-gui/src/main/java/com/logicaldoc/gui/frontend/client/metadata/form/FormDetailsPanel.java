@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.metadata.form;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
@@ -11,15 +10,12 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.automation.HtmlItemEditor;
 import com.logicaldoc.gui.frontend.client.services.FormService;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -29,14 +25,11 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
-import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 
 /**
  * This panel collects details about a form
@@ -103,41 +96,28 @@ public class FormDetailsPanel extends VLayout {
 			removeMember(tabSet);
 		}
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (form.getId() != 0) {
-					FormService.Instance.get().getById(form.getId(), new AsyncCallback<GUIForm>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (form.getId() != 0) {
+				FormService.Instance.get().getById(form.getId(), new AsyncCallback<GUIForm>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIForm Form) {
-							setForm(Form);
-						}
-					});
-				} else {
-					GUIForm newForm = new GUIForm();
-					setForm(newForm);
-				}
-				tabSet.hideSave();
+					@Override
+					public void onSuccess(GUIForm Form) {
+						setForm(Form);
+					}
+				});
+			} else {
+				GUIForm newForm = new GUIForm();
+				setForm(newForm);
 			}
+			tabSet.hideSave();
 		});
 		addMember(tabSet);
 
-		ChangedHandler changedHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
+		ChangedHandler changedHandler = event -> onModified();
 
 		preparePropertiesTab(changedHandler);
 
@@ -149,13 +129,7 @@ public class FormDetailsPanel extends VLayout {
 		}
 
 		tabSet.selectTab(selectedTabIndex);
-		tabSet.addTabSelectedHandler(new TabSelectedHandler() {
-
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				selectedTabIndex = event.getTabNum();
-			}
-		});
+		tabSet.addTabSelectedHandler(event -> selectedTabIndex = event.getTabNum());
 	}
 
 	private void preparePropertiesTab(ChangedHandler changedHandler) {
@@ -193,8 +167,8 @@ public class FormDetailsPanel extends VLayout {
 		form1.setValuesManager(vm);
 		form1.setItems(name, template, css);
 
-		TextAreaItem content = ItemFactory.newTextAreaItemForAutomation(CONTENT, form.getContent(),
-				changedHandler, true);
+		TextAreaItem content = ItemFactory.newTextAreaItemForAutomation(CONTENT, form.getContent(), changedHandler,
+				true);
 		content.addChangedHandler(changedHandler);
 		content.setColSpan(2);
 		content.setWidth("100%");
@@ -293,8 +267,8 @@ public class FormDetailsPanel extends VLayout {
 			columns.setRequired(true);
 			columns.addChangedHandler(changedHandler);
 
-			TextAreaItem title = ItemFactory.newTextAreaItemForAutomation("title", form.getTitle(),
-					changedHandler, true);
+			TextAreaItem title = ItemFactory.newTextAreaItemForAutomation("title", form.getTitle(), changedHandler,
+					true);
 			title.setRequired(true);
 			title.setColSpan(3);
 			title.setWidth(400);
@@ -330,12 +304,7 @@ public class FormDetailsPanel extends VLayout {
 			targetFolder.setTitle(I18N.message("destination"));
 			targetFolder.setFolder(form.getTargetFolder());
 			targetFolder.setWidth(250);
-			targetFolder.addFolderChangeListener(new FolderChangeListener() {
-				@Override
-				public void onChanged(GUIFolder folder) {
-					changedHandler.onChanged(null);
-				}
-			});
+			targetFolder.addFolderChangeListener(folder -> changedHandler.onChanged(null));
 			targetFolder.setRequiredWhen(new Criteria(WEB_ENABLED, "yes"));
 
 			TextItem backgroundColor = ItemFactory.newColorItemPicker("backgroundColor", "background",
@@ -380,12 +349,9 @@ public class FormDetailsPanel extends VLayout {
 	 * Call to directly open the HTML edior of the forms's content
 	 */
 	public void openContentEditor() {
-		HtmlItemEditor editor = new HtmlItemEditor(form2.getItem(CONTENT), new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-				onSave();
-			}
+		HtmlItemEditor editor = new HtmlItemEditor(form2.getItem(CONTENT), event -> {
+			onModified();
+			onSave();
 		});
 		editor.show();
 	}
@@ -404,7 +370,7 @@ public class FormDetailsPanel extends VLayout {
 	}
 
 	public void onSave() {
-		if (Boolean.TRUE.equals(vm.validate()))  {
+		if (Boolean.TRUE.equals(vm.validate())) {
 			collectValuesAndSave();
 		} else {
 			if (!form1.validate() || !form2.validate())

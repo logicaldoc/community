@@ -13,8 +13,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -57,13 +55,7 @@ public class ReportUploader extends Window {
 		this.reportsPanel = reportsPanel;
 
 		save = new IButton(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave(report);
-			}
-		});
+		save.addClickHandler(event -> onSave(report));
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(2);
@@ -78,23 +70,18 @@ public class ReportUploader extends Window {
 		layout.addMember(uploader);
 		layout.addMember(save);
 
-		addCloseClickHandler(new CloseClickHandler() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+
 			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						destroy();
-					}
-				});
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
 			}
-		});
+
+			@Override
+			public void onSuccess(Void result) {
+				destroy();
+			}
+		}));
 
 		addItem(layout);
 

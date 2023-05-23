@@ -14,8 +14,6 @@ import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.gui.frontend.client.workflow.WorkflowTriggersPanel;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -233,12 +231,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	private void prepareTabSet() {
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, (ClickEvent event) -> {
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			FolderService.Instance.get().getFolder(getFolder().getId(), false, false, false,
 					new AsyncCallback<GUIFolder>() {
 
@@ -262,9 +255,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		try {
 			disableSave();
 
-			ChangedHandler changeHandler = (ChangedEvent changeEvent) -> {
-				onModified();
-			};
+			ChangedHandler changeHandler = changeEvent -> onModified();
 
 			/*
 			 * Prepare the standard properties tab

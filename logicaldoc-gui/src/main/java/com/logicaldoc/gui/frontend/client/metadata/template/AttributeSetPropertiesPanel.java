@@ -18,7 +18,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -37,10 +36,6 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.CellSavedEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -59,7 +54,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	private static final String ATTRIBUTE_NAME = "attributename";
 
-	private static final String EDITOR_STR	= "editor";
+	private static final String EDITOR_STR = "editor";
 
 	private static final String INITIALIZATION = "initialization";
 
@@ -142,19 +137,16 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		name.setWidth(150);
 		name.setCanEdit(false);
 		name.setCanSort(false);
-		attributesList.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				if (!AttributeSetPropertiesPanel.this.attributeSet.isReadonly())
-					showContextMenu();
-				event.cancel();
-			}
+		attributesList.addCellContextClickHandler(event -> {
+			if (!AttributeSetPropertiesPanel.this.attributeSet.isReadonly())
+				showContextMenu();
+			event.cancel();
 		});
 
 		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL));
 		label.setCanEdit(true);
 		label.setCanSort(false);
-		label.addCellSavedHandler((CellSavedEvent labelSaved) -> {
+		label.addCellSavedHandler(labelSaved -> {
 			AttributeSetPropertiesPanel.this.attributeSet.getAttribute(labelSaved.getRecord().getAttribute("name"))
 					.setLabel((String) labelSaved.getNewValue());
 			AttributeSetPropertiesPanel.this.changedHandler.onChanged(null);
@@ -162,7 +154,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		attributesList.setFields(name, label);
 
-		attributesList.addDropCompleteHandler((DropCompleteEvent attributesListDropCompleted) -> {
+		attributesList.addDropCompleteHandler(attributesListDropCompleted -> {
 			List<String> attributes = new ArrayList<>();
 			for (int i = 0; i < attributesList.getTotalRows(); i++) {
 				ListGridRecord rec = attributesList.getRecord(i);
@@ -268,9 +260,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
 		save.setEndRow(false);
-		save.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent saveClick) -> {
-			onSaveClicked(attributeName, label, mandatory, hidden, readonly, multiple, validation, initialization);
-		});
+		save.addClickHandler(saveClick -> onSaveClicked(attributeName, label, mandatory, hidden, readonly, multiple,
+				validation, initialization));
 
 		ButtonItem clean = prepareCleanButton();
 
@@ -363,7 +354,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		clean.setTitle(I18N.message("clean"));
 		clean.setAutoFit(true);
 		clean.setStartRow(false);
-		clean.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent cleanClick) -> clean());
+		clean.addClickHandler(cleanClick -> clean());
 		return clean;
 	}
 
@@ -380,8 +371,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		initializationComposer.setHeight(16);
 		initializationComposer.setSrc("[SKIN]/cog.png");
 		initializationComposer.setPrompt(I18N.message("openinitializatorcomposer"));
-		initializationComposer.addFormItemClickHandler(
-				(FormItemIconClickEvent initializationComposerClick) -> new AttributeInitializerComposer(initialization,
+		initializationComposer
+				.addFormItemClickHandler(initializationComposerClick -> new AttributeInitializerComposer(initialization,
 						type.getValue() != null && !type.getValue().toString().isEmpty()
 								? Integer.parseInt(type.getValueAsString())
 								: GUIAttribute.TYPE_STRING).show());
@@ -420,7 +411,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	private void addOptionsItem(final TextItem attributeName) {
 		options = ItemFactory.newLinkItem("options", I18N.message("options"));
 		options.setLinkTitle(I18N.message("attributeoptions"));
-		options.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent optionsClick) -> {
+		options.addClickHandler(optionsClick -> {
 			if (attributeSet.getId() == 0L) {
 				SC.say(I18N.message("saveattributesetfirst"));
 			} else {
@@ -471,7 +462,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		final TextItem attributeName = ItemFactory.newSimpleTextItem(ATTRIBUTE_NAME, null);
 		attributeName.setRequired(true);
 		attributeName.setWidth(180);
-		PickerIcon cleanPicker = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent attributeNameClick) -> {
+		PickerIcon cleanPicker = new PickerIcon(PickerIcon.CLEAR, attributeNameClick -> {
 			clean();
 			attributeSettingsForm1.getField(MANDATORY).setDisabled(false);
 			attributeSettingsForm1.getField(HIDDEN).setDisabled(false);
@@ -504,7 +495,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		addMetadata();
 		addMember(setPropertiesForm);
 
-		attributesList.addSelectionChangedHandler((SelectionEvent attributesListSelected) -> {
+		attributesList.addSelectionChangedHandler(attributesListSelected -> {
 			Record rec = attributesList.getSelectedRecord();
 			onChangeSelectedAttribute(rec);
 		});
@@ -637,11 +628,11 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	private MenuItem prepareApplyInitializationToTemplatesContextMenuItem() {
 		MenuItem applyInitializationToTemplates = new MenuItem();
 		applyInitializationToTemplates.setTitle(I18N.message("applyinitializationtotemplates"));
-		applyInitializationToTemplates.addClickHandler((MenuItemClickEvent applyInitializationToTemplatesClick) -> {
+		applyInitializationToTemplates.addClickHandler(applyInitializationToTemplatesClick -> {
 			final ListGridRecord selection = attributesList.getSelectedRecord();
 
 			LD.ask(I18N.message("applyinitializationtotemplates"),
-					I18N.message("applyinitializationtotemplatesquestion"), (Boolean yes) -> {
+					I18N.message("applyinitializationtotemplatesquestion"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyInitializationToTemplates(attributeSet.getId(),
@@ -667,12 +658,12 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	private MenuItem prepareApplyValidationToTemplatesContextMenuItem() {
 		MenuItem applyValidationToTemplates = new MenuItem();
 		applyValidationToTemplates.setTitle(I18N.message("applyvalidationtotemplates"));
-		applyValidationToTemplates.addClickHandler((MenuItemClickEvent applyValidationToTemplatesClick) -> {
+		applyValidationToTemplates.addClickHandler(applyValidationToTemplatesClick -> {
 			final ListGridRecord selection = attributesList.getSelectedRecord();
 
 			LD.ask(I18N.message("applyvalidationtotemplates"), I18N.message("applyvalidationtotemplatesquestion"),
-					(Boolean value) -> {
-						if (Boolean.TRUE.equals(value)) {
+					confirm -> {
+						if (Boolean.TRUE.equals(confirm)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
 									selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
@@ -706,8 +697,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				names[i] = selection[i].getAttribute("name");
 			}
 
-			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
+			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), confirm -> {
+				if (Boolean.TRUE.equals(confirm)) {
 					for (String attrName : names)
 						attributeSet.removeAttribute(attrName);
 					attributesList.removeSelectedData();

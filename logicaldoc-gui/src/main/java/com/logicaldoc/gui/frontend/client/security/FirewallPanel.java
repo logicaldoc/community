@@ -91,13 +91,8 @@ public class FirewallPanel extends VLayout {
 		IButton save = new IButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> 
+				onSave());
 
 		setMembers(tabs, save);
 	}

@@ -64,13 +64,7 @@ public class ConverterAssociationsDialog extends ComparatorAssociationsDialog {
 
 		apply = new IButton(I18N.message("apply"));
 		apply.setAutoFit(true);
-		apply.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onApply();
-			}
-		});
+		apply.addClickHandler(event -> onApply());
 
 		addItem(associationsGrid);
 		addItem(apply);

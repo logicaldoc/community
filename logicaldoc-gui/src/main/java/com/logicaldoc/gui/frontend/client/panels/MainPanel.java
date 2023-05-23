@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.panels;
 
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
@@ -29,7 +27,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
-import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 
 /**
@@ -84,25 +81,17 @@ public class MainPanel extends VLayout implements SessionObserver {
 		administrationTab = new Tab(I18N.message("administration"));
 		administrationTab.setName("administration");
 
-		Window.addResizeHandler(new ResizeHandler() {
-			public void onResize(ResizeEvent event) {
-				int width = Window.getClientWidth();
-				int height = Window.getClientHeight();
-				tabSet.setSize(width + "px", height - 95 + "px");
-				redraw();
-			}
+		Window.addResizeHandler(event -> {
+			int width = Window.getClientWidth();
+			int height = Window.getClientHeight();
+			tabSet.setSize(width + "px", height - 95 + "px");
+			redraw();
 		});
 
 		/*
 		 * Setup notification logic
 		 */
-		TabSelectedHandler selectionHandler = new TabSelectedHandler() {
-
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				MainMenu.get().onTabSeleted(event.getTab().getName());
-			}
-		};
+		TabSelectedHandler selectionHandler = event -> MainMenu.get().onTabSeleted(event.getTab().getName());
 
 		documentsTab.addTabSelectedHandler(selectionHandler);
 		searchTab.addTabSelectedHandler(selectionHandler);

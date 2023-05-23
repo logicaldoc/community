@@ -20,8 +20,6 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -99,35 +97,30 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 
 		ButtonItem sign = new ButtonItem(I18N.message("signnow"));
 		sign.setEndRow(false);
-		sign.addClickHandler(new ClickHandler() {
+		sign.addClickHandler(event -> {
+			if (!form.validate())
+				return;
 
-			@Override
-			public void onClick(ClickEvent event) {
-				if (!form.validate())
-					return;
+			if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
+				VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(
+						new long[] { document.getId() }, form.getValueAsString(REASON));
+				dialog.show();
+			} else {
+				LD.contactingServer();
+				SignService.Instance.get().signDocuments(new long[] { document.getId() }, form.getValueAsString(REASON),
+						1, null, null, null, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+							}
 
-				if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
-					VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(
-							new long[] { document.getId() }, form.getValueAsString(REASON));
-					dialog.show();
-				} else {
-					LD.contactingServer();
-					SignService.Instance.get().signDocuments(new long[] { document.getId() },
-							form.getValueAsString(REASON), 1, null, null, null, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void ret) {
-									LD.clearPrompt();
-									refresh(document);
-								}
-							});
-				}
-
+							@Override
+							public void onSuccess(Void ret) {
+								LD.clearPrompt();
+								refresh(document);
+							}
+						});
 			}
 		});
 

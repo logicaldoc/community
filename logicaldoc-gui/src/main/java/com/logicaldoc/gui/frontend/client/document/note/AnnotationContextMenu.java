@@ -20,8 +20,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -106,13 +104,9 @@ public class AnnotationContextMenu extends Menu {
 
 	private MenuItem prepareFillMenuItem() {
 		ColorPickerItem fillColor = ItemFactory.newColorItemPicker("fillColor", I18N.message("color"), note.getColor(),
-				false, new ChangedHandler() {
-
-					@Override
-					public void onChanged(ChangedEvent event) {
-						note.setColor((String) event.getValue());
-						drawItem.setFillColor((String) event.getValue());
-					}
+				false, event -> {
+					note.setColor((String) event.getValue());
+					drawItem.setFillColor((String) event.getValue());
 				});
 		fillColor.setRequired(true);
 		fillColor.setDisabled(!editEnabled);
@@ -122,9 +116,9 @@ public class AnnotationContextMenu extends Menu {
 		fillOpacity.setMin(0);
 		fillOpacity.setMax(100);
 		fillOpacity.setDisabled(!editEnabled);
-		fillOpacity.addChangedHandler( event -> {
-				note.setOpacity(Integer.parseInt(event.getValue().toString()));
-				drawItem.setFillOpacity((float) note.getOpacity() / 100f);
+		fillOpacity.addChangedHandler(event -> {
+			note.setOpacity(Integer.parseInt(event.getValue().toString()));
+			drawItem.setFillOpacity((float) note.getOpacity() / 100f);
 		});
 
 		final DynamicForm fillForm = new DynamicForm();
@@ -157,16 +151,16 @@ public class AnnotationContextMenu extends Menu {
 		form.setTitleOrientation(TitleOrientation.RIGHT);
 
 		FormItem contentArea = ItemFactory.newTextAreaItemForNote(CONTENT, I18N.message(CONTENT), note.getMessage(),
-				event -> { 
-						form.setValue(CONTENT, (String) event.getValue());
-						note.setMessage((String) event.getValue());
+				event -> {
+					form.setValue(CONTENT, (String) event.getValue());
+					note.setMessage((String) event.getValue());
 
-						if (drawItem instanceof DrawLabel)
-							((DrawLabel) drawItem).setContents(Util.strip(note.getMessage()));
-						else
-							drawItem.setTitle(Util.strip(note.getMessage()));
+					if (drawItem instanceof DrawLabel)
+						((DrawLabel) drawItem).setContents(Util.strip(note.getMessage()));
+					else
+						drawItem.setTitle(Util.strip(note.getMessage()));
 
-						drawItem.setPrompt(note.getMessage());
+					drawItem.setPrompt(note.getMessage());
 				}, true);
 		contentArea.setRequired(false);
 		contentArea.setShowTitle(false);
@@ -191,8 +185,8 @@ public class AnnotationContextMenu extends Menu {
 	private MenuItem prepareLineMenuItem() {
 		ColorPickerItem lineColor = ItemFactory.newColorItemPicker("lineColor", I18N.message("color"),
 				note.getLineColor(), false, event -> {
-						note.setLineColor((String) event.getValue());
-						drawItem.setLineColor((String) event.getValue());
+					note.setLineColor((String) event.getValue());
+					drawItem.setLineColor((String) event.getValue());
 				});
 		lineColor.setRequired(true);
 		lineColor.setDisabled(!editEnabled);
@@ -201,9 +195,9 @@ public class AnnotationContextMenu extends Menu {
 		opacity.setRequired(true);
 		opacity.setMin(0);
 		opacity.setMax(100);
-		opacity.addChangedHandler( event -> {
-				note.setLineOpacity(Integer.parseInt(event.getValue().toString()));
-				drawItem.setLineOpacity((float) note.getLineOpacity() / 100f);
+		opacity.addChangedHandler(event -> {
+			note.setLineOpacity(Integer.parseInt(event.getValue().toString()));
+			drawItem.setLineOpacity((float) note.getLineOpacity() / 100f);
 		});
 		opacity.setVisible(!(drawItem instanceof DrawLabel));
 		opacity.setDisabled(!editEnabled);
@@ -214,12 +208,12 @@ public class AnnotationContextMenu extends Menu {
 		width.setMax(100);
 		width.setDisabled(!editEnabled);
 		width.addChangedHandler(event -> {
-				note.setLineWidth(Integer.parseInt(event.getValue().toString()));
+			note.setLineWidth(Integer.parseInt(event.getValue().toString()));
 
-				if (drawItem instanceof DrawLabel)
-					((DrawLabel) drawItem).setFontSize(note.getLineWidth());
-				else
-					drawItem.setLineWidth(note.getLineWidth());
+			if (drawItem instanceof DrawLabel)
+				((DrawLabel) drawItem).setFontSize(note.getLineWidth());
+			else
+				drawItem.setLineWidth(note.getLineWidth());
 		});
 
 		final DynamicForm lineForm = new DynamicForm();

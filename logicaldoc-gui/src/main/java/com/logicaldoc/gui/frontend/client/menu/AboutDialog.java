@@ -10,8 +10,6 @@ import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VStack;
 
 /**
@@ -25,12 +23,7 @@ public class AboutDialog extends Window {
 	public AboutDialog() {
 		super();
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+		addCloseClickHandler(event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("about") + " " + Session.get().getInfo().getBranding().getProductName());
@@ -66,8 +59,10 @@ public class AboutDialog extends Window {
 		copyright.setHeight(20);
 		copyright.setAlign(Alignment.CENTER);
 
-		Label trademark = new Label(I18N.message("copyrights", new String[] { Session.get().getInfo().getBranding().getProduct(),
-				Session.get().getInfo().getBranding().getProduct(), Session.get().getInfo().getBranding().getVendor() }));
+		Label trademark = new Label(I18N.message("copyrights",
+				new String[] { Session.get().getInfo().getBranding().getProduct(),
+						Session.get().getInfo().getBranding().getProduct(),
+						Session.get().getInfo().getBranding().getVendor() }));
 		trademark.setWidth("80%");
 		trademark.setHeight(40);
 		trademark.setAlign(Alignment.CENTER);
@@ -76,7 +71,8 @@ public class AboutDialog extends Window {
 		String wsurl = Session.get().getInfo().getBranding().getUrl();
 
 		String htmlUrl = "";
-		if (Session.get().getInfo().getBranding().getUrl() != null && !"-".equals(Session.get().getInfo().getBranding().getUrl()))
+		if (Session.get().getInfo().getBranding().getUrl() != null
+				&& !"-".equals(Session.get().getInfo().getBranding().getUrl()))
 			htmlUrl = "<div style='text-align: center;'><a href='" + wsurl + "' target='_blank'>" + wsurl
 					+ "</a></div>";
 		HTMLPane sitelink = new HTMLPane();

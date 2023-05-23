@@ -17,20 +17,11 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -62,12 +53,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
-		userSelector.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		userSelector.addChangedHandler(event -> refresh());
 		toolStrip.addFormItem(userSelector);
 
 		folderSelector = new FolderSelector("folder", true);
@@ -81,11 +67,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
 		print.setTooltip(I18N.message("print"));
 		print.setAutoFit(true);
-		print.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(list));
 		toolStrip.addSeparator();
 		toolStrip.addButton(print);
 
@@ -96,12 +78,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 			export.setTooltip(I18N.message("export"));
 			export.setAutoFit(true);
 			toolStrip.addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					GridUtil.exportCSV(list, false);
-				}
-			});
+			export.addClickHandler(event -> GridUtil.exportCSV(list, false));
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
 				export.setDisabled(true);
 				export.setTooltip(I18N.message("featuredisabled"));
@@ -139,20 +116,13 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 
 		list.setFields(id, name, lastModified, deleteUser);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showndocuments", Integer.toString(list.getTotalRows())));
-			}
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showndocuments", Integer.toString(list.getTotalRows()))));
 
 		body.setMembers(toolStrip, infoPanel, list);
 
@@ -175,22 +145,15 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				if (selection == null || selection.length == 0)
-					return;
-				final Long[] ids = new Long[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					ids[i] = Long.parseLong(selection[i].getAttribute("id"));
+		restore.addClickHandler(event -> {
+			if (selection == null || selection.length == 0)
+				return;
+			final Long[] ids = new Long[selection.length];
+			for (int i = 0; i < selection.length; i++)
+				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 
-				final RestoreDialog dialog = new RestoreDialog(null, ids, new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						refresh();
-					}
-				});
-				dialog.show();
-			}
+			final RestoreDialog dialog = new RestoreDialog(null, ids, evn -> refresh());
+			dialog.show();
 		});
 
 		contextMenu.setItems(restore);

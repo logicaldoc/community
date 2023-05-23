@@ -21,17 +21,10 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -159,34 +152,23 @@ public class ExportArchivesList extends VLayout {
 		});
 		toolStrip.addButton(addArchive);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
+		});
+
+		list.addSelectionChangedHandler(event -> {
+			ListGridRecord rec = list.getSelectedRecord();
+			try {
+				showDetails(Long.parseLong(rec.getAttribute("id")),
+						!Integer.toString(GUIArchive.STATUS_OPENED).equals(rec.getAttribute(STATUS)));
+			} catch (Throwable t) {
+				// Nothing to do
 			}
 		});
 
-		list.addSelectionChangedHandler(new SelectionChangedHandler() {
-			@Override
-			public void onSelectionChanged(SelectionEvent event) {
-				ListGridRecord rec = list.getSelectedRecord();
-				try {
-					showDetails(Long.parseLong(rec.getAttribute("id")),
-							!Integer.toString(GUIArchive.STATUS_OPENED).equals(rec.getAttribute(STATUS)));
-				} catch (Throwable t) {
-					// Nothing to do
-				}
-			}
-		});
-
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showarchives", Integer.toString(list.getTotalRows()),
-						Session.get().getConfig("conf.exportdir")));
-			}
-		});
+		list.addDataArrivedHandler(event -> infoPanel.setMessage(I18N.message("showarchives",
+				Integer.toString(list.getTotalRows()), Session.get().getConfig("conf.exportdir"))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -205,47 +187,35 @@ public class ExportArchivesList extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								showDetails(null, true);
-							}
-						});
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showDetails(null, true);
 					}
 				});
 			}
-		});
+		}));
 
 		MenuItem open = new MenuItem();
 		open.setTitle(I18N.message("open"));
-		open.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				openArchive(rec);
-			}
-		});
+		open.addClickHandler(event -> openArchive(rec));
 
 		MenuItem close = new MenuItem();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						onClosingArchive(rec, id);
-					}
-				});
+		close.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				onClosingArchive(rec, id);
 			}
-		});
+		}));
 
 		if (GUIArchive.STATUS_OPENED != Integer.parseInt(rec.getAttributeAsString(STATUS)))
 			close.setEnabled(false);

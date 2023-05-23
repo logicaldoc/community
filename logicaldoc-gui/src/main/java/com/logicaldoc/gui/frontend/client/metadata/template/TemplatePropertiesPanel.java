@@ -30,8 +30,6 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -408,13 +406,11 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareResetValidationItem() {
 		MenuItem resetValidation = new MenuItem();
 		resetValidation.setTitle(I18N.message("resetvalidation"));
-		resetValidation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), (Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes))
-						resetValidation();
-				});
-			}
+		resetValidation.addClickHandler(event -> {
+			LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), (Boolean yes) -> {
+				if (Boolean.TRUE.equals(yes))
+					resetValidation();
+			});
 		});
 		return resetValidation;
 	}
@@ -425,7 +421,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		validation.addClickHandler(event -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
 			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
-			
+
 			TextAreaItem validationItem = ItemFactory.newTextAreaItemForAutomation(VALIDATION, null, null, false);
 			validationItem.setWidth(600);
 			validationItem.setHeight(400);
@@ -445,7 +441,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			validationItem.setIcons(validationIcons.toArray(new FormItemIcon[0]));
 
 			LD.askForValue(I18N.message(VALIDATION), I18N.message(VALIDATION), attribute.getValidation(),
-					validationItem, 600, (String validationScript) -> {
+					validationItem, 600, validationScript -> {
 						attribute.setValidation(validationScript);
 						fillAttributesList();
 						if (changedHandler != null)
@@ -458,7 +454,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareMakeVisibleItem() {
 		MenuItem makeVisible = new MenuItem();
 		makeVisible.setTitle(I18N.message("makevisible"));
-		makeVisible.addClickHandler((MenuItemClickEvent event) -> {
+		makeVisible.addClickHandler(event -> {
 			final ListGridRecord[] selection = attributesList.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
@@ -479,7 +475,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareMakeRedonlyItem() {
 		MenuItem makeReadonly = new MenuItem();
 		makeReadonly.setTitle(I18N.message("makereadonly"));
-		makeReadonly.addClickHandler((MenuItemClickEvent event) -> {
+		makeReadonly.addClickHandler(event -> {
 			final ListGridRecord[] selection = attributesList.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
@@ -500,7 +496,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareMakeHiddenItem() {
 		MenuItem makeHidden = new MenuItem();
 		makeHidden.setTitle(I18N.message("makehidden"));
-		makeHidden.addClickHandler((MenuItemClickEvent event) -> {
+		makeHidden.addClickHandler(event -> {
 			final ListGridRecord[] selection = attributesList.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
@@ -521,7 +517,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareMakeOptionalItem() {
 		MenuItem makeOptional = new MenuItem();
 		makeOptional.setTitle(I18N.message("makeoptional"));
-		makeOptional.addClickHandler((MenuItemClickEvent event) -> {
+		makeOptional.addClickHandler(event -> {
 			final ListGridRecord[] selection = attributesList.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
@@ -542,7 +538,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem pepareMakeMandatoryItem() {
 		MenuItem makeMandatory = new MenuItem();
 		makeMandatory.setTitle(I18N.message("makemandatory"));
-		makeMandatory.addClickHandler((MenuItemClickEvent makeMandatoryClicked) -> {
+		makeMandatory.addClickHandler(makeMandatoryClicked -> {
 			final ListGridRecord[] selection = attributesList.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
@@ -563,14 +559,14 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareDeleteItem() {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent deleteClick) -> {
+		delete.addClickHandler(deleteClick -> {
 			final ListGridRecord[] selection = attributesList.getSelectedRecords();
 			final String[] names = new String[selection.length];
 			for (int i = 0; i < selection.length; i++) {
 				names[i] = selection[i].getAttribute("name");
 			}
 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
 				if (Boolean.TRUE.equals(yes)) {
 					for (String attrName : names)
 						template.removeAttribute(attrName);
@@ -654,22 +650,20 @@ public class TemplatePropertiesPanel extends HLayout {
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setDisabled(template.isReadonly() || !template.isWrite());
 
-		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {
-			public void onFormItemClick(final FormItemIconClickEvent event) {
-				event.getItem().setValue(I18N.message("computing") + "...");
-				TemplateService.Instance.get().countDocuments(template.getId(), new AsyncCallback<Long>() {
+		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, event -> {
+			event.getItem().setValue(I18N.message("computing") + "...");
+			TemplateService.Instance.get().countDocuments(template.getId(), new AsyncCallback<Long>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Long count) {
-						event.getItem().setValue(Util.formatLong(count));
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Long count) {
+					event.getItem().setValue(Util.formatLong(count));
+				}
+			});
 		});
 		computeStat.setPrompt(I18N.message("calculatestats"));
 

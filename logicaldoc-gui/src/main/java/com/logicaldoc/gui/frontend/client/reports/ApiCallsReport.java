@@ -24,7 +24,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -37,7 +36,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -236,17 +234,13 @@ public class ApiCallsReport extends AdminPanel {
 
 		body.setMembers(callsLayout);
 
-		calls.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
+		calls.addCellDoubleClickHandler(event -> {
 			String value = event.getRecord().getAttributeAsString(calls.getField(event.getColNum()).getName());
 			TextAreaItem item = ItemFactory.newTextAreaItem(VALUE, value);
 			item.setWidth(500);
 			item.setHeight(400);
-			LD.askForValue(I18N.message(VALUE), I18N.message(VALUE), value, item, 500, new ValueCallback() {
-
-				@Override
-				public void execute(String value) {
-					// Nothing to do
-				}
+			LD.askForValue(I18N.message(VALUE), I18N.message(VALUE), value, item, 500, val -> {
+				// Nothing to do
 			});
 		});
 	}

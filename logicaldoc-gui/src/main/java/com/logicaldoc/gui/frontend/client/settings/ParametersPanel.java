@@ -11,8 +11,6 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -26,6 +24,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 public class ParametersPanel extends AdminPanel {
 
 	private static final String VALUE = "value";
+
 	private static final String PARAMETER = "parameter";
 
 	public ParametersPanel() {
@@ -91,31 +90,27 @@ public class ParametersPanel extends AdminPanel {
 
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				ArrayList<GUIParameter> params = new ArrayList<>();
-				ListGridRecord[] records = parametersGrid.getRecords();
-				for (ListGridRecord rec : records) {
-					GUIParameter param = new GUIParameter(rec.getAttributeAsString(PARAMETER),
-							rec.getAttributeAsString(VALUE));
-					Session.get().getInfo().setConfig(param.getName(), param.getValue());
-					params.add(param);
+		save.addClickHandler(event -> {
+			ArrayList<GUIParameter> params = new ArrayList<>();
+			for (ListGridRecord rec : parametersGrid.getRecords()) {
+				GUIParameter param = new GUIParameter(rec.getAttributeAsString(PARAMETER),
+						rec.getAttributeAsString(VALUE));
+				Session.get().getInfo().setConfig(param.getName(), param.getValue());
+				params.add(param);
+			}
+
+			SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
 				}
 
-				SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]),
-						new AsyncCallback<Void>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void ret) {
-								GuiLog.info(I18N.message("settingssaved"), null);
-							}
-						});
-			}
+				@Override
+				public void onSuccess(Void ret) {
+					GuiLog.info(I18N.message("settingssaved"), null);
+				}
+			});
 		});
 		save.setDisabled(Session.get().isDemo() || !Session.get().isAdmin() || !Session.get().isDefaultTenant());
 

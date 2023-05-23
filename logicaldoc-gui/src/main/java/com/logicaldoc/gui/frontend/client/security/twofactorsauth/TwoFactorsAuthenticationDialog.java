@@ -10,8 +10,6 @@ import com.logicaldoc.gui.frontend.client.services.TwoFactorsAuthenticationServi
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -36,35 +34,31 @@ public class TwoFactorsAuthenticationDialog extends Window {
 		panel.setWidth(350);
 
 		IButton save = new IButton(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
+		save.addClickHandler(event -> {
+			if (panel.validate()) {
+				LD.contactingServer();
+				save.setDisabled(true);
+				TwoFactorsAuthenticationService.Instance.get().changeTwoFactorsAuthentication(user.getId(),
+						panel.getFactor(), panel.getKey(), panel.getAccount(), panel.isNotify(),
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								save.setDisabled(false);
+								GuiLog.serverError(caught);
+							}
 
-			@Override
-			public void onClick(ClickEvent event) {
-				if (panel.validate()) {
-					LD.contactingServer();
-					save.setDisabled(true);
-					TwoFactorsAuthenticationService.Instance.get().changeTwoFactorsAuthentication(user.getId(),
-							panel.getFactor(), panel.getKey(), panel.getAccount(), panel.isNotify(),
-							new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									save.setDisabled(false);
-									GuiLog.serverError(caught);
+							@Override
+							public void onSuccess(Void arg) {
+								LD.clearPrompt();
+								if (panel != null) {
+									user.setSecondFactor(panel.getFactor());
+									user.setKey(panel.getKey());
 								}
-
-								@Override
-								public void onSuccess(Void arg) {
-									LD.clearPrompt();
-									if(panel!=null) {
-									 user.setSecondFactor(panel.getFactor());
-									 user.setKey(panel.getKey());
-									}
-									UserController.get().changed(user);
-									TwoFactorsAuthenticationDialog.this.destroy();
-								}
-							});
-				}
+								UserController.get().changed(user);
+								TwoFactorsAuthenticationDialog.this.destroy();
+							}
+						});
 			}
 		});
 

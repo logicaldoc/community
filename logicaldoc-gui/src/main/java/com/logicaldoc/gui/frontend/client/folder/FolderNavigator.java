@@ -45,20 +45,14 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.util.EventHandler;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellClickHandler;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
-import com.smartgwt.client.widgets.tree.events.FolderOpenedEvent;
-import com.smartgwt.client.widgets.tree.events.FolderOpenedHandler;
 
 /**
  * The panel that shows the workspaces/folders navigation tree
@@ -249,31 +243,27 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * that closes all the previously opened branches.
 	 */
 	private void addFolderOpenedHandler() {
-		addFolderOpenedHandler(new FolderOpenedHandler() {
+		addFolderOpenedHandler(event -> {
+			event.getNode().setAttribute(OPENED, true);
+			updateData(event.getNode());
 
-			@Override
-			public void onFolderOpened(FolderOpenedEvent event) {
-				event.getNode().setAttribute(OPENED, true);
-				updateData(event.getNode());
+			if (Session.get().getConfigAsBoolean("gui.folder.autoclose")) {
+				TreeNode selectedNode = event.getNode();
+				long selectedFolderId = selectedNode.getAttributeAsLong(FOLDER_ID);
 
-				if (Session.get().getConfigAsBoolean("gui.folder.autoclose")) {
-					TreeNode selectedNode = event.getNode();
-					long selectedFolderId = selectedNode.getAttributeAsLong(FOLDER_ID);
-
-					// Expand the selected node if it is not already expanded
-					TreeNode parentNode = getTree().getParent(selectedNode);
-					TreeNode[] children = getTree().getChildren(parentNode);
-					if (children != null)
-						for (TreeNode child : children) {
-							if (child.getAttributeAsLong(FOLDER_ID) == selectedFolderId)
-								continue;
-							else {
-								getTree().closeAll(child);
-								child.setAttribute(OPENED, false);
-								updateData(child);
-							}
+				// Expand the selected node if it is not already expanded
+				TreeNode parentNode = getTree().getParent(selectedNode);
+				TreeNode[] children = getTree().getChildren(parentNode);
+				if (children != null)
+					for (TreeNode child : children) {
+						if (child.getAttributeAsLong(FOLDER_ID) == selectedFolderId)
+							continue;
+						else {
+							getTree().closeAll(child);
+							child.setAttribute(OPENED, false);
+							updateData(child);
 						}
-				}
+					}
 			}
 		});
 	}
@@ -282,18 +272,15 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * Handles the click on a folder to show the contained documents
 	 */
 	private void addCellClickHandler() {
-		addCellClickHandler(new CellClickHandler() {
-			@Override
-			public void onCellClick(CellClickEvent event) {
-				long selectedFolderId = event.getRecord().getAttributeAsLong(FOLDER_ID);
+		addCellClickHandler(event -> {
+			long selectedFolderId = event.getRecord().getAttributeAsLong(FOLDER_ID);
 
-				selectFolder(selectedFolderId);
+			selectFolder(selectedFolderId);
 
-				if (Session.get().getConfigAsBoolean("gui.folder.openonselect")) {
-					// Expand the selected node if it is not already expanded
-					TreeNode selectedNode = (TreeNode) getSelectedRecord();
-					openFolder(selectedNode);
-				}
+			if (Session.get().getConfigAsBoolean("gui.folder.openonselect")) {
+				// Expand the selected node if it is not already expanded
+				TreeNode selectedNode = (TreeNode) getSelectedRecord();
+				openFolder(selectedNode);
 			}
 		});
 	}
@@ -302,7 +289,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * Handles the body click on folder name to create the context menu
 	 */
 	private void addCellContextHandler() {
-		addCellContextClickHandler((CellContextClickEvent contextClickEvent) -> {
+		addCellContextClickHandler(contextClickEvent -> {
 			if (getSelectedRecord() != null && getSelectedRecords().length > 1) {
 				Menu contextMenu = prepateContextMenu();
 				contextMenu.showContextMenu();
@@ -333,28 +320,27 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				: (selection.length + " " + I18N.message("documents").toLowerCase());
 		final String targetName = selectedNode.getAttributeAsString("name");
 
-		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
-				(Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						FolderService.Instance.get().paste(ids, folderId, "cut", new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
-								GuiLog.debug("Drag&Drop operation completed.");
-							}
-						});
+		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }), yes -> {
+			if (Boolean.TRUE.equals(yes)) {
+				FolderService.Instance.get().paste(ids, folderId, "cut", new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
 					}
 
-					TreeNode node = getTree().find(FOLDER_ID, (Object) Long.valueOf(folderId));
-					if (node != null)
-						getTree().reloadChildren(node);
+					@Override
+					public void onSuccess(Void result) {
+						DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
+						GuiLog.debug("Drag&Drop operation completed.");
+					}
 				});
+			}
+
+			TreeNode node = getTree().find(FOLDER_ID, (Object) Long.valueOf(folderId));
+			if (node != null)
+				getTree().reloadChildren(node);
+		});
 	}
 
 	private void doMoveFolderOnDrop() {
@@ -364,30 +350,29 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		final String sourceName = getDragData()[0].getAttributeAsString("name");
 		final String targetName = getDropFolder().getAttributeAsString("name");
 
-		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }),
-				(Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						for (long id : source) {
-							TreeNode node = getTree().find(FOLDER_ID, (Object) id);
-							getTree().remove(node);
-						}
+		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }), yes -> {
+			if (Boolean.TRUE.equals(yes)) {
+				for (long id : source) {
+					TreeNode node = getTree().find(FOLDER_ID, (Object) id);
+					getTree().remove(node);
+				}
 
-						FolderService.Instance.get().move(source, target, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
-							}
+				FolderService.Instance.get().move(source, target, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
+					}
 
-							@Override
-							public void onSuccess(Void ret) {
-								TreeNode targetNode = getTree().find(FOLDER_ID, (Object) Long.valueOf(target));
-								if (targetNode != null)
-									getTree().reloadChildren(targetNode);
-							}
-						});
+					@Override
+					public void onSuccess(Void ret) {
+						TreeNode targetNode = getTree().find(FOLDER_ID, (Object) Long.valueOf(target));
+						if (targetNode != null)
+							getTree().reloadChildren(targetNode);
 					}
 				});
+			}
+		});
 	}
 
 	protected String getOriginalIcon(Record rec, boolean defaultState) {
@@ -586,17 +571,14 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		if (Feature.visible(Feature.IMPEX)) {
 			MenuItem sendToExpArchive = new MenuItem();
 			sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
-			sendToExpArchive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-				public void onClick(MenuItemClickEvent event) {
-					LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), (Boolean yes) -> {
+			sendToExpArchive.addClickHandler(
+					event -> LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
 							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(new long[] { folder.getId() },
 									false);
 							archiveDialog.show();
 						}
-					});
-				}
-			});
+					}));
 			contextMenu.addItem(sendToExpArchive);
 			if (!Feature.enabled(Feature.IMPEX) || !folder.hasPermission(Constants.PERMISSION_EXPORT))
 				sendToExpArchive.setEnabled(false);
@@ -607,9 +589,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		if (Feature.visible(Feature.ARCHIVING)) {
 			MenuItem archive = new MenuItem();
 			archive.setTitle(I18N.message("archive"));
-			archive.addClickHandler((MenuItemClickEvent archiveClick) -> {
-				onArchive(folder.getId());
-			});
+			archive.addClickHandler(archiveClick -> onArchive(folder.getId()));
 			contextMenu.addItem(archive);
 			if (!Feature.enabled(Feature.ARCHIVING) || !folder.hasPermission(Constants.PERMISSION_ARCHIVE))
 				archive.setEnabled(false);
@@ -620,9 +600,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
 			MenuItem applyTemplate = new MenuItem();
 			applyTemplate.setTitle(I18N.message("applytemplate"));
-			applyTemplate.addClickHandler((MenuItemClickEvent applyTemplateClick) -> {
-				onApplyTemplate();
-			});
+			applyTemplate.addClickHandler(applyTemplateClick -> onApplyTemplate());
 			contextMenu.addItem(applyTemplate);
 			if (!Feature.enabled(Feature.FOLDER_TEMPLATE) || !folder.hasPermission(Constants.PERMISSION_ADD))
 				applyTemplate.setEnabled(false);
@@ -633,7 +611,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		if (Feature.visible(Feature.AUDIT)) {
 			MenuItem subscribe = new MenuItem();
 			subscribe.setTitle(I18N.message("subscribe"));
-			subscribe.addClickHandler((MenuItemClickEvent click) -> {
+			subscribe.addClickHandler(click -> {
 				SubscriptionDialog dialog = new SubscriptionDialog(folder.getId(), null);
 				dialog.show();
 			});
@@ -645,7 +623,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareCopyMenuItem() {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler((MenuItemClickEvent copyClick) -> {
+		copy.addClickHandler(copyClick -> {
 			FolderCopyDialog dialog = new FolderCopyDialog();
 			dialog.show();
 		});
@@ -655,7 +633,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareCreateAliasMenuItem() {
 		MenuItem createAlias = new MenuItem();
 		createAlias.setTitle(I18N.message("createalias"));
-		createAlias.addClickHandler((MenuItemClickEvent caClick) -> {
+		createAlias.addClickHandler(caClick -> {
 			CreateAliasDialog dialog = new CreateAliasDialog();
 			dialog.show();
 		});
@@ -666,11 +644,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareExportZipMenuItem(final GUIFolder folder) {
 		MenuItem exportZip = new MenuItem();
 		exportZip.setTitle(I18N.message("exportzip"));
-		exportZip.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				Window.open(Util.contextPath() + "zip-export?folderId=" + folder.getId(), "_blank", "");
-			}
-		});
+		exportZip.addClickHandler(
+				event -> Window.open(Util.contextPath() + "zip-export?folderId=" + folder.getId(), "_blank", ""));
 		exportZip.setEnabled(folder.hasPermission(Constants.PERMISSION_EXPORT)
 				&& folder.hasPermission(Constants.PERMISSION_DOWNLOAD));
 		return exportZip;
@@ -679,12 +654,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareMoveMenuItem(final GUIFolder folder) {
 		MenuItem move = new MenuItem();
 		move.setTitle(I18N.message("move"));
-		move.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				MoveDialog dialog = new MoveDialog();
-				dialog.show();
-			}
-		});
+		move.addClickHandler(event -> new MoveDialog().show());
 		move.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
 				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
 		return move;
@@ -693,12 +663,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareMergeMenuItem(final GUIFolder folder) {
 		MenuItem merge = new MenuItem();
 		merge.setTitle(I18N.message("merge"));
-		merge.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				MergeDialog dialog = new MergeDialog();
-				dialog.show();
-			}
-		});
+		merge.addClickHandler(event -> new MergeDialog().show());
 		merge.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
 				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
 		return merge;
@@ -707,11 +672,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareDeleteMenuItem(final GUIFolder folder) {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onDelete();
-			}
-		});
+		delete.addClickHandler(event -> onDelete());
 		delete.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
 				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
 		return delete;
@@ -733,9 +694,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareRenameMenuItem(final GUIFolder folder) {
 		MenuItem rename = new MenuItem();
 		rename.setTitle(I18N.message("rename"));
-		rename.addClickHandler((MenuItemClickEvent event) -> {
-			onRename();
-		});
+		rename.addClickHandler(event -> onRename());
 		rename.setEnabled(folder.hasPermission(Constants.PERMISSION_RENAME) && !folder.isDefaultWorkspace());
 		return rename;
 	}
@@ -743,9 +702,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private MenuItem prepareCreateMenuItem(final GUIFolder folder) {
 		MenuItem create = new MenuItem();
 		create.setTitle(I18N.message("newfolder"));
-		create.addClickHandler((MenuItemClickEvent event) -> {
-			onCreate(folder.getId());
-		});
+		create.addClickHandler(event -> onCreate(folder.getId()));
 		create.setEnabled(folder.hasPermission(Constants.PERMISSION_ADD));
 		return create;
 	}
@@ -768,7 +725,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						? (I18N.message(selectedIds.length == 1 ? "confirmdeletefolder" : "confirmdeletefolders"))
 						: (I18N.message(selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
 								: "confirmdeletefoldersarchdocs")),
-						(Boolean yes) -> {
+						yes -> {
 							if (Boolean.TRUE.equals(yes)) {
 								LD.contactingServer();
 								doDelete(selectedIds);
@@ -799,10 +756,10 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 				for (long id : selectedIds) {
 					TreeNode node = getTree().find(FOLDER_ID, Long.toString(id));
-					if(node!=null)
+					if (node != null)
 						getTree().remove(node);
 				}
-				
+
 				if (parentNode == null || "/".equals(getTree().getPath(parentNode))) {
 					// In case of a workspace we close the whole tree and select
 					// first workspace
@@ -1174,28 +1131,24 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	private void onRename() {
 		final TreeNode selectedNode = (TreeNode) getSelectedRecord();
 		LD.askForValue(I18N.message("rename"), I18N.message("name"), selectedNode.getAttributeAsString("name"),
-				new ValueCallback() {
-					@Override
-					public void execute(final String value) {
-						if (value == null || "".equals(value.trim()))
-							return;
-						final String val = value.trim().replace("/", "").replace("\\\\", "");
-						final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
-						FolderService.Instance.get().rename(folderId, val, new AsyncCallback<Void>() {
+				value -> {
+					if (value == null || "".equals(value.trim()))
+						return;
+					final String val = value.trim().replace("/", "").replace("\\\\", "");
+					final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
+					FolderService.Instance.get().rename(folderId, val, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void v) {
-								selectedNode.setAttribute("name", val);
-								refreshRow(getRecordIndex(selectedNode));
-//								selectFolder(folderId);
-							}
-						});
-					}
+						@Override
+						public void onSuccess(Void v) {
+							selectedNode.setAttribute("name", val);
+							refreshRow(getRecordIndex(selectedNode));
+						}
+					});
 				});
 	}
 
@@ -1241,13 +1194,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		if (Feature.enabled(Feature.PDF))
 			LD.askForValue(I18N.message("pasteasalias"), "type", "", ItemFactory.newAliasTypeSelector(),
-					new ValueCallback() {
-
-						@Override
-						public void execute(String type) {
-							pasteAsAlias(folderId, docIds, type);
-						}
-					});
+					type -> pasteAsAlias(folderId, docIds, type));
 		else
 			pasteAsAlias(folderId, docIds, null);
 	}
@@ -1520,29 +1467,25 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	public void onArchive(final long folderId) {
-		LD.askForValue(I18N.message("warning"), I18N.message("archiveadvice"), "", 400, new ValueCallback() {
+		LD.askForValue(I18N.message("warning"), I18N.message("archiveadvice"), "", 400, value -> {
+			if (value == null)
+				return;
 
-			@Override
-			public void execute(String value) {
-				if (value == null)
-					return;
+			if (value.isEmpty())
+				SC.warn(I18N.message("commentrequired"));
+			else
+				DocumentService.Instance.get().archiveFolder(folderId, value, new AsyncCallback<Long>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				if (value.isEmpty())
-					SC.warn(I18N.message("commentrequired"));
-				else
-					DocumentService.Instance.get().archiveFolder(folderId, value, new AsyncCallback<Long>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Long result) {
-							GuiLog.info(I18N.message("documentswerearchived", "" + result), null);
-							reload();
-						}
-					});
-			}
+					@Override
+					public void onSuccess(Long result) {
+						GuiLog.info(I18N.message("documentswerearchived", "" + result), null);
+						reload();
+					}
+				});
 		});
 	}
 
@@ -1617,7 +1560,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		MenuItem actionItem = new MenuItem(I18N.message(menuAction.getName()));
 		customActionsMenu.addItem(actionItem);
 
-		actionItem.addClickHandler((MenuItemClickEvent event) -> {
+		actionItem.addClickHandler(event -> {
 			/**
 			 * Check on the server if the action has been modified
 			 */

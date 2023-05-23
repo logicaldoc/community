@@ -10,8 +10,6 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -65,29 +63,26 @@ public class FolderCopyDetailsDialog extends StickyWindow {
 
 		Button copy = new Button(I18N.message("copy"));
 		copy.setAutoFit(true);
-		copy.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (!detailsPanel.validate())
-					return;
+		copy.addClickHandler(event -> {
+			if (!detailsPanel.validate())
+				return;
 
-				LD.contactingServer();
-				FolderService.Instance.get().copyFolders(new long[] { metadata.getId() }, targetFolderId, foldersOnly,
-						securityPolicy, metadata, new AsyncCallback<Void>() {
+			LD.contactingServer();
+			FolderService.Instance.get().copyFolders(new long[] { metadata.getId() }, targetFolderId, foldersOnly,
+					securityPolicy, metadata, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void arg) {
-								LD.clearPrompt();
-								destroy();
-							}
-						});
-			}
+						@Override
+						public void onSuccess(Void arg) {
+							LD.clearPrompt();
+							destroy();
+						}
+					});
 		});
 
 		HLayout savePanel = new HLayout();

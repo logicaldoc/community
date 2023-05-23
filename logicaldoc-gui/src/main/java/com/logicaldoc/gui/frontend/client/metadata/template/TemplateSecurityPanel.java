@@ -18,19 +18,15 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the security policies of a template
@@ -110,14 +106,14 @@ public class TemplateSecurityPanel extends VLayout {
 		addMember(list);
 
 		if (template.isWrite()) {
-			list.addCellContextClickHandler((CellContextClickEvent event) -> {
+			list.addCellContextClickHandler(event -> {
 				if (event.getColNum() == 0) {
 					Menu contextMenu = setupContextMenu();
 					contextMenu.showContextMenu();
 				}
 				event.cancel();
 			});
-			list.addEditCompleteHandler((EditCompleteEvent event) -> {
+			list.addEditCompleteHandler(event -> {
 				changedHandler.onChanged(null);
 			});
 		}
@@ -139,38 +135,35 @@ public class TemplateSecurityPanel extends VLayout {
 		if (template.isWrite())
 			buttons.addMember(groupForm);
 
-		group.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord selectedRecord = group.getSelectedRecord();
+		group.addChangedHandler(event -> {
+			ListGridRecord selectedRecord = group.getSelectedRecord();
 
-				// Check if the selected user is already present in the rights
-				// table
-				ListGridRecord[] records = list.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
-						group.clearValue();
-						return;
-					}
+			// Check if the selected user is already present in the rights
+			// table
+			ListGridRecord[] records = list.getRecords();
+			for (ListGridRecord test : records) {
+				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
+					group.clearValue();
+					return;
 				}
-
-				// Update the rights table
-				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
-				rec.setAttribute(AVATAR, "group");
-				rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
-				rec.setAttribute("read", true);
-				list.addData(rec);
-				changedHandler.onChanged(null);
-				group.clearValue();
 			}
+
+			// Update the rights table
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
+			rec.setAttribute(AVATAR, "group");
+			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
+			rec.setAttribute("read", true);
+			list.addData(rec);
+			changedHandler.onChanged(null);
+			group.clearValue();
 		});
 
 		final DynamicForm userForm = new DynamicForm();
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
-		user.addChangedHandler((ChangedEvent event) -> {
+		user.addChangedHandler(event -> {
 			ListGridRecord selectedRecord = user.getSelectedRecord();
 			if (selectedRecord == null)
 				return;
@@ -276,11 +269,7 @@ public class TemplateSecurityPanel extends VLayout {
 
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
-		deleteItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onDelete();
-			}
-		});
+		deleteItem.addClickHandler(event -> onDelete());
 
 		contextMenu.setItems(deleteItem);
 		return contextMenu;
@@ -291,7 +280,7 @@ public class TemplateSecurityPanel extends VLayout {
 		if (selection == null || selection.length == 0)
 			return;
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
 				list.removeSelectedData();
 				changedHandler.onChanged(null);
