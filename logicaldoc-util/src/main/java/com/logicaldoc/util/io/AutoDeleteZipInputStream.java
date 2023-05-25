@@ -18,6 +18,7 @@ public class AutoDeleteZipInputStream extends ZipInputStream {
 		this.zipFile = zipFile;
 	}
 
+	@Override
 	public void close() throws IOException {
 		wrapped.close();
 		if (zipFile != null)

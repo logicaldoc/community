@@ -52,49 +52,59 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 
 	}
 
+    @Override
 	public DavResourceIterator getMembers() {
 		return new DavResourceIteratorImpl(Collections.emptyList());
 	}
 
+    @Override
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+    @Override
 	public void removeMember(DavResource member) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+    @Override
 	public void setProperty(DavProperty<?> property) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+    @Override
 	public void removeProperty(DavPropertyName propertyName) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+    @Override
 	public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
 			throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Override
 	public MultiStatusResponse alterProperties(List changeList) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+	@Override
 	public void label(LabelInfo labelInfo) throws DavException {
 		// Nothing to do
 	}
 
+	@Override
 	public VersionHistoryResource getVersionHistory() throws DavException {
 		return null;
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused")s
 	private VersionHistory getVersionHistoryItem() throws RepositoryException {
 		return null;
 	}
 
+	@Override
 	protected void initSupportedReports() {
 		super.initSupportedReports();
 		if (exists()) {
@@ -102,6 +112,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 		}
 	}
 
+	@Override
 	protected void initProperties() {
 
 		if (!propsInitialized) {

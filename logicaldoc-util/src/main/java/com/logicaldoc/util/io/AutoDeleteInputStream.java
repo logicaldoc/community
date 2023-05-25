@@ -37,44 +37,54 @@ public class AutoDeleteInputStream extends InputStream {
 		return wrappedStream.hashCode();
 	}
 
+	@Override
 	public int read(byte[] b) throws IOException {
 		return wrappedStream.read(b);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		return wrappedStream.equals(obj);
 	}
 
+	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
 		return wrappedStream.read(b, off, len);
 	}
 
+	@Override
 	public long skip(long n) throws IOException {
 		return wrappedStream.skip(n);
 	}
 
+	@Override
 	public String toString() {
 		return wrappedStream.toString();
 	}
 
+	@Override
 	public int available() throws IOException {
 		return wrappedStream.available();
 	}
 
+	@Override
 	public void close() throws IOException {
 		wrappedStream.close();
 		if (file != null)
 			FileUtil.strongDelete(file);
 	}
 
+	@Override
 	public synchronized void mark(int readlimit) {
 		wrappedStream.mark(readlimit);
 	}
 
+	@Override
 	public synchronized void reset() throws IOException {
 		wrappedStream.reset();
 	}
 
+	@Override
 	public boolean markSupported() {
 		return wrappedStream.markSupported();
 	}

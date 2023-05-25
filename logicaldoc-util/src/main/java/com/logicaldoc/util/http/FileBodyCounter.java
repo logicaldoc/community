@@ -38,6 +38,7 @@ public class FileBodyCounter extends FileBody {
 		super.writeTo(new FilterOutputStream(out) {
 			// Other write() methods omitted for brevity.
 			// Implement for better performance
+			@Override
 			public void write(int b) throws IOException {
 				byteCount++;
 				super.write(b);

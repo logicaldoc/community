@@ -37,6 +37,8 @@ public class InMemoryZipImport extends ZipImport {
 		super(docVo, charset);
 	}
 
+
+	@Override
 	public void process(File zipsource, Folder parent, long userId, String sessionId) {
 		this.zipFile = zipsource;
 		this.sessionId = sessionId;

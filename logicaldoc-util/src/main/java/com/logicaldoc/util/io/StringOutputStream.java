@@ -20,14 +20,17 @@ public class StringOutputStream extends OutputStream {
 		this.sb = sb;
 	}
 
+	@Override
 	public void close() throws IOException {
 		sb = new StringBuilder();
 	}
 
+	@Override
 	public void flush() throws IOException {
 		// Nothing to do
 	}
 
+	@Override
 	public void write(byte[] b) throws IOException {
 		sb.append(new String(b));
 	}
@@ -36,6 +39,7 @@ public class StringOutputStream extends OutputStream {
 		sb.append((char) b);
 	}
 
+	@Override
 	public void write(int i) throws IOException {
 		sb.append((char) i);
 	}

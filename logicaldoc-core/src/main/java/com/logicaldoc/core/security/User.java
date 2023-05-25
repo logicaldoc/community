@@ -465,6 +465,8 @@ public class User extends PersistentObject implements Serializable {
 		workingTimes = new HashSet<>();
 	}
 
+
+	@Override
 	public String toString() {
 		return getUsername();
 	}

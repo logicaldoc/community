@@ -362,6 +362,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		AdminScreen.get().setContent(new ZonalOCRPanel(selectedDocumentTemplate, selectedOcrTemplate));
 	}
 
+	@Override
 	public GUIOCRTemplate getSelectedOcrTemplate() {
 		return selectedOcrTemplate;
 	}

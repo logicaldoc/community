@@ -218,6 +218,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		return type == TYPE_ALIAS;
 	}
 
+	@Override
 	public long getId() {
 		return id;
 	}
@@ -235,6 +236,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		folderGroups = new HashSet<>();
 	}
 
+	@Override
 	public void setId(long id) {
 		this.id = id;
 	}

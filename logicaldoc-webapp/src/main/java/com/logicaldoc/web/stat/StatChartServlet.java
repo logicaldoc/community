@@ -38,6 +38,7 @@ public class StatChartServlet extends HttpServlet {
 
 	protected static Logger log = LoggerFactory.getLogger(StatChartServlet.class);
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		File chartFile = null;
 

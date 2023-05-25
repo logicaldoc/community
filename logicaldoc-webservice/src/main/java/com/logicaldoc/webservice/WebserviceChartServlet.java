@@ -64,6 +64,7 @@ public class WebserviceChartServlet extends HttpServlet {
 	 * @throws ServletException if an error occurred
 	 * @throws IOException if an error occurred
 	 */
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		File chartFile = null;
 		try {
@@ -86,7 +87,7 @@ public class WebserviceChartServlet extends HttpServlet {
 				tenantId = Long.parseLong(request.getParameter("tenantId"));
 
 			chartFile = FileUtil.createTempFile("chart", ".png");
-			
+
 			/**
 			 * Retrieve the sequences and order them by date
 			 */
@@ -100,8 +101,8 @@ public class WebserviceChartServlet extends HttpServlet {
 				cal.add(Calendar.MONTH, -i);
 				String month = dfNumber.format(cal.getTime());
 				String monthName = dfName.format(cal.getTime());
-				dataset.addValue(dao.getCurrentValue(WebserviceInterceptor.WSCALL_HYPHEN + month, 0L, tenantId), "calls",
-						monthName);
+				dataset.addValue(dao.getCurrentValue(WebserviceInterceptor.WSCALL_HYPHEN + month, 0L, tenantId),
+						"calls", monthName);
 			}
 
 			JFreeChart chart = ChartFactory.createBarChart("", null, null, dataset, PlotOrientation.VERTICAL, false,

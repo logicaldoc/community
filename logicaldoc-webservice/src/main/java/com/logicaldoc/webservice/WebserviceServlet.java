@@ -19,6 +19,7 @@ import com.logicaldoc.util.Context;
 public class WebserviceServlet extends CXFServlet {
 	private static final long serialVersionUID = 1L;
 
+    @Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			// Check if the service is enabled

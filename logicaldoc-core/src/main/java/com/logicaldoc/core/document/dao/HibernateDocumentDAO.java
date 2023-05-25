@@ -813,14 +813,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		@SuppressWarnings("rawtypes")
 		RowMapper docMapper = new BeanPropertyRowMapper() {
+			@Override
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
 				Document doc = new Document();
 				doc.setId(rs.getLong(1));
 				doc.setCustomId(rs.getString(2));
 				doc.setLastModified(rs.getDate(3));
 				doc.setFileName(rs.getString(4));
-
 				return doc;
 			}
 		};
@@ -910,6 +909,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		store(doc, transaction);
 	}
 
+	@Override
 	public void deleteAll(Collection<Document> documents, DocumentHistory transaction) throws PersistenceException {
 		deleteAll(documents, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
@@ -993,6 +993,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		@SuppressWarnings("rawtypes")
 		RowMapper docMapper = new BeanPropertyRowMapper() {
+			@Override
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Document doc = new Document();
 				doc.setId(rs.getLong(1));
@@ -1104,7 +1105,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			// tags no more existing in the ld_tag table or that belong to
 			// deleted documents
-			deleteStatement.append(" ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT t.ld_tag FROM ld_tag t JOIN ld_document d ON d.ld_id = t.ld_docid WHERE ld_uniquetag.ld_tenantid = t.ld_tenantid AND ld_uniquetag.ld_tag = t.ld_tag AND d.ld_deleted = 0 ) ");
+			deleteStatement.append(
+					" ld_uniquetag.ld_tag NOT IN ( SELECT DISTINCT t.ld_tag FROM ld_tag t JOIN ld_document d ON d.ld_id = t.ld_docid WHERE ld_uniquetag.ld_tenantid = t.ld_tenantid AND ld_uniquetag.ld_tag = t.ld_tag AND d.ld_deleted = 0 ) ");
 
 			// tags no more existing in the ld_foldertag table or that belong to
 			// deleted folders
@@ -1330,6 +1332,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) throws PersistenceException {
 		// First of all, find all duplicates digests.
@@ -1349,10 +1352,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
 
-		return query(digestQuery.toString(), null, new RowMapper<String>() {
-			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getString(1);
-			}
+		return query(digestQuery.toString(), null, (rs, rowNum) -> {
+			return rs.getString(1);
 		}, null);
 
 	}

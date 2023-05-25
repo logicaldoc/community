@@ -45,6 +45,7 @@ public class DisplayServlet extends HttpServlet {
 	/**
 	 * Redirects the request to the proper frontend URL
 	 */
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		String docId = request.getParameter(DOC_ID);
 		String folderId = request.getParameter(FOLDER_ID);

@@ -33,10 +33,12 @@ public class GUIVersion extends GUIDocument {
 		this.docId = docId;
 	}
 
+	@Override
 	public String getComment() {
 		return comment;
 	}
 
+	@Override
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
@@ -57,10 +59,12 @@ public class GUIVersion extends GUIDocument {
 		this.versionDate = versionDate;
 	}
 
+	@Override
 	public int getSigned() {
 		return signed;
 	}
 
+	@Override
 	public void setSigned(int signed) {
 		this.signed = signed;
 	}

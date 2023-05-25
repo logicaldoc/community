@@ -89,6 +89,8 @@ public abstract class AbstractEmailDialog extends Window {
 		// Nothing to do
 	}
 
+
+	@Override
 	public void onDraw() {
 		SectionStack recipientsStack = prepareRecipientsGrid();
 

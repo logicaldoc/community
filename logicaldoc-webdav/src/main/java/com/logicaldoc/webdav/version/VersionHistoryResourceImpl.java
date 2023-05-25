@@ -42,36 +42,44 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 		super(locator, factory, session, config, resource);
 	}
 
+	@Override
 	public DavResourceIterator getMembers() {
 		return new DavResourceIteratorImpl(new ArrayList<>());
 	}
 
+	@Override
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+	@Override
 	public void removeMember(DavResource member) throws DavException {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void setProperty(DavProperty<?> property) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+	@Override
 	public void removeProperty(DavPropertyName propertyName) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+	@Override
 	public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
 			throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Override
 	public MultiStatusResponse alterProperties(List changeList) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
+	@Override
 	public VersionResource[] getVersions() throws DavException {
 
 		List<Resource> resourceVersions = resourceService.getHistory(resource);
@@ -88,6 +96,7 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 
 	}
 
+	@Override
 	protected void initProperties() {
 		if (!propsInitialized) {
 			super.initProperties();

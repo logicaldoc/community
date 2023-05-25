@@ -207,6 +207,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 			SC.warn(I18N.message("sometagaddedbecauseinvalid"));
 	}
 
+	@Override
 	public boolean validate() {
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {

@@ -51,6 +51,8 @@ public class AbiWordParser extends AbstractParser {
 			return tmp;
 		}
 
+
+		@Override
 		public void startElement(String namespaceURI, String localName, String rawName, Attributes atts)
 				throws SAXException {
 			if (rawName.startsWith("p")) {
@@ -58,12 +60,14 @@ public class AbiWordParser extends AbstractParser {
 			}
 		}
 
+		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (appendChar) {
 				content.append(ch, start, length).append(" ");
 			}
 		}
 
+		@Override
 		public void endElement(java.lang.String namespaceURI, java.lang.String localName, java.lang.String qName)
 				throws SAXException {
 			appendChar = false;

@@ -68,6 +68,7 @@ public class XMLParser extends AbstractParser {
 			// we prevent the parser from closing it by catching the close()
 			// call and explicitly close the stream in a finally block.
 			InputSource source = new InputSource(new FilterInputStream(input) {
+				@Override
 				public void close() {
 					// Nothing to do
 				}

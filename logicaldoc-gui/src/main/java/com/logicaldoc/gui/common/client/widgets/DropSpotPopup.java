@@ -74,6 +74,7 @@ public class DropSpotPopup extends Window {
 	/**
 	 * Triggers the load of the last uploaded files
 	 */
+	@Override
 	public void close() {
 		FolderNavigator.get().reload();
 		destroy();

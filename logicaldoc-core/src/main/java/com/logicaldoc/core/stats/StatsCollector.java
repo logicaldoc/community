@@ -839,10 +839,12 @@ public class StatsCollector extends Task {
 		this.genericDAO = genericDAO;
 	}
 
+	@Override
 	public ContextProperties getConfig() {
 		return config;
 	}
 
+	@Override
 	public void setConfig(ContextProperties config) {
 		this.config = config;
 	}

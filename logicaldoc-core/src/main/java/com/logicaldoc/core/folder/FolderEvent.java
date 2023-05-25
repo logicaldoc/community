@@ -33,6 +33,7 @@ public enum FolderEvent {
 	    this.event = event;
 	}
 
+	@Override
 	public String toString() {
 	    return this.event;
 	}

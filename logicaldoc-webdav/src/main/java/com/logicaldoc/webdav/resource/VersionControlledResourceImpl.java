@@ -92,6 +92,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * 
 	 * @see org.apache.jackrabbit.webdav.DavResource#getSupportedMethods()
 	 */
+	@Override
 	public String getSupportedMethods() {
 		StringBuilder sb = new StringBuilder(super.getSupportedMethods());
 		// Versioning support
@@ -249,6 +250,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see SupportedReportSetProperty
 	 * @see DeltaVResourceImpl#initSupportedReports()
 	 */
+	@Override
 	protected void initSupportedReports() {
 		super.initSupportedReports();
 		if (exists()) {
@@ -263,6 +265,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * 
 	 * @see DavResourceImpl#initProperties()
 	 */
+	@Override
 	protected void initProperties() {
 
 		if (!propsInitialized) {
@@ -327,6 +330,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
 	 *         communication
 	 */
+	@Override
 	protected DavResource createResourceFromLocator(DavResourceLocator loc) throws DavException {
 		DavResource res = getFactory().createResource(loc, getSession());
 		return res;

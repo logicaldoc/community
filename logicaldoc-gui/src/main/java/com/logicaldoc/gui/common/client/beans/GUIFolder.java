@@ -115,10 +115,13 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.id = id;
 	}
 
+
+	@Override
 	public long getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(long id) {
 		this.id = id;
 	}

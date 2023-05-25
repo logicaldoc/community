@@ -75,6 +75,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 		form.setItems(usersItem, message);
 	}
 
+	@Override
 	public boolean validate() {
 		vm.validate();
 

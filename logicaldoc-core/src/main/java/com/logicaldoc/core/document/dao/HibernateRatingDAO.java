@@ -84,6 +84,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 
 			@SuppressWarnings("rawtypes")
 			RowMapper ratingMapper = new BeanPropertyRowMapper() {
+				@Override
 				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
 					Rating rating = new Rating();

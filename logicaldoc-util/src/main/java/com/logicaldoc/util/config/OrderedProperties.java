@@ -34,6 +34,7 @@ public class OrderedProperties extends Properties {
 	 * @param header a textual header for the top of the file
 	 * @exception IOException when things go wrong
 	 */
+	@Override
 	public void store(OutputStream out, String header) throws IOException {
 		List<String> keys = getKeys();
 

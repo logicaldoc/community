@@ -130,6 +130,7 @@ public class EmailDialog extends AbstractEmailDialog {
 		mail.setDocIds(docIds);
 	}
 
+	@Override
 	public void onDraw() {
 		super.onDraw();
 

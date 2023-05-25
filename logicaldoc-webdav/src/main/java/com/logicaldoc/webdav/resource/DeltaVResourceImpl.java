@@ -63,6 +63,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 		initSupportedReports();
 	}
 
+    @Override
 	public String getComplianceClass() {
 		return DavCompliance.concatComplianceClasses(new String[] { DavCompliance._1_, DavCompliance.VERSION_CONTROL,
 				DavCompliance.VERSION_HISTORY, DavCompliance.LABEL });
@@ -149,6 +150,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 		}
 	}
 
+	@Override
 	protected void initProperties() {
 		if (!propsInitialized) {
 			super.initProperties();

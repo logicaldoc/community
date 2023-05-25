@@ -69,6 +69,7 @@ public class ComparatorAssociationsDialog extends Window {
 		selectItem = ItemFactory.newComparatorSelector();
 	}
 
+	@Override
 	public void onDraw() {
 		refresh();
 	}

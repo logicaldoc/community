@@ -32,6 +32,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	private static Logger log = LoggerFactory.getLogger(RestAuthService.class);
 
 	@Context
+	@Override
 	public void setMessageContext(MessageContext messageContext) {
 		// https://docs.oracle.com/cd/E13222_01/wls/docs92/webserv/annotations.html
 		// https://jersey.java.net/documentation/latest/jaxrs-resources.html#d0e2790
@@ -41,6 +42,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 
 	@GET
     @Path("/login")
+	@Override
 	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws AuthenticationException {
 		return super.login(username, password);
 	}
@@ -49,6 +51,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
     @Path("/loginForm")
 	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Login with the credentials in a form POST")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Override
 	public String loginForm(@FormParam("username") String username, @FormParam("password") String password) {
 		return super.login(username, password);
 	}
@@ -56,13 +59,15 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	@POST
     @Path("/login")
 	@Operation(operationId = "loginPostJSON", summary = "Login with POST in JSON format", description = "Login posting the credentials in JSON format")
-	@Consumes(MediaType.APPLICATION_JSON)	
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Override
 	public String loginPostJSON(WSCredentials cred) {
 		return super.login(cred.getUsername(), cred.getPassword());
 	}
 
 	@DELETE
     @Path("/logout")
+	@Override
 	public void logout(@QueryParam("sid") String sid) {
 		log.debug("logout({})", sid);
 		if (sid != null)
@@ -72,6 +77,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	@GET
     @Path("/getSid")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
+	@Override
 	public String getSid() {
 		return getCurrentSessionId();
 	}
@@ -83,6 +89,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	 */
 	@GET
 	@Path("/renew")
+	@Override
 	public void renew(@QueryParam("sid") String sid) {
 		super.renew(sid);
 	}

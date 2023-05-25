@@ -27,12 +27,12 @@ public class OrderedProperties extends Properties {
 	 * @param header a textual header for the top of the file
 	 * @exception IOException when things go wrong
 	 */
+	@Override
 	public void store(OutputStream out, String header) throws IOException {
 		Vector keys = new Vector();
 
-		for (Enumeration e = this.propertyNames(); e.hasMoreElements();) {
+		for (Enumeration e = this.propertyNames(); e.hasMoreElements();)
 			keys.addElement((String) (e.nextElement()));
-		}
 
 		// sort them
 		Collections.sort(keys);

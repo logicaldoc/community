@@ -92,7 +92,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 * Represents a dictionary of custom informations a client may save in the
 	 * session
 	 */
-	private transient Map<String, Object> dictionary =  new ConcurrentHashMap<>();
+	private transient Map<String, Object> dictionary = new ConcurrentHashMap<>();
 
 	private transient List<Log> logs = new ArrayList<>();
 
@@ -117,7 +117,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 */
 	protected int getTimeout() {
 		int timeout = 30;
-		ContextProperties config = Context.get().getProperties();		
+		ContextProperties config = Context.get().getProperties();
 		if (config.getInt(getTenantName() + ".session.timeout") > 0)
 			timeout = config.getInt(getTenantName() + ".session.timeout");
 		return timeout;
@@ -185,10 +185,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	Session(User user, String password, String key, Client client) {
 		super();
-		
+
 		if (user == null)
 			throw new IllegalArgumentException("user cannot be null");
-		
+
 		this.sid = UUID.randomUUID().toString();
 		this.tenantId = user.getTenantId();
 		this.user = user;
@@ -201,7 +201,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		this.tenantName = tenantDAO.getTenantName(tenantId);
-		
+
 		UserHistory history = saveUserHistory(user, client);
 
 		/*
@@ -327,6 +327,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		return user.getId();
 	}
 
+	@Override
 	public long getTenantId() {
 		return tenantId;
 	}
@@ -420,6 +421,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		return user;
 	}
 
+	@Override
 	public void setTenantId(long tenantId) {
 		this.tenantId = tenantId;
 	}

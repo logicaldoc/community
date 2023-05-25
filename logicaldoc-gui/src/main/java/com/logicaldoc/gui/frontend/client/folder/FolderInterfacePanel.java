@@ -188,6 +188,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		return saveCurrentLayout;
 	}
 
+	@Override
 	public boolean validate() {
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {

@@ -64,6 +64,7 @@ public class ThumbnailServlet extends HttpServlet {
 	 * @param request the request send by the client to the server
 	 * @param response the response send by the server to the client
 	 */
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		String suffix = request.getParameter(SUFFIX);
 

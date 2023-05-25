@@ -132,6 +132,7 @@ public class PreviewPanel extends VLayout {
 		}
 	}
 
+	@Override
 	public synchronized void redraw() {
 		redrawing = true;
 		try {

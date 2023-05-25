@@ -176,10 +176,12 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		this.folderName = folderName;
 	}
 
+	@Override
 	public Long getTemplateId() {
 		return templateId;
 	}
 
+	@Override
 	public void setTemplateId(Long templateId) {
 		this.templateId = templateId;
 	}
@@ -277,18 +279,22 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		this.event = event;
 	}
 
+	@Override
 	public String getCreator() {
 		return creator;
 	}
 
+	@Override
 	public void setCreator(String creator) {
 		this.creator = creator;
 	}
 
+	@Override
 	public long getCreatorId() {
 		return creatorId;
 	}
 
+	@Override
 	public void setCreatorId(long creatorId) {
 		this.creatorId = creatorId;
 	}

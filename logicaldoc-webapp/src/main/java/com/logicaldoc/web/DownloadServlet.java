@@ -50,6 +50,7 @@ public class DownloadServlet extends HttpServlet {
 	 * @param request the request send by the client to the server
 	 * @param response the response send by the server to the client
 	 */
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Session session = ServletUtil.validateSession(request);

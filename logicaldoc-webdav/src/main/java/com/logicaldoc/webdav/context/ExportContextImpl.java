@@ -106,6 +106,7 @@ public class ExportContextImpl extends AbstractExportContext {
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Override
 	public void informCompleted(boolean success) {
 		checkCompleted();
 		completed = true;

@@ -50,6 +50,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	private static ResourceConfig config;
 
+	@Override
 	public void init() {
 		String resourcePathPrefix = getInitParameter(INIT_PARAM_RESOURCE_PATH_PREFIX);
 		if (resourcePathPrefix == null) {
@@ -123,6 +124,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		return config;
 	}
 
+	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		ContextProperties settings = Context.get().getProperties();
 

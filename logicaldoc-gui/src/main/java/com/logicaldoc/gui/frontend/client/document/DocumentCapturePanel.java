@@ -137,6 +137,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public boolean validate() {
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		vm.validate();

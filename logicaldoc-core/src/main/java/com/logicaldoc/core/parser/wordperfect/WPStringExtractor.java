@@ -35,6 +35,7 @@ public class WPStringExtractor extends StringExtractor {
 	/**
 	 * Wraps the specified InputStream in a WPFilterInputStream and passes it to the super class.
 	 */
+	@Override
 	public String extract(InputStream stream) throws IOException {
 		WPFilterInputStream wpfis = new WPFilterInputStream(stream);
 		String text = super.extract(wpfis);
@@ -43,6 +44,7 @@ public class WPStringExtractor extends StringExtractor {
 	}
 	
 	// overrides StringExtractor.isTextCharacter
+	@Override
 	protected boolean isTextCharacter(int charNumber) {
 		
 		boolean xxx = super.isTextCharacter(charNumber) || charNumber >= 0xC0 && charNumber <= 0xFF
@@ -55,6 +57,7 @@ public class WPStringExtractor extends StringExtractor {
 	}
 
 	// overrides StringExtractor.isStartLine
+	@Override
 	protected boolean isStartLine(String lineLowerCase) {
 		for (int i = 0; i < EXACT_START_LINES.length; i++) {
 			if (lineLowerCase.equals(EXACT_START_LINES[i])) {
@@ -65,6 +68,7 @@ public class WPStringExtractor extends StringExtractor {
 	}
 
 	// overrides StringExtractor.isValidLine
+	@Override
 	protected boolean isValidLine(String lineLowerCase) {
 		for (int i = 0; i < EXACT_EXCLUDES.length; i++) {
 			if (lineLowerCase.equals(EXACT_EXCLUDES[i])) {

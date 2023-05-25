@@ -28,6 +28,7 @@ public enum UserEvent {
 	    this.event = event;
 	}
 
+	@Override
 	public String toString() {
 	    return this.event;
 	}

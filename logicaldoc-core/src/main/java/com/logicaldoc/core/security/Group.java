@@ -101,6 +101,7 @@ public class Group extends PersistentObject implements Serializable {
 		users = new HashSet<>();
 	}
 
+	@Override
 	public String toString() {
 		return getName();
 	}

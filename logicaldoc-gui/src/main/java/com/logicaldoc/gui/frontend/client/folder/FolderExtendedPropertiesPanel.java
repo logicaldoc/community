@@ -14,8 +14,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * Shows folder's optional template metadata
@@ -45,21 +43,21 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		applyMetadata.setEndRow(true);
 		applyMetadata.setDisabled(!folder.isWrite());
 		applyMetadata.setColSpan(1);
-		applyMetadata.addClickHandler( event -> {
-				LD.contactingServer();
-				FolderService.Instance.get().applyMetadata(folder.getId(), new AsyncCallback<Void>() {
+		applyMetadata.addClickHandler(event -> {
+			LD.contactingServer();
+			FolderService.Instance.get().applyMetadata(folder.getId(), new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void v) {
-						LD.clearPrompt();
-					}
-				});
+				@Override
+				public void onSuccess(Void v) {
+					LD.clearPrompt();
+				}
+			});
 		});
 
 		form1 = new DynamicForm();
@@ -73,6 +71,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		setMembers(form1, propertiesPanel);
 	}
 
+	@Override
 	public boolean validate() {
 		if (propertiesPanel.validate() && form1.validate()) {
 			folder.setTemplateLocked("yes".equals(form1.getValueAsString("locked")) ? 1 : 0);

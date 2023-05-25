@@ -47,6 +47,7 @@ public class ExportZip extends HttpServlet {
 		super();
 	}
 
+    @Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			Session session = ServletUtil.validateSession(request);
@@ -164,6 +165,7 @@ public class ExportZip extends HttpServlet {
 	 * @throws ServletException if an error occurred
 	 * @throws IOException if an error occurred
 	 */
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			response.setContentType("text/html");

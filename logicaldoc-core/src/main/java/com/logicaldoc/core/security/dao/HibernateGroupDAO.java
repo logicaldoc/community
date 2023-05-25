@@ -35,6 +35,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		this.menuDAO = menuDAO;
 	}
 
+	@Override
 	public void delete(long groupId, int code) throws PersistenceException {
 		if (code == 0)
 			throw new IllegalArgumentException("code cannot be 0");

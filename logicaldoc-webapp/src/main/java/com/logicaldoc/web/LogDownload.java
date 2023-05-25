@@ -44,6 +44,7 @@ public class LogDownload extends HttpServlet {
 
 	protected static Logger log = LoggerFactory.getLogger(LogDownload.class);
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			ServletUtil.checkMenu(request, Menu.LOGS);
@@ -112,9 +113,10 @@ public class LogDownload extends HttpServlet {
 	 * Prepare all the support resources in one single zip: all the logs, the
 	 * context.properties, the snapshot of the env variables.
 	 * 
-	 * @throws IOException error creting a temporary file 
+	 * @throws IOException error creting a temporary file
 	 */
-	private File prepareAllSupportResources(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private File prepareAllSupportResources(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		File tmp = FileUtil.createTempFile("logs", ".zip");
 
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
@@ -181,14 +183,13 @@ public class LogDownload extends HttpServlet {
 		File logsDir = new File(webappDescriptor.getPath() + "/logs");
 		File[] files = logsDir.listFiles();
 		for (File file : files) {
-			if (file.isDirectory() || (!file.getName().toLowerCase().endsWith(".log")
-					&& !file.getName().toLowerCase().endsWith(".out")
-					&& !file.getName().toLowerCase().endsWith(".txt")))
+			if (file.isDirectory()
+					|| (!file.getName().toLowerCase().endsWith(".log") && !file.getName().toLowerCase().endsWith(".out")
+							&& !file.getName().toLowerCase().endsWith(".txt")))
 				continue;
 
 			// store just the logs of today
-			if (file.getName().toLowerCase().endsWith(".out")
-					|| file.getName().toLowerCase().endsWith(today + ".log")
+			if (file.getName().toLowerCase().endsWith(".out") || file.getName().toLowerCase().endsWith(today + ".log")
 					|| file.getName().toLowerCase().endsWith(today + ".txt"))
 				writeEntry(out, "tomcat/" + file.getName(), file);
 		}
@@ -229,6 +230,7 @@ public class LogDownload extends HttpServlet {
 		}
 	}
 
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			doGet(request, response);

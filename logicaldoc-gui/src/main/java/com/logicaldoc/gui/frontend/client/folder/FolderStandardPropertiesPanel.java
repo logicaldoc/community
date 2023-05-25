@@ -464,6 +464,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		items.add(applyTags);
 	}
 
+    @Override
 	public boolean validate() {
 		vm.validate();
 		if (Boolean.TRUE.equals(vm.hasErrors()))

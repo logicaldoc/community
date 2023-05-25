@@ -57,6 +57,7 @@ public enum DocumentEvent {
 	    this.event = event;
 	}
 
+    @Override
 	public String toString() {
 	    return this.event;
 	}
