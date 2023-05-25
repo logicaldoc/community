@@ -65,6 +65,7 @@ import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.web.AbstractWebappTCase;
 import com.logicaldoc.web.UploadServlet;
@@ -134,7 +135,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		super.tearDown();
 	}
 
-	private void activateCorePlugin() throws JpfException, IOException {
+	private void activateCorePlugin() throws JpfException, IOException, PluginException {
 		File pluginsDir = new File("target/tests-plugins");
 		pluginsDir.mkdir();
 

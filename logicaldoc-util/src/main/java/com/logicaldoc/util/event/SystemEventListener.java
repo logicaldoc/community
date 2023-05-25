@@ -6,7 +6,7 @@ public abstract class SystemEventListener {
 	
 	protected SystemEventListener(SystemEventStatus status) {
 		if(status == null)
-			throw new RuntimeException("A valid SystemEventStatus must be registered");
+			throw new IllegalArgumentException("A valid SystemEventStatus must be registered");
 		
 		this.systemStatus = status;
 	}

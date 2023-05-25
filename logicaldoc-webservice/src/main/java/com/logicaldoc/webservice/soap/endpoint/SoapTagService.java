@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.TagCloud;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -16,9 +17,12 @@ import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.webservice.AbstractService;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSTagCloud;
@@ -47,7 +51,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void setDocumentTags(String sid, long docId, String[] tags) throws Exception {
+	public void setDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		SoapDocumentService docService = getDocumentService();
 		WSDocument doc = docService.getDocument(sid, docId);
 		if (doc == null)
@@ -60,7 +64,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void addDocumentTags(String sid, long docId, String[] tags) throws Exception {
+	public void addDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		SoapDocumentService docService = getDocumentService();
 		WSDocument doc = docService.getDocument(sid, docId);
 		if (doc == null)
@@ -74,7 +78,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getDocumentTags(String sid, long docId) throws Exception {
+	public String[] getDocumentTags(String sid, long docId) throws PermissionException, PersistenceException, AuthenticationException, WebserviceException{
 		SoapDocumentService docService = getDocumentService();
 		WSDocument doc = docService.getDocument(sid, docId);
 		if (doc == null)
@@ -86,7 +90,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void setFolderTags(String sid, long folderId, String[] tags) throws Exception {
+	public void setFolderTags(String sid, long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		SoapFolderService folderService = getFolderService();
 		WSFolder folder = folderService.getFolder(sid, folderId);
 		if (folder == null)
@@ -99,7 +103,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void addFolderTags(String sid, long folderId, String[] tags) throws Exception {
+	public void addFolderTags(String sid, long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		SoapFolderService folderService = getFolderService();
 		WSFolder folder = folderService.getFolder(sid, folderId);
 		if (folder == null)
@@ -113,7 +117,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getFolderTags(String sid, long folderId) throws Exception {
+	public String[] getFolderTags(String sid, long folderId) throws PermissionException, PersistenceException, AuthenticationException, WebserviceException{
 		SoapFolderService folderService = getFolderService();
 		WSFolder folder = folderService.getFolder(sid, folderId);
 		if (folder == null)
@@ -125,7 +129,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getTags(String sid) throws Exception {
+	public String[] getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException{
 		User user = validateSession(sid);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<String> tags = docDao.findAllTags(null, user.getTenantId());
@@ -137,7 +141,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getTagsPreset(String sid) throws Exception {
+	public String[] getTagsPreset(String sid) throws AuthenticationException, WebserviceException, PersistenceException{
 		validateSession(sid);
 		Session session = SessionManager.get().get(sid);
 		List<String> tags = new ArrayList<>();
@@ -160,7 +164,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public WSTagCloud[] getTagCloud(String sid) throws Exception {
+	public WSTagCloud[] getTagCloud(String sid) throws PersistenceException, AuthenticationException, WebserviceException{
 		validateSession(sid);
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -177,7 +181,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public WSDocument[] findDocumentsByTag(String sid, String tag) throws Exception {
+	public WSDocument[] findDocumentsByTag(String sid, String tag) throws PersistenceException, AuthenticationException, WebserviceException{
 		User user = validateSession(sid);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -198,7 +202,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public WSFolder[] findFoldersByTag(String sid, String tag) throws Exception {
+	public WSFolder[] findFoldersByTag(String sid, String tag) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);

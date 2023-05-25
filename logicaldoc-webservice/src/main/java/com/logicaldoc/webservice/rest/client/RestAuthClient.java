@@ -26,7 +26,7 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 		proxy = JAXRSClientFactory.create(endpoint, AuthService.class);
 	}
 
-	public String login(String username, String password) throws Exception {
+	public String login(String username, String password) {
 		return proxy.login(username, password);
 	}
 
@@ -35,7 +35,7 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	}
 
 	@Override
-	public String loginPostJSON(WSCredentials wscred) throws Exception {
+	public String loginPostJSON(WSCredentials wscred) {
 		return proxy.loginPostJSON(wscred);
 	}
 
@@ -45,7 +45,7 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	}
 
 	@Override
-	public String loginForm(String username, String password) throws Exception {
+	public String loginForm(String username, String password) {
 		return proxy.loginForm(username, password);
 	}
 

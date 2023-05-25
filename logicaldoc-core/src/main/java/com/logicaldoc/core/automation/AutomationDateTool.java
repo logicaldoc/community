@@ -488,6 +488,7 @@ public class AutomationDateTool extends org.apache.velocity.tools.generic.DateTo
 		this.dateFormat = dateFormat;
 	}
 
+	@Override
 	public TimeZone getTimeZone() {
 		return timeZone;
 	}

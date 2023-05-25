@@ -71,8 +71,10 @@ public abstract class PluginRegistry {
 	 * Initializes all found plugins
 	 * 
 	 * @param pluginsDir the root folder where the plugins files are located
+	 * 
+	 * @throws PluginException Error trying to publish the plugins
 	 */
-	public void init(String pluginsDir) {
+	public void init(String pluginsDir) throws PluginException {
 		ExtendedProperties properties = new ExtendedProperties();
 		// properties.put("org.java.plugin.PathResolver",
 		// "com.logicaldoc.util.ShadingPathResolver");
@@ -83,7 +85,12 @@ public abstract class PluginRegistry {
 		ObjectFactory pluginObjectFactory = ObjectFactory.newInstance(properties);
 		manager = pluginObjectFactory.createManager();
 
-		List<PluginManager.PluginLocation> pluginLocations = locatePlugins(pluginsDir);
+		List<PluginManager.PluginLocation> pluginLocations;
+		try {
+			pluginLocations = locatePlugins(pluginsDir);
+		} catch (Exception e) {
+			throw new PluginException("Error locating plugins", e);
+		}
 
 		if (pluginLocations.size() > 0) {
 			Map<String, Identity> plugins = null;
@@ -92,7 +99,7 @@ public abstract class PluginRegistry {
 						.toArray(new PluginManager.PluginLocation[0]);
 				plugins = manager.publishPlugins(pLocations);
 			} catch (JpfException e) {
-				throw new RuntimeException("Error publishing plugins", e);
+				throw new PluginException("Error publishing plugins", e);
 			}
 
 			System.out.println("Succesfully registered " + plugins.size() + " plugins");
@@ -104,10 +111,12 @@ public abstract class PluginRegistry {
 	 * Initializes found plugins
 	 * 
 	 * @param plugins Map of found plugins
+	 * 
+	 * @throws IOException I/O error
 	 */
 	protected abstract void initPlugins(Map<String, Identity> plugins);
 
-	protected List<PluginManager.PluginLocation> locatePlugins(String pluginsDirectoryPath) {
+	protected List<PluginManager.PluginLocation> locatePlugins(String pluginsDirectoryPath) throws IOException {
 
 		List<PluginManager.PluginLocation> pluginLocations = new LinkedList<>();
 
@@ -136,7 +145,7 @@ public abstract class PluginRegistry {
 				File pluginZIPFile = new File(pluginDirectory.getPath() + "/" + pluginFilename);
 
 				if (!pluginZIPFile.exists())
-					throw new RuntimeException("file not Found:" + pluginZIPFile.getAbsolutePath());
+					throw new IOException("file not Found:" + pluginZIPFile.getAbsolutePath());
 
 				try {
 
@@ -161,7 +170,7 @@ public abstract class PluginRegistry {
 			}
 
 		} else {
-			throw new RuntimeException("Unable to access Plugins directory: " + pluginDirectory.getAbsolutePath());
+			throw new IOException("Unable to access Plugins directory: " + pluginDirectory.getAbsolutePath());
 		}
 		return pluginLocations;
 	}

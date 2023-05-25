@@ -104,15 +104,16 @@ public class Contact extends PersistentObject {
 		return firstName != null ? firstName : (lastName != null ? " " + lastName : "");
 	}
 
-	public String toString() {
-		return getFullName() + (email != null ? " - " + email : "");
-	}
-
 	public String getAddress() {
 		return address;
 	}
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	
+	@Override
+	public String toString() {
+		return getFullName() + (email != null ? " - " + email : "");
 	}
 }

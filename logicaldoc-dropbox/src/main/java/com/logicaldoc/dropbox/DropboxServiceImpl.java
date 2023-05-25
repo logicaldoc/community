@@ -297,7 +297,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	}
 
 	private void importEntry(Session session, Dropbox dbox, Folder root, Set<String> imported, Metadata entry)
-			throws Exception, DbxException, PersistenceException {
+			throws DbxException, PersistenceException, IOException {
 		if (entry instanceof FileMetadata) {
 			importDocument(root, (FileMetadata) entry, dbox, session);
 			imported.add(entry.getPathDisplay());
@@ -327,7 +327,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		}
 	}
 
-	private void importDocument(Folder root, FileMetadata src, Dropbox dbox, Session session) throws Exception {
+	private void importDocument(Folder root, FileMetadata src, Dropbox dbox, Session session)
+			throws IOException, PersistenceException {
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 

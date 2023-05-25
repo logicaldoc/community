@@ -11,7 +11,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -294,13 +293,11 @@ public class StatsCollector extends Task {
 		/*
 		 * General usage
 		 */
-		SimpleDateFormat isoDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
 		Date lastLogin = findLastLogin();
-		postParams.add(new BasicNameValuePair("last_login", lastLogin != null ? isoDf.format(lastLogin) : ""));
+		postParams.add(new BasicNameValuePair("last_login", formatDate(lastLogin)));
 
 		Date lastCreation = findLastCreation();
-		postParams.add(new BasicNameValuePair("last_creation", lastCreation != null ? isoDf.format(lastCreation) : ""));
+		postParams.add(new BasicNameValuePair("last_creation", formatDate(lastCreation)));
 
 		/*
 		 * Quotas
@@ -318,33 +315,38 @@ public class StatsCollector extends Task {
 		postParams.add(new BasicNameValuePair("reg_organization", regOrganization != null ? regOrganization : ""));
 		postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
 
+		postStatistics(postParams);
+
+		next();
+	}
+
+	private String formatDate(Date lastLogin) {
+		SimpleDateFormat isoDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		return lastLogin != null ? isoDf.format(lastLogin) : "";
+	}
+
+	private void postStatistics(List<NameValuePair> postParams) {
 		try {
-			postStatistics(postParams);
+			HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
+			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
+			post.setEntity(entity);
+
+			CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
+
+			// Execute request
+			try (CloseableHttpResponse response = httpclient.execute(post)) {
+				int responseStatusCode = response.getStatusLine().getStatusCode();
+				// log status code
+				log.debug("Response status code: {}", responseStatusCode);
+				if (responseStatusCode != 200)
+					throw new IOException(HttpUtil.getBodyString(response));
+			}
+			log.info("Statistics packaged");
 		} catch (IOException e) {
 			log.warn("Troubles sending the statistics");
 			log.debug("Unable to send statistics", e);
 
 		}
-		next();
-
-	}
-
-	private void postStatistics(List<NameValuePair> postParams) throws IOException, ClientProtocolException {
-		HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
-		post.setEntity(entity);
-
-		CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
-
-		// Execute request
-		try (CloseableHttpResponse response = httpclient.execute(post)) {
-			int responseStatusCode = response.getStatusLine().getStatusCode();
-			// log status code
-			log.debug("Response status code: {}", responseStatusCode);
-			if (responseStatusCode != 200)
-				throw new IOException(HttpUtil.getBodyString(response));
-		}
-		log.info("Statistics packaged");
 	}
 
 	private Date findLastLogin() {

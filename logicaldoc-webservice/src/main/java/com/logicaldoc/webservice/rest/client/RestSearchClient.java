@@ -12,6 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.searchengine.SearchException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.rest.SearchService;
@@ -53,11 +57,9 @@ public class RestSearchClient extends AbstractRestClient {
 		}
 	}	
 	
-	public WSSearchResult find(WSSearchOptions owd) throws Exception {	
-		
+	public WSSearchResult find(WSSearchOptions owd) throws AuthenticationException, PersistenceException, WebserviceException, SearchException {	
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);		
-
 		return proxy.find(owd);
 	}
 }

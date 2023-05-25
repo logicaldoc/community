@@ -12,6 +12,10 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSTagCloud;
@@ -35,7 +39,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	@Operation(summary = "Set the tags of a document")
 	public void setDocumentTags(@Parameter(description = "Document ID", required = true) @FormParam("docId") long docId,
-			@FormParam("tag") String[] tags) throws Exception {
+			@FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		String sid = validateSession();
 		super.setDocumentTags(sid, docId, tags);
 	}
@@ -46,7 +50,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	@Operation(summary = "Appends new tags to a document")
 	public void addDocumentTags(@Parameter(description = "Document ID", required = true) @FormParam("docId") long docId,
-			@FormParam("tag") String[] tags) throws Exception {
+			@FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		String sid = validateSession();
 		super.addDocumentTags(sid, docId, tags);
 	}
@@ -55,8 +59,8 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getDocumentTags")
 	@Operation(summary = "Gets all the tags of a document")
-	public String[] getDocumentTags(@Parameter(description = "Document ID", required = true) @QueryParam("docId") long docId)
-			throws Exception {
+	public String[] getDocumentTags(@Parameter(description = "Document ID", required = true) @QueryParam("docId") long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException
+			 {
 		String sid = validateSession();
 		return super.getDocumentTags(sid, docId);
 	}
@@ -68,7 +72,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Operation(summary = "Sets the tags of a folder")
 	public void setFolderTags(
 			@Parameter(description = "Folder ID", required = true) @FormParam("folderId") long folderId,
-			@FormParam("tag") String[] tags) throws Exception {
+			@FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		String sid = validateSession();
 		super.setFolderTags(sid, folderId, tags);
 	}
@@ -80,7 +84,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Operation(summary = "Appends new tags to a folder")
 	public void addFolderTags(
 			@Parameter(description = "Folder ID", required = true) @FormParam("folderId") long folderId,
-			@FormParam("tag") String[] tags) throws Exception {
+			@FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		String sid = validateSession();
 		super.addFolderTags(sid, folderId, tags);
 	}
@@ -89,7 +93,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getFolderTags")
 	@Operation(summary = "Gets all the tags of a folder")
-	public String[] getFolderTags(@Parameter(description = "Folder ID", required = true) @QueryParam("folderId") long folderId) throws Exception {
+	public String[] getFolderTags(@Parameter(description = "Folder ID", required = true) @QueryParam("folderId") long folderId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException{
 		String sid = validateSession();
 		return super.getFolderTags(sid, folderId);
 	}
@@ -98,7 +102,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getTags")
 	@Operation(summary = "Gets all the tags used in the sysem")
-	public String[] getTags() throws Exception {
+	public String[] getTags() throws AuthenticationException, PersistenceException, WebserviceException{
 		String sid = validateSession();
 		return super.getTags(sid);
 	}
@@ -107,7 +111,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getTagCloud")
 	@Operation(summary = "Retrieves all tag clouds in the repository")
-	public WSTagCloud[] getTagCloud() throws Exception {
+	public WSTagCloud[] getTagCloud() throws AuthenticationException, PersistenceException, WebserviceException{
 		String sid = validateSession();
 		return super.getTagCloud(sid);
 	}
@@ -116,7 +120,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/findDocumentsByTag")
 	@Operation(summary = "Finds authorized documents for the current user having a specified tag")
-	public WSDocument[] findDocumentsByTag(@Parameter(description = "The tag", required = true) @QueryParam("tag") String tag) throws Exception {
+	public WSDocument[] findDocumentsByTag(@Parameter(description = "The tag", required = true) @QueryParam("tag") String tag) throws AuthenticationException, PersistenceException, WebserviceException{
 		String sid = validateSession();
 		WSDocument[] docs = super.findDocumentsByTag(sid, tag);
 		return docs;
@@ -126,7 +130,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/findFoldersByTag")
 	@Operation(summary = "Finds authorized folders for the current user having a specified tag")
-	public WSFolder[] findFoldersByTag(@Parameter(description = "The tag", required = true) @QueryParam("tag") String tag) throws Exception {
+	public WSFolder[] findFoldersByTag(@Parameter(description = "The tag", required = true) @QueryParam("tag") String tag) throws AuthenticationException, WebserviceException, PersistenceException{
 		String sid = validateSession();
 		return super.findFoldersByTag(sid, tag);
 	}
@@ -137,7 +141,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Operation(
 			summary = "Retrieves all the tags in the preset", 
 			description = "Retrieves all the tags specified in the preset, empty if input mode is free")
-	public String[] getTagsPreset() throws Exception {
+	public String[] getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException{
 		String sid = validateSession();
 		return super.getTagsPreset(sid);
 	}

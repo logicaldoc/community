@@ -185,14 +185,14 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		return webdavResponse;
 	}
 
-	private void handleException(HttpServletRequest request, int methodCode, Throwable e) {
+	private void handleException(HttpServletRequest request, int methodCode, Throwable e) throws DavException {
 		if (e instanceof UnsupportedOperationException) {
 			log.warn("{}: {} {}", e.getClass().getName(), request.getMethod(), methodCode);
 		} else if (e.getClass().getName().contains("ClientAbortException")) {
 			log.warn("{}: {} {} {}", e.getClass().getName(), e.getMessage(), request.getMethod(), methodCode);
 		} else {
 			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
+			throw new DavException( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 

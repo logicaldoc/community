@@ -67,7 +67,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 				try {
 					dao.store(option);
 				} catch (Exception e) {
-					throw new Exception(String.format("Options have not been %s", setId != 0L ? "updated" : "stored"),
+					throw new ServerException(String.format("Options have not been %s", setId != 0L ? "updated" : "stored"),
 							e);
 				}
 			}
@@ -89,7 +89,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 						try {
 							dao.delete(option.getId());
 						} catch (Exception e) {
-							throw new Exception(String.format("Option has not been deleted"), e);
+							throw new ServerException(String.format("Option has not been deleted"), e);
 						}
 						break;
 					}
@@ -123,7 +123,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			try {
 				dao.store(attSet);
 			} catch (Exception e) {
-				throw new Exception(String.format("Attribute Set has not been %s",
+				throw new ServerException(String.format("AttributeSet has not been %s",
 						attributeSet.getId() != 0L ? "updated" : "stored"), e);
 			}
 

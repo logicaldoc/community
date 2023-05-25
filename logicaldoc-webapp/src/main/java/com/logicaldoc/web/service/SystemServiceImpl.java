@@ -928,8 +928,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				throw new ServerException("Database Connection failure.");
 			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException | ClassNotFoundException | PluginException
-				| ServerException | SQLException e) {
+				| NoSuchMethodException | SecurityException | ClassNotFoundException | PluginException | ServerException
+				| SQLException e) {
 			throwServerException(session, log, e);
 		}
 	}
@@ -1007,7 +1007,12 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			 * Initialize the plugin
 			 */
 			PluginRegistry pluginRegistry = PluginRegistry.getInstance();
-			pluginRegistry.init(libFolder.getAbsolutePath());
+			try {
+				pluginRegistry.init(libFolder.getAbsolutePath());
+			} catch (PluginException e) {
+				log.error(e.getMessage(), e);
+				return;
+			}
 			initializePlugin(pluginId);
 
 			/*

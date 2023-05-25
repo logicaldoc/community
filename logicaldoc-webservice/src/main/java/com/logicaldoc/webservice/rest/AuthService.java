@@ -24,17 +24,17 @@ public interface AuthService {
 
 	@GET
     @Path("/login")
-	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws Exception;
+	public String login(@QueryParam("u") String username, @QueryParam("pw") String password);
 
 	@POST
     @Path("/loginForm")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public String loginForm(@FormParam("username") String username, @FormParam("password") String password) throws Exception;
+	public String loginForm(@FormParam("username") String username, @FormParam("password") String password);
 
 	@POST
     @Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String loginPostJSON(WSCredentials wscred) throws Exception;	
+	public String loginPostJSON(WSCredentials wscred);	
 
 	@DELETE
     @Path("/logout")

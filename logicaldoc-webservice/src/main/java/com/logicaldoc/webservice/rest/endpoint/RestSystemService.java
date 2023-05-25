@@ -9,6 +9,9 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSSystemInfo;
 import com.logicaldoc.webservice.rest.SystemService;
@@ -24,20 +27,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class RestSystemService extends SoapSystemService implements SystemService {
 
 	protected static Logger log = LoggerFactory.getLogger(RestSystemService.class);
-	
+
 	@Override
 	@GET
-    @Path("/getInfo")	
+	@Path("/getInfo")
 	@Operation(summary = "Get system information", description = "Retrieves information about the Installation")
-	public WSSystemInfo getInfo() throws Exception {
+	public WSSystemInfo getInfo() throws WebserviceException {
 		return super.getInfo();
 	}
 
 	@Override
 	@GET
-    @Path("/getStatistics")
+	@Path("/getStatistics")
 	@Operation(summary = "Get system statistics", description = "Retrieves the system statistics")
-	public WSParameter[] getStatistics() throws Exception {
+	public WSParameter[] getStatistics() throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSession();
 		return super.getStatistics(sid);
 	}
@@ -46,7 +49,7 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	@GET
 	@Path("/getLanguages")
 	@Operation(summary = "Get enabled languages", description = "Retrieves the languages enabled in the server")
-	public String[] getLanguages() throws Exception {
+	public String[] getLanguages() {
 		String sid = validateSession();
 		return super.getLanguages(sid);
 	}

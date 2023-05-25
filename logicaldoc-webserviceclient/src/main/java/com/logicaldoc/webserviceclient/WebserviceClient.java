@@ -13,6 +13,7 @@ import org.ksoap2.serialization.MarshalBase64;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpResponseException;
 import org.ksoap2.transport.HttpTransportSE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +162,7 @@ public class WebserviceClient {
 		return null;
 	}
 
-	public Entry getDocument(long id) throws Exception {
+	public Entry getDocument(long id) throws HttpResponseException, IOException, XmlPullParserException {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "getDocument");
 		request.addProperty("sid", sid);
 		request.addProperty(DOC_ID, Long.toString(id));
@@ -207,7 +208,7 @@ public class WebserviceClient {
 		envelope.getResponse();
 	}
 
-	public void checkout(long docId) throws Exception {
+	public void checkout(long docId) throws HttpResponseException, IOException, XmlPullParserException {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "checkout");
 		request.addProperty("sid", sid);
 		request.addProperty(DOC_ID, docId);
@@ -221,7 +222,7 @@ public class WebserviceClient {
 		transport.call("", envelope);
 	}
 
-	public void unlock(long docId) throws Exception {
+	public void unlock(long docId) throws HttpResponseException, IOException, XmlPullParserException {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "unlock");
 		request.addProperty("sid", sid);
 		request.addProperty(DOC_ID, docId);

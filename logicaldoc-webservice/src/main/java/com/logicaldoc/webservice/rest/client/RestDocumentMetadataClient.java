@@ -10,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSTemplate;
@@ -45,55 +49,65 @@ public class RestDocumentMetadataClient extends AbstractRestClient {
 		}
 	}
 
-	public void setAttributeOptions(long setId, String attribute, WSAttributeOption[] options) throws Exception {
+	public void setAttributeOptions(long setId, String attribute, WSAttributeOption[] options)
+			throws WebserviceException, PersistenceException {
 		proxy.setAttributeOptions(setId, attribute, options);
 	}
-	
-	public void setAttributeOptionsPOST(long setId, String attribute, WSAttributeOption[] options) throws Exception {
-		proxy.setAttributeOptionsPOST(setId, attribute, options);
-	}	
 
-	public long storeAttributeSet(WSAttributeSet attributeSet) throws Exception {
+	public void setAttributeOptionsPOST(long setId, String attribute, WSAttributeOption[] options)
+			throws WebserviceException, PersistenceException {
+		proxy.setAttributeOptionsPOST(setId, attribute, options);
+	}
+
+	public long storeAttributeSet(WSAttributeSet attributeSet) throws WebserviceException, PersistenceException {
 		return proxy.storeAttributeSet(attributeSet);
 	}
 
-	public long storeTemplate(WSTemplate template) throws Exception {
+	public long storeTemplate(WSTemplate template)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return proxy.storeTemplate(template);
 	}
 
-	public WSAttributeSet getAttributeSetById(long setId) throws Exception {
+	public WSAttributeSet getAttributeSetById(long setId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.getAttributeSetById(setId);
 	}
 
-	public WSAttributeSet getAttributeSet(String name) throws Exception {
+	public WSAttributeSet getAttributeSet(String name)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.getAttributeSet(name);
 	}
 
-	public WSTemplate getTemplate(String name) throws Exception {
+	public WSTemplate getTemplate(String name)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.getTemplate(name);
 	}
 
-	public WSTemplate getTemplateById(long templateId) throws Exception {
+	public WSTemplate getTemplateById(long templateId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.getTemplateById(templateId);
 	}
 
-	public String[] getAttributeOptions(long setId, String attribute) throws Exception {
+	public String[] getAttributeOptions(long setId, String attribute)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.getAttributeOptions(setId, attribute);
 	}
 
-	public WSAttributeSet[] listAttributeSets() throws Exception {
+	public WSAttributeSet[] listAttributeSets()
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.listAttributeSets();
 	}
 
-	public void deleteAttributeSet(long setId) throws Exception {
+	public void deleteAttributeSet(long setId) throws WebserviceException, PersistenceException {
 		proxy.deleteAttributeSet(setId);
 	}
 
-	public void deleteTemplate(long templateId) throws Exception {
+	public void deleteTemplate(long templateId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		proxy.deleteTemplate(templateId);
 	}
 
-	public WSTemplate[] listTemplates() throws Exception {
+	public WSTemplate[] listTemplates() throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.listTemplates();
 	}
 }

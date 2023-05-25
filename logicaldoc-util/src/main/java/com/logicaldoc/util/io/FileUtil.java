@@ -91,7 +91,7 @@ public class FileUtil {
 		}
 	}
 
-	public static void writeFile(byte[] in, String filepath) throws Exception {
+	public static void writeFile(byte[] in, String filepath) throws IOException {
 		try (InputStream inStream = new ByteArrayInputStream(in);) {
 			writeFile(inStream, filepath);
 		}
@@ -589,7 +589,7 @@ public class FileUtil {
 		}
 	}
 
-	public static void replaceInFile(String sourcePath, String token, String newValue) throws Exception {
+	public static void replaceInFile(String sourcePath, String token, String newValue) {
 		String oldContent = "";
 
 		File tmp = new File(sourcePath + ".tmp");

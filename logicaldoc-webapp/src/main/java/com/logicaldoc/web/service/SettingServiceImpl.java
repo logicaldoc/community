@@ -305,7 +305,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		try {
 			ContextProperties config = Context.get().getProperties();
 			if (storageId == config.getInt("store.write"))
-				throw new Exception(
+				throw new ServerException(
 						"You cannot delete the storage " + storageId + " because it is the current default");
 
 			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);

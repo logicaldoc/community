@@ -49,8 +49,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
     @Path("/loginForm")
 	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Login with the credentials in a form POST")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public String loginForm(@FormParam("username") String username, @FormParam("password") String password)
-			throws Exception {
+	public String loginForm(@FormParam("username") String username, @FormParam("password") String password) {
 		return super.login(username, password);
 	}
 
@@ -58,7 +57,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
     @Path("/login")
 	@Operation(operationId = "loginPostJSON", summary = "Login with POST in JSON format", description = "Login posting the credentials in JSON format")
 	@Consumes(MediaType.APPLICATION_JSON)	
-	public String loginPostJSON(WSCredentials cred) throws Exception {
+	public String loginPostJSON(WSCredentials cred) {
 		return super.login(cred.getUsername(), cred.getPassword());
 	}
 

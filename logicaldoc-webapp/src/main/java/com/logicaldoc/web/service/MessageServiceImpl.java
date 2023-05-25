@@ -223,7 +223,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 				try {
 					dao.store(template);
 				} catch (Exception e) {
-					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED);
+					throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED);
 				}
 			}
 		} catch (Exception t) {
@@ -245,7 +245,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					try {
 						dao.delete(id);
 					} catch (Exception e) {
-						throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
+						throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 					}
 				}
 			}
@@ -269,7 +269,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 				try {
 					dao.delete(template.getId());
 				} catch (Exception e) {
-					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
+					throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 				}
 			}
 		} catch (Exception t) {

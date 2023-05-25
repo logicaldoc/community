@@ -9,16 +9,20 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.WorkingTime;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.webservice.AbstractService;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
 import com.logicaldoc.webservice.model.WSUtil;
@@ -35,7 +39,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	protected static Logger log = LoggerFactory.getLogger(SoapSecurityService.class);
 
 	@Override
-	public WSUser[] listUsers(String sid, String group) throws Exception {
+	public WSUser[] listUsers(String sid, String group) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		try {
@@ -59,7 +63,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			return users.toArray(new WSUser[0]);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new Exception(t.getMessage());
+			throw new PersistenceException(t.getMessage());
 		}
 	}
 
@@ -86,7 +90,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public WSGroup[] listGroups(String sid) throws Exception {
+	public WSGroup[] listGroups(String sid) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		User user = validateSession(sid);
 
@@ -102,12 +106,12 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			return groups.toArray(new WSGroup[0]);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new Exception(t.getMessage());
+			throw new PersistenceException(t.getMessage());
 		}
 	}
 
 	@Override
-	public long storeUser(String sid, WSUser user) throws Exception {
+	public long storeUser(String sid, WSUser user) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		User sessionUser = validateSession(sid);
 
@@ -120,7 +124,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (user.getId() != 0) {
 				usr = dao.findById(user.getId());
 				if (usr.getType() == User.TYPE_SYSTEM)
-					throw new Exception("You cannot edit user with id " + usr.getId() + " because it is a system user");
+					throw new PermissionException("You cannot edit user with id " + usr.getId() + " because it is a system user");
 				dao.initialize(usr);
 
 				usr.setCity(user.getCity());
@@ -177,23 +181,23 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			return usr.getId();
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new Exception(t.getMessage());
+			throw new PersistenceException(t.getMessage());
 		}
 	}
 
-	private void validateMandatoryFields(User usr) throws Exception {
+	private void validateMandatoryFields(User usr) throws PersistenceException {
 		if (StringUtils.isEmpty(usr.getUsername()))
-			throw new Exception("Missing mandatory value 'UserName'");
+			throw new PersistenceException("Missing mandatory value 'UserName'");
 		else if (StringUtils.isEmpty(usr.getEmail()))
-			throw new Exception("Missing mandatory value 'Email'");
+			throw new PersistenceException("Missing mandatory value 'Email'");
 		else if (StringUtils.isEmpty(usr.getName()))
-			throw new Exception("Missing mandatory value 'Name'");
+			throw new PersistenceException("Missing mandatory value 'Name'");
 		else if (StringUtils.isEmpty(usr.getFirstName()))
-			throw new Exception("Missing mandatory value 'FirstName'");
+			throw new PersistenceException("Missing mandatory value 'FirstName'");
 	}
 
 	@Override
-	public long storeGroup(String sid, WSGroup group) throws Exception {
+	public long storeGroup(String sid, WSGroup group) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 
 		try {
@@ -203,7 +207,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				grp = dao.findById(group.getId());
 				dao.initialize(grp);
 				if (grp.getType() != Group.TYPE_DEFAULT) {
-					throw new Exception(String.format("You cannot edit group with id %s because it is a system group",
+					throw new PermissionException(String.format("You cannot edit group with id %s because it is a system group",
 							grp.getId()));
 				}
 				grp.setName(group.getName());
@@ -212,7 +216,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			}
 
 			if (StringUtils.isEmpty(grp.getName()))
-				throw new Exception("Missing mandatory value 'Name'");
+				throw new PersistenceException("Missing mandatory value 'Name'");
 
 			if (group.getUserIds() != null && group.getUserIds().length > 0) {
 
@@ -237,59 +241,59 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			return grp.getId();
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new Exception(t.getMessage());
+			throw new PersistenceException(t.getMessage());
 		}
 	}
 
 	@Override
-	public void deleteUser(String sid, long userId) throws Exception {
+	public void deleteUser(String sid, long userId) throws WebserviceException, PersistenceException, PermissionException {
 		checkAdministrator(sid);
 
 		if (userId == 1)
-			throw new Exception("You cannot delete the admin user");
+			throw new PermissionException("You cannot delete the admin user");
 
 		try {
 			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 			User usr = dao.findById(userId);
 			if (usr.getType() == User.TYPE_SYSTEM) {
-				throw new Exception("You cannot delete user with id " + usr.getId() + " because it is a system user");
+				throw new PermissionException("You cannot delete user with id " + usr.getId() + " because it is a system user");
 			}
 			dao.delete(userId);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new Exception("Unable to delete the user with id " + userId);
+			throw new PersistenceException("Unable to delete the user with id " + userId);
 		}
 	}
 
 	@Override
-	public void deleteGroup(String sid, long groupId) throws Exception {
+	public void deleteGroup(String sid, long groupId) throws PermissionException, PersistenceException, WebserviceException {
 		checkAdministrator(sid);
 
 		if (groupId == 1)
-			throw new Exception("You cannot delete the admin group");
+			throw new PermissionException("You cannot delete the admin group");
 
 		try {
 			GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			Group grp = dao.findById(groupId);
 			if (grp.getType() != Group.TYPE_DEFAULT) {
-				throw new Exception("You cannot delete group with id " + grp.getId() + " because it is a system group");
+				throw new PermissionException("You cannot delete group with id " + grp.getId() + " because it is a system group");
 			}
 			dao.delete(groupId);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new Exception("Unable to delete the group with id " + groupId);
+			throw new PersistenceException("Unable to delete the group with id " + groupId);
 		}
 	}
 
 	@Override
-	public int changePassword(String sid, long userId, String oldPassword, String newPassword) throws Exception {
+	public int changePassword(String sid, long userId, String oldPassword, String newPassword) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			User user = userDao.findById(userId);
 			if (user == null)
-				throw new Exception("User " + userId + " not found");
+				throw new WebserviceException("User " + userId + " not found");
 
 			if (oldPassword != null && !CryptUtil.cryptString(oldPassword).equals(user.getPassword())) {
 				return 1;
@@ -318,7 +322,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public WSUser getUser(String sid, long userId) throws Exception {
+	public WSUser getUser(String sid, long userId) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -335,7 +339,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public WSUser getUserByUsername(String sid, String username) throws Exception {
+	public WSUser getUserByUsername(String sid, String username) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -353,7 +357,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public WSGroup getGroup(String sid, long groupId) throws Exception {
+	public WSGroup getGroup(String sid, long groupId) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);

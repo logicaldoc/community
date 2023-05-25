@@ -415,7 +415,7 @@ public class ResourceServiceImpl implements ResourceService {
 				is.close();
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 
 		return null;
@@ -705,7 +705,7 @@ public class ResourceServiceImpl implements ResourceService {
 						transaction);
 
 				if (notDeletableFolders.size() > 0)
-					throw new RuntimeException("Unable to delete some subfolders.");
+					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to delete some subfolders.");
 			} else if (!resource.isFolder()) {
 				// verify the write permission on the parent folder
 				Resource parent = getParentResource(resource);
@@ -733,7 +733,7 @@ public class ResourceServiceImpl implements ResourceService {
 		} catch (DavException de) {
 			throw de;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -769,7 +769,7 @@ public class ResourceServiceImpl implements ResourceService {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot write in the root");
 
 		if (resource.isFolder() == true) {
-			throw new RuntimeException("FolderCopy not supported");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "FolderCopy not supported");
 		} else {
 			try {
 				boolean writeEnabled = destinationResource.isWriteEnabled();
@@ -799,7 +799,7 @@ public class ResourceServiceImpl implements ResourceService {
 				throw de;
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
-				throw new RuntimeException(e);
+				throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 		}
 	}
@@ -895,11 +895,9 @@ public class ResourceServiceImpl implements ResourceService {
 			transaction.setUser(user);
 
 			documentManager.checkout(Long.parseLong(resource.getID()), transaction);
-		} catch (NumberFormatException e) {
-			throw new RuntimeException(e);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+		} 
 	}
 
 	public boolean isCheckedOut(Resource resource) throws NumberFormatException, PersistenceException {
@@ -946,7 +944,7 @@ public class ResourceServiceImpl implements ResourceService {
 		return resourceHistory;
 	}
 
-	public void uncheckout(Resource resource, WebdavSession session) {
+	public void uncheckout(Resource resource, WebdavSession session) throws DavException {
 		String sid = getSid(session);
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
@@ -960,7 +958,7 @@ public class ResourceServiceImpl implements ResourceService {
 			resource.setCheckedOut(false);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -977,7 +975,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	@Override
-	public void addBookmark(Resource resource, WebdavSession session) {
+	public void addBookmark(Resource resource, WebdavSession session) throws DavException {
         try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 			
@@ -1001,21 +999,14 @@ public class ResourceServiceImpl implements ResourceService {
 			}
 							
 			bdao.store(bmark);
-			
-		} catch (NumberFormatException e) {
+		} catch (Exception e) { 
 			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
-		} catch (IllegalArgumentException e) {
-			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
-		}
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+		} 
 	}
 
 	@Override
-	public void deleteBookmark(Resource resource, WebdavSession session) {
+	public void deleteBookmark(Resource resource, WebdavSession session) throws DavException {
 		log.info("deleteBookmark");
         try {
 			User user = userDAO.findById(resource.getRequestedPerson());		
@@ -1032,16 +1023,9 @@ public class ResourceServiceImpl implements ResourceService {
 			if (bkm != null) {
 				bdao.delete(bkm.getId());
 			} 
-			
-		} catch (NumberFormatException e) {
+		} catch (Exception e) { 
 			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
-		} catch (IllegalArgumentException e) {
-			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			throw new RuntimeException(e);
-		}	
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+		} 
 	}
 }

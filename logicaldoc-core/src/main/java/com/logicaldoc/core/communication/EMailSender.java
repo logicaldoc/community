@@ -375,6 +375,7 @@ public class EMailSender {
 		try {
 			if (!StringUtils.isEmpty(username))
 				sess = Session.getInstance(props, new Authenticator() {
+					@Override
 					protected PasswordAuthentication getPasswordAuthentication() {
 						return new PasswordAuthentication(username, password);
 					}
@@ -384,6 +385,7 @@ public class EMailSender {
 		} catch (SecurityException e) {
 			if (!StringUtils.isEmpty(username))
 				sess = Session.getInstance(props, new Authenticator() {
+					@Override
 					protected PasswordAuthentication getPasswordAuthentication() {
 						return new PasswordAuthentication(username, password);
 					}

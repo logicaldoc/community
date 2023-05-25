@@ -26,9 +26,11 @@ public interface InfoService extends RemoteService {
 	 * @param tenant name of the tenant
 	 * @param login if the informations are asked by the login form
 	 * 
+	 * @throws ServerException raised in case of error in the server
+	 * 
 	 * @return the User Inteface's informations
 	 */
-	public GUIInfo getInfo(String locale, String tenant, boolean login);
+	public GUIInfo getInfo(String locale, String tenant, boolean login) throws ServerException;
 
 	/**
 	 * Retrieves all the settings for the current session

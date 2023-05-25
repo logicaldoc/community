@@ -104,7 +104,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				indexer.dropIndex();
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
-				throw new RuntimeException(e.getMessage(), e);
+				throw new ServerException(e.getMessage(), e);
 			}
 
 		Runnable task = () -> {
@@ -116,7 +116,6 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 						(Map<String, Object>) null);
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
-				throw new RuntimeException(t.getMessage(), t);
 			}
 		};
 

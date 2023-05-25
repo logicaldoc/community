@@ -266,7 +266,7 @@ public class AbstractService {
 		} else
 			return null;
 	}
-	
+
 	public static String convertDateToString(Date date) {
 		return DateUtil.format(date);
 	}
@@ -277,21 +277,5 @@ public class AbstractService {
 
 	public boolean isValidateSession() {
 		return validateSession;
-	}
-
-	/**
-	 * Utility method that logs the error and rethrows the same exception
-	 * 
-	 * @param log the logger to print to
-	 * @param exception the exception representing the error
-	 * 
-	 * @throws Throwable the passed exception
-	 */
-	protected void logAndRethrow(Logger log, Throwable exception) throws Exception {
-		log.error(exception.getMessage(), exception);
-		if (exception instanceof Exception)
-			throw (Exception) exception;
-		else
-			throw new Exception(exception);
 	}
 }

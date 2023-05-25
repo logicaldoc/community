@@ -9,6 +9,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSTagCloud;
@@ -30,11 +34,15 @@ public interface TagService {
 	 * @param docId identifier of the document
 	 * @param tags array of tags
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@POST
 	@Path("/setDocumentTags")
-	public void setDocumentTags(@FormParam("docId") long docId, @FormParam("tag") String[] tags) throws Exception;
+	public void setDocumentTags(@FormParam("docId") long docId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Adds tags to a document
@@ -42,11 +50,15 @@ public interface TagService {
 	 * @param docId identifier of the document
 	 * @param tags array of tags
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@POST
 	@Path("/addDocumentTags")
-	public void addDocumentTags(@FormParam("docId") long docId, @FormParam("tag") String[] tags) throws Exception;
+	public void addDocumentTags(@FormParam("docId") long docId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves all the tags of a document
@@ -55,11 +67,15 @@ public interface TagService {
 	 * 
 	 * @return The tags of the document
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@GET
 	@Path("/getDocumentTags")
-	public String[] getDocumentTags(@QueryParam("docId") long docId) throws Exception;
+	public String[] getDocumentTags(@QueryParam("docId") long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Sets the tags of a folder
@@ -67,11 +83,15 @@ public interface TagService {
 	 * @param folderId identifier of the folder
 	 * @param tags list of tags
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@POST
 	@Path("/setFolderTags")
-	public void setFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws Exception;
+	public void setFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Adds tags to a folder
@@ -79,11 +99,15 @@ public interface TagService {
 	 * @param folderId identifier of the folder
 	 * @param tags list of tags
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@POST
 	@Path("/addFolderTags")
-	public void addFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws Exception;
+	public void addFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves all the tags of a folder
@@ -92,33 +116,42 @@ public interface TagService {
 	 * 
 	 * @return The tags of the folder
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@GET
 	@Path("/getFolderTags")
-	public String[] getFolderTags(@QueryParam("folderId") long folderId) throws Exception;
+	public String[] getFolderTags(@QueryParam("folderId") long folderId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Retrieves all the tags in the repository
 	 * 
 	 * @return The tags in the repository
+	 * @throws WebserviceException 
+	 * @throws PersistenceException 
+	 * @throws AuthenticationException 
 	 * 
 	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/getTags")
-	public String[] getTags() throws Exception;
+	public String[] getTags() throws AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Retrieves all tag clouds in the repository
 	 * 
 	 * @return The tags in the repository
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getTagCloud")
-	public WSTagCloud[] getTagCloud() throws Exception;
+	public WSTagCloud[] getTagCloud() throws AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Finds authorized documents for the current user having a specified tag
@@ -127,11 +160,14 @@ public interface TagService {
 	 * 
 	 * @return Collection of found documents
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+
 	 */
 	@GET
 	@Path("/findDocumentsByTag")
-	public WSDocument[] findDocumentsByTag(@QueryParam("tag") String tag) throws Exception;
+	public WSDocument[] findDocumentsByTag(@QueryParam("tag") String tag) throws AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Finds authorized folders for the current user having a specified tag.
@@ -140,20 +176,24 @@ public interface TagService {
 	 * 
 	 * @return Collection of found folders
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/findFoldersByTag")
-	public WSFolder[] findFoldersByTag(@QueryParam("tag") String tag) throws Exception;
+	public WSFolder[] findFoldersByTag(@QueryParam("tag") String tag) throws AuthenticationException, WebserviceException, PersistenceException;
 	
 	/**
 	 * Retrieves all the tags in the preset (if the input mode is preset).
 	 * 
 	 * @return The tags in the preset
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getTagsPreset")
-	public String[] getTagsPreset() throws Exception;	
+	public String[] getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException;	
 }

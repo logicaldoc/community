@@ -1,10 +1,12 @@
 package com.logicaldoc.util.http;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -35,7 +37,7 @@ public class HttpUpload {
 
 	private FileBodyCounter.ProgressListener listener;
 
-	public void upload() throws Exception {
+	public void upload() throws ClientProtocolException, IOException {
 		HttpPost filePost = new HttpPost(url);
 
 		String f = fileName;
@@ -68,7 +70,7 @@ public class HttpUpload {
 			} else {
 				String message = "Upload failed, response= " + status;
 				System.out.println(message);
-				throw new Exception(message);
+				throw new IOException(message);
 			}
 		}
 	}

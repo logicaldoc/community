@@ -4,6 +4,10 @@ import java.io.IOException;
 
 import javax.jws.WebService;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSTagCloud;
@@ -27,57 +31,57 @@ public class SoapTagClient extends SoapClient<TagService> implements TagService 
 	}
 
 	@Override
-	public void setDocumentTags(String sid, long docId, String[] tags) throws Exception {
+	public void setDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		client.setDocumentTags(sid, docId, tags);
 	}
 
 	@Override
-	public void addDocumentTags(String sid, long docId, String[] tags) throws Exception {
+	public void addDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		client.addDocumentTags(sid, docId, tags);
 	}
 
 	@Override
-	public String[] getDocumentTags(String sid, long docId) throws Exception {
+	public String[] getDocumentTags(String sid, long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException{
 		return client.getDocumentTags(sid, docId);
 	}
 
 	@Override
-	public void setFolderTags(String sid, long folderId, String[] tags) throws Exception {
+	public void setFolderTags(String sid, long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		client.setFolderTags(sid, folderId, tags);
 	}
 
 	@Override
-	public void addFolderTags(String sid, long folderId, String[] tags) throws Exception {
+	public void addFolderTags(String sid, long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
 		client.addFolderTags(sid, folderId, tags);
 	}
 
 	@Override
-	public String[] getFolderTags(String sid, long folderId) throws Exception {
+	public String[] getFolderTags(String sid, long folderId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException{
 		return client.getFolderTags(sid, folderId);
 	}
 
 	@Override
-	public String[] getTags(String sid) throws Exception {
+	public String[] getTags(String sid) throws AuthenticationException, PersistenceException, WebserviceException{
 		return client.getTags(sid);
 	}
 
 	@Override
-	public WSTagCloud[] getTagCloud(String sid) throws Exception {
+	public WSTagCloud[] getTagCloud(String sid) throws AuthenticationException, PersistenceException, WebserviceException{
 		return client.getTagCloud(sid);
 	}
 
 	@Override
-	public WSDocument[] findDocumentsByTag(String sid, String tag) throws Exception {
+	public WSDocument[] findDocumentsByTag(String sid, String tag) throws AuthenticationException, PersistenceException, WebserviceException{
 		return client.findDocumentsByTag(sid, tag);
 	}
 
 	@Override
-	public WSFolder[] findFoldersByTag(String sid, String tag) throws Exception {
+	public WSFolder[] findFoldersByTag(String sid, String tag) throws AuthenticationException, WebserviceException, PersistenceException{
 		return client.findFoldersByTag(sid, tag);
 	}
 
 	@Override
-	public String[] getTagsPreset(String sid) throws Exception {
+	public String[] getTagsPreset(String sid) throws AuthenticationException, WebserviceException, PersistenceException{
 		return client.getTagsPreset(sid);
 	}
 

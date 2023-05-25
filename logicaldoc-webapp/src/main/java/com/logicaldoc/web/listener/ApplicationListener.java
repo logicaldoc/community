@@ -31,6 +31,7 @@ import com.logicaldoc.util.config.WebContextConfigurator;
 import com.logicaldoc.util.dbinit.DBInit;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -168,7 +169,12 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			String pluginsDir = context.getRealPath("/WEB-INF/lib");
 
 			// Initialize plugins
-			PluginRegistry.getInstance().init(pluginsDir);
+			try {
+				PluginRegistry.getInstance().init(pluginsDir);
+			} catch (PluginException e) {
+				log.error(e.getMessage(), e);
+				return;
+			}
 
 			// Clean some temporary folders
 			cleanTemporaryFolders(context);
@@ -244,7 +250,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			System.out.println(String.format("Taking log configuration from %s", log4jPath));
 			LoggerContext lContext = Configurator.initialize(null, log4jPath);
 			if (lContext == null)
-				throw new Exception("Null logger context");
+				throw new IOException("Null logger context");
 		} catch (Exception e) {
 			System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
 		}
@@ -259,7 +265,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	private void unpackPlugins(ServletContext context) throws IOException {
 		File pluginsDir = PluginRegistry.getPluginsDir();
 		File[] archives = pluginsDir.listFiles((dir, fileName) -> {
-				return fileName.toLowerCase().contains("plugin") && fileName.toLowerCase().endsWith(".zip");
+			return fileName.toLowerCase().contains("plugin") && fileName.toLowerCase().endsWith(".zip");
 		});
 		File webappDir = new File(context.getRealPath("/"));
 		if (archives != null)
@@ -278,7 +284,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				System.out.println("Remove installation marker of plugin " + pluginName);
 				File pluginDir = new File(pluginsDir, pluginName);
 				File[] installationMarkers = pluginDir.listFiles((File dir, String fileName) -> {
-						return fileName.toLowerCase().startsWith("install-");
+					return fileName.toLowerCase().startsWith("install-");
 				});
 				for (File file : installationMarkers)
 					FileUtils.deleteQuietly(file);

@@ -6,6 +6,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSSystemInfo;
 
@@ -26,22 +29,24 @@ public interface SystemService {
 	 * 
 	 * @return The value object containing the installation informations
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@GET
     @Path("/getInfo")	
-	public WSSystemInfo getInfo() throws Exception;
+	public WSSystemInfo getInfo() throws WebserviceException;
 
 	/**
 	 * Retrieves the system statistics
 	 * 
 	 * @return The value object containing the statistics values
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
     @Path("/getStatistics")		
-	public WSParameter[] getStatistics() throws Exception;
+	public WSParameter[] getStatistics() throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the languages enabled in the server.
@@ -52,6 +57,6 @@ public interface SystemService {
 	 */
 	@GET
 	@Path("/getLanguages")	
-	public String[] getLanguages() throws Exception;	
+	public String[] getLanguages();	
 	
 }

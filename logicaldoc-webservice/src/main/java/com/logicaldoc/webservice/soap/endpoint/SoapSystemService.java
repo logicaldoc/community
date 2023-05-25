@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
@@ -17,9 +19,11 @@ import com.logicaldoc.core.i18n.Language;
 import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.stats.StatsCollector;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSSystemInfo;
 import com.logicaldoc.webservice.soap.SystemService;
@@ -35,9 +39,9 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	protected static Logger log = LoggerFactory.getLogger(SoapSystemService.class);
 
 	@Override
-	public WSParameter[] getStatistics(String sid) throws Exception {
+	public WSParameter[] getStatistics(String sid)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-
 
 		WSParameter[] parameters = new WSParameter[15];
 		try {
@@ -143,7 +147,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			logsDirSize.setValue("0");
 		return logsDirSize;
 	}
-	
+
 	private WSParameter getLogsDirSize() {
 		return getStat("logdir", "repo_logs");
 	}
@@ -177,7 +181,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	}
 
 	@Override
-	public String[] getLanguages(String tenantOrSid) throws Exception {
+	public String[] getLanguages(String tenantOrSid) {
 		List<String> langs = new ArrayList<>();
 
 		String t = Tenant.DEFAULT_NAME;
@@ -199,14 +203,18 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	}
 
 	@Override
-	public WSSystemInfo getInfo() throws Exception {
-		SystemInfo inf = SystemInfo.get();
-		WSSystemInfo info = new WSSystemInfo();
-		BeanUtils.copyProperties(info, inf);
+	public WSSystemInfo getInfo() throws WebserviceException {
+		try {
+			SystemInfo inf = SystemInfo.get();
+			WSSystemInfo info = new WSSystemInfo();
+			BeanUtils.copyProperties(info, inf);
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-		info.setDate(df.format(inf.getDate()));
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+			info.setDate(df.format(inf.getDate()));
 
-		return info;
+			return info;
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new WebserviceException(e.getMessage(), e);
+		}
 	}
 }

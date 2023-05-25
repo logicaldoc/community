@@ -1,5 +1,6 @@
 package com.logicaldoc.web;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -64,7 +65,7 @@ public class ConvertPdf extends HttpServlet {
 				document = docDao.findById(document.getDocRef());
 
 			if (!document.getFileName().toLowerCase().endsWith(".pdf"))
-				throw new Exception("Unsupported format");
+				throw new IOException("Unsupported format");
 
 			String ver = document.getVersion();
 			if (StringUtils.isNotEmpty(request.getParameter(VERSION)))
@@ -76,7 +77,7 @@ public class ConvertPdf extends HttpServlet {
 			// Download the already stored resource
 			ServletUtil.downloadDocument(request, response, null, document.getId(), version.getFileVersion(), null,
 					suffix, session.getUser());
-		} catch (Throwable r) {
+		} catch (Exception r) {
 			log.error(r.getMessage(), r);
 
 			int letter = 0;
@@ -95,7 +96,7 @@ public class ConvertPdf extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			doGet(request, response);
-		} catch (Throwable r) {
+		} catch (Exception r) {
 			// Nothing to do
 		}
 	}

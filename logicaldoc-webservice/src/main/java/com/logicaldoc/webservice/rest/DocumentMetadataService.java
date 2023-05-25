@@ -13,6 +13,10 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSTemplate;
@@ -31,7 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path("/")
 @Tag(name = "documentMetadata")
 public interface DocumentMetadataService {
-	
+
 	/**
 	 * Add a new option for the given attribute
 	 * 
@@ -39,16 +43,17 @@ public interface DocumentMetadataService {
 	 * @param attribute Attribute name
 	 * @param option Attribute option
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws AuthenticationException Invalid session 
+	 * @throws WebserviceException Error in the webservice
+	 * @throws PersistenceException Error in the database
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Path("/addAttributeOption")
-	public void addAttributeOption(
-			@FormParam("setId") long setId, 
-			@FormParam("attribute") String attribute, 
-			@FormParam("option") WSAttributeOption option) 
-					throws Exception;	
+	public void addAttributeOption(@FormParam("setId")
+	long setId, @FormParam("attribute")
+	String attribute, @FormParam("option")
+	WSAttributeOption option) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Saves the options for the given attribute
@@ -57,15 +62,16 @@ public interface DocumentMetadataService {
 	 * @param attribute The attribute's name
 	 * @param options The attribute's options
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@PUT
 	@Path("/setAttributeOptions")
 	public void setAttributeOptions(@QueryParam("setId")
 	long setId, @QueryParam("attribute")
 	String attribute, @QueryParam("options")
-	WSAttributeOption[] options) throws Exception;
-	
+	WSAttributeOption[] options) throws WebserviceException, PersistenceException;
+
 	/**
 	 * Saves the options for the given attribute with a POST method. This is
 	 * useful for very large lists of values
@@ -74,15 +80,16 @@ public interface DocumentMetadataService {
 	 * @param attribute The attribute's name
 	 * @param options The attribute's options
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@POST
-	@Consumes(MediaType.MULTIPART_FORM_DATA)		
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Path("/setAttributeOptionsPOST")
-	public void setAttributeOptionsPOST(
-			@Multipart(value = "setId") Long setId, 
-			@Multipart(value = "attribute") String attribute, 
-			@Multipart(value = "options", type = "application/json") WSAttributeOption[] options) throws Exception;	
+	public void setAttributeOptionsPOST(@Multipart(value = "setId")
+	Long setId, @Multipart(value = "attribute")
+	String attribute, @Multipart(value = "options", type = "application/json")
+	WSAttributeOption[] options) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the
@@ -94,11 +101,12 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return The ID of the new attribute set
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@POST
 	@Path("/storeAttributeSet")
-	public long storeAttributeSet(WSAttributeSet attributeSet) throws Exception;
+	public long storeAttributeSet(WSAttributeSet attributeSet) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Create/Update a template. You can completely customize the template
@@ -108,39 +116,42 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return The ID of the new template
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@POST
 	@Path("/storeTemplate")
-	public long storeTemplate(WSTemplate template) throws Exception;
+	public long storeTemplate(WSTemplate template) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets attribute set's metadata
 	 * 
 	 * @param setId The attribute set's id
 	 * 
-	 * @return A value object containing the attribute set's metadata
-	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getAttributeSetById")
 	public WSAttributeSet getAttributeSetById(@QueryParam("setId")
-	long setId) throws Exception;
+	long setId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets attribute set's metadata
 	 * 
 	 * @param name The attribute set's name
 	 * 
-	 * @return A value object containing the attribute set's metadata
-	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getAttributeSet")
 	public WSAttributeSet getAttributeSet(@QueryParam("name")
-	String name) throws Exception;
+	String name) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets template's metadata
@@ -149,12 +160,14 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return A value object containing the template's metadata.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getTemplate")
 	public WSTemplate getTemplate(@QueryParam("name")
-	String name) throws Exception;
+	String name) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets template's metadata
@@ -163,12 +176,14 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return A value object containing the template's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getTemplateById")
 	public WSTemplate getTemplateById(@QueryParam("templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the options for the given attribute
@@ -178,57 +193,67 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return the list of all the attribute's options
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getAttributeOptions")
 	public String[] getAttributeOptions(@QueryParam("setId")
 	long setId, @QueryParam("attribute")
-	String attribute) throws Exception;
+	String attribute) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets metadata of all existing attribute sets.
 	 * 
 	 * @return The list of all attribute sets
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/listAttributeSets")
-	public WSAttributeSet[] listAttributeSets() throws Exception;
+	public WSAttributeSet[] listAttributeSets() throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Deletes an existing attribute set with the given identifier.
 	 * 
 	 * @param setId The attribute set's id
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@DELETE
 	@Path("/deleteAttributeSet")
 	public void deleteAttributeSet(@QueryParam("setId")
-	long setId) throws Exception;
+	long setId) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Deletes an existing template with the given identifier
 	 * 
 	 * @param templateId The template's id
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@DELETE
 	@Path("/deleteTemplate")
 	public void deleteTemplate(@QueryParam("templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets metadata of all existing templates.
 	 * 
 	 * @return The list of all templates
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/listTemplates")
-	public WSTemplate[] listTemplates() throws Exception;
+	public WSTemplate[] listTemplates() throws AuthenticationException, WebserviceException, PersistenceException;
 }

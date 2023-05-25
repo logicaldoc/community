@@ -62,14 +62,15 @@ public class ThreadPools {
 	 * 
 	 * @return the created pool
 	 * 
-	 * @throws InterruptedException Raised in case the pool has been shutdown
+	 * @throws ThreadPoolNotAvailableException Raised in case the pool has been
+	 *         shutdown
 	 */
-	public synchronized ExecutorService getPool(String name) throws InterruptedException {
+	public synchronized ExecutorService getPool(String name) throws ThreadPoolNotAvailableException {
 		ExecutorService pool = pools.get(name);
 
 		if (pool != null) {
 			if (pools.get(name).isShutdown())
-				throw new InterruptedException(name + " pool was shutdown");
+				throw new ThreadPoolNotAvailableException(name);
 		} else {
 			int core = config.getInt(THREADPOOL + name + ".core", 5);
 			int max = config.getInt(THREADPOOL + name + ".max", 10);
@@ -102,7 +103,7 @@ public class ThreadPools {
 				log.debug("Pool {} does not support scheduling so the task has been started immediately", poolName);
 				execute(task, poolName);
 			}
-		} catch (InterruptedException e) {
+		} catch (ThreadPoolNotAvailableException e) {
 			log.error(e.getMessage());
 		}
 	}
@@ -117,7 +118,7 @@ public class ThreadPools {
 		try {
 			ExecutorService pool = getPool(poolName);
 			pool.execute(task);
-		} catch (InterruptedException e) {
+		} catch (ThreadPoolNotAvailableException e) {
 			log.error(e.getMessage());
 		}
 	}

@@ -12,6 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.rest.FolderService;
 
@@ -45,57 +49,52 @@ public class RestFolderClient extends AbstractRestClient {
 		}
 	}
 
-	public WSFolder[] listChildren(long folderId) throws Exception {
+	public WSFolder[] listChildren(long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-
 		return proxy.listChildren(folderId);
 	}
 
-	public WSFolder create(WSFolder folder) throws Exception {
-
+	public WSFolder create(WSFolder folder) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-
 		return proxy.create(folder);
 	}
 
-	public WSFolder createPath(long rootFolder, String path) throws Exception {
+	public WSFolder createPath(long rootFolder, String path) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.createPath(rootFolder, path);
 	}
 
-	public WSFolder findByPath(String path) throws Exception {
+	public WSFolder findByPath(String path) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.findByPath(path);
 	}
 
-	public WSFolder getRootFolder() throws Exception {
+	public WSFolder getRootFolder() throws AuthenticationException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getRootFolder();
 	}
 
-	public WSFolder getFolder(long folderId) throws Exception {
+	public WSFolder getFolder(long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getFolder(folderId);
 	}
 
-	public long createFolder(long parentId, String folderName) throws Exception {
+	public long createFolder(long parentId, String folderName) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).accept(MediaType.TEXT_PLAIN);
 		return proxy.createFolder(parentId, folderName);
 	}
 
-	public void delete(long folderId) throws Exception {
+	public void delete(long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.delete(folderId);
 	}
 
-	public void update(WSFolder folder) throws Exception {
+	public void update(WSFolder folder) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-
 		proxy.update(folder);
 	}
-
 }

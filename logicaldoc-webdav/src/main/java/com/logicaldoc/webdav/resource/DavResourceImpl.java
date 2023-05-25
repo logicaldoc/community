@@ -53,6 +53,7 @@ import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.context.ExportContextImpl;
 import com.logicaldoc.webdav.context.ImportContext;
 import com.logicaldoc.webdav.context.ImportContextImpl;
+import com.logicaldoc.webdav.exception.UncheckedDavException;
 import com.logicaldoc.webdav.io.manager.IOManager;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
@@ -304,7 +305,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			// optional
 			addSizeProperty(name, ocns);
 		}
-		
+
 		return properties.get(name);
 	}
 
@@ -335,7 +336,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (!isCollection() && !resource.isFolder()) {
 			val = "d-" + resource.getID();
 		}
-		
+
 		DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", val, nameSpace);
 		properties.add(idProp);
 	}
@@ -528,10 +529,10 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 			catch (DavException e) {
 				log.error(e.getMessage());
-				throw new RuntimeException(e);
+				throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			} catch (Exception e) {
 				log.error(e.getMessage());
-				throw new RuntimeException(e);
+				throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 		}
 		return new DavResourceIteratorImpl(list);
@@ -636,7 +637,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 					// This filter will only include files ending with .py
 					FilenameFilter filter = (dir, fileName) -> {
-							return fileName.contains(chunkString + "-" + chunkID);
+						return fileName.contains(chunkString + "-" + chunkID);
 					};
 
 					// We apply the filter
@@ -800,7 +801,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		} catch (DavException de) {
 			throw de;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -861,7 +862,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		} catch (DavException de) {
 			throw de;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 

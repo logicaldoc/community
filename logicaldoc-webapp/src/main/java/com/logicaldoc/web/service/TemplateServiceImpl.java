@@ -72,12 +72,12 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				return;
 
 			if (template.getReadonly() == 1 || !dao.isWriteEnable(templateId, session.getUserId()))
-				throw new Exception("You do not have the permission");
+				throw new ServerException("You do not have the permission");
 
 			try {
 				dao.delete(templateId);
 			} catch (Exception e) {
-				throw new Exception("Template has not been deleted", e);
+				throw new ServerException("Template has not been deleted", e);
 			}
 		} catch (Exception t) {
 			throwServerException(session, log, t);
@@ -112,7 +112,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			try {
 				dao.store(template);
 			} catch (Exception e) {
-				throw new Exception(
+				throw new ServerException(
 						String.format("Template has not been %s", template.getId() != 0L ? "updated" : "stored"), e);
 			}
 
@@ -177,7 +177,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	}
 
 	private Template getTemplate(GUITemplate guiTemplate, Session session, User sessionUser)
-			throws PersistenceException, Exception {
+			throws PersistenceException, ServerException {
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		Template template;
 		if (guiTemplate.getId() != 0) {
@@ -185,7 +185,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			dao.initialize(template);
 			if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)
 					&& (template.getReadonly() == 1 || !dao.isWriteEnable(template.getId(), session.getUserId())))
-				throw new Exception("You do not have the permission");
+				throw new ServerException("You do not have the permission");
 		} else {
 			template = newTemplate(guiTemplate, session, sessionUser);
 		}

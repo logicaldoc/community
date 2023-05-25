@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -24,8 +25,11 @@ import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
+import com.logicaldoc.webservice.WebserviceException;
 
 /**
  * Adds new comments on a document.
@@ -40,8 +44,9 @@ public class CommentService extends AbstractService {
 	@GET
 	@Path("/getcomments/{sid}/{docid}")
 	@Produces({ "application/json" })
-	public Response getComments(@PathParam("sid") String sid, @PathParam("docid") String docid) throws Exception {
-
+	public Response getComments(@PathParam("sid")
+	String sid, @PathParam("docid")
+	String docid) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -95,9 +100,10 @@ public class CommentService extends AbstractService {
 	@Path("/addcommentform/{sid}/{docid}")
 	@Produces({ "application/xml", "application/json" })
 	@Consumes({ "application/x-www-form-urlencoded" })
-	public Response addCommentForm(@PathParam("sid") String sid, @PathParam("docid") String docid,
-			@FormParam("content") String content) throws Exception {
-
+	public Response addCommentForm(@PathParam("sid")
+	String sid, @PathParam("docid")
+	String docid, @FormParam("content")
+	String content) throws AuthenticationException, WebserviceException, PersistenceException {
 		CommentVO comment = new CommentVO();
 		comment.setContent(content);
 
@@ -120,9 +126,9 @@ public class CommentService extends AbstractService {
 	@Path("/addcomment/{sid}/{docid}")
 	@Produces({ "application/xml", "application/json" })
 	@Consumes({ "application/xml", "application/json" })
-	public Response addComment(@PathParam("sid") String sid, @PathParam("docid") String docid, CommentVO comment)
-			throws Exception {
-
+	public Response addComment(@PathParam("sid")
+	String sid, @PathParam("docid")
+	String docid, CommentVO comment) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		DocumentNote note = new DocumentNote();

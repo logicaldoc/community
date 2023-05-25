@@ -5,6 +5,10 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
@@ -27,15 +31,19 @@ public interface SecurityService {
 	 * 
 	 * @return A value object containing the users metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WebResult(name = "user")
 	@WSDoc(description = "gets all existing users")
 	public WSUser[] listUsers(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid,
-			@WSDoc(description = "if not null, all the users that belong to this group will be returned") @WebParam(name = "group") String group)
-			throws Exception;
+			@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+			@WebParam(name = "sid")
+			String sid, @WSDoc(description = "if not null, all the users that belong to this group will be returned")
+			@WebParam(name = "group")
+			String group) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets group metadata of all existing groups.
@@ -44,14 +52,16 @@ public interface SecurityService {
 	 * 
 	 * @return A value object containing the groups metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebMethod
 	@WebResult(name = "group")
 	@WSDoc(description = "gets all existing groups")
 	public WSGroup[] listGroups(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid)
-			throws Exception;
+			@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+			@WebParam(name = "sid")
+			String sid) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Creates/Updates a user. You can completely customize the user through a
@@ -61,18 +71,18 @@ public interface SecurityService {
 	 * @param sid identifier of the session, must be an administrator
 	 * @param user Web service value object containing the user's metadata
 	 * 
-	 * @return id of the created/updated user
-	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "userId")
 	@WebMethod
 	@WSDoc(description = "creates/updates a user; you can completely customize the user through a value object containing the user's metadata;"
 			+ "<br/>the current user must be an administrator;"
 			+ "<br/>returns the identifier of the created/updated user")
-	public long storeUser(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "user") WSUser user) throws Exception;
+	public long storeUser(@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "user")
+	WSUser user) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Creates/Updates a group. You can completely customize the group through a
@@ -83,16 +93,18 @@ public interface SecurityService {
 	 * 
 	 * @return id of the created/updated group.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "groupId")
 	@WebMethod
 	@WSDoc(description = "creates/updates a group; you can completely customize the group through a value object containing the group's metadata;"
 			+ "<br/>the current user must be an administrator;"
 			+ "<br/>returns the identifier of the created/updated user")
-	public long storeGroup(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "group") WSGroup group) throws Exception;
+	public long storeGroup(@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "group")
+	WSGroup group) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Deletes an existing user with the given identifier
@@ -100,13 +112,17 @@ public interface SecurityService {
 	 * @param sid Session identifier. Must be an administrator
 	 * @param userId The user id
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "deletes an existing user")
-	public void deleteUser(
-			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "userId") long userId) throws Exception;
+	public void deleteUser(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "userId")
+	long userId) throws WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Deletes an existing group with the given identifier
@@ -114,13 +130,17 @@ public interface SecurityService {
 	 * @param sid Session identifier. Must be an administrator
 	 * @param groupId The group id
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "deletes an existing group")
-	public void deleteGroup(
-			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "groupId") long groupId) throws Exception;
+	public void deleteGroup(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "groupId")
+	long groupId) throws PermissionException, PersistenceException, WebserviceException;
 
 	/**
 	 * changes the password of a user.<br>
@@ -137,7 +157,8 @@ public interface SecurityService {
 	 *         password cannot be notified, otherwise a positive number grater
 	 *         than 2
 	 *         
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "changeResult")
 	@WebMethod
@@ -145,9 +166,12 @@ public interface SecurityService {
 			+ "<b>0</b> if all is ok, <b>1</b> if the password is incorrect, <b>2</b> if the new "
 			+ "password cannot be notified, otherwise a positive number grater than <b>2</b>")
 	public int changePassword(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "userId") long userId, @WebParam(name = "oldPassword") String oldPassword,
-			@WebParam(name = "newPassword") String newPassword) throws Exception;
+			@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+			@WebParam(name = "sid")
+			String sid, @WebParam(name = "userId")
+			long userId, @WebParam(name = "oldPassword")
+			String oldPassword, @WebParam(name = "newPassword")
+			String newPassword) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Gets user metadata of an existing user with the given identifier
@@ -157,14 +181,16 @@ public interface SecurityService {
 	 * 
 	 * @return A value object containing the user's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "user")
 	@WebMethod
 	@WSDoc(description = "gets an existing user")
-	public WSUser getUser(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "userId") long userId) throws Exception;
+	public WSUser getUser(@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "userId")
+	long userId) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Gets user metadata of an existing user with the given username
@@ -174,14 +200,17 @@ public interface SecurityService {
 	 * 
 	 * @return A value object containing the user's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "user")
 	@WebMethod
 	@WSDoc(description = "finds a user by his username")
 	public WSUser getUserByUsername(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "username") String username) throws Exception;
+			@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+			@WebParam(name = "sid")
+			String sid, @WebParam(name = "username")
+			String username) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Gets group metadata of an existing group with the given identifier
@@ -191,12 +220,14 @@ public interface SecurityService {
 	 * 
 	 * @return A value object containing the group's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "group")
 	@WebMethod
 	@WSDoc(description = "gets an existing group")
-	public WSGroup getGroup(
-			@WSDoc(description = "identifier of the session, must be an administrator", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "groupId") long groupId) throws Exception;
+	public WSGroup getGroup(@WSDoc(description = "identifier of the session, must be an administrator", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "groupId")
+	long groupId) throws WebserviceException, PersistenceException;
 }

@@ -64,7 +64,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public GUIInfo getInfo(String locale, String tenantName, boolean login) {
+	public GUIInfo getInfo(String locale, String tenantName, boolean login) throws ServerException {
 		GUIInfo info = null;
 
 		try {
@@ -117,7 +117,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			return info;
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new RuntimeException(t.getMessage(), t);
+			throw new ServerException(t.getMessage());
 		}
 	}
 
@@ -368,7 +368,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			return parameters.toArray(new GUIParameter[0]);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new RuntimeException(t.getMessage(), t);
+			throw new InvalidSessionServerException(t.getMessage());
 		}
 	}
 

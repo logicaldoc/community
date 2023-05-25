@@ -6,16 +6,20 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
+import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSSearchOptions;
@@ -34,7 +38,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 	protected static Logger log = LoggerFactory.getLogger(SoapSearchService.class);
 
 	@Override
-	public WSSearchResult find(String sid, WSSearchOptions opt) throws Exception {
+	public WSSearchResult find(String sid, WSSearchOptions opt) throws PersistenceException, AuthenticationException, WebserviceException, SearchException {
 		User user = validateSession(sid);
 
 		SearchOptions options = opt.toSearchOptions();
@@ -70,7 +74,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 	}
 
 	@Override
-	public WSDocument[] findByFilename(String sid, String filename) throws Exception {
+	public WSDocument[] findByFilename(String sid, String filename) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -93,7 +97,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 	}
 
 	@Override
-	public WSFolder[] findFolders(String sid, String name) throws Exception {
+	public WSFolder[] findFolders(String sid, String name) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);

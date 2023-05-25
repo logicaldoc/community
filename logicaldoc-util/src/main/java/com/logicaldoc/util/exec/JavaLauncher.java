@@ -27,12 +27,13 @@ public class JavaLauncher {
 	 * @param jvmargs - arguments for the jvm
 	 * @param properties - any system properties
 	 * 
-	 * @throws Exception An error happened during execution
 	 * 
 	 * @return the launched process
+	 * 
+	 * @throws ExecException Error in executing the given command
 	 */
 	public static Process exec(String mainClass, String classpath, String[] jvmargs, String[] properties)
-			throws Exception {
+			throws ExecException {
 
 		// get a jvm to execute with
 		String jvm = findJVM();
@@ -63,7 +64,7 @@ public class JavaLauncher {
 			wholeCommand.append(command[i] + " ");
 		}
 
-		log.info("Executing Command: " + wholeCommand);
+		log.info("Executing Command: {}", wholeCommand);
 
 		try {
 
@@ -76,7 +77,7 @@ public class JavaLauncher {
 
 		} catch (Exception e) {
 			log.error("Failed to launch java program: {}", e.getMessage());
-			throw new Exception(FAILED_TO_LAUNCH_JAVA_PROGRAM + e.getMessage());
+			throw new ExecException(wholeCommand.toString(), e);
 		}
 
 	}
@@ -88,9 +89,9 @@ public class JavaLauncher {
 	 * @param jvmargs - arguments for the java virtual machine
 	 * @return Process The launched process
 	 * 
-	 * @throws Exception An error happened during execution
+	 * @throws ExecException An error happened during execution
 	 */
-	public static Process execJar(String pathToJar, String[] jvmargs) throws Exception {
+	public static Process execJar(String pathToJar, String[] jvmargs) throws ExecException {
 		String jvm = findJVM();
 
 		String[] command = new String[jvmargs.length + 3];
@@ -120,7 +121,7 @@ public class JavaLauncher {
 			return proc;
 
 		} catch (Exception e) {
-			throw new Exception(FAILED_TO_LAUNCH_JAVA_PROGRAM + e.getMessage());
+			throw new ExecException(wholeCommand.toString(), e);
 		}
 
 	}
@@ -129,7 +130,8 @@ public class JavaLauncher {
 	 * Monitor an execute java program for errors and exit status.
 	 * 
 	 * @param proc
-	 * @throws java.io.IOException
+	 * 
+	 * @throws IOException I/O error
 	 */
 	private static void monitorProcess(Process proc) throws IOException {
 		proc.getInputStream().close();
@@ -142,17 +144,13 @@ public class JavaLauncher {
 
 		// read the output
 		String line;
-		while ((line = bufferedreader.readLine()) != null) {
+		while ((line = bufferedreader.readLine()) != null)
 			log.info(line);
-		}
 
 		// check for failure
 		try {
-
-			if (proc.waitFor() != 0) {
+			if (proc.waitFor() != 0)
 				log.info("exit value = " + proc.exitValue());
-			}
-
 		} catch (InterruptedException e) {
 			log.error(e.getMessage());
 			Thread.currentThread().interrupt();
@@ -165,24 +163,19 @@ public class JavaLauncher {
 	 * @return - path to java binary
 	 */
 	public static String findJVM() {
-
 		String jvm = null;
 		jvm = System.getProperty("java.home");
 
 		// handle property not set
 		if (jvm == null) {
-
 			log.warn("Java home property not set, just guessing with a general java call, and will probably fail.");
 
 			// just take a guess an hope it's in the classpath
 			jvm = "java";
-
 		}
 
-		// add binary folder
-		jvm = jvm + File.separator + "bin" + File.separator + "java";
-
-		return jvm;
+		// add binary folders
+		return jvm + File.separator + "bin" + File.separator + "java";
 	}
 
 	/**
@@ -191,9 +184,7 @@ public class JavaLauncher {
 	 * @param args the invocation arguments
 	 */
 	public static void main(String[] args) {
-
 		try {
-
 			// things you want the JVM to get. NOT program arguments.
 			String[] jvmargs = { "-Xms256m", "-Xmx1024m", "-Ddebug=true" };
 

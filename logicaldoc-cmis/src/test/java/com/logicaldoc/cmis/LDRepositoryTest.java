@@ -40,6 +40,7 @@ import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 public class LDRepositoryTest extends AbstractCmisTCase {
@@ -63,7 +64,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		fdao = (FolderDAO) context.getBean("FolderDAO");
 	}
 
-	private void activateCorePlugin() throws JpfException, IOException {
+	private void activateCorePlugin() throws JpfException, IOException, PluginException {
 		File pluginsDir = new File("target/tests-plugins");
 		pluginsDir.mkdir();
 

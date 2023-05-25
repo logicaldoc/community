@@ -16,6 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.rest.BookmarkService;
 
@@ -49,13 +53,13 @@ public class RestBookmarkClient extends AbstractRestClient {
 		}
 	}
 
-	public WSBookmark saveBookmark(WSBookmark bookmark) throws Exception {
+	public WSBookmark saveBookmark(WSBookmark bookmark) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.saveBookmark(bookmark);
 	}
 
-	public WSBookmark bookmarkDocument(@QueryParam("docId") long docId) throws Exception {
+	public WSBookmark bookmarkDocument(@QueryParam("docId") long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.bookmarkDocument(docId);
@@ -63,7 +67,7 @@ public class RestBookmarkClient extends AbstractRestClient {
 
 	@GET
 	@Path("/bookmarkFolder")
-	public WSBookmark bookmarkFolder(@QueryParam("folderId") long folderId) throws Exception {
+	public WSBookmark bookmarkFolder(@QueryParam("folderId") long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.bookmarkFolder(folderId);
@@ -74,11 +78,15 @@ public class RestBookmarkClient extends AbstractRestClient {
 	 * 
 	 * @return array of bookmarks
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@GET
 	@Path("/getBookmarks")
-	public WSBookmark[] getBookmarks() throws Exception {
+	public WSBookmark[] getBookmarks() throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getBookmarks();
@@ -86,7 +94,7 @@ public class RestBookmarkClient extends AbstractRestClient {
 
 	@DELETE
 	@Path("/deleteBookmark")
-	public void deleteBookmark(@QueryParam("bookmarkId") long bookmarkId) throws Exception {
+	public void deleteBookmark(@QueryParam("bookmarkId") long bookmarkId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.deleteBookmark(bookmarkId);
@@ -94,7 +102,7 @@ public class RestBookmarkClient extends AbstractRestClient {
 
 	@DELETE
 	@Path("/unbookmarkDocument")
-	public void unbookmarkDocument(@QueryParam("docId") long docId) throws Exception {
+	public void unbookmarkDocument(@QueryParam("docId") long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.unbookmarkDocument(docId);
@@ -102,7 +110,7 @@ public class RestBookmarkClient extends AbstractRestClient {
 
 	@DELETE
 	@Path("/unbookmarkFolder")
-	public void unbookmarkFolder(@QueryParam("folderId") long folderId) throws Exception {
+	public void unbookmarkFolder(@QueryParam("folderId") long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.unbookmarkFolder(folderId);

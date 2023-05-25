@@ -223,10 +223,13 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * repository node. If the node is not versionable an exception is thrown.
 	 * 
 	 * @return the {@link VersionHistoryResource} associated with this resource.
+	 * 
+	 * @throws DavException Some error
+	 *  
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#getVersionHistory()
 	 * @see javax.jcr.Node#getVersionHistory()
 	 */
-	public VersionHistoryResource getVersionHistory() {
+	public VersionHistoryResource getVersionHistory() throws DavException {
 
 		DavResourceLocator loc = getLocatorFromResource(resource);
 
@@ -236,7 +239,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 			log.warn(e.getMessage(), e);
 		}
 
-		throw new RuntimeException("");
+		throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"");
 	}
 
 	// --------------------------------------------------------------------------
@@ -310,12 +313,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see #getLocatorFromNodePath(String)
 	 */
 	protected DavResourceLocator getLocatorFromResource(Resource resource) {
-		String nodePath = null;
-		try {
-			nodePath = locator.getResourcePath();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		String nodePath = locator.getResourcePath();
 		return getLocatorFromNodePath(nodePath);
 	}
 

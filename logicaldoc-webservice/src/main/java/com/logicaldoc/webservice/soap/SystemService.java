@@ -5,6 +5,9 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSSystemInfo;
@@ -24,12 +27,12 @@ public interface SystemService {
 	 * 
 	 * @return The value object containing the installation informations
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "info")
 	@WebMethod
 	@WSDoc(description = "retrieves the Installation informations")
-	public WSSystemInfo getInfo() throws Exception;
+	public WSSystemInfo getInfo() throws WebserviceException;
 
 	/**
 	 * Retrieves the system statistics
@@ -38,12 +41,15 @@ public interface SystemService {
 	 * 
 	 * @return The value object containing the statistics values
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "parameter")
 	@WebMethod
 	@WSDoc(description = "gets a set of statisticts of the system")
-	public WSParameter[] getStatistics(@WebParam(name = "sid") String sid) throws Exception;
+	public WSParameter[] getStatistics(@WebParam(name = "sid")
+	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the languages enabled in the server.
@@ -51,12 +57,10 @@ public interface SystemService {
 	 * @return Array of active languages (en, it, es ....)
 	 * 
 	 * @param tenantOrSid Tenant name or session identifier (optional)
-	 * 
-	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "language")
 	@WSDoc(description = "retrieves the languages enabled in the server")
-	public String[] getLanguages(
-			@WSDoc(description = "a session's identifier or a tenant's name") @WebParam(name = "tenantOrSid") String tenantOrSid)
-			throws Exception;
+	public String[] getLanguages(@WSDoc(description = "a session's identifier or a tenant's name")
+	@WebParam(name = "tenantOrSid")
+	String tenantOrSid);
 }

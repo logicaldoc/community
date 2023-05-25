@@ -213,10 +213,12 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @param resource the DAV resource
 	 * @param session the current session
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
-	public void uncheckout(Resource resource, WebdavSession session);
+	public void uncheckout(Resource resource, WebdavSession session) throws DavException;
 
-	public void addBookmark(Resource resource, WebdavSession session);
+	public void addBookmark(Resource resource, WebdavSession session) throws DavException;
 
-	public void deleteBookmark(Resource resource, WebdavSession session);
+	public void deleteBookmark(Resource resource, WebdavSession session) throws DavException;
 }
