@@ -62,7 +62,7 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 					}
 				} catch (AuthenticationException ae) {
 					// Noting to do
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.error(t.getMessage(), t);
 				}
 			}

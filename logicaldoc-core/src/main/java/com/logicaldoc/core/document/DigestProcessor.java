@@ -5,9 +5,11 @@ import java.util.Locale;
 
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.task.Task;
+import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.i18n.I18N;
 
 /**
@@ -45,7 +47,7 @@ public class DigestProcessor extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Exception {
+	protected void runTask() throws TaskException {
 		log.info("Start processing of digests");
 		errors = 0;
 		processed = 0;
@@ -77,7 +79,7 @@ public class DigestProcessor extends Task {
 
 					log.debug("Processed document {}", id);
 					processed++;
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 					errors++;
 				} finally {
@@ -86,6 +88,8 @@ public class DigestProcessor extends Task {
 				if (interruptRequested)
 					return;
 			}
+		} catch (PersistenceException e) {
+			throw new TaskException(e.getMessage(), e);
 		} finally {
 			log.info("Digest processing finished");
 			log.info("Processed documents: {}", processed);

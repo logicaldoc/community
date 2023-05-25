@@ -45,7 +45,7 @@ public class ConnectionPool implements DataSource, Closeable {
 				BasicDataSource ds = new BasicDataSource();
 				try {
 					BeanUtils.copyProperties(ds, dbcpConfig);
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
 				

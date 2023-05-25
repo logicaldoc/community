@@ -20,17 +20,12 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Panel that shows the histories of a specific workflow instance
@@ -121,13 +116,9 @@ public class WorkflowHistoriesPanel extends VLayout {
 		else
 			historiesGrid.setFields(historyId, templateVersion, templateId, historyEvent, historyName, historyDate,
 					historyUser, historyComment, historyFilename, transition, documentId);
-		historiesGrid.addCellContextClickHandler(new CellContextClickHandler() {
-
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				event.cancel();
-				showHistoryContextMenu();
-			}
+		historiesGrid.addCellContextClickHandler(event -> {
+			event.cancel();
+			showHistoryContextMenu();
 		});
 
 		HLayout buttons = new HLayout();
@@ -138,22 +129,12 @@ public class WorkflowHistoriesPanel extends VLayout {
 		Button exportButton = new Button(I18N.message("export"));
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
-		exportButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(historiesGrid, true);
-			}
-		});
+		exportButton.addClickHandler(event -> GridUtil.exportCSV(historiesGrid, true));
 
 		Button print = new Button(I18N.message("print"));
 		print.setAutoFit(true);
 		buttons.addMember(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(historiesGrid);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(historiesGrid));
 
 		setMembers(historiesGrid, buttons);
 	}
@@ -193,31 +174,23 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 						final MenuItem preview = new MenuItem();
 						preview.setTitle(I18N.message("preview"));
-						preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
-						preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								PreviewPopup iv = new PreviewPopup(doc);
-								iv.show();
-							}
-						});
+						preview.setEnabled(com.logicaldoc.gui.common.client.Menu
+								.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+						preview.addClickHandler(event -> new PreviewPopup(doc).show());
 
 						final MenuItem download = new MenuItem();
 						download.setTitle(I18N.message("download"));
 						download.setEnabled(doc.getFolder().isDownload());
-						download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								if (doc.getFolder().isDownload())
-									DocUtil.download(doc.getId(), null);
-							}
+						download.addClickHandler(event -> {
+							if (doc.getFolder().isDownload())
+								DocUtil.download(doc.getId(), null);
 						});
 
 						final MenuItem open = new MenuItem();
 						open.setTitle(I18N.message("openinfolder"));
-						open.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-							public void onClick(MenuItemClickEvent event) {
-								destroy();
-								DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
-							}
+						open.addClickHandler(event -> {
+							destroy();
+							DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
 						});
 
 						contextMenu.setItems(preview, download, open);

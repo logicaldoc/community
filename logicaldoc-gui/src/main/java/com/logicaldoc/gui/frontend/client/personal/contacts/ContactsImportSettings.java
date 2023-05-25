@@ -196,7 +196,7 @@ public class ContactsImportSettings extends Window {
 								preview.setContacts(contacts);
 							}
 						});
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				LD.clearPrompt();
 			}
 		}

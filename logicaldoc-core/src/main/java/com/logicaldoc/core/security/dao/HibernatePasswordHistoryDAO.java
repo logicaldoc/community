@@ -43,7 +43,7 @@ public class HibernatePasswordHistoryDAO extends HibernatePersistentObjectDAO<Pa
 				if (i >= retain)
 					delete(histories.get(i).getId());
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 

@@ -47,7 +47,7 @@ public class PasswordValidator {
 			try {
 				standardMessages
 						.load(this.getClass().getClassLoader().getResourceAsStream("/passay.properties"));
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 			resolver = new PropertiesMessageResolver(standardMessages);

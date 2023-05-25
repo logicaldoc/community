@@ -30,7 +30,7 @@ public class FolderSubscriptionOptionListGridField extends ColoredListGridField 
 					return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
 				else
 					return decoded != null ? decoded : "";
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				return "";
 			}
 		});

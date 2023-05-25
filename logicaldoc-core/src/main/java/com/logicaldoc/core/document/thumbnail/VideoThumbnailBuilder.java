@@ -41,14 +41,10 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 
 			ImageThumbnailBuilder imageTBuilder = new ImageThumbnailBuilder();
 			imageTBuilder.buildThumbnail(sid, document, fileVersion, frameImage, dest, size, quality);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new IOException("Error in extracting video frame", e);
 		} finally {
-			try {
-				FileUtils.deleteQuietly(frameImage);
-			} catch (Throwable e) {
-				// do nothing
-			}
+			FileUtils.deleteQuietly(frameImage);
 		}
 	}
 
@@ -72,7 +68,7 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 						continue;
 
 					ImageIO.write(img, "png", frameFile);
-				} catch (Throwable t) {
+				} catch (IOException ioe) {
 					// Nothing to do
 				}
 			}
@@ -106,7 +102,7 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 						continue;
 
 					ImageIO.write(img, "png", frameFile);
-				} catch (Throwable t) {
+				} catch (IOException ioe) {
 					// Nothing to do
 				}
 			}

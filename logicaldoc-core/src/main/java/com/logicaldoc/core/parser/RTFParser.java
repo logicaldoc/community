@@ -90,7 +90,7 @@ public class RTFParser extends AbstractParser {
 			// Delete temp file when program exits.
 			tempFile.deleteOnExit();
 
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn("Failed to extract RTF text content", t);
 		}
 	}
@@ -117,7 +117,7 @@ public class RTFParser extends AbstractParser {
 				String npages = nofpages.substring(9);
 				return Integer.parseInt(npages);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 		return 1;

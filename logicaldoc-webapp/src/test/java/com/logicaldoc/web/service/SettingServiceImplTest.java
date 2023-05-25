@@ -34,7 +34,7 @@ public class SettingServiceImplTest extends AbstractWebappTCase {
 		try {
 			service.saveEmailSettings(emailSettings);
 			notThrownTest = "ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
@@ -52,7 +52,7 @@ public class SettingServiceImplTest extends AbstractWebappTCase {
 		try {
 			service.saveSettings(params);
 			notThrownTest = "ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
@@ -77,7 +77,7 @@ public class SettingServiceImplTest extends AbstractWebappTCase {
 		try {
 			service.saveSettings(settings);
 			notThrownTest = "ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);

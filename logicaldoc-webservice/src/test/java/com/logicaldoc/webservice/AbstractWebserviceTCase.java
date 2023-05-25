@@ -110,7 +110,7 @@ public abstract class AbstractWebserviceTCase {
 		destroyDatabase();
 		try {
 			((AbstractApplicationContext) context).close();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		// Restore user home system property

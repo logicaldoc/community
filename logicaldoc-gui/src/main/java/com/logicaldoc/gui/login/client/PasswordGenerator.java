@@ -9,8 +9,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * An utility to generate passwords
@@ -63,13 +61,9 @@ public class PasswordGenerator extends Window {
 		password.setWrap(false);
 
 		generate = new ButtonItem("generate", I18N.message("generate"));
-		generate.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				if (form.validate())
-					generatePassword();
-			}
+		generate.addClickHandler(event -> {
+			if (form.validate())
+				generatePassword();
 		});
 
 		form.setWidth(1);

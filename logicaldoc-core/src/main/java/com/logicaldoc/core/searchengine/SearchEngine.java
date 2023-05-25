@@ -21,10 +21,10 @@ public interface SearchEngine {
 	 * @param document The document to add into the index
 	 * @param content The extracted body text
 	 * 
-	 * @throws Exception is an error happens and the document cannot be added to
+	 * @throws IndexException is an error happens and the document cannot be added to
 	 *         the index
 	 */
-	public void addHit(Document document, String content) throws Exception;
+	public void addHit(Document document, String content) throws IndexException;
 
 	/**
 	 * Adds a new hit to the index
@@ -32,10 +32,10 @@ public interface SearchEngine {
 	 * @param content Stream of the document's file
 	 * @param document The document that we want to add
 	 * 
-	 * @throws Exception is an error happens and the document cannot be added to
+	 * @throws IndexException is an error happens and the document cannot be added to
 	 *         the index
 	 */
-	public void addHit(Document document, InputStream content) throws Exception;
+	public void addHit(Document document, InputStream content) throws IndexException;
 
 	/**
 	 * Launch the index optimization that physically deletes the removed

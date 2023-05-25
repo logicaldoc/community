@@ -201,7 +201,7 @@ public class OpenOfficeParser extends AbstractParser {
 			} finally {
 				FileUtil.strongDelete(contentXml);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Failed to extract OpenOffice text content", e);
 		}
 	}
@@ -213,7 +213,7 @@ public class OpenOfficeParser extends AbstractParser {
 			tmp = FileUtil.createTempFile("countpages", null);
 			IOUtil.write(input, tmp);
 			return countPages(tmp, filename);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Failed to extract OpenOffice metadata", e);
 			return 1;
 		}
@@ -239,7 +239,7 @@ public class OpenOfficeParser extends AbstractParser {
 				xmlReader.parse(new InputSource(is));
 				if (metadataHandler.getPages() > pages)
 					pages = metadataHandler.getPages();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Failed to extract OpenOffice meta.xml entry", t);
 			}
 
@@ -249,12 +249,12 @@ public class OpenOfficeParser extends AbstractParser {
 				xmlReader.parse(new InputSource(is));
 				if (metadataHandler.getPages() > pages)
 					pages = metadataHandler.getPages();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Failed to extract OpenOffice content.xml entry", t);
 			}
 
 			return pages;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Failed to extract OpenOffice metadata", e);
 			return 1;
 		}

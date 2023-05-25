@@ -12,8 +12,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to handle ShareFile settings.
@@ -70,13 +68,7 @@ public class ShareFileSettings extends Window {
 		ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
 		authorize.setAutoFit(true);
 
-		authorize.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onAuthorize();
-			}
-		});
+		authorize.addClickHandler(event -> onAuthorize());
 
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setFields(clientId, clientSecret, authBaseUrl, callbackUrl, authorize);

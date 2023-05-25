@@ -293,7 +293,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 			if (vm.getValue("time") != null)
 				try {
 					trigger.setDate(df.parse(str + " " + vm.getValue("time").toString()));
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					trigger.setDate(df.parse(str + " " + dfTime.format((Date) vm.getValue("time"))));
 				}
 			else

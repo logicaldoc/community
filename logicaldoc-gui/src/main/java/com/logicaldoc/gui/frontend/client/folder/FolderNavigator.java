@@ -1519,7 +1519,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				} else {
 					getTree().reloadChildren(getRootNode());
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}

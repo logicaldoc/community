@@ -1,5 +1,6 @@
 package com.logicaldoc.core.folder;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,20 +54,23 @@ public class FolderListenerManager {
 
 		for (Extension ext : sortedExts) {
 			String className = ext.getParameter("class").valueAsString();
+
 			try {
 				Class clazz = Class.forName(className);
 				// Try to instantiate the listener
 				@SuppressWarnings("unchecked")
 				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof FolderListener))
-					throw new Exception(
+					throw new ClassNotFoundException(
 							"The specified listener " + className + " doesn't implement FolderListener interface");
 				listeners.add((FolderListener) listener);
 				log.info("Added new folder listener " + className + " position "
 						+ ext.getParameter(POSITION).valueAsString());
-			} catch (Throwable e) {
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage());
 			}
+
 		}
 	}
 

@@ -25,7 +25,7 @@ public class SevenZipParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws IOException, ParseException {
 		File sevenFile = FileUtil.createTempFile("parse7z", ".7z");
 		try {
 			FileUtil.writeFile(input, sevenFile.getAbsolutePath());
@@ -78,7 +78,7 @@ public class SevenZipParser extends AbstractParser {
 			rarFile = FileUtil.createTempFile("parse7z", ".7z");
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
 			return countPages(rarFile, filename);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		} finally {
 			if (rarFile != null)
@@ -115,7 +115,7 @@ public class SevenZipParser extends AbstractParser {
 						FileUtil.strongDelete(uncompressedEntryFile);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return 1;

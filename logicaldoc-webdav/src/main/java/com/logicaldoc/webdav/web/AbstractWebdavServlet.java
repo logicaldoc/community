@@ -149,7 +149,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				if (!isPreconditionValid(webdavRequest, resource)) {
 					try {
 						webdavResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-					} catch (Throwable t) {
+					} catch (Exception t) {
 						// Nothing to do
 					}
 					return;
@@ -161,13 +161,13 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			} catch (DavException e) {
 				handleDavException(webdavResponse, e);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				handleException(request, methodCode, e);
 			}
 
 			response.getOutputStream().flush();
 			response.getOutputStream().close();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 	}
@@ -201,7 +201,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		if (e.getErrorCode() != HttpServletResponse.SC_UNAUTHORIZED) {
 			try {
 				webdavResponse.sendError(e);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -319,11 +319,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		} catch (DavException dave) {
 			log.debug(dave.getMessage(), dave);
 			response.setStatus(dave.getErrorCode());
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			try {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -582,7 +582,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -630,7 +630,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -668,7 +668,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -693,7 +693,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		if (!(depth == DEPTH_0 || depth == DEPTH_INFINITY)) {
 			try {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 			return;
@@ -702,7 +702,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		DavResource destResource = null;
 		try {
 			destResource = getResourceFactory().createResource(request.getDestinationLocator(), request);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			destResource = resource.getCollection();
 		}
 
@@ -710,7 +710,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		if (status > HttpServletResponse.SC_NO_CONTENT) {
 			try {
 				response.sendError(status);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 			return;
@@ -744,7 +744,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 //				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getHref(false));
 //				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getHref(true));
 				destResource = getResourceFactory().createResource(request.getDestinationLocator(), request, session);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 //				log.error("Failure computing destination", e);
 				destResource = resource.getCollection();
 			}
@@ -757,7 +757,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				log.debug("status > HttpServletResponse.SC_NO_CONTENT");
 				try {
 					response.sendError(status);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 				return;
@@ -772,7 +772,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.error("Error during move", e);
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -860,7 +860,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		if (!(resource instanceof VersionableResource)) {
 			try {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 			return;
@@ -925,7 +925,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		try {
 			response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -953,7 +953,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		} else {
 			try {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 			return;

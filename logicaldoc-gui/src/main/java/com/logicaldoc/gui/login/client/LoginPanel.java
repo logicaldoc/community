@@ -32,9 +32,7 @@ import com.logicaldoc.gui.login.client.services.TfaService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -255,8 +253,8 @@ public class LoginPanel extends VLayout {
 		 */
 		String copyrightHtml = "<div>\u00A9 " + info.getYear() + " " + info.getBranding().getVendor();
 		if (info.getBranding().getUrl() != null && !"-".equals(info.getBranding().getUrl()))
-			copyrightHtml = A_HREF + info.getBranding().getUrl()
-					+ "' target='_blank' class='login-copyright-link'>" + copyrightHtml + "</a></div>";
+			copyrightHtml = A_HREF + info.getBranding().getUrl() + "' target='_blank' class='login-copyright-link'>"
+					+ copyrightHtml + "</a></div>";
 		String licenseeHtml = "";
 		if (info.getLicensee() != null && !"".equals(info.getLicensee().trim()))
 			licenseeHtml += "<div>" + I18N.message("licensedto") + " <b>" + info.getLicensee() + "</b></div>";
@@ -691,43 +689,28 @@ public class LoginPanel extends VLayout {
 							if (trusted.booleanValue()) {
 								Util.redirectToSuccessUrl(language.getValueAsString());
 							} else {
-								SC.ask(I18N.message("trustdevice"), I18N.message("trustdevicequestion"),
-										new BooleanCallback() {
+								SC.ask(I18N.message("trustdevice"), I18N.message("trustdevicequestion"), choice -> {
+									if (Boolean.FALSE.equals(choice)) {
+										Util.redirectToSuccessUrl(language.getValueAsString());
+									} else {
+										LD.askForString(I18N.message("trustdevice"), I18N.message("optlabeldevice"),
+												null, value -> SecurityService.Instance.get().trustDevice(value,
+														new AsyncCallback<String>() {
 
-											@Override
-											public void execute(Boolean choice) {
-												if (Boolean.FALSE.equals(choice)) {
-													Util.redirectToSuccessUrl(language.getValueAsString());
-												} else {
-													LD.askForString(I18N.message("trustdevice"),
-															I18N.message("optlabeldevice"), null, new ValueCallback() {
+															@Override
+															public void onFailure(Throwable caught) {
+																Util.redirectToSuccessUrl(language.getValueAsString());
+															}
 
-																@Override
-																public void execute(String value) {
-																	SecurityService.Instance.get().trustDevice(value,
-																			new AsyncCallback<String>() {
+															@Override
+															public void onSuccess(String deviceId) {
+																CookiesManager.saveDevice(deviceId);
+																Util.redirectToSuccessUrl(language.getValueAsString());
+															}
+														}));
 
-																				@Override
-																				public void onFailure(
-																						Throwable caught) {
-																					Util.redirectToSuccessUrl(language
-																							.getValueAsString());
-																				}
-
-																				@Override
-																				public void onSuccess(String deviceId) {
-																					CookiesManager.saveDevice(deviceId);
-																					Util.redirectToSuccessUrl(language
-																							.getValueAsString());
-																				}
-																			});
-
-																}
-															});
-
-												}
-											}
-										});
+									}
+								});
 							}
 
 						}

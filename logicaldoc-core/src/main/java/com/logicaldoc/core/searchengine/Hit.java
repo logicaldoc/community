@@ -57,12 +57,12 @@ public class Hit extends Document implements Comparable<Hit> {
 						return this.getFileName().compareToIgnoreCase(other.getFileName());
 					else
 						return 0;
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					return 0;
 				}
 			} else
 				return -1 * (Integer.valueOf(this.score).compareTo(Integer.valueOf(other.score)));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return 0;
 		}
 	}

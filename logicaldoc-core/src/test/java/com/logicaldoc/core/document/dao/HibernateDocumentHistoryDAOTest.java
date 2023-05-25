@@ -43,7 +43,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(4, histories.size());
 
 		for (DocumentHistory history : histories) {
-			dao.delete(history.getId());			
+			dao.delete(history.getId());
 		}
 
 		histories = (Collection<DocumentHistory>) dao.findByUserId(4);
@@ -109,10 +109,10 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTCase {
 		history.setComment("The document has been created.");
 
 		dao.store(history);
-		
-		history=dao.findById(history.getId());
+
+		history = dao.findById(history.getId());
 		Assert.assertEquals("127.0.0.1", history.getIp());
-		
+
 		Collection histories = dao.findByDocId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(4, histories.size());

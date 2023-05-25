@@ -37,7 +37,7 @@ public class WebConfiguratorTest {
 			WebConfigurator config = new WebConfigurator(webXml.getPath());
 			config.addServlet("DocumentsData", "pippo");
 			notThrownTest = "ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
@@ -52,7 +52,7 @@ public class WebConfiguratorTest {
 		String notThrownTest = null;
 		try {
 			notThrownTest = "ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);

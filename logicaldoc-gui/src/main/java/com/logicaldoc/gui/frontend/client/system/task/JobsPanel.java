@@ -14,20 +14,13 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -72,28 +65,11 @@ public class JobsPanel extends VLayout {
 
 		addMember(toolStrip);
 
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh();
-			}
-		});
+		refresh.addClickHandler(event -> refresh());
 
-		group.addChangedHandler(new ChangedHandler() {
+		group.addChangedHandler(event -> refresh());
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
-
-		max.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		max.addChangedHandler(event -> refresh());
 	}
 
 	@Override
@@ -124,12 +100,9 @@ public class JobsPanel extends VLayout {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setFields(job, trigger, previousFire, nextFire, tenant, tenantId, description);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		addMember(list);
@@ -139,17 +112,16 @@ public class JobsPanel extends VLayout {
 		Menu contextMenu = new Menu();
 		MenuItem unschedule = new MenuItem();
 		unschedule.setTitle(I18N.message("unschedule"));
-		unschedule.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmunschedule"), (Boolean value) -> {
+		unschedule
+				.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmunschedule"), value -> {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 
 						List<GUIValue> selectedJobs = new ArrayList<>();
 						ListGridRecord[] selection = list.getSelectedRecords();
 						for (ListGridRecord rec : selection)
-							selectedJobs.add(new GUIValue(rec.getAttributeAsString(TRIGGER),
-									rec.getAttributeAsString("group")));
+							selectedJobs.add(
+									new GUIValue(rec.getAttributeAsString(TRIGGER), rec.getAttributeAsString("group")));
 
 						SystemService.Instance.get().unscheduleJobs(selectedJobs.toArray(new GUIValue[0]),
 								new AsyncCallback<Void>() {
@@ -166,9 +138,7 @@ public class JobsPanel extends VLayout {
 									}
 								});
 					}
-				});
-			}
-		});
+				}));
 
 		contextMenu.setItems(unschedule);
 		contextMenu.showContextMenu();

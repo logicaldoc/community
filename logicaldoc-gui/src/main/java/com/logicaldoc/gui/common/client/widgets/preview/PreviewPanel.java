@@ -199,7 +199,7 @@ public class PreviewPanel extends VLayout {
 			else
 				contents = Util.videoHTML(url, getWidth() != null ? "" + (getWidth() - 2) : "",
 						getHeight() != null ? "" + (getHeight() - 1) : "");
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			GuiLog.info(t.getMessage(), null);
 		}
 
@@ -262,7 +262,7 @@ public class PreviewPanel extends VLayout {
 				contents = "<iframe src='" + url + "' style='border:0px solid white; width:" + (getWidth() - 1)
 						+ "px; height:" + (getHeight() - 1)
 						+ "px; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}

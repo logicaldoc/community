@@ -894,7 +894,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		try {
 			String test = CryptUtil.cryptString(myPassword);
 			return test.equals(getPassword());
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return false;
 		}
 	}

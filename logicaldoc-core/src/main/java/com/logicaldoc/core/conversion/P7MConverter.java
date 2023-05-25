@@ -43,7 +43,7 @@ public class P7MConverter extends AbstractFormatConverter {
 				throw new IOException(
 						String.format("Unable to find a converter from %s to %s", enclosedExtension, targetExtension));
 			converter.convert(sid, document, tmp, dest);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		} finally {
 			FileUtil.strongDelete(tmp);

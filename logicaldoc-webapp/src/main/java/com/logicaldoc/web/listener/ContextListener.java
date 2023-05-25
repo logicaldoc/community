@@ -48,7 +48,7 @@ public class ContextListener extends ContextLoaderListener {
 				int sessionTtl = config.getInt("session.ttl", -1);
 				sessionDAO.cleanOldSessions(sessionTtl);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 		}
 	}

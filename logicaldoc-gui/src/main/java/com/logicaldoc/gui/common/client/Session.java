@@ -303,7 +303,7 @@ public class Session implements DocumentObserver {
 					String tenant = Session.get().getUser().getTenant().getName();
 					Session.get().close();
 					Util.redirectToLoginUrl(tenant);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 			}

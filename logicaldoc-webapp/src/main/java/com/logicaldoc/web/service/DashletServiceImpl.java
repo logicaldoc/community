@@ -51,7 +51,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 			dashlet.setType(guiDashlet.getType());
 
 			dao.store(dashlet);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throwServerException(session, log, e);
 		}
 	}
@@ -75,7 +75,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 			for (Dashlet dashlet : dashlets)
 				guiDashlets.add(fromDashlet(dashlet));
 			return guiDashlets.toArray(new GUIDashlet[0]);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return (GUIDashlet[]) throwServerException(session, log, e);
 		}
 	}
@@ -89,7 +89,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 			if (dashlet == null)
 				throw new ServerException("Unexisting dashlet " + dashletId);
 			return fromDashlet(dashlet);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return (GUIDashlet) throwServerException(session, log, e);
 		}
 	}
@@ -111,7 +111,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			dao.delete(dashletId);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throwServerException(session, log, e);
 		}
 	}
@@ -141,7 +141,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 				generic.setString1(Long.toString(dashlet.getIndex()));
 				gDao.store(generic);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}

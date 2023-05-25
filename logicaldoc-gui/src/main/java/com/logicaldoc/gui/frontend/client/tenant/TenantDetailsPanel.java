@@ -9,8 +9,6 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -55,31 +53,23 @@ public class TenantDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (tenant.getId() != 0) {
-					TenantService.Instance.get().load(tenant.getId(), new AsyncCallback<GUITenant>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (tenant.getId() != 0) {
+				TenantService.Instance.get().load(tenant.getId(), new AsyncCallback<GUITenant>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUITenant tenant) {
-							setTenant(tenant);
-						}
-					});
-				} else {
-					setTenant(new GUITenant());
-				}
-				tabSet.hideSave();
+					@Override
+					public void onSuccess(GUITenant tenant) {
+						setTenant(tenant);
+					}
+				});
+			} else {
+				setTenant(new GUITenant());
 			}
+			tabSet.hideSave();
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));

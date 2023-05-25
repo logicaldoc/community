@@ -92,7 +92,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 			Trigger trigger = (Trigger) applicationContext.getBean("TempFolderCleaner");
 			if (trigger != null)
 				triggers.add(trigger);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Noting to do
 		}
 

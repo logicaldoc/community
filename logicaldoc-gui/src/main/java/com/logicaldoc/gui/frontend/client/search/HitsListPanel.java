@@ -50,7 +50,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				visualizationMode = Integer
 						.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE).toString());
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

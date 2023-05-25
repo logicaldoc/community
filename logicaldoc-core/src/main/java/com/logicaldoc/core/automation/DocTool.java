@@ -202,7 +202,7 @@ public class DocTool {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
 			docDao.store(doc, transaction);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 	}
@@ -752,7 +752,7 @@ public class DocTool {
 		try {
 			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 			dao.store(note, transaction);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 	}

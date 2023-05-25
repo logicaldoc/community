@@ -94,7 +94,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 					}
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new IOException("Thumbnail building " + e.getMessage(), e);
 		} finally {
 			FileUtil.strongDelete(tmp);

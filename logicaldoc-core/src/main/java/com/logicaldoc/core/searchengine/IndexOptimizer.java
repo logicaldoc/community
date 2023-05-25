@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.task.Task;
+import com.logicaldoc.core.task.TaskException;
 
 /**
  * This task optimises all indexes
@@ -35,7 +36,7 @@ public class IndexOptimizer extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Exception {
+	protected void runTask() throws TaskException {
 		if (indexer.isLocked()) {
 			log.warn("Index locked, skipping optimization");
 			return;
@@ -45,6 +46,8 @@ public class IndexOptimizer extends Task {
 		try {
 			deleteOrphaned();
 			indexer.optimize();
+		} catch (PersistenceException e) {
+			throw new TaskException(e.getMessage(), e);
 		} finally {
 			indexer.unlock();
 		}

@@ -113,7 +113,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 			Group group = null;
 			try {
 				group = groupDao.findById(Long.parseLong(groupIdOrName));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 			if (group == null)

@@ -15,14 +15,8 @@ import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
-import com.google.gwt.event.dom.client.MouseMoveHandler;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
-import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.event.dom.client.ScrollEvent;
-import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -69,9 +63,6 @@ import com.orange.links.client.utils.LinksClientBundle;
 import com.orange.links.client.utils.MovablePoint;
 import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.DragStartHandler;
-import com.smartgwt.client.widgets.events.DragStopEvent;
-import com.smartgwt.client.widgets.events.DragStopHandler;
 
 /**
  * Controller which manage all the diagram logic
@@ -191,26 +182,11 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	}
 
 	protected void initMouseHandlers(final DiagramCanvas canvas) {
-		canvas.addDomHandler(new MouseMoveHandler() {
-			@Override
-			public void onMouseMove(MouseMoveEvent event) {
-				DiagramController.this.onMouseMove(event);
-			}
-		}, MouseMoveEvent.getType());
+		canvas.addDomHandler(event -> DiagramController.this.onMouseMove(event), MouseMoveEvent.getType());
 
-		canvas.addDomHandler(new MouseDownHandler() {
-			@Override
-			public void onMouseDown(MouseDownEvent event) {
-				DiagramController.this.onMouseDown(event);
-			}
-		}, MouseDownEvent.getType());
+		canvas.addDomHandler(event -> DiagramController.this.onMouseDown(event), MouseDownEvent.getType());
 
-		canvas.addDomHandler(new MouseUpHandler() {
-			@Override
-			public void onMouseUp(MouseUpEvent event) {
-				DiagramController.this.onMouseUp(event);
-			}
-		}, MouseUpEvent.getType());
+		canvas.addDomHandler(event -> DiagramController.this.onMouseUp(event), MouseUpEvent.getType());
 	}
 
 	protected void initWidgetPanel(final DiagramCanvas canvas) {
@@ -344,12 +320,9 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		functionsMap.put(w, new HashMap<>());
 
 		if (w instanceof HasContextMenu) {
-			w.addDomHandler(new MouseUpHandler() {
-				@Override
-				public void onMouseUp(MouseUpEvent event) {
-					if (event.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
-						showMenu((HasContextMenu) w, event.getClientX(), event.getClientY());
-					}
+			w.addDomHandler(event -> {
+				if (event.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
+					showMenu((HasContextMenu) w, event.getClientX(), event.getClientY());
 				}
 			}, MouseUpEvent.getType());
 		}
@@ -361,13 +334,10 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		}
 
 		// If the is mouse is over the widget, clear the topCanvas
-		w.addDomHandler(new MouseOverHandler() {
-			@Override
-			public void onMouseOver(com.google.gwt.event.dom.client.MouseOverEvent arg0) {
-				topCanvas.clear();
-				mousePoint.setLeft(-30);
-				mousePoint.setTop(-30);
-			}
+		w.addDomHandler(event -> {
+			topCanvas.clear();
+			mousePoint.setLeft(-30);
+			mousePoint.setTop(-30);
 		}, com.google.gwt.event.dom.client.MouseOverEvent.getType());
 		shape.draw();
 
@@ -461,12 +431,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	}
 
 	public ScrollPanel getViewAsScrollPanel() {
-		scrollPanel.addScrollHandler(new ScrollHandler() {
-			@Override
-			public void onScroll(ScrollEvent event) {
-				unsynchronizedShapes();
-			}
-		});
+		scrollPanel.addScrollHandler(event -> unsynchronizedShapes());
 		return scrollPanel;
 	}
 
@@ -480,27 +445,20 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		widget.setCanHover(true);
 		widget.setDragAppearance(DragAppearance.TARGET);
 
-		widget.addDragStopHandler(new DragStopHandler() {
-
-			@Override
-			public void onDragStop(DragStopEvent event) {
-				inDragWidget = false;
-				FunctionShape shape = (FunctionShape) widgetShapeMap.get(widget);
-				shape.setSynchronized(true);
-				shape.getConnections().setAllowSynchronized(true);
-				shape.getConnections().setSynchronized(true);
-			}
+		widget.addDragStopHandler(event -> {
+			inDragWidget = false;
+			FunctionShape shape = (FunctionShape) widgetShapeMap.get(widget);
+			shape.setSynchronized(true);
+			shape.getConnections().setAllowSynchronized(true);
+			shape.getConnections().setSynchronized(true);
 		});
 
-		widget.addDragStartHandler(new DragStartHandler() {
-			@Override
-			public void onDragStart(com.smartgwt.client.widgets.events.DragStartEvent event) {
-				inDragWidget = true;
-				FunctionShape shape = (FunctionShape) widgetShapeMap.get(widget);
-				shape.setSynchronized(false);
-				shape.getConnections().setSynchronized(false);
-				shape.getConnections().setAllowSynchronized(false);
-			}
+		widget.addDragStartHandler(nevent -> {
+			inDragWidget = true;
+			FunctionShape shape = (FunctionShape) widgetShapeMap.get(widget);
+			shape.setSynchronized(false);
+			shape.getConnections().setSynchronized(false);
+			shape.getConnections().setAllowSynchronized(false);
 		});
 	}
 
@@ -950,5 +908,4 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	public Map<Widget, Map<Widget, Connection>> getFunctionsMap() {
 		return functionsMap;
 	}
-
 }

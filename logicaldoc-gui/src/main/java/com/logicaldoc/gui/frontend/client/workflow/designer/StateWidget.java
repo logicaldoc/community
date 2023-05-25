@@ -13,7 +13,6 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Base visual representation of a Workflow object (a state or a transition).
@@ -68,13 +67,11 @@ public class StateWidget extends Label {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler((MenuItemClickEvent click) -> {
-			edit();
-		});
+		edit.addClickHandler(click -> edit());
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent click) -> {
+		delete.addClickHandler(click -> {
 			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean yes) -> {
 				if (Boolean.TRUE.equals(yes))
 					delete();
@@ -83,19 +80,11 @@ public class StateWidget extends Label {
 
 		MenuItem makeStart = new MenuItem();
 		makeStart.setTitle(I18N.message("startstate"));
-		makeStart.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent click) {
-				makeStartState();
-			}
-		});
+		makeStart.addClickHandler(click -> makeStartState());
 
 		MenuItem straight = new MenuItem();
 		straight.setTitle(I18N.message("straight"));
-		straight.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent click) {
-				restoreStraight();
-			}
-		});
+		straight.addClickHandler(click -> restoreStraight());
 
 		if (isTask())
 			contextMenu.setItems(edit, makeStart, delete);
@@ -199,7 +188,7 @@ public class StateWidget extends Label {
 		WorkflowDesigner workflowDesigner = getDrawingPanel().getWorkflowDesigner();
 		try {
 			workflowDesigner.saveModel();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

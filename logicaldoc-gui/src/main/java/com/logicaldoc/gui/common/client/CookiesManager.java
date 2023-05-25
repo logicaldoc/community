@@ -46,7 +46,7 @@ public class CookiesManager {
 			Offline.remove(COOKIE_SID);
 			Cookies.removeCookie(COOKIE_SID);
 			Cookies.removeCookie(COOKIE_JSESSIONID);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -57,7 +57,7 @@ public class CookiesManager {
 	public static void removeLogin() {
 		try {
 			removeSid();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -68,56 +68,56 @@ public class CookiesManager {
 	public static void removeAllCookies() {
 		try {
 			Offline.remove(COOKIE_DENSITY);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_HITSLIST_PREV_W);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_DOCSLIST_PREV_W);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_DOCSMENU_W);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_PASSWORD);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		
 		try {
 			Offline.remove(COOKIE_SAVELOGIN);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		
 		try {
 			Offline.remove(COOKIE_USER);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_DEVICE);
 			Cookies.removeCookie(COOKIE_DEVICE);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			removeLogin();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -182,7 +182,7 @@ public class CookiesManager {
 	public static String[] getSavedCredentials() {
 		try {
 			return new String[] { Offline.get(COOKIE_USER).toString(), Offline.get(COOKIE_PASSWORD).toString() };
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return new String[] { null, null };
 		}
 	}

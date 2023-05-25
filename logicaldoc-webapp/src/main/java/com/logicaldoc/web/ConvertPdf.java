@@ -85,7 +85,7 @@ public class ConvertPdf extends HttpServlet {
 				ServletUtil.setContentDisposition(request, response, "notavailable.pdf");
 				while ((letter = is.read()) != -1)
 					os.write(letter);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.warn(e.getMessage());
 			}
 		}

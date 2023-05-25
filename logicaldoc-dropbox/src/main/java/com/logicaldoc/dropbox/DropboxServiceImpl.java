@@ -77,9 +77,9 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			if (accessToken == null)
 				return false;
 			return dbox.login(accessToken);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new RuntimeException(t.getMessage(), t);
+			throw new ServerException(t.getMessage(), t);
 		}
 	}
 
@@ -90,9 +90,9 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		try {
 			Dropbox dbox = new Dropbox();
 			return dbox.startAuthorization(session.getUser().getLocale());
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new RuntimeException(t.getMessage(), t);
+			throw new ServerException(t.getMessage(), t);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			String account = dbox.getAccountName();
 			saveAccessToken(user, token, account);
 			return account;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			throw new RuntimeException(t.getMessage(), t);
+			throw new ServerException(t.getMessage(), t);
 		}
 	}
 
@@ -142,7 +142,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 		try {
 			dao.store(generic);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 	}
@@ -204,7 +204,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			}
 
 			return true;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return false;
 		}
@@ -240,7 +240,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 			try {
 				ddao.saveDocumentHistory(doc, history);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		} finally {
@@ -289,7 +289,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			}
 
 			count = imported.size();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 

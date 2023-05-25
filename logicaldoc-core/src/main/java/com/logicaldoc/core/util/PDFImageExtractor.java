@@ -68,7 +68,7 @@ public class PDFImageExtractor {
 	public int getNumberOfPages() {
 		try {
 			return document.getPages().getCount();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage());
 			return 1;
 		}
@@ -115,11 +115,11 @@ public class PDFImageExtractor {
 			BufferedImage bi = image.getImage();
 
 			if (bi == null) {
-				throw new Exception("Error image is null");
+				throw new IOException("Error image is null");
 			}
 
 			image2 = correctRotation(bi, page.getRotation());
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Unable to read: {} bits: {} Suffix: {}", image.getClass(), image.getBitsPerComponent(),
 					image.getSuffix());
 		}
@@ -223,7 +223,7 @@ public class PDFImageExtractor {
 				Collection<PDImageXObject> images = getImagesFromResources(iter.next().getResources()).values();
 				for (PDImageXObject pdImageXObject : images)
 					imgs.add(pdImageXObject.getImage());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}

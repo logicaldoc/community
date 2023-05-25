@@ -92,7 +92,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 				usr.setLastLoginFailureReason(failures.get(0).getComment());
 
 			return usr;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return null;
 		}
@@ -159,7 +159,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 			EMailSender sender = new EMailSender(user.getTenantId());
 			sender.send(email, "psw.rec2", dictionary);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new ServerException(e.getMessage());
 		}

@@ -17,25 +17,17 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.ImgButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -76,50 +68,39 @@ public class CustomActionsPanel extends VLayout {
 		ToolStripButton add = new ToolStripButton();
 		add.setAutoFit(true);
 		add.setTitle(I18N.message("addcustomaction"));
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				TextItem item = ItemFactory.newTextItem("name", "", null);
-				item.setRequired(true);
-				LD.askForValue(I18N.message("newcustomaction"), I18N.message("name"), null, item, new ValueCallback() {
+		add.addClickHandler(event -> {
+			TextItem item = ItemFactory.newTextItem("name", "", null);
+			item.setRequired(true);
+			LD.askForValue(I18N.message("newcustomaction"), I18N.message("name"), null, item, value -> {
+				GUIMenu action = new GUIMenu();
+				action.setName(value.replace("/", ""));
+				action.setType(2);
+				action.setEnabled(true);
+				action.setParentId(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS);
+
+				SecurityService.Instance.get().saveMenu(action, I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+
 					@Override
-					public void execute(String value) {
-						GUIMenu action = new GUIMenu();
-						action.setName(value.replace("/", ""));
-						action.setType(2);
-						action.setEnabled(true);
-						action.setParentId(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS);
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						SecurityService.Instance.get().saveMenu(action, I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+					@Override
+					public void onSuccess(GUIMenu newMenu) {
+						actions.add(newMenu);
+						fillGrid();
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIMenu newMenu) {
-								actions.add(newMenu);
-								fillGrid();
-
-								CustomActionEditor editor = new CustomActionEditor(newMenu, CustomActionsPanel.this);
-								editor.show();
-							}
-						});
+						CustomActionEditor editor = new CustomActionEditor(newMenu, CustomActionsPanel.this);
+						editor.show();
 					}
 				});
-			}
+			});
 		});
 
 		ToolStripButton save = new ToolStripButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addButton(add);
@@ -172,11 +153,7 @@ public class CustomActionsPanel extends VLayout {
 					editImg.setPrompt(I18N.message("edit"));
 					editImg.setHeight(16);
 					editImg.setWidth(16);
-					editImg.addClickHandler(new ClickHandler() {
-						public void onClick(ClickEvent event) {
-							onEdit();
-						}
-					});
+					editImg.addClickHandler(event -> onEdit());
 
 					rollOverCanvas.addMember(editImg);
 				}
@@ -196,21 +173,12 @@ public class CustomActionsPanel extends VLayout {
 		grid.setFields(enabled, id, name, description, allowed);
 		setMembers(hint, toolStrip, grid);
 
-		grid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		grid.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		grid.addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				onEdit();
-			}
-		});
+		grid.addDoubleClickHandler(event -> onEdit());
 
 		reload();
 	}
@@ -267,9 +235,7 @@ public class CustomActionsPanel extends VLayout {
 	}
 
 	private void onEdit() {
-		CustomActionEditor editor = new CustomActionEditor(getAction(rollOverRecord.getAttributeAsLong("id")),
-				CustomActionsPanel.this);
-		editor.show();
+		new CustomActionEditor(getAction(rollOverRecord.getAttributeAsLong("id")), CustomActionsPanel.this).show();
 	}
 
 	private void fillGrid() {
@@ -308,10 +274,9 @@ public class CustomActionsPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler(event ->
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+					if (Boolean.TRUE.equals(confirm)) {
 						long menuId = selectedRecord.getAttributeAsLong("id");
 						if (menuId == 0L) {
 							int index = grid.getRecordIndex(selectedRecord);
@@ -331,9 +296,7 @@ public class CustomActionsPanel extends VLayout {
 									});
 						}
 					}
-				});
-			}
-		});
+				}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

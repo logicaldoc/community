@@ -98,7 +98,7 @@ public class FSStorer extends AbstractStorer {
 			FileUtil.writeFile(stream, file.getPath());
 		} catch (IOException e) {
 			throw e;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		} finally {
 			try {
@@ -125,7 +125,7 @@ public class FSStorer extends AbstractStorer {
 			return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
 		} catch (IOException e) {
 			throw e;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		}
 	}

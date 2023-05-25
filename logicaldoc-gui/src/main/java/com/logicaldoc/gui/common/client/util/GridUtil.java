@@ -114,7 +114,7 @@ public class GridUtil {
 					continue;
 
 				printRecordColumn(stringBuilder, rec, listGridField);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				/*
 				 * May be that not all the rows are available, since we can
 				 * count just on the rows that were rendered.

@@ -293,7 +293,7 @@ public class TemplateSecurityPanel extends VLayout {
 			try {
 				if (template.isWrite())
 					template.setRights(getRights());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		return true;

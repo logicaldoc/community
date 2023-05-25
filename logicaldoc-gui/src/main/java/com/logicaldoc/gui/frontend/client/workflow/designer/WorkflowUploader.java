@@ -43,13 +43,7 @@ public class WorkflowUploader extends Window {
 		layout.setMargin(2);
 
 		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSend();
-			}
-		});
+		sendButton.addClickHandler(event -> onSend());
 
 		uploader = new Upload(sendButton);
 		layout.addMember(uploader);
@@ -58,7 +52,7 @@ public class WorkflowUploader extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}
@@ -94,7 +88,6 @@ public class WorkflowUploader extends Window {
 					});
 				}
 			}
-
 		});
 	}
 }

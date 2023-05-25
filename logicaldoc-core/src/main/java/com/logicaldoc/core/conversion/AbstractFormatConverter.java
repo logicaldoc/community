@@ -61,10 +61,10 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 		ContextProperties config = null;
 		try {
 			config = (ContextProperties) Context.get().getBean(ContextProperties.class);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			try {
 				config = new ContextProperties();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Noting to do
 			}
 		}
@@ -79,7 +79,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 				String key = getParameterPropertyName(param);
 				parameters.put(param, config().getProperty(key));
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Noting to do
 		}
 	}

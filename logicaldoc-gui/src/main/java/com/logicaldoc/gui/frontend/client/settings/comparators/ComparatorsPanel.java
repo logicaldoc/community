@@ -24,24 +24,16 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridEditorContext;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellSavedEvent;
-import com.smartgwt.client.widgets.grid.events.CellSavedHandler;
-import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditorExitEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -145,12 +137,7 @@ public class ComparatorsPanel extends AdminPanel {
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
 		save.setDisabled(Session.get().isDemo());
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 		save.setDisabled(Session.get().isDemo());
 		toolStrip.addButton(save);
 		return toolStrip;
@@ -163,7 +150,7 @@ public class ComparatorsPanel extends AdminPanel {
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
 		comparator.setCanEdit(!Session.get().isDemo());
-		comparator.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		comparator.setCellFormatter((value, rec, rowNum, colNum) -> {
 			String label = getComparatorShortName(value != null ? value.toString() : null);
 			boolean enabled = rec.getAttributeAsBoolean(EENABLED);
 			if (!enabled)
@@ -175,7 +162,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 		associationsGrid.setFields(in, comparator);
 
-		associationsGrid.setEditorCustomizer((ListGridEditorContext context) -> {
+		associationsGrid.setEditorCustomizer(context -> {
 			ListGridField field = context.getEditField();
 
 			if (field.getName().equals(gridAttributeName)) {
@@ -188,7 +175,7 @@ public class ComparatorsPanel extends AdminPanel {
 				return context.getDefaultProperties();
 		});
 
-		associationsGrid.addEditCompleteHandler((EditCompleteEvent event) -> {
+		associationsGrid.addEditCompleteHandler(event -> {
 			Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
 					associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 			if (converterRecord != null)
@@ -232,7 +219,7 @@ public class ComparatorsPanel extends AdminPanel {
 		ListGridField enabled = new ListGridField(EENABLED, " ", 20);
 		enabled.setCanSort(false);
 		enabled.setCanFilter(false);
-		enabled.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		enabled.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if (value == null)
 				return "";
 			else if ("true".equals(value.toString()))
@@ -243,12 +230,12 @@ public class ComparatorsPanel extends AdminPanel {
 
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
-		comparator.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		comparator.setCellFormatter((value, rec, rowNum, colNum) -> {
 			return getComparatorShortName(value != null ? value.toString() : null);
 		});
 
 		settingsGrid.setFields(enabled, comparator);
-		settingsGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+		settingsGrid.addCellContextClickHandler(event -> {
 			event.cancel();
 			showContextMenu();
 		});
@@ -272,13 +259,10 @@ public class ComparatorsPanel extends AdminPanel {
 		value.setCanEdit(true);
 		parametersGrid.setFields(name, value);
 
-		parametersGrid.addCellSavedHandler(new CellSavedHandler() {
-			@Override
-			public void onCellSaved(CellSavedEvent event) {
-				ListGridRecord paramRecord = event.getRecord();
-				rec.setAttribute(paramRecord.getAttributeAsString("name"),
-						event.getNewValue() != null ? event.getNewValue().toString() : "");
-			}
+		parametersGrid.addCellSavedHandler(event -> {
+			ListGridRecord paramRecord = event.getRecord();
+			rec.setAttribute(paramRecord.getAttributeAsString("name"),
+					event.getNewValue() != null ? event.getNewValue().toString() : "");
 		});
 
 		String[] attrs = rec.getAttributes();
@@ -297,7 +281,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 		// When the parameter's editing ends, update the same parameters
 		// in all the records
-		value.addEditorExitHandler((EditorExitEvent event) -> {
+		value.addEditorExitHandler(event -> {
 			String parameterName = event.getRecord().getAttributeAsString("name");
 			String parameterValue = event.getNewValue() != null ? event.getNewValue().toString() : "";
 			rec.setAttribute(parameterName, parameterValue);
@@ -410,7 +394,7 @@ public class ComparatorsPanel extends AdminPanel {
 	private MenuItem prepareDisableMenuItem() {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler((MenuItemClickEvent event) -> {
+		disable.addClickHandler(event -> {
 			SettingService.Instance.get()
 					.saveSettings(new GUIParameter[] { new GUIParameter(
 							settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled",
@@ -451,7 +435,7 @@ public class ComparatorsPanel extends AdminPanel {
 	private MenuItem prepareEnableMenuItem() {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler((MenuItemClickEvent event) -> {
+		enable.addClickHandler(event -> {
 			SettingService.Instance.get()
 					.saveSettings(new GUIParameter[] { new GUIParameter(
 							settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled",

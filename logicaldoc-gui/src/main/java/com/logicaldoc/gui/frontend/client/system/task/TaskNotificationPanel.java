@@ -12,7 +12,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -54,15 +53,11 @@ public class TaskNotificationPanel extends VLayout {
 		sendReport.setRedrawOnChange(true);
 		sendReport.setWidth(50);
 		sendReport.setValue(task.isSendActivityReport());
-		sendReport.addChangedHandler(new ChangedHandler() {
+		sendReport.addChangedHandler(event -> {
+			task.setSendActivityReport("true".equals(notificationsForm.getValue("sendReport").toString()));
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				task.setSendActivityReport("true".equals(notificationsForm.getValue("sendReport").toString()));
-
-				// Notify the external handler
-				changedHandler.onChanged(event);
-			}
+			// Notify the external handler
+			changedHandler.onChanged(event);
 		});
 
 		items.add(sendReport);
@@ -97,7 +92,7 @@ public class TaskNotificationPanel extends VLayout {
 				task.setReportRecipients(recipients);
 			}
 			return true;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return false;
 		}
 	}

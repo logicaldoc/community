@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.task.Task;
+import com.logicaldoc.core.task.TaskException;
 
 /**
  * This task calculate the path attributes of the folders(only those folders
@@ -39,7 +41,7 @@ public class PathCalculator extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Exception {
+	protected void runTask() throws TaskException {
 		log.info("Start indexing of all documents");
 
 		errors = 0;
@@ -62,7 +64,7 @@ public class PathCalculator extends Task {
 						processed++;
 						if (interruptRequested)
 							break;
-					} catch (Throwable t) {
+					} catch (Exception t) {
 						log.error("Error processing folder {}: {}", id, t.getMessage(), t);
 						errors++;
 					} finally {
@@ -70,6 +72,8 @@ public class PathCalculator extends Task {
 					}
 				}
 			}
+		} catch (PersistenceException e) {
+			throw new TaskException(e.getMessage(), e);
 		} finally {
 			log.info("Path calculation finished");
 			log.info("Processed folders: {}", processed);

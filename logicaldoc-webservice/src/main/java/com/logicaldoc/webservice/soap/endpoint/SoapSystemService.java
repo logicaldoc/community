@@ -125,7 +125,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 				lastrun.setValue("");
 			}
 			parameters[14] = lastrun;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -191,7 +191,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			for (Language lang : LanguageManager.getInstance().getActiveLanguages(t)) {
 				langs.add(lang.getLocale().toString());
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 

@@ -48,8 +48,10 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 			}
 
 			if (!dest.exists() || dest.length() < 1)
-				throw new Exception("Empty conversion");
-		} catch (Throwable e) {
+				throw new IOException("Empty conversion");
+		} catch (IOException ioe) {
+			throw ioe;
+		} catch (Exception e) {
 			throw new IOException("Error in Zip conversion", e);
 		} finally {
 			if (tempFile != null)

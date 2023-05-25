@@ -41,7 +41,7 @@ public class InputValues {
 		List<String> str = new ArrayList<>();
 		if (inputs != null) {
 			for (Object val : inputs) {
-				str.add((String) val.toString());
+				str.add(val.toString());
 			}
 			return str;
 		}

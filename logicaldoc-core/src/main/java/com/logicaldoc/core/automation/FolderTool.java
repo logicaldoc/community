@@ -141,7 +141,7 @@ public class FolderTool {
 		try {
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			folderDao.store(folder, transaction);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 	}
@@ -162,9 +162,9 @@ public class FolderTool {
 	 * @param folderId identifier of the folder
 	 * @param username the user in whose name the method is run
 	 * 
-	 * @throws Exception a generic error happened
+	 * @throws PersistenceException Error in the persistence layers
 	 */
-	public void delete(long folderId, String username) throws Exception {
+	public void delete(long folderId, String username) throws PersistenceException {
 		User user = new SecurityTool().getUser(username);
 
 		FolderHistory transaction = new FolderHistory();
@@ -183,9 +183,9 @@ public class FolderTool {
 	 *        it will be created)
 	 * @param username the user in whose name the method is run
 	 * 
-	 * @throws Exception a generic error happened
+	 * @throws PersistenceException Error in the persistence layer
 	 */
-	public void move(Folder folder, String targetPath, String username) throws Exception {
+	public void move(Folder folder, String targetPath, String username) throws PersistenceException {
 		User user = new SecurityTool().getUser(username);
 
 		Folder target = createPath(null, targetPath, username);
@@ -218,10 +218,11 @@ public class FolderTool {
 	 * @param username the user in whose name the method is run
 	 * @return The new folder created
 	 * 
-	 * @throws Exception a generic error happened
+	 * @throws PersistenceException Error in the persistence layer
+	 * 
 	 */
 	public Folder copy(Folder source, String targetPath, boolean foldersOnly, String securityOption, String username)
-			throws Exception {
+			throws PersistenceException {
 		User user = new SecurityTool().getUser(username);
 
 		Folder target = createPath(null, targetPath, username);
@@ -242,9 +243,9 @@ public class FolderTool {
 	 * @param target the final container
 	 * @param username the user in whose name the method is run
 	 * 
-	 * @throws Exception a generic error happened
+	 * @throws PersistenceException Error in the persistence layer
 	 */
-	public void merge(Folder source, Folder target, String username) throws Exception {
+	public void merge(Folder source, Folder target, String username) throws PersistenceException {
 		User user = new SecurityTool().getUser(username);
 
 		FolderHistory transaction = new FolderHistory();

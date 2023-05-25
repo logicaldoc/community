@@ -11,8 +11,6 @@ import com.orange.links.client.DiagramController;
 import com.orange.links.client.connection.Connection;
 import com.orange.links.client.shapes.Point;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.events.ScrolledEvent;
-import com.smartgwt.client.widgets.events.ScrolledHandler;
 import com.smartgwt.client.widgets.layout.VStack;
 
 /**
@@ -44,14 +42,7 @@ public class WorkflowDrawingPanel extends VStack {
 		controller.showGrid(false);
 		addMember(controller.getView());
 
-		addScrolledHandler(new ScrolledHandler() {
-
-			@Override
-			public void onScrolled(ScrolledEvent event) {
-				// This will avoid connection explosions when scrolling
-				controller.unsynchronizedShapes();
-			}
-		});
+		addScrolledHandler(event -> controller.unsynchronizedShapes());
 
 		if (workflow != null)
 			redraw();
@@ -83,7 +74,7 @@ public class WorkflowDrawingPanel extends VStack {
 
 		try {
 			drawAll(workflow);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			GuiLog.error(t.getMessage(), null, t);
 		}
 	}

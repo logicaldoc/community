@@ -89,7 +89,7 @@ public class Language implements Comparable<Language> {
 				}
 			}
 			stopWords = swSet;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 		}
 	}
@@ -130,7 +130,7 @@ public class Language implements Comparable<Language> {
 		Class<?> aClass = null;
 		try {
 			aClass = Class.forName(analyzerClass);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(analyzerClass + " not found");
 		}
 
@@ -140,7 +140,7 @@ public class Language implements Comparable<Language> {
 				Constructor<?> constructor = aClass.getConstructor(new Class[] { java.util.Set.class });
 				if (constructor != null)
 					analyzer = (Analyzer) constructor.newInstance(stopWords);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.debug("constructor (Version matchVersion, Set<?> stopwords)  not found");
 			}
 		}
@@ -149,7 +149,7 @@ public class Language implements Comparable<Language> {
 		if (aClass != null && analyzer == null) {
 			try {
 				analyzer = (Analyzer) aClass.getDeclaredConstructor().newInstance();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.debug("constructor without arguments not found");
 			}
 		}
@@ -201,7 +201,7 @@ public class Language implements Comparable<Language> {
 					if (constructor != null)
 						stemmer = (SnowballProgram) constructor.newInstance();
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}

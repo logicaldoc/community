@@ -108,7 +108,7 @@ public class FreemarkerWebServiceDisplayer {
 					return annotation.description();
 				} else
 					return "";
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				return "";
 			}
 		}

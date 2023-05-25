@@ -55,7 +55,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 		try {
 			refresh();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			GuiLog.error(t.getMessage(), null, null);
 			SC.warn(t.getMessage());
 		}

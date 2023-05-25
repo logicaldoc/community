@@ -88,7 +88,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 
 						System.out.println("++ move " + i);
 					}
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					if (t.getMessage().contains("org.hibernate"))
 						t.printStackTrace();
 				}
@@ -124,7 +124,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 						}
 
 					}
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					if (t.getMessage().contains("org.hibernate"))
 						t.printStackTrace();
 				}
@@ -150,7 +150,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 
 						System.out.println("-- rename " + i);
 					}
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					if (t.getMessage().contains("org.hibernate"))
 						t.printStackTrace();
 				}
@@ -177,7 +177,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 
 						System.out.println("++ lock " + i);
 					}
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					if (t.getMessage().contains("org.hibernate"))
 						t.printStackTrace();
 				}
@@ -210,7 +210,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 
 						System.out.println("++ update " + i + ": " + value);
 					}
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					if (t.getMessage().contains("org.hibernate"))
 						t.printStackTrace();
 				}
@@ -251,7 +251,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 
 						System.out.println("++ create " + i);
 					}
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					if (t.getMessage().contains("org.hibernate"))
 						t.printStackTrace();
 				}

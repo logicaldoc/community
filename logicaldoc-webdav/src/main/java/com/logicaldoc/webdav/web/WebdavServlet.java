@@ -132,7 +132,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		else
 			try {
 				response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 

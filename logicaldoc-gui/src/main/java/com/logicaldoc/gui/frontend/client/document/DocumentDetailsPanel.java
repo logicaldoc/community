@@ -379,7 +379,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					subscriptionsTabPanel.addMember(subscriptionsPanel);
 					if (tabSet.getTab(ID_TAB_SUBSCRIPTIONS) == null)
 						tabSet.addTab(subscriptionsTab);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 			} else
@@ -396,7 +396,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			calendarPanel = new DocumentCalendarPanel(document);
 			calendarTabPanel.addMember(calendarPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -410,7 +410,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			previewPanel = new DetailsPreviewPanel(document);
 			previewTabPanel.addMember(previewPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -424,7 +424,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			notesPanel = new NotesPanel(document);
 			notesTabPanel.addMember(notesPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -438,7 +438,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			signaturePanel = new DigitalSignaturePanel(document);
 			signatureTabPanel.addMember(signaturePanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -453,7 +453,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			linksPanel = new LinksPanel(document);
 			linksTabPanel.addMember(linksPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -471,7 +471,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				aliasesTabPanel.addMember(aliasesPanel);
 				if (tabSet.getTab(ID_TAB_ALIASES) == null)
 					tabSet.addTab(aliasesTab);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		} else
@@ -487,7 +487,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			historyPanel = new DcoumentHistoryPanel(document);
 			historyTabPanel.addMember(historyPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -501,7 +501,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			versionsPanel = new VersionsPanel(document);
 			versionsTabPanel.addMember(versionsPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -515,7 +515,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			capturePanel = new DocumentCapturePanel(document, changeHandler, true);
 			captureTabPanel.addMember(capturePanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -530,7 +530,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
 			propertiesTabPanel.addMember(propertiesPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -544,7 +544,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		try {
 			retentionPoliciesPanel = new PublishingPanel(document, changeHandler);
 			retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -565,7 +565,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, changeHandler,
 					templateChangedHandler);
 			extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -618,7 +618,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				} else {
 					saveDocument();
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				SC.warn(t.getMessage());
 			}
 		}

@@ -8,10 +8,6 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.logicaldoc.gui.frontend.client.tenant.TenantBrandingPanel;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
  * Shows the branding details.
@@ -42,23 +38,15 @@ public class BrandingPanel extends AdminPanel {
 	}
 
 	private void initGUI() {
-		tenantBranding = new TenantBrandingPanel(tenant, new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				// Nothing to do
-			}
+		tenantBranding = new TenantBrandingPanel(tenant, event -> {
+			// Nothing to do
 		});
 
 		IButton save = new IButton(I18N.message("save"));
 		save.setMinWidth(80);
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				if (tenantBranding.validate())
-					onSave();
-			}
+		save.addClickHandler(event -> {
+			if (tenantBranding.validate())
+				onSave();
 		});
 
 		body.setMembers(tenantBranding);

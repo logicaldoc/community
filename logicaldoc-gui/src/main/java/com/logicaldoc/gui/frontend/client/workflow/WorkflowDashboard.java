@@ -8,8 +8,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.PortalLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -65,22 +63,11 @@ public class WorkflowDashboard extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh(null);
-			}
-		});
+		refresh.addClickHandler(event -> refresh(null));
 		ToolStripButton history = new ToolStripButton();
 		history.setTitle(I18N.message("history"));
 		toolStrip.addButton(history);
-		history.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				WorkflowHistoryDialog dialog = new WorkflowHistoryDialog();
-				dialog.show();
-			}
-		});
+		history.addClickHandler(event -> new WorkflowHistoryDialog().show());
 		toolStrip.addFill();
 
 		portalLayout = new PortalLayout();
@@ -138,7 +125,6 @@ public class WorkflowDashboard extends VLayout {
 		});
 	}
 
-	
 	private void refreshGridsAfterWorkflowsKilled(ArrayList<String> instanceIds) {
 		for (String id : instanceIds) {
 			if (assignedTasks != null)
@@ -153,11 +139,12 @@ public class WorkflowDashboard extends VLayout {
 				involvedTasks.onDeletedWorkflow(id);
 		}
 	}
-	
+
 	/**
 	 * Refreshes all the dashlets related to the given workflow instance
 	 * 
-	 * @param processId Identifier of the instance(use null for all the instances)
+	 * @param processId Identifier of the instance(use null for all the
+	 *        instances)
 	 */
 	public void refresh(String processId) {
 		if (assignedTasks != null)

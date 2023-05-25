@@ -241,7 +241,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 				account.setRules(rules.toArray(new GUIEmailRule[0]));
 			}
 			return true;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return false;
 		}
 	}

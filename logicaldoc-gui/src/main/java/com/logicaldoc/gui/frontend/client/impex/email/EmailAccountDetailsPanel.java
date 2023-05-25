@@ -169,21 +169,21 @@ public class EmailAccountDetailsPanel extends VLayout {
 		boolean extValid = true;
 		try {
 			extValid = advancedPanel.validate();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		boolean automationValid = true;
 		try {
 			automationValid = automationPanel.validate();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		boolean filtValid = true;
 		try {
 			filtValid = filtersPanel.validate();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

@@ -27,7 +27,7 @@ public class PdfThumbnailBuilder extends ImageThumbnailBuilder {
 		try {
 			GhostUtil.print(src, tmp, 1);
 			super.buildThumbnail(sid, document, fileVersion, tmp, dest, size, compression);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new IOException("Thumbnail building " + e.getMessage(), e);
 		} finally {
 			FileUtil.strongDelete(tmp);

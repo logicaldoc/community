@@ -37,7 +37,7 @@ public class ChatController {
 		for (ChatObserver observer : observers)
 			try {
 				observer.onMessage(id, date, username, message);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 	}

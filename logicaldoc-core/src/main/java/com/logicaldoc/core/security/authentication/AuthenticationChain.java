@@ -157,7 +157,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			if (cmp.canAuthenticateUser(username)) {
 				try {
 					user = cmp.pickUser(username);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.warn("Cannot pick user {} using authenticator {}", username, cmp.getClass().getName(), t);
 				}
 			}

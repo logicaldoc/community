@@ -655,7 +655,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query.append(AND + "ld_tenantid = " + tenantId);
 
 		@SuppressWarnings("unchecked")
-		List<Long> ids = (List<Long>) queryForList(query.toString(), Long.class);
+		List<Long> ids = queryForList(query.toString(), Long.class);
 		List<Folder> folders = new ArrayList<Folder>();
 		for (Long id : ids)
 			folders.add(findById(id));
@@ -1912,7 +1912,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		// We do this way because if using the HQL we will have all the
 		// collections initialized
 		@SuppressWarnings("unchecked")
-		List<Long> wsIds = (List<Long>) queryForList("select ld_id from ld_folder where (not ld_id=" + rootId
+		List<Long> wsIds = queryForList("select ld_id from ld_folder where (not ld_id=" + rootId
 				+ ") and ld_deleted=0 and ld_parentid=" + rootId + " and ld_type=" + Folder.TYPE_WORKSPACE
 				+ " and ld_tenantid=" + tenantId + " order by lower(ld_name)", Long.class);
 		ArrayList<Folder> workspaces = new ArrayList<>();

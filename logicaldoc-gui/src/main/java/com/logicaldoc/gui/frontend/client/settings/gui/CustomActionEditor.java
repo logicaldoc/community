@@ -12,7 +12,6 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -56,21 +55,11 @@ public class CustomActionEditor extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -93,22 +82,19 @@ public class CustomActionEditor extends Window {
 		description.setRequired(false);
 		description.setWidth(300);
 
-		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", 
-				action.getAutomation(), null, false);
+		final TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", action.getAutomation(),
+				null, false);
 		automation.setShowTitle(false);
 		automation.setStartRow(false);
 		automation.setWidth("*");
 		automation.setHeight("*");
 		automation.setDisabled(action.getRoutineId() != null);
 
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if (event == null) {
-					automation.setDisabled(false);
-				} else {
-					automation.setDisabled(event.getValue() != null && !event.getValue().toString().isEmpty());
-				}
+		ChangedHandler changeHandler = event -> {
+			if (event == null) {
+				automation.setDisabled(false);
+			} else {
+				automation.setDisabled(event.getValue() != null && !event.getValue().toString().isEmpty());
 			}
 		};
 		routine = ItemFactory.newAutomationRoutineSelector("routine",
@@ -147,7 +133,7 @@ public class CustomActionEditor extends Window {
 			try {
 				if (rightsPanel != null)
 					action.setRights(rightsPanel.getRights());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 

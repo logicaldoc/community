@@ -87,7 +87,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public List<T> findAll() {
 		try {
 			return findByWhere("", "", null);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
 		}
@@ -96,7 +96,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public List<T> findAll(long tenantId) {
 		try {
 			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
 		}
@@ -105,7 +105,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public List<Long> findAllIds() {
 		try {
 			return findIdsByWhere("", "", null);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Long>();
 		}
@@ -114,7 +114,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public List<Long> findAllIds(long tenantId) {
 		try {
 			return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Long>();
 		}
@@ -132,11 +132,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public T findById(long id) throws PersistenceException {
 		T entity = null;
 		try {
-			entity = (T) sessionFactory.getCurrentSession().get(entityClass, id);
+			entity = sessionFactory.getCurrentSession().get(entityClass, id);
 			if (entity != null && entity.getDeleted() == 1)
 				return null;
 			return entity;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -158,7 +158,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
 			coll = findByObjectQuery(query, values, max);
 			return coll;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -169,9 +169,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			logQuery(query);
 			Query<T> queryObject = prepareQueryForObject(query, values, max);
-			coll = (List<T>) queryObject.list();
+			coll = queryObject.list();
 			return coll;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -189,7 +189,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
 			coll = findByObjectQuery(query, parameters, max);
 			return coll;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -201,9 +201,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			logQuery(query);
 			Query<T> queryObject = prepareQueryForObject(query, parameters, max);
-			coll = (List<T>) queryObject.list();
+			coll = queryObject.list();
 			return coll;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -219,9 +219,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, values, max);
-			coll = (List<Object>) queryObject.list();
+			coll = queryObject.list();
 			return coll;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -233,9 +233,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, parameters, max);
-			coll = (List<Object>) queryObject.list();
+			coll = queryObject.list();
 			return coll;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -258,9 +258,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
 			logQuery(query);
 			Query<Long> queryObject = prepareQueryForLong(query, values, max);
-			coll = (List<Long>) queryObject.list();
+			coll = queryObject.list();
 			return coll;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -284,7 +284,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		// Save the entity
 		try {
 			saveOrUpdate(entity);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -303,7 +303,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 					} else
 						att.setStringValues(null);
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -336,7 +336,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	protected Object merge(Object entity) {
 		try {
 			return sessionFactory.getCurrentSession().merge(entity);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return null;
 		}
@@ -580,7 +580,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			else
 				list = jdbcTemplate.query(insertTopClause(sql, maxRows), rowMapper);
 			return list;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 
@@ -602,7 +602,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			else
 				list = jdbcTemplate.queryForList(insertTopClause(sql, maxRows), elementType);
 			return list;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
@@ -621,7 +621,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			else
 				rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows));
 			return new SqlRowSetWrapper(rs);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -645,7 +645,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return jdbcTemplate.queryForObject(sql, Long.class);
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -658,7 +658,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return jdbcTemplate.queryForObject(sql, Long.class, args);
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -671,7 +671,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return jdbcTemplate.queryForObject(sql, String.class);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
@@ -687,7 +687,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return jdbcTemplate.queryForObject(sql, type);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -701,7 +701,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			return jdbcTemplate.update(statement);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -725,7 +725,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			Query<T> queryObject = prepareQueryForObject(UPDATE + entityClass.getCanonicalName() + " set deleted="
 					+ code + " where id in(" + ids.toString() + ")", (Map<String, Object>) null, null);
 			queryObject.executeUpdate();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -745,7 +745,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			Query queryObject = prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression,
 					values, null);
 			return queryObject.executeUpdate();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -759,7 +759,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			Query queryObject = prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression,
 					parameters, null);
 			return queryObject.executeUpdate();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -773,7 +773,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			return jdbcTemplate.update(statement, args);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}

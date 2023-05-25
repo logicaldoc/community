@@ -9,8 +9,6 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.PanelPlacement;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 
 /**
  * Show the completion diagram
@@ -30,12 +28,8 @@ public class WorkflowPreview extends Window {
 
 		final WorkflowDrawingPanel drawingPanel = new WorkflowDrawingPanel(workflow);
 
-		HeaderControl print = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				PrintUtil.printScreenShot(drawingPanel.getID(), I18N.message("workflow") + " - " + workflow.getName());
-			}
-		});
+		HeaderControl print = new HeaderControl(HeaderControl.PRINT, event -> PrintUtil
+				.printScreenShot(drawingPanel.getID(), I18N.message("workflow") + " - " + workflow.getName()));
 		setHeaderControls(HeaderControls.HEADER_LABEL, print, HeaderControls.CLOSE_BUTTON);
 
 		addItem(drawingPanel);

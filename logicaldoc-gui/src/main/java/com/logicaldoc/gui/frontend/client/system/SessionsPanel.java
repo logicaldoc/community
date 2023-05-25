@@ -12,19 +12,12 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -50,12 +43,7 @@ public class SessionsPanel extends VLayout {
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				sessionsGrid.refresh(new SessionsDS());
-			}
-		});
+		refresh.addClickHandler(event -> sessionsGrid.refresh(new SessionsDS()));
 
 		activeSessions = ItemFactory.newStaticTextItem("activesessions", "");
 
@@ -70,23 +58,20 @@ public class SessionsPanel extends VLayout {
 	public void onDraw() {
 		prepareSessionsGrid();
 
-		sessionsGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+		sessionsGrid.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
 		});
 
-		sessionsGrid.addDoubleClickHandler((DoubleClickEvent event) -> {
+		sessionsGrid.addDoubleClickHandler(event -> {
 			LD.askForValue(I18N.message("sid"), I18N.message("sid"),
-					sessionsGrid.getSelectedRecord().getAttributeAsString("sid"), new ValueCallback() {
-						@Override
-						public void execute(final String value) {
-							// Nothing to do
-						}
+					sessionsGrid.getSelectedRecord().getAttributeAsString("sid"), value -> {
+						// Nothing to do
 					});
 			event.cancel();
 		});
 
-		sessionsGrid.addDataArrivedHandler((DataArrivedEvent event) -> {
+		sessionsGrid.addDataArrivedHandler(event -> {
 			// Search the records with status=0 that are the active sessions
 			Record[] records = sessionsGrid.getRecordList().findAll(STATUS, "0");
 			if (records == null || records.length < 1)
@@ -156,30 +141,24 @@ public class SessionsPanel extends VLayout {
 
 		MenuItem killSession = new MenuItem();
 		killSession.setTitle(I18N.message("kill"));
-		killSession.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmkill"), (Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						ListGridRecord rec = sessionsGrid.getSelectedRecord();
-						SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"),
-								new AsyncCallback<Void>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+		killSession.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmkill"), yes -> {
+			if (Boolean.TRUE.equals(yes)) {
+				ListGridRecord rec = sessionsGrid.getSelectedRecord();
+				SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-									@Override
-									public void onSuccess(Void result) {
-										sessionsGrid.getSelectedRecord().setAttribute(STATUS_LABEL, "Closed");
-										sessionsGrid.getSelectedRecord().setAttribute(STATUS, "1");
-										sessionsGrid.refreshRow(
-												sessionsGrid.getRecordIndex(sessionsGrid.getSelectedRecord()));
-									}
-								});
+					@Override
+					public void onSuccess(Void result) {
+						sessionsGrid.getSelectedRecord().setAttribute(STATUS_LABEL, "Closed");
+						sessionsGrid.getSelectedRecord().setAttribute(STATUS, "1");
+						sessionsGrid.refreshRow(sessionsGrid.getRecordIndex(sessionsGrid.getSelectedRecord()));
 					}
 				});
 			}
-		});
+		}));
 
 		if (!"0".equals(sessionsGrid.getSelectedRecord().getAttributeAsString(STATUS))
 				|| (Session.get().getSid() != null

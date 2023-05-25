@@ -96,7 +96,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			result.setHits(guiResults.toArray(new GUIDocument[0]));
 
 			return result;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUIResult) throwServerException(session, log, t);
 		}
 	}
@@ -152,7 +152,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		try {
 			log.info("Searching max {} hits", searchOptions.getMaxHits());
 			search.search();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -204,7 +204,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 			log.debug("Saved query {}", opt.getName());
 			return true;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (Boolean) throwServerException(session, log, t);
 		}
 	}
@@ -221,13 +221,13 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				if (search != null)
 					dao.delete(search.getId());
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 
 		try {
 			legacyDelete(session.getUserId(), names);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -263,7 +263,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				return toGUIOptions(search.readOptions());
 			else
 				return legacyLoad(session.getUserId(), name);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUISearchOptions) throwServerException(session, log, t);
 		}
 	}
@@ -310,7 +310,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		for (com.logicaldoc.core.searchengine.saved.SavedSearch search : searches) {
 			try {
 				map.put(search.getName(), search.readOptions());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error("Cannot process saved search {} of user {}", search.getName(), session.getUsername(), e);
 			}
 		}
@@ -341,7 +341,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			SearchOptions opt = null;
 			try {
 				opt = SearchOptions.read(searchFile);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.warn(e.getMessage());
 			}
 
@@ -426,11 +426,11 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 							search);
 					clone.setUserId(userId);
 					dao.store(clone);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.warn("Cannot save search {} for user {}", search.getName(), userId, t);
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}

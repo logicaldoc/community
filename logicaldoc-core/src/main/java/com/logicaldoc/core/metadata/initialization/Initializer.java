@@ -68,11 +68,11 @@ public class Initializer {
 								&& StringUtils.isNotEmpty(templateAttribute.getInitialization())) {
 							executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
 						}
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}

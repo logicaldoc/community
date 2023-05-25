@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
@@ -49,6 +50,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		data.setRepositoryFolder(data.getRepositoryFolder().replace("\\", "/"));
 		File repoFolder = new File(data.getRepositoryFolder());
 		log.warn("Initialize system using repository " + repoFolder);
+
 		try {
 			makeWorkingDir(repoFolder);
 			createDB(data);
@@ -60,7 +62,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 				LoggingConfigurator lconf = new LoggingConfigurator();
 				lconf.setLogsRoot(pbean.getProperty("conf.logdir"));
 				lconf.write();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 
@@ -69,65 +71,53 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 				ContextProperties pbean = new ContextProperties();
 				pbean.setProperty("initialized", "true");
 				pbean.write();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 
 			// Reload the application context in order to reconnect DAOs to the
 			// database
 			Context.get().refresh();
-
-		} catch (Throwable caught) {
+		} catch (IOException | SQLException caught) {
 			System.err.println(caught.getMessage());
 			log.error(caught.getMessage(), caught);
 			throw new ServerException(caught.getMessage(), caught);
 		}
+
 	}
 
-	private void writeDBConfig(SetupInfo data) throws Exception {
-		try {
-			ContextProperties pbean = new ContextProperties();
-			pbean.setProperty("jdbc.driver", data.getDbDriver() != null ? data.getDbDriver() : "");
-			pbean.setProperty("jdbc.url", data.getDbUrl() != null ? data.getDbUrl() : "");
-			pbean.setProperty("jdbc.username", data.getDbUsername() != null ? data.getDbUsername() : "");
-			pbean.setProperty("jdbc.password", data.getDbPassword() != null ? data.getDbPassword() : "");
+	private void writeDBConfig(SetupInfo data) throws IOException {
+		ContextProperties pbean = new ContextProperties();
+		pbean.setProperty("jdbc.driver", data.getDbDriver() != null ? data.getDbDriver() : "");
+		pbean.setProperty("jdbc.url", data.getDbUrl() != null ? data.getDbUrl() : "");
+		pbean.setProperty("jdbc.username", data.getDbUsername() != null ? data.getDbUsername() : "");
+		pbean.setProperty("jdbc.password", data.getDbPassword() != null ? data.getDbPassword() : "");
 
-			String dbmms = data.getDbEngine().toLowerCase();
-			if (dbmms.startsWith("postgre"))
-				dbmms = "postgres";
-			pbean.setProperty("jdbc.dbms", dbmms);
+		String dbmms = data.getDbEngine().toLowerCase();
+		if (dbmms.startsWith("postgre"))
+			dbmms = "postgres";
+		pbean.setProperty("jdbc.dbms", dbmms);
 
-			if (StringUtils.isNotEmpty(data.getDbValidationQuery())) {
-				pbean.setProperty("jdbc.validationQuery", data.getDbValidationQuery());
-			} else {
-				pbean.setProperty("jdbc.validationQuery", "");
-			}
-
-			pbean.setProperty("hibernate.dialect", data.getDbDialect());
-
-			pbean.write();
-			log.info("configuration data written successfully.");
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			log.error("Exception writing db config on context file: " + e.getMessage(), e);
-			throw e;
+		if (StringUtils.isNotEmpty(data.getDbValidationQuery())) {
+			pbean.setProperty("jdbc.validationQuery", data.getDbValidationQuery());
+		} else {
+			pbean.setProperty("jdbc.validationQuery", "");
 		}
+
+		pbean.setProperty("hibernate.dialect", data.getDbDialect());
+
+		pbean.write();
+		log.info("configuration data written successfully.");
 	}
 
-	private void writeRegConfig(SetupInfo data) throws Exception {
-		try {
-			ContextProperties pbean = new ContextProperties();
-			pbean.setProperty("reg.name", data.getRegName() != null ? data.getRegName() : "");
-			pbean.setProperty("reg.website", data.getRegWebsite() != null ? data.getRegWebsite() : "");
-			pbean.setProperty("reg.organization", data.getRegOrganization() != null ? data.getRegOrganization() : "");
-			pbean.setProperty("reg.email", data.getRegEmail() != null ? data.getRegEmail() : "");
-			pbean.write();
-			log.info("configuration data written successfully.");
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			log.error("Exception writing registration config on context file: " + e.getMessage(), e);
-			throw e;
-		}
+	private void writeRegConfig(SetupInfo data) throws IOException {
+		ContextProperties pbean = new ContextProperties();
+		pbean.setProperty("reg.name", data.getRegName() != null ? data.getRegName() : "");
+		pbean.setProperty("reg.website", data.getRegWebsite() != null ? data.getRegWebsite() : "");
+		pbean.setProperty("reg.organization", data.getRegOrganization() != null ? data.getRegOrganization() : "");
+		pbean.setProperty("reg.email", data.getRegEmail() != null ? data.getRegEmail() : "");
+		pbean.write();
+		log.info("configuration data written successfully.");
 	}
 
 	/**
@@ -217,7 +207,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		reloadContext();
 	}
 
-	public void createDB(SetupInfo info) throws Exception {
+	private void createDB(SetupInfo info) throws IOException, SQLException {
 		// write the configuration for the db on the general context
 		writeDBConfig(info);
 
@@ -249,7 +239,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 
 					if (init.testConnection())
 						init.executeSql("create database " + dbName);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.warn("Unable to create the database schema, perhaps it already exists");
 				}
 		}
@@ -257,7 +247,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		doInit(info);
 	}
 
-	private void doInit(SetupInfo info) throws Exception {
+	private void doInit(SetupInfo info) throws SQLException {
 		PluginDbInit init = new PluginDbInit();
 		init.setDbms(info.getDbEngine());
 		init.setDriver(info.getDbDriver());
@@ -276,7 +266,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		} else {
 			// connection failure
 			log.debug("connection failure");
-			throw new Exception("Database Connection failure.");
+			throw new SQLException("Database Connection failure.");
 		}
 	}
 

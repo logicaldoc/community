@@ -1,9 +1,9 @@
 package com.logicaldoc.core.security;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.java.plugin.registry.Extension;
@@ -39,29 +39,31 @@ public class UserListenerManager {
 			sortedExts.add(extension);
 		}
 		Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
-				int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
-				if (position1 < position2)
-					return -1;
-				else if (position1 > position2)
-					return 1;
-				else
-					return 0;
+			int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
+			int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
+			if (position1 < position2)
+				return -1;
+			else if (position1 > position2)
+				return 1;
+			else
+				return 0;
 		});
 
 		for (Extension ext : sortedExts) {
 			String className = ext.getParameter("class").valueAsString();
+
 			try {
 				Class<?> clazz = Class.forName(className);
 				// Try to instantiate the listener
 				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof UserListener))
-					throw new Exception(
+					throw new ClassNotFoundException(
 							"The specified listener " + className + " doesn't implement UserListener interface");
 				listeners.add((UserListener) listener);
 				log.info("Added new user listener {} position {}", className,
 						ext.getParameter(POSITION).valueAsString());
-			} catch (Throwable e) {
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage());
 			}
 		}

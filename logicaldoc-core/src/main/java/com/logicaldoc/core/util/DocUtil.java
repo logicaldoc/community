@@ -38,7 +38,7 @@ public class DocUtil {
 				TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 				Tenant tenant = tenantDao.findById(document.getTenantId());
 				tenantName = tenant.getName();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage());
 			}
 		return tenantName;

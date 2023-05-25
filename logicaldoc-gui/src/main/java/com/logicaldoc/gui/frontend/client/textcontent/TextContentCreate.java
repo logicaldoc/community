@@ -14,8 +14,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to create a new web content.
@@ -53,12 +51,7 @@ public class TextContentCreate extends Window {
 
 		create = new SubmitItem();
 		create.setTitle(I18N.message("create"));
-		create.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onCreate();
-			}
-		});
+		create.addClickHandler(event -> onCreate());
 
 		form.setItems(filename, template, create);
 

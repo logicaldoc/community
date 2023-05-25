@@ -11,10 +11,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -53,12 +49,7 @@ public class TextContentEditor extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				unlockAndClose();
-			}
-		});
+		addCloseClickHandler(event -> unlockAndClose());
 
 		layout = new VLayout();
 		layout.setWidth100();
@@ -67,18 +58,19 @@ public class TextContentEditor extends Window {
 		if (content != null) {
 			prepareBody(content);
 		} else {
-			DocumentService.Instance.get().getContentAsString(TextContentEditor.this.document.getId(), new AsyncCallback<String>() {
+			DocumentService.Instance.get().getContentAsString(TextContentEditor.this.document.getId(),
+					new AsyncCallback<String>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-				@Override
-				public void onSuccess(String content) {
-					prepareBody(content);
-				}
-			});
+						@Override
+						public void onSuccess(String content) {
+							prepareBody(content);
+						}
+					});
 		}
 	}
 
@@ -94,22 +86,12 @@ public class TextContentEditor extends Window {
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
 		toolStrip.addButton(save);
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
 		toolStrip.addButton(close);
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				unlockAndClose();
-			}
-		});
+		close.addClickHandler(event -> unlockAndClose());
 
 		TextAreaItem contentItem = ItemFactory.newTextAreaItem(CONTENT, content);
 		contentItem.setShowTitle(false);
@@ -126,19 +108,20 @@ public class TextContentEditor extends Window {
 
 	private void unlockAndClose() {
 		if (document.getId() != 0)
-			DocumentService.Instance.get().unlock(new long[] { TextContentEditor.this.document.getId() }, new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					destroy();
-				}
+			DocumentService.Instance.get().unlock(new long[] { TextContentEditor.this.document.getId() },
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+							destroy();
+						}
 
-				@Override
-				public void onSuccess(Void result) {
-					DocumentsPanel.get().refresh();
-					destroy();
-				}
-			});
+						@Override
+						public void onSuccess(Void result) {
+							DocumentsPanel.get().refresh();
+							destroy();
+						}
+					});
 		else
 			destroy();
 	}

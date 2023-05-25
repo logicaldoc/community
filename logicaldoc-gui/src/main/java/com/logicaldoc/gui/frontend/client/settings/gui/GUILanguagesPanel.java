@@ -13,12 +13,9 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Displays a list of languages available for the GUI, allowing for
@@ -30,6 +27,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 public class GUILanguagesPanel extends VLayout {
 
 	private static final String EENABLED = "eenabled";
+
 	private ListGrid list;
 
 	public GUILanguagesPanel() {
@@ -66,12 +64,9 @@ public class GUILanguagesPanel extends VLayout {
 		addMember(list);
 
 		if (Feature.enabled(Feature.GUI_LANGUAGES))
-			list.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
-					showContextMenu();
-					event.cancel();
-				}
+			list.addCellContextClickHandler(event -> {
+				showContextMenu();
+				event.cancel();
 			});
 	}
 
@@ -81,47 +76,39 @@ public class GUILanguagesPanel extends VLayout {
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().setGUILanguageStatus(rec.getAttributeAsString("code"), true,
-						new AsyncCallback<Void>() {
+		enable.addClickHandler(event -> SystemService.Instance.get()
+				.setGUILanguageStatus(rec.getAttributeAsString("code"), true, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute(EENABLED, "0");
-								list.refreshRow(list.getRecordIndex(rec));
-								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
-							}
-						});
-			}
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "0");
+						list.refreshRow(list.getRecordIndex(rec));
+						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
+					}
+				}));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SystemService.Instance.get().setGUILanguageStatus(rec.getAttributeAsString("code"), false,
-						new AsyncCallback<Void>() {
+		disable.addClickHandler(event -> SystemService.Instance.get()
+				.setGUILanguageStatus(rec.getAttributeAsString("code"), false, new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								rec.setAttribute(EENABLED, "2");
-								list.refreshRow(list.getRecordIndex(rec));
-								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
-							}
-						});
-			}
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "2");
+						list.refreshRow(list.getRecordIndex(rec));
+						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
+					}
+				}));
 
 		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(disable);

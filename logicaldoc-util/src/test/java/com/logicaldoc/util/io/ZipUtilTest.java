@@ -97,7 +97,7 @@ public class ZipUtilTest {
 			List<String> entries = zipUtil.listEntries(file);
 			log.debug("Found {} entries", entries.size());
 			notThrownTest="ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 
 		}

@@ -39,7 +39,7 @@ public class HttpUtil {
 			// Try to get the config of the application context
 			try {
 				config = Context.get().getProperties();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 
@@ -51,14 +51,14 @@ public class HttpUtil {
 			proxy[1] = config.getProperty("proxy.port");
 			proxy[2] = config.getProperty("proxy.username");
 			proxy[3] = config.getProperty("proxy.password");
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		// The port must be an integer
 		try {
 			proxy[1] = "" + Integer.parseInt(proxy[1]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			proxy[1] = "0";
 		}
 
@@ -98,7 +98,7 @@ public class HttpUtil {
 						}
 					}).build()).setDefaultRequestConfig(requestConfig).build();
 			return httpclient;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return null;
 		}
 	}
@@ -123,7 +123,7 @@ public class HttpUtil {
 			String respBody = "";
 			try {
 				respBody = EntityUtils.toString(rent, "UTF-8");
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 			return respBody;

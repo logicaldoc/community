@@ -27,23 +27,13 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.ViewStateChangedEvent;
 import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Dashlet specialized in listing user workflow task records.
@@ -91,28 +81,13 @@ public class WorkflowDashlet extends Portlet {
 			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowsinvolvedin")));
 		}
 
-		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(list, true);
-			}
-		});
+		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, event -> GridUtil.exportCSV(list, true));
 		exportControl.setTooltip(I18N.message("export"));
 
-		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
+		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, event -> GridUtil.print(list));
 		printControl.setTooltip(I18N.message("print"));
 
-		HeaderControl refreshControl = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				refresh(null);
-			}
-		});
+		HeaderControl refreshControl = new HeaderControl(HeaderControl.REFRESH, event -> refresh(null));
 		refreshControl.setTooltip(I18N.message("refresh"));
 
 		DynamicForm maxSelector = new DynamicForm();
@@ -123,11 +98,7 @@ public class WorkflowDashlet extends Portlet {
 		max.setMin(0);
 		max.setStep(10);
 		max.setShowHint(false);
-		max.addChangedHandler(new ChangedHandler() {
-			public void onChanged(ChangedEvent event) {
-				refresh(null);
-			}
-		});
+		max.addChangedHandler(event -> refresh(null));
 		maxSelector.setItems(max);
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, maxSelector, refreshControl, exportControl, printControl);
@@ -180,7 +151,7 @@ public class WorkflowDashlet extends Portlet {
 			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, id, processId,
 					name, documents, lastnote, documentIds);
 
-		list.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
+		list.addCellDoubleClickHandler(event -> {
 			Record rec = event.getRecord();
 			WorkflowService.Instance.get().getWorkflowDetailsByTask(rec.getAttributeAsString("id"),
 					new AsyncCallback<GUIWorkflow>() {
@@ -201,7 +172,7 @@ public class WorkflowDashlet extends Portlet {
 					});
 		});
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+		list.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
 		});
@@ -209,14 +180,14 @@ public class WorkflowDashlet extends Portlet {
 		/*
 		 * Save the layout of the grid at every change
 		 */
-		list.addViewStateChangedHandler((ViewStateChangedEvent event) -> {
+		list.addViewStateChangedHandler(event -> {
 			gridState = list.getViewState();
 		});
 
 		/*
 		 * Restore any previously saved view state for this grid
 		 */
-		list.addDrawHandler((DrawEvent event) -> {
+		list.addDrawHandler(event -> {
 			if (gridState != null)
 				list.setViewState(gridState);
 		});
@@ -229,7 +200,7 @@ public class WorkflowDashlet extends Portlet {
 
 	private void countTotalAssignedTasksToCurrentUser() {
 		// Count the total of user tasks
-		list.addDataArrivedHandler((DataArrivedEvent event) -> {
+		list.addDataArrivedHandler(event -> {
 			int total = list.getTotalRows();
 
 			// If the returned entries are a different total,
@@ -279,19 +250,15 @@ public class WorkflowDashlet extends Portlet {
 		 */
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						ArrayList<String> ids = new ArrayList<>();
-						ListGridRecord[] selectedRecords = list.getSelectedRecords();
-						for (ListGridRecord rec : selectedRecords)
-							ids.add(rec.getAttributeAsString(PROCESS_ID));
-						workflowDashboard.killWorkflows(ids);
-					}
-				});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
+			if (Boolean.TRUE.equals(value)) {
+				ArrayList<String> ids = new ArrayList<>();
+				ListGridRecord[] selectedRecords = list.getSelectedRecords();
+				for (ListGridRecord rec : selectedRecords)
+					ids.add(rec.getAttributeAsString(PROCESS_ID));
+				workflowDashboard.killWorkflows(ids);
 			}
-		});
+		}));
 
 		if (!Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN))
 			delete.setEnabled(false);

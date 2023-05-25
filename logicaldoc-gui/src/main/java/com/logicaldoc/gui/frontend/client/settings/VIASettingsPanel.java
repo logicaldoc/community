@@ -145,8 +145,7 @@ public class VIASettingsPanel extends AdminPanel {
 		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME, account.getUsername());
 		username.setWidth(180);
 
-		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD,
-				account.getPassword());
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD, account.getPassword());
 		password.setWidth(180);
 
 		TextItem server = ItemFactory.newTextItem("server", account.getHost());
@@ -206,33 +205,28 @@ public class VIASettingsPanel extends AdminPanel {
 
 	private ButtonItem prepareResetCacheButton() {
 		ButtonItem resetCache = new ButtonItem("resetcache", I18N.message("resetcache"));
-		resetCache.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean yes) -> {
-					if (Boolean.TRUE.equals(yes)) {
-						EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
-								new AsyncCallback<Void>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+		resetCache.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), yes -> {
+			if (Boolean.TRUE.equals(yes)) {
+				EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(Void result) {
-										GuiLog.info(I18N.message("cachedeleted"), null);
-									}
-								});
-					}
-				});
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("cachedeleted"), null);
+							}
+						});
 			}
-		});
+		}));
 		return resetCache;
 	}
 
 	private ButtonItem prepareTestEmailButton() {
 		ButtonItem testEmail = new ButtonItem("testconnection", I18N.message("testconnection"));
-		testEmail.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+		testEmail.addClickHandler(event -> {
 			if (validate()) {
 				VIAService.Instance.get().save(settings, new AsyncCallback<GUIVIASettings>() {
 					@Override

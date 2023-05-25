@@ -112,7 +112,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 				html += "</tr></table>";
 
 				return html;
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				return "";
 			}
 		});
@@ -138,7 +138,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 						return Util.imageHTML("blank.png", null,
 								"width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				return "";
 			}
 		});
@@ -362,7 +362,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 					removeData(rec);
 					cursor.setMessage(I18N.message(SHOWNDOCUMENTS,
 							"" + (getData() != null ? Integer.toString(getData().length) : 0)));
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 			}

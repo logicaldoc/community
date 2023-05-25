@@ -476,11 +476,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				listener.afterStore(user, transaction, dictionary);
 			} catch (AuthenticationException ae) {
 				throw ae;
-			} catch (Exception e) {
+			} catch (PersistenceException e) {
 				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
 			}
 	}
-	
+
 	private void invokeListenersBefore(User user, UserHistory transaction, Map<String, Object> dictionary)
 			throws AuthenticationException {
 		log.debug("Invoke listeners before store");
@@ -489,7 +489,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				listener.beforeStore(user, transaction, dictionary);
 			} catch (AuthenticationException ae) {
 				throw ae;
-			} catch (Exception e) {
+			} catch (PersistenceException e) {
 				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e);
 			}
 	}
@@ -599,7 +599,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		try {
 			User user = findByUsernameIgnoreCase(username);
 			return isPasswordExpired(user);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return true;
 		}
@@ -628,7 +628,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 						+ user.getId());
 		sb.append(" UNION select max(ld_date) from ld_folder_history where ld_deleted=0 and ld_userid=" + user.getId()
 				+ " order by 1 desc");
-		List<Date> interactions = (List<Date>) queryForList(sb.toString(), Date.class);
+		@SuppressWarnings("unchecked")
+		List<Date> interactions = queryForList(sb.toString(), Date.class);
 		Date lastInteraction = null;
 		if (!interactions.isEmpty())
 			lastInteraction = interactions.get(0);
@@ -669,7 +670,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		try {
 			User user = findByUsernameIgnoreCase(username);
 			return isInactive(user);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return true;
 		}
@@ -767,6 +768,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		return userListenerManager;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize(User user) {
 		if (user == null)
@@ -827,6 +829,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return findByUsername(ADMIN + StringUtils.capitalize(tenantName));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<User> findByGroup(long groupId) {
 		List<Long> docIds = new ArrayList<>();

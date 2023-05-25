@@ -635,11 +635,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 					log.debug("Join the parts in a unique filename");
 
 					// This filter will only include files ending with .py
-					FilenameFilter filter = new FilenameFilter() {
-						@Override
-						public boolean accept(File f, String name) {
-							return name.contains(chunkString + "-" + chunkID);
-						}
+					FilenameFilter filter = (dir, fileName) -> {
+							return fileName.contains(chunkString + "-" + chunkID);
 					};
 
 					// We apply the filter

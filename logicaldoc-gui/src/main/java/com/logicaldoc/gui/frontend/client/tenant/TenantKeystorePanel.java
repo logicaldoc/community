@@ -406,7 +406,7 @@ public class TenantKeystorePanel extends VLayout {
 			try {
 				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalunit")
 						+ ",C=" + values.get("countrycode").toString().toUpperCase());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 

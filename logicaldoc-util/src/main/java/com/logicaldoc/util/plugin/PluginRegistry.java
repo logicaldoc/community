@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -117,10 +116,8 @@ public abstract class PluginRegistry {
 
 		System.out.println("Searching for plugins in " + pluginDirectory.getAbsolutePath());
 
-		FilenameFilter filter = new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return (name.endsWith(".jar") && name.contains("-plugin"));
-			}
+		FilenameFilter filter = (dir, fileName) -> {
+			return (fileName.endsWith(".jar") && fileName.contains("-plugin"));
 		};
 
 		if (!pluginDirectory.isDirectory()) {
@@ -214,20 +211,18 @@ public abstract class PluginRegistry {
 			sortedExts.add(extension);
 		}
 
-		Collections.sort(sortedExts, new Comparator<Extension>() {
-			public int compare(Extension e1, Extension e2) {
-				String sortParam = "position";
-				if (StringUtils.isNotEmpty(sortingParameter))
-					sortParam = sortingParameter;
-				int position1 = Integer.parseInt(e1.getParameter(sortParam).valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter(sortParam).valueAsString());
-				if (position1 < position2)
-					return -1;
-				else if (position1 > position2)
-					return 1;
-				else
-					return 0;
-			}
+		Collections.sort(sortedExts, (e1, e2) -> {
+			String sortParam = "position";
+			if (StringUtils.isNotEmpty(sortingParameter))
+				sortParam = sortingParameter;
+			int position1 = Integer.parseInt(e1.getParameter(sortParam).valueAsString());
+			int position2 = Integer.parseInt(e2.getParameter(sortParam).valueAsString());
+			if (position1 < position2)
+				return -1;
+			else if (position1 > position2)
+				return 1;
+			else
+				return 0;
 		});
 		return sortedExts;
 	}

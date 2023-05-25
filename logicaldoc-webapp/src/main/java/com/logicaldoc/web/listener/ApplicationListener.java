@@ -1,7 +1,6 @@
 package com.logicaldoc.web.listener;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -91,7 +90,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			} else if (config.getProperty(JDBC_URL).contains("jdbc:mysql")) {
 				com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.uncheckedShutdown();
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage());
 		}
 
@@ -110,7 +109,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 					log.warn(String.format("Error unregistering driver %s", d), ex);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 		}
 
@@ -124,7 +123,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 					try {
 						t.interrupt();
 						log.warn("Killed thread {}", t.getName());
-					} catch (Throwable e) {
+					} catch (Exception e) {
 						log.warn("Error killing {}", t.getName());
 					}
 			}
@@ -149,7 +148,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				if (configurator.setTransportGuarantee(policy)) {
 					PluginRegistry.getInstance().setRestartRequired();
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 
@@ -161,7 +160,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				if (configurator.setSameSiteCookies(conf.getProperty("cookies.samesite", "lax"))) {
 					PluginRegistry.getInstance().setRestartRequired();
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 
@@ -226,7 +225,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			URL configFile = null;
 			try {
 				configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 
@@ -246,7 +245,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			LoggerContext lContext = Configurator.initialize(null, log4jPath);
 			if (lContext == null)
 				throw new Exception("Null logger context");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
 		}
 	}
@@ -259,11 +258,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	 */
 	private void unpackPlugins(ServletContext context) throws IOException {
 		File pluginsDir = PluginRegistry.getPluginsDir();
-		File[] archives = pluginsDir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.toLowerCase().contains("plugin") && name.toLowerCase().endsWith(".zip");
-			}
+		File[] archives = pluginsDir.listFiles((dir, fileName) -> {
+				return fileName.toLowerCase().contains("plugin") && fileName.toLowerCase().endsWith(".zip");
 		});
 		File webappDir = new File(context.getRealPath("/"));
 		if (archives != null)
@@ -281,11 +277,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				pluginName = pluginName.substring(0, pluginName.lastIndexOf('-'));
 				System.out.println("Remove installation marker of plugin " + pluginName);
 				File pluginDir = new File(pluginsDir, pluginName);
-				File[] installationMarkers = pluginDir.listFiles(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						return name.toLowerCase().startsWith("install-");
-					}
+				File[] installationMarkers = pluginDir.listFiles((File dir, String fileName) -> {
+						return fileName.toLowerCase().startsWith("install-");
 				});
 				for (File file : installationMarkers)
 					FileUtils.deleteQuietly(file);
@@ -313,7 +306,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		try {
 			if (uploadFolder.exists())
 				FileUtils.forceDelete(uploadFolder);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage());
 		}
 
@@ -346,7 +339,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		try {
 			ContextProperties config = new ContextProperties();
 			return new File(config.getProperty("LDOCHOME") + "/bin/pid");
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return new File("pid");
 		}
 	}

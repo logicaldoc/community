@@ -182,7 +182,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		else
 			try {
 				currentUser = ServletUtil.getSessionUser(request);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		return currentUser;

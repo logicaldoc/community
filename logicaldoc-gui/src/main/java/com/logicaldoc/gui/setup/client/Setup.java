@@ -23,19 +23,12 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.FormItemIfFunction;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
-import com.smartgwt.client.widgets.form.validator.RequiredIfFunction;
 import com.smartgwt.client.widgets.form.validator.RequiredIfValidator;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -159,11 +152,7 @@ public class Setup implements EntryPoint {
 		// This is the button used to confirm each step
 		submit = new IButton();
 		submit.setTitle(I18N.message("next"));
-		submit.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				onSubmit(info);
-			}
-		});
+		submit.addClickHandler(event -> onSubmit(info));
 
 		// Prepare the heading panel with Logo and Title
 		// Prepare the logo image to be shown inside the login form
@@ -235,9 +224,8 @@ public class Setup implements EntryPoint {
 		engines.put(MARIADB, new String[] { MARIADB, "org.mariadb.jdbc.Driver",
 				"jdbc:mariadb://<server>[<:3306>]/<database>", "org.hibernate.dialect.MySQLDialect", SELECT_1 });
 		engines.put(POSTGRESQL,
-				new String[] { POSTGRESQL, "org.postgresql.Driver",
-						"jdbc:postgresql:[<//server>[<:5432>/]]<database>", "org.hibernate.dialect.PostgreSQLDialect",
-						SELECT_1 });
+				new String[] { POSTGRESQL, "org.postgresql.Driver", "jdbc:postgresql:[<//server>[<:5432>/]]<database>",
+						"org.hibernate.dialect.PostgreSQLDialect", SELECT_1 });
 		engines.put(ORACLE,
 				new String[] { ORACLE, "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@<server>[<:1521>]:<sid>",
 						"org.hibernate.dialect.Oracle10gDialect", "SELECT 1 FROM DUAL" });
@@ -277,24 +265,18 @@ public class Setup implements EntryPoint {
 			valueMap.put(engine, engines.get(engine)[0]);
 		dbEngine.setValueMap(valueMap);
 		dbEngine.setValue(MYSQL);
-		dbEngine.setShowIfCondition(new FormItemIfFunction() {
-			public boolean execute(FormItem item, Object value, DynamicForm form) {
-				return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-			}
+		dbEngine.setShowIfCondition((item, value, form) -> {
+			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
 		});
 		RequiredIfValidator ifValidator = new RequiredIfValidator();
-		ifValidator.setExpression(new RequiredIfFunction() {
-			public boolean execute(FormItem formItem, Object value) {
-				return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-			}
+		ifValidator.setExpression((formItem, value) -> {
+			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
 		});
 		dbEngine.setValidators(ifValidator);
-		dbEngine.addChangeHandler(new ChangeHandler() {
-			public void onChange(ChangeEvent event) {
-				String selectedItem = (String) event.getValue();
-				databaseForm.getField(DB_DRIVER).setValue(engines.get(selectedItem)[1]);
-				databaseForm.getField(DB_URL).setValue(engines.get(selectedItem)[2]);
-			}
+		dbEngine.addChangeHandler(event -> {
+			String selectedItem = (String) event.getValue();
+			databaseForm.getField(DB_DRIVER).setValue(engines.get(selectedItem)[1]);
+			databaseForm.getField(DB_URL).setValue(engines.get(selectedItem)[2]);
 		});
 
 		// The driver for the external DB
@@ -302,10 +284,8 @@ public class Setup implements EntryPoint {
 		dbDriver.setVisible(false);
 		dbDriver.setWrapTitle(false);
 		dbDriver.setWidth(300);
-		dbDriver.setShowIfCondition(new FormItemIfFunction() {
-			public boolean execute(FormItem item, Object value, DynamicForm form) {
-				return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-			}
+		dbDriver.setShowIfCondition((item, value, form) -> {
+			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
 		});
 		dbDriver.setValidators(ifValidator);
 
@@ -314,10 +294,8 @@ public class Setup implements EntryPoint {
 		dbUrl.setWidth(400);
 		dbUrl.setVisible(false);
 		dbUrl.setWrapTitle(false);
-		dbUrl.setShowIfCondition(new FormItemIfFunction() {
-			public boolean execute(FormItem item, Object value, DynamicForm form) {
-				return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-			}
+		dbUrl.setShowIfCondition((item, value, form) -> {
+			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
 		});
 		dbUrl.setValidators(ifValidator);
 
@@ -325,10 +303,8 @@ public class Setup implements EntryPoint {
 		TextItem dbUsername = ItemFactory.newTextItem(DB_USERNAME, "username", info.getConfig("jdbc.username"));
 		dbUsername.setVisible(false);
 		dbUsername.setWrapTitle(false);
-		dbUsername.setShowIfCondition(new FormItemIfFunction() {
-			public boolean execute(FormItem item, Object value, DynamicForm form) {
-				return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-			}
+		dbUsername.setShowIfCondition((item, value, form) -> {
+			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
 		});
 
 		// The password to access the external DB
@@ -338,10 +314,8 @@ public class Setup implements EntryPoint {
 		dbPassword.setName(DB_PASSWORD);
 		dbPassword.setWrapTitle(false);
 		dbPassword.setValue(info.getConfig("jdbc.password"));
-		dbPassword.setShowIfCondition(new FormItemIfFunction() {
-			public boolean execute(FormItem item, Object value, DynamicForm form) {
-				return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-			}
+		dbPassword.setShowIfCondition((item, value, form) -> {
+			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
 		});
 
 		databaseForm.setFields(dbType, dbEngine, dbDriver, dbUrl, dbUsername, dbPassword);
@@ -436,9 +410,8 @@ public class Setup implements EntryPoint {
 					public void onSuccess(Void arg) {
 						LD.clearPrompt();
 						SC.say(I18N.message("installationperformed"),
-								I18N.message("installationend", info.getBranding().getProduct()), (Boolean value) -> {
-									Util.redirect(Util.contextPath());
-								});
+								I18N.message("installationend", info.getBranding().getProduct()),
+								value -> Util.redirect(Util.contextPath()));
 					}
 				});
 				submit.setDisabled(true);
@@ -451,7 +424,7 @@ public class Setup implements EntryPoint {
 				if (step == tabs.getTabs().length - 1)
 					submit.setTitle(I18N.message("setup"));
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			SC.warn("Error: " + e.getMessage());
 		}
 	}

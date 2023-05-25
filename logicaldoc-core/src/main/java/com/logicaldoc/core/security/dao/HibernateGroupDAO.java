@@ -36,7 +36,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	}
 
 	public void delete(long groupId, int code) throws PersistenceException {
-		if(code==0)
+		if (code == 0)
 			throw new IllegalArgumentException("code cannot be 0");
 		Group group = findById(groupId);
 		refresh(group);
@@ -57,7 +57,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		try {
 			Group group = findByName(groupname, tenantId);
 			result = (group != null);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage());
 		}
 
@@ -74,7 +74,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 				if (group.getTenantId() == tenantId)
 					coll.add(group.getName());
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 
@@ -85,8 +85,8 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	public Group findByName(String name, long tenantId) {
 		Group group = null;
 		try {
-			Collection<Group> coll = findByWhere(ENTITY + ".tenantId=" + tenantId + " and " + ENTITY
-					+ ".name = '" + SqlUtil.doubleQuotes(name) + "'", null, null);
+			Collection<Group> coll = findByWhere(ENTITY + ".tenantId=" + tenantId + " and " + ENTITY + ".name = '"
+					+ SqlUtil.doubleQuotes(name) + "'", null, null);
 			if (coll.size() > 0) {
 				group = coll.iterator().next();
 				if (group.getDeleted() == 1)
@@ -118,7 +118,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			} else {
 				fixGuestPermissions(group);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			result = false;
 		}
@@ -169,7 +169,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			}
 
 			fixGuestPermissions(group);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}
@@ -180,8 +180,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			Map<String, Object> params = new HashMap<>();
 			params.put("name", name.toLowerCase());
 			params.put("tenantId", tenantId);
-			return findByWhere(
-					"lower(" + ENTITY + ".name) like :name and " + ENTITY + ".tenantId = :tenantId", params,
+			return findByWhere("lower(" + ENTITY + ".name) like :name and " + ENTITY + ".tenantId = :tenantId", params,
 					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -215,7 +214,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	@Override
 	public void store(Group group) throws PersistenceException {
 		super.store(group);
-		fixGuestPermissions((Group) group);
+		fixGuestPermissions(group);
 	}
 
 	/**
@@ -241,7 +240,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 						+ " where ld_groupid=" + group.getId();
 				jdbcUpdate(sql);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}

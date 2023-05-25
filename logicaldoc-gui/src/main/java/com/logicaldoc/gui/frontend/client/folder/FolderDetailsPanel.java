@@ -193,7 +193,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 					quotaTab.setPane(quotaTabPanel);
 					tabSet.addTab(quotaTab);
 				}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

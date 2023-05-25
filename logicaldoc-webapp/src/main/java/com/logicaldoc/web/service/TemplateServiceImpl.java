@@ -79,7 +79,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			} catch (Exception e) {
 				throw new Exception("Template has not been deleted", e);
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -117,7 +117,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			}
 
 			guiTemplate.setId(template.getId());
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUITemplate) throwServerException(session, log, t);
 		}
 
@@ -254,7 +254,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			GUITemplate guiTemplate = toGuiTemplate(templateId, template, session);
 
 			return guiTemplate;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 
@@ -360,7 +360,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		try {
 			session = validateSession(getThreadLocalRequest());
 			sessionUser = session.getUser();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -404,16 +404,19 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			});
 
 			return attributes;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUIAttribute[]) throwServerException(session, log, t);
 		}
 	}
 
 	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
-		Map<String, Attribute> attrs = template.getAttributes();
-		template = initializeTemplateAttributes(template, attrs);
+		if (template == null)
+			return new GUIAttribute[0];
+
+		template = initializeTemplateAttributes(template);
 
 		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+		Map<String, Attribute> attrs = template.getAttributes();
 
 		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null || attrs == null || attrs.isEmpty())
@@ -436,20 +439,19 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 			Collections.sort(attributes);
 			return attributes.toArray(new GUIAttribute[0]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return null;
 		}
 	}
 
-	private Template initializeTemplateAttributes(Template template, Map<String, Attribute> attrs) {
+	private Template initializeTemplateAttributes(Template template) {
 		if (template != null) {
 			try {
-				if (attrs != null) {
-					int attrsCount = attrs.size();
-					if (log.isDebugEnabled())
-						log.debug("Initialized {} attributes", attrsCount);
-				}
+				template.getAttributes();
+				int attrsCount = template.getAttributes().size();
+				if (log.isDebugEnabled())
+					log.debug("Initialized {} attributes", attrsCount);
 			} catch (LazyInitializationException e) {
 				// If an error happens here it means that the collection could
 				// not

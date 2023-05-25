@@ -177,7 +177,7 @@ public abstract class AbstractStorer implements Storer {
 		} catch (IOException ioe) {
 			log.error(ioe.getMessage(), ioe);
 			throw ioe;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error("Error writing document {} into {}", docId, out.getPath());
 			log.error(e.getMessage(), e);
 		}
@@ -189,7 +189,7 @@ public abstract class AbstractStorer implements Storer {
 		try {
 			IOUtils.copy(getStream(docId, resource), writer, "UTF-8");
 			return writer.toString();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 			return null;
 		}
@@ -266,7 +266,7 @@ public abstract class AbstractStorer implements Storer {
 			FileUtil.writeFile("test", tmpFile.getAbsolutePath());
 			store(tmpFile, 0L, resource);
 			return exists(0L, resource);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;
 		} finally {
@@ -274,7 +274,7 @@ public abstract class AbstractStorer implements Storer {
 			try {
 				if (exists(0L, resource))
 					delete(0L);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Noting to do
 			}
 		}

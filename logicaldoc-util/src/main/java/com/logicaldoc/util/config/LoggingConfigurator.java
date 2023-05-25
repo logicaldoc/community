@@ -31,7 +31,7 @@ public class LoggingConfigurator {
 		URL configFile = null;
 		try {
 			configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

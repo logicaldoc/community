@@ -436,7 +436,7 @@ public class User extends PersistentObject implements Serializable {
 				groupNames[i] = ug.getName();
 				i++;
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// Nothing to do
 		}
 	}

@@ -77,7 +77,7 @@ public class ContextProperties extends OrderedProperties {
 
 		try (FileInputStream fis = new FileInputStream(this.file)) {
 			load(fis);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(UNABLE_TO_READ_FROM, filePath, e);
 			throw e;
 		}
@@ -87,7 +87,7 @@ public class ContextProperties extends OrderedProperties {
 			try (FileInputStream fis = new FileInputStream(this.overrideFile)) {
 				load(fis);
 				log.info("Override settings defined in {}", overrideFile.getPath());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
 				throw e;
 			}
@@ -128,7 +128,7 @@ public class ContextProperties extends OrderedProperties {
 			try (FileInputStream fis = new FileInputStream(overrideFile)) {
 				load(fis);
 				log.debug("Override settings defined in {}", overrideFile.getPath());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
 				throw e;
 			}

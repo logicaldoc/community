@@ -27,7 +27,7 @@ public class ZipParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws IOException, ParseException {
 
 		if (filename.toLowerCase().endsWith(".zip"))
 			internalParseZip(input, encoding, locale, tenant, document, fileVersion, content);
@@ -36,7 +36,7 @@ public class ZipParser extends AbstractParser {
 	}
 
 	private void internalParseGZip(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws IOException, ParseException {
 		File ungzippedFile = null;
 		try {
 			ungzippedFile = gunzip(input, filename);
@@ -71,7 +71,7 @@ public class ZipParser extends AbstractParser {
 	}
 
 	private void internalParseZip(InputStream input, String encoding, Locale locale, String tenant, Document document,
-			String fileVersion, StringBuilder content) throws Exception {
+			String fileVersion, StringBuilder content) throws IOException, ParseException {
 		File zipFile = FileUtil.createTempFile("parsezip", "zip");
 		try {
 			FileUtil.writeFile(input, zipFile.getAbsolutePath());
@@ -124,7 +124,7 @@ public class ZipParser extends AbstractParser {
 				zipFile = FileUtil.createTempFile("parsezip", "zip");
 				FileUtil.writeFile(input, zipFile.getAbsolutePath());
 				return countPages(zipFile, filename);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			} finally {
 				if (zipFile != null)
@@ -137,7 +137,7 @@ public class ZipParser extends AbstractParser {
 				Parser parser = ParserFactory.getParser(ungzippedFile.getName());
 				if (parser != null)
 					return parser.countPages(ungzippedFile, ungzippedFile.getName());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			} finally {
 				if (ungzippedFile != null)
@@ -155,7 +155,7 @@ public class ZipParser extends AbstractParser {
 		if (filename.toLowerCase().endsWith(".zip")) {
 			try {
 				return countPagesInZipFile(input);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		} else {
@@ -165,7 +165,7 @@ public class ZipParser extends AbstractParser {
 				Parser parser = ParserFactory.getParser(ungzippedFile.getName());
 				if (parser != null)
 					return parser.countPages(ungzippedFile, ungzippedFile.getName());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			} finally {
 				if (ungzippedFile != null)

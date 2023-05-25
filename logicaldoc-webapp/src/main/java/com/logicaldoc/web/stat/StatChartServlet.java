@@ -121,7 +121,7 @@ public class StatChartServlet extends HttpServlet {
 				if (font == null && fontNames != null && fontNames.length > 0)
 					font = new Font(fontNames[0], Font.PLAIN, 12);
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage());
 		}
 		return font;

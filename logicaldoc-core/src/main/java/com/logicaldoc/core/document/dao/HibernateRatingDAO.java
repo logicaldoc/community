@@ -46,7 +46,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 				transaction.setComment("rating: " + rating.getVote());
 			}
 			updateDocumentRating(rating.getDocId(), transaction);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
 				session.logError(e.getMessage());
@@ -103,7 +103,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 			if (!coll.isEmpty() && coll.get(0).getCount() != 0)
 				return coll.get(0);
 
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
 		}

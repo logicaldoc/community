@@ -2,6 +2,7 @@ package com.logicaldoc.core.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -131,18 +132,21 @@ public class ParserFactory {
 		for (Extension extension : exts) {
 			String ext = extension.getParameter("extension").valueAsString().toLowerCase();
 			String className = extension.getParameter("class").valueAsString();
+
 			try {
 				Class clazz = Class.forName(className);
 				// Try to instantiate the parser
 				Object parser = clazz.getDeclaredConstructor().newInstance();
 				if (!(parser instanceof Parser))
-					throw new Exception(
+					throw new ClassNotFoundException(
 							String.format("The specified parser %s doesn't implement Parser interface", className));
 				parsers.put(ext, (Parser) parser);
 				log.info("Added new parser {} for extension {}", className, ext);
-			} catch (Throwable e) {
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage());
 			}
+
 		}
 
 		initAliases();

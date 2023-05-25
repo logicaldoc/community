@@ -100,7 +100,7 @@ public class BruteForcePanel extends AdminPanel {
 		usernameMax.setWrapTitle(false);
 		try {
 			usernameMax.setValue(Integer.parseInt(params.get(THROTTLE_USERNAME_MAX)));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -110,7 +110,7 @@ public class BruteForcePanel extends AdminPanel {
 		usernameWait.setWrapTitle(false);
 		try {
 			usernameWait.setValue(Integer.parseInt(params.get(THROTTLE_USERNAME_WAIT)));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -119,7 +119,7 @@ public class BruteForcePanel extends AdminPanel {
 		ipMax.setWrapTitle(false);
 		try {
 			ipMax.setValue(Integer.parseInt(params.get(THROTTLE_IP_MAX)));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -129,7 +129,7 @@ public class BruteForcePanel extends AdminPanel {
 		ipWait.setHint(I18N.message("minutes"));
 		try {
 			ipWait.setValue(Integer.parseInt(params.get(THROTTLE_IP_WAIT)));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

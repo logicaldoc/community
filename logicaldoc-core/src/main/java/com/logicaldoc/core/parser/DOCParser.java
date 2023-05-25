@@ -40,7 +40,7 @@ public class DOCParser extends RTFParser {
 			String tmp = "";
 			try (WordExtractor extractor = new WordExtractor(bis)) {
 				tmp = extractor.getText();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Maybe the document to be parsed is not a Word file.
 				// Try to evaluate it as a RTF file.
 			}
@@ -60,7 +60,7 @@ public class DOCParser extends RTFParser {
 			if (tmp != null)
 				tmp = tmp.replaceAll("[\\p{Cntrl}&&[^\\n]]", " ");
 			return StringUtil.writeToString(new StringReader(tmp));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Failed to extract Word text content", e);
 		}
 		return "";

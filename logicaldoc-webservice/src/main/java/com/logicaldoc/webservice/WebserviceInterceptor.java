@@ -92,7 +92,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		Session session = null;
 		try {
 			session = getSession(message, payload);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 
@@ -101,7 +101,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		 */
 		try {
 			increaseCounters(session);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 
@@ -129,7 +129,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 				saveCall(call, message);
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 	}
@@ -247,7 +247,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	public void shutdown() {
 		try {
 			syncCounters();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 	}
@@ -305,7 +305,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 				return sb.toString();
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new Fault(e);
 		}
 		return null;
@@ -331,7 +331,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 			try {
 				syncCounters();
 				lastSync = new Date();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn(t.getMessage(), t);
 			}
 		}
@@ -363,7 +363,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 					dao.cleanOldCalls(settings.getInt("webservice.call.ttl", 90));
 
 				dao.store(call);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn(t.getMessage(), t);
 			}
 		}

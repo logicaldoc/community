@@ -9,18 +9,12 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -46,14 +40,9 @@ public class PluginsPanel extends VLayout {
 		toolStrip.addSpacer(2);
 
 		ToolStripButton install = new ToolStripButton(I18N.message("install"));
-		install.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				PluginUploader uploader = new PluginUploader(PluginsPanel.this);
-				uploader.show();
-				event.cancel();
-			}
+		install.addClickHandler(event -> {
+			new PluginUploader(PluginsPanel.this).show();
+			event.cancel();
 		});
 
 		toolStrip.addButton(install);
@@ -61,15 +50,11 @@ public class PluginsPanel extends VLayout {
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 250);
 		name.setCanEdit(false);
-		name.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				if (value.toString().startsWith("logicaldoc-"))
-					return value.toString().substring(value.toString().indexOf('-') + 1);
-				else
-					return value.toString();
-			}
+		name.setCellFormatter((value, rec, rowNum, colNum) -> {
+			if (value.toString().startsWith("logicaldoc-"))
+				return value.toString().substring(value.toString().indexOf('-') + 1);
+			else
+				return value.toString();
 		});
 
 		ListGridField version = new VersionListGridField();
@@ -89,13 +74,9 @@ public class PluginsPanel extends VLayout {
 		addMember(list);
 
 		if (Session.get().isAdmin() && Session.get().isDefaultTenant())
-			list.addCellContextClickHandler(new CellContextClickHandler() {
-
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
-					showContextMenu();
-					event.cancel();
-				}
+			list.addCellContextClickHandler(event -> {
+				showContextMenu();
+				event.cancel();
 			});
 
 		refresh();
@@ -125,9 +106,8 @@ public class PluginsPanel extends VLayout {
 		Menu contextMenu = new Menu();
 		MenuItem initialize = new MenuItem();
 		initialize.setTitle(I18N.message("initialize"));
-		initialize.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirminitializeplugin"), (Boolean value) -> {
+		initialize.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirminitializeplugin"), value -> {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 						SystemService.Instance.get().initializePlugin(
@@ -145,14 +125,12 @@ public class PluginsPanel extends VLayout {
 									}
 								});
 					}
-				});
-			}
-		});
+				}));
+
 		MenuItem uninstall = new MenuItem();
 		uninstall.setTitle(I18N.message("uninstall"));
-		uninstall.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmuninstallplugin"), (Boolean value) -> {
+		uninstall.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmuninstallplugin"), value -> {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 						SystemService.Instance.get().uninstallPlugin(
@@ -170,9 +148,7 @@ public class PluginsPanel extends VLayout {
 									}
 								});
 					}
-				});
-			}
-		});
+				}));
 
 		contextMenu.setItems(initialize, uninstall);
 		contextMenu.showContextMenu();

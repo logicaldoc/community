@@ -39,13 +39,13 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static HashMap<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new HashMap<>();
 
 	// Singleton instance
-	private static Context instance = new Context();
+	private static Context instance;
 
 	// The Spring's application context
 	private ApplicationContext applicationContext;
 
 	private Context() {
-		
+		Context.instance = this;
 	}
 
 	public static Context get() {
@@ -62,6 +62,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 		return registry;
 	}
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
@@ -135,7 +136,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 				((AbstractApplicationContext) applicationContext).stop();
 				((AbstractApplicationContext) applicationContext).start();
 				((AbstractApplicationContext) applicationContext).refresh();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 		}
@@ -238,7 +239,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 
 			try {
 				evt.processEvent();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		}

@@ -49,7 +49,7 @@ public class LanguageManager {
 		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "Language");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 
@@ -69,7 +69,7 @@ public class LanguageManager {
 				}
 				languages.put(locale, lang);
 				log.info("Added new Language: " + language);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 		}

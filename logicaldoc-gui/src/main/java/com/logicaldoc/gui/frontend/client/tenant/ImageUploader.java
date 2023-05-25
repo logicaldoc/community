@@ -13,8 +13,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -57,13 +55,7 @@ public class ImageUploader extends Window {
 		customExternalDropZone.getElement().getStyle().setPadding(10, Unit.PX);
 
 		uploadButton = new IButton(I18N.message("upload"));
-		uploadButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onUpload();
-			}
-		});
+		uploadButton.addClickHandler(event -> onUpload());
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
@@ -78,23 +70,18 @@ public class ImageUploader extends Window {
 		layout.addMember(uploadButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(new CloseClickHandler() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+
 			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						// Nothing to do0
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						destroy();
-					}
-				});
+			public void onFailure(Throwable caught) {
+				// Nothing to do0
 			}
-		});
+
+			@Override
+			public void onSuccess(Void result) {
+				destroy();
+			}
+		}));
 
 		addItem(layout);
 
@@ -105,7 +92,7 @@ public class ImageUploader extends Window {
 			public void onFailure(Throwable caught) {
 				// Nothing to do
 			}
-			
+
 			@Override
 			public void onSuccess(Void result) {
 				// Nothing to do
@@ -114,7 +101,7 @@ public class ImageUploader extends Window {
 	}
 
 	public void onUpload() {
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

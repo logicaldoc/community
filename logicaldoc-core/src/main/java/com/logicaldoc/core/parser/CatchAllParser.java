@@ -50,7 +50,7 @@ public class CatchAllParser extends AbstractParser {
 						locale, tenant, null, null));
 			} else
 				log.warn("Cannot convert the file {} into pdf in order to parse the contents", filename);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 	}
@@ -78,7 +78,7 @@ public class CatchAllParser extends AbstractParser {
 					log.warn("Cannot convert the file {} into pdf in order to parse the contents", filename);
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		} finally {
 			if (inputFile != null && inputFile.exists())

@@ -27,6 +27,7 @@ import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.lock.LockManager;
+import com.logicaldoc.core.searchengine.IndexException;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.system.SystemLoadMonitor;
@@ -161,7 +162,7 @@ public abstract class Task implements Runnable {
 			if (needNotification)
 				for (TaskListener listener : taskListeners)
 					listener.progressChanged(progress);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		} finally {
 			checkExpiration();
@@ -211,7 +212,7 @@ public abstract class Task implements Runnable {
 			transactionId = UUID.randomUUID().toString();
 			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId)))
 				runTask();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error("Error caught " + t.getMessage(), t);
 			log.error("The task is stopped");
 			lastRunError = t;
@@ -220,7 +221,7 @@ public abstract class Task implements Runnable {
 			try {
 				if (lockManager != null)
 					lockManager.release(getName(), transactionId);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 
@@ -406,9 +407,9 @@ public abstract class Task implements Runnable {
 	 * Concrete implementations must override this method implementing their own
 	 * processing logic.
 	 * 
-	 * @throws Exception If something goes wrong this exception is raised
+	 * @throws IndexException If something goes wrong this exception is raised
 	 */
-	abstract protected void runTask() throws Exception;
+	abstract protected void runTask() throws TaskException;
 
 	/**
 	 * Concrete implementations must override this method declaring if the task

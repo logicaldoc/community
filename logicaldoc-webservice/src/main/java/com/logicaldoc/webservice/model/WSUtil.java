@@ -94,7 +94,7 @@ public class WSUtil {
 				}
 			}
 			wsDoc.setTags(tags);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -134,7 +134,7 @@ public class WSUtil {
 					attributes[i++] = attribute;
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		wsDoc.setAttributes(attributes);
@@ -341,7 +341,7 @@ public class WSUtil {
 				}
 				wsAttributeSet.setAttributes(attributes);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -384,7 +384,7 @@ public class WSUtil {
 				}
 				set.setAttributes(attributes);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -427,7 +427,7 @@ public class WSUtil {
 				}
 				template.setAttributes(attributes);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -479,7 +479,7 @@ public class WSUtil {
 				}
 				wsTemplate.setAttributes(attributes);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 

@@ -151,19 +151,19 @@ public class ImportFolderDetailsPanel extends VLayout {
 
 		try {
 			stdValid = standardPanel.validate();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			extValid = advancedPanel.validate();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
 		try {
 			histValid = historyPanel.validate();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

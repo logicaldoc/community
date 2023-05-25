@@ -141,7 +141,7 @@ public class ThumbnailManager {
 			// Put the resource
 			String resource = storer.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);
 			storer.store(dest, document.getId(), resource);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Error rendering image for document: {} - {}", document.getId(), document.getFileName(), e);
 		} finally {
 			// Delete temporary resources
@@ -158,7 +158,7 @@ public class ThumbnailManager {
 		try {
 			ContextProperties conf = Context.get().getProperties();
 			size = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".size"));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage());
 		}
 
@@ -174,7 +174,7 @@ public class ThumbnailManager {
 			if (buf > 100)
 				buf = 100;
 			return buf;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage());
 			return 100;
 		}
@@ -188,8 +188,7 @@ public class ThumbnailManager {
 	 * @return the right thumbnail builder for the given file name
 	 */
 	public ThumbnailBuilder getBuilder(String filename) {
-		String ext = filename.contains(".") ? FileUtil.getExtension(filename.toLowerCase())
-				: filename.toLowerCase();
+		String ext = filename.contains(".") ? FileUtil.getExtension(filename.toLowerCase()) : filename.toLowerCase();
 		ThumbnailBuilder builder = getBuilders().get(ext);
 
 		if (builder == null) {
@@ -201,7 +200,7 @@ public class ThumbnailManager {
 					builder = getBuilders().get("txt");
 				} else
 					builder = getBuilders().get("*");
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 		}
@@ -274,11 +273,11 @@ public class ThumbnailManager {
 				@SuppressWarnings("unchecked")
 				Object builder = clazz.getDeclaredConstructor().newInstance();
 				if (!(builder instanceof ThumbnailBuilder))
-					throw new Exception(
+					throw new ClassNotFoundException(
 							"The specified builder " + className + " doesn't implement ThumbnailBuilder interface");
 				builders.put(extension, (ThumbnailBuilder) builder);
 				log.info("Added new thumbnail builder {} for extension {}", className, extension);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}

@@ -107,18 +107,16 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				throw new RuntimeException(e.getMessage(), e);
 			}
 
-		Runnable task = new Runnable() {
-			public void run() {
-				try {
-					DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-					documentDao.bulkUpdate(
-							"set ld_indexed=0 where ld_indexed=1 "
-									+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""),
-							(Map<String, Object>) null);
-				} catch (Exception t) {
-					log.error(t.getMessage(), t);
-					throw new RuntimeException(t.getMessage(), t);
-				}
+		Runnable task = () -> {
+			try {
+				DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				documentDao.bulkUpdate(
+						"set ld_indexed=0 where ld_indexed=1 "
+								+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""),
+						(Map<String, Object>) null);
+			} catch (Exception t) {
+				log.error(t.getMessage(), t);
+				throw new RuntimeException(t.getMessage(), t);
 			}
 		};
 
@@ -195,7 +193,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			ContextProperties conf = Context.get().getProperties();
 			conf.setProperty(session.getTenantName() + ".lang." + language, active ? "enabled" : "disabled");
 			conf.write();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -211,7 +209,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				buf.add(((String) st.nextElement()).trim());
 
 			ParserFactory.setAliases(extension, buf.toArray(new String[0]));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -222,7 +220,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 			return indexer.getCount();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (Long) throwServerException(session, log, t);
 		}
 	}
@@ -236,7 +234,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			for (String filter : filters)
 				conf.setProperty(INDEX_TOKENFILTER + filter + ".position", Integer.toString(i++));
 			conf.write();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -250,7 +248,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			for (GUIParameter setting : settings)
 				conf.setProperty(prefix + setting.getName(), setting.getValue().trim());
 			conf.write();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -262,7 +260,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			ContextProperties conf = Context.get().getProperties();
 			conf.setProperty(INDEX_TOKENFILTER + filter, active ? "enabled" : "disabled");
 			conf.write();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -272,18 +270,13 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession(getThreadLocalRequest());
 
 		try {
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
-					indexer.purge();
-				}
-
+			Runnable runnable = () -> {
+				SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
+				indexer.purge();
 			};
 
 			executeLongRunningOperation("Purge Index", runnable, session);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -293,57 +286,50 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession(getThreadLocalRequest());
 
 		try {
-			Runnable runnable = new Runnable() {
+			Runnable runnable = () -> {
+				SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 
-				@Override
-				public void run() {
-					SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
+				List<Long> hitsIds = Arrays.asList(entryIds);
+				indexer.deleteHits(hitsIds);
+				log.info("Removed {} entries from the index", hitsIds.size());
 
-					List<Long> hitsIds = Arrays.asList(entryIds);
-					indexer.deleteHits(hitsIds);
-					log.info("Removed {} entries from the index", hitsIds.size());
+				DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				StringBuilder updateQuery = new StringBuilder();
+				updateQuery = new StringBuilder("update ld_document set ld_indexed=0 where ld_indexed = 1 ");
 
-					DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-					StringBuilder updateQuery = new StringBuilder();
-					updateQuery = new StringBuilder("update ld_document set ld_indexed=0 where ld_indexed = 1 ");
+				StringBuilder hitsIdsCondition = new StringBuilder();
+				if (!hitsIds.isEmpty()) {
+					hitsIdsCondition.append(" and (");
 
-					StringBuilder hitsIdsCondition = new StringBuilder();
-					if (!hitsIds.isEmpty()) {
-						hitsIdsCondition.append(" and (");
-
-						if (dao.isOracle()) {
-							/*
-							 * In Oracle The limit of 1000 elements applies to
-							 * sets of single items: (x) IN ((1), (2), (3),
-							 * ...). There is no limit if the sets contain two
-							 * or more items: (x, 0) IN ((1,0), (2,0), (3,0),
-							 * ...):
-							 */
-							hitsIdsCondition.append(" (ld_id,0) in ( ");
-							hitsIdsCondition.append(
-									hitsIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-							hitsIdsCondition.append(" )");
-						} else {
-							hitsIdsCondition
-									.append(" ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
-						}
-
-						hitsIdsCondition.append(")");
+					if (dao.isOracle()) {
+						/*
+						 * In Oracle The limit of 1000 elements applies to sets
+						 * of single items: (x) IN ((1), (2), (3), ...). There
+						 * is no limit if the sets contain two or more items:
+						 * (x, 0) IN ((1,0), (2,0), (3,0), ...):
+						 */
+						hitsIdsCondition.append(" (ld_id,0) in ( ");
+						hitsIdsCondition.append(
+								hitsIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+						hitsIdsCondition.append(" )");
+					} else {
+						hitsIdsCondition.append(" ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
 					}
-					updateQuery.append(hitsIdsCondition.toString());
 
-					try {
-						int updated = dao.jdbcUpdate(updateQuery.toString());
-						log.info("{} documents marked to be indexed", updated);
-					} catch (PersistenceException e) {
-						log.error(e.getMessage(), e);
-					}
+					hitsIdsCondition.append(")");
 				}
+				updateQuery.append(hitsIdsCondition.toString());
 
+				try {
+					int updated = dao.jdbcUpdate(updateQuery.toString());
+					log.info("{} documents marked to be indexed", updated);
+				} catch (PersistenceException e) {
+					log.error(e.getMessage(), e);
+				}
 			};
 
 			executeLongRunningOperation("Delete Index Entries", runnable, session);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	};
@@ -359,7 +345,6 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			result.setEstimatedHits(hits.getEstimatedCount());
 			result.setTime(hits.getElapsedTime());
 
-			
 			List<GUIDocument> guiResults = new ArrayList<>();
 
 			Map<Long, Hit> hitsMap = new HashMap<>();
@@ -434,7 +419,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 						fold.setName(hit.getFolder().getName());
 						document.setFolder(fold);
 					}
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					document.setId(hit.getId());
 					document.setLanguage(hit.getLanguage());
 					GUIFolder fold = new GUIFolder();
@@ -447,7 +432,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			result.setHits(guiResults.toArray(new GUIDocument[0]));
 
 			return result;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUIResult) throwServerException(session, log, t);
 		}
 	}
@@ -457,11 +442,9 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		// Find real documents
 		richQuery = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
-		richQuery
-				.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
+		richQuery.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
 		richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
-		richQuery.append(
-				" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
+		richQuery.append(" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
 		richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
 		richQuery.append(
 				" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
@@ -473,7 +456,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		richQuery.append(" where A.ld_deleted=0 and A.ld_folderid=FOLD.ld_id  ");
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		
+
 		Set<Long> hitsIds = hitsMap.keySet();
 		StringBuilder hitsIdsCondition = new StringBuilder();
 		if (!hitsIds.isEmpty()) {
@@ -482,9 +465,9 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			if (dao.isOracle()) {
 				/*
 				 * In Oracle The limit of 1000 elements applies to sets of
-				 * single items: (x) IN ((1), (2), (3), ...). There is no
-				 * limit if the sets contain two or more items: (x, 0) IN
-				 * ((1,0), (2,0), (3,0), ...):
+				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
+				 * if the sets contain two or more items: (x, 0) IN ((1,0),
+				 * (2,0), (3,0), ...):
 				 */
 				hitsIdsCondition.append(" (A.ld_id,0) in ( ");
 				hitsIdsCondition

@@ -13,10 +13,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.HeaderSpan;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -65,13 +62,7 @@ public class RunLevelPanel extends VLayout {
 		toolbar.setWidth100();
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
 		save.setDisabled("demo".equals(Session.get().getConfig(RUNLEVEL)));
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 		currentRunlevel = ItemFactory.newRunlevelSelector();
 
 		toolbar.addFormItem(currentRunlevel);
@@ -132,12 +123,8 @@ public class RunLevelPanel extends VLayout {
 		id.setCanEdit(false);
 		id.setCanSort(false);
 		id.setAutoFitWidth(true);
-		id.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				return I18N.message(ASPECT + rec.getAttributeAsString("id"));
-			}
+		id.setCellFormatter((value, rec, rowNum, colNum) -> {
+			return I18N.message(ASPECT + rec.getAttributeAsString("id"));
 		});
 
 		ListGridField _default = new ListGridField(DEFAULT, I18N.message(DEFAULT), 60);
@@ -177,8 +164,8 @@ public class RunLevelPanel extends VLayout {
 		aspects.setDataSource(new AspectsDS());
 		aspects.setFields(id, _default, bulkload, slave, devel, demo);
 		aspects.setHeaderHeight(44);
-		aspects.setHeaderSpans(new HeaderSpan(I18N.message("runlevels"),
-				new String[] { DEFAULT, BULKLOAD, SLAVE, DEVEL, "demo" }));
+		aspects.setHeaderSpans(
+				new HeaderSpan(I18N.message("runlevels"), new String[] { DEFAULT, BULKLOAD, SLAVE, DEVEL, "demo" }));
 
 		return aspects;
 	}

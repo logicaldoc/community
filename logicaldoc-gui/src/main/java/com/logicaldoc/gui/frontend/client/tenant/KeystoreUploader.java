@@ -53,13 +53,7 @@ public class KeystoreUploader extends Window {
 		layout.setMargin(2);
 
 		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSend();
-			}
-		});
+		sendButton.addClickHandler(event -> onSend());
 
 		prepareForm();
 
@@ -108,7 +102,7 @@ public class KeystoreUploader extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

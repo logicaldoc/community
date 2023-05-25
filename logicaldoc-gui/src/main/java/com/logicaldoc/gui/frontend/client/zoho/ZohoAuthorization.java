@@ -12,8 +12,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to handle Zoho settings.
@@ -49,13 +47,7 @@ public class ZohoAuthorization extends Window {
 		ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
 		authorize.setAutoFit(true);
 
-		authorize.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onAuthenticate();
-			}
-		});
+		authorize.addClickHandler(event -> onAuthenticate());
 
 		form.setFields(clientId, clientSecret, authorize);
 

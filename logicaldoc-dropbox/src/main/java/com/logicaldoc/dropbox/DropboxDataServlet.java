@@ -68,7 +68,7 @@ public class DropboxDataServlet extends HttpServlet {
 				printEntries(dbox, folders, parent, writer);
 			}
 			writer.write("</list>");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			handleError(response, e);
 		}
 	}
@@ -116,7 +116,7 @@ public class DropboxDataServlet extends HttpServlet {
 		log.error(message, e);
 		try {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

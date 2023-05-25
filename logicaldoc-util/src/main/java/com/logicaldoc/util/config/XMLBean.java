@@ -107,7 +107,7 @@ public class XMLBean {
 			if (docPath != null) {
 				try {
 					doc = builder.build(docPath);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// In some environments, during maven test phase a well formed URL must be used
 					// insead of ordinary path
 					log.error(t.getMessage());
@@ -121,7 +121,7 @@ public class XMLBean {
 			} else
 				try {
 					doc = builder.build(docInputStream);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.error(t.getMessage());
 				}
 
@@ -160,7 +160,7 @@ public class XMLBean {
 				expr = xpath.compile(xpathExpression, Filters.element(), null, namespaces.keySet().stream()
 						.map(key -> Namespace.getNamespace(key, namespaces.get(key))).collect(Collectors.toList()));
 			return expr.evaluateFirst(doc);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 		return null;

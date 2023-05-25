@@ -45,22 +45,14 @@ public class MessageTemplateEditor extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSave();
-				destroy();
-			}
+		save.addClickHandler(event -> {
+			onSave();
+			destroy();
 		});
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				destroy();
-			}
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -72,14 +64,14 @@ public class MessageTemplateEditor extends Window {
 
 		addItem(toolStrip);
 
-		TextAreaItem subject = ItemFactory.newTextAreaItemForAutomation(SUBJECT, 
-				rec.getAttributeAsString(SUBJECT), null, false);
+		TextAreaItem subject = ItemFactory.newTextAreaItemForAutomation(SUBJECT, rec.getAttributeAsString(SUBJECT),
+				null, false);
 		subject.setRequired(true);
 		subject.setWidth("*");
 		subject.setHeight(30);
 
-		RichTextItem body = ItemFactory.newRichTextItemForAutomation("body", "body",
-				rec.getAttributeAsString("body"), null);
+		RichTextItem body = ItemFactory.newRichTextItemForAutomation("body", "body", rec.getAttributeAsString("body"),
+				null);
 		body.setRequired(true);
 		body.setWidth("*");
 		body.setHeight("*");

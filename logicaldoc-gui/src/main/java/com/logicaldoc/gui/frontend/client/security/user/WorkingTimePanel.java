@@ -135,7 +135,7 @@ public class WorkingTimePanel extends VLayout {
 			for (GUIWorkingTime wt : user.getWorkingTimes()) {
 				try {
 					calendar.addEvent(wt.getStart(), wt.getEnd(), wt.getLabel(), wt.getDescription());
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 			}

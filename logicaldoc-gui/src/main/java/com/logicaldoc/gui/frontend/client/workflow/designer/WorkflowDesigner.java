@@ -112,7 +112,7 @@ public class WorkflowDesigner extends AdminPanel {
 
 		try {
 			saveModel();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

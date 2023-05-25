@@ -14,8 +14,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
@@ -57,13 +55,7 @@ public class ComparatorAssociationsDialog extends Window {
 		selectItem.setValue(defaultComparator);
 		selectItem.setWidth(290);
 		selectItem.setRequired(true);
-		selectItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				refresh();
-			}
-		});
+		selectItem.addChangedHandler(event -> refresh());
 
 		DynamicForm form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.TOP);
@@ -111,13 +103,7 @@ public class ComparatorAssociationsDialog extends Window {
 		associationsGrid.setDataSource(ds);
 		apply = new IButton(I18N.message("apply"));
 		apply.setAutoFit(true);
-		apply.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onApply();
-			}
-		});
+		apply.addClickHandler(event -> onApply());
 
 		addItem(associationsGrid);
 		addItem(apply);

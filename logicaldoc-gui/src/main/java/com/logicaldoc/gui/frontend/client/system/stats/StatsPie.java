@@ -53,7 +53,7 @@ public class StatsPie extends HLayout {
 				long val = Long.parseLong(parameters[0][i].getValue()) / 1024 / 1024;
 				params[i].setValue(Long.toString(val));
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -69,7 +69,7 @@ public class StatsPie extends HLayout {
 		try {
 			repository.addMember(prepareLegend(parameters[STATS_REPOSITORY], STATS_REPOSITORY));
 			addMember(repository);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -86,7 +86,7 @@ public class StatsPie extends HLayout {
 		try {
 			documents.addMember(prepareLegend(parameters[STATS_DOCUMENTS], STATS_DOCUMENTS));
 			addMember(documents);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -103,7 +103,7 @@ public class StatsPie extends HLayout {
 		try {
 			pages.addMember(prepareLegend(parameters[STATS_PAGES], STATS_PAGES));
 			addMember(pages);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -121,7 +121,7 @@ public class StatsPie extends HLayout {
 		try {
 			folders.addMember(prepareLegend(parameters[STATS_FOLDERS], STATS_FOLDERS));
 			addMember(folders);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -216,7 +216,7 @@ public class StatsPie extends HLayout {
 
 			try {
 				count += fmt1.parse(parameter.getValue());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				GuiLog.info("error in " + parameter + " " + parameter.getValue(), null);
 			}
 		}

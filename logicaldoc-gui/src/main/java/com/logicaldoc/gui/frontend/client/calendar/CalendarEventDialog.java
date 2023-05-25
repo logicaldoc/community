@@ -749,7 +749,7 @@ public class CalendarEventDialog extends Window {
 		if (vm.getValue(START_TIME) != null)
 			try {
 				calendarEvent.setStartDate(df.parse(str + " " + vm.getValue(START_TIME).toString()));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				calendarEvent.setStartDate(df.parse(str + " " + dfTime.format((Date) vm.getValue(START_TIME))));
 			}
 
@@ -758,7 +758,7 @@ public class CalendarEventDialog extends Window {
 			if (vm.getValue(EXPIRATION_TIME) != null)
 				try {
 					calendarEvent.setExpirationDate(df.parse(str + " " + vm.getValue(EXPIRATION_TIME).toString()));
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					calendarEvent.setExpirationDate(
 							df.parse(str + " " + dfTime.format((Date) vm.getValue(EXPIRATION_TIME))));
 				}

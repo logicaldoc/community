@@ -19,8 +19,7 @@ import net.sf.ehcache.Element;
  * Thread-safety is taken care of by the underlying <b>Ehcache</b> instance.
  * 
  * <p>
- * see org.springframework.cache.ehcache.EhCacheFactoryBean
- * <br>
+ * see org.springframework.cache.ehcache.EhCacheFactoryBean <br>
  * see org.springframework.cache.ehcache.EhCacheManagerFactoryBean
  */
 public class EhCache<K extends Serializable, V extends Object> implements com.logicaldoc.util.cache.Cache<K, V> {
@@ -39,7 +38,7 @@ public class EhCache<K extends Serializable, V extends Object> implements com.lo
 		try {
 			return (cache.get(key) != null);
 		} catch (CacheException e) {
-			throw new RuntimeException("contains failed", e);
+			throw new CacheException("contains failed", e);
 		}
 	}
 
@@ -58,10 +57,10 @@ public class EhCache<K extends Serializable, V extends Object> implements com.lo
 				return null;
 			}
 		} catch (IllegalStateException ie) {
-			throw new RuntimeException("Failed to get from EhCache as state invalid: \n" + "  state: "
-					+ cache.getStatus() + "\n" + "   key: " + key, ie);
+			throw new CacheException("Failed to get from EhCache as state invalid: \n" + "  state: " + cache.getStatus()
+					+ "\n" + "   key: " + key, ie);
 		} catch (CacheException e) {
-			throw new RuntimeException("Failed to get from EhCache: \n" + "   key: " + key, e);
+			throw new CacheException("Failed to get from EhCache: \n" + "   key: " + key, e);
 		}
 	}
 
@@ -100,7 +99,7 @@ public class EhCache<K extends Serializable, V extends Object> implements com.lo
 				System.setProperty(CacheManager.ENABLE_SHUTDOWN_HOOK_PROPERTY, "TRUE");
 				URL resource = Cache.class.getResource("/cache.xml");
 				manager = CacheManager.create(Paths.get(resource.toURI()).toFile().getAbsolutePath());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error("Cannot initialize the cache manager");
 				return null;
 			}

@@ -121,7 +121,7 @@ public class EMailAttachment implements Serializable {
 				content = parser.parse(contentStream, getFileName(),
 						StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8", locale != null ? locale : Locale.ENGLISH,
 						Tenant.DEFAULT_NAME);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 

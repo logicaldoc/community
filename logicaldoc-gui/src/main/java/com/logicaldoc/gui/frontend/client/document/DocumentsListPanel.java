@@ -67,7 +67,7 @@ public class DocumentsListPanel extends VLayout {
 					&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 				try {
 					DocUtil.download(id, null);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 			else {

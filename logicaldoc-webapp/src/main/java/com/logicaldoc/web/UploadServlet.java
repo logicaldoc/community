@@ -75,7 +75,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			out.println("</HTML>");
 			out.flush();
 			out.close();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -289,7 +289,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	public void onSessionClosed(Object sid) {
 		try {
 			FileUtils.forceDelete(getUploadDir(sid.toString()));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Unable to clean the upload folder for session {}", sid);
 		}
 	}

@@ -117,7 +117,7 @@ public class Exec {
 		} finally {
 			try {
 				process.destroy();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -197,7 +197,7 @@ public class Exec {
 
 		try {
 			process.destroy();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -274,7 +274,7 @@ public class Exec {
 
 		try {
 			process.destroy();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -327,7 +327,7 @@ public class Exec {
 
 		try {
 			process.destroy();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

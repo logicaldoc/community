@@ -163,7 +163,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				tg.setWrite(groupSet.getInt(2));
 				template.getTemplateGroups().add(tg);
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

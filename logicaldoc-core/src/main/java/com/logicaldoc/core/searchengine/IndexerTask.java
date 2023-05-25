@@ -27,6 +27,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.task.Task;
+import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.core.threading.NamedThreadFactory;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.CollectionUtil;
@@ -93,7 +94,7 @@ public class IndexerTask extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Exception {
+	protected void runTask() throws TaskException {
 		if (indexer.isLocked()) {
 			log.warn("Index locked, skipping indexing");
 			return;
@@ -176,6 +177,8 @@ public class IndexerTask extends Task {
 					errors += thread.getErrors();
 				}
 			}
+		} catch (PersistenceException e) {
+			throw new TaskException(e.getMessage(), e);
 		} finally {
 			killIndexerThreads();
 
@@ -191,10 +194,13 @@ public class IndexerTask extends Task {
 			lockManager.release(getName(), transactionId);
 
 			// Remove the transaction reference
-
 			Map<String, Object> params = new HashMap<>();
 			params.put("transactionId", transactionId);
-			documentDao.bulkUpdate("set ld_transactionid = null where ld_transactionId = :transactionId", params);
+			try {
+				documentDao.bulkUpdate("set ld_transactionid = null where ld_transactionId = :transactionId", params);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 
 			// Last step done
 			next();
@@ -395,7 +401,7 @@ public class IndexerTask extends Task {
 							log.debug("Thread {}: Indexed document {} in {}ms", number, indexingDiff);
 						}
 						indexed++;
-					} catch (Throwable e) {
+					} catch (Exception e) {
 						log.error("Thread {}: There was a problem indexing document {}", number, id);
 						log.error(e.getMessage(), e);
 						errors++;

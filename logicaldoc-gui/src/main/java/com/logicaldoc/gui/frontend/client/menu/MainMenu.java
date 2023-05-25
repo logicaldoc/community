@@ -206,7 +206,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				criterion.setOperator("equals");
 				try {
 					criterion.setLongValue(Long.parseLong(value));
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					criterion.setLongValue(0L);
 				}
 			} else

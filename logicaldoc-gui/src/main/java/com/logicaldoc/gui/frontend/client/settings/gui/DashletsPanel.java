@@ -13,26 +13,17 @@ import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.ImgButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -73,38 +64,27 @@ public class DashletsPanel extends VLayout {
 		ToolStripButton add = new ToolStripButton();
 		add.setAutoFit(true);
 		add.setTitle(I18N.message("adddashlet"));
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
-				item.setRequired(true);
-				LD.askForValue(I18N.message("newdashlet"), I18N.message("name"), null, item, new ValueCallback() {
-					@Override
-					public void execute(String value) {
-						GUIDashlet dashlet = new GUIDashlet();
-						dashlet.setName(value);
-						dashlet.setType(CONTENT);
-						dashlet.setId(-1L);
-						dashlets.add(dashlet);
+		add.addClickHandler(event -> {
+			TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
+			item.setRequired(true);
+			LD.askForValue(I18N.message("newdashlet"), I18N.message("name"), null, item, value -> {
+				GUIDashlet dashlet = new GUIDashlet();
+				dashlet.setName(value);
+				dashlet.setType(CONTENT);
+				dashlet.setId(-1L);
+				dashlets.add(dashlet);
 
-						refreshGrid();
+				refreshGrid();
 
-						DashletEditor editor = new DashletEditor(dashlet, DashletsPanel.this);
-						editor.show();
-					}
-				});
-			}
+				DashletEditor editor = new DashletEditor(dashlet, DashletsPanel.this);
+				editor.show();
+			});
 		});
 
 		ToolStripButton save = new ToolStripButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				saveDashlets();
-			}
-		});
+		save.addClickHandler(event -> saveDashlets());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addButton(add);
@@ -125,20 +105,14 @@ public class DashletsPanel extends VLayout {
 
 		ListGridField title = new ListGridField(TITLE, I18N.message(TITLE));
 		title.setWidth(120);
-		title.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				return value != null ? I18N.message(value.toString()) : "";
-			}
+		title.setCellFormatter((value, rec, rowNum, colNum) -> {
+			return value != null ? I18N.message(value.toString()) : "";
 		});
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setWidth(125);
-		type.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				return I18N.message("dashlet.type." + value);
-			}
+		type.setCellFormatter((value, rec, rowNum, colNum) -> {
+			return I18N.message("dashlet.type." + value);
 		});
 
 		ListGridField max = new ListGridField("max", I18N.message("max"));
@@ -171,11 +145,7 @@ public class DashletsPanel extends VLayout {
 					editImg.setPrompt(I18N.message("edit"));
 					editImg.setHeight(16);
 					editImg.setWidth(16);
-					editImg.addClickHandler(new ClickHandler() {
-						public void onClick(ClickEvent event) {
-							onEdit();
-						}
-					});
+					editImg.addClickHandler(event -> onEdit());
 
 					rollOverCanvas.addMember(editImg);
 				}
@@ -183,6 +153,7 @@ public class DashletsPanel extends VLayout {
 
 			}
 		};
+
 		grid.setEmptyMessage(I18N.message("notitemstoshow"));
 		grid.setShowAllRecords(true);
 		grid.setCanEdit(false);
@@ -194,21 +165,12 @@ public class DashletsPanel extends VLayout {
 		grid.setShowRollUnderCanvas(false);
 		grid.setFields(id, name, title, type, max, query, content);
 
-		grid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		grid.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		grid.addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				onEdit();
-			}
-		});
+		grid.addDoubleClickHandler(event -> onEdit());
 
 		setMembers(hint, toolStrip, grid);
 
@@ -259,22 +221,18 @@ public class DashletsPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DashletService.Instance.get().delete(grid.getSelectedRecord().getAttributeAsLong("id"),
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		delete.addClickHandler(event -> DashletService.Instance.get()
+				.delete(grid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void arg) {
-								reload();
-							}
-						});
-			}
-		});
+					@Override
+					public void onSuccess(Void arg) {
+						reload();
+					}
+				}));
 
 		delete.setEnabled(!GUIDashlet.isSystemDashlet(grid.getSelectedRecord().getAttributeAsString("name")));
 

@@ -28,7 +28,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -464,46 +463,40 @@ public class TenantBrandingPanel extends HLayout {
 		Menu contextMenu = new Menu();
 		MenuItem reset = new MenuItem();
 		reset.setTitle(I18N.message("reset"));
-		reset.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				GUIBranding model = new GUIBranding();
+		reset.addClickHandler(event -> {
+			GUIBranding model = new GUIBranding();
 
-				String image = "";
-				if ("logo".equals(name)) {
-					tenant.getBranding().setLogoSrc(model.getLogoSrc());
-					image = model.getLogo();
-				} else if (LOGO_HEAD.equals(name)) {
-					tenant.getBranding().setLogoHeadSrc(model.getLogoHeadSrc());
-					image = model.getLogoHead();
-				} else if (LOGO_MENU.equals(name)) {
-					tenant.getBranding().setLogoMenuSrc(model.getLogoMenuSrc());
-					image = model.getLogoMenu();
-				} else if (LOGO_OEM.equals(name)) {
-					tenant.getBranding().setLogoOemSrc(model.getLogoOemSrc());
-					image = model.getLogoOem();
-				} else if (LOGO_HEAD_OEM.equals(name)) {
-					tenant.getBranding().setLogoHeadOemSrc(model.getLogoHeadOemSrc());
-					image = model.getLogoHeadOem();
-				} else if (FAVICON.equals(name)) {
-					tenant.getBranding().setFaviconSrc(model.getFaviconSrc());
-					image = model.getFavicon();
-				} else if (BANNER.equals(name)) {
-					tenant.getBranding().setBannerSrc(model.getBannerSrc());
-					image = model.getBanner();
-				}
-
-				updateImage(name, image);
+			String image = "";
+			if ("logo".equals(name)) {
+				tenant.getBranding().setLogoSrc(model.getLogoSrc());
+				image = model.getLogo();
+			} else if (LOGO_HEAD.equals(name)) {
+				tenant.getBranding().setLogoHeadSrc(model.getLogoHeadSrc());
+				image = model.getLogoHead();
+			} else if (LOGO_MENU.equals(name)) {
+				tenant.getBranding().setLogoMenuSrc(model.getLogoMenuSrc());
+				image = model.getLogoMenu();
+			} else if (LOGO_OEM.equals(name)) {
+				tenant.getBranding().setLogoOemSrc(model.getLogoOemSrc());
+				image = model.getLogoOem();
+			} else if (LOGO_HEAD_OEM.equals(name)) {
+				tenant.getBranding().setLogoHeadOemSrc(model.getLogoHeadOemSrc());
+				image = model.getLogoHeadOem();
+			} else if (FAVICON.equals(name)) {
+				tenant.getBranding().setFaviconSrc(model.getFaviconSrc());
+				image = model.getFavicon();
+			} else if (BANNER.equals(name)) {
+				tenant.getBranding().setBannerSrc(model.getBannerSrc());
+				image = model.getBanner();
 			}
+
+			updateImage(name, image);
 		});
 
 		MenuItem upload = new MenuItem();
 		upload.setTitle(I18N.message("uploadnewimage"));
-		upload.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ImageUploader uploader = new ImageUploader(rec.getAttributeAsString(NAME), TenantBrandingPanel.this);
-				uploader.show();
-			}
-		});
+		upload.addClickHandler(
+				event -> new ImageUploader(rec.getAttributeAsString(NAME), TenantBrandingPanel.this).show());
 
 		contextMenu.setItems(upload, reset);
 		contextMenu.showContextMenu();

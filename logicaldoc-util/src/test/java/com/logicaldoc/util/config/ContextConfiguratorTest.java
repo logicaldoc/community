@@ -31,7 +31,7 @@ public class ContextConfiguratorTest {
 			ContextConfigurator config = new ContextConfigurator(contextXml.getPath());
 			config.addTrigger("TestTrigger");
 			notThrownTest = "ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);

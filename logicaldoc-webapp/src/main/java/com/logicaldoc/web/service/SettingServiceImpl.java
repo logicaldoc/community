@@ -246,7 +246,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			conf.write();
 
 			log.info("Successfully saved {} parameters", counter);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throwServerException(session, log, e);
 		}
 	}
@@ -336,7 +336,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 				config.write();
 				return null;
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return (String[]) throwServerException(session, log, e);
 		}
 	}

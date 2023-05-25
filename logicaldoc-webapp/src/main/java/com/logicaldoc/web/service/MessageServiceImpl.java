@@ -107,7 +107,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 			return m;
 
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return (GUIMessage) throwServerException(session, log, e);
 		}
 	}
@@ -119,7 +119,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		try {
 			for (long id : recipientIds)
 				saveMessage(message, session, id);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -196,7 +196,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			buf.sort((s1, s2) -> s1.getType().compareTo(s2.getType()));
 
 			return buf.toArray(new GUIMessageTemplate[0]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUIMessageTemplate[]) throwServerException(session, log, t);
 		}
 	}
@@ -226,7 +226,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED);
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -249,7 +249,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					}
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -272,7 +272,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 					throw new Exception(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -296,7 +296,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			t.setBody(template.getBody());
 			t.setType(template.getType());
 			return t;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUIMessageTemplate) throwServerException(session, log, t);
 		}
 	}

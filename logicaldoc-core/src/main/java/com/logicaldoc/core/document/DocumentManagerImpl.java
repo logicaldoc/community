@@ -452,9 +452,11 @@ public class DocumentManagerImpl implements DocumentManager {
 			try {
 				doc = documentDAO.findById(docref);
 				if (doc == null)
-					throw new Exception(String.format("Unexisting referenced document {}", docref));
-			} catch (Throwable e) {
-				throw new RuntimeException(e.getMessage(), e);
+					throw new ParseException(String.format("Unexisting referenced document {}", docref));
+			} catch (ParseException pe) {
+				throw pe;
+			} catch (PersistenceException e) {
+				throw new ParseException(e.getMessage(), e);
 			}
 		}
 
@@ -471,7 +473,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			try {
 				content = parser.parse(storer.getStream(doc.getId(), resource), doc.getFileName(), null, locale,
 						tDao.findById(doc.getTenantId()).getName(), doc, fileVersion);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc, e);
 				if (e instanceof ParseException)
 					throw (ParseException) e;
@@ -576,7 +578,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			 * multi-threading may lead to hibernate's sessions rollbacks
 			 */
 			synchronizedUpdate(document, docVO, transaction);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			if (e instanceof PersistenceException)
 				throw (PersistenceException) e;
@@ -586,7 +588,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	private synchronized void synchronizedUpdate(Document document, Document docVO, DocumentHistory transaction)
-			throws Exception, PersistenceException {
+			throws PersistenceException {
 		documentDAO.initialize(document);
 		if (document.getImmutable() == 0
 				|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
@@ -629,7 +631,6 @@ public class DocumentManagerImpl implements DocumentManager {
 			setBarcodeTemplate(document, docVO);
 
 			// create a new version
-
 			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 					DocumentEvent.CHANGED.toString(), false);
 
@@ -646,7 +647,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			markAliasesToIndex(document.getId());
 		} else {
-			throw new Exception(String.format("Document %s is immutable", document));
+			throw new PersistenceException(String.format("Document %s is immutable", document));
 		}
 	}
 
@@ -828,7 +829,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			if (file != null)
 				try {
 					storeFile(docVO, file);
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					String message = String.format("Unable to store the file of document %d", docVO.getId());
 					log.error(message);
 					documentDAO.delete(docVO.getId());
@@ -940,7 +941,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			log.debug("Using parser {} to count pages of document {}", parser.getClass().getName(), doc);
 			if (parser != null)
 				doc.setPages(parser.countPages(file, doc.getFileName()));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Cannot count pages of document {}", doc, e);
 		}
 	}
@@ -952,7 +953,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			return parser.countPages(storer.getStream(doc.getId(), storer.getResourceName(doc, null, null)),
 					doc.getFileName());
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("Cannot count pages of document {}", doc, e);
 			return 1;
 		}
@@ -1103,25 +1104,25 @@ public class DocumentManagerImpl implements DocumentManager {
 	public Document replaceAlias(long aliasId, DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
 
+		// get the alias
+		Document alias = documentDAO.findById(aliasId);
+		if (alias == null || alias.getDocRef() == null)
+			throw new PersistenceException(String.format("Unable to find alias %s", aliasId));
+
+		Folder folder = alias.getFolder();
+		folderDAO.initialize(folder);
+
+		if (!folderDAO.isWriteEnabled(alias.getFolder().getId(), transaction.getUserId()))
+			throw new PersistenceException(String.format("User %s without WRITE permission in folder %s",
+					transaction.getUsername(), folder.getId()));
+
+		Document originalDoc = documentDAO.findById(alias.getDocRef());
+		documentDAO.initialize(originalDoc);
+		documentDAO.delete(aliasId, transaction);
+
 		try {
-			// get the alias
-			Document alias = documentDAO.findById(aliasId);
-			if (alias == null || alias.getDocRef() == null)
-				throw new Exception(String.format("Unable to find alias %s", aliasId));
-
-			Folder folder = alias.getFolder();
-			folderDAO.initialize(folder);
-
-			if (!folderDAO.isWriteEnabled(alias.getFolder().getId(), transaction.getUserId()))
-				throw new Exception(String.format("User %s without WRITE permission in folder %s",
-						transaction.getUsername(), folder.getId()));
-
-			Document originalDoc = documentDAO.findById(alias.getDocRef());
-			documentDAO.initialize(originalDoc);
-			documentDAO.delete(aliasId, transaction);
-
 			return copyToFolder(originalDoc, folder, new DocumentHistory(transaction));
-		} catch (Throwable e) {
+		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
@@ -1182,7 +1183,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			documentDAO.store(alias, transaction);
 
 			return alias;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
@@ -1250,7 +1251,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			for (String resource : resources)
 				try {
 					storer.delete(versionToDelete.getDocId(), resource);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.warn("Unable to delete resource {} of document {}", resource, versionToDelete.getDocId());
 				}
 		}
@@ -1547,7 +1548,7 @@ public class DocumentManagerImpl implements DocumentManager {
 						storedTransaction
 								.setComment(String.format("%d files moved to storage %d", movedFiles, targetStorage));
 						documentDAO.saveDocumentHistory(document, transaction);
-					} catch (Throwable t) {
+					} catch (Exception t) {
 						log.warn("Cannot gridRecord history for document {}", document, t);
 					}
 				}
@@ -1656,7 +1657,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				File pdf = new File(tempDir, nf.format(i) + ".pdf");
 
 				manager.writePdfToFile(document, null, pdf, null);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		}

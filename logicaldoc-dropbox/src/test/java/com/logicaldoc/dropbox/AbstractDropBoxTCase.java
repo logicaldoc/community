@@ -53,7 +53,7 @@ public abstract class AbstractDropBoxTCase {
 
 		try {
 			context = new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

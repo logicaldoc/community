@@ -333,7 +333,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 				String[] tokens = txt.split("\\|");
 				if (tokens.length == 2)
 					return Long.parseLong(tokens[0]);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				return null;
 			}
 		}

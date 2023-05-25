@@ -72,7 +72,7 @@ public class MailUtil {
 				int count = mp.getCount();
 				return count > 1;
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 		return false;
@@ -82,7 +82,7 @@ public class MailUtil {
 		try {
 			EMail email = messageToMail(is, true);
 			return email.getAttachmentsCount();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 		return 0;
@@ -266,7 +266,7 @@ public class MailUtil {
 			Session mailSession = Session.getInstance(props, null);
 			MimeMessage msg = new MimeMessage(mailSession, is);
 			return msg;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage());
 		}
 		return null;
@@ -365,7 +365,7 @@ public class MailUtil {
 					rec.setMode(Recipient.MODE_EMAIL_REPLYTO);
 					return rec;
 				}).collect(Collectors.toSet()));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Unable to extract BCC addresses - %s", t.getMessage());
 			}
 		}
@@ -383,7 +383,7 @@ public class MailUtil {
 					rec.setMode(Recipient.MODE_EMAIL_BCC);
 					return rec;
 				}).collect(Collectors.toSet()));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Unable to extract BCC addresses - %s", t.getMessage());
 			}
 		}
@@ -401,7 +401,7 @@ public class MailUtil {
 					rec.setMode(Recipient.MODE_EMAIL_CC);
 					return rec;
 				}).collect(Collectors.toSet()));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Unable to extract CC addresses - %s", t.getMessage());
 			}
 		}
@@ -419,7 +419,7 @@ public class MailUtil {
 					rec.setMode(Recipient.MODE_EMAIL_TO);
 					return rec;
 				}).collect(Collectors.toSet()));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Unable to extract TO addresses - %s", t.getMessage());
 			}
 		}
@@ -489,7 +489,7 @@ public class MailUtil {
 			try (InputStream is = part.getInputStream()) {
 				EMail embeddedEmail = messageToMail(part.getInputStream(), false);
 				fileName = embeddedEmail.getSubject() + ".eml";
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn(t.getMessage(), t);
 			}
 		}
@@ -636,7 +636,7 @@ public class MailUtil {
 	public static int countMsgAttachments(File msgFile) {
 		try (InputStream is = new FileInputStream(msgFile);) {
 			return countMsgAttachments(is);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 			return 0;
 		}
@@ -645,7 +645,7 @@ public class MailUtil {
 	public static boolean msgContainsAttachments(File msgFile) {
 		try (InputStream is = new FileInputStream(msgFile);) {
 			return msgContainsAttachments(is);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 			return false;
 		}
@@ -671,7 +671,7 @@ public class MailUtil {
 			}
 
 			return msg.getAttachments() != null ? msg.getAttachments().size() : 0;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 
@@ -698,7 +698,7 @@ public class MailUtil {
 			}
 
 			return msg.getAttachments() != null && !msg.getAttachments().isEmpty();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 		return false;
@@ -707,7 +707,7 @@ public class MailUtil {
 	public static int countEmlAttachments(File emlFile) {
 		try (InputStream is = new FileInputStream(emlFile)) {
 			return countEmlAttachments(is);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 			return 0;
 		}
@@ -716,7 +716,7 @@ public class MailUtil {
 	public static boolean emlContainsAttachments(File emlFile) {
 		try (InputStream is = new FileInputStream(emlFile)) {
 			return emlContainsAttachments(is);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 			return false;
 		}
@@ -784,7 +784,7 @@ public class MailUtil {
 				} else {
 					extractPartText(part, textBody);
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
 			}
 		}

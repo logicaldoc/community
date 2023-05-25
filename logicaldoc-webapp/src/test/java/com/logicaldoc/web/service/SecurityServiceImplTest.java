@@ -196,7 +196,7 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 		try {
 			service.saveSettings(securitySettings);
 			notThrownTest = "ok";
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			t.printStackTrace();
 			// Nothing to do
 		}

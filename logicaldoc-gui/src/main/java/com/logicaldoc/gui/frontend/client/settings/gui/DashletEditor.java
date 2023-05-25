@@ -16,17 +16,12 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -128,21 +123,14 @@ public class DashletEditor extends Window {
 		columnsGrid.setShowRowNumbers(true);
 		columnsGrid.setFields(attribute);
 
-		columnsGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new Menu();
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						columnsGrid.removeSelectedData();
-					}
-				});
-				contextMenu.setItems(delete);
-				contextMenu.showContextMenu();
-				event.cancel();
-			}
+		columnsGrid.addCellContextClickHandler(event -> {
+			Menu contextMenu = new Menu();
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.addClickHandler(evnt -> columnsGrid.removeSelectedData());
+			contextMenu.setItems(delete);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 
 		ToolStrip controls = new ToolStrip();
@@ -151,28 +139,23 @@ public class DashletEditor extends Window {
 		final SelectItem selector = ItemFactory
 				.newAttributesSelector(dashlet.getType().equals(GUIDashlet.TYPE_DOCEVENT) ? "docevent" : null);
 		selector.setWidth(100);
-		selector.addChangedHandler(new ChangedHandler() {
+		selector.addChangedHandler(event -> {
+			ListGridRecord[] seletion = selector.getSelectedRecords();
+			for (ListGridRecord sel : seletion) {
+				// Skip search-specific attributes
+				if (sel.getAttributeAsString("name").equals("folder")
+						|| sel.getAttributeAsString("name").equals("score"))
+					continue;
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord[] seletion = selector.getSelectedRecords();
-				for (ListGridRecord sel : seletion) {
-					// Skip search-specific attributes
-					if (sel.getAttributeAsString("name").equals("folder")
-							|| sel.getAttributeAsString("name").equals("score"))
-						continue;
-
-					Record rec = columnsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (rec == null) {
-						ListGridRecord newRec = new ListGridRecord();
-						newRec.setAttribute("name", sel.getAttributeAsString("name"));
-						newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
-						columnsGrid.addData(newRec);
-					}
+				Record rec = columnsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+				if (rec == null) {
+					ListGridRecord newRec = new ListGridRecord();
+					newRec.setAttribute("name", sel.getAttributeAsString("name"));
+					newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
+					columnsGrid.addData(newRec);
 				}
-				selector.clearValue();
 			}
-
+			selector.clearValue();
 		});
 		controls.addFormItem(selector);
 
@@ -208,15 +191,9 @@ public class DashletEditor extends Window {
 		SelectItem type = ItemFactory.newDashletTypeSelector(dashlet.getType());
 		type.setRequired(true);
 		type.setDisabled(dashlet.isSystemDashlet());
-		type.addChangedHandler(new ChangedHandler() {
+		type.addChangedHandler(event -> onTypeChange(event.getValue().toString()));
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onTypeChange(event.getValue().toString());
-			}
-		});
-
-		content = ItemFactory.newTextAreaItemForAutomation(CONTENT_STR,  dashlet.getContent(), null, true);
+		content = ItemFactory.newTextAreaItemForAutomation(CONTENT_STR, dashlet.getContent(), null, true);
 		content.setWidth("*");
 
 		query = ItemFactory.newTextAreaItemForAutomation("query", dashlet.getQuery(), null, false);

@@ -18,8 +18,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This popup window is used to create a new web content.
@@ -42,8 +40,7 @@ public class WebcontentCreate extends Window {
 		setShowModalMask(true);
 		setAutoSize(true);
 		centerInPage();
-		
-		
+
 		DynamicForm form = new DynamicForm();
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
@@ -58,12 +55,7 @@ public class WebcontentCreate extends Window {
 
 		create = new SubmitItem();
 		create.setTitle(I18N.message("create"));
-		create.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onCreate();
-			}
-		});
+		create.addClickHandler(event -> onCreate());
 
 		form.setItems(title, template, create);
 
@@ -96,7 +88,7 @@ public class WebcontentCreate extends Window {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();
-						
+
 						GuiLog.serverError(caught);
 						destroy();
 					}
@@ -104,7 +96,7 @@ public class WebcontentCreate extends Window {
 					@Override
 					public void onSuccess(GUIDocument document) {
 						LD.clearPrompt();
-						
+
 						DocumentsPanel.get().refresh();
 						DocumentsPanel.get().selectDocument(document.getId(), true);
 
@@ -113,8 +105,7 @@ public class WebcontentCreate extends Window {
 
 						destroy();
 
-						WebcontentEditor popup = new WebcontentEditor(document);
-						popup.show();
+						new WebcontentEditor(document).show();
 					}
 				});
 

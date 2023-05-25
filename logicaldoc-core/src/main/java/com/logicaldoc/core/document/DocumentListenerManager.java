@@ -1,5 +1,6 @@
 package com.logicaldoc.core.document;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,18 +54,20 @@ public class DocumentListenerManager {
 
 		for (Extension ext : sortedExts) {
 			String className = ext.getParameter("class").valueAsString();
+
 			try {
 				Class clazz = Class.forName(className);
 				// Try to instantiate the listener
 				@SuppressWarnings("unchecked")
 				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof DocumentListener))
-					throw new Exception(
+					throw new ClassNotFoundException(
 							"The specified listener " + className + " doesn't implement DocumentListener interface");
 				listeners.add((DocumentListener) listener);
-				log.info("Added new document listener " + className + " position "
-						+ ext.getParameter(POSITION).valueAsString());
-			} catch (Throwable e) {
+				log.info("Added new document listener {} position {}", className,
+						ext.getParameter(POSITION).valueAsString());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage());
 			}
 		}

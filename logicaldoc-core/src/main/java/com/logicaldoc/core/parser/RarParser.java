@@ -25,7 +25,7 @@ public class RarParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws ParseException, IOException {
 		File rarFile = FileUtil.createTempFile("parserar", ".rar");
 		try {
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
@@ -48,7 +48,7 @@ public class RarParser extends AbstractParser {
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)
-						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
+						throw new ParseException(String.format("Unable to find a parser for %s", entryExtension));
 
 					new RarUtil().extractEntry(rarFile, entry, uncompressedEntryFile);
 
@@ -78,7 +78,7 @@ public class RarParser extends AbstractParser {
 			rarFile = FileUtil.createTempFile("parserar", ".rar");
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
 			return countPages(rarFile, filename);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		} finally {
 			if (rarFile != null)
@@ -115,7 +115,7 @@ public class RarParser extends AbstractParser {
 						FileUtil.strongDelete(uncompressedEntryFile);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return 1;

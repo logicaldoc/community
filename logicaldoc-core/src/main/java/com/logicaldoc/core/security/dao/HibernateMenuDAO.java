@@ -84,7 +84,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (menu.getSecurityRef() != null)
 				menu.getMenuGroups().clear();
 			saveOrUpdate(menu);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
 	}
@@ -111,7 +111,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query.append(precoll.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 				query.append(")");
 
-				coll = (List<Menu>) findByQuery(query.toString(), (Map<String, Object>) null, null);
+				coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 				// Now collect all menus that references the policies of the
 				// previously found menus
@@ -119,7 +119,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query = new StringBuilder("select _menu from Menu _menu  where _menu.securityRef in (");
 				query.append(coll.stream().map(m -> Long.toString(m.getId())).collect(Collectors.joining(",")));
 				query.append(")");
-				tmp = (List<Menu>) findByQuery(query.toString(), (Map<String, Object>) null, null);
+				tmp = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 				for (Menu menu : tmp) {
 					if (!coll.contains(menu))
@@ -171,7 +171,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (type != null)
 				query1.append(AND + ENTITY + ".type = " + type.toString());
 
-			coll = (List<Menu>) findByQuery(query1.toString(), params, null);
+			coll = findByQuery(query1.toString(), params, null);
 
 			/*
 			 * Now search for all other menus that references accessible menus
@@ -186,7 +186,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 					user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query2.append("))");
 
-			List<Menu> coll2 = (List<Menu>) findByQuery(query2.toString(), params, null);
+			List<Menu> coll2 = findByQuery(query2.toString(), params, null);
 			for (Menu menu : coll2) {
 				if (!coll.contains(menu))
 					coll.add(menu);
@@ -229,7 +229,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			/*
 			 * Search for the menus that define its own policies
 			 */
-			StringBuilder query1 = new StringBuilder(SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + "  ");
+			StringBuilder query1 = new StringBuilder(
+					SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + "  ");
 			query1.append(LEFT_JOIN + ENTITY + MENU_GROUPS_AS_GROUP);
 			query1.append(WHERE + ENTITY + ".enabled=1 and _group.groupId in (");
 
@@ -244,7 +245,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query1.append(CLOSE_BRACKET_AND + ENTITY + DOT_PARENT_ID + parentId);
 			query1.append(" and not(" + ENTITY + ".id=" + parentId + ")");
 
-			coll = (List<Menu>) findByQuery(query1.toString(), (Map<String, Object>) null, null);
+			coll = findByQuery(query1.toString(), (Map<String, Object>) null, null);
 
 			/*
 			 * Now search for all other menus that references accessible menus
@@ -270,7 +271,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 			Map<String, Object> params = new HashMap<>();
 			params.put(PARENT_ID, parentId);
-			List<Menu> coll2 = (List<Menu>) findByQuery(query2.toString(), params, null);
+			List<Menu> coll2 = findByQuery(query2.toString(), params, null);
 			for (Menu menu : coll2) {
 				if (!coll.contains(menu))
 					coll.add(menu);
@@ -333,7 +334,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			Map<String, Object> params = new HashMap<>();
 			params.put("id", Long.valueOf(id));
 
-			List<MenuGroup> coll = (List<MenuGroup>) findByQuery(query.toString(), params, null);
+			List<MenuGroup> coll = findByQuery(query.toString(), params, null);
 			result = coll.size() > 0;
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
@@ -417,7 +418,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query.append(LEFT_JOIN + ENTITY + MENU_GROUPS_AS_GROUP);
 			query.append(WHERE + ENTITY + ".deleted=0 and _group.groupId =" + groupId);
 
-			coll = (List<Menu>) findByQuery(query.toString(), (Map<String, Object>) null, null);
+			coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 			/*
 			 * Now search for all other menus that references the previous ones
@@ -434,7 +435,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 					first = false;
 				}
 				query2.append(")");
-				List<Menu> coll2 = (List<Menu>) findByQuery(query2.toString(), (Map<String, Object>) null, null);
+				List<Menu> coll2 = findByQuery(query2.toString(), (Map<String, Object>) null, null);
 				for (Menu menu : coll2) {
 					if (!coll.contains(menu))
 						coll.add(menu);
@@ -468,7 +469,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				if (type != null)
 					query1.append(" AND B.ld_type=" + type.toString());
 
-				ids = (List<Long>) queryForList(query1.toString(), Long.class);
+				ids = queryForList(query1.toString(), Long.class);
 
 				/*
 				 * Now find all menus referencing the previously found ones
@@ -480,7 +481,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query2.append(query1.toString());
 				query2.append(")");
 
-				List<Long> menuids2 = (List<Long>) queryForList(query2.toString(), Long.class);
+				List<Long> menuids2 = queryForList(query2.toString(), Long.class);
 				for (Long menuid : menuids2) {
 					if (!ids.contains(menuid))
 						ids.add(menuid);
@@ -564,7 +565,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				if (menu != null)
 					coll.add(0, menu);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return coll;
@@ -579,7 +580,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			String query = "select ld_parentid from ld_menu where ld_id =" + menuId;
 
 			try {
-				List<Long> menus = (List<Long>) super.queryForList(query, Long.class);
+				List<Long> menus = super.queryForList(query, Long.class);
 				for (Long id : menus) {
 					if (id.longValue() != menuId)
 						restore(id, parents);
@@ -627,7 +628,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				StringBuilder query2 = new StringBuilder("select B.ld_id from ld_menu B where B.ld_deleted=0 ");
 				query2.append(AND_B_LD_SECURITYREF_IN + query1.toString() + ")");
 
-				List<Long> mrefs = (List<Long>) queryForList(query2.toString(), Long.class);
+				List<Long> mrefs = queryForList(query2.toString(), Long.class);
 				for (Long menuId : mrefs) {
 					if (!ids.contains(menuId))
 						ids.add(menuId);
@@ -645,7 +646,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		for (Menu menu : menus) {
 			try {
 				delete(menu.getId());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}
@@ -677,7 +678,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				}
 				applyRightToTree(menu.getId());
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
 			result = false;
@@ -714,7 +715,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				}
 				query1.append(")");
 
-				ids = (List<Long>) queryForList(query1.toString(), Long.class);
+				ids = queryForList(query1.toString(), Long.class);
 
 				/*
 				 * Now find all menus referencing the previously found ones

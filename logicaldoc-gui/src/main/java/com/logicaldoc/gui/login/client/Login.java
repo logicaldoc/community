@@ -2,7 +2,6 @@ package com.logicaldoc.gui.login.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -31,13 +30,7 @@ public class Login implements EntryPoint {
 		if (RootPanel.get("loadingwrapper-login") == null)
 			return;
 
-		GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			@Override
-			public void onUncaughtException(Throwable caught) {
-				SC.warn("Error", caught.getMessage());
-			}
-
-		});
+		GWT.setUncaughtExceptionHandler(caught -> SC.warn("Error", caught.getMessage()));
 
 		declareShowLostDialog(this);
 

@@ -47,9 +47,9 @@ public class RepositoriesPanel extends AdminPanel {
 
 		tabs.addTab(foldersTab);
 
-		SettingService.Instance.get().loadSettingsByNames(
-				new String[] { "conf.dbdir", "conf.exportdir", "conf.importdir", "conf.logdir", "conf.plugindir",
-						"conf.userdir" }, new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadSettingsByNames(new String[] { "conf.dbdir", "conf.exportdir",
+				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir" },
+				new AsyncCallback<GUIParameter[]>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -70,13 +70,7 @@ public class RepositoriesPanel extends AdminPanel {
 						}
 
 						ButtonItem save = new ButtonItem("save", I18N.message("save"));
-						save.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
-							@Override
-							public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-								onSaveFolders();
-							}
-						});
+						save.addClickHandler(event -> onSaveFolders());
 						items.add(save);
 
 						save.setDisabled(Session.get().isDemo() && Session.get().getUser().getId() == 1);

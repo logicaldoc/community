@@ -124,7 +124,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		for (SessionListener listener : listeners)
 			try {
 				listener.onSessionCreated(session);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn(t.getMessage(), t);
 			}
 
@@ -161,7 +161,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			}
 		} catch (org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException fe1) {
 			// May happen, forget it.
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 	}
@@ -182,7 +182,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			for (SessionListener listener : listeners)
 				try {
 					listener.onSessionClosed(sid);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.warn(t.getMessage(), t);
 				}
 		}
@@ -502,7 +502,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		for (Session session : getSessions()) {
 			try {
 				SessionManager.get().kill(session.getSid());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -511,7 +511,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (timeoutWatchDog.isAlive()) {
 			try {
 				timeoutWatchDog.interrupt();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 			log.info("Session timeout watch dog killed");

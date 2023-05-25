@@ -129,7 +129,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 					out.add(sm);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 

@@ -25,8 +25,6 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -93,7 +91,6 @@ public class WebservicesPanel extends VLayout {
 				GWT.getHostPageBaseURL() + "services/rest");
 		restUrl.setColSpan(4);
 
-		
 		// Web Service Enabled
 		RadioGroupItem wsEnabled = prepareEnabledItem();
 		SpinnerItem ttl = ItemFactory.newSpinnerItem(WS_TTL, "timetolive", Integer.parseInt(callsTtl.getValue()));
@@ -101,7 +98,7 @@ public class WebservicesPanel extends VLayout {
 		ttl.setMin(1);
 		ttl.setStep(1);
 		ttl.setDisabled(FALSE.equals(recCalls.getValue()));
-		
+
 		// Flag to rec webservice calls payload
 		RadioGroupItem recordCallsPayload = prepareRecordCallsPayloadItem();
 
@@ -109,13 +106,9 @@ public class WebservicesPanel extends VLayout {
 		RadioGroupItem recordCalls = ItemFactory.newBooleanSelector("wsRecordCalls", "recordcalls");
 		recordCalls.setRequired(true);
 		recordCalls.setValue(recCalls.getValue().equals("true") ? "yes" : "no");
-		recordCalls.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ttl.setDisabled("no".equals(event.getValue().toString()));
-				recordCallsPayload.setDisabled("no".equals(event.getValue().toString()));
-			}
+		recordCalls.addChangedHandler(event -> {
+			ttl.setDisabled("no".equals(event.getValue().toString()));
+			recordCallsPayload.setDisabled("no".equals(event.getValue().toString()));
 		});
 
 		apicalls = ItemFactory.newStaticTextItem("apicalls", I18N.message("totalcalls"), "0");
@@ -152,7 +145,7 @@ public class WebservicesPanel extends VLayout {
 		tenantStat.setColSpan(4);
 		tenantStat.setWidth("*");
 		tenantStat.setAllowEmptyValue(true);
-		tenantStat.addChangedHandler((ChangedEvent tenantStatChanged) -> {
+		tenantStat.addChangedHandler(tenantStatChanged -> {
 			refreshStats(tenantStatChanged.getValue() != null ? Long.parseLong(tenantStatChanged.getValue().toString())
 					: null);
 		});

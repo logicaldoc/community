@@ -7,7 +7,6 @@ import java.util.Set;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
@@ -27,28 +26,41 @@ import com.orange.links.client.utils.SegmentPath;
 public abstract class AbstractConnection implements Connection {
 
 	protected Shape startShape;
+
 	protected Shape endShape;
+
 	protected Set<Segment> segmentSet;
+
 	protected DiagramController controller;
+
 	protected ConnectionCanvas canvas;
+
 	protected DecorationShape decoration;
 
 	public static CssColor defaultConnectionColor = CssColor.make("#000000");
+
 	public CssColor connectionColor = defaultConnectionColor;
+
 	protected CssColor highlightPointColor = CssColor.make("#cccccc 1");
 
 	protected Point highlightPoint;
+
 	protected Segment highlightSegment;
+
 	protected SegmentPath segmentPath;
 
 	protected ContextMenu menu;
+
 	protected static String deleteMenuText = "Delete";
+
 	protected static String straightenMenuText = "Straighten";
 
 	private boolean sync;
+
 	private boolean allowSync = true;
 
-	protected AbstractConnection(DiagramController controller, Shape startShape, Shape endShape) throws DiagramViewNotDisplayedException {
+	protected AbstractConnection(DiagramController controller, Shape startShape, Shape endShape)
+			throws DiagramViewNotDisplayedException {
 		this.startShape = startShape;
 		this.endShape = endShape;
 		this.segmentSet = new HashSet<>();
@@ -64,30 +76,25 @@ public abstract class AbstractConnection implements Connection {
 		this.controller.getView().add(canvas.asWidget());
 	}
 
-
 	protected void initMenu() {
 		menu = new ContextMenu();
-		menu.addItem(new MenuItem(deleteMenuText, true, new Command() {
-			public void execute() {
-				// fireEvent
-				FunctionShape startShape = (FunctionShape) getStartShape();
-				FunctionShape endShape = (FunctionShape) getEndShape();
+		menu.addItem(new MenuItem(deleteMenuText, true, () -> {
+			// fireEvent
+			FunctionShape startShape = (FunctionShape) getStartShape();
+			FunctionShape endShape = (FunctionShape) getEndShape();
 
-				Widget startWidget = startShape.asWidget();
-				Widget endWidget = endShape.asWidget();
-				controller.fireEvent(new UntieLinkEvent(startWidget, endWidget, AbstractConnection.this));
-				controller.deleteConnection(AbstractConnection.this);
-				startShape.removeConnection(AbstractConnection.this);
-				endShape.removeConnection(AbstractConnection.this);
-				menu.hide();
-			}
+			Widget startWidget = startShape.asWidget();
+			Widget endWidget = endShape.asWidget();
+			controller.fireEvent(new UntieLinkEvent(startWidget, endWidget, AbstractConnection.this));
+			controller.deleteConnection(AbstractConnection.this);
+			startShape.removeConnection(AbstractConnection.this);
+			endShape.removeConnection(AbstractConnection.this);
+			menu.hide();
 		}));
 
-		menu.addItem(new MenuItem(straightenMenuText, true, new Command() {
-			public void execute() {
-				setStraight();
-				menu.hide();
-			}
+		menu.addItem(new MenuItem(straightenMenuText, true, () -> {
+			setStraight();
+			menu.hide();
 		}));
 	}
 
@@ -104,12 +111,12 @@ public abstract class AbstractConnection implements Connection {
 			this.sync = sync;
 		}
 	}
-	
-	public boolean allowSynchronized(){
+
+	public boolean allowSynchronized() {
 		return allowSync;
 	}
-	
-	public void delete(){
+
+	public void delete() {
 		canvas.asWidget().removeFromParent();
 	}
 
@@ -200,7 +207,8 @@ public abstract class AbstractConnection implements Connection {
 
 	public boolean isMouseNearConnection(Point p) {
 		for (Segment s : segmentSet) {
-			if (!s.getP1().equals(s.getP2()) && ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
+			if (!s.getP1().equals(s.getP2())
+					&& ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
 				return true;
 			}
 		}
@@ -228,13 +236,14 @@ public abstract class AbstractConnection implements Connection {
 		return menu;
 	}
 
-	public static void setStraightenText(String text){
+	public static void setStraightenText(String text) {
 		straightenMenuText = text;
 	}
 
-	public static void setDeleteText(String text){
+	public static void setDeleteText(String text) {
 		deleteMenuText = text;
 	}
+
 	public void setController(DiagramController controller) {
 		this.controller = controller;
 	}

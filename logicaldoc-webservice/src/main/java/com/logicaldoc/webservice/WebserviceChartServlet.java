@@ -120,7 +120,7 @@ public class WebserviceChartServlet extends HttpServlet {
 
 			ChartUtilities.saveChartAsPNG(chartFile, chart, width, height);
 			WebserviceServletUtil.downloadFile(request, response, chartFile, "wschart.png");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		} finally {
 			FileUtil.strongDelete(chartFile);

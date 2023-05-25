@@ -199,7 +199,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 				togglePreview.setTooltip(I18N.message("openpreview"));
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		togglePreview.addClickHandler(event -> {
@@ -212,7 +212,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				try {
 					String w = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_PREV_W);
 					DocumentsPanel.get().getPreviewPanel().setWidth(Integer.parseInt(w));
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					DocumentsPanel.get().getPreviewPanel().setWidth(350);
 				}
 				DocumentsPanel.get().getPreviewPanel().setDocument(document);
@@ -609,7 +609,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 
 			updateUsingFolder(document, folder);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

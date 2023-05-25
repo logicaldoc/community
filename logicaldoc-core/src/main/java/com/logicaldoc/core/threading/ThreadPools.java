@@ -40,8 +40,6 @@ public class ThreadPools {
 
 	private static String TYPE_DEFAULT = "default";
 
-	private static String TYPE_SCHEDULED = "scheduled";
-
 	private static Logger log = LoggerFactory.getLogger(ThreadPools.class);
 
 	private Map<String, ExecutorService> pools = new HashMap<>();
@@ -63,13 +61,15 @@ public class ThreadPools {
 	 * @param name the name of the new pool
 	 * 
 	 * @return the created pool
+	 * 
+	 * @throws InterruptedException Raised in case the pool has been shutdown
 	 */
-	public synchronized ExecutorService getPool(String name) {
+	public synchronized ExecutorService getPool(String name) throws InterruptedException {
 		ExecutorService pool = pools.get(name);
 
 		if (pool != null) {
 			if (pools.get(name).isShutdown())
-				throw new RuntimeException(name + " pool was shutdown");
+				throw new InterruptedException(name + " pool was shutdown");
 		} else {
 			int core = config.getInt(THREADPOOL + name + ".core", 5);
 			int max = config.getInt(THREADPOOL + name + ".max", 10);
@@ -94,12 +94,16 @@ public class ThreadPools {
 	 * @param delay a delay expressed in milliseconds
 	 */
 	public void schedule(Runnable task, String poolName, long delay) {
-		ExecutorService pool = getPool(poolName);
-		if (pool instanceof ScheduledExecutorService)
-			((ScheduledExecutorService) pool).schedule(task, delay, TimeUnit.MILLISECONDS);
-		else {
-			log.debug("Pool {} does not support scheduling so the task has been started immediately", poolName);
-			execute(task, poolName);
+		try {
+			ExecutorService pool = getPool(poolName);
+			if (pool instanceof ScheduledExecutorService)
+				((ScheduledExecutorService) pool).schedule(task, delay, TimeUnit.MILLISECONDS);
+			else {
+				log.debug("Pool {} does not support scheduling so the task has been started immediately", poolName);
+				execute(task, poolName);
+			}
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
 		}
 	}
 
@@ -110,8 +114,12 @@ public class ThreadPools {
 	 * @param poolName The name of the pool
 	 */
 	public void execute(Runnable task, String poolName) {
-		ExecutorService pool = getPool(poolName);
-		pool.execute(task);
+		try {
+			ExecutorService pool = getPool(poolName);
+			pool.execute(task);
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+		}
 	}
 
 	/**

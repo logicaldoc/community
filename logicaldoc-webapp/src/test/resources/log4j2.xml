@@ -27,6 +27,9 @@
 		<Logger name="com.logicaldoc.web.service" level="info" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
+		<Logger name="com.logicaldoc.core.system" level="fatal" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
 		<Logger name="org.hibernate" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
@@ -35,7 +38,7 @@
 		</Logger>
 		<Logger name="org.eclipse.jetty" level="fatal" additivity="false">
 			<AppenderRef ref="file" />
-		</Logger>				
+		</Logger>		
 		
 		<Root level="warn">
 			<AppenderRef ref="file" />

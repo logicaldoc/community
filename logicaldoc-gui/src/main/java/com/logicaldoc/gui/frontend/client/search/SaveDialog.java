@@ -92,7 +92,7 @@ public class SaveDialog extends Window {
 									vm.getValueAsString(DESCRIPTION),
 									options.getType() == GUISearchOptions.TYPE_FULLTEXT ? I18N.message("fulltext")
 											: I18N.message("parametric"));
-					} catch (Throwable t) {
+					} catch (Exception t) {
 						// Nothing to do
 					}
 					destroy();

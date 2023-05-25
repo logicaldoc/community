@@ -37,7 +37,7 @@ public class PreviewPopup extends Window {
 			size = Integer.parseInt(Session.get().getInfo().getConfig("gui.preview.size"));
 			if (size <= 0 || size > 100)
 				size = 100;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

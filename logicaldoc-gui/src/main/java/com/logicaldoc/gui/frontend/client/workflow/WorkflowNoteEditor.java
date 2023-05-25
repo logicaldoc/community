@@ -10,8 +10,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This is the form used to edit a note in a workflow
@@ -48,11 +46,7 @@ public class WorkflowNoteEditor extends Window {
 		save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 
 		noteForm.setItems(message, save);
 		addItem(noteForm);

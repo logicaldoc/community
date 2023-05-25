@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -43,6 +42,10 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
  */
 public class ZipUtil {
 
+	private static final String ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES = "Zip file %s looks like a Zip Bomb Attack: can lead to inodes exhaustion of the system and is over the maximum allowed of %d";
+
+	private static final String ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE = "Zip file %s looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s";
+
 	private String fileNameCharset = "UTF-8";
 
 	protected static Logger log = LoggerFactory.getLogger(JarUtil.class);
@@ -69,7 +72,7 @@ public class ZipUtil {
 			maxEntries = Context.get().getProperties().getInt("zip.maxentries", 100000);
 			maxSize = Context.get().getProperties().getInt("zip.maxsize", 1024) * 1024 * 1024;
 			maxCompressionRatio = Context.get().getProperties().getDouble("zip.maxratio", 30D);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -83,19 +86,25 @@ public class ZipUtil {
 		List<ZipEntry> files = new ArrayList<>();
 
 		try (java.util.zip.ZipFile zFile = new java.util.zip.ZipFile(zipFile)) {
+			if (zipFile.length() > maxSize)
+				throw new IOException(String.format(
+						ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
+						zipFile.length(), FileUtil.getDisplaySize(maxSize, "en")));
+
 			Enumeration<? extends ZipEntry> e = zFile.entries();
 			while (e.hasMoreElements()) {
 				ZipEntry zipEntry = (ZipEntry) e.nextElement();
 				files.add(zipEntry);
-			}
-			files.sort(new Comparator<ZipEntry>() {
 
-				@Override
-				public int compare(ZipEntry o1, ZipEntry o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
+				if (files.size() > maxEntries)
+					throw new IOException(String.format(
+							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES,
+							zipFile.getName(), maxEntries));
+			}
+			files.sort((ZipEntry o1, ZipEntry o2) -> {
+				return o1.getName().compareTo(o2.getName());
 			});
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			logError(e.getMessage());
 		}
 
@@ -112,8 +121,8 @@ public class ZipUtil {
 			for (FileHeader fileHeader : fileHeaders) {
 				files.add(fileHeader.getFileName());
 			}
-			
-		} catch (Throwable e) {
+
+		} catch (Exception e) {
 			logError(e.getMessage());
 		}
 		return files;
@@ -173,12 +182,12 @@ public class ZipUtil {
 
 				if (totalSizeArchive > maxSize)
 					throw new IOException(String.format(
-							"Zip file %s looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
+							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
 							zipStream, FileUtil.getDisplaySize(maxSize, "en")));
 
 				if (totalEntryArchive > maxEntries)
 					throw new IOException(String.format(
-							"Zip file %s looks like a Zip Bomb Attack: can lead to inodes exhaustion of the system and is over the maximum allowed of %d",
+							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES,
 							zipStream, maxEntries));
 			}
 		}
@@ -272,7 +281,7 @@ public class ZipUtil {
 							zipFile.getAbsolutePath(), compressionRatio, maxCompressionRatio));
 				if (totalSizeEntry > maxSize)
 					throw new IOException(String.format(
-							"Zip file %s looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
+							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
 							zipFile.getAbsolutePath(), FileUtil.getDisplaySize(maxSize, "en")));
 			}
 
@@ -303,14 +312,14 @@ public class ZipUtil {
 			IOUtils.copy(entryStream, baos);
 			baos.flush();
 			return baos.toByteArray();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			logError(e.getMessage());
 			return null;
 		} finally {
 			try {
 				if (entryStream != null)
 					entryStream.close();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 		}
@@ -337,7 +346,7 @@ public class ZipUtil {
 			setCharset(zFile);
 			FileHeader header = zFile.getFileHeader(entry);
 			return zFile.getInputStream(header);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			logError(e.getMessage());
 			return null;
 		}

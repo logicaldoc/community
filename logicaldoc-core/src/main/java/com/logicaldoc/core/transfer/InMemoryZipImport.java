@@ -90,7 +90,7 @@ public class InMemoryZipImport extends ZipImport {
 					logger.warn("InMemoryZipImport unable to import ZIP entry {}", entry, e);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			logger.error("InMemoryZipImport process failed", e);
 		}
 

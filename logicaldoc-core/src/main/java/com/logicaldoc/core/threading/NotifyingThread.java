@@ -103,7 +103,7 @@ public class NotifyingThread extends Thread {
 				super.run();
 			else
 				doRun();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			error = t;
 			log.debug("Thread {} ended in error after {}", getName(), TimeDiff.printDuration(getElapsedTime()), t);
 		} finally {
@@ -136,7 +136,7 @@ public class NotifyingThread extends Thread {
 	 * 
 	 * @throws Throwable whatever error that happens during the elaboration
 	 */
-	public void doRun() throws Throwable {
+	public void doRun() {
 		// Nothing to do
 	}
 

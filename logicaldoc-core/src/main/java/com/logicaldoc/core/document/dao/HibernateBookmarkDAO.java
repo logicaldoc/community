@@ -88,7 +88,7 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 				+ " and ld_deleted = 0 and ld_userid = " + userId + " and ld_docid = " + docId;
 		try {
 			return queryForInt(sql) > 0;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			try {
 				return queryForLong(sql) > 0;
 			} catch (PersistenceException e) {

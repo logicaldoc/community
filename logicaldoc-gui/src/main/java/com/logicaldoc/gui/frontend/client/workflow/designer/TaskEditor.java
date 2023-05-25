@@ -26,8 +26,6 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
@@ -42,14 +40,12 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
@@ -77,11 +73,7 @@ public class TaskEditor extends Window {
 		this.state = widget.getWfState();
 		this.widget = widget;
 
-		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				destroy();
-			}
-		});
+		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
 		setTitle(I18N.message("editworkflowstate",
@@ -110,11 +102,11 @@ public class TaskEditor extends Window {
 
 		Button save = new Button(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-				if (Boolean.TRUE.equals(vm.validate())) {
-					onSave();
-					destroy();
-				}
+		save.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(vm.validate())) {
+				onSave();
+				destroy();
+			}
 		});
 		save.setMargin(3);
 
@@ -239,7 +231,7 @@ public class TaskEditor extends Window {
 		try {
 			GUIValue[] parts = this.state.getParticipants();
 			return !(parts != null && parts.length == 1 && parts[0].getCode().equals("_workflow"));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return true;
 		}
 	}
@@ -324,13 +316,11 @@ public class TaskEditor extends Window {
 		participantsGrid.setShowFilterEditor(false);
 		participantsGrid.setShowHeader(false);
 		participantsGrid.setFields(name, avatar, label);
-		participantsGrid.addCellContextClickHandler((CellContextClickEvent click) -> {
+		participantsGrid.addCellContextClickHandler(click -> {
 			Menu contextMenu = new Menu();
 			MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler((MenuItemClickEvent itemClick) -> {
-				participantsGrid.removeSelectedData();
-			});
+			delete.addClickHandler(itemClick -> participantsGrid.removeSelectedData());
 
 			contextMenu.setItems(delete);
 			contextMenu.showContextMenu();
@@ -405,7 +395,7 @@ public class TaskEditor extends Window {
 		SelectItem addGroup = ItemFactory.newGroupSelector("group", "addgroup");
 		addGroup.setWidth(110);
 		addGroup.setRequired(false);
-		addGroup.addChangedHandler((ChangedEvent event) -> {
+		addGroup.addChangedHandler(event -> {
 			if (event.getValue() != null && !"".equals((String) event.getValue())) {
 				final ListGridRecord selectedRecord = addGroup.getSelectedRecord();
 				if (selectedRecord == null)
@@ -428,7 +418,7 @@ public class TaskEditor extends Window {
 		SelectItem addUser = ItemFactory.newUserSelector("user", "adduser", null, false, false);
 		addUser.setWidth(110);
 		addUser.setRequired(false);
-		addUser.addChangedHandler((ChangedEvent event) -> {
+		addUser.addChangedHandler(event -> {
 			if (event.getValue() != null && !"".equals((String) event.getValue())) {
 				final ListGridRecord selectedRecord = addUser.getSelectedRecord();
 				if (selectedRecord == null)
@@ -525,7 +515,7 @@ public class TaskEditor extends Window {
 				if (!records.isEmpty())
 					participantsGrid.setRecords(records.toArray(new ListGridRecord[0]));
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

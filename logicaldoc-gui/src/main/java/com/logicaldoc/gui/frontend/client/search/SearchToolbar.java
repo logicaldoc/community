@@ -219,7 +219,7 @@ public class SearchToolbar extends ToolStrip {
 				try {
 					String width = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
 					SearchPanel.get().getPreviewPanel().setWidth(Integer.parseInt(width));
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					SearchPanel.get().getPreviewPanel().setWidth(350);
 				}
 				SearchPanel.get().getPreviewPanel().setDocument(hitsPanel.getGrid().getSelectedDocument());

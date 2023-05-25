@@ -109,7 +109,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 			Class aClass = null;
 			try {
 				aClass = Class.forName(filterClass);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error("{} not found", filterClass);
 			}
 
@@ -144,7 +144,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 				log.debug("Appended token stream filter {}", aClass.getName());
 			} catch (NoSuchMethodException nse) {
 				log.warn("constructor (Map<String, String>) not found for {}", aClass.getName());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.warn("constructor (Map<String, String>) of {} raised an error: {}", aClass.getName(),
 						e.getMessage(), e);
 			}
@@ -163,7 +163,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "TokenFilter");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 

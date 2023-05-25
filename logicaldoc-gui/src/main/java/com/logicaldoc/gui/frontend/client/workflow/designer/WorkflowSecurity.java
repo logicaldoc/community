@@ -29,7 +29,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This window shows the security policies of the Workflow.
@@ -269,11 +268,8 @@ public class WorkflowSecurity extends Window {
 
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
-		deleteItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				onDelete();
-			}
-		});
+		deleteItem.addClickHandler(event ->
+				onDelete());
 
 		contextMenu.setItems(deleteItem);
 		return contextMenu;
@@ -284,8 +280,8 @@ public class WorkflowSecurity extends Window {
 		if (selection == null || selection.length == 0)
 			return;
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-			if (Boolean.TRUE.equals(value))
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm))
 				list.removeSelectedData();
 		});
 	}

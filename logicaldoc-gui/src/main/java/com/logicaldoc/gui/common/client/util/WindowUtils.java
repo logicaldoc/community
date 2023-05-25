@@ -96,7 +96,7 @@ public class WindowUtils {
 			link.setAttribute("href", info.getBranding().getFaviconSrc());
 
 			DOM.appendChild(parent, link);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

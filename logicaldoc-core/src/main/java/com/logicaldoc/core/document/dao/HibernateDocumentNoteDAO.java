@@ -54,7 +54,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				transaction.setEvent(DocumentEvent.NEW_NOTE.toString());
 				documentDao.saveDocumentHistory(doc, transaction);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
 				session.logError(e.getMessage());

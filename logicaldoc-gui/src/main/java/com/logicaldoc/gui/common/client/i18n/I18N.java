@@ -61,14 +61,14 @@ public class I18N {
 		if (val1 != null)
 			try {
 				tmp = tmp.replace("{0}", val1);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 
 		if (val2 != null)
 			try {
 				tmp = tmp.replace("{1}", val2);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		return tmp;
@@ -80,7 +80,7 @@ public class I18N {
 			for (int i = 0; i < vals.length; i++) {
 				tmp = tmp.replace("{" + i + "}", vals[i]);
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		return tmp;

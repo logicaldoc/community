@@ -19,22 +19,13 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -76,12 +67,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				initListGrid();
-			}
-		});
+		refresh.addClickHandler(event -> initListGrid());
 		toolStrip.addFill();
 
 		VLayout layout = new VLayout();
@@ -131,35 +117,26 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		list.sort(1, SortDirection.DESCENDING);
 		listing.addMember(list);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				String type = list.getSelectedRecord().getAttribute("type");
-				Long id = list.getSelectedRecord().getAttributeAsLong("objectid");
-				if ("document".equals(type)) {
-					DocUtil.download(id, null);
-				} else {
-					DocumentsPanel.get().openInFolder(id, null);
-					close();
-				}
+		list.addDoubleClickHandler(event -> {
+			String type = list.getSelectedRecord().getAttribute("type");
+			Long oid = list.getSelectedRecord().getAttributeAsLong("objectid");
+			if ("document".equals(type)) {
+				DocUtil.download(oid, null);
+			} else {
+				DocumentsPanel.get().openInFolder(oid, null);
+				close();
 			}
 		});
 
 		// Count the total of events and the total of unchecked events
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent e) {
-				int total = list.getTotalRows();
-				Session.get().getUser().setSubscriptions(total);
-			}
+		list.addDataArrivedHandler(e -> {
+			int total = list.getTotalRows();
+			Session.get().getUser().setSubscriptions(total);
 		});
 	}
 
@@ -176,9 +153,8 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
 							@Override
@@ -193,42 +169,33 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 							}
 						});
 					}
-				});
-			}
-		});
+				}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SubscriptionDialog dialog = new SubscriptionDialog(list);
-				dialog.show();
-			}
-		});
+		edit.addClickHandler(event -> new SubscriptionDialog(list).show());
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord rec = list.getSelectedRecord();
-				String type = rec.getAttribute("type");
-				String id = rec.getAttribute("objectid");
-				if ("folder".equals(type))
-					DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
-				else {
-					DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
+		openInFolder.addClickHandler(event -> {
+			ListGridRecord rec = list.getSelectedRecord();
+			String type = rec.getAttribute("type");
+			String id = rec.getAttribute("objectid");
+			if ("folder".equals(type))
+				DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
+			else {
+				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIDocument result) {
-							DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());
-						}
-					});
-				}
+					@Override
+					public void onSuccess(GUIDocument result) {
+						DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());
+					}
+				});
 			}
 		});
 

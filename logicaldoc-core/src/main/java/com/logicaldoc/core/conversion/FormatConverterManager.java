@@ -333,7 +333,7 @@ public class FormatConverterManager {
 		try {
 			Tenant tenant = tenantDao.findById(document.getTenantId());
 			tenantName = tenant.getName();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage());
 		}
 		return tenantName;

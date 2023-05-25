@@ -66,7 +66,7 @@ public class DBInit {
 					log.error("Failed to execute " + sql, e);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			try {
 				if (con != null)
@@ -88,7 +88,7 @@ public class DBInit {
 			try (PreparedStatement st = con.prepareStatement(sql)) {
 				st.execute();
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			log.error("Failed to execute " + sql, e);
 			try {

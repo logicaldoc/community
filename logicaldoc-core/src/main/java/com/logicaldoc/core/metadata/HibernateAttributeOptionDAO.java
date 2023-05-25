@@ -39,7 +39,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 			List<AttributeOption> options = findByAttribute(setId, attribute);
 			for (AttributeOption option : options)
 				del(option, PersistentObject.DELETED_CODE_DEFAULT);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			result = false;
 		}
@@ -92,7 +92,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 							params, null);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return coll;
@@ -145,7 +145,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 
 			for (AttributeOption option : options)
 				del(option, PersistentObject.DELETED_CODE_DEFAULT);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}

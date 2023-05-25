@@ -79,13 +79,13 @@ public class TicketDownload extends HttpServlet {
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 
 			ticketDao.store(ticket);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 
 			try (PrintWriter out = response.getWriter();) {
 				out.println("Ticket " + ticketId + " is no more active"
 						+ (e.getMessage() != null ? ": " + e.getMessage() : ""));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -166,7 +166,7 @@ public class TicketDownload extends HttpServlet {
 				out.println("  </BODY>");
 				out.println("</HTML>");
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
@@ -213,7 +213,7 @@ public class TicketDownload extends HttpServlet {
 					os.flush();
 					os.close();
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}

@@ -60,7 +60,7 @@ public class I18N {
 				String val = bundle.getString(key);
 				if (val != null && !val.isEmpty())
 					return val;
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}
@@ -92,7 +92,7 @@ public class I18N {
 					if (val != null && !val.isEmpty())
 						map.put(key, bundle.getString(key));
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}

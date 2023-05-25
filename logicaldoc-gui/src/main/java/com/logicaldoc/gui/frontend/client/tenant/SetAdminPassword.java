@@ -12,8 +12,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 
@@ -48,8 +46,8 @@ public class SetAdminPassword extends Window {
 		equalsValidator.setErrorMessage(I18N.message("passwordnotmatch"));
 
 		LengthRangeValidator sizeValidator = new LengthRangeValidator();
-		sizeValidator.setErrorMessage(I18N.message("errorfieldminlenght",
-				Integer.toString(Session.get().getUser().getPasswordMinLenght())));
+		sizeValidator.setErrorMessage(
+				I18N.message("errorfieldminlenght", Integer.toString(Session.get().getUser().getPasswordMinLenght())));
 		sizeValidator.setMin(Session.get().getUser().getPasswordMinLenght());
 
 		PasswordItem newPass = new PasswordItem();
@@ -67,28 +65,26 @@ public class SetAdminPassword extends Window {
 		final ButtonItem apply = new ButtonItem();
 		apply.setTitle(I18N.message("apply"));
 		apply.setAutoFit(true);
-		apply.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (Boolean.FALSE.equals(vm.hasErrors())) {
-					apply.setDisabled(true);
-					TenantService.Instance.get().changeAdminPassword(vm.getValueAsString(NEWPASSWORD).trim(),
-							tenantName, new AsyncCallback<Void>() {
+		apply.addClickHandler(event -> {
+			vm.validate();
+			if (Boolean.FALSE.equals(vm.hasErrors())) {
+				apply.setDisabled(true);
+				TenantService.Instance.get().changeAdminPassword(vm.getValueAsString(NEWPASSWORD).trim(), tenantName,
+						new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									SC.warn(caught.getMessage());
-									apply.setDisabled(false);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								SC.warn(caught.getMessage());
+								apply.setDisabled(false);
+							}
 
-								@Override
-								public void onSuccess(Void arg) {
-									apply.setDisabled(false);
-									SetAdminPassword.this.destroy();
-									GuiLog.info(I18N.message("event.user.passwordchanged"), null);
-								}
-							});
-				}
+							@Override
+							public void onSuccess(Void arg) {
+								apply.setDisabled(false);
+								SetAdminPassword.this.destroy();
+								GuiLog.info(I18N.message("event.user.passwordchanged"), null);
+							}
+						});
 			}
 		});
 

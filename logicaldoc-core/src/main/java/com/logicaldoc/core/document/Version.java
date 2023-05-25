@@ -8,7 +8,6 @@ import java.util.StringTokenizer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -140,7 +139,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 			num2 = Integer.parseInt(st2.nextToken());
 
 			return num1.compareTo(num2);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			if (this.getDate() != null && other.getDate() != null)
 				return this.getDate().compareTo(other.getDate());
 			else
@@ -236,7 +235,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 				for (String name : document.getAttributeNames()) {
 					version.getAttributes().put(name, document.getAttributes().get(name));
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		}

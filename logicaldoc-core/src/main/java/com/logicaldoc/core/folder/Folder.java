@@ -425,7 +425,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	public Integer getStorage() {
 		try {
 			return storages.get(Context.get().getProperties().get("id"));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return null;
 		}
 	}
@@ -442,7 +442,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 				storages.remove(nodeId);
 			else
 				storages.put(nodeId, storage);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

@@ -42,7 +42,7 @@ public class DocumentsMenu extends SectionStack {
 			// Retrieve the saved menu width
 			String w = CookiesManager.get(CookiesManager.COOKIE_DOCSMENU_W);
 			setWidth(Integer.parseInt(w));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			setWidth(280);
 		}
 

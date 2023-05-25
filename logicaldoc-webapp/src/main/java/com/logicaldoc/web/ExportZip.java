@@ -87,7 +87,7 @@ public class ExportZip extends HttpServlet {
 					os.flush();
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}
@@ -180,7 +180,7 @@ public class ExportZip extends HttpServlet {
 			out.println("</HTML>");
 			out.flush();
 			out.close();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// Nothing to do
 		}
 	}

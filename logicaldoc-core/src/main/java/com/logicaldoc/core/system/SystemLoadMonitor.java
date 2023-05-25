@@ -76,7 +76,7 @@ public class SystemLoadMonitor {
 		// try to get the CPU usage with JMX
 		OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
 		int load = (int) Math
-				.round((osMXBean.getSystemLoadAverage() / (double) osMXBean.getAvailableProcessors()) * 100d);
+				.round((osMXBean.getSystemLoadAverage() / osMXBean.getAvailableProcessors()) * 100d);
 		if (load < 0) {
 			// On some systems Java is not able to get the CPU usage so try to
 			// extract the information from the shell

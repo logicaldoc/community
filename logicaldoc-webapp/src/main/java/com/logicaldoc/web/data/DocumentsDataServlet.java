@@ -298,7 +298,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			Document doc = null;
 			try {
 				doc = dao.findById(Long.parseLong(id));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 			if (doc == null || doc.getDeleted() == 1)

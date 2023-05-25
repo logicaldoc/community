@@ -5,8 +5,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -41,22 +39,14 @@ public class LogPanel extends VLayout {
 		toolStrip.addSpacer(2);
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				htmlPane.redraw();
-				htmlPane.setWidth100();
-				htmlPane.setHeight100();
-			}
+		refresh.addClickHandler(event -> {
+			htmlPane.redraw();
+			htmlPane.setWidth100();
+			htmlPane.setHeight100();
 		});
 
 		ToolStripButton download = new ToolStripButton(I18N.message("downloadlogs"));
-		download.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Util.download(Util.contextPath() + "log?appender=all");
-			}
-		});
+		download.addClickHandler(event -> Util.download(Util.contextPath() + "log?appender=all"));
 
 		toolStrip.addButton(refresh);
 		toolStrip.addButton(download);

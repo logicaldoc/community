@@ -159,7 +159,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			DataHandler datah = filedataDetail.getDataHandler();
 
 			super.checkin(sid, Long.parseLong(docId), comment, filename, release, datah);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new WebApplicationException(t.getMessage(), 500);
 		}
@@ -220,7 +220,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			DataHandler datah = filedataDetail.getDataHandler();
 
 			return super.upload(sid, doc_id, folder_id, release_bool, filename, language, datah);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new WebApplicationException(t.getMessage(), 500);
 		}
@@ -276,7 +276,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			DataHandler datah = filedataDetail.getDataHandler();
 
 			super.replaceFile(sid, docId, fileVersion, comment, datah);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new WebApplicationException(t.getMessage(), 500);
 		}

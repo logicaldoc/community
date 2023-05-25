@@ -6,9 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -44,33 +41,24 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (routine.getId() != 0) {
-					AutomationService.Instance.get().getRoutine(routine.getId(),
-							new AsyncCallback<GUIAutomationRoutine>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			if (routine.getId() != 0) {
+				AutomationService.Instance.get().getRoutine(routine.getId(), new AsyncCallback<GUIAutomationRoutine>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-								@Override
-								public void onSuccess(GUIAutomationRoutine routine) {
-									setRoutine(routine);
-								}
-							});
-				} else {
-					GUIAutomationRoutine newRoutine = new GUIAutomationRoutine();
-					setRoutine(newRoutine);
-				}
-				tabSet.hideSave();
+					@Override
+					public void onSuccess(GUIAutomationRoutine routine) {
+						setRoutine(routine);
+					}
+				});
+			} else {
+				GUIAutomationRoutine newRoutine = new GUIAutomationRoutine();
+				setRoutine(newRoutine);
 			}
+			tabSet.hideSave();
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
@@ -105,7 +93,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 				parametersTabPanel.removeMember(parametersPanel);
 		}
 
-		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
+		ChangedHandler changeHandler = event -> onModified();
 
 		standardPanel = new AutomationRoutineProperties(routine, changeHandler);
 		standardTabPanel.addMember(standardPanel);

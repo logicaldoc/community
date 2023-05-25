@@ -114,7 +114,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
 			// Deserialize the object
 			searchOptions = (SearchOptions) in.readObject();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Now try to deserialize using then XML format
 			try (XMLDecoder decoder = new XMLDecoder(new FileInputStream(file))) {
 				searchOptions = (SearchOptions) decoder.readObject();

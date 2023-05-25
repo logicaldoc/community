@@ -795,7 +795,7 @@ public class ServletUtil {
 	public static void sendError(HttpServletResponse response, String message) {
 		try {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// Nothing to do
 		}
 	}

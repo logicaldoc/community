@@ -93,7 +93,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 			DavResource resource = createResource(locator, session, res);
 
 			return resource;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}

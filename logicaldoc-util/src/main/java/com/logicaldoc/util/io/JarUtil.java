@@ -48,7 +48,7 @@ public class JarUtil {
 			maxEntries = Context.get().getProperties().getInt("zip.maxentries", 100000);
 			maxSize = Context.get().getProperties().getInt("zip.maxsize", 1024) * 1024 * 1024;
 			maxCompressionRatio = Context.get().getProperties().getDouble("zip.maxratio", 30D);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

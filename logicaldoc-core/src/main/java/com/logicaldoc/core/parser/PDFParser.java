@@ -41,13 +41,13 @@ public class PDFParser extends AbstractParser {
 			pdfDocument = PDDocument.load(input);
 
 			if (pdfDocument == null) {
-				throw new Exception(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
+				throw new IOException(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
 			} else {
 				if (pdfDocument.isEncrypted()) {
 					try {
 						pdfDocument.close();
 						pdfDocument = PDDocument.load(input, "");
-					} catch (Throwable e) {
+					} catch (Exception e) {
 						log.error("Error: The document is encrypted.");
 						content.append("The document is encrypted");
 						return;
@@ -55,7 +55,7 @@ public class PDFParser extends AbstractParser {
 				}
 
 				if (pdfDocument == null)
-					throw new Exception(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
+					throw new IOException(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
 
 				// Strip text from the entire document
 				parseDocument(pdfDocument, content);
@@ -63,13 +63,13 @@ public class PDFParser extends AbstractParser {
 				// Now parse the forms
 				parseForm(pdfDocument, content);
 			}
-		} catch (Throwable ex) {
+		} catch (IOException ex) {
 			log.error(ex.getMessage(), ex);
 		} finally {
 			try {
 				if (pdfDocument != null)
 					pdfDocument.close();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
 			}
 		}
@@ -78,12 +78,12 @@ public class PDFParser extends AbstractParser {
 	/**
 	 * Extract text and metadata from the main document
 	 * 
-	 * @throws Exception
+	 * @throws IOException I/O error
 	 */
-	protected void parseDocument(PDDocument pdfDocument, StringBuilder content) throws Exception {
+	protected void parseDocument(PDDocument pdfDocument, StringBuilder content) throws IOException {
 		PDDocumentInformation information = pdfDocument.getDocumentInformation();
 		if (information == null) {
-			throw new Exception("Can not get information from pdf document");
+			throw new IOException("Can not get information from pdf document");
 		}
 
 		/*
@@ -101,7 +101,7 @@ public class PDFParser extends AbstractParser {
 				stripper.writeText(pdfDocument, writer);
 				writer.flush();
 				content.append(writer.toString());
-			} catch (Throwable tw) {
+			} catch (Exception tw) {
 				log.error("Exception reading pdf document: {}", tw.getMessage());
 			}
 		}
@@ -123,7 +123,7 @@ public class PDFParser extends AbstractParser {
 		List<PDField> fields = acroForm.getFields();
 		if (fields != null && !fields.isEmpty()) {
 			content.append("\n");
-			
+
 			log.debug("{} top-level fields were found on the form", fields.size());
 
 			for (PDField field : fields) {
@@ -139,7 +139,7 @@ public class PDFParser extends AbstractParser {
 	public int countPages(File file, String filename) {
 		try {
 			return internalCountPages(PDDocument.load(file));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.warn(e.getMessage(), e);
 			return 1;
@@ -150,7 +150,7 @@ public class PDFParser extends AbstractParser {
 	public int countPages(InputStream input, String filename) {
 		try {
 			return internalCountPages(PDDocument.load(input));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			if (log.isDebugEnabled())
 				log.warn(e.getMessage(), e);
 			return 1;
@@ -160,11 +160,11 @@ public class PDFParser extends AbstractParser {
 	private int internalCountPages(PDDocument pdfDocument) {
 		try {
 			if (pdfDocument == null) {
-				throw new Exception(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
+				throw new IOException(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
 			} else {
 				return pdfDocument.getNumberOfPages();
 			}
-		} catch (Throwable ex) {
+		} catch (IOException ex) {
 			if (log.isDebugEnabled())
 				log.warn(ex.getMessage(), ex);
 			return 1;
@@ -172,7 +172,7 @@ public class PDFParser extends AbstractParser {
 			try {
 				if (pdfDocument != null)
 					pdfDocument.close();
-			} catch (Throwable e) {
+			} catch (IOException e) {
 				if (log.isDebugEnabled())
 					log.warn(e.getMessage(), e);
 			}

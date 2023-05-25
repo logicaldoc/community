@@ -12,10 +12,6 @@ import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -50,12 +46,7 @@ public class WebcontentEditor extends Window {
 		setHeight100();
 		centerInPage();
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				unlockAndClose();
-			}
-		});
+		addCloseClickHandler(event -> unlockAndClose());
 
 		layout = new VLayout();
 		layout.setWidth100();
@@ -85,12 +76,7 @@ public class WebcontentEditor extends Window {
 		close.setTitle(I18N.message("close"));
 		toolStrip.addButton(close);
 		toolStrip.addSeparator();
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				unlockAndClose();
-			}
-		});
+		close.addClickHandler(event -> unlockAndClose());
 
 		layout.setMembers(toolStrip, editorPanel);
 	}

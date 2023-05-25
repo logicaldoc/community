@@ -111,7 +111,7 @@ public class RequestInfo {
 	}
 
 	public String getParameter(String name) {
-		return (String) paramMap.get(name);
+		return paramMap.get(name);
 	}
 
 	public Map<String, String> getParameterMap() {

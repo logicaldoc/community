@@ -155,7 +155,7 @@ public class ThumbnailServlet extends HttpServlet {
 				ThumbnailManager thumbManager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
 				thumbManager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
 				log.debug("Created custom thumbnail {}", resource);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		}
@@ -169,7 +169,7 @@ public class ThumbnailServlet extends HttpServlet {
 				ThumbnailManager thumbManager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
 				thumbManager.createTile(doc, fileVersion, sid);
 				log.debug("Created tile {}", resource);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		}
@@ -183,7 +183,7 @@ public class ThumbnailServlet extends HttpServlet {
 			try {
 				thumbManager.createTumbnail(doc, fileVersion, sid);
 				log.debug("Created thumbnail {}", resource);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		}

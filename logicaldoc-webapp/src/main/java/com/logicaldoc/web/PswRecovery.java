@@ -143,12 +143,12 @@ public class PswRecovery extends HttpServlet {
 
 					ticket.setCount(ticket.getCount() + 1);
 					ticketDao.store(ticket);
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 					response.getWriter().println("Request not correctly processed");
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}
@@ -180,7 +180,7 @@ public class PswRecovery extends HttpServlet {
 			out.println("</HTML>");
 			out.flush();
 			out.close();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// Nothing to do
 		}
 	}

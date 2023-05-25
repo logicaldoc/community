@@ -101,7 +101,7 @@ public class FileUtil {
 		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filepath));) {
 			bos.write(text.getBytes(UTF_8));
 			bos.flush();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			logError(e.getLocalizedMessage());
 		}
 	}
@@ -164,7 +164,7 @@ public class FileUtil {
 			return digest;
 		} catch (IOException io) {
 			log.error("Error generating digest: ", io);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error("Error generating digest: ", t);
 		} finally {
 			try {
@@ -185,7 +185,7 @@ public class FileUtil {
 	public static String computeDigest(File file) {
 		try (InputStream is = new BufferedInputStream(new FileInputStream(file), BUFF_SIZE);) {
 			return computeDigest(is);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 		return null;
@@ -246,7 +246,7 @@ public class FileUtil {
 			}
 		} catch (IOException io) {
 			log.error("Error generating SHA-1: ", io);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error("Error generating SHA-1: ", t);
 		}
 		return null;
@@ -524,7 +524,7 @@ public class FileUtil {
 		} finally {
 			try {
 				input.close();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 		}

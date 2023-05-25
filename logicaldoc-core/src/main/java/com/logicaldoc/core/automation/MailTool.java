@@ -1,6 +1,7 @@
 package com.logicaldoc.core.automation;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,12 +11,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.cms.CMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.EMailSender;
@@ -55,10 +60,13 @@ public class MailTool {
 	 * @param subject subject of the email
 	 * @param message message printed in the body of the email
 	 * 
+	 * @throws MessagingException Cannot send the email
+	 * @throws IOException I/O error
+	 * 
 	 * @throws Exception error sending the email
 	 */
 	public void sendDocuments(Collection<Document> documents, String from, String to, String subject, String message)
-			throws Exception {
+			throws IOException, MessagingException {
 		sendDocuments(documents, from, Arrays.asList(new String[] { to }), subject, message);
 	}
 
@@ -71,10 +79,11 @@ public class MailTool {
 	 * @param subject subject of the email
 	 * @param message message printed in the body of the email
 	 * 
-	 * @throws Exception error sending the email
+	 * @throws IOException I/O error
+	 * @throws MessagingException Cannot send the email
 	 */
 	public void sendDocuments(Collection<Document> documents, String from, Collection<String> to, String subject,
-			String message) throws Exception {
+			String message) throws IOException, MessagingException {
 		if (documents == null || documents.isEmpty())
 			return;
 
@@ -116,10 +125,11 @@ public class MailTool {
 	 * @param subject subject of the email
 	 * @param message message printed in the body of the email
 	 * 
-	 * @throws Exception error sending the email
+	 * @throws IOException I/O error
+	 * @throws MessagingException Cannot send the email
 	 */
 	public void sendDocument(Document document, String from, String to, String subject, String message)
-			throws Exception {
+			throws IOException, MessagingException {
 		sendDocuments(Arrays.asList(new Document[] { document }), from, Arrays.asList(new String[] { to }), subject,
 				message);
 	}
@@ -133,10 +143,11 @@ public class MailTool {
 	 * @param subject subject of the email
 	 * @param message message printed in the body of the email
 	 * 
-	 * @throws Exception error sending the email
+	 * @throws IOException I/O error
+	 * @throws MessagingException Cannot send the email
 	 */
 	public void sendDocument(Document document, String from, Collection<String> to, String subject, String message)
-			throws Exception {
+			throws IOException, MessagingException {
 		sendDocuments(Arrays.asList(new Document[] { document }), from, to, subject, message);
 	}
 
@@ -149,10 +160,10 @@ public class MailTool {
 	 * @param subject subject of the email
 	 * @param message message printed in the body of the email
 	 * 
-	 * @throws Exception error sending the email
+	 * @throws MessagingException Cannot send the message
 	 */
 	public void sendMessage(long tenantId, String from, Collection<String> to, String subject, String message)
-			throws Exception {
+			throws MessagingException {
 		EMail email = new EMail();
 		email.setHtml(1);
 		email.setTenantId(tenantId);
@@ -189,9 +200,10 @@ public class MailTool {
 	 * @param subject subject of the email
 	 * @param message message printed in the body of the email
 	 * 
-	 * @throws Exception error sending the email
+	 * @throws MessagingException Cannot send the email
 	 */
-	public void sendMessage(long tenantId, String from, String to, String subject, String message) throws Exception {
+	public void sendMessage(long tenantId, String from, String to, String subject, String message)
+			throws MessagingException {
 		this.sendMessage(tenantId, from, to != null ? Arrays.asList(new String[] { to }) : null, subject, message);
 	}
 
@@ -206,9 +218,10 @@ public class MailTool {
 	 * 
 	 * @return The object representation of the email
 	 * 
-	 * @throws Exception the email cannot be correctly analyzed
+	 * @throws IOException I/O error getting the document's contents
+	 * @throws MessagingException  Cannot read the source message
 	 */
-	public EMail documentToEMail(Document document, boolean extractAttachments) throws Exception {
+	public EMail documentToEMail(Document document, boolean extractAttachments) throws MessagingException, IOException  {
 		if (!(document.getFileName().toLowerCase().endsWith(".eml")
 				|| document.getFileName().toLowerCase().endsWith(".msg")))
 			throw new IllegalArgumentException("Filename must end with .msg or .eml");
@@ -220,8 +233,12 @@ public class MailTool {
 					storer.getStream(document.getId(), storer.getResourceName(document, null, null)),
 					extractAttachments);
 		else
-			email = MailUtil.msgToMail(storer.getStream(document.getId(), storer.getResourceName(document, null, null)),
-					extractAttachments);
+			try {
+				email = MailUtil.msgToMail(storer.getStream(document.getId(), storer.getResourceName(document, null, null)),
+						extractAttachments);
+			}  catch (CMSException e) {
+				throw new MessagingException(e.getMessage(), e);
+			}
 		return email;
 	}
 
@@ -235,10 +252,10 @@ public class MailTool {
 	 * @param priority a priority: <b>0</b> = low, <b>1</b> = medium, <b>2</b> =
 	 *        high
 	 * 
-	 * @throws Exception If an error occurs
+	 * @throws PersistenceException Error in the persistence layer
 	 */
 	public void sendSystemMessage(String recipient, String message, String subject, int scope, int priority)
-			throws Exception {
+			throws PersistenceException {
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user = uDao.findByUsername(recipient);
 
@@ -326,7 +343,7 @@ public class MailTool {
 				}
 			}
 
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		} finally {
 			IOUtils.closeQuietly(is);

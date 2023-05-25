@@ -167,7 +167,7 @@ public class Automation {
 			} catch (ClassNotFoundException e) {
 				log.error(e.getMessage(), e);
 				continue;
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}
@@ -298,7 +298,7 @@ public class Automation {
 						"The script makes use of the forbidden class java.lang.Runtime and cannot be executed");
 			VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
 			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error("Error in the script", e);
 		}
 	}

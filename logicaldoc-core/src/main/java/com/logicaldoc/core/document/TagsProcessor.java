@@ -2,8 +2,10 @@ package com.logicaldoc.core.document;
 
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.task.Task;
+import com.logicaldoc.core.task.TaskException;
 
 /**
  * This task generate all data needed by the tag cloud panel and the tags
@@ -39,25 +41,29 @@ public class TagsProcessor extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Exception {
+	protected void runTask() throws TaskException {
 		log.info("Start tags processing");
 
-		if (!interruptRequested) {
-			log.info("Clean unexisting tags");
-			documentDao.cleanUnexistingUniqueTags();
-			next();
-		}
+		try {
+			if (!interruptRequested) {
+				log.info("Clean unexisting tags");
+				documentDao.cleanUnexistingUniqueTags();
+				next();
+			}
 
-		if (!interruptRequested) {
-			log.info("Detect new unique tags");
-			documentDao.insertNewUniqueTags();
-			next();
-		}
+			if (!interruptRequested) {
+				log.info("Detect new unique tags");
+				documentDao.insertNewUniqueTags();
+				next();
+			}
 
-		if (!interruptRequested) {
-			log.info("Count tags occurrences");
-			documentDao.updateCountUniqueTags();
-			next();
+			if (!interruptRequested) {
+				log.info("Count tags occurrences");
+				documentDao.updateCountUniqueTags();
+				next();
+			}
+		} catch (PersistenceException e) {
+			throw new TaskException(e.getMessage(), e);
 		}
 
 		log.info("End of tags processing");

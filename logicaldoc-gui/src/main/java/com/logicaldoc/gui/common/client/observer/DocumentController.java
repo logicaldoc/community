@@ -57,7 +57,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentSelected(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -68,7 +68,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentsDeleted(documents);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -79,7 +79,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentMoved(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -90,7 +90,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentModified(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -101,7 +101,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentStored(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -112,7 +112,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentCheckedIn(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -123,7 +123,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentCheckedOut(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -134,7 +134,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentLocked(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -145,7 +145,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentUnlocked(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -179,7 +179,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentBeginEditing(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -212,7 +212,7 @@ public class DocumentController {
 			for (DocumentObserver observer : observers)
 				try {
 					observer.onDocumentCancelEditing(document);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 			editing = false;

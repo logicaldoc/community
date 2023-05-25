@@ -38,7 +38,7 @@ public class EventsListGridField extends ColoredListGridField {
 					return decodeEvents(value, rec);
 				} else
 					return "";
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				return "";
 			}
 		});

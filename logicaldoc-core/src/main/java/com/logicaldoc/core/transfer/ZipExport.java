@@ -85,7 +85,7 @@ public class ZipExport {
 			try {
 				zos.flush();
 				zos.close();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 		}
@@ -160,7 +160,7 @@ public class ZipExport {
 
 				try {
 					zos.flush();
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log.warn(e.getMessage());
 				}
 				saveHistory(transaction, doc);
@@ -169,7 +169,7 @@ public class ZipExport {
 			try {
 				zos.flush();
 				zos.close();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.warn(e.getMessage());
 			}
 		}

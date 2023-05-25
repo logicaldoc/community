@@ -2,6 +2,7 @@ package com.logicaldoc.web.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -1245,9 +1246,12 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	}
 
 	@Test
-	public void testBulkUpdate() throws ParseException, PersistenceException {
+	public void testBulkUpdate() throws ParseException, PersistenceException, ServerException {
 
-		long[] ids = new long[] { 2, 3, 4 };
+		GUIDocument doc4=service.getById(4L);
+		assertNull(doc4.getAttribute("attr1"));
+		
+		long[] ids = new long[] { 4 };
 		GUIDocument vo = new GUIDocument();
 		vo.setPublished(1);
 
@@ -1332,7 +1336,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		// try to extract an attachment from a non email document
 		try {
-			service.saveEmailAttachment(4, "testDocVer", "data.sql");
+			service.saveEmailAttachment(4, "1.0", "data.sql");
 			fail("Expected exception was not thrown");
 		} catch (ServerException e) {
 			// nothing to do

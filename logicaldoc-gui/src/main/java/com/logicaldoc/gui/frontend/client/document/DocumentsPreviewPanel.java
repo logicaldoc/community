@@ -81,7 +81,7 @@ public class DocumentsPreviewPanel extends VLayout {
 				if (w == null || w.isEmpty())
 					w = "xxxx";
 				setWidth(Integer.parseInt(w));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				setWidth(350);
 			}
 		}

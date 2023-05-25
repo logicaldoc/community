@@ -206,13 +206,13 @@ public class Geolocation {
 		} finally {
 			try {
 				FileUtils.forceDelete(gzFile);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn(t.getMessage());
 			}
 
 			try {
 				FileUtils.forceDelete(tmpDir);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn(t.getMessage());
 			}
 		}
@@ -293,7 +293,7 @@ public class Geolocation {
 		if (dbReader != null) {
 			try {
 				dbReader.close();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 			dbReader = null;

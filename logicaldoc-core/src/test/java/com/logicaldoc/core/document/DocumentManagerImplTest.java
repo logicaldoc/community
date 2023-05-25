@@ -1,7 +1,8 @@
 package com.logicaldoc.core.document;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -255,7 +256,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		folder = folderDao.findByPathExtended("/Default/test", 1L);
 		folderDao.initialize(folder);
-		Assert.assertTrue(1 == folder.getStorages().size());
+		Assert.assertEquals(1, folder.getStorages().size());
 		Assert.assertEquals(Integer.valueOf(2), folder.getStorage());
 
 		folder = folderDao.findByPathExtended("/Default/test/subfolder", 1L);
@@ -269,6 +270,9 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		String store2Root = Context.get().getProperties().getPropertyWithSubstitutions("store.2.dir");
 
 		Assert.assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
+		
+		Thread.sleep(3000);
+		
 		int count = new File(storeRoot + "/1/doc/").list().length;
 		Assert.assertEquals(1, count);
 
@@ -462,7 +466,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStoreVersionAsync() throws PersistenceException {
+	public void testStoreVersionAsync() throws PersistenceException, InterruptedException {
 		// A new document will have ID=101 so we prepare a fake document with
 		// that ID and create a version.
 		Document doc = docDao.findById(1);
@@ -473,9 +477,9 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Version version = Version.create(doc, user, null, DocumentEvent.STORED.toString(), false);
 
-		assertTrue(version.getId() == 0L);
-		assertTrue(version.getDocId() == doc.getId());
-		assertTrue(null == docDao.findById(version.getDocId()));
+		assertEquals(0L, version.getId());
+		assertEquals(version.getDocId(), doc.getId());
+		assertNull(docDao.findById(version.getDocId()));
 
 		// Prepare a separate thread that creates the document
 		Thread createDoc = new Thread() {
@@ -514,14 +518,10 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		DocumentManagerImpl docMan = (DocumentManagerImpl) documentManager;
 		docMan.storeVersionAsync(version);
 
-		try {
-			Thread.sleep(4000L);
-		} catch (InterruptedException e) {
-			// Nothing to do
-		}
-
-		assertTrue(version.getId() != 0L);
-		assertTrue(version.getDocId() == 101L);
+		Thread.sleep(4000L);
+			
+		assertEquals(101L, version.getId());
+		assertEquals(101L, version.getDocId());
 		assertNotNull(docDao.findById(version.getDocId()));
 	}
 

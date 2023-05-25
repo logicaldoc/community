@@ -11,20 +11,16 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -78,16 +74,13 @@ public class MessageTemplatesPanel extends VLayout {
 			langSelector.setValue("en");
 			TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
 			item.setRequired(true);
-			LD.askForValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item, new ValueCallback() {
-				@Override
-				public void execute(String value) {
-					ListGridRecord rec = new ListGridRecord();
-					rec.setAttribute("id", "-1");
-					rec.setAttribute("type", "user");
-					rec.setAttribute("name", value);
-					list.getRecordList().addAt(rec, 0);
-					list.startEditing(0);
-				}
+			LD.askForValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item, value -> {
+				ListGridRecord rec = new ListGridRecord();
+				rec.setAttribute("id", "-1");
+				rec.setAttribute("type", "user");
+				rec.setAttribute("name", value);
+				list.getRecordList().addAt(rec, 0);
+				list.startEditing(0);
 			});
 		});
 
@@ -140,11 +133,7 @@ public class MessageTemplatesPanel extends VLayout {
 					editImg.setPrompt(I18N.message("edit"));
 					editImg.setHeight(16);
 					editImg.setWidth(16);
-					editImg.addClickHandler(new ClickHandler() {
-						public void onClick(ClickEvent event) {
-							onEdit();
-						}
-					});
+					editImg.addClickHandler(event -> onEdit());
 
 					rollOverCanvas.addMember(editImg);
 				}
@@ -168,12 +157,12 @@ public class MessageTemplatesPanel extends VLayout {
 		list.setCanAcceptDroppedRecords(true);
 		list.setDragDataAction(DragDataAction.MOVE);
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+		list.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
 		});
 
-		list.addDoubleClickHandler((DoubleClickEvent event) -> onEdit());
+		list.addDoubleClickHandler(event -> onEdit());
 
 		// Initialize with english language
 		langSelector.setValue("en");
@@ -201,7 +190,7 @@ public class MessageTemplatesPanel extends VLayout {
 		int i = 0;
 		for (Record rec : records) {
 			GUIMessageTemplate t = new GUIMessageTemplate();
-			t.setId(new Long(rec.getAttributeAsString("id")));
+			t.setId(Long.parseLong(rec.getAttributeAsString("id")));
 			t.setLanguage(lang);
 			t.setName(rec.getAttributeAsString("name"));
 			t.setSubject(rec.getAttributeAsString(SUBJECT));
@@ -253,7 +242,7 @@ public class MessageTemplatesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
+		delete.addClickHandler(event -> {
 			MessageService.Instance.get().deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"),
 					new AsyncCallback<Void>() {
 						@Override

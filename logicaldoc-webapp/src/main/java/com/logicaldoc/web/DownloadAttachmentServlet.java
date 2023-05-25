@@ -84,7 +84,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 				throw new IOException("The document is protected by a password");
 
 			download(request, response, docId, fileVersion, filename, doc);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			ServletUtil.sendError(response, e.getMessage());
 		}

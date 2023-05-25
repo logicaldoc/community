@@ -57,7 +57,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			}
 
 			return users.toArray(new WSUser[0]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
 		}
@@ -100,7 +100,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				}
 			}
 			return groups.toArray(new WSGroup[0]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
 		}
@@ -175,7 +175,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			}
 
 			return usr.getId();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
 		}
@@ -235,7 +235,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				dao.inheritACLs(grp, group.getInheritGroupId().longValue());
 
 			return grp.getId();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
 		}
@@ -255,7 +255,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				throw new Exception("You cannot delete user with id " + usr.getId() + " because it is a system user");
 			}
 			dao.delete(userId);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new Exception("Unable to delete the user with id " + userId);
 		}
@@ -275,7 +275,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				throw new Exception("You cannot delete group with id " + grp.getId() + " because it is a system group");
 			}
 			dao.delete(groupId);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new Exception("Unable to delete the group with id " + groupId);
 		}
@@ -311,7 +311,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			dao.store(user, history);
 			
 			return 0;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return 1;
 		}
@@ -328,7 +328,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			userDao.initialize(user);
 			return WSUser.fromUser(user);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
 		}
@@ -346,7 +346,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			userDao.initialize(user);
 			return WSUser.fromUser(user);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
 		}

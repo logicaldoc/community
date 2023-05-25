@@ -76,12 +76,12 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 
 									try {
 										Contacts.get().refresh();
-									} catch (Throwable t) {
+									} catch (Exception t) {
 										// Nothing to do
 									}
 								}
 							});
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					LD.clearPrompt();
 				}
 		});

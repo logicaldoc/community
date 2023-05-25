@@ -48,7 +48,7 @@ public class Dropbox {
 		try {
 			DbxRequestConfig config = new DbxRequestConfig("LogicalDOC");
 			this.client = new DbxClientV2(config, accessToken);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return false;
 		}
@@ -56,7 +56,7 @@ public class Dropbox {
 		// Test the connection
 		try {
 			return getAccountName() != null && !getAccountName().isEmpty();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return false;
 		}
 	}

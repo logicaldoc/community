@@ -13,24 +13,17 @@ import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.ListGridComponent;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -49,30 +42,24 @@ public class GUIGridsPanel extends VLayout {
 	private ListGrid searchGrid;
 
 	private SpinnerItem searchHits;
-	
+
 	private SpinnerItem pageSize;
-	
+
 	public GUIGridsPanel() {
-		setMembersMargin(3);	
-	}	
-		
+		setMembersMargin(3);
+	}
+
 	@Override
 	public void onDraw() {
 		ToolStrip toolbar = new ToolStrip();
 		toolbar.setWidth100();
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
+		save.addClickHandler(event -> onSave());
 		toolbar.addButton(save);
 
 		SectionStack documentsStack = prepareDocumentsGrid();
 		SectionStack searchStack = prepareSearchGrid();
-		
+
 		HLayout body = new HLayout();
 		body.setMembersMargin(3);
 		body.setWidth100();
@@ -96,21 +83,14 @@ public class GUIGridsPanel extends VLayout {
 		documentsFieldsGrid.setShowRowNumbers(true);
 		documentsFieldsGrid.setFields(attribute);
 
-		documentsFieldsGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new Menu();
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						documentsFieldsGrid.removeSelectedData();
-					}
-				});
-				contextMenu.setItems(delete);
-				contextMenu.showContextMenu();
-				event.cancel();
-			}
+		documentsFieldsGrid.addCellContextClickHandler(event -> {
+			Menu contextMenu = new Menu();
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.addClickHandler(evnt -> documentsFieldsGrid.removeSelectedData());
+			contextMenu.setItems(delete);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 
 		ToolStrip controls = new ToolStrip();
@@ -118,32 +98,28 @@ public class GUIGridsPanel extends VLayout {
 		controls.setHeight(24);
 		final SelectItem selector = ItemFactory.newAttributesSelector();
 		selector.setWidth(100);
-		selector.addChangedHandler(new ChangedHandler() {
+		selector.addChangedHandler(event -> {
+			ListGridRecord[] seletion = selector.getSelectedRecords();
+			for (ListGridRecord sel : seletion) {
+				// Skip search-specific attributes
+				if (sel.getAttributeAsString("name").equals("folder")
+						|| sel.getAttributeAsString("name").equals("score"))
+					continue;
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord[] seletion = selector.getSelectedRecords();
-				for (ListGridRecord sel : seletion) {
-					// Skip search-specific attributes
-					if (sel.getAttributeAsString("name").equals("folder")
-							|| sel.getAttributeAsString("name").equals("score"))
-						continue;
-
-					Record rec = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (rec == null) {
-						ListGridRecord newRec = new ListGridRecord();
-						newRec.setAttribute("name", sel.getAttributeAsString("name"));
-						newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
-						documentsFieldsGrid.addData(newRec);
-					}
+				Record rec = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+				if (rec == null) {
+					ListGridRecord newRec = new ListGridRecord();
+					newRec.setAttribute("name", sel.getAttributeAsString("name"));
+					newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
+					documentsFieldsGrid.addData(newRec);
 				}
-				selector.clearValue();
 			}
-
+			selector.clearValue();
 		});
 		controls.addFormItem(selector);
 
-		documentsFieldsGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
+		documentsFieldsGrid
+				.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
 
 		String columns = Session.get().getConfig("gui.document.columns");
 
@@ -172,7 +148,7 @@ public class GUIGridsPanel extends VLayout {
 		pageSize.setMin(5);
 		pageSize.setStep(10);
 		controls.addFormItem(pageSize);
-		
+
 		section.setItems(documentsFieldsGrid);
 		stack.setSections(section);
 
@@ -193,21 +169,14 @@ public class GUIGridsPanel extends VLayout {
 		searchGrid.setShowRowNumbers(true);
 		searchGrid.setFields(attribute);
 
-		searchGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new Menu();
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						searchGrid.removeSelectedData();
-					}
-				});
-				contextMenu.setItems(delete);
-				contextMenu.showContextMenu();
-				event.cancel();
-			}
+		searchGrid.addCellContextClickHandler(event -> {
+			Menu contextMenu = new Menu();
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.addClickHandler(evnt -> searchGrid.removeSelectedData());
+			contextMenu.setItems(delete);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 
 		ToolStrip controls = new ToolStrip();
@@ -215,27 +184,23 @@ public class GUIGridsPanel extends VLayout {
 		controls.setHeight(24);
 		final SelectItem selector = ItemFactory.newAttributesSelector();
 		selector.setWidth(100);
-		selector.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				ListGridRecord[] seletion = selector.getSelectedRecords();
-				for (ListGridRecord sel : seletion) {
-					Record rec = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
-					if (rec == null) {
-						ListGridRecord newRec = new ListGridRecord();
-						newRec.setAttribute("name", sel.getAttributeAsString("name"));
-						newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
-						searchGrid.addData(newRec);
-					}
+		selector.addChangedHandler(event -> {
+			ListGridRecord[] seletion = selector.getSelectedRecords();
+			for (ListGridRecord sel : seletion) {
+				Record rec = searchGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+				if (rec == null) {
+					ListGridRecord newRec = new ListGridRecord();
+					newRec.setAttribute("name", sel.getAttributeAsString("name"));
+					newRec.setAttribute(LABEL, sel.getAttributeAsString(LABEL));
+					searchGrid.addData(newRec);
 				}
-				selector.clearValue();
 			}
-
+			selector.clearValue();
 		});
 		controls.addFormItem(selector);
-		
-		searchHits = ItemFactory.newSpinnerItem("searchhits", I18N.message("searchhits"), Session.get().getConfigAsInt("search.hits"));
+
+		searchHits = ItemFactory.newSpinnerItem("searchhits", I18N.message("searchhits"),
+				Session.get().getConfigAsInt("search.hits"));
 		searchHits.setRequired(true);
 		searchHits.setWrapTitle(false);
 		searchHits.setMin(5);
@@ -275,12 +240,12 @@ public class GUIGridsPanel extends VLayout {
 	private void onSave() {
 		List<String> extendedAttributes = new ArrayList<>();
 		List<GUIParameter> parameters = new ArrayList<>();
-		
+
 		/*
 		 * Prepare the list of columns for the documents screen
 		 */
 		collectDocumentsColumns(extendedAttributes, parameters);
-		
+
 		/*
 		 * Prepare the list of columns for the search screen
 		 */
@@ -303,11 +268,11 @@ public class GUIGridsPanel extends VLayout {
 		param = new GUIParameter(Session.get().getTenantName() + ".search.hits", searchHits.getValueAsString());
 		parameters.add(param);
 		Session.get().setConfig(param.getName(), param.getValue());
-		
+
 		param = new GUIParameter(Session.get().getTenantName() + ".gui.document.pagesize", pageSize.getValueAsString());
 		parameters.add(param);
 		Session.get().setConfig(param.getName(), param.getValue());
-		
+
 		// Save all
 		SettingService.Instance.get().saveSettings(parameters.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
 
@@ -360,8 +325,9 @@ public class GUIGridsPanel extends VLayout {
 					extendedAttributes.add(n);
 			}
 		}
-		
-		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.document.columns", value.toString());
+
+		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.document.columns",
+				value.toString());
 		parameters.add(param);
 		Session.get().setConfig(param.getName(), param.getValue());
 		return parameters;

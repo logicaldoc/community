@@ -503,7 +503,7 @@ public class ResourceServiceImpl implements ResourceService {
 				}
 			}
 			return null;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
 		}
@@ -543,7 +543,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			document = documentDAO.findById(Long.parseLong(source.getID()));
 			user = userDAO.findById(source.getRequestedPerson());
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
@@ -565,7 +565,7 @@ public class ResourceServiceImpl implements ResourceService {
 			// we are doing a file rename
 			try {
 				documentManager.rename(document.getId(), source.getName(), transaction);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
 			}
 		} else {
@@ -585,7 +585,7 @@ public class ResourceServiceImpl implements ResourceService {
 				if (document.getDocRef() != null)
 					transaction.setEvent(DocumentEvent.SHORTCUT_MOVED.toString());
 				documentManager.moveToFolder(document, folder, transaction);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 			}
 		}
@@ -631,7 +631,7 @@ public class ResourceServiceImpl implements ResourceService {
 					Folder destParentFolder = folderDAO.findById(destinationParentFolder);
 					folderDAO.initialize(destParentFolder);
 					folderDAO.move(currentFolder, destParentFolder, transaction);
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during Folder Move");
 				}

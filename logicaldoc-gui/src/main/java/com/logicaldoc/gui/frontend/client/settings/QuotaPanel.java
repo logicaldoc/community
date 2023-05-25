@@ -8,10 +8,6 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.logicaldoc.gui.frontend.client.tenant.TenantQuotaPanel;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
  * Shows the quota details.
@@ -27,7 +23,7 @@ public class QuotaPanel extends AdminPanel {
 
 	public QuotaPanel(long tenantId) {
 		super("quota");
-		
+
 		TenantService.Instance.get().load(tenantId, new AsyncCallback<GUITenant>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -43,35 +39,27 @@ public class QuotaPanel extends AdminPanel {
 	}
 
 	private void initGUI() {
-		tenantQuota = new TenantQuotaPanel(tenant, new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				// Nothing to do
-			}
+		tenantQuota = new TenantQuotaPanel(tenant, event -> {
+			// Nothing to do
 		});
 
 		IButton save = new IButton(I18N.message("save"));
 		save.setMinWidth(80);
-		save.addClickHandler(new ClickHandler() {
+		save.addClickHandler(event -> {
+			if (tenantQuota.validate())
+				TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
 
-			@Override
-			public void onClick(ClickEvent event) {
-				if (tenantQuota.validate())
-					TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUITenant ten) {
-							QuotaPanel.this.tenant = ten;
-							GuiLog.info(I18N.message("settingssaved"), null);
-						}
-					});
-			}
+					@Override
+					public void onSuccess(GUITenant ten) {
+						QuotaPanel.this.tenant = ten;
+						GuiLog.info(I18N.message("settingssaved"), null);
+					}
+				});
 		});
 
 		body.setMembers(tenantQuota);

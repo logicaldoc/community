@@ -30,8 +30,6 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -336,52 +334,48 @@ public class PatchPanel extends VLayout {
 		download = new IButton(I18N.message("download"));
 		download.setAutoFit(true);
 		download.setVisible(!patch.isLocal());
-		download.addClickHandler(new ClickHandler() {
+		download.addClickHandler(event -> {
+			bar.setPercentDone(0);
+			download.setDisabled(true);
 
-			@Override
-			public void onClick(ClickEvent event) {
-				bar.setPercentDone(0);
-				download.setDisabled(true);
+			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
+					new AsyncCallback<Void>() {
 
-				UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
-						new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+							download.setDisabled(false);
+						}
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								download.setDisabled(false);
-							}
+						@Override
+						public void onSuccess(Void arg) {
+							confirmPatch.setVisible(false);
 
-							@Override
-							public void onSuccess(Void arg) {
-								confirmPatch.setVisible(false);
+							new Timer() {
+								public void run() {
+									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<int[]>() {
 
-								new Timer() {
-									public void run() {
-										UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<int[]>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
+										@Override
+										public void onSuccess(int[] status) {
+											bar.setPercentDone(status[1]);
 
-											@Override
-											public void onSuccess(int[] status) {
-												bar.setPercentDone(status[1]);
-
-												if (status[1] == 100) {
-													download.setDisabled(false);
-													confirmPatch.setVisible(true);
-													displayNotes(fileName);
-												} else
-													schedule(50);
-											}
-										});
-									}
-								}.schedule(50);
-							}
-						});
-			}
+											if (status[1] == 100) {
+												download.setDisabled(false);
+												confirmPatch.setVisible(true);
+												displayNotes(fileName);
+											} else
+												schedule(50);
+										}
+									});
+								}
+							}.schedule(50);
+						}
+					});
 		});
 
 		HLayout buttonCanvas = new HLayout();

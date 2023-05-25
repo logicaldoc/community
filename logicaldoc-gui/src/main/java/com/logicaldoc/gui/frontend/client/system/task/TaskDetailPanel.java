@@ -10,8 +10,6 @@ import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.logicaldoc.gui.frontend.client.system.LogPanel;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -56,28 +54,19 @@ public class TaskDetailPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		tabSet = new EditingTabSet(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		}, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SystemService.Instance.get().getTaskByName(task.getName(), I18N.getLocale(),
-						new AsyncCallback<GUITask>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
+			SystemService.Instance.get().getTaskByName(task.getName(), I18N.getLocale(), new AsyncCallback<GUITask>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-							@Override
-							public void onSuccess(GUITask task) {
-								setTask(task);
-								tabSet.hideSave();
-							}
-						});
-			}
+				@Override
+				public void onSuccess(GUITask task) {
+					setTask(task);
+					tabSet.hideSave();
+				}
+			});
 		});
 
 		Tab schedulingTab = new Tab(I18N.message("scheduling"));

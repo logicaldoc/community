@@ -102,7 +102,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 				cronTrigger.setJobDetail(jobDetail);
 				try {
 					cronTrigger.afterPropertiesSet();
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}
 			}
@@ -118,7 +118,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 				return SimpleTrigger.class;
 			else
 				return CronTrigger.class;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return SimpleTrigger.class;
 		}
 	}

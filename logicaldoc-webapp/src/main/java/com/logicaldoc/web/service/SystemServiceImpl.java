@@ -929,7 +929,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException | PluginException
-				| ServerException e) {
+				| ServerException | SQLException e) {
 			throwServerException(session, log, e);
 		}
 	}

@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlType;
@@ -452,7 +451,7 @@ public class WSUser {
 					BeanUtils.copyProperties(wt, wswt);
 					user.getWorkingTimes().add(wt);
 				}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// Nothing to do
 		}
 
@@ -516,23 +515,18 @@ public class WSUser {
 			}
 
 			if (user.getWorkingTimes() != null && !user.getWorkingTimes().isEmpty()) {
-				List<WSWorkingTime> tmp = user.getWorkingTimes().stream()
-						.map(new Function<WorkingTime, WSWorkingTime>() {
-
-							@Override
-							public WSWorkingTime apply(WorkingTime wt) {
-								WSWorkingTime wswt = new WSWorkingTime();
-								try {
-									BeanUtils.copyProperties(wswt, wt);
-								} catch (Throwable t) {
-									// Nothing to do
-								}
-								return wswt;
-							}
-						}).collect(Collectors.toList());
+				List<WSWorkingTime> tmp = user.getWorkingTimes().stream().map(wt -> {
+					WSWorkingTime wswt = new WSWorkingTime();
+					try {
+						BeanUtils.copyProperties(wswt, wt);
+					} catch (Exception t) {
+						// Nothing to do
+					}
+					return wswt;
+				}).collect(Collectors.toList());
 				wsUser.setWorkingTimes(tmp.toArray(new WSWorkingTime[0]));
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 

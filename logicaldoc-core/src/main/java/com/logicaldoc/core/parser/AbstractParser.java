@@ -2,6 +2,7 @@ package com.logicaldoc.core.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Locale;
@@ -168,14 +169,6 @@ public abstract class AbstractParser implements Parser {
 			try {
 				internalParse(is, filename, encoding, locale, tenant, document, fileVersion, content);
 				return "completed";
-			} catch (InterruptedException e) {
-				try {
-					String message = "Timeout while parsing document " + document;
-					log.warn(message);
-					throw new ParseException(message);
-				} finally {
-					Thread.currentThread().interrupt();
-				}
 			} catch (ParseException pe) {
 				throw pe;
 			} catch (Exception ee) {
@@ -188,7 +181,8 @@ public abstract class AbstractParser implements Parser {
 	 * Invoked by the parse method
 	 */
 	abstract protected void internalParse(InputStream is, String filename, String encoding, Locale locale,
-			String tenant, Document document, String fileVersion, StringBuilder output) throws Exception;
+			String tenant, Document document, String fileVersion, StringBuilder output)
+			throws IOException, ParseException;
 
 	@Override
 	public int countPages(InputStream input, String filename) {

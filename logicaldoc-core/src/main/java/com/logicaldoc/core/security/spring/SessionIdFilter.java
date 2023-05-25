@@ -88,7 +88,7 @@ public class SessionIdFilter extends GenericFilterBean {
 				SecurityContextHolder.getContext().setAuthentication(a);
 			} catch (AuthenticationException ae) {
 				log.error(ae.getMessage(), ae);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		}

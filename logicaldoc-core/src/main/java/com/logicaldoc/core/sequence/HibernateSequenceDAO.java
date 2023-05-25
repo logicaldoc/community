@@ -114,7 +114,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 				params.put("name", name);
 
 				sequences = findByWhere(query, params, null, null);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 
@@ -127,7 +127,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 					long sequenceId = queryForLong(query);
 					if (sequenceId != 0L)
 						sequence = findById(sequenceId);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.warn(t.getMessage(), t);
 				}
 			} else {
@@ -140,7 +140,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 				refresh(sequence);
 
 			return sequence;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return null;
 		}

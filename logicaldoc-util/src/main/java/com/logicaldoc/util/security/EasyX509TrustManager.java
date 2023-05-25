@@ -39,7 +39,7 @@ public class EasyX509TrustManager implements X509TrustManager {
 			}
 
 			log.info("Using default trust manager {}", dafaultTrustManager);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 	}

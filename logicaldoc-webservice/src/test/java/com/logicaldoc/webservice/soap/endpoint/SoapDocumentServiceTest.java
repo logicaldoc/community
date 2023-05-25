@@ -322,7 +322,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTCase {
 
 		try {
 			docService.unsetPassword(session.getSid(), 1L, "adsfddf");
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			Assert.assertNotNull(t);
 		}
 

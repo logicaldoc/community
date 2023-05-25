@@ -13,24 +13,14 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.search.Search;
 import com.logicaldoc.gui.frontend.client.services.SearchEngineService;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -59,37 +49,24 @@ public class SearchIndexEntriesPanel extends VLayout {
 		pageSize.setSaveOnEnter(true);
 		pageSize.setImplicitSave(true);
 		pageSize.setHint(I18N.message("elements"));
-		pageSize.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				page.setValue(1);
-				onSearch();
-			}
+		pageSize.addChangedHandler(event -> {
+			page.setValue(1);
+			onSearch();
 		});
 
 		page = ItemFactory.newSpinnerItem("page", "page", 1, 1, null);
 		page.setHint("");
 		page.setSaveOnEnter(true);
 		page.setImplicitSave(true);
-		page.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onSearch();
-			}
-		});
+		page.addChangedHandler(event -> onSearch());
 
 		query = ItemFactory.newTextItem("query", "*:*");
-		query.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() == null)
-					return;
-				if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase())) {
-					page.setValue(1);
-					onSearch();
-				}
+		query.addKeyPressHandler(event -> {
+			if (event.getKeyName() == null)
+				return;
+			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase())) {
+				page.setValue(1);
+				onSearch();
 			}
 		});
 
@@ -98,13 +75,9 @@ public class SearchIndexEntriesPanel extends VLayout {
 		total.setWrap(false);
 
 		ToolStripButton search = new ToolStripButton(I18N.message("search"));
-		search.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				page.setValue(1);
-				onSearch();
-			}
+		search.addClickHandler(event -> {
+			page.setValue(1);
+			onSearch();
 		});
 
 		ToolStrip toolstrip = new ToolStrip();
@@ -117,12 +90,9 @@ public class SearchIndexEntriesPanel extends VLayout {
 		toolstrip.addFormItem(total);
 
 		entriesGrid = new SearchIndexEntriesGrid();
-		entriesGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		entriesGrid.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		addMember(toolstrip);
@@ -185,42 +155,30 @@ public class SearchIndexEntriesPanel extends VLayout {
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				DocumentsPanel.get().openInFolder(docId);
-			}
-		});
+		openInFolder.addClickHandler(event -> DocumentsPanel.get().openInFolder(docId));
 
 		MenuItem deleteEntry = new MenuItem();
 		deleteEntry.setTitle(I18N.message("ddelete"));
-		deleteEntry.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				SC.ask(I18N.message("deleteindexentriesconfirm"), new BooleanCallback() {
+		deleteEntry.addClickHandler(event -> SC.ask(I18N.message("deleteindexentriesconfirm"), confirm -> {
+			if (confirm.booleanValue()) {
+				LD.contactingServer();
+				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIdsAsLong(),
+						new AsyncCallback<Void>() {
 
-					@Override
-					public void execute(Boolean val) {
-						if (val.booleanValue()) {
-							LD.contactingServer();
-							SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIdsAsLong(),
-									new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+								LD.clearPrompt();
+							}
 
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-											LD.clearPrompt();
-										}
-
-										@Override
-										public void onSuccess(Void arg) {
-											LD.clearPrompt();
-											onSearch();
-										}
-									});
-						}
-					}
-				});
+							@Override
+							public void onSuccess(Void arg) {
+								LD.clearPrompt();
+								onSearch();
+							}
+						});
 			}
-		});
+		}));
 
 		openInFolder.setEnabled(selection.getAttributeAsLong("tenantId").longValue() == Session.get().getTenantId());
 

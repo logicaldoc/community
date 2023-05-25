@@ -20,7 +20,7 @@ public class ImportFolderHistoryDS extends DataSource {
 	private static Integer getDefaultMaxHistories() {
 		try {
 			return Session.get().getConfigAsInt("gui.maxhistories");
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return 100;
 		}
 	}

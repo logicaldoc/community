@@ -10,8 +10,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -41,13 +39,7 @@ public class PluginUploader extends Window {
 		centerInPage();
 
 		sendButton = new IButton(I18N.message("install"));
-		sendButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				onSend();
-			}
-		});
+		sendButton.addClickHandler(event -> onSend());
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
@@ -60,13 +52,7 @@ public class PluginUploader extends Window {
 
 		addItem(layout);
 
-		addCloseClickHandler(new CloseClickHandler() {
-
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				cleanUploads();
-			}
-		});
+		addCloseClickHandler(event -> cleanUploads());
 	}
 
 	private void cleanUploads() {
@@ -85,7 +71,7 @@ public class PluginUploader extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFile()==null) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

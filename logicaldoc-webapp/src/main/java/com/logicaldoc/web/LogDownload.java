@@ -47,7 +47,7 @@ public class LogDownload extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			ServletUtil.checkMenu(request, Menu.LOGS);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			ServletUtil.sendError(response, t.getMessage());
 		}
 
@@ -232,7 +232,7 @@ public class LogDownload extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			doGet(request, response);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 	}

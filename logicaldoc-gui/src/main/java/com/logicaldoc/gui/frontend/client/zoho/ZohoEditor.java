@@ -15,10 +15,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -47,12 +43,7 @@ public class ZohoEditor extends Window {
 		centerInPage();
 		setMargin(2);
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				onCancel();
-			}
-		});
+		addCloseClickHandler(event -> onCancel());
 
 		layout = new VLayout();
 		layout.setMargin(1);
@@ -67,25 +58,22 @@ public class ZohoEditor extends Window {
 	 * Reloads a preview.
 	 */
 	private void prepareBody() {
-		Label editorUrl = new Label("<span style='text-decoration: underline'>" + I18N.message("clicktoopenzohoeditor")
-				+ "</span>");
+		Label editorUrl = new Label(
+				"<span style='text-decoration: underline'>" + I18N.message("clicktoopenzohoeditor") + "</span>");
 		editorUrl.setHeight(30);
 		editorUrl.setWidth(300);
 		editorUrl.setWrap(false);
-		editorUrl.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				String url = "https://docs.zoho.com/writer/open/";
-				if (document.getFileName().toLowerCase().contains(".xls")
-						|| document.getFileName().toLowerCase().contains(".ods"))
-					url = "https://docs.zoho.com/sheet/ropen.do?rid=";
-				else if (document.getFileName().toLowerCase().contains(".ppt")
-						|| document.getFileName().toLowerCase().contains(".odp"))
-					url = "https://docs.zoho.com/show/open/";
-				url += document.getExtResId();
+		editorUrl.addClickHandler(event -> {
+			String url = "https://docs.zoho.com/writer/open/";
+			if (document.getFileName().toLowerCase().contains(".xls")
+					|| document.getFileName().toLowerCase().contains(".ods"))
+				url = "https://docs.zoho.com/sheet/ropen.do?rid=";
+			else if (document.getFileName().toLowerCase().contains(".ppt")
+					|| document.getFileName().toLowerCase().contains(".odp"))
+				url = "https://docs.zoho.com/show/open/";
+			url += document.getExtResId();
 
-				WindowUtils.openUrlInNewTab(url);
-			}
+			WindowUtils.openUrlInNewTab(url);
 		});
 
 		Label spacer20 = new Label("");
@@ -101,23 +89,12 @@ public class ZohoEditor extends Window {
 
 		IButton cancel = new IButton(I18N.message("cancel"));
 		cancel.setAutoFit(true);
-		cancel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onCancel();
-			}
-		});
+		cancel.addClickHandler(event -> onCancel());
 
 		IButton checkin = new IButton(I18N.message("cancel"));
 		checkin.setTitle(document.getId() != 0 ? I18N.message("checkin") : I18N.message("save"));
 		checkin.setAutoFit(true);
-		checkin.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ZohoCheckin checkin = new ZohoCheckin(document, ZohoEditor.this);
-				checkin.show();
-			}
-		});
+		checkin.addClickHandler(event -> new ZohoCheckin(document, ZohoEditor.this).show());
 
 		Label hSpacer = new Label("");
 		hSpacer.setWidth(15);

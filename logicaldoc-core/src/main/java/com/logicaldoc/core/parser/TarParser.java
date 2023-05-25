@@ -25,7 +25,7 @@ public class TarParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws IOException, ParseException {
 		File tarFile = FileUtil.createTempFile("parsetar", ".tar");
 		try {
 			FileUtil.writeFile(input, tarFile.getAbsolutePath());
@@ -78,7 +78,7 @@ public class TarParser extends AbstractParser {
 			tarFile = FileUtil.createTempFile("parsetar", ".tar");
 			FileUtil.writeFile(input, tarFile.getAbsolutePath());
 			return countPages(tarFile, filename);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		} finally {
 			if (tarFile != null)
@@ -112,7 +112,7 @@ public class TarParser extends AbstractParser {
 						FileUtil.strongDelete(uncompressedEntryFile);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return 1;

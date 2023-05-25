@@ -53,7 +53,7 @@ public abstract class Search {
 		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "Search");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 
@@ -68,7 +68,7 @@ public abstract class Search {
 			try {
 				search = (Search) Class.forName(className).getDeclaredConstructor().newInstance();
 				search.setOptions(opt);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 			break;
@@ -83,7 +83,7 @@ public abstract class Search {
 		Collection<Extension> extensions = new ArrayList<>();
 		try {
 			extensions = registry.getExtensions("logicaldoc-core", "Search");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 
@@ -98,7 +98,7 @@ public abstract class Search {
 			try {
 				options = (SearchOptions) Class.forName(className).getDeclaredConstructor().newInstance();
 				options.setType(type);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 			break;

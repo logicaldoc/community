@@ -42,6 +42,7 @@ import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.searchengine.analyzer.FilteredAnalyzer;
 import com.logicaldoc.util.StringUtil;
@@ -83,56 +84,53 @@ public class StandardSearchEngine implements SearchEngine {
 		this.documentDao = documentDao;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.logicaldoc.core.searchengine.SearchEngine#addHit(com.logicaldoc.core
-	 * .document.Document, java.lang.String)
-	 */
 	@Override
-	public synchronized void addHit(Document document, String content) throws Exception {
-		Document doc = getDocument(document);
-
-		SolrInputDocument hit = new SolrInputDocument();
-		hit.addField(HitField.ID.getName(), Long.toString(doc.getId()));
-		hit.addField(HitField.TENANT_ID.getName(), Long.toString(doc.getTenantId()));
-		hit.addField(HitField.LANGUAGE.getName(), doc.getLanguage());
-		hit.addField(HitField.FILENAME.getName(), doc.getFileName());
-		hit.addField(HitField.TITLE.getName(), doc.getTitle());
-		hit.addField(HitField.SIZE.getName(), doc.getFileSize());
-		hit.addField(HitField.DATE.getName(), doc.getDate());
-		hit.addField(HitField.CREATION.getName(), doc.getCreation());
-		hit.addField(HitField.CUSTOM_ID.getName(), doc.getCustomId());
-		hit.addField(HitField.COMMENT.getName(), doc.getComment());
-		hit.addField(HitField.TAGS.getName(), doc.getTagsString());
-		hit.addField(HitField.DOC_REF.getName(), doc.getDocRef());
-
-		setContent(content, hit);
-
-		setFolder(doc, hit);
-
-		if (doc.getTemplateId() != null) {
-			addExtendedAttributes(doc, hit);
-		}
-
-		// Retrieve the notes
-		StringBuilder sb = new StringBuilder();
-		List<DocumentNote> notes = noteDao.findByDocId(doc.getId(), doc.getFileVersion());
-		for (DocumentNote note : notes) {
-			if (sb.length() > 0)
-				sb.append("\n\n");
-			sb.append(note.getMessage());
-		}
-		if (sb.length() > 0)
-			hit.addField(HitField.NOTES.getName(), sb.toString());
-
+	public synchronized void addHit(Document document, String content) throws IndexException {
 		try {
-			FilteredAnalyzer.lang.set(doc.getLanguage());
-			server.add(hit);
-			server.commit();
-		} finally {
-			FilteredAnalyzer.lang.remove();
+			Document doc = getDocument(document);
+
+			SolrInputDocument hit = new SolrInputDocument();
+			hit.addField(HitField.ID.getName(), Long.toString(doc.getId()));
+			hit.addField(HitField.TENANT_ID.getName(), Long.toString(doc.getTenantId()));
+			hit.addField(HitField.LANGUAGE.getName(), doc.getLanguage());
+			hit.addField(HitField.FILENAME.getName(), doc.getFileName());
+			hit.addField(HitField.TITLE.getName(), doc.getTitle());
+			hit.addField(HitField.SIZE.getName(), doc.getFileSize());
+			hit.addField(HitField.DATE.getName(), doc.getDate());
+			hit.addField(HitField.CREATION.getName(), doc.getCreation());
+			hit.addField(HitField.CUSTOM_ID.getName(), doc.getCustomId());
+			hit.addField(HitField.COMMENT.getName(), doc.getComment());
+			hit.addField(HitField.TAGS.getName(), doc.getTagsString());
+			hit.addField(HitField.DOC_REF.getName(), doc.getDocRef());
+
+			setContent(content, hit);
+
+			setFolder(doc, hit);
+
+			if (doc.getTemplateId() != null) {
+				addExtendedAttributes(doc, hit);
+			}
+
+			// Retrieve the notes
+			StringBuilder sb = new StringBuilder();
+			List<DocumentNote> notes = noteDao.findByDocId(doc.getId(), doc.getFileVersion());
+			for (DocumentNote note : notes) {
+				if (sb.length() > 0)
+					sb.append("\n\n");
+				sb.append(note.getMessage());
+			}
+			if (sb.length() > 0)
+				hit.addField(HitField.NOTES.getName(), sb.toString());
+
+			try {
+				FilteredAnalyzer.lang.set(doc.getLanguage());
+				server.add(hit);
+				server.commit();
+			} finally {
+				FilteredAnalyzer.lang.remove();
+			}
+		} catch (PersistenceException | SolrServerException | IOException e) {
+			throw new IndexException(e.getMessage(), e);
 		}
 	}
 
@@ -204,36 +202,28 @@ public class StandardSearchEngine implements SearchEngine {
 		return doc;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.logicaldoc.core.searchengine.SearchEngine#addHit(com.logicaldoc.core
-	 * .document.Document, java.io.InputStream)
-	 */
 	@Override
-	public synchronized void addHit(Document document, InputStream content) throws Exception {
-		Document doc = document;
-		if (doc.getDocRef() != null)
-			doc = documentDao.findById(doc.getDocRef());
+	public synchronized void addHit(Document document, InputStream content) throws IndexException {
+		try {
+			Document doc = document;
+			if (doc.getDocRef() != null)
+				doc = documentDao.findById(doc.getDocRef());
 
-		Locale locale = doc.getLocale();
-		if (locale == null)
-			locale = Locale.ENGLISH;
+			Locale locale = doc.getLocale();
+			if (locale == null)
+				locale = Locale.ENGLISH;
 
-		String contentString = null;
+			String contentString = null;
 
-		if (doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA)
-			ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId(), doc, null);
+			if (doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA)
+				ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId(), doc, null);
 
-		addHit(doc, contentString);
+			addHit(doc, contentString);
+		} catch (PersistenceException | ParseException | IndexException e) {
+			throw new IndexException(e.getMessage(), e);
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#optimize()
-	 */
 	@Override
 	public synchronized void optimize() {
 		log.warn("Started optimization of the index");
@@ -245,11 +235,6 @@ public class StandardSearchEngine implements SearchEngine {
 		log.warn("Finished optimization of the index");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#check()
-	 */
 	@Override
 	public String check() {
 		log.warn("Checking index");
@@ -286,7 +271,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 				statMsg += "\n" + content;
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage());
 		}
 
@@ -326,7 +311,7 @@ public class StandardSearchEngine implements SearchEngine {
 		try {
 			server.deleteById(Long.toString(id));
 			server.commit();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.debug("Unable to delete hit {}", id, e);
 		}
 	}
@@ -342,7 +327,7 @@ public class StandardSearchEngine implements SearchEngine {
 		try {
 			server.deleteById(ids.stream().map(i -> Long.toString(i)).collect(Collectors.toList()));
 			server.commit();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.debug("Unable to delete {} hits", ids.size(), e);
 		}
 	}
@@ -367,7 +352,7 @@ public class StandardSearchEngine implements SearchEngine {
 			Hit hit = Hits.toHit(doc);
 			hit.setContent((String) doc.getFieldValue(HitField.CONTENT.getName()));
 			return hit;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 		return null;
@@ -381,7 +366,7 @@ public class StandardSearchEngine implements SearchEngine {
 		try {
 			QueryResponse rsp = server.query(query);
 			hits = new Hits(rsp);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return hits;
@@ -400,7 +385,7 @@ public class StandardSearchEngine implements SearchEngine {
 				log.info("Execute search: {}", expression);
 				QueryResponse rsp = server.query(query);
 				hits = new Hits(rsp);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 			return hits;
@@ -438,7 +423,7 @@ public class StandardSearchEngine implements SearchEngine {
 			server.getCoreContainer().shutdown();
 			server.close();
 			FileUtil.strongDelete(new File(getIndexDataFolder(), IndexWriter.WRITE_LOCK_NAME));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 		}
 	}
@@ -454,7 +439,7 @@ public class StandardSearchEngine implements SearchEngine {
 			Directory directory = getIndexDataDirectory();
 			if (isLocked())
 				directory.obtainLock(IndexWriter.WRITE_LOCK_NAME).close();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("unlock {}", e.getMessage());
 			try {
 				FileUtil.strongDelete(new File(getIndexDataFolder(), "write.lock"));
@@ -481,7 +466,7 @@ public class StandardSearchEngine implements SearchEngine {
 			} catch (LockObtainFailedException failed) {
 				result = true;
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.warn("isLocked {}", e.getMessage(), e);
 		}
 
@@ -499,7 +484,7 @@ public class StandardSearchEngine implements SearchEngine {
 			QueryResponse rsp = server.query(query);
 			SolrDocumentList docs = rsp.getResults();
 			return docs.getNumFound();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return 0;
@@ -571,7 +556,7 @@ public class StandardSearchEngine implements SearchEngine {
 		try {
 			server.deleteByQuery("*:*");
 			server.optimize();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}
@@ -597,7 +582,7 @@ public class StandardSearchEngine implements SearchEngine {
 			// Put some environment variable we need
 			System.setProperty("solr.disable.shardsWhitelist", "true");
 			System.setProperty("solr.http1", "true");
-			
+
 			File indexHome = new File(config.getPropertyWithSubstitutions(INDEX_DIR));
 			File solr_xml = new File(indexHome, "solr.xml");
 
@@ -653,7 +638,7 @@ public class StandardSearchEngine implements SearchEngine {
 			container.load();
 
 			unlock();
-			
+
 			log.info("The full-text search engine has been initialized");
 		} catch (Error | Exception e) {
 			log.error("Unable to initialize the Full-text search engine", e);

@@ -50,7 +50,7 @@ public class FolderController {
 			for (FolderObserver observer : observers)
 				try {
 					observer.onFolderSelected(folder);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					GuiLog.error(t.getMessage(), null, t);
 				}
 		}
@@ -61,7 +61,7 @@ public class FolderController {
 			for (FolderObserver observer : observers)
 				try {
 					observer.onFolderChanged(folder);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -72,7 +72,7 @@ public class FolderController {
 			for (FolderObserver observer : observers)
 				try {
 					observer.onFolderDeleted(folder);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -83,7 +83,7 @@ public class FolderController {
 			for (FolderObserver observer : observers)
 				try {
 					observer.onFolderCreated(folder);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -94,7 +94,7 @@ public class FolderController {
 			for (FolderObserver observer : observers)
 				try {
 					observer.onFolderMoved(folder);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -105,7 +105,7 @@ public class FolderController {
 			for (FolderObserver observer : observers)
 				try {
 					observer.onFolderBeginEditing(folder);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}
@@ -116,7 +116,7 @@ public class FolderController {
 			for (FolderObserver observer : observers)
 				try {
 					observer.onFolderCancelEditing(folder);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					// Nothing to do
 				}
 		}

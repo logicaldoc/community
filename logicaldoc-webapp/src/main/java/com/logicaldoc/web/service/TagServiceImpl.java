@@ -46,7 +46,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 			}
 
 			return ret.toArray(new GUITag[0]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUITag[]) throwServerException(session, log, t);
 		}
 	}

@@ -8,14 +8,11 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -81,13 +78,10 @@ public class TaskSchedulingPanel extends VLayout {
 		simple.setValue(simplePolicy ? "true" : "false");
 		simple.setTitle(I18N.message("policy"));
 		simple.setDefaultValue(Boolean.toString(task.getScheduling().isSimple()));
-		simple.addChangedHandler(new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				simplePolicy = "true".equals(simple.getValueAsString());
-				changedHandler.onChanged(event);
-				reloadForm();
-			}
+		simple.addChangedHandler(event -> {
+			simplePolicy = "true".equals(simple.getValueAsString());
+			changedHandler.onChanged(event);
+			reloadForm();
 		});
 
 		// Max Lengths
@@ -136,14 +130,12 @@ public class TaskSchedulingPanel extends VLayout {
 		IButton restoreDefaults = new IButton();
 		restoreDefaults.setTitle(I18N.message("restoredefaults"));
 		restoreDefaults.setWidth(150);
-		restoreDefaults.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				if (Boolean.TRUE.equals(vm.validate())) {
-					TaskSchedulingPanel.this.maxDuration.setValue("30");
-					TaskSchedulingPanel.this.initialDelay.setValue(1800);
-					TaskSchedulingPanel.this.repeatInterval.setValue(1800);
-					TaskSchedulingPanel.this.cronExpression.setValue("* 10 * * * ? *");
-				}
+		restoreDefaults.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(vm.validate())) {
+				TaskSchedulingPanel.this.maxDuration.setValue("30");
+				TaskSchedulingPanel.this.initialDelay.setValue(1800);
+				TaskSchedulingPanel.this.repeatInterval.setValue(1800);
+				TaskSchedulingPanel.this.cronExpression.setValue("* 10 * * * ? *");
 			}
 		});
 

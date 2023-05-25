@@ -126,7 +126,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 
 	@Override
 	public void store(Tenant entity) {
-		throw new RuntimeException("Feature not enabled");
+		throw new IllegalArgumentException("Feature not enabled");
 	}
 
 	public void setAttributeSetDao(AttributeSetDAO attributeSetDao) {

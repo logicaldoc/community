@@ -21,21 +21,13 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridEditorContext;
-import com.smartgwt.client.widgets.grid.ListGridEditorCustomizer;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellSavedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -97,14 +89,14 @@ public class StoragesPanel extends VLayout {
 	private void addRefreshButton(ToolStrip toolStrip) {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
-		refresh.addClickHandler((ClickEvent event) -> refresh());
+		refresh.addClickHandler(event -> refresh());
 		toolStrip.addButton(refresh);
 	}
 
 	private void addSaveButton(ToolStrip toolStrip) {
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> onSave(true));
+		save.addClickHandler(event -> onSave(true));
 		save.setDisabled(Session.get().isDemo() || Session.get().getUser().getId() != 1);
 		toolStrip.addButton(save);
 	}
@@ -112,7 +104,7 @@ public class StoragesPanel extends VLayout {
 	private void addAddButton(ToolStrip toolStrip) {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addstore"));
-		add.addClickHandler((ClickEvent event) -> onAddStorage());
+		add.addClickHandler(event -> onAddStorage());
 		add.setDisabled(Session.get().isDemo());
 		if (Feature.visible(Feature.MULTI_STORAGE)) {
 			toolStrip.addButton(add);
@@ -155,24 +147,21 @@ public class StoragesPanel extends VLayout {
 
 		storagesGrid.setFields(id, write, name, type, path);
 		storagesGrid.setAutoFetchData(true);
-		storagesGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+		storagesGrid.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
 		});
-		storagesGrid.setEditorCustomizer(new ListGridEditorCustomizer() {
-			public FormItem getEditor(ListGridEditorContext context) {
-				ListGridField field = context.getEditField();
-				if (field.getName().equals("type")) {
-					SelectItem item = ItemFactory.newStorageTypeSelector();
-					item.addChangedHandler((ChangedEvent event) -> {
-						storagesGrid.getSelectedRecord().setAttribute("type", event.getValue().toString());
-						storagesGrid.collapseRecord(storagesGrid.getSelectedRecord());
-//							onSave(false);
-					});
-					return item;
-				} else
-					return context.getDefaultProperties();
-			}
+		storagesGrid.setEditorCustomizer(context -> {
+			ListGridField field = context.getEditField();
+			if (field.getName().equals("type")) {
+				SelectItem item = ItemFactory.newStorageTypeSelector();
+				item.addChangedHandler(event -> {
+					storagesGrid.getSelectedRecord().setAttribute("type", event.getValue().toString());
+					storagesGrid.collapseRecord(storagesGrid.getSelectedRecord());
+				});
+				return item;
+			} else
+				return context.getDefaultProperties();
 		});
 	}
 
@@ -194,7 +183,7 @@ public class StoragesPanel extends VLayout {
 		value.setCanEdit(true);
 		parametersGrid.setFields(name, value);
 
-		parametersGrid.addCellSavedHandler((CellSavedEvent event) -> {
+		parametersGrid.addCellSavedHandler(event -> {
 			ListGridRecord paramRecord = event.getRecord();
 			rec.setAttribute(paramRecord.getAttributeAsString("name"),
 					event.getNewValue() != null ? event.getNewValue().toString() : "");
@@ -266,13 +255,11 @@ public class StoragesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes)) {
-					doRemoveStorage(selectedStorageId);
-				}
-			});
-		});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
+			if (Boolean.TRUE.equals(yes)) {
+				doRemoveStorage(selectedStorageId);
+			}
+		}));
 		delete.setEnabled(!Session.get().isDemo() && !DATABASE_EDIT.equals(selectedRecord.getAttributeAsString(WRITE)));
 		return delete;
 	}
@@ -310,24 +297,22 @@ public class StoragesPanel extends VLayout {
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler((MenuItemClickEvent event) -> {
-			SettingService.Instance.get().testStorage(selectedRecord.getAttributeAsInt("id"),
-					new AsyncCallback<Boolean>() {
+		test.addClickHandler(event -> SettingService.Instance.get().testStorage(selectedRecord.getAttributeAsInt("id"),
+				new AsyncCallback<Boolean>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Boolean result) {
-							if (result.booleanValue())
-								SC.say(I18N.message("connectionestablished"));
-							else
-								SC.warn(I18N.message("connectionfailed"));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Boolean result) {
+						if (result.booleanValue())
+							SC.say(I18N.message("connectionestablished"));
+						else
+							SC.warn(I18N.message("connectionfailed"));
+					}
+				}));
 		test.setEnabled(!Session.get().isDemo());
 		return test;
 	}
@@ -335,7 +320,7 @@ public class StoragesPanel extends VLayout {
 	private MenuItem prepareMakeWriteMenuItem() {
 		MenuItem makeWrite = new MenuItem();
 		makeWrite.setTitle(I18N.message("makedefwritestore"));
-		makeWrite.addClickHandler((MenuItemClickEvent event) -> {
+		makeWrite.addClickHandler(event -> {
 			ListGridRecord[] recs = storagesGrid.getRecords();
 			for (ListGridRecord rec : recs) {
 				rec.setAttribute(WRITE, "blank");
@@ -391,7 +376,7 @@ public class StoragesPanel extends VLayout {
 				}
 
 				collectAttribute(settings, storageRecord);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				/*
 				 * the extensions table is lazy loaded so we may have null
 				 * pointers here, in this case just skip
@@ -412,7 +397,7 @@ public class StoragesPanel extends VLayout {
 					settings.add(new GUIParameter(STORE + storageId + "." + attr,
 							storageRecord.getAttributeAsString(attr).trim()));
 				}
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				/*
 				 * the extensions table is lazy loaded so we may have null
 				 * pointers here, in this case just skip

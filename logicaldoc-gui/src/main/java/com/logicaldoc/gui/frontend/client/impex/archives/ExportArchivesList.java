@@ -162,7 +162,7 @@ public class ExportArchivesList extends VLayout {
 			try {
 				showDetails(Long.parseLong(rec.getAttribute("id")),
 						!Integer.toString(GUIArchive.STATUS_OPENED).equals(rec.getAttribute(STATUS)));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		});

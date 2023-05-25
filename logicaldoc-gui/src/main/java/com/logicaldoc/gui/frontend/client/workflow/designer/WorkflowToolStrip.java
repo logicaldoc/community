@@ -15,7 +15,6 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -122,7 +121,7 @@ public class WorkflowToolStrip extends ToolStrip {
 				currentWorkflow = new GUIWorkflow();
 				AdminScreen.get().setContent(new WorkflowDesigner(currentWorkflow));
 				update();
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		});
@@ -342,21 +341,16 @@ public class WorkflowToolStrip extends ToolStrip {
 
 			FormItem workflowName = ItemFactory.newSimpleTextItem("workflowName", null);
 			workflowName.setRequired(true);
-			LD.askForValue(I18N.message("newwftemplate"), I18N.message("workflowname"), null, workflowName,
-					new ValueCallback() {
+			LD.askForValue(I18N.message("newwftemplate"), I18N.message("workflowname"), null, workflowName, value -> {
+				if (value != null && !value.trim().isEmpty()) {
+					GUIWorkflow newWF = new GUIWorkflow();
+					newWF.setName(value);
+					newWF.setPermissions(new String[] { "write" });
+					newWF.setLatestVersion(true);
 
-						@Override
-						public void execute(String value) {
-							if (value != null && !value.trim().isEmpty()) {
-								GUIWorkflow newWF = new GUIWorkflow();
-								newWF.setName(value);
-								newWF.setPermissions(new String[] { "write" });
-								newWF.setLatestVersion(true);
-
-								AdminScreen.get().setContent(new WorkflowDesigner(newWF));
-							}
-						}
-					});
+					AdminScreen.get().setContent(new WorkflowDesigner(newWF));
+				}
+			});
 		});
 		addButton(newWorkflow);
 	}
@@ -473,7 +467,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		try {
 			if (!designer.saveModel())
 				return;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 

@@ -142,7 +142,7 @@ public class EMailSender {
 			connectionSecurity = config.getInt(tenant + ".smtp.connectionSecurity");
 			folderId = config.getLong(tenant + ".smtp.save.folderId", 0);
 			foldering = config.getInt(tenant + ".smtp.save.foldering", FOLDERING_DAY);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 	}
@@ -203,7 +203,7 @@ public class EMailSender {
 		tPools.execute(() -> {
 			try {
 				send(email, templateName, dictionary);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}, THREAD_POOL);
@@ -244,7 +244,7 @@ public class EMailSender {
 		tPools.execute(() -> {
 			try {
 				send(email);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}, THREAD_POOL);
@@ -572,7 +572,7 @@ public class EMailSender {
 			manager.create(emlFile, emailDocument, transaction);
 			log.debug("Historycizes the email with subject '{}' sent to {}", email.getSubject(),
 					email.getAllRecipientsEmails());
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn("Cannot historycize the email with subject '{}' sent to {}", email.getSubject(),
 					email.getAllRecipientsEmails(), t);
 		} finally {

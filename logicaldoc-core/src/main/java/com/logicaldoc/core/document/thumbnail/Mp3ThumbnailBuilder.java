@@ -47,7 +47,7 @@ public class Mp3ThumbnailBuilder extends AbstractThumbnailBuilder {
 					FileUtils.deleteQuietly(albumImage);
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new IOException("Error in extracting album image from the MP3", e);
 		}
 	}

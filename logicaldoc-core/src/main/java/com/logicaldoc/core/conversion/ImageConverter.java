@@ -32,7 +32,7 @@ public class ImageConverter extends AbstractFormatConverter {
 			int timeout = 10;
 			try {
 				timeout = Integer.parseInt(getParameter("timeout"));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 
@@ -40,8 +40,10 @@ public class ImageConverter extends AbstractFormatConverter {
 			new Exec().exec(commandLine, null, null, timeout);
 
 			if (!dest.exists() || dest.length() < 1)
-				throw new Exception("Empty conversion");
-		} catch (Throwable e) {
+				throw new IOException("Empty conversion");
+		} catch (IOException ioe) {
+			throw ioe;
+		} catch (Exception e) {
 			throw new IOException("Error in IMG to PDF conversion", e);
 		}
 	}

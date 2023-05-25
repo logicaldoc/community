@@ -103,7 +103,7 @@ public class UserUtil {
 			} catch (IOException e) {
 				return null;
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 		return userpath;
@@ -132,7 +132,7 @@ public class UserUtil {
 			ImageIO.write(avatar, "png", tmpAvatarImage);
 			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));
 			userDao.store(user);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 		} finally {
 			FileUtil.strongDelete(tmpAvatarImage);
@@ -166,7 +166,7 @@ public class UserUtil {
 			else
 				userDao.jdbcUpdate("update ld_user set ld_avatar = ? where ld_username = ?", user.getAvatar(),
 						user.getUsername());
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			if (user.getType() == User.TYPE_DEFAULT)
 				log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 			else
@@ -191,7 +191,7 @@ public class UserUtil {
 			bytes = gravatar.download(user.getEmail());
 			if (bytes != null && bytes.length > 0)
 				avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
 		}
 
@@ -203,7 +203,7 @@ public class UserUtil {
 				bytes = gravatar.download(user.getEmail2());
 				if (bytes != null && bytes.length > 0)
 					avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
 			}
 		}
@@ -215,7 +215,7 @@ public class UserUtil {
 			try {
 				Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(size, size).build();
 				avatarImage = avatar.create(user.getId() > 0 ? user.getId() : -user.getId());
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("Cannot generate avatar for user {}", user, t);
 			}
 		}
@@ -248,7 +248,7 @@ public class UserUtil {
 		if (userIdOrName != null)
 			try {
 				user = userDao.findById(Long.parseLong(userIdOrName));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// perhaps the id is the username
 				user = userDao.findByUsername(userIdOrName);
 			}

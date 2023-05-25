@@ -57,12 +57,12 @@ public class ResourceUtil {
 		try {
 			try {
 				is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				is = new BufferedInputStream(
 						Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
 			}
 			return is != null;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return false;
 		} finally {
 			if (is != null)

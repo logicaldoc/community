@@ -62,7 +62,7 @@ public class AvatarServlet extends HttpServlet {
 
 			String content = UserUtil.getAvatarImage(id);
 			saveImage(content, response.getOutputStream());
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			ServletUtil.sendError(response, e.getMessage());
 		}

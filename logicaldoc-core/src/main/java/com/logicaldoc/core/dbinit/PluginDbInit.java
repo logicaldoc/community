@@ -1,5 +1,6 @@
 package com.logicaldoc.core.dbinit;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,12 +26,14 @@ public class PluginDbInit extends DBInit {
 
 	/**
 	 * Intitializes the database using 'DbInit' extension point.
+	 * 
+	 * @throws SQLException Error in the database
 	 */
-	public void init() {
+	public void init() throws SQLException {
 		init(null);
 	}
 
-	public void init(String[] ids) {
+	public void init(String[] ids) throws SQLException {
 		log.info("Start database initialization");
 		log.info("Database engine is " + getDbms());
 
@@ -74,9 +77,9 @@ public class PluginDbInit extends DBInit {
 					getSqlList().add(sqlFile);
 			}
 			execute();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw new RuntimeException(e.getMessage());
+			throw new SQLException(e.getMessage());
 		}
 	}
 
@@ -87,7 +90,7 @@ public class PluginDbInit extends DBInit {
 		ClassLoader cl = this.getClass().getClassLoader();
 		try {
 			return cl.getResourceAsStream(name) != null;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return false;
 		}
 	}

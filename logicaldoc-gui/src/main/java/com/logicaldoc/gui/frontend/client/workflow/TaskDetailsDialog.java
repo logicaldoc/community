@@ -57,8 +57,6 @@ import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -468,59 +466,55 @@ public class TaskDetailsDialog extends Window {
 		IButton reassignButton = new IButton(I18N.message("workflowtaskreassign"));
 		reassignButton.setAutoFit(true);
 		reassignButton.setMargin(2);
-		reassignButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+		reassignButton.addClickHandler(event -> {
+			final Window window = new Window();
+			window.setTitle(I18N.message("workflowtaskreassign"));
+			window.setCanDragResize(true);
+			window.setIsModal(true);
+			window.setShowModalMask(true);
+			window.setAutoSize(true);
+			window.centerInPage();
 
-			@Override
-			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				final Window window = new Window();
-				window.setTitle(I18N.message("workflowtaskreassign"));
-				window.setCanDragResize(true);
-				window.setIsModal(true);
-				window.setShowModalMask(true);
-				window.setAutoSize(true);
-				window.centerInPage();
+			DynamicForm reassignUserForm = new DynamicForm();
+			reassignUserForm.setTitleOrientation(TitleOrientation.TOP);
+			reassignUserForm.setNumCols(1);
+			reassignUserForm.setValuesManager(vm);
+			user = ItemFactory.newUserSelector("user", I18N.message("user"), null, true, true);
+			user.setWidth(250);
+			user.setShowTitle(true);
+			user.setDisplayField("username");
 
-				DynamicForm reassignUserForm = new DynamicForm();
-				reassignUserForm.setTitleOrientation(TitleOrientation.TOP);
-				reassignUserForm.setNumCols(1);
-				reassignUserForm.setValuesManager(vm);
-				user = ItemFactory.newUserSelector("user", I18N.message("user"), null, true, true);
-				user.setWidth(250);
-				user.setShowTitle(true);
-				user.setDisplayField("username");
+			SubmitItem saveButton = new SubmitItem("save", I18N.message("save"));
+			saveButton.setAlign(Alignment.LEFT);
+			saveButton.addClickHandler((ClickEvent saveClick) -> {
+				if (user.getSelectedRecord() == null)
+					return;
+				setUser(user.getSelectedRecord().getAttribute("id"));
 
-				SubmitItem saveButton = new SubmitItem("save", I18N.message("save"));
-				saveButton.setAlign(Alignment.LEFT);
-				saveButton.addClickHandler((ClickEvent saveClick) -> {
-					if (user.getSelectedRecord() == null)
-						return;
-					setUser(user.getSelectedRecord().getAttribute("id"));
+				WorkflowService.Instance.get().reassignTask(workflow.getSelectedTask().getId(),
+						user.getSelectedRecord().getAttribute("id"), new AsyncCallback<GUIWorkflow>() {
 
-					WorkflowService.Instance.get().reassignTask(workflow.getSelectedTask().getId(),
-							user.getSelectedRecord().getAttribute("id"), new AsyncCallback<GUIWorkflow>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
+							@Override
+							public void onSuccess(GUIWorkflow result) {
+								if (result != null) {
+									window.destroy();
+									workflow = result;
+									reload(workflow);
+									workflowDashboard.refresh(workflow.getId());
 								}
+							}
+						});
+			});
 
-								@Override
-								public void onSuccess(GUIWorkflow result) {
-									if (result != null) {
-										window.destroy();
-										workflow = result;
-										reload(workflow);
-										workflowDashboard.refresh(workflow.getId());
-									}
-								}
-							});
-				});
+			reassignUserForm.setItems(user, saveButton);
 
-				reassignUserForm.setItems(user, saveButton);
-
-				window.addItem(reassignUserForm);
-				window.show();
-			}
+			window.addItem(reassignUserForm);
+			window.show();
 		});
 		return reassignButton;
 	}
@@ -629,22 +623,19 @@ public class TaskDetailsDialog extends Window {
 
 		Button addNote = new Button(I18N.message("addnote"));
 		addNote.setAutoFit(true);
-		addNote.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-			WorkflowNoteEditor dialog = new WorkflowNoteEditor(TaskDetailsDialog.this);
-			dialog.show();
-		});
+		addNote.addClickHandler(event -> new WorkflowNoteEditor(TaskDetailsDialog.this).show());
 
 		if (!readOnly)
 			notesPanel.addMember(addNote);
 
 		// Expand all notes after arrived
-		notesGrid.addDataArrivedHandler((DataArrivedEvent event) -> {
+		notesGrid.addDataArrivedHandler(event -> {
 			for (ListGridRecord rec : notesGrid.getRecords()) {
 				notesGrid.expandRecord(rec);
 			}
 		});
 
-		notesGrid.addCellContextClickHandler((CellContextClickEvent eevent) -> {
+		notesGrid.addCellContextClickHandler(eevent -> {
 			Menu contextMenu = new Menu();
 			MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
@@ -664,7 +655,7 @@ public class TaskDetailsDialog extends Window {
 
 			MenuItem print = new MenuItem();
 			print.setTitle(I18N.message("print"));
-			print.addClickHandler((MenuItemClickEvent eee) -> {
+			print.addClickHandler(eee -> {
 				HTMLPane printContainer = new HTMLPane();
 				printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(COMMENT));
 				Canvas.printComponents(new Canvas[] { printContainer });
@@ -719,7 +710,7 @@ public class TaskDetailsDialog extends Window {
 						: "empty"));
 		appendedDocs.setFields(statusIcons, docFilename, docLastModified);
 
-		appendedDocs.registerCellContextClickHandler((CellContextClickEvent event) -> {
+		appendedDocs.registerCellContextClickHandler(event -> {
 			event.cancel();
 			showAppendedDocsContextMenu();
 		});
@@ -749,7 +740,7 @@ public class TaskDetailsDialog extends Window {
 		Button addDocuments = new Button(I18N.message("adddocuments"));
 		addDocuments.setAutoFit(true);
 		addDocuments.setVisible(workflow.getSelectedTask().getTaskState().equals("started"));
-		addDocuments.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent eevnt) -> {
+		addDocuments.addClickHandler(eevnt -> {
 			Clipboard clipboard = Clipboard.getInstance();
 			if (clipboard.isEmpty()) {
 				SC.warn(I18N.message("nodocsinclipboard"));
@@ -882,8 +873,8 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareCheckinContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem checkin = new MenuItem();
 		checkin.setTitle(I18N.message("checkin"));
-		checkin.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
-				.getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+		checkin.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocument.getId(),
+				new AsyncCallback<GUIDocument>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -902,8 +893,8 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareUnlockContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem unlock = new MenuItem();
 		unlock.setTitle(I18N.message("unlock"));
-		unlock.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
-				.unlock(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
+		unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(new long[] { selectedDocument.getId() },
+				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -921,7 +912,7 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareCheckoutContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem checkout = new MenuItem();
 		checkout.setTitle(I18N.message("checkout"));
-		checkout.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
+		checkout.addClickHandler(event -> DocumentService.Instance.get()
 				.checkout(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -943,7 +934,7 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareRemoveContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("remove"));
-		remove.addClickHandler((MenuItemClickEvent event) -> WorkflowService.Instance.get().removeDocument(
+		remove.addClickHandler(event -> WorkflowService.Instance.get().removeDocument(
 				workflow.getSelectedTask().getId(), selectedDocument.getId(), new AsyncCallback<Void>() {
 
 					@Override
@@ -963,7 +954,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem open = new MenuItem();
 		open.setTitle(I18N.message("openinfolder"));
 		open.setEnabled(false);
-		open.addClickHandler((MenuItemClickEvent event) -> {
+		open.addClickHandler(event -> {
 			destroy();
 
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))

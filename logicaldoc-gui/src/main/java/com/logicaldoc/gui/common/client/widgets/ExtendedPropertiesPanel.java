@@ -96,9 +96,9 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected void adaptForms() {
 		if (templateItem != null && templateItem.getValue() != null) {
-			int maxExtCols = ((int) getWidth() - 500) / 160; // 160 = length of
-																// an item
-			int maxExtRows = (int) getHeight() / 46; // 46 = height of an item
+			int maxExtCols = (getWidth() - 500) / 160; // 160 = length of
+														// an item
+			int maxExtRows = getHeight() / 46; // 46 = height of an item
 			if (maxExtRows < 3)
 				maxExtCols = 3;
 
@@ -329,12 +329,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 		} else if (att.getType() == GUIAttribute.TYPE_INT) {
 			item = ItemFactory.newIntegerItemForAttribute(att.getName(), att.getLabel(), null);
 			if (object.getValue(att.getName()) != null)
-				item.setValue((Long) object.getValue(att.getName()));
+				item.setValue(object.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			item = prepareBooleanItem(att);
 		} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
 			item = ItemFactory.newFloatItemForAttribute(att.getName(), att.getLabel(), null);
-			item.setValue((Double) object.getValue(att.getName()));
+			item.setValue(object.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_DATE) {
 			item = prepareDateItem(att);
 		} else if (att.getType() == GUIAttribute.TYPE_USER) {

@@ -74,7 +74,7 @@ public class TaskScheduling {
 	}
 
 	public Date getNextFireTime() {
-		Object trigger = (Object) Context.get().getBean(taskName + "Trigger");
+		Object trigger = Context.get().getBean(taskName + "Trigger");
 
 		if (!(trigger instanceof Trigger))
 			return null;
@@ -143,7 +143,7 @@ public class TaskScheduling {
 				log.info("Rescheduled the task {}; next estimated fire time is {}", taskName, date);
 			else
 				log.warn("Unable to reschedule the task {}", taskName);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 

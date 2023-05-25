@@ -47,7 +47,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			dao.delete(setId);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -71,7 +71,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 							e);
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -93,7 +93,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 						}
 						break;
 					}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -128,7 +128,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			}
 
 			attributeSet.setId(attSet.getId());
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUIAttributeSet) throwServerException(session, log, t);
 		}
 
@@ -216,7 +216,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			}
 
 			return attSet;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 
@@ -304,7 +304,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			for (Long setId : setIds)
 				guiSets.add(getAttributeSet(setId));
 			return guiSets.toArray(new GUIAttributeSet[0]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return (GUIAttributeSet[]) throwServerException(session, log, t);
 		}
 	}
@@ -329,7 +329,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 				options.add(option);
 				row = reader.readFields();
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error("Unable to parse options in CSV file", e);
 		} finally {
 			UploadServlet.cleanReceivedFiles(session.getSid());
@@ -356,7 +356,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 					"update ld_template_ext set ld_validation = ? where ld_setid=" + setId + " and ld_name = ?",
 					setAttribute.getValidation(), attribute);
 			log.info("Updated the validation of {} template attributes named {}", count, attribute);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}
@@ -376,7 +376,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 					"update ld_template_ext set ld_initialization = ? where ld_setid=" + setId + " and ld_name = ?",
 					setAttribute.getInitialization(), attribute);
 			log.info("Updated the initialization of {} template attributes named {}", count, attribute);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
 	}

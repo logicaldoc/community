@@ -101,7 +101,7 @@ public class SystemInfo {
 				info = (SystemInfo) tmp;
 				info.setTenantId(tenantId);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -120,7 +120,7 @@ public class SystemInfo {
 						features.add(name);
 				}
 				info.setFeatures(features.toArray(new String[0]));
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 
@@ -134,7 +134,7 @@ public class SystemInfo {
 			info.setYear(config.getProperty("product.year"));
 			info.setRunLevel(config.getProperty("runlevel"));
 			info.setInstallationId(config.getProperty("id"));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 

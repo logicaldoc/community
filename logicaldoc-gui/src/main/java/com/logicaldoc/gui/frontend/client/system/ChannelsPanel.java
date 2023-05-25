@@ -4,8 +4,6 @@ import com.logicaldoc.gui.common.client.data.ChannelsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -34,12 +32,7 @@ public class ChannelsPanel extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.refresh(new ChannelsDS());
-			}
-		});
+		refresh.addClickHandler(event -> list.refresh(new ChannelsDS()));
 		toolStrip.addFill();
 
 		Layout listing = new VLayout();

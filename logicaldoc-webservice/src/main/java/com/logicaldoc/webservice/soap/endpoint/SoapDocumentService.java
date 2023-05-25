@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -612,11 +611,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Document> docs = docDao.findByFolder(folderId, null);
 		if (docs.size() > 1)
-			Collections.sort(docs, new Comparator<Document>() {
-				@Override
-				public int compare(Document o1, Document o2) {
-					return o1.getFileName().compareTo(o2.getFileName());
-				}
+			Collections.sort(docs, (doc1, doc2) -> {
+				return doc1.getFileName().compareTo(doc2.getFileName());
 			});
 
 		List<WSDocument> wsDocs = new ArrayList<>();
@@ -624,7 +620,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			try {
 				checkPublished(user, doc);
 				checkNotArchived(doc);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				continue;
 			}
 
@@ -652,7 +648,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			try {
 				checkPublished(user, docs.get(i));
 				checkNotArchived(docs.get(i));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				continue;
 			}
 			if (user.isMemberOf(Group.GROUP_ADMIN) || folderIds.contains(docs.get(i).getFolder().getId()))
@@ -738,7 +734,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		for (Document doc : docs) {
 			try {
 				checkPublished(user, doc);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				continue;
 			}
 

@@ -477,7 +477,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		if (folder.hasPermission(Constants.PERMISSION_STORAGE))
 			try {
 				folder.setStorage(Integer.parseInt(vm.getValueAsString("storage")));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				folder.setStorage(null);
 			}
 
@@ -486,7 +486,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 				folder.setMaxVersions(Integer.parseInt(vm.getValueAsString("maxversions")));
 				if (folder.getMaxVersions() != null && folder.getMaxVersions() < 1)
 					folder.setMaxVersions(null);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				folder.setMaxVersions(null);
 			}
 

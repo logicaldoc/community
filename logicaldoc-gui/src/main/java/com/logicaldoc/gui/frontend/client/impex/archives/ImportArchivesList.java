@@ -132,7 +132,7 @@ public class ImportArchivesList extends VLayout {
 			ListGridRecord rec = list.getSelectedRecord();
 			try {
 				showDetails(Long.parseLong(rec.getAttribute("id")));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		});

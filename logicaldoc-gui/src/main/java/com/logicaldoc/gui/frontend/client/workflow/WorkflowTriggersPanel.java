@@ -10,18 +10,13 @@ import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Displays the list of all workflow triggers on a folder.
@@ -48,24 +43,21 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		Button applyTriggersToSubfolders = new Button(I18N.message("applytosubfolders"));
 		applyTriggersToSubfolders.setAutoFit(true);
-		applyTriggersToSubfolders.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				LD.contactingServer();
-				WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<Void>() {
+		applyTriggersToSubfolders.addClickHandler(event -> {
+			LD.contactingServer();
+			WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void v) {
-						LD.clearPrompt();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void v) {
+					LD.clearPrompt();
+				}
+			});
 		});
 
 		HLayout buttons = new HLayout();
@@ -74,13 +66,10 @@ public class WorkflowTriggersPanel extends VLayout {
 		buttons.setWidth100();
 		buttons.setHeight(15);
 
-		addTrigger.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				TriggerDialog dialog = new TriggerDialog(WorkflowTriggersPanel.this);
-				dialog.show();
-			}
+		addTrigger.addClickHandler(event -> {
+			list.deselectAllRecords();
+			TriggerDialog dialog = new TriggerDialog(WorkflowTriggersPanel.this);
+			dialog.show();
 		});
 
 		setMembersMargin(4);
@@ -117,12 +106,9 @@ public class WorkflowTriggersPanel extends VLayout {
 		list.setDataSource(new WorkflowTriggersDS("" + folder.getId()));
 		list.setFields(workflow, template, events);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
+		list.addCellContextClickHandler(event -> {
+			showContextMenu();
+			event.cancel();
 		});
 
 		addMember(list, 0);
@@ -133,9 +119,8 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		MenuItem deleteTrigger = new MenuItem();
 		deleteTrigger.setTitle(I18N.message("ddelete"));
-		deleteTrigger.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+		deleteTrigger.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						ListGridRecord rec = list.getSelectedRecord();
 						WorkflowService.Instance.get().deleteTrigger(Long.parseLong(rec.getAttributeAsString("id")),
@@ -152,13 +137,11 @@ public class WorkflowTriggersPanel extends VLayout {
 									}
 								});
 					}
-				});
-			}
-		});
+				}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler((MenuItemClickEvent event) -> new TriggerDialog(WorkflowTriggersPanel.this).show());
+		edit.addClickHandler(event -> new TriggerDialog(WorkflowTriggersPanel.this).show());
 
 		contextMenu.setItems(edit, deleteTrigger);
 		contextMenu.showContextMenu();

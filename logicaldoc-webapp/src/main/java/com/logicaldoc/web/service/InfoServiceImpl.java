@@ -115,7 +115,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			setAttributes(info, tenantName);
 
 			return info;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new RuntimeException(t.getMessage(), t);
 		}
@@ -147,7 +147,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				guiAttributes.add(guiAtt);
 			}
 			info.setAttributeDefinitions(guiAttributes.toArray(new GUIAttribute[0]));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
 	}
@@ -163,7 +163,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			int test = -1;
 			try {
 				test = dao.queryForInt("select count(*) from ld_user");
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				test = -1;
 			}
 			if (test < 1) {
@@ -210,7 +210,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		GUITenant tenant = null;
 		try {
 			tenant = SecurityServiceImpl.getTenant(tname);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Before setup we may have exception here
 			log.warn(t.getMessage());
 		}
@@ -267,12 +267,12 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				List<Generic> dbSettings = dao.findByTypeAndSubtype("guisetting", null, 0L, tenant.getId());
 				for (Generic generic : dbSettings)
 					values.add(new GUIValue(generic.getSubtype(), generic.getString1()));
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				log.warn("cannot load GUI settings from the database", t);
 			}
 
 			info.setConfig(values.toArray(new GUIValue[0]));
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.warn("cannot load GUI settings", t);
 		}
 
@@ -282,7 +282,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		try {
 			GUIAttributeSet defaultSet = new AttributeSetServiceImpl().getAttributeSet("default");
 			info.setDefaultAttributeSet(defaultSet);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to dox
 		}
 
@@ -366,7 +366,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			parameters.add(new GUIParameter("valid", "" + SessionManager.get().isOpen(session.getSid())));
 
 			return parameters.toArray(new GUIParameter[0]);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			throw new RuntimeException(t.getMessage(), t);
 		}
@@ -378,7 +378,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			Session session = validateSession(getThreadLocalRequest());
 			if (session == null)
 				return false;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			return false;
 		}
 		return true;
@@ -395,7 +395,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			// parse some expression and ask descriptor for description
 			CronDescriptor descriptor = CronDescriptor.instance(LocaleUtil.toLocale(locale));
 			return descriptor.describe(parser.parse(expression));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return (String) throwServerException(session, log, e);
 		}
 	}

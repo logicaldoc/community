@@ -84,7 +84,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 				ticket.setDeleted(1);
 				saveOrUpdate(ticket);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 
@@ -96,15 +96,15 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		try {
 			Map<String, Object> params = new HashMap<>();
 			params.put("ticketid", ticketid);
-			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
-					"from Ticket _ticket where _ticket.ticketId = :ticketid", params, null);
+			Collection<Ticket> coll = findByQuery("from Ticket _ticket where _ticket.ticketId = :ticketid", params,
+					null);
 			Ticket ticket = null;
 			if (!coll.isEmpty()) {
 				ticket = coll.iterator().next();
 				if (ticket.getDeleted() == 0)
 					return ticket;
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return null;
@@ -120,13 +120,12 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		try {
 			Map<String, Object> params = new HashMap<>();
 			params.put("docId", docId);
-			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
-					"from Ticket _ticket where _ticket.docId = :docId", params, null);
+			Collection<Ticket> coll = findByQuery("from Ticket _ticket where _ticket.docId = :docId", params, null);
 			for (Ticket downloadTicket : coll) {
 				downloadTicket.setDeleted(1);
 				saveOrUpdate(downloadTicket);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			result = false;
 		}
@@ -146,13 +145,12 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		try {
 			Map<String, Object> params = new HashMap<>();
 			params.put("expired", new Date());
-			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
-					"from Ticket _ticket where _ticket.expired < :expired", params, null);
+			Collection<Ticket> coll = findByQuery("from Ticket _ticket where _ticket.expired < :expired", params, null);
 			for (Ticket downloadTicket : coll) {
 				downloadTicket.setDeleted(1);
 				saveOrUpdate(downloadTicket);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}

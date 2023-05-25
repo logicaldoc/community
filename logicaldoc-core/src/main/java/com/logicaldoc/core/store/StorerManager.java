@@ -1,5 +1,6 @@
 package com.logicaldoc.core.store;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,13 +51,14 @@ public class StorerManager {
 		for (Extension ext : exts) {
 			String type = ext.getParameter("type").valueAsString();
 			String className = ext.getParameter("class").valueAsString();
+
 			try {
 				@SuppressWarnings("rawtypes")
 				Class clazz = Class.forName(className);
 				// Try to instantiate the builder
 				Object storer = clazz.getDeclaredConstructor().newInstance();
 				if (!(storer instanceof Storer))
-					throw new Exception(
+					throw new ClassNotFoundException(
 							String.format("The specified storer %s doesn't implement the Storer interface", className));
 				storers.put(type, (Storer) storer);
 
@@ -65,7 +67,8 @@ public class StorerManager {
 					st.getParameters().put(name, null);
 
 				log.info("Added new storer {} for type {}", clazz.getSimpleName(), type);
-			} catch (Throwable e) {
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage(), e);
 			}
 		}
@@ -92,7 +95,7 @@ public class StorerManager {
 		Storer storer = null;
 		try {
 			storer = definition.getClass().getDeclaredConstructor().newInstance();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error("Unable to instanciate class {} / {}", definition.getClass(), e.getMessage(), e);
 			return null;
 		}

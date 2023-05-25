@@ -70,7 +70,7 @@ public class TriggerDialog extends Window {
 		templateForm.setTitleOrientation(TitleOrientation.LEFT);
 		templateForm.setNumCols(2);
 		templateForm.setColWidths(110, "*");
-		
+
 		// Templates list
 		SelectItem template = ItemFactory.newTemplateSelector(true, null);
 		template.setWrapTitle(false);
@@ -82,7 +82,8 @@ public class TriggerDialog extends Window {
 		if (panel.getSelectedRecord() != null)
 			template.setValue(panel.getSelectedRecord().getAttributeAsLong("templateId"));
 
-		SelectItem eventsSelector = ItemFactory.newEventsSelector("events", "triggeron", null, false, false, false, false);
+		SelectItem eventsSelector = ItemFactory.newEventsSelector("events", "triggeron", null, false, false, false,
+				false);
 		eventsSelector.setValue(events);
 
 		DynamicForm form = new DynamicForm();
@@ -90,34 +91,30 @@ public class TriggerDialog extends Window {
 
 		SubmitItem saveButton = new SubmitItem("save", I18N.message("save"));
 		saveButton.setAlign(Alignment.LEFT);
-		saveButton.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-			@Override
-			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				String workflowSelectedId = "";
-				if (workflow.getValue() != null) {
-					workflowSelectedId = workflow.getValue().toString();
+		saveButton.addClickHandler(event -> {
+			String workflowSelectedId = "";
+			if (workflow.getValue() != null) {
+				workflowSelectedId = workflow.getValue().toString();
 
-					String templateSelectedId = "";
-					if (template.getValue() != null)
-						templateSelectedId = template.getValueAsString();
+				String templateSelectedId = "";
+				if (template.getValue() != null)
+					templateSelectedId = template.getValueAsString();
 
-					WorkflowService.Instance.get().saveTrigger(Long.toString(panel.getFolder().getId()),
-							workflowSelectedId, templateSelectedId, eventsSelector.getValueAsString(),
-							new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+				WorkflowService.Instance.get().saveTrigger(Long.toString(panel.getFolder().getId()), workflowSelectedId,
+						templateSelectedId, eventsSelector.getValueAsString(), new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void result) {
-									panel.refresh();
-									destroy();
-								}
-							});
-				} else {
-					SC.warn(I18N.message("workflowselection"));
-				}
+							@Override
+							public void onSuccess(Void result) {
+								panel.refresh();
+								destroy();
+							}
+						});
+			} else {
+				SC.warn(I18N.message("workflowselection"));
 			}
 		});
 
