@@ -308,8 +308,6 @@ public class DocumentManagerImpl implements DocumentManager {
 			try {
 				storeFile(document, file);
 			} catch (IOException ioe) {
-				log.error("Cannot save the new version {} into the storage", document, ioe);
-
 				document.copyAttributes(oldDocument);
 				document.setOcrd(oldDocument.getOcrd());
 				document.setOcrTemplateId(oldDocument.getOcrTemplateId());
@@ -322,7 +320,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				document.setSigned(oldDocument.getSigned());
 				document.setComment(oldDocument.getComment());
 				documentDAO.store(document);
-				throw new PersistenceException(ioe.getMessage());
+				throw new PersistenceException(
+						String.format("Cannot save the new version %s into the storage", document), ioe);
 			}
 
 			version.setFileSize(document.getFileSize());
@@ -429,9 +428,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			long docId = doc.getId();
 
 			// Physically remove the document from full-text index
-			if (doc != null) {
-				indexer.deleteHit(docId);
-			}
+			indexer.deleteHit(docId);
 
 			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 			documentDAO.store(doc);
@@ -452,7 +449,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			try {
 				doc = documentDAO.findById(docref);
 				if (doc == null)
-					throw new ParseException(String.format("Unexisting referenced document {}", docref));
+					throw new ParseException(String.format("Unexisting referenced document %s", docref));
 			} catch (ParseException pe) {
 				throw pe;
 			} catch (PersistenceException e) {
@@ -465,10 +462,10 @@ public class DocumentManagerImpl implements DocumentManager {
 		String resource = storer.getResourceName(doc, fileVersion, null);
 		Parser parser = ParserFactory.getParser(doc.getFileName());
 
-		log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
-
 		// and gets some fields
 		if (parser != null) {
+			log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
+
 			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			try {
 				content = parser.parse(storer.getStream(doc.getId(), resource), doc.getFileName(), null, locale,
@@ -643,7 +640,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				documentDAO.store(document, transaction);
 			}
 
-			storeVersionAsync(version);
+			versionDAO.store(version);
 
 			markAliasesToIndex(document.getId());
 		} else {
@@ -662,10 +659,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	private void setFileName(Document document, Document docVO) {
-		if (StringUtils.isNotEmpty(docVO.getFileName())) {
-			if (!document.getFileName().equals(docVO.getFileName())) {
-				document.setFileName(docVO.getFileName());
-			}
+		if (StringUtils.isNotEmpty(docVO.getFileName()) && !document.getFileName().equals(docVO.getFileName())) {
+			document.setFileName(docVO.getFileName());
 		}
 	}
 
@@ -818,23 +813,21 @@ public class DocumentManagerImpl implements DocumentManager {
 			if (docVO.getTemplate() == null && docVO.getTemplateId() != null)
 				docVO.setTemplate(templateDAO.findById(docVO.getTemplateId()));
 
-			if (file != null)
-				transaction.setFile(file.getAbsolutePath());
+			transaction.setFile(file.getAbsolutePath());
 
 			// Create the gridRecord
 			transaction.setEvent(DocumentEvent.STORED.toString());
 			documentDAO.store(docVO, transaction);
 
 			/* store the document into filesystem */
-			if (file != null)
-				try {
-					storeFile(docVO, file);
-				} catch (Exception e) {
-					String message = String.format("Unable to store the file of document %d", docVO.getId());
-					log.error(message);
-					documentDAO.delete(docVO.getId());
-					throw new PersistenceException(message, e);
-				}
+			try {
+				storeFile(docVO, file);
+			} catch (Exception e) {
+				String message = String.format("Unable to store the file of document %d", docVO.getId());
+				log.error(message);
+				documentDAO.delete(docVO.getId());
+				throw new PersistenceException(message, e);
+			}
 
 			// The document record has been written, now store the initial
 			// version (default 1.0)
@@ -867,22 +860,23 @@ public class DocumentManagerImpl implements DocumentManager {
 				int tests = 0;
 				while (count == 0 && tests < 100) {
 					count = documentDAO.queryForInt(documentWriteCheckQuery);
-					try {
-						Thread.sleep(1000L);
-					} catch (InterruptedException ie) {
-						Thread.currentThread().interrupt();
-					}
+					Thread.sleep(1000L);
 					tests++;
 				}
 
-				if (log.isDebugEnabled() && count > 0)
-					log.debug("Record of document {} has been written", version.getDocId());
+				if (count > 0) {
+					if (log.isDebugEnabled())
+						log.debug("Record of document {} has been written", version.getDocId());
 
-				versionDAO.store(version);
-				if (log.isDebugEnabled())
-					log.debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
+					versionDAO.store(version);
+
+					if (log.isDebugEnabled())
+						log.debug("Stored version {} of document {}", version.getVersion(), version.getDocId());
+				}
 			} catch (PersistenceException ex) {
 				log.error(ex.getMessage(), ex);
+			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
 			}
 		}, "VersionSave", 100L);
 	}
@@ -938,9 +932,10 @@ public class DocumentManagerImpl implements DocumentManager {
 	private void countPages(File file, Document doc) {
 		try {
 			Parser parser = ParserFactory.getParser(doc.getFileName());
-			log.debug("Using parser {} to count pages of document {}", parser.getClass().getName(), doc);
-			if (parser != null)
+			if (parser != null) {
+				log.debug("Using parser {} to count pages of document {}", parser.getClass().getName(), doc);
 				doc.setPages(parser.countPages(file, doc.getFileName()));
+			}
 		} catch (Exception e) {
 			log.warn("Cannot count pages of document {}", doc, e);
 		}
@@ -950,8 +945,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	public int countPages(Document doc) {
 		try {
 			Parser parser = ParserFactory.getParser(doc.getFileName());
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			return parser.countPages(storer.getStream(doc.getId(), storer.getResourceName(doc, null, null)),
+			Storer strt = (Storer) Context.get().getBean(Storer.class);
+			return parser.countPages(strt.getStream(doc.getId(), strt.getResourceName(doc, null, null)),
 					doc.getFileName());
 		} catch (Exception e) {
 			log.warn("Cannot count pages of document {}", doc, e);
@@ -1123,7 +1118,6 @@ public class DocumentManagerImpl implements DocumentManager {
 		try {
 			return copyToFolder(originalDoc, folder, new DocumentHistory(transaction));
 		} catch (IOException e) {
-			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
 	}
@@ -1184,7 +1178,6 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			return alias;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
 	}

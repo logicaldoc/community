@@ -63,7 +63,6 @@ public abstract class LogicalDOCPlugin extends Plugin {
 			onStart();
 			saveData();
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
 			throw new PluginException(e);
 		}
 	}
@@ -229,7 +228,6 @@ public abstract class LogicalDOCPlugin extends Plugin {
 			pbean.setProperty("schedule.delay." + taskName, "1800000");
 			pbean.write();
 		} catch (IOException e) {
-			System.err.println(e.getMessage());
 			logger.warn("Cannot add task {} to the configuration", taskName);
 		}
 	}

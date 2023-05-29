@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.java.plugin.registry.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -22,12 +24,13 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 public enum RunLevel {
 	DEFAULT("default"), BULKLOAD("bulkload"), DEVEL("devel"), DEMO("demo"), UPDATED("updated"), SLAVE("slave");
 
+	private static Logger log = LoggerFactory.getLogger(RunLevel.class);
+
 	private String level;
 
 	RunLevel(String level) {
 		this.level = level;
 	}
-
 
 	@Override
 	public String toString() {
@@ -36,8 +39,7 @@ public enum RunLevel {
 
 	public static RunLevel current() {
 		ContextProperties config = getConfig();
-		String runLevel = config != null ? config.getProperty("runlevel", DEFAULT.toString())
-				: DEFAULT.toString();
+		String runLevel = config != null ? config.getProperty("runlevel", DEFAULT.toString()) : DEFAULT.toString();
 		return RunLevel.fromString(runLevel);
 	}
 
@@ -79,7 +81,7 @@ public enum RunLevel {
 			try {
 				conf = new ContextProperties();
 			} catch (IOException e) {
-				System.out.println(e.getMessage());
+				log.error(e.getMessage(), e);
 			}
 		return conf;
 	}

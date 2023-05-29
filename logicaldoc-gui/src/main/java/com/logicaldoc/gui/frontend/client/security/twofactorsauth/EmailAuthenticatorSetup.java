@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
  */
 public class EmailAuthenticatorSetup extends TwoFactorsAuthenticationSetup {
 
-	public EmailAuthenticatorSetup(GUIUser user) {
+	public EmailAuthenticatorSetup() {
 		super();
 		setWidth100();
 		setHeight100();

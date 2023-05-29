@@ -110,15 +110,14 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		GUIFolder folder = FolderController.get().getCurrentFolder();
 		boolean downloadEnabled = folder != null && folder.isDownload();
 		boolean writeEnabled = folder != null && folder.isWrite();
-		boolean signEnabled = folder != null && folder.hasPermission(Constants.PERMISSION_SIGN);
 
-		prepareButtons(downloadEnabled, writeEnabled, signEnabled);
+		prepareButtons(downloadEnabled, writeEnabled);
 		update(null, folder);
 
 		FolderController.get().addObserver(this);
 	}
 
-	protected void prepareButtons(boolean downloadEnabled, boolean writeEnabled, boolean signEnabled) {
+	protected void prepareButtons(boolean downloadEnabled, boolean writeEnabled) {
 
 		addRefresh();
 

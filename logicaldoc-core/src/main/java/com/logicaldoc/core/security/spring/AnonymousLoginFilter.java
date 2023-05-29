@@ -43,7 +43,7 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if ((authentication == null || (authentication != null && !authentication.isAuthenticated()))
+		if ((authentication == null || !authentication.isAuthenticated())
 				&& "login".equals(request.getParameter("anonymous"))) {
 
 			String tenant = getTenant(request);

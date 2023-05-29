@@ -29,12 +29,7 @@ public class ImageConverter extends AbstractFormatConverter {
 			throw new IOException("Unable to convert image to " + ext);
 
 		try {
-			int timeout = 10;
-			try {
-				timeout = Integer.parseInt(getParameter("timeout"));
-			} catch (Exception t) {
-				// Nothing to do
-			}
+			int timeout = getTimeout();
 
 			String commandLine = getParameter("path") + " -compress JPEG " + src.getPath() + " " + dest.getPath();
 			new Exec().exec(commandLine, null, null, timeout);
@@ -46,6 +41,16 @@ public class ImageConverter extends AbstractFormatConverter {
 		} catch (Exception e) {
 			throw new IOException("Error in IMG to PDF conversion", e);
 		}
+	}
+
+	private int getTimeout() {
+		int timeout = 10;
+		try {
+			timeout = Integer.parseInt(getParameter("timeout"));
+		} catch (Exception t) {
+			// Nothing to do
+		}
+		return timeout;
 	}
 
 	@Override

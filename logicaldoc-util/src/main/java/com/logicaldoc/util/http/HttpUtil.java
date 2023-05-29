@@ -28,20 +28,17 @@ import com.logicaldoc.util.config.ContextProperties;
 
 public class HttpUtil {
 
+	private HttpUtil() {
+	}
+
 	/**
 	 * Gets the proxy configuration from the context (proxy. properties)
 	 */
 	private static String[] getProxy() {
 		String[] proxy = new String[] { null, "0", null, null };
 		try {
-			ContextProperties config = null;
-
 			// Try to get the config of the application context
-			try {
-				config = Context.get().getProperties();
-			} catch (Exception t) {
-				// Nothing to do
-			}
+			ContextProperties config = getContextProperties();
 
 			// fallback to the classpath resource
 			if (config == null)
@@ -63,6 +60,15 @@ public class HttpUtil {
 		}
 
 		return proxy;
+	}
+
+	private static ContextProperties getContextProperties() {
+		try {
+			return Context.get().getProperties();
+		} catch (Exception t) {
+			// Nothing to do
+		}
+		return null;
 	}
 
 	public static CloseableHttpClient getNotValidatingClient(int timeout, String proxyServer, Integer proxyPort,

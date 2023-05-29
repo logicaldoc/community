@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.webdav.DavCompliance;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -63,7 +62,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 		initSupportedReports();
 	}
 
-    @Override
+	@Override
 	public String getComplianceClass() {
 		return DavCompliance.concatComplianceClasses(new String[] { DavCompliance._1_, DavCompliance.VERSION_CONTROL,
 				DavCompliance.VERSION_HISTORY, DavCompliance.LABEL });
@@ -75,9 +74,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 			oR = new OptionsResponse();
 			// currently only DAV:version-history-collection-set is supported
 			if (optionsInfo.containsElement(DeltaVConstants.XML_VH_COLLECTION_SET, DeltaVConstants.NAMESPACE)) {
-				String[] hrefs = new String[] {
-						getLocatorFromNodePath("/" + JcrConstants.JCR_SYSTEM + "/" + JcrConstants.JCR_VERSIONSTORAGE)
-								.getHref(true) };
+				String[] hrefs = new String[] { getLocatorFromNodePath().getHref(true) };
 				oR.addEntry(DeltaVConstants.XML_VH_COLLECTION_SET, DeltaVConstants.NAMESPACE, hrefs);
 			}
 		}
@@ -126,7 +123,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 		return (DavResource[]) resources.toArray(new DavResource[0]);
 	}
 
-	protected DavResourceLocator getLocatorFromNodePath(String nodePath) {
+	protected DavResourceLocator getLocatorFromNodePath() {
 		DavResourceLocator loc = getLocator().getFactory().createResourceLocator(getLocator().getPrefix(), "/", "",
 				false);
 		return loc;

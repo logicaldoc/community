@@ -80,7 +80,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		toolStrip.addFormItem(max);
 		toolStrip.addSeparator();
 
-		folderSelector = new FolderSelector("folder", true);
+		folderSelector = new FolderSelector("folder", null);
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);

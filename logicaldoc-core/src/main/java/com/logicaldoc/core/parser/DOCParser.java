@@ -37,19 +37,9 @@ public class DOCParser extends RTFParser {
 		try (BufferedInputStream bis = new BufferedInputStream(input)) {
 			bis.mark(Integer.MAX_VALUE);
 
-			String tmp = "";
-			try (WordExtractor extractor = new WordExtractor(bis)) {
-				tmp = extractor.getText();
-			} catch (Exception e) {
-				// Maybe the document to be parsed is not a Word file.
-				// Try to evaluate it as a RTF file.
-			}
+			String tmp = extractTextAsWord(bis);
 
-			try {
-				bis.reset();
-			} catch (Exception e) {
-				// Noting to do
-			}
+			resetStream(bis);
 
 			if (tmp.length() == 0) {
 				// Try to evaluate it as a RTF file.
@@ -64,6 +54,25 @@ public class DOCParser extends RTFParser {
 			log.warn("Failed to extract Word text content", e);
 		}
 		return "";
+	}
+
+	private void resetStream(BufferedInputStream bis) {
+		try {
+			bis.reset();
+		} catch (Exception e) {
+			// Noting to do
+		}
+	}
+
+	private String extractTextAsWord(BufferedInputStream bis) {
+		String tmp = "";
+		try (WordExtractor extractor = new WordExtractor(bis)) {
+			tmp = extractor.getText();
+		} catch (Exception e) {
+			// Maybe the document to be parsed is not a Word file.
+			// Try to evaluate it as a RTF file.
+		}
+		return tmp;
 	}
 
 	@Override

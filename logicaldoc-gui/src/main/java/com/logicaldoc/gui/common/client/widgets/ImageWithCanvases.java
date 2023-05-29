@@ -143,7 +143,7 @@ public class ImageWithCanvases extends Canvas {
 			int newCanvasTop = (int) ((double) newHeight / proportionY);
 			int newCanvasLeft = (int) ((double) newWidth / proportionX);
 
-			if (img != null && newHeight > 100) {
+			if (newHeight > 100) {
 				canvas.setLeft(newCanvasLeft);
 				canvas.setTop(newCanvasTop);
 				canvas.setWidth(newCanvasWidth);
@@ -151,7 +151,7 @@ public class ImageWithCanvases extends Canvas {
 			}
 		}
 
-		if (img != null && newHeight > 100) {
+		if (newHeight > 100) {
 			img.setHeight(newHeight);
 			img.setWidth(newWidth);
 		}

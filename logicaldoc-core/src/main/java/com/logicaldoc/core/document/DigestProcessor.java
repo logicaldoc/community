@@ -71,20 +71,7 @@ public class DigestProcessor extends Task {
 			List<Long> ids = documentDao.findIdsByWhere(PersistentObjectDAO.ENTITY + ".docRef is null and "
 					+ PersistentObjectDAO.ENTITY + ".digest is null and deleted = 0", null, max);
 			for (Long id : ids) {
-				try {
-					log.debug("Processing document {}", id);
-
-					Document doc = documentDao.findById(id);
-					documentDao.updateDigest(doc);
-
-					log.debug("Processed document {}", id);
-					processed++;
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-					errors++;
-				} finally {
-					next();
-				}
+				processDocument(id);
 				if (interruptRequested)
 					return;
 			}
@@ -94,6 +81,23 @@ public class DigestProcessor extends Task {
 			log.info("Digest processing finished");
 			log.info("Processed documents: {}", processed);
 			log.info("Errors: {}", errors);
+		}
+	}
+
+	private void processDocument(Long id) {
+		try {
+			log.debug("Processing document {}", id);
+
+			Document doc = documentDao.findById(id);
+			documentDao.updateDigest(doc);
+
+			log.debug("Processed document {}", id);
+			processed++;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			errors++;
+		} finally {
+			next();
 		}
 	}
 

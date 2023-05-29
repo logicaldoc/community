@@ -105,6 +105,9 @@ public interface ZohoService extends RemoteService {
 	public static class Instance {
 		private static ZohoServiceAsync instance;
 
+		private Instance() {
+		}
+		
 		public static ZohoServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(ZohoService.class);

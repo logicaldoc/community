@@ -40,6 +40,9 @@ public class LD {
 
 	private static final String VALUE = "value";
 
+	private LD() {
+	}
+
 	/**
 	 * Show a dialog to confirm a operation
 	 * 
@@ -161,12 +164,11 @@ public class LD {
 		item.setTitle(I18N.message(message));
 		item.setWrapTitle(false);
 		item.addKeyPressHandler((KeyPressEvent event) -> {
-			if (form.validate() && event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
-				if (callback != null) {
-					dialog.close();
-					callback.execute(form.getValue(VALUE).toString());
-					dialog.destroy();
-				}
+			if (form.validate() && event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())
+					&& callback != null) {
+				dialog.close();
+				callback.execute(form.getValue(VALUE).toString());
+				dialog.destroy();
 			}
 		});
 

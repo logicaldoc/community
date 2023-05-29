@@ -216,37 +216,6 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		chain.doFilter(request, response);
 	}
 
-	// ORIGINAL
-	// /**
-	// * Decodes the header into a username and password.
-	// *
-	// * @throws BadCredentialsException if the Basic header is not present or
-	// is
-	// * not valid Base64
-	// */
-	// private String[] extractAndDecodeHeader(String header, HttpServletRequest
-	// request) throws IOException {
-	//
-	// byte[] base64Token = header.substring(6).getBytes("UTF-8");
-	// byte[] decoded;
-	// try {
-	// decoded = Base64.getDecoder().decode(base64Token);
-	// } catch (IllegalArgumentException e) {
-	// throw new
-	// BadCredentialsException("Failed to decode basic authentication token");
-	// }
-	//
-	// String token = new String(decoded, getCredentialsCharset(request));
-	//
-	// int delim = token.indexOf(":");
-	//
-	// if (delim == -1) {
-	// throw new BadCredentialsException("Invalid basic authentication token");
-	// }
-	// return new String[] { token.substring(0, delim), token.substring(delim +
-	// 1) };
-	// }
-
 	/**
 	 * @LOGICALDOC
 	 * 
@@ -259,9 +228,9 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		String userAgent = request.getHeader("user-agent");
 		if (userAgent != null && userAgent.contains("Chrome")) { // checking if
 																	// Chrome
-			return extractAndDecodeHeaderChrome(header, request);
+			return extractAndDecodeHeaderChrome(header);
 		} else {
-			return extractAndDecodeHeaderAll(header, request);
+			return extractAndDecodeHeaderAll(header);
 		}
 	}
 
@@ -274,7 +243,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	 * @throws BadCredentialsException if the Basic header is not present or is
 	 *         not valid Base64
 	 */
-	private String[] extractAndDecodeHeaderChrome(String header, HttpServletRequest request) throws IOException {
+	private String[] extractAndDecodeHeaderChrome(String header) throws IOException {
 		byte[] base64Token = header.substring(6).getBytes("UTF-8");
 		byte[] decoded;
 		try {
@@ -283,7 +252,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 			throw new BadCredentialsException("Failed to decode basic authentication token");
 		}
 
-		String token = new String(decoded, getCredentialsCharset(request));
+		String token = new String(decoded, getCredentialsCharset());
 
 		int delim = token.indexOf(":");
 
@@ -302,7 +271,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	 * @throws BadCredentialsException if the Basic header is not present or is
 	 *         not valid Base64
 	 */
-	private String[] extractAndDecodeHeaderAll(String header, HttpServletRequest request) throws IOException {
+	private String[] extractAndDecodeHeaderAll(String header) throws IOException {
 
 		String encoded = header.substring(6);
 		String decoded = null;
@@ -321,10 +290,8 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private boolean authenticationIsRequired(String username) {
-		// Only reauthenticate if username doesn't match SecurityContextHolder
-		// and user
-		// isn't authenticated
-		// (see SEC-53)
+		// Only reauthenticate if username doesn't match Security ContextHolder
+		// and user isn't authenticated (see SEC-53)
 		Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
 
 		if (existingAuth == null || !existingAuth.isAuthenticated()) {
@@ -332,7 +299,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		// Limit username comparison to providers which use usernames (ie
-		// UsernamePasswordAuthenticationToken)
+		// Username Password Authentication Token)
 		// (see SEC-348)
 
 		if (existingAuth instanceof UsernamePasswordAuthenticationToken && !existingAuth.getName().equals(username)) {
@@ -402,7 +369,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		this.credentialsCharset = credentialsCharset;
 	}
 
-	protected String getCredentialsCharset(HttpServletRequest httpRequest) {
+	protected String getCredentialsCharset() {
 		return this.credentialsCharset;
 	}
 }

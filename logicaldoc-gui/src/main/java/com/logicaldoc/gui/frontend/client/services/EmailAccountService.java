@@ -85,14 +85,17 @@ public interface EmailAccountService extends RemoteService {
 	public void resetCounter(long id) throws ServerException;
 
 	public static class Instance {
-		private static EmailAccountServiceAsync instance;
+		private static EmailAccountServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static EmailAccountServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(EmailAccountService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(EmailAccountService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

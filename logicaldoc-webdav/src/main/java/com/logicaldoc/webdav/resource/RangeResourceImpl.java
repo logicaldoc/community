@@ -74,15 +74,7 @@ public class RangeResourceImpl extends DavResourceImpl {
 		outputContext.setProperty(CONTENT_DISPOSITION_HEADER, CONTENT_DISPOSITION_VALUE);
 		outputContext.setProperty(X_CONTENT_TYPE_OPTIONS_HEADER, X_CONTENT_TYPE_OPTIONS_VALUE);
 
-		/*
-		 * try (ReadableFile src = node.openReadable(); OutputStream out =
-		 * outputContext.getOutputStream()) { src.position(range.getLeft());
-		 * InputStream limitedIn =
-		 * ByteStreams.limit(Channels.newInputStream(src), rangeLength);
-		 * ByteStreams.copy(limitedIn, out); }
-		 */
-
-		if (exists() && outputContext != null) {
+		if (exists()) {
 			ExportContext exportCtx = getExportContext(outputContext);
 
 			if (!config.getIOManager().exportContent(exportCtx, this, range.getLeft(), rangeLength)) {
@@ -90,7 +82,6 @@ public class RangeResourceImpl extends DavResourceImpl {
 						"Unexpected Error while spooling resource - " + range.getLeft() + "-" + rangeLength);
 			}
 		}
-
 	}
 
 	private String contentRangeResponseHeader(long firstByte, long lastByte, long completeLength) {

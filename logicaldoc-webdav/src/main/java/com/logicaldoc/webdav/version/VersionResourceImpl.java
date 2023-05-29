@@ -99,7 +99,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 		return null;
 	}
 
-	@SuppressWarnings("unused")s
+	@SuppressWarnings("unused")
 	private VersionHistory getVersionHistoryItem() throws RepositoryException {
 		return null;
 	}
@@ -120,9 +120,6 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 
 			properties.add(new DefaultDavProperty<>(VERSION_NAME, resource.getVersionLabel(), true));
 
-			// properties.add(new
-			// DefaultDavProperty<String>(DavPropertyName.CREATIONDATE,
-			// resource.getVersionDate()));
 			String creationDate = IOUtil.getCreated(resource.getVersionDate().getTime());
 			properties.add(new DefaultDavProperty<>(DavPropertyName.CREATIONDATE, creationDate));
 			properties.add(new HrefProperty(VersionResource.VERSION_HISTORY,

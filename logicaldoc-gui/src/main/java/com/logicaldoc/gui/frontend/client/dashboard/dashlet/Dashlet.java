@@ -44,7 +44,6 @@ public abstract class Dashlet extends Portlet {
 		// show either a shadow, or translucency, when dragging a portlet
 		// (could do both at the same time, but these are not visually
 		// compatible effects)
-		// setShowDragShadow(true);
 		setDragOpacity(30);
 
 		setCloseConfirmationMessage(I18N.message("closedashletconfirm"));

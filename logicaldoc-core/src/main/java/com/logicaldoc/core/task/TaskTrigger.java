@@ -140,7 +140,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
 	public long getRepeatInterval() {
 		SimpleTrigger triggerObject = simpleTrigger.getObject();
-		if (simpleTrigger != null && triggerObject != null)
+		if (triggerObject != null)
 			return triggerObject.getRepeatInterval();
 		else
 			return -1;

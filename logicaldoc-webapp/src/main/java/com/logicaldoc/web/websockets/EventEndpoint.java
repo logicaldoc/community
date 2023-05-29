@@ -226,25 +226,6 @@ public class EventEndpoint implements EventListener {
 			}
 	}
 
-	// Until now we do not need deserialization
-	// private EventMessage deserializeMessage(String data) throws
-	// SerializationException {
-	// /*
-	// * We need an instance of a ServerSerializationStreamReader for read the
-	// * object. The only hack is how create a
-	// * CustomSerializationPolicyProvider
-	// */
-	// ServerSerializationStreamReader streamReader = new
-	// ServerSerializationStreamReader(
-	// Thread.currentThread().getContextClassLoader(), new
-	// CustomSerializationPolicyProvider());
-	// // Filling stream reader with data
-	// streamReader.prepareToRead(data);
-	// // Reading deserialized object from the stream
-	// final EventMessage message = (EventMessage) streamReader.readObject();
-	// return message;
-	// }
-
 	private static String serializeMessage(final WebsocketMessage messageDto) throws SerializationException {
 		ServerSerializationStreamWriter serverSerializationStreamWriter = new ServerSerializationStreamWriter(
 				new SimpleSerializationPolicy());

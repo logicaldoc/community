@@ -13,11 +13,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.VLayout;
 
-//import gwtupload.client.IFileInput.FileInputType;
-//import gwtupload.client.IUploadStatus.Status;
-//import gwtupload.client.IUploader;
-//import gwtupload.client.MultiUploader;
-
 /**
  * This popup window is used to upload a new branding package
  * 

@@ -2,12 +2,18 @@ package com.logicaldoc.util.crypt;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
@@ -45,6 +51,7 @@ public class CryptUtil {
 	public CryptUtil(String encryptionScheme, String encryptionKey) throws EncryptionException {
 		if (encryptionKey == null)
 			throw new IllegalArgumentException("encryption key was null");
+
 		try {
 			String key = encryptionKey;
 			if (encryptionKey.length() < 32)
@@ -59,8 +66,8 @@ public class CryptUtil {
 			}
 			keyFactory = SecretKeyFactory.getInstance(encryptionScheme);
 			cipher = Cipher.getInstance(encryptionScheme);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		} catch (InvalidKeyException | UnsupportedEncodingException | NoSuchAlgorithmException
+				| NoSuchPaddingException e) {
 			throw new EncryptionException(e);
 		}
 	}
@@ -68,6 +75,7 @@ public class CryptUtil {
 	public void encrypt(File inputFile, File outputFile) throws EncryptionException {
 		if (inputFile == null || !inputFile.exists())
 			throw new IllegalArgumentException("Unencrypted file not found in inpout file");
+
 		try {
 			SecretKey key = keyFactory.generateSecret(keySpec);
 			cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -79,13 +87,14 @@ public class CryptUtil {
 			if (!created)
 				throw new IOException("Cannot create file " + outputFile.getAbsolutePath());
 			FileUtils.writeByteArrayToFile(outputFile, encryptedContent);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		} catch (InvalidKeyException | InvalidKeySpecException | IllegalBlockSizeException | BadPaddingException
+				| IOException e) {
 			throw new EncryptionException(e);
 		}
 	}
 
 	public void decrypt(File inputFile, File outputFile) throws EncryptionException {
+
 		try {
 			if (inputFile == null || !inputFile.exists())
 				throw new IllegalArgumentException("Encrypted file not found in input file");
@@ -99,8 +108,8 @@ public class CryptUtil {
 			if (!created)
 				throw new IOException("Cannot create file " + outputFile.getAbsolutePath());
 			FileUtils.writeByteArrayToFile(outputFile, clearContent);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		} catch (InvalidKeyException | InvalidKeySpecException | IllegalBlockSizeException | BadPaddingException
+				| IOException e) {
 			throw new EncryptionException(e);
 		}
 	}
@@ -108,14 +117,15 @@ public class CryptUtil {
 	public String encrypt(String unencryptedString) throws EncryptionException {
 		if (unencryptedString == null || unencryptedString.trim().length() == 0)
 			throw new IllegalArgumentException("unencrypted string was null or empty");
+
 		try {
 			SecretKey key = keyFactory.generateSecret(keySpec);
 			cipher.init(Cipher.ENCRYPT_MODE, key);
 			byte[] cleartext = unencryptedString.getBytes(UNICODE_FORMAT);
 			byte[] ciphertext = cipher.doFinal(cleartext);
 			return new String(java.util.Base64.getMimeEncoder().encode(ciphertext), StandardCharsets.UTF_8);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		} catch (InvalidKeyException | InvalidKeySpecException | UnsupportedEncodingException
+				| IllegalBlockSizeException | BadPaddingException e) {
 			throw new EncryptionException(e);
 		}
 	}
@@ -123,14 +133,14 @@ public class CryptUtil {
 	public String decrypt(String encryptedString) throws EncryptionException {
 		if (encryptedString == null || encryptedString.trim().length() <= 0)
 			throw new IllegalArgumentException("encrypted string was null or empty");
+
 		try {
 			SecretKey key = keyFactory.generateSecret(keySpec);
 			cipher.init(Cipher.DECRYPT_MODE, key);
 			byte[] cleartext = java.util.Base64.getMimeDecoder().decode(encryptedString);
 			byte[] ciphertext = cipher.doFinal(cleartext);
 			return bytes2String(ciphertext);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		} catch (InvalidKeyException | InvalidKeySpecException | IllegalBlockSizeException | BadPaddingException e) {
 			throw new EncryptionException(e);
 		}
 	}
@@ -184,8 +194,7 @@ public class CryptUtil {
 			byte[] encPwd = new byte[md4.getDigestSize()];
 			md4.doFinal(encPwd, 0);
 			copy = getHex(encPwd).toLowerCase();
-			// new BigInteger(1, encPwd).toString(16);
-		} catch (Throwable nsae) {
+		} catch (Exception nsae) {
 			log.error(nsae.getMessage());
 		}
 		return copy;
@@ -199,6 +208,7 @@ public class CryptUtil {
 	 * @return the MD4 hash
 	 */
 	public static String hashNTLM1(String original) {
+
 		try {
 			if (original == null) {
 				original = "";
@@ -218,10 +228,11 @@ public class CryptUtil {
 			md4.doFinal(encPwd, 0);
 
 			return CryptUtil.getHex(encPwd).substring(0, 32);
-		} catch (Throwable nsae) {
-			log.error(nsae.getMessage());
+		} catch (Exception e) {
+			log.error(e.getMessage());
 			return null;
 		}
+
 	}
 
 	public static String getHex(byte[] raw) {

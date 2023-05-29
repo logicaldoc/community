@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.github.mertakdut.BookSection;
 import com.github.mertakdut.Reader;
 import com.github.mertakdut.exception.OutOfPagesException;
+import com.github.mertakdut.exception.ReadingException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -37,28 +38,31 @@ public class EpubParser extends AbstractParser {
 			Reader reader = new Reader();
 			reader.setIsIncludingTextContent(true);
 			// Max string length for the current page
-			// reader.setMaxContentPerSection(10000);
 			reader.setFullContent(tmpFile.getAbsolutePath());
 
-			for (int i = 0; i < Integer.MAX_VALUE; i++) {
-				try {
-					BookSection bookSection = reader.readSection(i);
-
-					// Excludes html tags
-					String sectionTextContent = bookSection.getSectionTextContent();
-					if (StringUtils.isNotEmpty(sectionTextContent)) {
-						if (content.length() > 0)
-							content.append("\n");
-						content.append(sectionTextContent);
-					}
-				} catch (OutOfPagesException t) {
-					break;
-				}
-			}
-		} catch (Throwable ex) {
+			extractSections(reader, content);
+		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 		} finally {
 			FileUtil.strongDelete(tmpFile);
+		}
+	}
+
+	private void extractSections(Reader reader, StringBuilder content) throws ReadingException {
+		for (int sectionIndex = 0; sectionIndex < Integer.MAX_VALUE; sectionIndex++) {
+			try {
+				BookSection bookSection = reader.readSection(sectionIndex);
+
+				// Excludes html tags
+				String sectionTextContent = bookSection.getSectionTextContent();
+				if (StringUtils.isNotEmpty(sectionTextContent)) {
+					if (content.length() > 0)
+						content.append("\n");
+					content.append(sectionTextContent);
+				}
+			} catch (OutOfPagesException t) {
+				break;
+			}
 		}
 	}
 

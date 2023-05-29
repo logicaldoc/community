@@ -24,8 +24,4 @@ public class AutoDeleteZipInputStream extends ZipInputStream {
 		if (zipFile != null)
 			FileUtil.strongDelete(zipFile);
 	}
-
-	public void close(boolean arg0) throws IOException {
-		this.close();
-	}
 }

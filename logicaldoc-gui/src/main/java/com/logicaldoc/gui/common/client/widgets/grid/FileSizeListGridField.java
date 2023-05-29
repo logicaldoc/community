@@ -29,12 +29,8 @@ public class FileSizeListGridField extends ColoredListGridField {
 		this(name, title != null ? title : I18N.message("size"), width, false);
 	}
 
-	public FileSizeListGridField(String name, String iconFieldName, String title) {
-		this(name, title, 70);
-	}
-
 	public FileSizeListGridField(String name, String title) {
-		this(name, title, null);
+		this(name, 70);
 	}
 
 	public class FileSizeCellFormatter extends ColoredCellFormatter {

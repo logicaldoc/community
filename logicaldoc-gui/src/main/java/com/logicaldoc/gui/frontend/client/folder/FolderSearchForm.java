@@ -56,7 +56,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 	private ValuesManager vm = new ValuesManager();
 
-	private FolderSelector folder;
+	private FolderSelector folderSelector;
 
 	private GUITemplate selectedTemplate = null;
 
@@ -86,11 +86,11 @@ public abstract class FolderSearchForm extends VLayout {
 		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders2"));
 		subfolders.setEndRow(true);
 
-		folder = new FolderSelector(null, true);
-		folder.setTitle(I18N.message("parent"));
-		folder.setEndRow(true);
-		folder.setWidth(160);
-		folder.addFolderChangeListener(folder -> {
+		folderSelector = new FolderSelector(null, null);
+		folderSelector.setTitle(I18N.message("parent"));
+		folderSelector.setEndRow(true);
+		folderSelector.setWidth(160);
+		folderSelector.addFolderChangeListener(folder -> {
 			if (folder != null)
 				subfolders.setValue(true);
 			else
@@ -101,7 +101,7 @@ public abstract class FolderSearchForm extends VLayout {
 		folderForm.setValuesManager(vm);
 		folderForm.setTitleOrientation(TitleOrientation.TOP);
 
-		folderForm.setItems(folder, subfolders);
+		folderForm.setItems(folderSelector, subfolders);
 
 		IButton search = new IButton(I18N.message("search"));
 		search.setAutoFit(true);
@@ -344,9 +344,9 @@ public abstract class FolderSearchForm extends VLayout {
 	}
 
 	private void addFolderCriterion(GUISearchOptions options, List<GUICriterion> criteria) {
-		if (folder != null) {
-			options.setFolder(folder.getFolderId());
-			options.setFolderName(folder.getFolderName());
+		if (folderSelector != null) {
+			options.setFolder(folderSelector.getFolderId());
+			options.setFolderName(folderSelector.getFolderName());
 
 			GUICriterion criterion = new GUICriterion();
 			criterion.setField("folder");

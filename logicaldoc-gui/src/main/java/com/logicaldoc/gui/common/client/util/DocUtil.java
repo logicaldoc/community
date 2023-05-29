@@ -16,6 +16,9 @@ import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentP
  */
 public class DocUtil {
 
+	private DocUtil() {
+	}
+
 	public static void download(final long docId, final String fileVersion) {
 		download(docId, fileVersion, null);
 	}

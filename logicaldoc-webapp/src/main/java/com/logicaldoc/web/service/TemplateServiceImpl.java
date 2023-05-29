@@ -74,13 +74,18 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			if (template.getReadonly() == 1 || !dao.isWriteEnable(templateId, session.getUserId()))
 				throw new ServerException("You do not have the permission");
 
-			try {
-				dao.delete(templateId);
-			} catch (Exception e) {
-				throw new ServerException("Template has not been deleted", e);
-			}
+			deleteTemplate(templateId);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
+		}
+	}
+
+	private void deleteTemplate(long templateId) throws ServerException {
+		try {
+			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			dao.delete(templateId);
+		} catch (Exception e) {
+			throw new ServerException("Template has not been deleted", e);
 		}
 	}
 
@@ -97,7 +102,6 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		Session session = validateSession(getThreadLocalRequest());
 		User sessionUser = session.getUser();
 
-		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		try {
 			Template template = getTemplate(guiTemplate, session, sessionUser);
 
@@ -109,12 +113,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			 */
 			saveSecuritySettings(template, guiTemplate, session, sessionUser);
 
-			try {
-				dao.store(template);
-			} catch (Exception e) {
-				throw new ServerException(
-						String.format("Template has not been %s", template.getId() != 0L ? "updated" : "stored"), e);
-			}
+			store(template);
 
 			guiTemplate.setId(template.getId());
 		} catch (Exception t) {
@@ -122,6 +121,16 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		}
 
 		return guiTemplate;
+	}
+
+	private void store(Template template) throws ServerException {
+		try {
+			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			dao.store(template);
+		} catch (Exception e) {
+			throw new ServerException(
+					String.format("Template has not been %s", template.getId() != 0L ? "updated" : "stored"), e);
+		}
 	}
 
 	private void updateTemplate(GUITemplate guiTemplate, Template template, Session session) {

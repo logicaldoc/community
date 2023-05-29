@@ -292,14 +292,17 @@ public interface FolderService extends RemoteService {
 	public String readImage() throws ServerException;
 	
 	public static class Instance {
-		private static FolderServiceAsync instance;
+		private static FolderServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static FolderServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(FolderService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(FolderService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

@@ -23,6 +23,9 @@ public class DocumentProtectionManager {
 	// Stores the doc's ID and the password used to un-protect it
 	private static Map<Long, String> unprotectedDocs = new HashMap<>();
 
+	private DocumentProtectionManager() {
+	}
+
 	public static boolean isUnprotected(long docId) {
 		return unprotectedDocs.containsKey(docId);
 	}
@@ -69,51 +72,48 @@ public class DocumentProtectionManager {
 			}
 		});
 	}
-	
+
 	private static void unsetPassword(final Long docId, final DocumentProtectionHandler handler,
 			final GUIDocument result, final String password) {
-		DocumentService.Instance.get().unsetPassword(result.getId(), password,
-				new AsyncCallback<Void>() {
+		DocumentService.Instance.get().unsetPassword(result.getId(), password, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Void res) {
-						saveProtectionPasswordAndNotify(docId, handler, result, password);
-					}
-				});
+			@Override
+			public void onSuccess(Void res) {
+				saveProtectionPasswordAndNotify(docId, handler, result, password);
+			}
+		});
 	}
-	
+
 	private static void unprotect(final Long docId, final DocumentProtectionHandler handler, final GUIDocument result,
 			final String password) {
-		DocumentService.Instance.get().unprotect(result.getId(), password,
-				new AsyncCallback<Boolean>() {
+		DocumentService.Instance.get().unprotect(result.getId(), password, new AsyncCallback<Boolean>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Boolean granted) {
-						if (Boolean.TRUE.equals(granted)) {
-							saveProtectionPasswordAndNotify(docId, handler, result,
-									password);
-						} else if (handler != null) {
-							SC.warn(I18N.message("accesdenied"));
-						}
-					}
-				});
+			@Override
+			public void onSuccess(Boolean granted) {
+				if (Boolean.TRUE.equals(granted)) {
+					saveProtectionPasswordAndNotify(docId, handler, result, password);
+				} else if (handler != null) {
+					SC.warn(I18N.message("accesdenied"));
+				}
+			}
+		});
 	}
 
 	private static void notifyUnprotected(final DocumentProtectionHandler handler, final GUIDocument document) {
 		if (handler != null)
 			handler.onUnprotected(document);
 	}
-	
+
 	private static void saveProtectionPasswordAndNotify(final Long docId, final DocumentProtectionHandler handler,
 			final GUIDocument document, final String password) {
 		// Save the password for further reference

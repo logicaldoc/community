@@ -70,6 +70,9 @@ public class ServletUtil {
 
 	private static final String USER = "user";
 
+	private ServletUtil() {
+	}
+
 	public static Session validateSession(HttpServletRequest request) throws InvalidSessionException {
 		String sid = SessionManager.get().getSessionId(request);
 		return validateSession(sid);
@@ -348,12 +351,12 @@ public class ServletUtil {
 		}
 
 		// Range header should match format "bytes=n-n,n-n,n-n...". If not,
-		// then return 416. Impose a max range size in order avoid stack overflow of the Java regex 
+		// then return 416. Impose a max range size in order avoid stack
+		// overflow of the Java regex
 		if (!StringUtils.left(range, 500).matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
 			response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
-																		// in
-																		// 416.
-			// response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+																	// in
+																	// 416.
 			return null;
 		}
 
@@ -385,9 +388,8 @@ public class ServletUtil {
 			// return 416.
 			if (start > end) {
 				response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
-																			// in
-																			// 416.
-				// response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+																		// in
+																		// 416.
 				return null;
 			}
 
@@ -601,8 +603,7 @@ public class ServletUtil {
 			// Used by some LG phones
 			encodedFileName = filename;
 		} else {
-			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8)
-					+ "?=";
+			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8) + "?=";
 		}
 
 		boolean asAttachment = true;
@@ -660,7 +661,7 @@ public class ServletUtil {
 
 		UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
 		udao.initialize(user);
-		if (doc != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 
 		SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);

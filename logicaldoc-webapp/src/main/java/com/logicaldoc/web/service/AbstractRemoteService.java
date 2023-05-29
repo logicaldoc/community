@@ -203,7 +203,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		if (message != null)
 			message = message.replace("com.logicaldoc.", "").replace("java.lang.", "");
 
-		if (session != null && t != null
+		if (session != null
 				&& (t instanceof org.hibernate.TransactionException || t instanceof org.hibernate.HibernateException
 						|| t instanceof org.springframework.transaction.TransactionSystemException)) {
 			message = I18N.message("dberrorretry", session.getUser().getLocale());
@@ -314,9 +314,8 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
 			return new GUIAttribute[0];
 		try {
-			if (template != null)
-				for (String attrName : template.getAttributeNames())
-					attributes.add(prepareGUIAttribute(attrName, template, attributes, extensibleObject));
+			for (String attrName : template.getAttributeNames())
+				attributes.add(prepareGUIAttribute(attrName, template, attributes, extensibleObject));
 
 			Collections.sort(attributes);
 			return attributes.toArray(new GUIAttribute[0]);

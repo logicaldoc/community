@@ -52,7 +52,7 @@ public class Client implements Serializable {
 		try {
 			this.geolocation = Geolocation.get(address);
 		} catch (IOException e) {
-			log.debug("Geolocalization: " + e.getMessage(), address);
+			log.debug("Geolocalization: {} {}", e.getMessage(), address);
 		}
 	}
 

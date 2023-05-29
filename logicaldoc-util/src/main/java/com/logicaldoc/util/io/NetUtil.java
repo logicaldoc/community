@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 public class NetUtil {
 	protected static Logger log = LoggerFactory.getLogger(JarUtil.class);
 
+	private NetUtil() {
+	}
+
 	/**
 	 * Checks if a port is available
 	 * 
@@ -24,34 +27,19 @@ public class NetUtil {
 	 * @return true id the port is available
 	 */
 	public static boolean available(int port) {
-		ServerSocket socket = null;
-		Socket client = null;
-		try {
-			try {
-				client = new Socket("127.0.0.1", port);
-				return false;
-			} catch (Exception e) {
-				socket = new ServerSocket(port);
-				socket.close();
-				return true;
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage());
+		try (Socket client = new Socket("127.0.0.1", port)) {
 			return false;
-		} finally {
-			// Clean up
-			if (socket != null)
-				try {
-					socket.close();
-				} catch (IOException e) {
-					// Nothing to do
-				}
-			if (client != null)
-				try {
-					client.close();
-				} catch (IOException e) {
-					// Nothing to do
-				}
+		} catch (Exception e) {
+			return createSocket(port);
+		}
+	}
+
+	private static boolean createSocket(int port) {
+		try (ServerSocket socket = new ServerSocket(port)) {
+			socket.close();
+			return true;
+		} catch (IOException e) {
+			return false;
 		}
 	}
 }

@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.cms.CMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +20,7 @@ import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -58,14 +55,11 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			Session session = ServletUtil.validateSession(request);
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 			long docId = Long.parseLong(request.getParameter("docId"));
 			String fileVersion = request.getParameter("fileVersion");
 			String filename = request.getParameter("attachmentFileName");
-
-			Version version = null;
 
 			Document doc = docDao.findById(docId);
 			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
@@ -77,9 +71,6 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			 */
 			if (doc.getDocRef() != null)
 				doc = docDao.findById(doc.getDocRef());
-
-			if (version == null && doc != null && StringUtils.isNotEmpty(fileVersion))
-				version = versDao.findByFileVersion(doc.getId(), fileVersion);
 
 			if (doc != null && doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
 				throw new IOException("The document is protected by a password");

@@ -35,7 +35,7 @@ public class PluginDbInit extends DBInit {
 
 	public void init(String[] ids) throws SQLException {
 		log.info("Start database initialization");
-		log.info("Database engine is " + getDbms());
+		log.info("Database engine is {}", getDbms());
 
 		try {
 			// Acquire the 'DbInit' extensions of the core plugin
@@ -78,7 +78,6 @@ public class PluginDbInit extends DBInit {
 			}
 			execute();
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new SQLException(e.getMessage());
 		}
 	}

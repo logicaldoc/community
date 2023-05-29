@@ -15,6 +15,9 @@ public class SnippetStripper {
 	// Lucene font hilight end tag
 	private static final String LUCENE_HILIGHT_STOP = "&lt;/font&gt;";
 
+	private SnippetStripper() {
+	}
+
 	/**
 	 * Strips all characters from the input string that may invalidate XML.
 	 * Particularly useful for search result summaries

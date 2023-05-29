@@ -16,6 +16,9 @@ public class FileNameCleaner {
 		Arrays.sort(illegalChars);
 	}
 
+	private FileNameCleaner() {
+	}
+
 	public static String cleanFileName(String badFileName) {
 		StringBuilder cleanName = new StringBuilder();
 		for (int i = 0; i < badFileName.length(); i++) {

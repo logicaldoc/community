@@ -38,6 +38,9 @@ public class CookiesManager {
 
 	public static final String COOKIE_JSESSIONID = "JSESSIONID";
 
+	private CookiesManager() {
+	}
+
 	/**
 	 * Removes the cookies that store the session ID
 	 */
@@ -95,13 +98,13 @@ public class CookiesManager {
 		} catch (Exception t) {
 			// Nothing to do
 		}
-		
+
 		try {
 			Offline.remove(COOKIE_SAVELOGIN);
 		} catch (Exception t) {
 			// Nothing to do
 		}
-		
+
 		try {
 			Offline.remove(COOKIE_USER);
 		} catch (Exception t) {

@@ -72,11 +72,10 @@ public class DateBean extends Date {
 	 * 
 	 * @param date string containing the date to be converted
 	 * @param dateFormat format of the date
-	 * @param lang from which language it should be converted
 	 * 
 	 * @return a string containing the converted date
 	 */
-	public static String toCompactString(String date, String dateFormat, String lang) {
+	public static String toCompactString(String date, String dateFormat) {
 		if ((date != null) && !date.equals("")) {
 			return convertDate(dateFormat, YYYY_MMDD_HMMSS, date);
 		} else {

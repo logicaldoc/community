@@ -27,7 +27,7 @@ public class IOManagerImpl implements IOManager {
 	protected static Logger log = LoggerFactory.getLogger(IOManagerImpl.class);
 
 	private final List<IOHandler> ioHandlers = new ArrayList<>();
-	
+
 	public void addIOHandler(IOHandler ioHandler) {
 		if (ioHandler == null) {
 			throw new IllegalArgumentException("'null' is not a valid IOHandler.");
@@ -44,9 +44,9 @@ public class IOManagerImpl implements IOManager {
 		boolean success = false;
 		if (context != null) {
 
-			IOHandler[] ioHandlers = getIOHandlers();
-			for (int i = 0; i < ioHandlers.length && !success; i++) {
-				IOHandler ioh = ioHandlers[i];
+			IOHandler[] handlers = getIOHandlers();
+			for (int i = 0; i < handlers.length && !success; i++) {
+				IOHandler ioh = handlers[i];
 				if (ioh.canImport(context, isCollection)) {
 					success = ioh.importContent(context, isCollection);
 				}
@@ -60,9 +60,9 @@ public class IOManagerImpl implements IOManager {
 		boolean success = false;
 		if (context != null && resource != null) {
 
-			IOHandler[] ioHandlers = getIOHandlers();
-			for (int i = 0; i < ioHandlers.length && !success; i++) {
-				IOHandler ioh = ioHandlers[i];
+			IOHandler[] handlers = getIOHandlers();
+			for (int i = 0; i < handlers.length && !success; i++) {
+				IOHandler ioh = handlers[i];
 				if (ioh.canImport(context, resource)) {
 					success = ioh.importContent(context, resource);
 				}
@@ -73,13 +73,13 @@ public class IOManagerImpl implements IOManager {
 	}
 
 	public boolean exportContent(ExportContext context, boolean isCollection) throws IOException {
-		
+
 		boolean success = false;
-		
+
 		if (context != null) {
-			IOHandler[] ioHandlers = getIOHandlers();
-			for (int i = 0; i < ioHandlers.length && !success; i++) {
-				IOHandler ioh = ioHandlers[i];
+			IOHandler[] handlers = getIOHandlers();
+			for (int i = 0; i < handlers.length && !success; i++) {
+				IOHandler ioh = handlers[i];
 				if (ioh.canExport(context, isCollection)) {
 					success = ioh.exportContent(context, isCollection);
 				}
@@ -90,13 +90,13 @@ public class IOManagerImpl implements IOManager {
 	}
 
 	public boolean exportContent(ExportContext context, DavResource resource) throws IOException {
-		
+
 		boolean success = false;
-		
+
 		if (context != null && resource != null) {
-			IOHandler[] ioHandlers = getIOHandlers();
-			for (int i = 0; i < ioHandlers.length && !success; i++) {
-				IOHandler ioh = ioHandlers[i];
+			IOHandler[] handlers = getIOHandlers();
+			for (int i = 0; i < handlers.length && !success; i++) {
+				IOHandler ioh = handlers[i];
 				if (ioh.canExport(context, resource)) {
 					success = ioh.exportContent(context, resource);
 				}
@@ -115,14 +115,15 @@ public class IOManagerImpl implements IOManager {
 	}
 
 	@Override
-	public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength) throws IOException {
-		
+	public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength)
+			throws IOException {
+
 		boolean success = false;
-		
+
 		if (context != null && resource != null) {
-			IOHandler[] ioHandlers = getIOHandlers();
-			for (int i = 0; i < ioHandlers.length && !success; i++) {
-				IOHandler ioh = ioHandlers[i];
+			IOHandler[] handlers = getIOHandlers();
+			for (int i = 0; i < handlers.length && !success; i++) {
+				IOHandler ioh = handlers[i];
 				if (ioh.canExport(context, resource)) {
 					success = ioh.exportContent(context, resource, left, rangeLength);
 				}

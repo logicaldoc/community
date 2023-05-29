@@ -235,11 +235,11 @@ public class PatchPanel extends VLayout {
 		message.setLayoutAlign(VerticalAlignment.TOP);
 		message.setHeight(20);
 
-		VLayout download = prepareActionBar(patch);
+		VLayout downloadLayout = prepareActionBar(patch);
 
 		VLayout infoPanel = new VLayout();
 		infoPanel.setMembersMargin(10);
-		infoPanel.setMembers(form, download);
+		infoPanel.setMembers(form, downloadLayout);
 
 		HLayout body = new HLayout();
 		body.setWidth100();

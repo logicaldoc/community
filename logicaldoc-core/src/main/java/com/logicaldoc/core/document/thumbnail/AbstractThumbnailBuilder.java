@@ -12,4 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractThumbnailBuilder implements ThumbnailBuilder {
 	protected static Logger log = LoggerFactory.getLogger(AbstractThumbnailBuilder.class);
+	
+	protected AbstractThumbnailBuilder() {
+	}
 }

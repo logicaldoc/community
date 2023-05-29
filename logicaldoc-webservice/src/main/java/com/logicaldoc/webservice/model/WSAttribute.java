@@ -241,8 +241,7 @@ public class WSAttribute implements Serializable {
 			attribute.setIntValue((Long) value);
 		} else if (value instanceof Integer) {
 			attribute.type = TYPE_INT;
-			if (value != null)
-				attribute.setIntValue(((Integer) value).longValue());
+			attribute.setIntValue(((Integer) value).longValue());
 		} else if (value instanceof Boolean) {
 			attribute.setIntValue(((Boolean) value).booleanValue() ? 1L : 0L);
 			attribute.type = TYPE_BOOLEAN;

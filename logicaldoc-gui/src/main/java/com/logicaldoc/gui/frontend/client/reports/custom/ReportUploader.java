@@ -105,7 +105,7 @@ public class ReportUploader extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		outputFolderSelector = new FolderSelector("outputFolder", false);
+		outputFolderSelector = new FolderSelector("outputFolder", null);
 		outputFolderSelector.setRequired(true);
 		outputFolderSelector.setWidth(250);
 		outputFolderSelector.setTitle(I18N.message("outputfolder"));

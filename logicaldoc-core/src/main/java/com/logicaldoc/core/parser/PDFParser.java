@@ -44,14 +44,8 @@ public class PDFParser extends AbstractParser {
 				throw new IOException(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
 			} else {
 				if (pdfDocument.isEncrypted()) {
-					try {
-						pdfDocument.close();
-						pdfDocument = PDDocument.load(input, "");
-					} catch (Exception e) {
-						log.error("Error: The document is encrypted.");
-						content.append("The document is encrypted");
-						return;
-					}
+					pdfDocument.close();
+					pdfDocument = PDDocument.load(input, "");
 				}
 
 				if (pdfDocument == null)

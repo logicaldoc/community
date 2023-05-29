@@ -157,9 +157,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			@Override
 			public void onSuccess(GUIDocument result) {
 				DocumentController.get().selected(result);
-				GUIFolder folder = result.getFolder();
-				if (folder != null) {
-					openInFolder(folder.getId(), result.getId());
+				GUIFolder fld = result.getFolder();
+				if (fld != null) {
+					openInFolder(fld.getId(), result.getId());
 				}
 			}
 		});
@@ -220,7 +220,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			scheduleFolderDetailsRefresh();
 	}
 
-	public void changePageSize(Integer pageSize) {
+	public void changePageSize() {
 		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
 			((DocumentsListPanel) listingPanel).updateData(folder);

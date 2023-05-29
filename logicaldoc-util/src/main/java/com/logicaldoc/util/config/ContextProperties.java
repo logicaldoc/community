@@ -33,7 +33,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class ContextProperties extends OrderedProperties {
 
-	private static final String UNABLE_TO_READ_FROM = "Unable to read from {}";
+	private static final String UNABLE_TO_READ_FROM = "Unable to read from %s";
 
 	private static final long serialVersionUID = 1L;
 
@@ -77,9 +77,8 @@ public class ContextProperties extends OrderedProperties {
 
 		try (FileInputStream fis = new FileInputStream(this.file)) {
 			load(fis);
-		} catch (Exception e) {
-			log.error(UNABLE_TO_READ_FROM, filePath, e);
-			throw e;
+		} catch (IOException e) {
+			throw new IOException(String.format(UNABLE_TO_READ_FROM, filePath), e);
 		}
 
 		overrideFile = detectOverrideFile();
@@ -87,9 +86,8 @@ public class ContextProperties extends OrderedProperties {
 			try (FileInputStream fis = new FileInputStream(this.overrideFile)) {
 				load(fis);
 				log.info("Override settings defined in {}", overrideFile.getPath());
-			} catch (Exception e) {
-				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
-				throw e;
+			} catch (IOException e) {
+				throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
 			}
 		}
 	}
@@ -113,14 +111,12 @@ public class ContextProperties extends OrderedProperties {
 		try {
 			file = new File(URLDecoder.decode(fileUrl.getPath(), "UTF-8"));
 		} catch (Exception e) {
-			log.error(UNABLE_TO_READ_FROM, file, e);
-			throw e;
+			throw new IOException(String.format(UNABLE_TO_READ_FROM, file.getPath()), e);
 		}
 		try (FileInputStream fis = new FileInputStream(file)) {
 			load(fis);
-		} catch (Exception e) {
-			log.error(UNABLE_TO_READ_FROM, file, e);
-			throw e;
+		} catch (IOException e) {
+			throw new IOException(String.format(UNABLE_TO_READ_FROM, file.getPath()), e);
 		}
 
 		overrideFile = detectOverrideFile();
@@ -128,9 +124,8 @@ public class ContextProperties extends OrderedProperties {
 			try (FileInputStream fis = new FileInputStream(overrideFile)) {
 				load(fis);
 				log.debug("Override settings defined in {}", overrideFile.getPath());
-			} catch (Exception e) {
-				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
-				throw e;
+			} catch (IOException e) {
+				throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
 			}
 		}
 	}
@@ -143,18 +138,16 @@ public class ContextProperties extends OrderedProperties {
 					load(fis);
 				}
 			}
-		} catch (Exception e) {
-			log.error("Unable to read from " + file.getPath(), e);
-			throw e;
+		} catch (IOException e) {
+			throw new IOException("Unable to read from " + file.getPath(), e);
 		}
 
 		overrideFile = detectOverrideFile();
 		if (overrideFile != null) {
 			try (FileInputStream fis = new FileInputStream(overrideFile)) {
 				load(fis);
-			} catch (Exception e) {
-				log.error(UNABLE_TO_READ_FROM, overrideFile.getPath(), e);
-				throw e;
+			} catch (IOException e) {
+				throw new IOException(String.format(UNABLE_TO_READ_FROM, overrideFile.getPath()), e);
 			}
 		}
 	}
@@ -171,9 +164,8 @@ public class ContextProperties extends OrderedProperties {
 		overrideFile = null;
 		try {
 			load(is);
-		} catch (Exception e) {
-			log.error("Unable to read from stream");
-			throw e;
+		} catch (IOException e) {
+			throw new IOException("Unable to read from stream", e);
 		}
 	}
 
@@ -197,10 +189,7 @@ public class ContextProperties extends OrderedProperties {
 			try (FileOutputStream fos = new FileOutputStream(tmpFile);) {
 				store(fos, "");
 				log.info("Saved settings into temp file {}", tmpFile.getAbsolutePath());
-			} catch (Exception ex) {
-				if (log.isWarnEnabled()) {
-					log.warn(ex.getMessage());
-				}
+			} catch (IOException ex) {
 				throw ex;
 			}
 

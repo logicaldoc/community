@@ -53,14 +53,17 @@ public interface TwoFactorsAuthenticationService extends RemoteService {
 			throws ServerException;
 
 	public static class Instance {
-		private static TwoFactorsAuthenticationServiceAsync instance;
-
+		private static TwoFactorsAuthenticationServiceAsync inst;
+		
+		private Instance() {
+		}
+		
 		public static TwoFactorsAuthenticationServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(TwoFactorsAuthenticationService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(TwoFactorsAuthenticationService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

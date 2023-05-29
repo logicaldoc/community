@@ -134,7 +134,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 				items.add(tagItem);
 				tagItem.setVisible(false);
 				newTagItem.setVisible(false);
-				if ("free".equals(mode) && updateEnabled)
+				if ("free".equals(mode))
 					items.add(newTagItem);
 			}
 		}

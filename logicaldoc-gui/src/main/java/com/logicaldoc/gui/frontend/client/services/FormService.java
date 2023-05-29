@@ -68,14 +68,17 @@ public interface FormService extends RemoteService {
 	void invite(long formId, GUIEmail email, String locale) throws ServerException;
 
 	public static class Instance {
-		private static FormServiceAsync instance;
+		private static FormServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static FormServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(FormService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(FormService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

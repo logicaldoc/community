@@ -84,13 +84,9 @@ public class DocumentsDS extends DataSource {
 		setDataURL("data/documents.xml?status=" + status + "&max=" + max);
 	}
 
-	public DocumentsDS(String url, String locale, List<String> extendedAttributes) {
+	public DocumentsDS(String url, List<String> extendedAttributes) {
 		prepareFields(extendedAttributes);
 		setDataURL(url);
-	}
-
-	public DocumentsDS(String url, String locale) {
-		this(url, locale, null);
 	}
 
 	private void prepareFields(List<String> extendedAttributes) {

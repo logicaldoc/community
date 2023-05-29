@@ -372,8 +372,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected FormItem prepareFolderItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
 		FormItem item;
-		item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getLabel(),
-				checkMandatory ? !att.isMandatory() : true, multiValIcons);
+		item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getLabel(), multiValIcons);
 		FolderSelector selector = (FolderSelector) item;
 		if (object.getValue(att.getName()) != null) {
 			selector.setFolder(att.getIntValue(), att.getStringValue());
@@ -782,14 +781,13 @@ public class ExtendedPropertiesPanel extends HLayout {
 					String editedAttributeName = editedItem.getName().substring(1).replace(Constants.BLANK_PLACEHOLDER,
 							" ");
 
-					if (dependsOn.equals(editedAttributeName)) {
-						if (event.getItem() != null && !event.getItem().equals(item)) {
-							/*
-							 * Clear the currently selected item so the user can
-							 * choose an option from the new list
-							 */
-							item.clearValue();
-						}
+					if (dependsOn.equals(editedAttributeName) && event.getItem() != null
+							&& !event.getItem().equals(item)) {
+						/*
+						 * Clear the currently selected item so the user can
+						 * choose an option from the new list
+						 */
+						item.clearValue();
 					}
 				}
 			}

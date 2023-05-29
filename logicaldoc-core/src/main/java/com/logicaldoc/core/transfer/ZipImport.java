@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -82,16 +81,7 @@ public class ZipImport {
 			ZipUtil zipUtil = new ZipUtil();
 			zipUtil.unzip(zipFile.getPath(), dir.getPath());
 			File[] files = dir.listFiles();
-
-			for (int i = 0; i < files.length; i++) {
-				if (StringUtils.isNotEmpty(files[i].getName())
-						|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
-					try {
-						addEntry(files[i], parent);
-					} catch (PersistenceException e) {
-						log.error("Error adding entry " + files[i].getName(), e);
-					}
-			}
+			addEntries(parent, files);
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		} finally {
@@ -108,6 +98,18 @@ public class ZipImport {
 			} catch (Exception e) {
 				log.warn("Cannot notify zip import", e);
 			}
+	}
+
+	private void addEntries(Folder parentFolder, File[] files) {
+		for (int i = 0; i < files.length; i++) {
+			if (StringUtils.isNotEmpty(files[i].getName())
+					|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
+				try {
+					addEntry(files[i], parentFolder);
+				} catch (PersistenceException e) {
+					log.error("Error adding entry " + files[i].getName(), e);
+				}
+		}
 	}
 
 	private File prepareUnzipDir(long userId) {
@@ -128,8 +130,7 @@ public class ZipImport {
 		return dir;
 	}
 
-	public void process(String zipsource, Locale locale, Folder parent, long userId, Long templateId, String sessionId)
-			throws PersistenceException {
+	public void process(String zipsource, Folder parent, long userId, String sessionId) throws PersistenceException {
 		File srcfile = new File(zipsource);
 		process(srcfile, parent, userId, sessionId);
 	}
@@ -151,8 +152,7 @@ public class ZipImport {
 		transaction.setSessionId(sessionId);
 
 		Session session = SessionManager.get().get(sessionId);
-		if (transaction != null)
-			transaction.setSession(session);
+		transaction.setSession(session);
 
 		if (file.isDirectory()) {
 			// creates a logicaldoc folder

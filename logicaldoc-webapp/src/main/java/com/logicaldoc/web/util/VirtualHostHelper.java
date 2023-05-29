@@ -68,7 +68,7 @@ public class VirtualHostHelper {
 		sbaseURL.append(serverName);
 
 		if (serverPort != 0) {
-			log.debug("serverPort != 0; serverPort: " + serverPort);
+			log.debug("serverPort != 0; serverPort: {}", serverPort);
 			if (("http".equals(scheme) && serverPort != HTTP_PORT_NUMBER)
 					|| ("https".equals(scheme) && serverPort != HTTPS_PORT_NUMBER)) {
 				sbaseURL.append(':');
@@ -109,7 +109,7 @@ public class VirtualHostHelper {
 		String logicaldocVH = httpRequest.getHeader(VH_HEADER);
 		if (!local && logicaldocVH != null && logicaldocVH.contains("http")) {
 			log.debug("logicaldocVH.contains(http)");
-			log.debug("logicaldocVH: " + logicaldocVH);
+			log.debug("logicaldocVH: {}", logicaldocVH);
 			baseURL = logicaldocVH;
 		} else {
 			// default values
@@ -129,7 +129,7 @@ public class VirtualHostHelper {
 					if (forwardedHost.contains(":")) {
 						serverName = forwardedHost.split(":")[0];
 						serverPort = Integer.valueOf(forwardedHost.split(":")[1]);
-						log.debug("forwardedHost contains ':', serverPort: " + serverPort);
+						log.debug("forwardedHost contains ':', serverPort: {}", serverPort);
 					} else {
 						log.debug("forwardedHost NOT contains ':', using fallback");
 						serverName = forwardedHost;
@@ -157,7 +157,7 @@ public class VirtualHostHelper {
 			log.info("forwardedPort != null");
 			try {
 				serverPort = Integer.parseInt(forwardedPort);
-				log.debug("forwardedPort != null; serverPort: " + serverPort);
+				log.debug("forwardedPort != null; serverPort: {}", serverPort);
 			} catch (NumberFormatException e) {
 				log.error("Unable to get forwarded port from header", e);
 			}

@@ -434,19 +434,19 @@ public class FormatConverterManager {
 
 		String inOutkey = composeKey(inFileName, outFileName);
 
-		List<FormatConverter> converters = getConverters().get(inOutkey);
-		if (converters == null || converters.isEmpty())
-			converters = getConverters().get("*-pdf");
-		if (converters == null || converters.isEmpty())
-			log.warn("No format converter for file " + inFileName);
+		List<FormatConverter> convrters = getConverters().get(inOutkey);
+		if (convrters == null || convrters.isEmpty())
+			convrters = getConverters().get("*-pdf");
+		if (convrters == null || convrters.isEmpty())
+			log.warn("No format converter for file {}", inFileName);
 
 		// Get the first available converter
-		FormatConverter converter = converters != null ? converters.get(0) : null;
+		FormatConverter converter = convrters != null ? convrters.get(0) : null;
 
 		// Check if a special binding is configured
 		String currentConverter = config.getProperty("converter." + inOutkey);
 		if (StringUtils.isNotEmpty(currentConverter))
-			for (FormatConverter formatConverter : converters) {
+			for (FormatConverter formatConverter : convrters) {
 				if (formatConverter.getClass().getName().equals(currentConverter)) {
 					converter = formatConverter;
 				}

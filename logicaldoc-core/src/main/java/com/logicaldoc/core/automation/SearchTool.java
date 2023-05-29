@@ -128,9 +128,8 @@ public class SearchTool {
 				hitsIdsCondition.append(")");
 			}
 			
-			StringBuilder richQuery = new StringBuilder();
 			// Find real documents
-			richQuery = new StringBuilder(
+			StringBuilder richQuery = new StringBuilder(
 					"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 			richQuery
 					.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");

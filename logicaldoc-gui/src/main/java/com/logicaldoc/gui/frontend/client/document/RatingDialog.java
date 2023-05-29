@@ -136,7 +136,7 @@ public class RatingDialog extends Window {
 					@Override
 					public void onSuccess(Integer rating) {
 						GuiLog.info(I18N.message("votesaved"), null);
-						afterSaveOrDelete(rating);
+						afterSaveOrDelete();
 					}
 				});
 			}
@@ -184,7 +184,7 @@ public class RatingDialog extends Window {
 
 							@Override
 							public void onSuccess(Integer rating) {
-								afterSaveOrDelete(rating);
+								afterSaveOrDelete();
 							}
 						});
 					});
@@ -198,7 +198,7 @@ public class RatingDialog extends Window {
 		addItem(layout);
 	}
 
-	private void afterSaveOrDelete(Integer rat) {
+	private void afterSaveOrDelete() {
 		// We have to reload the document because
 		// the rating is changed. We need to know if
 		// this operation into the Documents list

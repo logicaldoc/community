@@ -176,8 +176,8 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 		setAttributes(new HashMap<>());
 		try {
-			for (String name : source.getAttributes().keySet()) {
-				getAttributes().put(name, source.getAttributes().get(name));
+			for (String attName : source.getAttributes().keySet()) {
+				getAttributes().put(attName, source.getAttributes().get(attName));
 			}
 		} catch (LazyInitializationException x) {
 			// may happen do nothing

@@ -274,6 +274,9 @@ public interface WorkflowService extends RemoteService {
 	public static class Instance {
 		private static WorkflowServiceAsync instance;
 
+		private Instance() {
+		}
+		
 		public static WorkflowServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(WorkflowService.class);

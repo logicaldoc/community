@@ -36,11 +36,17 @@ import com.logicaldoc.util.sql.SqlUtil;
 public class FolderSearch extends Search {
 
 	private static final String EQUAL_PARAMETER = " = ?)";
+
 	private static final String NOT = "(not ";
+
 	private static final String LIKE = " like '%";
+
 	private static final String IS_NOT_NULL = " is not null ";
+
 	private static final String IS_NULL = " is null ";
+
 	private static final String LOWER = "lower(";
+
 	private static final String AND = " and ";
 
 	@SuppressWarnings("unchecked")
@@ -127,7 +133,7 @@ public class FolderSearch extends Search {
 
 		options.setExpression(query.toString());
 
-		log.info("executing query {}", query.toString());
+		log.info("executing query {}", query);
 		log.info("with parameters {}", params);
 
 		return params.toArray(new Serializable[0]);
@@ -142,7 +148,7 @@ public class FolderSearch extends Search {
 	 * @param params
 	 * @param query
 	 * 
-	 * PersistenceException error at data layer
+	 *        PersistenceException error at data layer
 	 */
 	private void appendWhereClause(boolean searchAliases, ArrayList<Serializable> params, StringBuilder query)
 			throws PersistenceException {
@@ -513,13 +519,11 @@ public class FolderSearch extends Search {
 		int counter = 0;
 		if (((FolderSearchOptions) options).getCriteria() != null)
 			for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
-				if (criterion.isExtendedAttribute()) {
-					if (!criterion.isEmpty()) {
-						counter++;
-						query.append(", ld_folder_ext C" + counter);
-						if ("or".equals(options.getTopOperator()))
-							break;
-					}
+				if (criterion.isExtendedAttribute() && !criterion.isEmpty()) {
+					counter++;
+					query.append(", ld_folder_ext C" + counter);
+					if ("or".equals(options.getTopOperator()))
+						break;
 				}
 			}
 	}
@@ -547,13 +551,11 @@ public class FolderSearch extends Search {
 		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Collection<Long> ids = new HashSet<>();
 		for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
-			if (criterion.getType() == FolderCriterion.TYPE_FOLDER) {
-				if (!criterion.isEmpty()) {
-					if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
-						ids.addAll(folderDAO.findFolderIdByUserIdInPath(user.getId(), criterion.getLongValue()));
-					} else if (folderDAO.isReadEnabled(criterion.getLongValue(), user.getId())) {
-						ids.add(criterion.getLongValue());
-					}
+			if (criterion.getType() == FolderCriterion.TYPE_FOLDER && !criterion.isEmpty()) {
+				if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
+					ids.addAll(folderDAO.findFolderIdByUserIdInPath(user.getId(), criterion.getLongValue()));
+				} else if (folderDAO.isReadEnabled(criterion.getLongValue(), user.getId())) {
+					ids.add(criterion.getLongValue());
 				}
 			}
 		}

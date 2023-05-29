@@ -2,6 +2,7 @@ package com.logicaldoc.web.listener;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.Driver;
@@ -103,12 +104,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			Driver d = null;
 			while (drivers.hasMoreElements()) {
 				d = drivers.nextElement();
-				try {
-					DriverManager.deregisterDriver(d);
-					log.warn(String.format("Driver %s unregistered", d.getClass().getName()));
-				} catch (SQLException ex) {
-					log.warn(String.format("Error unregistering driver %s", d), ex);
-				}
+				registerDriver(d);
 			}
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
@@ -121,16 +117,29 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			synchronized (t) {
 				if ((t.getName().toLowerCase().contains("abandoned connection") || t.getName().startsWith("Scheduler_"))
 						&& !Thread.currentThread().equals(t) && !t.isInterrupted())
-					try {
-						t.interrupt();
-						log.warn("Killed thread {}", t.getName());
-					} catch (Exception e) {
-						log.warn("Error killing {}", t.getName());
-					}
+					interruptThread(t);
 			}
 		}
 
 		log.warn("Application stopped");
+	}
+
+	private static void interruptThread(Thread thread) {
+		try {
+			thread.interrupt();
+			log.warn("Killed thread {}", thread.getName());
+		} catch (Exception e) {
+			log.warn("Error killing {}", thread.getName());
+		}
+	}
+
+	private static void registerDriver(Driver driver) {
+		try {
+			DriverManager.deregisterDriver(driver);
+			log.warn(String.format("Driver %s unregistered", driver.getClass().getName()));
+		} catch (SQLException ex) {
+			log.warn(String.format("Error unregistering driver %s", driver), ex);
+		}
 	}
 
 	@Override
@@ -228,17 +237,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	private void initializeLogging() {
 		String log4jPath = null;
 		try {
-			URL configFile = null;
-			try {
-				configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
-			} catch (Exception t) {
-				// Nothing to do
-			}
-
-			if (configFile == null)
-				configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
-
-			log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
+			log4jPath = getLogConfigFilePath();
 
 			// Setup the correct logs folder
 			ContextProperties config = new ContextProperties();
@@ -256,6 +255,22 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		}
 	}
 
+	private String getLogConfigFilePath() throws UnsupportedEncodingException {
+		String log4jPath;
+		URL configFile = null;
+		try {
+			configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
+		} catch (Exception t) {
+			// Nothing to do
+		}
+
+		if (configFile == null)
+			configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
+
+		log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
+		return log4jPath;
+	}
+
 	/**
 	 * Unpacks the plugin that are newly installed and positioned in the plugins
 	 * folder
@@ -270,7 +285,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		File webappDir = new File(context.getRealPath("/"));
 		if (archives != null)
 			for (File archive : archives) {
-				System.out.println("Unpack plugin " + archive.getName());
+				log.info("Unpack plugin {}", archive.getName());
 				ZipUtil zipUtil = new ZipUtil();
 				zipUtil.unzip(archive.getPath(), webappDir.getPath());
 
@@ -281,7 +296,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 				String pluginName = archive.getName().replace("-plugin.zip", "");
 				pluginName = pluginName.substring(0, pluginName.lastIndexOf('-'));
-				System.out.println("Remove installation marker of plugin " + pluginName);
+				log.info("Remove installation marker of plugin {}", pluginName);
 				File pluginDir = new File(pluginsDir, pluginName);
 				File[] installationMarkers = pluginDir.listFiles((File dir, String fileName) -> {
 					return fileName.toLowerCase().startsWith("install-");

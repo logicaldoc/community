@@ -44,10 +44,10 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
 		String username = String.valueOf(auth.getPrincipal());
-		
+
 		HttpServletRequest httpReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
-		
+
 		String password = getPassword(auth, httpReq);
 
 		String key = httpReq.getParameter("key");
@@ -135,14 +135,16 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 			LoginThrottle.recordFailure(username, client, owte);
 
 			throw new CredentialsExpiredException(owte.getMessage());
-		} catch (Throwable ae) {
-			String message = String.format("Security checks failed for user %s - %s", username, ae.getMessage());
-			log.warn(message, ae);
-
-			if (ae instanceof com.logicaldoc.core.security.authentication.AuthenticationException)
-				LoginThrottle.recordFailure(username, client,
-						(com.logicaldoc.core.security.authentication.AuthenticationException) ae);
-			throw new CredentialsExpiredException(ae.getMessage() != null ? ae.getMessage() : "badcredentials");
+		} catch (com.logicaldoc.core.security.authentication.AuthenticationException ae) {
+			LoginThrottle.recordFailure(username, client,
+					(com.logicaldoc.core.security.authentication.AuthenticationException) ae);
+			throw new CredentialsExpiredException(ae.getMessage() != null
+					? String.format("Security checks failed for user %s - %s", username, ae.getMessage())
+					: "badcredentials");
+		} catch (Exception e) {
+			throw new CredentialsExpiredException(e.getMessage() != null
+					? String.format("Security checks failed for user %s - %s", username, e.getMessage())
+					: "badcredentials");
 		}
 	}
 

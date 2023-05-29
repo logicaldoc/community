@@ -100,7 +100,7 @@ public class UpdatePanel extends VLayout {
 					onUpdateUnavailable();
 				} else if (parameters.length == 1 && parameters[0].getName().equals("error")) {
 					onUpdateTemporarilyUnavailable(parameters[0].getValue());
-				} else if (parameters != null) {
+				} else {
 					updateFileName = Util.getValue("file", parameters);
 
 					DynamicForm form = new DynamicForm();
@@ -132,11 +132,11 @@ public class UpdatePanel extends VLayout {
 					message.setLayoutAlign(VerticalAlignment.TOP);
 					message.setHeight(20);
 
-					VLayout download = prepareActionsBar(parameters);
+					VLayout downloadLayout = prepareActionsBar(parameters);
 
 					VLayout infoPanel = new VLayout();
 					infoPanel.setMembersMargin(10);
-					infoPanel.setMembers(form, download);
+					infoPanel.setMembers(form, downloadLayout);
 
 					HLayout body = new HLayout();
 					body.setWidth100();

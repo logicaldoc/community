@@ -80,7 +80,7 @@ public class ResourceServiceImpl implements ResourceService {
 		this.documentManager = documentManager;
 	}
 
-	private Resource marshallFolder(Folder folder, long userId, WebdavSession session) throws PersistenceException {
+	private Resource marshallFolder(Folder folder, WebdavSession session) throws PersistenceException {
 		Resource resource = new ResourceImpl();
 		resource.setID(String.valueOf(folder.getId()));
 		resource.setContentLength(0L);
@@ -150,33 +150,33 @@ public class ResourceServiceImpl implements ResourceService {
 			if (folders != null) {
 				for (Folder currentFolder : folders) {
 					if (currentFolder.getHidden() == 0)
-						resourceList.add(marshallFolder(currentFolder, parentResource.getRequestedPerson(),
-								parentResource.getSession()));
+						resourceList.add(marshallFolder(currentFolder, parentResource.getSession()));
 				}
 			}
 
-			Collection<Document> documents = documentDAO.findByFolder(folderID, null);
-			for (Iterator<Document> iterator = documents.iterator(); iterator.hasNext();) {
-				Document document = iterator.next();
-				try {
-					checkPublished(user, document);
-				} catch (Exception t) {
-					continue;
-				}
-				resourceList.add(marshallDocument(document, parentResource.getSession()));
-			}
+			getDocumentChildren(parentResource, resourceList, user);
 		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}
 
 		return resourceList;
 	}
 
-	private boolean isFolderAccessible(Resource parentResource, final Long folderID)
+	private void getDocumentChildren(Resource parentResource, List<Resource> resourceList, User user)
 			throws PersistenceException {
-		//FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		Collection<Document> documents = documentDAO.findByFolder(Long.parseLong(parentResource.getID()), null);
+		for (Iterator<Document> iterator = documents.iterator(); iterator.hasNext();) {
+			Document document = iterator.next();
+			try {
+				checkPublished(user, document);
+			} catch (Exception t) {
+				continue;
+			}
+			resourceList.add(marshallDocument(document, parentResource.getSession()));
+		}
+	}
 
+	private boolean isFolderAccessible(Resource parentResource, final Long folderID) throws PersistenceException {
 		boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
 
 		if (hasAccess == false) {
@@ -195,7 +195,6 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource getResource(String requestPath, WebdavSession session) throws DavException {
-		//log.trace("Find DAV resource: {}", requestPath);
 		log.debug("getResource: {}", requestPath);
 
 		validateSession(session);
@@ -231,7 +230,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 			// if this resource request is a folder
 			if (folder != null)
-				return marshallFolder(folder, userId, session);
+				return marshallFolder(folder, session);
 		} catch (Exception e) {
 			// Nothing to do
 		}
@@ -315,20 +314,14 @@ public class ResourceServiceImpl implements ResourceService {
 				folder = folderDAO.findRoot(tenantId);
 			else {
 				log.debug("resourcePath: {}", resourcePath);
-				log.debug("name: {}", name);				
-//				if (resourcePath.endsWith("/") || name.startsWith("/")) {
-//					log.debug("Looking for resource {}{}", resourcePath, name);
-//					folder = folderDAO.findByPathExtended(resourcePath + name, tenantId);
-//				} else {
-//					log.debug("Looking for resource {}/{}", resourcePath, name);
-//					folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
-//				}
+				log.debug("name: {}", name);
+
 				String folderToFind = resourcePath + "/" + name;
 				folderToFind = folderToFind.replace("//", "/");
 				log.debug("folderToFind: {}", folderToFind);
 				folder = folderDAO.findByPathExtended(folderToFind, tenantId);
 			}
-			return marshallFolder(folder, userId, session);
+			return marshallFolder(folder, session);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -368,12 +361,11 @@ public class ResourceServiceImpl implements ResourceService {
 			try {
 				createdFolder = folderDAO.create(parentFolder, newFolder, true, transaction);
 			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
 				throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 
 			try {
-				return this.marshallFolder(createdFolder, parentResource.getRequestedPerson(), session);
+				return this.marshallFolder(createdFolder, session);
 			} catch (PersistenceException e1) {
 				throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 			}
@@ -385,40 +377,46 @@ public class ResourceServiceImpl implements ResourceService {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Write Access not granted to this user");
 		}
 
+		User user = getUser(parentResource);
+
+		try {
+			// Create the document history event
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSessionId(sid);
+			transaction.setEvent(DocumentEvent.STORED.toString());
+			transaction.setComment("");
+			transaction.setUser(user);
+
+			Document doc = new Document();
+			doc.setFileName(name);
+			doc.setFolder(parentFolder);
+			doc.setLocale(user.getLocale());
+			doc.setTenantId(session.getTenantId());
+
+			createDocument(context, doc, transaction);
+		} catch (Exception e) {
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+		}
+
+		return null;
+	}
+
+	private void createDocument(ImportContext context, Document doc, DocumentHistory transaction) {
+		try (InputStream is = context.getInputStream()) {
+			documentManager.create(is, doc, transaction);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	private User getUser(Resource parentResource) throws DavException {
 		User user = null;
 		try {
 			user = userDAO.findById(parentResource.getRequestedPerson());
 		} catch (PersistenceException e1) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 		}
-
-		InputStream is = context.getInputStream();
-		try {
-			try {
-				// Create the document history event
-				DocumentHistory transaction = new DocumentHistory();
-				transaction.setSessionId(sid);
-				transaction.setEvent(DocumentEvent.STORED.toString());
-				transaction.setComment("");
-				transaction.setUser(user);
-
-				Document doc = new Document();
-				doc.setFileName(name);
-				doc.setFolder(parentFolder);
-				doc.setLocale(user.getLocale());
-				doc.setTenantId(session.getTenantId());
-
-				documentManager.create(is, doc, transaction);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			} finally {
-				is.close();
-			}
-		} catch (Exception e) {
-			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-		}
-
-		return null;
+		return user;
 	}
 
 	private long getRootId(Folder parentFolder) throws DavException {
@@ -544,7 +542,6 @@ public class ResourceServiceImpl implements ResourceService {
 			document = documentDAO.findById(Long.parseLong(source.getID()));
 			user = userDAO.findById(source.getRequestedPerson());
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
 
@@ -601,8 +598,6 @@ public class ResourceServiceImpl implements ResourceService {
 	private Resource folderRenameOrMove(Resource source, Resource destination, WebdavSession session, String sid)
 			throws DavException {
 
-//		log.info("Rename or Move folder {} to {}", source.getPath(), destination.getPath());
-
 		Folder currentFolder = getFolder(source);
 
 		long currentParentFolder = currentFolder.getParentId();
@@ -627,48 +622,57 @@ public class ResourceServiceImpl implements ResourceService {
 				transaction.setUser(user);
 
 				// we are doing a folder move
-				try {
-					Folder destParentFolder = folderDAO.findById(destinationParentFolder);
-					folderDAO.initialize(destParentFolder);
-					folderDAO.move(currentFolder, destParentFolder, transaction);
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
-					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during Folder Move");
-				}
+				moveFolder(currentFolder, destinationParentFolder, transaction);
 
-				return this.marshallFolder(currentFolder, source.getRequestedPerson(), session);
+				return this.marshallFolder(currentFolder, session);
 			} else {
 				if (!source.isRenameEnabled())
 					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
 
-				// Folder Rename
-				currentFolder.setName(source.getName());
-
 				User user = (User) session.getObject("user");
 
-				// Add a folder history entry
 				FolderHistory transaction = new FolderHistory();
 				transaction.setUser(user);
 				transaction.setEvent(FolderEvent.RENAMED.toString());
 				transaction.setSessionId(sid);
-				try {
-					folderDAO.store(currentFolder, transaction);
-				} catch (PersistenceException e) {
-					log.warn(e.getMessage(), e);
-				}
 
-				if (destination != null)
-					currentFolder.setParentId(Long.parseLong(destination.getID()));
-				try {
-					folderDAO.store(currentFolder);
-				} catch (PersistenceException e) {
-					log.error(e.getMessage(), e);
-					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-				}
-				return this.marshallFolder(currentFolder, source.getRequestedPerson(), session);
+				renameFolder(currentFolder, source.getName(), destinationParentFolder, transaction);
+
+				return this.marshallFolder(currentFolder, session);
 			}
 		} catch (PersistenceException e) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
+		}
+	}
+
+	private void renameFolder(Folder currentFolder, String newName, long destinationParentFolder,
+			FolderHistory transaction) throws DavException {
+		// Folder Rename
+		currentFolder.setName(newName);
+
+		// Add a folder history entry
+		try {
+			folderDAO.store(currentFolder, transaction);
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+		}
+
+		currentFolder.setParentId(destinationParentFolder);
+		try {
+			folderDAO.store(currentFolder);
+		} catch (PersistenceException e) {
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+		}
+	}
+
+	private void moveFolder(Folder currentFolder, long destinationParentFolder, FolderHistory transaction)
+			throws DavException {
+		try {
+			Folder destParentFolder = folderDAO.findById(destinationParentFolder);
+			folderDAO.initialize(destParentFolder);
+			folderDAO.move(currentFolder, destParentFolder, transaction);
+		} catch (Exception e) {
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during Folder Move");
 		}
 	}
 
@@ -691,7 +695,7 @@ public class ResourceServiceImpl implements ResourceService {
 		String sid = getSid(session);
 		try {
 			Folder folder = assertResourceIsNotWorkspace(resource);
-			
+
 			User user = userDAO.findById(resource.getRequestedPerson());
 			if (resource.isFolder()) {
 				assertResourceIsDeletable(resource);
@@ -705,7 +709,8 @@ public class ResourceServiceImpl implements ResourceService {
 						transaction);
 
 				if (notDeletableFolders.size() > 0)
-					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to delete some subfolders.");
+					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+							"Unable to delete some subfolders.");
 			} else if (!resource.isFolder()) {
 				// verify the write permission on the parent folder
 				Resource parent = getParentResource(resource);
@@ -718,7 +723,6 @@ public class ResourceServiceImpl implements ResourceService {
 				transaction.setUser(user);
 				transaction.setEvent(DocumentEvent.DELETED.toString());
 
-				
 				Document document = documentDAO.findById(Long.parseLong(resource.getID()));
 				assertDocumentIsNotImmutable(user, document);
 
@@ -795,10 +799,8 @@ public class ResourceServiceImpl implements ResourceService {
 					documentManager.copyToFolder(document, folder, transaction);
 				}
 			} catch (DavException de) {
-				log.info(de.getMessage(), de);
 				throw de;
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
 				throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 		}
@@ -813,7 +815,7 @@ public class ResourceServiceImpl implements ResourceService {
 	public Resource getParentResource(Resource resource) {
 		try {
 			Document document = documentDAO.findById(Long.parseLong(resource.getID()));
-			return this.marshallFolder(document.getFolder(), resource.getRequestedPerson(), resource.getSession());
+			return this.marshallFolder(document.getFolder(), resource.getSession());
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -897,7 +899,7 @@ public class ResourceServiceImpl implements ResourceService {
 			documentManager.checkout(Long.parseLong(resource.getID()), transaction);
 		} catch (Exception e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-		} 
+		}
 	}
 
 	public boolean isCheckedOut(Resource resource) throws NumberFormatException, PersistenceException {
@@ -957,7 +959,6 @@ public class ResourceServiceImpl implements ResourceService {
 
 			resource.setCheckedOut(false);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
@@ -976,11 +977,11 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Override
 	public void addBookmark(Resource resource, WebdavSession session) throws DavException {
-        try {
+		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
-			
+
 			BookmarkDAO bdao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
-			
+
 			Bookmark bmark = new Bookmark();
 			if (resource.isFolder()) {
 				bmark.setType(Bookmark.TYPE_FOLDER);
@@ -992,40 +993,38 @@ public class ResourceServiceImpl implements ResourceService {
 				bmark.setType(Bookmark.TYPE_DOCUMENT);
 				bmark.setTitle(resource.getName());
 				// get the file extension
-			    String fileType = FilenameUtils.getExtension(resource.getName());
+				String fileType = FilenameUtils.getExtension(resource.getName());
 				bmark.setFileType(fileType);
 				bmark.setUserId(user.getId());
-				bmark.setTargetId(Long.parseLong(resource.getID()));		
+				bmark.setTargetId(Long.parseLong(resource.getID()));
 			}
-							
+
 			bdao.store(bmark);
-		} catch (Exception e) { 
-			log.error(e.getMessage(), e);
+		} catch (Exception e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-		} 
+		}
 	}
 
 	@Override
 	public void deleteBookmark(Resource resource, WebdavSession session) throws DavException {
 		log.info("deleteBookmark");
-        try {
-			User user = userDAO.findById(resource.getRequestedPerson());		
-			
-			BookmarkDAO bdao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);		
+		try {
+			User user = userDAO.findById(resource.getRequestedPerson());
+
+			BookmarkDAO bdao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 
 			Bookmark bkm = null;
 			if (resource.isFolder()) {
 				bkm = bdao.findByUserIdAndFolderId(user.getId(), Long.parseLong(resource.getID()));
-			} else {	
-				bkm = bdao.findByUserIdAndDocId(user.getId(), Long.parseLong(resource.getID()));		
+			} else {
+				bkm = bdao.findByUserIdAndDocId(user.getId(), Long.parseLong(resource.getID()));
 			}
-							
+
 			if (bkm != null) {
 				bdao.delete(bkm.getId());
-			} 
-		} catch (Exception e) { 
-			log.error(e.getMessage(), e);
+			}
+		} catch (Exception e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-		} 
+		}
 	}
 }

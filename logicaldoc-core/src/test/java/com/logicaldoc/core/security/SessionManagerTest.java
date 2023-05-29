@@ -4,8 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
-import com.logicaldoc.core.security.dao.GroupDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -23,7 +21,7 @@ public class SessionManagerTest extends AbstractCoreTCase {
 	public void setUp() throws Exception {
 		super.setUp();
 	}
-	
+
 	@Test
 	public void testNewSession() {
 		SessionManager sm = SessionManager.get();
@@ -32,7 +30,7 @@ public class SessionManagerTest extends AbstractCoreTCase {
 		Assert.assertNotNull(session1);
 		Session session2 = sm.newSession("admin", "admin", null);
 		Assert.assertNotNull(session2);
-		Assert.assertFalse(session1.equals(session2));
+		Assert.assertNotSame(session1, session2);
 		Assert.assertEquals(2, sm.getSessions().size());
 	}
 
@@ -44,7 +42,7 @@ public class SessionManagerTest extends AbstractCoreTCase {
 		Assert.assertNotNull(session1);
 		Session session2 = sm.newSession("admin", "admin", null);
 		Assert.assertNotNull(session2);
-		Assert.assertFalse(session1.equals(session2));
+		Assert.assertNotSame(session1, session2);
 		Assert.assertEquals(2, sm.getSessions().size());
 
 		sm.kill(session1.getSid());
@@ -64,6 +62,12 @@ public class SessionManagerTest extends AbstractCoreTCase {
 		Session session1 = sm.newSession("admin", "admin", null);
 		Assert.assertNotNull(session1);
 
+		waiting(timeout);
+
+		Assert.assertFalse(sm.isOpen(session1.getSid()));
+	}
+	
+	private void waiting(int timeout) {
 		synchronized (this) {
 			try {
 				wait(1000 * 60 * timeout);
@@ -71,7 +75,5 @@ public class SessionManagerTest extends AbstractCoreTCase {
 				Thread.currentThread().interrupt();
 			}
 		}
-
-		Assert.assertFalse(sm.isOpen(session1.getSid()));
 	}
 }

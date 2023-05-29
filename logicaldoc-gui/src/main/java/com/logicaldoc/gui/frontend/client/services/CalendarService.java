@@ -25,7 +25,7 @@ public interface CalendarService extends RemoteService {
 	 * 
 	 * @param event the event to save
 	 * 
-	 * @throws ServerException an error happened in the server application 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void saveEvent(GUICalendarEvent event) throws ServerException;
 
@@ -84,14 +84,17 @@ public interface CalendarService extends RemoteService {
 	public int countUserEvents(String username, Date end) throws ServerException;
 
 	public static class Instance {
-		private static CalendarServiceAsync instance;
+		private static CalendarServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static CalendarServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(CalendarService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(CalendarService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

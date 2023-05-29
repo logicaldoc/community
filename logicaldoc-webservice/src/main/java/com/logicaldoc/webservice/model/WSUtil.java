@@ -30,6 +30,9 @@ import com.logicaldoc.util.time.DateUtil;
 public class WSUtil {
 	protected static Logger log = LoggerFactory.getLogger(WSUtil.class);
 
+	private WSUtil() {
+	}
+
 	public static WSDocument toWSDocument(AbstractDocument document) {
 		WSDocument wsDoc = new WSDocument();
 
@@ -41,13 +44,13 @@ public class WSUtil {
 			wsDoc.setWorkflowStatus(document.getWorkflowStatus());
 			wsDoc.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
 			wsDoc.setColor(document.getColor());
-			
+
 			setTemplateIntoWsDocument(document, wsDoc);
-			
+
 			wsDoc.setImmutable(document.getImmutable());
-			
+
 			setFolderIntoWsDocument(document, wsDoc);
-			
+
 			wsDoc.setIndexed(document.getIndexed());
 			wsDoc.setVersion(document.getVersion());
 			wsDoc.setFileVersion(document.getFileVersion());
@@ -77,7 +80,7 @@ public class WSUtil {
 			wsDoc.setBarcoded(document.getBarcoded());
 
 			setDatesIntoWsDocument(document, wsDoc);
-			
+
 			wsDoc.setPublished(document.getPublished());
 
 			// Populate the attributes
@@ -87,7 +90,7 @@ public class WSUtil {
 			if (document.getTags() != null && document.getTags().size() > 0) {
 				tags = new String[document.getTags().size()];
 				List<String> docTags = new ArrayList<>(document.getTagsAsWords());
-				if (docTags != null && docTags.size() > 0) {
+				if (docTags.size() > 0) {
 					for (int j = 0; j < docTags.size(); j++) {
 						tags[j] = docTags.get(j);
 					}
@@ -175,8 +178,7 @@ public class WSUtil {
 		if (folder == null) {
 			throw new PersistenceException("error - folder not found");
 		}
-		// fdao.initialize(folder);
-		
+
 		Document doc = new Document();
 		doc.setFileName(wsDoc.getFileName());
 		doc.setFolder(folder);
@@ -195,7 +197,7 @@ public class WSUtil {
 		doc.setTagsFromWords(tagsSet);
 
 		setAttributesIntoDocument(wsDoc, doc);
-		
+
 		doc.setCustomId(wsDoc.getCustomId());
 		doc.setLanguage(wsDoc.getLanguage());
 		doc.setImmutable(wsDoc.getImmutable());
@@ -206,9 +208,9 @@ public class WSUtil {
 		doc.setPages(wsDoc.getPages());
 		doc.setNature(wsDoc.getNature());
 		doc.setFormId(wsDoc.getFormId());
-		
+
 		setDatesIntoDocument(wsDoc, doc);
-		
+
 		doc.setPublisher(wsDoc.getPublisher());
 		doc.setPublisherId(wsDoc.getPublisherId());
 		doc.setCreator(wsDoc.getCreator());
@@ -223,13 +225,13 @@ public class WSUtil {
 		if (wsDoc.getRating() != null)
 			doc.setRating(wsDoc.getRating());
 		doc.setPublished(wsDoc.getPublished());
-		
+
 		doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
 		doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
 
 		doc.setSigned(wsDoc.getSigned());
 		doc.setBarcoded(wsDoc.getBarcoded());
-		
+
 		return doc;
 	}
 
@@ -261,7 +263,7 @@ public class WSUtil {
 						att.setDependsOn(wsDoc.getAttributes()[i].getDependsOn());
 						att.setValidation(wsDoc.getAttributes()[i].getValidation());
 						att.setInitialization(wsDoc.getAttributes()[i].getInitialization());
-						
+
 						attrs.put(wsDoc.getAttributes()[i].getName(), att);
 					}
 				}
@@ -379,7 +381,7 @@ public class WSUtil {
 					att.setType(wsSet.getAttributes()[i].getType());
 					att.setDependsOn(wsSet.getAttributes()[i].getDependsOn());
 					att.setValidation(wsSet.getAttributes()[i].getValidation());
-					att.setInitialization(wsSet.getAttributes()[i].getInitialization());					
+					att.setInitialization(wsSet.getAttributes()[i].getInitialization());
 					attributes.put(wsSet.getAttributes()[i].getName(), att);
 				}
 				set.setAttributes(attributes);
@@ -474,7 +476,7 @@ public class WSUtil {
 					attribute.setType(attr.getType());
 					attribute.setDependsOn(attr.getDependsOn());
 					attribute.setValidation(attr.getValidation());
-					attribute.setInitialization(attr.getInitialization());					
+					attribute.setInitialization(attr.getInitialization());
 					attributes[i++] = attribute;
 				}
 				wsTemplate.setAttributes(attributes);

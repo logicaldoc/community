@@ -48,64 +48,13 @@ abstract public class AbstractDocumentProcessor extends Task {
 		try {
 			int max = getBatchSize();
 
-			String where = prepareQueueQuery(null, null);
 			@SuppressWarnings("unchecked")
-			List<Long> ids = documentDao.queryForList("select ld_id from ld_document where " + where, null, Long.class,
-					max);
-
+			List<Long> ids = documentDao.queryForList(
+					"select ld_id from ld_document where " + prepareQueueQuery(null, null), null, Long.class, max);
 			getSize(max, ids);
 
-			if (size > 0) {
-				String idsStr = ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
-
-				// Mark all these documents as belonging to the current
-				// transaction
-				documentDao.bulkUpdate("set ld_transactionid='" + transactionId + "' where ld_id in " + idsStr,
-						(Map<String, Object>) null);
-
-				// Now we can release the lock
-				lockManager.release(getName(), transactionId);
-
-				where = prepareQueueQuery(transactionId, null);
-
-				@SuppressWarnings("unchecked")
-				List<Object[]> records = documentDao.query(
-						"select ld_id, ld_filename from ld_document where ld_id in " + idsStr, null,
-						new RowMapper<Object[]>() {
-							@Override
-							public Object[] mapRow(ResultSet rs, int row) throws SQLException {
-								Object[] rec = new Object[2];
-								rec[0] = rs.getLong(1);
-								rec[1] = rs.getString(2);
-								return rec;
-							}
-						}, max);
-
-				User user = loadUser();
-				for (Object[] cols : records) {
-					long id = (Long) cols[0];
-					log.debug("Process document {}", id);
-
-					try {
-						Document doc = documentDao.findById(id);
-						if (doc == null || doc.getBarcoded() != 0 || doc.getBarcodeTemplateId() == null)
-							continue;
-						documentDao.initialize(doc);
-
-						processDocument(doc, user);
-
-						log.debug("Processed document {}", id);
-						processed++;
-					} catch (Exception e) {
-						log.error(e.getMessage(), e);
-						errors++;
-					} finally {
-						next();
-					}
-					if (interruptRequested)
-						return;
-				}
-			}
+			if (size > 0)
+				processDocuments(ids, max);
 		} catch (PersistenceException e) {
 			throw new TaskException(e.getMessage(), e);
 		} finally {
@@ -117,6 +66,55 @@ abstract public class AbstractDocumentProcessor extends Task {
 			lockManager.release(getName(), transactionId);
 
 			removeTransactionReference();
+		}
+	}
+
+	private void processDocuments(List<Long> docIds, int max) throws PersistenceException {
+		String idsStr = docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
+
+		// Mark all these documents as belonging to the current
+		// transaction
+		documentDao.bulkUpdate("set ld_transactionid='" + transactionId + "' where ld_id in " + idsStr,
+				(Map<String, Object>) null);
+
+		// Now we can release the lock
+		lockManager.release(getName(), transactionId);
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> records = documentDao.query(
+				"select ld_id, ld_filename from ld_document where ld_id in " + idsStr, null, new RowMapper<Object[]>() {
+					@Override
+					public Object[] mapRow(ResultSet rs, int row) throws SQLException {
+						Object[] rec = new Object[2];
+						rec[0] = rs.getLong(1);
+						rec[1] = rs.getString(2);
+						return rec;
+					}
+				}, max);
+
+		User user = loadUser();
+		for (Object[] cols : records) {
+			long id = (Long) cols[0];
+			log.debug("Process document {}", id);
+
+			try {
+				Document doc = documentDao.findById(id);
+				if (doc == null || doc.getBarcoded() != 0 || doc.getBarcodeTemplateId() == null)
+					continue;
+				documentDao.initialize(doc);
+
+				processDocument(doc, user);
+
+				log.debug("Processed document {}", id);
+				processed++;
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+				errors++;
+			} finally {
+				next();
+			}
+			if (interruptRequested)
+				return;
 		}
 	}
 

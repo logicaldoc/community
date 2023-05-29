@@ -92,14 +92,17 @@ public interface MessageService extends RemoteService {
 	public void deleteTemplates(String name) throws ServerException;
 	
 	public static class Instance {
-		private static MessageServiceAsync instance;
+		private static MessageServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static MessageServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(MessageService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(MessageService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 } 

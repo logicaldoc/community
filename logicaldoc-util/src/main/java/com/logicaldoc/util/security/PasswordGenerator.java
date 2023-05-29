@@ -41,7 +41,7 @@ public class PasswordGenerator {
 
 		// generate 5 random password
 		for (int i = 0; i < 5; i++) {
-			System.out.println("password : " + generate(16, 2, 2, 1, 1, 4, 2));
+			System.out.println("password: " + generate(16, 2, 2, 1, 1, 4, 2));
 			System.out.println("\n");
 		}
 

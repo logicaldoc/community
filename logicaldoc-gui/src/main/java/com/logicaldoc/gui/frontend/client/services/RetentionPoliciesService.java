@@ -65,14 +65,17 @@ public interface RetentionPoliciesService extends RemoteService {
 	public void changeStatus(long id, boolean enabled) throws ServerException;
 
 	public static class Instance {
-		private static RetentionPoliciesServiceAsync instance;
+		private static RetentionPoliciesServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static RetentionPoliciesServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(RetentionPoliciesService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(RetentionPoliciesService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

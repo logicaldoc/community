@@ -750,7 +750,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction)
 			throws PersistenceException {
-		List<Document> coll = new ArrayList<>();
 		StringBuilder query = new StringBuilder("");
 		if (direction == null)
 			query.append(
@@ -762,8 +761,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(query.toString(),
 				linkType != null ? new Object[] { docId } : new Object[] { docId, docId }, Long.class, null);
-		coll = findByWhere(ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
-				+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
+		List<Document> coll = findByWhere(
+				ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+						+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED,
+				null, null);
 
 		return coll;
 	}
@@ -963,7 +964,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			EventCollector.get().newEvent(transaction);
 		} catch (PersistenceException e) {
-			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
+			if (StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
 				session.logError(e.getMessage());
 			}
@@ -1241,9 +1242,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<TagCloud> getTagCloud(String sid) throws PersistenceException {
 		Session session = SessionManager.get().get(sid);
-		ContextProperties config = Context.get().getProperties();
-
-		int maxTags = config.getInt(session.getTenantName() + ".tagcloud.maxtags", 30);
+		int maxTags = Context.get().getProperties().getInt(session.getTenantName() + ".tagcloud.maxtags", 30);
 		return getTagCloud(session.getTenantId(), maxTags);
 	}
 

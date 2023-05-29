@@ -14,7 +14,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String tag;
+	private String tagWord;
 
 	private long tenantId = Tenant.DEFAULT_ID;
 
@@ -24,23 +24,23 @@ public class Tag implements Comparable<Tag>, Serializable {
 
 	public Tag(long tenantId, String tag) {
 		this.tenantId = tenantId;
-		this.tag = tag;
+		this.tagWord = tag;
 	}
 
 	@Override
 	public int compareTo(Tag o) {
-		int comp = this.tag.compareTo(o.tag);
+		int comp = this.tagWord.compareTo(o.tagWord);
 		if (comp != 0)
 			return comp;
 		return Long.compare(this.tenantId, o.tenantId);
 	}
 
 	public String getTag() {
-		return tag;
+		return tagWord;
 	}
 
 	public void setTag(String tag) {
-		this.tag = tag;
+		this.tagWord = tag;
 	}
 
 	public long getTenantId() {
@@ -53,18 +53,18 @@ public class Tag implements Comparable<Tag>, Serializable {
 
 	@Override
 	public String toString() {
-		if (tag == null)
+		if (tagWord == null)
 			return "";
 		else
-			return tag.toString();
+			return tagWord.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		if (tag == null)
+		if (tagWord == null)
 			return 0;
 		else
-			return (tag + tenantId).hashCode();
+			return (tagWord + tenantId).hashCode();
 	}
 
 	@Override
@@ -76,6 +76,6 @@ public class Tag implements Comparable<Tag>, Serializable {
 			return false;
 
 		Tag other = (Tag) o;
-		return other.tenantId == this.tenantId && this.tag != null && this.tag.equals(other.tag);
+		return other.tenantId == this.tenantId && this.tagWord != null && this.tagWord.equals(other.tagWord);
 	}
 }

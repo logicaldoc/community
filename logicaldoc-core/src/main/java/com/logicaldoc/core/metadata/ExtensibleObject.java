@@ -187,7 +187,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 		Attribute master = setValue(name, values[0]);
 		attrs.add(master);
 
-		if (values != null && values.length > 1) {
+		if (values.length > 1) {
 			master.setMultiple(1);
 			NumberFormat nf = new DecimalFormat("0000");
 			for (int i = 1; i < values.length; i++) {

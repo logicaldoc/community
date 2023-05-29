@@ -124,7 +124,7 @@ public class ParameterConditionRow extends HLayout {
 		else
 			operatorsMap = operatorsFor(null);
 		operator.setValueMap(operatorsMap);
-		if (operatorsMap != null && !operatorsMap.isEmpty())
+		if (!operatorsMap.isEmpty())
 			operator.setValue(operatorsMap.keySet().iterator().next());
 
 		attribute.addChangedHandler((ChangedEvent event) -> {
@@ -293,7 +293,7 @@ public class ParameterConditionRow extends HLayout {
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
-			FormItem item = ItemFactory.newFolderSelectorForAttribute(VALUE_STR, att.getLabel(), false, null);
+			FormItem item = ItemFactory.newFolderSelectorForAttribute(VALUE_STR, att.getLabel(), null);
 			item.setName(VALUE_STR);
 			return item;
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")

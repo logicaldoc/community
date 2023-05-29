@@ -637,8 +637,6 @@ public class LoginPanel extends VLayout {
 					} else {
 						// status code 405 means that the request has been
 						// received but the method used is not allowed
-//						SC.say("### response: " + response.getText() + " "
-//								+ (response != null ? response.getStatusCode() : ""));
 						onAuthenticationFailure();
 					}
 				}
@@ -656,8 +654,6 @@ public class LoginPanel extends VLayout {
 			data += "&j_secretkey=" + URL.encodeQueryString((String) secretKey.getValue());
 		if (CookiesManager.getSavedDevice() != null)
 			data += "&device=" + URL.encodeQueryString(CookiesManager.getSavedDevice());
-//			data += "&" + PARAM_SUCCESSURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_SUCCESSURL));
-//			data += "&" + PARAM_FAILUREURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_FAILUREURL));
 		return data;
 	}
 

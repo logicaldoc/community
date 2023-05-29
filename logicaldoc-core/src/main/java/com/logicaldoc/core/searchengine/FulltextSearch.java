@@ -187,9 +187,8 @@ public class FulltextSearch extends Search {
 			hitsIdsCondition.append(")");
 		}
 
-		StringBuilder richQuery = new StringBuilder();
 		// Find real documents
-		richQuery = new StringBuilder(
+		StringBuilder richQuery = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 		richQuery.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
 		richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
@@ -248,7 +247,7 @@ public class FulltextSearch extends Search {
 			richQuery.append(hitsIdsCondition.toString().replace("A.ld_id", "A.ld_docref"));
 		}
 
-		log.debug("Execute query {}", richQuery.toString());
+		log.debug("Execute query {}", richQuery);
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
@@ -269,12 +268,11 @@ public class FulltextSearch extends Search {
 		Map<Long, Hit> hitsMap = new HashMap<>();
 		while (results != null && results.hasNext()) {
 			Hit hit = results.next();
-			
+
 			// Skip a document if not in the filter set
-			if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()) {
-				if (!opt.getFilterIds().contains(hit.getId()))
-					continue;
-			}
+			if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()
+					&& !opt.getFilterIds().contains(hit.getId()))
+				continue;
 			hitsMap.put(hit.getId(), hit);
 		}
 		return hitsMap;
@@ -366,15 +364,15 @@ public class FulltextSearch extends Search {
 			throw new SearchException(e1.getMessage(), e1);
 		}
 
-		StringBuilder foldersFilter=new StringBuilder();		
+		StringBuilder foldersFilter = new StringBuilder();
 		if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
 			for (Long id : accessibleFolderIds) {
-				if(foldersFilter.length() > 0)
+				if (foldersFilter.length() > 0)
 					foldersFilter.append(" or ");
 				foldersFilter.append(HitField.FOLDER_ID + ":" + (id < 0 ? "\\" : "") + id);
 			}
-				
-			filters.add(" ("+foldersFilter.toString()+") ");
+
+			filters.add(" (" + foldersFilter.toString() + ") ");
 		}
 	}
 

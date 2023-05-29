@@ -42,7 +42,7 @@ public class JarUtil {
 	 * Maximum compression ratio, config parameter zip.maxratio
 	 */
 	private double maxCompressionRatio = 30D;
-
+	
 	public JarUtil() {
 		try {
 			maxEntries = Context.get().getProperties().getInt("zip.maxentries", 100000);

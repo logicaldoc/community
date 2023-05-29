@@ -30,6 +30,7 @@ import com.logicaldoc.util.Context;
 public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<DocumentNote> implements DocumentNoteDAO {
 
 	private static final String DOC_ID_DOC_ID_AND = ".docId = :docId and ";
+
 	private static final String DOC_ID = "docId";
 
 	public HibernateDocumentNoteDAO() {
@@ -55,7 +56,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				documentDao.saveDocumentHistory(doc, transaction);
 			}
 		} catch (Exception e) {
-			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
+			if (StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
 				session.logError(e.getMessage());
 			}
@@ -84,22 +85,21 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 					params.put(DOC_ID, docId);
 					params.put("types", types);
 
-					return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types)",
-							params, null, null);
+					return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types)", params, null, null);
 				}
 			else if (types == null || types.isEmpty()) {
 				Map<String, Object> params = new HashMap<>();
 				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
-				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion",
-						params, null, null);
+				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion", params, null,
+						null);
 			} else {
 				Map<String, Object> params = new HashMap<>();
 				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
 				params.put("types", types);
-				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY
-						+ ".fileVersion = :fileVersion and " + ENTITY + ".type in (:types)", params, null, null);
+				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
+						+ ".type in (:types)", params, null, null);
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

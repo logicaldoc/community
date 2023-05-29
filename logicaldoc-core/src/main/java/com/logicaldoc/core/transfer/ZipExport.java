@@ -156,7 +156,7 @@ public class ZipExport {
 					if ("pdf".equals(doc.getDocRefType()))
 						convertToPdf = true;
 				}
-				addDocument("", doc, convertToPdf, transaction.getSessionId());
+				addDocument("", doc, convertToPdf);
 
 				try {
 					zos.flush();
@@ -247,7 +247,7 @@ public class ZipExport {
 					convertToPdf = true;
 			}
 
-			addDocument(getZipEntryPath(folder), doc, convertToPdf, sid);
+			addDocument(getZipEntryPath(folder), doc, convertToPdf);
 		}
 	}
 
@@ -275,9 +275,8 @@ public class ZipExport {
 	 * @param path path to store the document in
 	 * @param document the document
 	 * @param pdfConversion if the PDF conversion has to be used instead
-	 * @param sid identifier of the session
 	 */
-	private void addDocument(String path, Document document, boolean pdfConversion, String sid) {
+	private void addDocument(String path, Document document, boolean pdfConversion) {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(document, null, null);
 

@@ -114,7 +114,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			return false;
 
 		Device requestDevice = new Device(request);
-		if (requestDevice == null || requestDevice.getDeviceId() == null)
+		if (requestDevice.getDeviceId() == null)
 			return false;
 
 		List<Device> trustedDevices = findTrustedDevices(user.getId());

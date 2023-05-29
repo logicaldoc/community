@@ -75,8 +75,7 @@ public class SystemLoadMonitor {
 	public int getCpuLoad() {
 		// try to get the CPU usage with JMX
 		OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
-		int load = (int) Math
-				.round((osMXBean.getSystemLoadAverage() / osMXBean.getAvailableProcessors()) * 100d);
+		int load = (int) Math.round((osMXBean.getSystemLoadAverage() / osMXBean.getAvailableProcessors()) * 100d);
 		if (load < 0) {
 			// On some systems Java is not able to get the CPU usage so try to
 			// extract the information from the shell
@@ -249,18 +248,18 @@ public class SystemLoadMonitor {
 
 		private void checkOverloadOrUnderload() {
 			if (isAverageCpuOverLoaded()) {
-				if(!lastCheckOverloaded)
-					log.warn("The system is overloaded (" + averageCpuLoad + "%)");
-				lastCheckOverloaded=true;
-				
+				if (!lastCheckOverloaded)
+					log.warn("The system is overloaded ({}%)", averageCpuLoad);
+				lastCheckOverloaded = true;
+
 				for (SystemLoadListener listener : listeners) {
 					listener.onOverload(averageCpuLoad, averageCpuLoad);
 				}
 			} else {
-				if(lastCheckOverloaded)
-					log.warn("The system is underloaded (" + averageCpuLoad + "%)");
-				lastCheckOverloaded=false;
-				
+				if (lastCheckOverloaded)
+					log.warn("The system is underloaded ({}%)", averageCpuLoad);
+				lastCheckOverloaded = false;
+
 				for (SystemLoadListener listener : listeners) {
 					listener.onUnderload(averageCpuLoad, averageCpuLoad);
 				}

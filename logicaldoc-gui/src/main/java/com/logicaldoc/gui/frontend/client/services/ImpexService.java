@@ -142,14 +142,17 @@ public interface ImpexService extends RemoteService {
 	public void startImport(String folderName) throws ServerException;
 
 	public static class Instance {
-		private static ImpexServiceAsync instance;
+		private static ImpexServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static ImpexServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ImpexService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ImpexService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

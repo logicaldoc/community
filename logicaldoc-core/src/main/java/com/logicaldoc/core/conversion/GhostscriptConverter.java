@@ -42,12 +42,7 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 			else if ("eps".equals(ext))
 				device = "eps2write ";
 
-			int timeout = 30;
-			try {
-				timeout = Integer.parseInt(getParameter("timeout"));
-			} catch (Exception t) {
-				// Nothing to do
-			}
+			int timeout = getTimeout();
 
 			String arguments = getParameter("arguments");
 			String commandLine = getParameter("path") + " " + (arguments != null ? arguments : "") + " -sDEVICE="
@@ -61,6 +56,16 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 		} catch (Exception e) {
 			throw new IOException("Error in PDF to image conversion", e);
 		}
+	}
+
+	private int getTimeout() {
+		int timeout = 30;
+		try {
+			timeout = Integer.parseInt(getParameter("timeout"));
+		} catch (Exception t) {
+			// Nothing to do
+		}
+		return timeout;
 	}
 
 	@Override

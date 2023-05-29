@@ -1007,12 +1007,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			 * Initialize the plugin
 			 */
 			PluginRegistry pluginRegistry = PluginRegistry.getInstance();
-			try {
-				pluginRegistry.init(libFolder.getAbsolutePath());
-			} catch (PluginException e) {
-				log.error(e.getMessage(), e);
-				return;
-			}
+			pluginRegistry.init(libFolder.getAbsolutePath());
 			initializePlugin(pluginId);
 
 			/*
@@ -1027,7 +1022,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			if (pluginRegistry.isRestartRequired())
 				ApplicationListener.restartRequired();
 		} catch (ServerException | IOException | NoSuchMethodException | SecurityException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException e) {
+				| IllegalArgumentException | InvocationTargetException | PluginException e) {
 			throwServerException(session, log, e);
 		} finally {
 			UploadServlet.cleanReceivedFiles(session.getSid());

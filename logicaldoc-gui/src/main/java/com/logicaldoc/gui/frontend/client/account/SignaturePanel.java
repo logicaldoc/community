@@ -139,12 +139,9 @@ public class SignaturePanel extends StampProperties {
 		image.setMargin(1);
 		image.setMembersMargin(2);
 
-//		String html = "<img border='0' alt='' title='' src='" + stampImageUrl(stamp.getId())
-//				+ "' style='max-width:300px' />";
-//		HTMLFlow img = new HTMLFlow(html);
+
 		Img imageItem = new Img(stampImageUrl(stamp.getId()));
 		imageItem.setMaxWidth(300);
-//		imageItem.setAutoFit(true);
 		image.setMembers(imageItem);
 		formsContainer.addMember(image, 0);
 	}

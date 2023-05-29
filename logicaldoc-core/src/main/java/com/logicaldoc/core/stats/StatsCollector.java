@@ -476,7 +476,7 @@ public class StatsCollector extends Task {
 		try {
 			links = folderDAO.queryForLong("SELECT COUNT(ld_id) FROM ld_link where ld_deleted=0");
 		} catch (Exception t) {
-			log.warn("Unable to calculate links statistics - ", t.getMessage());
+			log.warn("Unable to calculate links statistics - {}", t.getMessage());
 		}
 		postParams.add(new BasicNameValuePair("links", Long.toString(links)));
 

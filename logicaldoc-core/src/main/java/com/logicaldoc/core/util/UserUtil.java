@@ -42,6 +42,9 @@ public class UserUtil {
 
 	protected static Logger log = LoggerFactory.getLogger(UserUtil.class);
 
+	private UserUtil() {
+	}
+
 	/**
 	 * This method retrieves the user folder. If not exists, it creates the
 	 * folder. The folder is: <b>conf.userdir</b>/<b>id</b>
@@ -98,11 +101,7 @@ public class UserUtil {
 		try {
 			ContextProperties conf = Context.get().getProperties();
 			userpath = new File(conf.getPropertyWithSubstitutions("conf.userdir"));
-			try {
-				FileUtils.forceMkdir(userpath);
-			} catch (IOException e) {
-				return null;
-			}
+			FileUtils.forceMkdir(userpath);
 		} catch (Exception t) {
 			// Nothing to do
 		}

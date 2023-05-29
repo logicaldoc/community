@@ -35,26 +35,27 @@ public class TXTParser extends AbstractParser {
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
 			String fileVersion) {
 		try (FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis);) {
-			String enc = encoding;
-			if (StringUtils.isEmpty(enc)) {
-				// Determine the most probable encoding
-				try {
-					CharsetDetector cd = new CharsetDetector();
-					cd.setText(bis);
-					CharsetMatch cm = cd.detect();
-					if (cm != null) {
-						if (Charset.isSupported(cm.getName()))
-							enc = cm.getName();
-					}
-				} catch (Throwable th) {
-					log.warn("Error during TXT fileNameCharset detection", th);
-				}
-			}
-			return parse(bis, filename, enc, locale, tenant, document, fileVersion);
-		} catch (Throwable ex) {
+			return parse(bis, filename, determineEncoding(bis, encoding), locale, tenant, document, fileVersion);
+		} catch (Exception ex) {
 			log.warn("Failed to extract TXT text content", ex);
 		}
 		return "";
+	}
+
+	private String determineEncoding(BufferedInputStream bis, String probableEncoding) {
+		if (StringUtils.isEmpty(probableEncoding)) {
+			// Determine the most probable encoding
+			try {
+				CharsetDetector cd = new CharsetDetector();
+				cd.setText(bis);
+				CharsetMatch cm = cd.detect();
+				if (cm != null && Charset.isSupported(cm.getName()))
+					probableEncoding = cm.getName();
+			} catch (Exception th) {
+				log.warn("Error during TXT fileNameCharset detection", th);
+			}
+		}
+		return probableEncoding;
 	}
 
 	@Override

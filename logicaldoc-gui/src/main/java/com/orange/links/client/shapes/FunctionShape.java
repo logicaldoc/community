@@ -107,14 +107,11 @@ public class FunctionShape extends AbstractShape {
 
 	@Override
 	public void drawHighlight() {
-		// widget.addStyleName(LinksClientBundle.INSTANCE.css().translucide());
 		setSynchronized(true);
 	}
 
 	@Override
 	public void draw() {
-		// widget.removeStyleName(LinksClientBundle.INSTANCE.css().translucide());
 		setSynchronized(true);
 	}
-
 }

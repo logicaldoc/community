@@ -50,7 +50,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		setHeight100();
 
 		setMembers(formsContainer);
-		sourceSelector = new FolderSelector("source", false);
+		sourceSelector = new FolderSelector("source", null);
 		sourceSelector.setRequired(true);
 		sourceSelector.setWidth(250);
 		sourceSelector.setTitle(I18N.message("sourcefolder"));
@@ -64,9 +64,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 	private void refresh() {
 		form.clearValues();
 		form.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.destroy();
 
 		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);

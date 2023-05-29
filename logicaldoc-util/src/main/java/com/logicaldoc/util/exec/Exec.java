@@ -94,7 +94,7 @@ public class Exec {
 
 		Process process = pb.start();
 
-		StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), log);
+		StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
 		outputGobbler.start();
 
 		Worker worker = new Worker(process);

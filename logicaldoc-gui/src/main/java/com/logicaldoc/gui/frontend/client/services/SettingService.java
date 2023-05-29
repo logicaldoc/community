@@ -181,14 +181,17 @@ public interface SettingService extends RemoteService {
 	public void saveExtensionAliases(String extension, String aliases) throws ServerException;
 
 	public static class Instance {
-		private static SettingServiceAsync instance;
+		private static SettingServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static SettingServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SettingService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SettingService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

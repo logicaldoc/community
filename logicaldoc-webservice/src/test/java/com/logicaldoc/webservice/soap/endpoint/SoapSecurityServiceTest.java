@@ -2,6 +2,7 @@ package com.logicaldoc.webservice.soap.endpoint;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -166,7 +167,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTCase {
 
 		Long groupId = securityServiceImpl.storeGroup("", wsGroupTest);
 		assertNotNull(groupId);
-		assertTrue(groupId.longValue()!=0L);
+		assertNotSame(0L, groupId.longValue());
 
 		Group createdGroup = groupDao.findById(groupId);
 		assertNotNull(createdGroup);

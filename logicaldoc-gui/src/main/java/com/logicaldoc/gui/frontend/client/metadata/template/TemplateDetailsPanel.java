@@ -132,7 +132,7 @@ public class TemplateDetailsPanel extends VLayout {
 			if (Boolean.TRUE.equals(validationTabPanel.contains(validationPanel)))
 				validationTabPanel.removeMember(validationPanel);
 		}
-		validationPanel = new TemplateValidationPanel(template, changeHandler, this);
+		validationPanel = new TemplateValidationPanel(template, changeHandler);
 		validationTabPanel.addMember(validationPanel);
 
 		/*

@@ -200,7 +200,6 @@ public class WebservicesPanel extends VLayout {
 
 		chartImg = new Img(chartUrl, 600, 440);
 		chartImg.setImageType(ImageStyle.NORMAL);
-		// chartImg.setBorder("1px solid gray");
 		chartImg.setImageWidth(chartWidth);
 		chartImg.setImageHeight(chartHeight);
 		chartImg.setOverflow(Overflow.AUTO);

@@ -13,6 +13,9 @@ import org.apache.commons.lang.StringUtils;
  */
 public class LocaleUtil {
 
+	private LocaleUtil() {
+	}
+
 	/**
 	 * Creates the locale from a string
 	 * 
@@ -24,8 +27,8 @@ public class LocaleUtil {
 		if (StringUtils.isEmpty(str))
 			return Locale.ENGLISH;
 
-		str=str.replace('-', '_');
-		
+		str = str.replace('-', '_');
+
 		String lang = "";
 		String country = "";
 		String variant = "";

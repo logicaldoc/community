@@ -178,9 +178,9 @@ public class GUIDashlet implements Serializable {
 	 */
 	public List<String> getExtendedAttributes() {
 		List<String> set = new ArrayList<>();
-		for (String column : getColumnsList()) {
-			if (column.startsWith("ext_"))
-				set.add(column.substring(4));
+		for (String col : getColumnsList()) {
+			if (col.startsWith("ext_"))
+				set.add(col.substring(4));
 		}
 		return set;
 	}

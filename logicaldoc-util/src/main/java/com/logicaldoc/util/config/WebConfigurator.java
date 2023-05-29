@@ -119,7 +119,7 @@ public class WebConfigurator extends XMLBean {
 			return;
 		}
 
-		if (contextParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
+		if (append.equals(INIT_PARAM.PARAM_APPEND)) {
 
 			Element paramValue = (Element) contextParam.getChildren().get(1);
 			paramValue.setText(paramValue.getText() + "," + value);
@@ -127,7 +127,7 @@ public class WebConfigurator extends XMLBean {
 			return;
 		}
 
-		if (contextParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
+		if (append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
 			Element paramValue = (Element) contextParam.getChildren().get(1);
 			paramValue.setText(value);
 			writeXMLDoc();
@@ -183,23 +183,19 @@ public class WebConfigurator extends XMLBean {
 		// the name
 		Element param = new Element(PARAM_NAME, getRootElement().getNamespace());
 		param.setText(name);
-		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		param = new Element(PARAM_VALUE, getRootElement().getNamespace());
 		param.setText(value);
-		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		if (description != null && description.equals("") != true) {
 			param = new Element(DESCRIPTION, getRootElement().getNamespace());
 			param.setText(description);
-			// paramElement.addContent("\n ");
 			paramElement.getChildren().add(param);
 		}
 
 		filter.getChildren().add(paramElement);
-
 	}
 
 	/**
@@ -244,18 +240,15 @@ public class WebConfigurator extends XMLBean {
 		// the name
 		Element param = new Element(PARAM_NAME, getRootElement().getNamespace());
 		param.setText(name);
-		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		param = new Element(PARAM_VALUE, getRootElement().getNamespace());
 		param.setText(value);
-		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		if (description != null && description.equals("") != true) {
 			param = new Element(DESCRIPTION, getRootElement().getNamespace());
 			param.setText(description);
-			// paramElement.addContent("\n ");
 			paramElement.getChildren().add(param);
 		}
 
@@ -313,12 +306,10 @@ public class WebConfigurator extends XMLBean {
 		// the name
 		Element param = new Element(PARAM_NAME, getRootElement().getNamespace());
 		param.setText(name);
-		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		param = new Element(PARAM_VALUE, getRootElement().getNamespace());
 		param.setText(value);
-		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 		listener.getChildren().add(paramElement);
 	}

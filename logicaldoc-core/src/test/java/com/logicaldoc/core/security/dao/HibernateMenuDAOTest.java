@@ -153,10 +153,10 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 		menus = dao.findByUserId(4, 2, false);
 		Assert.assertNotNull(menus);
 		Assert.assertEquals(2, menus.size());
-		
+
 		menus = dao.findByUserId(4);
 		Assert.assertNotNull(menus);
-		Assert.assertEquals(25, menus.size());		
+		Assert.assertEquals(25, menus.size());
 	}
 
 	@Test
@@ -226,7 +226,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 		ids = dao.findIdByUserId(99, 101);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(0, ids.size());
-	}	
+	}
 
 	@Test
 	public void testHasWriteAccess() throws PersistenceException {
@@ -329,19 +329,20 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 		user.setId(4);
 
 		Menu menu = dao.findById(1041);
-		Assert.assertTrue(null == menu.getSecurityRef());
+		Assert.assertNull(menu.getSecurityRef());
 
 		Assert.assertTrue(dao.applyRightToTree(-101));
 		menu = dao.findById(-104);
-		Assert.assertTrue(-101 == menu.getSecurityRef());
+		Assert.assertEquals(Long.valueOf(-101L), menu.getSecurityRef());
 		menu = dao.findById(1041);
-		Assert.assertTrue(-101 == menu.getSecurityRef());
+		Assert.assertEquals(Long.valueOf(-101L), menu.getSecurityRef());
 	}
 
 	@Test
 	public void testCreatePath() throws PersistenceException {
 		Menu newMenu = dao.createPath(72L, 1L, Menu.TYPE_CUSTOM_ACTION, "/pippo/pluto/paperino", true);
-        Assert.assertNotNull(newMenu);
-        Assert.assertEquals("/administration/system/general/logs/pippo/pluto/paperino", dao.computePathExtended(newMenu.getId()));
+		Assert.assertNotNull(newMenu);
+		Assert.assertEquals("/administration/system/general/logs/pippo/pluto/paperino",
+				dao.computePathExtended(newMenu.getId()));
 	}
 }

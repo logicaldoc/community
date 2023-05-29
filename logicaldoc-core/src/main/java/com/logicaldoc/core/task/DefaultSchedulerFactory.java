@@ -9,6 +9,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.SchedulingException;
@@ -81,7 +82,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 		for (Task task : tasks) {
 			String name = task.getName();
 			Object trigger = applicationContext.getBean(name + "Trigger");
-			if (trigger != null && trigger instanceof Trigger) {
+			if (trigger instanceof Trigger) {
 				triggers.add((Trigger) trigger);
 			} else
 				log.warn("Cannot schedule task {}", name);
@@ -89,11 +90,9 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 		// Some default triggers
 		try {
-			Trigger trigger = (Trigger) applicationContext.getBean("TempFolderCleaner");
-			if (trigger != null)
-				triggers.add(trigger);
-		} catch (Exception t) {
-			// Noting to do
+			triggers.add((Trigger) applicationContext.getBean("TempFolderCleaner"));
+		} catch (BeansException e) {
+			// Nothing to do
 		}
 
 		if (!triggers.isEmpty())

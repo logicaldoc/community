@@ -153,7 +153,6 @@ public abstract class AbstractStorer implements Storer {
 		try {
 			IOUtils.copyLarge(getStream(docId, resource), output, start, length);
 		} catch (IOException ioe) {
-			log.error(ioe.getMessage(), ioe);
 			throw ioe;
 		}
 	}
@@ -162,8 +161,7 @@ public abstract class AbstractStorer implements Storer {
 	public void writeToStream(long docId, String resource, OutputStream output) throws IOException {
 		try {
 			IOUtils.copyLarge(getStream(docId, resource), output);
-		} catch (IOException ioe) {
-			log.error(ioe.getMessage(), ioe);
+		} catch (IOException ioe) {;
 			throw ioe;
 		}
 	}
@@ -175,7 +173,6 @@ public abstract class AbstractStorer implements Storer {
 				InputStream is = getStream(docId, resource);) {
 			FileUtil.writeFile(is, out.getPath());
 		} catch (IOException ioe) {
-			log.error(ioe.getMessage(), ioe);
 			throw ioe;
 		} catch (Exception e) {
 			log.error("Error writing document {} into {}", docId, out.getPath());

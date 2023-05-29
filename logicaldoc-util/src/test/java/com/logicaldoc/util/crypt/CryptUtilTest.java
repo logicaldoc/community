@@ -20,7 +20,7 @@ public class CryptUtilTest {
 		crypt.encrypt(clearFile, cryptedFile);
 		Assert.assertTrue(cryptedFile.exists());
 		Assert.assertTrue(cryptedFile.length()>0);
-		Assert.assertTrue(cryptedFile.length()!=clearFile.length());
+		Assert.assertNotSame(cryptedFile.length(), clearFile.length());
 		
 		File decryptedFile = new File("target/ctypt.decrypted");
 		crypt.decrypt(cryptedFile, decryptedFile);

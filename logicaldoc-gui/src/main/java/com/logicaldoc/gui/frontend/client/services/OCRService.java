@@ -26,14 +26,17 @@ public interface OCRService extends RemoteService {
 	public GUIParameter[] loadSettings() throws ServerException;
 
 	public static class Instance {
-		private static OCRServiceAsync instance;
+		private static OCRServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static OCRServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(OCRService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(OCRService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

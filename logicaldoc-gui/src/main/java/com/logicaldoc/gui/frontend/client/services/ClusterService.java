@@ -36,14 +36,17 @@ public interface ClusterService extends RemoteService {
 	public void makeLocal(String[] parameters) throws ServerException;
 
 	public static class Instance {
-		private static ClusterServiceAsync instance;
+		private static ClusterServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static ClusterServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ClusterService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ClusterService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

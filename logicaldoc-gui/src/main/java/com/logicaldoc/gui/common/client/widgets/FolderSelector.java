@@ -30,11 +30,7 @@ public class FolderSelector extends TextItem {
 
 	private Collection<FolderChangeListener> listeners = new ArrayList<>();
 
-	public FolderSelector(String name, boolean clean) {
-		this(name, clean, null);
-	}
-
-	public FolderSelector(String name, boolean clean, List<FormItemIcon> additionalIcons) {
+	public FolderSelector(String name, List<FormItemIcon> additionalIcons) {
 		if (name != null)
 			setName(name);
 		else

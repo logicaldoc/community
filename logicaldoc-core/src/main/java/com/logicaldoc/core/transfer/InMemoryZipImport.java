@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -37,66 +38,69 @@ public class InMemoryZipImport extends ZipImport {
 		super(docVo, charset);
 	}
 
-
 	@Override
 	public void process(File zipsource, Folder parent, long userId, String sessionId) {
 		this.zipFile = zipsource;
 		this.sessionId = sessionId;
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
 		try {
 			this.user = userDao.findById(userId);
-
-			// Open the Zip and list all the contents
-			ZipUtil zipUtil = new ZipUtil();
-			zipUtil.setFileNameCharset(fileNameCharset);
-			List<String> entries = zipUtil.listEntries(zipsource);
-
-			for (String entry : entries) {
-				String relativePath = FileUtil.getPath(entry);
-				if (relativePath.startsWith("/"))
-					relativePath = relativePath.substring(1);
-				if (relativePath.endsWith("/"))
-					relativePath = relativePath.substring(0, relativePath.length() - 1);
-
-				// Ensure to have the proper folder to upload the file into
-				FolderHistory folderTransaction = new FolderHistory();
-				folderTransaction.setSessionId(sessionId);
-				folderTransaction.setUser(user);
-				Folder folder = fDao.createPath(parent, relativePath, true, folderTransaction);
-
-				// Create the document
-				String fileName = FileUtil.getName(entry);
-				String title = FileUtil.getBaseName(fileName);
-
-				if (StringUtils.isEmpty(fileName) || StringUtils.isEmpty(title))
-					continue;
-
-				try {
-					Document doc = new Document(docVo);
-					doc.setId(0L);
-					doc.setFileName(fileName);
-					doc.setFolder(folder);
-
-					DocumentHistory history = new DocumentHistory();
-					history.setEvent(DocumentEvent.STORED.toString());
-					history.setComment("");
-					history.setUser(user);
-					history.setSessionId(sessionId);
-		
-					docManager.create(zipUtil.getEntryStream(zipsource, entry), doc, history);
-				} catch (Exception e) {
-					logger.warn("InMemoryZipImport unable to import ZIP entry {}", entry, e);
-				}
-			}
+			extractEntries(zipsource, parent, sessionId);
 		} catch (Exception e) {
 			logger.error("InMemoryZipImport process failed", e);
 		}
 
 		if (isNotifyUser())
 			sendNotificationMessage();
+	}
+
+	private void extractEntries(File sourceZipFile, Folder parent, String sessionId) throws PersistenceException {
+		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+
+		// Open the Zip and list all the contents
+		ZipUtil zipUtil = new ZipUtil();
+		zipUtil.setFileNameCharset(fileNameCharset);
+		List<String> entries = zipUtil.listEntries(sourceZipFile);
+
+		for (String entry : entries) {
+			String fileName = FileUtil.getName(entry);
+			String title = FileUtil.getBaseName(fileName);
+
+			if (StringUtils.isEmpty(fileName) || StringUtils.isEmpty(title))
+				continue;
+
+			String relativePath = FileUtil.getPath(entry);
+			if (relativePath.startsWith("/"))
+				relativePath = relativePath.substring(1);
+			if (relativePath.endsWith("/"))
+				relativePath = relativePath.substring(0, relativePath.length() - 1);
+
+			// Ensure to have the proper folder to upload the file into
+			FolderHistory folderTransaction = new FolderHistory();
+			folderTransaction.setSessionId(sessionId);
+			folderTransaction.setUser(user);
+			Folder folder = fDao.createPath(parent, relativePath, true, folderTransaction);
+
+			// Create the document
+			Document doc = new Document(docVo);
+			doc.setId(0L);
+			doc.setFileName(fileName);
+			doc.setFolder(folder);
+
+			DocumentHistory history = new DocumentHistory();
+			history.setEvent(DocumentEvent.STORED.toString());
+			history.setComment("");
+			history.setUser(user);
+			history.setSessionId(sessionId);
+
+			try {
+				docManager.create(zipUtil.getEntryStream(sourceZipFile, entry), doc, history);
+			} catch (Exception e) {
+				logger.warn("InMemoryZipImport unable to import ZIP entry {}", entry, e);
+			}
+		}
 	}
 }

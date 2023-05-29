@@ -316,8 +316,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see #getLocatorFromNodePath(String)
 	 */
 	protected DavResourceLocator getLocatorFromResource(Resource resource) {
-		String nodePath = locator.getResourcePath();
-		return getLocatorFromNodePath(nodePath);
+		return getLocatorFromNodePath();
 	}
 
 	/**

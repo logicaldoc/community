@@ -181,4 +181,7 @@ public final class Constants {
 
 	public static final String[] FULLTEXT_DEFAULT_FIELDS = new String[] { FULLTEXT_FIELD_FILENAME,
 			FULLTEXT_FIELD_CONTENT, FULLTEXT_FIELD_TAGS };
+
+	private Constants() {
+	}
 }

@@ -435,10 +435,9 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static TextItem newFolderSelectorForAttribute(String name, String title, boolean allowsNull,
+	public static TextItem newFolderSelectorForAttribute(String name, String title,
 			List<FormItemIcon> additionalIcons) {
-		final TextItem item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), !allowsNull,
-				additionalIcons);
+		final TextItem item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), additionalIcons);
 		if (title != null)
 			item.setTitle(I18N.message(title));
 		return item;

@@ -62,7 +62,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			return users.toArray(new WSUser[0]);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new PersistenceException(t.getMessage());
 		}
 	}
@@ -105,7 +104,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			}
 			return groups.toArray(new WSGroup[0]);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new PersistenceException(t.getMessage());
 		}
 	}
@@ -180,7 +178,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			return usr.getId();
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new PersistenceException(t.getMessage());
 		}
 	}
@@ -240,7 +237,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			return grp.getId();
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new PersistenceException(t.getMessage());
 		}
 	}
@@ -260,7 +256,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			}
 			dao.delete(userId);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new PersistenceException("Unable to delete the user with id " + userId);
 		}
 	}
@@ -280,7 +275,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			}
 			dao.delete(groupId);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new PersistenceException("Unable to delete the group with id " + groupId);
 		}
 	}

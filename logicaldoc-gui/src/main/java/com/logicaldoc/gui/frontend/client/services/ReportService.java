@@ -108,14 +108,17 @@ public interface ReportService extends RemoteService {
 	public void execute(long id, GUIAttribute[] parameters) throws ServerException;
 
 	public static class Instance {
-		private static ReportServiceAsync instance;
+		private static ReportServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static ReportServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ReportService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ReportService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

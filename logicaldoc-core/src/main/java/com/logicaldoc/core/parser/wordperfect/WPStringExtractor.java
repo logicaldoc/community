@@ -3,60 +3,53 @@ package com.logicaldoc.core.parser.wordperfect;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
- * A StringExtractor extension optimized for processing WordPerfect document streams.
+ * A StringExtractor extension optimized for processing WordPerfect document
+ * streams.
  * 
  * <p>
- * This class is made available as a utility class as other file formats may also use WordPerfect's file
- * structure, e.g. Corel Presentations 3.0 files.
+ * This class is made available as a utility class as other file formats may
+ * also use WordPerfect's file structure, e.g. Corel Presentations 3.0 files.
  */
 public class WPStringExtractor extends StringExtractor {
 
 	private static final String[] EXACT_START_LINES = { "doc init", "tech init" };
 
-	private static final String[] START_EXCLUDES = { "wpc", "monotype sorts", "section", "columns",
-			"aligned ", "standard", "default ", "biblio", "footnote", "gfootnote", "endnote", "heading",
-			"header for ", "underlined heading", "centered heading", "technical", "object #",
-			"microsoft word" };
+	private static final String[] START_EXCLUDES = { "wpc", "monotype sorts", "section", "columns", "aligned ",
+			"standard", "default ", "biblio", "footnote", "gfootnote", "endnote", "heading", "header for ",
+			"underlined heading", "centered heading", "technical", "object #", "microsoft word" };
 
 	private static final String[] END_EXCLUDES = { "aligned paragraph numbers", "heading", "bullet list"
-	// " style", " roman", "laserJet", "bullet list", "defaults", "typestyle", "land", "landscape", "portrait"
+			// " style", " roman", "laserJet", "bullet list", "defaults",
+			// "typestyle", "land", "landscape", "portrait"
 	};
 
-	private static final String[] EXACT_EXCLUDES = { "nlus.", "usjp", "initialize technical style",
-			"document style", "pleading", "times", "and", "where", "left", "right", "over", "(k over",
-			"document", "header", "footer", "itemize", "page number", "pages", "body text", "word",
-			"sjablone", "d printer" };
+	private static final String[] EXACT_EXCLUDES = { "nlus.", "usjp", "initialize technical style", "document style",
+			"pleading", "times", "and", "where", "left", "right", "over", "(k over", "document", "header", "footer",
+			"itemize", "page number", "pages", "body text", "word", "sjablone", "d printer" };
 
 	private static final String[] CONTAIN_EXCLUDES = { "left (", "right )", "right ]", "right par",
 			"default paragraph", };
 
 	/**
-	 * Wraps the specified InputStream in a WPFilterInputStream and passes it to the super class.
+	 * Wraps the specified InputStream in a WPFilterInputStream and passes it to
+	 * the super class.
 	 */
 	@Override
 	public String extract(InputStream stream) throws IOException {
 		WPFilterInputStream wpfis = new WPFilterInputStream(stream);
 		String text = super.extract(wpfis);
-		//wpfis.closeExtraOut();
 		return text;
 	}
-	
-	// overrides StringExtractor.isTextCharacter
+
 	@Override
 	protected boolean isTextCharacter(int charNumber) {
-		
+
 		boolean xxx = super.isTextCharacter(charNumber) || charNumber >= 0xC0 && charNumber <= 0xFF
-		// accented ANSI character
-		|| charNumber == 0x91 // backquote
-		|| charNumber == 0x92; // quote;
-		
-		
+				|| charNumber == 0x91 || charNumber == 0x92;
 		return xxx;
 	}
 
-	// overrides StringExtractor.isStartLine
 	@Override
 	protected boolean isStartLine(String lineLowerCase) {
 		for (int i = 0; i < EXACT_START_LINES.length; i++) {
@@ -67,7 +60,6 @@ public class WPStringExtractor extends StringExtractor {
 		return false;
 	}
 
-	// overrides StringExtractor.isValidLine
 	@Override
 	protected boolean isValidLine(String lineLowerCase) {
 		for (int i = 0; i < EXACT_EXCLUDES.length; i++) {

@@ -50,7 +50,7 @@ public class TarParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					new TarUtil().extractEntry(tarFile, entry, uncompressedEntryFile);
+					new TarUtil().extractEntry(tarFile, uncompressedEntryFile);
 
 					Document clone = new Document(document);
 					clone.setFileName(uncompressedEntryFile.getName());
@@ -63,8 +63,7 @@ public class TarParser extends AbstractParser {
 				}
 			}
 		} finally {
-			if (tarFile != null)
-				FileUtil.strongDelete(tarFile);
+			FileUtil.strongDelete(tarFile);
 		}
 	}
 
@@ -105,7 +104,7 @@ public class TarParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					new TarUtil().extractEntry(input, entry, uncompressedEntryFile);
+					new TarUtil().extractEntry(input, uncompressedEntryFile);
 					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 				} finally {
 					if (uncompressedEntryFile != null)

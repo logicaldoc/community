@@ -115,7 +115,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 		SelectItem template = ItemFactory.newTemplateSelector(true, policy.getTemplateId());
 		template.addChangedHandler(changedHandler);
 
-		folder = new FolderSelector(null, true);
+		folder = new FolderSelector(null, null);
 		folder.setFolder(policy.getFolderId(), policy.getFolderName());
 		folder.addFolderChangeListener(RetentionPolicyDetailsPanel.this);
 

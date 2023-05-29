@@ -1,6 +1,5 @@
 package com.logicaldoc.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,6 +12,10 @@ import java.util.stream.Collectors;
  * @since 8.2.1
  */
 public class CollectionUtil {
+
+	private CollectionUtil() {
+	}
+
 	/**
 	 * Divide a list to segments of n size
 	 * 

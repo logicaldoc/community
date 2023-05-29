@@ -271,7 +271,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			bottom.removeMembers(bottom.getMembers());
 		}
 
-		pageDrawingPane = new ImageDrawingPane(getPageUrl(page), null, imageElements -> {
+		pageDrawingPane = new ImageDrawingPane(getPageUrl(page), imageElements -> {
 			// Reload the document to update the pages count
 			if (document.getPreviewPages() <= 1)
 				DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {

@@ -63,8 +63,7 @@ public class RarParser extends AbstractParser {
 				}
 			}
 		} finally {
-			if (rarFile != null)
-				FileUtil.strongDelete(rarFile);
+			FileUtil.strongDelete(rarFile);
 		}
 	}
 

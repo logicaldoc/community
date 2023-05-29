@@ -56,7 +56,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		userSelector.addChangedHandler(event -> refresh());
 		toolStrip.addFormItem(userSelector);
 
-		folderSelector = new FolderSelector("folder", true);
+		folderSelector = new FolderSelector("folder", null);
 		folderSelector.setTitle(I18N.message("parent"));
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);

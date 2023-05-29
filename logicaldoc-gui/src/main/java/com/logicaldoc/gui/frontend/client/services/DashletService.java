@@ -46,7 +46,7 @@ public interface DashletService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void saveDashlets(GUIDashlet[] dashlets) throws ServerException;
-	
+
 	/**
 	 * Loads all the dashlet definitions
 	 * 
@@ -55,8 +55,7 @@ public interface DashletService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIDashlet[] loadDashlets() throws ServerException;
-	
-	
+
 	/**
 	 * Saves the user's dashlet configuration
 	 * 
@@ -71,7 +70,7 @@ public interface DashletService extends RemoteService {
 	 * 
 	 * @param name the name of the dashlet
 	 * 
-	 * @return the dashlet retrieved by the server application 
+	 * @return the dashlet retrieved by the server application
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
@@ -80,14 +79,17 @@ public interface DashletService extends RemoteService {
 	public void delete(long dashletId) throws ServerException;
 
 	public static class Instance {
-		private static DashletServiceAsync instance;
+		private static DashletServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static DashletServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(DashletService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(DashletService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

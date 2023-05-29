@@ -336,7 +336,6 @@ public class EMailSender {
 		Transport trans = buildTransport(sess);
 
 		Address[] adr = message.getAllRecipients();
-		// message.setSentDate(new Date());
 
 		MailDateFormat formatter = new MailDateFormat();
 		formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
@@ -432,7 +431,6 @@ public class EMailSender {
 		props.put("mail.smtp.ssl.protocols", "TLSv1.1 TLSv1.2");
 		props.put("mail.smtp.ssl.checkserveridentity", "false");
 		props.put("mail.smtp.ssl.trust", "*");
-		// props.put("mail.debug", "true");
 		return props;
 	}
 

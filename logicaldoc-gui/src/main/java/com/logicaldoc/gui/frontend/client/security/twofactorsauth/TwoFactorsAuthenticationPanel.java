@@ -61,7 +61,7 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 				notify.setValue(false);
 				notify.setDisabled(true);
 			} else if (Constants.TWOFA_EMAIL_AUTHENTICATOR.equals(event.getValue().toString())) {
-				setupPanel = new EmailAuthenticatorSetup(TwoFactorsAuthenticationPanel.this.user);
+				setupPanel = new EmailAuthenticatorSetup();
 				notify.setValue(false);
 				notify.setDisabled(true);
 			} else if (Constants.TWOFA_DUO.equals(event.getValue().toString())) {

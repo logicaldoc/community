@@ -101,41 +101,20 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 	@Override
 	public Sequence findByAlternateKey(String name, long objectId, long tenantId) {
 		try {
+			List<Sequence> sequences = findSequences(name, objectId, tenantId);
+
 			Sequence sequence = null;
-
-			String query = " " + ENTITY + ".tenantId = :tenantId ";
-			query += AND + ENTITY + ".objectId = :objectId ";
-			query += AND + ENTITY + ".name = :name ";
-			List<Sequence> sequences = new ArrayList<>();
-			try {
-				Map<String, Object> params = new HashMap<>();
-				params.put("tenantId", tenantId);
-				params.put("objectId", objectId);
-				params.put("name", name);
-
-				sequences = findByWhere(query, params, null, null);
-			} catch (Exception t) {
-				// Nothing to do
-			}
 
 			// It's incredible but the findByWhere sometimes doesn't find the
 			// sequence so finding by the ID is safer
 			if (sequences.isEmpty()) {
-				query = "select ld_id from ld_sequence where ld_name='" + SqlUtil.doubleQuotes(name)
-						+ "' and ld_objectid=" + objectId + " and ld_tenantid=" + tenantId;
-				try {
-					long sequenceId = queryForLong(query);
-					if (sequenceId != 0L)
-						sequence = findById(sequenceId);
-				} catch (Exception t) {
-					log.warn(t.getMessage(), t);
-				}
+				sequence = findSequence(name, objectId, tenantId, sequence);
 			} else {
 				sequence = sequences.get(0);
 			}
 
 			if (sequence == null)
-				log.debug("Unable to find sequence " + name + "," + objectId + "," + tenantId);
+				log.debug("Unable to find sequence {},{},{}", name, objectId, tenantId);
 			else
 				refresh(sequence);
 
@@ -144,6 +123,38 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			log.error(t.getMessage(), t);
 			return null;
 		}
+	}
+
+	private Sequence findSequence(String sequenceName, long objectId, long tenantId, Sequence sequence) {
+		String query = "select ld_id from ld_sequence where ld_name='" + SqlUtil.doubleQuotes(sequenceName)
+				+ "' and ld_objectid=" + objectId + " and ld_tenantid=" + tenantId;
+		try {
+			long sequenceId = queryForLong(query);
+			if (sequenceId != 0L)
+				sequence = findById(sequenceId);
+		} catch (Exception t) {
+			log.warn(t.getMessage(), t);
+		}
+		return sequence;
+	}
+
+	private List<Sequence> findSequences(String sequenceName, long objectId, long tenantId) {
+		List<Sequence> sequences = new ArrayList<>();
+		try {
+			Map<String, Object> params = new HashMap<>();
+			params.put("tenantId", tenantId);
+			params.put("objectId", objectId);
+			params.put("name", sequenceName);
+
+			String query = " " + ENTITY + ".tenantId = :tenantId ";
+			query += AND + ENTITY + ".objectId = :objectId ";
+			query += AND + ENTITY + ".name = :name ";
+
+			sequences = findByWhere(query, params, null, null);
+		} catch (Exception t) {
+			// Nothing to do
+		}
+		return sequences;
 	}
 
 	@Override

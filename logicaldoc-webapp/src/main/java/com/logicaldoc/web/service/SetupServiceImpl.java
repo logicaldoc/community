@@ -49,41 +49,53 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 
 		data.setRepositoryFolder(data.getRepositoryFolder().replace("\\", "/"));
 		File repoFolder = new File(data.getRepositoryFolder());
-		log.warn("Initialize system using repository " + repoFolder);
+		log.warn("Initialize system using repository {}", repoFolder);
 
 		try {
 			makeWorkingDir(repoFolder);
+
 			createDB(data);
+
 			writeRegConfig(data);
 
-			// Setup the correct logs folder
-			try {
-				ContextProperties pbean = new ContextProperties();
-				LoggingConfigurator lconf = new LoggingConfigurator();
-				lconf.setLogsRoot(pbean.getProperty("conf.logdir"));
-				lconf.write();
-			} catch (Exception t) {
-				log.error(t.getMessage(), t);
-			}
+			setLogFolder();
 
-			// Mark the system as initialized
-			try {
-				ContextProperties pbean = new ContextProperties();
-				pbean.setProperty("initialized", "true");
-				pbean.write();
-			} catch (Exception t) {
-				log.error(t.getMessage(), t);
-			}
+			markInitialized();
 
 			// Reload the application context in order to reconnect DAOs to the
 			// database
 			Context.get().refresh();
 		} catch (IOException | SQLException caught) {
-			System.err.println(caught.getMessage());
-			log.error(caught.getMessage(), caught);
 			throw new ServerException(caught.getMessage(), caught);
 		}
 
+	}
+
+	/**
+	 * Setups the correct logs folder
+	 */
+	private void markInitialized() {
+		try {
+			ContextProperties pbean = new ContextProperties();
+			pbean.setProperty("initialized", "true");
+			pbean.write();
+		} catch (Exception t) {
+			log.error(t.getMessage(), t);
+		}
+	}
+
+	/**
+	 * Marks the system as initialized
+	 */
+	private void setLogFolder() {
+		try {
+			ContextProperties pbean = new ContextProperties();
+			LoggingConfigurator lconf = new LoggingConfigurator();
+			lconf.setLogsRoot(pbean.getProperty("conf.logdir"));
+			lconf.write();
+		} catch (Exception t) {
+			log.error(t.getMessage(), t);
+		}
 	}
 
 	private void writeDBConfig(SetupInfo data) throws IOException {
@@ -149,7 +161,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 				if (!file.createNewFile())
 					throw new IOException("Cannot create file " + file.getAbsolutePath());
 			} catch (Exception e) {
-				System.err.println(e.getMessage());
+				log.error(e.getMessage());
 			}
 		}
 	}

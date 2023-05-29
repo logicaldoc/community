@@ -15,28 +15,18 @@ public class ProgressCanvas extends HLayout {
 		setHeight(15);
 		setAlign(Alignment.CENTER);
 
-		Progressbar progressBar = new Progressbar();
-		progressBar.setHeight(8);
-		progressBar.setMargin(3);
-		progressBar.setVertical(false);
-		progressBar.setShowTitle(true);
+		Progressbar progrBar = new Progressbar();
+		progrBar.setHeight(8);
+		progrBar.setMargin(3);
+		progrBar.setVertical(false);
+		progrBar.setShowTitle(true);
 
-		boolean enabled = true;
-		// rec.getAttributeAsBoolean("eenabled");
-		boolean running = true;
-		// rec.getAttributeAsInt("status") ==
-		// GUITask.STATUS_RUNNING;
-		Img image = new Img();
-		if (enabled && running) {
-			image = ItemFactory.newImgIcon("paste.gif");
-		} else {
-			image = ItemFactory.newImgIcon("document_lock.png");
-		}
-
+		Img image = ItemFactory.newImgIcon("paste.gif");
+		
 		image.setWidth("16px");
 		image.setHeight("16px");
 
-		addMember(progressBar);
+		addMember(progrBar);
 		addMember(image);
 
 		setProgress(progress);

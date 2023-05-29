@@ -150,14 +150,17 @@ public interface SearchEngineService extends RemoteService {
 	public void remove(Long[] entryIds) throws ServerException;
 
 	public static class Instance {
-		private static SearchEngineServiceAsync instance;
+		private static SearchEngineServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static SearchEngineServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SearchEngineService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SearchEngineService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

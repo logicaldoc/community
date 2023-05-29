@@ -29,8 +29,7 @@ public class TemplateValidationPanel extends HLayout {
 
 	private HLayout container = new HLayout();
 
-	public TemplateValidationPanel(GUITemplate template, ChangedHandler changedHandler,
-			TemplateDetailsPanel detailsPanel) {
+	public TemplateValidationPanel(GUITemplate template, ChangedHandler changedHandler) {
 		if (template == null) {
 			setMembers(TemplatesPanel.SELECT_TEMPLATE);
 			return;

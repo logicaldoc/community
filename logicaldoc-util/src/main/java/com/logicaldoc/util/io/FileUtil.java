@@ -61,6 +61,9 @@ public class FileUtil {
 
 	protected static Logger log = LoggerFactory.getLogger(FileUtil.class);
 
+	private FileUtil() {
+	}
+
 	/**
 	 * Writes a stream to a file and then closes the same stream.
 	 * 
@@ -616,7 +619,7 @@ public class FileUtil {
 			FileUtil.strongDelete(file);
 			boolean renamed = tmp.renameTo(file);
 			if (!renamed)
-				log.warn("Cannot rename to " + file.getAbsolutePath());
+				log.warn("Cannot rename to {}", file.getAbsolutePath());
 		}
 	}
 
@@ -717,8 +720,7 @@ public class FileUtil {
 					throw new IOException(CANNOT_CREATE_FILE + tmp.getAbsolutePath());
 			}
 		} finally {
-			if (tmp != null && tmp.exists())
-				FileUtils.deleteQuietly(tmp);
+			FileUtils.deleteQuietly(tmp);
 		}
 
 	}

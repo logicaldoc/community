@@ -90,14 +90,16 @@ public interface AutomationService extends RemoteService {
 	public void execute(GUIAutomationRoutine routine, long[] docIds, Long folderId) throws ServerException;
 
 	public static class Instance {
-		private static AutomationServiceAsync instance;
+		private static AutomationServiceAsync inst;
 
+		private Instance() {}
+		
 		public static AutomationServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(AutomationService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(AutomationService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

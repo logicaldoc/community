@@ -190,14 +190,17 @@ public interface SystemService extends RemoteService {
 			int maxResult) throws ServerException;
 
 	public static class Instance {
-		private static SystemServiceAsync instance;
+		private static SystemServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static SystemServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SystemService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SystemService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

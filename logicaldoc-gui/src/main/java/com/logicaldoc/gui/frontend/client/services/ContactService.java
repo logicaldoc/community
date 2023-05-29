@@ -65,10 +65,10 @@ public interface ContactService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIContact[] parseContacts(boolean preview, String separator, String delimiter,
-			boolean skipFirstRow, int firstName, int lastName, int email, int company, int phone, int mobile,
-			int address) throws ServerException;
-	
+	public GUIContact[] parseContacts(boolean preview, String separator, String delimiter, boolean skipFirstRow,
+			int firstName, int lastName, int email, int company, int phone, int mobile, int address)
+			throws ServerException;
+
 	/**
 	 * Shares contacts among a set of users and groups
 	 * 
@@ -79,16 +79,19 @@ public interface ContactService extends RemoteService {
 	 * @throws ServerException share the search to
 	 */
 	void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException;
-	
+
 	public static class Instance {
-		private static ContactServiceAsync instance;
+		private static ContactServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static ContactServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ContactService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ContactService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

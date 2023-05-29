@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  * JavaLauncher Provides an easy way to launch java applications.
  */
 public class JavaLauncher {
-	private static final String FAILED_TO_LAUNCH_JAVA_PROGRAM = "Failed to launch java program: ";
 
 	protected static Logger log = LoggerFactory.getLogger(JavaLauncher.class);
 
@@ -67,7 +66,6 @@ public class JavaLauncher {
 		log.info("Executing Command: {}", wholeCommand);
 
 		try {
-
 			Process proc = Runtime.getRuntime().exec(command);
 
 			if (debug) {
@@ -76,10 +74,8 @@ public class JavaLauncher {
 			return proc;
 
 		} catch (Exception e) {
-			log.error("Failed to launch java program: {}", e.getMessage());
 			throw new ExecException(wholeCommand.toString(), e);
 		}
-
 	}
 
 	/**
@@ -109,17 +105,15 @@ public class JavaLauncher {
 			wholeCommand.append(command[i] + " ");
 		}
 
-		log.info("Executing Command: " + wholeCommand);
+		log.info("Executing command: {}", wholeCommand);
 
 		try {
-
 			Process proc = Runtime.getRuntime().exec(command);
 
 			if (debug) {
 				monitorProcess(proc);
 			}
 			return proc;
-
 		} catch (Exception e) {
 			throw new ExecException(wholeCommand.toString(), e);
 		}
@@ -150,7 +144,7 @@ public class JavaLauncher {
 		// check for failure
 		try {
 			if (proc.waitFor() != 0)
-				log.info("exit value = " + proc.exitValue());
+				log.info("exit value = {}", proc.exitValue());
 		} catch (InterruptedException e) {
 			log.error(e.getMessage());
 			Thread.currentThread().interrupt();
@@ -195,7 +189,7 @@ public class JavaLauncher {
 			JavaLauncher.monitorProcess(proc);
 
 		} catch (Exception e) {
-			log.error(FAILED_TO_LAUNCH_JAVA_PROGRAM + e.getMessage());
+			log.error("Failed to launch java program: {}", e.getMessage());
 		}
 	}
 }

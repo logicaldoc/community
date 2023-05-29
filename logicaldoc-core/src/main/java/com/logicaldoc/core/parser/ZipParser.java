@@ -111,8 +111,7 @@ public class ZipParser extends AbstractParser {
 				}
 			}
 		} finally {
-			if (zipFile != null)
-				FileUtil.strongDelete(zipFile);
+			FileUtil.strongDelete(zipFile);
 		}
 	}
 

@@ -539,9 +539,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
-//		if (this.folder != null && this.folder.getId() == folder.getId()) {
-//			setFolder(folder);
-//		}
+		// Nothing to do
 	}
 
 	@Override

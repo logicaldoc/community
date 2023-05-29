@@ -173,17 +173,15 @@ public class MailUtil {
 		rec.setType(Recipient.TYPE_EMAIL);
 		email.getRecipients().add(rec);
 
-		if (StringUtils.isEmpty(email.getMessageText()))
-			if (StringUtils.isNotEmpty(msg.getBodyRTF())) {
-				email.setMessageText(msg.getBodyRTF());
-				email.setHtml(0);
-			}
+		if (StringUtils.isEmpty(email.getMessageText()) && StringUtils.isNotEmpty(msg.getBodyRTF())) {
+			email.setMessageText(msg.getBodyRTF());
+			email.setHtml(0);
+		}
 
-		if (StringUtils.isEmpty(email.getMessageText()))
-			if (StringUtils.isNotEmpty(msg.getBodyText())) {
-				email.setMessageText(msg.getBodyText());
-				email.setHtml(0);
-			}
+		if (StringUtils.isEmpty(email.getMessageText()) && StringUtils.isNotEmpty(msg.getBodyText())) {
+			email.setMessageText(msg.getBodyText());
+			email.setHtml(0);
+		}
 
 		List<RecipientEntry> recs = msg.getCcRecipients();
 		for (RecipientEntry entry : recs) {
@@ -260,7 +258,6 @@ public class MailUtil {
 		props.put("mail.smtp.provider.class", CustomTransport.class.getName());
 		props.put("mail.smtp.provider.vendor", "foo");
 		props.put("mail.smtp.provider.version", "0.0.0");
-		// props.put("mail.host", "smtp.unexisting.com");
 
 		try {
 			Session mailSession = Session.getInstance(props, null);
@@ -366,7 +363,7 @@ public class MailUtil {
 					return rec;
 				}).collect(Collectors.toSet()));
 			} catch (Exception t) {
-				log.warn("Unable to extract BCC addresses - %s", t.getMessage());
+				log.warn("Unable to extract BCC addresses {}", t.getMessage());
 			}
 		}
 	}
@@ -384,7 +381,7 @@ public class MailUtil {
 					return rec;
 				}).collect(Collectors.toSet()));
 			} catch (Exception t) {
-				log.warn("Unable to extract BCC addresses - %s", t.getMessage());
+				log.warn("Unable to extract BCC addresses {}", t.getMessage());
 			}
 		}
 	}
@@ -402,7 +399,7 @@ public class MailUtil {
 					return rec;
 				}).collect(Collectors.toSet()));
 			} catch (Exception t) {
-				log.warn("Unable to extract CC addresses - %s", t.getMessage());
+				log.warn("Unable to extract CC addresses {}", t.getMessage());
 			}
 		}
 	}
@@ -420,7 +417,7 @@ public class MailUtil {
 					return rec;
 				}).collect(Collectors.toSet()));
 			} catch (Exception t) {
-				log.warn("Unable to extract TO addresses - %s", t.getMessage());
+				log.warn("Unable to extract TO addresses {}", t.getMessage());
 			}
 		}
 	}
@@ -554,7 +551,7 @@ public class MailUtil {
 	 */
 	private static String extractTextFromTextStar(Part p) throws IOException, MessagingException {
 		Object obj = p.getContent();
-		String str = NO_BODY;
+		String str;
 
 		if (obj instanceof InputStream) {
 			InputStream is = (InputStream) obj;
@@ -586,7 +583,6 @@ public class MailUtil {
 		// prefer html over plain text
 		Multipart mp = (Multipart) p.getContent();
 		String text = "T" + NO_BODY;
-		// log.info("Mime Parts: {}", mp.getCount());
 
 		for (int i = 0; i < mp.getCount(); i++) {
 			Part bp = mp.getBodyPart(i);
@@ -759,10 +755,9 @@ public class MailUtil {
 			String disposition = part.getDisposition();
 			String contentType = part.getContentType();
 
-			if ((disposition == null || "inline".equals(disposition)) && contentType != null) {
-				if (contentType.toLowerCase().startsWith("text/plain")) {
-					textBody.append(part.getContent());
-				}
+			if ((disposition == null || "inline".equals(disposition)) && contentType != null
+					&& contentType.toLowerCase().startsWith("text/plain")) {
+				textBody.append(part.getContent());
 			}
 			return;
 		}
@@ -799,7 +794,6 @@ public class MailUtil {
 		@Override
 		public void sendMessage(Message message, Address[] addresses) throws MessagingException {
 			// Take the message and write it somewhere
-			// e.g.: a logger or an OutputStream message.writeTo(...);
 		}
 
 		@Override

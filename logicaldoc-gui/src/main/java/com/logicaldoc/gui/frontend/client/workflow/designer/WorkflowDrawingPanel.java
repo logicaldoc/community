@@ -68,12 +68,12 @@ public class WorkflowDrawingPanel extends VStack {
 		if (workflow.getStates() == null)
 			return;
 
-		GUIWorkflow workflow = this.workflow;
+		GUIWorkflow wf = this.workflow;
 		if (workflowDesigner != null)
-			workflow = workflowDesigner.getWorkflow();
+			wf = workflowDesigner.getWorkflow();
 
 		try {
-			drawAll(workflow);
+			drawAll(wf);
 		} catch (Exception t) {
 			GuiLog.error(t.getMessage(), null, t);
 		}

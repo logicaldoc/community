@@ -215,6 +215,10 @@ public class Feature {
 
 	private static Set<String> features = new HashSet<>();
 
+	private Feature() {
+		
+	}
+	
 	static public void init(GUIInfo info) {
 		features.clear();
 		for (String feature : info.getFeatures()) {

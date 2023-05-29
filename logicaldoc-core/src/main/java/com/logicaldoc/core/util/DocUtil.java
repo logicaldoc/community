@@ -20,6 +20,9 @@ import com.logicaldoc.util.Context;
 public class DocUtil {
 	protected static Logger log = LoggerFactory.getLogger(DocUtil.class);
 
+	private DocUtil() {
+	}
+
 	public static String getFileName(Document document, String fileVersion) {
 		String fileName = document.getFileName();
 		if (StringUtils.isNotEmpty(fileVersion) && !fileVersion.equals(document.getFileVersion())) {

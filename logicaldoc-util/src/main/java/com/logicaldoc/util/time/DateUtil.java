@@ -21,6 +21,10 @@ public class DateUtil {
 
 	protected static Logger log = LoggerFactory.getLogger(DateUtil.class);
 
+	private DateUtil() {
+
+	}
+
 	/**
 	 * Formats a date using the ISO format <code>yyyy-MM-dd HH:mm:ss Z</code>
 	 * 

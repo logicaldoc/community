@@ -8,7 +8,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.server.io.PropertyExportContext;
-import org.apache.jackrabbit.server.io.PropertyImportContext;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.slf4j.Logger;
@@ -44,8 +43,8 @@ public class DefaultHandler implements IOHandler {
 	private String defaultNodetype = JcrConstants.NT_FILE;
 
 	/*
-	 * IMPORTANT NOTES: for webDAV compliancy the default nodetype of the content
-	 * node has been changed from nt:resource to nt:unstructured.
+	 * IMPORTANT NOTES: for webDAV compliancy the default nodetype of the
+	 * content node has been changed from nt:resource to nt:unstructured.
 	 */
 	private String contentNodetype = JcrConstants.NT_UNSTRUCTURED;
 
@@ -64,7 +63,8 @@ public class DefaultHandler implements IOHandler {
 		this.ioManager = ioManager;
 	}
 
-	public DefaultHandler(IOManager ioManager, String collectionNodetype, String defaultNodetype, String contentNodetype) {
+	public DefaultHandler(IOManager ioManager, String collectionNodetype, String defaultNodetype,
+			String contentNodetype) {
 		this.ioManager = ioManager;
 
 		this.collectionNodetype = collectionNodetype;
@@ -101,14 +101,15 @@ public class DefaultHandler implements IOHandler {
 
 	public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException {
 		if (!canImport(context, isCollection)) {
-			log.warn(getName() + CANNOT_IMPORT + context.getSystemId());
-			throw new IOException(getName() + CANNOT_IMPORT + context.getSystemId());
+			final String message = getName() + CANNOT_IMPORT + context.getSystemId();
+			log.warn(message);
+			throw new IOException(message);
 		}
 
 		boolean success = false;
 		try {
 			success = setContentData(context, isCollection);
-			log.debug("success = " + success);
+			log.debug("success = {}" + success);
 		} catch (DavException e) {
 			throw e;
 		} catch (Exception e) {
@@ -123,11 +124,6 @@ public class DefaultHandler implements IOHandler {
 			throw new IOException(getName() + CANNOT_IMPORT + context.getSystemId());
 		}
 		return importContent(context, resource.isCollection());
-	}
-
-	protected boolean importData(ImportContext context, boolean isCollection, Resource resource) throws IOException,
-			WebDavStorageException {
-		return true;
 	}
 
 	public boolean canExport(ExportContext context, boolean isCollection) {
@@ -150,7 +146,7 @@ public class DefaultHandler implements IOHandler {
 		}
 		try {
 			if (context.hasStream())
-				exportData(context, isCollection, context.getResource());
+				exportData(context, context.getResource());
 
 			return true;
 		} catch (WebDavStorageException e) {
@@ -167,8 +163,7 @@ public class DefaultHandler implements IOHandler {
 		return exportContent(context, resource.isCollection());
 	}
 
-	protected void exportData(ExportContext context, boolean isCollection, Resource resource) throws IOException,
-			WebDavStorageException {
+	protected void exportData(ExportContext context, Resource resource) throws IOException, WebDavStorageException {
 		try {
 			InputStream is = resourceService.streamOut(resource);
 			if (is != null)
@@ -183,7 +178,7 @@ public class DefaultHandler implements IOHandler {
 
 		Resource resource = context.getResource();
 		String name = context.getSystemId();
-		
+
 		Resource res = resourceService.getChildByName(resource, name);
 
 		if (res == null) {
@@ -196,7 +191,7 @@ public class DefaultHandler implements IOHandler {
 		}
 	}
 
-	protected Resource getContentNode(ExportContext context, boolean isCollection) throws WebDavStorageException {
+	protected Resource getContentNode(ExportContext context) throws WebDavStorageException {
 		return context.getResource();
 	}
 
@@ -225,30 +220,27 @@ public class DefaultHandler implements IOHandler {
 		return true;
 	}
 
-	public boolean canImport(PropertyImportContext context, boolean isCollection) {
-		return true;
-	}
-
 	@Override
 	public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength)
 			throws IOException {
-		
+
 		if (!canExport(context, resource)) {
 			throw new IOException(getName() + CANNOT_EXPORT);
 		}
-		
+
 		return exportContent(context, resource.isCollection(), left, rangeLength);
 	}
 
-	private boolean exportContent(ExportContext context, boolean isCollection, Long left, Long rangeLength) throws IOException {
-		
+	private boolean exportContent(ExportContext context, boolean isCollection, Long left, Long rangeLength)
+			throws IOException {
+
 		if (!canExport(context, isCollection)) {
 			throw new IOException(getName() + CANNOT_EXPORT);
 		}
-		
+
 		try {
 			if (context.hasStream())
-				exportData(context, isCollection, context.getResource(), left, rangeLength);
+				exportData(context, context.getResource(), left, rangeLength);
 
 			return true;
 		} catch (WebDavStorageException e) {
@@ -257,13 +249,12 @@ public class DefaultHandler implements IOHandler {
 			throw new IOException(e.getMessage());
 		}
 	}
-	
-	protected void exportData(ExportContext context, boolean isCollection, Resource resource, Long left, Long rangeLength) 
+
+	protected void exportData(ExportContext context, Resource resource, Long left, Long rangeLength)
 			throws IOException, WebDavStorageException {
 		try {
 			InputStream is = resourceService.streamOut(resource);
 			if (is != null) {
-				//IOUtil.spool(is, context.getOutputStream());
 				IOUtils.copyLarge(is, context.getOutputStream(), left, rangeLength);
 			}
 		} catch (FileNotFoundException e) {

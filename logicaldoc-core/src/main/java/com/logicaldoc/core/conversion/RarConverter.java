@@ -24,7 +24,7 @@ public class RarConverter extends CompressedArchiveConverter {
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		List<String> entries = new RarUtil().listEntries(src);
 		if (entries.size() > 1)
-			convertMultipleEntries(sid, document, src, dest, entries);
+			convertMultipleEntries(sid, document, dest, entries);
 		else
 			convertSingleEntry(sid, document, src, dest, entries.get(0));
 	}

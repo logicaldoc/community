@@ -37,7 +37,8 @@ public interface InfoService extends RemoteService {
 	 * 
 	 * @return array with all the settings
 	 * 
-	 * @throws InvalidSessionServerException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is
+	 *         expired
 	 */
 	public GUIParameter[] getSessionInfo() throws InvalidSessionServerException;
 
@@ -58,19 +59,23 @@ public interface InfoService extends RemoteService {
 	 * 
 	 * @return if the server has been successfully contacted
 	 * 
-	 * @throws InvalidSessionServerException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is
+	 *         expired
 	 */
 	public boolean ping() throws InvalidSessionServerException;
 
 	public static class Instance {
-		private static InfoServiceAsync instance;
+		private static InfoServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static InfoServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(InfoService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(InfoService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

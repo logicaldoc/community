@@ -119,7 +119,6 @@ public class StringExtractor {
 	protected boolean isTextCharacter(int charNumber) {
 		return charNumber >= 32 && charNumber <= 126 || // readable ASCII
 														// characters
-		// charNumber >= 128 && charNumber <= 168 || // letters with accents,
 		// currency symbols, etc.
 				charNumber == 9; // tab
 	}

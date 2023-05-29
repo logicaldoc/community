@@ -24,7 +24,7 @@ public class SevenZipConverter extends CompressedArchiveConverter {
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		List<String> entries = new SevenZipUtil().listEntries(src);
 		if (entries.size() > 1)
-			convertMultipleEntries(sid, document, src, dest, entries);
+			convertMultipleEntries(sid, document, dest, entries);
 		else
 			convertSingleEntry(sid, document, src, dest, entries.get(0));
 	}

@@ -127,7 +127,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		aliases.setValue(true);
 		aliases.setEndRow(true);
 
-		folder = new FolderSelector(null, true);
+		folder = new FolderSelector(null, null);
 		folder.setColSpan(3);
 		folder.setWidth(200);
 

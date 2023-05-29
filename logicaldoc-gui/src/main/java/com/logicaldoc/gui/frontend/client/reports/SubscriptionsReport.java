@@ -92,7 +92,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		userSelector.addChangedHandler((ChangedEvent event) -> refresh());
 		toolStrip.addFormItem(userSelector);
 
-		folderSelector = new FolderSelector("folder", true);
+		folderSelector = new FolderSelector("folder", null);
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);

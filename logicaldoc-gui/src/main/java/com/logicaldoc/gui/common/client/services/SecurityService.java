@@ -416,13 +416,15 @@ public interface SecurityService extends RemoteService {
 	void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds) throws ServerException;
 
 	public static class Instance {
-		private static SecurityServiceAsync instance;
+		private static SecurityServiceAsync inst;
 
+		private Instance() {}
+		
 		public static SecurityServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SecurityService.class);
+			if (inst == null) {
+				inst = GWT.create(SecurityService.class);
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

@@ -129,7 +129,7 @@ public class LastChangesReport extends AdminPanel {
 		sessionId.setColSpan(8);
 		sessionId.setEndRow(true);
 
-		folder = new FolderSelector(null, true);
+		folder = new FolderSelector(null, null);
 		folder.setWidth(200);
 		folder.setEndRow(true);
 		folder.setColSpan(8);
@@ -215,8 +215,8 @@ public class LastChangesReport extends AdminPanel {
 		FileNameListGridField name = new FileNameListGridField(NAME, "icon", I18N.message(NAME), 150);
 		name.setCanFilter(true);
 
-		ListGridField folder = new ListGridField(FOLDER_STR, I18N.message(FOLDER_STR), 100);
-		folder.setCanFilter(true);
+		ListGridField folderField = new ListGridField(FOLDER_STR, I18N.message(FOLDER_STR), 100);
+		folderField.setCanFilter(true);
 
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"), 250);
 		sid.setCanFilter(true);
@@ -259,7 +259,7 @@ public class LastChangesReport extends AdminPanel {
 		histories.setEmptyMessage(I18N.message("notitemstoshow"));
 		histories.setWidth100();
 		histories.setHeight100();
-		histories.setFields(eventField, date, userField, name, folder, sid, docId, folderId, userId, username, ip,
+		histories.setFields(eventField, date, userField, name, folderField, sid, docId, folderId, userId, username, ip,
 				device, geolocation, comment, reason);
 		histories.setSelectionType(SelectionStyle.SINGLE);
 		histories.setShowRecordComponents(true);
@@ -441,7 +441,7 @@ public class LastChangesReport extends AdminPanel {
 
 		if (docId != null)
 			contextMenu.setItems(download, preview, openInFolder);
-		else if (folderId != null)
+		else
 			contextMenu.setItems(openFolder);
 		contextMenu.showContextMenu();
 	}

@@ -16,11 +16,19 @@ import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
  */
 public class AwesomeFactory {
 	private static final String STYLE_COLOR = " style='color: ";
+
 	private static final String DIV_CLASS_STATUS_ICON = "<div class='statusIcon' ";
+
 	private static final String CLOSE_DIV = "</div>";
+
 	private static final String DIV_I_CLASS = "<div><i class='";
+
 	private static final String I_CLASS = "<i class='";
+
 	private static final String TITLE = "title='";
+
+	private AwesomeFactory() {
+	}
 
 	/**
 	 * Creates a ToolStripButton using font-awesome icon
@@ -168,23 +176,22 @@ public class AwesomeFactory {
 	}
 
 	public static String getLockedButtonHTML(Integer status, String user, String color) {
-		String button = DIV_CLASS_STATUS_ICON
-				+ (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED
-						? TITLE + I18N.message("lockedby") + " " + user + "' "
-						: "")
-				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "");
+		String button = DIV_CLASS_STATUS_ICON + (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED
+				? TITLE + I18N.message("lockedby") + " " + user + "' "
+				: "") + (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "");
 		button += " >";
 		button += DocUtil.getLockedIcon(status);
 		button += CLOSE_DIV;
 		return button;
 	}
-	
+
 	public static String getIndexedIcon(Integer indexed) {
 		if (indexed == null)
 			return "";
 		String html = AwesomeFactory.getIconHtml("database");
-		if (indexed == Constants.INDEX_SKIP) {		
-			html = "<span class='fa-stack'><i class='" + getCssClassPrefix() + " fa-database fa-stack-1x' aria-hidden='true' data-fa-transform='grow-6'></i>";
+		if (indexed == Constants.INDEX_SKIP) {
+			html = "<span class='fa-stack'><i class='" + getCssClassPrefix()
+					+ " fa-database fa-stack-1x' aria-hidden='true' data-fa-transform='grow-6'></i>";
 			html += I_CLASS + AwesomeFactory.getCssClassPrefix()
 					+ " fa-times fa-stack-1x' style='color: red' data-fa-transform='grow-2'></i></span>";
 		}

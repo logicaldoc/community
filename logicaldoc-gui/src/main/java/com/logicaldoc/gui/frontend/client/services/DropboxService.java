@@ -65,14 +65,17 @@ public interface DropboxService extends RemoteService {
 			throws ServerException;
 	
 	public static class Instance {
-		private static DropboxServiceAsync instance;
+		private static DropboxServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static DropboxServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(DropboxService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(DropboxService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

@@ -33,9 +33,7 @@ public class EmailAccountAutomationPanel extends EmailAccountDetailsTab {
 	public void onDraw() {
 		form.clearValues();
 		form.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.destroy();
 
 		if (Boolean.TRUE.equals(container.contains(form))) 
 			container.removeChild(form);

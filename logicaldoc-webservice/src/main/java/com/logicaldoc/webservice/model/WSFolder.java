@@ -93,13 +93,13 @@ public class WSFolder implements Serializable {
 
 	@WSDoc(required = false, description = "maximum number of versions maintaned in the workspace")
 	private Integer maxVersions;
-	
+
 	@WSDoc(required = false, description = "optional color assigned to the folder")
 	private String color;
-	
+
 	@WSDoc(required = false, description = "optional tile image(Base64 encoded) of the folder")
 	private String tile;
-	
+
 	public void addAttribute(WSAttribute att) {
 		List<WSAttribute> buf = (List<WSAttribute>) Arrays.asList(getAttributes());
 		buf.add(att);
@@ -208,24 +208,22 @@ public class WSFolder implements Serializable {
 			folder.getAttributes().clear();
 			TemplateDAO templDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			template = templDao.findById(templateId);
-			if (template != null) {
-				if (attributes != null && attributes.length > 0) {
-					for (int i = 0; i < attributes.length; i++) {
-						Attribute extAttribute = new Attribute();
-						extAttribute.setMandatory(attributes[i].getMandatory());
-						extAttribute.setHidden(attributes[i].getHidden());
-						extAttribute.setReadonly(attributes[i].getReadonly());
-						extAttribute.setMultiple(attributes[i].getMultiple());
-						extAttribute.setParent(attributes[i].getParent());
-						extAttribute.setDependsOn(attributes[i].getDependsOn());
-						extAttribute.setPosition(attributes[i].getPosition());
-						extAttribute.setIntValue(attributes[i].getIntValue());
-						extAttribute.setStringValue(attributes[i].getStringValue());
-						extAttribute.setDoubleValue(attributes[i].getDoubleValue());
-						extAttribute.setDateValue(WSUtil.convertStringToDate(attributes[i].getDateValue()));
-						extAttribute.setType(attributes[i].getType());
-						folder.getAttributes().put(attributes[i].getName(), extAttribute);
-					}
+			if (template != null && attributes != null && attributes.length > 0) {
+				for (int i = 0; i < attributes.length; i++) {
+					Attribute extAttribute = new Attribute();
+					extAttribute.setMandatory(attributes[i].getMandatory());
+					extAttribute.setHidden(attributes[i].getHidden());
+					extAttribute.setReadonly(attributes[i].getReadonly());
+					extAttribute.setMultiple(attributes[i].getMultiple());
+					extAttribute.setParent(attributes[i].getParent());
+					extAttribute.setDependsOn(attributes[i].getDependsOn());
+					extAttribute.setPosition(attributes[i].getPosition());
+					extAttribute.setIntValue(attributes[i].getIntValue());
+					extAttribute.setStringValue(attributes[i].getStringValue());
+					extAttribute.setDoubleValue(attributes[i].getDoubleValue());
+					extAttribute.setDateValue(WSUtil.convertStringToDate(attributes[i].getDateValue()));
+					extAttribute.setType(attributes[i].getType());
+					folder.getAttributes().put(attributes[i].getName(), extAttribute);
 				}
 			}
 		}

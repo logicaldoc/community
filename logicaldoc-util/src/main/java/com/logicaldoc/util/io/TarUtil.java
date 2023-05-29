@@ -60,8 +60,7 @@ public class TarUtil {
 							entry = tarInput.getNextTarEntry();
 						}
 					} finally {
-						if (tarInput != null)
-							tarInput.close();
+						tarInput.close();
 					}
 				}
 			}
@@ -72,7 +71,7 @@ public class TarUtil {
 		return entries;
 	}
 
-	public void extractEntry(File tarFile, String entryName, File dest) throws IOException {
+	public void extractEntry(File tarFile, File dest) throws IOException {
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
 					BufferedInputStream bis = new BufferedInputStream(fis);

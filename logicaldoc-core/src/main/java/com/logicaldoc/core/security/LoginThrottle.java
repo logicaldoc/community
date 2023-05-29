@@ -33,6 +33,9 @@ public class LoginThrottle {
 
 	protected static Logger log = LoggerFactory.getLogger(LoginThrottle.class);
 
+	private LoginThrottle() {
+	}
+
 	/**
 	 * Clears the failures for the given username and or password
 	 * 
@@ -169,7 +172,7 @@ public class LoginThrottle {
 			}
 		}
 	}
-	
+
 	private static void deleteSequence(Sequence seq) {
 		try {
 			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);

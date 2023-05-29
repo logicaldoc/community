@@ -18,7 +18,7 @@ public class StreamGobbler extends Thread {
 
 	protected static Logger log = LoggerFactory.getLogger(StreamGobbler.class);
 
-	public StreamGobbler(InputStream is, Logger log) {
+	public StreamGobbler(InputStream is) {
 		this.is = is;
 	}
 
@@ -29,7 +29,6 @@ public class StreamGobbler extends Thread {
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				System.out.println(line);
 				log.debug(line);
 			}
 		} catch (IOException ioe) {

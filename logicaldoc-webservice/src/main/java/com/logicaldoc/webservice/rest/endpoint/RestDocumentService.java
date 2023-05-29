@@ -96,7 +96,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		try {
 			return super.create(sid, document, content);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new WebApplicationException(e.getMessage(), 500);
 		}
 	}
@@ -160,7 +159,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 			super.checkin(sid, Long.parseLong(docId), comment, filename, release, datah);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new WebApplicationException(t.getMessage(), 500);
 		}
 	}
@@ -221,7 +219,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 			return super.upload(sid, doc_id, folder_id, release_bool, filename, language, datah);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new WebApplicationException(t.getMessage(), 500);
 		}
 	}
@@ -277,7 +274,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 			super.replaceFile(sid, docId, fileVersion, comment, datah);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new WebApplicationException(t.getMessage(), 500);
 		}
 	}
@@ -845,10 +841,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String sid = validateSession();
 		return super.unprotect(sid, docId, password);
 	}
-
-	// @Produces(MediaType.APPLICATION_OCTET_STREAM)
-	// "application/octet-stream";
-	// @Produces("image/jpeg")
 
 	@Override
 	@GET

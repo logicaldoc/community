@@ -161,7 +161,7 @@ public class ReportParametersForm extends Window {
 
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 
-		ArrayList<GUIAttribute> parameters = new ArrayList<>();
+		ArrayList<GUIAttribute> params = new ArrayList<>();
 
 		for (String name : values.keySet()) {
 			if (!name.startsWith("_"))
@@ -175,8 +175,8 @@ public class ReportParametersForm extends Window {
 
 			if (value != null) {
 				setAttributeValue(value, parameterName, attribute);
-				parameters.add(attribute);
-			} else if (attribute != null) {
+				params.add(attribute);
+			} else {
 				attribute.setIntValue(null);
 				attribute.setBooleanValue(null);
 				attribute.setDoubleValue(null);
@@ -185,7 +185,7 @@ public class ReportParametersForm extends Window {
 			}
 		}
 
-		doExecute(parameters);
+		doExecute(params);
 	}
 
 	private void setAttributeValue(Object value, String parameterName, GUIAttribute attribute) {

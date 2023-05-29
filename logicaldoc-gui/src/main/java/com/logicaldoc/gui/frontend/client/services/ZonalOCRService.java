@@ -89,6 +89,9 @@ public interface ZonalOCRService extends RemoteService {
 	public static class Instance {
 		private static ZonalOCRServiceAsync instance;
 
+		private Instance() {
+		}
+		
 		public static ZonalOCRServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(ZonalOCRService.class);

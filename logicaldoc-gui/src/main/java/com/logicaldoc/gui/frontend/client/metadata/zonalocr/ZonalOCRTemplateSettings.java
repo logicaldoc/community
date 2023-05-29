@@ -22,10 +22,6 @@ import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
-//import gwtupload.client.IUploadStatus.Status;
-//import gwtupload.client.IUploader;
-//import gwtupload.client.MultiUploader;
-
 /**
  * This popup window is used to upload / edit an OCR template
  * 

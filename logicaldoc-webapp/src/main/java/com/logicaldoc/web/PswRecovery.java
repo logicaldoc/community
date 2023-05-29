@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
@@ -94,64 +96,74 @@ public class PswRecovery extends HttpServlet {
 				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 				User user = userDao.findById(Long.parseLong(userId));
 
-				EMail email;
-				try {
-					email = new EMail();
-					email.setHtml(1);
-					Recipient recipient = new Recipient();
-					recipient.setRead(1);
-					recipient.setAddress(user.getEmail());
-					email.addRecipient(recipient);
-					email.setFolder("outbox");
-
-					// Generate a new password
-					ContextProperties config = Context.get().getProperties();
-					String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
-							config.getInt(tenant + ".password.uppercase", 2),
-							config.getInt(tenant + ".password.lowercase", 2),
-							config.getInt(tenant + ".password.digit", 1),
-							config.getInt(tenant + ".password.special", 1),
-							config.getInt(tenant + ".password.sequence", 4),
-							config.getInt(tenant + ".password.occurrence", 3));
-					user.setDecodedPassword(password);
-					user.setPasswordChanged(new Date());
-					user.setPasswordExpired(1);
-
-					userDao.store(user);
-
-					Locale locale = user.getLocale();
-
-					email.setSentDate(new Date());
-					email.setUsername(user.getUsername());
-					email.setLocale(locale);
-					email.setHtml(1);
-
-					/*
-					 * Prepare the template
-					 */
-					Map<String, Object> dictionary = new HashMap<>();
-					String address = request.getScheme() + "://" + request.getServerName() + ":"
-							+ request.getServerPort() + request.getContextPath();
-					dictionary.put("url", address);
-					dictionary.put("user", user);
-					dictionary.put("password", password);
-					dictionary.put(Automation.LOCALE, locale);
-
-					EMailSender sender = new EMailSender(tenant);
-					sender.send(email, "psw.rec1", dictionary);
-
-					response.getWriter().println(String.format("A message was sent to %s", user.getEmail()));
-
-					ticket.setCount(ticket.getCount() + 1);
-					ticketDao.store(ticket);
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-					response.getWriter().println("Request not correctly processed");
-				}
+				sendEmail(request, response, tenant, ticket, user);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+
+			writeResponse(response, "Request not correctly processed");
 		}
+	}
+
+	private void writeResponse(HttpServletResponse response, String message) {
+		try {
+			response.getWriter().println(message);
+		} catch (IOException e) {
+			// Ignore
+		}
+	}
+
+	private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant, Ticket ticket,
+			User user) throws IOException, PersistenceException, MessagingException {
+
+		EMail email = new EMail();
+		email.setHtml(1);
+		Recipient recipient = new Recipient();
+		recipient.setRead(1);
+		recipient.setAddress(user.getEmail());
+		email.addRecipient(recipient);
+		email.setFolder("outbox");
+
+		// Generate a new password
+		ContextProperties config = Context.get().getProperties();
+		String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
+				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
+				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1),
+				config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
+		user.setDecodedPassword(password);
+		user.setPasswordChanged(new Date());
+		user.setPasswordExpired(1);
+
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		userDao.store(user);
+
+		Locale locale = user.getLocale();
+
+		email.setSentDate(new Date());
+		email.setUsername(user.getUsername());
+		email.setLocale(locale);
+		email.setHtml(1);
+
+		/*
+		 * Prepare the template
+		 */
+		Map<String, Object> dictionary = new HashMap<>();
+		String address = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+				+ request.getContextPath();
+		dictionary.put("url", address);
+		dictionary.put("user", user);
+		dictionary.put("password", password);
+		dictionary.put(Automation.LOCALE, locale);
+
+		EMailSender sender = new EMailSender(tenant);
+		sender.send(email, "psw.rec1", dictionary);
+
+		response.getWriter().println(String.format("A message was sent to %s", user.getEmail()));
+
+		ticket.setCount(ticket.getCount() + 1);
+
+		TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
+		ticketDao.store(ticket);
 	}
 
 	/**

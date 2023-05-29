@@ -47,6 +47,8 @@ public class ParserFactory {
 	 */
 	private static Map<String, String> aliases = new HashMap<>();
 
+	private ParserFactory() {}
+	
 	/**
 	 * Registers all parsers from extension points
 	 */

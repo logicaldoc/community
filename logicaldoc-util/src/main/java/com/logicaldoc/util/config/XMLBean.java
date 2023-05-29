@@ -92,42 +92,44 @@ public class XMLBean {
 	 * Initializes the SAX builder
 	 */
 	private void initDocument() {
+		SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
+
+		builder.setFeature("http://xml.org/sax/features/validation", false);
+		builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+		builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+		builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
+		builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+		if (docPath != null) {
+			try {
+				doc = builder.build(docPath);
+			} catch (Exception t) {
+				// In some environments, during maven test phase a well formed
+				// URL must be used
+				// instead of ordinary path
+				log.error(t.getMessage());
+
+				buildFromFileUrl(builder);
+			}
+		} else {
+			try {
+				doc = builder.build(docInputStream);
+			} catch (Exception t) {
+				log.error(t.getMessage());
+			}
+		}
+
+		root = doc.getRootElement();
+	}
+
+	private void buildFromFileUrl(SAXBuilder builder) {
 		try {
-			SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
-			
-			builder.setFeature("http://xml.org/sax/features/validation", false);
-			builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-			builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-			builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			
-			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-
-			if (docPath != null) {
-				try {
-					doc = builder.build(docPath);
-				} catch (Exception t) {
-					// In some environments, during maven test phase a well formed URL must be used
-					// insead of ordinary path
-					log.error(t.getMessage());
-
-					try {
-						doc = builder.build("file://" + docPath);
-					} catch (Throwable t2) {
-						log.error(t2.getMessage());
-					}
-				}
-			} else
-				try {
-					doc = builder.build(docInputStream);
-				} catch (Exception t) {
-					log.error(t.getMessage());
-				}
-
-			root = doc.getRootElement();
-		} catch (Exception jdome) {
-			log.error(jdome.getMessage());
+			doc = builder.build("file://" + docPath);
+		} catch (Throwable t2) {
+			log.error(t2.getMessage());
 		}
 	}
 
@@ -366,7 +368,7 @@ public class XMLBean {
 		} catch (Exception ex) {
 			log.error(ex.getMessage());
 		}
-		log.debug("Backup saved in " + backup.getPath());
+		log.debug("Backup saved in {}", backup.getPath());
 
 		boolean result = true;
 		try {
@@ -375,13 +377,11 @@ public class XMLBean {
 			OutputStream out = new FileOutputStream(file);
 			outputter.output(doc, out);
 			out.close();
-			log.info("Saved file " + docPath);
+			log.info("Saved file {}", docPath);
 		} catch (Exception ex) {
 			result = false;
-
-			if (log.isWarnEnabled()) {
+			if (log.isWarnEnabled())
 				log.warn(ex.getMessage());
-			}
 		}
 
 		return result;

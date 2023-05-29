@@ -76,10 +76,6 @@ public abstract class PluginRegistry {
 	 */
 	public void init(String pluginsDir) throws PluginException {
 		ExtendedProperties properties = new ExtendedProperties();
-		// properties.put("org.java.plugin.PathResolver",
-		// "com.logicaldoc.util.ShadingPathResolver");
-		// properties.put("com.logicaldoc.util.ShadingPathResolver.shadowFolder",
-		// pluginsDir + "/../.plugins");
 		properties.put("com.logicaldoc.util.ShadingPathResolver.unpackMode", "smart");
 
 		ObjectFactory pluginObjectFactory = ObjectFactory.newInstance(properties);

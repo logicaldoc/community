@@ -74,19 +74,23 @@ public class XMLParser extends AbstractParser {
 				}
 			});
 			if (encoding != null) {
-				try {
-					Charset.forName(encoding);
-					source.setEncoding(encoding);
-				} catch (Exception e) {
-					log.warn("Unsupported encoding '{}', using default ({}) instead.", encoding,
-							System.getProperty("file.encoding"));
-				}
+				setEncoding(encoding, source);
 			}
 			reader.parse(source);
 
 			content.append(StringUtil.writeToString(new CharArrayReader(writer.toCharArray())));
 		} catch (Exception e) {
 			log.warn("Failed to extract XML text content", e);
+		}
+	}
+
+	private void setEncoding(String encoding, InputSource source) {
+		try {
+			Charset.forName(encoding);
+			source.setEncoding(encoding);
+		} catch (Exception e) {
+			log.warn("Unsupported encoding '{}', using default ({}) instead.", encoding,
+					System.getProperty("file.encoding"));
 		}
 	}
 }

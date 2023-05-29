@@ -84,14 +84,17 @@ public interface LDAPService extends RemoteService {
 	public GUIValue[] importUsers(String[] usernames, long serverId) throws ServerException;
 
 	public static class Instance {
-		private static LDAPServiceAsync instance;
+		private static LDAPServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static LDAPServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(LDAPService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(LDAPService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

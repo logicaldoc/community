@@ -18,6 +18,9 @@ import java.io.OutputStream;
  */
 public class ResourceUtil {
 
+	private ResourceUtil() {
+	}
+
 	public static String readAsString(String resourceName) throws IOException {
 		StringBuilder resourceData = new StringBuilder(1000);
 		try (BufferedReader reader = new BufferedReader(
@@ -55,12 +58,7 @@ public class ResourceUtil {
 	public static boolean existsResource(String resourceName) {
 		InputStream is = null;
 		try {
-			try {
-				is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
-			} catch (Exception e) {
-				is = new BufferedInputStream(
-						Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
-			}
+			is = getInputStream(resourceName);
 			return is != null;
 		} catch (Exception e) {
 			return false;
@@ -72,5 +70,16 @@ public class ResourceUtil {
 					// Nothing to do
 				}
 		}
+	}
+
+	private static InputStream getInputStream(String resourceName) throws IOException {
+		InputStream is;
+		try {
+			is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
+		} catch (Exception e) {
+			is = new BufferedInputStream(
+					Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
+		}
+		return is;
 	}
 }

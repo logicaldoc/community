@@ -2,7 +2,6 @@ package com.logicaldoc.core.job;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -193,15 +192,15 @@ public class JobManager {
 		List<JobDetail> jobs = new ArrayList<>();
 		for (JobKey key : jobKeys) {
 			JobDetail job = getJob(key.getName(), key.getGroup());
-			if (tenantId == null || (tenantId != null && tenantId.equals(job.getJobDataMap().get(TENANT_ID))))
+			if (tenantId == null || tenantId.equals(job.getJobDataMap().get(TENANT_ID)))
 				jobs.add(job);
 		}
 
 		jobs.sort((JobDetail o1, JobDetail o2) -> {
-				int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
-				if (cmp == 0)
-					cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
-				return cmp;
+			int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
+			if (cmp == 0)
+				cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
+			return cmp;
 		});
 		return jobs;
 	}
@@ -250,15 +249,15 @@ public class JobManager {
 		List<Trigger> triggers = new ArrayList<>();
 		for (TriggerKey key : triggerKeys) {
 			Trigger trigger = getTrigger(key.getName(), key.getGroup());
-			if (tenantId == null || (tenantId != null && tenantId.equals(trigger.getJobDataMap().get(TENANT_ID))))
+			if (tenantId == null || tenantId.equals(trigger.getJobDataMap().get(TENANT_ID)))
 				triggers.add(trigger);
 		}
 
 		triggers.sort((Trigger o1, Trigger o2) -> {
-				int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
-				if (cmp == 0)
-					cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
-				return cmp;
+			int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
+			if (cmp == 0)
+				cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
+			return cmp;
 		});
 		return triggers;
 	}

@@ -28,6 +28,10 @@ public class HTMLColor {
 		colorNames.put("aqua", new Color(0x00FFFF));
 	}
 
+	private HTMLColor() {
+		
+	}
+	
 	/**
 	 * Decode HTML-attribute style of color to {@link Color}
 	 * 

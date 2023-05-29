@@ -317,7 +317,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setCustomId(null);
 		doc = service.createWithContent(doc, "text content", true);
 		Assert.assertNotNull(doc);
-		Assert.assertTrue(doc.getId() != 0L);
+		Assert.assertNotSame(0L, doc.getId());
 
 		doc = service.getById(doc.getId());
 		Assert.assertNotNull(doc);
@@ -330,7 +330,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setCustomId(null);
 		doc = service.createWithContent(doc, " ", true);
 		Assert.assertNotNull(doc);
-		Assert.assertTrue(doc.getId() != 0L);
+		Assert.assertNotSame(0L, doc.getId());
 
 		doc = service.getById(doc.getId());
 		Assert.assertNotNull(doc);
@@ -1282,7 +1282,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			assertNotNull(gdocs);
 			assertTrue(gdocs.length > 0);
 			assertNotNull(gdocs[0].getTags());
-			assertTrue(gdocs[0].getTags().length == 3);
+			assertEquals(3, gdocs[0].getTags().length);
 
 			GUIAttribute gatX = gdocs[0].getAttribute("attr1");
 			assertNotNull(gatX);

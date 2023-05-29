@@ -11,6 +11,9 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class IconSelector {
 
+	private IconSelector() {
+	}
+
 	/**
 	 * Returns the icon by parsing the provided file extension
 	 * 

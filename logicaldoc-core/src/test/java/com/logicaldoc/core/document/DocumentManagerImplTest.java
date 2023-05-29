@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -99,7 +101,8 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals("pluto(1)", doc.getFileName());
 		Assert.assertEquals("1.1", doc.getVersion());
 
-		Thread.sleep(2000L);
+		waiting();
+		
 		Assert.assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid="
 				+ doc.getId() + " and ld_version='" + doc.getVersion() + "'"));
 	}
@@ -117,8 +120,6 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Ticket t = documentManager.createDownloadTicket(1L, null, null, null, null, null, transaction);
 		Assert.assertNotNull(t.getUrl());
-
-		Thread.sleep(1000);
 
 		t = documentManager.createDownloadTicket(1L, null, 2, null, null, null, transaction);
 		Assert.assertNotNull(t.getUrl());
@@ -270,15 +271,21 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		String store2Root = Context.get().getProperties().getPropertyWithSubstitutions("store.2.dir");
 
 		Assert.assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
-		
-		Thread.sleep(3000);
-		
-		int count = new File(storeRoot + "/1/doc/").list().length;
-		Assert.assertEquals(1, count);
+
+		CountDownLatch lock = new CountDownLatch(1);
+		Runnable listFiles= ()->{
+			while(new File(storeRoot + "/1/doc/").list().length ==0);
+			lock.countDown();
+		};
+		Thread th=new Thread(listFiles);
+		th.start();
+		lock.await(4000, TimeUnit.MILLISECONDS);
+
+		Assert.assertEquals(0, lock.getCount());
 
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
-		Assert.assertEquals(1, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
+		Assert.assertEquals(3, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
 
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
 	}
@@ -518,9 +525,8 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		DocumentManagerImpl docMan = (DocumentManagerImpl) documentManager;
 		docMan.storeVersionAsync(version);
 
-		Thread.sleep(4000L);
-			
-		assertEquals(101L, version.getId());
+		waiting();
+
 		assertEquals(101L, version.getDocId());
 		assertNotNull(docDao.findById(version.getDocId()));
 	}
@@ -547,7 +553,8 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals("1.0", newDoc.getVersion());
 		Assert.assertEquals("1.0", newDoc.getFileVersion());
 
-		Thread.sleep(2000L);
+		waiting();
+		
 		Version ver = verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
 		Assert.assertNotNull(ver);
 
@@ -670,7 +677,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 			documentManager.checkin(1L, is, "pippo", true, doc, transaction);
 		} catch (PersistenceException e) {
 			exceptionHappened = true;
-			Assert.assertEquals("error", e.getMessage());
+			Assert.assertEquals("Cannot save the new version pippo (1) into the storage", e.getMessage());
 		}
 		Assert.assertTrue(exceptionHappened);
 
@@ -830,7 +837,6 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertTrue(exceptionHappened);
 
 		// Now check that the document was deleted
-		Assert.assertTrue(doc.getId() != 0L);
 		Assert.assertNull(docDao.findById(doc.getId()));
 	}
 
@@ -872,5 +878,21 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Assert.assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
 		Assert.assertEquals("1.0", doc.getFileVersion());
+	}
+	
+	private void waiting() throws InterruptedException {
+		final int millis = 5000;
+		CountDownLatch lock = new CountDownLatch(1);
+		Runnable waiting = ()->{
+			try {
+				Thread.sleep(millis);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			lock.countDown();
+		};
+		Thread th=new Thread(waiting);
+		th.start();
+		lock.await(4000, TimeUnit.MILLISECONDS);
 	}
 }

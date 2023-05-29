@@ -130,7 +130,7 @@ public class ImageCropper extends Canvas {
 		int newSelectionTop = (int) ((double) newHeight / proportionY);
 		int newSelectionLeft = (int) ((double) newWidth / proportionX);
 
-		if (img != null && newHeight > 100) {
+		if (newHeight > 100) {
 			img.setHeight(newHeight);
 			img.setWidth(newWidth);
 

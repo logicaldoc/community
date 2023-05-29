@@ -31,6 +31,10 @@ public interface TfaService extends RemoteService {
 	public static class Instance {
 		private static TfaServiceAsync instance;
 
+		private Instance() {
+			
+		}
+		
 		public static TfaServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(TfaService.class);

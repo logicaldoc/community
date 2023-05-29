@@ -67,7 +67,7 @@ public class LogDownload extends HttpServlet {
 				response.setHeader("Cache-Control", "no-store");
 				response.setDateHeader("Expires", 0);
 
-				file = prepareAllSupportResources(request, response);
+				file = prepareAllSupportResources();
 			} else if (appender != null) {
 				response.setContentType("text/html");
 				LoggingConfigurator conf = new LoggingConfigurator();
@@ -115,7 +115,7 @@ public class LogDownload extends HttpServlet {
 	 * 
 	 * @throws IOException error creting a temporary file
 	 */
-	private File prepareAllSupportResources(HttpServletRequest request, HttpServletResponse response)
+	private File prepareAllSupportResources()
 			throws IOException {
 		File tmp = FileUtil.createTempFile("logs", ".zip");
 

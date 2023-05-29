@@ -168,8 +168,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 */
 	public static void cleanReceivedFiles(HttpSession httpSession) {
 		FileUtil.strongDelete(getUploadDir(httpSession));
-		if (getReceivedFiles(httpSession) != null)
-			getReceivedFiles(httpSession).clear();
+		getReceivedFiles(httpSession).clear();
 	}
 
 	protected String getSid(HttpServletRequest request) {

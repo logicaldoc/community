@@ -108,7 +108,6 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		} else if (folder.getId() == rootId) {
 			throw new WebserviceException("Cannot add documents in the root");
 		}
-		// fdao.initialize(folder);
 
 		Document doc = WSUtil.toDocument(document);
 		doc.setTenantId(user.getTenantId());
@@ -342,7 +341,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				manager.createTile(doc, fileVersion, sid);
 			else if (type.equals(ThumbnailManager.SUFFIX_MOBILE))
 				manager.createMobile(doc, fileVersion, sid);
-			else if (type.startsWith(ThumbnailManager.THUMB) && !type.equals(ThumbnailManager.SUFFIX_THUMB)) {
+			else if (type.startsWith(ThumbnailManager.THUMB)) {
 				/*
 				 * In this case the resource is like thumb450.png so we extract
 				 * the size from the name
@@ -790,9 +789,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		String extension = doc.getFileExtension();
 		att.setMimeType(MimeType.get(extension));
 
-		if (att != null) {
-			email.addAttachment(2 + email.getAttachments().size(), att);
-		}
+		email.addAttachment(2 + email.getAttachments().size(), att);
 	}
 
 	@Override

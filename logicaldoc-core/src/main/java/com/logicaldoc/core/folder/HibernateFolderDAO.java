@@ -542,8 +542,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Folder> findByGroupId(long groupId) throws PersistenceException {
-		List<Folder> coll = new ArrayList<>();
-
 		// The administrators can see all folders
 		if (groupId == Group.GROUPID_ADMIN)
 			return findAll();
@@ -555,7 +553,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		query.append(LEFT_JOIN + ENTITY + FOLDER_GROUPS_AS_GROUP);
 		query.append(WHERE + ENTITY + ".deleted=0 and _group.groupId =" + groupId);
 
-		coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<Folder> coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		/*
 		 * Now search for all other folders that references the previous ones
@@ -1620,11 +1618,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internatlCopyValidation(Folder source, Folder target, String securityOption,
 			FolderHistory transaction) throws PersistenceException {
-		if(!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
-			throw new IllegalArgumentException("Invalid security option "+securityOption);
-		if(source==null)
+		if (!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
+			throw new IllegalArgumentException("Invalid security option " + securityOption);
+		if (source == null)
 			throw new IllegalArgumentException("Source folder cannot be null");
-		if(target==null)
+		if (target == null)
 			throw new IllegalArgumentException("Target folder cannot be null");
 		if (transaction == null)
 			throw new IllegalArgumentException("transaction cannot be null");

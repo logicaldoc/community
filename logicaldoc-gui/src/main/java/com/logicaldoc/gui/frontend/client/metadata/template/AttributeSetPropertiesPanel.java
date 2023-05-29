@@ -415,9 +415,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			if (attributeSet.getId() == 0L) {
 				SC.say(I18N.message("saveattributesetfirst"));
 			} else {
-				Options options = new Options(attributeSet.getId(), attributeName.getValueAsString(),
+				Options attributeOptions = new Options(attributeSet.getId(), attributeName.getValueAsString(),
 						attributeSet.isReadonly());
-				options.show();
+				attributeOptions.show();
 			}
 		});
 	}
@@ -762,9 +762,5 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		attributeSettingsForm1.markForRedraw();
 		attributeSettingsForm2.markForRedraw();
-	}
-
-	protected boolean isMandatory(int category, String attributeName) {
-		return false;
 	}
 }

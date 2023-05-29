@@ -134,7 +134,7 @@ public class IndexerTask extends Task {
 
 			// Must take into account start and end of the transaction
 			size += 2;
-			
+
 			// Mark all the documents as belonging to the current
 			// transaction. This may require time
 			assignTransition(docIds);
@@ -156,9 +156,8 @@ public class IndexerTask extends Task {
 				List<IndexerThread> threads = new ArrayList<>();
 
 				// Prepare the threads and launch them
-				int i = 1;
 				for (List<Long> partition : partitions) {
-					IndexerThread iThread = new IndexerThread(partition, i++);
+					IndexerThread iThread = new IndexerThread(partition);
 					threads.add(iThread);
 					executor.schedule(new FutureTask<Long>(iThread), 1, TimeUnit.SECONDS);
 					log.debug("Launched the thread for documents {}", partition);
@@ -290,9 +289,9 @@ public class IndexerTask extends Task {
 		if (StringUtils.isNotEmpty(sortingCustom))
 			sorting = sortingCustom;
 
-		String where = " (" + PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX
-				+ " or " + PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX_METADATA
-				+ ") and not " + PersistentObjectDAO.ENTITY + ".status = " + AbstractDocument.DOC_ARCHIVED;
+		String where = " (" + PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX + " or "
+				+ PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX_METADATA + ") and not "
+				+ PersistentObjectDAO.ENTITY + ".status = " + AbstractDocument.DOC_ARCHIVED;
 
 		return new String[] { where, sorting };
 	}
@@ -361,7 +360,7 @@ public class IndexerTask extends Task {
 
 		private int errors = 0;
 
-		IndexerThread(List<Long> docIds, int number) {
+		IndexerThread(List<Long> docIds) {
 			this.docIds = docIds;
 		}
 
@@ -398,7 +397,7 @@ public class IndexerTask extends Task {
 							long indexingDiff = TimeDiff.getTimeDifference(beforeIndexing, new Date(),
 									TimeField.MILLISECOND);
 							indexingTime += indexingDiff;
-							log.debug("Thread {}: Indexed document {} in {}ms", number, indexingDiff);
+							log.debug("Thread {}: Indexed document {} in {}ms", number, doc, indexingDiff);
 						}
 						indexed++;
 					} catch (Exception e) {
@@ -415,7 +414,7 @@ public class IndexerTask extends Task {
 					}
 				}
 
-				log.debug("Thread {} has completed");
+				log.debug("Thread {} has completed", number);
 				return indexingTime;
 			} finally {
 				completed = true;

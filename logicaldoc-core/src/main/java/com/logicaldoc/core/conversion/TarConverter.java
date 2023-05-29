@@ -24,13 +24,13 @@ public class TarConverter extends CompressedArchiveConverter {
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		List<String> entries = new TarUtil().listEntries(src);
 		if (entries.size() > 1)
-			convertMultipleEntries(sid, document, src, dest, entries);
+			convertMultipleEntries(sid, document, dest, entries);
 		else
 			convertSingleEntry(sid, document, src, dest, entries.get(0));
 	}
 
 	@Override
 	protected void extractEntry(File archiveFile, String entry, File uncompressedEntryFile) throws IOException {
-		new TarUtil().extractEntry(archiveFile, entry, uncompressedEntryFile);
+		new TarUtil().extractEntry(archiveFile, uncompressedEntryFile);
 	}
 }

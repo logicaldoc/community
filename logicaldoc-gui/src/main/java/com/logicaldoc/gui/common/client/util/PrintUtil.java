@@ -18,6 +18,9 @@ public class PrintUtil {
 
 	private static final String PRINT = "print";
 
+	private PrintUtil() {
+	}
+
 	public static void printPreview(String title, String htmlContent) {
 		StringBuilder content = new StringBuilder("<html><head>\n");
 

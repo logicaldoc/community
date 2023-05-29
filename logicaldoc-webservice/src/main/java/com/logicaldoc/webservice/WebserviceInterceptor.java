@@ -135,10 +135,6 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	}
 
 	public void saveCall(WebserviceCall call, Message message) {
-//			String encoding = (String) message.get(Message.ENCODING);
-//			String httpMethod = (String) message.get(Message.HTTP_REQUEST_METHOD);
-//			String contentType = (String) message.get(Message.CONTENT_TYPE);
-//			Object headers = message.get(Message.PROTOCOL_HEADERS);
 		call.setProtocol(message instanceof SoapMessage ? WebserviceCall.SOAP : WebserviceCall.REST);
 		String uri = (String) message.get(Message.REQUEST_URL);
 		if (uri != null) {

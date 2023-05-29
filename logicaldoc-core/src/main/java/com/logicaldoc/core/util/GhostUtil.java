@@ -34,6 +34,9 @@ public class GhostUtil {
 
 	protected static Logger log = LoggerFactory.getLogger(GhostUtil.class);
 
+	private GhostUtil() {
+	}
+
 	/**
 	 * Prints a PDF file into a Jpeg image using 150dpi resolution
 	 * 

@@ -89,15 +89,15 @@ public class Device extends PersistentObject implements Serializable {
 
 		setDeviceId(getDeviceId(request));
 		setBrowser(agent.getBrowser().getName());
-		if (agent != null) {
-			if (agent.getBrowserVersion() != null)
-				setBrowserVersion(agent.getBrowserVersion().getVersion());
-			if (agent.getOperatingSystem() != null) {
-				setOperativeSystem(agent.getOperatingSystem().getName());
-				if (agent.getOperatingSystem().getDeviceType() != null)
-					setType(agent.getOperatingSystem().getDeviceType().toString());
-			}
+
+		if (agent.getBrowserVersion() != null)
+			setBrowserVersion(agent.getBrowserVersion().getVersion());
+		if (agent.getOperatingSystem() != null) {
+			setOperativeSystem(agent.getOperatingSystem().getName());
+			if (agent.getOperatingSystem().getDeviceType() != null)
+				setType(agent.getOperatingSystem().getDeviceType().toString());
 		}
+
 		setIp(request.getRemoteAddr());
 	}
 

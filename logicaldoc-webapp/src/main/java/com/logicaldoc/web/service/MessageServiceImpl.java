@@ -206,8 +206,8 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		Session session = validateSession(getThreadLocalRequest());
 
 		try {
-			Context context = Context.get();
-			MessageTemplateDAO dao = (MessageTemplateDAO) context.getBean(MessageTemplateDAO.class);
+
+			MessageTemplateDAO dao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
 
 			for (GUIMessageTemplate t : templates) {
 				MessageTemplate template = dao.findByNameAndLanguage(t.getName(), t.getLanguage(),
@@ -220,14 +220,20 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 				template.setSubject(t.getSubject());
 				template.setBody(t.getBody());
 				template.setType(t.getType());
-				try {
-					dao.store(template);
-				} catch (Exception e) {
-					throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED);
-				}
+
+				storeTemplate(template);
 			}
 		} catch (Exception t) {
 			throwServerException(session, log, t);
+		}
+	}
+
+	private void storeTemplate(MessageTemplate template) throws ServerException {
+		try {
+			MessageTemplateDAO dao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
+			dao.store(template);
+		} catch (Exception e) {
+			throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED);
 		}
 	}
 
@@ -236,21 +242,23 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		Session session = validateSession(getThreadLocalRequest());
 
 		try {
-			Context context = Context.get();
-			MessageTemplateDAO dao = (MessageTemplateDAO) context.getBean(MessageTemplateDAO.class);
-
+			MessageTemplateDAO dao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
 			for (long id : ids) {
 				MessageTemplate template = dao.findById(id);
-				if (template != null && !"en".equals(template.getLanguage())) {
-					try {
-						dao.delete(id);
-					} catch (Exception e) {
-						throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
-					}
-				}
+				if (template != null && !"en".equals(template.getLanguage()))
+					delete(id);
 			}
 		} catch (Exception t) {
 			throwServerException(session, log, t);
+		}
+	}
+
+	private void delete(long id) throws ServerException {
+		try {
+			MessageTemplateDAO dao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
+			dao.delete(id);
+		} catch (Exception e) {
+			throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
 		}
 	}
 
@@ -265,12 +273,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			for (MessageTemplate template : templates) {
 				if (template.getType().equals(MessageTemplate.TYPE_SYSTEM))
 					continue;
-
-				try {
-					dao.delete(template.getId());
-				} catch (Exception e) {
-					throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
-				}
+				delete(template.getId());
 			}
 		} catch (Exception t) {
 			throwServerException(session, log, t);

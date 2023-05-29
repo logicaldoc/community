@@ -64,7 +64,7 @@ public class WorkflowNoteEditor extends Window {
 
 					@Override
 					public void onSuccess(Long noteId) {
-						parentDialog.onNewNote(message.getValue().toString());
+						parentDialog.onNewNote();
 						destroy();
 					}
 				});

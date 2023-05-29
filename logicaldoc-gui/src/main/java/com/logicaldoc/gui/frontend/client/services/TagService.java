@@ -74,14 +74,17 @@ public interface TagService extends RemoteService {
 	public GUIParameter[] getSettings() throws ServerException;
 
 	public static class Instance {
-		private static TagServiceAsync instance;
+		private static TagServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static TagServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(TagService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(TagService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

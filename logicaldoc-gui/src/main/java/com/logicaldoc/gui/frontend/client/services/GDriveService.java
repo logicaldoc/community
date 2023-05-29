@@ -117,14 +117,17 @@ public interface GDriveService extends RemoteService {
 	public GUIDocument[] search(String expression) throws ServerException;
 
 	public static class Instance {
-		private static GDriveServiceAsync instance;
+		private static GDriveServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static GDriveServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(GDriveService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(GDriveService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

@@ -111,64 +111,54 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		log.debug("Received WebDAV request");
 
+		// DeltaV requires 'Cache-Control' header for all methods except
+		// 'VERSION-CONTROL' and 'REPORT'.
+		int methodCode = DavMethods.getMethodCode(request.getMethod());
+
+		WebdavRequest webdavRequest = new EncodingWebdavRequest(request, getLocatorFactory());
+		WebdavResponse webdavResponse = getDavResponse(response, webdavRequest, methodCode);
 		try {
-			WebdavRequest webdavRequest = new EncodingWebdavRequest(request, getLocatorFactory());
-
-			// DeltaV requires 'Cache-Control' header for all methods except
-			// 'VERSION-CONTROL' and 'REPORT'.
-			int methodCode = DavMethods.getMethodCode(request.getMethod());
-
 			log.debug("method {} {}", request.getMethod(), methodCode);
 
-			WebdavResponse webdavResponse = getDavResponse(response, webdavRequest, methodCode);
+			Session session = SessionManager.get().getSession(request);
+			if (session == null)
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 
-			try {
-				Session session = SessionManager.get().getSession(request);
-				if (session == null)
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN);
+			SessionManager.get().renew(session.getSid());
 
-				SessionManager.get().renew(session.getSid());
+			DavSessionImpl davSession = new DavSessionImpl();
+			davSession.setTenantId(SessionManager.get().get(session.getSid()).getTenantId());
+			davSession.putObject("sid", session.getSid());
+			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
+			User user = dao.findById(session.getUserId());
+			dao.initialize(user);
+			davSession.putObject("id", session.getUserId());
+			davSession.putObject("user", user);
 
-				DavSessionImpl davSession = new DavSessionImpl();
-				davSession.setTenantId(SessionManager.get().get(session.getSid()).getTenantId());
-				davSession.putObject("sid", session.getSid());
-				UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-				User user = dao.findById(session.getUserId());
-				dao.initialize(user);
-				davSession.putObject("id", session.getUserId());
-				davSession.putObject("user", user);
+			webdavRequest.setDavSession(davSession);
 
-				webdavRequest.setDavSession(davSession);
+			getPath(webdavRequest);
 
-				getPath(webdavRequest);
+			// check matching if=header for lock-token relevant operations
+			DavResource resource = getResourceFactory().createResource(webdavRequest.getRequestLocator(), webdavRequest,
+					davSession);
 
-				// check matching if=header for lock-token relevant operations
-				DavResource resource = getResourceFactory().createResource(webdavRequest.getRequestLocator(),
-						webdavRequest, davSession);
+			if (!isPreconditionValid(webdavRequest, resource))
+				webdavResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
 
-				if (!isPreconditionValid(webdavRequest, resource)) {
-					try {
-						webdavResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-					} catch (Exception t) {
-						// Nothing to do
-					}
-					return;
-				}
-
-				if (!execute(webdavRequest, webdavResponse, methodCode, resource)) {
-					super.service(request, response);
-				}
-
-			} catch (DavException e) {
-				handleDavException(webdavResponse, e);
-			} catch (Exception e) {
-				handleException(request, methodCode, e);
-			}
+			if (!execute(webdavRequest, webdavResponse, methodCode, resource))
+				super.service(request, response);
 
 			response.getOutputStream().flush();
 			response.getOutputStream().close();
-		} catch (Exception t) {
-			log.error(t.getMessage(), t);
+		} catch (DavException e) {
+			handleDavException(webdavResponse, e);
+		} catch (Exception e) {
+			try {
+				handleException(request, methodCode, e);
+			} catch (DavException e1) {
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -192,7 +182,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.warn("{}: {} {} {}", e.getClass().getName(), e.getMessage(), request.getMethod(), methodCode);
 		} else {
 			log.error(e.getMessage(), e);
-			throw new DavException( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -273,7 +263,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			doReport(request, response, resource);
 			break;
 		case DavMethods.DAV_VERSION_CONTROL:
-			doVersionControl(request, response, resource);
+			doVersionControl(response, resource);
 			break;
 		case DavMethods.DAV_UNCHECKOUT:
 			doUncheckout(request, response, resource);
@@ -394,7 +384,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 				response.setHeader(HttpHeaders.PRAGMA, "no-cache");
 			}
-			
+
 			setETagHeader(request, response, exportCtx);
 		}
 
@@ -611,16 +601,17 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				response.sendError(HttpServletResponse.SC_CONFLICT);
 				return;
 			}
+
 			// shortcut: mkcol is only allowed on deleted/non-existing resources
-			if (resource.exists()) {
+			if (resource.exists())
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-			}
 
 			if (request.getContentLength() > 0 || request.getHeader("Transfer-Encoding") != null) {
 				parentResource.addMember(resource, getInputContext(request, request.getInputStream()));
 			} else {
 				parentResource.addMember(resource, getInputContext(request, null));
 			}
+
 			response.setStatus(HttpServletResponse.SC_CREATED);
 		} catch (DavException dave) {
 			log.debug("Error during folder creation", dave);
@@ -736,30 +727,22 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		log.debug("doMove");
 
 		WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
+		DavResource destResource = null;
 		try {
-			DavResource destResource = null;
-			try {
-				log.debug("Destination: {}", request.getHeader("Destination"));
-//				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getResourcePath());
-//				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getHref(false));
-//				log.debug("getDestinationLocator: {}", request.getDestinationLocator().getHref(true));
-				destResource = getResourceFactory().createResource(request.getDestinationLocator(), request, session);
-			} catch (Exception e) {
-//				log.error("Failure computing destination", e);
-				destResource = resource.getCollection();
-			}
+			log.debug("Destination: {}", request.getHeader("Destination"));
+			destResource = getResourceFactory().createResource(request.getDestinationLocator(), request, session);
+		} catch (Exception e) {
+			destResource = resource.getCollection();
+		}
 
+		try {
 			log.debug("before validateDestination");
 			int status = validateDestination(destResource, request);
 			log.debug("status = {}", status);
 
 			if (status > HttpServletResponse.SC_NO_CONTENT) {
 				log.debug("status > HttpServletResponse.SC_NO_CONTENT");
-				try {
-					response.sendError(status);
-				} catch (Exception t) {
-					// Nothing to do
-				}
+				response.sendError(status);
 				return;
 			}
 
@@ -854,8 +837,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		}
 	}
 
-	protected void doVersionControl(WebdavRequest request, WebdavResponse response, DavResource resource)
-			throws DavException, IOException {
+	protected void doVersionControl(WebdavResponse response, DavResource resource) throws DavException, IOException {
 		log.debug("doVersionControl");
 		if (!(resource instanceof VersionableResource)) {
 			try {
@@ -976,7 +958,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	protected void doUncheckout(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws DavException, IOException {
-		log.debug("doUncheckout(" + resource.getDisplayName() + ")");
+		log.debug("doUncheckout({})", resource.getDisplayName());
 		if (!(resource instanceof VersionControlledResource)) {
 			try {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);

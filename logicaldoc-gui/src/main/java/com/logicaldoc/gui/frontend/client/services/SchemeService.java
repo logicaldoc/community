@@ -85,14 +85,17 @@ public interface SchemeService extends RemoteService {
 	public void deleteSequence(long sequenceId) throws ServerException;
 
 	public static class Instance {
-		private static SchemeServiceAsync instance;
+		private static SchemeServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static SchemeServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SchemeService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SchemeService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

@@ -14,6 +14,9 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
  */
 public class WindowUtils {
 
+	private WindowUtils() {
+	}
+
 	public static RequestInfo getRequestInfo() {
 		RequestInfo result = new RequestInfo();
 		result.setHash(getHash());

@@ -24,7 +24,6 @@ import com.smartgwt.client.widgets.layout.FlowLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * Renders the preview of a mail
@@ -34,7 +33,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class MailPreviewPanel extends VLayout {
 
-	public MailPreviewPanel(final GUIEmail mail, final GUIDocument document, final int width, final int height) {
+	public MailPreviewPanel(final GUIEmail mail, final GUIDocument document, final int width) {
 		setWidth100();
 		setHeight100();
 
@@ -241,22 +240,20 @@ public class MailPreviewPanel extends VLayout {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
 		copy.addClickHandler(event -> {
-				DocumentService.Instance.get().saveEmailAttachment(doc.getId(), doc.getFileVersion(),
-						attachment.getFileName(), new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().saveEmailAttachment(doc.getId(), doc.getFileVersion(),
+					attachment.getFileName(), new AsyncCallback<GUIDocument>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIDocument doc) {
-								if (MainPanel.get().isOnDocumentsTab())
-									if (FolderController.get().getCurrentFolder() != null)
-										FolderNavigator.get()
-												.selectFolder(FolderController.get().getCurrentFolder().getId());
-							}
-						});
+						@Override
+						public void onSuccess(GUIDocument doc) {
+							if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)
+								FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
+						}
+					});
 		});
 		copy.setEnabled(doc.getFolder().isWrite());
 

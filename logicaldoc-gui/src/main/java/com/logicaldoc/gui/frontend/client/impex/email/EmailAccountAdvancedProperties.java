@@ -41,9 +41,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 	private void refresh() {
 		form.clearValues();
 		form.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.destroy();
 
 		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);

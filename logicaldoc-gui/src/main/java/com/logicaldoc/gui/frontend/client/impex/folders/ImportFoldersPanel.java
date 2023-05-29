@@ -105,7 +105,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new ImportFoldersDS(false));
+		list.setDataSource(new ImportFoldersDS());
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -164,7 +164,7 @@ public class ImportFoldersPanel extends AdminPanel {
 	}
 
 	public void refresh() {
-		list.refresh(new ImportFoldersDS(false));
+		list.refresh(new ImportFoldersDS());
 		detailsContainer.removeMembers(detailsContainer.getMembers());
 		details = SELECT_FOLDER;
 		detailsContainer.setMembers(details);

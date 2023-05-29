@@ -19,7 +19,7 @@ import com.logicaldoc.core.PersistentObject;
 public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final long ROOT = 1;
 
 	public static final long ADMINISTRATION = 2;
@@ -45,13 +45,13 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	public static final long VERSIONS = 1603;
 
 	public static final long ALIASES = 1605;
-	
+
 	public static final long PREVIEW = 1609;
-	
+
 	public static final long RATING = 1610;
 
 	public static final long PARAMETERS = 100;
-	
+
 	public static final long ADMIN_SESSIONS = 71;
 
 	public static final long LOGS = 72;
@@ -67,7 +67,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	public static final long INTERFACE_DENSITY = 1535;
 
 	public static final long CUSTOM_ACTIONS = 1300;
-	
+
 	public static final int TYPE_DEFAULT = 1;
 
 	public static final int TYPE_CUSTOM_ACTION = 2;
@@ -89,7 +89,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	private int position = 1;
 
 	private int enabled = 1;
-	
+
 	/**
 	 * The declared routine to execute
 	 */
@@ -101,6 +101,10 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	private String automation;
 
 	private Set<MenuGroup> menuGroups = new HashSet<>();
+
+	public Menu() {
+		super();
+	}
 
 	@Override
 	public long getId() {

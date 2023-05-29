@@ -179,22 +179,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	Long setId, @Multipart(value = "attribute")
 	String attribute, @Multipart(value = "options", type = "application/json")
 	WSAttributeOption[] options) throws WebserviceException, PersistenceException {
-
-//		log.debug("setAttributeOptionsPOST");
-
 		String sid = validateSession();
-
-//		log.debug("setId: {}", setId);
-//		log.debug("attribute: {}", attribute);
-//		log.debug("options: {}", (Object[])options);
-//		
-//		if (options != null) {
-//			for (WSAttributeOption wso : options) {
-//				log.debug("getValue: {}", wso.getValue());
-//				log.debug("getCategory: {}", wso.getCategory());
-//			}
-//		}
-
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 
@@ -218,19 +203,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	long setId, @FormParam("attribute")
 	String attribute, @FormParam("option")
 	WSAttributeOption option) throws AuthenticationException, WebserviceException, PersistenceException {
-
-//		log.debug("addAttributeOption");
-
 		String sid = validateSession();
-
-//		log.debug("setId: {}", setId);
-//		log.debug("attribute: {}", attribute);
-//		
-//		if (option != null) {
-//			log.debug("value: {}", option.getValue());
-//			log.debug("category: {}", option.getCategory());
-//		}
-
 		super.addAttributeOption(sid, setId, attribute, option);
 	}
 }

@@ -8,10 +8,14 @@ import java.lang.reflect.Type;
 /**
  * Get a variable's java type, or a collection's generic type<br>
  * For Example, <br>
- * "String a" =&gt; String.class, and "List&lt;Integer&gt; b" =&gt; Integer.class
+ * "String a" =&gt; String.class, and "List&lt;Integer&gt; b" =&gt;
+ * Integer.class
  * 
  */
 public class GenericsUtils {
+
+	private GenericsUtils() {
+	}
 
 	public static Class<?> getFieldGenericType(Field field) {
 		return chooseOneType(field.getType(), field.getGenericType());

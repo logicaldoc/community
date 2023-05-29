@@ -171,11 +171,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				Session.get().getUser().getUsername(), Session.get().getInfo().getTenant().getDisplayName()),
 				I18N.message("account"));
 		account.addClickHandler(event -> new AccountMenu().showContextMenu());
-
-// Uncomment to show the avatar		
-//		account.setTitle("<div><img class='accountIcon' src='" + Util.avatarUrl(Session.get().getUser().getId()) + "' />"
-//				+ I18N.message("account") + "</div>");
-
 		addButton(account, 1);
 	}
 
@@ -350,7 +345,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		return textcontentItems;
 	}
 
-	private MenuItem getDropboxMenuItem(GUIFolder folder, final GUIDocument document) {
+	private MenuItem getDropboxMenuItem(GUIFolder folder) {
 		final MenuItem exportTo = new MenuItem(I18N.message("exporttodropbox"));
 		exportTo.addClickHandler(event -> DropboxService.Instance.get().isConnected(new AsyncCallback<Boolean>() {
 
@@ -427,7 +422,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		return dropboxItem;
 	}
 
-	private MenuItem getShareFileMenuItem(GUIFolder folder, final GUIDocument document) {
+	private MenuItem getShareFileMenuItem(GUIFolder folder) {
 		final MenuItem exportTo = new MenuItem(I18N.message("exporttosharefile"));
 		exportTo.addClickHandler((MenuItemClickEvent event) -> new ShareFileDialog(true).show());
 
@@ -472,7 +467,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		return sharefileItem;
 	}
 
-	private MenuItem getDocuSignMenuItem(GUIFolder folder, final GUIDocument document) {
+	private MenuItem getDocuSignMenuItem(GUIDocument document) {
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
 		authorize.addClickHandler((MenuItemClickEvent event) -> new DocuSignSettings().show());
 
@@ -600,10 +595,10 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	private void addItemsWhenFolderOrDocumentSelected(GUIFolder folder, GUIDocument document, Menu menu) {
 		if (Feature.enabled(Feature.DROPBOX)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DROPBOX))
-			menu.addItem(getDropboxMenuItem(folder, document));
+			menu.addItem(getDropboxMenuItem(folder));
 		if (Feature.enabled(Feature.SHAREFILE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHAREFILE))
-			menu.addItem(getShareFileMenuItem(folder, document));
+			menu.addItem(getShareFileMenuItem(folder));
 		if (Feature.enabled(Feature.GDRIVE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.GDOCS))
 			menu.addItem(new GDriveMenuItem(folder, document));
@@ -612,7 +607,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(new ZohoMenuItem(folder, document));
 		if (Feature.enabled(Feature.DOCUSIGN)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUSIGN))
-			menu.addItem(getDocuSignMenuItem(folder, document));
+			menu.addItem(getDocuSignMenuItem(document));
 		if (Feature.enabled(Feature.OFFICE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
 			menu.addItem(getOfficeMenuItem(folder, document));

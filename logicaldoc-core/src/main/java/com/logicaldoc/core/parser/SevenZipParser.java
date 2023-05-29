@@ -63,8 +63,7 @@ public class SevenZipParser extends AbstractParser {
 				}
 			}
 		} finally {
-			if (sevenFile != null)
-				FileUtil.strongDelete(sevenFile);
+			FileUtil.strongDelete(sevenFile);
 		}
 	}
 

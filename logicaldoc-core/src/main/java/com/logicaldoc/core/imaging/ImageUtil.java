@@ -48,6 +48,9 @@ public class ImageUtil {
 
 	protected static Logger log = LoggerFactory.getLogger(ImageUtil.class);
 
+	private ImageUtil() {
+	}
+
 	/**
 	 * Saves an image into a given file in an image format
 	 * 
@@ -177,11 +180,9 @@ public class ImageUtil {
 		for (int x = 0; x < srcImage.getWidth(); x++) {
 			for (int y = 1; y < srcImage.getHeight(); y++) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
-				if (!pixelColor.equals(Color.WHITE)) {
-					if (x > right) {
+				if (!pixelColor.equals(Color.WHITE) && x > right) {
 						right = x;
 						break;
-					}
 				}
 			}
 		}
@@ -193,11 +194,9 @@ public class ImageUtil {
 		for (int x = srcImage.getWidth() - 1; x > 0; x--) {
 			for (int y = 1; y < srcImage.getHeight(); y++) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
-				if (!pixelColor.equals(Color.WHITE)) {
-					if (x < left) {
+				if (!pixelColor.equals(Color.WHITE) && x < left) {
 						left = x;
 						break;
-					}
 				}
 			}
 		}
@@ -209,11 +208,9 @@ public class ImageUtil {
 		for (int x = 0; x < srcImage.getWidth(); x++) {
 			for (int y = 0; y < srcImage.getHeight(); y++) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
-				if (!pixelColor.equals(Color.WHITE)) {
-					if (y > bottom) {
+				if (!pixelColor.equals(Color.WHITE) && y > bottom) {
 						bottom = y;
 						break;
-					}
 				}
 			}
 		}
@@ -225,11 +222,9 @@ public class ImageUtil {
 		for (int x = 1; x < srcImage.getWidth(); x++) {
 			for (int y = srcImage.getHeight() - 1; y > 0; y--) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
-				if (!pixelColor.equals(Color.WHITE)) {
-					if (y < top) {
+				if (!pixelColor.equals(Color.WHITE) && y < top) {
 						top = y;
 						break;
-					}
 				}
 			}
 		}

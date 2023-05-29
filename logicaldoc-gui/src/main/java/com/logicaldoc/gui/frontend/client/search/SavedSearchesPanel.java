@@ -180,9 +180,6 @@ public class SavedSearchesPanel extends VLayout {
 	}
 
 	public void addEntry(String name, String description, String type) {
-		// Incredible!!! Without this line we have a duplicated save search
-		// entry when the user saves the first search.
-		System.out.println("");
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", name);
 		rec.setAttribute(DESCRIPTION, description);

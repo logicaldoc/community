@@ -90,7 +90,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 		userSelector.addChangedHandler(event -> refresh());
 		toolStrip.addFormItem(userSelector);
 
-		folderSelector = new FolderSelector("folder", true);
+		folderSelector = new FolderSelector("folder", null);
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);

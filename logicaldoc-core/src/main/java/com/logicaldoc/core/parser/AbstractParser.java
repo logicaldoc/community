@@ -96,11 +96,8 @@ public abstract class AbstractParser implements Parser {
 			} catch (InterruptedException ie) {
 				log.warn("Interrupted parse");
 				Thread.currentThread().interrupt();
-			} catch (Throwable e) {
-				if (e instanceof ParseException)
-					throw (ParseException) e;
-				else
-					log.warn(e.getMessage(), e);
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
 			}
 			if (!"completed".equals(ret))
 				throw new ParseException(ret);
@@ -114,11 +111,10 @@ public abstract class AbstractParser implements Parser {
 			String fileVersion, StringBuilder content, Locale locale, String tenant) throws ParseException {
 		try {
 			internalParse(input, filename, encoding, locale, tenant, document, fileVersion, content);
+		} catch (ParseException pe) {
+			throw pe;
 		} catch (Exception e) {
-			if (e instanceof ParseException)
-				throw (ParseException) e;
-			else
-				throw new ParseException(e);
+			throw new ParseException(e);
 		}
 	}
 

@@ -76,14 +76,17 @@ public interface SyndicationService extends RemoteService {
 	public void resetCache(long id) throws ServerException;
 	
 	public static class Instance {
-		private static SyndicationServiceAsync instance;
+		private static SyndicationServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static SyndicationServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SyndicationService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SyndicationService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

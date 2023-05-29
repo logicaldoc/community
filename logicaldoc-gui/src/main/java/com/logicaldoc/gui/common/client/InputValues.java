@@ -16,6 +16,9 @@ public class InputValues {
 	// Item name - Inputed value
 	private static Map<String, List<Object>> savedInputs = new HashMap<>();
 
+	private InputValues() {
+	}
+
 	public static void saveInput(String name, Object value) {
 		if (value == null || !Session.get().getConfigAsBoolean("gui.saveinputs"))
 			return;

@@ -118,14 +118,17 @@ public interface UpdateService extends RemoteService {
 	public String[] getStatus(String fileName);
 
 	public static class Instance {
-		private static UpdateServiceAsync instance;
+		private static UpdateServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static UpdateServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(UpdateService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(UpdateService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

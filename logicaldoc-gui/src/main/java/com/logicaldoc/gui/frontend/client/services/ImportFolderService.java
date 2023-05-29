@@ -85,14 +85,17 @@ public interface ImportFolderService extends RemoteService {
 	public void resetCache(long id) throws ServerException;
 
 	public static class Instance {
-		private static ImportFolderServiceAsync instance;
+		private static ImportFolderServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static ImportFolderServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ImportFolderService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ImportFolderService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

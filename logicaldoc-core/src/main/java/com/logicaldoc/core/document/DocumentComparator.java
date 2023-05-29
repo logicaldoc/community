@@ -16,6 +16,9 @@ import java.util.StringTokenizer;
  */
 public abstract class DocumentComparator implements Comparator<AbstractDocument> {
 
+	private DocumentComparator() {
+	};
+
 	private static DocumentComparator ID_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
@@ -100,9 +103,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			String val2 = d2.getComment();
 			if (val1 == null && val2 == null)
 				return 0;
-			else if (val1 == null && val2 != null)
+			else if (val1 == null)
 				return -1;
-			else if (val1 != null && val2 == null)
+			else if (val2 == null)
 				return 1;
 			else
 				return val1.compareTo(val2);
@@ -116,9 +119,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			String val2 = d2.getComment();
 			if (val1 == null && val2 == null)
 				return 0;
-			else if (val1 == null && val2 != null)
+			else if (val1 == null)
 				return -1;
-			else if (val1 != null && val2 == null)
+			else if (val2 == null)
 				return 1;
 			else
 				return val1.toLowerCase().compareTo(val2.toLowerCase());
@@ -132,9 +135,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			Date val2 = d2.getStartPublishing();
 			if (val1 == null && val2 == null)
 				return 0;
-			else if (val1 == null && val2 != null)
+			else if (val1 == null)
 				return -1;
-			else if (val1 != null && val2 == null)
+			else if (val2 == null)
 				return 1;
 			else
 				return val1.compareTo(val2);
@@ -148,9 +151,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			Date val2 = d2.getStopPublishing();
 			if (val1 == null && val2 == null)
 				return 0;
-			else if (val1 == null && val2 != null)
+			else if (val1 == null)
 				return -1;
-			else if (val1 != null && val2 == null)
+			else if (val2 == null)
 				return 1;
 			else
 				return val1.compareTo(val2);
@@ -164,9 +167,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			String val2 = d2.getWorkflowStatus();
 			if (val1 == null && val2 == null)
 				return 0;
-			else if (val1 == null && val2 != null)
+			else if (val1 == null)
 				return -1;
-			else if (val1 != null && val2 == null)
+			else if (val2 == null)
 				return 1;
 			else
 				return val1.compareTo(val2);
@@ -180,9 +183,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			String val2 = d2.getWorkflowStatus();
 			if (val1 == null && val2 == null)
 				return 0;
-			else if (val1 == null && val2 != null)
+			else if (val1 == null)
 				return -1;
-			else if (val1 != null && val2 == null)
+			else if (val2 == null)
 				return 1;
 			else
 				return val1.toLowerCase().compareTo(val2.toLowerCase());
@@ -232,9 +235,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 				Comparable val2 = (Comparable) d2.getValue(attribute);
 				if (val1 == null && val2 == null)
 					return 0;
-				else if (val1 == null && val2 != null)
+				else if (val1 == null)
 					return -1;
-				else if (val1 != null && val2 == null)
+				else if (val2 == null)
 					return 1;
 				else {
 					if (val1 instanceof String && !caseSensitive)

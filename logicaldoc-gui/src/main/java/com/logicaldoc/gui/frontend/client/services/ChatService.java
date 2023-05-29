@@ -36,14 +36,16 @@ public interface ChatService extends RemoteService {
 	public void invite(String[] users, String invitation) throws ServerException;
 	
 	public static class Instance {
-		private static ChatServiceAsync instance;
+		private static ChatServiceAsync inst;
 
+		private Instance() {}
+		
 		public static ChatServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ChatService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ChatService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

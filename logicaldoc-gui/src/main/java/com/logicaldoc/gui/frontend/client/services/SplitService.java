@@ -47,14 +47,17 @@ public interface SplitService extends RemoteService {
 
 	public static class Instance {
 
-		private static SplitServiceAsync instance;
-
+		private static SplitServiceAsync inst;
+		
+		private Instance() {
+		}
+		
 		public static SplitServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SplitService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SplitService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

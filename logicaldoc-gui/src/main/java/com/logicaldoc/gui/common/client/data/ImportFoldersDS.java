@@ -14,7 +14,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class ImportFoldersDS extends DataSource {
 
-	public ImportFoldersDS(boolean withEmpty) {
+	public ImportFoldersDS() {
 		setTitleField("src");
 		setRecordXPath("/list/folder");
 		DataSourceTextField id = new DataSourceTextField("id");

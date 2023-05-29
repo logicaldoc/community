@@ -102,7 +102,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new EmailAccountsDS(false, "default"));
+		list.setDataSource(new EmailAccountsDS("default"));
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -116,7 +116,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
 		refresh.addClickHandler((ClickEvent event) -> {
-			list.refresh(new EmailAccountsDS(false, "default"));
+			list.refresh(new EmailAccountsDS("default"));
 			detailsContainer.removeMembers(detailsContainer.getMembers());
 			details = SELECT_ACCOUNT;
 			detailsContainer.setMembers(details);

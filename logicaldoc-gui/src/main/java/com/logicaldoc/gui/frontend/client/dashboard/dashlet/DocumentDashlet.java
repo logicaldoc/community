@@ -197,6 +197,6 @@ public class DocumentDashlet extends Dashlet {
 	}
 
 	protected DataSource getDataSource() {
-		return new DocumentsDS(getDataSourceUrl(), I18N.getLocale(), guiDashlet.getExtendedAttributes());
+		return new DocumentsDS(getDataSourceUrl(), guiDashlet.getExtendedAttributes());
 	}
 }

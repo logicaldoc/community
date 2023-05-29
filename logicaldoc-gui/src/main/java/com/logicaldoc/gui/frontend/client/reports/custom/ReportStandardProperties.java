@@ -41,7 +41,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		this.report = report;
 
 		setMembers(columns);
-		outputFolderSelector = new FolderSelector("outputFolder", false);
+		outputFolderSelector = new FolderSelector("outputFolder", null);
 		outputFolderSelector.setRequired(true);
 		outputFolderSelector.setWidth(250);
 		outputFolderSelector.setTitle(I18N.message("outputfolder"));

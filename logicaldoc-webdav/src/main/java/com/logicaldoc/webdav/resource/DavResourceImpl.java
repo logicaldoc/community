@@ -264,7 +264,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		outputContext.setETag(this.resource.getETag());
 		outputContext.setContentType(AbstractWebdavServlet.getContext().getMimeType(this.resource.getName()));
 
-		if (exists() && outputContext != null) {
+		if (exists()) {
 			ExportContext exportCtx = getExportContext(outputContext);
 			if (!config.getIOManager().exportContent(exportCtx, this)) {
 				throw new IOException("Unexpected Error while spooling resource.");
@@ -322,12 +322,10 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	private void addSizeProperty(DavPropertyName name, Namespace nameSpace) {
-		if (name.getName().equals("size")) {
-			if (!isCollection() && !resource.isFolder()) {
-				DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("size",
-						resource.getContentLength(), nameSpace);
-				properties.add(defaultDavProperty);
-			}
+		if (name.getName().equals("size") && !isCollection() && !resource.isFolder()) {
+			DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("size",
+					resource.getContentLength(), nameSpace);
+			properties.add(defaultDavProperty);
 		}
 	}
 
@@ -383,12 +381,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 		 * set current lock information. If no lock is set to this resource, an
 		 * empty lockdiscovery will be returned in the response.
 		 */
-		// properties.add(new LockDiscovery(getLock(Type.WRITE,
-		// Scope.EXCLUSIVE)));
-		/* lock support information: all locks are lockable. */
-		// SupportedLock supportedLock = new SupportedLock();
-		// supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
-		// properties.add(supportedLock);
 		properties.add(new DefaultDavProperty<>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
 
 		// Set Dav property LastModified
@@ -508,13 +500,13 @@ public class DavResourceImpl implements DavResource, Serializable {
 				Iterator<Resource> resourceIterator = resources.iterator();
 
 				while (resourceIterator.hasNext()) {
-					Resource resource = resourceIterator.next();
+					Resource res = resourceIterator.next();
 
 					String currentFilePath = path;
 					if (currentFilePath.lastIndexOf("/") == currentFilePath.length() - 1) {
-						currentFilePath = currentFilePath + resource.getName();
+						currentFilePath = currentFilePath + res.getName();
 					} else {
-						currentFilePath = currentFilePath + "/" + resource.getName();
+						currentFilePath = currentFilePath + "/" + res.getName();
 					}
 
 					DavResourceLocator resourceLocator = locator.getFactory().createResourceLocator(locator.getPrefix(),
@@ -528,10 +520,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 			}
 
 			catch (DavException e) {
-				log.error(e.getMessage());
 				throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			} catch (Exception e) {
-				log.error(e.getMessage());
 				throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 		}
@@ -546,18 +536,12 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 */
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
 
-		checkConflictAndLocked(member);
+		checkConflictAndLocked();
 
 		try {
 			String memberName = Text.getName(member.getLocator().getResourcePath());
 
 			ImportContext ctx = getImportContext(inputContext, memberName);
-
-//			log.debug("member.getDisplayName() {}", member.getDisplayName());
-//			log.debug("member.isCollection() {}", member.isCollection());
-//			
-//			log.debug("ctx.getResource().getName() {}", ctx.getResource().getName());
-//			log.debug("ctx.getSystemId() {}", ctx.getSystemId());			
 
 			// Check Write permission on the target folder
 			checkWritePermission(member, ctx);
@@ -573,12 +557,9 @@ public class DavResourceImpl implements DavResource, Serializable {
 			 * 1024000 Content-Type: video/mp4
 			 */
 
-			// log.debug("LD-Chunk-Size {}", ctx.getProperty("LD-Chunk-Size"));
 			log.debug("LD-Total-Length {}", ctx.getProperty("LD-Total-Length"));
 
 			log.debug("memberName {}", memberName);
-//			log.debug("ContentLength {}", ctx.getContentLength());
-//			log.debug("MimeType {}", ctx.getMimeType());
 
 			boolean isChunking = false;
 			boolean isChunkingComplete = false;
@@ -587,20 +568,16 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 				isChunking = true;
 
-				// String fileName =
-				// com.google.common.io.Files.getNameWithoutExtension(memberName);
 				String filext = com.google.common.io.Files.getFileExtension(memberName);
 				log.debug("filext {}", filext);
 
 				// get chunk part and total chunks
 				String ssss[] = filext.split("-");
-				// String XXXfilext = ssss[0];
 				String chunkString = ssss[1];
 				int chunkID = Integer.parseInt(ssss[2]);
 				int chunkTotal = Integer.parseInt(ssss[3]);
 				int chunkPart = Integer.parseInt(ssss[4]);
 
-				// log.debug("chunkString {}", chunkString);
 				log.debug("chunkID {}", chunkID);
 				log.debug("chunkPart {}-{}", chunkPart, chunkTotal);
 
@@ -657,9 +634,9 @@ public class DavResourceImpl implements DavResource, Serializable {
 						mergeChunks(chunkfiles, webdavChunkingPath, memberName, chunkID, ctx);
 					}
 
-				} // end if (chunkPart == (chunkTotal-1)) {
+				}
 
-			} // end if (memberName.contains("chunking")) {
+			}
 
 			if (isChunking && !isChunkingComplete)
 				return;
@@ -709,7 +686,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 				ici.setInputFile(filePathObj.toFile());
 			}
 		} catch (IOException ioExceptionObj) {
-			log.error("Problem Occured While Writing To The File= " + ioExceptionObj.getMessage());
+			log.error("Problem Occured While Writing To The File  {}", ioExceptionObj.getMessage());
 		}
 	}
 
@@ -722,23 +699,21 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	private void checkAddChildPermission(DavResource member, ImportContext ctx) throws DavException {
 		if (member.isCollection() && !ctx.getResource().isAddChildEnabled()) {
-//				log.debug("Target folder is not add-child enabled");
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Add Child not allowed on the selected folder");
 		}
 	}
 
 	private void checkWritePermission(DavResource member, ImportContext ctx) throws DavException {
 		if (!member.isCollection() && !ctx.getResource().isWriteEnabled()) {
-//				log.debug("Target folder is not write enabled");
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Write Access not allowed on the selected folder");
 		}
 	}
 
-	private void checkConflictAndLocked(DavResource member) throws DavException {
+	private void checkConflictAndLocked() throws DavException {
 		if (!exists()) {
 			throw new DavException(HttpServletResponse.SC_CONFLICT);
 		}
-		if (isLocked(this) || isLocked(member)) {
+		if (isLocked()) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
 		}
 	}
@@ -751,19 +726,19 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (!exists() || !member.exists()) {
 			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
-		if (isLocked(this) || isLocked(member)) {
+		if (isLocked()) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
 		}
 
-		Resource resource = resourceService.getResource(member.getLocator().getResourcePath(), session);
+		Resource res = resourceService.getResource(member.getLocator().getResourcePath(), session);
 		// set the requesting person
-		resource.setRequestedPerson(this.resource.getRequestedPerson());
+		res.setRequestedPerson(this.resource.getRequestedPerson());
 
-		if (!resource.isDeleteEnabled()) {
+		if (!res.isDeleteEnabled()) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Delete not allowed.");
 		}
 
-		resourceService.deleteResource(resource, session);
+		resourceService.deleteResource(res, session);
 	}
 
 	/**
@@ -774,7 +749,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (!exists()) {
 			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
-		if (isLocked(this)) {
+		if (isLocked()) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
 		}
 
@@ -813,7 +788,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (!exists()) {
 			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
-		if (isLocked(destination)) {
+		if (isLocked()) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
 		}
 
@@ -826,13 +801,13 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 		try {
 			Resource res = resourceService.getResource(destination.getLocator().getResourcePath(), session);
-			log.debug("res = " + res);
+			log.debug("res = {}", res);
 
 			if (res != null) {
 				log.debug("res != null");
 				res.setName(this.resource.getName());
 				Resource destResource = resourceService.getParentResource(res);
-				log.debug("destResource.getID() = " + destResource.getID());
+				log.debug("destResource.getID() = {}", destResource.getID());
 
 				if (destResource.getRequestedPerson() == 0) {
 					destResource.setRequestedPerson((Long.parseLong(session.getObject("id").toString())));
@@ -843,7 +818,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 				log.debug("res IS NULL");
 				String name = destination.getLocator().getResourcePath();
 				name = name.substring(name.lastIndexOf("/") + 1, name.length()).replace("/default", "");
-				log.debug("name = " + name);
+				log.debug("name = {}" + name);
 
 				Resource destResource = resourceService.getParentResource(destination.getResourcePath(),
 						this.resource.getRequestedPerson(), session);
@@ -853,9 +828,9 @@ public class DavResourceImpl implements DavResource, Serializable {
 					destResource.setRequestedPerson((Long.parseLong(session.getObject("id").toString())));
 				}
 
-				log.debug("destResource.getID() = " + destResource.getID());
-				log.debug("this.resource.getName() = " + this.resource.getName());
-				log.debug("this.resource.getID() = " + this.resource.getID());
+				log.debug("destResource.getID() = {}", destResource.getID());
+				log.debug("this.resource.getName() = {}", this.resource.getName());
+				log.debug("this.resource.getID() = {}", this.resource.getID());
 
 				resourceService.copyResource(destResource, this.resource, session);
 			}
@@ -1008,7 +983,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * 
 	 * @return true if this resource cannot be modified due to a write lock
 	 */
-	private boolean isLocked(DavResource res) {
+	private boolean isLocked() {
 		return (resource.isCheckedOut() || resource.isLocked());
 	}
 

@@ -16,10 +16,13 @@ import org.jsoup.safety.Safelist;
  */
 public class HTMLSanitizer {
 
+	private HTMLSanitizer() {
+	}
+
 	public static String sanitize(String unsafeHtmlContent) {
-		if(StringUtils.isEmpty(unsafeHtmlContent))
+		if (StringUtils.isEmpty(unsafeHtmlContent))
 			return unsafeHtmlContent;
-		
+
 		Safelist whiteList = Safelist.relaxed().preserveRelativeLinks(true);
 		whiteList = whiteList.addTags("head", "html", "style", "body", "fieldsMap", "area");
 		whiteList = whiteList.addAttributes(":all", "name", "class", "style", "id", "src", "type", "cellpadding",
@@ -30,9 +33,9 @@ public class HTMLSanitizer {
 	}
 
 	public static String sanitizeSimpleText(String unsafeHtmlContent) {
-		if(StringUtils.isEmpty(unsafeHtmlContent))
+		if (StringUtils.isEmpty(unsafeHtmlContent))
 			return unsafeHtmlContent;
-		
+
 		OutputSettings outputSettings = new OutputSettings().indentAmount(0).prettyPrint(false);
 		Safelist whiteList = Safelist.simpleText().preserveRelativeLinks(false);
 		String sanitized = Jsoup.clean(unsafeHtmlContent, "", whiteList, outputSettings);
@@ -41,9 +44,9 @@ public class HTMLSanitizer {
 	}
 
 	public static String stripIframes(String htmlContent) {
-		if(StringUtils.isEmpty(htmlContent))
+		if (StringUtils.isEmpty(htmlContent))
 			return htmlContent;
-		
+
 		Document doc = Jsoup.parse(htmlContent, "UTF-8");
 		doc.select("iframe").remove();
 		return doc.text();

@@ -115,11 +115,10 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 				// Now collect all menus that references the policies of the
 				// previously found menus
-				List<Menu> tmp = new ArrayList<>();
 				query = new StringBuilder("select _menu from Menu _menu  where _menu.securityRef in (");
 				query.append(coll.stream().map(m -> Long.toString(m.getId())).collect(Collectors.joining(",")));
 				query.append(")");
-				tmp = findByQuery(query.toString(), (Map<String, Object>) null, null);
+				List<Menu> tmp = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 				for (Menu menu : tmp) {
 					if (!coll.contains(menu))
@@ -458,9 +457,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return findIdsByWhere(ENTITY + ENABLED_1_AND + ENTITY + DOT_PARENT_ID + parentId
 						+ (type == null ? "" : AND + ENTITY + ".type=" + type), null, null);
 
-			StringBuilder query1 = new StringBuilder();
 			if (!user.getGroups().isEmpty()) {
-				query1 = new StringBuilder(SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B
+				StringBuilder query1 = new StringBuilder(SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B
 						+ " where B.ld_enabled=1 and B.ld_deleted=0 and A.ld_menuid=B.ld_id AND B.ld_parentid="
 						+ parentId + " AND A.ld_groupid in (");
 				query1.append(
@@ -698,11 +696,10 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findIdsByWhere(ENTITY + DOT_PARENT_ID + parentId, null, null);
 
-			StringBuilder query1 = new StringBuilder();
 			Set<Group> precoll = user.getGroups();
 			Iterator iter = precoll.iterator();
 			if (!precoll.isEmpty()) {
-				query1 = new StringBuilder(SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B
+				StringBuilder query1 = new StringBuilder(SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B
 						+ " where B.ld_deleted=0 and A.ld_menuid=B.ld_id AND B.ld_parentid=" + parentId
 						+ " AND A.ld_groupid in (");
 				boolean first = true;

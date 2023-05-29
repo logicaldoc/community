@@ -89,7 +89,6 @@ public abstract class AbstractEmailDialog extends Window {
 		// Nothing to do
 	}
 
-
 	@Override
 	public void onDraw() {
 		SectionStack recipientsStack = prepareRecipientsGrid();
@@ -304,9 +303,9 @@ public abstract class AbstractEmailDialog extends Window {
 	private void handleBackspace(KeyPressEvent event) {
 		if (event.getKeyName().equals("Backspace")) {
 			ListGridRecord selection = recipientsGrid.getSelectedRecord();
-			if (selection.getAttribute(EMAIL) == null || selection.getAttribute(EMAIL).toString().equals(""))
-				if (recipientsGrid.getDataAsRecordList().getLength() > 1)
-					recipientsGrid.removeSelectedData();
+			if ((selection.getAttribute(EMAIL) == null || selection.getAttribute(EMAIL).toString().equals(""))
+					&& recipientsGrid.getDataAsRecordList().getLength() > 1)
+				recipientsGrid.removeSelectedData();
 		}
 	}
 

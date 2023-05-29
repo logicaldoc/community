@@ -294,12 +294,7 @@ public class FormDetailsPanel extends VLayout {
 			webCss.setWidth(300);
 			webCss.setRowSpan(7);
 
-//		String formUrl = webformURL(form.getFormId());
-//		String perma = "<a href='" + formUrl + "' target='_blank'>" + I18N.message("preview") + "</a>";
-//		StaticTextItem permaLink = ItemFactory.newStaticTextItem("permalink", "permalink", perma);
-//		permaLink.setWidth(60);
-
-			targetFolder = new FolderSelector("targetFolder", false);
+			targetFolder = new FolderSelector("targetFolder", null);
 			targetFolder.setColSpan(3);
 			targetFolder.setTitle(I18N.message("destination"));
 			targetFolder.setFolder(form.getTargetFolder());
@@ -405,15 +400,15 @@ public class FormDetailsPanel extends VLayout {
 			form.setNotifyResponses("true".equals(vm.getValueAsString("notifyResponses")));
 
 			String[] ids = recipients.getValues();
-			GUIUser[] recipients = new GUIUser[ids != null ? ids.length : 0];
+			GUIUser[] formReceipients = new GUIUser[ids != null ? ids.length : 0];
 
 			if (ids != null && ids.length > 0)
 				for (int i = 0; i < ids.length; i++) {
 					GUIUser user = new GUIUser();
 					user.setId(Long.parseLong(ids[i]));
-					recipients[i] = user;
+					formReceipients[i] = user;
 				}
-			form.setRecipients(recipients);
+			form.setRecipients(formReceipients);
 		}
 
 		saveForm();

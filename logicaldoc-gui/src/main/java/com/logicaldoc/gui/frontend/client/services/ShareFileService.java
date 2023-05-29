@@ -63,14 +63,17 @@ public interface ShareFileService extends RemoteService {
 	public boolean isAuthorized() throws ServerException;
 
 	public static class Instance {
-		private static ShareFileServiceAsync instance;
+		private static ShareFileServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static ShareFileServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ShareFileService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ShareFileService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

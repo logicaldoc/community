@@ -41,13 +41,6 @@ public class FolderListGridField extends ColoredListGridField {
 					rec.getAttributeAsBoolean("opened") != null && rec.getAttributeAsBoolean("opened"),
 					rec.getAttributeAsInt("type"), val, color);
 
-// Uncomment to have the name itself colored
-//			if (color != null) {
-//				val = DocUtil.getFolderIcon(
-//						rec.getAttributeAsBoolean("opened") != null && rec.getAttributeAsBoolean("opened"),
-//						rec.getAttributeAsInt("type"), val);
-//				val = "<span style='color: " + color + "'>" + val + "</span>";
-//			}
 			return val;
 		}
 	}

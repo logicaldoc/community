@@ -419,19 +419,23 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 			addUsersFromGroups(groupIds, users);
 
-			SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 			for (Long userId : users) {
-				try {
-					com.logicaldoc.core.searchengine.saved.SavedSearch clone = new com.logicaldoc.core.searchengine.saved.SavedSearch(
-							search);
-					clone.setUserId(userId);
-					dao.store(clone);
-				} catch (Exception t) {
-					log.warn("Cannot save search {} for user {}", search.getName(), userId, t);
-				}
+				store(search, userId);
 			}
 		} catch (Exception t) {
 			throwServerException(session, log, t);
+		}
+	}
+
+	private void store(com.logicaldoc.core.searchengine.saved.SavedSearch search, Long userId) {
+		try {
+			SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
+			com.logicaldoc.core.searchengine.saved.SavedSearch clone = new com.logicaldoc.core.searchengine.saved.SavedSearch(
+					search);
+			clone.setUserId(userId);
+			dao.store(clone);
+		} catch (Exception t) {
+			log.warn("Cannot save search {} for user {}", search.getName(), userId, t);
 		}
 	}
 

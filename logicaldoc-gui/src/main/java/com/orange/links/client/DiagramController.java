@@ -197,13 +197,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	}
 
 	protected void initMenu() {
-		// canvasMenu = new ContextMenu();
-		// canvasMenu.addItem(new MenuItem("About", new Command() {
-		// @Override
-		// public void execute() {
-		// Window.alert("http://www.logicaldoc.com");
-		// }
-		// }));
+		// nothing
 	}
 
 	@Override

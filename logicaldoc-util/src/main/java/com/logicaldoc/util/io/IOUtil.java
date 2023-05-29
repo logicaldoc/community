@@ -15,6 +15,9 @@ import java.nio.file.StandardCopyOption;
 public class IOUtil {
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
 
+	private IOUtil() {
+	}
+
 	/**
 	 * Close the given resource.
 	 * 

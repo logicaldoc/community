@@ -45,11 +45,9 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		if (group.getName().equals("admin") || group.getName().equals("guest") || group.getName().equals("publisher"))
 			throw new PersistenceException(String.format("Group %s cannot be deleted", group.getName()));
 
-		if (group != null) {
-			group.setName(group.getName() + "." + group.getId());
-			group.setDeleted(code);
-			saveOrUpdate(group);
-		}
+		group.setName(group.getName() + "." + group.getId());
+		group.setDeleted(code);
+		saveOrUpdate(group);
 	}
 
 	public boolean exists(String groupname, long tenantId) {
@@ -205,7 +203,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		if (group == null)
 			return;
 
-		if (group != null && group.getDeleted() == 0)
+		if (group.getDeleted() == 0)
 			refresh(group);
 
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);

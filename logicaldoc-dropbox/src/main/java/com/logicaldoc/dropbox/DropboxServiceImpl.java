@@ -77,9 +77,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			if (accessToken == null)
 				return false;
 			return dbox.login(accessToken);
-		} catch (Exception t) {
-			log.error(t.getMessage(), t);
-			throw new ServerException(t.getMessage(), t);
+		} catch (Exception e) {
+			throw new ServerException(e.getMessage(), e);
 		}
 	}
 
@@ -91,7 +90,6 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			Dropbox dbox = new Dropbox();
 			return dbox.startAuthorization(session.getUser().getLocale());
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new ServerException(t.getMessage(), t);
 		}
 	}
@@ -111,7 +109,6 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			saveAccessToken(user, token, account);
 			return account;
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new ServerException(t.getMessage(), t);
 		}
 	}

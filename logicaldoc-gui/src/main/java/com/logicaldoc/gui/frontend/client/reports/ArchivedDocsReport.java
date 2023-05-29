@@ -66,7 +66,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		toolStrip.addFormItem(max);
 		toolStrip.addSeparator();
 
-		folderSelector = new FolderSelector(FOLDER, true);
+		folderSelector = new FolderSelector(FOLDER, null);
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);

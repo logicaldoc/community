@@ -700,14 +700,17 @@ public interface DocumentService extends RemoteService {
 	public int updatePages(long docId) throws ServerException;
 
 	public static class Instance {
-		private static DocumentServiceAsync instance;
+		private static DocumentServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static DocumentServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(DocumentService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(DocumentService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

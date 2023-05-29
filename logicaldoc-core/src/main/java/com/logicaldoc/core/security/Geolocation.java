@@ -39,7 +39,7 @@ import com.maxmind.geoip2.model.CityResponse;
  */
 public class Geolocation {
 
-	private static final String GEOLOCATION = "geolocation";
+	private static final String CONST_GEOLOCATION = "geolocation";
 
 	private static Logger log = LoggerFactory.getLogger(Geolocation.class);
 
@@ -114,7 +114,7 @@ public class Geolocation {
 					response.getCity().getName(), response.getPostal().getCode(),
 					response.getLeastSpecificSubdivision().getName());
 
-			log.debug("IP {} is located at {}", geo.toString());
+			log.debug("IP {} is located at {}", ip, geo);
 
 			return geo;
 		} catch (GeoIp2Exception e) {
@@ -165,7 +165,7 @@ public class Geolocation {
 				if (result != HttpStatus.SC_OK)
 					throw new IOException("HTTP error " + result);
 
-				gzFile = FileUtil.createTempFile(GEOLOCATION, ".tar.gz");
+				gzFile = FileUtil.createTempFile(CONST_GEOLOCATION, ".tar.gz");
 
 				try (InputStream in = HttpUtil.getBodyStream(response);
 						FileOutputStream fos = new FileOutputStream(gzFile);
@@ -183,7 +183,7 @@ public class Geolocation {
 			/*
 			 * Prepare a temporary folder and hunzip the downloaded file in it
 			 */
-			tmpDir = FileUtil.createTempFile(GEOLOCATION, null);
+			tmpDir = FileUtil.createTempFile(CONST_GEOLOCATION, null);
 			FileUtil.strongDelete(tmpDir);
 			tmpDir.mkdir();
 			new ZipUtil().unGZipUnTar(gzFile, tmpDir);
@@ -285,7 +285,7 @@ public class Geolocation {
 	}
 
 	private static File getDatabaseFile() {
-		File folder = PluginRegistry.getPluginResource("logicaldoc-core", GEOLOCATION);
+		File folder = PluginRegistry.getPluginResource("logicaldoc-core", CONST_GEOLOCATION);
 		return new File(folder, "geolocation.db");
 	}
 

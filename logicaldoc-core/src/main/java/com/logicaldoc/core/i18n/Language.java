@@ -66,13 +66,13 @@ public class Language implements Comparable<Language> {
 		try {
 			Set<String> swSet = new HashSet<>();
 			String stopwordsResource = "/stopwords/stopwords_" + getLocale().toString() + ".txt";
-			log.debug("Loading stopwords from: " + stopwordsResource);
+			log.debug("Loading stopwords from: {}", stopwordsResource);
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(stopwordsResource);
 			if (is == null)
 				is = getClass().getResourceAsStream(stopwordsResource);
 
 			if (is == null) {
-				log.warn("No stopwords found for locale " + getLocale().toString());
+				log.warn("No stopwords found for locale {}", getLocale());
 			} else {
 				InputStreamReader isr = new InputStreamReader(is, "UTF-8");
 				BufferedReader br = new BufferedReader(isr);
@@ -131,7 +131,7 @@ public class Language implements Comparable<Language> {
 		try {
 			aClass = Class.forName(analyzerClass);
 		} catch (Exception t) {
-			log.error(analyzerClass + " not found");
+			log.error("{} not found", analyzerClass);
 		}
 
 		// Try to use constructor (Set<?> stopwords)

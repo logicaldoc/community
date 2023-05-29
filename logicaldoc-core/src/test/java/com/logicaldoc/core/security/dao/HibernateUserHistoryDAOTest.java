@@ -97,7 +97,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 			}
 		}
 
-		Assert.assertTrue(hStored.equals(newUserHistory));
+		Assert.assertEquals(hStored, newUserHistory);
 		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
 		Assert.assertEquals(hStored.getUsername(), "sebastian");
 		Assert.assertEquals(hStored.getEvent(), "second test User History store");

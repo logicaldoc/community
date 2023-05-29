@@ -122,7 +122,7 @@ public class BarcodeTemplateSettings extends Window {
 		name.setDisabled(template.getId() != 0L);
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + template.getId());
-		id.setVisible(template != null && template.getId() != 0L);
+		id.setVisible(template.getId() != 0L);
 
 		SelectItem type = ItemFactory.newSelectItem("type");
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();

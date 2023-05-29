@@ -211,7 +211,7 @@ public class User extends PersistentObject implements Serializable {
 	private Set<WorkingTime> workingTimes = new HashSet<>();
 
 	private String timeZone;
-	
+
 	public int getType() {
 		return type;
 	}
@@ -353,11 +353,9 @@ public class User extends PersistentObject implements Serializable {
 		Iterator<Group> iter = getGroups().iterator();
 		while (iter.hasNext()) {
 			Group grp = iter.next();
-			if (!getUserGroupName().equals(grp.getName())) {
-				if (source == null || (source != null && source.equals(grp.getSource()))) {
-					iter.remove();
-					getUserGroups().remove(new UserGroup(grp.getId()));
-				}
+			if (!getUserGroupName().equals(grp.getName()) && (source == null || source.equals(grp.getSource()))) {
+				iter.remove();
+				getUserGroups().remove(new UserGroup(grp.getId()));
 			}
 		}
 	}
@@ -464,7 +462,6 @@ public class User extends PersistentObject implements Serializable {
 		enforceWorkingTime = 0;
 		workingTimes = new HashSet<>();
 	}
-
 
 	@Override
 	public String toString() {

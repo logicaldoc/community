@@ -51,7 +51,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		setHeight100();
 
 		setMembers(formsContainer);
-		folderSelector = new FolderSelector(FOLDER, true);
+		folderSelector = new FolderSelector(FOLDER, null);
 		folderSelector.setWidth(200);
 		folderSelector.setEndRow(true);
 		folderSelector.setTitle(I18N.message(FOLDER));

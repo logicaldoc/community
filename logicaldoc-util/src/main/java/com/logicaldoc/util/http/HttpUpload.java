@@ -14,8 +14,11 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.MimeType;
+import com.logicaldoc.util.exec.Exec;
 
 /**
  * 
@@ -24,6 +27,8 @@ import com.logicaldoc.util.MimeType;
  * @since 4.5
  */
 public class HttpUpload {
+
+	protected static Logger log = LoggerFactory.getLogger(Exec.class);
 
 	private static final String UTF_8 = "UTF-8";
 
@@ -48,8 +53,7 @@ public class HttpUpload {
 
 		FileBody filePart = null;
 		if (listener != null)
-			filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name,
-					listener);
+			filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name, listener);
 		else
 			filePart = new FileBody(file, ContentType.create(MimeType.getByFilename(f), UTF_8), name);
 
@@ -66,11 +70,10 @@ public class HttpUpload {
 				respBody = EntityUtils.toString(rent, UTF_8);
 
 			if (status == HttpStatus.SC_OK) {
-				System.out.println("Upload complete, response= " + respBody);
+				log.debug("Upload complete, response: {}", respBody);
 			} else {
-				String message = "Upload failed, response= " + status;
-				System.out.println(message);
-				throw new IOException(message);
+				log.debug("Upload failed, response: {}", status);
+				throw new IOException(""+status);
 			}
 		}
 	}

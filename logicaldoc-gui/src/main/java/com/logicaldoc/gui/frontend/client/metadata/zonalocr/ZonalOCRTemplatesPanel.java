@@ -87,46 +87,46 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		if (toolStrip != null)
 			removeMember(toolStrip);
 
-		ToolStrip toolStrip = new ToolStrip();
-		toolStrip.setWidth100();
-		toolStrip.addSpacer(2);
+		ToolStrip toolBar = new ToolStrip();
+		toolBar.setWidth100();
+		toolBar.addSpacer(2);
 
-		addTemplateSelector(templateId, toolStrip);
+		addTemplateSelector(templateId, toolBar);
 
-		addOcrTemplateSelector(templateId, barcodeTemplateId, toolStrip);
+		addOcrTemplateSelector(templateId, barcodeTemplateId, toolBar);
 
-		addNewButton(toolStrip);
+		addNewButton(toolBar);
 
-		addSettingsButton(toolStrip);
+		addSettingsButton(toolBar);
 
-		addDeleteButton(toolStrip);
+		addDeleteButton(toolBar);
 
-		addSaveButton(toolStrip);
+		addSaveButton(toolBar);
 
-		toolStrip.addSeparator();
+		toolBar.addSeparator();
 
-		addAddZoneButton(toolStrip);
+		addAddZoneButton(toolBar);
 
-		addDeleteZonesButton(toolStrip);
+		addDeleteZonesButton(toolBar);
 
-		toolStrip.addSeparator();
+		toolBar.addSeparator();
 
-		addZoomInButton(toolStrip);
+		addZoomInButton(toolBar);
 
-		addZoomOutButton(toolStrip);
+		addZoomOutButton(toolBar);
 
-		addPrintButton(toolStrip);
+		addPrintButton(toolBar);
 
-		toolStrip.addSeparator();
+		toolBar.addSeparator();
 
-		addCloseButton(toolStrip);
+		addCloseButton(toolBar);
 
-		toolStrip.addFill();
+		toolBar.addFill();
 
 		editorPanel.setWidth100();
 		editorPanel.setHeight100();
 		editorPanel.setOverflow(Overflow.AUTO);
-		setMembers(toolStrip, editorPanel);
+		setMembers(toolBar, editorPanel);
 
 		updateSample();
 	}

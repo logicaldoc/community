@@ -85,14 +85,17 @@ public interface DocuSignService extends RemoteService {
 	public String sendEnvelope(GUIDocuSignSettings envelope) throws ServerException;
 
 	public static class Instance {
-		private static DocuSignServiceAsync instance;
+		private static DocuSignServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static DocuSignServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(DocuSignService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(DocuSignService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

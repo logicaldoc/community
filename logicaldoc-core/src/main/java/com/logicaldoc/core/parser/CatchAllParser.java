@@ -26,14 +26,14 @@ public class CatchAllParser extends AbstractParser {
 		if (document == null)
 			parse1(input, filename, encoding, locale, tenant, content);
 		else
-			parse2(input, filename, encoding, locale, tenant, document, fileVersion, content);
+			parse2(filename, encoding, locale, tenant, document, fileVersion, content);
 	}
 
 	/**
 	 * Parses with document specification
 	 */
-	private void parse2(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	private void parse2(String filename, String encoding, Locale locale, String tenant, Document document,
+			String fileVersion, StringBuilder content) {
 
 		try {
 			FormatConverterManager manager = (FormatConverterManager) Context.get()

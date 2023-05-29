@@ -19,6 +19,9 @@ public class TagUtil {
 
 	public static final int MAX_FIELD_LENGTH = 4000;
 
+	private TagUtil() {
+	}
+
 	/**
 	 * Detects words in the passed string and creates a list of tags. <br>
 	 * <b>Atention:</b> Recognized tags are words of min. MIN_CHARS chars and

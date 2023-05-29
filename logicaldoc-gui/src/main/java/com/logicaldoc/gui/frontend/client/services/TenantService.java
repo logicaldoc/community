@@ -89,14 +89,17 @@ public interface TenantService extends RemoteService {
 	public GUIBranding importBrandingPackage() throws ServerException;
 
 	public static class Instance {
-		private static TenantServiceAsync instance;
+		private static TenantServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static TenantServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(TenantService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(TenantService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

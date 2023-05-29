@@ -34,7 +34,7 @@ public class IncrementalSettingsPanel extends VLayout {
 
 	protected DynamicForm form = new DynamicForm();
 
-	protected FolderSelector folderSelector = new FolderSelector("folder", false);
+	protected FolderSelector folderSelector = new FolderSelector("folder", null);
 	
 	protected TextItem prefix = null;
 	
@@ -87,13 +87,13 @@ public class IncrementalSettingsPanel extends VLayout {
 						.replace("]", "");
 				if (!templateIdString.isEmpty()) {
 					String[] selection = templateIdString.split(",");
-					List<GUITemplate> templates = new ArrayList<>();
+					List<GUITemplate> guiTemplates = new ArrayList<>();
 					for (String selectionId : selection) {
 						GUITemplate currentTemplate = new GUITemplate();
 						currentTemplate.setId(Long.parseLong(selectionId.trim()));
-						templates.add(currentTemplate);
+						guiTemplates.add(currentTemplate);
 					}
-					incremental.setTemplates(templates.toArray(new GUITemplate[0]));
+					incremental.setTemplates(guiTemplates.toArray(new GUITemplate[0]));
 				}
 			}
 

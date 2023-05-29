@@ -150,10 +150,6 @@ public class Frontend implements EntryPoint {
 		TagsForm.searchTag(tag, false);
 	}
 
-	public void addTagInCloud(String tag, String weight, String link) {
-		TagsForm.searchTag(tag, false);
-	}
-
 	private void init(final GUIInfo info) {
 		Feature.init(info);
 		I18N.init(info);

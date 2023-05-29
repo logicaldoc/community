@@ -120,10 +120,9 @@ public class MultipleUpload extends HorizontalPanel {
 					}
 					return true;
 				}).setFileDialogCompleteHandler((FileDialogCompleteEvent fileDialogCompleteEvent) -> {
-					if (fileDialogCompleteEvent.getTotalFilesInQueue() > 0) {
-						if (uploader.getStats().getUploadsInProgress() <= 0) {
-							uploader.startUpload();
-						}
+					if (fileDialogCompleteEvent.getTotalFilesInQueue() > 0
+							&& uploader.getStats().getUploadsInProgress() <= 0) {
+						uploader.startUpload();
 					}
 					return true;
 				}).setFileQueueErrorHandler((FileQueueErrorEvent fileQueueErrorEvent) -> {

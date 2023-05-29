@@ -67,14 +67,17 @@ public interface SignService extends RemoteService {
 
 	public static class Instance {
 
-		private static SignServiceAsync instance;
+		private static SignServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static SignServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SignService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SignService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

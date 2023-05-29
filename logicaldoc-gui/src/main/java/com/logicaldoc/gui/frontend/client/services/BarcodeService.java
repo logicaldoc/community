@@ -89,14 +89,16 @@ public interface BarcodeService extends RemoteService {
 	public GUIBarcodeZone updateZone(GUIBarcodeZone zone) throws ServerException;
 
 	public static class Instance {
-		private static BarcodeServiceAsync instance;
+		private static BarcodeServiceAsync inst;
 
+		private Instance() {}
+		
 		public static BarcodeServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(BarcodeService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(BarcodeService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

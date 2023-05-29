@@ -106,7 +106,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 			protected Canvas createRecordComponent(final ListGridRecord rec, Integer colNum) {
 				String fieldName = this.getFieldName(colNum);
 				if (fieldName.equals(TARGET_NAME)) {
-					final FolderSelector folderSelector = new FolderSelector("target", true);
+					final FolderSelector folderSelector = new FolderSelector("target", null);
 					folderSelector.setShowTitle(false);
 					folderSelector.setFolder(Long.parseLong(rec.getAttributeAsString(TARGET_ID)),
 							rec.getAttributeAsString(TARGET_NAME));

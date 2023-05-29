@@ -20,6 +20,9 @@ import com.logicaldoc.webservice.doc.model.StubTypeTree;
  */
 public class Variable2Stub {
 
+	private Variable2Stub() {
+	}
+
 	public static Stub convertToStub(JavaLanguageVariable variable, StubTypeTreeRepository typeTreeRepository) {
 		Stub stub = new Stub();
 		stub.setStubName(variable.getVariableName());

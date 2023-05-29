@@ -17,6 +17,9 @@ import com.logicaldoc.webservice.doc.model.WebServiceStubSet;
  */
 public class WebServiceStubSetFactory {
 
+	private WebServiceStubSetFactory() {
+	}
+
 	public static WebServiceStubSet createWebServiceStubSet(Class<?> webServiceClass) {
 		List<Method> methods = getWebMethods(webServiceClass);
 		WebServiceStubSet serviceStubs = new WebServiceStubSet();

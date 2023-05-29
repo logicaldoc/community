@@ -672,7 +672,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
 	}

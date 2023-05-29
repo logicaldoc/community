@@ -290,10 +290,10 @@ public class GUIImportFolder implements Serializable {
 			if (getPath() != null && !getPath().isEmpty())
 				url += getPath();
 		} else if (getProvider().startsWith(PROVIDER_SMB)) {
-			String path = getPath().replace("/", "\\\\");
-			if (!path.startsWith("\\"))
-				path = "\\" + path;
-			url += path;
+			String importFolderPath = getPath().replace("/", "\\\\");
+			if (!importFolderPath.startsWith("\\"))
+				importFolderPath = "\\" + importFolderPath;
+			url += importFolderPath;
 		} else {
 			url += getProvider();
 			url += "://";

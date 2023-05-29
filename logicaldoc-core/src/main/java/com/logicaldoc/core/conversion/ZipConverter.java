@@ -67,7 +67,7 @@ public class ZipConverter extends CompressedArchiveConverter {
 		ZipUtil zipUtil = new ZipUtil();
 		List<String> entries = zipUtil.listEntries(src);
 		if (entries.size() > 1)
-			convertMultipleEntries(sid, document, src, dest, entries);
+			convertMultipleEntries(sid, document, dest, entries);
 		else
 			convertSingleEntry(sid, document, src, dest, entries.get(0));
 

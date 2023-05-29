@@ -116,7 +116,6 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 			return info;
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new ServerException(t.getMessage());
 		}
 	}
@@ -261,15 +260,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				values.add(pair);
 			}
 
-			GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-
-			try {
-				List<Generic> dbSettings = dao.findByTypeAndSubtype("guisetting", null, 0L, tenant.getId());
-				for (Generic generic : dbSettings)
-					values.add(new GUIValue(generic.getSubtype(), generic.getString1()));
-			} catch (Exception t) {
-				log.warn("cannot load GUI settings from the database", t);
-			}
+			loadGUISettingsFromDB(tenant, values);
 
 			info.setConfig(values.toArray(new GUIValue[0]));
 		} catch (Exception t) {
@@ -287,6 +278,17 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		}
 
 		return info;
+	}
+
+	private static void loadGUISettingsFromDB(GUITenant tenant, ArrayList<GUIValue> values) {
+		try {
+			GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			List<Generic> dbSettings = dao.findByTypeAndSubtype("guisetting", null, 0L, tenant.getId());
+			for (Generic generic : dbSettings)
+				values.add(new GUIValue(generic.getSubtype(), generic.getString1()));
+		} catch (Exception t) {
+			log.warn("cannot load GUI settings from the database", t);
+		}
 	}
 
 	static protected GUIValue[] getBundle(String locale, String tenantName) {
@@ -358,16 +360,13 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			SystemMessageDAO messageDao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
 			List<GUIParameter> parameters = new ArrayList<>();
 
-			if (session != null) {
-				GUIParameter messages = new GUIParameter("messages",
-						"" + messageDao.getUnreadCount(session.getUsername(), Message.TYPE_SYSTEM));
-				parameters.add(messages);
-			}
+			GUIParameter messages = new GUIParameter("messages",
+					"" + messageDao.getUnreadCount(session.getUsername(), Message.TYPE_SYSTEM));
+			parameters.add(messages);
 			parameters.add(new GUIParameter("valid", "" + SessionManager.get().isOpen(session.getSid())));
 
 			return parameters.toArray(new GUIParameter[0]);
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
 			throw new InvalidSessionServerException(t.getMessage());
 		}
 	}

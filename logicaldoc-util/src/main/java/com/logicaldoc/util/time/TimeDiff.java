@@ -10,6 +10,9 @@ import org.apache.commons.lang.StringUtils;
 
 public class TimeDiff {
 
+	private TimeDiff() {
+	}
+
 	/**
 	 * Calculate the absolute difference between two Date without regard for
 	 * time offsets
@@ -115,14 +118,6 @@ public class TimeDiff {
 		out.append(".");
 		out.append(StringUtils.leftPad(Long.toString(millis), 3, '0'));
 		return out.toString();
-	}
-
-	public static void printDiffs(long[] diffs) {
-		System.out.printf("Days:         %3d\n", diffs[0]);
-		System.out.printf("Hours:        %3d\n", diffs[1]);
-		System.out.printf("Minutes:      %3d\n", diffs[2]);
-		System.out.printf("Seconds:      %3d\n", diffs[3]);
-		System.out.printf("Milliseconds: %3d\n", diffs[4]);
 	}
 
 	public static enum TimeField {

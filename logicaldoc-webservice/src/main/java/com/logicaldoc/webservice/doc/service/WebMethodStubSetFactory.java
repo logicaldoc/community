@@ -18,14 +18,17 @@ import com.logicaldoc.webservice.doc.model.WebMethodStubSet;
  */
 public class WebMethodStubSetFactory {
 
+	private WebMethodStubSetFactory() {
+	}
+
 	public static WebMethodStubSet createWebMethodStubSet(Method method) {
 		WebMethodStubSet stubSet = new WebMethodStubSet();
 		stubSet.setMethodName(method.getName());
-		
-		WSDoc annotation=method.getAnnotation(WSDoc.class);
-		if(annotation!=null)
+
+		WSDoc annotation = method.getAnnotation(WSDoc.class);
+		if (annotation != null)
 			stubSet.setDescription(annotation.description());
-		
+
 		addRequestStubs(method, stubSet);
 		if (!Void.TYPE.equals(method.getReturnType())) {
 			addResponseStub(method, stubSet);

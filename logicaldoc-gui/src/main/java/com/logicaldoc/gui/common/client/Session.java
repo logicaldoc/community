@@ -32,7 +32,7 @@ public class Session implements DocumentObserver {
 
 	private GUIInfo info;
 
-	private GUISession session;
+	private GUISession guiSession;
 
 	private Long hiliteDocId;
 
@@ -62,15 +62,15 @@ public class Session implements DocumentObserver {
 	}
 
 	public String getSid() {
-		if (session != null)
-			return session.getSid();
+		if (guiSession != null)
+			return guiSession.getSid();
 		else
 			return null;
 	}
 
 	public String getIncomingMessage() {
-		if (session != null)
-			return session.getWelcomeMessage();
+		if (guiSession != null)
+			return guiSession.getWelcomeMessage();
 		else
 			return null;
 	}
@@ -80,7 +80,7 @@ public class Session implements DocumentObserver {
 	}
 
 	public void close() {
-		session = null;
+		guiSession = null;
 		sessionObservers.clear();
 		if (timer != null)
 			timer.cancel();
@@ -88,11 +88,11 @@ public class Session implements DocumentObserver {
 	}
 
 	public GUIUser getUser() {
-		return session.getUser();
+		return guiSession.getUser();
 	}
 
 	public void setUser(GUIUser user) {
-		session.setUser(user);
+		guiSession.setUser(user);
 		I18N.init(user);
 	}
 
@@ -106,7 +106,7 @@ public class Session implements DocumentObserver {
 
 			@Override
 			public void onSuccess(GUIParameter[] parameters) {
-				Session.get().session = session;
+				Session.get().guiSession = session;
 				Session.get().info = session.getInfo();
 
 				I18N.init(session.getUser());
@@ -208,11 +208,11 @@ public class Session implements DocumentObserver {
 	}
 
 	public GUISession getSession() {
-		return session;
+		return guiSession;
 	}
 
 	public void setSession(GUISession session) {
-		this.session = session;
+		this.guiSession = session;
 	}
 
 	public String getTenantName() {

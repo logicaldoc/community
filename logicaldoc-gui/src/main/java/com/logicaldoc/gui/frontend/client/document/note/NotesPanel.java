@@ -89,8 +89,8 @@ public class NotesPanel extends DocumentDetailTab {
 		notesGrid.setDataSource(new NotesDS(null, document.getId(), document.getFileVersion(), null));
 		notesGrid.setFields(id, userId, user, date, page, content);
 
-		ToolStrip buttons = new ToolStrip();
-		buttons.setWidth100();
+		ToolStrip btns = new ToolStrip();
+		btns.setWidth100();
 
 		addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(event -> {
@@ -112,23 +112,23 @@ public class NotesPanel extends DocumentDetailTab {
 		print.addClickHandler(event -> GridUtil.print(notesGrid));
 
 		if (document.getFolder().isWrite()) {
-			buttons.addButton(addNote);
+			btns.addButton(addNote);
 		}
 
 		if (Feature.visible(Feature.ANNOTATIONS)) {
-			buttons.addButton(annotations);
+			btns.addButton(annotations);
 			annotations.setDisabled(!Feature.enabled(Feature.ANNOTATIONS));
 		}
 
 		if (document.getFolder().isWrite())
-			buttons.addSeparator();
-		buttons.addButton(export);
-		buttons.addButton(print);
+			btns.addSeparator();
+		btns.addButton(export);
+		btns.addButton(print);
 
 		container.setHeight100();
 		container.setWidth100();
 		container.addMember(notesGrid);
-		container.addMember(buttons);
+		container.addMember(btns);
 
 		notesGrid.addCellContextClickHandler(event -> {
 			Menu contextMenu = new Menu();

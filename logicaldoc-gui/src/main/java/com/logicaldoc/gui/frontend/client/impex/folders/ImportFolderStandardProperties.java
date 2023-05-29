@@ -46,7 +46,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		setHeight100();
 
 		setMembers(formsContainer);
-		targetSelector = new FolderSelector("target", false);
+		targetSelector = new FolderSelector("target", null);
 		targetSelector.setRequired(true);
 		targetSelector.setWidth(250);
 		targetSelector.setTitle(I18N.message("targetfolder"));
@@ -60,9 +60,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 	private void refresh() {
 		form.clearValues();
 		form.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.destroy();
 
 		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);

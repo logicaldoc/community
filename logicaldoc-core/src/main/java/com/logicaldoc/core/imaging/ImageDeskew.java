@@ -93,10 +93,10 @@ public class ImageDeskew {
 				sum += hl[i].alpha;
 				count++;
 			}
-			if (count > 0) 
-				return (sum / count);						
+			if (count > 0)
+				return (sum / count);
 		}
-		
+
 		return 0.0d;
 	}
 
@@ -147,14 +147,11 @@ public class ImageDeskew {
 		for (int y = hMin; y < hMax; y++) {
 			for (int x = 1; x < (this.image.getWidth() - 2); x++) {
 				// only lower edges are considered
-				if (ImageUtil.isBlack(this.image, x, y)) {
-					if (!ImageUtil.isBlack(this.image, x, y + 1)) {
-						calc(x, y);
-					}
+				if (ImageUtil.isBlack(this.image, x, y) && !ImageUtil.isBlack(this.image, x, y + 1)) {
+					calc(x, y);
 				}
 			}
 		}
-
 	}
 
 	// calculate all lines through the point (x,y)

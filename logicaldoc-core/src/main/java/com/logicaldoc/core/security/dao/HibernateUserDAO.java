@@ -715,11 +715,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		User user = (User) findById(userId);
 		Group userGroup = user.getUserGroup();
 
-		if (user != null) {
-			user.setDeleted(PersistentObject.DELETED_CODE_DEFAULT);
-			user.setUsername(user.getUsername() + "." + user.getId());
-			saveOrUpdate(user);
-		}
+		user.setDeleted(PersistentObject.DELETED_CODE_DEFAULT);
+		user.setUsername(user.getUsername() + "." + user.getId());
+		saveOrUpdate(user);
 
 		// Delete the user's group
 		if (userGroup != null) {

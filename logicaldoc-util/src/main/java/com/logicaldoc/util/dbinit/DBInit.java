@@ -59,13 +59,8 @@ public class DBInit {
 	public void execute() {
 		try {
 			doConnection();
-			for (String sql : sqlList) {
-				try {
-					execute(sql);
-				} catch (Exception e) {
-					log.error("Failed to execute " + sql, e);
-				}
-			}
+			for (String sql : sqlList)
+				execute(sql);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			try {

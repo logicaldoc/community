@@ -51,21 +51,8 @@ public abstract class AbstractShape implements Shape {
 	public int getTop() {
 		return widget.getAbsoluteTop() - getContainerOffsetTop();
 	}
-	
+
 	protected int getContainerOffsetLeft() {
-		// if (containerOffsetLeft < 0 || !sync) {
-		// int scrollLeft = 0;
-		// Element parent = DOM.getParent(widget.getElement());
-		// while (parent != null) {
-		// if(getScrollLeft(parent) > 0){
-		// scrollLeft += getScrollLeft(parent);
-		// GWT.log("Scroll left detected : " + scrollLeft);
-		// }
-		// if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
-		// containerOffsetLeft = DOM.getAbsoluteLeft(parent) - scrollLeft;
-		// }
-		// parent = DOM.getParent(parent);
-		// }
 		if (containerOffsetLeft < 0 || !sync) {
 			int left = 0;
 			Widget parent = widget.getParent();
@@ -75,26 +62,11 @@ public abstract class AbstractShape implements Shape {
 					left = parent.getAbsoluteLeft();
 			}
 			containerOffsetLeft = left;
-			//containerOffsetLeft = AdminPanel.get().getContent().getAbsoluteLeft();
 		}
 		return containerOffsetLeft;
 	}
 
 	protected int getContainerOffsetTop() {
-		// if (containerOffsetTop < 0 || !sync) {
-		// int scrollTop = 0;
-		// Element parent = DOM.getParent(widget.getElement());
-		// while (parent != null) {
-		// if (getScrollTop(parent) > 0) {
-		// scrollTop += getScrollTop(parent);
-		// GWT.log("Scroll Top detected : " + scrollTop);
-		// }
-		// if ("relative".equals(DOM.getStyleAttribute(parent, "position"))) {
-		// containerOffsetTop = DOM.getAbsoluteTop(parent) - scrollTop;
-		// }
-		// parent = DOM.getParent(parent);
-		// }
-		// }
 		if (containerOffsetTop < 0 || !sync) {
 			int top = 0;
 			Widget parent = widget.getParent();
@@ -104,8 +76,6 @@ public abstract class AbstractShape implements Shape {
 					top = parent.getAbsoluteTop();
 			}
 			containerOffsetTop = top;
-
-			//containerOffsetTop = AdminPanel.get().getContent().getAbsoluteTop();
 		}
 		return containerOffsetTop;
 	}
@@ -177,5 +147,4 @@ public abstract class AbstractShape implements Shape {
 	public void setAllowSynchronized(boolean allowSynchronized) {
 		this.allowSync = allowSynchronized;
 	}
-
 }

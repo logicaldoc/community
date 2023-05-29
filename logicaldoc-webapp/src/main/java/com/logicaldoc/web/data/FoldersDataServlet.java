@@ -258,8 +258,8 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			Integer[] pagination = new Integer[] {
 					(Integer) session.getDictionary().get(FOLDER_START_RECORD + ":" + parentFolderId),
 					(Integer) session.getDictionary().get(FOLDER_PAGE_SIZE + ":" + parentFolderId) };
-			if (pagination != null && pagination[0] != null && pagination[1] != null) {
-				log.debug("Found pagination for folder %s -> max: %s  page: %s", parentFolder, pagination[0],
+			if (pagination[0] != null && pagination[1] != null) {
+				log.debug("Found pagination for folder {} -> max: {}  page: {}", parentFolder, pagination[0],
 						pagination[1]);
 				startRecord = (long) pagination[0];
 				endRecord = startRecord + pagination[1] - 1;
@@ -303,8 +303,6 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		if (request.getParameter(PARENT) != null) {
 			parent = request.getParameter(PARENT);
 		} else if (request.getParameter("criteria") != null) {
-			// The request comes from a menu, expecting something like
-			// criteria={"fieldName":"parent","value":"5-4","operator":"equals"}
 			String criteria = request.getParameter("criteria");
 			parent = criteria.substring(criteria.indexOf("value") + 8);
 			parent = parent.substring(0, parent.indexOf('"'));

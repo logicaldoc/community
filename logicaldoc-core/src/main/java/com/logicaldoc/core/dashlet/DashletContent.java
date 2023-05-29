@@ -101,9 +101,9 @@ public class DashletContent extends HttpServlet {
 			if (Dashlet.TYPE_DOCEVENT.equals(dashlet.getType()))
 				handleDocumentEvent(showSid, locale, dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_DOCUMENT.equals(dashlet.getType()))
-				handleDocument(showSid, locale, dashlet, dashletDictionary, automation, writer);
+				handleDocument(locale, dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_NOTE.equals(dashlet.getType()))
-				handleNote(showSid, locale, dashlet, dashletDictionary, automation, writer);
+				handleNote(dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_CONTENT.equals(dashlet.getType()))
 				handleContent(dashlet, dashletDictionary, automation, writer);
 		} catch (NumberFormatException | ServletException | PersistenceException | IOException e) {
@@ -132,10 +132,9 @@ public class DashletContent extends HttpServlet {
 		} else {
 			writer.write(LIST_TAG);
 
-			List<DocumentHistory> records = new ArrayList<>();
 			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
-			records = hdao.findByObjectQuery(query.trim(), (Map<String, Object>) null,
+			List<DocumentHistory> records = hdao.findByObjectQuery(query.trim(), (Map<String, Object>) null,
 					dashlet.getUnique() == 0 ? dashlet.getMax() : null);
 
 			List<DocumentHistory> uniqueRecords = filterUniqueDocumentEvents(dashlet, records);
@@ -248,7 +247,7 @@ public class DashletContent extends HttpServlet {
 			 * fieldsMap is used to maximize the listing performances.
 			 */
 			Map<String, Object> extValues = new HashMap<>();
-			retrieveExtendedAttributes(locale, dashlet, uniqueRecords, extValues, attrs);
+			retrieveExtendedAttributes(locale, uniqueRecords, extValues, attrs);
 
 			printExtendedAttributes(df, writer, doc, attrs, extValues);
 		}
@@ -261,7 +260,6 @@ public class DashletContent extends HttpServlet {
 	 * given history records
 	 * 
 	 * @param locale the current locale
-	 * @param dashlet the dashlet currently elaborated
 	 * @param records the list of retrieved histories
 	 * @param extValues The key is documentId-atttributeName, the value is the
 	 *        attribute value
@@ -269,8 +267,8 @@ public class DashletContent extends HttpServlet {
 	 *        columns in
 	 * @throws PersistenceException
 	 */
-	private void retrieveExtendedAttributes(Locale locale, Dashlet dashlet, List<DocumentHistory> records,
-			Map<String, Object> extValues, List<String> attrs) throws PersistenceException {
+	private void retrieveExtendedAttributes(Locale locale, List<DocumentHistory> records, Map<String, Object> extValues,
+			List<String> attrs) throws PersistenceException {
 
 		if (attrs.isEmpty())
 			return;
@@ -355,7 +353,7 @@ public class DashletContent extends HttpServlet {
 		writer.write("</" + fieldName + ">");
 	}
 
-	private void handleDocument(boolean showSid, Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
+	private void handleDocument(Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
 			Automation automation, PrintWriter writer) throws PersistenceException {
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
@@ -508,8 +506,8 @@ public class DashletContent extends HttpServlet {
 		return attrs;
 	}
 
-	private void handleNote(boolean showSid, Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
-			Automation automation, PrintWriter writer) {
+	private void handleNote(Dashlet dashlet, Map<String, Object> dashletDictionary, Automation automation,
+			PrintWriter writer) {
 
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);

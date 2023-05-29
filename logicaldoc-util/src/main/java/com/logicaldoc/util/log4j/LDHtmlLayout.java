@@ -296,11 +296,9 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		append(sbuf, "<title>").append(title);
 		appendLs(sbuf, "</title>");
 		appendLs(sbuf, "<style type=\"text/css\">");
-		// appendLs(sbuf, "<!--");
 		append(sbuf, "body, table {font-family:").append(font).append("; font-size: ");
 		appendLs(sbuf, fontSize).append(";}");
 		appendLs(sbuf, "th {background: #336699; color: #FFFFFF; text-align: left;}");
-		// appendLs(sbuf, "-->");
 		appendLs(sbuf, "</style>");
 		appendLs(sbuf, "</head>");
 		appendLs(sbuf, "<body bgcolor=\"#FFFFFF\" topmargin=\"6\" leftmargin=\"6\">");

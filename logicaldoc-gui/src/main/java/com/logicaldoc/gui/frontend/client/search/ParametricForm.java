@@ -126,7 +126,7 @@ public class ParametricForm extends VLayout {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
 
-		folder = new FolderSelector(null, true);
+		folder = new FolderSelector(null, null);
 		folder.setColSpan(2);
 		folder.setEndRow(true);
 		folder.setWidth(200);

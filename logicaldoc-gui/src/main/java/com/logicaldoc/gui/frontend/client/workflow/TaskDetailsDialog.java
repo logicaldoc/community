@@ -578,7 +578,7 @@ public class TaskDetailsDialog extends Window {
 		tabs.selectTab(notesTab);
 	}
 
-	public void onNewNote(String note) {
+	public void onNewNote() {
 		refreshAndSelectNotesTab();
 		workflowDashboard.refresh(workflow.getId());
 	}
@@ -594,7 +594,7 @@ public class TaskDetailsDialog extends Window {
 		taskId.setHidden(true);
 
 		ListGridField task = new ListGridField("name", I18N.message("task"), 150);
-		ListGridField user = new UserListGridField("user", USER_ID, "user");
+		ListGridField usr = new UserListGridField("user", USER_ID, "user");
 		ListGridField date = new DateListGridField("date", "date");
 
 		notesGrid = new ListGrid() {
@@ -616,7 +616,7 @@ public class TaskDetailsDialog extends Window {
 		notesGrid.setCanSelectAll(false);
 		notesGrid.setCanExpandRecords(true);
 		notesGrid.setSelectionType(SelectionStyle.SINGLE);
-		notesGrid.setFields(id, task, date, user);
+		notesGrid.setFields(id, task, date, usr);
 		notesGrid.setDataSource(new WorkflowHistoriesDS(Long.parseLong(workflow.getId()), workflow.getTemplateId(),
 				"event.workflow.task.note", null, null));
 		notesPanel.addMember(notesGrid);
@@ -1016,12 +1016,12 @@ public class TaskDetailsDialog extends Window {
 				}
 
 				setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
-				if (value != null && value.toString().length() > maxlength)
+				if (value.toString().length() > maxlength)
 					return false;
 
 				if (minlength != null && minlength > 1) {
 					setErrorMessage(I18N.message("notetoosmall", Integer.toString(minlength)));
-					if (value != null && value.toString().length() < minlength)
+					if (value.toString().length() < minlength)
 						return false;
 				}
 

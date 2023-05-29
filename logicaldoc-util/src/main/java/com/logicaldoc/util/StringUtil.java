@@ -29,6 +29,9 @@ public class StringUtil {
 
 	private static final String UTF_8 = "UTF-8";
 
+	private StringUtil() {
+	}
+
 	/**
 	 * Splits a string into tokens separated by a separator
 	 * 

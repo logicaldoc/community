@@ -27,7 +27,7 @@ public class ImageDrawingPane extends DrawPane {
 
 	private DrawImage background = new DrawImage();
 
-	public ImageDrawingPane(String imageUrl, List<DrawItem> items, CallBack loadImageCallback) {
+	public ImageDrawingPane(String imageUrl, CallBack loadImageCallback) {
 		this.imageUrl = imageUrl;
 
 		setShowEdges(true);

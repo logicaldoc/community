@@ -4,7 +4,6 @@ import java.io.File;
 
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
-//import com.logicaldoc.webservice.WebserviceServlet;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**

@@ -111,14 +111,17 @@ public interface AttributeSetService extends RemoteService {
 	void applyInitializationToTemplates(long setId, String attribute) throws ServerException;
 
 	public static class Instance {
-		private static AttributeSetServiceAsync instance;
+		private static AttributeSetServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static AttributeSetServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(AttributeSetService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(AttributeSetService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 

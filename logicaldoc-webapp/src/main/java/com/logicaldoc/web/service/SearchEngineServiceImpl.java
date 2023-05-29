@@ -103,7 +103,6 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 				indexer.dropIndex();
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
 				throw new ServerException(e.getMessage(), e);
 			}
 
@@ -358,75 +357,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			List<Hit> sortedHitsList = new ArrayList<>(hitsMap.values());
 			sortedHitsList.sort((h1, h2) -> Long.valueOf(h1.getId()).compareTo(Long.valueOf(h2.getId())));
 			for (Hit hit : sortedHitsList) {
-				GUIDocument document = new GUIDocument();
-				try {
-					document.setId(hit.getId());
-					document.setTenantId(hit.getTenantId());
-					document.setCustomId(hit.getCustomId());
-					document.setType(hit.getType());
-					document.setFileName(hit.getFileName());
-					document.setColor(hit.getColor());
-					document.setVersion(hit.getVersion());
-					document.setCreation(hit.getCreation());
-					document.setCreator(hit.getCreator());
-					document.setCreatorId(hit.getCreatorId());
-					document.setDate(hit.getDate());
-					document.setPublisher(hit.getPublisher());
-					document.setPublisherId(hit.getPublisherId());
-					document.setFileVersion(hit.getFileVersion());
-					document.setLanguage(hit.getLanguage());
-					document.setTemplateId(hit.getTemplateId());
-					document.setLastModified(hit.getLastModified());
-					document.setLockUserId(hit.getLockUserId());
-					document.setLockUser(hit.getLockUser());
-					document.setComment(hit.getComment());
-					document.setStatus(hit.getStatus());
-					document.setWorkflowStatus(hit.getWorkflowStatus());
-					document.setWorkflowStatusDisplay(hit.getWorkflowStatusDisplay());
-					document.setImmutable(hit.getImmutable());
-					document.setFileSize(hit.getFileSize());
-					document.setStartPublishing(hit.getStartPublishing());
-					document.setStopPublishing(hit.getStopPublishing());
-					document.setPublished(hit.getPublished());
-					document.setSigned(hit.getSigned());
-					document.setStamped(hit.getStamped());
-					document.setIndexed(hit.getIndexed());
-					document.setExtResId(hit.getExtResId());
-					document.setPages(hit.getPages());
-					document.setPreviewPages(hit.getPreviewPages());
-					document.setNature(hit.getNature());
-					document.setFormId(hit.getFormId());
-					document.setIcon(FileUtil.getBaseName(hit.getIcon()));
-					document.setPasswordProtected(hit.isPasswordProtected());
-					document.setLinks(hit.getLinks());
-					document.setOcrd(hit.getOcrd());
-					document.setOcrTemplateId(hit.getOcrTemplateId());
-					document.setBarcoded(hit.getBarcoded());
-					document.setBarcodeTemplateId(hit.getBarcodeTemplateId());
-
-					if (hit.getRating() != null)
-						document.setRating(hit.getRating());
-
-					if (hit.getCustomId() != null)
-						document.setCustomId(hit.getCustomId());
-					else
-						document.setCustomId("");
-
-					if (hit.getFolder() != null) {
-						GUIFolder fold = new GUIFolder();
-						fold.setId(hit.getFolder().getId());
-						fold.setName(hit.getFolder().getName());
-						document.setFolder(fold);
-					}
-				} catch (Exception t) {
-					document.setId(hit.getId());
-					document.setLanguage(hit.getLanguage());
-					GUIFolder fold = new GUIFolder();
-					fold.setId(hit.getFolder().getId());
-					fold.setName(hit.getFolder().getName());
-					document.setFolder(fold);
-				}
-				guiResults.add(document);
+				guiResults.add(toDocument(hit));
 			}
 			result.setHits(guiResults.toArray(new GUIDocument[0]));
 
@@ -434,6 +365,78 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		} catch (Exception t) {
 			return (GUIResult) throwServerException(session, log, t);
 		}
+	}
+
+	private GUIDocument toDocument(Hit hit) {
+		GUIDocument document = new GUIDocument();
+		try {
+			document.setId(hit.getId());
+			document.setTenantId(hit.getTenantId());
+			document.setCustomId(hit.getCustomId());
+			document.setType(hit.getType());
+			document.setFileName(hit.getFileName());
+			document.setColor(hit.getColor());
+			document.setVersion(hit.getVersion());
+			document.setCreation(hit.getCreation());
+			document.setCreator(hit.getCreator());
+			document.setCreatorId(hit.getCreatorId());
+			document.setDate(hit.getDate());
+			document.setPublisher(hit.getPublisher());
+			document.setPublisherId(hit.getPublisherId());
+			document.setFileVersion(hit.getFileVersion());
+			document.setLanguage(hit.getLanguage());
+			document.setTemplateId(hit.getTemplateId());
+			document.setLastModified(hit.getLastModified());
+			document.setLockUserId(hit.getLockUserId());
+			document.setLockUser(hit.getLockUser());
+			document.setComment(hit.getComment());
+			document.setStatus(hit.getStatus());
+			document.setWorkflowStatus(hit.getWorkflowStatus());
+			document.setWorkflowStatusDisplay(hit.getWorkflowStatusDisplay());
+			document.setImmutable(hit.getImmutable());
+			document.setFileSize(hit.getFileSize());
+			document.setStartPublishing(hit.getStartPublishing());
+			document.setStopPublishing(hit.getStopPublishing());
+			document.setPublished(hit.getPublished());
+			document.setSigned(hit.getSigned());
+			document.setStamped(hit.getStamped());
+			document.setIndexed(hit.getIndexed());
+			document.setExtResId(hit.getExtResId());
+			document.setPages(hit.getPages());
+			document.setPreviewPages(hit.getPreviewPages());
+			document.setNature(hit.getNature());
+			document.setFormId(hit.getFormId());
+			document.setIcon(FileUtil.getBaseName(hit.getIcon()));
+			document.setPasswordProtected(hit.isPasswordProtected());
+			document.setLinks(hit.getLinks());
+			document.setOcrd(hit.getOcrd());
+			document.setOcrTemplateId(hit.getOcrTemplateId());
+			document.setBarcoded(hit.getBarcoded());
+			document.setBarcodeTemplateId(hit.getBarcodeTemplateId());
+
+			if (hit.getRating() != null)
+				document.setRating(hit.getRating());
+
+			if (hit.getCustomId() != null)
+				document.setCustomId(hit.getCustomId());
+			else
+				document.setCustomId("");
+
+			if (hit.getFolder() != null) {
+				GUIFolder fold = new GUIFolder();
+				fold.setId(hit.getFolder().getId());
+				fold.setName(hit.getFolder().getName());
+				document.setFolder(fold);
+			}
+		} catch (Exception t) {
+			document.setId(hit.getId());
+			document.setLanguage(hit.getLanguage());
+			GUIFolder fold = new GUIFolder();
+			fold.setId(hit.getFolder().getId());
+			fold.setName(hit.getFolder().getName());
+			document.setFolder(fold);
+		}
+		return document;
 	}
 
 	private void executeEnrichingQuery(Map<Long, Hit> hitsMap) throws SearchException {
@@ -480,7 +483,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		}
 		richQuery.append(hitsIdsCondition.toString());
 
-		log.debug("Execute query {}", richQuery.toString());
+		log.debug("Execute query {}", richQuery);
 
 		try {
 			dao.query(richQuery.toString(), null, new HitMapper(hitsMap), null);
@@ -507,7 +510,6 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			}
 
 			// Maintain the ID stored in the index
-			// hit.setId(rs.getLong(1));
 			hit.setCustomId(rs.getString(2));
 			if (rs.getLong(3) != 0L) {
 				hit.setDocRef(rs.getLong(3));
@@ -555,12 +557,10 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			}
 
 			// Maintain the Tenant ID stored in the index
-			// hit.setTenantId(rs.getLong(31));
 			hit.setStamped(rs.getInt(33));
 			hit.setPassword(rs.getString(34));
 			hit.setWorkflowStatusDisplay(rs.getString(35));
 			// Maintain the language stored in the index
-			// hit.setLanguage(rs.getString(36));
 			hit.setPages(rs.getInt(37));
 			hit.setColor(rs.getString(38));
 

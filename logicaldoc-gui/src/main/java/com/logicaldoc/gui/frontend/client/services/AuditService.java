@@ -70,14 +70,17 @@ public interface AuditService extends RemoteService {
 	public void deleteSubscriptions(long[] ids) throws ServerException;
 
 	public static class Instance {
-		private static AuditServiceAsync instance;
+		private static AuditServiceAsync inst;
+
+		private Instance() {
+		}
 
 		public static AuditServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(AuditService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(AuditService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

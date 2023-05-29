@@ -120,7 +120,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		userAsSender.setWrapTitle(false);
 
 		// Target folder where outgoing messages are saved
-		targetSelector = new FolderSelector("target", true);
+		targetSelector = new FolderSelector("target", null);
 		targetSelector.setTitle(I18N.message("targetfolder"));
 		targetSelector.setHint(I18N.message("smtptargetfolderhint"));
 		targetSelector.setWidth(250);

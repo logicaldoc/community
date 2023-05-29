@@ -92,18 +92,17 @@ public class DocumentsListPanel extends VLayout {
 			if (grid.getSelectedCount() != 1)
 				return;
 			GUIDocument selectedDocument = grid.getSelectedDocument();
-			DocumentService.Instance.get().getById(selectedDocument.getId(),
-					new AsyncCallback<GUIDocument>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(GUIDocument doc) {					
-							DocumentController.get().setCurrentDocument(doc);
-						}
-					});
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					DocumentController.get().setCurrentDocument(doc);
+				}
+			});
 		});
 
 		grid.registerCellContextClickHandler(event -> {
@@ -118,8 +117,8 @@ public class DocumentsListPanel extends VLayout {
 		// Prepare a panel containing a title and the documents list
 		cursor = new Cursor(true, false);
 		cursor.setTotalRecords((int) folder.getDocumentCount());
-		cursor.registerPageSizeChangedHandler(event -> DocumentsPanel.get().changePageSize(cursor.getPageSize()));
-		cursor.registerPageChangedHandler(event -> DocumentsPanel.get().changePageSize(cursor.getPageSize()));
+		cursor.registerPageSizeChangedHandler(event -> DocumentsPanel.get().changePageSize());
+		cursor.registerPageChangedHandler(event -> DocumentsPanel.get().changePageSize());
 		addMember(cursor);
 	}
 

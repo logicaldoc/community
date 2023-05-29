@@ -14,7 +14,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
- * A base class for those converters that operate on comressed archives
+ * A base class for those converters that operate on compressed archives
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.3
@@ -23,7 +23,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 
 	protected static Logger log = LoggerFactory.getLogger(CompressedArchiveConverter.class);
 
-	protected void convertMultipleEntries(String sid, Document document, File src, File dest, List<String> entries)
+	protected void convertMultipleEntries(String sid, Document document, File dest, List<String> entries)
 			throws IOException {
 		File tempFile = FileUtil.createTempFile("zipconvert", ".txt");
 		try (FileWriter writer = new FileWriter(tempFile);) {

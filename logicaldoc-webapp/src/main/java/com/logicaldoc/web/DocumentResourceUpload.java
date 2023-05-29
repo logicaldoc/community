@@ -97,7 +97,7 @@ public class DocumentResourceUpload extends HttpServlet {
 
 			String docVersion = request.getParameter(VERSION_DOC);
 
-			log.debug("Start Upload resource for document " + docId);
+			log.debug("Start Upload resource for document {}", docId);
 
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 

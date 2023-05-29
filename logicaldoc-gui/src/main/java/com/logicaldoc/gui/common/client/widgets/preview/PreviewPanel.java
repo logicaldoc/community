@@ -176,7 +176,7 @@ public class PreviewPanel extends VLayout {
 			public void onSuccess(final GUIEmail email) {
 				if (mail != null)
 					removeMember(mail);
-				mail = new MailPreviewPanel(email, document, getWidth(), getHeight());
+				mail = new MailPreviewPanel(email, document, getWidth());
 				addMember(mail);
 			}
 		});

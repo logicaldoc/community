@@ -22,6 +22,9 @@ import com.logicaldoc.webservice.doc.util.GenericsUtils;
  */
 public class JavaLanguageVariableFactory {
 
+	private JavaLanguageVariableFactory() {
+	}
+
 	/**
 	 * Creates a variable from a field which is @XmlElement annotated
 	 * 
@@ -40,7 +43,7 @@ public class JavaLanguageVariableFactory {
 		} else {
 			variable.setVariableName(getVariableName(field, annotation));
 			variable.setRequired(isVariableRequired(annotation));
-			variable.setDescription(getVariableDescription(field, annotation));
+			variable.setDescription(getVariableDescription(annotation));
 		}
 
 		if (isClassArrayOrCollection((Class<?>) field.getType()))
@@ -62,7 +65,7 @@ public class JavaLanguageVariableFactory {
 			return getElementName(field);
 	}
 
-	private static String getVariableDescription(Field field, WSDoc annotation) {
+	private static String getVariableDescription(WSDoc annotation) {
 		return annotation.description();
 	}
 

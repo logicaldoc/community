@@ -38,14 +38,17 @@ public interface VIAService extends RemoteService {
 	public GUIVIASettings save(GUIVIASettings settings) throws ServerException;
 
 	public static class Instance {
-		private static VIAServiceAsync instance;
+		private static VIAServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static VIAServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(VIAService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(VIAService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

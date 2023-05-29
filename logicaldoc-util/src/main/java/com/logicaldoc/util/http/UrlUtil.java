@@ -23,6 +23,9 @@ public class UrlUtil {
 
 	private static final String UTF_8 = "UTF-8";
 
+	private UrlUtil() {
+	}
+
 	public static Map<String, List<String>> getQueryParams(String url) {
 		try {
 			Map<String, List<String>> params = new HashMap<>();
@@ -65,7 +68,7 @@ public class UrlUtil {
 		}
 		return query_pairs;
 	}
-	
+
 	public static String getQueryParam(String url, String parameter) throws MalformedURLException {
 		try {
 			return getParams(url).get(parameter);

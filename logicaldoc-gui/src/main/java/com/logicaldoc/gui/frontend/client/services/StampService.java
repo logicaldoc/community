@@ -116,14 +116,17 @@ public interface StampService extends RemoteService {
 	public void addUsers(long[] userIds, long stampId) throws ServerException;
 
 	public static class Instance {
-		private static StampServiceAsync instance;
+		private static StampServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static StampServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(StampService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(StampService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

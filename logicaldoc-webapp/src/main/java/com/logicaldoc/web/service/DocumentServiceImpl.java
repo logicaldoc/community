@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
@@ -2652,19 +2650,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		String resource = storer.getResourceName(docId, fileVersion, null);
 
 		try (InputStream is = storer.getStream(emailDocument.getId(), resource)) {
-			EMail email = null;
-
-			try {
-				if (emailDocument.getFileName().toLowerCase().endsWith(".eml"))
-					email = MailUtil.messageToMail(is, true);
-				else
-					email = MailUtil.msgToMail(is, true);
-			} catch (MessagingException | IOException | CMSException e) {
-				log.warn("Cannot render the email document {}", docId);
-			}
-
 			GUIEmail guiMail = new GUIEmail();
-
+			EMail email = readEmail(is, docId, emailDocument);
 			if (email != null) {
 				if (email.getFrom() != null)
 					guiMail.setFrom(new GUIContact(email.getFrom().getName(), null, email.getFrom().getAddress()));
@@ -2685,6 +2672,19 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} catch (IOException e1) {
 			return (GUIEmail) throwServerException(session, log, e1);
 		}
+	}
+
+	private EMail readEmail(InputStream is, long docId, GUIDocument emailDocument) {
+		EMail email = null;
+		try {
+			if (emailDocument.getFileName().toLowerCase().endsWith(".eml"))
+				email = MailUtil.messageToMail(is, true);
+			else
+				email = MailUtil.msgToMail(is, true);
+		} catch (MessagingException | IOException | CMSException e) {
+			log.warn("Cannot render the email document {}", docId);
+		}
+		return email;
 	}
 
 	private void setEmailAttachments(GUIDocument emailDocument, EMail email, GUIEmail guiMail) {
@@ -2987,12 +2987,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 				log.info("Notify the move of {} files to the right storage in the tree {}", movedFiles, treePath);
 
-				try {
-					notifyEnforcement(session, I18N.message("enforcementofstoragereport", user.getLocale(),
-							new Object[] { movedFiles, treePath }));
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
-				}
+				notifyEnforcement(session, I18N.message("enforcementofstoragereport", user.getLocale(),
+						new Object[] { movedFiles, treePath }));
 
 			} catch (Exception t) {
 				log.error("Error enforcing files storage into tree {}", treePath, t);
@@ -3006,8 +3002,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}).start();
 	}
 
-	private void notifyEnforcement(Session session, String message)
-			throws PersistenceException, UnsupportedEncodingException, MalformedURLException, MessagingException {
+	private void notifyEnforcement(Session session, String message) {
 		User user = session.getUser();
 
 		// Prepare the system message
@@ -3028,32 +3023,36 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		sys.setMessageText(message);
 		sys.setSubject(I18N.message("enforcementofstorage", user.getLocale()));
 
-		SystemMessageDAO sDao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
-		sDao.store(sys);
+		try {
+			SystemMessageDAO sDao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
+			sDao.store(sys);
 
-		// Prepare the email
-		Recipient emailRecipient = new Recipient();
-		emailRecipient.setName(user.getUsername());
-		emailRecipient.setAddress(user.getEmail());
-		emailRecipient.setType(Recipient.TYPE_EMAIL);
-		emailRecipient.setMode(Recipient.MODE_EMAIL_TO);
-		emailRecipient.setRead(1);
+			// Prepare the email
+			Recipient emailRecipient = new Recipient();
+			emailRecipient.setName(user.getUsername());
+			emailRecipient.setAddress(user.getEmail());
+			emailRecipient.setType(Recipient.TYPE_EMAIL);
+			emailRecipient.setMode(Recipient.MODE_EMAIL_TO);
+			emailRecipient.setRead(1);
 
-		EMail mail = new EMail();
-		mail.setHtml(0);
-		mail.setTenantId(user.getTenantId());
-		mail.setAccountId(-1);
-		mail.setAuthor(user.getUsername());
-		mail.setAuthorAddress(user.getEmail());
-		mail.setFolder(OUTBOX);
-		mail.setSentDate(new Date());
-		mail.setUsername(user.getUsername());
-		mail.getRecipients().add(emailRecipient);
-		mail.setSubject(sys.getSubject());
-		mail.setMessageText(message);
+			EMail mail = new EMail();
+			mail.setHtml(0);
+			mail.setTenantId(user.getTenantId());
+			mail.setAccountId(-1);
+			mail.setAuthor(user.getUsername());
+			mail.setAuthorAddress(user.getEmail());
+			mail.setFolder(OUTBOX);
+			mail.setSentDate(new Date());
+			mail.setUsername(user.getUsername());
+			mail.getRecipients().add(emailRecipient);
+			mail.setSubject(sys.getSubject());
+			mail.setMessageText(message);
 
-		EMailSender sender = getEmailSender(session);
-		sender.send(mail);
+			EMailSender sender = getEmailSender(session);
+			sender.send(mail);
+		} catch (PersistenceException | MessagingException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	@Override

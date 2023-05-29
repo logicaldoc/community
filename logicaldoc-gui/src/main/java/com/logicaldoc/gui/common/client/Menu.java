@@ -195,6 +195,8 @@ public class Menu {
 	
 	private static Set<Long> menus = new HashSet<>();
 
+	private Menu() {}
+	
 	static public void init(GUIUser user) {
 		menus.clear();
 		for (long menu : user.getMenus()) {

@@ -233,12 +233,12 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 				// Send an email alert to the user in case of new device
 				if (newDevice && Context.get().getProperties().getBoolean(tenantName + ".alertnewdevice", true)) {
-					Map<String, Object> dictionary = new HashMap<>();
-					dictionary.put("user", user);
-					dictionary.put("device", device);
-					dictionary.put("client", client);
-					dictionary.put("location", client.getGeolocation());
-					dictionary.put("event", history);
+					Map<String, Object> dictionaryMap = new HashMap<>();
+					dictionaryMap.put("user", user);
+					dictionaryMap.put("device", device);
+					dictionaryMap.put("client", client);
+					dictionaryMap.put("location", client.getGeolocation());
+					dictionaryMap.put("event", history);
 
 					EMail email = new EMail();
 					email.setTenantId(tenantId);
@@ -251,7 +251,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 					email.getRecipients().add(recipient);
 
 					EMailSender sender = (EMailSender) Context.get().getBean(EMailSender.class);
-					sender.sendAsync(email, "newdevice", dictionary);
+					sender.sendAsync(email, "newdevice", dictionaryMap);
 				}
 
 			} catch (PersistenceException e) {
@@ -360,9 +360,9 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		if (logs == null || logs.isEmpty())
 			return null;
 
-		for (Log log : logs)
-			if (ERROR.equals(log.getLevel()))
-				return log;
+		for (Log lg : logs)
+			if (ERROR.equals(lg.getLevel()))
+				return lg;
 		return null;
 	}
 

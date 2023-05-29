@@ -449,27 +449,28 @@ public class StandardSearchEngine implements SearchEngine {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#isLocked()
-	 */
 	@Override
 	public boolean isLocked() {
-		boolean result = false;
+		boolean locked = false;
 
 		try {
 			Directory directory = getIndexDataDirectory();
-			try {
-				directory.obtainLock(IndexWriter.WRITE_LOCK_NAME).close();
-				result = false;
-			} catch (LockObtainFailedException failed) {
-				result = true;
-			}
+			locked = !obtainLock(directory);
 		} catch (Exception e) {
 			log.warn("isLocked {}", e.getMessage(), e);
 		}
 
+		return locked;
+	}
+
+	private boolean obtainLock(Directory directory) throws IOException {
+		boolean result = false;
+		try {
+			directory.obtainLock(IndexWriter.WRITE_LOCK_NAME).close();
+			result = true;
+		} catch (LockObtainFailedException failed) {
+			result = false;
+		}
 		return result;
 	}
 

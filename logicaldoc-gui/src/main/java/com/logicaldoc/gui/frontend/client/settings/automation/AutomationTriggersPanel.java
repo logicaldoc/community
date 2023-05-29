@@ -109,33 +109,33 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(event -> refresh());
+		refresh.addClickHandler(evnt -> refresh());
 
-		folderSelector = new FolderSelector(FOLDER, true);
+		folderSelector = new FolderSelector(FOLDER, null);
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);
 		toolStrip.addFormItem(folderSelector);
 
-		event = ItemFactory.newEventSelector("event", "event", event -> refresh(), true, true, true, true);
+		event = ItemFactory.newEventSelector("event", "event", evnt -> refresh(), true, true, true, true);
 		toolStrip.addFormItem(event);
 
 		toolStrip.addSeparator();
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addtrigger"));
-		add.addClickHandler(event -> {
+		add.addClickHandler(evnt -> {
 			list.deselectAllRecords();
 			GUIAutomationTrigger trigger = new GUIAutomationTrigger();
 			showTriggerDetails(trigger);
 		});
 		toolStrip.addButton(add);
 
-		list.addCellContextClickHandler(event -> {
+		list.addCellContextClickHandler(evnt -> {
 			showContextMenu();
-			event.cancel();
+			evnt.cancel();
 		});
 
-		list.addSelectionChangedHandler(event -> {
+		list.addSelectionChangedHandler(evnt -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				AutomationService.Instance.get().getTrigger(rec.getAttributeAsLong("id"),
@@ -154,7 +154,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		});
 
 		list.addDataArrivedHandler(
-				event -> infoPanel.setMessage(I18N.message("showtriggers", Integer.toString(list.getTotalRows()))));
+				evnt -> infoPanel.setMessage(I18N.message("showtriggers", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -179,7 +179,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
+		delete.addClickHandler(evnt -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
 				AutomationService.Instance.get().deleteTriggers(new long[] { id }, new AsyncCallback<Void>() {
 					@Override

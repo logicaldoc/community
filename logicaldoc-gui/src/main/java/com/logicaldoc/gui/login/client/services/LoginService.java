@@ -67,6 +67,10 @@ public interface LoginService extends RemoteService {
 	public static class Instance {
 		private static LoginServiceAsync instance;
 
+		private Instance() {
+			
+		}
+		
 		public static LoginServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(LoginService.class);

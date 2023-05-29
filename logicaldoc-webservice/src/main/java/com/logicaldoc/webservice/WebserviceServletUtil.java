@@ -28,8 +28,13 @@ import com.logicaldoc.util.MimeType;
  * @since 8.7
  */
 public class WebserviceServletUtil {
+
 	private static final String UTF_8 = "UTF-8";
+
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
+
+	private WebserviceServletUtil() {
+	}
 
 	/**
 	 * Sets the correct Content-Disposition header into the response
@@ -58,8 +63,7 @@ public class WebserviceServletUtil {
 			// Used by some LG phones
 			encodedFileName = filename;
 		} else {
-			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8)
-					+ "?=";
+			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8) + "?=";
 		}
 
 		boolean asAttachment = true;

@@ -266,11 +266,9 @@ public class XMLConverter extends AbstractFormatConverter {
 		if (StringUtils.isNotEmpty(value)) {
 			String[] styles = value.split("\\,");
 			for (String style : styles) {
-				if (StringUtils.isNoneEmpty(style)) {
-					if (style.contains("|")) {
-						String[] tokens = style.trim().split("\\|");
-						map.put(tokens[0].trim(), tokens[1].trim());
-					}
+				if (StringUtils.isNoneEmpty(style) && style.contains("|")) {
+					String[] tokens = style.trim().split("\\|");
+					map.put(tokens[0].trim(), tokens[1].trim());
 				}
 			}
 		}

@@ -78,8 +78,6 @@ public class Login implements EntryPoint {
 
 	// Setup the initial visualization of the login panel
 	private void showLogin() {
-		// RootPanel.get().add(loginPanel);
-
 		// Remove the loading frame
 		RootPanel.getBodyElement().removeChild(RootPanel.get("loadingwrapper-login").getElement());
 

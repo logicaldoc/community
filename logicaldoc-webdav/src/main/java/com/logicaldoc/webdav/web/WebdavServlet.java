@@ -6,8 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.WebdavRequest;
-import org.apache.jackrabbit.webdav.lock.LockManager;
-import org.apache.jackrabbit.webdav.lock.SimpleLockManager;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImplEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +40,6 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	private static String resourcePathPrefix;
 
-	private static LockManager lockManager;
-
 	private static DavResourceFactory resourceFactory;
 
 	private static DavLocatorFactory locatorFactory;
@@ -52,17 +48,17 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	@Override
 	public void init() {
-		String resourcePathPrefix = getInitParameter(INIT_PARAM_RESOURCE_PATH_PREFIX);
-		if (resourcePathPrefix == null) {
+		String resPathPrefix = getInitParameter(INIT_PARAM_RESOURCE_PATH_PREFIX);
+		if (resPathPrefix == null) {
 			log.debug("Missing path prefix > setting to empty string.");
-			resourcePathPrefix = "";
-		} else if (resourcePathPrefix.endsWith("/")) {
+			resPathPrefix = "";
+		} else if (resPathPrefix.endsWith("/")) {
 			log.debug("Path prefix ends with '/' > removing trailing slash.");
-			resourcePathPrefix = resourcePathPrefix.substring(0, resourcePathPrefix.length() - 1);
+			resPathPrefix = resPathPrefix.substring(0, resPathPrefix.length() - 1);
 		}
-		getServletContext().setAttribute(CTX_ATTR_RESOURCE_PATH_PREFIX, resourcePathPrefix);
-		log.info(INIT_PARAM_RESOURCE_PATH_PREFIX + " = '" + resourcePathPrefix + "'");
-		setResourcePathPrefix(resourcePathPrefix);
+		getServletContext().setAttribute(CTX_ATTR_RESOURCE_PATH_PREFIX, resPathPrefix);
+		log.info("{} = '{}'", INIT_PARAM_RESOURCE_PATH_PREFIX, resPathPrefix);
+		setResourcePathPrefix(resPathPrefix);
 
 		String configParam = getInitParameter(INIT_PARAM_RESOURCE_CONFIG);
 		if (configParam != null) {
@@ -76,10 +72,6 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	private static void setResourcePathPrefix(String resourcePathPrefix) {
 		WebdavServlet.resourcePathPrefix = resourcePathPrefix;
-	}
-
-	private static void setLockManager(LockManager lockManager) {
-		WebdavServlet.lockManager = lockManager;
 	}
 
 	private static void setConfig(ResourceConfig config) {
@@ -103,16 +95,9 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		return locatorFactory;
 	}
 
-	private LockManager getLockManager() {
-		if (lockManager == null) {
-			setLockManager(new SimpleLockManager());
-		}
-		return lockManager;
-	}
-
 	public DavResourceFactory getResourceFactory() {
 		if (resourceFactory == null) {
-			setResourceFactory(new DavResourceFactoryImpl(getLockManager(), getResourceConfig()));
+			setResourceFactory(new DavResourceFactoryImpl(getResourceConfig()));
 		}
 		return resourceFactory;
 	}

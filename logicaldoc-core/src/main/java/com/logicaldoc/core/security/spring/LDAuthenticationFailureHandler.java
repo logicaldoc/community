@@ -41,7 +41,7 @@ public class LDAuthenticationFailureHandler implements AuthenticationFailureHand
 		if (normalizedFailureUrl.startsWith("/"))
 			normalizedFailureUrl = normalizedFailureUrl.substring(1);
 
-		log.info("Redirecting to {}", normalizedFailureUrl.toString());
+		log.info("Redirecting to {}", normalizedFailureUrl);
 		response.sendRedirect(failureUrl.toString());
 	}
 }

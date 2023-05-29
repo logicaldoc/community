@@ -93,8 +93,8 @@ public class GUIAttributeSet implements Serializable {
 	public void reorderAttributes(List<String> names) {
 		List<GUIAttribute> newAttrs = new ArrayList<>();
 		int i = 0;
-		for (String name : names) {
-			GUIAttribute att = getAttribute(name);
+		for (String attributeName : names) {
+			GUIAttribute att = getAttribute(attributeName);
 			att.setPosition(i++);
 			newAttrs.add(att);
 		}

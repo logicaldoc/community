@@ -160,7 +160,6 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			EMailSender sender = new EMailSender(user.getTenantId());
 			sender.send(email, "psw.rec2", dictionary);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new ServerException(e.getMessage());
 		}
 	}

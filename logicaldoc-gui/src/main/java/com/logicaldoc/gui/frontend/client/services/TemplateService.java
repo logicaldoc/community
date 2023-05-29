@@ -72,14 +72,17 @@ public interface TemplateService extends RemoteService {
 	public GUIAttribute[] getAttributes(long templateId, GUIExtensibleObject extensibleObject) throws ServerException;
 
 	public static class Instance {
-		private static TemplateServiceAsync instance;
-
+		private static TemplateServiceAsync inst;
+		
+		private Instance() {
+		}
+		
 		public static TemplateServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(TemplateService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(TemplateService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

@@ -213,7 +213,7 @@ public class ExportArchivesList extends VLayout {
 		close.setTitle(I18N.message("close"));
 		close.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				onClosingArchive(rec, id);
+				onClosingArchive(rec);
 			}
 		}));
 
@@ -224,7 +224,7 @@ public class ExportArchivesList extends VLayout {
 			open.setEnabled(false);
 
 		contextMenu.setItems(close, open, delete);
-		addUsefulMenuItem(rec, contextMenu);
+		addUsefulMenuItem(contextMenu);
 		contextMenu.showContextMenu();
 	}
 
@@ -272,12 +272,11 @@ public class ExportArchivesList extends VLayout {
 	/**
 	 * This method is used only by the classes that extend this class.
 	 */
-	protected Menu addUsefulMenuItem(final ListGridRecord rec, Menu contextMenu) {
-		// DO NOTHING
+	protected Menu addUsefulMenuItem(Menu contextMenu) {
 		return contextMenu;
 	}
 
-	protected void onClosingArchive(final ListGridRecord rec, final long id) {
+	protected void onClosingArchive(final ListGridRecord rec) {
 		closeArchive(rec);
 	}
 

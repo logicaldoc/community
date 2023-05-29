@@ -117,6 +117,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(3, histories.size());
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testStore() throws PersistenceException {
 		FolderHistory history = new FolderHistory();
@@ -153,8 +154,8 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 			}
 		}
 
-		Assert.assertTrue(hStored.equals(folderFolderHistory));
-		Assert.assertEquals(hStored.getFolderId(), new Long(5));
+		Assert.assertEquals(folderFolderHistory, hStored);
+		Assert.assertEquals(hStored.getFolderId(), Long.valueOf(5L));
 		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
 		Assert.assertEquals(hStored.getUsername(), "sebastian");
 		Assert.assertEquals(hStored.getEvent(), "test FolderHistory store");

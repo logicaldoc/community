@@ -40,7 +40,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		setHeight100();
 		setMembers(formsContainer);
 
-		targetSelector = new FolderSelector("target", true);
+		targetSelector = new FolderSelector("target", null);
 		targetSelector.setTitle(I18N.message("targetfolder"));
 		targetSelector.setWidth(250);
 
@@ -54,9 +54,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 	private void refresh() {
 		form.clearValues();
 		form.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.destroy();
 
 		if (Boolean.TRUE.equals(formsContainer.contains(form)))
 			formsContainer.removeChild(form);

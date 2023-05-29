@@ -56,24 +56,18 @@ public class Initializer {
 
 		template = initializeAttributes(template);
 
-		try {
-			// We access the collection as is without initializing the bean
-			// because that would lead to hibernate errors
-			for (String attributeName : template.getAttributeNames()) {
-				try {
-					Attribute attribute = object.getAttribute(attributeName);
-					Attribute templateAttribute = template.getAttribute(attributeName);
-					if (attribute != null && templateAttribute != null)
-						if (attribute.getValue() == null
-								&& StringUtils.isNotEmpty(templateAttribute.getInitialization())) {
-							executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
-						}
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-				}
+		// We access the collection as is without initializing the bean
+		// because that would lead to hibernate errors
+		for (String attributeName : template.getAttributeNames()) {
+			try {
+				Attribute attribute = object.getAttribute(attributeName);
+				Attribute templateAttribute = template.getAttribute(attributeName);
+				if (attribute != null && templateAttribute != null && attribute.getValue() == null
+						&& StringUtils.isNotEmpty(templateAttribute.getInitialization()))
+					executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 		}
 	}
 

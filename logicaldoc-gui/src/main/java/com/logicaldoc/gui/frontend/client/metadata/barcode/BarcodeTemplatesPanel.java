@@ -306,9 +306,9 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		newTemplate = new ToolStripButton();
 		newTemplate.setTitle(I18N.message("new"));
 		newTemplate.addClickHandler((ClickEvent newTemplateClick) -> {
-			GUIBarcodeTemplate newTemplate = new GUIBarcodeTemplate();
-			newTemplate.setTemplate(selectedDocumentTemplate);
-			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newTemplate).show();
+			GUIBarcodeTemplate newBarcodeTemplate = new GUIBarcodeTemplate();
+			newBarcodeTemplate.setTemplate(selectedDocumentTemplate);
+			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newBarcodeTemplate).show();
 		});
 		toolStrip.addButton(newTemplate);
 	}

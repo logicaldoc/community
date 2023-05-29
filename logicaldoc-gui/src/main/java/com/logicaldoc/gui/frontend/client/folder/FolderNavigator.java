@@ -145,7 +145,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		// Used to expand root folder after login or to open in folder
 		addDataArrivedHandler(
-				(DataArrivedEvent dataArrivedEvent) -> FolderNavigator.this.onDataArrived(dataArrivedEvent));
+				(DataArrivedEvent dataArrivedEvent) -> FolderNavigator.this.handleDataArrived());
 
 		FolderCursor.get().registerMaxChangedHandler(event -> reloadChildren());
 
@@ -808,7 +808,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		return instance;
 	}
 
-	private void onDataArrived(DataArrivedEvent event) {
+	private void handleDataArrived() {
 		if (isFirstTime()) {
 			onDataArrivedFirstTime();
 		} else {

@@ -72,14 +72,17 @@ public interface SearchService extends RemoteService {
 	public GUISearchOptions load(String name) throws ServerException;
 
 	public static class Instance {
-		private static SearchServiceAsync instance;
+		private static SearchServiceAsync inst;
 
+		private Instance() {
+		}
+		
 		public static SearchServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(SearchService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(SearchService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

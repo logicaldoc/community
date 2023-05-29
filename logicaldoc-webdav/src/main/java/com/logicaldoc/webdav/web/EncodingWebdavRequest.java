@@ -66,7 +66,7 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 				if (auth == null) {
 					// verify that href is an absolute path
 					if (ref.startsWith("//") || !ref.startsWith("/")) {
-						log.warn("expected absolute path but found " + ref);
+						log.warn("expected absolute path but found {}", ref);
 						throw new DavException(HttpServletResponse.SC_BAD_REQUEST);
 					}
 				} else if (!auth.equals(request.getHeader("Host"))) {
@@ -80,7 +80,7 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 					throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 				}
 			} catch (URISyntaxException e) {
-				log.warn("malformed uri: " + href, e);
+				log.warn("malformed uri: {}", href, e);
 				throw new DavException(HttpServletResponse.SC_BAD_REQUEST);
 			}
 			// cut off the context path

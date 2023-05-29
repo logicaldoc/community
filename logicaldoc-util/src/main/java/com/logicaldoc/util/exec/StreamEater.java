@@ -41,7 +41,7 @@ public class StreamEater implements Runnable {
 			while (line != null) {
 				writeLine(line, firstLine);
 
-				if (buffer != null && line != null) {
+				if (buffer != null) {
 					if (!firstLine)
 						buffer.append("\n");
 					buffer.append(line);

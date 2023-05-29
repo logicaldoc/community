@@ -56,7 +56,7 @@ public class LanguageManager {
 		for (Extension ext : extensions) {			
 			String language = ext.getParameter("locale").valueAsString();
 			String analyzer = ext.getParameter("analyzer").valueAsString();
-			log.debug("analyzer = " + analyzer);
+			log.debug("analyzer = {}", analyzer);
 			try {
 				Locale locale = LocaleUtil.toLocale(language);
 				Language lang = new Language(locale);
@@ -68,7 +68,7 @@ public class LanguageManager {
 							+ lang.getLocale().getDisplayName(Locale.ENGLISH) + "Analyzer");
 				}
 				languages.put(locale, lang);
-				log.info("Added new Language: " + language);
+				log.info("Added new Language: {}", language);
 			} catch (Exception e) {
 				log.error(e.getMessage());
 			}

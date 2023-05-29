@@ -58,18 +58,9 @@ public class PathCalculator extends Task {
 
 			if (!ids.isEmpty()) {
 				for (Long id : ids) {
-					try {
-						String path = folderDao.computePath(id);
-						folderDao.jdbcUpdate("update ld_folder set ld_path='" + path + "' where ld_id=" + id);
-						processed++;
-						if (interruptRequested)
-							break;
-					} catch (Exception t) {
-						log.error("Error processing folder {}: {}", id, t.getMessage(), t);
-						errors++;
-					} finally {
-						next();
-					}
+					processFolder(id);
+					if (interruptRequested)
+						break;
 				}
 			}
 		} catch (PersistenceException e) {
@@ -78,6 +69,19 @@ public class PathCalculator extends Task {
 			log.info("Path calculation finished");
 			log.info("Processed folders: {}", processed);
 			log.info("Errors: {}", errors);
+		}
+	}
+
+	private void processFolder(Long id) {
+		try {
+			String path = folderDao.computePath(id);
+			folderDao.jdbcUpdate("update ld_folder set ld_path='" + path + "' where ld_id=" + id);
+			processed++;
+			} catch (Exception t) {
+			log.error("Error processing folder {}: {}", id, t.getMessage(), t);
+			errors++;
+		} finally {
+			next();
 		}
 	}
 

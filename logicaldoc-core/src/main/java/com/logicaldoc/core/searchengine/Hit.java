@@ -11,7 +11,7 @@ import com.logicaldoc.core.document.Document;
 public class Hit extends Document implements Comparable<Hit> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private int score;
 
 	private String content;
@@ -52,14 +52,10 @@ public class Hit extends Document implements Comparable<Hit> {
 				return 0;
 
 			if (other.score == this.score) {
-				try {
-					if (this.getFileName() != null)
-						return this.getFileName().compareToIgnoreCase(other.getFileName());
-					else
-						return 0;
-				} catch (Exception t) {
+				if (this.getFileName() != null)
+					return this.getFileName().compareToIgnoreCase(other.getFileName());
+				else
 					return 0;
-				}
 			} else
 				return -1 * (Integer.valueOf(this.score).compareTo(Integer.valueOf(other.score)));
 		} catch (Exception t) {
