@@ -535,6 +535,8 @@ public class LDRepository {
 	public String createDocument(CallContext context, Properties properties, String folderId,
 			ContentStream contentStream, VersioningState versioningState) {
 
+		log.info("A creating document into folder {}", folderId);
+		
 		log.debug("createDocument {}", folderId);
 
 		validatePermission(folderId, context, Permission.WRITE);
@@ -545,6 +547,8 @@ public class LDRepository {
 			if ((properties == null) || (properties.getProperties() == null))
 				throw new CmisInvalidArgumentException("Properties must be set!");
 
+			log.info("B");
+			
 			// check type
 			String typeId = getTypeId(properties);
 			TypeDefinition type = types.getType(typeId);
@@ -553,6 +557,8 @@ public class LDRepository {
 
 			User user = getSessionUser();
 			assert (user != null);
+			
+			log.info("C user:{}", user);
 			
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
@@ -567,6 +573,7 @@ public class LDRepository {
 			if (!isValidName(fileName))
 				throw new CmisNameConstraintViolationException("File name is not valid!");
 			
+			log.info("D creating document {}", fileName);
 
 			Document document = new Document();
 			updateDocumentMetadata(document, properties, true);
@@ -582,8 +589,13 @@ public class LDRepository {
 			document = documentManager.create(new BufferedInputStream(contentStream.getStream(), BUFFER_SIZE), document,
 					transaction);
 
-			return getId(document);
+			log.info("E created document {}", document.getId());
+			
+			String docId = getId(document);
+			log.info("F DocId is: {}", docId);
+			return docId;
 		} catch (Exception t) {
+			log.error(t.getMessage(), t);
 			return (String) catchError(t);
 		}
 	}

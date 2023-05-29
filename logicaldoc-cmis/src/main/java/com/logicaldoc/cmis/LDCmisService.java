@@ -206,7 +206,7 @@ public class LDCmisService extends AbstractCmisService {
 			return "0";
 		} else {
 			log.debug("latestDate.getTime(): {}", latestDate != null ? latestDate.getTime() : "");
-			log.debug("latestFolderDate.getTime(): {}", latestDate != null ? latestFolderDate.getTime() : "");
+			log.debug("latestFolderDate.getTime(): {}", latestFolderDate != null ? latestFolderDate.getTime() : "");
 			Timestamp myDate = getLatestTimestamp(latestDate, latestFolderDate);
 
 			log.debug("myDate.getTime(): {}", myDate.getTime());
