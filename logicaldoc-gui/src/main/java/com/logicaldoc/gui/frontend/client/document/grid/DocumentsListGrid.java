@@ -168,7 +168,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		DocumentController.get().addObserver(this);
 	}
-
+	
 	private void onDataArrived(DataArrivedEvent event) {
 		if (cursor != null)
 			cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getCount())));
@@ -185,6 +185,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 						newSpecs[i] = sortSpecs[i - 1];
 				setSort(newSpecs);
 			}
+			
 			selectDocument(Session.get().getHiliteDocId());
 		} else if (groupField != null) {
 			groupBy(groupField);
