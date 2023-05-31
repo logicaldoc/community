@@ -108,11 +108,8 @@ public class GUIExtensibleObject implements Serializable {
 
 		if (getAttributes() != null)
 			for (GUIAttribute att : getAttributes()) {
-				if (att.getName().equals(name)) {
+				if (att.getName().equals(name) || name.equals(att.getParent()))
 					values.add(att);
-				} else if (name.equals(att.getParent())) {
-					values.add(att);
-				}
 			}
 
 		values.sort((GUIAttribute arg0, GUIAttribute arg1) -> {

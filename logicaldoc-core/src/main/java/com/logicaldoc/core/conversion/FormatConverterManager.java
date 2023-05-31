@@ -554,10 +554,9 @@ public class FormatConverterManager {
 		for (String i : ins)
 			for (String o : outs) {
 				String key = composeKey(i, o);
-				if (!converters.containsKey(key))
-					converters.put(key, new ArrayList<>());
-				if (!converters.get(key).contains(cnvrt))
-					converters.get(key).add(cnvrt);
+				List<FormatConverter> convList = converters.computeIfAbsent(key, k -> new ArrayList<>());
+				if (!convList.contains(cnvrt))
+					convList.add(cnvrt);
 			}
 	}
 

@@ -82,7 +82,8 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 
 		query.append(" order by A.ld_creation desc ");
 
-		log.error(query.toString());
+		if (log.isErrorEnabled())
+			log.error(query.toString());
 
 		@SuppressWarnings("unchecked")
 		List<Document> records = (List<Document>) docDao.query(query.toString(), null, new RowMapper<Document>() {

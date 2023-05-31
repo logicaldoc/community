@@ -1,6 +1,5 @@
 package com.logicaldoc.web.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +32,6 @@ import com.logicaldoc.core.searchengine.saved.SearchDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
@@ -53,8 +50,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 6.0
  */
 public class SearchServiceImpl extends AbstractRemoteService implements SearchService {
-
-	private static final String QUERIES = "queries";
 
 	private static final long serialVersionUID = 1L;
 
@@ -176,7 +171,6 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			if (lang == null) {
 				// Try to find another supported language
 				exprLoc = LocaleUtil.toLocale(exprLoc.getLanguage());
-				lang = LanguageManager.getInstance().getLanguage(exprLoc);
 
 				if (exprLoc != null)
 					((FulltextSearchOptions) searchOptions).setExpressionLanguage(exprLoc.getLanguage());
@@ -224,31 +218,6 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
-
-		try {
-			legacyDelete(session.getUserId(), names);
-		} catch (Exception t) {
-			// Nothing to do
-		}
-	}
-
-	/**
-	 * Deletes the searches from the filesystem (legacy format)
-	 * 
-	 * @param userId identifier of the user
-	 * @param names the searches to delete
-	 */
-	@Deprecated(forRemoval = true, since = "9.0")
-	private void legacyDelete(long userId, String[] names) {
-		File dir = UserUtil.getUserResource(userId, QUERIES);
-		for (String name : names) {
-			File file = new File(dir, name + ".ser");
-			try {
-				FileUtils.forceDelete(file);
-			} catch (IOException e) {
-				log.error(e.getMessage());
-			}
-		}
 	}
 
 	@Override
@@ -259,36 +228,10 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		try {
 			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(),
 					name);
-			if (search != null)
-				return toGUIOptions(search.readOptions());
-			else
-				return legacyLoad(session.getUserId(), name);
+			return toGUIOptions(search.readOptions());
 		} catch (Exception t) {
 			return (GUISearchOptions) throwServerException(session, log, t);
 		}
-	}
-
-	/**
-	 * Loads a search from the file system (legacy format)
-	 * 
-	 * @param name name of the saved search
-	 * @param userId identifier of the user
-	 * 
-	 * @return the saved search options
-	 * 
-	 * @throws ServerException
-	 */
-	@Deprecated(forRemoval = true, since = "9.0")
-	private GUISearchOptions legacyLoad(long userId, String name) {
-		File dir = UserUtil.getUserResource(userId, QUERIES);
-		File file = new File(dir, name + ".ser");
-		SearchOptions opt = null;
-		try {
-			opt = SearchOptions.read(file);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-		return toGUIOptions(opt);
 	}
 
 	/**
@@ -315,41 +258,9 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			}
 		}
 
-		List<SearchOptions> lecacyList = legacyGetSearches(session);
-		for (SearchOptions searchOptions : lecacyList)
-			if (!map.containsKey(searchOptions.getName()))
-				map.put(searchOptions.getName(), searchOptions);
-
 		return map.values().stream()
 				.sorted((SearchOptions s1, SearchOptions s2) -> s1.getName().compareTo(s2.getName()))
 				.collect(Collectors.toList());
-	}
-
-	@Deprecated(forRemoval = true, since = "9.0")
-	private static List<SearchOptions> legacyGetSearches(Session session) {
-		File file = UserUtil.getUserResource(session.getUserId(), QUERIES);
-		if (!file.exists()) {
-			return null;
-		}
-
-		// initiate the list
-		List<SearchOptions> queries = new ArrayList<>();
-
-		File[] searchesFiles = file.listFiles();
-		for (int i = 0; i < searchesFiles.length; i++) {
-			File searchFile = searchesFiles[i];
-			SearchOptions opt = null;
-			try {
-				opt = SearchOptions.read(searchFile);
-			} catch (Exception e) {
-				log.warn(e.getMessage());
-			}
-
-			if (opt != null)
-				queries.add(opt);
-		}
-
-		return queries;
 	}
 
 	protected GUISearchOptions toGUIOptions(SearchOptions searchOptions) {
@@ -465,16 +376,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	private com.logicaldoc.core.searchengine.saved.SavedSearch loadSavedSearch(String name, Session session)
 			throws PersistenceException, ServerException {
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
-		com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(), name);
-		if (search == null) {
-			// Perhaps the search is not already in the database
-			GUISearchOptions legacyOptions = legacyLoad(session.getUserId(), name);
-			if (legacyOptions != null) {
-				save(legacyOptions);
-				search = dao.findByUserIdAndName(session.getUserId(), name);
-			}
-		}
-		return search;
+		return dao.findByUserIdAndName(session.getUserId(), name);
 	}
 
 	protected java.util.Date convertToJavaDate(Date source) {

@@ -502,16 +502,16 @@ public class ExtendedPropertiesPanel extends HLayout {
 			}
 		}
 
-		for (String itemName : values.keySet()) {
+		for (Map.Entry<String, Object> entry : values.entrySet()) {
+			String itemName = entry.getKey();
 			if (itemName.startsWith("_")) {
-				Object value = values.get(itemName);
 				String attributeName = itemName.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
 
 				GUIAttribute attribute = object.getAttribute(attributeName);
 				if (attribute == null || attribute.isHidden())
 					continue;
 
-				validateExtendedAttribute(itemName, value, attributeName, attribute);
+				validateExtendedAttribute(itemName, entry.getValue(), attributeName, attribute);
 			}
 		}
 
@@ -671,10 +671,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 	private void copyValuesToObject() {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> valuesMap = (Map<String, Object>) attributesForm.getValues();
-		for (String name : valuesMap.keySet()) {
+
+		for (Map.Entry<String, Object> entry : valuesMap.entrySet()) {
+			String name = entry.getKey();
 			if (name.startsWith("_")) {
 				String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
-				Object val = valuesMap.get(name);
+				Object val = entry.getValue();
 				FormItem item = attributesForm.getItem(name);
 
 				GUIAttribute attribute = object.getAttribute(nm);

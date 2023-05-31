@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.ksoap2.SoapEnvelope;
@@ -62,7 +64,6 @@ public class WebserviceClient {
 		return instance;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public String getPath(long folderId) throws IOException, XmlPullParserException {
 		SoapObject request = new SoapObject(WS_NAMESPACE, "getPath");
 		request.addProperty("sid", sid);
@@ -76,19 +77,22 @@ public class WebserviceClient {
 		HttpTransportSE transport = new HttpTransportSE(url);
 		transport.call("", envelope);
 
-		Vector response = new Vector();
-		if (envelope.getResponse() != null && envelope.getResponse() instanceof Vector)
+		AbstractList<SoapObject> response = new ArrayList<>();
+		if (envelope.getResponse() != null && envelope.getResponse() instanceof Vector) {
 			// We have more elements
-			response = (Vector) envelope.getResponse();
-		else if (envelope.getResponse() instanceof SoapObject) {
+			@SuppressWarnings("unchecked")
+			AbstractList<SoapObject> vector = (Vector<SoapObject>) envelope.getResponse();
+			for (SoapObject soapObject : vector) {
+				response.add(soapObject);
+			}
+		} else if (envelope.getResponse() instanceof SoapObject) {
 			// We have just one element
-			response.add(envelope.getResponse());
+			response.add((SoapObject) envelope.getResponse());
 		}
 
 		StringBuilder path = new StringBuilder();
 
-		for (Object object : response) {
-			SoapObject element = (SoapObject) object;
+		for (SoapObject element : response) {
 			String name = getProperty(element, "name");
 			if (!"/".equals(name))
 				path.append(name);

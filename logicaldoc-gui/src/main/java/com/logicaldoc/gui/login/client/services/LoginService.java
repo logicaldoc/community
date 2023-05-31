@@ -65,18 +65,18 @@ public interface LoginService extends RemoteService {
 	public String generatePassword(String username);
 	
 	public static class Instance {
-		private static LoginServiceAsync instance;
+		private static LoginServiceAsync inst;
 
 		private Instance() {
 			
 		}
 		
 		public static LoginServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(LoginService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(LoginService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

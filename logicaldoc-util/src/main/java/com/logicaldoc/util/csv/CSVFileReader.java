@@ -104,7 +104,7 @@ public class CSVFileReader extends CSVFile implements Closeable {
 		StringBuilder sb = new StringBuilder();
 		String line = in.readLine();
 		if (line == null)
-			return null;
+			return new ArrayList<>();
 
 		if (line.length() == 0) {
 			fields.add(line);

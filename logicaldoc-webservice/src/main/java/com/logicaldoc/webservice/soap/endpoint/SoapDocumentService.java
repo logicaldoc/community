@@ -332,7 +332,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		Document doc = docDao.findDocument(docId);
 
 		if (!type.toLowerCase().endsWith(".png"))
-			type = type += ".png";
+			type += ".png";
 		String resource = storer.getResourceName(doc, fileVersion, type);
 		if (!storer.exists(docId, resource)) {
 			if (type.equals(ThumbnailManager.SUFFIX_THUMB))
@@ -489,11 +489,10 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (folderId == rootId)
 			throw new PermissionException("Cannot create documents in the root");
 
-		Document doc = retrieveReadableDocument(docId, user);
 		checkWriteEnable(user, folderId);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		doc = docDao.findDocument(docId);
+		Document doc = docDao.findDocument(docId);
 		checkPublished(user, doc);
 
 		// Create the document history event

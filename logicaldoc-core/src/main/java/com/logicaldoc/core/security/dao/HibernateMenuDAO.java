@@ -751,23 +751,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 			List<Menu> childs = findByName(menu, name, false);
 			if (childs.isEmpty()) {
-				Menu newMenu = new Menu();
-				newMenu.setName(name);
-				newMenu.setParentId(menu.getId());
-				newMenu.setTenantId(tenantId);
-				newMenu.setType(type);
-
-				if (inheritSecurity) {
-					if (menu.getSecurityRef() != null)
-						newMenu.setSecurityRef(menu.getSecurityRef());
-					else
-						newMenu.setSecurityRef(menu.getId());
-				}
-
-				store(newMenu);
-				flush();
-				menu = newMenu;
-				log.info("created menu {}", computePathExtended(newMenu.getId()));
+				menu = createNewMenu(name, tenantId, type, menu, inheritSecurity);
 			} else {
 				menu = childs.iterator().next();
 				initialize(menu);
@@ -775,5 +759,28 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		}
 
 		return menu;
+	}
+
+	private Menu createNewMenu(String name, long tenantId, int type, Menu parentMenu, boolean inheritSecurity)
+			throws PersistenceException {
+		Menu newMenu = new Menu();
+		newMenu.setName(name);
+		newMenu.setParentId(parentMenu.getId());
+		newMenu.setTenantId(tenantId);
+		newMenu.setType(type);
+
+		if (inheritSecurity) {
+			if (parentMenu.getSecurityRef() != null)
+				newMenu.setSecurityRef(parentMenu.getSecurityRef());
+			else
+				newMenu.setSecurityRef(parentMenu.getId());
+		}
+
+		store(newMenu);
+		flush();
+		parentMenu = newMenu;
+		if (log.isInfoEnabled())
+			log.info("created menu {}", computePathExtended(newMenu.getId()));
+		return parentMenu;
 	}
 }

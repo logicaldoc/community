@@ -109,10 +109,8 @@ public class ConversionDialog extends Window {
 						@Override
 						public void onSuccess(GUIDocument doc) {
 							LD.clearPrompt();
-							if (MainPanel.get().isOnDocumentsTab())
-								if (FolderController.get().getCurrentFolder() != null)
-									FolderNavigator.get()
-											.selectFolder(FolderController.get().getCurrentFolder().getId());
+							if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)
+								FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 							destroy();
 						}
 					});

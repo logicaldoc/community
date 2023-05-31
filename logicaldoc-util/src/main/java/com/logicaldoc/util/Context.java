@@ -198,7 +198,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 			// Nothing to do
 		}
 
-		return null;
+		return new Resource[0];
 	}
 
 	/**

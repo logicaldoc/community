@@ -75,30 +75,26 @@ public class MockServletSession implements HttpSession {
 	@SuppressWarnings("deprecation")
 	@Override
 	public HttpSessionContext getSessionContext() {
-
 		return null;
 	}
 
 	@Override
 	public Object getValue(String arg0) {
-
 		return null;
 	}
 
 	@Override
 	public String[] getValueNames() {
-
-		return null;
+		return new String[0];
 	}
 
 	@Override
 	public void invalidate() {
-// Nothing to do
+		// Nothing to do
 	}
 
 	@Override
 	public boolean isNew() {
-
 		return false;
 	}
 

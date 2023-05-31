@@ -69,8 +69,6 @@ public class LDHtmlLayout extends AbstractStringLayout {
 
 	private final String fontSize;
 
-	private final String headerSize;
-
 	private final DatePatternConverter datePatternConverter;
 
 	/** Possible font sizes */
@@ -103,15 +101,13 @@ public class LDHtmlLayout extends AbstractStringLayout {
 	}
 
 	private LDHtmlLayout(final boolean locationInfo, final String title, final String contentType,
-			final Charset charset, final String font, final String fontSize, final String headerSize,
-			String datePattern, String timezone) {
+			final Charset charset, final String font, final String fontSize, String datePattern, String timezone) {
 		super(charset);
 		this.locationInfo = locationInfo;
 		this.title = title;
 		this.contentType = addCharsetToContentType(contentType);
 		this.font = font;
 		this.fontSize = fontSize;
-		this.headerSize = headerSize;
 		this.datePatternConverter = DEFAULT_DATE_PATTERN.equals(datePattern) ? null
 				: DatePatternConverter.newInstance(new String[] { datePattern, timezone });
 	}
@@ -425,7 +421,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 				contentType = DEFAULT_CONTENT_TYPE + CHARSET + charset;
 			}
 			return new LDHtmlLayout(locationInfo, title, contentType, charset, fontName, fontSize.getFontSize(),
-					fontSize.larger().getFontSize(), datePattern, timezone);
+					datePattern, timezone);
 		}
 	}
 }

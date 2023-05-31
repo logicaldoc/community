@@ -203,11 +203,12 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			return;
 
 		final GUIDocument hit = grid.getSelectedDocument();
-		if (hit != null)
+		if (hit != null) {
 			if (hit.getType().contains(FOLDER))
 				SearchPanel.get().onSelectedFolderHit(hit.getId());
 			else
 				SearchPanel.get().onSelectedDocumentHit(hit.getId());
+		}
 	}
 
 	private void showContextMenu(GUIFolder folder, final boolean document) {

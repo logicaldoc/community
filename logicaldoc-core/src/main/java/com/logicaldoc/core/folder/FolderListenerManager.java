@@ -64,8 +64,9 @@ public class FolderListenerManager {
 					throw new ClassNotFoundException(
 							"The specified listener " + className + " doesn't implement FolderListener interface");
 				listeners.add((FolderListener) listener);
-				log.info("Added new folder listener {} position {}", className,
-						ext.getParameter(POSITION).valueAsString());
+				if (log.isInfoEnabled())
+					log.info("Added new folder listener {} position {}", className,
+							ext.getParameter(POSITION).valueAsString());
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage());

@@ -56,18 +56,15 @@ public class StatusDialog extends Window {
 			public void onClick(ClickEvent event) {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
-				if (Boolean.TRUE.equals(vm.validate()))  {
-					if (Boolean.TRUE.equals(vm.validate()))  {
-						StatusDialog.this.widget.getWfState().setName((String) values.get("name"));
-						StatusDialog.this.widget.setContents("<b>" + (String) values.get("name") + "</b>");
-						StatusDialog.this.widget.getDrawingPanel().getDiagramController().update();
-
-						destroy();
-					}
+				if (Boolean.TRUE.equals(vm.validate())) {
+					StatusDialog.this.widget.getWfState().setName((String) values.get("name"));
+					StatusDialog.this.widget.setContents("<b>" + (String) values.get("name") + "</b>");
+					StatusDialog.this.widget.getDrawingPanel().getDiagramController().update();
+					destroy();
 				}
 			}
 		});
-		
+
 		save.setDisabled(!widget.getDrawingPanel().getWorkflowDesigner().getWorkflow().isLatestVersion());
 
 		form.setItems(name, save);

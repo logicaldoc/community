@@ -547,10 +547,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			} else
 				hiliteDoc = null;
 		}
-		if (hiliteDoc != null) {
-			if (!documentRecords.contains(hiliteDoc))
-				documentRecords.add(0, hiliteDoc);
-		}
+		if (hiliteDoc != null && !documentRecords.contains(hiliteDoc))
+			documentRecords.add(0, hiliteDoc);
 		return hiliteDoc;
 	}
 

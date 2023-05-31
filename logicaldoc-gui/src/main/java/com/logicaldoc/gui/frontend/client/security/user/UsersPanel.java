@@ -332,11 +332,12 @@ public class UsersPanel extends AdminPanel {
 		}
 		items.add(password);
 
-		if (!ADMIN.equals(list.getSelectedRecord().getAttributeAsString(USERNAME)))
+		if (!ADMIN.equals(list.getSelectedRecord().getAttributeAsString(USERNAME))) {
 			if (Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
 				items.add(disableUser);
 			else
 				items.add(enableUser);
+		}
 
 		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION))
 			items.add(twoTactorsAuth);

@@ -26,11 +26,11 @@ public class Encodings {
 	public static List<String> enlistSupportedEncodings() {
 		List<String> encodings = new ArrayList<>();
 
-		SortedMap m = Charset.availableCharsets();
-		Set k = m.keySet();
-		Iterator i = k.iterator();
+		SortedMap<String, Charset> m = Charset.availableCharsets();
+		Set<String> k = m.keySet();
+		Iterator<String> i = k.iterator();
 		while (i.hasNext()) {
-			String n = (String) i.next();
+			String n = i.next();
 			encodings.add(n);
 		}
 

@@ -45,7 +45,6 @@ public class EventsListGridField extends ColoredListGridField {
 	}
 
 	private String decodeEvents(Object value, ListGridRecord rec) {
-		String decoded = "document";
 		// Translate the set of events
 		String[] key = null;
 
@@ -61,7 +60,7 @@ public class EventsListGridField extends ColoredListGridField {
 		}
 
 		String str = labels.toString().substring(1);
-		decoded = str.substring(0, str.length() - 1);
+		String decoded = str.substring(0, str.length() - 1);
 
 		String colorSpec = rec.getAttributeAsString("color");
 		if (colorSpec != null && !colorSpec.isEmpty())

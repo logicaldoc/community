@@ -3,13 +3,13 @@ package com.logicaldoc.util.config;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
-import java.util.Vector;
 
 /**
  * This is an extension of Java Properties that stores the properties
@@ -90,11 +90,10 @@ public class OrderedProperties extends Properties {
 	 * @return the ordered collection of all the keys
 	 */
 	public List<String> getKeys() {
-		Vector<String> keys = new Vector<>();
+		ArrayList<String> keys = new ArrayList<>();
 
-		for (Object key : keySet()) {
-			keys.addElement(key.toString());
-		}
+		for (Object key : keySet())
+			keys.add(key.toString());
 
 		// sort them
 		Collections.sort(keys);

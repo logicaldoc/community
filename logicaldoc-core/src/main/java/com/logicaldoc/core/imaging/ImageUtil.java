@@ -140,8 +140,8 @@ public class ImageUtil {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 
-		int x = width < squareSize ? 0 : (int) ((width / 2D)) - (int) ((squareSize / 2D));
-		int y = height < squareSize ? 0 : (int) ((height / 2D)) - (int) ((squareSize / 2D));
+		int x = width < squareSize ? 0 : (int) (width / 2D) - (int) (squareSize / 2D);
+		int y = height < squareSize ? 0 : (int) (height / 2D) - (int) (squareSize / 2D);
 		int w = width < squareSize ? width : squareSize;
 		int h = height < squareSize ? height : squareSize;
 

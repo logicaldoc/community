@@ -188,7 +188,7 @@ public class ImageDeskew {
 
 		// range of d
 		this.cDMin = -this.image.getWidth();
-		this.cDCount = (int) (2.0 * ((this.image.getWidth() + this.image.getHeight())) / this.cDStep);
+		this.cDCount = (int) (2.0 * (this.image.getWidth() + this.image.getHeight()) / this.cDStep);
 		this.cHMatrix = new int[this.cDCount * this.cSteps];
 	}
 

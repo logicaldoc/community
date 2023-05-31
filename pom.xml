@@ -86,14 +86,6 @@
             <timezone>+0</timezone>
         </developer>
     </developers>
-	<!--
-    <scm>
-        <connection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/community/logicaldoc/trunk</connection>
-        <developerConnection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/community/logicaldoc/trunk</developerConnection>
-        <url>http://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/logicaldoc/trunk</url>
-    </scm>
-	-->
-	
     <scm>
 		<connection>scm:git:https://github.com/logicaldoc/community.git</connection>
 		<developerConnection>scm:git:https://github.com/logicaldoc/community.git</developerConnection>
@@ -183,9 +175,6 @@
         <module>logicaldoc-android</module>
         <module>logicaldoc-ios</module>
         <module>logicaldoc-webapp</module>
-        <!--
-        <module>logicaldoc-webservicesamples</module>
-        -->
     </modules>
     
 </project>

@@ -43,9 +43,11 @@ public class SystemUtil {
 		StringBuilder sb = new StringBuilder();
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		for (StackTraceElement element : elements) {
-			if(element.getClassName().equals(Thread.class.getName()) && element.getMethodName().equals("getStackTrace"))
+			if (element.getClassName().equals(Thread.class.getName())
+					&& element.getMethodName().equals("getStackTrace"))
 				continue;
-			if(element.getClassName().equals(SystemUtil.class.getName()) && element.getMethodName().equals("printStackTrace"))
+			if (element.getClassName().equals(SystemUtil.class.getName())
+					&& element.getMethodName().equals("printStackTrace"))
 				continue;
 			sb.append(element.getClassName());
 			sb.append(".");
@@ -56,16 +58,17 @@ public class SystemUtil {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String printSystemEnvironment() {
 		StringBuilder sb = new StringBuilder();
 		Map<String, String> env = System.getenv();
-		for (String key : env.keySet()) {
+
+		for (Map.Entry<String, String> entry : env.entrySet()) {
 			if (sb.length() > 0)
 				sb.append("\n");
-			sb.append(key);
+			sb.append(entry.getKey());
 			sb.append("=");
-			sb.append(env.get(key));
+			sb.append(entry.getValue());
 		}
 		return "#System Environment\n#" + new Date() + "\n" + sb.toString();
 	}
@@ -116,7 +119,7 @@ public class SystemUtil {
 	 * 
 	 * @param runBeforeRestart some custom code to be run before restarting
 	 * 
-	 * @throws IOException raised if the application cannot be restarted 
+	 * @throws IOException raised if the application cannot be restarted
 	 */
 	public static void restartApplication(Runnable runBeforeRestart) throws IOException {
 		try {

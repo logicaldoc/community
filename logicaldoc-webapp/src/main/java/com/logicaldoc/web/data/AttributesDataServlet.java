@@ -98,12 +98,12 @@ public class AttributesDataServlet extends AbstractDataServlet {
 				attributes.put(name, template.getAttribute(name));
 		}
 
-		for (String name : attributes.keySet()) {
-			Attribute attribute = attributes.get(name);
+		for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
+			Attribute attribute = entry.getValue();
 			if (attribute.getHidden() == 1)
 				continue;
 
-			printAttibute("ext_" + name, (StringUtils.isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : ""),
+			printAttibute("ext_" + entry.getKey(), (StringUtils.isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : ""),
 					attribute.getType(), writer);
 		}
 

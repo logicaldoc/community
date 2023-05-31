@@ -109,7 +109,8 @@ public class DefaultHandler implements IOHandler {
 		boolean success = false;
 		try {
 			success = setContentData(context, isCollection);
-			log.debug("success = {}" + success);
+			if (log.isDebugEnabled())
+				log.debug("success = {}", success);
 		} catch (DavException e) {
 			throw e;
 		} catch (Exception e) {

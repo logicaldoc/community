@@ -673,12 +673,10 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			isOfficeFile = Util.isOfficeFileType(document.getType());
 
 		office.setDisabled(!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !downloadEnabled || !writeEnabled);
-		if (document.getStatus() != Constants.DOC_UNLOCKED
-				&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-			if (document.getLockUserId() != null
-					&& Session.get().getUser().getId() != document.getLockUserId().longValue())
-				office.setDisabled(true);
-		}
+		if (document.getStatus() != Constants.DOC_UNLOCKED && !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
+				&& document.getLockUserId() != null
+				&& Session.get().getUser().getId() != document.getLockUserId().longValue())
+			office.setDisabled(true);
 	}
 
 	@Override

@@ -234,9 +234,10 @@ public class Automation {
 
 	private void mergeDictionary(HashMap<String, Object> dictionary, Map<String, Object> clientDictionary) {
 		if (clientDictionary != null && !clientDictionary.isEmpty()) {
-			for (String key : clientDictionary.keySet())
-				if (key != null && clientDictionary.get(key) != null)
-					dictionary.put(key, clientDictionary.get(key));
+			for (Map.Entry<String, Object> entry : clientDictionary.entrySet()) {
+				if (entry.getKey() != null && entry.getValue() != null)
+					dictionary.put(entry.getKey(), entry.getValue());
+			}
 		}
 	}
 

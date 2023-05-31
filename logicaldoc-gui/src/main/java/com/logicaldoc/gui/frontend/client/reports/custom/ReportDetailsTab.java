@@ -16,12 +16,13 @@ public abstract class ReportDetailsTab extends HLayout {
 	protected ChangedHandler changedHandler;
 
 	/**
+	 * Constructor
 	 * 
 	 * @param report The report this instance refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        importFolder
 	 */
-	public ReportDetailsTab(GUIReport report, ChangedHandler changedHandler) {
+	protected ReportDetailsTab(GUIReport report, ChangedHandler changedHandler) {
 		super();
 		this.report = report;
 		this.changedHandler = changedHandler;

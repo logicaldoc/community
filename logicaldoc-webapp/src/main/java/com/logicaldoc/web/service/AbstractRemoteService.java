@@ -321,7 +321,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			return attributes.toArray(new GUIAttribute[0]);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			return null;
+			return new GUIAttribute[0];
 		}
 	}
 

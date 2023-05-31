@@ -60,9 +60,10 @@ public class WebConfigurator extends XMLBean {
 	 * 
 	 * @return the element
 	 */
-	private Element elementLookUp(List elements, String match_text, String name) {
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element elem = (Element) iterator.next();
+
+	private Element elementLookUp(List<Element> elements, String match_text, String name) {
+		for (Iterator<Element> iterator = elements.iterator(); iterator.hasNext();) {
+			Element elem = iterator.next();
 			Element elementName = elem.getChild(match_text, elem.getNamespace());
 			if (elementName != null && elementName.getText().trim().equals(name)) {
 				// The element already exists
@@ -152,7 +153,7 @@ public class WebConfigurator extends XMLBean {
 	 */
 	public void addFilterInitParam(String filterName, String name, String value, String description,
 			INIT_PARAM append) {
-		List filters = getRootElement().getChildren(FILTER, getRootElement().getNamespace());
+		List<Element> filters = getRootElement().getChildren(FILTER, getRootElement().getNamespace());
 		Element filter = this.elementLookUp(filters, FILTER_NAME, filterName);
 
 		if (filter == null)
@@ -209,7 +210,7 @@ public class WebConfigurator extends XMLBean {
 	 *        values are represented in {@link WebConfigurator.INIT_PARAM}
 	 */
 	public void addInitParam(String servletName, String name, String value, String description, INIT_PARAM append) {
-		List servlets = getRootElement().getChildren(SERVLET, getRootElement().getNamespace());
+		List<Element> servlets = getRootElement().getChildren(SERVLET, getRootElement().getNamespace());
 		Element servlet = this.elementLookUp(servlets, SERVLET_NAME, servletName);
 
 		if (servlet == null)
@@ -275,7 +276,7 @@ public class WebConfigurator extends XMLBean {
 	 *        values are represented in {@link WebConfigurator.INIT_PARAM}
 	 */
 	public void addListenerInitParam(String listenerClazz, String name, String value, INIT_PARAM append) {
-		List listeners = getRootElement().getChildren(LISTENER, getRootElement().getNamespace());
+		List<Element> listeners = getRootElement().getChildren(LISTENER, getRootElement().getNamespace());
 		Element listener = this.elementLookUp(listeners, LISTENER_CLASS, listenerClazz);
 
 		if (listener == null)
@@ -346,13 +347,12 @@ public class WebConfigurator extends XMLBean {
 	 * @param loadOnStartup use 1 in case the servlet must be started during the
 	 *        startup
 	 */
-	@SuppressWarnings("unchecked")
 	public void addServlet(String name, String clazz, int loadOnStartup) {
 		Element servlet = null;
 		Element servletClass = null;
 
 		// Search for the specified servlet
-		List servlets = getRootElement().getChildren(SERVLET, getRootElement().getNamespace());
+		List<Element> servlets = getRootElement().getChildren(SERVLET, getRootElement().getNamespace());
 		servlet = this.elementLookUp(servlets, SERVLET_NAME, name);
 		if (servlet != null) {
 			// The servlet already exists, so update it
@@ -361,9 +361,9 @@ public class WebConfigurator extends XMLBean {
 		} else {
 
 			// Retrieve the last <servlet> element
-			Element lastServlet = (Element) servlets.get(servlets.size() - 1);
+			Element lastServlet = servlets.get(servlets.size() - 1);
 
-			List children = getRootElement().getChildren();
+			List<Element> children = getRootElement().getChildren();
 
 			// Find the index of the element to add the new element after.
 			int index = children.indexOf(lastServlet);
@@ -401,7 +401,7 @@ public class WebConfigurator extends XMLBean {
 		Element filterClass = null;
 
 		// Search for the specified filter
-		List filters = getRootElement().getChildren(FILTER, getRootElement().getNamespace());
+		List<Element> filters = getRootElement().getChildren(FILTER, getRootElement().getNamespace());
 		filter = this.elementLookUp(filters, FILTER_NAME, name);
 		if (filter != null) {
 			// The filter already exists, so update it
@@ -412,7 +412,7 @@ public class WebConfigurator extends XMLBean {
 			// Retrieve the last <filter> element
 			Element lastFilter = (Element) filters.get(filters.size() - 1);
 
-			List children = getRootElement().getChildren();
+			List<Element> children = getRootElement().getChildren();
 
 			// Find the index of the element to add the new element after.
 			int index = children.indexOf(lastFilter);

@@ -1,5 +1,6 @@
 package com.logicaldoc.core.automation;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class CollectionTool {
 	 */
 	public List<Object> toList(Object[] array) {
 		if (array == null)
-			return null;
+			return new ArrayList<Object>();
 		else
 			return Arrays.asList(array);
 	}
@@ -44,7 +45,7 @@ public class CollectionTool {
 	 */
 	public Object[] toArray(List<Object> list) {
 		if (list == null)
-			return null;
+			return new Object[0];
 		else
 			return list.toArray();
 	}

@@ -72,16 +72,10 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTCase {
 		assertEquals(2, users.length);
 
 		for (WSUser wsUser : users) {
-//			System.err.println("Name: " + wsUser.getName());
-//			System.err.println("Username: " + wsUser.getUsername());
-//			System.err.println("Password: " + wsUser.getPassword());
-//			System.err.println("Email: " + wsUser.getEmail());
-//			System.err.println("Email2: " + wsUser.getEmail2());
-//			System.err.println("Passwordmd4: " + wsUser.getPasswordmd4());
-
 			assertNull(wsUser.getUsername());
 			assertNull(wsUser.getEmail());
 			assertNull(wsUser.getEmail2());
+						
 			assertTrue(wsUser.getPassword() == null || wsUser.getPassword().isEmpty());
 			assertNull(wsUser.getPasswordmd4());
 		}

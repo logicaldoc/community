@@ -224,7 +224,7 @@ public class FileUtil {
 		} catch (IOException io) {
 			log.error(io.getMessage(), io);
 		}
-		return null;
+		return new byte[0];
 	}
 
 	/**
@@ -252,7 +252,7 @@ public class FileUtil {
 		} catch (Exception t) {
 			log.error("Error generating SHA-1: ", t);
 		}
-		return null;
+		return new byte[0];
 	}
 
 	/**
@@ -516,7 +516,7 @@ public class FileUtil {
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
-		return null;
+		return new byte[0];
 	}
 
 	public static byte[] toByteArray(RandomAccessFile input, long start, long length) throws IOException {

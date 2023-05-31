@@ -38,7 +38,7 @@ public class HttpUtil {
 		String[] proxy = new String[] { null, "0", null, null };
 		try {
 			// Try to get the config of the application context
-			ContextProperties config = getContextProperties();
+			ContextProperties config = Context.get().getProperties();
 
 			// fallback to the classpath resource
 			if (config == null)
@@ -60,15 +60,6 @@ public class HttpUtil {
 		}
 
 		return proxy;
-	}
-
-	private static ContextProperties getContextProperties() {
-		try {
-			return Context.get().getProperties();
-		} catch (Exception t) {
-			// Nothing to do
-		}
-		return null;
 	}
 
 	public static CloseableHttpClient getNotValidatingClient(int timeout, String proxyServer, Integer proxyPort,

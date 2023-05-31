@@ -116,31 +116,29 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			addFormItem(getDensitySelector());
 		}
 
-		if (Feature.enabled(Feature.MULTI_TENANT)) {
-			if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
-					&& Session.get().getUser().getTenant().getTenantId() == Constants.TENANT_DEFAULTID) {
-				SelectItem tenantItem = ItemFactory.newTenantSelector();
-				tenantItem.setShowTitle(false);
-				tenantItem.setValue(Long.toString(Session.get().getInfo().getTenant().getId()));
-				tenantItem.addChangedHandler(event -> {
-					long tenantId = Long.parseLong(event.getValue().toString());
-					if (tenantId != Session.get().getInfo().getTenant().getId())
-						TenantService.Instance.get().changeSessionTenant(tenantId, new AsyncCallback<GUITenant>() {
+		if (Feature.enabled(Feature.MULTI_TENANT) && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
+				&& Session.get().getUser().getTenant().getTenantId() == Constants.TENANT_DEFAULTID) {
+			SelectItem tenantItem = ItemFactory.newTenantSelector();
+			tenantItem.setShowTitle(false);
+			tenantItem.setValue(Long.toString(Session.get().getInfo().getTenant().getId()));
+			tenantItem.addChangedHandler(event -> {
+				long tenantId = Long.parseLong(event.getValue().toString());
+				if (tenantId != Session.get().getInfo().getTenant().getId())
+					TenantService.Instance.get().changeSessionTenant(tenantId, new AsyncCallback<GUITenant>() {
 
-							@Override
-							public void onSuccess(GUITenant tenant) {
-								Session.get().getInfo().setTenant(tenant);
-								Util.redirectToRoot();
-							}
+						@Override
+						public void onSuccess(GUITenant tenant) {
+							Session.get().getInfo().setTenant(tenant);
+							Util.redirectToRoot();
+						}
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-						});
-				});
-				addFormItem(tenantItem);
-			}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+					});
+			});
+			addFormItem(tenantItem);
 		}
 
 		addSeparator();

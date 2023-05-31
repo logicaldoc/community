@@ -98,7 +98,7 @@ public class Avatar extends HLayout {
 
 		private IButton saveButton;
 
-		private Upload uploader;
+		private Upload upload;
 
 		private long userId;
 
@@ -128,9 +128,9 @@ public class Avatar extends HLayout {
 
 			layout.addMember(hint);
 
-			uploader = new Upload(saveButton);
-			uploader.setFileTypes("*.png,*.jpg,*.jpeg,*.gif");
-			layout.addMember(uploader);
+			upload = new Upload(saveButton);
+			upload.setFileTypes("*.png,*.jpg,*.jpeg,*.gif");
+			layout.addMember(upload);
 			layout.addMember(saveButton);
 
 			addCloseClickHandler(
@@ -151,7 +151,7 @@ public class Avatar extends HLayout {
 		}
 
 		public void onSave() {
-			if (uploader.getUploadedFile() == null) {
+			if (upload.getUploadedFile() == null) {
 				SC.warn(I18N.message("filerequired"));
 				return;
 			}

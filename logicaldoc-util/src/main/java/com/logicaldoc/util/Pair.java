@@ -118,7 +118,8 @@ public class Pair<K extends Object, V extends Object> {
 		if (this == o)
 			return true;
 		if (o instanceof Pair) {
-			Pair pair = (Pair) o;
+			@SuppressWarnings("unchecked")
+			Pair<K,V> pair = (Pair<K,V>) o;
 			if (key != null ? !key.equals(pair.key) : pair.key != null)
 				return false;
 			if (value != null ? !value.equals(pair.value) : pair.value != null)

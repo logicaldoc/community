@@ -24,6 +24,7 @@ import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.html.HTMLSanitizer;
@@ -61,14 +62,13 @@ public class DownloadServlet extends HttpServlet {
 						request.getParameter("fileName"));
 			else
 				downloadDocument(request, response, session);
-		} catch (Throwable ex) {
-			if (ex.getClass().getName().contains("ClientAbortException")) {
-				log.debug(ex.getMessage(), ex);
+		} catch (InvalidSessionException | IOException | ServletException | PersistenceException e) {
+			if (e.getClass().getName().contains("ClientAbortException")) {
+				log.debug(e.getMessage(), e);
 			} else {
-				log.error(ex.getMessage(), ex);
-				ServletUtil.sendError(response, ex.getMessage());
+				log.error(e.getMessage(), e);
+				ServletUtil.sendError(response, e.getMessage());
 			}
-
 		}
 	}
 
@@ -214,15 +214,16 @@ public class DownloadServlet extends HttpServlet {
 	private void download(HttpServletRequest request, HttpServletResponse response, Session session,
 			String downloadText, Long docId, String fileVersion, String filename, String suffix, Document doc)
 			throws FileNotFoundException, IOException, PersistenceException, ServletException {
-		if (doc != null)
+		if (doc != null) {
 			if ("true".equals(downloadText)) {
 				ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());
 			} else {
 				ServletUtil.downloadDocument(request, response, session.getSid(), doc.getId(), fileVersion, filename,
 						suffix, session.getUser());
 			}
-		else
+		} else {
 			throw new FileNotFoundException("Cannot find document " + docId);
+		}
 	}
 
 	private void processSafeHtml(String suffix, Version version, Document doc) throws IOException {

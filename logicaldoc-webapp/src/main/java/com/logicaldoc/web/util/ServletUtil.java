@@ -357,7 +357,7 @@ public class ServletUtil {
 			response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
 																	// in
 																	// 416.
-			return null;
+			return new ArrayList<>();
 		}
 
 		// If-Range header should either match ETag or be greater then
@@ -390,7 +390,7 @@ public class ServletUtil {
 				response.setHeader(CONTENT_RANGE, "bytes */" + length); // Required
 																		// in
 																		// 416.
-				return null;
+				return new ArrayList<>();
 			}
 
 			// Add range.

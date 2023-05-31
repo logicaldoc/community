@@ -23,11 +23,7 @@ public class InputValues {
 		if (value == null || !Session.get().getConfigAsBoolean("gui.saveinputs"))
 			return;
 
-		List<Object> inputs = savedInputs.get(name);
-		if (inputs == null) {
-			inputs = new ArrayList<>();
-			savedInputs.put(name, inputs);
-		}
+		List<Object> inputs = savedInputs.computeIfAbsent(name, k -> new ArrayList<>());
 		if (!inputs.contains(value))
 			inputs.add(value);
 	}

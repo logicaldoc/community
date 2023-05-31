@@ -1,7 +1,6 @@
 package com.logicaldoc.util.config;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -134,8 +133,7 @@ public class ContextConfigurator {
 	protected Element getPropElement(String id, String propertyName, String key) {
 		Element element = getPropertyElement(id, propertyName);
 		Element props = element.getChild("props", element.getNamespace());
-		for (Iterator iter = props.getChildren().iterator(); iter.hasNext();) {
-			Element prop = (Element) iter.next();
+		for (Element prop : props.getChildren()) {
 			if (key.equals(prop.getAttributeValue("key")))
 				return prop;
 		}
@@ -165,9 +163,8 @@ public class ContextConfigurator {
 		Element element = xml.getChild("bean", "id", id);
 		if (element == null)
 			return null;
-		List properties = element.getChildren(PROPERTY, element.getNamespace());
-		for (Iterator iter = properties.iterator(); iter.hasNext();) {
-			Element property = (Element) iter.next();
+		List<Element> properties = element.getChildren(PROPERTY, element.getNamespace());
+		for (Element property : properties) {
 			Attribute nameAttribute = property.getAttribute("name");
 			if (nameAttribute != null && propertyName.equals(nameAttribute.getValue())) {
 				return property;
@@ -192,9 +189,8 @@ public class ContextConfigurator {
 	public void addTrigger(String triggerId) {
 		Element element = getPropertyElement("Scheduler", "triggers");
 		Element list = element.getChild("list", element.getNamespace());
-		List refs = list.getChildren("ref", element.getNamespace());
-		for (Iterator iterator = refs.iterator(); iterator.hasNext();) {
-			Element ref = (Element) iterator.next();
+		List<Element> refs = list.getChildren("ref", element.getNamespace());
+		for (Element ref : refs) {
 			if (triggerId.equals(ref.getAttribute("bean").getValue()))
 				return;
 		}

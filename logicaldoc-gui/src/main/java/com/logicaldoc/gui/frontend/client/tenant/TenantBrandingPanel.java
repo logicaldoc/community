@@ -543,23 +543,21 @@ public class TenantBrandingPanel extends HLayout {
 
 	public boolean validate() {
 		vm.validate();
-		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			if (Feature.enabled(Feature.BRANDING_FULL)) {
-				tenant.getBranding().setSkin(skin.getValueAsString());
-				tenant.getBranding().setProduct(vm.getValueAsString("product"));
-				tenant.getBranding().setProductName(vm.getValueAsString("productname"));
-				tenant.getBranding().setVendor(vm.getValueAsString("vendor"));
-				tenant.getBranding().setVendorAddress(vm.getValueAsString("address"));
-				tenant.getBranding().setVendorCap(vm.getValueAsString("postalcode"));
-				tenant.getBranding().setVendorCity(vm.getValueAsString("city"));
-				tenant.getBranding().setVendorCountry(vm.getValueAsString("country"));
-				tenant.getBranding().setUrl(vm.getValueAsString("website"));
-				tenant.getBranding().setBugs(vm.getValueAsString("bugs"));
-				tenant.getBranding().setForum(vm.getValueAsString("forum"));
-				tenant.getBranding().setHelp(vm.getValueAsString("help"));
-				tenant.getBranding().setSupport(vm.getValueAsString(SUPPORT));
-				tenant.getBranding().setSales(vm.getValueAsString(SALES));
-			}
+		if (Boolean.FALSE.equals(vm.hasErrors()) && Feature.enabled(Feature.BRANDING_FULL)) {
+			tenant.getBranding().setSkin(skin.getValueAsString());
+			tenant.getBranding().setProduct(vm.getValueAsString("product"));
+			tenant.getBranding().setProductName(vm.getValueAsString("productname"));
+			tenant.getBranding().setVendor(vm.getValueAsString("vendor"));
+			tenant.getBranding().setVendorAddress(vm.getValueAsString("address"));
+			tenant.getBranding().setVendorCap(vm.getValueAsString("postalcode"));
+			tenant.getBranding().setVendorCity(vm.getValueAsString("city"));
+			tenant.getBranding().setVendorCountry(vm.getValueAsString("country"));
+			tenant.getBranding().setUrl(vm.getValueAsString("website"));
+			tenant.getBranding().setBugs(vm.getValueAsString("bugs"));
+			tenant.getBranding().setForum(vm.getValueAsString("forum"));
+			tenant.getBranding().setHelp(vm.getValueAsString("help"));
+			tenant.getBranding().setSupport(vm.getValueAsString(SUPPORT));
+			tenant.getBranding().setSales(vm.getValueAsString(SALES));
 		}
 
 		return !vm.hasErrors();

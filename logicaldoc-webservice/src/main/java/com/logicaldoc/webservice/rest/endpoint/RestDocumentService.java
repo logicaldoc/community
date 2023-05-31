@@ -333,7 +333,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@ApiResponses(value = {
 			@ApiResponse(description = "default response", content = @Content(mediaType = "application/octet-stream", schema = @Schema(type = "string", format = "binary"))) })
 	public DataHandler getContent(@QueryParam("docId")
-	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		String sid = validateSession();
 		return super.getContent(sid, docId);
 	}
@@ -346,7 +347,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			@ApiResponse(description = "default response", content = @Content(mediaType = "application/octet-stream", schema = @Schema(type = "string", format = "binary"))) })
 	public DataHandler getVersionContent(@QueryParam("docId")
 	long docId, @QueryParam("version")
-	String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		String sid = validateSession();
 		return super.getVersionContent(sid, docId, version);
 	}
@@ -369,7 +371,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Operation(summary = "Updates an existing document", description = "Updates the metadata of an existing document. The ID of the document must be specified in the WSDocument value object. The provided example moves document with ID 1111111 to folder 3435433")
 	public void update(
 			@Parameter(description = "Document object that needs to be updated", required = true, example = "{ \"id\": 1111111, \"folderId\": 3435433 }")
-			WSDocument document) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+			WSDocument document)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSession();
 		super.update(sid, document);
 	}
@@ -387,7 +390,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String sid = validateSession();
 		return super.addNote(sid, docId, note);
 	}
-
 
 	@Override
 	@DELETE
@@ -461,7 +463,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "Document ID", required = true)
 	long docId, @QueryParam("folderId")
 	@Parameter(description = "Target Folder ID", required = true)
-	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		String sid = validateSession();
 		return super.copy(sid, docId, folderId);
 	}
@@ -484,7 +487,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Operation(summary = "Creates the PDF conversion of the given document; if the PDF conversion was already created, nothing will happen")
 	public void createPdf(@QueryParam("docId")
 	long docId, @QueryParam("fileVersion")
-	String fileVersion) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	String fileVersion) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		String sid = validateSession();
 		super.createPdf(sid, docId, fileVersion);
 	}
@@ -496,7 +500,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	public void promoteVersion(@QueryParam("docId")
 	@Parameter(description = "Document ID", required = true)
 	long docId, @QueryParam("version")
-	String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		String sid = validateSession();
 		super.promoteVersion(sid, docId, version);
 	}
@@ -556,7 +561,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "exact expiration date expressed in the format yyyy-MM-dd")
 	String expireDate, @FormParam("maxDownloads")
 	@Parameter(description = "maximum number of downloads allowed", required = true)
-	Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	Integer maxDownloads)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSession();
 		return super.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
 	}
@@ -652,7 +658,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "The file version to retrieve")
 	String fileVersion, @QueryParam("suffix")
 	@Parameter(description = "suffix specification(it cannot be empty, use 'conversion.pdf' to get the PDF conversion)")
-	String suffix) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	String suffix) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		String sid = validateSession();
 		return super.getResource(sid, docId, fileVersion, suffix);
 	}
@@ -720,7 +727,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	Integer docId, @Multipart(value = "fileVersion", required = false)
 	String fileVersion, @Multipart(value = "suffix", required = true)
 	String suffix, @Multipart(value = "content", required = true)
-	Attachment contentDetail) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	Attachment contentDetail) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, IOException {
 
 		String sid = validateSession();
 
@@ -784,7 +792,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "The email subject")
 	String subject, @FormParam("message")
 	@Parameter(description = "The email message body")
-	String message) throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException {
+	String message)
+			throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException {
 		String sid = validateSession();
 		super.sendEmail(sid, docIds, recipients, subject, message);
 	}
@@ -823,7 +832,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "Document ID", required = true)
 	long docId, @FormParam("currentPassword")
 	@Parameter(description = "A password", required = true)
-	String currentPassword) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	String currentPassword)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSession();
 		super.unsetPassword(sid, docId, currentPassword);
 	}
@@ -851,7 +861,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	public DataHandler getThumbnail(@PathParam("type")
 	String type, @PathParam("docpath")
 	String docPath, @PathParam("docpath")
-	List<PathSegment> docPathList) throws AuthenticationException, WebserviceException, PersistenceException, IOException, PermissionException {
+	List<PathSegment> docPathList) throws AuthenticationException, WebserviceException, PersistenceException,
+			IOException, PermissionException {
 		String sid = validateSession();
 
 		String myPath = "/" + docPath;
@@ -861,7 +872,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		Document doc = docDao.findByPath(myPath, user.getTenantId());
 
 		if (!type.toLowerCase().endsWith(".png"))
-			type = type += ".png";
+			type += ".png";
 
 		try {
 			return super.getResource(sid, doc.getId(), doc.getFileVersion(), type);

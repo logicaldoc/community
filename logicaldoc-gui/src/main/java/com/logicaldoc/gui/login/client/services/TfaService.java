@@ -29,18 +29,18 @@ public interface TfaService extends RemoteService {
 	public String generateKey(String username) throws ServerException;
 
 	public static class Instance {
-		private static TfaServiceAsync instance;
+		private static TfaServiceAsync inst;
 
 		private Instance() {
 			
 		}
 		
 		public static TfaServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(TfaService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(TfaService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

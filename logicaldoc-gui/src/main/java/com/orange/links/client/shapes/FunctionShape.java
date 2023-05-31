@@ -53,9 +53,9 @@ public class FunctionShape extends AbstractShape {
 			if (((StateWidget) widget).getWfState().getType() == GUIWFState.TYPE_JOIN) {
 				// just one outcoming connection for a join node
 				for (Connection con : getConnections()) {
-				  if(con.getStartShape().equals(this))
-					  return false;
-				}			
+					if (con.getStartShape().equals(this))
+						return false;
+				}
 			}
 		}
 		return getSelectableArea(mousePoint) != null;
@@ -80,9 +80,8 @@ public class FunctionShape extends AbstractShape {
 	}
 
 	public Couple<Direction, Point> getSelectableArea(Point p) {
-		if (widget instanceof StateWidget)
-			if (((StateWidget) widget).isEnd())
-				return null;
+		if (widget instanceof StateWidget && ((StateWidget) widget).isEnd())
+			return null;
 
 		// Center of the selectable areas
 		if (centerW == null || !isSynchronized()) {

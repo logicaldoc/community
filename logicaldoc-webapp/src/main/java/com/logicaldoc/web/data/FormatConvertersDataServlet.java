@@ -88,7 +88,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 
 	private void writeConverters(PrintWriter writer, String in, String out, boolean parameters) {
 		FormatConverterManager manager = getManager();
-		Collection<FormatConverter> converters = new ArrayList<>();
+		Collection<FormatConverter> converters;
 		if (in.equals("-") && out.equals("-")) {
 			// Get all configured converters
 			converters = manager.getAllConverters();

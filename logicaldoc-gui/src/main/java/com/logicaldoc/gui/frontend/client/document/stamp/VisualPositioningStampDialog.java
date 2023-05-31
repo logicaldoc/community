@@ -132,7 +132,7 @@ public class VisualPositioningStampDialog extends Window {
 				+ (1 - ((double) cropper.getSelectionYCoordinate() / (double) cropper.getImageHeight())));
 		stamp.setExprW("$PAGE_WIDTH * " + (double) cropper.getSelectionWidth() / (double) cropper.getImageWidth());
 		stamp.setExprH(
-				"$PAGE_HEIGHT * " + (((double) cropper.getSelectionHeight() / (double) cropper.getImageHeight())));
+				"$PAGE_HEIGHT * " + ((double) cropper.getSelectionHeight() / (double) cropper.getImageHeight()));
 
 		if (("01" + CURRENTPAGE).equals(pageOption.getValue())) {
 			stamp.setPageOption(GUIStamp.PAGE_OPT_SEL);

@@ -457,11 +457,13 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 			String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 			icon = IconSelector.selectIcon(extension, docRef != null && docRef.longValue() != 0L);
 			if ((getFileName().toLowerCase().endsWith(".eml") || getFileName().toLowerCase().endsWith(".msg"))
-					&& getPages() > 1)
-				if (docRef != null && docRef.longValue() != 0L)
+					&& getPages() > 1) {
+				if (docRef != null && docRef.longValue() != 0L) {
 					icon = "email_attach-sc.png";
-				else
+				} else {
 					icon = "email_attach.png";
+				}
+			}
 			if (docRef != null && docRef.longValue() != 0L && "pdf".equals(getDocRefType()))
 				icon = IconSelector.selectIcon("pdf", true);
 		} catch (Exception e) {

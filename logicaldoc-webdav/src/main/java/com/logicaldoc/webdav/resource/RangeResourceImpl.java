@@ -59,7 +59,9 @@ public class RangeResourceImpl extends DavResourceImpl {
 		final Pair<Long, Long> range = getEffectiveRange(contentLength);
 		if (range.getLeft() < 0 || range.getLeft() > range.getRight() || range.getRight() > contentLength) {
 			log.debug("REQUESTED_RANGE_NOT_SATISFIABLE");
-			log.debug("Content-Range: {}", "bytes */" + contentLength);
+			if (log.isDebugEnabled())
+				log.debug("Content-Range: {}", "bytes */" + contentLength);
+
 			outputContext.setProperty(HttpHeader.CONTENT_RANGE.asString(), "bytes */" + contentLength);
 			throw new UncheckedDavException(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE,
 					"Valid Range would be in [0, " + contentLength + "]");

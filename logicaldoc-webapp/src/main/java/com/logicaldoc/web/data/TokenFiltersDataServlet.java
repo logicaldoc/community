@@ -42,12 +42,12 @@ public class TokenFiltersDataServlet extends AbstractDataServlet {
 			// We have to iterate over the configs of a specific filter
 			String prefix = "index.tokenfilter." + filter + ".";
 			Map<String, String> settings = config.getProperties(prefix);
-			for (String setting : settings.keySet()) {
-				if (setting.equals("position"))
+			for (Map.Entry<String, String> entry : settings.entrySet()) {
+				if (entry.getKey().equals("position"))
 					continue;
 				writer.print("<filter>");
-				writer.print("<name><![CDATA[" + setting + "]]></name>");
-				writer.print("<value><![CDATA[" + settings.get(setting) + "]]></value>");
+				writer.print("<name><![CDATA[" + entry.getKey() + "]]></name>");
+				writer.print("<value><![CDATA[" + entry.getValue() + "]]></value>");
 				writer.print("</filter>");
 			}
 		} else {

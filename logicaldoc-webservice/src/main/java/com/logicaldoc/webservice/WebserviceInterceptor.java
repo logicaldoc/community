@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -232,9 +233,9 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	}
 
 	protected void syncCounters() {
-		for (Pair<String, Long> counterPair : counters.keySet()) {
-			AtomicLong counter = counters.get(counterPair);
-			sequenceDAO.next(counterPair.getKey(), 0L, counterPair.getValue(), counter.get());
+		for (Map.Entry<Pair<String, Long>, AtomicLong> entry : counters.entrySet()) {
+			AtomicLong counter = entry.getValue();
+			sequenceDAO.next(entry.getKey().getKey(), 0L, entry.getKey().getValue(), counter.get());
 			counter.set(0L);
 		}
 		lastSync = new Date();
@@ -250,11 +251,8 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	protected void increaseCounter(String counterName, long tenantId) {
 		Pair<String, Long> counterPair = new Pair<>(counterName, tenantId);
-		AtomicLong counter = counters.get(counterPair);
-		if (counter == null) {
-			counter = new AtomicLong(0L);
-			counters.put(counterPair, counter);
-		}
+
+		AtomicLong counter = counters.computeIfAbsent(counterPair, k -> new AtomicLong(0L));
 		counter.incrementAndGet();
 	}
 
@@ -267,7 +265,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		if (StringUtils.isEmpty(payload))
 			payload = getPayload(message, 2048L);
 		if (StringUtils.isNotEmpty(payload)) {
-			String pattern = "<sid(.*)>([\\w\\-\\d]*)</sid>";
+			String pattern = "<sid(.*)>([\\w\\-]*)</sid>";
 			Pattern regPat = Pattern.compile(pattern);
 			Matcher matcher = regPat.matcher(payload);
 			if (matcher.find()) {
@@ -291,10 +289,10 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 				IOUtils.copy(is, bos);
 
 				bos.flush();
-				
+
 				StringBuilder sb = new StringBuilder();
 				message.setContent(InputStream.class, bos.getInputStream());
-				if(maxlength!=null)
+				if (maxlength != null)
 					bos.writeCacheTo(sb, maxlength);
 				else
 					bos.writeCacheTo(sb);

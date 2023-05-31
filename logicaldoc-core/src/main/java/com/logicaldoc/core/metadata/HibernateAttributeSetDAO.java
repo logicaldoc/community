@@ -196,9 +196,9 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		for (AttributeSet set : sets) {
 			initialize(set);
 			Map<String, Attribute> localAttributes = set.getAttributes();
-			for (String name : localAttributes.keySet())
-				if (!attributes.containsKey(name))
-					attributes.put(name, localAttributes.get(name));
+			for (Map.Entry<String, Attribute> entry : localAttributes.entrySet())
+				if (!attributes.containsKey(entry.getKey()))
+					attributes.put(entry.getKey(), entry.getValue());
 		}
 
 		return attributes;

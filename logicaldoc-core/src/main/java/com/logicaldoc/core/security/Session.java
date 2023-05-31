@@ -315,12 +315,12 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		if (getClass() != obj.getClass())
 			return false;
 		final Session other = (Session) obj;
-		if (sid == null) {
-			if (other.sid != null)
-				return false;
-		} else if (!sid.equals(other.sid))
+		if (sid == null && other.sid != null) {
 			return false;
-		return true;
+		} else {
+			return sid.equals(other.sid);
+		}
+
 	}
 
 	public long getUserId() {

@@ -16,6 +16,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 public class FileNameListGridField extends ColoredListGridField {
 
 	private static final String FILENAME = "filename";
+
 	private String iconFieldName = "icon";
 
 	public FileNameListGridField() {
@@ -64,18 +65,19 @@ public class FileNameListGridField extends ColoredListGridField {
 			if (iconName == null || iconName.isEmpty())
 				return val != null ? val.toString() : "";
 
-			if (iconName.contains("folder") || iconName.contains("workspace"))
+			if (iconName.contains("folder") || iconName.contains("workspace")) {
 				if (iconName.contains("alias"))
-					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_ALIAS, value.toString(), null),
-							rec, rowNum, colNum);
+					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_ALIAS, value.toString(), null), rec,
+							rowNum, colNum);
 				else if (iconName.contains("workspace"))
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_WORKSPACE, value.toString(), null),
 							rec, rowNum, colNum);
 				else
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_DEFAULT, value.toString(), null),
 							rec, rowNum, colNum);
-			else
+			} else {
 				return Util.iconWithFilename(iconName, val != null ? val.toString() : "");
+			}
 		}
 	}
 }

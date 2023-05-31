@@ -70,12 +70,12 @@ public class Validator {
 
 		if (!errors.isEmpty()) {
 			List<ValidationError> errorsList = new ArrayList<>();
-			for (String key : errors.keySet()) {
-				Attribute att = template.getAttribute(key);
+			for (Map.Entry<String, String> entry : errors.entrySet()) {
+				Attribute att = template.getAttribute(entry.getKey());
 				if (att != null)
-					errorsList.add(new ValidationError(key, att.getLabel(), errors.get(key)));
+					errorsList.add(new ValidationError(entry.getKey(), att.getLabel(), entry.getValue()));
 				else
-					errorsList.add(new ValidationError(key, errors.get(key)));
+					errorsList.add(new ValidationError(entry.getKey(), entry.getValue()));
 			}
 
 			throw new ValidationException(errorsList);

@@ -378,7 +378,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			Template template = templateDao.findById(templateId);
 			templateDao.initialize(template);
 
-			GUIAttribute[] attributes = new GUIAttribute[0];
+			GUIAttribute[] attributes;
 
 			if (extensibleObject == null) {
 				attributes = prepareGUIAttributes(template, null, sessionUser);
@@ -450,7 +450,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			return attributes.toArray(new GUIAttribute[0]);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			return null;
+			return new GUIAttribute[0];
 		}
 	}
 

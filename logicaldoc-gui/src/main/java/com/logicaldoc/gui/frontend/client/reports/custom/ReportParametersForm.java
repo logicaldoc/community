@@ -162,12 +162,12 @@ public class ReportParametersForm extends Window {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 
 		ArrayList<GUIAttribute> params = new ArrayList<>();
-
-		for (String name : values.keySet()) {
+		for (Map.Entry<String, Object> entry : values.entrySet()) {
+			String name = entry.getKey();
 			if (!name.startsWith("_"))
 				continue;
 
-			Object value = values.get(name);
+			Object value = entry.getValue();
 			String parameterName = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
 			GUIAttribute attribute = getParameter(parameterName);
 			if (attribute == null)

@@ -184,17 +184,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	/**
-	 * Package protected method that allows to define whether this resource
-	 * represents a collection or not.
-	 * 
-	 * @param isCollection
-	 * @deprecated Use the constructor taking a boolean flag instead.
-	 */
-	void setIsCollection(boolean isCollection) {
-		this.isCollection = isCollection;
-	}
-
-	/**
 	 * @see org.apache.jackrabbit.webdav.DavResource#getLocator()
 	 */
 	public DavResourceLocator getLocator() {
@@ -818,7 +807,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 				log.debug("res IS NULL");
 				String name = destination.getLocator().getResourcePath();
 				name = name.substring(name.lastIndexOf("/") + 1, name.length()).replace("/default", "");
-				log.debug("name = {}" + name);
+				if (log.isDebugEnabled())
+					log.debug("name = {}", name);
 
 				Resource destResource = resourceService.getParentResource(destination.getResourcePath(),
 						this.resource.getRequestedPerson(), session);

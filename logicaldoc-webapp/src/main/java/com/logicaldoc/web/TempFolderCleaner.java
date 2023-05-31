@@ -23,12 +23,11 @@ public class TempFolderCleaner {
 		int retentionDays = 1;
 		for (File f : tempDir.listFiles()) {
 			long diff = new Date().getTime() - f.lastModified();
-			if (f.isFile() && !f.getName().endsWith(".data"))
-				if (diff > retentionDays * 24 * 60 * 60 * 1000) {
-					FileUtils.deleteQuietly(f);
-					if (!f.exists())
-						log.debug("Deleted file {}", f.getPath());
-				}
+			if (f.isFile() && !f.getName().endsWith(".data") && diff > retentionDays * 24 * 60 * 60 * 1000) {
+				FileUtils.deleteQuietly(f);
+				if (!f.exists())
+					log.debug("Deleted file {}", f.getPath());
+			}
 		}
 	}
 }

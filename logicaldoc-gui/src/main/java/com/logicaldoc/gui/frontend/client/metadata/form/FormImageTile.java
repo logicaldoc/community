@@ -85,7 +85,7 @@ public class FormImageTile extends HLayout {
 
 		private IButton saveButton;
 
-		private Upload uploader;
+		private Upload upload;
 
 		private GUIForm form;
 
@@ -108,9 +108,9 @@ public class FormImageTile extends HLayout {
 			layout.setMembersMargin(5);
 			layout.setMargin(2);
 
-			uploader = new Upload(saveButton);
-			uploader.setFileTypes("*.png,*.jpg,*.jpeg,*.gif");
-			layout.addMember(uploader);
+			upload = new Upload(saveButton);
+			upload.setFileTypes("*.png,*.jpg,*.jpeg,*.gif");
+			layout.addMember(upload);
 			layout.addMember(saveButton);
 
 			addCloseClickHandler(
@@ -131,7 +131,7 @@ public class FormImageTile extends HLayout {
 		}
 
 		public void onSave() {
-			if (uploader.getUploadedFile() == null) {
+			if (upload.getUploadedFile() == null) {
 				SC.warn(I18N.message("filerequired"));
 				return;
 			}

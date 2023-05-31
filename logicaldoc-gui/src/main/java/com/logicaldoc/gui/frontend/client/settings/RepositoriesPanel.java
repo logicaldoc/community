@@ -84,9 +84,10 @@ public class RepositoriesPanel extends AdminPanel {
 		final List<GUIParameter> settings = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = foldersForm.getValues();
-		for (String name : values.keySet()) {
+		for (Map.Entry<String, Object> entry : values.entrySet()){
+			String name=entry.getKey();
 			if (!"save".equals(name))
-				settings.add(new GUIParameter(ItemFactory.originalItemName(name), values.get(name).toString().trim()));
+				settings.add(new GUIParameter(ItemFactory.originalItemName(name), entry.getValue().toString().trim()));
 		}
 
 		SettingService.Instance.get().saveSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {

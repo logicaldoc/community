@@ -119,25 +119,24 @@ public class ExportContextImpl extends AbstractExportContext {
 				// ignore
 			}
 		}
-		if (success) {
-			// write properties and data to the output-context
-			if (outputCtx != null) {
-				boolean hasContentLength = false;
-				Iterator it = properties.keySet().iterator();
-				while (it.hasNext()) {
-					Object name = it.next();
-					Object value = properties.get(name);
-					if (name != null && value != null) {
-						outputCtx.setProperty(name.toString(), value.toString());
-						// check for content-length
-						hasContentLength = DavConstants.HEADER_CONTENT_LENGTH.equals(name.toString());
-					}
-				}
 
-				writeFile(hasContentLength);
+		// write properties and data to the output-context
+		if (success && outputCtx != null) {
+			boolean hasContentLength = false;
+			Iterator it = properties.keySet().iterator();
+			while (it.hasNext()) {
+				Object name = it.next();
+				Object value = properties.get(name);
+				if (name != null && value != null) {
+					outputCtx.setProperty(name.toString(), value.toString());
+					// check for content-length
+					hasContentLength = DavConstants.HEADER_CONTENT_LENGTH.equals(name.toString());
+				}
 			}
+
+			writeFile(hasContentLength);
 		}
-		
+
 		FileUtil.strongDelete(outFile);
 	}
 

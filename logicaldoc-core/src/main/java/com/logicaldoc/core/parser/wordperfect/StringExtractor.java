@@ -213,15 +213,15 @@ public class StringExtractor {
 
 	private boolean checkCharacterFrequency(String word, int wordLength, boolean result) {
 		if (result == true) {
-			Map charFreq = new HashMap(32);
+			Map<Character, Integer> charFreq = new HashMap<>(32);
 			for (int i = 0; i < wordLength; i++) {
-				Character c = new Character(word.charAt(i));
+				Character c = Character.valueOf(word.charAt(i));
 
 				Integer freq = (Integer) charFreq.get(c);
 				if (freq == null) {
-					freq = new Integer(1);
+					freq = Integer.valueOf(1);
 				} else {
-					freq = new Integer(freq.intValue() + 1);
+					freq = Integer.valueOf(freq.intValue() + 1);
 				}
 				charFreq.put(c, freq);
 			}
@@ -229,7 +229,7 @@ public class StringExtractor {
 			// no word should consist for 50% or more of a single character
 			int freqThreshold = wordLength / 2;
 
-			Iterator valueIter = charFreq.values().iterator();
+			Iterator<Integer> valueIter = charFreq.values().iterator();
 			while (valueIter.hasNext() && result == true) {
 				Integer freq = (Integer) valueIter.next();
 				result = (freq.intValue() < freqThreshold);

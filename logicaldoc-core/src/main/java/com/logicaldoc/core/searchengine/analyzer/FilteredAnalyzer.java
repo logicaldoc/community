@@ -88,10 +88,10 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 			// Add the specific settings
 			Map<String, String> filterSettings = config.getProperties(INDEX_TOKENFILTER + filter + ".");
-			for (String key : filterSettings.keySet()) {
-				String val = filterSettings.get(key);
+			for (Map.Entry<String, String> entry : filterSettings.entrySet()) {
+				String val = entry.getValue();
 				if (StringUtils.isNotEmpty(val))
-					configs.put(key, val);
+					configs.put(entry.getKey(), val);
 			}
 
 			String filterClass = filters.get(filter);
@@ -196,9 +196,9 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 			}
 		}
 		names.sort((String name1, String name2) -> {
-				Integer pos1 = config.getInt(INDEX_TOKENFILTER + name1 + ".position", 1);
-				Integer pos2 = config.getInt(INDEX_TOKENFILTER + name2 + ".position", 1);
-				return pos1.compareTo(pos2);
+			Integer pos1 = config.getInt(INDEX_TOKENFILTER + name1 + ".position", 1);
+			Integer pos2 = config.getInt(INDEX_TOKENFILTER + name2 + ".position", 1);
+			return pos1.compareTo(pos2);
 		});
 
 		return names;

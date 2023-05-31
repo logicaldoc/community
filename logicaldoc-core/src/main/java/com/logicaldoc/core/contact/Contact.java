@@ -101,7 +101,8 @@ public class Contact extends PersistentObject {
 	}
 
 	public String getFullName() {
-		return firstName != null ? firstName : (lastName != null ? " " + lastName : "");
+		final String lstName = lastName != null ? " " + lastName : "";
+		return firstName != null ? firstName : lstName;
 	}
 
 	public String getAddress() {

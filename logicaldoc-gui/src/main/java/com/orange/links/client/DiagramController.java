@@ -840,8 +840,9 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		}
 
 		// Add links
-		for (Widget startWidget : functionsMap.keySet()) {
-			for (Widget endWidget : functionsMap.get(startWidget).keySet()) {
+		for (Map.Entry<Widget, Map<Widget, Connection>> entry : functionsMap.entrySet()) {
+			Widget startWidget = entry.getKey();
+			for (Widget endWidget : entry.getValue().keySet()) {
 				Connection c = functionsMap.get(startWidget).get(endWidget);
 				int[][] pointList = new int[c.getMovablePoints().size()][2];
 				int i = 0;

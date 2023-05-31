@@ -16,7 +16,7 @@ public class HttpBasicAuthenticationHeader {
 			// credentials = username:password
 			return credentials.split(":", 2);
 		} else
-			return null;
+			return new String[0];
 	}
 
 	public static String[] decode(final String encodedString) {

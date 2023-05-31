@@ -19,11 +19,12 @@ public class FolderSubscriptionOptionListGridField extends ColoredListGridField 
 		setCellFormatter((value, rec, rowNum, colNum) -> {
 			try {
 				String decoded = I18N.message("document");
-				if ("folder".equals(rec.getAttributeAsString("type")))
+				if ("folder".equals(rec.getAttributeAsString("type"))) {
 					if ("1".equals(value.toString()))
 						decoded = I18N.message("tree");
 					else
 						decoded = I18N.message("folder");
+				}
 
 				String colorSpec = rec.getAttributeAsString("color");
 				if (colorSpec != null && !colorSpec.isEmpty())

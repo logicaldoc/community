@@ -2,6 +2,7 @@ package com.logicaldoc.core.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ public abstract class AbstractParser implements Parser {
 			String fileVersion) throws ParseException {
 		try (InputStream is = new FileInputStream(file);) {
 			return parse(is, filename, encoding, locale, tenant, document, fileVersion);
-		} catch (Throwable e) {
+		} catch (IOException e) {
 			log.error(e.getMessage());
 			return "";
 		}
@@ -189,7 +190,7 @@ public abstract class AbstractParser implements Parser {
 	public int countPages(File file, String filename) {
 		try (InputStream is = new FileInputStream(file);) {
 			return countPages(is, filename);
-		} catch (Throwable e) {
+		} catch (IOException e) {
 			log.error(e.getMessage());
 			return 1;
 		}

@@ -2,6 +2,7 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -122,13 +123,16 @@ public class SessionsDataServlet extends AbstractDataServlet {
 
 		writer.print(showSid ? session.getSid() : "--");
 		writer.print(",");
-		if (showSid)
+
+		if (showSid) {
 			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
 				writer.print(I18N.message("opened", locale));
 			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
 				writer.print(I18N.message("closed", locale));
 			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_EXPIRED)
 				writer.print(I18N.message("expired", locale));
+		}
+
 		writer.print(",");
 		if (showSid)
 			writer.print(session.getUsername());
@@ -140,11 +144,14 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print(",");
 		writer.print(df.format((Date) session.getCreation()));
 		writer.print(",");
-		if (showSid)
+
+		if (showSid) {
 			if (SessionManager.get().get(session.getSid()) != null)
 				writer.print(SessionManager.get().get(session.getSid()).getLastRenew());
 			else
 				writer.print(df.format((Date) session.getLastRenew()));
+		}
+
 		writer.print(",");
 		if (showSid)
 			writer.print(session.getNode());
@@ -169,8 +176,9 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		}
 		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
 		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
-		writer.print("<client><![CDATA[" + (showSid ? (session.getClient() != null ? session.getClient() : "") : "")
-				+ "]]></client>");
+
+		final Serializable client = session.getClient() != null ? session.getClient() : "";
+		writer.print("<client><![CDATA[" + (showSid ? client : "") + "]]></client>");
 		writer.print("<tenant><![CDATA[" + session.getTenantName() + "]]></tenant>");
 		writer.print("<created>" + df.format((Date) session.getCreation()) + "</created>");
 		if (SessionManager.get().get(session.getSid()) != null)

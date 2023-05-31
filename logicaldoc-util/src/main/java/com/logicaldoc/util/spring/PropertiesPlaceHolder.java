@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
@@ -54,8 +55,8 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 
 			// Load the database driver
 			Class.forName(conf.getProperty("jdbc.driver"));
-		} catch (Throwable se) {
-			log.error(se.getMessage());
+		} catch (ClassNotFoundException | IOException e) {
+			log.error(e.getMessage());
 			return null;
 		}
 
@@ -76,9 +77,9 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 					return null;
 				}
 			}
-		} catch (Throwable se) {
-			log.error(se.getMessage());
+		} catch (SQLException e) {
+			log.error(e.getMessage());
 			return null;
-		}
+		} 
 	}
 }

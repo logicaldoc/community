@@ -126,10 +126,11 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		try {
 			Map<String, Attribute> attributes = aDAO.findAttributes(tDAO.findByName(tenantName).getId(), null);
 			List<GUIAttribute> guiAttributes = new ArrayList<>();
-			for (String name : attributes.keySet()) {
-				Attribute att = attributes.get(name);
+
+			for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
+				Attribute att = entry.getValue();
 				GUIAttribute guiAtt = new GUIAttribute();
-				guiAtt.setName(name);
+				guiAtt.setName(entry.getKey());
 				guiAtt.setStringValue(att.getStringValue());
 				guiAtt.setBooleanValue(att.getBooleanValue());
 				guiAtt.setDoubleValue(att.getDoubleValue());

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -128,7 +129,7 @@ public class XMLBean {
 	private void buildFromFileUrl(SAXBuilder builder) {
 		try {
 			doc = builder.build("file://" + docPath);
-		} catch (Throwable t2) {
+		} catch (Exception t2) {
 			log.error(t2.getMessage());
 		}
 	}
@@ -392,10 +393,9 @@ public class XMLBean {
 	 * 
 	 * @return Childrenlist
 	 */
-	@SuppressWarnings("rawtypes")
-	public List getRootChild() {
+	public List<Element> getRootChild() {
 		if (doc == null) {
-			return null;
+			return new ArrayList<>();
 		} else {
 			return root.getChildren();
 		}
@@ -405,13 +405,12 @@ public class XMLBean {
 	 * Returns a list of all attributes from an element.
 	 * 
 	 * @param elem Name of the element.
+	 * 
 	 * @return Attributelist
 	 */
-	@SuppressWarnings("rawtypes")
-	public List getAllAttribute(Element elem) {
-
+	public List<Attribute> getAllAttribute(Element elem) {
 		if (doc == null) {
-			return null;
+			return new ArrayList<>();
 		} else {
 			return elem.getAttributes();
 		}
@@ -424,10 +423,9 @@ public class XMLBean {
 	 * 
 	 * @return list of the children elements
 	 */
-	@SuppressWarnings("rawtypes")
-	public List getAllChildren(String elemname) {
+	public List<Element> getAllChildren(String elemname) {
 		if (doc == null) {
-			return null;
+			return new ArrayList<>();
 		} else {
 			return root.getChildren(elemname);
 		}
@@ -443,15 +441,11 @@ public class XMLBean {
 	 * 
 	 * @return the list of children
 	 */
-	@SuppressWarnings("rawtypes")
-	public List getAllChildren(String elemname, String attribute, String value) {
+	public List<Element> getAllChildren(String elemname, String attribute, String value) {
 		List<Element> list = new LinkedList<>();
-		List elems = root.getChildren(elemname);
-		Iterator iter = elems.iterator();
+		List<Element> elems = root.getChildren(elemname);
 
-		while (iter.hasNext()) {
-			Element elem = (Element) iter.next();
-
+		for (Element elem : elems) {
 			try {
 				String val = elem.getAttributeValue(attribute);
 

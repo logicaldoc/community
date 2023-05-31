@@ -83,7 +83,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 *        version
 	 * @param types collection of annotation types
 	 */
-	public AbstractAnnotationsWindow(GUIDocument document, String fileVersion, Collection<String> types) {
+	protected AbstractAnnotationsWindow(GUIDocument document, String fileVersion, Collection<String> types) {
 		super();
 		this.document = document;
 		this.fileVersion = fileVersion;

@@ -755,9 +755,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return 0;
 
 		try {
-			Query queryObject = prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression,
-					parameters, null);
-			return queryObject.executeUpdate();
+			return prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression,
+					parameters, null).executeUpdate();
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}

@@ -181,11 +181,13 @@ public class IndexerTask extends Task {
 		} finally {
 			killIndexerThreads();
 
-			log.info("Indexing finished");
-			log.info("Indexing time: {}", TimeDiff.printDuration(indexingTime));
-			log.info("Parsing time: {}", TimeDiff.printDuration(parsingTime));
-			log.info("Indexed documents: {}", indexed);
-			log.info("Errors: {}", errors);
+			if (log.isInfoEnabled()) {
+				log.info("Indexing finished");
+				log.info("Indexing time: {}", TimeDiff.printDuration(indexingTime));
+				log.info("Parsing time: {}", TimeDiff.printDuration(parsingTime));
+				log.info("Indexed documents: {}", indexed);
+				log.info("Errors: {}", errors);
+			}
 
 			indexer.unlock();
 
@@ -203,7 +205,8 @@ public class IndexerTask extends Task {
 
 			// Last step done
 			next();
-			log.info("Documents released from transaction {}", transactionId);
+			if (log.isInfoEnabled())
+				log.info("Documents released from transaction {}", transactionId);
 		}
 	}
 
@@ -273,7 +276,7 @@ public class IndexerTask extends Task {
 
 		// Determine the sorting
 		String sorting = config.getProperty("index.sorting");
-		if (StringUtils.isNotEmpty(sorting))
+		if (StringUtils.isNotEmpty(sorting)) {
 			if ("oldestfirst".equals(sorting))
 				sorting = PersistentObjectDAO.ENTITY + ".date asc";
 			else if ("mostrecentfirst".equals(sorting))
@@ -282,6 +285,7 @@ public class IndexerTask extends Task {
 				sorting = PersistentObjectDAO.ENTITY + ".fileSize asc";
 			else
 				sorting = PersistentObjectDAO.ENTITY + ".fileSize desc";
+		}
 
 		// This hidden setting overrides the default sorting policy(some really
 		// demanding users may need this optimization).

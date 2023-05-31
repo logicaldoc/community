@@ -124,11 +124,6 @@ public class PDFImageExtractor {
 					image.getSuffix());
 		}
 
-		// Clear references
-		image = null;
-		images = null;
-		resources = null;
-
 		return image2;
 	}
 

@@ -311,14 +311,13 @@ public class ParametricForm extends VLayout {
 
 		String fieldName = criterion.getField();
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
-				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER))
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
 			fieldValue = Long.parseLong(fieldValue.toString());
-		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE))
+		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
 			fieldValue = Double.parseDouble(fieldValue.toString());
-		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN))
+		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {
 			fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
-		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DATE))
-			fieldValue = (Date) fieldValue;
+		}
 
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
 			criterion.setField(

@@ -588,7 +588,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throws PersistenceException {
 		documentDAO.initialize(document);
 		if (document.getImmutable() == 0
-				|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
+				|| (document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 			DocumentHistory renameTransaction = checkDocumentRenamed(document, docVO, transaction);
 
 			// Check CustomId uniqueness
@@ -724,7 +724,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			return;
 
 		if (doc.getImmutable() == 0
-				|| ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
+				|| (doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 
 			/*
 			 * Better to synchronize this block because under high
@@ -1068,7 +1068,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Document document = documentDAO.findById(docId);
 
 			if (document.getImmutable() == 0
-					|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
+					|| (document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 				documentDAO.initialize(document);
 				document.setFileName(newName.trim());
 				String extension = FileUtil.getExtension(newName.trim());

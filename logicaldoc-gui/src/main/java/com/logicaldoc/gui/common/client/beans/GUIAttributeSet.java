@@ -53,7 +53,7 @@ public class GUIAttributeSet implements Serializable {
 
 	public GUIAttribute[] getAttributesOrderedByPosition() {
 		if (attributes == null)
-			return null;
+			return new GUIAttribute[0];
 
 		Arrays.sort(attributes, (arg0, arg1) -> {
 			return Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition()));

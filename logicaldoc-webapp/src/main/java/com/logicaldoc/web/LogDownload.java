@@ -79,8 +79,8 @@ public class LogDownload extends HttpServlet {
 				return;
 
 			downloadLogFile(response, appender, file);
-		} catch (Throwable ex) {
-			log.warn(ex.getMessage(), ex);
+		} catch (IOException e) {
+			log.warn(e.getMessage(), e);
 		}
 	}
 
@@ -115,8 +115,7 @@ public class LogDownload extends HttpServlet {
 	 * 
 	 * @throws IOException error creting a temporary file
 	 */
-	private File prepareAllSupportResources()
-			throws IOException {
+	private File prepareAllSupportResources() throws IOException {
 		File tmp = FileUtil.createTempFile("logs", ".zip");
 
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
@@ -170,8 +169,6 @@ public class LogDownload extends HttpServlet {
 			writeTomcatLogs(out, webappDescriptor);
 
 			prop.store(new FileOutputStream(buf), "Support Request");
-		} catch (Throwable ex) {
-			log.error(ex.getMessage(), ex);
 		}
 
 		return tmp;

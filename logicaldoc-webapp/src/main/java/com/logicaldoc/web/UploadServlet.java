@@ -128,7 +128,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			}
 			return uploadedFiles;
 		} else
-			return null;
+			return new HashMap<>();
 	}
 
 	/**
@@ -157,8 +157,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	public static void cleanReceivedFiles(String sid) {
 		FileUtil.strongDelete(getUploadDir(sid));
 		Map<String, File> receivedFiles = getReceivedFiles(sid);
-		if (receivedFiles != null)
-			receivedFiles.clear();
+		receivedFiles.clear();
 	}
 
 	/**
@@ -177,7 +176,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 		if (session == null) {
 			// No SID already associated to the current session, so do it
-			session = request.getSession(true);
+			request.getSession(true);
 			if (sid != null)
 				LDSecurityContextRepository.bindServletSession(sid, request);
 		}

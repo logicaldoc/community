@@ -293,9 +293,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void export() {
-		if (listingPanel instanceof DocumentsListPanel)
-			if (((DocumentsListPanel) listingPanel).getGrid() instanceof DocumentsListGrid)
-				GridUtil.exportCSV((DocumentsListGrid) ((DocumentsListPanel) listingPanel).getGrid(), false);
+		if (listingPanel instanceof DocumentsListPanel
+				&& ((DocumentsListPanel) listingPanel).getGrid() instanceof DocumentsListGrid)
+			GridUtil.exportCSV((DocumentsListGrid) ((DocumentsListPanel) listingPanel).getGrid(), false);
 	}
 
 	public GUIDocument getSelectedDocument() {
@@ -344,11 +344,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	@Override
 	public void onDocumentCancelEditing(GUIDocument document) {
 		DocumentsGrid grid = getDocumentsGrid();
-		if (grid.getSelectedDocument().getId() == document.getId()) {
+		if (grid.getSelectedDocument().getId() == document.getId()
+				|| (document.getDocRef() != null && grid.getSelectedDocument().getId() == document.getDocRef()))
 			enableAll();
-		} else if (document.getDocRef() != null && grid.getSelectedDocument().getId() == document.getDocRef()) {
-			enableAll();
-		}
 	}
 
 	private void enableAll() {
@@ -368,9 +366,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		if (!MainPanel.get().isOnDocumentsTab())
 			return;
 
-		if (folder.getFoldRef() != null && folder.getFoldRef() != document.getFolder().getId())
-			return;
-		else if (folder.getFoldRef() == null && folder.getId() != document.getFolder().getId())
+		if ((folder.getFoldRef() != null && folder.getFoldRef() != document.getFolder().getId())
+				|| (folder.getFoldRef() == null && folder.getId() != document.getFolder().getId()))
 			return;
 
 		if (detailPanel != null && !(detailPanel instanceof DocumentDetailsPanel)) {

@@ -19,7 +19,7 @@ public abstract class AdminPanel extends VLayout {
 
 	protected Tab tab = new Tab();
 	
-	public AdminPanel(String title) {
+	protected AdminPanel(String title) {
 		setWidth100();
 		setMembersMargin(5);
 		setMargin(5);

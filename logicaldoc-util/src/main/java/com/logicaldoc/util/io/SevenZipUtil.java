@@ -40,8 +40,8 @@ public class SevenZipUtil {
 			SevenZArchiveEntry entry;
 			while ((entry = archiveFile.getNextEntry()) != null)
 				entries.add(entry.getName());
-		} catch (Throwable r) {
-			throw new IOException(r.getMessage(), r);
+		} catch (IOException e) {
+			throw new IOException(e.getMessage(), e);
 		}
 
 		return entries;
@@ -70,8 +70,6 @@ public class SevenZipUtil {
 					break;
 				}
 			}
-		} catch (Throwable r) {
-			throw new IOException(r.getMessage(), r);
 		}
 	}
 }

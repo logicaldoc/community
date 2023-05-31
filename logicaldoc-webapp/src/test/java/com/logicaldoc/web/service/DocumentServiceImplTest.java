@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.java.plugin.JpfException;
 import org.junit.After;
@@ -424,7 +426,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		service.enforceFilesIntoFolderStorage(1200);
 
-		Thread.sleep(3000);
+		waiting();
 
 		File movedFile = new File(repositoryDir + "/docs2/5/doc/1.0");
 		Assert.assertTrue(movedFile.exists());
@@ -522,7 +524,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 		Assert.assertEquals(4, createdDocs.length);
 
-		Thread.sleep(3000);
+		waiting();
 
 		service.cleanUploadedFileFolder();
 		prepareUploadedFiles();
@@ -565,7 +567,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		// Try with a user without permissions
 		prepareUploadedFiles();
-		
+
 		doc = service.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);
@@ -573,7 +575,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setFolder(new FolderServiceImpl().getFolder(1201, false, false, false));
 		prepareSession("boss", "admin");
 		prepareUploadedFiles();
-		
+
 		createdDocs = service.addDocuments(true, UTF_8, false, doc);
 		Assert.assertEquals(0, createdDocs.length);
 
@@ -1249,9 +1251,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	@Test
 	public void testBulkUpdate() throws ParseException, PersistenceException, ServerException {
 
-		GUIDocument doc4=service.getById(4L);
+		GUIDocument doc4 = service.getById(4L);
 		assertNull(doc4.getAttribute("attr1"));
-		
+
 		long[] ids = new long[] { 4 };
 		GUIDocument vo = new GUIDocument();
 		vo.setPublished(1);
@@ -1359,4 +1361,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		}
 	}
 
+	private void waiting() throws InterruptedException {
+		final int secondsToWait = 5;
+		CountDownLatch lock = new CountDownLatch(1);
+		lock.await(secondsToWait, TimeUnit.SECONDS);
+	}
 }

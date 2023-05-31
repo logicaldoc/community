@@ -143,18 +143,17 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			tabSet.addTab(aliasesTab);
 
 		automationTab = new Tab(I18N.message("automation"));
-		if (folder.hasPermission(Constants.PERMISSION_AUTOMATION))
-			if (Feature.visible(Feature.AUTOMATION)) {
-				if (Feature.enabled(Feature.AUTOMATION)) {
-					automationTabPanel = new HLayout();
-					automationTabPanel.setWidth100();
-					automationTabPanel.setHeight100();
-				} else {
-					automationTabPanel = new FeatureDisabled();
-				}
-				automationTab.setPane(automationTabPanel);
-				tabSet.addTab(automationTab);
+		if (folder.hasPermission(Constants.PERMISSION_AUTOMATION) && Feature.visible(Feature.AUTOMATION)) {
+			if (Feature.enabled(Feature.AUTOMATION)) {
+				automationTabPanel = new HLayout();
+				automationTabPanel.setWidth100();
+				automationTabPanel.setHeight100();
+			} else {
+				automationTabPanel = new FeatureDisabled();
 			}
+			automationTab.setPane(automationTabPanel);
+			tabSet.addTab(automationTab);
+		}
 
 		if (Menu.enabled(Menu.FOLDER_INTERFACE)) {
 			interfaceTab = new Tab(I18N.message("userinterface"));
@@ -181,18 +180,18 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	private void prepareQuotaTab(GUIFolder folder) {
 		try {
 			quotaTab = new Tab(I18N.message("quota"));
-			if (folder.isWorkspace() && folder.hasPermission(Constants.PERMISSION_WRITE))
-				if (Feature.visible(Feature.QUOTAS)) {
-					if (Feature.enabled(Feature.QUOTAS)) {
-						quotaTabPanel = new HLayout();
-						quotaTabPanel.setWidth100();
-						quotaTabPanel.setHeight100();
-					} else {
-						quotaTabPanel = new FeatureDisabled();
-					}
-					quotaTab.setPane(quotaTabPanel);
-					tabSet.addTab(quotaTab);
+			if (folder.isWorkspace() && folder.hasPermission(Constants.PERMISSION_WRITE)
+					&& Feature.visible(Feature.QUOTAS)) {
+				if (Feature.enabled(Feature.QUOTAS)) {
+					quotaTabPanel = new HLayout();
+					quotaTabPanel.setWidth100();
+					quotaTabPanel.setHeight100();
+				} else {
+					quotaTabPanel = new FeatureDisabled();
 				}
+				quotaTab.setPane(quotaTabPanel);
+				tabSet.addTab(quotaTab);
+			}
 		} catch (Exception t) {
 			// Nothing to do
 		}
@@ -200,34 +199,32 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private void prepareSubscriptionsTab(GUIFolder folder) {
 		subscriptionsTab = new Tab(I18N.message("subscriptions"));
-		if (folder.hasPermission(Constants.PERMISSION_SUBSCRIPTION))
-			if (Feature.visible(Feature.AUDIT)) {
-				if (Feature.enabled(Feature.AUDIT)) {
-					subscriptionsTabPanel = new HLayout();
-					subscriptionsTabPanel.setWidth100();
-					subscriptionsTabPanel.setHeight100();
-				} else {
-					subscriptionsTabPanel = new FeatureDisabled();
-				}
-				subscriptionsTab.setPane(subscriptionsTabPanel);
-				tabSet.addTab(subscriptionsTab);
+		if (folder.hasPermission(Constants.PERMISSION_SUBSCRIPTION) && Feature.visible(Feature.AUDIT)) {
+			if (Feature.enabled(Feature.AUDIT)) {
+				subscriptionsTabPanel = new HLayout();
+				subscriptionsTabPanel.setWidth100();
+				subscriptionsTabPanel.setHeight100();
+			} else {
+				subscriptionsTabPanel = new FeatureDisabled();
 			}
+			subscriptionsTab.setPane(subscriptionsTabPanel);
+			tabSet.addTab(subscriptionsTab);
+		}
 	}
 
 	private void prepareWorkflowTab(GUIFolder folder) {
 		workflowTab = new Tab(I18N.message("workflow"));
-		if (folder.hasPermission(Constants.PERMISSION_WORKFLOW))
-			if (Feature.visible(Feature.WORKFLOW)) {
-				if (Feature.enabled(Feature.WORKFLOW)) {
-					workflowsTabPanel = new HLayout();
-					workflowsTabPanel.setWidth100();
-					workflowsTabPanel.setHeight100();
-				} else {
-					workflowsTabPanel = new FeatureDisabled();
-				}
-				workflowTab.setPane(workflowsTabPanel);
-				tabSet.addTab(workflowTab);
+		if (folder.hasPermission(Constants.PERMISSION_WORKFLOW) && Feature.visible(Feature.WORKFLOW)) {
+			if (Feature.enabled(Feature.WORKFLOW)) {
+				workflowsTabPanel = new HLayout();
+				workflowsTabPanel.setWidth100();
+				workflowsTabPanel.setHeight100();
+			} else {
+				workflowsTabPanel = new FeatureDisabled();
 			}
+			workflowTab.setPane(workflowsTabPanel);
+			tabSet.addTab(workflowTab);
+		}
 	}
 
 	private void prepareTabSet() {
@@ -293,8 +290,8 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			addInterfaceTab(changeHandler);
 
 			addCapturePanel(changeHandler);
-		} catch (Throwable r) {
-			GuiLog.error(r.getMessage(), null, r);
+		} catch (Exception e) {
+			GuiLog.error(e.getMessage(), null, e);
 		}
 	}
 

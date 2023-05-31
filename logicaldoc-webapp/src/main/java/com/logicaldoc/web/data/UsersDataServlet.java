@@ -93,8 +93,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		if (user.getUserGroup() != null)
 			writer.print("<usergroup><![CDATA[" + user.getUserGroup().getId() + "]]></usergroup>");
 
-		String[] groups = user.getGroupNames();
-		groups = Arrays.stream(user.getGroupNames()).filter(g -> !g.startsWith("_user_")).toArray(String[]::new);
+		String[] groups = Arrays.stream(user.getGroupNames()).filter(g -> !g.startsWith("_user_")).toArray(String[]::new);
 		writer.print("<groups><![CDATA[" + StringUtil.arrayToString(groups, ", ") + "]]></groups>");
 		writer.print("<avatar>" + user.getId() + "</avatar>");
 

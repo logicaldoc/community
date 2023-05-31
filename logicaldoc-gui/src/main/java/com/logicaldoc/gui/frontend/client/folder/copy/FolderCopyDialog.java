@@ -30,6 +30,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  */
 public class FolderCopyDialog extends Dialog {
 	private static final String FOLDERS_ONLY = "foldersOnly";
+
 	private static final String SECURITY = "security";
 
 	public FolderCopyDialog() {
@@ -118,18 +119,15 @@ public class FolderCopyDialog extends Dialog {
 
 	private void copyMultipleFolders(TreeGrid folders, long[] selectedSourceIds, final boolean securityOptionEnabled,
 			final DynamicForm form, long tagetFolderId) {
-		String label = FolderNavigator.get().getSelectedRecord().getAttributeAsString("name");
-		label = selectedSourceIds.length + " " + I18N.message("folders").toLowerCase();
+		String label = selectedSourceIds.length + " " + I18N.message("folders").toLowerCase();
 
 		LD.ask(I18N.message("copy"),
 				I18N.message("copyask",
 						new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
 				(Boolean yes) -> {
 					if (Boolean.TRUE.equals(yes)) {
-						FolderNavigator.get().copyTo(tagetFolderId,
-								"true".equals(form.getValueAsString(FOLDERS_ONLY)),
-								!securityOptionEnabled ? "inheritparentsec"
-										: form.getValueAsString(SECURITY));
+						FolderNavigator.get().copyTo(tagetFolderId, "true".equals(form.getValueAsString(FOLDERS_ONLY)),
+								!securityOptionEnabled ? "inheritparentsec" : form.getValueAsString(SECURITY));
 						hide();
 						destroy();
 					}
@@ -137,26 +135,24 @@ public class FolderCopyDialog extends Dialog {
 	}
 
 	private void copySingleFolder(long selectedSourceId, final DynamicForm form, long tagetFolderId) {
-		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false,
-				new AsyncCallback<GUIFolder>() {
+		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new AsyncCallback<GUIFolder>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIFolder sourceFolder) {
-						sourceFolder.setName(form.getValueAsString("name"));
-						sourceFolder.setPermissions(new String[] { "read", "write" });
+			@Override
+			public void onSuccess(GUIFolder sourceFolder) {
+				sourceFolder.setName(form.getValueAsString("name"));
+				sourceFolder.setPermissions(new String[] { "read", "write" });
 
-						FolderCopyDetailsDialog dialog = new FolderCopyDetailsDialog(sourceFolder,
-								tagetFolderId, form.getValueAsString(SECURITY),
-								"true".equals(form.getValueAsString(FOLDERS_ONLY)));
-						dialog.show();
-						hide();
-						destroy();
-					}
-				});
+				FolderCopyDetailsDialog dialog = new FolderCopyDetailsDialog(sourceFolder, tagetFolderId,
+						form.getValueAsString(SECURITY), "true".equals(form.getValueAsString(FOLDERS_ONLY)));
+				dialog.show();
+				hide();
+				destroy();
+			}
+		});
 	}
 }

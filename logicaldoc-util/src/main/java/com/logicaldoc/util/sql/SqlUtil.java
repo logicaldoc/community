@@ -8,6 +8,9 @@ package com.logicaldoc.util.sql;
  */
 public class SqlUtil {
 
+	private SqlUtil() {
+	}
+
 	/**
 	 * Double the quotes in a string. This means that each character ' will be
 	 * replaced with '' (two quote characters)
@@ -36,11 +39,5 @@ public class SqlUtil {
 
 	public static String doubleQuotesAndBackslashes(String input) {
 		return doubleBackslashes(doubleQuotes(input));
-	}
-
-	public void initialize(int[] vector, int index) {
-		vector[index] = 0;
-		if (index < vector.length)
-			initialize(vector, index++);
 	}
 }

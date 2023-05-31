@@ -269,20 +269,20 @@ public abstract class FolderSearchForm extends VLayout {
 
 		if (fieldName.startsWith("_"))
 			fieldName = fieldName.substring(1);
+		
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
-				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER))
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
 			fieldValue = Long.parseLong(fieldValue.toString());
-		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE))
+		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
 			fieldValue = Double.parseDouble(fieldValue.toString());
-		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN))
+		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {
 			fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
-		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DATE))
-			fieldValue = (Date) fieldValue;
-		else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
+		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
 			fieldName = fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_PRESET, TYPE + GUIAttribute.TYPE_STRING);
 		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA)) {
 			fieldName = fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA, TYPE + GUIAttribute.TYPE_STRING);
 		}
+		
 		criterion.setField(fieldName);
 
 		setCriterionValue(criterion, fieldValue);

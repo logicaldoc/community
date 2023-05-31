@@ -190,15 +190,15 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 				loadFoldersTree(folder.getId(), folder.getName() + "/", user.getId(), folders);
 			}
-			for (Long folderId : folders.keySet()) {
-				List<Document> folderDocs = docDao.findByFolder(folderId, null);
+
+			for (Map.Entry<Long, String> entr : folders.entrySet()) {
+				List<Document> folderDocs = docDao.findByFolder(entr.getKey(), null);
 				for (Document doc : folderDocs)
-					documents.put(doc.getId(), folders.get(folderId) + doc.getFileName());
+					documents.put(doc.getId(), entr.getValue() + doc.getFileName());
 			}
 
-			for (Long docId : documents.keySet()) {
-				uploadDocument(docId, targetPath + documents.get(docId), dbox, session);
-			}
+			for (Map.Entry<Long, String> entr : documents.entrySet())
+				uploadDocument(entr.getKey(), targetPath + entr.getValue(), dbox, session);
 
 			return true;
 		} catch (Exception t) {
@@ -312,8 +312,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				FolderHistory transaction = new FolderHistory();
 				transaction.setSession(session);
 
-				String folderPath = file.getPathDisplay().substring(rootPath.length());
-				folderPath = FileUtil.getPath(file.getPathDisplay());
+				String folderPath = FileUtil.getPath(file.getPathDisplay());
 				folderPath = folderPath.replace("\\\\", "/");
 
 				Folder folder = fdao.createPath(root, folderPath, true, transaction);

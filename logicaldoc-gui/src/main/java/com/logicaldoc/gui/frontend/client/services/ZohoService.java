@@ -103,17 +103,17 @@ public interface ZohoService extends RemoteService {
 	public GUIDocument checkin(long docId, String comment, boolean major) throws ServerException;
 
 	public static class Instance {
-		private static ZohoServiceAsync instance;
+		private static ZohoServiceAsync inst;
 
 		private Instance() {
 		}
 		
 		public static ZohoServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ZohoService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ZohoService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

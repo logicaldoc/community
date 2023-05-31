@@ -118,12 +118,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		FolderController.get().addObserver(this);
 
 		addDragStartHandler(event -> {
-			if (EventHandler.getDragTarget() instanceof FolderNavigator) {
-				// Workspaces cannot be moved
-				if ("1".equals(getDragData()[0].getAttributeAsString("type"))) {
-					event.cancel();
-					return;
-				}
+			// Workspaces cannot be moved
+			if (EventHandler.getDragTarget() instanceof FolderNavigator
+					&& "1".equals(getDragData()[0].getAttributeAsString("type"))) {
+				event.cancel();
+				return;
 			}
 		});
 
@@ -144,8 +143,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		});
 
 		// Used to expand root folder after login or to open in folder
-		addDataArrivedHandler(
-				(DataArrivedEvent dataArrivedEvent) -> FolderNavigator.this.handleDataArrived());
+		addDataArrivedHandler((DataArrivedEvent dataArrivedEvent) -> FolderNavigator.this.handleDataArrived());
 
 		FolderCursor.get().registerMaxChangedHandler(event -> reloadChildren());
 
@@ -721,10 +719,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			@Override
 			public void onSuccess(Long count) {
 				LD.clearPrompt();
-				LD.ask(I18N.message("question"), count.longValue() == 0L
-						? (I18N.message(selectedIds.length == 1 ? "confirmdeletefolder" : "confirmdeletefolders"))
-						: (I18N.message(selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
-								: "confirmdeletefoldersarchdocs")),
+				final String folderMessage = selectedIds.length == 1 ? "confirmdeletefolder" : "confirmdeletefolders";
+				final String documentMessage = selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
+						: "confirmdeletefoldersarchdocs";
+				LD.ask(I18N.message("question"),
+						count.longValue() == 0L ? (I18N.message(folderMessage)) : (I18N.message(documentMessage)),
 						yes -> {
 							if (Boolean.TRUE.equals(yes)) {
 								LD.contactingServer();
@@ -1444,10 +1443,9 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			return;
 
 		TreeNode parent = getTree().getParent(node);
-		if (parent.getAttributeAsLong(FOLDER_ID) != null) {
-			if (folder.getId() == FolderController.get().getCurrentFolder().getId())
-				selectFolder(parent.getAttributeAsLong(FOLDER_ID));
-		}
+		if (parent.getAttributeAsLong(FOLDER_ID) != null
+				&& folder.getId() == FolderController.get().getCurrentFolder().getId())
+			selectFolder(parent.getAttributeAsLong(FOLDER_ID));
 
 		getTree().remove(node);
 		getTree().reloadChildren(parent);

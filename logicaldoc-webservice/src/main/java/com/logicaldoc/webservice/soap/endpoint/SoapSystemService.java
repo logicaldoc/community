@@ -185,16 +185,16 @@ public class SoapSystemService extends AbstractService implements SystemService 
 		List<String> langs = new ArrayList<>();
 
 		String t = Tenant.DEFAULT_NAME;
-		if (tenantOrSid != null)
+		if (tenantOrSid != null) {
 			if (SessionManager.get().get(tenantOrSid) != null)
 				t = SessionManager.get().get(tenantOrSid).getTenantName();
 			else
 				t = tenantOrSid;
+		}
 
 		try {
-			for (Language lang : LanguageManager.getInstance().getActiveLanguages(t)) {
+			for (Language lang : LanguageManager.getInstance().getActiveLanguages(t))
 				langs.add(lang.getLocale().toString());
-			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

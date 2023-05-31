@@ -201,21 +201,13 @@ public class GUILDAPServer implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	public boolean isAnon() {
-		return anon;
-	}
-
+	
 	public String getUserNodes() {
 		return userNodes;
 	}
 
 	public String getGroupNodes() {
 		return groupNodes;
-	}
-
-	public void setAnon(boolean anon) {
-		this.anon = anon;
 	}
 
 	public void setUserNodes(String userNodes) {

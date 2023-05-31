@@ -136,7 +136,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	private static void registerDriver(Driver driver) {
 		try {
 			DriverManager.deregisterDriver(driver);
-			log.warn(String.format("Driver %s unregistered", driver.getClass().getName()));
+			if (log.isWarnEnabled())
+				log.warn(String.format("Driver %s unregistered", driver.getClass().getName()));
 		} catch (SQLException ex) {
 			log.warn(String.format("Error unregistering driver %s", driver), ex);
 		}

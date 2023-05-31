@@ -30,13 +30,11 @@ public class SimpleSerializationPolicy extends SerializationPolicy {
 	}
 
 	private boolean isSerializable(Class<?> clazz) {
-		if (clazz != null) {
-			if (clazz.isPrimitive() || Serializable.class.isAssignableFrom(clazz)
-					|| IsSerializable.class.isAssignableFrom(clazz)) {
-				return true;
-			}
-		}
-		return false;
+		if (clazz != null && (clazz.isPrimitive() || Serializable.class.isAssignableFrom(clazz)
+				|| IsSerializable.class.isAssignableFrom(clazz)))
+			return true;
+		else
+			return false;
 	}
 
 	@Override

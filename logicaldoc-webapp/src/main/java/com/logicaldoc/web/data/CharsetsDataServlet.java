@@ -23,8 +23,8 @@ public class CharsetsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+			Locale locale) throws PersistenceException, IOException {
 
 		PrintWriter writer = response.getWriter();
 		writer.print("<list>");
@@ -33,11 +33,10 @@ public class CharsetsDataServlet extends AbstractDataServlet {
 		writer.print("<name>auto</name>");
 		writer.print("</charset>");
 		Map<String, Charset> charsets = Charset.availableCharsets();
-		for (String name : charsets.keySet()) {
+		for (Map.Entry<String, Charset> entry : charsets.entrySet()) {
 			writer.print("<charset>");
-			writer.print("<code><![CDATA[" + name + "]]></code>");
-			writer.print(
-					"<name><![CDATA[" + charsets.get(name).displayName(locale) + "]]></name>");
+			writer.print("<code><![CDATA[" + entry.getKey() + "]]></code>");
+			writer.print("<name><![CDATA[" + entry.getValue().displayName(locale) + "]]></name>");
 			writer.print("</charset>");
 		}
 

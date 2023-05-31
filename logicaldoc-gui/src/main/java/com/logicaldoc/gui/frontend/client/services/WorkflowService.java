@@ -272,17 +272,17 @@ public interface WorkflowService extends RemoteService {
 	public void deleteNote(long noteId) throws ServerException;
 
 	public static class Instance {
-		private static WorkflowServiceAsync instance;
+		private static WorkflowServiceAsync inst;
 
 		private Instance() {
 		}
 		
 		public static WorkflowServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(WorkflowService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(WorkflowService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

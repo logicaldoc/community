@@ -1064,9 +1064,9 @@ public abstract class Util {
 
 	public static void waitForUpAndRunning(String tenant, String locale) {
 		final String url = Util.getJavascriptVariable("j_loginurl") + "?tenant=" + tenant + AND_LOCALE_EQUAL + locale;
-		
+
 		LD.contactingServer();
-		
+
 		RequestBuilder checkRequest = new RequestBuilder(RequestBuilder.HEAD, url);
 		checkRequest.setCallback(new RequestCallback() {
 			@Override
@@ -1171,9 +1171,7 @@ public abstract class Util {
 
 	public static String getParameterValue(GUIParameter[] params, String name) {
 		for (GUIParameter param : params) {
-			if (param.getName().equals(Session.get().getTenantName() + "." + name))
-				return param.getValue();
-			else if (param.getName().equals(name))
+			if (param.getName().equals(Session.get().getTenantName() + "." + name) || param.getName().equals(name))
 				return param.getValue();
 		}
 		return null;

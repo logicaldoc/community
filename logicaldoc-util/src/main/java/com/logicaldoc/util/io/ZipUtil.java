@@ -314,7 +314,7 @@ public class ZipUtil {
 			return baos.toByteArray();
 		} catch (Exception e) {
 			logError(e.getMessage());
-			return null;
+			return new byte[0];
 		} finally {
 			try {
 				if (entryStream != null)

@@ -84,8 +84,9 @@ public class LongRunningOperationCompleteListener implements ThreadCompleteListe
 						new Object[] { thread.getName(), TimeDiff.printDuration(thread.getElapsedTime()),
 								thread.getError().getMessage() }));
 				sysmess.setPrio(2);
-				log.error("Thread {} ended in error after {}", thread.getName(),
-						TimeDiff.printDuration(thread.getElapsedTime()), thread.getError());
+				if (log.isErrorEnabled())
+					log.error("Thread {} ended in error after {}", thread.getName(),
+							TimeDiff.printDuration(thread.getElapsedTime()), thread.getError());
 			}
 
 			sysmess.setSentDate(now);

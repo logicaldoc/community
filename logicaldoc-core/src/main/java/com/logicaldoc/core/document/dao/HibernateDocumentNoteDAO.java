@@ -77,17 +77,17 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	@Override
 	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types) {
 		try {
-			if (StringUtils.isEmpty(fileVersion))
-				if (types == null || types.isEmpty())
+			if (StringUtils.isEmpty(fileVersion)) {
+				if (types == null || types.isEmpty()) {
 					return findByWhere(ENTITY + ".docId = " + docId, null, null);
-				else {
+				} else {
 					Map<String, Object> params = new HashMap<>();
 					params.put(DOC_ID, docId);
 					params.put("types", types);
 
 					return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types)", params, null, null);
 				}
-			else if (types == null || types.isEmpty()) {
+			} else if (types == null || types.isEmpty()) {
 				Map<String, Object> params = new HashMap<>();
 				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);

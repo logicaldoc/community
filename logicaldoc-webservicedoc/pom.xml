@@ -214,7 +214,6 @@
                                 <delete dir="target/plugin" quiet="true" />
                                 <unzip src="target/${project.artifactId}-${project.version}-plugin.zip" dest="target/plugin" />
                                 <delete dir="target/${project.artifactId}-${project.version}-plugin.zip" />
-                                <!-- <delete> <fileset dir="target/plugin/WEB-INF/lib" includes="*logicaldoc*,*spring*,*velocity*,*geronimo*,*aopalliance*,*saaj*,ant*,hibernate*,ehcache*,jetty*,joda*" /> </delete> -->
                                 <copy file="target/${project.artifactId}-${project.version}.${project.packaging}" tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
                                 <zip destfile="target/${project.artifactId}-${project.version}-plugin2.zip" basedir="target/plugin" />
                                 <move file="target/${project.artifactId}-${project.version}-plugin2.zip" tofile="target/${project.artifactId}-${project.version}-plugin.zip" />

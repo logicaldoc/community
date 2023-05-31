@@ -261,8 +261,9 @@ public class Setup implements EntryPoint {
 		dbEngine.setVisible(false);
 		dbEngine.setName(DB_ENGINE);
 		LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
-		for (String engine : engines.keySet())
-			valueMap.put(engine, engines.get(engine)[0]);
+		for (Map.Entry<String, String[]> entry : engines.entrySet()) 
+			valueMap.put(entry.getKey(), entry.getValue()[0]);
+	
 		dbEngine.setValueMap(valueMap);
 		dbEngine.setValue(MYSQL);
 		dbEngine.setShowIfCondition((item, value, form) -> {

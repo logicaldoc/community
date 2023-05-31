@@ -97,7 +97,7 @@ public class StatChartServlet extends HttpServlet {
 			ServletUtil.downloadFile(request, response, chartFile, chart + ".png");
 		} catch (IOException ioe) {
 			log.error("Error generating the chart: {}", ioe.getMessage(), ioe);
-		} catch (Throwable ex) {
+		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 		} finally {
 			FileUtil.strongDelete(chartFile);

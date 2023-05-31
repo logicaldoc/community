@@ -244,13 +244,13 @@ public class WSUser {
 	/**
 	 * Sets the password and encode it
 	 * 
-	 * @param password The password in readable format
+	 * @param passwd The password in readable format
 	 */
-	public void setPassword(String password) {
-		decodedPassword = password;
-		if (org.apache.commons.lang.StringUtils.isNotEmpty(password)) {
-			password = CryptUtil.cryptString(password);
-		}
+	public void setPassword(String passwd) {
+		decodedPassword = passwd;
+		password=null;
+		if (org.apache.commons.lang.StringUtils.isNotEmpty(passwd))
+			password = CryptUtil.cryptString(passwd);
 	}
 
 	public void setName(String name) {

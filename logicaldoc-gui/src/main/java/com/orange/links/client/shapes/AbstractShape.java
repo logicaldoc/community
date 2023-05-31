@@ -1,6 +1,6 @@
 package com.orange.links.client.shapes;
 
-import com.google.gwt.user.client.Element;
+//import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.connection.Connection;
@@ -80,13 +80,13 @@ public abstract class AbstractShape implements Shape {
 		return containerOffsetTop;
 	}
 
-	private native int getScrollLeft(Element element)/*-{
-		return element.scrollLeft;
-	}-*/;
-
-	private native int getScrollTop(Element element)/*-{
-		return element.scrollTop;
-	}-*/;
+//	private native int getScrollLeft(Element element)/*-{
+//		return element.scrollLeft;
+//	}-*/;
+//
+//	private native int getScrollTop(Element element)/*-{
+//		return element.scrollTop;
+//	}-*/;
 
 	public int getWidth() {
 		if (offsetWidth < 0 || !sync) {

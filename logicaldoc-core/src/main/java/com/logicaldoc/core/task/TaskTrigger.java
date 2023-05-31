@@ -38,8 +38,6 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
 	private JobDetail jobDetail;
 
-	private String beanName;
-
 	private TaskTrigger() {
 		super();
 	}
@@ -78,7 +76,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
 	@Override
 	public void setBeanName(String beanName) {
-		this.beanName = beanName;
+		// Nothing to do
 	}
 
 	@Override

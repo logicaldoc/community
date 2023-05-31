@@ -30,9 +30,9 @@ public class CacheConfigurator {
 
 	private Element getCacheElement(String cacheName) {
 		// Search for the specified cache
-		List caches = xml.getRootElement().getChildren("cache", xml.getRootElement().getNamespace());
-		for (Iterator iterator = caches.iterator(); iterator.hasNext();) {
-			Element elem = (Element) iterator.next();
+		List<Element> caches = xml.getRootElement().getChildren("cache", xml.getRootElement().getNamespace());
+		for (Iterator<Element> iterator = caches.iterator(); iterator.hasNext();) {
+			Element elem = iterator.next();
 			String name = elem.getAttributeValue("name");
 			if (cacheName.equals(name))
 				return elem;
@@ -54,7 +54,7 @@ public class CacheConfigurator {
 		if (containsCache(cacheName))
 			return;
 
-		List children = xml.getRootElement().getChildren("defaultCache", xml.getRootElement().getNamespace());
+		List<Element> children = xml.getRootElement().getChildren("defaultCache", xml.getRootElement().getNamespace());
 		int index = xml.getRootElement().getChildren().indexOf(children.get(0));
 
 		// Prepare the new cache
@@ -70,8 +70,8 @@ public class CacheConfigurator {
 	}
 
 	public void setCacheDir(String path) {
-		List list = xml.getAllChildren("diskStore");
-		Element elem = (Element) list.iterator().next();
+		List<Element> list = xml.getAllChildren("diskStore");
+		Element elem = list.iterator().next();
 		elem.setAttribute("path", path);
 	}
 

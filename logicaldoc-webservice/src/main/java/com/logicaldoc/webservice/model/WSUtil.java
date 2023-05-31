@@ -313,7 +313,7 @@ public class WSUtil {
 			wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
 
 			// Populate extended attributes
-			WSAttribute[] attributes = new WSAttribute[0];
+			WSAttribute[] attributes;
 			if (attributeSet.getAttributes() != null && attributeSet.getAttributes().size() > 0) {
 				attributes = new WSAttribute[attributeSet.getAttributeNames().size()];
 				int i = 0;
@@ -451,7 +451,7 @@ public class WSUtil {
 			wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
 
 			// Populate extended attributes
-			WSAttribute[] attributes = new WSAttribute[0];
+			WSAttribute[] attributes;
 			if (template.getAttributes() != null && template.getAttributes().size() > 0) {
 				attributes = new WSAttribute[template.getAttributeNames().size()];
 				int i = 0;

@@ -443,7 +443,7 @@ public class StandardSearchEngine implements SearchEngine {
 			log.warn("unlock {}", e.getMessage());
 			try {
 				FileUtil.strongDelete(new File(getIndexDataFolder(), "write.lock"));
-			} catch (Throwable e1) {
+			} catch (IOException e1) {
 				log.warn("unlock {}", e1.getMessage());
 			}
 		}
@@ -641,7 +641,7 @@ public class StandardSearchEngine implements SearchEngine {
 			unlock();
 
 			log.info("The full-text search engine has been initialized");
-		} catch (Error | Exception e) {
+		} catch (Exception e) {
 			log.error("Unable to initialize the Full-text search engine", e);
 		}
 	}

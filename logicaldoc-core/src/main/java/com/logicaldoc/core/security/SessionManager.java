@@ -176,8 +176,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (session != null) {
 			session.setClosed();
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			log.warn("Killed session {} of user {} started at {}", sid, session.getUsername(),
-					df.format(session.getCreation()));
+			if (log.isWarnEnabled())
+				log.warn("Killed session {} of user {} started at {}", sid, session.getUsername(),
+						df.format(session.getCreation()));
 			storeSession(session);
 			for (SessionListener listener : listeners)
 				try {
@@ -469,11 +470,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		 * flag is activates
 		 */
 		String[] credentials = getBasicCredentials(req);
-		if (credentials != null && credentials[0] != null)
+		if (credentials.length > 0 && credentials[0] != null)
 			client.setUsername(credentials[0]);
-		if (credentials != null)
+		if (credentials.length > 1)
 			client.setId(String.format("%s-%s-%s", credentials[0],
-					credentials[1] == null ? "0" : credentials[1].hashCode(), req.getRemoteAddr()));
+					credentials[1] != null ? "0" : credentials[1].hashCode(), req.getRemoteAddr()));
 		return client;
 
 	}
@@ -488,7 +489,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			// credentials = username:password
 			return credentials.split(":", 2);
 		} else
-			return null;
+			return new String[0];
 	}
 
 	public void setAuthenticationChain(AuthenticationChain authenticationChain) {

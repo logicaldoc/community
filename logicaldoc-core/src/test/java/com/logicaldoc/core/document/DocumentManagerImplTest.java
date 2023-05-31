@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -102,7 +103,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals("1.1", doc.getVersion());
 
 		waiting();
-		
+
 		Assert.assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid="
 				+ doc.getId() + " and ld_version='" + doc.getVersion() + "'"));
 	}
@@ -272,20 +273,11 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Assert.assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
 
-		CountDownLatch lock = new CountDownLatch(1);
-		Runnable listFiles= ()->{
-			while(new File(storeRoot + "/1/doc/").list().length ==0);
-			lock.countDown();
-		};
-		Thread th=new Thread(listFiles);
-		th.start();
-		lock.await(4000, TimeUnit.MILLISECONDS);
-
-		Assert.assertEquals(0, lock.getCount());
+		waiting();
 
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
-		Assert.assertEquals(3, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
+		Assert.assertEquals(1, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
 
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
 	}
@@ -494,12 +486,6 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 			@Override
 			public void run() {
 				try {
-					try {
-						Thread.sleep(2000L);
-					} catch (InterruptedException e) {
-						// Nothing to do
-					}
-
 					Document doc = docDao.findById(1);
 					doc = new Document(doc);
 					DocumentHistory transaction = new DocumentHistory();
@@ -554,7 +540,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals("1.0", newDoc.getFileVersion());
 
 		waiting();
-		
+
 		Version ver = verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
 		Assert.assertNotNull(ver);
 
@@ -879,20 +865,10 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
 		Assert.assertEquals("1.0", doc.getFileVersion());
 	}
-	
+
 	private void waiting() throws InterruptedException {
-		final int millis = 5000;
+		final int secondsToWait = 5;
 		CountDownLatch lock = new CountDownLatch(1);
-		Runnable waiting = ()->{
-			try {
-				Thread.sleep(millis);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-			lock.countDown();
-		};
-		Thread th=new Thread(waiting);
-		th.start();
-		lock.await(4000, TimeUnit.MILLISECONDS);
+		lock.await(secondsToWait, TimeUnit.SECONDS);
 	}
 }

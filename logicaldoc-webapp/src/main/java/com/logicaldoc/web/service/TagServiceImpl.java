@@ -85,11 +85,12 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 		List<GUIParameter> params = new ArrayList<>();
 		for (Object name : conf.keySet()) {
 			if (name.toString().startsWith(session.getTenantName() + ".tag.")
-					|| name.toString().startsWith(session.getTenantName() + ".tagcloud."))
+					|| name.toString().startsWith(session.getTenantName() + ".tagcloud.")) {
 				if (name.equals(session.getTenantName() + ".tag.mode"))
 					params.add(new GUIParameter(name.toString(), "free"));
 				else
 					params.add(new GUIParameter(name.toString(), conf.getProperty(name.toString())));
+			}
 		}
 
 		return params.toArray(new GUIParameter[0]);

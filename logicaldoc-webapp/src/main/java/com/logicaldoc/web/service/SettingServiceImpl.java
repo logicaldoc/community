@@ -334,7 +334,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 				for (String setting : settings.keySet())
 					config.remove("store." + storageId + "." + setting);
 				config.write();
-				return null;
+				return new String[0];
 			}
 		} catch (Exception e) {
 			return (String[]) throwServerException(session, log, e);
@@ -352,8 +352,8 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			for (int i = 0; i < names.length; i++) {
 				if (names[i].endsWith("*")) {
 					Map<String, String> map = conf.getProperties(names[i].substring(0, names[i].length() - 1));
-					for (String key : map.keySet())
-						values.add(new GUIParameter(key, map.get(key)));
+					for (Map.Entry<String, String> entry : map.entrySet())
+						values.add(new GUIParameter(entry.getKey(), entry.getValue()));
 				} else
 					values.add(new GUIParameter(names[i], conf.getProperty(names[i])));
 			}

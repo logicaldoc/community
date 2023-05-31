@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -19,7 +22,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
@@ -293,6 +295,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			setTags(doc);
 
+			setType(doc);
+
 			/*
 			 * Avoid documents inside folder alias
 			 */
@@ -351,6 +355,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			handleStoreError(transaction, e);
 		}
 
+	}
+
+	private void setType(Document doc) {
+		if (StringUtils.isEmpty(doc.getType()) && doc.getFileName().contains("."))
+			doc.setType(FileUtil.getExtension(doc.getFileName()).toLowerCase());
 	}
 
 	private boolean handleStoreError(final DocumentHistory transaction, Throwable e) throws PersistenceException {
@@ -474,10 +483,21 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private void truncatePublishingDates(Document doc) {
 		// Truncate publishing dates
-		if (doc.getStartPublishing() != null)
-			doc.setStartPublishing(DateUtils.truncate(doc.getStartPublishing(), Calendar.DATE));
-		if (doc.getStopPublishing() != null)
-			doc.setStopPublishing(DateUtils.truncate(doc.getStopPublishing(), Calendar.DATE));
+		if (doc.getStartPublishing() != null) {
+			Instant instant = doc.getStartPublishing().toInstant();
+			ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+			ZonedDateTime truncatedZonedDateTime = zonedDateTime.truncatedTo(ChronoUnit.DAYS);
+			Instant truncatedInstant = truncatedZonedDateTime.toInstant();
+			doc.setStartPublishing(Date.from(truncatedInstant));
+		}
+
+		if (doc.getStopPublishing() != null) {
+			Instant instant = doc.getStopPublishing().toInstant();
+			ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+			ZonedDateTime truncatedZonedDateTime = zonedDateTime.truncatedTo(ChronoUnit.DAYS);
+			Instant truncatedInstant = truncatedZonedDateTime.toInstant();
+			doc.setStopPublishing(Date.from(truncatedInstant));
+		}
 	}
 
 	/**

@@ -26,7 +26,7 @@ public abstract class Dashlet extends Portlet {
 
 	protected HeaderControl refreshControl;
 
-	public Dashlet(GUIDashlet guiDashlet) {
+	protected Dashlet(GUIDashlet guiDashlet) {
 		super();
 		this.guiDashlet = guiDashlet;
 

@@ -136,9 +136,8 @@ public class ParserFactory {
 			String className = extension.getParameter("class").valueAsString();
 
 			try {
-				Class clazz = Class.forName(className);
 				// Try to instantiate the parser
-				Object parser = clazz.getDeclaredConstructor().newInstance();
+				Object parser = Class.forName(className).getDeclaredConstructor().newInstance();
 				if (!(parser instanceof Parser))
 					throw new ClassNotFoundException(
 							String.format("The specified parser %s doesn't implement Parser interface", className));

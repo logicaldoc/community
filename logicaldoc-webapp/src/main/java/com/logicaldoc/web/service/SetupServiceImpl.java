@@ -140,11 +140,6 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		Context.get().refresh();
 
 		ContextProperties conf = Context.get().getProperties();
-		String path = conf.getPropertyWithSubstitutions("index.dir");
-
-		if (!path.endsWith(File.pathSeparator)) {
-			path += "/";
-		}
 
 		SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 		indexer.close();

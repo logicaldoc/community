@@ -109,6 +109,17 @@ public class ThreadPools {
 	}
 
 	/**
+	 * Schedule the execution of a task in a thread pool.
+	 * 
+	 * @param task The task to execute
+	 * @param poolName The name of the pool
+	 * @param delay a delay expressed in milliseconds
+	 */
+	public void schedule(Thread task, String poolName, long delay) {
+		schedule((Runnable) task, poolName, delay);
+	}
+
+	/**
 	 * Executes a task in the given pool.
 	 * 
 	 * @param task The task to execute
@@ -128,10 +139,10 @@ public class ThreadPools {
 	 */
 	public void shutdown() {
 		log.info("Shutting down {} thread pools", pools.size());
-		for (String name : pools.keySet()) {
-			log.info("Killing all the threads of pool {}", name);
+		for (Map.Entry<String, ExecutorService> entry : pools.entrySet()) {
+			log.info("Killing all the threads of pool {}", entry.getKey());
 
-			ExecutorService pool = pools.get(name);
+			ExecutorService pool = entry.getValue();
 			pool.shutdownNow();
 			try {
 				pool.awaitTermination(3, TimeUnit.SECONDS);

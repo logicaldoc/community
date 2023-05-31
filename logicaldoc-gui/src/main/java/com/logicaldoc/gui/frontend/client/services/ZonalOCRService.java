@@ -87,17 +87,17 @@ public interface ZonalOCRService extends RemoteService {
 	public void markUnprocessable(long[] ids) throws ServerException;
 
 	public static class Instance {
-		private static ZonalOCRServiceAsync instance;
+		private static ZonalOCRServiceAsync inst;
 
 		private Instance() {
 		}
 		
 		public static ZonalOCRServiceAsync get() {
-			if (instance == null) {
-				instance = GWT.create(ZonalOCRService.class);
-				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
+			if (inst == null) {
+				inst = GWT.create(ZonalOCRService.class);
+				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
-			return instance;
+			return inst;
 		}
 	}
 }

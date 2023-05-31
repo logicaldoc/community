@@ -277,7 +277,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 		log.debug("Find parent DAV resource: {}", resourcePath);
 
-		long tenantId = Tenant.DEFAULT_ID;
+		long tenantId;
 		if (session != null) {
 			tenantId = session.getTenantId();
 		} else {

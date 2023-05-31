@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,14 +51,12 @@ public class SoapAuthServiceTest extends AbstractWebserviceTCase {
 
 		// Make sure that this is a SoapAuthService instance
 		soapAuthServiceImpl = new SoapAuthService();
-		// soapAuthServiceImpl.setValidateSession(false);
 		soapAuthServiceImpl.setContext(wscontext);
 	}
 
 	@Test
 	public void testLogin() {
 		String sid = soapAuthServiceImpl.login("author", "admin");
-		System.err.println(sid);
 		assertNotNull(sid);
 	}
 
@@ -71,7 +70,6 @@ public class SoapAuthServiceTest extends AbstractWebserviceTCase {
 	@Test
 	public void testValid() {
 		String sid = soapAuthServiceImpl.login("author", "admin");
-		System.err.println(sid);
 		assertNotNull(sid);
 		boolean isValid = soapAuthServiceImpl.valid(sid);
 		assertTrue(isValid);
@@ -93,8 +91,13 @@ public class SoapAuthServiceTest extends AbstractWebserviceTCase {
 		String sid = soapAuthServiceImpl.login("author", "admin");
 		System.err.println(sid);
 		assertNotNull(sid);
-		TimeUnit.SECONDS.sleep(3);
+		waiting();
 		soapAuthServiceImpl.renew(sid);
 	}
 
+	private void waiting() throws InterruptedException {
+		final int secondsToWait = 5;
+		CountDownLatch lock = new CountDownLatch(1);
+		lock.await(secondsToWait, TimeUnit.SECONDS);
+	}
 }

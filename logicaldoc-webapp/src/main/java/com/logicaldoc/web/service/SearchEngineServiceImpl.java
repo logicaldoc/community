@@ -440,9 +440,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	}
 
 	private void executeEnrichingQuery(Map<Long, Hit> hitsMap) throws SearchException {
-		StringBuilder richQuery = new StringBuilder();
 		// Find real documents
-		richQuery = new StringBuilder(
+		StringBuilder richQuery = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 		richQuery.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
 		richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");

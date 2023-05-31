@@ -59,7 +59,7 @@ public class DocumentsDS extends DataSource {
 					+ "&max=" + max(max) + "&indexed="
 					+ defaultValue(indexed) + PAGE + page
 					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : "")
-					+ defaultValue(Session.get().getHiliteDocId()));
+					+ "&hiliteDocId=" + defaultValue(Session.get().getHiliteDocId()));
 		} else if (barcoded)
 			setDataURL("data/barcodequeue.xml?max=" + max(max) + PAGE + page);
 		else

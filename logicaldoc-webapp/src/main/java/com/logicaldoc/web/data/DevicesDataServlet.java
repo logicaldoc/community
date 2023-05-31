@@ -88,7 +88,7 @@ public class DevicesDataServlet extends AbstractDataServlet {
 
 	private List<Device> getDevices(Session session, boolean trustedOnly) {
 		DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
-		List<Device> devices = new ArrayList<>();
+		List<Device> devices;
 		if (trustedOnly)
 			devices = dDao.findTrustedDevices(session.getUserId());
 		else
