@@ -2,7 +2,6 @@ package com.logicaldoc.core.parser;
 
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Locale;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -15,7 +14,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -51,7 +49,6 @@ public class AbiWordParser extends AbstractParser {
 			return tmp;
 		}
 
-
 		@Override
 		public void startElement(String namespaceURI, String localName, String rawName, Attributes atts)
 				throws SAXException {
@@ -75,8 +72,7 @@ public class AbiWordParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);

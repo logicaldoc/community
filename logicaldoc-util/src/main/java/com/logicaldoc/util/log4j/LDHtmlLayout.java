@@ -50,7 +50,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 
 	private static final String REGEXP = Strings.LINE_SEPARATOR.equals("\n") ? "\n" : Strings.LINE_SEPARATOR + "|\n";
 
-	private static final String DEFAULT_TITLE = "Log4j Log Messages";
+	private static final String DEFAULT_TITLE = "LogicalDOC log";
 
 	private static final String DEFAULT_CONTENT_TYPE = "text/html";
 
@@ -61,7 +61,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 	// Print no location info by default
 	private final boolean locationInfo;
 
-	private final String title;
+	private final String title = DEFAULT_TITLE;
 
 	private final String contentType;
 
@@ -100,11 +100,10 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		}
 	}
 
-	private LDHtmlLayout(final boolean locationInfo, final String title, final String contentType,
-			final Charset charset, final String font, final String fontSize, String datePattern, String timezone) {
+	private LDHtmlLayout(final boolean locationInfo, final String contentType, final Charset charset, final String font,
+			final String fontSize, String datePattern, String timezone) {
 		super(charset);
 		this.locationInfo = locationInfo;
-		this.title = title;
 		this.contentType = addCharsetToContentType(contentType);
 		this.font = font;
 		this.fontSize = fontSize;
@@ -420,7 +419,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 			if (contentType == null) {
 				contentType = DEFAULT_CONTENT_TYPE + CHARSET + charset;
 			}
-			return new LDHtmlLayout(locationInfo, title, contentType, charset, fontName, fontSize.getFontSize(),
+			return new LDHtmlLayout(locationInfo,  contentType, charset, fontName, fontSize.getFontSize(),
 					datePattern, timezone);
 		}
 	}

@@ -3,7 +3,6 @@ package com.logicaldoc.web.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -404,12 +403,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					attributes = prepareGUIAttributes(template, null, sessionUser);
 			}
 
-			Arrays.sort(attributes, new Comparator<GUIAttribute>() {
-
-				@Override
-				public int compare(GUIAttribute o1, GUIAttribute o2) {
-					return Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition()));
-				}
+			Arrays.sort(attributes, (o1, o2) -> {
+				return Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition()));
 			});
 
 			return attributes;

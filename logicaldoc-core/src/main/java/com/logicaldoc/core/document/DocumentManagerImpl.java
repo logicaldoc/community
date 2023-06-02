@@ -37,6 +37,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParseParameters;
 import com.logicaldoc.core.parser.Parser;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.searchengine.SearchEngine;
@@ -468,8 +469,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			try {
-				content = parser.parse(storer.getStream(doc.getId(), resource), doc.getFileName(), null, locale,
-						tDao.findById(doc.getTenantId()).getName(), doc, fileVersion);
+				content = parser.parse(storer.getStream(doc.getId(), resource), new ParseParameters(doc, doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
 			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc, e);
 				if (e instanceof ParseException)

@@ -1,9 +1,6 @@
 package com.logicaldoc.core.parser;
 
 import java.io.InputStream;
-import java.util.Locale;
-
-import com.logicaldoc.core.document.Document;
 
 /**
  * Parser that doesn't parse anything
@@ -14,8 +11,7 @@ import com.logicaldoc.core.document.Document;
 public class DummyParser extends AbstractParser {
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder contentx) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder contentx) {
 		// Noting to do
 	}
 }

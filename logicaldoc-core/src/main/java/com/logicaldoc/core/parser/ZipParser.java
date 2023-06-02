@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,25 +25,26 @@ public class ZipParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(ZipParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws IOException, ParseException {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)
+			throws IOException, ParseException {
 
-		if (filename.toLowerCase().endsWith(".zip"))
-			internalParseZip(input, encoding, locale, tenant, document, fileVersion, content);
+		if (parameters.getFileName().toLowerCase().endsWith(".zip"))
+			internalParseZip(input, parameters, content);
 		else
-			internalParseGZip(input, filename, encoding, locale, tenant, document, fileVersion, content);
+			internalParseGZip(input, parameters, content);
 	}
 
-	private void internalParseGZip(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws IOException, ParseException {
+	private void internalParseGZip(InputStream input, ParseParameters parameters, StringBuilder content)
+			throws IOException, ParseException {
 		File ungzippedFile = null;
 		try {
-			ungzippedFile = gunzip(input, filename);
+			ungzippedFile = gunzip(input, parameters.getFileName());
 			Parser parser = ParserFactory.getParser(ungzippedFile.getName());
 
 			if (parser != null) {
-				String cnt = parser.parse(ungzippedFile, ungzippedFile.getName(), encoding, locale, tenant, document,
-						fileVersion);
+				String cnt = parser.parse(ungzippedFile, ungzippedFile.getName(), parameters.getEncoding(),
+						parameters.getLocale(), parameters.getTenant(), parameters.getDocument(),
+						parameters.getFileVersion());
 				content.append(cnt);
 			}
 		} finally {
@@ -70,8 +70,8 @@ public class ZipParser extends AbstractParser {
 		return ungzippedFile;
 	}
 
-	private void internalParseZip(InputStream input, String encoding, Locale locale, String tenant, Document document,
-			String fileVersion, StringBuilder content) throws IOException, ParseException {
+	private void internalParseZip(InputStream input, ParseParameters parameters, StringBuilder content)
+			throws IOException, ParseException {
 		File zipFile = FileUtil.createTempFile("parsezip", "zip");
 		try {
 			FileUtil.writeFile(input, zipFile.getAbsolutePath());
@@ -100,10 +100,11 @@ public class ZipParser extends AbstractParser {
 
 					zipUtil.unzipEntry(zipFile, entry, uncompressedEntryFile);
 
-					Document clone = new Document(document);
+					Document clone = new Document(parameters.getDocument());
 					clone.setFileName(uncompressedEntryFile.getName());
-					String text = entryParser.parse(uncompressedEntryFile, uncompressedEntryFile.getName(), encoding,
-							locale, tenant, document, fileVersion);
+					String text = entryParser.parse(uncompressedEntryFile, uncompressedEntryFile.getName(),
+							parameters.getEncoding(), parameters.getLocale(), parameters.getTenant(),
+							parameters.getDocument(), parameters.getFileVersion());
 					content.append(text);
 				} finally {
 					if (uncompressedEntryFile != null)

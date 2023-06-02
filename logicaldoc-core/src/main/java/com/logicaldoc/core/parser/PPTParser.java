@@ -3,14 +3,12 @@ package com.logicaldoc.core.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Locale;
 
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
 import org.apache.poi.hslf.usermodel.HSLFSlideShowImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -25,8 +23,7 @@ public class PPTParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(PPTParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 
 		try (PowerPointExtractor extractor = new PowerPointExtractor(input);) {
 			String tmp = extractor.getText(true, true);

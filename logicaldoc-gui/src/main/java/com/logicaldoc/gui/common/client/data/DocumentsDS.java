@@ -31,42 +31,28 @@ public class DocumentsDS extends DataSource {
 
 	private GUIFolder folder = null;
 
-	public DocumentsDS(GUIFolder folder, String fileFilter, Integer max, int page, Integer indexed, boolean barcoded,
-			boolean ocrd, String sortSpec) {
-		this(folder != null ? folder.getId() : null, fileFilter, max, page, indexed, barcoded, ocrd, sortSpec);
-		this.folder = folder;
-	}
-
 	/**
 	 * Constructor.
 	 * 
-	 * @param folderId The folder to be listed (optional)
-	 * @param filename A filter on the file nale (optional)
-	 * @param max The maximum number of records (if not specified MAX_ROWS is
-	 *        used)
-	 * @param indexed The indexed flag
-	 * @param barcoded The barcoded flag
-	 * @param ocrd The ocrd flag
-	 * @param sortSpec the sort specification (optional)
+	 * @param parameters the parameters for the data source
 	 */
-	private DocumentsDS(Long folderId, String fileFilter, Integer max, int page, Integer indexed, boolean barcoded,
-			boolean ocrd, String sortSpec) {
+	public DocumentsDS(DocumentsDSParameters parameters) {
 		prepareFields(null);
 
-		if (!barcoded && !ocrd) {
+		if (!parameters.isBarcoded() && !parameters.isOcrd()) {
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
-					+ defaultValue(folderId) + "&filename=" + defaultValue(fileFilter)
-					+ "&max=" + max(max) + "&indexed="
-					+ defaultValue(indexed) + PAGE + page
-					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : "")
+					+ defaultValue(parameters.getFolderId()) + "&filename=" + defaultValue(parameters.getFileFilter())
+					+ "&max=" + maxValue(parameters.getMax()) + "&indexed="
+					+ defaultValue(parameters.getIndexed()) + PAGE + parameters.getPage()
+					+ (parameters.sortSpec != null && !parameters.sortSpec.isEmpty() ? "&sort=" + parameters.sortSpec : "")
 					+ "&hiliteDocId=" + defaultValue(Session.get().getHiliteDocId()));
-		} else if (barcoded)
-			setDataURL("data/barcodequeue.xml?max=" + max(max) + PAGE + page);
+		} else if (parameters.isBarcoded())
+			setDataURL("data/barcodequeue.xml?max=" + maxValue(parameters.getMax()) + PAGE + parameters.getPage());
 		else
-			setDataURL("data/zonalocrqueue.xml?max=" + max(max) + PAGE + page);
+			setDataURL("data/zonalocrqueue.xml?max=" + maxValue(parameters.getMax()) + PAGE + parameters.getPage());
 	}
 
-	private Integer max(Integer max) {
+	private Integer maxValue(Integer max) {
 		return max != null ? max : DEFAULT_MAX;
 	}
 

@@ -582,7 +582,8 @@ public class FileUtil {
 			long toRead = length;
 
 			while ((read = input.read(buffer)) > 0) {
-				if ((toRead -= read) > 0) {
+				toRead -= read;
+				if (toRead > 0) {
 					output.write(buffer, 0, read);
 				} else {
 					output.write(buffer, 0, (int) toRead + read);

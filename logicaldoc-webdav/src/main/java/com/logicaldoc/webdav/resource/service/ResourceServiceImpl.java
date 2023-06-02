@@ -843,7 +843,7 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 		if (document == null) {
 			// Document not found
-			return new ByteArrayInputStream(new String("not found").getBytes());
+			return new ByteArrayInputStream("not found".getBytes());
 		}
 
 		if (document.getVersion() != null && document.getVersion().equals(resource.getVersionLabel()))

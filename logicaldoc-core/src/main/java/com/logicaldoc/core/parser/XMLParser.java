@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.util.Locale;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -19,7 +18,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -39,16 +37,15 @@ public class XMLParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(XMLParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 		try {
 			CharArrayWriter writer = new CharArrayWriter();
 			ExtractorHandler handler = new ExtractorHandler(writer);
 
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);			
-			
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
 			SAXParser parser = factory.newSAXParser();
 			XMLReader reader = parser.getXMLReader();
 			reader.setContentHandler(handler);
@@ -73,8 +70,8 @@ public class XMLParser extends AbstractParser {
 					// Nothing to do
 				}
 			});
-			if (encoding != null) {
-				setEncoding(encoding, source);
+			if (parameters.getEncoding() != null) {
+				setEncoding(parameters.getEncoding(), source);
 			}
 			reader.parse(source);
 

@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
+import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -73,7 +74,8 @@ public class BarcodeQueuePanel extends VLayout {
 		display.addClickHandler(event -> {
 			if (Boolean.TRUE.equals(max.validate())) {
 				maxRecords = (Integer) max.getValue();
-				list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
+				DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1, null);
+				list.refresh(new DocumentsDS(params));
 			}
 		});
 
@@ -93,7 +95,10 @@ public class BarcodeQueuePanel extends VLayout {
 							public void onSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
 								maxRecords = (Integer) max.getValue();
-								list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
+								DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1,
+										null);
+								params.setBarcoded(true);
+								list.refresh(new DocumentsDS(params));
 							}
 						});
 				}));
@@ -192,7 +197,10 @@ public class BarcodeQueuePanel extends VLayout {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
+
+		DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1, null);
+		params.setBarcoded(true);
+		list.setDataSource(new DocumentsDS(params));
 		list.setFields(locked, immutable, filename, size, lastModified, version, publisher, published, creator, created,
 				customId);
 

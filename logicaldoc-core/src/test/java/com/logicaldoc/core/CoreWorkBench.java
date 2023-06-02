@@ -7,8 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -36,19 +34,29 @@ import com.logicaldoc.util.io.FileUtil;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
 
-import junit.framework.Assert;
-
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		URL url = new URL("http://www.example.com/collo");
-		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+		String filename = "John Doe - Pay Stub[-20151209[M#1234[A#L17[S#123456789.pdf";
 
-		int responseCode = huc.getResponseCode();
+		if (!filename.startsWith("_") && filename.contains("[") && filename.contains("#")
+				&& filename.toLowerCase().endsWith(".pdf")) {
 
-		System.out.println(""+responseCode);
-		
-		Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, responseCode);
+			String memberName = filename.substring(0, filename.indexOf("["));
+			String compound = filename.substring(filename.indexOf("[M")+1);
+			String memberNumber = compound.substring(compound.indexOf("M#")+2, compound.indexOf("["));
+			
+			compound = filename.substring(filename.indexOf("[A#")+1);
+			String accountType = compound.substring(compound.indexOf("A#")+2, compound.indexOf("["));
+			
+			compound = filename.substring(filename.indexOf("[S#")+1);
+			String socialSecurityNumber = compound.substring(compound.indexOf("S#")+2, compound.indexOf("."));
+			
+			System.out.println("memberName: " + memberName);
+			System.out.println("memberNumber: " + memberNumber);
+			System.out.println("accountType: " + accountType);
+			System.out.println("socialSecurityNumber: " + socialSecurityNumber);	
+		}
 
 //		StringBuilder sb = new StringBuilder();
 //		Exec.exec("wmic cpu get loadpercentage", null, null, sb, 20);

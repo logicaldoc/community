@@ -34,7 +34,7 @@ public interface Parser {
 
 	/**
 	 * Same as
-	 * {@link #parse(InputStream, String, String, Locale, String, Document, String)},
+	 * {@link #parse(InputStream, ParseParameters)},
 	 * but use this when you have a file rather than a stream.
 	 * 
 	 * @param file the file
@@ -81,19 +81,12 @@ public interface Parser {
 	 * </p>
 	 * 
 	 * @param input binary content from which to extract the text
-	 * @param filename name of the file
-	 * @param encoding character encoding
-	 * @param locale the locale
-	 * @param tenant name of the tenant
-	 * @param document the document the file belongs to (optional)
-	 * @param fileVersion the file version being processed (optional)
-	 * 
+	 * @param parameterObject TODO
 	 * @return the extracted text
 	 * 
 	 * @throws ParseException error in the parsing
 	 */
-	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion) throws ParseException;
+	public String parse(InputStream input, ParseParameters parameterObject) throws ParseException;
 
 	/**
 	 * Extracts content for the text content of the given binary document. The

@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.services;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
+import com.logicaldoc.gui.common.client.beans.ParseContactsParameters;
 
 public interface ContactServiceAsync {
 
@@ -11,9 +12,7 @@ public interface ContactServiceAsync {
 
 	void save(GUIContact contact, AsyncCallback<Void> callback);
 
-	void parseContacts(boolean preview, String separator, String delimiter, boolean skipFirstRow,
-			int firstName, int lastName, int email, int company, int phone, int mobile, int address,
-			AsyncCallback<GUIContact[]> callback);
+	void parseContacts(boolean preview, ParseContactsParameters parameters, AsyncCallback<GUIContact[]> callback);
 
 	void shareContacts(long[] contactIds, long[] userIds, long[] groupIds, AsyncCallback<Void> callback);
 }

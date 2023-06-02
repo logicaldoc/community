@@ -2,7 +2,6 @@ package com.logicaldoc.core.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -39,7 +38,7 @@ public abstract class AbstractParser implements Parser {
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
 			String fileVersion) throws ParseException {
 		try (InputStream is = new FileInputStream(file);) {
-			return parse(is, filename, encoding, locale, tenant, document, fileVersion);
+			return parse(is, new ParseParameters(document, filename, fileVersion, encoding, locale, tenant));
 		} catch (IOException e) {
 			log.error(e.getMessage());
 			return "";
@@ -49,25 +48,24 @@ public abstract class AbstractParser implements Parser {
 	@Override
 	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant)
 			throws ParseException {
-		return parse(input, filename, encoding, locale, tenant, null, null);
+		return parse(input, new ParseParameters(null, filename, null, encoding, locale, tenant));
 	}
 
 	@Override
-	public String parse(final InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion) throws ParseException {
+	public String parse(final InputStream input, ParseParameters parameters) throws ParseException {
 		if (log.isDebugEnabled())
 			log.debug("Parse started");
 		StringBuilder content = new StringBuilder();
 
-		Locale lcl = getLocale(locale);
-		String tnt = getTenant(locale, tenant);
+		parameters.setLocale(getLocale(parameters.getLocale()));
+		parameters.setTenant(getTenant(parameters.getLocale(), parameters.getTenant()));
 
-		long timeout = getTimeout(tenant);
+		long timeout = getTimeout(parameters.getTenant());
 
 		if (timeout <= 0) {
-			parseInCurrentThread(input, filename, encoding, document, fileVersion, content, lcl, tnt);
+			parseInCurrentThread(input, parameters, content);
 		} else {
-			parseInNewThread(input, filename, encoding, document, fileVersion, content, lcl, tnt, timeout);
+			parseInNewThread(input, parameters, content, timeout);
 		}
 
 		if (log.isDebugEnabled())
@@ -84,16 +82,15 @@ public abstract class AbstractParser implements Parser {
 		}
 	}
 
-	private void parseInNewThread(final InputStream input, String filename, String encoding, Document document,
-			String fileVersion, StringBuilder content, Locale locale, String tenant, long timeout)
-			throws ParseException {
+	private void parseInNewThread(final InputStream input, ParseParameters parameters, StringBuilder content,
+			long timeout) throws ParseException {
 		// Invoke in a separate thread
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		try {
 			String ret = null;
 			try {
-				ret = executor.invokeAll(Arrays.asList(new InternalParseTask(input, filename, encoding, locale, tenant,
-						document, fileVersion, content)), timeout, TimeUnit.SECONDS).get(0).get();
+				ret = executor.invokeAll(Arrays.asList(new InternalParseTask(input, parameters, content)), timeout,
+						TimeUnit.SECONDS).get(0).get();
 			} catch (InterruptedException ie) {
 				log.warn("Interrupted parse");
 				Thread.currentThread().interrupt();
@@ -108,10 +105,10 @@ public abstract class AbstractParser implements Parser {
 		}
 	}
 
-	private void parseInCurrentThread(final InputStream input, String filename, String encoding, Document document,
-			String fileVersion, StringBuilder content, Locale locale, String tenant) throws ParseException {
+	private void parseInCurrentThread(final InputStream input, ParseParameters parameters, StringBuilder content)
+			throws ParseException {
 		try {
-			internalParse(input, filename, encoding, locale, tenant, document, fileVersion, content);
+			internalParse(input, parameters, content);
 		} catch (ParseException pe) {
 			throw pe;
 		} catch (Exception e) {
@@ -135,36 +132,20 @@ public abstract class AbstractParser implements Parser {
 	class InternalParseTask implements Callable<String> {
 		private InputStream is;
 
-		private String filename;
-
-		private String encoding;
-
-		private Locale locale;
-
-		private String tenant;
-
-		private Document document;
-
-		private String fileVersion;
+		private ParseParameters parameters;
 
 		private StringBuilder content;
 
-		public InternalParseTask(InputStream is, String filename, String encoding, Locale locale, String tenant,
-				Document document, String fileVersion, StringBuilder content) {
+		public InternalParseTask(InputStream is, ParseParameters parameters, StringBuilder content) {
 			super();
 			this.is = is;
-			this.filename = filename;
-			this.encoding = encoding;
-			this.locale = locale;
-			this.tenant = tenant;
+			this.parameters = parameters;
 			this.content = content;
-			this.document = document;
-			this.fileVersion = fileVersion;
 		}
 
 		public String call() throws ParseException {
 			try {
-				internalParse(is, filename, encoding, locale, tenant, document, fileVersion, content);
+				internalParse(is, parameters, content);
 				return "completed";
 			} catch (ParseException pe) {
 				throw pe;
@@ -177,8 +158,7 @@ public abstract class AbstractParser implements Parser {
 	/**
 	 * Invoked by the parse method
 	 */
-	abstract protected void internalParse(InputStream is, String filename, String encoding, Locale locale,
-			String tenant, Document document, String fileVersion, StringBuilder output)
+	abstract protected void internalParse(InputStream is, ParseParameters parameters, StringBuilder output)
 			throws IOException, ParseException;
 
 	@Override

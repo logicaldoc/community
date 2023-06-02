@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
+import com.logicaldoc.gui.common.client.beans.ParseContactsParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -174,13 +175,24 @@ public class ContactsImportSettings extends Window {
 		return Integer.parseInt(values.get("address").toString());
 	}
 
+	public ParseContactsParameters getParseContactsParameters() {
+		ParseContactsParameters parameters = new ParseContactsParameters(getSeparator(), getTextDelimiter(),
+				isSkipFirstRow());
+		parameters.setAddress(getAddressIndex());
+		parameters.setCompany(getCompanyIndex());
+		parameters.setEmail(getEmailIndex());
+		parameters.setFirstName(getFirstNameIndex());
+		parameters.setLastName(getLastNameIndex());
+		parameters.setMobile(getMobileIndex());
+		parameters.setPhone(getPhoneIndex());
+		return parameters;
+	}
+
 	private void onImport() {
 		if (form.validate()) {
 			LD.contactingServer();
 			try {
-				ContactService.Instance.get().parseContacts(true, getSeparator(), getTextDelimiter(), isSkipFirstRow(),
-						getFirstNameIndex(), getLastNameIndex(), getEmailIndex(), getCompanyIndex(), getPhoneIndex(),
-						getMobileIndex(), getAddressIndex(), new AsyncCallback<GUIContact[]>() {
+				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new AsyncCallback<GUIContact[]>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

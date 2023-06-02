@@ -47,8 +47,9 @@ public class ParserFactory {
 	 */
 	private static Map<String, String> aliases = new HashMap<>();
 
-	private ParserFactory() {}
-	
+	private ParserFactory() {
+	}
+
 	/**
 	 * Registers all parsers from extension points
 	 */
@@ -173,8 +174,8 @@ public class ParserFactory {
 		Parser parser = getParser(filename);
 		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenantName = dao.getTenantName(tenantId);
-		return parser.parse(input, filename, encoding, locale, tenantName != null ? tenantName : Tenant.DEFAULT_NAME,
-				document, fileVersion);
+		return parser.parse(input, new ParseParameters(document, filename, fileVersion, encoding, locale,
+				tenantName != null ? tenantName : Tenant.DEFAULT_NAME));
 	}
 
 	/**

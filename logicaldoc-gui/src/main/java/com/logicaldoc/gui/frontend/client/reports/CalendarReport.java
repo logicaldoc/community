@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.beans.CalendarEventSearchCriteria;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -300,8 +301,14 @@ public class CalendarReport extends AdminPanel {
 
 		int maxRecords = getMaxRecords(values);
 
-		doSearch(fromValue, toValue, endDateFrom, endDateTo, frequencyValue, statusValue, titleValue, typeValue,
-				subtypeValue, maxRecords);
+		CalendarEventSearchCriteria criteria = new CalendarEventSearchCriteria(fromValue, toValue, endDateFrom, endDateTo, frequencyValue);
+		criteria.setStatus(statusValue);
+		criteria.setTitle(titleValue);
+		criteria.setType(typeValue);
+		criteria.setSubtype(subtypeValue);
+		criteria.setMaxRecords(maxRecords);
+		
+		doSearch(criteria);
 	}
 
 	private int getMaxRecords(final Map<String, Object> values) {
@@ -315,10 +322,8 @@ public class CalendarReport extends AdminPanel {
 		return maxRecords;
 	}
 
-	private void doSearch(Date fromValue, Date toValue, Date endDateFrom, Date endDateTo, Integer frequencyValue,
-			Integer statusValue, String titleValue, String typeValue, String subtypeValue, int maxRecords) {
-		CalendarService.Instance.get().find(fromValue, toValue, endDateFrom, endDateTo, frequencyValue, titleValue,
-				typeValue, subtypeValue, statusValue, maxRecords, new AsyncCallback<GUICalendarEvent[]>() {
+	private void doSearch(CalendarEventSearchCriteria criteria) {
+		CalendarService.Instance.get().find(criteria, new AsyncCallback<GUICalendarEvent[]>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

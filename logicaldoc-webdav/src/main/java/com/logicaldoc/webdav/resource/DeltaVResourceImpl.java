@@ -140,10 +140,6 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 			if (isCollection()) {
 				supportedReports.addReportType(ReportType.LOCATE_BY_HISTORY);
 			}
-
-			// properties.add(new
-			// DefaultDavProperty(DeltaVConstants.CREATOR_DISPLAYNAME,
-			// resource.getAuthor()));
 		}
 	}
 

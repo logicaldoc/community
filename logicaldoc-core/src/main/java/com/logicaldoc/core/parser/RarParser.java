@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +23,8 @@ public class RarParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(RarParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws ParseException, IOException {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)
+			throws ParseException, IOException {
 		File rarFile = FileUtil.createTempFile("parserar", ".rar");
 		try {
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
@@ -52,10 +51,11 @@ public class RarParser extends AbstractParser {
 
 					new RarUtil().extractEntry(rarFile, entry, uncompressedEntryFile);
 
-					Document clone = new Document(document);
+					Document clone = new Document(parameters.getDocument());
 					clone.setFileName(uncompressedEntryFile.getName());
-					String text = entryParser.parse(uncompressedEntryFile, uncompressedEntryFile.getName(), encoding,
-							locale, tenant, document, fileVersion);
+					String text = entryParser.parse(uncompressedEntryFile, uncompressedEntryFile.getName(),
+							parameters.getEncoding(), parameters.getLocale(), parameters.getTenant(),
+							parameters.getDocument(), parameters.getFileVersion());
 					content.append(text);
 				} finally {
 					if (uncompressedEntryFile != null)

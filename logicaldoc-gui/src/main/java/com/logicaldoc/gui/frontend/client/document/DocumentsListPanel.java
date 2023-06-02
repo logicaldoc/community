@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
+import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.FolderController;
@@ -130,9 +131,10 @@ public class DocumentsListPanel extends VLayout {
 	public void updateData(GUIFolder folder) {
 		if (grid.getFolder() == null || (grid.getFolder() != null && grid.getFolder().getId() != folder.getId()))
 			grid.loadGridLayout(folder);
-		DocumentsDS dataSource = new DocumentsDS(folder, null, grid.getGridCursor().getPageSize(),
-				grid.getGridCursor().getCurrentPage(), null, false, false,
-				(grid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) grid) : null));
+		
+		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null, grid.getGridCursor().getPageSize(), grid.getGridCursor().getCurrentPage(),
+				grid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) grid) : null);
+		DocumentsDS dataSource = new DocumentsDS(params);
 		grid.fetchNewData(dataSource);
 
 	}

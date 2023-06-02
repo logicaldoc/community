@@ -734,29 +734,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		deleteAll(entities, PersistentObject.DELETED_CODE_DEFAULT);
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public int bulkUpdate(String expression, Object[] values) throws PersistenceException {
-		if (!checkStoringAspect())
-			return 0;
-
-		try {
-			Query queryObject = prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression,
-					values, null);
-			return queryObject.executeUpdate();
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-	}
-
 	@Override
 	public int bulkUpdate(String expression, Map<String, Object> parameters) throws PersistenceException {
 		if (!checkStoringAspect())
 			return 0;
 
 		try {
-			return prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression,
-					parameters, null).executeUpdate();
+			return prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression, parameters, null)
+					.executeUpdate();
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}

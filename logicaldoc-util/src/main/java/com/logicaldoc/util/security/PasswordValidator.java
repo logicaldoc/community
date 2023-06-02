@@ -29,18 +29,10 @@ public class PasswordValidator {
 	/**
 	 * Constructor
 	 * 
-	 * @param length minimum size of the password
-	 * @param uppercaseChars minimum number of upper case chars
-	 * @param lowercaseChars minimum number of lower case chars
-	 * @param digits minimum number of digits
-	 * @param specialChars minimum number of special chars
-	 * @param maxSequenceSize maximum size of a sequence
-	 * @param maxOccurrences maximum number of occurrences of the same char
-	 * @param messages optional map with error codes and messages
+	 * @param criteria minimum size of the password
+	 * @param mesages optional map with error codes and messages
 	 */
-	public PasswordValidator(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
-			int maxSequenceSize, int maxOccurrences, Properties messages) {
-
+	public PasswordValidator(PasswordCriteria criteria, Properties messages) {
 		MessageResolver resolver;
 		if (messages == null) {
 			Properties standardMessages = new Properties();
@@ -56,22 +48,22 @@ public class PasswordValidator {
 
 		validator = new org.passay.PasswordValidator(resolver,
 				// length between X and 30 characters
-				new LengthRule(length, 255),
+				new LengthRule(criteria.getMinLength(), 255),
 
 				// at least X upper-case character
-				new CharacterRule(EnglishCharacterData.UpperCase, uppercaseChars),
+				new CharacterRule(EnglishCharacterData.UpperCase, criteria.getMinUppercaseChars()),
 
 				// at least X lower-case characters
-				new CharacterRule(EnglishCharacterData.LowerCase, lowercaseChars),
+				new CharacterRule(EnglishCharacterData.LowerCase, criteria.getMinLowercaseChars()),
 
 				// at least X digit characters
-				new CharacterRule(EnglishCharacterData.Digit, digits),
+				new CharacterRule(EnglishCharacterData.Digit, criteria.getMinDigits()),
 
 				// at least X symbols (special character)
-				new CharacterRule(EnglishCharacterData.Special, specialChars),
+				new CharacterRule(EnglishCharacterData.Special, criteria.getMinSpecialChars()),
 
 				// at least X times a character can be used
-				new CharacterOccurrencesRule(maxOccurrences),
+				new CharacterOccurrencesRule(criteria.getMaxOccurrences()),
 
 				// define some illegal sequences that will fail when >= 4 chars
 				// long alphabetical is of the form 'abcd', numerical is '3456',
@@ -79,9 +71,9 @@ public class PasswordValidator {
 				// is 'asdf' the false parameter indicates that wrapped
 				// sequences are
 				// allowed; e.g. 'xyzab'
-				new IllegalSequenceRule(EnglishSequenceData.Alphabetical, maxSequenceSize, false),
-				new IllegalSequenceRule(EnglishSequenceData.Numerical, maxSequenceSize, false),
-				new IllegalSequenceRule(EnglishSequenceData.USQwerty, maxSequenceSize, false),
+				new IllegalSequenceRule(EnglishSequenceData.Alphabetical, criteria.getMaxSequenceSize(), false),
+				new IllegalSequenceRule(EnglishSequenceData.Numerical, criteria.getMaxSequenceSize(), false),
+				new IllegalSequenceRule(EnglishSequenceData.USQwerty, criteria.getMaxSequenceSize(), false),
 
 				// no whitespace
 				new WhitespaceRule());

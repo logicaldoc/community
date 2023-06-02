@@ -3,7 +3,6 @@ package com.logicaldoc.core.parser;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hslf.usermodel.HSLFSlideShow;
@@ -14,7 +13,6 @@ import com.github.mertakdut.BookSection;
 import com.github.mertakdut.Reader;
 import com.github.mertakdut.exception.OutOfPagesException;
 import com.github.mertakdut.exception.ReadingException;
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -28,8 +26,7 @@ public class EpubParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(EpubParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 		File tmpFile = null;
 		try {
 			tmpFile = FileUtil.createTempFile("epubparser", ".epub");

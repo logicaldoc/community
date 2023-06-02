@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.CalendarEventSearchCriteria;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 
 /**
@@ -43,23 +44,13 @@ public interface CalendarService extends RemoteService {
 	/**
 	 * Searches for events
 	 * 
-	 * @param startDate Start date (optional)
-	 * @param endDate End date (optional)
-	 * @param expireFrom (optional)
-	 * @param expireTo (optional)
-	 * @param frequency The frequency of the event (1,15, 30 ... optional)
-	 * @param title The title (used with like operator, optional)
-	 * @param type The type (used with like operator, optional)
-	 * @param subtype The subtype (used with like operator, optional)
-	 * @param status The title (used with like operator, optional)
-	 * @param maxRecords Maximum number of records (optional)
+	 * @param criteria the search criteria
 	 * 
 	 * @return The list of events ordered by ascending date
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUICalendarEvent[] find(Date startDate, Date endDate, Date expireFrom, Date expireTo, Integer frequency,
-			String title, String type, String subtype, Integer status, Integer maxRecords) throws ServerException;
+	public GUICalendarEvent[] find(CalendarEventSearchCriteria criteria) throws ServerException;
 
 	/**
 	 * Deletes an event. If the event is a master, in any case all the

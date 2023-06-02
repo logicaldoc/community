@@ -25,10 +25,10 @@ public class ZABWParser extends AbstractParser {
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
 			String fileVersion) {
 		String enc = encoding != null ? encoding : "UTF-8";
-		
-		try(FileInputStream stream = new FileInputStream(file);) {
+
+		try (FileInputStream stream = new FileInputStream(file);) {
 			GZIPInputStream gis = new GZIPInputStream(stream);
-			return parse(gis, filename, enc, locale, tenant, document, fileVersion);
+			return parse(gis, new ParseParameters(document, filename, fileVersion, enc, locale, tenant));
 		} catch (Exception ex) {
 			log.warn("Failed to extract Compressed AbiWord text content", ex);
 		}
@@ -36,11 +36,10 @@ public class ZABWParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 		try {
 			AbiWordParser parser = new AbiWordParser();
-			content.append(parser.parse(input, filename, encoding, locale, tenant, document, fileVersion));
+			content.append(parser.parse(input, parameters));
 		} catch (Exception e) {
 			log.warn("Failed to extract AbiWord Compressed zabw text content", e);
 		}

@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -37,17 +35,16 @@ public class RTFParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(RTFParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
-		
-		
-		try(BufferedInputStream bis0 = new BufferedInputStream(input); ) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
+
+		try (BufferedInputStream bis0 = new BufferedInputStream(input);) {
 			bis0.mark(Integer.MAX_VALUE);
 
 			String text = extractText(bis0);
 			content.append(StringUtil.writeToString(new StringReader(text)));
 
-			// Check if there are some variable code that must be added to the content
+			// Check if there are some variable code that must be added to the
+			// content
 			bis0.reset();
 			File tempFile = FileUtil.createTempFile("rtf", ".rtf");
 			try (OutputStream out = new FileOutputStream(tempFile)) {
@@ -56,7 +53,7 @@ public class RTFParser extends AbstractParser {
 				while ((len = bis0.read(buf)) > 0)
 					out.write(buf, 0, len);
 			}
-			
+
 			StringBuilder strBuf = null;
 			try (FileInputStream fis = new FileInputStream(tempFile);
 					BufferedReader d = new BufferedReader(new InputStreamReader(fis))) {
@@ -85,8 +82,8 @@ public class RTFParser extends AbstractParser {
 
 			input.close();
 
-			content.append(strBuf.toString()); 
-			
+			content.append(strBuf.toString());
+
 			// Delete temp file when program exits.
 			tempFile.deleteOnExit();
 

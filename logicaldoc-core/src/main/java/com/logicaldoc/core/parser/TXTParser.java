@@ -35,7 +35,8 @@ public class TXTParser extends AbstractParser {
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
 			String fileVersion) {
 		try (FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis);) {
-			return parse(bis, filename, determineEncoding(bis, encoding), locale, tenant, document, fileVersion);
+			return parse(bis, new ParseParameters(document, filename, fileVersion, determineEncoding(bis, encoding),
+					locale, tenant));
 		} catch (Exception ex) {
 			log.warn("Failed to extract TXT text content", ex);
 		}
@@ -59,13 +60,12 @@ public class TXTParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 		try {
 			if (input != null)
-				content.append(StringUtil.writeToString(getLimitedStream(input, tenant), encoding));
+				content.append(StringUtil.writeToString(getLimitedStream(input, parameters.getTenant()), parameters.getEncoding()));
 		} catch (UnsupportedEncodingException e) {
-			log.warn("Unsupported encoding '{}', using default ({}) instead.", encoding,
+			log.warn("Unsupported encoding '{}', using default ({}) instead.", parameters.getEncoding(),
 					System.getProperty("file.encoding"));
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);

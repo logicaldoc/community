@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
+import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
@@ -149,7 +150,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		DocumentsDS ds = null;
 		if (folder != null) {
 			int max = loadGridLayout(folder);
-			ds = new DocumentsDS(folder, null, max, 1, null, false, false, null);
+			DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null, max, 1, null);
+			ds = new DocumentsDS(params);
 		}
 
 		if (ds == null) {
@@ -470,7 +472,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		if (getGridCursor() != null) {
 			getGridCursor().setPageSize(pageSize);
 			if (folder != null)
-				getGridCursor().setTotalRecords((int)folder.getDocumentCount());
+				getGridCursor().setTotalRecords((int) folder.getDocumentCount());
 		}
 
 		return pageSize;

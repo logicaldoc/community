@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -16,8 +15,6 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.logicaldoc.core.document.Document;
 
 /**
  * Text extractor for Portable Document Format (PDF). For parsing uses an
@@ -34,8 +31,8 @@ public class PDFParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(PDFParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) throws ParseException {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)
+			throws ParseException {
 		PDDocument pdfDocument = null;
 		try {
 			pdfDocument = PDDocument.load(input);

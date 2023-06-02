@@ -82,7 +82,7 @@ public class GUIReminder implements Comparable<GUIReminder>, Serializable {
 			return -1;
 		else if (this.date != null && other == null)
 			return 1;
-		else if (this.date == null && other == null)
+		else if (this.date == null)
 			return 0;
 		else
 			return this.date.compareTo(other.date);

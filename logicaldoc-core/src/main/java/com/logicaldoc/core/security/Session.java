@@ -314,8 +314,9 @@ public class Session extends PersistentObject implements Comparable<Session> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
+
 		final Session other = (Session) obj;
-		if (sid == null && other.sid != null) {
+		if (sid == null) {
 			return false;
 		} else {
 			return sid.equals(other.sid);

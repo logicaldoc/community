@@ -20,6 +20,7 @@ import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
+import com.logicaldoc.gui.common.client.beans.ParseContactsParameters;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.csv.CSVFileReader;
@@ -105,8 +106,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	}
 
 	@Override
-	public GUIContact[] parseContacts(boolean preview, String separator, String delimiter, boolean skipFirstRow,
-			int firstName, int lastName, int email, int company, int phone, int mobile, int address)
+	public GUIContact[] parseContacts(boolean preview, ParseContactsParameters parameters)
 			throws ServerException {
 		final Session session = validateSession(getThreadLocalRequest());
 
@@ -117,15 +117,15 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 		List<GUIContact> contacts = new ArrayList<>();
 
-		try (CSVFileReader reader = new CSVFileReader(file.getAbsolutePath(), separator.charAt(0),
-				delimiter.charAt(0));) {
-			if (skipFirstRow)
+		try (CSVFileReader reader = new CSVFileReader(file.getAbsolutePath(), parameters.getSeparator().charAt(0),
+				parameters.getDelimiter().charAt(0));) {
+			if (parameters.isSkipFirstRow())
 				reader.readFields();
 
 			List<String> fields = reader.readFields();
 			long i = 1;
 			while (fields != null) {
-				String emailStr = fields.get(email - 1);
+				String emailStr = fields.get(parameters.getEmail() - 1);
 
 				// Skip rows without an email
 				if (StringUtils.isEmpty(emailStr)) {
@@ -145,12 +145,12 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 				contact.setEmail(emailStr);
 
-				contact.setFirstName(fields.get(firstName - 1));
-				contact.setLastName(fields.get(lastName - 1));
-				contact.setAddress(fields.get(address - 1));
-				contact.setCompany(fields.get(company - 1));
-				contact.setMobile(fields.get(mobile - 1));
-				contact.setPhone(fields.get(phone - 1));
+				contact.setFirstName(fields.get(parameters.getFirstName() - 1));
+				contact.setLastName(fields.get(parameters.getLastName() - 1));
+				contact.setAddress(fields.get(parameters.getAddress() - 1));
+				contact.setCompany(fields.get(parameters.getCompany() - 1));
+				contact.setMobile(fields.get(parameters.getMobile() - 1));
+				contact.setPhone(fields.get(parameters.getPhone() - 1));
 
 				GUIContact guiContact = fromContact(contact);
 				guiContact.setId(i++);

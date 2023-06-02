@@ -6,6 +6,7 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
+import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -26,8 +27,9 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 		this.lastChangedSortFolder = folder.getId();
 
 		int pageSize = loadGridLayout(folder);
-		DocumentsDS dataSource = new DocumentsDS(folder, null, pageSize, 1, null, false, false,
+		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null, pageSize, 1,
 				DocumentGridUtil.getSortSpec(this));
+		DocumentsDS dataSource = new DocumentsDS(params);
 		setDataSource(dataSource);
 
 		final List<ListGridField> fields = new ArrayList<>();
@@ -63,9 +65,10 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 			if (lastChangedSortFolder == getFolder().getId() && getGridCursor().getTotalPages() > 1) {
 				// if we have more pages, it is required to retrieve again
 				// the recodrs from the server using the right sorting
-				DocumentsDS ds = new DocumentsDS(getFolder(), null, getGridCursor().getPageSize(),
-						getGridCursor().getCurrentPage(), null, false, false,
+				DocumentsDSParameters pars = new DocumentsDSParameters(getFolder().getId(), null,
+						getGridCursor().getPageSize(), getGridCursor().getCurrentPage(),
 						DocumentGridUtil.getSortSpec(event.getSortSpecifiers()));
+				DocumentsDS ds = new DocumentsDS(pars);
 				refresh(ds);
 			} else {
 				// save the current folder's ID

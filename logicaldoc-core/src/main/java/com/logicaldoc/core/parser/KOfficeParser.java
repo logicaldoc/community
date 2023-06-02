@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Locale;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -17,7 +16,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
@@ -75,8 +73,7 @@ public class KOfficeParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			// to be compliant, completely disable DOCTYPE declaration:

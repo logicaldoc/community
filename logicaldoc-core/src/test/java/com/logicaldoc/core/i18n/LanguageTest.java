@@ -24,7 +24,7 @@ public class LanguageTest {
 	@Test
 	public void testGetLocale() {
 		Language language = new Language(Locale.GERMAN);
-		assertEquals(language.getLocale(), Locale.GERMAN);
+		assertEquals(Locale.GERMAN, language.getLocale());
 	}
 	
 	@Test
@@ -34,26 +34,9 @@ public class LanguageTest {
 		assertNotNull(sbp);		
 		assertEquals("org.tartarus.snowball.ext.GermanStemmer", sbp.getClass().getName());
 		
-		/*
-		Locale[] avlocales = Locale.getAvailableLocales();
-		for (Locale locale : avlocales) {
-			System.out.println(locale.toString());
-			System.out.println(locale.getLanguage());			
-			System.out.println(locale.getDisplayName());			
-			System.out.println(locale.getDisplayLanguage());
-			System.out.println(locale.getDisplayCountry());
-			System.out.println(locale.getVariant());
-		} */
-		
 		// Test for Arabic
 		Locale locale = Locale.forLanguageTag("ar");
-//		System.out.println(locale.toString());
-//		System.out.println(locale.getLanguage());			
-//		System.out.println(locale.getDisplayName());			
-//		System.out.println(locale.getDisplayLanguage());
-//		System.out.println(locale.getDisplayCountry());
-//		System.out.println(locale.getVariant());		
-		
+
 		language = new Language(locale);
 		sbp = language.getStemmer();
 		assertNotNull(sbp);		

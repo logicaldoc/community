@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
+import com.logicaldoc.gui.common.client.beans.ParseContactsParameters;
 
 /**
  * The client side stub for the Contact Service. This service allows r/w
@@ -49,24 +50,14 @@ public interface ContactService extends RemoteService {
 	/**
 	 * Reads the contacts that are about to be imported from CSV file
 	 * 
-	 * @param preview if the preview must be shown
-	 * @param separator the separator char
-	 * @param delimiter the fields delimiter
-	 * @param skipFirstRow if the first row contains titles and mus be skipped
-	 * @param firstName the first name
-	 * @param lastName the last name
-	 * @param email the email
-	 * @param company the company
-	 * @param phone the phone
-	 * @param mobile the mobile phone
-	 * @param address the address
+	 * @param preview if it is just to see the extraction, do not save
+	 * @param parameters the rules to interpret the CSV
 	 * 
 	 * @return the extracted contacts
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIContact[] parseContacts(boolean preview, String separator, String delimiter, boolean skipFirstRow,
-			int firstName, int lastName, int email, int company, int phone, int mobile, int address)
+	public GUIContact[] parseContacts(boolean preview, ParseContactsParameters parameters)
 			throws ServerException;
 
 	/**

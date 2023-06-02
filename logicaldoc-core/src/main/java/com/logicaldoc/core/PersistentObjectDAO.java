@@ -436,22 +436,6 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	/**
 	 * Executes a bulk update as specified by the given expression
 	 * 
-	 * @param expression The update expression. (for positional parameters,
-	 *        please use JPA-style: ?1, ?2 ...)
-	 * @param values Optional array of parameters values
-	 * 
-	 * @return the number of modified records
-	 * 
-	 * @throws PersistenceException raised in case of errors in the database
-	 * 
-	 * @deprecated
-	 */
-	@Deprecated(since = "8.9")
-	public int bulkUpdate(String expression, Object[] values) throws PersistenceException;
-
-	/**
-	 * Executes a bulk update as specified by the given expression
-	 * 
 	 * @param expression The update expression.
 	 * @param parameters Optional map of parameters
 	 * 

@@ -11,7 +11,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -27,9 +26,13 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 
 	private static final String ADDRESS = "address";
+
 	private static final String PHONE = "phone";
+
 	private static final String COMPANY = "company";
+
 	private static final String EMAIL = "email";
+
 	private ListGrid list = null;
 
 	public ContactsImportPreview(final ContactsImportSettings settings) {
@@ -54,43 +57,39 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		importButton.setTitle(I18N.message("iimport"));
 		toolStrip.addButton(importButton);
 		importButton.addClickHandler((ClickEvent event) -> {
-				LD.contactingServer();
-				try {
-					ContactService.Instance.get().parseContacts(false, settings.getSeparator(),
-							settings.getTextDelimiter(), settings.isSkipFirstRow(), settings.getFirstNameIndex(),
-							settings.getLastNameIndex(), settings.getEmailIndex(), settings.getCompanyIndex(),
-							settings.getPhoneIndex(), settings.getMobileIndex(), settings.getAddressIndex(),
-							new AsyncCallback<GUIContact[]>() {
+			LD.contactingServer();
+			try {
+				ContactService.Instance.get().parseContacts(false, settings.getParseContactsParameters(),
+						new AsyncCallback<GUIContact[]>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIContact[] contacts) {
+								LD.clearPrompt();
+								settings.destroy();
+								destroy();
+
+								try {
+									Contacts.get().refresh();
+								} catch (Exception t) {
+									// Nothing to do
 								}
-
-								@Override
-								public void onSuccess(GUIContact[] contacts) {
-									LD.clearPrompt();
-									settings.destroy();
-									destroy();
-
-									try {
-										Contacts.get().refresh();
-									} catch (Exception t) {
-										// Nothing to do
-									}
-								}
-							});
-				} catch (Exception t) {
-					LD.clearPrompt();
-				}
+							}
+						});
+			} catch (Exception t) {
+				LD.clearPrompt();
+			}
 		});
 
 		ToolStripButton cancel = new ToolStripButton();
 		cancel.setTitle(I18N.message("cancel"));
 		toolStrip.addButton(cancel);
-		cancel.addClickHandler((ClickEvent event) -> 
-				destroy());
+		cancel.addClickHandler((ClickEvent event) -> destroy());
 
 		toolStrip.addFill();
 

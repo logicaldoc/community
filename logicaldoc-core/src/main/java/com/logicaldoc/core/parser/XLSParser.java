@@ -3,7 +3,6 @@ package com.logicaldoc.core.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Locale;
 
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -11,7 +10,6 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -26,8 +24,7 @@ public class XLSParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(XLSParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 
 		try (POIFSFileSystem fs = new POIFSFileSystem(input); ExcelExtractor extractor = new ExcelExtractor(fs);) {
 			String tmp = extractor.getText();

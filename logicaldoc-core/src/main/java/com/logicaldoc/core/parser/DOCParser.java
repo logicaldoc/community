@@ -4,14 +4,12 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Locale;
 
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -32,8 +30,7 @@ public class DOCParser extends RTFParser {
 	protected static Logger log = LoggerFactory.getLogger(DOCParser.class);
 
 	@Override
-	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion) {
+	public String parse(InputStream input, ParseParameters parameterObject) {
 		try (BufferedInputStream bis = new BufferedInputStream(input)) {
 			bis.mark(Integer.MAX_VALUE);
 

@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.services;
 import java.util.Date;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.beans.CalendarEventSearchCriteria;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 
 public interface CalendarServiceAsync {
@@ -14,6 +15,5 @@ public interface CalendarServiceAsync {
 
 	void countUserEvents(String username, Date end, AsyncCallback<Integer> callback);
 
-	void find(Date startDate, Date endDate, Date expireFrom, Date expireTo, Integer frequency,
-			String title, String type, String subtype, Integer status, Integer maxRecords, AsyncCallback<GUICalendarEvent[]> callback);
+	void find(CalendarEventSearchCriteria criteria, AsyncCallback<GUICalendarEvent[]> callback);
 }

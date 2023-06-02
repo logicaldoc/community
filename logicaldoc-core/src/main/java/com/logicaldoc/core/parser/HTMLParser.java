@@ -2,13 +2,11 @@ package com.logicaldoc.core.parser;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Locale;
 
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -26,8 +24,7 @@ public class HTMLParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(HTMLParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 		try {
 			org.jsoup.nodes.Document doc = Jsoup.parse(FileUtil.readFile(new File("test.html")));
 			String title = doc.title();

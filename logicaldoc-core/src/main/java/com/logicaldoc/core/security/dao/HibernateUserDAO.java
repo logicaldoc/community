@@ -39,6 +39,7 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordValidator;
 
 /**
@@ -175,34 +176,25 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		ContextProperties config = Context.get().getProperties();
 
-		PasswordValidator validator = new PasswordValidator(
-				// length between X and 30 characters
-				config.getInt(tenant + ".password.size", 8),
+		// length between X and 30 characters
+		// at least X upper-case character
+		// at least X lower-case characters
+		// at least X digit characters
+		// at least X digit characters
+		PasswordCriteria criteria = new PasswordCriteria(config.getInt(tenant + ".password.size", 8),
+				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
+				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1));
 
-				// at least X upper-case character
-				config.getInt(tenant + ".password.uppercase", 2),
+		// at least X times a character can be used
+		criteria.setMaxOccurrences(config.getInt(tenant + ".password.occurrence", 3));
 
-				// at least X lower-case characters
-				config.getInt(tenant + ".password.lowercase", 2),
+		// define some illegal sequences that will fail when >= 4 chars
+		// long alphabetical is of the form 'abcd', numerical is '3456',
+		// qwer is 'asdf' the false parameter indicates that wrapped
+		// sequences are allowed; e.g. 'xyzab'
+		criteria.setMaxSequenceSize(config.getInt(tenant + ".password.sequence", 3));
 
-				// at least X digit characters
-				config.getInt(tenant + ".password.digit", 1),
-
-				// at least X symbols (special character)
-				config.getInt(tenant + ".password.special", 1),
-
-				// define some illegal sequences that will fail when >= 4 chars
-				// long alphabetical is of the form 'abcd', numerical is '3456',
-				// qwer
-				// is 'asdf' the false parameter indicates that wrapped
-				// sequences are
-				// allowed; e.g. 'xyzab'
-				config.getInt(tenant + ".password.sequence", 3),
-
-				// at least X times a character can be used
-				config.getInt(tenant + ".password.occurrence", 3),
-
-				props);
+		PasswordValidator validator = new PasswordValidator(criteria, props);
 
 		List<String> errors = validator.validate(password);
 		if (!errors.isEmpty())

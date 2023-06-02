@@ -87,8 +87,12 @@ public class PasswordGenerator {
 			throw new IllegalArgumentException(
 					String.format("Cannot generate password with less than %d chars", minLength));
 
-		PasswordValidator validator = new PasswordValidator(minLength, uppercaseChars, lowercaseChars, digits,
-				specialChars, maxSequenceSize, maxOccurrences, null);
+		PasswordCriteria criteria=new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
+				specialChars);
+		criteria.setMaxSequenceSize(maxSequenceSize);
+		criteria.setMaxOccurrences(maxOccurrences);
+		
+		PasswordValidator validator = new PasswordValidator(criteria, null);
 
 		String pswd = "";
 		boolean valid = false;
