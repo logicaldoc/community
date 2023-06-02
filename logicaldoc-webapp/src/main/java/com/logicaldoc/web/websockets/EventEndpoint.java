@@ -95,6 +95,18 @@ public class EventEndpoint implements EventListener {
 		}
 	}
 
+	/**
+	 * Returns the number of canched events of the given type
+	 * 
+	 * @param historyClass a class of History
+	 * 
+	 * @return number of cached events
+	 */
+	public <T extends History> int countQueueSize(Class<T> historyClass) {
+		Queue<Long> fifo = fifos.get(historyClass.getName());
+		return fifo != null ? fifo.size() : 0;
+	}
+
 	@OnOpen
 	public void onOpen(final Session session) {
 		if (!registered) {
@@ -157,7 +169,7 @@ public class EventEndpoint implements EventListener {
 		message.setComment(event.getComment());
 		message.setDate(event.getDate());
 		message.setId(event.getId());
-
+		
 		if (event instanceof UserHistory)
 			message.setAuthor(((UserHistory) event).getAuthor());
 
@@ -220,7 +232,9 @@ public class EventEndpoint implements EventListener {
 	public static void distributeMessage(WebsocketMessage message) {
 		for (Session peer : peers)
 			try {
-				peer.getAsyncRemote().sendText(serializeMessage(message));
+				String serializedMessage=serializeMessage(message);
+				if(peer.getAsyncRemote()!=null)
+					peer.getAsyncRemote().sendText(serializedMessage);
 			} catch (SerializationException e) {
 				log.error("Error preparing websocket message {}", message.getEvent(), e);
 			}
