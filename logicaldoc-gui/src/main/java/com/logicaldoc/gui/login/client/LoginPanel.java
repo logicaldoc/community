@@ -74,7 +74,7 @@ public class LoginPanel extends VLayout {
 
 	protected TextItem username = new TextItem();
 
-	protected PasswordItem password = new PasswordItem();
+	protected PasswordItem password = ItemFactory.newPasswordItem();
 
 	protected TextItem secretKey = new TextItem();
 

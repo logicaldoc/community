@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
@@ -1462,13 +1465,51 @@ public class ItemFactory {
 		return item;
 	}
 
+	public static PasswordItem newPasswordItem() {
+		return newPasswordItem(null);
+	}
+
+	public static PasswordItem newPasswordItem(String value) {
+		return newPasswordItem("pasword", I18N.message("password"), value);
+	}
+
 	public static PasswordItem newPasswordItem(String name, String title, String value) {
 		PasswordItem password = new PasswordItem();
 		password.setTitle(I18N.message(title));
 		password.setName(originalItemName(name));
 		if (value != null)
 			password.setValue(value);
+		password.setIconVAlign(VerticalAlignment.CENTER);
+
+		FormItemIcon showPassword = newShowPasswordIcon();
+
+		password.setIcons(showPassword);
+
 		return password;
+	}
+
+	private static FormItemIcon newShowPasswordIcon() {
+		FormItemIcon showPassword = new FormItemIcon();
+		showPassword.setName("showpassword");
+		showPassword.setWidth(16);
+		showPassword.setHeight(16);
+		showPassword.setSrc("[SKIN]/eye.png");
+		showPassword.setPrompt(I18N.message("showpassword"));
+		showPassword.addFormItemClickHandler(event -> {
+			NodeList<Element> inputElements = Document.get().getElementsByTagName("input");
+			for (int i = 0; i < inputElements.getLength(); i++) {
+				Element inputElement = inputElements.getItem(i);
+				if (!event.getItem().getName().equals(inputElement.getAttribute("name")))
+					continue;
+
+				String test = inputElement.getAttribute("type");
+				if ("PASSWORD".equalsIgnoreCase(test))
+					inputElement.setAttribute("type", "");
+				else
+					inputElement.setAttribute("type", "PASSWORD");
+			}
+		});
+		return showPassword;
 	}
 
 	public static PasswordItem newPasswordItemPreventAutocomplete(String name, String title, String value) {
@@ -1480,19 +1521,16 @@ public class ItemFactory {
 	public static PasswordItem newPasswordItemPreventAutocomplete(String name, String title, String value,
 			boolean withGeneratorTool) {
 		PasswordItem password = newPasswordItemPreventAutocomplete(name, title, value);
-		FormItemIcon generator = new FormItemIcon();
-		generator.setName("generator");
-		generator.setWidth(16);
-		generator.setHeight(16);
-
 		if (withGeneratorTool) {
+			FormItemIcon generator = new FormItemIcon();
+			generator.setName("generator");
+			generator.setWidth(16);
+			generator.setHeight(16);
 			generator.setSrc("[SKIN]/key.png");
 			generator.setPrompt(I18N.message("passwordgenerator"));
 			generator.addFormItemClickHandler((FormItemIconClickEvent event) -> new PasswordGenerator().show());
+			password.setIcons(newShowPasswordIcon(), generator);
 		}
-
-		password.setIcons(generator);
-		password.setIconVAlign(VerticalAlignment.CENTER);
 
 		return password;
 	}
@@ -1515,7 +1553,7 @@ public class ItemFactory {
 			FormItem hiddenPasswordItem, ChangedHandler changedHandler) {
 		StaticTextItem item = newStaticTextItem(name, title, value == null || value.isEmpty() ? "" : "*****");
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
 			item.setValue((String) null);
 			hiddenPasswordItem.setValue((String) null);
 			if (changedHandler != null)
@@ -1528,7 +1566,7 @@ public class ItemFactory {
 		edit.setHeight(16);
 		edit.setSrc("[SKIN]/edit.png");
 		edit.setPrompt(I18N.message("changepassword"));
-		edit.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+		edit.addFormItemClickHandler(event -> {
 			PasswordItem password = newPasswordItem("psw", title, null);
 			password.setAutoCompleteKeywords("new-password");
 			password.setShowTitle(false);
