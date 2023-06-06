@@ -86,7 +86,7 @@ public class FolderTool {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		return folderDao.computePathExtended(folderId);
 	}
-
+	
 	/**
 	 * Finds the folder by it's path
 	 * 
@@ -116,6 +116,23 @@ public class FolderTool {
 		}
 	}
 
+	/**
+	 * Finds the folder by it's identifier
+	 * 
+	 * @param id the unique identifier
+	 * 
+	 * @return the found folder
+	 */
+	public Folder findById(long id) {
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		try {
+			return folderDao.findById(id);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+	
 	/**
 	 * Saves / updates a folder into the database
 	 * 
@@ -188,7 +205,7 @@ public class FolderTool {
 	public void move(Folder folder, String targetPath, String username) throws PersistenceException {
 		User user = new SecurityTool().getUser(username);
 
-		Folder target = createPath(null, targetPath, username);
+		Folder target = createPath(folder, targetPath, username);
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setFolder(folder);
@@ -225,7 +242,7 @@ public class FolderTool {
 			throws PersistenceException {
 		User user = new SecurityTool().getUser(username);
 
-		Folder target = createPath(null, targetPath, username);
+		Folder target = createPath(source, targetPath, username);
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setFolder(source);

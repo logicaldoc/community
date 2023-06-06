@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -277,8 +276,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
-		Assert.assertEquals(1, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
-
+		Assert.assertEquals(2, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
 	}
 

@@ -28,13 +28,13 @@ import com.logicaldoc.webservice.AbstractWebserviceTCase;
 public class SoapAuthServiceTest extends AbstractWebserviceTCase {
 
 	@Mock
-	WebServiceContext wscontext;
+	private WebServiceContext wscontext;
 
 	@Mock
-	MessageContext messageContext;
+	private MessageContext messageContext;
 
 	@Mock
-	HttpServletRequest httpRequest;
+	private HttpServletRequest httpRequest;
 
 	// Instance under test
 	private SoapAuthService soapAuthServiceImpl;

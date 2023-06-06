@@ -69,6 +69,7 @@ public abstract class AbstractCoreTCase {
 				
 		// Store the file of document 1
 		FileUtil.copyResource("/Digital_Day.pdf", new File(storePath+"/1/doc/1.0"));
+		FileUtil.copyResource("/Digital_Day.pdf", new File(storePath+"/1/doc/1.0-conversion.pdf"));
 		
 		// Store the file of document 3
 		FileUtil.copyResource("/small.pdf", new File(storePath+"/3/doc/1.3"));

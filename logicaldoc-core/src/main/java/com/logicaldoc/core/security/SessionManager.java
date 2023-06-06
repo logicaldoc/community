@@ -210,12 +210,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public void renew(String sid) {
 		if (isOpen(sid)) {
 			Session session = get(sid);
-			if (session.getStatus() == Session.STATUS_OPEN) {
-				if (session.isTimedOut()) {
-					session.setExpired();
-				} else {
-					session.setLastRenew(new Date());
-				}
+			if (session.isTimedOut()) {
+				session.setExpired();
+			} else {
+				session.setLastRenew(new Date());
 			}
 		}
 	}

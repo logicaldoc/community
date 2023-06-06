@@ -301,8 +301,10 @@ public class DocTool {
 	 * @param doc1 first document
 	 * @param doc2 second document
 	 * @param type type of link(optional)
+	 * 
+	 * @return the created link
 	 */
-	public void link(Document doc1, Document doc2, String type) {
+	public DocumentLink link(Document doc1, Document doc2, String type) {
 		DocumentLinkDAO linkDao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		DocumentLink link = linkDao.findByDocIdsAndType(doc1.getId(), doc2.getId(), "default");
 		if (link == null) {
@@ -318,6 +320,7 @@ public class DocTool {
 				log.error(e.getMessage(), e);
 			}
 		}
+		return link;
 	}
 
 	/**
