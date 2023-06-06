@@ -272,6 +272,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		store(doc, null);
 	}
 
+	private void setType(Document doc) {
+		if (StringUtils.isEmpty(doc.getType()) && doc.getFileName().contains("."))
+			doc.setType(FileUtil.getExtension(doc.getFileName()).toLowerCase());
+	}
+
 	@Override
 	public void store(Document doc, final DocumentHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
@@ -290,6 +295,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			setIndexed(doc, tenant);
 
 			setTags(doc);
+
+			setType(doc);
 
 			/*
 			 * Avoid documents inside folder alias

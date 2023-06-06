@@ -67,8 +67,6 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  */
 public class DocumentManagerImpl implements DocumentManager {
 
-	private static final String NO_COMMENT_IN_TRANSACTION = "No comment in transaction";
-
 	private static final String MERGE = "merge";
 
 	private static final String UNKNOWN = "unknown";
@@ -149,9 +147,6 @@ public class DocumentManagerImpl implements DocumentManager {
 			throws PersistenceException, IOException {
 		validateTransaction(transaction);
 
-		if (transaction.getComment() == null)
-			throw new IllegalArgumentException(NO_COMMENT_IN_TRANSACTION);
-
 		transaction.setEvent(DocumentEvent.VERSION_REPLACED.toString());
 		transaction.setComment(String.format("file version %s - %s", fileVersion, transaction.getComment()));
 
@@ -205,9 +200,6 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
-
-		if (transaction.getComment() == null)
-			throw new IllegalArgumentException(NO_COMMENT_IN_TRANSACTION);
 
 		if (filename == null)
 			throw new IllegalArgumentException("File name is mandatory");
@@ -352,9 +344,6 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws IOException, PersistenceException {
 		validateTransaction(transaction);
-
-		if (transaction.getComment() == null)
-			throw new IllegalArgumentException(NO_COMMENT_IN_TRANSACTION);
 
 		// Write content to temporary file, then delete it
 		File tmp = FileUtil.createTempFile("checkin", "");
