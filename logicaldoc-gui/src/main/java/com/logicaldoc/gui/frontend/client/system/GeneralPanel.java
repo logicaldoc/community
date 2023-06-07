@@ -48,5 +48,10 @@ public class GeneralPanel extends AdminPanel {
 			logs.setPane(new LogPanel("DMS_WEB"));
 			tabs.addTab(logs);
 		}
+		
+		Tab environment = new Tab();
+		environment.setTitle(I18N.message("environment"));
+		environment.setPane(new EnvironmentPanel());
+		tabs.addTab(environment);
 	}
 }

@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
@@ -37,25 +38,16 @@ import com.talanlabs.avatargenerator.IdenticonAvatar;
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		String filename = "John Doe - Pay Stub[-20151209[M#1234[A#L17[S#123456789.pdf";
+		Map<String, String> env = System.getenv();
+		System.out.println("env:");
+		for (Map.Entry<String, String> entry : env.entrySet()) {
+			System.out.println(entry.getKey() + " = " + entry.getValue());
+		}
 
-		if (!filename.startsWith("_") && filename.contains("[") && filename.contains("#")
-				&& filename.toLowerCase().endsWith(".pdf")) {
-
-			String memberName = filename.substring(0, filename.indexOf("["));
-			String compound = filename.substring(filename.indexOf("[M")+1);
-			String memberNumber = compound.substring(compound.indexOf("M#")+2, compound.indexOf("["));
-			
-			compound = filename.substring(filename.indexOf("[A#")+1);
-			String accountType = compound.substring(compound.indexOf("A#")+2, compound.indexOf("["));
-			
-			compound = filename.substring(filename.indexOf("[S#")+1);
-			String socialSecurityNumber = compound.substring(compound.indexOf("S#")+2, compound.indexOf("."));
-			
-			System.out.println("memberName: " + memberName);
-			System.out.println("memberNumber: " + memberNumber);
-			System.out.println("accountType: " + accountType);
-			System.out.println("socialSecurityNumber: " + socialSecurityNumber);	
+		System.out.println("\njava:");
+		Properties props = System.getProperties();
+		for (Map.Entry<Object, Object> entry : props.entrySet()) {
+			System.out.println(entry.getKey() + " = " + entry.getValue());
 		}
 
 //		StringBuilder sb = new StringBuilder();

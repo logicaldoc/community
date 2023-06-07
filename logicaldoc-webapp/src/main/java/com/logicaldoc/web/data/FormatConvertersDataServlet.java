@@ -2,7 +2,6 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -31,7 +30,9 @@ import com.logicaldoc.util.config.ContextProperties;
 public class FormatConvertersDataServlet extends AbstractDataServlet {
 
 	private static final String CLOSE_ID = "]]></id>";
+
 	private static final String ID = "<id><![CDATA[";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override

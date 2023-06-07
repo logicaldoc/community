@@ -429,7 +429,15 @@
 	<servlet-name>Echo</servlet-name>
 	<servlet-class>com.logicaldoc.web.EchoServlet</servlet-class>
   </servlet>
+  <servlet>
+	<servlet-name>Environment</servlet-name>
+	<servlet-class>com.logicaldoc.web.data.EnvironmentDataServlet</servlet-class>
+  </servlet>
       
+  <servlet-mapping>
+    <servlet-name>Environment</servlet-name>
+    <url-pattern>/data/environment.xml</url-pattern>
+  </servlet-mapping>       
   <servlet-mapping>
     <servlet-name>Echo</servlet-name>
     <url-pattern>/echo</url-pattern>

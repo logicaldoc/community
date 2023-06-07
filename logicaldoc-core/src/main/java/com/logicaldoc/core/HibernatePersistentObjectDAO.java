@@ -1,12 +1,14 @@
 package com.logicaldoc.core;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -842,5 +844,30 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 */
 	protected int cleanOldRecords(int ttl, String tableName) throws PersistenceException {
 		return cleanOldRecords(ttl, tableName, "ld_date");
+	}
+
+	@Override
+	public Map<String, String> getDatabaseMetadata() {
+		Map<String, String> map = new HashMap<>();
+		DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
+		try {
+			DatabaseMetaData meta = dataSource.getConnection().getMetaData();
+			map.put("db.product.name", meta.getDatabaseProductName());
+			map.put("db.product.version", meta.getDatabaseProductVersion());
+			map.put("db.minorversion", Integer.toString(meta.getDatabaseMinorVersion()));
+			map.put("db.majorversion", Integer.toString(meta.getDatabaseMajorVersion()));
+			map.put("db.driver.name", meta.getDriverName());
+			map.put("db.driver.version", meta.getDriverVersion());
+			map.put("db.driver.minorversion", Integer.toString(meta.getDriverMinorVersion()));
+			map.put("db.driver.majorversion", Integer.toString(meta.getDriverMajorVersion()));
+			map.put("db.jdbc.majorversion", Integer.toString(meta.getJDBCMajorVersion()));
+			map.put("db.jdbc.minorversion", Integer.toString(meta.getJDBCMinorVersion()));
+			map.put("db.catalog.term", meta.getCatalogTerm());
+			map.put("db.catalog.separator", meta.getCatalogSeparator());
+			map.put("db.schema.term", meta.getSchemaTerm());
+		} catch (SQLException e) {
+			log.error(e.getMessage(), e);
+		}
+		return map;
 	}
 }

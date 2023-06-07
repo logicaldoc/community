@@ -6,7 +6,7 @@ import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
- * Datasource to handle documents grid lists. It is based on Xml parsing
+ * Datasource to handle the discussions on a document. It is based on Xml parsing
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0

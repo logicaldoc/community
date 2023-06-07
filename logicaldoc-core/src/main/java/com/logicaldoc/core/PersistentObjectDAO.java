@@ -86,8 +86,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<Long> findAllIds(long tenantId);
 
 	/**
-	 * Finds all entities by the given expression. Use {@value #ENTITY}
-	 * alias to reference attributes in the where expression.
+	 * Finds all entities by the given expression. Use {@value #ENTITY} alias to
+	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param order The order clause expression
@@ -100,8 +100,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities by the given expression. Use {@value #ENTITY}
-	 * alias to reference attributes in the where expression.
+	 * Finds all entities by the given expression. Use {@value #ENTITY} alias to
+	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param values Parameters used in the where expression
@@ -118,8 +118,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities by the given expression. Use {@value #ENTITY}
-	 * alias to reference attributes in the where expression.
+	 * Finds all entities by the given expression. Use {@value #ENTITY} alias to
+	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param parameters Parameters used in the where expression
@@ -193,9 +193,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 			throws PersistenceException;
 
 	/**
-	 * Finds all entities ids by the given expression. Use
-	 * {@value #ENTITY} alias to reference attributes in the where
-	 * expression.
+	 * Finds all entities ids by the given expression. Use {@value #ENTITY}
+	 * alias to reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param order The order clause expression
@@ -208,9 +207,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities ids by the given expression. Use
-	 * {@value #ENTITY} alias to reference attributes in the where
-	 * expression.
+	 * Finds all entities ids by the given expression. Use {@value #ENTITY}
+	 * alias to reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression (for positional parameters,
 	 *        please use JPA-style: ?1, ?2 ...)
@@ -481,4 +479,11 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public String getDbms();
 
 	public boolean isOracle();
+
+	/**
+	 * Retrieves the metadata from the database
+	 * 
+	 * @return a map of metadata from the database driver
+	 */
+	public Map<String, String> getDatabaseMetadata();
 }

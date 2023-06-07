@@ -7,9 +7,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -23,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.SystemUtil;
@@ -145,8 +149,10 @@ public class LogDownload extends HttpServlet {
 			 * Now create a file with the environment
 			 */
 			String env = SystemUtil.printEnvironment();
+			env += "\n\n" + printDatabaseEnvironment();
 			buf = FileUtil.createTempFile("environment", ".txt");
 			FileUtil.writeFile(env, buf.getPath());
+
 			writeEntry(out, "environment.txt", buf);
 			FileUtil.strongDelete(buf);
 
@@ -172,6 +178,21 @@ public class LogDownload extends HttpServlet {
 		}
 
 		return tmp;
+	}
+
+	private String printDatabaseEnvironment() {
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean("DocumentDAO");
+		Properties prop = new Properties();
+		prop.putAll(dao.getDatabaseMetadata());
+
+		StringWriter writer = new StringWriter();
+		try {
+			prop.store(new PrintWriter(writer), "Database Environment");
+			return writer.getBuffer().toString();
+		} catch (IOException e) {
+			// Nothing to do
+		}
+		return "";
 	}
 
 	private void writeTomcatLogs(ZipOutputStream out, File webappDescriptor) throws FileNotFoundException, IOException {
