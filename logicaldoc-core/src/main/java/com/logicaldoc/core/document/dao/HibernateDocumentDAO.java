@@ -227,6 +227,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return findIdsByWhere(query.toString(), null, null);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Document> findByLockUserAndStatus(Long userId, Integer status) {
 		StringBuilder sb = new StringBuilder(
@@ -238,22 +239,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(" and ld_status=" + status);
 
 		try {
-			return query(sb.toString(), null, new RowMapper<Document>() {
-
-				@Override
-				public Document mapRow(ResultSet rs, int col) throws SQLException {
+			return query(sb.toString(), null, (resultSet, col) ->  {
 					Document doc = new Document();
-					doc.setId(rs.getLong(1));
+					doc.setId(resultSet.getLong(1));
 					Folder folder = new Folder();
-					folder.setId(rs.getLong(2));
+					folder.setId(resultSet.getLong(2));
 					doc.setFolder(folder);
-					doc.setVersion(rs.getString(3));
-					doc.setFileVersion(rs.getString(4));
-					doc.setLastModified(rs.getTimestamp(5));
-					doc.setFileName(rs.getString(6));
+					doc.setVersion(resultSet.getString(3));
+					doc.setFileVersion(resultSet.getString(4));
+					doc.setLastModified(resultSet.getTimestamp(5));
+					doc.setFileName(resultSet.getString(6));
 					return doc;
-				}
-
 			}, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
