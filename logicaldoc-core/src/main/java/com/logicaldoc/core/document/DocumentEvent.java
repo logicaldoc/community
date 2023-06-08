@@ -15,6 +15,7 @@ public enum DocumentEvent {
 	RENAMED("event.renamed"),
 	DOWNLOADED("event.downloaded"),
 	INDEXED("event.indexed"),
+	INDEXED_ERROR("event.indexed.error"),
 	MOVED("event.moved"),
 	LOCKED("event.locked"),
 	UNLOCKED("event.unlocked"),

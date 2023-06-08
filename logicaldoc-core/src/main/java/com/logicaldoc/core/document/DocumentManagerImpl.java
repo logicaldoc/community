@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -486,40 +487,53 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		log.debug("Reindexing document {} - {}", docId, doc.getFileName());
 
-		String cont = content;
-		long parsingTime = 0;
-		if (doc.getDocRef() != null) {
-			// We are indexing an alias, so index the real document first
-			Document realDoc = documentDAO.findById(doc.getDocRef());
-			if (realDoc != null) {
-				if (realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
-						|| realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
-					parsingTime = reindex(realDoc.getId(), content, new DocumentHistory(transaction));
+		String cont;
+		long parsingTime;
+		try {
+			cont = content;
+			parsingTime = 0;
+			if (doc.getDocRef() != null) {
+				// We are indexing an alias, so index the real document first
+				Document realDoc = documentDAO.findById(doc.getDocRef());
+				if (realDoc != null) {
+					if (realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
+							|| realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
+						parsingTime = reindex(realDoc.getId(), content, new DocumentHistory(transaction));
 
-				// Take the content from the real document to avoid double
-				// parsing
-				if (StringUtils.isEmpty(content))
-					cont = indexer.getHit(realDoc.getId()).getContent();
-			} else {
-				log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
-						doc.getDocRef());
-				documentDAO.initialize(doc);
-				doc.setIndexed(AbstractDocument.INDEX_SKIP);
-				documentDAO.store(doc);
-				return 0;
+					// Take the content from the real document to avoid double
+					// parsing
+					if (StringUtils.isEmpty(content))
+						cont = indexer.getHit(realDoc.getId()).getContent();
+				} else {
+					log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
+							doc.getDocRef());
+					documentDAO.initialize(doc);
+					doc.setIndexed(AbstractDocument.INDEX_SKIP);
+					documentDAO.store(doc);
+					return 0;
+				}
 			}
-		}
 
-		if (StringUtils.isEmpty(cont) && doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA) {
-			// Extracts the content from the file. This may take very long
-			// time.
-			Date beforeParsing = new Date();
-			cont = parseDocument(doc, null);
-			parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
+			if (StringUtils.isEmpty(cont) && doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA) {
+				// Extracts the content from the file. This may take very long
+				// time.
+				Date beforeParsing = new Date();
+				cont = parseDocument(doc, null);
+				parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
+			}
+			
+			// This may take time
+			addHIt(doc, cont);
+		} catch (PersistenceException | ParseException e) {
+			if (transaction != null) {
+				transaction.setEvent(DocumentEvent.INDEXED_ERROR.toString());
+				transaction.setComment(e.getMessage());
+				transaction.setDocument(doc);
+				DocumentHistoryDAO hDao=(DocumentHistoryDAO)Context.get().getBean(DocumentHistoryDAO.class);
+				hDao.store(transaction);
+			}
+			throw e;
 		}
-
-		// This may take time
-		addHIt(doc, cont);
 
 		// For additional safety update the DB directly
 		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
