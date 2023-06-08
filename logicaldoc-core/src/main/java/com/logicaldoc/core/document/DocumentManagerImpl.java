@@ -209,6 +209,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throw new IllegalArgumentException("File name is mandatory");
 
 		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
+		transaction.setFile(file.getAbsolutePath());
 
 		/*
 		 * Better to synchronize this block because under high multi-threading
@@ -349,7 +350,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		validateTransaction(transaction);
 
 		// Write content to temporary file, then delete it
-		File tmp = FileUtil.createTempFile("checkin", "");
+		File tmp = FileUtil.createTempFile("checkin", "." + FileUtil.getExtension(filename));
 		try {
 			FileUtil.writeFile(content, tmp.getPath());
 			checkin(docId, tmp, filename, release, docVO, transaction);
@@ -458,7 +459,8 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			try {
-				content = parser.parse(storer.getStream(doc.getId(), resource), new ParseParameters(doc, doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
+				content = parser.parse(storer.getStream(doc.getId(), resource), new ParseParameters(doc,
+						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
 			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc, e);
 				if (e instanceof ParseException)
