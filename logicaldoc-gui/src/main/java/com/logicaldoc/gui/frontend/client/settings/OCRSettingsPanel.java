@@ -36,9 +36,11 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class OCRSettingsPanel extends AdminPanel {
 
-	private static final String NO = "no";
+	private static final String OCR_EVENTS_RECORD = "ocr_events_record";
 
-	private static final String OCR_DOT_TIMEOUT_DOT_BATCH = "ocr.timeout.batch";
+	private static final String OCR_EVENTS_MAXTEXT = "ocr_events_maxtext";
+
+	private static final String NO = "no";
 
 	private static final String OCR_TIMEOUT_BATCH = "ocr_timeout_batch";
 
@@ -46,11 +48,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 	private static final String OCR_DOT_THREADS = "ocr.threads";
 
-	private static final String OCR_DOT_RESOLUTION_DOT_THRESHOLD = "ocr.resolution.threshold";
-
 	private static final String OCR_RESOLUTION_THRESHOLD = "ocr_resolution_threshold";
-
-	private static final String OCR_DOT_TEXT_DOT_THRESHOLD = "ocr.text.threshold";
 
 	private static final String OCR_TEXT_THRESHOLD = "ocr_text_threshold";
 
@@ -60,17 +58,11 @@ public class OCRSettingsPanel extends AdminPanel {
 
 	private static final String SECONDS = "seconds";
 
-	private static final String OCR_DOT_THREADS_DOT_WAIT = "ocr.threads.wait";
-
 	private static final String OCR_THREADS_WAIT = "ocr_threads_wait";
 
 	private static final String OCR_THREADS = "ocr_threads";
 
-	private static final String OCR_DOT_MAXSIZE = "ocr.maxsize";
-
 	private static final String OCR_MAXSIZE = "ocr_maxsize";
-
-	private static final String OCR_DOT_BATCH = "ocr.batch";
 
 	private static final String OCR_BATCH = "ocr_batch";
 
@@ -106,9 +98,9 @@ public class OCRSettingsPanel extends AdminPanel {
 		DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.LEFT);
-		form.setNumCols(2);
-		form.setColWidths(1, "*");
+		form.setNumCols(4);
 		form.setPadding(5);
+		form.setWidth(1);
 
 		// OCR Enabled
 		RadioGroupItem enabled = prepareEnabledSwitch(params);
@@ -119,10 +111,12 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		TextItem includes = ItemFactory.newTextItem("ocr_includes", "include",
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.includes"));
+		includes.setEndRow(true);
 
 		TextItem excludes = ItemFactory.newTextItem("ocr_excludes", "exclude",
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.excludes"));
-
+		excludes.setEndRow(true);
+		
 		SpinnerItem timeout = prepareTimeoutSpinner(params);
 
 		SpinnerItem batchTimeout = prepareBatchTimeoutSpinner(params);
@@ -131,33 +125,37 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		SpinnerItem ocrrendres = prepareOcrRendResSpinner(params);
 
-		SpinnerItem batch = ItemFactory.newSpinnerItem(OCR_BATCH, I18N.message("batch"),
-				Integer.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_DOT_BATCH)));
+		SpinnerItem batch = ItemFactory.newSpinnerItem(OCR_BATCH, I18N.message("batch"), Integer.parseInt(
+				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_BATCH.replace('_', '.'))));
 		batch.setRequired(true);
+		batch.setEndRow(true);
 		batch.setWrapTitle(false);
 		batch.setHint("pages");
 		batch.setMin(1);
 		batch.setStep(1);
 
-		SpinnerItem maxSize = ItemFactory.newSpinnerItem(OCR_MAXSIZE, I18N.message("maxsize"), Integer
-				.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_DOT_MAXSIZE)));
+		SpinnerItem maxSize = ItemFactory.newSpinnerItem(OCR_MAXSIZE, I18N.message("maxsize"), Integer.parseInt(
+				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_MAXSIZE.replace('_', '.'))));
 		maxSize.setRequired(true);
+		maxSize.setEndRow(true);
 		maxSize.setWrapTitle(false);
 		maxSize.setHint("MB");
 		maxSize.setMin(1);
 		maxSize.setStep(5);
 
-		SpinnerItem threads = ItemFactory.newSpinnerItem(OCR_THREADS, I18N.message("allowedthreads"), Integer
-				.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_DOT_THREADS)));
+		SpinnerItem threads = ItemFactory.newSpinnerItem(OCR_THREADS, I18N.message("allowedthreads"), Integer.parseInt(
+				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_THREADS.replace('_', '.'))));
 		threads.setRequired(true);
+		threads.setEndRow(true);
 		threads.setWrapTitle(false);
 		threads.setMin(1);
 		threads.setStep(1);
 
 		SpinnerItem threadsWait = ItemFactory.newSpinnerItem(OCR_THREADS_WAIT, I18N.message("waitforthread"),
 				Integer.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
-						OCR_DOT_THREADS_DOT_WAIT)));
+						OCR_THREADS_WAIT.replace('_', '.'))));
 		threadsWait.setRequired(true);
+		threadsWait.setEndRow(true);
 		threadsWait.setWrapTitle(false);
 		threadsWait.setHint(I18N.message(SECONDS).toLowerCase());
 		threadsWait.setMin(1);
@@ -169,12 +167,13 @@ public class OCRSettingsPanel extends AdminPanel {
 				I18N.message("erroronemptyextraction"));
 		errorOnEmpty.setWrapTitle(false);
 		errorOnEmpty.setRequired(true);
+		errorOnEmpty.setEndRow(true);
 		errorOnEmpty.setValue(
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.erroronempty").equals(TRUE)
 						? YES
 						: NO);
 
-		RadioGroupItem recordEvents = ItemFactory.newBooleanSelector("ocr_events_record", I18N.message("recordevents"));
+		RadioGroupItem recordEvents = ItemFactory.newBooleanSelector(OCR_EVENTS_RECORD, I18N.message("recordevents"));
 		recordEvents.setWrapTitle(false);
 		recordEvents.setRequired(true);
 		recordEvents.setValue(
@@ -182,13 +181,22 @@ public class OCRSettingsPanel extends AdminPanel {
 						? YES
 						: NO);
 
+		SpinnerItem eventMaxText = ItemFactory.newSpinnerItem(OCR_EVENTS_MAXTEXT, I18N.message("nomorethan"),
+				Integer.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
+						OCR_EVENTS_MAXTEXT.replace('_', '.'))));
+		eventMaxText.setRequired(true);
+		eventMaxText.setWrapTitle(false);
+		eventMaxText.setHint(I18N.message("characters").toLowerCase());
+		eventMaxText.setMin(0);
+		eventMaxText.setStep(10);
+
 		List<FormItem> items = new ArrayList<>();
 		items.add(enabled);
 
 		if (Session.get().isDefaultTenant()) {
-			items.addAll(
-					Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold, ocrrendres,
-							cropImage, batch, batchTimeout, threads, threadsWait, errorOnEmpty, recordEvents, engine));
+			items.addAll(Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold,
+					ocrrendres, cropImage, batch, batchTimeout, threads, threadsWait, errorOnEmpty, recordEvents,
+					eventMaxText, engine));
 		} else
 			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold, errorOnEmpty));
 		form.setItems(items.toArray(new FormItem[0]));
@@ -213,6 +221,7 @@ public class OCRSettingsPanel extends AdminPanel {
 				I18N.message("cropvisiblepartofimage"));
 		cropImage.setWrapTitle(false);
 		cropImage.setRequired(true);
+		cropImage.setEndRow(true);
 		cropImage.setDisabled(!Session.get().isDefaultTenant());
 		cropImage.setValue(
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.cropImage").equals(TRUE) ? YES
@@ -224,6 +233,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		SpinnerItem ocrrendres = ItemFactory.newSpinnerItem(OCR_RENDRES, I18N.message("ocrrendres"), Integer
 				.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_DOT_TIMEOUT)));
 		ocrrendres.setRequired(true);
+		ocrrendres.setEndRow(true);
 		ocrrendres.setWrapTitle(false);
 		ocrrendres.setHint("dpi");
 		ocrrendres.setMin(1);
@@ -240,6 +250,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		final RadioGroupItem engine = ItemFactory.newBooleanSelector("ocr_engine", "engine");
 		engine.setRequired(true);
+		engine.setEndRow(true);
 		engine.setValueMap(engines);
 		engine.addChangedHandler((ChangedEvent event) -> initEngineForm(event.getValue().toString(), params));
 		engine.setValue(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.engine"));
@@ -250,8 +261,9 @@ public class OCRSettingsPanel extends AdminPanel {
 	private SpinnerItem prepareBatchTimeoutSpinner(GUIParameter[] params) {
 		SpinnerItem batchTimeout = ItemFactory.newSpinnerItem(OCR_TIMEOUT_BATCH, I18N.message("batchtimeout"),
 				Integer.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
-						OCR_DOT_TIMEOUT_DOT_BATCH)));
+						OCR_TIMEOUT_BATCH.replace('_', '.'))));
 		batchTimeout.setRequired(true);
+		batchTimeout.setEndRow(true);
 		batchTimeout.setWrapTitle(false);
 		batchTimeout.setHint(I18N.message(SECONDS).toLowerCase());
 		batchTimeout.setMin(0);
@@ -262,6 +274,7 @@ public class OCRSettingsPanel extends AdminPanel {
 	private SpinnerItem prepareTimeoutSpinner(GUIParameter[] params) {
 		SpinnerItem timeout = ItemFactory.newSpinnerItem(OCR_TIMEOUT, I18N.message("timeout"), Integer
 				.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_DOT_TIMEOUT)));
+		timeout.setEndRow(true);
 		timeout.setRequired(true);
 		timeout.setWrapTitle(false);
 		timeout.setHint(I18N.message(SECONDS).toLowerCase());
@@ -273,8 +286,8 @@ public class OCRSettingsPanel extends AdminPanel {
 	private FloatItem prepareTextThresholdSpinner(GUIParameter[] params) {
 		FloatItem textThreshold = ItemFactory.newFloatItem(OCR_TEXT_THRESHOLD, I18N.message("textthreshold"),
 				Float.parseFloat(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
-						OCR_DOT_TEXT_DOT_THRESHOLD)));
-
+						OCR_TEXT_THRESHOLD.replace('_', '.'))));
+		textThreshold.setEndRow(true);
 		textThreshold.setRequired(true);
 		textThreshold.setWrapTitle(false);
 		textThreshold.setHint("%");
@@ -291,8 +304,9 @@ public class OCRSettingsPanel extends AdminPanel {
 	private SpinnerItem prepareResolutionThresholdSpinner(GUIParameter[] params) {
 		SpinnerItem resolutionThreshold = ItemFactory.newSpinnerItem(OCR_RESOLUTION_THRESHOLD,
 				I18N.message("resolutionthreshold"), Integer.parseInt(com.logicaldoc.gui.common.client.util.Util
-						.getParameterValue(params, OCR_DOT_RESOLUTION_DOT_THRESHOLD)));
+						.getParameterValue(params, OCR_RESOLUTION_THRESHOLD.replace('_', '.'))));
 		resolutionThreshold.setRequired(true);
+		resolutionThreshold.setEndRow(true);
 		resolutionThreshold.setWrapTitle(false);
 		resolutionThreshold.setHint("pixels");
 		resolutionThreshold.setMin(1);
@@ -303,6 +317,7 @@ public class OCRSettingsPanel extends AdminPanel {
 	private RadioGroupItem prepareEnabledSwitch(GUIParameter[] params) {
 		RadioGroupItem enabled = ItemFactory.newBooleanSelector("ocr_enabled", "enabled");
 		enabled.setRequired(true);
+		enabled.setEndRow(true);
 		enabled.setDisabled(!Session.get().isDefaultTenant());
 		enabled.setValue(
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.enabled").equals(TRUE) ? YES
@@ -379,15 +394,15 @@ public class OCRSettingsPanel extends AdminPanel {
 			params.add(new GUIParameter(OCR_DOT_TIMEOUT, (String) values.get(OCR_TIMEOUT)));
 
 		if (values.get(OCR_TIMEOUT_BATCH) instanceof Integer)
-			params.add(
-					new GUIParameter(OCR_DOT_TIMEOUT_DOT_BATCH, ((Integer) values.get(OCR_TIMEOUT_BATCH)).toString()));
+			params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'),
+					((Integer) values.get(OCR_TIMEOUT_BATCH)).toString()));
 		else
-			params.add(new GUIParameter(OCR_DOT_TIMEOUT_DOT_BATCH, (String) values.get(OCR_TIMEOUT_BATCH)));
+			params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'), (String) values.get(OCR_TIMEOUT_BATCH)));
 
 		if (values.get(OCR_MAXSIZE) instanceof Integer)
-			params.add(new GUIParameter(OCR_DOT_MAXSIZE, ((Integer) values.get(OCR_MAXSIZE)).toString()));
+			params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), ((Integer) values.get(OCR_MAXSIZE)).toString()));
 		else
-			params.add(new GUIParameter(OCR_DOT_MAXSIZE, (String) values.get(OCR_MAXSIZE)));
+			params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), (String) values.get(OCR_MAXSIZE)));
 
 		if (values.get(OCR_RENDRES) instanceof Integer)
 			params.add(new GUIParameter("ocr.rendres", ((Integer) values.get(OCR_RENDRES)).toString()));
@@ -395,11 +410,18 @@ public class OCRSettingsPanel extends AdminPanel {
 			params.add(new GUIParameter("ocr.rendres", (String) values.get(OCR_RENDRES)));
 
 		if (values.get(OCR_BATCH) instanceof Integer)
-			params.add(new GUIParameter(OCR_DOT_BATCH, ((Integer) values.get(OCR_BATCH)).toString()));
+			params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), ((Integer) values.get(OCR_BATCH)).toString()));
 		else
-			params.add(new GUIParameter(OCR_DOT_BATCH, (String) values.get(OCR_BATCH)));
+			params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), (String) values.get(OCR_BATCH)));
 
-		params.add(new GUIParameter("ocr.events.record", values.get("ocr_events_record").equals(YES) ? TRUE : FALSE));
+		if (values.get(OCR_EVENTS_MAXTEXT) instanceof Integer)
+			params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'),
+					((Integer) values.get(OCR_EVENTS_MAXTEXT)).toString()));
+		else
+			params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'), (String) values.get(OCR_EVENTS_MAXTEXT)));
+
+		params.add(new GUIParameter(OCR_EVENTS_RECORD.replace('_', '.'),
+				values.get(OCR_EVENTS_RECORD).equals(YES) ? TRUE : FALSE));
 
 		collectThreadValues(values, params);
 
@@ -413,9 +435,10 @@ public class OCRSettingsPanel extends AdminPanel {
 			params.add(new GUIParameter(OCR_DOT_THREADS, (String) values.get(OCR_THREADS)));
 
 		if (values.get(OCR_THREADS_WAIT) instanceof Integer)
-			params.add(new GUIParameter(OCR_DOT_THREADS_DOT_WAIT, ((Integer) values.get(OCR_THREADS_WAIT)).toString()));
+			params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'),
+					((Integer) values.get(OCR_THREADS_WAIT)).toString()));
 		else
-			params.add(new GUIParameter(OCR_DOT_THREADS_DOT_WAIT, (String) values.get(OCR_THREADS_WAIT)));
+			params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'), (String) values.get(OCR_THREADS_WAIT)));
 	}
 
 	private void collectEngineSettings(Map<String, Object> values, List<GUIParameter> params) {
