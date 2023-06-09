@@ -1102,13 +1102,13 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newEventsSelector(String name, String title, final ChangedHandler handler, boolean folder,
-			boolean workflow, boolean user, boolean importfolder) {
+			boolean workflow, boolean user, boolean importfolder, boolean ocr) {
 		final SelectItem select = newMultipleSelector(originalItemName(name), title);
 		select.setWidth(350);
 		select.setHeight(250);
 		select.setMultipleAppearance(MultipleAppearance.GRID);
 		select.setMultiple(true);
-		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder));
+		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder, ocr));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)
@@ -1128,11 +1128,11 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler, boolean folder,
-			boolean workflow, boolean user, boolean importfolder) {
+			boolean workflow, boolean user, boolean importfolder, boolean ocr) {
 		final SelectItem select = newSelectItem(originalItemName(name), title);
 		select.setWidth(350);
 		select.setMultiple(false);
-		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder));
+		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder, ocr));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)

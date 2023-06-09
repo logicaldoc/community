@@ -17,7 +17,6 @@ import com.logicaldoc.gui.frontend.client.services.OCRService;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FloatItem;
@@ -27,6 +26,7 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.validator.FloatRangeValidator;
+import com.smartgwt.client.widgets.tab.Tab;
 
 /**
  * This panel shows the OCR settings.
@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.form.validator.FloatRangeValidator;
  * @since 6.0
  */
 public class OCRSettingsPanel extends AdminPanel {
+
+	private static final String NO = "no";
 
 	private static final String OCR_DOT_TIMEOUT_DOT_BATCH = "ocr.timeout.batch";
 
@@ -170,26 +172,40 @@ public class OCRSettingsPanel extends AdminPanel {
 		errorOnEmpty.setValue(
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.erroronempty").equals(TRUE)
 						? YES
-						: "no");
+						: NO);
+
+		RadioGroupItem recordEvents = ItemFactory.newBooleanSelector("ocr_events_record", I18N.message("recordevents"));
+		recordEvents.setWrapTitle(false);
+		recordEvents.setRequired(true);
+		recordEvents.setValue(
+				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.events.record").equals(TRUE)
+						? YES
+						: NO);
 
 		List<FormItem> items = new ArrayList<>();
 		items.add(enabled);
 
 		if (Session.get().isDefaultTenant()) {
-			items.addAll(Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold,
-					ocrrendres, cropImage, batch, batchTimeout, threads, threadsWait, errorOnEmpty, engine));
+			items.addAll(
+					Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold, ocrrendres,
+							cropImage, batch, batchTimeout, threads, threadsWait, errorOnEmpty, recordEvents, engine));
 		} else
 			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold, errorOnEmpty));
 		form.setItems(items.toArray(new FormItem[0]));
 
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> onSave());
+		save.addClickHandler(event -> onSave());
 
 		body.setMembers(form);
 		if (Session.get().isDefaultTenant())
 			initEngineForm(engine.getValueAsString(), params);
 		addMember(save);
+
+		Tab history = new Tab();
+		history.setTitle(I18N.message("history"));
+		history.setPane(new OCRHistoryPanel());
+		tabs.addTab(history);
 	}
 
 	private RadioGroupItem prepareCropImageSwitch(GUIParameter[] params) {
@@ -200,7 +216,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		cropImage.setDisabled(!Session.get().isDefaultTenant());
 		cropImage.setValue(
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.cropImage").equals(TRUE) ? YES
-						: "no");
+						: NO);
 		return cropImage;
 	}
 
@@ -290,7 +306,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		enabled.setDisabled(!Session.get().isDefaultTenant());
 		enabled.setValue(
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.enabled").equals(TRUE) ? YES
-						: "no");
+						: NO);
 		return enabled;
 	}
 
@@ -334,8 +350,8 @@ public class OCRSettingsPanel extends AdminPanel {
 				new GUIParameter(Session.get().getTenantName() + ".ocr.excludes", (String) values.get("ocr_excludes")));
 
 		params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
-					values.get(OCR_TEXT_THRESHOLD).toString()));
-		
+				values.get(OCR_TEXT_THRESHOLD).toString()));
+
 		if (values.get(OCR_RESOLUTION_THRESHOLD) instanceof Integer)
 			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
 					((Integer) values.get(OCR_RESOLUTION_THRESHOLD)).toString()));
@@ -347,12 +363,12 @@ public class OCRSettingsPanel extends AdminPanel {
 				values.get("ocr_erroronempty").equals(YES) ? TRUE : FALSE));
 
 		if (Session.get().isDefaultTenant())
-			collectValuesForDefaultTenant(values, params);
+			collectValuesForWholeSystem(values, params);
 
 		doSaveSettings(params);
 	}
 
-	private void collectValuesForDefaultTenant(Map<String, Object> values, List<GUIParameter> params) {
+	private void collectValuesForWholeSystem(Map<String, Object> values, List<GUIParameter> params) {
 		params.add(new GUIParameter("ocr.enabled", values.get("ocr_enabled").equals(YES) ? TRUE : FALSE));
 
 		params.add(new GUIParameter("ocr.cropImage", values.get("ocr_cropimage").equals(YES) ? TRUE : FALSE));
@@ -382,6 +398,8 @@ public class OCRSettingsPanel extends AdminPanel {
 			params.add(new GUIParameter(OCR_DOT_BATCH, ((Integer) values.get(OCR_BATCH)).toString()));
 		else
 			params.add(new GUIParameter(OCR_DOT_BATCH, (String) values.get(OCR_BATCH)));
+
+		params.add(new GUIParameter("ocr.events.record", values.get("ocr_events_record").equals(YES) ? TRUE : FALSE));
 
 		collectThreadValues(values, params);
 

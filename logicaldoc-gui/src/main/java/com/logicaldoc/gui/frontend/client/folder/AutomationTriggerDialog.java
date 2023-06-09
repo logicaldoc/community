@@ -107,7 +107,7 @@ public class AutomationTriggerDialog extends Window {
 		form1.setValuesManager(vm);
 
 		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeron"), null, true, true, true,
-				true);
+				true, true);
 		events.setHeight(210);
 		events.setHeight(250);
 		events.setEndRow(true);

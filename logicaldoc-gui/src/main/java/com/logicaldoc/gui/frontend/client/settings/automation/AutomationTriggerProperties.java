@@ -139,7 +139,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 	private SelectItem prepareEventsSelector() {
 		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeronevents"),
-				(ChangedEvent event) -> {
+				event -> {
 					SelectItem item = (SelectItem) vm.getItem(EVENTS);
 					if (item.getValues() != null && item.getValues().length > 0) {
 						vm.getItem("date").setDisabled(true);
@@ -157,7 +157,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 					if (changedHandler != null)
 						changedHandler.onChanged(event);
-				}, true, true, true, true);
+				}, true, true, true, true, true);
 		events.setRowSpan(2);
 		events.setColSpan(4);
 		events.setValues(trigger.getEventsArray());

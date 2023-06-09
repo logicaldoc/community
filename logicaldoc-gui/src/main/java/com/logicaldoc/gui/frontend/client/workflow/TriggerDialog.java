@@ -83,7 +83,7 @@ public class TriggerDialog extends Window {
 			template.setValue(panel.getSelectedRecord().getAttributeAsLong("templateId"));
 
 		SelectItem eventsSelector = ItemFactory.newEventsSelector("events", "triggeron", null, false, false, false,
-				false);
+				false, false);
 		eventsSelector.setValue(events);
 
 		DynamicForm form = new DynamicForm();

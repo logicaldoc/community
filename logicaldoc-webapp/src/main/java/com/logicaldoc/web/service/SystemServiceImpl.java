@@ -654,6 +654,19 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			appendEventsCondition("E", events, query);
 		}
 
+		if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_3")) {
+			// Search in the OCR history
+			query.append(
+					" union select F.ld_username, F.ld_event, F.ld_date, F.ld_filename, F.ld_folderid, F.ld_path, null, F.ld_docid, F.ld_userid, null as ip, F.ld_userlogin, F.ld_comment, null, null, null  from ld_ocr_history F where F.ld_tenantid = "
+							+ session.getTenantId());
+			appendUserCondition("F", userId, query);
+			if (StringUtils.isNotEmpty(historySid))
+				query.append(" and 1 = 2 ");
+			appendDatesCondition("F", from, till, query);
+			appendFolderCondition("F", rootFolderId, query);
+			appendEventsCondition("F", events, query);
+		}
+		
 		query.append(" order by 3 desc ");
 
 		try {

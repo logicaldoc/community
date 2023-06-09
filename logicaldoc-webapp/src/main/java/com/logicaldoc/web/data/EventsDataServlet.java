@@ -44,6 +44,7 @@ public class EventsDataServlet extends AbstractDataServlet {
 		boolean workflow = Boolean.parseBoolean(request.getParameter("workflow"));
 		boolean user = Boolean.parseBoolean(request.getParameter("user"));
 		boolean importfolder = Boolean.parseBoolean(request.getParameter("importfolder"));
+		boolean ocr = Boolean.parseBoolean(request.getParameter("ocr"));
 
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
@@ -104,6 +105,17 @@ public class EventsDataServlet extends AbstractDataServlet {
 				writer.print(CODE + event + CLOSE_CODE);
 				writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
 				writer.print("<type>workflow</type>");
+				writer.print(CLOSE_EVENT);
+			}
+		}
+
+		if (ocr) {
+			String[] events = new String[] { "event.ocr.success", "event.ocr.failure" };
+			for (String event : events) {
+				writer.print(EVENT);
+				writer.print(CODE + event + CLOSE_CODE);
+				writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
+				writer.print("<type>ocr</type>");
 				writer.print(CLOSE_EVENT);
 			}
 		}
