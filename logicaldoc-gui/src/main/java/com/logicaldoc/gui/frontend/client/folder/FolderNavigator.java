@@ -478,6 +478,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		MenuItem reload = new MenuItem();
 		reload.setTitle(I18N.message("reload"));
 		reload.addClickHandler(click -> reload());
+		
 
 		MenuItem move = prepareMoveMenuItem(selectedFolder);
 
@@ -671,8 +672,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> onDelete());
-		delete.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
-				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
+		delete.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace());
 		return delete;
 	}
 
