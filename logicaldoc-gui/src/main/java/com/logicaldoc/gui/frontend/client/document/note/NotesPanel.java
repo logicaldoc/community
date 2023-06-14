@@ -20,7 +20,6 @@ import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -41,10 +40,8 @@ public class NotesPanel extends DocumentDetailTab {
 
 	private ListGrid notesGrid;
 
-	private ToolStripButton addNote;
-
-	private HLayout buttons;
-
+	private ToolStrip toolStrip;
+	
 	private VLayout container = new VLayout();
 
 	public NotesPanel(final GUIDocument document) {
@@ -59,12 +56,11 @@ public class NotesPanel extends DocumentDetailTab {
 	}
 
 	public void refresh() {
-		if (addNote != null)
-			container.removeMember(addNote);
 		if (notesGrid != null)
 			container.removeMember(notesGrid);
-		if (buttons != null)
-			container.removeMember(buttons);
+		
+		if (toolStrip != null)
+			container.removeMember(toolStrip);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
@@ -89,21 +85,16 @@ public class NotesPanel extends DocumentDetailTab {
 		notesGrid.setDataSource(new NotesDS(null, document.getId(), document.getFileVersion(), null));
 		notesGrid.setFields(id, userId, user, date, page, content);
 
-		ToolStrip btns = new ToolStrip();
-		btns.setWidth100();
+		toolStrip = new ToolStrip();
+		toolStrip.setWidth100();
 
-		addNote = new ToolStripButton(I18N.message("addnote"));
-		addNote.addClickHandler(event -> {
-			NoteUpdateDialog note = new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this);
-			note.show();
-		});
+		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
+		addNote.addClickHandler(event -> new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this).show());
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
-		annotations.addClickHandler(event -> {
-			AnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document,
-					null, NotesPanel.this, true);
-			dialog.show();
-		});
+		annotations.addClickHandler(
+				event -> new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document, null,
+						NotesPanel.this, true).show());
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		export.addClickHandler(event -> GridUtil.exportCSV(notesGrid, true));
@@ -112,23 +103,23 @@ public class NotesPanel extends DocumentDetailTab {
 		print.addClickHandler(event -> GridUtil.print(notesGrid));
 
 		if (document.getFolder().isWrite()) {
-			btns.addButton(addNote);
+			toolStrip.addButton(addNote);
 		}
 
 		if (Feature.visible(Feature.ANNOTATIONS)) {
-			btns.addButton(annotations);
+			toolStrip.addButton(annotations);
 			annotations.setDisabled(!Feature.enabled(Feature.ANNOTATIONS));
 		}
 
 		if (document.getFolder().isWrite())
-			btns.addSeparator();
-		btns.addButton(export);
-		btns.addButton(print);
+			toolStrip.addSeparator();
+		toolStrip.addButton(export);
+		toolStrip.addButton(print);
 
 		container.setHeight100();
 		container.setWidth100();
 		container.addMember(notesGrid);
-		container.addMember(btns);
+		container.addMember(toolStrip);
 
 		notesGrid.addCellContextClickHandler(event -> {
 			Menu contextMenu = new Menu();
