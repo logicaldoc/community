@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.common.client.widgets.preview;
 
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -17,8 +16,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -80,7 +77,8 @@ public class MailPreviewPanel extends VLayout {
 			HTMLPane html = new HTMLPane();
 			html.setWidth100();
 			html.setHeight100();
-			html.setContents("<iframe style='border:0px solid white; width:100%; height:100%;' sandbox srcdoc='"+mail.getMessage()+"'></iframe>");
+			html.setContents("<iframe style='border:0px solid white; width:100%; height:100%;' sandbox srcdoc='"
+					+ mail.getMessage() + "'></iframe>");
 			body = html;
 		} else {
 			if (document.getFileName().toLowerCase().endsWith(".msg") && mail.getMessage().contains("\\rtf1")) {
@@ -155,14 +153,18 @@ public class MailPreviewPanel extends VLayout {
 				button.setAutoFit(true);
 				button.setIcon("[SKIN]/" + doc.getIcon());
 				if (doc.getFolder().isDownload())
-					button.addClickHandler(new ClickHandler() {
+					button.addClickHandler(event -> {
+						String filename = doc.getFileName();
+						filename = filename.replace("&", "%26");
+						filename = filename.replace(" ", "%20");
+						filename = filename.replace("#", "%23");
+						filename = filename.replace("/", "%2F");
+						filename = filename.replace("=", "%3D");
+						filename = filename.replace("?", "%3F");
+						filename = filename.replace(":", "%3A");
 
-						@Override
-						public void onClick(ClickEvent event) {
-							String url = Util.downloadAttachmentURL(document.getId(), document.getFileVersion(),
-									URL.encodeQueryString(doc.getFileName()));
-							Util.download(url);
-						}
+						Util.download(
+								Util.downloadAttachmentURL(document.getId(), document.getFileVersion(), filename));
 					});
 				button.setContextMenu(prepareButtonMenu(document, doc));
 				attachmentsPanel.addTile(button);
