@@ -712,8 +712,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 				onDelete();
 			}
 		});
-		delete.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
-				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
+		delete.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace());
 		return delete;
 	}
 
