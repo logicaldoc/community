@@ -17,18 +17,12 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -46,10 +40,8 @@ public class NotesPanel extends DocumentDetailTab {
 
 	private ListGrid notesGrid;
 
-	private ToolStripButton addNote;
-
-	private HLayout buttons;
-
+	private ToolStrip toolStrip;
+	
 	private VLayout container = new VLayout();
 
 	public NotesPanel(final GUIDocument document) {
@@ -64,12 +56,11 @@ public class NotesPanel extends DocumentDetailTab {
 	}
 
 	public void refresh() {
-		if (addNote != null)
-			container.removeMember(addNote);
 		if (notesGrid != null)
 			container.removeMember(notesGrid);
-		if (buttons != null)
-			container.removeMember(buttons);
+		
+		if (toolStrip != null)
+			container.removeMember(toolStrip);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
@@ -94,116 +85,83 @@ public class NotesPanel extends DocumentDetailTab {
 		notesGrid.setDataSource(new NotesDS(null, document.getId(), document.getFileVersion(), null));
 		notesGrid.setFields(id, userId, user, date, page, content);
 
-		ToolStrip buttons = new ToolStrip();
-		buttons.setWidth100();
+		toolStrip = new ToolStrip();
+		toolStrip.setWidth100();
 
-		addNote = new ToolStripButton(I18N.message("addnote"));
-		addNote.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				NoteUpdateDialog note = new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this);
-				note.show();
-			}
-		});
+		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
+		addNote.addClickHandler(event -> new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this).show());
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
-		annotations.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(
-						document, null, NotesPanel.this, true);
-				dialog.show();
-			}
-		});
+		annotations.addClickHandler(
+				event -> new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document, null,
+						NotesPanel.this, true).show());
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
-		export.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.exportCSV(notesGrid, true);
-			}
-		});
+		export.addClickHandler(event -> GridUtil.exportCSV(notesGrid, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GridUtil.print(notesGrid);
-			}
-		});
+		print.addClickHandler(event -> GridUtil.print(notesGrid));
 
 		if (document.getFolder().isWrite()) {
-			buttons.addButton(addNote);
+			toolStrip.addButton(addNote);
 		}
 
 		if (Feature.visible(Feature.ANNOTATIONS)) {
-			buttons.addButton(annotations);
+			toolStrip.addButton(annotations);
 			annotations.setDisabled(!Feature.enabled(Feature.ANNOTATIONS));
 		}
 
 		if (document.getFolder().isWrite())
-			buttons.addSeparator();
-		buttons.addButton(export);
-		buttons.addButton(print);
+			toolStrip.addSeparator();
+		toolStrip.addButton(export);
+		toolStrip.addButton(print);
 
 		container.setHeight100();
 		container.setWidth100();
 		container.addMember(notesGrid);
-		container.addMember(buttons);
+		container.addMember(toolStrip);
 
-		notesGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new Menu();
-				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("ddelete"));
-				delete.setEnabled(false);
-				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						onDelete();
-					}
-				});
+		notesGrid.addCellContextClickHandler(event -> {
+			Menu contextMenu = new Menu();
+			MenuItem delete = new MenuItem();
+			delete.setTitle(I18N.message("ddelete"));
+			delete.setEnabled(false);
+			delete.addClickHandler(clickEvent -> onDelete());
 
-				MenuItem edit = new MenuItem();
-				edit.setTitle(I18N.message("edit"));
-				edit.setEnabled(false);
-				edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
-								notesGrid.getSelectedRecord().getAttributeAsLong("id"),
-								notesGrid.getSelectedRecord().getAttribute(MESSAGE), NotesPanel.this);
-						note.show();
-					}
-				});
+			MenuItem edit = new MenuItem();
+			edit.setTitle(I18N.message("edit"));
+			edit.setEnabled(false);
+			edit.addClickHandler(clickEvent -> {
+				NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
+						notesGrid.getSelectedRecord().getAttributeAsLong("id"),
+						notesGrid.getSelectedRecord().getAttribute(MESSAGE), NotesPanel.this);
+				note.show();
+			});
 
-				MenuItem print = new MenuItem();
-				print.setTitle(I18N.message("print"));
-				print.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-					public void onClick(MenuItemClickEvent event) {
-						HTMLPane printContainer = new HTMLPane();
-						printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
-						Canvas.showPrintPreview(printContainer);
-					}
-				});
+			MenuItem prnt = new MenuItem();
+			prnt.setTitle(I18N.message("print"));
+			prnt.addClickHandler(clickEvent -> {
+				HTMLPane printContainer = new HTMLPane();
+				printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
+				Canvas.showPrintPreview(printContainer);
+			});
 
-				ListGridRecord[] selection = notesGrid.getSelectedRecords();
+			ListGridRecord[] selection = notesGrid.getSelectedRecords();
 
-				if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-					delete.setEnabled(selection.length > 0);
-					edit.setEnabled(selection.length == 1);
-				} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {
-					long userId = Long.parseLong(selection[0].getAttribute(USER_ID));
-					delete.setEnabled(selection.length == 1 && userId == Session.get().getUser().getId());
-					edit.setEnabled(selection.length == 1 && userId == Session.get().getUser().getId());
-				}
-
-				print.setEnabled(selection.length == 1);
-
-				contextMenu.setItems(edit, print, delete);
-				contextMenu.showContextMenu();
-				event.cancel();
+			if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
+				delete.setEnabled(selection.length > 0);
+				edit.setEnabled(selection.length == 1);
+			} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {
+				long usrId = Long.parseLong(selection[0].getAttribute(USER_ID));
+				delete.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
+				edit.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
 			}
+
+			prnt.setEnabled(selection.length == 1);
+
+			contextMenu.setItems(edit, prnt, delete);
+			contextMenu.showContextMenu();
+			event.cancel();
 		});
 	}
 
@@ -215,8 +173,8 @@ public class NotesPanel extends DocumentDetailTab {
 		for (int i = 0; i < selection.length; i++)
 			ids[i] = selection[i].getAttributeAsLong("id");
 
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-			if (Boolean.TRUE.equals(value)) {
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
 				DocumentService.Instance.get().deleteNotes(ids, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
