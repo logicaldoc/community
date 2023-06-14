@@ -1,7 +1,9 @@
 package com.logicaldoc.web.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -11,6 +13,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,8 +25,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.java.plugin.JpfException;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -69,13 +70,11 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
-import com.logicaldoc.web.AbstractWebappTCase;
+import com.logicaldoc.web.AbstractWebappTestCase;
 import com.logicaldoc.web.UploadServlet;
 
-import junit.framework.Assert;
-
 @RunWith(MockitoJUnitRunner.class)
-public class DocumentServiceImplTest extends AbstractWebappTCase {
+public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	private static final String UTF_8 = "UTF-8";
 
@@ -105,7 +104,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	protected SearchEngine searchEngine;
 
-	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -129,8 +128,8 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		activateCorePlugin();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws SQLException {
 		searchEngine.unlock();
 		searchEngine.close();
 
@@ -138,13 +137,13 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	}
 
 	private void activateCorePlugin() throws JpfException, IOException, PluginException {
-		File pluginsDir = new File("target/tests-plugins");
+		File pluginsDir = new File(tempDir, "tests-plugins");
 		pluginsDir.mkdir();
 
 		File corePluginFile = new File(pluginsDir, "logicaldoc-core-plugin.jar");
 
 		// copy plugin file to target resources
-		copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile.getAbsolutePath());
+		FileUtil.copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile);
 
 		PluginRegistry registry = PluginRegistry.getInstance();
 		registry.init(pluginsDir.getAbsolutePath());
@@ -153,19 +152,19 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	private void prepareUploadedFiles() throws IOException {
 		File file3 = new File(repositoryDir.getPath() + "/docs/3/doc/1.0");
 		file3.getParentFile().mkdirs();
-		copyResource("/test.zip", file3.getCanonicalPath());
+		FileUtil.copyResource("/test.zip", file3);
 
 		File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
 		file5.getParentFile().mkdirs();
-		copyResource("/Joyce Jinks shared the Bruce Duo post.eml", file5.getCanonicalPath());
+		FileUtil.copyResource("/Joyce Jinks shared the Bruce Duo post.eml", file5);
 
 		File file6 = new File(repositoryDir.getPath() + "/docs/6/doc/1.0");
 		file6.getParentFile().mkdirs();
-		copyResource("/Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg", file6.getCanonicalPath());
+		FileUtil.copyResource("/Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg", file6);
 
 		File file7 = new File(repositoryDir.getPath() + "/docs/7/doc/1.0");
 		file7.getParentFile().mkdirs();
-		copyResource("/New error indexing documents.eml", file7.getCanonicalPath());
+		FileUtil.copyResource("/New error indexing documents.eml", file7);
 
 		Map<String, File> uploadedFiles = new HashMap<>();
 		uploadedFiles.put("file3.zip", file3);
@@ -182,13 +181,13 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.delete(new long[] { 7 });
 		List<Long> docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1",
 				Long.class);
-		Assert.assertEquals(1, docIds.size());
+		assertEquals(1, docIds.size());
 
 		service.deleteFromTrash(docIds.toArray(new Long[] {}));
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1", Long.class);
-		Assert.assertEquals(0, docIds.size());
+		assertEquals(0, docIds.size());
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=2", Long.class);
-		Assert.assertEquals(1, docIds.size());
+		assertEquals(1, docIds.size());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -197,13 +196,13 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.delete(new long[] { 7 });
 		List<Long> docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1",
 				Long.class);
-		Assert.assertEquals(1, docIds.size());
+		assertEquals(1, docIds.size());
 
 		service.emptyTrash();
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1", Long.class);
-		Assert.assertEquals(0, docIds.size());
+		assertEquals(0, docIds.size());
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=2", Long.class);
-		Assert.assertEquals(1, docIds.size());
+		assertEquals(1, docIds.size());
 	}
 
 	@Test
@@ -212,11 +211,11 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.archiveDocuments(new long[] { doc.getId() }, "archive comment");
 
 		Document document = docDao.findById(7);
-		Assert.assertEquals(Document.DOC_ARCHIVED, document.getStatus());
+		assertEquals(Document.DOC_ARCHIVED, document.getStatus());
 
 		service.unarchiveDocuments(new long[] { doc.getId() });
 		document = docDao.findById(7);
-		Assert.assertEquals(Document.DOC_UNLOCKED, document.getStatus());
+		assertEquals(Document.DOC_UNLOCKED, document.getStatus());
 	}
 
 	@Test
@@ -229,10 +228,10 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		docDao.store(doc);
 
 		long count = service.archiveFolder(1200, "archive comment");
-		Assert.assertEquals(1, count);
+		assertEquals(1, count);
 
 		Document document = docDao.findById(5);
-		Assert.assertEquals(Document.DOC_ARCHIVED, document.getStatus());
+		assertEquals(Document.DOC_ARCHIVED, document.getStatus());
 	}
 
 	@Test
@@ -240,12 +239,12 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		String[] ticket = service.createDownloadTicket(5, null, null, null, null);
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
-		Assert.assertEquals("http://server:port/download-ticket?ticketId=" + ticket[0], ticket[1]);
+		assertEquals("http://server:port/download-ticket?ticketId=" + ticket[0], ticket[1]);
 
 		TicketDAO tDao = (TicketDAO) context.getBean("TicketDAO");
 		Ticket t = tDao.findByTicketId(ticket[0]);
-		Assert.assertNotNull(t);
-		Assert.assertEquals(5L, t.getDocId());
+		assertNotNull(t);
+		assertEquals(5L, t.getDocId());
 	}
 
 	@Test
@@ -256,59 +255,59 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		// exact ticket ID
 		TicketDAO tDao = (TicketDAO) context.getBean("TicketDAO");
 		Ticket t = tDao.findByTicketId(ticket[0]);
-		Assert.assertNotNull(t);
-		Assert.assertEquals(5L, t.getDocId());
-		Assert.assertEquals(1, t.getEnabled());
+		assertNotNull(t);
+		assertEquals(5L, t.getDocId());
+		assertEquals(1, t.getEnabled());
 
 		service.disableTicket(t.getId());
 		t = tDao.findByTicketId(ticket[0]);
-		Assert.assertEquals(0, t.getEnabled());
+		assertEquals(0, t.getEnabled());
 
 		service.enableTicket(t.getId());
 		t = tDao.findByTicketId(ticket[0]);
-		Assert.assertEquals(1, t.getEnabled());
+		assertEquals(1, t.getEnabled());
 
 		service.deleteTicket(t.getId());
 		t = tDao.findByTicketId(ticket[0]);
-		Assert.assertNull(t);
+		assertNull(t);
 	}
 
 	@Test
 	public void testRename() throws ServerException, PersistenceException {
 		GUIDocument doc = service.getById(7);
 		System.out.println(doc.getFileName());
-		Assert.assertEquals("New error indexing documents.eml", doc.getFileName());
+		assertEquals("New error indexing documents.eml", doc.getFileName());
 
 		service.rename(doc.getId(), "newname.eml");
 		doc = service.getById(7);
-		Assert.assertEquals("newname.eml", doc.getFileName());
+		assertEquals("newname.eml", doc.getFileName());
 	}
 
 	@Test
 	public void testSetAndUnsetPassword() throws ServerException, PersistenceException {
 		service.setPassword(5, "pippo");
 		Document doc = docDao.findById(5);
-		Assert.assertNotNull(doc.getPassword());
+		assertNotNull(doc.getPassword());
 
 		// Try to unset with wrong password but admin user
 		service.unsetPassword(5, "paperino");
 		doc = docDao.findById(5);
-		Assert.assertNull(doc.getPassword());
+		assertNull(doc.getPassword());
 	}
 
 	@Test
 	public void testUprotect() throws ServerException, PersistenceException {
 		service.setPassword(5, "pippo");
 		Document doc = docDao.findById(5);
-		Assert.assertNotNull(doc.getPassword());
+		assertNotNull(doc.getPassword());
 
 		// Try to uprotect with wrong password
 		service.unprotect(5, "paperino");
-		Assert.assertTrue(session.getUnprotectedDocs().isEmpty());
+		assertTrue(session.getUnprotectedDocs().isEmpty());
 
 		// Try to uprotect with correct password
 		service.unprotect(5, "pippo");
-		Assert.assertTrue(session.getUnprotectedDocs().containsKey(5L));
+		assertTrue(session.getUnprotectedDocs().containsKey(5L));
 	}
 
 	@Test
@@ -318,25 +317,24 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setFileName("testcontent.txt");
 		doc.setCustomId(null);
 		doc = service.createWithContent(doc, "text content", true);
-		Assert.assertNotNull(doc);
-		Assert.assertNotSame(0L, doc.getId());
+		assertNotNull(doc);
+		assertNotSame(0L, doc.getId());
 
 		doc = service.getById(doc.getId());
-		Assert.assertNotNull(doc);
-		Assert.assertEquals("text content",
-				storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
+		assertNotNull(doc);
+		assertEquals("text content", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
 		service.checkout(new long[] { doc.getId() });
 
 		doc.setId(0);
 		doc.setFileName("testcontent2.txt");
 		doc.setCustomId(null);
 		doc = service.createWithContent(doc, " ", true);
-		Assert.assertNotNull(doc);
-		Assert.assertNotSame(0L, doc.getId());
+		assertNotNull(doc);
+		assertNotSame(0L, doc.getId());
 
 		doc = service.getById(doc.getId());
-		Assert.assertNotNull(doc);
-		Assert.assertEquals(" ", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
+		assertNotNull(doc);
+		assertEquals(" ", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
 		service.checkout(new long[] { doc.getId() });
 	}
 
@@ -346,13 +344,13 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.checkout(new long[] { 7 });
 
 		service.checkinContent(7, "checkedin contents");
-		Assert.assertEquals("checkedin contents", service.getContentAsString(7));
+		assertEquals("checkedin contents", service.getContentAsString(7));
 	}
 
 	@Test
 	public void testSaveAndGetRating() throws ServerException {
 		GUIDocument doc = service.getById(7);
-		Assert.assertEquals(0, doc.getRating());
+		assertEquals(0, doc.getRating());
 
 		GUIRating rating = new GUIRating();
 		rating.setDocId(doc.getId());
@@ -362,24 +360,24 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		service.saveRating(rating);
 		doc = service.getById(doc.getId());
-		Assert.assertEquals(4, doc.getRating());
+		assertEquals(4, doc.getRating());
 
 		rating = service.getRating(doc.getId());
-		Assert.assertEquals("4.0", rating.getAverage().toString());
-		Assert.assertEquals(Integer.valueOf(1), rating.getCount());
+		assertEquals("4.0", rating.getAverage().toString());
+		assertEquals(Integer.valueOf(1), rating.getCount());
 
 		rating = service.getUserRating(doc.getId());
-		Assert.assertEquals(4, rating.getVote());
+		assertEquals(4, rating.getVote());
 
-		Assert.assertEquals(Integer.valueOf(0), service.deleteRating(rating.getId()));
+		assertEquals(Integer.valueOf(0), service.deleteRating(rating.getId()));
 		rating = service.getRating(doc.getId());
-		Assert.assertEquals(0, rating.getVote());
+		assertEquals(0, rating.getVote());
 	}
 
 	@Test
 	public void testReplaceFile() throws ServerException {
 		GUIDocument doc = service.getById(7);
-		Assert.assertFalse(service.getContentAsString(7).contains("replaced contents"));
+		assertFalse(service.getContentAsString(7).contains("replaced contents"));
 
 		service.cleanUploadedFileFolder();
 
@@ -391,7 +389,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 			service.replaceFile(doc.getId(), doc.getFileVersion(), "replace");
-			Assert.assertTrue(service.getContentAsString(7).contains("replaced contents"));
+			assertTrue(service.getContentAsString(7).contains("replaced contents"));
 		} finally {
 			FileUtil.strongDelete(tmpFile);
 		}
@@ -405,16 +403,16 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setCustomId(null);
 
 		doc = service.createDocument(doc, "document content");
-		Assert.assertNotNull(doc);
+		assertNotNull(doc);
 
-		Assert.assertEquals("document content", service.getContentAsString(doc.getId()));
+		assertEquals("document content", service.getContentAsString(doc.getId()));
 	}
 
 	@Test
 	public void testEnforceFilesIntoFolderStorage() throws ServerException, PersistenceException, InterruptedException {
 		Folder folder = folderDao.findById(1200);
 		folderDao.initialize(folder);
-		Assert.assertEquals(Integer.valueOf(2), folder.getStorage());
+		assertEquals(Integer.valueOf(2), folder.getStorage());
 
 		Document doc = docDao.findById(5);
 		docDao.initialize(doc);
@@ -422,41 +420,41 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		docDao.store(doc);
 
 		doc = docDao.findById(5);
-		Assert.assertNull(doc.getFolder().getStorage());
+		assertNull(doc.getFolder().getStorage());
 
 		service.enforceFilesIntoFolderStorage(1200);
 
 		waiting();
 
 		File movedFile = new File(repositoryDir + "/docs2/5/doc/1.0");
-		Assert.assertTrue(movedFile.exists());
+		assertTrue(movedFile.exists());
 	}
 
 	@Test
 	public void testMakeImmutable() throws ServerException, IOException, InterruptedException {
 		GUIDocument doc = service.getById(7);
-		Assert.assertEquals(0, doc.getImmutable());
+		assertEquals(0, doc.getImmutable());
 
 		service.makeImmutable(new long[] { 7 }, "immutable comment");
 
 		doc = service.getById(7);
-		Assert.assertEquals(1, doc.getImmutable());
+		assertEquals(1, doc.getImmutable());
 	}
 
 	@Test
 	public void testPromoteVersion() throws ServerException, IOException, InterruptedException {
 		testCheckin();
 		GUIDocument doc = service.getById(7);
-		Assert.assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
-		Assert.assertEquals("1.1", doc.getVersion());
-		Assert.assertEquals("1.1", doc.getFileVersion());
+		assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals("1.1", doc.getVersion());
+		assertEquals("1.1", doc.getFileVersion());
 
 		service.promoteVersion(doc.getId(), "1.0");
 
 		doc = service.getById(7);
-		Assert.assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
-		Assert.assertEquals("1.2", doc.getVersion());
-		Assert.assertEquals("1.2", doc.getFileVersion());
+		assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals("1.2", doc.getVersion());
+		assertEquals("1.2", doc.getFileVersion());
 
 		// Unexisting version
 		boolean exceptionHappened = false;
@@ -464,9 +462,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			service.promoteVersion(doc.getId(), "xxxx");
 		} catch (ServerException e) {
 			exceptionHappened = true;
-			Assert.assertEquals("Unexisting version xxxx of document 7", e.getMessage());
+			assertEquals("Unexisting version xxxx of document 7", e.getMessage());
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 
 		// Document locked
 		service.lock(new long[] { 7 }, "lock comment");
@@ -475,19 +473,19 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			service.promoteVersion(doc.getId(), "1.0");
 		} catch (ServerException e) {
 			exceptionHappened = true;
-			Assert.assertEquals("The document 7 is locked", e.getMessage());
+			assertEquals("The document 7 is locked", e.getMessage());
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 	}
 
 	@Test
 	public void testCheckout() throws ServerException, IOException, InterruptedException {
 		GUIDocument doc = service.getById(7);
-		Assert.assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
 
 		service.checkout(new long[] { 7 });
 		doc = service.getById(7);
-		Assert.assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
 	}
 
 	@Test
@@ -501,16 +499,16 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 		GUIDocument doc = service.getById(7);
-		Assert.assertEquals("1.0", doc.getVersion());
-		Assert.assertEquals("1.0", doc.getFileVersion());
+		assertEquals("1.0", doc.getVersion());
+		assertEquals("1.0", doc.getFileVersion());
 
 		doc.setComment("version comment");
 		service.checkin(doc, false);
 
 		doc = service.getById(7);
-		Assert.assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
-		Assert.assertEquals("1.1", doc.getVersion());
-		Assert.assertEquals("1.1", doc.getFileVersion());
+		assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals("1.1", doc.getVersion());
+		assertEquals("1.1", doc.getFileVersion());
 	}
 
 	@Test
@@ -522,7 +520,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setNotifyUsers(new long[] { 2, 3 });
 
 		GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
-		Assert.assertEquals(4, createdDocs.length);
+		assertEquals(4, createdDocs.length);
 
 		waiting();
 
@@ -535,7 +533,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		// Request immediate indexing
 		createdDocs = service.addDocuments(false, UTF_8, true, doc);
-		Assert.assertEquals(4, createdDocs.length);
+		assertEquals(4, createdDocs.length);
 
 		prepareUploadedFiles();
 		doc = service.getById(7);
@@ -546,7 +544,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		// Request zip import so just the other 3 documents are imported
 		// immediately
 		createdDocs = service.addDocuments(true, UTF_8, false, doc);
-		Assert.assertEquals(3, createdDocs.length);
+		assertEquals(3, createdDocs.length);
 
 		// Remove the uploaded files
 		@SuppressWarnings("unchecked")
@@ -561,9 +559,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			service.addDocuments(false, UTF_8, false, doc);
 		} catch (ServerException e) {
 			exceptionHappened = true;
-			Assert.assertEquals("No file uploaded", e.getMessage());
+			assertEquals("No file uploaded", e.getMessage());
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 
 		// Try with a user without permissions
 		prepareUploadedFiles();
@@ -577,12 +575,12 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		prepareUploadedFiles();
 
 		createdDocs = service.addDocuments(true, UTF_8, false, doc);
-		Assert.assertEquals(0, createdDocs.length);
+		assertEquals(0, createdDocs.length);
 
 		prepareSession("admin", "admin");
 		prepareUploadedFiles();
 		createdDocs = service.addDocuments("en", 1201, false, UTF_8, false, null);
-		Assert.assertEquals(4, createdDocs.length);
+		assertEquals(4, createdDocs.length);
 
 		// Cannot add documents into the root
 		exceptionHappened = false;
@@ -590,9 +588,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			service.addDocuments("en", Folder.ROOTID, false, UTF_8, false, null);
 		} catch (ServerException e) {
 			exceptionHappened = true;
-			Assert.assertEquals("Cannot add documents in the root", e.getMessage());
+			assertEquals("Cannot add documents in the root", e.getMessage());
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 	}
 
 	@Test
@@ -602,12 +600,12 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setCustomId(null);
 		doc.setIndexed(0);
 
-		File pdf1 = new File("target/pdf1.pdf");
-		File pdf2 = new File("target/pdf2.pdf");
+		File pdf1 = new File(tempDir, "pdf1.pdf");
+		File pdf2 = new File(tempDir, "pdf2.pdf");
 
 		try {
-			copyResource("/pdf1.pdf", pdf1.getCanonicalPath());
-			copyResource("/pdf2.pdf", pdf2.getCanonicalPath());
+			FileUtil.copyResource("/pdf1.pdf", pdf1);
+			FileUtil.copyResource("/pdf2.pdf", pdf2);
 
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(pdf1.getName(), pdf1);
@@ -616,13 +614,13 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
-			Assert.assertEquals(2, createdDocs.length);
+			assertEquals(2, createdDocs.length);
 
 			GUIDocument mergedDoc = service.merge(new long[] { createdDocs[0].getId(), createdDocs[1].getId() }, 1200,
 					"merged.pdf");
 			mergedDoc = service.getById(mergedDoc.getId());
-			Assert.assertNotNull(mergedDoc);
-			Assert.assertEquals("merged.pdf", mergedDoc.getFileName());
+			assertNotNull(mergedDoc);
+			assertEquals("merged.pdf", mergedDoc.getFileName());
 		} finally {
 			FileUtil.strongDelete(pdf1);
 			FileUtil.strongDelete(pdf2);
@@ -636,9 +634,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setCustomId(null);
 		doc.setIndexed(0);
 
-		File pdf2 = new File("target/pdf2.pdf");
+		File pdf2 = new File(tempDir, "pdf2.pdf");
 		try {
-			copyResource("/pdf2.pdf", pdf2.getCanonicalPath());
+			FileUtil.copyResource("/pdf2.pdf", pdf2);
 
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(pdf2.getName(), pdf2);
@@ -646,10 +644,10 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
-			Assert.assertEquals(1, createdDocs.length);
-			Assert.assertEquals(2, createdDocs[0].getPages());
+			assertEquals(1, createdDocs.length);
+			assertEquals(2, createdDocs[0].getPages());
 
-			Assert.assertEquals(2, service.updatePages(createdDocs[0].getId()));
+			assertEquals(2, service.updatePages(createdDocs[0].getId()));
 		} finally {
 			FileUtil.strongDelete(pdf2);
 		}
@@ -663,14 +661,14 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		transaction.setSession(session);
 
 		Document alias = manager.createAlias(docDao.findById(5), folderDao.findById(1201), null, transaction);
-		Assert.assertEquals(Long.valueOf(5), alias.getDocRef());
+		assertEquals(Long.valueOf(5), alias.getDocRef());
 		GUIDocument newFile = service.replaceAlias(alias.getId());
 
-		Assert.assertNull(docDao.findById(alias.getId()));
+		assertNull(docDao.findById(alias.getId()));
 		Document newDoc = docDao.findById(newFile.getId());
-		Assert.assertNotNull(newDoc);
-		Assert.assertNull(newDoc.getDocRef());
-		Assert.assertEquals(alias.getFileName(), newDoc.getFileName());
+		assertNotNull(newDoc);
+		assertNull(newDoc.getDocRef());
+		assertEquals(alias.getFileName(), newDoc.getFileName());
 	}
 
 	@Test
@@ -690,10 +688,10 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		service.deDuplicate(null, true);
 
-		Assert.assertNull(service.getById(doc5.getId()));
+		assertNull(service.getById(doc5.getId()));
 		GUIDocument dc = service.getById(newDoc.getId());
-		Assert.assertNotNull(dc);
-		Assert.assertEquals(1201, dc.getFolder().getId());
+		assertNotNull(dc);
+		assertEquals(1201, dc.getFolder().getId());
 	}
 
 	@Test
@@ -701,8 +699,8 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		GUIDocument doc = service.getById(7);
 		GUIDocument conversion = service.convert(doc.getId(), doc.getFileVersion(), "pdf");
 		conversion = service.getById(conversion.getId());
-		Assert.assertNotNull(conversion);
-		Assert.assertTrue(conversion.getFileName().endsWith(".pdf"));
+		assertNotNull(conversion);
+		assertTrue(conversion.getFileName().endsWith(".pdf"));
 	}
 
 	@Test
@@ -715,15 +713,15 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.save(doc);
 
 		doc = service.getById(7);
-		Assert.assertEquals(0, doc.getIndexed());
-		Assert.assertEquals("test.txt", doc.getFileName());
+		assertEquals(0, doc.getIndexed());
+		assertEquals("test.txt", doc.getFileName());
 
-		copyResource("/New error indexing documents.eml",
-				"target/repository/docs/" + doc.getId() + "/doc/" + doc.getFileVersion());
+		FileUtil.copyResource("/New error indexing documents.eml",
+				new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
 
 		service.indexDocuments(new Long[] { doc.getId() });
 		doc = service.getById(doc.getId());
-		Assert.assertEquals(1, doc.getIndexed());
+		assertEquals(1, doc.getIndexed());
 
 		service.indexDocuments(null);
 	}
@@ -736,34 +734,34 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.save(doc);
 
 		doc = service.getById(7);
-		Assert.assertEquals(0, doc.getIndexed());
-		Assert.assertEquals("test.txt", doc.getFileName());
+		assertEquals(0, doc.getIndexed());
+		assertEquals("test.txt", doc.getFileName());
 
-		copyResource("/New error indexing documents.eml",
-				"target/repository/docs/" + doc.getId() + "/doc/" + doc.getFileVersion());
-		Assert.assertTrue(service.getContentAsString(doc.getId()).contains("Gracias por tu pronta respuesta"));
+		FileUtil.copyResource("/New error indexing documents.eml",
+				new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
+		assertTrue(service.getContentAsString(doc.getId()).contains("Gracias por tu pronta respuesta"));
 	}
 
 	@Test
 	public void testGetVersionsById() throws ServerException {
 		GUIVersion[] versions = service.getVersionsById(1, 2);
-		Assert.assertNotNull(versions);
-		Assert.assertEquals(2, versions.length);
+		assertNotNull(versions);
+		assertEquals(2, versions.length);
 
 		// only the first version of the two
 		versions = service.getVersionsById(1, 23);
-		Assert.assertNotNull(versions);
-		Assert.assertEquals(1, versions.length);
+		assertNotNull(versions);
+		assertEquals(1, versions.length);
 
 		// only the 2nd version of the two
 		versions = service.getVersionsById(21, 2);
-		Assert.assertNotNull(versions);
-		Assert.assertEquals(1, versions.length);
+		assertNotNull(versions);
+		assertEquals(1, versions.length);
 
 		// no versions
 		versions = service.getVersionsById(21, 22);
-		Assert.assertNotNull(versions);
-		Assert.assertEquals(0, versions.length);
+		assertNotNull(versions);
+		assertEquals(0, versions.length);
 	}
 
 	@Test
@@ -776,7 +774,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (AssertionError | ServerException e) {
 			exceptionHappened = true;
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 
 		ids = new long[] { 1, 2 };
 		gdoc = service.deleteVersions(ids);
@@ -787,19 +785,19 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	@Test
 	public void testGetById() throws ServerException {
 		GUIDocument doc = service.getById(1);
-		Assert.assertEquals(1, doc.getId());
-		Assert.assertEquals("pippo", doc.getFileName());
-		Assert.assertNotNull(doc.getFolder());
-		Assert.assertEquals(5, doc.getFolder().getId());
-		Assert.assertEquals("/", doc.getFolder().getName());
+		assertEquals(1, doc.getId());
+		assertEquals("pippo", doc.getFileName());
+		assertNotNull(doc.getFolder());
+		assertEquals(5, doc.getFolder().getId());
+		assertEquals("/", doc.getFolder().getName());
 
 		doc = service.getById(3);
-		Assert.assertEquals(3, doc.getId());
-		Assert.assertEquals("test.zip", doc.getFileName());
+		assertEquals(3, doc.getId());
+		assertEquals("test.zip", doc.getFileName());
 
 		// Try with unexisting document
 		doc = service.getById(99);
-		Assert.assertNull(doc);
+		assertNull(doc);
 	}
 
 	@Test
@@ -807,100 +805,100 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		GUIDocument doc = service.getById(1);
 
 		doc = service.save(doc);
-		Assert.assertNotNull(doc);
-		Assert.assertEquals("myself", doc.getPublisher());
+		assertNotNull(doc);
+		assertEquals("myself", doc.getPublisher());
 
 		doc = service.getById(3);
-		Assert.assertEquals("test.zip", doc.getFileName());
+		assertEquals("test.zip", doc.getFileName());
 
 		doc = service.save(doc);
-		Assert.assertNotNull(doc);
+		assertNotNull(doc);
 	}
 
 	@Test
 	public void testUpdateLink() throws ServerException, PersistenceException {
 		DocumentLink link = linkDao.findById(1);
-		Assert.assertNotNull(link);
-		Assert.assertEquals("test", link.getType());
+		assertNotNull(link);
+		assertEquals("test", link.getType());
 
 		service.updateLink(1, "pippo");
 
 		link = linkDao.findById(1);
-		Assert.assertNotNull(link);
-		Assert.assertEquals("pippo", link.getType());
+		assertNotNull(link);
+		assertEquals("pippo", link.getType());
 	}
 
 	@Test
 	public void testDeleteLinks() throws ServerException, PersistenceException {
 		DocumentLink link = linkDao.findById(1);
-		Assert.assertNotNull(link);
-		Assert.assertEquals("test", link.getType());
+		assertNotNull(link);
+		assertEquals("test", link.getType());
 		link = linkDao.findById(2);
-		Assert.assertNotNull(link);
-		Assert.assertEquals("xyz", link.getType());
+		assertNotNull(link);
+		assertEquals("xyz", link.getType());
 
 		service.deleteLinks(new long[] { 1, 2 });
 
 		link = linkDao.findById(1);
-		Assert.assertNull(link);
+		assertNull(link);
 		link = linkDao.findById(2);
-		Assert.assertNull(link);
+		assertNull(link);
 	}
 
 	@Test
 	public void testDelete() throws ServerException, PersistenceException {
 		Document doc = docDao.findById(1);
-		Assert.assertNotNull(doc);
-		Assert.assertEquals("pippo", doc.getFileName());
+		assertNotNull(doc);
+		assertEquals("pippo", doc.getFileName());
 		doc = docDao.findById(2);
-		Assert.assertNotNull(doc);
-		Assert.assertEquals("pippo", doc.getFileName());
-		Assert.assertEquals(1, doc.getDocRef().longValue());
+		assertNotNull(doc);
+		assertEquals("pippo", doc.getFileName());
+		assertEquals(1, doc.getDocRef().longValue());
 		doc = docDao.findById(3);
-		Assert.assertNotNull(doc);
-		Assert.assertEquals("test.zip", doc.getFileName());
+		assertNotNull(doc);
+		assertEquals("test.zip", doc.getFileName());
 
 		doc = docDao.findById(1);
-		Assert.assertNotNull(doc);
+		assertNotNull(doc);
 		service.delete(new long[] { 2, 3 });
 
 		doc = docDao.findById(1);
-		Assert.assertNotNull(doc);
+		assertNotNull(doc);
 		doc = docDao.findById(2);
-		Assert.assertNull(doc);
+		assertNull(doc);
 		doc = docDao.findById(3);
-		Assert.assertNull(doc);
+		assertNull(doc);
 	}
 
 	@Test
 	public void testDeleteNotes() throws ServerException {
 		List<DocumentNote> notes = noteDao.findByDocId(1, "1.0");
-		Assert.assertNotNull(notes);
-		Assert.assertEquals(2, notes.size());
-		Assert.assertEquals("message for note 1", notes.get(0).getMessage());
+		assertNotNull(notes);
+		assertEquals(2, notes.size());
+		assertEquals("message for note 1", notes.get(0).getMessage());
 
 		service.deleteNotes(new long[] { 1 });
 
 		notes = noteDao.findByDocId(1, "1.0");
-		Assert.assertNotNull(notes);
-		Assert.assertEquals(1, notes.size());
+		assertNotNull(notes);
+		assertEquals(1, notes.size());
 	}
 
 	@Test
 	public void testAddNote() throws ServerException, PersistenceException {
 		List<DocumentNote> notes = noteDao.findByDocId(1L, "1.0");
-		Assert.assertNotNull(notes);
-		Assert.assertEquals(2, notes.size());
+		assertNotNull(notes);
+		assertEquals(2, notes.size());
 
 		long noteId = service.addNote(1L, "pippo");
 
 		DocumentNote note = noteDao.findById(noteId);
-		Assert.assertNotNull(note);
-		Assert.assertEquals("pippo", note.getMessage());
+		assertNotNull(note);
+		assertEquals("pippo", note.getMessage());
 
 		notes = noteDao.findByDocId(1L, "1.0");
-		Assert.assertNotNull(notes);
-		Assert.assertEquals(2, notes.size());
+		assertNotNull(notes);
+		assertEquals(2, notes.size());
 
 		boolean exceptionHappened = false;
 		try {
@@ -909,33 +907,33 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (ServerException e) {
 			exceptionHappened = true;
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 	}
 
 	@Test
 	public void testLock() throws ServerException, PersistenceException {
 		Document doc = docDao.findById(1);
-		Assert.assertNotNull(doc);
-		Assert.assertEquals(3L, doc.getLockUserId().longValue());
+		assertNotNull(doc);
+		assertEquals(3L, doc.getLockUserId().longValue());
 		doc = docDao.findById(2);
-		Assert.assertNotNull(doc);
-		Assert.assertEquals(3L, doc.getLockUserId().longValue());
+		assertNotNull(doc);
+		assertEquals(3L, doc.getLockUserId().longValue());
 
 		service.unlock(new long[] { 1, 2 });
 
 		doc = docDao.findDocument(1);
-		Assert.assertNotNull(doc);
-		Assert.assertNull(doc.getLockUserId());
+		assertNotNull(doc);
+		assertNull(doc.getLockUserId());
 		doc = docDao.findDocument(2);
-		Assert.assertNotNull(doc);
-		Assert.assertNull(doc.getLockUserId());
+		assertNotNull(doc);
+		assertNull(doc.getLockUserId());
 
 		service.lock(new long[] { 1, 2 }, "comment");
 
 		doc = docDao.findDocument(1);
-		Assert.assertEquals(1L, doc.getLockUserId().longValue());
+		assertEquals(1L, doc.getLockUserId().longValue());
 		doc = docDao.findDocument(2);
-		Assert.assertEquals(1L, doc.getLockUserId().longValue());
+		assertEquals(1L, doc.getLockUserId().longValue());
 	}
 
 	@Test
@@ -943,25 +941,25 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.linkDocuments(new long[] { 1, 2 }, new long[] { 3, 4 });
 
 		DocumentLink link = linkDao.findByDocIdsAndType(1, 3, "default");
-		Assert.assertNotNull(link);
+		assertNotNull(link);
 		link = linkDao.findByDocIdsAndType(1, 4, "default");
-		Assert.assertNotNull(link);
+		assertNotNull(link);
 		link = linkDao.findByDocIdsAndType(2, 3, "default");
-		Assert.assertNotNull(link);
+		assertNotNull(link);
 		link = linkDao.findByDocIdsAndType(2, 4, "default");
-		Assert.assertNotNull(link);
+		assertNotNull(link);
 		link = linkDao.findByDocIdsAndType(3, 4, "default");
-		Assert.assertNull(link);
+		assertNull(link);
 	}
 
 	@Test
 	public void testRestore() throws ServerException, PersistenceException {
 		docDao.delete(4);
-		Assert.assertNull(docDao.findById(4));
+		assertNull(docDao.findById(4));
 		service.restore(new Long[] { 4L }, 5);
-		Assert.assertNotNull(docDao.findById(4));
-		Assert.assertNotNull(docDao.findById(4));
-		Assert.assertEquals(5L, docDao.findById(4).getFolder().getId());
+		assertNotNull(docDao.findById(4));
+		assertNotNull(docDao.findById(4));
+		assertEquals(5L, docDao.findById(4).getFolder().getId());
 	}
 
 	@Test
@@ -969,9 +967,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.addBookmarks(new long[] { 1, 2 }, 0);
 
 		Bookmark book = bookDao.findByUserIdAndDocId(1, 1);
-		Assert.assertNotNull(book);
+		assertNotNull(book);
 		book = bookDao.findByUserIdAndDocId(1, 2);
-		Assert.assertNotNull(book);
+		assertNotNull(book);
 
 		GUIBookmark bookmark = new GUIBookmark();
 		bookmark.setId(book.getId());
@@ -980,16 +978,16 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		service.updateBookmark(bookmark);
 		book = bookDao.findById(bookmark.getId());
-		Assert.assertNotNull(book);
-		Assert.assertEquals("bookmarkTest", book.getTitle());
-		Assert.assertEquals("bookDescr", book.getDescription());
+		assertNotNull(book);
+		assertEquals("bookmarkTest", book.getTitle());
+		assertEquals("bookDescr", book.getDescription());
 
 		service.deleteBookmarks(new long[] { bookmark.getId() });
 
 		book = bookDao.findById(1);
-		Assert.assertNull(book);
+		assertNull(book);
 		book = bookDao.findById(2);
-		Assert.assertNull(book);
+		assertNull(book);
 
 		// delete an already deleted bookmark
 		service.deleteBookmarks(new long[] { bookmark.getId() });
@@ -1004,61 +1002,61 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (ServerException e) {
 			exceptionHappened = true;
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 	}
 
 	@Test
 	public void testMarkHistoryAsRead() throws ServerException {
 		List<DocumentHistory> histories = documentHistoryDao.findByUserIdAndEvent(1, "data test 01", null);
-		Assert.assertEquals(2, histories.size());
-		Assert.assertEquals(1, histories.get(0).getIsNew());
-		Assert.assertEquals(1, histories.get(1).getIsNew());
+		assertEquals(2, histories.size());
+		assertEquals(1, histories.get(0).getIsNew());
+		assertEquals(1, histories.get(1).getIsNew());
 
 		service.markHistoryAsRead("data test 01");
 
 		histories = documentHistoryDao.findByUserIdAndEvent(1, "data test 01", null);
-		Assert.assertEquals(2, histories.size());
-		Assert.assertEquals(0, histories.get(0).getIsNew());
-		Assert.assertEquals(0, histories.get(1).getIsNew());
+		assertEquals(2, histories.size());
+		assertEquals(0, histories.get(0).getIsNew());
+		assertEquals(0, histories.get(1).getIsNew());
 	}
 
 	@Test
 	public void testIndexable() throws ServerException, PersistenceException {
 		Document doc1 = docDao.findById(1);
-		Assert.assertNotNull(doc1);
-		Assert.assertEquals(AbstractDocument.INDEX_INDEXED, doc1.getIndexed());
+		assertNotNull(doc1);
+		assertEquals(AbstractDocument.INDEX_INDEXED, doc1.getIndexed());
 		Document doc2 = docDao.findById(2);
-		Assert.assertNotNull(doc2);
-		Assert.assertEquals(AbstractDocument.INDEX_TO_INDEX, doc2.getIndexed());
+		assertNotNull(doc2);
+		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc2.getIndexed());
 		Document doc3 = docDao.findById(3);
-		Assert.assertNotNull(doc3);
-		Assert.assertEquals(AbstractDocument.INDEX_INDEXED, doc3.getIndexed());
+		assertNotNull(doc3);
+		assertEquals(AbstractDocument.INDEX_INDEXED, doc3.getIndexed());
 		service.markUnindexable(new long[] { 1, 2, 3 });
 
 		doc1 = docDao.findById(1);
-		Assert.assertNotNull(doc1);
-		Assert.assertEquals(AbstractDocument.INDEX_SKIP, doc1.getIndexed());
+		assertNotNull(doc1);
+		assertEquals(AbstractDocument.INDEX_SKIP, doc1.getIndexed());
 		doc2 = docDao.findById(2);
-		Assert.assertNotNull(doc2);
-		Assert.assertEquals(AbstractDocument.INDEX_SKIP, doc2.getIndexed());
+		assertNotNull(doc2);
+		assertEquals(AbstractDocument.INDEX_SKIP, doc2.getIndexed());
 		doc3 = docDao.findById(3);
-		Assert.assertNotNull(doc3);
-		Assert.assertEquals(AbstractDocument.INDEX_SKIP, doc3.getIndexed());
+		assertNotNull(doc3);
+		assertEquals(AbstractDocument.INDEX_SKIP, doc3.getIndexed());
 
 		service.markIndexable(new long[] { 1, 3 }, AbstractDocument.INDEX_TO_INDEX);
 
 		doc1 = docDao.findById(1);
-		Assert.assertNotNull(doc1);
-		Assert.assertEquals(AbstractDocument.INDEX_TO_INDEX, doc1.getIndexed());
+		assertNotNull(doc1);
+		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc1.getIndexed());
 		doc3 = docDao.findById(3);
-		Assert.assertNotNull(doc3);
-		Assert.assertEquals(AbstractDocument.INDEX_TO_INDEX, doc3.getIndexed());
+		assertNotNull(doc3);
+		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc3.getIndexed());
 	}
 
 	@Test
 	public void testCountDocuments() throws ServerException {
-		Assert.assertEquals(7, service.countDocuments(new long[] { 5 }, 0));
-		Assert.assertEquals(0, service.countDocuments(new long[] { 5 }, 3));
+		assertEquals(7, service.countDocuments(new long[] { 5 }, 0));
+		assertEquals(0, service.countDocuments(new long[] { 5 }, 3));
 	}
 
 	@Test
@@ -1232,7 +1230,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (ServerException e) {
 			exceptionHappened = true;
 		}
-		Assert.assertTrue(exceptionHappened);
+		assertTrue(exceptionHappened);
 
 		List<GUIDocumentNote> notes = new ArrayList<>();
 		GUIDocumentNote gdn01 = new GUIDocumentNote();

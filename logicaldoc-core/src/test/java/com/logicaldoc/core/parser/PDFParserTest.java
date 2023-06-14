@@ -19,10 +19,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.Tenant;
 
-public class PDFParserTest extends AbstractCoreTCase {
+public class PDFParserTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(PDFParserTest.class);
 	

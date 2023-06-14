@@ -10,10 +10,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 
-public class DocumentComparatorTest extends AbstractCoreTCase {
+public class DocumentComparatorTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private DocumentDAO dao;

@@ -305,7 +305,7 @@ public abstract class PluginRegistry {
 		File pluginsPath = null;
 		try {
 			ContextProperties conf = new ContextProperties();
-			pluginsPath = new File(conf.getPropertyWithSubstitutions("conf.plugindir"));
+			pluginsPath = new File(conf.getProperty("conf.plugindir"));
 		} catch (IOException e1) {
 			// Nothing to do
 		}

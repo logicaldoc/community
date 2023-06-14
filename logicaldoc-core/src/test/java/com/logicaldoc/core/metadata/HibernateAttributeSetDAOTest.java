@@ -6,7 +6,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
 
@@ -18,7 +18,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
-public class HibernateAttributeSetDAOTest extends AbstractCoreTCase {
+public class HibernateAttributeSetDAOTest extends AbstractCoreTestCase {
 
 	private AttributeSetDAO dao;
 

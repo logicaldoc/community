@@ -6,11 +6,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 
 import junit.framework.Assert;
 
-public class TagSearchTest extends AbstractCoreTCase {
+public class TagSearchTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(TagSearchTest.class);
 

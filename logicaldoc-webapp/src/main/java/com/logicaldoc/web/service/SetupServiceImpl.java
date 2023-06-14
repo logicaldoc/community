@@ -149,7 +149,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 		Collection<PluginDescriptor> descriptors = PluginRegistry.getInstance().getPlugins();
 		for (PluginDescriptor descriptor : descriptors) {
 			try {
-				File file = new File(conf.getPropertyWithSubstitutions("conf.plugindir"), descriptor.getId());
+				File file = new File(conf.getProperty("conf.plugindir"), descriptor.getId());
 				file.mkdirs();
 				file.mkdir();
 				file = new File(file, "plugin.properties");

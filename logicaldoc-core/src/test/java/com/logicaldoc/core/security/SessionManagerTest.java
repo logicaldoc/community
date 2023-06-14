@@ -8,6 +8,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -37,7 +39,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 4.6
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SessionManagerTest extends AbstractCoreTCase implements SessionListener {
+public class SessionManagerTest extends AbstractCoreTestCase implements SessionListener {
 
 	// instance under test
 	private SessionManager testSubject;
@@ -55,6 +57,7 @@ public class SessionManagerTest extends AbstractCoreTCase implements SessionList
 	private Client client;
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		testSubject = SessionManager.get();
@@ -65,7 +68,8 @@ public class SessionManagerTest extends AbstractCoreTCase implements SessionList
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws SQLException {
 		testSubject.removeListener(this);
 		testSubject.destroy();
 		super.tearDown();

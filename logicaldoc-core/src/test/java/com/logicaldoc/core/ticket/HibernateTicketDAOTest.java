@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 
 import junit.framework.Assert;
@@ -17,7 +17,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-public class HibernateTicketDAOTest extends AbstractCoreTCase {
+public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private TicketDAO dao;

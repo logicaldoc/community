@@ -7,9 +7,9 @@ import org.junit.Test;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
-import com.logicaldoc.web.AbstractWebappTCase;
+import com.logicaldoc.web.AbstractWebappTestCase;
 
-public class SettingServiceImplTest extends AbstractWebappTCase {
+public class SettingServiceImplTest extends AbstractWebappTestCase {
 
 	// Instance under test
 	private SettingServiceImpl service = new SettingServiceImpl();

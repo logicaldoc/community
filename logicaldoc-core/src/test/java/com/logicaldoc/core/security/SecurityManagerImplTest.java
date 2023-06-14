@@ -6,7 +6,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -19,7 +19,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-public class SecurityManagerImplTest extends AbstractCoreTCase {
+public class SecurityManagerImplTest extends AbstractCoreTestCase {
 	// Instance under test
 	private SecurityManager manager;
 

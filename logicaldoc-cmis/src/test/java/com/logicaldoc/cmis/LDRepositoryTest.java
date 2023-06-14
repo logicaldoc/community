@@ -40,10 +40,11 @@ import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
-public class LDRepositoryTest extends AbstractCmisTCase {
+public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	private FolderDAO fdao;
 
@@ -52,6 +53,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 	protected SearchEngine engine;
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -71,7 +73,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		File corePluginFile = new File(pluginsDir, "logicaldoc-core-plugin.jar");
 
 		// copy plugin file to target resources
-		copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile.getAbsolutePath());
+		FileUtil.copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile);
 
 		PluginRegistry registry = PluginRegistry.getInstance();
 		registry.init(pluginsDir.getAbsolutePath());

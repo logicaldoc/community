@@ -11,7 +11,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 
 import junit.framework.Assert;
 
@@ -21,7 +21,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6.4
  */
-public class MailUtilTest extends AbstractCoreTCase {
+public class MailUtilTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testMsgToMail() throws Exception {

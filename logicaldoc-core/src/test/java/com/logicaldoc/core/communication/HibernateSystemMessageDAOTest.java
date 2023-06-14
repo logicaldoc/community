@@ -8,7 +8,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 
 import junit.framework.Assert;
@@ -19,7 +19,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
+public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 	// Instance under test
 	private SystemMessageDAO dao;
 

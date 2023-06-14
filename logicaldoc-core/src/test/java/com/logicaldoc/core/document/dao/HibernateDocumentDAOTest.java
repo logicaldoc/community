@@ -17,7 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
@@ -46,7 +46,7 @@ import junit.framework.Assert;
  * 
  * @since 3.0
  */
-public class HibernateDocumentDAOTest extends AbstractCoreTCase {
+public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private DocumentDAO dao;

@@ -9,11 +9,11 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
-import com.logicaldoc.web.AbstractWebappTCase;
+import com.logicaldoc.web.AbstractWebappTestCase;
 
 import junit.framework.Assert;
 
-public class TemplateServiceImplTest extends AbstractWebappTCase {
+public class TemplateServiceImplTest extends AbstractWebappTestCase {
 
 	// Instance under test
 	private TemplateServiceImpl service = new TemplateServiceImpl();

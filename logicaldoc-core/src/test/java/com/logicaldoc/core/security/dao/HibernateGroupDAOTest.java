@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Group;
 
@@ -19,7 +19,7 @@ import junit.framework.Assert;
  * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
-public class HibernateGroupDAOTest extends AbstractCoreTCase {
+public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(HibernateGroupDAOTest.class);
 

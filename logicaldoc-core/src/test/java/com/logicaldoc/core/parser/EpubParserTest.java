@@ -7,10 +7,10 @@ import java.util.Locale;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.Tenant;
 
-public class EpubParserTest extends AbstractCoreTCase {
+public class EpubParserTest extends AbstractCoreTestCase {
 	
 	@Test
 	public void testParse() throws UnsupportedEncodingException, ParseException {

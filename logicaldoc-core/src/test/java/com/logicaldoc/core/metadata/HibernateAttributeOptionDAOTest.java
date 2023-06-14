@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 
 /**
  * Test case for <code>HibernateAttributeOptionDAO</code>
@@ -16,7 +16,7 @@ import com.logicaldoc.core.AbstractCoreTCase;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
-public class HibernateAttributeOptionDAOTest extends AbstractCoreTCase {
+public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private AttributeOptionDAO dao;

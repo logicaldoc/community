@@ -6,12 +6,12 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.Tenant;
 
-public class FolderToolTest extends AbstractCoreTCase {
+public class FolderToolTest extends AbstractCoreTestCase {
 
 	// instance under test
 	private FolderTool testSubject = new FolderTool();

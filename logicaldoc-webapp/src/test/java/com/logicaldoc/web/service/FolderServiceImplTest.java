@@ -11,11 +11,11 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.web.AbstractWebappTCase;
+import com.logicaldoc.web.AbstractWebappTestCase;
 
 import junit.framework.Assert;
 
-public class FolderServiceImplTest extends AbstractWebappTCase {
+public class FolderServiceImplTest extends AbstractWebappTestCase {
 
 	// Instance under test
 	private FolderServiceImpl service = new FolderServiceImpl();

@@ -1,5 +1,6 @@
 package com.logicaldoc.core.searchengine;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -9,13 +10,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 
 import junit.framework.Assert;
 
-public class StandardSearchEngineTest extends AbstractCoreTCase {
+public class StandardSearchEngineTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngineTest.class);
 
@@ -28,7 +29,8 @@ public class StandardSearchEngineTest extends AbstractCoreTCase {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws SQLException  {
 		engine.unlock();
 		engine.close();
 		super.tearDown();

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 
 import junit.framework.Assert;
 
@@ -15,7 +15,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6.4
  */
-public class AutomationTest extends AbstractCoreTCase {
+public class AutomationTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testAutomation() throws Exception {

@@ -15,11 +15,11 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
-import com.logicaldoc.web.AbstractWebappTCase;
+import com.logicaldoc.web.AbstractWebappTestCase;
 
 import junit.framework.Assert;
 
-public class SecurityServiceImplTest extends AbstractWebappTCase {
+public class SecurityServiceImplTest extends AbstractWebappTestCase {
 
 	// Instance under test
 	private SecurityServiceImpl service = new SecurityServiceImpl();

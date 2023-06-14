@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -20,7 +20,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
-public class HibernateVersionDAOTest extends AbstractCoreTCase {
+public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private VersionDAO dao;

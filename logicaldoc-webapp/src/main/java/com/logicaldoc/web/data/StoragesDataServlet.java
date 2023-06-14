@@ -104,7 +104,7 @@ public class StoragesDataServlet extends AbstractDataServlet {
 			Storer st = StorerManager.get().getDefinitions().get(type);
 			if (st != null) {
 				for (String name : st.getParameterNames()) {
-					String value = conf.getPropertyWithSubstitutions(STORE + i + "." + name, "");
+					String value = conf.getProperty(STORE + i + "." + name, "");
 					writer.print("<" + name + "><![CDATA[" + value + "]]></" + name + ">");
 				}
 			}

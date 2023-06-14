@@ -196,7 +196,7 @@ public abstract class AbstractStorer implements Storer {
 	 * Retrieves the setting "store." + id + ".dir"
 	 */
 	protected String getDir() {
-		return getConfig().getPropertyWithSubstitutions("store." + id + ".dir");
+		return getConfig().getProperty("store." + id + ".dir");
 	}
 
 	@Override

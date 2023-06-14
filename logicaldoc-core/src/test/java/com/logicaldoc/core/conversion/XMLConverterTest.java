@@ -9,13 +9,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.util.io.FileUtil;
 
-public class XMLConverterTest extends AbstractCoreTCase {
+public class XMLConverterTest extends AbstractCoreTestCase {
 
 	private DocumentDAO ddao;
 

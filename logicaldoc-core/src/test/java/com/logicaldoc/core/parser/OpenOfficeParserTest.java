@@ -11,10 +11,10 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.Tenant;
 
-public class OpenOfficeParserTest extends AbstractCoreTCase {
+public class OpenOfficeParserTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testParse() throws UnsupportedEncodingException, ParseException {

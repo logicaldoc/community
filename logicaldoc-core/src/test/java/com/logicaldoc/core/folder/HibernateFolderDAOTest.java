@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
@@ -38,7 +38,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class HibernateFolderDAOTest extends AbstractCoreTCase {
+public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private FolderDAO dao;

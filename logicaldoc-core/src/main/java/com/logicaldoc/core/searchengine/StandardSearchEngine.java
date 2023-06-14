@@ -567,7 +567,7 @@ public class StandardSearchEngine implements SearchEngine {
 	}
 
 	File getIndexDataFolder() throws IOException {
-		File indexdir = new File(config.getPropertyWithSubstitutions(INDEX_DIR));
+		File indexdir = new File(config.getProperty(INDEX_DIR));
 		indexdir = new File(indexdir, LOGICALDOC);
 		indexdir = new File(indexdir, "data");
 		return new File(indexdir, "index");
@@ -584,7 +584,7 @@ public class StandardSearchEngine implements SearchEngine {
 			System.setProperty("solr.disable.shardsWhitelist", "true");
 			System.setProperty("solr.http1", "true");
 
-			File indexHome = new File(config.getPropertyWithSubstitutions(INDEX_DIR));
+			File indexHome = new File(config.getProperty(INDEX_DIR));
 			File solr_xml = new File(indexHome, "solr.xml");
 
 			if (!indexHome.exists()) {
@@ -595,7 +595,7 @@ public class StandardSearchEngine implements SearchEngine {
 				FileUtil.copyResource("/index/solr.xml", solr_xml);
 			}
 
-			File ldoc = new File(config.getPropertyWithSubstitutions(INDEX_DIR));
+			File ldoc = new File(config.getProperty(INDEX_DIR));
 			ldoc = new File(ldoc, LOGICALDOC);
 			if (!ldoc.exists()) {
 				ldoc.mkdirs();

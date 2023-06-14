@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
 
@@ -17,7 +17,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
-public class HibernateGenericDAOTest extends AbstractCoreTCase {
+public class HibernateGenericDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private GenericDAO dao;

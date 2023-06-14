@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
 
@@ -21,7 +21,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
-public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
+public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private FolderHistoryDAO dao;

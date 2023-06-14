@@ -100,7 +100,7 @@ public class UserUtil {
 		File userpath = new File("");
 		try {
 			ContextProperties conf = Context.get().getProperties();
-			userpath = new File(conf.getPropertyWithSubstitutions("conf.userdir"));
+			userpath = new File(conf.getProperty("conf.userdir"));
 			FileUtils.forceMkdir(userpath);
 		} catch (Exception t) {
 			// Nothing to do

@@ -332,14 +332,16 @@ public class ContextProperties extends OrderedProperties {
 	 * 
 	 * @return the porperty's value with expanded variables
 	 */
-	public String getPropertyWithSubstitutions(String property) {
-		return StrSubstitutor.replaceSystemProperties(getProperty(property));
+	@Override
+	public String getProperty(String property) {
+		return StrSubstitutor.replaceSystemProperties(super.getProperty(property));
 	}
 
-	public String getPropertyWithSubstitutions(String property, String defaultValue) {
-		return StrSubstitutor.replaceSystemProperties(getProperty(property, defaultValue));
+	@Override
+	public String getProperty(String property, String defaultValue) {
+		return StrSubstitutor.replaceSystemProperties(super.getProperty(property, defaultValue));
 	}
-
+	
 	public int getMaxBackups() {
 		return maxBackups;
 	}

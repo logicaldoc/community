@@ -2,6 +2,8 @@ package com.logicaldoc.web.websockets;
 
 import static org.junit.Assert.assertEquals;
 
+import java.sql.SQLException;
+
 import javax.websocket.Session;
 
 import org.junit.After;
@@ -15,9 +17,9 @@ import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
-import com.logicaldoc.web.AbstractWebappTCase;
+import com.logicaldoc.web.AbstractWebappTestCase;
 
-public class EventEndpointTest extends AbstractWebappTCase {
+public class EventEndpointTest extends AbstractWebappTestCase {
 
 	// Instance under test
 	private EventEndpoint endpoint = new EventEndpoint();
@@ -34,7 +36,7 @@ public class EventEndpointTest extends AbstractWebappTCase {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() throws SQLException  {
 		endpoint.onClose(websocketSession);
 		super.tearDown();
 	}
@@ -71,7 +73,7 @@ public class EventEndpointTest extends AbstractWebappTCase {
 
 		endpoint.newEvent(history);
 		assertEquals(2, endpoint.countQueueSize(DocumentHistory.class));
-		
+
 		history = new DocumentHistory();
 		history.setId(3L);
 		history.setDocument(null);
@@ -91,17 +93,17 @@ public class EventEndpointTest extends AbstractWebappTCase {
 
 		endpoint.newEvent(history);
 		assertEquals(4, endpoint.countQueueSize(DocumentHistory.class));
-		
+
 		history = new UserHistory();
 		history.setId(5L);
 		history.setUserId(1L);
 		history.setFolderId(4L);
 		((UserHistory) history).setAuthor("me");
 		history.setEvent(UserEvent.LOGOUT.toString());
-		
+
 		endpoint.newEvent(history);
 		assertEquals(1, endpoint.countQueueSize(UserHistory.class));
-		
+
 		endpoint.newEvent(history);
 		assertEquals(1, endpoint.countQueueSize(UserHistory.class));
 	}

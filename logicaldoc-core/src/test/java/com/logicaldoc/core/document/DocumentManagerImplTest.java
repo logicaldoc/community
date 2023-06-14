@@ -14,9 +14,10 @@ import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
@@ -43,7 +44,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5
  */
-public class DocumentManagerImplTest extends AbstractCoreTCase {
+public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 	private DocumentDAO docDao;
 
@@ -60,9 +61,11 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 	// Instance under test
 	private DocumentManager documentManager;
 
+	@Before
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+		
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
 		verDao = (VersionDAO) context.getBean("VersionDAO");
 		userDao = (UserDAO) context.getBean("UserDAO");
@@ -267,8 +270,8 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Document doc = docDao.findById(1);
 		documentManager.moveToFolder(doc, folder, transaction);
 
-		String storeRoot = Context.get().getProperties().getPropertyWithSubstitutions("store.1.dir");
-		String store2Root = Context.get().getProperties().getPropertyWithSubstitutions("store.2.dir");
+		String storeRoot = Context.get().getProperties().getProperty("store.1.dir");
+		String store2Root = Context.get().getProperties().getProperty("store.2.dir");
 
 		Assert.assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
 

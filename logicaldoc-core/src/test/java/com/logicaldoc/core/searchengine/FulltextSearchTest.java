@@ -11,14 +11,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 
 import junit.framework.Assert;
 
-public class FulltextSearchTest extends AbstractCoreTCase {
+public class FulltextSearchTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(FulltextSearchTest.class);
 

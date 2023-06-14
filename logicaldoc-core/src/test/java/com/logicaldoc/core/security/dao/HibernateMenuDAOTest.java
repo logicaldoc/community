@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Menu;
@@ -21,7 +21,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-public class HibernateMenuDAOTest extends AbstractCoreTCase {
+public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private MenuDAO dao;

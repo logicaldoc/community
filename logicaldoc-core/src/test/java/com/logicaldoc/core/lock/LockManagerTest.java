@@ -3,7 +3,7 @@ package com.logicaldoc.core.lock;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
@@ -17,7 +17,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
-public class LockManagerTest extends AbstractCoreTCase {
+public class LockManagerTest extends AbstractCoreTestCase {
 	private LockManager manager;
 
 	private GenericDAO dao;

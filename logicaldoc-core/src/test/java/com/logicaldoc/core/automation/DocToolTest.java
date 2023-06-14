@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -25,7 +25,7 @@ import com.logicaldoc.core.security.Tenant;
 
 import junit.framework.Assert;
 
-public class DocToolTest extends AbstractCoreTCase {
+public class DocToolTest extends AbstractCoreTestCase {
 
 	// instance under test
 	private DocTool testSubject = new DocTool();

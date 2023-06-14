@@ -12,7 +12,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
-public class SystemInfoTest extends AbstractCoreTCase {
+public class SystemInfoTest extends AbstractCoreTestCase {
 	@Test
 	public void testGet() throws UnsupportedEncodingException {
 		SystemInfo info = SystemInfo.get();

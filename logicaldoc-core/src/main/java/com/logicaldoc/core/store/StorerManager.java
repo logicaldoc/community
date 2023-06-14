@@ -103,7 +103,7 @@ public class StorerManager {
 
 		Set<String> params = definition.getParameters().keySet();
 		for (String param : params)
-			storer.getParameters().put(param, config.getPropertyWithSubstitutions("store." + id + "." + param, ""));
+			storer.getParameters().put(param, config.getProperty("store." + id + "." + param, ""));
 
 		return storer;
 	}

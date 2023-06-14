@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -22,7 +22,7 @@ import junit.framework.Assert;
  * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
-public class HibernateDocumentHistoryDAOTest extends AbstractCoreTCase {
+public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private DocumentHistoryDAO dao;

@@ -390,7 +390,7 @@ public class StatsCollector extends Task {
 
 	private long calculateLogDirSize() {
 		long logdir = 0;
-		File logsDir = new File(config.getPropertyWithSubstitutions("conf.logdir"));
+		File logsDir = new File(config.getProperty("conf.logdir"));
 		if (logsDir.exists())
 			logdir = FileUtils.sizeOfDirectory(logsDir);
 		return logdir;
@@ -405,7 +405,7 @@ public class StatsCollector extends Task {
 
 	private long calculateExportDirSize() {
 		long exportdir = 0;
-		File exportDir = new File(config.getPropertyWithSubstitutions("conf.exportdir"));
+		File exportDir = new File(config.getProperty("conf.exportdir"));
 		if (exportDir.exists())
 			exportdir = FileUtils.sizeOfDirectory(exportDir);
 		return exportdir;
@@ -413,7 +413,7 @@ public class StatsCollector extends Task {
 
 	private long calculateImportDirSize() {
 		long importdir = 0;
-		File importDir = new File(config.getPropertyWithSubstitutions("conf.importdir"));
+		File importDir = new File(config.getProperty("conf.importdir"));
 		if (importDir.exists())
 			importdir = FileUtils.sizeOfDirectory(importDir);
 		return importdir;
@@ -421,7 +421,7 @@ public class StatsCollector extends Task {
 
 	private long calculateIndexDirSize() {
 		long indexdir = 0;
-		File indexDir = new File(config.getPropertyWithSubstitutions("index.dir"));
+		File indexDir = new File(config.getProperty("index.dir"));
 		if (indexDir.exists())
 			indexdir = FileUtils.sizeOfDirectory(indexDir);
 		return indexdir;
@@ -456,7 +456,7 @@ public class StatsCollector extends Task {
 		 * Fall back to the database dir
 		 */
 		if (dbdir == 0) {
-			File dbDir = new File(config.getPropertyWithSubstitutions("conf.dbdir"));
+			File dbDir = new File(config.getProperty("conf.dbdir"));
 			if (dbDir.exists())
 				dbdir = FileUtils.sizeOfDirectory(dbDir);
 		}

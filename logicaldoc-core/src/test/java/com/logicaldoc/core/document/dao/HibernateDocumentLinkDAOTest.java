@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentLink;
@@ -18,7 +18,7 @@ import junit.framework.Assert;
  * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
-public class HibernateDocumentLinkDAOTest extends AbstractCoreTCase {
+public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private DocumentLinkDAO dao;

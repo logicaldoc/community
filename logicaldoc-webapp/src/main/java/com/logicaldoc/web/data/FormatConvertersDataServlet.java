@@ -140,7 +140,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 
 		if (parameters) {
 			for (String name : converter.getParameterNames()) {
-				String value = conf.getPropertyWithSubstitutions(
+				String value = conf.getProperty(
 						"converter." + converter.getClass().getSimpleName() + "." + name, "");
 				writer.print("<" + name + "><![CDATA[" + value + "]]></" + name + ">");
 			}

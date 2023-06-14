@@ -8,12 +8,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.searchengine.Hit;
 
 import junit.framework.Assert;
 
-public class FolderSearchTest extends AbstractCoreTCase {
+public class FolderSearchTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(FolderSearchTest.class);
 

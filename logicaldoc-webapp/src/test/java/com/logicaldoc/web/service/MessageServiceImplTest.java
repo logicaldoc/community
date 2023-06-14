@@ -7,11 +7,11 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MessageTemplate;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.web.AbstractWebappTCase;
+import com.logicaldoc.web.AbstractWebappTestCase;
 
 import junit.framework.Assert;
 
-public class MessageServiceImplTest extends AbstractWebappTCase {
+public class MessageServiceImplTest extends AbstractWebappTestCase {
 
 	// Instance under test
 	private MessageServiceImpl service = new MessageServiceImpl();

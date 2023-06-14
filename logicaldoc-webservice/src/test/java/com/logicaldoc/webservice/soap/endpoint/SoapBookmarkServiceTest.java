@@ -2,12 +2,12 @@ package com.logicaldoc.webservice.soap.endpoint;
 
 import org.junit.Test;
 
-import com.logicaldoc.webservice.AbstractWebserviceTCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSBookmark;
 
 import junit.framework.Assert;
 
-public class SoapBookmarkServiceTest extends AbstractWebserviceTCase {
+public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 
 	// Instance under test
 	private SoapBookmarkService bookmarkService;

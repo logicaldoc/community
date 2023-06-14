@@ -3,7 +3,7 @@ package com.logicaldoc.core.dashlet;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 
 import junit.framework.Assert;
 
@@ -13,7 +13,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.2.3
  */
-public class HibernateDashletDAOTest extends AbstractCoreTCase {
+public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private DashletDAO dao;

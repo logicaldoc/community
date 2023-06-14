@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.Session;
 
 import junit.framework.Assert;
@@ -16,7 +16,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6.4
  */
-public class HibernateSessionDAOTest extends AbstractCoreTCase {
+public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private SessionDAO dao;

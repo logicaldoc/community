@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Bookmark;
 
@@ -18,7 +18,7 @@ import junit.framework.Assert;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
-public class HibernateBookmarkDAOTest extends AbstractCoreTCase {
+public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private BookmarkDAO dao;

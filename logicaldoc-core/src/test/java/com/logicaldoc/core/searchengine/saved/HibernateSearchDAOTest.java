@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.FulltextSearchOptions;
 import com.logicaldoc.core.searchengine.SearchOptions;
@@ -25,7 +25,7 @@ import junit.framework.Assert;
  * @author Matteo Caruso - LogicalDOC
  * @since 8.6.1
  */
-public class HibernateSearchDAOTest extends AbstractCoreTCase {
+public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
 	private SearchDAO dao;
