@@ -32,6 +32,10 @@
 		<from>/webform/([\w]+\-[\w]+\-[\w]+\-[\w]+\-[\w]+)$</from>
 		<to type="redirect">%{context-path}/webform.jsp?formId=$1</to>
 	</rule>
+    <rule match-type="regex">
+		<from>/webform/([\w]+\-[\w]+\-[\w]+\-[\w]+\-[\w]+)\?(.*)$</from>
+		<to type="redirect">%{context-path}/webform.jsp?formId=$1&amp;$2</to>
+	</rule>    
 	<rule match-type="regex">
 		<from>/webform/edit/(\d+)$</from>
 		<to type="redirect">%{context-path}/webform.jsp?edit=$1</to>

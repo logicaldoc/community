@@ -59,20 +59,32 @@ public interface FormService extends RemoteService {
 	/**
 	 * Invites by email a set of recipients to fill out the given form
 	 * 
-	 * @param formId identifier of the form
+	 * @param form the form to notify
 	 * @param email the email to send
 	 * @param locale the current locale
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	void invite(long formId, GUIEmail email, String locale) throws ServerException;
+	public void invite(GUIForm form, GUIEmail email, String locale) throws ServerException;
+
+	/**
+	 * Generates the pre-filled link for the web form
+	 * 
+	 * @param form the form with the filled fields
+	 * @param responderEmail the email of the responder
+	 * 
+	 * @return the pre-filled link
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public String getPreFilledLink(GUIForm form, String responderEmail) throws ServerException;
 
 	public static class Instance {
 		private static FormServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static FormServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(FormService.class);

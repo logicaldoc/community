@@ -14,5 +14,7 @@ public interface FormServiceAsync {
 
 	void processImage(AsyncCallback<String> callback);
 
-	void invite(long formId, GUIEmail email, String locale, AsyncCallback<Void> callback);
+	void invite(GUIForm form, GUIEmail email, String locale, AsyncCallback<Void> callback);
+
+	void getPreFilledLink(GUIForm form, String responderEmail, AsyncCallback<String> callback);
 }

@@ -20,13 +20,9 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -121,22 +117,24 @@ public class FormsPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler((ClickEvent event) -> refresh());
+		refresh.addClickHandler(event -> refresh());
 
 		ToolStripButton addForm = new ToolStripButton();
 		addForm.setTitle(I18N.message("addform"));
 		toolStrip.addButton(addForm);
-		addForm.addClickHandler((ClickEvent event) -> {
+		addForm.addClickHandler(event -> {
 			list.deselectAllRecords();
 			new FormCreate(FormsPanel.this).show();
 		});
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
-			showContextMenu();
-			event.cancel();
+		list.addCellContextClickHandler(event -> {
+			if (!PREVIEW.equals(list.getField(event.getColNum()).getName())) {
+				showContextMenu();
+				event.cancel();
+			}
 		});
 
-		list.addSelectionChangedHandler((SelectionEvent event) -> {
+		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				FormService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString("id")),
@@ -154,8 +152,8 @@ public class FormsPanel extends AdminPanel {
 						});
 		});
 
-		list.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
-				.setMessage(I18N.message("showforms", Integer.toString(list.getTotalRows()))));
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showforms", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -173,7 +171,7 @@ public class FormsPanel extends AdminPanel {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 				if (Boolean.TRUE.equals(value)) {
 					FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
 						@Override
@@ -206,14 +204,23 @@ public class FormsPanel extends AdminPanel {
 		invite.addClickHandler((MenuItemClickEvent event) -> {
 			GUIForm selectedForm = getSelectedForm();
 			if (selectedForm != null) {
-				FormInvitationDialog invitation = new FormInvitationDialog(selectedForm.getId());
-				invitation.show();
+				new WebFormInvitationDialog(selectedForm.getId()).show();
 			}
 		});
 		invite.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
 
+		MenuItem getPrefilledLink = new MenuItem();
+		getPrefilledLink.setTitle(I18N.message("getprefilledlink"));
+		getPrefilledLink.addClickHandler((MenuItemClickEvent event) -> {
+			GUIForm selectedForm = getSelectedForm();
+			if (selectedForm != null) {
+				new WebFormPrefilledLink(selectedForm.getId()).show();
+			}
+		});
+		getPrefilledLink.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
+
 		if (Feature.enabled(Feature.WEB_FORM))
-			contextMenu.setItems(edit, preview, invite, delete);
+			contextMenu.setItems(edit, preview, invite, getPrefilledLink, delete);
 		else
 			contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();

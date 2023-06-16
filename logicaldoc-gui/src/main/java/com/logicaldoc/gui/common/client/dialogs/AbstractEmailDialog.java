@@ -131,17 +131,20 @@ public abstract class AbstractEmailDialog extends Window {
 
 			onSend(mail);
 		});
-
-		HLayout buttons = new HLayout();
-		buttons.setMembers(sendButton);
-		buttons.setHeight(30);
-
+		
 		addItem(recipientsStack);
 		addItem(form);
-		addItem(buttons);
+		addItem(prepareButtons());
 
 		List<FormItem> items = prepareFormItems();
 		form.setFields(items.toArray(new FormItem[0]));
+	}
+
+	protected HLayout prepareButtons() {
+		HLayout buttons = new HLayout();
+		buttons.setMembers(sendButton);
+		buttons.setHeight(30);
+		return buttons;
 	}
 
 	private void fillRecipients(List<String> to, List<String> cc, List<String> bcc, ListGridRecord[] records) {

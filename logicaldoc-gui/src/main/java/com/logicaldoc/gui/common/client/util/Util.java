@@ -928,6 +928,20 @@ public abstract class Util {
 
 		return val;
 	}
+	
+	public static Map<String, String> getParameters() {
+		Map<String, String> val = new HashMap<>();
+
+		try {
+			RequestInfo request = WindowUtils.getRequestInfo();
+			val = request.getParameterMap();
+		} catch (Exception t) {
+			// Nothing to do
+		}
+
+		return val;
+	}
+	
 
 	/**
 	 * Detect skin specification from the request

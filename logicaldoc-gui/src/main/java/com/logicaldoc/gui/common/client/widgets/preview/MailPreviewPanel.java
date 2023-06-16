@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.common.client.widgets.preview;
 
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -154,9 +153,16 @@ public class MailPreviewPanel extends VLayout {
 				button.setIcon("[SKIN]/" + doc.getIcon());
 				if (doc.getFolder().isDownload())
 					button.addClickHandler(event -> {
-						String url = Util.downloadAttachmentURL(document.getId(), document.getFileVersion(),
-								URL.encodeQueryString(doc.getFileName()));
-						Util.download(url);
+						String filename = doc.getFileName();
+						filename = filename.replace("&", "%26");
+						filename = filename.replace(" ", "%20");
+						filename = filename.replace("#", "%23");
+						filename = filename.replace("/", "%2F");
+						filename = filename.replace("=", "%3D");
+						filename = filename.replace("?", "%3F");
+						filename = filename.replace(":", "%3A");
+
+						Util.download(Util.downloadAttachmentURL(document.getId(), document.getFileVersion(), filename));
 					});
 				button.setContextMenu(prepareButtonMenu(document, doc));
 				attachmentsPanel.addTile(button);
