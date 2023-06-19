@@ -1,5 +1,8 @@
 package com.logicaldoc.core.document.dao;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
@@ -22,7 +25,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	private DocumentNoteDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentNoteDAO

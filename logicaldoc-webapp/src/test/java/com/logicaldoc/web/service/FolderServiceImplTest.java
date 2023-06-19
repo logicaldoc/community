@@ -1,5 +1,8 @@
 package com.logicaldoc.web.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,7 +26,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 	private FolderDAO folderDao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		folderDao = (FolderDAO) context.getBean("FolderDAO");

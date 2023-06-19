@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
 
@@ -18,6 +19,8 @@ import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlToolError;
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -33,6 +36,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public abstract class AbstractTestCase {
 
+	private static Logger log = LoggerFactory.getLogger(AbstractTestCase.class);
+
 	private static final String USER_HOME = "user.home";
 
 	protected ApplicationContext context;
@@ -42,7 +47,7 @@ public abstract class AbstractTestCase {
 	private String userHome;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		loadDevelSettings();
 
 		updateUserHome();
@@ -127,8 +132,8 @@ public abstract class AbstractTestCase {
 		if (getSqlScripts().length < 1)
 			return;
 
-		try (Connection con = getConnection()) {
-			con.createStatement().execute("shutdown");
+		try (Connection con = getConnection(); Statement statement = con.createStatement()) {
+			statement.execute("shutdown");
 		}
 	}
 
@@ -142,10 +147,8 @@ public abstract class AbstractTestCase {
 	 * 
 	 * @throws SQLException Error in one of the SQL scripts
 	 * @throws IOException Error reading one of the SQL scripts
-	 * @throws SqlToolError Error in one of the SQL scripts
-	 * 
 	 */
-	private void createTestDatabase() throws SQLException, IOException, SqlToolError {
+	private void createTestDatabase() throws SQLException, IOException {
 		if (getSqlScripts().length < 1)
 			return;
 
@@ -155,7 +158,12 @@ public abstract class AbstractTestCase {
 			try (Connection con = getConnection()) {
 				SqlFile sql = new SqlFile(sqlFile, "Cp1252", false);
 				sql.setConnection(con);
-				sql.execute();
+				try {
+					log.info("Running script {}", sqlScript);
+					sql.execute();
+				} catch (SqlToolError e) {
+					throw new SQLException(e.getMessage(), e);
+				}
 			} finally {
 				FileUtil.strongDelete(sqlFile);
 			}

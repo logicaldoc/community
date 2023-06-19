@@ -1,5 +1,8 @@
 package com.logicaldoc.core.metadata;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +25,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 	private AttributeOptionDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateAttributeOptionDAO
@@ -48,11 +51,11 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 		List<AttributeOption> options = dao.findByAttribute(1L, "att1");
 		Assert.assertEquals(4, options.size());
 
-		dao.deleteOrphaned(1L, (List<String>)Arrays.asList(new String[]{"pippo","pluto"}));
+		dao.deleteOrphaned(1L, (List<String>) Arrays.asList(new String[] { "pippo", "pluto" }));
 		options = dao.findByAttribute(1L, "att1");
 		Assert.assertEquals(0, options.size());
 	}
-	
+
 	@Test
 	public void testFindByTemplateAndAttribute() {
 		List<AttributeOption> options = dao.findByAttribute(1L, "att1");
@@ -70,7 +73,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 		options = dao.findByAttribute(2L, null);
 		Assert.assertEquals(1, options.size());
 	}
-	
+
 	@Test
 	public void testFindBySetIdAndAttributeCategory() {
 		List<AttributeOption> options = dao.findByAttributeAndCategory(1L, "att1", "cat1");
@@ -78,33 +81,32 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals("value1", options.get(0).getValue());
 		Assert.assertEquals("value2", options.get(1).getValue());
 		Assert.assertEquals("value5", options.get(2).getValue());
-		
+
 		options = dao.findByAttributeAndCategory(1L, "att1", "cat2");
 		Assert.assertEquals(1, options.size());
 		Assert.assertEquals("value6", options.get(0).getValue());
-	
+
 		options = dao.findByAttributeAndCategory(1L, "att1", "catX");
 		Assert.assertEquals(0, options.size());
 	}
-	
-	
+
 	@Test
 	public void testFindByTemplateAndAttributeAsMap() {
 		Map<String, List<AttributeOption>> optionsMap = dao.findByAttributeAsMap(1L, "att1");
 		Assert.assertEquals(2, optionsMap.size());
 		Assert.assertTrue(optionsMap.containsKey("cat1"));
 		Assert.assertTrue(optionsMap.containsKey("cat2"));
-		
+
 		List<AttributeOption> options = optionsMap.get("cat1");
 		Assert.assertEquals(3, options.size());
 		Assert.assertEquals("value1", options.get(0).getValue());
 		Assert.assertEquals("value2", options.get(1).getValue());
 		Assert.assertEquals("value5", options.get(2).getValue());
-		
+
 		options = optionsMap.get("cat2");
 		Assert.assertEquals(1, options.size());
 		Assert.assertEquals("value6", options.get(0).getValue());
-		
+
 		optionsMap = dao.findByAttributeAsMap(1L, "pollo");
 		Assert.assertEquals(0, optionsMap.size());
 	}

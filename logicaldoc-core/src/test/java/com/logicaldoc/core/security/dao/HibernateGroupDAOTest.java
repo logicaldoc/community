@@ -1,5 +1,8 @@
 package com.logicaldoc.core.security.dao;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -29,7 +32,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 	private com.logicaldoc.core.security.SecurityManager manager;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

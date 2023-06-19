@@ -1,7 +1,9 @@
 package com.logicaldoc.util.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -12,7 +14,7 @@ import junit.framework.Assert;
 
 public class JarUtilTest {
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		File dir = new File("target/test");
 		dir.mkdirs();
 		dir.mkdir();

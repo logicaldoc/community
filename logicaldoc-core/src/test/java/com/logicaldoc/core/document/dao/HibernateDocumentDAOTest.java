@@ -1,9 +1,11 @@
 package com.logicaldoc.core.document.dao;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -58,7 +60,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO templateDao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -109,13 +111,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		dao.initialize(doc);
 		Assert.assertEquals("xx", doc.getDigest());
 
-		String filePath = "target/store/1/doc/"+doc.getFileVersion();
+		String filePath = "target/store/1/doc/" + doc.getFileVersion();
 		Assert.assertTrue(new File(filePath).exists());
 		String digest = FileUtil.computeDigest(new File(filePath));
 
 		dao.updateDigest(doc);
 		Assert.assertEquals(digest, doc.getDigest());
-		
+
 		Document updatedDoc = dao.findById(1);
 		dao.initialize(updatedDoc);
 		Assert.assertEquals(doc.getVersion(), updatedDoc.getVersion());

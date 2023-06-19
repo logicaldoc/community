@@ -1,6 +1,9 @@
 package com.logicaldoc.util.config;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +24,7 @@ public class WebConfiguratorTest {
 	File webXml = new File("target/web.xml");
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		FileUtil.copyResource("/web.xml", webXml);
 	}
 
@@ -48,7 +51,7 @@ public class WebConfiguratorTest {
 		WebConfigurator config = new WebConfigurator(webXml.getPath());
 		Assert.assertTrue(config.setTransportGuarantee("CONFIDENCIAL"));
 		Assert.assertFalse(config.setTransportGuarantee("CONFIDENCIAL"));
-		
+
 		String notThrownTest = null;
 		try {
 			notThrownTest = "ok";

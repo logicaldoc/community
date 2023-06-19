@@ -1,5 +1,7 @@
 package com.logicaldoc.core.searchengine;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
@@ -23,14 +25,14 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 	protected SearchEngine engine;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		engine = (SearchEngine) context.getBean("SearchEngine");
 	}
 
 	@After
 	@Override
-	public void tearDown() throws SQLException  {
+	public void tearDown() throws SQLException {
 		engine.unlock();
 		engine.close();
 		super.tearDown();
@@ -64,7 +66,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 		document.setFolder(fold);
 		engine.addHit(document,
 				"This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response. document.");
-		
+
 		hit = engine.getHit(1L);
 		Assert.assertEquals(1L, hit.getId());
 		Assert.assertEquals("en", hit.getLanguage());
@@ -112,7 +114,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 	@Test
 	public void testQuery() throws Exception {
 		testAddHit();
-		
+
 		Document document = new Document();
 		document.setId(1L);
 		document.setFileName("Document test 1");
@@ -122,7 +124,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 		fold.setId(Folder.DEFAULTWORKSPACEID);
 		fold.setName("test");
 		document.setFolder(fold);
-		
+
 		document.setId(200L);
 		document.setFileName("Document test 200");
 		document.setTemplateId(0L);
@@ -131,7 +133,6 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 		document.setFolder(fold);
 		engine.addHit(document, "This test 200");
 
-		
 		document = new Document();
 		document.setId(201L);
 		document.setFileName("Document test 201");
@@ -140,7 +141,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 		document.setDate(new Date());
 		document.setFolder(fold);
 		engine.addHit(document, "This test 201");
-		
+
 		Hits hits = engine.query("*:*", 2, 3);
 		Assert.assertEquals(1, hits.getCount());
 	}

@@ -1,5 +1,8 @@
 package com.logicaldoc.core.document.dao;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -28,7 +31,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 	private DocumentHistoryDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

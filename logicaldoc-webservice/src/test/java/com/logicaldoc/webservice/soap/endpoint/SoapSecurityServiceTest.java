@@ -7,6 +7,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +41,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 	private SoapSecurityService securityServiceImpl;
 
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		userDao = (UserDAO) context.getBean("UserDAO");
 		groupDao = (GroupDAO) context.getBean("GroupDAO");

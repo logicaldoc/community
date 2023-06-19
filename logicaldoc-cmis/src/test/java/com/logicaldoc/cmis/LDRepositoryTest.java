@@ -5,9 +5,11 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -54,13 +56,17 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Before
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		engine = (SearchEngine) context.getBean("SearchEngine");
 
-		activateCorePlugin();
-		addHits();
+		try {
+			activateCorePlugin();
+			addHits();
+		} catch (Exception e) {
+			throw new IOException(e.getMessage(), e);
+		}
 
 		// Retrieve the instance under test from spring context.
 		fdao = (FolderDAO) context.getBean("FolderDAO");

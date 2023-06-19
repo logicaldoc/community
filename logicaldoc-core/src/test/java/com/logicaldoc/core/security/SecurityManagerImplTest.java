@@ -1,5 +1,8 @@
 package com.logicaldoc.core.security;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -28,7 +31,7 @@ public class SecurityManagerImplTest extends AbstractCoreTestCase {
 	private GroupDAO groupDAO;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		manager = (SecurityManager) context.getBean("SecurityManager");

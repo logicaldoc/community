@@ -1,5 +1,8 @@
 package com.logicaldoc.core.metadata;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,7 +26,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTestCase {
 	private AttributeSetDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

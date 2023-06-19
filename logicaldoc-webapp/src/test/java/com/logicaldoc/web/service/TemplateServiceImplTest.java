@@ -1,5 +1,9 @@
 package com.logicaldoc.web.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +25,7 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 	private TemplateDAO templateDao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");

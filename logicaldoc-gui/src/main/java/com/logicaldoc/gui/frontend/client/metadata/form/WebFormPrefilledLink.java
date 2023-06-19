@@ -23,6 +23,8 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class WebFormPrefilledLink extends StickyWindow {
 
+	private static final String RESPONDEREMAIL = "responderemail";
+
 	private ValuesManager vm;
 
 	private ExtendedPropertiesPanel extPanel;
@@ -46,7 +48,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 		responderForm.setTitleOrientation(TitleOrientation.TOP);
 		responderForm.setNumCols(1);
 
-		TextItem responder = ItemFactory.newEmailItem("responderemail", "responderemail", false);
+		TextItem responder = ItemFactory.newEmailItem(RESPONDEREMAIL, RESPONDEREMAIL, false);
 		responder.setWidth(200);
 
 		responderForm.setItems(responder);
@@ -92,7 +94,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 			return;
 
 		FormService.Instance.get().getPreFilledLink((GUIForm) extPanel.getObject(),
-				vm.getValueAsString("responderemail"), new AsyncCallback<String>() {
+				vm.getValueAsString(RESPONDEREMAIL), new AsyncCallback<String>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

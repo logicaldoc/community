@@ -1,5 +1,8 @@
 package com.logicaldoc.core.contact;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
@@ -21,7 +24,7 @@ public class HibernateContactDAOTest extends AbstractCoreTestCase {
 	private ContactDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateContactDAO

@@ -1,5 +1,8 @@
 package com.logicaldoc.util.dbinit;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +21,7 @@ public class DBInitTest extends TestCase {
 	// Instance under test
 	private DBInit dbinit;
 
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		List<String> sqlList = new ArrayList<>();
 		sqlList.add("sql1.sql");
 		sqlList.add("sql2.sql");
@@ -32,11 +35,11 @@ public class DBInitTest extends TestCase {
 
 	@Test
 	public void testExecute() {
-		String notThrownTest=null;
+		String notThrownTest = null;
 		try {
 			dbinit.execute();
-			notThrownTest="ok";
-		}catch(Throwable t) {
+			notThrownTest = "ok";
+		} catch (Throwable t) {
 			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -23,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import javax.mail.MessagingException;
 
 import org.java.plugin.JpfException;
 import org.junit.Test;
@@ -105,7 +108,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	protected SearchEngine searchEngine;
 
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
@@ -122,10 +125,14 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		prepareUploadedFiles();
 
 		emailSender = mock(EMailSender.class);
-		doNothing().when(emailSender).send(any(EMail.class));
-		DocumentServiceImpl.setEmailSender(emailSender);
+		try {
+			doNothing().when(emailSender).send(any(EMail.class));
+			DocumentServiceImpl.setEmailSender(emailSender);
 
-		activateCorePlugin();
+			activateCorePlugin();
+		} catch (MessagingException | JpfException | IOException | PluginException e) {
+			throw new IOException(e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -494,7 +501,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		// Prepare the file to checkin
 		Map<String, File> uploadedFiles = new HashMap<>();
-		File file3 = new File("target/repository/docs/3/doc/1.0");
+		File file3 = new File(repositoryDir, "docs/3/doc/1.0");
 		uploadedFiles.put("test.zip", file3);
 		session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 

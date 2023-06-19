@@ -3,8 +3,10 @@ package com.logicaldoc.core.searchengine.saved;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 	private SearchDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

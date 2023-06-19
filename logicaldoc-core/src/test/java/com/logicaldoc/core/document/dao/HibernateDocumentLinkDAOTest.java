@@ -1,5 +1,8 @@
 package com.logicaldoc.core.document.dao;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -26,7 +29,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 	private DocumentDAO docDao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentLinkDAO
@@ -60,7 +63,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 
 		// Try with unexisting link
 		dao.delete(99);
-		
+
 		link = dao.findById(1);
 		Assert.assertNull(link);
 		link = dao.findById(2);

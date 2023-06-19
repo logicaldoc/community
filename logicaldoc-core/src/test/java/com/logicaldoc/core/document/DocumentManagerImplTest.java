@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
@@ -63,7 +64,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 	@Before
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");

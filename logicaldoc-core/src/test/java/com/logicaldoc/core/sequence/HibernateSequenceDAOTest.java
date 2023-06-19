@@ -1,5 +1,8 @@
 package com.logicaldoc.core.sequence;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.junit.Assert;
@@ -15,7 +18,7 @@ public class HibernateSequenceDAOTest extends AbstractCoreTestCase {
 	private SequenceDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateSequqnceDAO

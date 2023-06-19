@@ -1,5 +1,8 @@
 package com.logicaldoc.core.communication;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +25,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 	private MessageTemplateDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context.

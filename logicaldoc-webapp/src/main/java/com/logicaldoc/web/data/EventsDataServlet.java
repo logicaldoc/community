@@ -57,6 +57,83 @@ public class EventsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
+		writeDocumentEvents(writer, locale);
+
+		if (folder)
+			writeFolderEvents(writer, locale);
+
+		if (user)
+			writeUserEvents(writer, locale);
+
+		if (workflow)
+			writeWorkflowEvents(writer, locale);
+
+		if (importfolder)
+			writeImportFolderEvents(writer, locale);
+
+		if (ocr)
+			writeOcrEvents(writer, locale);
+
+		writer.write("</list>");
+	}
+
+	private void writeOcrEvents(PrintWriter writer, Locale locale) {
+		String[] events = new String[] { "event.ocr.success", "event.ocr.failure" };
+		for (String event : events) {
+			writer.print(EVENT);
+			writer.print(CODE + event + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
+			writer.print("<type>ocr</type>");
+			writer.print(CLOSE_EVENT);
+		}
+	}
+
+	private void writeImportFolderEvents(PrintWriter writer, Locale locale) {
+		String[] events = new String[] { "event.importfolder.imported", "event.importfolder.updated",
+				"event.importfolder.error" };
+		for (String event : events) {
+			writer.print(EVENT);
+			writer.print(CODE + event + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
+			writer.print("<type>workflow</type>");
+			writer.print(CLOSE_EVENT);
+		}
+	}
+
+	private void writeWorkflowEvents(PrintWriter writer, Locale locale) {
+		String[] events = new String[] { "event.workflow.start", "event.workflow.end", "event.workflow.deleted",
+				"event.workflow.task.start", "event.workflow.task.end", "event.workflow.task.assigned",
+				"event.workflow.docappended", "event.workflow.task.reassigned", "event.workflow.task.note" };
+		for (String event : events) {
+			writer.print(EVENT);
+			writer.print(CODE + event + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
+			writer.print("<type>workflow</type>");
+			writer.print(CLOSE_EVENT);
+		}
+	}
+
+	private void writeUserEvents(PrintWriter writer, Locale locale) {
+		for (UserEvent event : UserEvent.values()) {
+			writer.print(EVENT);
+			writer.print(CODE + event.toString() + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
+			writer.print("<type>user</type>");
+			writer.print(CLOSE_EVENT);
+		}
+	}
+
+	private void writeFolderEvents(PrintWriter writer, Locale locale) {
+		for (FolderEvent event : FolderEvent.values()) {
+			writer.print(EVENT);
+			writer.print(CODE + event.toString() + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
+			writer.print("<type>folder</type>");
+			writer.print(CLOSE_EVENT);
+		}
+	}
+
+	private void writeDocumentEvents(PrintWriter writer, Locale locale) {
 		for (DocumentEvent event : DocumentEvent.values()) {
 			writer.print(EVENT);
 			writer.print(CODE + event.toString() + CLOSE_CODE);
@@ -64,62 +141,5 @@ public class EventsDataServlet extends AbstractDataServlet {
 			writer.print("<type>document</type>");
 			writer.print(CLOSE_EVENT);
 		}
-
-		if (folder)
-			for (FolderEvent event : FolderEvent.values()) {
-				writer.print(EVENT);
-				writer.print(CODE + event.toString() + CLOSE_CODE);
-				writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
-				writer.print("<type>folder</type>");
-				writer.print(CLOSE_EVENT);
-			}
-
-		if (user) {
-			for (UserEvent event : UserEvent.values()) {
-				writer.print(EVENT);
-				writer.print(CODE + event.toString() + CLOSE_CODE);
-				writer.print(LABEL_CDATA + I18N.message(event.toString(), locale) + CLOSE_LABEL);
-				writer.print("<type>user</type>");
-				writer.print(CLOSE_EVENT);
-			}
-		}
-
-		if (workflow) {
-			String[] events = new String[] { "event.workflow.start", "event.workflow.end", "event.workflow.deleted",
-					"event.workflow.task.start", "event.workflow.task.end", "event.workflow.task.assigned",
-					"event.workflow.docappended", "event.workflow.task.reassigned", "event.workflow.task.note" };
-			for (String event : events) {
-				writer.print(EVENT);
-				writer.print(CODE + event + CLOSE_CODE);
-				writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
-				writer.print("<type>workflow</type>");
-				writer.print(CLOSE_EVENT);
-			}
-		}
-
-		if (importfolder) {
-			String[] events = new String[] { "event.importfolder.imported", "event.importfolder.updated",
-					"event.importfolder.error" };
-			for (String event : events) {
-				writer.print(EVENT);
-				writer.print(CODE + event + CLOSE_CODE);
-				writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
-				writer.print("<type>workflow</type>");
-				writer.print(CLOSE_EVENT);
-			}
-		}
-
-		if (ocr) {
-			String[] events = new String[] { "event.ocr.success", "event.ocr.failure" };
-			for (String event : events) {
-				writer.print(EVENT);
-				writer.print(CODE + event + CLOSE_CODE);
-				writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
-				writer.print("<type>ocr</type>");
-				writer.print(CLOSE_EVENT);
-			}
-		}
-
-		writer.write("</list>");
 	}
 }

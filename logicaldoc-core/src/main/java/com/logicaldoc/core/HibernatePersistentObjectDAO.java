@@ -849,9 +849,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Override
 	public Map<String, String> getDatabaseMetadata() {
 		Map<String, String> map = new HashMap<>();
-		DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
-		try {
-			DatabaseMetaData meta = dataSource.getConnection().getMetaData();
+		DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
+		try (Connection connection = dataSource.getConnection();) {
+			DatabaseMetaData meta = connection.getMetaData();
 			map.put("db.product.name", meta.getDatabaseProductName());
 			map.put("db.product.version", meta.getDatabaseProductVersion());
 			map.put("db.minorversion", Integer.toString(meta.getDatabaseMinorVersion()));

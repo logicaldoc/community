@@ -1,5 +1,9 @@
 package com.logicaldoc.core.lock;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +29,7 @@ public class LockManagerTest extends AbstractCoreTestCase {
 	private ContextProperties config;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		manager = (LockManager) context.getBean("LockManager");

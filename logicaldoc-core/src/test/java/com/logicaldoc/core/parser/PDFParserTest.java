@@ -6,10 +6,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,7 +32,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	 * @throws java.lang.Exception
 	 */
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 	}
 

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +58,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	protected static Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

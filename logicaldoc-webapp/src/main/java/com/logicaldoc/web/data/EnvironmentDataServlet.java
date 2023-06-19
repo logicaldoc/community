@@ -22,6 +22,10 @@ import com.logicaldoc.util.Context;
  */
 public class EnvironmentDataServlet extends AbstractDataServlet {
 
+	private static final String CDATA_VALUE = "]]></value>";
+
+	private static final String VALUE_CDATA = "<value><![CDATA[";
+
 	private static final String ENTRY_CLOSE = "</entry>";
 
 	private static final String ENTRY_SCOPE_DATABASE_SCOPE = "<entry><scope>database</scope>";
@@ -39,7 +43,7 @@ public class EnvironmentDataServlet extends AbstractDataServlet {
 		for (Map.Entry<String, String> entry : env.entrySet()) {
 			writer.print("<entry><scope>system</scope>");
 			writer.print("<name><![CDATA[" + entry.getKey() + "]]></name>");
-			writer.print("<value><![CDATA[" + entry.getValue() + "]]></value>");
+			writer.print(VALUE_CDATA + entry.getValue() + CDATA_VALUE);
 			writer.print(ENTRY_CLOSE);
 		}
 
@@ -47,7 +51,7 @@ public class EnvironmentDataServlet extends AbstractDataServlet {
 		for (Map.Entry<Object, Object> entry : props.entrySet()) {
 			writer.print("<entry><scope>java</scope>");
 			writer.print("<name><![CDATA[" + entry.getKey() + "]]></name>");
-			writer.print("<value><![CDATA[" + entry.getValue() + "]]></value>");
+			writer.print(VALUE_CDATA + entry.getValue() + CDATA_VALUE);
 			writer.print(ENTRY_CLOSE);
 		}
 
@@ -56,7 +60,7 @@ public class EnvironmentDataServlet extends AbstractDataServlet {
 		for (Map.Entry<String, String> entry : meta.entrySet()) {
 			writer.print(ENTRY_SCOPE_DATABASE_SCOPE);
 			writer.print("<name>" + entry.getKey() + "</name>");
-			writer.print("<value><![CDATA[" + entry.getValue() + "]]></value>");
+			writer.print(VALUE_CDATA + entry.getValue() + CDATA_VALUE);
 			writer.print(ENTRY_CLOSE);
 		}
 

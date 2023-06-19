@@ -1,5 +1,8 @@
 package com.logicaldoc.core.metadata;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -22,7 +25,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -117,15 +120,15 @@ public class HibernateTemplateDAOTest extends AbstractCoreTestCase {
 
 		Assert.assertFalse(dao.isReadEnable(1L, 5L));
 		Assert.assertFalse(dao.isWriteEnable(1L, 5L));
-		
+
 		Assert.assertFalse(dao.isReadEnable(1L, 99L));
 		Assert.assertFalse(dao.isReadEnable(2L, 99L));
-		
+
 		Assert.assertFalse(dao.isReadEnable(1L, 4L));
 		Assert.assertFalse(dao.isWriteEnable(1L, 4L));
-		
+
 		Assert.assertFalse(dao.isReadEnable(2L, 4L));
 		Assert.assertFalse(dao.isWriteEnable(2L, 4L));
-		
+
 	}
 }

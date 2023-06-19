@@ -2,8 +2,10 @@ package com.logicaldoc.core.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -17,7 +19,7 @@ public class PDFImageExtractorTest {
 	File destFolder = null;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		destFolder = new File("target", "destFolder");
 		if (!destFolder.exists())
 			destFolder.mkdir();

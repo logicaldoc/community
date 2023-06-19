@@ -1,6 +1,9 @@
 package com.logicaldoc.util.config;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +24,7 @@ public class WebContextConfiguratorTest {
 	File webXml = new File("target/metainfcontext.xml");
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		FileUtil.copyResource("/metainfcontext.xml", webXml);
 	}
 
@@ -35,7 +38,7 @@ public class WebContextConfiguratorTest {
 		WebContextConfigurator config = new WebContextConfigurator(webXml.getPath());
 		Assert.assertEquals("strict", config.getSameSiteCookies());
 	}
-	
+
 	@Test
 	public void testSetSameSiteCookies() {
 		WebContextConfigurator config = new WebContextConfigurator(webXml.getPath());

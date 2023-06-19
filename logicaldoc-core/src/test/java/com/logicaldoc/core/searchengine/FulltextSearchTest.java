@@ -3,6 +3,7 @@ package com.logicaldoc.core.searchengine;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -25,10 +26,14 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 	protected SearchEngine engine;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		engine = (SearchEngine) context.getBean("SearchEngine");
-		addHits();
+		try {
+			addHits();
+		} catch (Exception e) {
+			throw new IOException(e.getMessage(), e);
+		}
 	}
 
 	@Test
@@ -145,7 +150,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 	public void testSearchInFolder() throws Exception {
 		FolderDAO folderDao = (FolderDAO) context.getBean("FolderDAO");
 		for (Long folderId : folderDao.findAllIds()) {
-			folderDao.computePath(folderId);	
+			folderDao.computePath(folderId);
 		}
 
 		Assert.assertEquals(4, engine.getCount());
@@ -167,7 +172,6 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		List<Hit> hits = search.search();
 		Assert.assertEquals(2, hits.size());
 
-
 		// Search in another tree
 		opt.setFolderId(5L);
 		opt.setSearchInSubPath(true);
@@ -177,7 +181,6 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
 		hits = search.search();
 		Assert.assertEquals(0, hits.size());
-		
 
 		// Search in single folder
 		opt.setFolderId(3000L);
@@ -189,7 +192,6 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		hits = search.search();
 		Assert.assertEquals(0, hits.size());
 
-		
 		// Search in single folder
 		opt.setFolderId(6L);
 		opt.setSearchInSubPath(false);

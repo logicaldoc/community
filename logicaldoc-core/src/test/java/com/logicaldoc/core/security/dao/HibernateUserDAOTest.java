@@ -1,5 +1,8 @@
 package com.logicaldoc.core.security.dao;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -36,7 +39,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	private GroupDAO groupDao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

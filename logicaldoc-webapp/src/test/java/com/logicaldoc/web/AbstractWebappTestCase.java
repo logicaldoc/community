@@ -1,6 +1,9 @@
 package com.logicaldoc.web;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -41,10 +44,20 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	protected MockServletSession servletSession = new MockServletSession();
 
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
-		prepareSession("admin", "admin");
+		repositoryDir.mkdirs();
+		repositoryDir.mkdir();
+
+		File docs2 = new File(repositoryDir, "docs2");
+		docs2.mkdir();
+
+		try {
+			prepareSession("admin", "admin");
+		} catch (ServerException e) {
+			throw new IOException(e.getMessage(), e);
+		}
 		Assert.assertNotNull(guiSession);
 		Assert.assertNotNull(SessionManager.get().get(guiSession.getSid()));
 	}
@@ -67,8 +80,12 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	}
 
 	@Override
+	protected String[] getContexts() {
+		return new String[] { "/contexttest.xml" };
+	}
+
+	@Override
 	protected String[] getSqlScripts() {
 		return new String[] { "/sql/logicaldoc-core.sql", "/data.sql" };
 	}
-
 }

@@ -1,7 +1,9 @@
 package com.logicaldoc.util.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
@@ -18,7 +20,7 @@ public class ZipUtilTest {
 	private static Logger log = LoggerFactory.getLogger(ZipUtilTest.class);
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		File dir = new File("target/test");
 		dir.mkdirs();
 		dir.mkdir();
@@ -96,7 +98,7 @@ public class ZipUtilTest {
 			zipUtil.setFileNameCharset("utf-8");
 			List<String> entries = zipUtil.listEntries(file);
 			log.debug("Found {} entries", entries.size());
-			notThrownTest="ok";
+			notThrownTest = "ok";
 		} catch (Exception t) {
 			// Nothing to do
 

@@ -809,9 +809,8 @@ public class FileUtil {
 	}
 
 	/**
-	 * Creates an empty file in the default temporary-file directory, usingthe
-	 * given prefix and suffix to generate its name. Invoking this methodis
-	 * equivalent to invoking
+	 * Creates an empty file in the default temporary-file directory, using the
+	 * given prefix and suffix to generate its name. 
 	 * 
 	 * @param prefix The prefix string to be used in generating the file'sname;
 	 *        must be at least three characters longsuffix
@@ -820,9 +819,25 @@ public class FileUtil {
 	 * 
 	 * @return An abstract pathname denoting a newly-created empty file
 	 * 
-	 * @throws IOException If a file could not be created
+	 * @throws IOException If the file could not be created
 	 */
 	public static File createTempFile(String prefix, String suffix) throws IOException {
 		return File.createTempFile(prefix, suffix);
+	}
+
+	/**
+	 * Creates an empty folder in the default temporary-file directory, using the
+	 * given prefix to generate its name. 
+	 * 
+	 * @param prefix The prefix string to be used in generating the file'sname;
+	 *        must be at least three characters longsuffix
+	 * 
+	 * @return An abstract pathname denoting a newly-created empty folder
+	 * 
+	 * @throws IOException If the directory could not be created
+	 */
+	public static File createTempDirectory(String prefix) throws IOException {
+		Path path = Files.createTempDirectory(prefix);
+		return path.toFile();
 	}
 }

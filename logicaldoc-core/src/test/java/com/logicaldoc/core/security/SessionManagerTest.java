@@ -8,6 +8,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.servlet.http.Cookie;
@@ -58,7 +60,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 	@Before
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		testSubject = SessionManager.get();
 		testSubject.addListener(this);
@@ -121,28 +123,28 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 		assertTrue(testSubject.isOpen(session2.getSid()));
 		assertEquals(1, testSubject.getSessions().size());
 	}
-	
+
 	@Test
 	public void testRemoveSid() {
 		testSubject.clear();
 		Session session = testSubject.newSession("admin", "admin", null);
 		assertNotNull(session);
-		
+
 		when(request.getSession(false)).thenReturn(httpSession);
-		
+
 		LDSecurityContextRepository.bindServletSession(session.getSid(), httpSession);
-		
-		LDAuthenticationToken authentication=new LDAuthenticationToken("admin");
+
+		LDAuthenticationToken authentication = new LDAuthenticationToken("admin");
 		authentication.setSid(session.getSid());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
+
 		testSubject.removeSid(request);
 		assertNull(testSubject.getSessionId(request));
 	}
 
 	@Test
 	public void testBuildClient() {
-		Client client=testSubject.buildClient(request);
+		Client client = testSubject.buildClient(request);
 		assertEquals("admin", client.getUsername());
 	}
 
@@ -249,17 +251,17 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 		testSubject.remove(session.getSid());
 		assertNull(testSubject.getSession(request));
 	}
-	
+
 	@Test
 	public void testCurrentSid() {
 		assertNull(SessionManager.getCurrentSid());
-		
+
 		Session session = testSubject.newSession("admin", "admin", null);
-		
-		LDAuthenticationToken authentication=new LDAuthenticationToken("admin");
+
+		LDAuthenticationToken authentication = new LDAuthenticationToken("admin");
 		authentication.setSid(session.getSid());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
+
 		assertEquals(session.getSid(), SessionManager.getCurrentSid());
 	}
 

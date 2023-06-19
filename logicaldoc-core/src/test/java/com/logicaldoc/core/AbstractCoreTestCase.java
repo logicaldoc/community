@@ -1,7 +1,9 @@
 package com.logicaldoc.core;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.junit.Before;
 
@@ -24,7 +26,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	@Before
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 		prepareStore();
 	}

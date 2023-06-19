@@ -1,5 +1,8 @@
 package com.logicaldoc.core.folder;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -27,7 +30,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 	private FolderHistoryDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

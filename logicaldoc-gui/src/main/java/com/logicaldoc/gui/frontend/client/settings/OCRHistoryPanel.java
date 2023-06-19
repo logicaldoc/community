@@ -56,17 +56,17 @@ public class OCRHistoryPanel extends VLayout {
 		ColoredListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);
 
-		ListGridField event = new ListGridField("event", I18N.message("event"));
-		event.setAlign(Alignment.CENTER);
-		event.setAutoFitWidth(true);
-		event.setCanFilter(true);
-		event.setCellFormatter((value, record, rowNum, colNum) -> {
-			if (value.toString().contains("ocr.success"))
+		ListGridField eventLabel = new ListGridField("event", I18N.message("event"));
+		eventLabel.setAlign(Alignment.CENTER);
+		eventLabel.setAutoFitWidth(true);
+		eventLabel.setCanFilter(true);
+		eventLabel.setCellFormatter((val, recrd, rowNum, colNum) -> {
+			if (val.toString().contains("ocr.success"))
 				return "<span class='event-ok'>" + I18N.message("success").toLowerCase() + CLOSE_SPAN;
-			else if (value.toString().contains("ocr.failure"))
+			else if (val.toString().contains("ocr.failure"))
 				return "<span class='event-error'>" + I18N.message("failure").toLowerCase() + CLOSE_SPAN;
 			else
-				return value.toString();
+				return val.toString();
 		});
 
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
@@ -89,18 +89,18 @@ public class OCRHistoryPanel extends VLayout {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setDataSource(new OCRHistoryDS(null));
-		list.setFields(date, event, fileName, size, path, comment);
+		list.setFields(date, eventLabel, fileName, size, path, comment);
 
 		list.addCellDoubleClickHandler(evnt -> {
-			Record record = evnt.getRecord();
+			Record rec = evnt.getRecord();
 			ListGridField field = list.getField(evnt.getColNum());
 			String title = field.getTitle();
 			if (evnt.getColNum() == 4 || evnt.getColNum() == 5) {
-				LD.askForValue(title, title, record.getAttribute(field.getName()), 350, val -> {
+				LD.askForValue(title, title, rec.getAttribute(field.getName()), 350, val -> {
 					// Nothing to do
 				});
 			} else {
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString(DOC_ID)));
+				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(DOC_ID)));
 			}
 		});
 

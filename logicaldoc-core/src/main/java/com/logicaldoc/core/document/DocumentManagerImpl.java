@@ -481,9 +481,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public long reindex(long docId, String content, DocumentHistory transaction)
 			throws PersistenceException, ParseException {
-		Document doc = documentDAO.findById(docId);
-		if (doc == null)
-			throw new IllegalArgumentException("Unexisting document with ID: " + docId);
+		Document doc = getExistingDocument(docId);
 
 		log.debug("Reindexing document {} - {}", docId, doc.getFileName());
 
@@ -525,13 +523,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			// This may take time
 			addHIt(doc, cont);
 		} catch (PersistenceException | ParseException e) {
-			if (transaction != null) {
-				transaction.setEvent(DocumentEvent.INDEXED_ERROR.toString());
-				transaction.setComment(e.getMessage());
-				transaction.setDocument(doc);
-				DocumentHistoryDAO hDao=(DocumentHistoryDAO)Context.get().getBean(DocumentHistoryDAO.class);
-				hDao.store(transaction);
-			}
+			recordIndexingError(transaction, doc, e);
 			throw e;
 		}
 
@@ -550,6 +542,24 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		return parsingTime;
 
+	}
+
+	private void recordIndexingError(DocumentHistory transaction, Document document, Exception exception)
+			throws PersistenceException {
+		if (transaction != null) {
+			transaction.setEvent(DocumentEvent.INDEXED_ERROR.toString());
+			transaction.setComment(exception.getMessage());
+			transaction.setDocument(document);
+			DocumentHistoryDAO hDao=(DocumentHistoryDAO)Context.get().getBean(DocumentHistoryDAO.class);
+			hDao.store(transaction);
+		}
+	}
+
+	private Document getExistingDocument(long docId) throws PersistenceException {
+		Document doc = documentDAO.findById(docId);
+		if (doc == null)
+			throw new IllegalArgumentException("Unexisting document with ID: " + docId);
+		return doc;
 	}
 
 	private void addHIt(Document doc, String cont) throws ParseException {

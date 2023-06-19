@@ -1,5 +1,8 @@
 package com.logicaldoc.core.security.dao;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
@@ -22,7 +25,7 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 	private SessionDAO dao;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -46,7 +49,7 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 		sessions = dao.findByNode("xxxx");
 		Assert.assertEquals(0, sessions.size());
 	}
-	
+
 	@Test
 	public void testFindBySid() {
 		Session session = dao.findBySid("sid1");
@@ -56,14 +59,14 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 		session = dao.findBySid("sid2");
 		Assert.assertNull(session);
 	}
-	
+
 	@Test
 	public void testCountSessions() {
 		Assert.assertEquals(1, dao.countSessions(1L, Session.STATUS_OPEN));
 		Assert.assertEquals(1, dao.countSessions(null, Session.STATUS_OPEN));
 		Assert.assertEquals(1, dao.countSessions(1L, null));
 		Assert.assertEquals(1, dao.countSessions(null, null));
-		
+
 		Assert.assertEquals(0, dao.countSessions(1L, Session.STATUS_CLOSED));
 		Assert.assertEquals(0, dao.countSessions(2L, Session.STATUS_OPEN));
 	}
