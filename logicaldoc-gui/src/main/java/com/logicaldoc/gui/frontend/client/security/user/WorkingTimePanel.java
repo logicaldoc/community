@@ -22,14 +22,6 @@ import com.smartgwt.client.widgets.calendar.Calendar;
 import com.smartgwt.client.widgets.calendar.CalendarEvent;
 import com.smartgwt.client.widgets.calendar.CalendarView;
 import com.smartgwt.client.widgets.calendar.DateHeaderCustomizer;
-import com.smartgwt.client.widgets.calendar.events.CalendarEventAdded;
-import com.smartgwt.client.widgets.calendar.events.CalendarEventChangedEvent;
-import com.smartgwt.client.widgets.calendar.events.CalendarEventRemoved;
-import com.smartgwt.client.widgets.calendar.events.EventAddedHandler;
-import com.smartgwt.client.widgets.calendar.events.EventChangedHandler;
-import com.smartgwt.client.widgets.calendar.events.EventRemovedHandler;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -60,50 +52,57 @@ public class WorkingTimePanel extends VLayout {
 			setMembersMargin(20);
 			setAlign(Alignment.LEFT);
 		}
+		
+		prepareGUI();
 	}
 
 	@Override
 	protected void onDraw() {
-		prepareGUI();
+		if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0) {
+			calendar.setChosenDate(user.getWorkingTimes()[0].getStart());
+			for (GUIWorkingTime wt : user.getWorkingTimes()) {
+				try {
+					calendar.addEvent(wt.getStart(), wt.getEnd(), wt.getLabel(), wt.getDescription());
+				} catch (Exception t) {
+					// Nothing to do
+				}
+			}
+		}
 	}
 
-	public void prepareGUI() {
+	private void prepareGUI() {
 		ToolStripButton clone = new ToolStripButton(I18N.message("clone"));
-		clone.addClickHandler(new ClickHandler() {
+		clone.addClickHandler(event -> {
+			final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
 
-			@Override
-			public void onClick(ClickEvent event) {
-				final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
+			final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
 
-				final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
+			LD.askForValues("cloneworktime", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }), 350,
+					new ValuesCallback() {
+						@Override
+						public void execute(String value) {
+							// Nothing to do
+						}
 
-				LD.askForValues("cloneworktime", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }),
-						350, new ValuesCallback() {
-							@Override
-							public void execute(String value) {
-								// Nothing to do
-							}
+						@Override
+						public void execute(Map<String, Object> values) {
+							LD.contactingServer();
+							SecurityService.Instance.get().cloneWorkTimes(user.getId(), usersSelector.getUserIds(),
+									groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
 
-							@Override
-							public void execute(Map<String, Object> values) {
-								LD.contactingServer();
-								SecurityService.Instance.get().cloneWorkTimes(user.getId(), usersSelector.getUserIds(),
-										groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											LD.clearPrompt();
+											GuiLog.serverError(caught);
+										}
 
-											@Override
-											public void onFailure(Throwable caught) {
-												LD.clearPrompt();
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void arg0) {
-												LD.clearPrompt();
-											}
-										});
-							}
-						});
-			}
+										@Override
+										public void onSuccess(Void arg0) {
+											LD.clearPrompt();
+										}
+									});
+						}
+					});
 		});
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addButton(clone);
@@ -142,17 +141,6 @@ public class WorkingTimePanel extends VLayout {
 		calendar.setRemoveButtonTitle(I18N.message("remove"));
 		calendar.setCancelButtonTitle(I18N.message("cancel"));
 
-		if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0) {
-			calendar.setChosenDate(user.getWorkingTimes()[0].getStart());
-			for (GUIWorkingTime wt : user.getWorkingTimes()) {
-				try {
-					calendar.addEvent(wt.getStart(), wt.getEnd(), wt.getLabel(), wt.getDescription());
-				} catch (Throwable t) {
-					// Nothing to do
-				}
-			}
-		}
-
 		calendar.setDateHeaderCustomizer(new DateHeaderCustomizer() {
 
 			@Override
@@ -164,29 +152,11 @@ public class WorkingTimePanel extends VLayout {
 		calendar.setCanCreateEvents(changedHandler != null);
 		calendar.setCanRemoveEvents(changedHandler != null);
 		if (changedHandler != null) {
-			calendar.addEventRemovedHandler(new EventRemovedHandler() {
+			calendar.addEventRemovedHandler(event -> changedHandler.onChanged(null));
 
-				@Override
-				public void onEventRemoved(CalendarEventRemoved event) {
-					changedHandler.onChanged(null);
-				}
-			});
+			calendar.addEventAddedHandler(event -> changedHandler.onChanged(null));
 
-			calendar.addEventAddedHandler(new EventAddedHandler() {
-
-				@Override
-				public void onEventAdded(CalendarEventAdded event) {
-					changedHandler.onChanged(null);
-				}
-			});
-
-			calendar.addEventChangedHandler(new EventChangedHandler() {
-
-				@Override
-				public void onEventChanged(CalendarEventChangedEvent event) {
-					changedHandler.onChanged(null);
-				}
-			});
+			calendar.addEventChangedHandler(event -> changedHandler.onChanged(null));
 		}
 
 		addMember(calendar);
