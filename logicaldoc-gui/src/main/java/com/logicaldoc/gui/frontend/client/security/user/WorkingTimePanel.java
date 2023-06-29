@@ -52,14 +52,25 @@ public class WorkingTimePanel extends VLayout {
 			setMembersMargin(20);
 			setAlign(Alignment.LEFT);
 		}
+		
+		prepareGUI();
 	}
 
 	@Override
 	protected void onDraw() {
-		prepareGUI();
+		if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0) {
+			calendar.setChosenDate(user.getWorkingTimes()[0].getStart());
+			for (GUIWorkingTime wt : user.getWorkingTimes()) {
+				try {
+					calendar.addEvent(wt.getStart(), wt.getEnd(), wt.getLabel(), wt.getDescription());
+				} catch (Exception t) {
+					// Nothing to do
+				}
+			}
+		}
 	}
 
-	public void prepareGUI() {
+	private void prepareGUI() {
 		ToolStripButton clone = new ToolStripButton(I18N.message("clone"));
 		clone.addClickHandler(event -> {
 			final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
@@ -129,17 +140,6 @@ public class WorkingTimePanel extends VLayout {
 		calendar.setDetailsButtonTitle(I18N.message("edit"));
 		calendar.setRemoveButtonTitle(I18N.message("remove"));
 		calendar.setCancelButtonTitle(I18N.message("cancel"));
-
-		if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0) {
-			calendar.setChosenDate(user.getWorkingTimes()[0].getStart());
-			for (GUIWorkingTime wt : user.getWorkingTimes()) {
-				try {
-					calendar.addEvent(wt.getStart(), wt.getEnd(), wt.getLabel(), wt.getDescription());
-				} catch (Exception t) {
-					// Nothing to do
-				}
-			}
-		}
 
 		calendar.setDateHeaderCustomizer(new DateHeaderCustomizer() {
 

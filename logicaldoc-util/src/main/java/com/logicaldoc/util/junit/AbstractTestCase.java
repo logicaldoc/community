@@ -61,12 +61,14 @@ public abstract class AbstractTestCase {
 
 	@After
 	public void tearDown() throws SQLException {
-		destroyDatabase();
+		try {
+			destroyDatabase();
 
-		if (context != null)
-			((AbstractApplicationContext) context).close();
-
-		restoreUserHome();
+			if (context != null)
+				((AbstractApplicationContext) context).close();
+		} finally {
+			restoreUserHome();
+		}
 	}
 
 	private void updateUserHome() {

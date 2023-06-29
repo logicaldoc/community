@@ -1,12 +1,16 @@
 package com.logicaldoc.core.imaging;
 
+import java.io.Serializable;
+
 /**
  * A zone specification inside an image.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
-public class ImageZone {
+public class ImageZone implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Upper-left corner of the zone (percentage of the width 0..1)

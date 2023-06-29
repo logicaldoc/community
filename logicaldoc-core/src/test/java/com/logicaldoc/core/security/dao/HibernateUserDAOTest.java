@@ -207,7 +207,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 		WorkingTime wt = new WorkingTime(1, 5, 30);
 		user.getWorkingTimes().add(wt);
-
+		
 		UserHistory transaction = new UserHistory();
 		transaction.setEvent(UserEvent.LOGIN.toString());
 		transaction.setUserId(user.getId());
@@ -219,6 +219,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		dao.store(user);
 
 		User storedUser = dao.findByUsername("xxx");
+		dao.initialize(storedUser);
 		Assert.assertNotNull(user);
 		Assert.assertEquals(user, storedUser);
 		Assert.assertEquals(2, storedUser.getGroups().size());

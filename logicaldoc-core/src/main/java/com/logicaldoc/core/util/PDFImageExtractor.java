@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Marco Meschieri - LogicalDOC
  * @since 1.0.0
  */
-public class PDFImageExtractor {
+public class PDFImageExtractor implements AutoCloseable {
 
 	protected static Logger log = LoggerFactory.getLogger(PDFImageExtractor.class);
 
@@ -53,6 +53,7 @@ public class PDFImageExtractor {
 	 * 
 	 * @throws java.io.IOException if the pdf file cannot be read
 	 */
+	@Override
 	public void close() throws java.io.IOException {
 		if (document != null) {
 			document.close();

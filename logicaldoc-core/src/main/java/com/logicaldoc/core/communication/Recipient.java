@@ -2,6 +2,8 @@ package com.logicaldoc.core.communication;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Michael Scholz
  */
@@ -39,7 +41,7 @@ public class Recipient implements Serializable {
 	public Recipient(String name, String address) {
 		super();
 		this.name = name;
-		this.address = address;
+		this.address = StringUtils.trimToEmpty(address);
 	}
 
 	public Recipient() {
@@ -67,7 +69,7 @@ public class Recipient implements Serializable {
 	}
 
 	public void setAddress(String addr) {
-		address = addr;
+		address = StringUtils.trimToEmpty(addr);
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public class Recipient implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return address.hashCode();
+		return  address.hashCode();
 	}
 
 	public String getMode() {

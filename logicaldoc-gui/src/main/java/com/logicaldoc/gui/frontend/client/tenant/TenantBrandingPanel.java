@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -23,7 +22,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -129,7 +127,7 @@ public class TenantBrandingPanel extends HLayout {
 		ToolStripButton reset = new ToolStripButton();
 		reset.setTitle(I18N.message("reset"));
 		toolStrip.addButton(reset);
-		reset.addClickHandler((ClickEvent event) -> {
+		reset.addClickHandler(event -> {
 			GUIBranding newBranding = new GUIBranding();
 			if (Feature.enabled(Feature.QUOTAS))
 				newBranding.setProductName("LogicalDOC Enterprise");
@@ -144,9 +142,8 @@ public class TenantBrandingPanel extends HLayout {
 		ToolStripButton export = new ToolStripButton();
 		export.setTitle(I18N.message("export"));
 		toolStrip.addButton(export);
-		export.addClickHandler((ClickEvent event) -> {
-			Util.download(Util.contextPath() + "exportbranding?tenantId=" + tenant.getId());
-		});
+		export.addClickHandler(
+				event -> Util.download(Util.contextPath() + "exportbranding?tenantId=" + tenant.getId()));
 	}
 
 	private void addImportButton(final ChangedHandler changedHandler, ToolStrip toolStrip) {
@@ -154,21 +151,18 @@ public class TenantBrandingPanel extends HLayout {
 		importButton.setTitle(I18N.message("iimport"));
 		importButton.setDisabled(changedHandler == null);
 		toolStrip.addButton(importButton);
-		importButton.addClickHandler((ClickEvent event) -> {
-			BrandingPackageUploader uploader = new BrandingPackageUploader(TenantBrandingPanel.this);
-			uploader.show();
-		});
+		importButton.addClickHandler(event -> new BrandingPackageUploader(TenantBrandingPanel.this).show());
 	}
 
 	private void addFooterButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
 		ToolStripButton footer = new ToolStripButton(I18N.message("footer"));
-		footer.addClickHandler((ClickEvent event) -> {
+		footer.addClickHandler(event -> {
 			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("footer", I18N.message("customfooter"),
 					tenant.getBranding().getFooter(), null, true);
 			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
 			LD.askForValue(I18N.message("customfooter"), I18N.message("entercustomfooter"),
 					tenant.getBranding().getFooter(), item, com.google.gwt.user.client.Window.getClientWidth() - 50,
-					(String value) -> {
+					value -> {
 						tenant.getBranding().setFooter(value);
 						if (changedHandler != null)
 							changedHandler.onChanged(null);
@@ -180,13 +174,13 @@ public class TenantBrandingPanel extends HLayout {
 
 	private void addBottomButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
 		ToolStripButton bottom = new ToolStripButton(I18N.message("bottom"));
-		bottom.addClickHandler((ClickEvent event) -> {
+		bottom.addClickHandler(event -> {
 			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("bottom", I18N.message("custombottom"),
 					tenant.getBranding().getBottom(), null, true);
 			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
 			LD.askForValue(I18N.message("custombottom"), I18N.message("entercustombottom"),
 					tenant.getBranding().getBottom(), item, com.google.gwt.user.client.Window.getClientWidth() - 50,
-					(String value) -> {
+					value -> {
 						tenant.getBranding().setBottom(value);
 						if (changedHandler != null)
 							changedHandler.onChanged(null);
@@ -198,12 +192,12 @@ public class TenantBrandingPanel extends HLayout {
 
 	private void addTopButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
 		ToolStripButton top = new ToolStripButton(I18N.message("top"));
-		top.addClickHandler((ClickEvent event) -> {
+		top.addClickHandler(event -> {
 			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("top", I18N.message("customtop"),
 					tenant.getBranding().getTop(), null, true);
 			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
 			LD.askForValue(I18N.message("customtop"), I18N.message("entercustomtop"), tenant.getBranding().getTop(),
-					item, com.google.gwt.user.client.Window.getClientWidth() - 50, (String value) -> {
+					item, com.google.gwt.user.client.Window.getClientWidth() - 50, value -> {
 						tenant.getBranding().setTop(value);
 						if (changedHandler != null)
 							changedHandler.onChanged(null);
@@ -215,12 +209,12 @@ public class TenantBrandingPanel extends HLayout {
 
 	private void addHeadButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
 		ToolStripButton head = new ToolStripButton(I18N.message("head"));
-		head.addClickHandler((ClickEvent event) -> {
+		head.addClickHandler(event -> {
 			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("head", I18N.message("customhead"),
 					tenant.getBranding().getHead(), null, true);
 			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
 			LD.askForValue(I18N.message("customhead"), I18N.message("entercustomhead"), tenant.getBranding().getHead(),
-					item, com.google.gwt.user.client.Window.getClientWidth() - 50, (String value) -> {
+					item, com.google.gwt.user.client.Window.getClientWidth() - 50, value -> {
 						tenant.getBranding().setHead(value);
 						if (changedHandler != null)
 							changedHandler.onChanged(null);
@@ -232,12 +226,12 @@ public class TenantBrandingPanel extends HLayout {
 
 	private void addCssButton(ChangedHandler changedHandler, ToolStrip toolStrip) {
 		ToolStripButton css = new ToolStripButton(I18N.message("css"));
-		css.addClickHandler((ClickEvent event) -> {
+		css.addClickHandler(event -> {
 			TextAreaItem item = ItemFactory.newTextAreaItemForAutomation("css", I18N.message("customcss"),
 					tenant.getBranding().getCss(), null, false);
 			item.setHeight(com.google.gwt.user.client.Window.getClientHeight() - 100);
 			LD.askForValue(I18N.message("customcss"), I18N.message("entercustomcss"), tenant.getBranding().getCss(),
-					item, com.google.gwt.user.client.Window.getClientWidth() - 50, (String value) -> {
+					item, com.google.gwt.user.client.Window.getClientWidth() - 50, value -> {
 						tenant.getBranding().setCss(value);
 						if (changedHandler != null)
 							changedHandler.onChanged(null);
@@ -404,7 +398,7 @@ public class TenantBrandingPanel extends HLayout {
 		grid.setRecords(records.toArray(new ListGridRecord[0]));
 
 		if (changedHandler != null)
-			grid.addCellContextClickHandler((CellContextClickEvent event) -> {
+			grid.addCellContextClickHandler(event -> {
 				showImagesContextMenu();
 				event.cancel();
 			});

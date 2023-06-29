@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -265,6 +266,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 					String.format("Trying to alter the %s user with null password", user.getUsername()));
 
 		saveOrUpdate(user);
+		if (newUser)
+			flush();
+
+		// Save the working times
+		saveWorkingTimes(user);
 
 		enforceUserGroupAssignment(user);
 
@@ -287,6 +293,17 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		enforceReadOnlyUserPermissions(user);
 
 		saveEnabledOrDisabledHistory(user, transaction, enabledStatusChanged);
+	}
+
+	private void saveWorkingTimes(User user) throws PersistenceException {
+		jdbcUpdate("delete from ld_workingtime where ld_userid=" + user.getId());
+		if (user.getWorkingTimes() != null)
+			for (WorkingTime wt : user.getWorkingTimes()) {
+				jdbcUpdate(
+						"insert into ld_workingtime(ld_userid,ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description) values (?,?,?,?,?,?,?,?)",
+						user.getId(), wt.getDayOfWeek(), wt.getHourStart(), wt.getMinuteStart(), wt.getHourEnd(),
+						wt.getMinuteEnd(), wt.getLabel(), wt.getDescription());
+			}
 	}
 
 	/**
@@ -766,9 +783,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		refresh(user);
 
-		for (WorkingTime wt : user.getWorkingTimes())
-			log.debug("Initializing working time {}", wt.getLabel());
-
 		List<Long> groupIds = new ArrayList<>();
 		try {
 			groupIds = queryForList("select distinct ld_groupid from ld_usergroup where ld_userid=" + user.getId(),
@@ -794,6 +808,26 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
 			}
+		}
+
+		// Manually initialize the collegtion of working times
+		user.getWorkingTimes().clear();
+
+		try {
+			SqlRowSet timeSet = queryForRowSet(
+					"select ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description from ld_workingtime where ld_userid="
+							+ user.getId(),
+					null, null);
+			while (timeSet.next()) {
+				WorkingTime wt = new WorkingTime(timeSet.getInt(1), timeSet.getInt(2), timeSet.getInt(3));
+				wt.setHourEnd(timeSet.getInt(4));
+				wt.setMinuteEnd(timeSet.getInt(5));
+				wt.setLabel(timeSet.getString(6));
+				wt.setDescription(timeSet.getString(7));
+				user.getWorkingTimes().add(wt);
+			}
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 

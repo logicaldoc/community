@@ -61,18 +61,6 @@
 		<property name="enforceWorkingTime" type="int" column="ld_enforcewrktime" not-null="true"/>
 		<property name="maxInactivity" type="int" column="ld_maxinactivity" />
 		
-	    <set name="workingTimes" table="ld_workingtime" lazy="true" cascade="all" order-by="ld_dayofweek, ld_hourstart, ld_minutestart">
-            <key column="ld_userid" />
-            <composite-element class="com.logicaldoc.core.security.WorkingTime">
-		   	   <property name="dayOfWeek" type="int" column="ld_dayofweek" not-null="true"/>
-		   	   <property name="hourStart" type="int" column="ld_hourstart" not-null="true"/>
-		   	   <property name="minuteStart" type="int" column="ld_minutestart" not-null="true"/>
-		   	   <property name="hourEnd" type="int" column="ld_hourend" not-null="true"/>
-			   <property name="minuteEnd" type="int" column="ld_minuteend" not-null="true"/>
-			   <property name="label" type="string" column="ld_label" length="255" />
-			   <property name="description" type="string" column="ld_description" length="1000" />
-		   </composite-element>
-        </set>
 		
 		<property name="timeZone" type="string" column="ld_timezone" />
 		
