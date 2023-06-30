@@ -8,9 +8,7 @@ import java.io.Serializable;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
-public class ImageZone implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class ImageZone {
 
 	/**
 	 * Upper-left corner of the zone (percentage of the width 0..1)
