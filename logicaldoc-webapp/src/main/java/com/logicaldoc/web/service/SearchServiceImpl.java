@@ -138,7 +138,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		guiHit.setAttributes(extList.toArray(new GUIAttribute[0]));
 	}
 
-	private List<Hit> doSearch(GUISearchOptions options, Session session, GUIResult result) {
+	private List<Hit> doSearch(GUISearchOptions options, Session session, GUIResult result) throws ServerException {
 		SearchOptions searchOptions = prepareSearchOptions(options, session);
 
 		// Retrieve the search machinery
@@ -160,7 +160,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		return hits;
 	}
 
-	private SearchOptions prepareSearchOptions(GUISearchOptions options, Session session) {
+	private SearchOptions prepareSearchOptions(GUISearchOptions options, Session session) throws ServerException {
 		SearchOptions searchOptions = toSearchOptions(options);
 		searchOptions.setTenantId(session.getTenantId());
 
@@ -263,7 +263,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				.collect(Collectors.toList());
 	}
 
-	protected GUISearchOptions toGUIOptions(SearchOptions searchOptions) {
+	protected GUISearchOptions toGUIOptions(SearchOptions searchOptions) throws ServerException {
 		GUISearchOptions op = new GUISearchOptions();
 		op.setType(searchOptions.getType());
 		op.setDescription(searchOptions.getDescription());
@@ -388,7 +388,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		return cal.getTime();
 	}
 
-	protected SearchOptions toSearchOptions(GUISearchOptions options) {
+	protected SearchOptions toSearchOptions(GUISearchOptions options) throws ServerException {
 		SearchOptions searchOptions = Search.newOptions(options.getType());
 		searchOptions.setTopOperator(options.getTopOperator());
 		searchOptions.setDescription(options.getDescription());

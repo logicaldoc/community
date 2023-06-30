@@ -50,12 +50,12 @@ public class GUIUser implements Serializable {
 
 	private boolean notifyCredentials = true;
 
-	private boolean passwordExpired = true;
-
 	private int passwordMinLenght = 0;
 
 	private boolean passwordExpires = false;
 
+	private boolean passwordExpired = false;
+	
 	private String address = "";
 
 	private String postalCode = "";
