@@ -1090,6 +1090,7 @@ public abstract class Util {
 						public void run() {
 							LD.clearPrompt();
 							CookiesManager.removeSid();
+							Util.uninstallCloseWindowAlert();
 							ApplicationRestarting.get(I18N.message("applicationisupagainpleaseclose")).show();
 						}
 					};

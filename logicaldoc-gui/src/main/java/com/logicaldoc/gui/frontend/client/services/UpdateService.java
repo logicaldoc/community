@@ -106,17 +106,6 @@ public interface UpdateService extends RemoteService {
 	 */
 	public String loadPatch() throws ServerException;
 
-	/**
-	 * Retrieves the processing status for the specified update/patch file
-	 * 
-	 * @param fileName the file to check
-	 * 
-	 * @return first string is the processing status: null, running, processed;
-	 *         the second string is the log, the third string is the relevant
-	 *         command that should be executed
-	 */
-	public String[] getStatus(String fileName);
-
 	public static class Instance {
 		private static UpdateServiceAsync inst;
 

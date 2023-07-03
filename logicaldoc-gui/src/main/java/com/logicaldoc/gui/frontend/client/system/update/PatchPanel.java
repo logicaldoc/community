@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
@@ -469,34 +474,46 @@ public class PatchPanel extends VLayout {
 
 	private void getStatus(GUIPatch patch) {
 		LD.updatingServer();
-		UpdateService.Instance.get().getStatus(patch.getFile(), new AsyncCallback<String[]>() {
 
-			@Override
-			public void onFailure(Throwable caugtht) {
-				scheduleGetStatus(patch);
-			}
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
+				Util.contextPath() + "updatestatus?fileName=" + patch.getFile());
 
-			@Override
-			public void onSuccess(String[] status) {
-				log.setValue(status[1]);
-
-				Date now = new Date();
-				long elapsedTime = now.getTime() - lastConfirmed.getTime();
-
-				String statusLabel = status[0];
-
-				if ("processed".equals(statusLabel)) {
-					LD.clearPrompt();
-					ok.setDisabled(patch.isRestart());
-					GuiLog.info(I18N.message("patchinstalled"));
-				} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
-					LD.clearPrompt();
-					ApplicationRestarting.get(I18N.message("patchnotstarted", status[2])).show();
-				} else {
-					scheduleGetStatus(patch);
+		try {
+			builder.sendRequest(null, new RequestCallback() {
+				public void onError(Request request, Throwable exception) {
+					// Nothing to do
 				}
-			}
-		});
+
+				public void onResponseReceived(Request request, Response response) {
+					if (response != null && response.getStatusCode() < 400) {
+						String[] tokens = response.getText().split("\\|");
+						String statusLabel = tokens[0];
+						String command = tokens[1];
+						String logContent = tokens[2];
+
+						log.setValue(logContent);
+
+						Date now = new Date();
+						long elapsedTime = now.getTime() - lastConfirmed.getTime();
+
+						if ("processed".equals(statusLabel)) {
+							LD.clearPrompt();
+							ok.setDisabled(patch.isRestart());
+							GuiLog.info(I18N.message("patchinstalled"));
+							if(patch.isRestart())
+								Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
+						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
+							LD.clearPrompt();
+							ApplicationRestarting.get(I18N.message("patchnotstarted", command)).show();
+						} else {
+							scheduleGetStatus(patch);
+						}
+					}
+				}
+			});
+		} catch (RequestException e) {
+			// Nothing to do
+		}
 	}
 
 	private void scheduleGetStatus(GUIPatch patch) {

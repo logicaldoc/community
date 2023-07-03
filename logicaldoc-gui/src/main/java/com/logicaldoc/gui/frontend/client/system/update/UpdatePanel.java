@@ -2,6 +2,11 @@ package com.logicaldoc.gui.frontend.client.system.update;
 
 import java.util.Date;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
@@ -318,34 +323,46 @@ public class UpdatePanel extends VLayout {
 
 	private void getStatus() {
 		LD.updatingServer();
-		UpdateService.Instance.get().getStatus(updateFileName, new AsyncCallback<String[]>() {
 
-			@Override
-			public void onFailure(Throwable caugtht) {
-				scheduleGetStatus();
-			}
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
+				Util.contextPath() + "updatestatus?fileName=" + updateFileName);
 
-			@Override
-			public void onSuccess(String[] status) {
-				log.setValue(status[1]);
-
-				Date now = new Date();
-				long elapsedTime = now.getTime() - lastConfirmed.getTime();
-
-				String statusLabel = status[0];
-
-				if ("processed".equals(statusLabel)) {
-					LD.clearPrompt();
-					ok.setDisabled(false);
-					GuiLog.info(I18N.message("updateinstalled"));
-				} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
-					LD.clearPrompt();
-					ApplicationRestarting.get(I18N.message("updatenotstarted", status[2])).show();
-				} else {
-					scheduleGetStatus();
+		try {
+			builder.sendRequest(null, new RequestCallback() {
+				public void onError(Request request, Throwable exception) {
+					// Nothing to do
 				}
-			}
-		});
+
+				public void onResponseReceived(Request request, Response response) {
+					if (response != null && response.getStatusCode() < 400) {
+						String[] tokens = response.getText().split("\\|");
+						String statusLabel = tokens[0];
+						String command = tokens[1];
+						String logContent = tokens[2];
+
+						log.setValue(logContent);
+
+						Date now = new Date();
+						long elapsedTime = now.getTime() - lastConfirmed.getTime();
+
+						if ("processed".equals(statusLabel)) {
+							LD.clearPrompt();
+							ok.setDisabled(false);
+							Util.uninstallCloseWindowAlert();
+							GuiLog.info(I18N.message("updateinstalled"));
+							Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
+						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
+							LD.clearPrompt();
+							ApplicationRestarting.get(I18N.message("updatenotstarted", command)).show();
+						} else {
+							scheduleGetStatus();
+						}
+					}
+				}
+			});
+		} catch (RequestException e) {
+			// Nothing to do
+		}
 	}
 
 	private void scheduleGetStatus() {
