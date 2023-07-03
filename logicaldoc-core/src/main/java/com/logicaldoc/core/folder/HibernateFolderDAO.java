@@ -1459,7 +1459,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			long child = queryForLong("SELECT ld_id FROM ld_folder WHERE ld_parentid=? AND ld_name=? AND ld_tenantid=?",
+			long child = queryForLong("SELECT ld_id FROM ld_folder WHERE ld_deleted=0 AND ld_parentid=? AND ld_name=? AND ld_tenantid=?",
 					folder.getId(), name, folder.getTenantId());
 
 			if (child == 0L) {
