@@ -1,12 +1,18 @@
 package com.logicaldoc.core.automation;
 
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -86,7 +92,7 @@ public class FolderTool {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		return folderDao.computePathExtended(folderId);
 	}
-	
+
 	/**
 	 * Finds the folder by it's path
 	 * 
@@ -132,7 +138,7 @@ public class FolderTool {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Saves / updates a folder into the database
 	 * 
@@ -325,5 +331,41 @@ public class FolderTool {
 			log.error(e.getMessage(), e);
 		}
 		return newFolder;
+	}
+
+	/**
+	 * Applies a folder template
+	 * 
+	 * @param rootId Id of the root where the template must be applied to
+	 * @param templateName Identifier of the folder template
+	 * @param inheritSecurity If the created folders must inherit the security
+	 *        from the root
+	 * @param username the user in whose name the method is run
+	 * 
+	 * @throws PersistenceException Error in the data layer
+	 */
+	public void applyTemplate(long rootId, String templateName, boolean inheritSecurity, String username)
+			throws PersistenceException {
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		GenericDAO gdao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+		Folder root = dao.findFolder(rootId);
+
+		SecurityTool secTool = new SecurityTool();
+		User user = secTool.getUser(username);
+
+		List<Generic> templates = gdao.findByTypeAndSubtype("folder-template", templateName, null, root.getTenantId());
+		Generic template = templates.get(0);
+
+		StringTokenizer st = new StringTokenizer(template.getString1(), "\n", false);
+		while (st.hasMoreElements()) {
+			String path = (String) st.nextElement();
+
+			FolderHistory history = new FolderHistory();
+			history.setEvent(FolderEvent.CREATED.toString());
+			history.setTenantId(root.getTenantId());
+			history.setUser(user);
+
+			dao.createPath(root, path, inheritSecurity, history);
+		}
 	}
 }
