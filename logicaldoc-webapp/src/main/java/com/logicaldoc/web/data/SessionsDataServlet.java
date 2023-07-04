@@ -2,6 +2,7 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -9,6 +10,9 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Menu;
@@ -20,6 +24,7 @@ import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.SessionDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.web.EchoServlet;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**
@@ -30,8 +35,12 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class SessionsDataServlet extends AbstractDataServlet {
 
+	protected static Logger log = LoggerFactory.getLogger(EchoServlet.class);
+
 	private static final String CLOSE_STATUS_LABEL = "</statusLabel>";
+
 	private static final String STATUS_LABEL = "<statusLabel>";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -46,7 +55,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		if (request.getParameter("kill") != null) {
 			// Kill a specific session
 			SessionManager.get().kill(request.getParameter("kill"));
-			System.out.println(String.format("Killed session %s", request.getParameter("kill")));
+			log.debug("Killed session {}", request.getParameter("kill"));
 			PrintWriter writer = response.getWriter();
 			writer.println("ok");
 		} else {
@@ -57,7 +66,6 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			// Just listing the sessions
 			SessionDAO sessionDao = (SessionDAO) Context.get().getBean(SessionDAO.class);
 			List<Session> sessions = sessionDao.findByNode(node);
-
 
 			boolean csvFormat = "true".equals(request.getParameter("csv"));
 
@@ -80,8 +88,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			 * The current user must be enabled to see the sessions.
 			 */
 			MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-			boolean showSid = currentUser == null
-					|| (currentUser != null && mDao.isReadEnable(Menu.ADMIN_SESSIONS, currentUser.getId()));
+			boolean showSid = currentUser == null || mDao.isReadEnable(Menu.ADMIN_SESSIONS, currentUser.getId());
 
 			PrintWriter writer = response.getWriter();
 			if (!csvFormat)
@@ -93,7 +100,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 
 	private void printSessions(Locale locale, Integer status, List<Session> sessions, boolean csvFormat, String tenant,
 			boolean showSid, PrintWriter writer) {
-			
+
 		for (Session session : sessions) {
 			if (tenant != null && !tenant.equals(session.getTenantName()))
 				continue;
@@ -113,16 +120,19 @@ public class SessionsDataServlet extends AbstractDataServlet {
 
 	private void printSessionCsv(PrintWriter writer, Session session, Locale locale, boolean showSid) {
 		DateFormat df = getDateFormat();
-		
+
 		writer.print(showSid ? session.getSid() : "--");
 		writer.print(",");
-		if (showSid)
+
+		if (showSid) {
 			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
 				writer.print(I18N.message("opened", locale));
 			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
 				writer.print(I18N.message("closed", locale));
 			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_EXPIRED)
 				writer.print(I18N.message("expired", locale));
+		}
+
 		writer.print(",");
 		if (showSid)
 			writer.print(session.getUsername());
@@ -134,11 +144,14 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print(",");
 		writer.print(df.format((Date) session.getCreation()));
 		writer.print(",");
-		if (showSid)
+
+		if (showSid) {
 			if (SessionManager.get().get(session.getSid()) != null)
 				writer.print(SessionManager.get().get(session.getSid()).getLastRenew());
 			else
 				writer.print(df.format((Date) session.getLastRenew()));
+		}
+
 		writer.print(",");
 		if (showSid)
 			writer.print(session.getNode());
@@ -147,7 +160,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 
 	private void printSessionXml(PrintWriter writer, Session session, Locale locale, boolean showSid) {
 		DateFormat df = getDateFormat();
-		
+
 		writer.print("<session>");
 		writer.print("<sid><![CDATA[" + (showSid ? session.getSid() : "--") + "]]></sid>");
 		writer.print("<status>" + (showSid ? session.getStatus() : "") + "</status>");
@@ -163,13 +176,13 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		}
 		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
 		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
-		writer.print("<client><![CDATA["
-				+ (showSid ? (session.getClient() != null ? session.getClient() : "") : "") + "]]></client>");
+
+		final Serializable client = session.getClient() != null ? session.getClient() : "";
+		writer.print("<client><![CDATA[" + (showSid ? client : "") + "]]></client>");
 		writer.print("<tenant><![CDATA[" + session.getTenantName() + "]]></tenant>");
 		writer.print("<created>" + df.format((Date) session.getCreation()) + "</created>");
 		if (SessionManager.get().get(session.getSid()) != null)
-			writer.print("<renew>" + df.format(SessionManager.get().get(session.getSid()).getLastRenew())
-					+ "</renew>");
+			writer.print("<renew>" + df.format(SessionManager.get().get(session.getSid()).getLastRenew()) + "</renew>");
 		else
 			writer.print("<renew>" + df.format((Date) session.getLastRenew()) + "</renew>");
 		writer.print("</session>");
@@ -182,9 +195,13 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		else
 			try {
 				currentUser = ServletUtil.getSessionUser(request);
-			} catch (Throwable t) {
+			} catch (Exception t) {
 				// Nothing to do
 			}
 		return currentUser;
+	}
+	
+	protected boolean isSessionRequired() {
+		return false;
 	}
 }
