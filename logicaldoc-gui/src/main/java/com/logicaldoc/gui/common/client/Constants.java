@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client;
 
 public final class Constants {
+	
 	// The currenly logged user name
 	public static final String AUTH_USERNAME = "authUser";
 
@@ -183,5 +184,6 @@ public final class Constants {
 			FULLTEXT_FIELD_CONTENT, FULLTEXT_FIELD_TAGS };
 
 	private Constants() {
+	  // Do nothing
 	}
 }
