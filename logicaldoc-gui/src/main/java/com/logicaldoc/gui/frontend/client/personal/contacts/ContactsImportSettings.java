@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
-import com.logicaldoc.gui.common.client.beans.ParseContactsParameters;
+import com.logicaldoc.gui.common.client.beans.GUIParseContactsParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -175,8 +175,8 @@ public class ContactsImportSettings extends Window {
 		return Integer.parseInt(values.get("address").toString());
 	}
 
-	public ParseContactsParameters getParseContactsParameters() {
-		ParseContactsParameters parameters = new ParseContactsParameters(getSeparator(), getTextDelimiter(),
+	public GUIParseContactsParameters getParseContactsParameters() {
+		GUIParseContactsParameters parameters = new GUIParseContactsParameters(getSeparator(), getTextDelimiter(),
 				isSkipFirstRow());
 		parameters.setAddress(getAddressIndex());
 		parameters.setCompany(getCompanyIndex());

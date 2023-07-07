@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.beans.CalendarEventSearchCriteria;
+import com.logicaldoc.gui.common.client.beans.GUICalendarEventSearchCriteria;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -301,7 +301,7 @@ public class CalendarReport extends AdminPanel {
 
 		int maxRecords = getMaxRecords(values);
 
-		CalendarEventSearchCriteria criteria = new CalendarEventSearchCriteria(fromValue, toValue, endDateFrom, endDateTo, frequencyValue);
+		GUICalendarEventSearchCriteria criteria = new GUICalendarEventSearchCriteria(fromValue, toValue, endDateFrom, endDateTo, frequencyValue);
 		criteria.setStatus(statusValue);
 		criteria.setTitle(titleValue);
 		criteria.setType(typeValue);
@@ -322,7 +322,7 @@ public class CalendarReport extends AdminPanel {
 		return maxRecords;
 	}
 
-	private void doSearch(CalendarEventSearchCriteria criteria) {
+	private void doSearch(GUICalendarEventSearchCriteria criteria) {
 		CalendarService.Instance.get().find(criteria, new AsyncCallback<GUICalendarEvent[]>() {
 
 					@Override

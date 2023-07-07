@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
-import com.logicaldoc.gui.common.client.beans.ParseContactsParameters;
+import com.logicaldoc.gui.common.client.beans.GUIParseContactsParameters;
 
 /**
  * The client side stub for the Contact Service. This service allows r/w
@@ -57,7 +57,7 @@ public interface ContactService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIContact[] parseContacts(boolean preview, ParseContactsParameters parameters)
+	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters)
 			throws ServerException;
 
 	/**

@@ -3,6 +3,10 @@ package com.logicaldoc.util.time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
@@ -102,5 +106,13 @@ public class DateUtil {
 			log.error("Unparseable date {}", formattedDate);
 
 		return date;
+	}
+
+	public static Date truncateToDay(Date date) {
+		Instant instant = date.toInstant();
+		ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+		ZonedDateTime truncatedZonedDateTime = zonedDateTime.truncatedTo(ChronoUnit.DAYS);
+		Instant truncatedInstant = truncatedZonedDateTime.toInstant();
+		return Date.from(truncatedInstant);
 	}
 }

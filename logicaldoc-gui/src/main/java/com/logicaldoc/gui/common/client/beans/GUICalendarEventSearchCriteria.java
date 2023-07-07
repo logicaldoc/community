@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.5
  */
-public class CalendarEventSearchCriteria implements Serializable {
+public class GUICalendarEventSearchCriteria implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -63,10 +63,10 @@ public class CalendarEventSearchCriteria implements Serializable {
 	 */
 	private Integer maxRecords;
 
-	public CalendarEventSearchCriteria() {
+	public GUICalendarEventSearchCriteria() {
 	}
 
-	public CalendarEventSearchCriteria(Date startDate, Date endDate, Date expireFrom, Date expireTo,
+	public GUICalendarEventSearchCriteria(Date startDate, Date endDate, Date expireFrom, Date expireTo,
 			Integer frequency) {
 		super();
 		this.startDate = startDate;

@@ -1,6 +1,8 @@
 package com.logicaldoc.util;
 
-import com.logicaldoc.util.io.NetUtil;
+import java.util.Date;
+
+import com.logicaldoc.util.time.DateUtil;
 
 public class UtilWorkbench {
 
@@ -10,7 +12,7 @@ public class UtilWorkbench {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		System.out.println(NetUtil.available(9080));
+		System.out.println(DateUtil.truncateToDay(new Date()));
 
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);

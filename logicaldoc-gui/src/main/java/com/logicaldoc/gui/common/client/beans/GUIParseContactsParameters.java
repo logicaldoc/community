@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.5
  */
-public class ParseContactsParameters implements Serializable {
+public class GUIParseContactsParameters implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -62,10 +62,10 @@ public class ParseContactsParameters implements Serializable {
 	 */
 	private int address = 6;
 
-	public ParseContactsParameters() {
+	public GUIParseContactsParameters() {
 	}
 	
-	public ParseContactsParameters(String separator, String delimiter, boolean skipFirstRow) {
+	public GUIParseContactsParameters(String separator, String delimiter, boolean skipFirstRow) {
 		super();
 		this.separator = separator;
 		this.delimiter = delimiter;
