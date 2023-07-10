@@ -228,9 +228,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		passwordChanged = processPasswordChanged(user);
 
-		if (newUser && findByUsernameIgnoreCase(user.getUsername()) != null)
-			throw new PersistenceException(String.format(
-					"Another user exists with the same username %s (perhaps with different case)", user.getUsername()));
+		validateUsernameUniquenes(user, newUser);
 
 		if (user.getType() == User.TYPE_SYSTEM)
 			user.setType(User.TYPE_DEFAULT);
@@ -293,6 +291,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		enforceReadOnlyUserPermissions(user);
 
 		saveEnabledOrDisabledHistory(user, transaction, enabledStatusChanged);
+	}
+
+	private void validateUsernameUniquenes(User user, boolean newUser) throws PersistenceException {
+		if (newUser && findByUsernameIgnoreCase(user.getUsername()) != null)
+			throw new PersistenceException(String.format(
+					"Another user exists with the same username %s (perhaps with different case)", user.getUsername()));
 	}
 
 	private void saveWorkingTimes(User user) throws PersistenceException {

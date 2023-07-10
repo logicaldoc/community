@@ -200,7 +200,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			}
 		return currentUser;
 	}
-	
+
+	@Override
 	protected boolean isSessionRequired() {
 		return false;
 	}

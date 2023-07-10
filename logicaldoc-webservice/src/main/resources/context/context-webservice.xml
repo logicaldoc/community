@@ -46,6 +46,7 @@
     <bean id="WebserviceFaultInterceptor" class="com.logicaldoc.webservice.WebserviceFaultInterceptor" />
     
     
+    
     <!-- ############################## -->
     <!-- ####### JAX-WS (SOAP) ######## -->
     <!-- ############################## -->
@@ -55,6 +56,9 @@
         <jaxws:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxws:inInterceptors>
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>        
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}"/>
         </jaxws:properties>
@@ -69,6 +73,9 @@
         <jaxws:outInterceptors>
             <ref bean="GZIPOutInterceptor" />
         </jaxws:outInterceptors>
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>        
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
@@ -83,6 +90,9 @@
         <jaxws:outInterceptors>
             <ref bean="GZIPOutInterceptor" />
         </jaxws:outInterceptors>
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>        
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
@@ -97,6 +107,9 @@
         <jaxws:outInterceptors>
             <ref bean="GZIPOutInterceptor" />
         </jaxws:outInterceptors>
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>        
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
@@ -111,6 +124,9 @@
         <jaxws:outInterceptors>
             <ref bean="GZIPOutInterceptor" />
         </jaxws:outInterceptors>
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>        
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
@@ -125,6 +141,9 @@
         <jaxws:outInterceptors>
             <ref bean="GZIPOutInterceptor" />
         </jaxws:outInterceptors>
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>        
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
@@ -134,7 +153,10 @@
         address="/System">
         <jaxws:inInterceptors>
             <ref bean="WebserviceInterceptor" />
-        </jaxws:inInterceptors>        
+        </jaxws:inInterceptors>      
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
@@ -144,7 +166,10 @@
         address="/Security">
         <jaxws:inInterceptors>
             <ref bean="WebserviceInterceptor" />
-        </jaxws:inInterceptors>        
+        </jaxws:inInterceptors>
+      	<jaxws:outFaultInterceptors>
+         	<ref bean="WebserviceFaultInterceptor" />
+      	</jaxws:outFaultInterceptors>          
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
@@ -175,7 +200,10 @@
     <jaxrs:server id="commentservice" address="/mobile/comments">
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
-        </jaxrs:inInterceptors>    
+        </jaxrs:inInterceptors> 
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>            
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.mobile.CommentService" />
         </jaxrs:serviceBeans>
@@ -189,6 +217,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestAuthService">
                 <aop:scoped-proxy />
@@ -203,6 +234,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestDocumentService">
                 <aop:scoped-proxy />
@@ -217,6 +251,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestFolderService" />
         </jaxrs:serviceBeans>
@@ -229,6 +266,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestSearchService"/>
         </jaxrs:serviceBeans>
@@ -241,6 +281,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>    
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestTagService"/>
         </jaxrs:serviceBeans>
@@ -253,6 +296,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>    
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestBookmarkService"/>
         </jaxrs:serviceBeans>
@@ -265,6 +311,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>    
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestSystemService"/>
         </jaxrs:serviceBeans>
@@ -277,6 +326,9 @@
         <jaxrs:inInterceptors>
             <ref bean="WebserviceInterceptor" />
         </jaxrs:inInterceptors>    
+        <jaxrs:outFaultInterceptors>
+            <ref bean="WebserviceFaultInterceptor" />
+        </jaxrs:outFaultInterceptors>         
         <jaxrs:serviceBeans>
             <bean class="com.logicaldoc.webservice.rest.endpoint.RestDocumentMetadataService"/>
         </jaxrs:serviceBeans>

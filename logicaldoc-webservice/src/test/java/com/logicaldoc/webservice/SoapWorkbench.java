@@ -60,7 +60,7 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-//			documentStuff(sid);
+			documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
@@ -77,7 +77,7 @@ public class SoapWorkbench {
 
 			// bookmarkStuff(sid);
 
-			metadataStuff(metadataClient, sid);
+			// metadataStuff(metadataClient, sid);
 
 			// WSFolder newFolder = new WSFolder();
 			// newFolder.setName("ddddd");
@@ -527,6 +527,11 @@ public class SoapWorkbench {
 
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
+		WSDocument doc = documentClient.getDocument(sid, 324730881L);
+		doc.getAttribute("VatID").setStringValue("pippo");
+		documentClient.update(sid, doc);
+		
+		
 		// WSDocument doc = documentClient.getDocument(sid, 735L);
 
 //		documentClient.deleteLink(sid, 102L);
@@ -561,11 +566,11 @@ public class SoapWorkbench {
 //		documentClient.update(sid, wsDoc);
 
 		// Create a document with multi-value attribute
-		WSDocument wsDoc = new WSDocument();
-		wsDoc.setFileName("build.xml");
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		wsDoc.setCreation(DateUtil.format(df.parse("2018-01-25")));
-		wsDoc.setFolderId(Folder.DEFAULTWORKSPACEID);
+//		WSDocument wsDoc = new WSDocument();
+//		wsDoc.setFileName("build.xml");
+//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//		wsDoc.setCreation(DateUtil.format(df.parse("2018-01-25")));
+//		wsDoc.setFolderId(Folder.DEFAULTWORKSPACEID);
 		// wsDoc.setTemplateId(547815424L);
 //		
 //		WSAttribute att1=new WSAttribute();
@@ -579,7 +584,7 @@ public class SoapWorkbench {
 //		att2.setParent("industries");
 //		wsDoc.addAttribute(att2);
 //		
-		documentClient.create(sid, wsDoc, new File("build.xml"));
+//		documentClient.create(sid, wsDoc, new File("build.xml"));
 
 //		WSDocument wsDoc = documentClient.getDocument(sid, 639L);
 //		wsDoc.setId(0);

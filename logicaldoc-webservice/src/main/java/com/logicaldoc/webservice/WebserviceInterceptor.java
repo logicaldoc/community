@@ -137,14 +137,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	public void saveCall(WebserviceCall call, Message message) {
 		call.setProtocol(message instanceof SoapMessage ? WebserviceCall.SOAP : WebserviceCall.REST);
-		String uri = (String) message.get(Message.REQUEST_URL);
-		if (uri != null) {
-			String query = (String) message.get(Message.QUERY_STRING);
-			if (query != null)
-				uri += "?" + query;
-		}
-
-		call.setUri(uri);
+		call.setUri(getURI(message));
 
 		// Strip the <content> tags in the payload and mask the credentials
 		if (call.getPayload() != null) {
@@ -169,6 +162,16 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 		ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);
 		pools.schedule(new WebserviceCallStore(call), THREADPOOL_CALL_STORE, 5000);
+	}
+
+	private String getURI(Message message) {
+		String uri = (String) message.get(Message.REQUEST_URL);
+		if (uri != null) {
+			String query = (String) message.get(Message.QUERY_STRING);
+			if (query != null)
+				uri += "?" + query;
+		}
+		return uri;
 	}
 
 	static String maskCredentials(String originalString) {

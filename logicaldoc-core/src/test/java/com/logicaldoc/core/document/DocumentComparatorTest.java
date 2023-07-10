@@ -42,12 +42,6 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		// check that the list is sorted
 		Collections.sort(docs, fdatec);
 
-		for (Document document : docs) {
-			System.out.println(document.getFileName());
-			System.out.println(document.getDate());
-			System.out.println(document.getTemplateName());
-		}
-
 		Document firstDoc = docs.get(0);
 		assertEquals("pluto.pdf", firstDoc.getFileName());
 
