@@ -489,7 +489,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return isPermissionEnabled(Permission.MOVE, id, userId);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isReadEnabled(long folderId, long userId) throws PersistenceException {
 		User user = getExistingtUser(userId);
@@ -507,16 +506,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (userGroups.isEmpty())
 			return false;
 
-		StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + "  ");
-		query.append(LEFT_JOIN + ENTITY + FOLDER_GROUPS_AS_GROUP);
-		query.append(WHERE_GROUP_GROUPID_IN);
+		StringBuilder query = new StringBuilder(
+				"select distinct(ld_folderid) from ld_foldergroup where ld_groupid in (");
 		query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
-		query.append(") " + AND + ENTITY + ".id = :id");
+		query.append(") and ld_folderid=" + id);
 
-		Map<String, Object> params = new HashMap<>();
-		params.put("id", Long.valueOf(id));
-		List<FolderGroup> coll = findByQuery(query.toString(), params, null);
-		return !coll.isEmpty();
+		return queryForLong(query.toString()) > 0;
 	}
 
 	@Override
@@ -1457,7 +1452,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
-			long child = queryForLong("SELECT ld_id FROM ld_folder WHERE ld_deleted=0 AND ld_parentid=? AND ld_name=? AND ld_tenantid=?",
+			long child = queryForLong(
+					"SELECT ld_id FROM ld_folder WHERE ld_deleted=0 AND ld_parentid=? AND ld_name=? AND ld_tenantid=?",
 					folder.getId(), name, folder.getTenantId());
 
 			if (child == 0L) {
