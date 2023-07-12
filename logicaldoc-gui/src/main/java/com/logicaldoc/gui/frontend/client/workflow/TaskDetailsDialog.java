@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -832,8 +833,12 @@ public class TaskDetailsDialog extends Window {
 
 						final MenuItem checkin = prepareCheckinContextMenuItem(selectedDocument);
 
+						final MenuItem office = prepareOfficeContextMenuItem(selectedDocument);
+
 						if (readOnly)
 							contextMenu.setItems(preview, download, open);
+						else if (Feature.visible(Feature.OFFICE))
+							contextMenu.setItems(preview, download, checkout, checkin, unlock, office, open, remove);
 						else
 							contextMenu.setItems(preview, download, checkout, checkin, unlock, open, remove);
 
@@ -860,6 +865,10 @@ public class TaskDetailsDialog extends Window {
 											unlock.setEnabled(selectedDocument.getStatus() != Constants.DOC_UNLOCKED
 													&& Session.get().getUser().getId() == selectedDocument
 															.getLockUserId());
+											office.setEnabled(Feature.enabled(Feature.OFFICE)
+													&& folder.hasPermission(Constants.PERMISSION_WRITE)
+													&& folder.hasPermission(Constants.PERMISSION_DOWNLOAD)
+													&& Util.isOfficeFile(selectedDocument.getFileName()));
 										}
 
 										contextMenu.showContextMenu();
@@ -929,6 +938,12 @@ public class TaskDetailsDialog extends Window {
 					}
 				}));
 		return checkout;
+	}
+
+	private MenuItem prepareOfficeContextMenuItem(final GUIDocument selectedDocument) {
+		final MenuItem office = new MenuItem(I18N.message("editwithoffice"));
+		office.addClickHandler(event -> Util.openEditWithOffice(selectedDocument.getId()));
+		return office;
 	}
 
 	private MenuItem prepareRemoveContextMenuItem(final GUIDocument selectedDocument) {
