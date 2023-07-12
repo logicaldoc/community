@@ -20,7 +20,7 @@ public interface ImpexServiceAsync {
 
 	void saveIncremental(GUIIncrementalArchive incremental, AsyncCallback<GUIIncrementalArchive> callback);
 
-	void addDocuments(long archiveId, long[] documentIds, AsyncCallback<Void> callback);
+	void addDocuments(long archiveId, Long[] documentIds, AsyncCallback<Void> callback);
 
 	void addFolder(long archiveId, long rootId, AsyncCallback<Void> callback);
 

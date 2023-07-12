@@ -573,7 +573,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			sendToExpArchive.addClickHandler(
 					event -> LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
-							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(new long[] { folder.getId() },
+							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(new Long[] { folder.getId() },
 									false);
 							archiveDialog.show();
 						}
@@ -788,7 +788,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		final TreeNode selectedNode = (TreeNode) getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
 
-		DocumentService.Instance.get().addBookmarks(new long[] { folderId }, 1, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().addBookmarks(new Long[] { folderId }, 1, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1617,7 +1617,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		});
 	}
 
-	private void executeRoutine(long folderId, long[] docIds, GUIAutomationRoutine routine) {
+	private void executeRoutine(long folderId, Long[] docIds, GUIAutomationRoutine routine) {
 		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
 
 			@Override

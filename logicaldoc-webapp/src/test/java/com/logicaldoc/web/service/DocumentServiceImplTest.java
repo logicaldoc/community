@@ -185,7 +185,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteFromTrash() throws ServerException, PersistenceException {
-		service.delete(new long[] { 7 });
+		service.delete(new Long[] { 7L });
 		List<Long> docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1",
 				Long.class);
 		assertEquals(1, docIds.size());
@@ -200,7 +200,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testEmptyTrash() throws ServerException, PersistenceException {
-		service.delete(new long[] { 7 });
+		service.delete(new Long[] { 7L });
 		List<Long> docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1",
 				Long.class);
 		assertEquals(1, docIds.size());
@@ -215,7 +215,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testArchiveAndUnarchiveDocuments() throws ServerException, PersistenceException {
 		GUIDocument doc = service.getById(7);
-		service.archiveDocuments(new long[] { doc.getId() }, "archive comment");
+		service.archiveDocuments(new Long[] { doc.getId() }, "archive comment");
 
 		Document document = docDao.findById(7);
 		assertEquals(Document.DOC_ARCHIVED, document.getStatus());
@@ -330,7 +330,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc = service.getById(doc.getId());
 		assertNotNull(doc);
 		assertEquals("text content", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
-		service.checkout(new long[] { doc.getId() });
+		service.checkout(new Long[] { doc.getId() });
 
 		doc.setId(0);
 		doc.setFileName("testcontent2.txt");
@@ -342,13 +342,13 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc = service.getById(doc.getId());
 		assertNotNull(doc);
 		assertEquals(" ", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
-		service.checkout(new long[] { doc.getId() });
+		service.checkout(new Long[] { doc.getId() });
 	}
 
 	@Test
 	public void testCheckinContext() throws ServerException {
 		testCreateWithContent();
-		service.checkout(new long[] { 7 });
+		service.checkout(new Long[] { 7L });
 
 		service.checkinContent(7, "checkedin contents");
 		assertEquals("checkedin contents", service.getContentAsString(7));
@@ -442,7 +442,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc = service.getById(7);
 		assertEquals(0, doc.getImmutable());
 
-		service.makeImmutable(new long[] { 7 }, "immutable comment");
+		service.makeImmutable(new Long[] { 7L }, "immutable comment");
 
 		doc = service.getById(7);
 		assertEquals(1, doc.getImmutable());
@@ -474,7 +474,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertTrue(exceptionHappened);
 
 		// Document locked
-		service.lock(new long[] { 7 }, "lock comment");
+		service.lock(new Long[] { 7L }, "lock comment");
 		exceptionHappened = false;
 		try {
 			service.promoteVersion(doc.getId(), "1.0");
@@ -490,7 +490,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc = service.getById(7);
 		assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
 
-		service.checkout(new long[] { 7 });
+		service.checkout(new Long[] { 7L });
 		doc = service.getById(7);
 		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
 	}
@@ -623,7 +623,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			assertEquals(2, createdDocs.length);
 
-			GUIDocument mergedDoc = service.merge(new long[] { createdDocs[0].getId(), createdDocs[1].getId() }, 1200,
+			GUIDocument mergedDoc = service.merge(new Long[] { createdDocs[0].getId(), createdDocs[1].getId() }, 1200,
 					"merged.pdf");
 			mergedDoc = service.getById(mergedDoc.getId());
 			assertNotNull(mergedDoc);
@@ -867,7 +867,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		doc = docDao.findById(1);
 		assertNotNull(doc);
-		service.delete(new long[] { 2, 3 });
+		service.delete(new Long[] { 2L, 3L });
 
 		doc = docDao.findById(1);
 		assertNotNull(doc);
@@ -926,7 +926,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc);
 		assertEquals(3L, doc.getLockUserId().longValue());
 
-		service.unlock(new long[] { 1, 2 });
+		service.unlock(new Long[] { 1L, 2L });
 
 		doc = docDao.findDocument(1);
 		assertNotNull(doc);
@@ -935,7 +935,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc);
 		assertNull(doc.getLockUserId());
 
-		service.lock(new long[] { 1, 2 }, "comment");
+		service.lock(new Long[] { 1L, 2L }, "comment");
 
 		doc = docDao.findDocument(1);
 		assertEquals(1L, doc.getLockUserId().longValue());
@@ -945,7 +945,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testLinkDocuments() throws ServerException {
-		service.linkDocuments(new long[] { 1, 2 }, new long[] { 3, 4 });
+		service.linkDocuments(new Long[] { 1L, 2L }, new Long[] { 3L, 4L });
 
 		DocumentLink link = linkDao.findByDocIdsAndType(1, 3, "default");
 		assertNotNull(link);
@@ -971,7 +971,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testBookmarks() throws ServerException, PersistenceException {
-		service.addBookmarks(new long[] { 1, 2 }, 0);
+		service.addBookmarks(new Long[] { 1L, 2L }, 0);
 
 		Bookmark book = bookDao.findByUserIdAndDocId(1, 1);
 		assertNotNull(book);
@@ -1000,12 +1000,12 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		service.deleteBookmarks(new long[] { bookmark.getId() });
 
 		// Add bookmarks on folders
-		service.addBookmarks(new long[] { 6, 7 }, Bookmark.TYPE_FOLDER);
+		service.addBookmarks(new Long[] { 6L, 7L }, Bookmark.TYPE_FOLDER);
 
 		// Add bookmarks on non existent documents
 		boolean exceptionHappened = false;
 		try {
-			service.addBookmarks(new long[] { 21, 22 }, Bookmark.TYPE_DOCUMENT);
+			service.addBookmarks(new Long[] { 21L, 22L }, Bookmark.TYPE_DOCUMENT);
 		} catch (ServerException e) {
 			exceptionHappened = true;
 		}
@@ -1038,7 +1038,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		Document doc3 = docDao.findById(3);
 		assertNotNull(doc3);
 		assertEquals(AbstractDocument.INDEX_INDEXED, doc3.getIndexed());
-		service.markUnindexable(new long[] { 1, 2, 3 });
+		service.markUnindexable(new Long[] { 1L, 2L, 3L });
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
@@ -1050,7 +1050,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc3);
 		assertEquals(AbstractDocument.INDEX_SKIP, doc3.getIndexed());
 
-		service.markIndexable(new long[] { 1, 3 }, AbstractDocument.INDEX_TO_INDEX);
+		service.markIndexable(new Long[] { 1L, 3L }, AbstractDocument.INDEX_TO_INDEX);
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
@@ -1133,7 +1133,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// Send the email as download ticket
 		GUIEmail gmail = service.extractEmail(5, "1.0");
 		log.info(gmail.getFrom().getEmail());
-		gmail.setDocIds(new long[] { 5 });
+		gmail.setDocIds(new Long[] { 5L });
 
 		List<GUIContact> tos = new ArrayList<>();
 		GUIContact gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
@@ -1160,7 +1160,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// Send the email with attached .zip
 		gmail = service.extractEmail(5, "1.0");
 		log.info(gmail.getFrom().getEmail());
-		gmail.setDocIds(new long[] { 5 });
+		gmail.setDocIds(new Long[] { 5L });
 
 		tos = new ArrayList<>();
 		gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
@@ -1259,7 +1259,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc4 = service.getById(4L);
 		assertNull(doc4.getAttribute("attr1"));
 
-		long[] ids = new long[] { 4 };
+		Long[] ids = new Long[] { 4L };
 		GUIDocument vo = new GUIDocument();
 		vo.setPublished(1);
 
@@ -1304,7 +1304,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc.setStatus(AbstractDocument.DOC_CHECKED_OUT);
 		docDao.store(doc);
 
-		ids = new long[] { 5, 6 };
+		ids = new Long[] { 5L, 6L };
 		vo = new GUIDocument();
 		vo.setPublished(0);
 

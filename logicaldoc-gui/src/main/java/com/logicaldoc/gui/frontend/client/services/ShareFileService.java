@@ -27,7 +27,7 @@ public interface ShareFileService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public boolean exportDocuments(String targetFolder, long[] folderIds, long[] docIds) throws ServerException;
+	public boolean exportDocuments(String targetFolder, Long[] folderIds, Long[] docIds) throws ServerException;
 
 	public int importDocuments(long targetFolder, String[] itemIds) throws ServerException;
 

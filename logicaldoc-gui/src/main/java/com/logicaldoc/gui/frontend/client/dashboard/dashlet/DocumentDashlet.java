@@ -172,7 +172,7 @@ public class DocumentDashlet extends Dashlet {
 			MenuItem unlock = new MenuItem();
 			unlock.setTitle(I18N.message("unlock"));
 			unlock.addClickHandler(event -> {
-				DocumentService.Instance.get().unlock(new long[] { document.getId() }, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().unlock(new Long[] { document.getId() }, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

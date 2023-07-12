@@ -83,7 +83,7 @@ public class WebcontentEditor extends Window {
 
 	private void unlockAndClose() {
 		if (document.getId() != 0)
-			DocumentService.Instance.get().unlock(new long[] { WebcontentEditor.this.document.getId() },
+			DocumentService.Instance.get().unlock(new Long[] { WebcontentEditor.this.document.getId() },
 					new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

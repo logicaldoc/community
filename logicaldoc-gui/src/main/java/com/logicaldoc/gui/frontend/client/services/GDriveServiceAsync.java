@@ -16,7 +16,7 @@ public interface GDriveServiceAsync {
 	void importDocuments(String[] resourceIds, long targetFolderId, String type,
 			AsyncCallback<Void> callback);
 
-	void exportDocuments(long[] ids, AsyncCallback<String[]> callback);
+	void exportDocuments(Long[] ids, AsyncCallback<String[]> callback);
 
 	void search(String expression, AsyncCallback<GUIDocument[]> callback);
 

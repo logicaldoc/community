@@ -872,15 +872,23 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	public long[] getSelectedIds() {
+	public Long[] getSelectedIds() {
 		return DocumentGridUtil.getIds(getSelectedRecords());
 	}
 
 	@Override
-	public Long[] getSelectedIdsAsLong() {
-		return DocumentGridUtil.getIdsAsLong(getSelectedRecords());
-	}
+	public Long[] getIds() {
+		ListGridRecord[] records = getRecords();
+		if (records == null || records.length == 0)
+			return new Long[0];
 
+		Long[] ids = new Long[records.length];
+		for (int j = 0; j < ids.length; j++)
+			ids[j] = Long.parseLong(records[j].getAttributeAsString("id"));
+
+		return ids;
+	}
+	
 	@Override
 	public void expandVisibleRows() {
 		Integer[] rows = getVisibleRows();
@@ -918,19 +926,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		}
 
 		setRecords(records);
-	}
-
-	@Override
-	public long[] getIds() {
-		ListGridRecord[] records = getRecords();
-		if (records == null || records.length == 0)
-			return new long[0];
-
-		long[] ids = new long[records.length];
-		for (int j = 0; j < ids.length; j++)
-			ids[j] = Long.parseLong(records[j].getAttributeAsString("id"));
-
-		return ids;
 	}
 
 	@Override

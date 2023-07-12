@@ -10,7 +10,7 @@ public interface DropboxServiceAsync {
 
 	void startAuthorization(AsyncCallback<String> callback);
 
-	void exportDocuments(String targetPath, long[] folderIds, long[] docIds, AsyncCallback<Boolean> callback);
+	void exportDocuments(String targetPath, long[] folderIds, Long[] docIds, AsyncCallback<Boolean> callback);
 
 	void importDocuments(long targetFolder, String[] paths, AsyncCallback<Integer> callback);
 

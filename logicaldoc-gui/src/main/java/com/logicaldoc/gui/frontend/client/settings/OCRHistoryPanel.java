@@ -71,7 +71,7 @@ public class OCRHistoryPanel extends VLayout {
 
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 
-		ColoredListGridField comment = new ColoredListGridField(COMMENT, I18N.message(COMMENT));
+		ColoredListGridField comment = new ColoredListGridField(COMMENT, I18N.message("extract"));
 		comment.setWidth("*");
 
 		ListGridField size = new FileSizeListGridField(I18N.getAttributeLabel("size"), 70);
@@ -88,7 +88,7 @@ public class OCRHistoryPanel extends VLayout {
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
-		list.setDataSource(new OCRHistoryDS(null));
+		list.setDataSource(new OCRHistoryDS(Session.get().getConfigAsInt("gui.maxhistories")));
 		list.setFields(date, eventLabel, fileName, size, path, comment);
 
 		list.addCellDoubleClickHandler(evnt -> {

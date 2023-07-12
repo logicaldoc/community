@@ -29,7 +29,7 @@ public class SendToArchiveDialog extends Window {
 	 * @param document True if the ids refers to documents, False in case of
 	 *        folders
 	 */
-	public SendToArchiveDialog(final long[] ids, final boolean document) {
+	public SendToArchiveDialog(Long[] ids, boolean document) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
 		setTitle(I18N.message("sendtoexparchive"));
@@ -55,7 +55,7 @@ public class SendToArchiveDialog extends Window {
 		addItem(form);
 	}
 
-	public void onSend(long[] ids, boolean document) {
+	public void onSend(Long[] ids, boolean document) {
 		if (!form.validate())
 			return;
 

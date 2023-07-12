@@ -61,8 +61,8 @@ public interface SignService extends RemoteService {
 	public void imporKeystore(GUIKeystore keystore) throws ServerException;
 
 	public boolean isVisualSignatureEnabled() throws ServerException;
-	
-	public void signDocuments(long[] docIds, String reason, int page, String signX, String signY, String signWidth)
+
+	public void signDocuments(Long[] docIds, String reason, int page, String signX, String signY, String signWidth)
 			throws ServerException;
 
 	public static class Instance {
@@ -71,7 +71,7 @@ public interface SignService extends RemoteService {
 
 		private Instance() {
 		}
-		
+
 		public static SignServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(SignService.class);

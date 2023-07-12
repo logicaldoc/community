@@ -77,7 +77,7 @@ public class ShareFileDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final long[] docIds = MainPanel.get().isOnDocumentsTab()
+		final Long[] docIds = MainPanel.get().isOnDocumentsTab()
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
@@ -86,7 +86,7 @@ public class ShareFileDialog extends Dialog {
 				: I18N.message("exportdocstosfile"), choice -> {
 					if (choice.booleanValue()) {
 						String targetId = selection.getAttributeAsString("iid");
-						long[] folderIds = new long[0];
+						Long[] folderIds = new Long[0];
 						if (docIds.length == 0 && FolderController.get().getCurrentFolder() != null)
 							folderIds[0] = FolderController.get().getCurrentFolder().getId();
 

@@ -524,7 +524,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				if (grid.getSelectedCount() == 0)
 					return;
 
-				long[] selection = grid.getSelectedIds();
+				Long[] selection = grid.getSelectedIds();
 				if (selection.length == 1) {
 					DocUtil.downloadPdfConversion(document.getId(), document.getVersion());
 				} else {

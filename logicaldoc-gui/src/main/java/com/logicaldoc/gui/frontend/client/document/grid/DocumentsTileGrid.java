@@ -26,6 +26,7 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
@@ -209,17 +210,12 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public long[] getSelectedIds() {
+	public Long[] getSelectedIds() {
 		return DocumentGridUtil.getIds(getSelection());
 	}
-
+	
 	@Override
-	public Long[] getSelectedIdsAsLong() {
-		return DocumentGridUtil.getIdsAsLong(getSelection());
-	}
-
-	@Override
-	public long[] getIds() {
+	public Long[] getIds() {
 		return DocumentGridUtil.getIds(getRecordList().toArray());
 	}
 

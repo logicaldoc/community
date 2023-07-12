@@ -70,7 +70,7 @@ public class GDriveMenuItem extends MenuItem {
 		final MenuItem exportDocs = new MenuItem(I18N.message("exporttogdrive"));
 		exportDocs.addClickHandler((MenuItemClickEvent exportDocsClick) -> {
 			DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-			final long[] ids = grid.getSelectedIds();
+			final Long[] ids = grid.getSelectedIds();
 
 			LD.contactingServer();
 			GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<String[]>() {
@@ -126,7 +126,7 @@ public class GDriveMenuItem extends MenuItem {
 
 	private void checkoutAndUploadToGDrive(final GUIDocument document) {
 		// Need to checkout first
-		DocumentService.Instance.get().checkout(new long[] { document.getId() }, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().checkout(new Long[] { document.getId() }, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

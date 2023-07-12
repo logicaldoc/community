@@ -30,7 +30,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 	private static final String SIGNATURE_SEPARATOR = "--";
 
-	private long[] docIds;
+	private Long[] docIds;
 
 	private String docTitle;
 
@@ -44,7 +44,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 	private SelectItem messageTemplate;
 
-	public EmailDialog(long[] docIds, final String docTitle) {
+	public EmailDialog(Long[] docIds, final String docTitle) {
 		super();
 		this.docIds = docIds;
 		this.docTitle = docTitle;

@@ -14,7 +14,7 @@ import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorsPanel;
 import com.logicaldoc.gui.frontend.client.settings.gui.GUISettingsPanel;
 import com.logicaldoc.gui.frontend.client.settings.messages.OutgoingEmailPanel;
 import com.logicaldoc.gui.frontend.client.settings.protocols.ProtocolsPanel;
-import com.logicaldoc.gui.frontend.client.settings.searchindex.SearchIndexingPanel;
+import com.logicaldoc.gui.frontend.client.settings.searchindex.SearchIndexPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -200,7 +200,7 @@ public class SettingsMenu extends VLayout {
 		searchAndIndexing.setWidth100();
 		searchAndIndexing.setHeight(25);
 		searchAndIndexing
-				.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new SearchIndexingPanel()));
+				.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new SearchIndexPanel()));
 		if (Menu.enabled(Menu.SEARCH_AND_INDEXING))
 			addMember(searchAndIndexing);
 	}

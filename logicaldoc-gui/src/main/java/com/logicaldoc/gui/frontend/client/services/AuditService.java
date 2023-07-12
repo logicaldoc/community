@@ -46,7 +46,7 @@ public interface AuditService extends RemoteService {
 	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public void subscribeDocuments(long[] docIds, String[] events, Long userId, Long groupId) throws ServerException;
+	public void subscribeDocuments(Long[] docIds, String[] events, Long userId, Long groupId) throws ServerException;
 
 	/**
 	 * Changes a set of subscriptions
@@ -58,7 +58,7 @@ public interface AuditService extends RemoteService {
 	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public void update(long[] ids, boolean currentOnly, String[] events) throws ServerException;
+	public void update(Long[] ids, boolean currentOnly, String[] events) throws ServerException;
 
 	/**
 	 * Deletes a list of Subscriptions

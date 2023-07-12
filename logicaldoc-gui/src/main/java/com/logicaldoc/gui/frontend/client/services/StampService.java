@@ -93,7 +93,7 @@ public interface StampService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void applyStamp(long[] docIds, GUIStamp stamp) throws ServerException;
+	public void applyStamp(Long[] docIds, GUIStamp stamp) throws ServerException;
 
 	/**
 	 * Remove users from stamp

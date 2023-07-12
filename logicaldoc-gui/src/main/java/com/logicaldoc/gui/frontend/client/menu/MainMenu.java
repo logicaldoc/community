@@ -264,7 +264,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(new long[] { document.getId() }, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(new Long[] { document.getId() }, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -310,7 +310,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(new long[] { document.getId() }, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(new Long[] { document.getId() }, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

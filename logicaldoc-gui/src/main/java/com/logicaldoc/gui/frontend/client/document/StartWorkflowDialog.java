@@ -29,7 +29,7 @@ public class StartWorkflowDialog extends Window {
 
 	private TextItem tag;
 
-	public StartWorkflowDialog(final long[] ids) {
+	public StartWorkflowDialog(Long[] ids) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("startworkflow"));
 		setCanDragResize(true);
@@ -57,7 +57,7 @@ public class StartWorkflowDialog extends Window {
 		addItem(form);
 	}
 
-	public void onStart(final long[] ids) {
+	public void onStart(Long[] ids) {
 		if (!form.validate())
 			return;
 

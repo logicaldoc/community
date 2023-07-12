@@ -41,11 +41,11 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 
 	private ImageCropper cropper;
 
-	private long[] docIds;
+	private Long[] docIds;
 
 	private String reason;
 
-	public VisualPositioningDigitalSignatureDialog(long[] docIds, String reason) {
+	public VisualPositioningDigitalSignatureDialog(Long[] docIds, String reason) {
 		this.docIds = docIds;
 		this.reason = reason;
 

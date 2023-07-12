@@ -127,8 +127,8 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
 			if (history.getComment() != null) {
-				// remove non printable chars
-				history.setComment(history.getComment().replaceAll("\\p{C}", ""));
+				// remove non printable chars, but maintanis the carriage returns and the tabs
+				history.setComment(history.getComment().trim().replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
 				
 				// trim to 4000 chars
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));

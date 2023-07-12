@@ -29,12 +29,17 @@ public class DocumentHistoryDS extends DataSource {
 				+ (max != null ? max : getDefaultMaxHistories()));
 	}
 
-	public DocumentHistoryDS(Long userId, Long docId, String event, Integer max) {
+	public DocumentHistoryDS(Long tenantId, String event, Integer max) {
+		init("data/documenthistory.xml?event=" + event + (tenantId != null ? "&tenantId=" + tenantId : "") + "&locale="
+				+ I18N.getLocale() + "&max=" + (max != null ? max : getDefaultMaxHistories()));
+	}
+
+	public DocumentHistoryDS(Long userId, Long docId, String events, Integer max) {
 		String url = "data/documenthistory.xml?locale=" + I18N.getLocale();
 		if (userId != null)
 			url += "&userId=" + userId;
-		if (event != null)
-			url += "&event=" + event;
+		if (events != null)
+			url += "&event=" + events;
 		if (docId != null)
 			url += "&docId=" + docId;
 		init(url + "&max=" + (max != null ? max : getDefaultMaxHistories()));
@@ -54,6 +59,7 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceTextField version = new DataSourceTextField("version");
 		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
+		DataSourceTextField fileSize = new DataSourceTextField("fileSize");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
 		DataSourceBooleanField _new = new DataSourceBooleanField("new");
@@ -66,8 +72,8 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
 
-		setFields(user, filename, date, event, comment, reason, version, fileVersion, icon, _new, documentId, folderId, userId, path,
-				sid, ip, device, geolocation);
+		setFields(user, filename, date, event, comment, reason, version, fileVersion, fileSize, icon, _new, documentId,
+				folderId, userId, path, sid, ip, device, geolocation);
 		setClientOnly(true);
 
 		setDataURL(url);

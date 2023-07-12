@@ -29,7 +29,7 @@ public class GUIEmail implements Serializable {
 
 	private GUIUser user;
 
-	private long[] docIds;
+	private Long[] docIds;
 
 	private GUIContact from;
 
@@ -85,11 +85,11 @@ public class GUIEmail implements Serializable {
 		this.user = user;
 	}
 
-	public long[] getDocIds() {
+	public Long[] getDocIds() {
 		return docIds;
 	}
 
-	public void setDocIds(long[] docIds) {
+	public void setDocIds(Long[] docIds) {
 		this.docIds = docIds;
 	}
 

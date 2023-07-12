@@ -69,6 +69,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 					.setExcludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.excludes.metadata"));
 			searchEngine
 					.setIncludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.includes.metadata"));
+			searchEngine.setSkipOnError(conf.getBoolean(session.getTenantName() + ".index.skiponerror", false));
 			searchEngine.setParsingTimeout(conf.getInt(session.getTenantName() + ".parser.timeout", 0));
 			searchEngine.setMaxTextFileSize(conf.getInt(session.getTenantName() + ".parser.txt.maxsize", 0));
 			searchEngine.setDir(conf.getProperty("index.dir"));
@@ -162,6 +163,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 					searchEngine.getExcludePatternsMetadata() != null ? searchEngine.getExcludePatternsMetadata() : "");
 			conf.setProperty(session.getTenantName() + ".index.includes.metadata",
 					searchEngine.getIncludePattersMetadata() != null ? searchEngine.getIncludePattersMetadata() : "");
+			conf.setProperty(session.getTenantName() + ".index.skiponerror",
+					Boolean.toString(searchEngine.isSkipOnError()));
 			conf.setProperty(session.getTenantName() + ".parser.timeout",
 					searchEngine.getParsingTimeout() != null ? Integer.toString(searchEngine.getParsingTimeout()) : "");
 			conf.setProperty(session.getTenantName() + ".parser.txt.maxsize",

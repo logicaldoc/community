@@ -160,7 +160,7 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public void startWorkflow(String workflowName, String workflowDescription, String tag, long[] docIds)
+	public void startWorkflow(String workflowName, String workflowDescription, String tag, Long[] docIds)
 			throws ServerException;
 
 	/**

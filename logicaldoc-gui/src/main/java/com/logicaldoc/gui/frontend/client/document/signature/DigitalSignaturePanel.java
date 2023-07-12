@@ -103,11 +103,11 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 
 			if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
 				VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(
-						new long[] { document.getId() }, form.getValueAsString(REASON));
+						new Long[] { document.getId() }, form.getValueAsString(REASON));
 				dialog.show();
 			} else {
 				LD.contactingServer();
-				SignService.Instance.get().signDocuments(new long[] { document.getId() }, form.getValueAsString(REASON),
+				SignService.Instance.get().signDocuments(new Long[] { document.getId() }, form.getValueAsString(REASON),
 						1, null, null, null, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {

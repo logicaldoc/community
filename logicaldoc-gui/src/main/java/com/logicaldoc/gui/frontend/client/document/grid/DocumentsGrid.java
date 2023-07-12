@@ -66,25 +66,18 @@ public interface DocumentsGrid {
 	public GUIDocument[] getSelectedDocuments();
 
 	/**
-	 * Retrieves the list of all selected documents
+	 * Retrieves the list of all selected document IDs
 	 * 
 	 * @return identifiers of the selected documents
 	 */
-	public long[] getSelectedIds();
-
-	/**
-	 * Retrieves the list of all selected documents
-	 * 
-	 * @return identifiers of the selected documents
-	 */
-	public Long[] getSelectedIdsAsLong();
+	public Long[] getSelectedIds();
 	
 	/**
 	 * Retrieves the list of all the ids
 	 * 
 	 * @return list of identifiers
 	 */
-	public long[] getIds();
+	public Long[] getIds();
 
 	/**
 	 * Clear the actual selection

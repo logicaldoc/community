@@ -72,17 +72,10 @@ public class DocumentGridUtil {
 	private DocumentGridUtil() {
 	}
 
-	public static long[] getIds(Record[] records) {
-		long[] ids = new long[records.length];
-		for (int i = 0; i < records.length; i++)
-			ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
-		return ids;
-	}
-
-	public static Long[] getIdsAsLong(Record[] records) {
+	public static Long[] getIds(Record[] records) {
 		Long[] ids = new Long[records.length];
 		for (int i = 0; i < records.length; i++)
-			ids[i] = records[i].getAttributeAsLong("id");
+			ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
 		return ids;
 	}
 

@@ -145,7 +145,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	}
 
 	@Override
-	public boolean exportDocuments(String targetPath, long[] folderIds, long[] docIds) throws ServerException {
+	public boolean exportDocuments(String targetPath, long[] folderIds, Long[] docIds) throws ServerException {
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {

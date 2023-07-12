@@ -50,7 +50,7 @@ public interface ZohoService extends RemoteService {
 	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public boolean exportDocuments(String targetFolderId, long[] folderIds, long[] docIds) throws ServerException;
+	public boolean exportDocuments(String targetFolderId, long[] folderIds, Long[] docIds) throws ServerException;
 
 	/**
 	 * Exports documents and folders from Zoho into LogicalDOC
@@ -89,8 +89,7 @@ public interface ZohoService extends RemoteService {
 	public void delete(String resourceId) throws ServerException;
 
 	/**
-	 * Performs the check-in of a Zoho's document into the LogicalDOC
-	 * repository
+	 * Performs the check-in of a Zoho's document into the LogicalDOC repository
 	 * 
 	 * @param docId identifier of the document to update
 	 * @param comment The comment left for the checkin
@@ -107,7 +106,7 @@ public interface ZohoService extends RemoteService {
 
 		private Instance() {
 		}
-		
+
 		public static ZohoServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(ZohoService.class);

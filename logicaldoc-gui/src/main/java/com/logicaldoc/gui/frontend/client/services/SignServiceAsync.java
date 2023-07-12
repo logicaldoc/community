@@ -19,7 +19,7 @@ public interface SignServiceAsync {
 
 	void deleteCertificate(AsyncCallback<Void> callback);
 
-	void signDocuments(long[] docIds, String reason, int page, String signX, String signY, String signWidth,
+	void signDocuments(Long[] docIds, String reason, int page, String signX, String signY, String signWidth,
 			AsyncCallback<Void> callback);
 
 	void isVisualSignatureEnabled(AsyncCallback<Boolean> callback);

@@ -517,11 +517,13 @@ public class DocumentManagerImpl implements DocumentManager {
 				// time.
 				Date beforeParsing = new Date();
 				cont = parseDocument(doc, null);
+				if (transaction != null)
+					transaction.setComment(StringUtils.abbreviate(cont, 100));
 				parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
 			}
-			
+
 			// This may take time
-			addHIt(doc, cont);
+			addHit(doc, cont);
 		} catch (PersistenceException | ParseException e) {
 			recordIndexingError(transaction, doc, e);
 			throw e;
@@ -530,8 +532,10 @@ public class DocumentManagerImpl implements DocumentManager {
 		// For additional safety update the DB directly
 		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
 
-		if (transaction != null)
+		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.INDEXED.toString());
+			transaction.setDocument(doc);
+		}
 
 		documentDAO.store(doc, transaction);
 
@@ -546,12 +550,25 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	private void recordIndexingError(DocumentHistory transaction, Document document, Exception exception)
 			throws PersistenceException {
-		if (transaction != null) {
-			transaction.setEvent(DocumentEvent.INDEXED_ERROR.toString());
-			transaction.setComment(exception.getMessage());
-			transaction.setDocument(document);
-			DocumentHistoryDAO hDao=(DocumentHistoryDAO)Context.get().getBean(DocumentHistoryDAO.class);
-			hDao.store(transaction);
+		if (transaction == null)
+			return;
+
+		transaction.setEvent(DocumentEvent.INDEXED_ERROR.toString());
+		transaction.setComment(exception.getMessage());
+		transaction.setDocument(document);
+		transaction.setPath(folderDAO.computePathExtended(document.getFolder().getId()));
+		DocumentHistoryDAO hDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		hDao.store(transaction);
+
+		if (exception instanceof ParseException) {
+			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			String tenant = tDao.getTenantName(document.getTenantId());
+			if (Context.get().getProperties().getBoolean(tenant + ".index.skiponerror", false)) {
+				DocumentDAO dDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				dDao.initialize(document);
+				document.setIndexed(AbstractDocument.INDEX_SKIP);
+				dDao.store(document);
+			}
 		}
 	}
 
@@ -562,7 +579,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		return doc;
 	}
 
-	private void addHIt(Document doc, String cont) throws ParseException {
+	private void addHit(Document doc, String cont) throws ParseException {
 		try {
 			indexer.addHit(doc, cont);
 		} catch (Exception e) {

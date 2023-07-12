@@ -58,7 +58,7 @@ public interface DropboxService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public boolean exportDocuments(String targetPath, long[] folderIds, long[] docIds)
+	public boolean exportDocuments(String targetPath, long[] folderIds, Long[] docIds)
 			throws ServerException;
 	
 	public int importDocuments(long targetFolder, String[] paths)

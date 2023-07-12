@@ -78,7 +78,7 @@ public class DropboxDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final long[] docIds = MainPanel.get().isOnDocumentsTab()
+		final Long[] docIds = MainPanel.get().isOnDocumentsTab()
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 

@@ -112,9 +112,9 @@ public class SubscriptionDialog extends Window {
 		return selectedEvents;
 	}
 
-	private long[] getSelectedIds(ListGrid grid) {
+	private Long[] getSelectedIds(ListGrid grid) {
 		ListGridRecord[] selectedRecords = grid.getSelectedRecords();
-		long[] selectedIds = new long[selectedRecords.length];
+		Long[] selectedIds = new Long[selectedRecords.length];
 		for (int i = 0; i < selectedRecords.length; i++) {
 			selectedIds[i] = Long.parseLong(selectedRecords[i].getAttributeAsString("id"));
 		}
@@ -122,7 +122,7 @@ public class SubscriptionDialog extends Window {
 	}
 
 	private ButtonItem prepareSaveButton(ListGrid grid, DynamicForm form) {
-		long[] selectedIds = getSelectedIds(grid);
+		Long[] selectedIds = getSelectedIds(grid);
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
@@ -146,7 +146,7 @@ public class SubscriptionDialog extends Window {
 		return save;
 	}
 
-	private void doUpdateSubscriptions(ListGrid grid, long[] selectedIds, String[] events, final String eventsStr,
+	private void doUpdateSubscriptions(ListGrid grid, Long[] selectedIds, String[] events, final String eventsStr,
 			final String folderOption) {
 		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events,
 				new AsyncCallback<Void>() {
@@ -174,7 +174,7 @@ public class SubscriptionDialog extends Window {
 	 * @param folderId identifier of the folder
 	 * @param docIds identifier of the documents
 	 */
-	public SubscriptionDialog(final Long folderId, final long[] docIds) {
+	public SubscriptionDialog(final Long folderId, final Long[] docIds) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
 		if (folderId != null)
@@ -232,7 +232,7 @@ public class SubscriptionDialog extends Window {
 		addItem(form);
 	}
 
-	private ButtonItem prepareSubscribeButton(final Long folderId, final long[] docIds, final DynamicForm form) {
+	private ButtonItem prepareSubscribeButton(final Long folderId, final Long[] docIds, final DynamicForm form) {
 		ButtonItem subscribe = new ButtonItem();
 		subscribe.setTitle(I18N.message("subscribe"));
 		subscribe.setAutoFit(true);

@@ -893,7 +893,7 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareUnlockContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem unlock = new MenuItem();
 		unlock.setTitle(I18N.message("unlock"));
-		unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(new long[] { selectedDocument.getId() },
+		unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(new Long[] { selectedDocument.getId() },
 				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -913,7 +913,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem checkout = new MenuItem();
 		checkout.setTitle(I18N.message("checkout"));
 		checkout.addClickHandler(event -> DocumentService.Instance.get()
-				.checkout(new long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
+				.checkout(new Long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

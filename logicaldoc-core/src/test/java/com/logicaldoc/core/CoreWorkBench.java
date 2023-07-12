@@ -38,17 +38,20 @@ import com.talanlabs.avatargenerator.IdenticonAvatar;
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		Map<String, String> env = System.getenv();
-		System.out.println("env:");
-		for (Map.Entry<String, String> entry : env.entrySet()) {
-			System.out.println(entry.getKey() + " = " + entry.getValue());
-		}
+String test="\r\n"
+		+ "I72MAALF\r\n"
+		+ "0001-004483\r\n"
+		+ "\r\n"
+		+ "\f\r\n"
+		+ "\f\r\n"
+		+ " \b\r\n"
+		+ " \r\n"
+		+ " ";
 
-		System.out.println("\njava:");
-		Properties props = System.getProperties();
-		for (Map.Entry<Object, Object> entry : props.entrySet()) {
-			System.out.println(entry.getKey() + " = " + entry.getValue());
-		}
+System.out.println("A: " + test.replaceAll("\\p{Cntrl}", ""));
+System.out.println("B: " + test.replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
+
+
 
 //		StringBuilder sb = new StringBuilder();
 //		Exec.exec("wmic cpu get loadpercentage", null, null, sb, 20);

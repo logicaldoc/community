@@ -125,7 +125,7 @@ public class GDriveEditor extends Window {
 		toolStrip.addButton(cancel);
 		toolStrip.addSeparator();
 		cancel.addClickHandler(event -> DocumentService.Instance.get()
-				.unlock(new long[] { GDriveEditor.this.document.getId() }, new AsyncCallback<Void>() {
+				.unlock(new Long[] { GDriveEditor.this.document.getId() }, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

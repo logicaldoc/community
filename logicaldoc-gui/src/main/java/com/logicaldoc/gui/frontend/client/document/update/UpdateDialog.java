@@ -58,9 +58,9 @@ public class UpdateDialog extends StickyWindow {
 
 	private boolean majorVersion = false;
 
-	private final long[] ids;
+	private final Long[] ids;
 
-	public UpdateDialog(long[] ids, GUIDocument metadata, String context, boolean majorVersion, String charset) {
+	public UpdateDialog(Long[] ids, GUIDocument metadata, String context, boolean majorVersion, String charset) {
 		super(context);
 		this.context = context;
 		this.metadata = metadata;
@@ -69,7 +69,7 @@ public class UpdateDialog extends StickyWindow {
 		this.charset = charset != null ? charset : Session.get().getConfig("charset");
 	}
 
-	public UpdateDialog(long[] ids, GUIDocument metadata, String context, boolean majorVersion) {
+	public UpdateDialog(Long[] ids, GUIDocument metadata, String context, boolean majorVersion) {
 		this(ids, metadata, context, majorVersion, null);
 	}
 

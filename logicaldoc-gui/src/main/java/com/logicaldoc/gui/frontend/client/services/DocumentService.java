@@ -158,7 +158,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void linkDocuments(long[] inDocIds, long[] outDocIds) throws ServerException;
+	public void linkDocuments(Long[] inDocIds, Long[] outDocIds) throws ServerException;
 
 	/**
 	 * Deletes a selection of documents
@@ -167,7 +167,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void delete(long[] ids) throws ServerException;
+	public void delete(Long[] ids) throws ServerException;
 
 	/**
 	 * Deletes a selection of documents from trash
@@ -193,7 +193,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void makeImmutable(long[] docIds, String comment) throws ServerException;
+	public void makeImmutable(Long[] docIds, String comment) throws ServerException;
 
 	/**
 	 * Archives a set of documents
@@ -203,7 +203,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void archiveDocuments(long[] docIds, String comment) throws ServerException;
+	public void archiveDocuments(Long[] docIds, String comment) throws ServerException;
 
 	/**
 	 * Archives the documents in a folder
@@ -250,7 +250,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void unlock(long[] docIds) throws ServerException;
+	public void unlock(Long[] docIds) throws ServerException;
 
 	/**
 	 * Locks a set of documents
@@ -260,7 +260,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void lock(long[] docIds, String comment) throws ServerException;
+	public void lock(Long[] docIds, String comment) throws ServerException;
 
 	/**
 	 * Checks out the document
@@ -269,7 +269,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void checkout(long[] docIds) throws ServerException;
+	public void checkout(Long[] docIds) throws ServerException;
 
 	/**
 	 * Adds new documents previously uploaded
@@ -423,7 +423,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void addBookmarks(long[] targetIds, int type) throws ServerException;
+	public void addBookmarks(Long[] targetIds, int type) throws ServerException;
 
 	/**
 	 * Deletes a set of bookmarks
@@ -460,7 +460,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void markUnindexable(long[] docIds) throws ServerException;
+	public void markUnindexable(Long[] docIds) throws ServerException;
 
 	/**
 	 * Marks a set of documents as indexable
@@ -473,7 +473,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void markIndexable(long[] docIds, int policy) throws ServerException;
+	public void markIndexable(Long[] docIds, int policy) throws ServerException;
 
 	/**
 	 * Cleans the uploaded files folder
@@ -571,7 +571,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument[] bulkUpdate(long[] ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException;
+	public GUIDocument[] bulkUpdate(Long[] ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException;
 
 	/**
 	 * Creates a new empty document
@@ -686,7 +686,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument merge(long[] docIds, long targetFolderId, String fileName) throws ServerException;
+	public GUIDocument merge(Long[] docIds, long targetFolderId, String fileName) throws ServerException;
 
 	/**
 	 * Counts the pages of a document and updates the DB.

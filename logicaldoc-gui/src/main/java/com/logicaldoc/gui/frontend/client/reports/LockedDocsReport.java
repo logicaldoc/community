@@ -144,7 +144,7 @@ public class LockedDocsReport extends ReportPanel {
 		unlock.addClickHandler((MenuItemClickEvent event) -> {
 			if (selection == null || selection.length == 0)
 				return;
-			final long[] ids = new long[selection.length];
+			final Long[] ids = new Long[selection.length];
 			for (int i = 0; i < selection.length; i++) {
 				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 			}

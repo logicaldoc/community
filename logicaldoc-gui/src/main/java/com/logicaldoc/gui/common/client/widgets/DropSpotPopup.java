@@ -76,7 +76,11 @@ public class DropSpotPopup extends Window {
 	 */
 	@Override
 	public void close() {
-		FolderNavigator.get().reload();
+		try {
+			FolderNavigator.get().reload();
+		}catch(Exception e) {
+			// Do nothing
+		}
 		destroy();
 	}
 

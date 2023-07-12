@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +54,7 @@ public class GUIUser implements Serializable {
 	private boolean passwordExpires = false;
 
 	private boolean passwordExpired = false;
-	
+
 	private String address = "";
 
 	private String postalCode = "";

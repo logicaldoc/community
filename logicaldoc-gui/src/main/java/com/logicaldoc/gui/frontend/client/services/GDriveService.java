@@ -71,7 +71,7 @@ public interface GDriveService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] exportDocuments(long[] ids) throws ServerException;
+	public String[] exportDocuments(Long[] ids) throws ServerException;
 
 	/**
 	 * Save the settings used by the Google Drive module

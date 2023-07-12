@@ -34,9 +34,9 @@ public class DigitalSignatureDialog extends Window {
 
 	private DynamicForm form = new DynamicForm();
 
-	private long[] docIds;
+	private Long[] docIds;
 
-	public DigitalSignatureDialog(long[] docIds) {
+	public DigitalSignatureDialog(Long[] docIds) {
 		super();
 
 		this.docIds = docIds;

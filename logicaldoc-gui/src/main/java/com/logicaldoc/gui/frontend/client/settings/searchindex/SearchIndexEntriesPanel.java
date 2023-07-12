@@ -162,7 +162,7 @@ public class SearchIndexEntriesPanel extends VLayout {
 		deleteEntry.addClickHandler(event -> SC.ask(I18N.message("deleteindexentriesconfirm"), confirm -> {
 			if (confirm.booleanValue()) {
 				LD.contactingServer();
-				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIdsAsLong(),
+				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIds(),
 						new AsyncCallback<Void>() {
 
 							@Override

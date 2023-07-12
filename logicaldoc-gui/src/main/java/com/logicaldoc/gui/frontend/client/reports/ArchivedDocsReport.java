@@ -193,7 +193,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> {
-			final long[] docIds = new long[selection.length];
+			final Long[] docIds = new Long[selection.length];
 			for (int i = 0; i < selection.length; i++)
 				docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
 
@@ -217,7 +217,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem sendToExpArchive = new MenuItem();
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
 		sendToExpArchive.addClickHandler(event -> {
-			long[] selectionIds = new long[selection.length];
+			Long[] selectionIds = new Long[selection.length];
 			for (int i = 0; i < selection.length; i++)
 				selectionIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
 			SendToArchiveDialog archiveDialog = new SendToArchiveDialog(selectionIds, true);

@@ -79,7 +79,7 @@ public interface ImpexService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void addDocuments(long archiveId, long[] documentIds) throws ServerException;
+	public void addDocuments(long archiveId, Long[] documentIds) throws ServerException;
 
 	/**
 	 * Adds a a folder(the current version of the contained documents at any

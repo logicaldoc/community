@@ -35,10 +35,12 @@ public class GUISearchEngine implements Serializable {
 	private String dir;
 
 	private String sorting;
-	
+
 	private String customSorting;
 
 	private int threads = 2;
+
+	private boolean skipOnError = false;
 
 	public int getThreads() {
 		return threads;
@@ -150,5 +152,13 @@ public class GUISearchEngine implements Serializable {
 
 	public void setCustomSorting(String customSorting) {
 		this.customSorting = customSorting;
+	}
+
+	public boolean isSkipOnError() {
+		return skipOnError;
+	}
+
+	public void setSkipOnError(boolean skipOnError) {
+		this.skipOnError = skipOnError;
 	}
 }

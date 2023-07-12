@@ -121,7 +121,7 @@ public class DocumentCheckin extends Window {
 		}
 
 		document.setComment(vm.getValueAsString("comment"));
-		UpdateDialog bulk = new UpdateDialog(new long[] { document.getId() }, document, UpdateDialog.CHECKIN,
+		UpdateDialog bulk = new UpdateDialog(new Long[] { document.getId() }, document, UpdateDialog.CHECKIN,
 				"true".equals(vm.getValueAsString(MAJORVERSION)));
 		bulk.show();
 		destroy();

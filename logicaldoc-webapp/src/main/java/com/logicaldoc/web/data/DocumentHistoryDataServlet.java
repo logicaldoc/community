@@ -3,6 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +36,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
+	private static final String TENANT_ID = "tenantId";
+
 	private static final String EVENT = "event";
 
 	private static final String DOC_ID = "docId";
@@ -51,8 +55,9 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion from DocumentHistory A where 1=1 and A.deleted = 0 ");
+				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize from DocumentHistory A where A.deleted = 0 ");
 		Map<String, Object> params = prepareQueryParams(request, query);
+
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
 
@@ -111,12 +116,14 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		if (historyRecord[16] != null)
 			writer.write("<color><![CDATA[" + historyRecord[16] + "]]></color>");
 		writer.print("<fileVersion>" + (historyRecord[17] == null ? "" : historyRecord[17]) + "</fileVersion>");
+		writer.print("<fileSize>" + (historyRecord[18] == null ? "" : historyRecord[18]) + "</fileSize>");
 		writer.print("</history>");
 	}
 
 	private Map<String, Object> prepareQueryParams(HttpServletRequest request, StringBuilder query)
 			throws PersistenceException {
 		Map<String, Object> params = new HashMap<>();
+
 		if (request.getParameter(DOC_ID) != null) {
 			Long docId = Long.parseLong(request.getParameter(DOC_ID));
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -126,15 +133,31 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			query.append(" and A.docId = :docId");
 			params.put(DOC_ID, docId);
 		}
+
 		if (request.getParameter("userId") != null) {
 			query.append(" and A.userId = :userId");
+		}
 
+		if (request.getParameter(TENANT_ID) != null) {
+			query.append(" and A.tenantId = :tenantId");
+			params.put(TENANT_ID, Long.parseLong(request.getParameter(TENANT_ID)));
 		}
-		if (request.getParameter(EVENT) != null) {
-			query.append(" and A.event = :event");
-			params.put(EVENT, request.getParameter(EVENT));
+
+		final String event = request.getParameter(EVENT);
+		if (event != null) {
+			if (event.contains(",")) {
+				query.append(" and A.event in (");
+				query.append(Arrays.asList(event.split("\\,")).stream().map(ev -> "'" + ev + "'")
+						.collect(Collectors.joining(",")));
+				query.append(")");
+			} else {
+				query.append(" and A.event = :event");
+				params.put(EVENT, event);
+			}
 		}
+
 		query.append(" order by A.date desc ");
+
 		return params;
 	}
 }

@@ -133,7 +133,7 @@ public class ContextMenu extends Menu {
 	public ContextMenu(final GUIFolder folder, final DocumentsGrid xxgrid) {
 		this.grid = xxgrid;
 		final GUIDocument[] selection = grid.getSelectedDocuments();
-		final long[] selectionIds = grid.getSelectedIds();
+		final Long[] selectionIds = grid.getSelectedIds();
 
 		download = new MenuItem();
 		download.setTitle(I18N.message("download"));
@@ -451,7 +451,7 @@ public class ContextMenu extends Menu {
 			removeItem(office);
 	}
 
-	private MenuItem prepareMergeItem(final GUIFolder folder, final long[] selectionIds) {
+	private MenuItem prepareMergeItem(final GUIFolder folder, Long[] selectionIds) {
 		MenuItem item = new MenuItem(I18N.message("merge"));
 		item.addClickHandler(
 				event -> LD.askForStringMandatory(I18N.message("merge"), I18N.message(FILENAME), null, value -> {
@@ -555,17 +555,13 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareIndexItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareIndexItem(final GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("index"));
 		item.addClickHandler(event -> {
 			LD.contactingServer();
 
-			Long[] docIds = new Long[selectionIds.length];
-			for (int i = 0; i < selectionIds.length; i++)
-				docIds[i] = Long.valueOf(selectionIds[i]);
-
-			DocumentService.Instance.get().indexDocuments(docIds, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().indexDocuments(selectionIds, new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
@@ -591,7 +587,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem markIndexableMetadataOnlyItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem markIndexableMetadataOnlyItem(GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("markindexablemetadataonly"));
 		item.addClickHandler(event -> {
@@ -624,7 +620,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareMarkIndexableItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareMarkIndexableItem(GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("markindexable"));
 		item.addClickHandler(event -> {
@@ -656,7 +652,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareMarkUnindexableItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareMarkUnindexableItem(final GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("markunindexable"));
 		item.addClickHandler(event -> {
@@ -687,7 +683,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareBookmarkItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareBookmarkItem(final GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("addbookmark"));
 		item.addClickHandler(event -> {
@@ -719,7 +715,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareArchiveItem(final long[] selectionIds) {
+	private MenuItem prepareArchiveItem(Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("archive"));
 		item.addClickHandler(
@@ -784,8 +780,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareCheckoutItem(final GUIFolder folder, final GUIDocument[] selection,
-			final long[] selectionIds) {
+	private MenuItem prepareCheckoutItem(GUIFolder folder, GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("checkout"));
 		item.addClickHandler(event -> DocumentService.Instance.get().checkout(selectionIds, new AsyncCallback<Void>() {
@@ -813,7 +808,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareUnlockItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareUnlockItem(final GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("unlock"));
 		item.addClickHandler(event -> {
@@ -838,7 +833,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareLockItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareLockItem(final GUIDocument[] selection, final Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("lock"));
 		item.addClickHandler(event -> LD.askForValue(I18N.message("info"), I18N.message("lockadvice"), "", value -> {
@@ -936,7 +931,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareImmutableItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareImmutableItem(final GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("makeimmutable"));
 		item.addClickHandler(
@@ -967,14 +962,14 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareLinksItem(final GUIDocument[] selection, final long[] selectionIds) {
+	private MenuItem prepareLinksItem(GUIDocument[] selection, Long[] selectionIds) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("pasteaslinks"));
 		item.addClickHandler(event -> {
 			if (selection == null || selection.length == 0 || Clipboard.getInstance().isEmpty())
 				return;
 
-			final long[] inIds = new long[Clipboard.getInstance().size()];
+			final Long[] inIds = new Long[Clipboard.getInstance().size()];
 			int i = 0;
 			for (GUIDocument doc : Clipboard.getInstance())
 				inIds[i++] = doc.getId();
@@ -1027,7 +1022,7 @@ public class ContextMenu extends Menu {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("ddelete"));
 		item.addClickHandler(event -> {
-			final long[] ids = new long[selection.length];
+			final Long[] ids = new Long[selection.length];
 			for (int i = 0; i < selection.length; i++)
 				ids[i] = selection[i].getId();
 
@@ -1123,7 +1118,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private MenuItem prepareCustomActionsItem(final long folderId, final long[] selectedDocIds) {
+	private MenuItem prepareCustomActionsItem(long folderId, Long[] selectedDocIds) {
 		MenuItem item = new MenuItem(I18N.message("customactions"));
 		Menu menu = new Menu();
 		item.setSubmenu(menu);
@@ -1144,7 +1139,7 @@ public class ContextMenu extends Menu {
 		return item;
 	}
 
-	private void onClickCustomAction(final long folderId, final long[] selectedDocIds, GUIMenu menuAction) {
+	private void onClickCustomAction(long folderId, Long[] selectedDocIds, GUIMenu menuAction) {
 		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
 
 			@Override
@@ -1242,7 +1237,7 @@ public class ContextMenu extends Menu {
 		}
 	}
 
-	private void executeRoutine(long folderId, long[] docIds, GUIAutomationRoutine routine) {
+	private void executeRoutine(long folderId, Long[] docIds, GUIAutomationRoutine routine) {
 		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
 
 			@Override
