@@ -483,10 +483,10 @@ public class DocumentManagerImpl implements DocumentManager {
 			throws PersistenceException, ParseException {
 		Document doc = getExistingDocument(docId);
 
-		log.debug("Reindexing document {} - {}", docId, doc.getFileName());
-
-		String cont;
+		log.debug("Reindexing document {} - {}", doc.getId(), doc.getFileName());
+		
 		long parsingTime;
+		String cont;
 		try {
 			cont = content;
 			parsingTime = 0;
@@ -517,8 +517,6 @@ public class DocumentManagerImpl implements DocumentManager {
 				// time.
 				Date beforeParsing = new Date();
 				cont = parseDocument(doc, null);
-				if (transaction != null)
-					transaction.setComment(StringUtils.abbreviate(cont, 100));
 				parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
 			}
 
@@ -534,6 +532,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.INDEXED.toString());
+			transaction.setComment(StringUtils.abbreviate(cont, 100));
 			transaction.setDocument(doc);
 		}
 
@@ -545,7 +544,6 @@ public class DocumentManagerImpl implements DocumentManager {
 		markAliasesToIndex(docId);
 
 		return parsingTime;
-
 	}
 
 	private void recordIndexingError(DocumentHistory transaction, Document document, Exception exception)

@@ -16,6 +16,8 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class DocumentHistoryDS extends DataSource {
 
+	private static final String MAX = "&max=";
+
 	private static Integer getDefaultMaxHistories() {
 		try {
 			return Session.get().getConfigAsInt("gui.maxhistories");
@@ -25,13 +27,13 @@ public class DocumentHistoryDS extends DataSource {
 	}
 
 	public DocumentHistoryDS(long docId, Integer max) {
-		init("data/documenthistory.xml?docId=" + docId + "&locale=" + I18N.getLocale() + "&max="
+		init("data/documenthistory.xml?docId=" + docId + "&locale=" + I18N.getLocale() + MAX
 				+ (max != null ? max : getDefaultMaxHistories()));
 	}
 
 	public DocumentHistoryDS(Long tenantId, String event, Integer max) {
 		init("data/documenthistory.xml?event=" + event + (tenantId != null ? "&tenantId=" + tenantId : "") + "&locale="
-				+ I18N.getLocale() + "&max=" + (max != null ? max : getDefaultMaxHistories()));
+				+ I18N.getLocale() + MAX + (max != null ? max : getDefaultMaxHistories()));
 	}
 
 	public DocumentHistoryDS(Long userId, Long docId, String events, Integer max) {
@@ -42,7 +44,7 @@ public class DocumentHistoryDS extends DataSource {
 			url += "&event=" + events;
 		if (docId != null)
 			url += "&docId=" + docId;
-		init(url + "&max=" + (max != null ? max : getDefaultMaxHistories()));
+		init(url + MAX + (max != null ? max : getDefaultMaxHistories()));
 	}
 
 	public DocumentHistoryDS(String url) {

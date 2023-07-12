@@ -296,7 +296,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		ListGridRecord[] selection = list.getSelectedRecords();
 		Long[] docIds = new Long[selection.length];
 		for (int i = 0; i < selection.length; i++)
-			docIds[i] = selection[i].getAttributeAsLong("docId");
+			docIds[i] = selection[i].getAttributeAsLong(DOC_ID);
 		return docIds;
 	}
 }
