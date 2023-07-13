@@ -137,7 +137,7 @@ public class IconSelector {
 	}
 
 	private static boolean isEmail(String ext) {
-		return ext.equals("eml") || ext.equals("msg") || ext.equals("mail");
+		return ext.equals("eml") || ext.equals("msg") || ext.equals("mail") || ext.equals("pst");
 	}
 
 	private static boolean isHtml(String ext) {

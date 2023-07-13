@@ -849,14 +849,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		// we do not count the aliases
 		long sizeDocs = queryForLong("SELECT SUM(ld_filesize) from ld_document where ld_docref is null "
 				+ (computeDeleted ? "" : " and ld_deleted=0 ") + (userId != null ? " and ld_publisherid=" + userId : "")
-				+ (tenantId != Tenant.SYSTEM_ID ? AND_LD_TENANTID + tenantId : ""));
+				+ (tenantId !=null ? AND_LD_TENANTID + tenantId : ""));
 
 		long sizeVersions = 0;
 
 		sizeVersions = queryForLong("select SUM(V.ld_filesize) from ld_version V where V.ld_version = V.ld_fileversion"
 				+ (computeDeleted ? "" : " and V.ld_deleted=0 ")
 				+ (userId != null ? " and V.ld_publisherid=" + userId : "")
-				+ (tenantId != Tenant.SYSTEM_ID ? " and V.ld_tenantid=" + tenantId : "")
+				+ (tenantId !=null ? " and V.ld_tenantid=" + tenantId : "")
 				+ "   and not exists (select D.ld_id from ld_document D"
 				+ "                   where D.ld_id=V.ld_documentid "
 				+ "                     and D.ld_fileversion=V.ld_fileversion)");

@@ -48,6 +48,5 @@ public class P7MConverter extends AbstractFormatConverter {
 		} finally {
 			FileUtil.strongDelete(tmp);
 		}
-
 	}
 }

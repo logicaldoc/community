@@ -25,8 +25,11 @@ public class HTMLParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
+		File tempFile = null;
 		try {
-			org.jsoup.nodes.Document doc = Jsoup.parse(FileUtil.readFile(new File("test.html")));
+			tempFile = FileUtil.createTempFile("html", ".html");
+			FileUtil.writeFile(input, tempFile.getAbsolutePath());
+			org.jsoup.nodes.Document doc = Jsoup.parse(tempFile);
 			String title = doc.title();
 			String body = doc.body().text();
 			content.append(title + "\n" + body);
@@ -35,6 +38,8 @@ public class HTMLParser extends AbstractParser {
 				log.debug("Failed to extract HTML text content", e);
 			else
 				log.warn("Failed to extract HTML text content");
+		} finally {
+			FileUtil.strongDelete(tempFile);
 		}
 	}
 }

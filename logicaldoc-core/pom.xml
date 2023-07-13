@@ -554,6 +554,10 @@
 			<artifactId>utils-mail-smime</artifactId>
 			<version>1.0.8</version>
 		</dependency>
+		<dependency>
+			<groupId>com.pff</groupId>
+			<artifactId>java-libpst</artifactId>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>
@@ -641,7 +645,8 @@
 									<exclude name="*msgparser*" />
 									<exclude name="commons-math*" />
 									<exclude name="xz-*" />
-									<exclude name="*smime*" />			
+									<exclude name="*smime*" />
+									<exclude name="java-libpst*" />			
 								</delete>
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="opencv-*-android-*" />

@@ -498,6 +498,11 @@
 		<parameter id="out" value="jpg,png,tif"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.GhostscriptConverter"/>
   </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="pstConv">
+		<parameter id="in" value="pst"/>
+		<parameter id="out" value="txt,pdf"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.PstConverter"/>
+  </extension>  
 
 
   <extension plugin-id="logicaldoc-core" point-id="DocumentListener" id="documentInitializationListener">
