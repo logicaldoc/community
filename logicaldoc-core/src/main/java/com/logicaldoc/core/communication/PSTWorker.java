@@ -174,32 +174,36 @@ public class PSTWorker {
 		if (folder.getContentCount() > 0) {
 			PSTMessage email = (PSTMessage) folder.getNextChild();
 			while (email != null) {
-				buffer.append("\n");
-				buffer.append(df.format(email.getCreationTime()));
-				buffer.append(": ");
-				buffer.append(email.getSubject());
-				buffer.append("\n");
-				if (email.getNumberOfRecipients() > 0) {
-					buffer.append(email.getRecipientsString());
-					buffer.append("\n");
-				}
-				if (StringUtils.isNotEmpty(email.getBody())) {
-					buffer.append(email.getBody());
-				} else if (StringUtils.isNotEmpty(email.getBodyHTML())) {
-					String html = email.getBodyHTML();
-					try {
-						org.jsoup.nodes.Document doc = Jsoup.parse(html);
-						buffer.append(doc.body().text());
-					} catch (Exception e) {
-						if (log.isDebugEnabled())
-							log.debug("Failed to extract HTML text content", e);
-						else
-							log.warn("Failed to extract HTML text content");
-					}
-				}
-				buffer.append("\n");
+				printEmail(email);
 				email = (PSTMessage) folder.getNextChild();
 			}
 		}
+	}
+
+	private void printEmail(PSTMessage email) throws PSTException, IOException {
+		buffer.append("\n");
+		buffer.append(df.format(email.getCreationTime()));
+		buffer.append(": ");
+		buffer.append(email.getSubject());
+		buffer.append("\n");
+		if (email.getNumberOfRecipients() > 0) {
+			buffer.append(email.getRecipientsString());
+			buffer.append("\n");
+		}
+		if (StringUtils.isNotEmpty(email.getBody())) {
+			buffer.append(email.getBody());
+		} else if (StringUtils.isNotEmpty(email.getBodyHTML())) {
+			String html = email.getBodyHTML();
+			try {
+				org.jsoup.nodes.Document doc = Jsoup.parse(html);
+				buffer.append(doc.body().text());
+			} catch (Exception e) {
+				if (log.isDebugEnabled())
+					log.debug("Failed to extract HTML text content", e);
+				else
+					log.warn("Failed to extract HTML text content");
+			}
+		}
+		buffer.append("\n");
 	}
 }
