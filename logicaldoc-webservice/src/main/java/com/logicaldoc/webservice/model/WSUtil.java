@@ -1,6 +1,8 @@
 package com.logicaldoc.webservice.model;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -287,6 +289,19 @@ public class WSUtil {
 			document.setStartPublishing(convertStringToDate(wsDocument.getStartPublishing()));
 		if (StringUtils.isNotEmpty(wsDocument.getStopPublishing()))
 			document.setStopPublishing(convertStringToDate(wsDocument.getStopPublishing()));
+	}
+
+	public static String convertDateToString(Date date) {
+		if (date == null)
+			return null;
+
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+		try {
+			return df.format(date);
+		} catch (Exception e) {
+			df = new SimpleDateFormat("yyyy-MM-dd");
+			return df.format(date);
+		}
 	}
 
 	public static Date convertStringToDate(String date) {
