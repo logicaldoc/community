@@ -25,11 +25,15 @@ public class ImportFolderDetailsPanel extends VLayout {
 
 	private Layout advancedTabPanel;
 
+	private Layout automationTabPanel;
+	
 	private Layout historyTabPanel;
 
 	private ImportFolderStandardProperties standardPanel;
 
 	private ImportFolderAdvancedProperties advancedPanel;
+
+	private ImportFolderAutomationPanel automationPanel;
 
 	private ImportFolderHistoryPanel historyPanel;
 
@@ -80,6 +84,13 @@ public class ImportFolderDetailsPanel extends VLayout {
 		advancedTabPanel.setHeight100();
 		extendedPropertiesTab.setPane(advancedTabPanel);
 		tabSet.addTab(extendedPropertiesTab);
+		
+		Tab automationTab = new Tab(I18N.message("automation"));
+		automationTabPanel = new HLayout();
+		automationTabPanel.setWidth100();
+		automationTabPanel.setHeight100();
+		automationTab.setPane(automationTabPanel);
+		tabSet.addTab(automationTab);
 
 		Tab historyTab = new Tab(I18N.message("history"));
 		historyTabPanel = new HLayout();
@@ -118,6 +129,17 @@ public class ImportFolderDetailsPanel extends VLayout {
 		}
 		advancedPanel = new ImportFolderAdvancedProperties(importFolder, changeHandler);
 		advancedTabPanel.addMember(advancedPanel);
+
+		/*
+		 * Prepare the automation tab
+		 */
+		if (automationPanel != null) {
+			automationPanel.destroy();
+			if (Boolean.TRUE.equals(automationTabPanel.contains(automationPanel)))
+				automationTabPanel.removeMember(automationPanel);
+		}
+		automationPanel = new ImportFolderAutomationPanel(importFolder, changeHandler);
+		automationTabPanel.addMember(automationPanel);
 
 		/*
 		 * Prepare the history tab
@@ -160,6 +182,13 @@ public class ImportFolderDetailsPanel extends VLayout {
 		} catch (Exception t) {
 			// Nothing to do
 		}
+		
+		boolean automationValid = true;
+		try {
+			automationValid = automationPanel.validate();
+		} catch (Exception t) {
+			// Nothing to do
+		}
 
 		try {
 			histValid = historyPanel.validate();
@@ -171,9 +200,11 @@ public class ImportFolderDetailsPanel extends VLayout {
 			tabSet.selectTab(0);
 		else if (!extValid)
 			tabSet.selectTab(1);
+		else if (!automationValid)
+			tabSet.selectTab(3);
 		else if (!histValid)
-			tabSet.selectTab(2);
-		return stdValid && extValid && histValid;
+			tabSet.selectTab(3);
+		return stdValid && extValid && automationValid && histValid;
 	}
 
 	public void onSave() {

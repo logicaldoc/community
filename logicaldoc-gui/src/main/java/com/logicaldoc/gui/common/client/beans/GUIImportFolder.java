@@ -76,12 +76,16 @@ public class GUIImportFolder implements Serializable {
 	private boolean preventDuplications = false;
 
 	private boolean recordHistory = false;
-	
+
 	private Integer port = null;
 
 	private String host;
 
 	private Long batch = 10000L;
+
+	private String automation;
+
+	private String automationAfter;
 
 	public GUIImportFolder() {
 		super();
@@ -339,5 +343,21 @@ public class GUIImportFolder implements Serializable {
 
 	public void setRecordHistory(boolean recordHistory) {
 		this.recordHistory = recordHistory;
+	}
+
+	public String getAutomation() {
+		return automation;
+	}
+
+	public void setAutomation(String automation) {
+		this.automation = automation;
+	}
+
+	public String getAutomationAfter() {
+		return automationAfter;
+	}
+
+	public void setAutomationAfter(String automationAfter) {
+		this.automationAfter = automationAfter;
 	}
 }
