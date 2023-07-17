@@ -64,7 +64,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 	private boolean rememberHistory(WebsocketMessage event) {
 		Queue<Long> fifo = fifos.get(event.getEvent());
 		if (fifo == null) {
-			fifo = new LimitedQueue<Long>(1000);
+			fifo = new LimitedQueue<>(1000);
 			fifos.put(event.getEvent(), fifo);
 		}
 

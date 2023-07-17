@@ -97,8 +97,8 @@ public class TypeManager {
 	 * Creates the base types.
 	 */
 	private void setup() {
-		types = new HashMap<String, TypeDefinitionContainerImpl>();
-		typesList = new ArrayList<TypeDefinitionContainer>();
+		types = new HashMap<>();
+		typesList = new ArrayList<>();
 
 		// folder type
 		FolderTypeDefinitionImpl folderType = new FolderTypeDefinitionImpl();
@@ -474,7 +474,7 @@ public class TypeManager {
 			TypeDefinitionContainerImpl tdc = types.get(type.getParentTypeId());
 			if (tdc != null) {
 				if (tdc.getChildren() == null) {
-					tdc.setChildren(new ArrayList<TypeDefinitionContainer>());
+					tdc.setChildren(new ArrayList<>());
 				}
 				tdc.getChildren().add(tc);
 			}
@@ -500,7 +500,7 @@ public class TypeManager {
 	public TypeDefinitionList getTypesChildren(CallContext context, String typeId, boolean includePropertyDefinitions,
 			BigInteger maxItems, BigInteger skipCount) {
 		TypeDefinitionContainer tc = types.get(typeId);
-		TypeDefinitionListImpl result = new TypeDefinitionListImpl(new ArrayList<TypeDefinition>());
+		TypeDefinitionListImpl result = new TypeDefinitionListImpl(new ArrayList<>());
 		if (typeId == null) {
 			result.getList().add(copyTypeDefintion(types.get(FOLDER_TYPE_ID).getTypeDefinition()));
 			result.getList().add(copyTypeDefintion(types.get(DOCUMENT_TYPE_ID).getTypeDefinition()));
@@ -512,7 +512,7 @@ public class TypeManager {
 					.map(c -> copyTypeDefintion(c.getTypeDefinition())).collect(Collectors.toList()));
 		}
 
-		result.setHasMoreItems(tc != null ? result.getList().size() < tc.getChildren().size() : false);
+		result.setHasMoreItems(tc != null && result.getList().size() < tc.getChildren().size());
 		result.setNumItems(BigInteger.valueOf(tc != null ? tc.getChildren().size() : result.getList().size()));
 
 		if (!includePropertyDefinitions) {
@@ -546,7 +546,7 @@ public class TypeManager {
 		}
 
 		// set property definition flag to default value if not set
-		boolean ipd = (includePropertyDefinitions == null ? false : includePropertyDefinitions.booleanValue());
+		boolean ipd = (includePropertyDefinitions != null && includePropertyDefinitions.booleanValue());
 
 		if (typeId == null) {
 			result.add(getTypesDescendants(d, types.get(FOLDER_TYPE_ID), ipd));
@@ -583,7 +583,7 @@ public class TypeManager {
 		result.setTypeDefinition(type);
 
 		if (depth != 0 && tc.getChildren() != null) {
-			result.setChildren(new ArrayList<TypeDefinitionContainer>());
+			result.setChildren(new ArrayList<>());
 			for (TypeDefinitionContainer tdc : tc.getChildren()) {
 				result.getChildren()
 						.add(getTypesDescendants(depth < 0 ? -1 : depth - 1, tdc, includePropertyDefinitions));

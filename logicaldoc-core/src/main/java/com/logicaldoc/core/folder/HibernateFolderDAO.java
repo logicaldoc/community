@@ -649,7 +649,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(query.toString(), Long.class);
-		List<Folder> folders = new ArrayList<Folder>();
+		List<Folder> folders = new ArrayList<>();
 		for (Long id : ids)
 			folders.add(findById(id));
 		return folders;

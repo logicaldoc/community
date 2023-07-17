@@ -92,6 +92,7 @@ public abstract class PersistentObject implements Serializable {
 		this.recordVersion = recordVersion;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof PersistentObject))
 			return false;
@@ -99,8 +100,8 @@ public abstract class PersistentObject implements Serializable {
 		return other.getId() == this.getId();
 	}
 
+	@Override
 	public int hashCode() {
 		return Long.valueOf(getId()).hashCode();
 	}
-
 }

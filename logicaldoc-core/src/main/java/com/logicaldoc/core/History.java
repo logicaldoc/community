@@ -97,7 +97,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	// collector
 	private boolean notifyEvent = true;
 
-	public static String ASPECT = "saveHistory";
+	public static final String ASPECT = "saveHistory";
 
 	private String ip;
 
@@ -290,8 +290,8 @@ public abstract class History extends PersistentObject implements Comparable<His
 		return isNew;
 	}
 
-	public void setIsNew(int _new) {
-		this.isNew = _new;
+	public void setIsNew(int nnew) {
+		this.isNew = nnew;
 	}
 
 	public String getFilename() {
@@ -425,13 +425,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public void setColor(String color) {
 		this.color = color;
 	}
-	
-	@Override
-	public int compareTo(History other) {
-		return getDate().compareTo(other.getDate());
-	}
-	
-	
+
 	protected void copyAttributesFrom(History source) {
 		setTenantId(source.getTenantId());
 		setDate(source.getDate());
@@ -465,6 +459,24 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	@Override
 	public String toString() {
-		return getId() +" - " + event;
+		return getId() + " - " + event;
+	}
+
+	@Override
+	public int compareTo(History other) {
+		return getDate().compareTo(other.getDate());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof History))
+			return false;
+		History other = (History) obj;
+		return other.getId() == this.getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.valueOf(getId()).hashCode();
 	}
 }

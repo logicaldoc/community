@@ -304,7 +304,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			if (!isCollection() && !resource.isFolder()) {
 				val = "RDNVW";
 			}
-			DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>("permissions", val,
+			DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<>("permissions", val,
 					nameSpace);
 			properties.add(defaultDavProperty);
 		}
@@ -312,7 +312,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	private void addSizeProperty(DavPropertyName name, Namespace nameSpace) {
 		if (name.getName().equals("size") && !isCollection() && !resource.isFolder()) {
-			DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<Long>("size",
+			DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<>("size",
 					resource.getContentLength(), nameSpace);
 			properties.add(defaultDavProperty);
 		}
@@ -324,7 +324,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			val = "d-" + resource.getID();
 		}
 
-		DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", val, nameSpace);
+		DefaultDavProperty<String> idProp = new DefaultDavProperty<>("id", val, nameSpace);
 		properties.add(idProp);
 	}
 

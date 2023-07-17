@@ -109,7 +109,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return findIdsByWhere("", "", null);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -118,7 +118,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -217,7 +217,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List findByQuery(String query, Object[] values, Integer max) throws PersistenceException {
-		List<Object> coll = new ArrayList<Object>();
+		List<Object> coll = new ArrayList<>();
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, values, max);
@@ -231,7 +231,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
-		List<Object> coll = new ArrayList<Object>();
+		List<Object> coll = new ArrayList<>();
 		try {
 			logQuery(query);
 			Query queryObject = prepareQuery(query, parameters, max);
@@ -244,13 +244,13 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException {
-		return findIdsByWhere(where, new Object[0], order, max);
+		return findIdsByWhere(where, new HashMap<>(), order, max);
 	}
 
 	@Override
-	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max)
+	public List<Long> findIdsByWhere(String where, Map<String, Object> parameters, String order, Integer max)
 			throws PersistenceException {
-		List<Long> coll = new ArrayList<Long>();
+		List<Long> coll = new ArrayList<>();
 		try {
 			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
 					? ORDER_BY + " " + order
@@ -259,7 +259,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 					+ (StringUtils.isNotEmpty(where) ? AND + where + ") " : " ")
 					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
 			logQuery(query);
-			Query<Long> queryObject = prepareQueryForLong(query, values, max);
+			Query<Long> queryObject = prepareQueryForLong(query, parameters, max);
 			coll = queryObject.list();
 			return coll;
 		} catch (Exception e) {
@@ -408,25 +408,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	/**
-	 * Utility method useful for preparing an Hibernate query for longs
-	 * 
-	 * @param expression The expression for the query
-	 * @param values The parameters values to be used (optional, if the query is
-	 *        parametric)
-	 * @param max Optional maximum number of wanted results
-	 * 
-	 * @return The Hibernate query
-	 */
-	protected Query<Long> prepareQueryForLong(String expression, Object[] values, Integer max) {
-		if (values != null)
-			for (int i = 0; i < values.length; i++)
-				expression = expression.replace("?" + (i + 1), PARAM + (i + 1));
-		Query<Long> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Long.class);
-		applyParamsAndLimit(values, max, queryObject);
-		return queryObject;
-	}
-
-	/**
 	 * Applies the params
 	 * 
 	 * @param values the values
@@ -435,7 +416,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * 
 	 * @deprecated
 	 */
-	@Deprecated(since = "8.9")
+	@Deprecated(since = "8.8")
 	private void applyParamsAndLimit(Object[] values, Integer max, @SuppressWarnings("rawtypes")
 	Query queryObject) {
 		if (values != null && values.length > 0)
@@ -458,6 +439,23 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 */
 	protected Query<Object[]> prepareQuery(String expression, Map<String, Object> values, Integer max) {
 		Query<Object[]> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Object[].class);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	/**
+	 * Utility method useful for preparing an Hibernate query for returning a
+	 * long
+	 * 
+	 * @param expression The expression for the query
+	 * @param values The parameters values to be used (optional, if the query is
+	 *        parametric)
+	 * @param max Optional maximum number of wanted results
+	 * 
+	 * @return The Hibernate query
+	 */
+	protected Query<Long> prepareQueryForLong(String expression, Map<String, Object> values, Integer max) {
+		Query<Long> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Long.class);
 		applyParamsAndLimit(values, max, queryObject);
 		return queryObject;
 	}

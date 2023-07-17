@@ -107,7 +107,7 @@ public enum RunLevel {
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Aspect");
 
-		List<String> aspects = new ArrayList<String>();
+		List<String> aspects = new ArrayList<>();
 		for (Extension ext : exts)
 			aspects.add(ext.getParameter("code").valueAsString());
 		Collections.sort(aspects);

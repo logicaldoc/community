@@ -114,7 +114,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @deprecated
 	 */
-	@Deprecated(since = "8.9")
+	@Deprecated(since = "8.8")
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException;
 
 	/**
@@ -145,6 +145,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
+	@Deprecated(since = "8.8")
 	public List<T> findByObjectQuery(String query, Object[] values, Integer max) throws PersistenceException;
 
 	/**
@@ -175,7 +176,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @deprecated
 	 */
-	@Deprecated(since = "8.9")
+	@Deprecated(since = "8.8")
 	public List<Object> findByQuery(String query, Object[] values, Integer max) throws PersistenceException;
 
 	/**
@@ -213,6 +214,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param where The where clause expression (for positional parameters,
 	 *        please use JPA-style: ?1, ?2 ...)
 	 * @param values Parameters used in the where expression
+	 * @param parameters The map of the parameters
 	 * @param order The order clause expression
 	 * @param max Maximum results number (optional)
 	 * 
@@ -220,7 +222,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max)
+	public List<Long> findIdsByWhere(String where, Map<String, Object> parameters, String order, Integer max)
 			throws PersistenceException;
 
 	/**

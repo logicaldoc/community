@@ -989,8 +989,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
 		setColor(docVO.getColor());
 
-		setAttributes(new HashMap<String, Attribute>());
-		setTags(new HashSet<Tag>());
+		setAttributes(new HashMap<>());
+		setTags(new HashSet<>());
 
 		try {
 			for (Entry<String, Attribute> entry : docVO.getAttributes().entrySet())

@@ -29,7 +29,7 @@ public class CollectionTool {
 	 */
 	public List<Object> toList(Object[] array) {
 		if (array == null)
-			return new ArrayList<Object>();
+			return new ArrayList<>();
 		else
 			return Arrays.asList(array);
 	}
