@@ -251,7 +251,7 @@ public class FulltextSearch extends Search {
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
-			dao.query(richQuery.toString(), null, new HitMapper(hitsMap), null);
+			dao.query(richQuery.toString(), new HitMapper(hitsMap), null);
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
 		}

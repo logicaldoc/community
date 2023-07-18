@@ -156,7 +156,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			// Manually initialize the collegtion of templateGroups
 			template.getTemplateGroups().clear();
 			SqlRowSet groupSet = queryForRowSet(
-					"select ld_groupid,ld_write from ld_templategroup where ld_templateid=" + template.getId(), null,
+					"select ld_groupid,ld_write from ld_templategroup where ld_templateid=" + template.getId(), 
 					null);
 			while (groupSet.next()) {
 				TemplateGroup tg = new TemplateGroup(groupSet.getLong(1));

@@ -284,7 +284,7 @@ public class DashletContent extends HttpServlet {
 		qry.append(")");
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		dao.query(qry.toString(), null, new EntendedAttributesRowMapper(locale, extValues), null);
+		dao.query(qry.toString(), new EntendedAttributesRowMapper(locale, extValues), null);
 	}
 
 	private List<DocumentHistory> filterUniqueDocumentEvents(Dashlet dashlet, List<DocumentHistory> records) {
@@ -386,7 +386,7 @@ public class DashletContent extends HttpServlet {
 				qry.append(") and ld_name in ");
 				qry.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','").replace(" ", ""));
 
-				dao.query(qry.toString(), null, new EntendedAttributesRowMapper(locale, extValues), null);
+				dao.query(qry.toString(), new EntendedAttributesRowMapper(locale, extValues), null);
 			}
 
 			writer.write(LIST_TAG);

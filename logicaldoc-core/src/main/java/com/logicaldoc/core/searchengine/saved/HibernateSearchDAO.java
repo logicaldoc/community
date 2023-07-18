@@ -87,7 +87,7 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 		// Execute the query to populate the sets
 		try {
-			SqlRowSet rs = queryForRowSet(query.toString(), null, null);
+			SqlRowSet rs = queryForRowSet(query.toString(), null);
 			if (rs != null)
 				while (rs.next()) {
 					String file = rs.getString(1);

@@ -38,7 +38,7 @@ public class TagSearch extends Search {
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
-			hits.addAll(dao.query(options.getExpression(), null, new HitMapper(), options.getMaxHits()));
+			hits.addAll(dao.query(options.getExpression(), new HitMapper(), options.getMaxHits()));
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
 		}

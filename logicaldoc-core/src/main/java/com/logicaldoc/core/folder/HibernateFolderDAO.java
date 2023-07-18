@@ -1270,15 +1270,23 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		/*
 		 * Apply the securityRef
 		 */
-		records = jdbcUpdate("update ld_folder set ld_securityref = ?, ld_lastmodified = ? where not ld_id = ? "
-				+ " and ld_id in " + treeIdsString, securityRef, new Date(), rootId);
+		Map<String, Object> params = new HashMap<>();
+		params.put("securityRef", securityRef);
+		params.put("lastModified", new Date());
+		params.put("rootId", rootId);
+
+		records = jdbcUpdate(
+				"update ld_folder set ld_securityref = :securityRef, ld_lastmodified = :lastModified where not ld_id = :rootId "
+						+ " and ld_id in " + treeIdsString,
+				params);
 
 		log.warn("Applied rights to {} folders in tree {}", records, rootId);
 
 		/*
 		 * Delete all the specific rights associated to the folders in the tree
 		 */
-		jdbcUpdate("delete from ld_foldergroup where not ld_folderid = ? and ld_folderid in " + treeIdsString, rootId);
+		jdbcUpdate("delete from ld_foldergroup where not ld_folderid = :rootId and ld_folderid in " + treeIdsString,
+				params);
 		log.warn("Removed {} specific rights in tree {}", records, rootId);
 
 		if (getSessionFactory().getCache() != null) {
@@ -1452,9 +1460,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String name = st.nextToken();
 
+			Map<String, Object> params = new HashMap<>();
+			params.put("folderId", folder.getId());
+			params.put("name", name);
+			params.put("tenantId", folder.getTenantId());
+
 			long child = queryForLong(
-					"SELECT ld_id FROM ld_folder WHERE ld_deleted=0 AND ld_parentid=? AND ld_name=? AND ld_tenantid=?",
-					folder.getId(), name, folder.getTenantId());
+					"SELECT ld_id FROM ld_folder WHERE ld_deleted=0 AND ld_parentid = :folderId AND ld_name = :name AND ld_tenantid = :tenantId",
+					params);
 
 			if (child == 0L) {
 				Folder folderVO = new Folder();
@@ -1954,7 +1967,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				}
 			};
 
-			results = query(query, null, mapper, maxHits);
+			results = query(query, mapper, maxHits);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}

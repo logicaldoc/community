@@ -54,7 +54,7 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 		SqlRowSet set = dao.queryForRowSet(
 				"select ld_id, ld_username, ld_firstname, ld_name from ld_user where ld_deleted=0 and ld_tenantid="
 						+ tenantId,
-				null, null);
+				null);
 		Map<Long, String> users = new HashMap<>();
 		while (set.next())
 			users.put(set.getLong(1), set.getString(4) + " " + set.getString(3) + " (" + set.getString(2) + ")");
@@ -80,7 +80,7 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 		query.append(" and B.ld_tenantid = " + template.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_name asc");
 
-		SqlRowSet set = tDao.queryForRowSet(query.toString(), null, null);
+		SqlRowSet set = tDao.queryForRowSet(query.toString(), null);
 
 		/*
 		 * Iterate over records composing the response XML document

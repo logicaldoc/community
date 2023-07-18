@@ -366,9 +366,13 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			if (setAttribute == null)
 				return;
 
+			Map<String, Object> params = new HashMap<>();
+			params.put("validation", setAttribute.getValidation());
+			params.put("name", attribute);
+			params.put("setId", setId);
 			int count = dao.jdbcUpdate(
-					"update ld_template_ext set ld_validation = ? where ld_setid=" + setId + " and ld_name = ?",
-					setAttribute.getValidation(), attribute);
+					"update ld_template_ext set ld_validation = :validation where ld_setid = :setId and ld_name = :name",
+					params);
 			log.info("Updated the validation of {} template attributes named {}", count, attribute);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
@@ -386,9 +390,13 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			if (setAttribute == null)
 				return;
 
+			Map<String, Object> params = new HashMap<>();
+			params.put("initialization", setAttribute.getInitialization());
+			params.put("name", attribute);
+			params.put("setId", setId);
 			int count = dao.jdbcUpdate(
-					"update ld_template_ext set ld_initialization = ? where ld_setid=" + setId + " and ld_name = ?",
-					setAttribute.getInitialization(), attribute);
+					"update ld_template_ext set ld_initialization = :initialization where ld_setid = :setId and ld_name = :name",
+					params);
 			log.info("Updated the initialization of {} template attributes named {}", count, attribute);
 		} catch (Exception t) {
 			throwServerException(session, log, t);

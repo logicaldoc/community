@@ -2821,7 +2821,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 			@SuppressWarnings("unchecked")
-			List<Document> duplications = (List<Document>) docDao.query(duplicationsQuery.toString(), null,
+			List<Document> duplications = (List<Document>) docDao.query(duplicationsQuery.toString(), 
 					new RowMapper<Document>() {
 						public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
 							Document doc = new Document();

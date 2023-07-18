@@ -74,7 +74,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 		sql = sql + " order by ld_sentdate desc";
 
 		try {
-			return query(sql, null, new SystemMessageMapper(), null);
+			return query(sql, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -150,7 +150,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				+ SqlUtil.doubleQuotes(mode) + "') order by ld_sentdate desc";
 
 		try {
-			return query(sql, null, new SystemMessageMapper(), null);
+			return query(sql, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -164,7 +164,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				+ type + ") order by ld_sentdate desc";
 
 		try {
-			return query(sql, null, new SystemMessageMapper(), null);
+			return query(sql, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -190,7 +190,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 		sql = sql + " order by ld_sentdate desc";
 
 		try {
-			return query(sql, null, new SystemMessageMapper(), null);
+			return query(sql, new SystemMessageMapper(), null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();

@@ -239,17 +239,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(" and ld_status=" + status);
 
 		try {
-			return query(sb.toString(), null, (resultSet, col) ->  {
-					Document doc = new Document();
-					doc.setId(resultSet.getLong(1));
-					Folder folder = new Folder();
-					folder.setId(resultSet.getLong(2));
-					doc.setFolder(folder);
-					doc.setVersion(resultSet.getString(3));
-					doc.setFileVersion(resultSet.getString(4));
-					doc.setLastModified(resultSet.getTimestamp(5));
-					doc.setFileName(resultSet.getString(6));
-					return doc;
+			return query(sb.toString(), (resultSet, col) -> {
+				Document doc = new Document();
+				doc.setId(resultSet.getLong(1));
+				Folder folder = new Folder();
+				folder.setId(resultSet.getLong(2));
+				doc.setFolder(folder);
+				doc.setVersion(resultSet.getString(3));
+				doc.setFileVersion(resultSet.getString(4));
+				doc.setLastModified(resultSet.getTimestamp(5));
+				doc.setFileName(resultSet.getString(6));
+				return doc;
 			}, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -525,7 +525,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		// Execute the query to populate the sets
 		try {
-			SqlRowSet rs = queryForRowSet(query.toString(), null, null);
+			SqlRowSet rs = queryForRowSet(query.toString(), null);
 			if (rs != null)
 				while (rs.next()) {
 					String file = rs.getString(1);
@@ -556,8 +556,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			evict(doc);
 
 			// Update the versions also
-			jdbcUpdate("update ld_version set ld_digest=?  where ld_documentid=? and ld_fileversion=?", doc.getDigest(),
-					doc.getId(), doc.getFileVersion());
+			Map<String, Object> params = new HashMap<>();
+			params.put("fileVersion", doc.getFileVersion());
+			params.put("digest", doc.getDigest());
+			params.put("docId", doc.getId());
+			jdbcUpdate(
+					"update ld_version set ld_digest = :digest  where ld_documentid = :docId and ld_fileversion = :fileVersion",
+					params);
 		}
 	}
 
@@ -603,7 +608,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (tenantId != null)
 			query.append(AND_LD_TENANTID + tenantId);
 
-		query(query.toString(), null, new RowMapper<Object>() {
+		query(query.toString(), new RowMapper<Object>() {
 
 			@Override
 			public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
@@ -626,12 +631,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(AND_LD_TENANTID + tenantId);
 		}
 
-		List<Object> parameters = new ArrayList<>();
+		Map<String, Object> params = new HashMap<String, Object>();
 		if (firstLetter != null) {
-			sb.append(" and lower(ld_tag) like ? ");
-			parameters.add(firstLetter.toLowerCase() + "%");
+			sb.append(" and lower(ld_tag) like :tagLike ");
+			params.put("tagLike", firstLetter.toLowerCase() + "%");
 		}
-		return queryForList(sb.toString(), parameters.toArray(new Object[0]), String.class, null);
+
+		return queryForList(sb.toString(), params, String.class, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -769,14 +775,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		StringBuilder query = new StringBuilder("");
 		if (direction == null)
 			query.append(
-					"select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1=?) UNION select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
+					"select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1 = :docId) UNION select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2 = :docId)");
 		else if (direction.intValue() == 1)
-			query.append("select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1=?)");
+			query.append("select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1 = :docId)");
 		else if (direction.intValue() == 2)
-			query.append("select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
+			query.append("select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2 = :docId)");
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("docId", docId);
+
 		@SuppressWarnings("unchecked")
-		List<Long> ids = queryForList(query.toString(),
-				linkType != null ? new Object[] { docId } : new Object[] { docId, docId }, Long.class, null);
+		List<Long> ids = queryForList(query.toString(), params, Long.class, null);
 		List<Document> coll = findByWhere(
 				ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
 						+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED,
@@ -841,7 +850,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			}
 		};
 
-		return query(query, new Object[] {}, docMapper, null);
+		return query(query, docMapper, null);
 	}
 
 	@Override
@@ -849,14 +858,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		// we do not count the aliases
 		long sizeDocs = queryForLong("SELECT SUM(ld_filesize) from ld_document where ld_docref is null "
 				+ (computeDeleted ? "" : " and ld_deleted=0 ") + (userId != null ? " and ld_publisherid=" + userId : "")
-				+ (tenantId !=null ? AND_LD_TENANTID + tenantId : ""));
+				+ (tenantId != null ? AND_LD_TENANTID + tenantId : ""));
 
 		long sizeVersions = 0;
 
 		sizeVersions = queryForLong("select SUM(V.ld_filesize) from ld_version V where V.ld_version = V.ld_fileversion"
 				+ (computeDeleted ? "" : " and V.ld_deleted=0 ")
 				+ (userId != null ? " and V.ld_publisherid=" + userId : "")
-				+ (tenantId !=null ? " and V.ld_tenantid=" + tenantId : "")
+				+ (tenantId != null ? " and V.ld_tenantid=" + tenantId : "")
 				+ "   and not exists (select D.ld_id from ld_document D"
 				+ "                   where D.ld_id=V.ld_documentid "
 				+ "                     and D.ld_fileversion=V.ld_fileversion)");
@@ -1028,7 +1037,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			}
 		};
 
-		return query(query, null, docMapper, maxHits);
+		return query(query, docMapper, maxHits);
 	}
 
 	public void setConfig(ContextProperties config) {
@@ -1083,13 +1092,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(" ) ");
 		}
 		query.append(" and ld_published = 1 ");
-		query.append(" and ld_startpublishing <= ? ");
-		query.append(" and ( ld_stoppublishing is null or ld_stoppublishing > ? )");
+		query.append(" and ld_startpublishing <= :now ");
+		query.append(" and ( ld_stoppublishing is null or ld_stoppublishing > :now )");
 
-		Date now = new Date();
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("now", new Date());
 
 		@SuppressWarnings("unchecked")
-		Collection<Long> buf = queryForList(query.toString(), new Object[] { now, now }, Long.class, null);
+		Collection<Long> buf = queryForList(query.toString(), params, Long.class, null);
 		Set<Long> ids = new HashSet<>();
 		for (Long id : buf) {
 			if (!ids.contains(id))
@@ -1205,10 +1215,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			// deleted documents
 			for (String tag : uniqueTags) {
 				try {
+					Map<String, Object> params = new HashMap<>();
+					params.put("tag", tag);
+					params.put("tenantId", tenantId);
+
 					jdbcUpdate(
-							"update ld_uniquetag set ld_count = (select count(T.ld_tag) from ld_tag T, ld_document D where T.ld_tag = ? and T.ld_tenantid = ? "
-									+ " and T.ld_docid = D.ld_id and D.ld_deleted=0 ) where ld_tag = ? and ld_tenantid = ?",
-							tag, tenantId, tag, tenantId);
+							"update ld_uniquetag set ld_count = (select count(T.ld_tag) from ld_tag T, ld_document D where T.ld_tag = :tag and T.ld_tenantid = :tenantId "
+									+ " and T.ld_docid = D.ld_id and D.ld_deleted=0 ) where ld_tag = :tag and ld_tenantid = :tenantId",
+							params);
 				} catch (PersistenceException e) {
 					log.warn(e.getMessage(), e);
 				}
@@ -1223,7 +1237,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		List<TagCloud> list = gendao.query(
 				"select ld_tag, ld_count from ld_uniquetag where ld_tenantid=" + tenantId + " order by ld_count desc",
-				null, new RowMapper<TagCloud>() {
+				new RowMapper<TagCloud>() {
 
 					@Override
 					public TagCloud mapRow(ResultSet rs, int arg1) throws SQLException {
@@ -1367,7 +1381,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
 
-		return query(digestQuery.toString(), null, (rs, rowNum) -> {
+		return query(digestQuery.toString(), (rs, rowNum) -> {
 			return rs.getString(1);
 		}, null);
 

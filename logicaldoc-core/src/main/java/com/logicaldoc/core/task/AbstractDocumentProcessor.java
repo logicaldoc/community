@@ -82,7 +82,7 @@ abstract public class AbstractDocumentProcessor extends Task {
 
 		@SuppressWarnings("unchecked")
 		List<Object[]> records = documentDao.query(
-				"select ld_id, ld_filename from ld_document where ld_id in " + idsStr, null, new RowMapper<Object[]>() {
+				"select ld_id, ld_filename from ld_document where ld_id in " + idsStr, new RowMapper<Object[]>() {
 					@Override
 					public Object[] mapRow(ResultSet rs, int row) throws SQLException {
 						Object[] rec = new Object[2];

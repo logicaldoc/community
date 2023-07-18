@@ -149,7 +149,7 @@ public class SearchTool {
 
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			try {
-				dao.query(richQuery.toString(), null, new HitMapper(hitsMap), null);
+				dao.query(richQuery.toString(), new HitMapper(hitsMap), null);
 			} catch (Exception e) {
 				log.error("Cannot enrich the hits", e);
 			}

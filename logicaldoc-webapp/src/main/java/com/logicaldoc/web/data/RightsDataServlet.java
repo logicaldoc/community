@@ -62,7 +62,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 		SqlRowSet set = dao.queryForRowSet(
 				"select ld_id, ld_username, ld_firstname, ld_name from ld_user where ld_deleted=0 and ld_tenantid="
 						+ tenantId,
-				null, null);
+				null);
 		Map<Long, String> users = new HashMap<>();
 		while (set.next())
 			users.put(set.getLong(1), set.getString(3) + " " + set.getString(4) + " (" + set.getString(2) + ")");
@@ -95,7 +95,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 		query.append(" and B.ld_tenantid = " + ref.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
 
-		SqlRowSet set = folderDao.queryForRowSet(query.toString(), null, null);
+		SqlRowSet set = folderDao.queryForRowSet(query.toString(), null);
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -174,7 +174,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + tenantId);
 		query.append(" order by B.ld_type asc, B.ld_name asc");
 
-		SqlRowSet set = menuDao.queryForRowSet(query.toString(), null, null);
+		SqlRowSet set = menuDao.queryForRowSet(query.toString(), null);
 
 		/*
 		 * Iterate over records composing the response XML document

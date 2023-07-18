@@ -1347,7 +1347,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		try {
 			@SuppressWarnings("unchecked")
-			List<GUIUser> users = userDao.query(query.toString(), null, new RowMapper<>() {
+			List<GUIUser> users = userDao.query(query.toString(), new RowMapper<>() {
 
 				@Override
 				public GUIUser mapRow(ResultSet rs, int row) throws SQLException {

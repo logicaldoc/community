@@ -172,7 +172,7 @@ public abstract class Search {
 			query.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','").replace(" ", ""));
 
 			try {
-				ddao.query(query.toString(), null, new RowMapper<Long>() {
+				ddao.query(query.toString(), new RowMapper<Long>() {
 					@Override
 					public Long mapRow(ResultSet rs, int row) throws SQLException {
 						Long docId = rs.getLong(1);

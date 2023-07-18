@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ import java.util.Set;
  */
 public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public static final int TYPE_FULLTEXT = 0;
 
@@ -31,7 +32,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 	public static final int TYPE_FOLDERS = 3;
 
 	private int page = 1;
-	
+
 	private int maxHits = 40;
 
 	private int type = TYPE_FULLTEXT;
@@ -42,7 +43,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	private String description = "";
 
-	private Serializable[] parameters = null;
+	private Map<String, Object> parameters = null;
 
 	private long userId = -1;
 
@@ -74,14 +75,6 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		this.template = template;
 	}
 
-	public Serializable[] getParameters() {
-		return parameters;
-	}
-
-	public void setParameters(Serializable[] parameters) {
-		this.parameters = parameters;
-	}
-
 	/**
 	 * Creates a new instance of SearchOptions
 	 * 
@@ -110,7 +103,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 	public static SearchOptions read(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
 		SearchOptions searchOptions = null;
 
-		// Deserialize from a file (binay format)
+		// Deserialize from a file (binary format)
 		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
 			// Deserialize the object
 			searchOptions = (SearchOptions) in.readObject();
@@ -238,5 +231,13 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	public void setPage(int page) {
 		this.page = page;
+	}
+
+	public Map<String, Object> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, Object> parameters) {
+		this.parameters = parameters;
 	}
 }

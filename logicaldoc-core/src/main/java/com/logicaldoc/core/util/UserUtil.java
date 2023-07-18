@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -160,11 +162,14 @@ public class UserUtil {
 			ImageIO.write(avatar, "png", tmpAvatarImage);
 			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));
 
-			if (user.getType() != User.TYPE_SYSTEM)
+			if (user.getType() != User.TYPE_SYSTEM) {
 				userDao.store(user);
-			else
-				userDao.jdbcUpdate("update ld_user set ld_avatar = ? where ld_username = ?", user.getAvatar(),
-						user.getUsername());
+			} else {
+				Map<String, Object> params = new HashMap<>();
+				params.put("avatar", user.getAvatar());
+				params.put("username", user.getUsername());
+				userDao.jdbcUpdate("update ld_user set ld_avatar = :avatar where ld_username = :username", params);
+			}
 		} catch (Exception t) {
 			if (user.getType() == User.TYPE_DEFAULT)
 				log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);

@@ -5,8 +5,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -96,7 +98,10 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			Folder parentFolder, User user, Long startRecord, Long endRecord) throws PersistenceException {
 		StringBuilder query = prepareQuery(session, tenantName, parentFolder, user);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		SqlRowSet rs = folderDao.queryForRowSet(query.toString(), new Long[] { parentFolder.getId(), tenantId }, null);
+		Map<String, Object> params = new HashMap<>();
+		params.put("parentId", parentFolder.getId());
+		params.put("tenantId", tenantId);
+		SqlRowSet rs = folderDao.queryForRowSet(query.toString(), params, null);
 
 		if (rs != null) {
 			long i = 0;
@@ -147,7 +152,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	private void printFoldersWithDocs(PrintWriter writer, String parent, Folder parentFolder, User user)
 			throws PersistenceException {
 		StringBuilder query = new StringBuilder(
-				"select ld_id, ld_filename, ld_filesize, ld_published, ld_startpublishing, ld_stoppublishing, ld_status, ld_color from ld_document where ld_deleted=0 and ld_folderid=? ");
+				"select ld_id, ld_filename, ld_filesize, ld_published, ld_startpublishing, ld_stoppublishing, ld_status, ld_color from ld_document where ld_deleted=0 and ld_folderid=:parentId ");
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")) {
 			query.append(" and ld_published=1");
 			query.append(" and (ld_startpublishing is null or CURRENT_TIMESTAMP > ld_startpublishing) ");
@@ -157,7 +162,9 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 		if (parentFolder != null) {
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			SqlRowSet rs = folderDao.queryForRowSet(query.toString(), new Long[] { parentFolder.getId() }, null);
+			Map<String, Object> params = new HashMap<>();
+			params.put("parentId", parentFolder.getId());
+			SqlRowSet rs = folderDao.queryForRowSet(query.toString(), params, null);
 			if (rs != null)
 				printFoldersWithDocs(writer, rs, parent);
 		}
@@ -190,7 +197,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	private StringBuilder prepareQuery(Session session, String tenantName, Folder parentFolder, User user)
 			throws PersistenceException {
 		StringBuilder query = new StringBuilder(
-				"select ld_id, ld_parentid, ld_name, ld_type, ld_foldref, ld_color, ld_position from ld_folder where ld_deleted=0 and ld_hidden=0 and not ld_id=ld_parentid and ld_parentid = ? and ld_tenantid = ? ");
+				"select ld_id, ld_parentid, ld_name, ld_type, ld_foldref, ld_color, ld_position from ld_folder where ld_deleted=0 and ld_hidden=0 and not ld_id=ld_parentid and ld_parentid = :parentId and ld_tenantid = :tenantId ");
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && parentFolder != null) {
 			addReadConditions(query, session, parentFolder);
 		}

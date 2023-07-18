@@ -709,7 +709,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	@SuppressWarnings("unchecked")
 	private List<GUIHistory> executeQuery(String query, int maxResult, Session session) throws PersistenceException {
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		return dao.query(query, null, new RowMapper<>() {
+		return dao.query(query, new RowMapper<>() {
 
 			@Override
 			public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
@@ -806,7 +806,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		query.append(" order by ld_date desc ");
 
 		try {
-			List<GUIHistory> calls = dao.query(query.toString(), null, new RowMapper<GUIHistory>() {
+			List<GUIHistory> calls = dao.query(query.toString(), new RowMapper<GUIHistory>() {
 
 				@Override
 				public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {

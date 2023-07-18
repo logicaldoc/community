@@ -44,7 +44,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 
 		DateFormat df = getDateFormat();
 
-		SqlRowSet set = dao.queryForRowSet(query.toString(), null, max != null ? max : 100);
+		SqlRowSet set = dao.queryForRowSet(query.toString(), max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document

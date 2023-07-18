@@ -1,12 +1,12 @@
 package com.logicaldoc.core.searchengine.folder;
 
-import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
@@ -61,7 +61,7 @@ public class FolderSearch extends Search {
 			throw new SearchException(e1);
 		}
 
-		Serializable[] params = null;
+		Map<String, Object> params = null;
 		try {
 			params = prepareExpression();
 		} catch (PersistenceException e1) {
@@ -77,6 +77,7 @@ public class FolderSearch extends Search {
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
 		}
+
 		estimatedHitsNumber = folders.size();
 
 		// Traverse the results checking visibility and count
@@ -102,11 +103,11 @@ public class FolderSearch extends Search {
 	 * 
 	 * PersistenceException error at data layer
 	 */
-	private Serializable[] prepareExpression() throws PersistenceException {
+	private Map<String, Object> prepareExpression() throws PersistenceException {
 		if (StringUtils.isNotEmpty(options.getExpression()))
 			return options.getParameters();
 
-		ArrayList<Serializable> params = new ArrayList<>();
+		Map<String, Object> params = new HashMap<>();
 
 		StringBuilder query = new StringBuilder();
 
@@ -136,7 +137,7 @@ public class FolderSearch extends Search {
 		log.info("executing query {}", query);
 		log.info("with parameters {}", params);
 
-		return params.toArray(new Serializable[0]);
+		return params;
 	}
 
 	/**
@@ -145,12 +146,12 @@ public class FolderSearch extends Search {
 	 * 
 	 * @param searchAliases If true, also the aliases must be considered in the
 	 *        search
-	 * @param params
-	 * @param query
+	 * @param params the query parameters map
+	 * @param query the query
 	 * 
-	 *        PersistenceException error at data layer
+	 * @throws PersistenceException error at data layer
 	 */
-	private void appendWhereClause(boolean searchAliases, ArrayList<Serializable> params, StringBuilder query)
+	private void appendWhereClause(boolean searchAliases, Map<String, Object> params, StringBuilder query)
 			throws PersistenceException {
 		FolderSearchOptions fOptions = (FolderSearchOptions) options;
 
@@ -192,7 +193,7 @@ public class FolderSearch extends Search {
 	}
 
 	private String prepareCriteriaConditions(String tableAlias, FolderSearchOptions fOptions,
-			ArrayList<Serializable> params) throws PersistenceException {
+			Map<String, Object> params) throws PersistenceException {
 		StringBuilder criteriaQueryPart = new StringBuilder();
 		int joinsCounter = 0;
 
@@ -301,7 +302,7 @@ public class FolderSearch extends Search {
 	}
 
 	private void appendAttributeCriterionColumnCondition(StringBuilder query, String tableAlias, String columnName,
-			FolderCriterion criterion, ArrayList<Serializable> params) throws PersistenceException {
+			FolderCriterion criterion, Map<String, Object> params) throws PersistenceException {
 		switch (criterion.getType()) {
 		case Attribute.TYPE_INT:
 			appendIntegerCriterion(query, columnName, criterion, params);
@@ -402,44 +403,50 @@ public class FolderSearch extends Search {
 	}
 
 	private void appendDateCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
-			ArrayList<Serializable> params) {
+			Map<String, Object> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NOT_NULL);
 		} else {
-			params.add(criterion.getSqlDateValue());
+			String paramName = addParameter(params, criterion.getSqlDateValue());
 			if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-				query.append(columnName + " > ?");
+				query.append(columnName + " > :" + paramName);
 			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-				query.append(columnName + " < ?");
+				query.append(columnName + " < :" + paramName);
 		}
 	}
 
+	private String addParameter(Map<String, Object> params, Object value) {
+		String paramName = "param" + params.size();
+		params.put(paramName, value);
+		return paramName;
+	}
+
 	private void appendDoubleCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
-			ArrayList<Serializable> params) {
+			Map<String, Object> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NOT_NULL);
 		} else {
-			params.add(criterion.getDoubleValue());
+			String paramName = addParameter(params, criterion.getDoubleValue());
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-				query.append(columnName + " = ?");
+				query.append(columnName + " = :" + paramName);
 			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
 				query.append(NOT + columnName + EQUAL_PARAMETER);
 			else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-				query.append(columnName + " > ?");
+				query.append(columnName + " > :" + paramName);
 			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-				query.append(columnName + " < ?");
+				query.append(columnName + " < :" + paramName);
 		}
 	}
 
 	private void appendBooleanCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
-			ArrayList<Serializable> params) {
+			Map<String, Object> params) {
 		if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator())) {
-			params.add(criterion.getLongValue());
-			query.append(columnName + " = ?");
+			String paramName = addParameter(params, criterion.getLongValue());
+			query.append(columnName + " = :" + paramName);
 		} else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
@@ -448,36 +455,36 @@ public class FolderSearch extends Search {
 	}
 
 	private void appendFolderOrUserOrTemplateCriterion(StringBuilder query, String columnName,
-			FolderCriterion criterion, ArrayList<Serializable> params) {
+			FolderCriterion criterion, Map<String, Object> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NOT_NULL);
 		} else {
-			params.add(criterion.getLongValue());
-			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-				query.append(columnName + " = ?");
-			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator())) {
+				String paramName = addParameter(params, criterion.getLongValue());
+				query.append(columnName + " = :" + paramName);
+			} else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
 				query.append(NOT + columnName + EQUAL_PARAMETER);
 		}
 	}
 
 	private void appendIntegerCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
-			ArrayList<Serializable> params) {
+			Map<String, Object> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NULL);
 		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NOT_NULL);
 		} else {
-			params.add(criterion.getLongValue());
+			String paramName = addParameter(params, criterion.getLongValue());
 			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-				query.append(columnName + " = ?");
+				query.append(columnName + " = :" + paramName);
 			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
 				query.append(NOT + columnName + EQUAL_PARAMETER);
 			else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-				query.append(columnName + " > ?");
+				query.append(columnName + " > :" + paramName);
 			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-				query.append(columnName + " < ?");
+				query.append(columnName + " < :" + paramName);
 		}
 	}
 

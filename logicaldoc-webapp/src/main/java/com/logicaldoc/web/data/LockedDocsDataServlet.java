@@ -65,7 +65,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Document> records = (List<Document>) docDao.query(query.toString(), null, new RowMapper<Document>() {
+		List<Document> records = (List<Document>) docDao.query(query.toString(), new RowMapper<Document>() {
 			public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Document doc = new Document();
 				doc.setTenantId(session.getTenantId());

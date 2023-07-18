@@ -247,7 +247,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				"select count(D.ld_id), sum(D.ld_filesize) from ld_document D, ld_folder F where D.ld_deleted=0 and F.ld_deleted=0 and D.ld_folderid=F.ld_id and (F.ld_id="
 						+ folderId + " or F.ld_path like '" + pathPrefix + "/%') " + " and not ld_status="
 						+ AbstractDocument.DOC_ARCHIVED,
-				null, null);
+				null);
 		long[] stats = new long[] { 0L, 0L };
 		if (resultSet.next()) {
 			stats[0] = resultSet.getLong(1);

@@ -5,7 +5,9 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,7 +54,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
-		
+
 		while (set.next()) {
 			printPost(writer, set);
 		}
@@ -79,18 +81,20 @@ public class NotesDataServlet extends AbstractDataServlet {
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 		SqlRowSet set = null;
 		if (docId != null && StringUtils.isNotEmpty(fileVersion)) {
-			query.append(" and A.ld_fileversion = ? order by A.ld_date desc, A.ld_page asc ");
-			set = dao.queryForRowSet(query.toString(), new Object[] { fileVersion }, 200);
+			query.append(" and A.ld_fileversion = :fileVersion order by A.ld_date desc, A.ld_page asc ");
+			Map<String, Object> params = new HashMap<>();
+			params.put("fileVersion", fileVersion);
+			set = dao.queryForRowSet(query.toString(), params, 200);
 		} else {
 			query.append(" order by A.ld_date desc, A.ld_page asc ");
-			set = dao.queryForRowSet(query.toString(), null, 200);
+			set = dao.queryForRowSet(query.toString(), 200);
 		}
 		return set;
 	}
 
 	private void printPost(PrintWriter writer, SqlRowSet set) {
 		DateFormat df = getDateFormat();
-		
+
 		writer.print("<post>");
 		writer.print("<id>" + set.getLong(1) + "</id>");
 		writer.print("<title><![CDATA[" + StringUtils.abbreviate(set.getString(2), 100) + "]]></title>");
@@ -115,8 +119,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		writer.print("<message><![CDATA[" + set.getString(2) + "]]></message>");
 		writer.print("<docId>" + set.getLong(5) + "</docId>");
 		writer.print("<filename><![CDATA[" + set.getString(6) + "]]></filename>");
-		writer.print("<icon>"
-				+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(set.getString(6))))
+		writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(set.getString(6))))
 				+ "</icon>");
 		writer.print("<userId>" + set.getString(7) + "</userId>");
 		writer.print("<fileVersion><![CDATA[" + set.getString(10) + "]]></fileVersion>");

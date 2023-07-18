@@ -604,7 +604,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		query.append(extendedAttributes.toString().replace("[", "('").replace("]", "')").replace(",", "','")
 				.replace(" ", ""));
 
-		dao.query(query.toString(), null, new ExtendedAttributeRowMapper(extAttributesValues, locale), null);
+		dao.query(query.toString(), new ExtendedAttributeRowMapper(extAttributesValues, locale), null);
 	}
 
 	private String getFilename(HttpServletRequest request) {

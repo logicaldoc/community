@@ -303,10 +303,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		jdbcUpdate("delete from ld_workingtime where ld_userid=" + user.getId());
 		if (user.getWorkingTimes() != null)
 			for (WorkingTime wt : user.getWorkingTimes()) {
+				Map<String, Object> params = new HashMap<>();
+				params.put("userId", user.getId());
+				params.put("dayOfWeek", wt.getDayOfWeek());
+				params.put("hourStart", wt.getHourStart());
+				params.put("minuteStart", wt.getMinuteStart());
+				params.put("hourEnd", wt.getHourEnd());
+				params.put("minuteEnd", wt.getMinuteEnd());
+				params.put("label", wt.getLabel());
+				params.put("description", wt.getDescription());
+
 				jdbcUpdate(
-						"insert into ld_workingtime(ld_userid,ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description) values (?,?,?,?,?,?,?,?)",
-						user.getId(), wt.getDayOfWeek(), wt.getHourStart(), wt.getMinuteStart(), wt.getHourEnd(),
-						wt.getMinuteEnd(), wt.getLabel(), wt.getDescription());
+						"insert into ld_workingtime(ld_userid,ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description) values (:userId, :dayOfWeek, :hourStart, :minuteStart, :hourEnd, :minuteEnd, :label, :description)",
+						params);
 			}
 	}
 
@@ -444,7 +453,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private void updateUserGroupAssignments(User user) throws PersistenceException {
-		jdbcUpdate("delete from ld_usergroup where ld_userid = ?", user.getId());
+		Map<String, Object> params = new HashMap<>();
+		params.put("userId", user.getId());
+		jdbcUpdate("delete from ld_usergroup where ld_userid = :userId", params);
 		for (UserGroup ug : user.getUserGroups()) {
 			int exists = queryForInt("select count(*) from ld_group where ld_id=" + ug.getGroupId());
 			if (exists > 0) {
@@ -821,7 +832,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			SqlRowSet timeSet = queryForRowSet(
 					"select ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description from ld_workingtime where ld_userid="
 							+ user.getId(),
-					null, null);
+					null);
 			while (timeSet.next()) {
 				WorkingTime wt = new WorkingTime(timeSet.getInt(1), timeSet.getInt(2), timeSet.getInt(3));
 				wt.setHourEnd(timeSet.getInt(4));
