@@ -294,8 +294,11 @@ public class FolderTool {
 		SecurityTool secTool = new SecurityTool();
 		User user = secTool.getUser(username);
 
+		long tenantId = folder!=null ? folder.getTenantId() : Tenant.DEFAULT_ID;
+		
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(user);
+		transaction.setTenantId(tenantId);
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder parent = folder;
@@ -308,13 +311,14 @@ public class FolderTool {
 				 * have to guarantee that the first element in the path is a
 				 * workspace. If not the Default one will be used.
 				 */
-				parent = fdao.findRoot(folder.getTenantId());
+				parent = fdao.findRoot(tenantId);
 				Folder workspace = null;
 
 				/*
 				 * Check if the path contains the workspace specification
 				 */
-				for (Folder w : fdao.findWorkspaces(folder.getTenantId())) {
+
+				for (Folder w : fdao.findWorkspaces(tenantId)) {
 					if (targetPath.startsWith(w.getName())) {
 						workspace = fdao.findById(w.getId());
 						break;
@@ -322,7 +326,7 @@ public class FolderTool {
 				}
 
 				if (workspace == null) {
-					parent = fdao.findDefaultWorkspace(folder.getTenantId());
+					parent = fdao.findDefaultWorkspace(tenantId);
 				}
 			}
 
