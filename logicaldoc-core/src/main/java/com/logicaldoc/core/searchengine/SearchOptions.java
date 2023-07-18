@@ -43,7 +43,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	private String description = "";
 
-	private Map<String, Object> parameters = null;
+	private Map<String, Serializable> parameters = null;
 
 	private long userId = -1;
 
@@ -233,11 +233,11 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		this.page = page;
 	}
 
-	public Map<String, Object> getParameters() {
+	public Map<String, Serializable> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, Object> parameters) {
+	public void setParameters(Map<String, Serializable> parameters) {
 		this.parameters = parameters;
 	}
 }

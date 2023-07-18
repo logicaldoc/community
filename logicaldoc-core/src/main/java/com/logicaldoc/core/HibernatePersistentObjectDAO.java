@@ -570,7 +570,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				jdbcTemplate.setMaxRows(maxRows);
 			return jdbcTemplate.queryForList(insertTopClause(sql, maxRows), elementType);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
 	}
@@ -588,7 +587,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 			return jdbcTemplate.queryForList(insertTopClause(sql, maxRows), prameters, elementType);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
 		}
 	}

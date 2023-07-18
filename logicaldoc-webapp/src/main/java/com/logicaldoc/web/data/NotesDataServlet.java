@@ -34,6 +34,8 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class NotesDataServlet extends AbstractDataServlet {
 
+	private static final String FILE_VERSION = "fileVersion";
+
 	protected static Logger logger = LoggerFactory.getLogger(NotesDataServlet.class);
 
 	private static final long serialVersionUID = 1L;
@@ -83,7 +85,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		if (docId != null && StringUtils.isNotEmpty(fileVersion)) {
 			query.append(" and A.ld_fileversion = :fileVersion order by A.ld_date desc, A.ld_page asc ");
 			Map<String, Object> params = new HashMap<>();
-			params.put("fileVersion", fileVersion);
+			params.put(FILE_VERSION, fileVersion);
 			set = dao.queryForRowSet(query.toString(), params, 200);
 		} else {
 			query.append(" order by A.ld_date desc, A.ld_page asc ");
@@ -135,8 +137,8 @@ public class NotesDataServlet extends AbstractDataServlet {
 
 	private String getFileVersion(HttpServletRequest request) {
 		String fileVersion = null;
-		if (request.getParameter("fileVersion") != null)
-			fileVersion = request.getParameter("fileVersion");
+		if (request.getParameter(FILE_VERSION) != null)
+			fileVersion = request.getParameter(FILE_VERSION);
 		return fileVersion;
 	}
 

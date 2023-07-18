@@ -1,5 +1,6 @@
 package com.logicaldoc.core.searchengine.folder;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -67,7 +68,13 @@ public class FolderSearch extends Search {
 		} catch (PersistenceException e1) {
 			throw new SearchException(e1);
 		}
-		options.setParameters(params);
+
+		Map<String, Serializable> serializableParams = new HashMap<>();
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
+			if (entry.getValue() instanceof Serializable)
+				serializableParams.put(entry.getKey(), (Serializable) entry.getValue());
+		}
+		options.setParameters(serializableParams);
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		// Execute the search
@@ -104,8 +111,13 @@ public class FolderSearch extends Search {
 	 * PersistenceException error at data layer
 	 */
 	private Map<String, Object> prepareExpression() throws PersistenceException {
-		if (StringUtils.isNotEmpty(options.getExpression()))
-			return options.getParameters();
+		if (StringUtils.isNotEmpty(options.getExpression())) {
+			Map<String, Serializable> serializableParams = options.getParameters();
+			Map<String, Object> params = new HashMap<>();
+			for (Map.Entry<String, Serializable> entry : serializableParams.entrySet()) {
+				params.put(entry.getKey(), entry.getValue());
+			}
+		}
 
 		Map<String, Object> params = new HashMap<>();
 

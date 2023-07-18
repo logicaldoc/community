@@ -35,6 +35,8 @@ import com.timgroup.jgravatar.GravatarRating;
  */
 public class UserUtil {
 
+	private static final String AVATAR = "avatar";
+
 	private static final String ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER = "Error generating default the avatar for user {}";
 
 	/**
@@ -127,7 +129,7 @@ public class UserUtil {
 
 		File tmpAvatarImage = null;
 		try {
-			tmpAvatarImage = FileUtil.createTempFile("avatar", ".png");
+			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 			BufferedImage avatar = ImageIO.read(avatarImageFile);
 			avatar = ImageUtil.cropCenterSquare(avatar, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
@@ -157,7 +159,7 @@ public class UserUtil {
 
 		File tmpAvatarImage = null;
 		try {
-			tmpAvatarImage = FileUtil.createTempFile("avatar", ".png");
+			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
 			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));
@@ -166,7 +168,7 @@ public class UserUtil {
 				userDao.store(user);
 			} else {
 				Map<String, Object> params = new HashMap<>();
-				params.put("avatar", user.getAvatar());
+				params.put(AVATAR, user.getAvatar());
 				params.put("username", user.getUsername());
 				userDao.jdbcUpdate("update ld_user set ld_avatar = :avatar where ld_username = :username", params);
 			}
