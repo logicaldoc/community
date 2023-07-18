@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
@@ -71,6 +72,8 @@ abstract public class AbstractDocumentProcessor extends Task {
 
 	private void processDocuments(List<Long> docIds, int max) throws PersistenceException {
 		String idsStr = docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
+		if (StringUtils.isNotEmpty(idsStr))
+			idsStr = "(" + idsStr + ")";
 
 		// Mark all these documents as belonging to the current
 		// transaction
