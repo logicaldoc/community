@@ -9,21 +9,22 @@ import java.io.Serializable;
  * @since 7.2
  */
 public class GUIRetentionPolicy implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 
-	public final static int DATE_OPT_CREATION = 0;
+	public static final int DATE_OPT_CREATION = 0;
 
-	public final static int DATE_OPT_PUBLISHED = 1;
+	public static final int DATE_OPT_PUBLISHED = 1;
 
-	public final static int DATE_OPT_STOPPUBLISHING = 2;
+	public static final int DATE_OPT_STOPPUBLISHING = 2;
 
-	public final static int DATE_OPT_ARCHIVED = 3;
+	public static final int DATE_OPT_ARCHIVED = 3;
 
-	public final static int ACTION_ARCHIVE = 0;
+	public static final int ACTION_ARCHIVE = 0;
 
-	public final static int ACTION_UNPUBLISH = 1;
+	public static final int ACTION_UNPUBLISH = 1;
 
-	public final static int ACTION_DELETE = 2;
+	public static final int ACTION_DELETE = 2;
 
 	private String name;
 

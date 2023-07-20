@@ -24,6 +24,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.IndexedListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -49,12 +50,10 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -122,7 +121,7 @@ public class SearchIndexPanel extends AdminPanel {
 					tabs.addTab(fillFiltersTab());
 					tabs.addTab(fillLanguagesTab());
 					tabs.addTab(fillParsersTab());
-					tabs.addTab(fillIndexingHistoryTab());
+					tabs.addTab(fillHistoryTab());
 
 					if (Session.get().isDefaultTenant()) {
 						tabs.addTab(fillIndexingQueueTab(100));
@@ -146,10 +145,10 @@ public class SearchIndexPanel extends AdminPanel {
 		return indexingQueueTab;
 	}
 
-	private Tab fillIndexingHistoryTab() {
-		Tab indexingHistoryTab = new Tab(I18N.message("history"));
-		indexingHistoryTab.setPane(new SearchIndexHistoryPanel());
-		return indexingHistoryTab;
+	private Tab fillHistoryTab() {
+		Tab historyTab = new Tab(I18N.message("history"));
+		historyTab.setPane(new SearchIndexHistoryPanel());
+		return historyTab;
 	}
 
 	private Tab fillParsersTab() {
@@ -777,7 +776,7 @@ public class SearchIndexPanel extends AdminPanel {
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler((ChangedEvent event) -> refreshIndexingQueue((Integer) max.getValue()));
+		max.addChangedHandler(event -> refreshIndexingQueue((Integer) max.getValue()));
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
@@ -800,36 +799,30 @@ public class SearchIndexPanel extends AdminPanel {
 		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 		size.setAlign(Alignment.CENTER);
 		size.setType(ListGridFieldType.FLOAT);
-		size.setCanFilter(false);
 
 		ListGridField version = new VersionListGridField();
 		version.setAlign(Alignment.CENTER);
-		version.setCanFilter(true);
 
 		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 
 		ListGridField publisher = new ColoredListGridField("publisher", I18N.message("publisher"), 90);
 		publisher.setAlign(Alignment.CENTER);
-		publisher.setCanFilter(true);
 
 		ListGridField published = new DateListGridField("published", "publishedon");
 
 		ListGridField creator = new ColoredListGridField("creator", I18N.message("creator"), 90);
 		creator.setAlign(Alignment.CENTER);
-		creator.setCanFilter(true);
 
 		ListGridField created = new DateListGridField("created", "createdon");
 
 		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
-		customId.setType(ListGridFieldType.TEXT);
-		customId.setCanFilter(false);
+
+		ListGridField indexable = new IndexedListGridField();
 
 		ListGridField filename = new FileNameListGridField();
-		filename.setCanFilter(true);
 
 		ListGridField lockUserId = new ColoredListGridField("lockUserId", " ", 24);
 		lockUserId.setHidden(true);
-		lockUserId.setCanFilter(false);
 
 		docsList = new RefreshableListGrid() {
 			@Override
@@ -854,7 +847,7 @@ public class SearchIndexPanel extends AdminPanel {
 			event.cancel();
 		});
 
-		docsList.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
+		docsList.addDataArrivedHandler(dataArrivedEvent -> infoPanel
 				.setMessage(I18N.message("showndocuments", Integer.toString(docsList.getTotalRows()))));
 
 		docsList.setShowRecordComponents(true);
@@ -864,7 +857,8 @@ public class SearchIndexPanel extends AdminPanel {
 		docsList.setSelectionType(SelectionStyle.MULTIPLE);
 		docsList.setShowFilterEditor(true);
 		docsList.setFilterOnKeypress(true);
-		docsList.setFields(id, filename, size, lastModified, version, publisher, published, creator, created, customId);
+		docsList.setFields(id, indexable, filename, size, lastModified, version, publisher, published, creator, created,
+				customId);
 
 		indexingQueueTabPanel = new VLayout();
 		indexingQueueTabPanel.setMembers(toolStrip, infoPanel, docsList);

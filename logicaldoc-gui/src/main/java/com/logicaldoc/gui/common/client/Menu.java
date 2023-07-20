@@ -197,7 +197,7 @@ public class Menu {
 
 	private Menu() {}
 	
-	static public void init(GUIUser user) {
+	public static void init(GUIUser user) {
 		menus.clear();
 		for (long menu : user.getMenus()) {
 			menus.add(menu);

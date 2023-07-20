@@ -36,9 +36,9 @@ public class Dropbox {
 
 	// Get your app key and secret from the Dropbox developers website -
 	// https://www.dropbox.com/developers/apps
-	final private String APP_KEY = "s7erzz9am7ikbl2";
+	private final String APP_KEY = "s7erzz9am7ikbl2";
 
-	final private String APP_SECRET = "9shfsbeilgfizam";
+	private final String APP_SECRET = "9shfsbeilgfizam";
 
 	private String accessToken;
 
@@ -71,7 +71,7 @@ public class Dropbox {
 	 * Generates the authorization URL where the user has to allow LogicalDOC
 	 * and gets an authorization code to be used then with finishAuthorization.
 	 * 
-	 * @param locale the user's locale 
+	 * @param locale the user's locale
 	 * 
 	 * @return The page to be shown to the user to allow the app to access
 	 */
@@ -87,7 +87,7 @@ public class Dropbox {
 	 * 
 	 * @param authorizationCode The authorization code that the user see in the
 	 *        authorization page
-
+	 * 
 	 * @return The access token
 	 */
 	public String finishAuthorization(String authorizationCode) {
@@ -156,7 +156,7 @@ public class Dropbox {
 	}
 
 	public boolean downloadFile(String path, File out) throws IOException {
-		try(FileOutputStream stream = new FileOutputStream(out);) {
+		try (FileOutputStream stream = new FileOutputStream(out);) {
 			client.files().download(path).download(stream);
 			stream.flush();
 			return true;
@@ -167,7 +167,7 @@ public class Dropbox {
 	}
 
 	public boolean uploadFile(File inputFile, String path) throws IOException {
-		try(FileInputStream stream = new FileInputStream(inputFile);) {
+		try (FileInputStream stream = new FileInputStream(inputFile);) {
 			if (!path.startsWith("/"))
 				path = "/" + path;
 			FileMetadata uploadedFile = client.files().upload(path).uploadAndFinish(stream);

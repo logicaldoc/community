@@ -198,7 +198,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			if (id != null) {
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
-				documentManager.reindex(id, null, transaction);
+				documentManager.index(id, null, transaction);
 			}
 		}
 	}

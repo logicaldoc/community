@@ -38,11 +38,11 @@ public class UpdateDialog extends StickyWindow {
 
 	private static final String VERSIONCOMMENT = "versioncomment";
 
-	public final static String CHECKIN = "checkin";
+	public static final String CHECKIN = "checkin";
 
-	public final static String CONTEXT_UPLOAD = "adddocuments";
+	public static final String CONTEXT_UPLOAD = "adddocuments";
 
-	public final static String BULKUPDATE = "bulkupdate";
+	public static final String BULKUPDATE = "bulkupdate";
 
 	private UpdatePanel bulkPanel;
 

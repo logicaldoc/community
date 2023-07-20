@@ -29,7 +29,7 @@ public class EventCollector {
 
 	private static final int FIFO_SIZE = 1000;
 
-	private final static String ASPECT = "eventsGathering";
+	private static final String ASPECT = "eventsGathering";
 
 	private static Logger log = LoggerFactory.getLogger(EventCollector.class);
 

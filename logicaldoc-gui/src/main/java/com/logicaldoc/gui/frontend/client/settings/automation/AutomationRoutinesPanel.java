@@ -49,7 +49,7 @@ public class AutomationRoutinesPanel extends VLayout {
 
 	private Canvas details = SELECT_FOLDER;
 
-	final static Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selectroutine"));
+	static final Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selectroutine"));
 
 	@Override
 	public void onDraw() {

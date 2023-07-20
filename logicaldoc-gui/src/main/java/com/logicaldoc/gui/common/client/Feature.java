@@ -219,7 +219,7 @@ public class Feature {
 		
 	}
 	
-	static public void init(GUIInfo info) {
+	public static void init(GUIInfo info) {
 		features.clear();
 		for (String feature : info.getFeatures()) {
 			features.add(feature);

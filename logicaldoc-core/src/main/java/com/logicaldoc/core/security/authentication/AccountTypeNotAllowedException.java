@@ -8,14 +8,14 @@ package com.logicaldoc.core.security.authentication;
  */
 public class AccountTypeNotAllowedException extends AuthenticationException {
 
-	public final static String CODE = "accounttypenotallowed";
+	public static final String CODE = "accounttypenotallowed";
 
 	private static final long serialVersionUID = 1L;
 
 	public AccountTypeNotAllowedException() {
 		super(CODE);
 	}
-	
+
 	public AccountTypeNotAllowedException(Authenticator authenticator) {
 		super(authenticator, CODE);
 	}

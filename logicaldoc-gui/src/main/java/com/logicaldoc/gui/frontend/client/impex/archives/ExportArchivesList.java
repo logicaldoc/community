@@ -46,7 +46,7 @@ public class ExportArchivesList extends VLayout {
 
 	protected Canvas details = SELECT_ELEMENT;
 
-	final static Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
+	static final Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
 
 	protected int archivesType = GUIArchive.TYPE_DEFAULT;
 

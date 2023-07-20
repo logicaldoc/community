@@ -105,7 +105,7 @@ public class HttpUtil {
 		return getNotValidatingClient(timeout, proxy[0], Integer.parseInt(proxy[1]), proxy[2], proxy[3]);
 	}
 
-	static public void close(CloseableHttpResponse response) {
+	public static void close(CloseableHttpResponse response) {
 		if (response != null)
 			try {
 				response.close();

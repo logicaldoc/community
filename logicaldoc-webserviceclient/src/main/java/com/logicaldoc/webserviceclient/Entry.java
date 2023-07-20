@@ -10,6 +10,7 @@ import java.util.Date;
  * @since 8.8.3
  */
 public class Entry {
+	
 	private long id;
 
 	private String fileName;
@@ -20,9 +21,9 @@ public class Entry {
 
 	private Date downloaded = new Date();
 	
-	public final static int CHECKEDIN = 0;
+	public static final int CHECKEDIN = 0;
 	
-	public final static int LOCALLY_MODIFIED = 1;
+	public static final int LOCALLY_MODIFIED = 1;
 	
 	public Entry(long id) {
 		super();

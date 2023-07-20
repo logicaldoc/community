@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class GUIForm extends GUIExtensibleObject implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public final static String DEFAULT_WEBCSS = ".webform-header {\n  margin-top: 10px;\n"
+	public static final String DEFAULT_WEBCSS = ".webform-header {\n  margin-top: 10px;\n"
 			+ "  background-color: #fff;\n  border: 1px solid #dadce0;\n  border-radius: 8px;\n"
 			+ "  margin-bottom: 12px;\n  padding: 24px;\n}\n.webform-title {\n"
 			+ "  font-family: Roboto,Arial,sans-serif;\n  font-size: 32px; \n  font-weight: 400;\n"

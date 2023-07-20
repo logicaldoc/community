@@ -46,7 +46,7 @@ public class SyndicationsPanel extends AdminPanel {
 
 	private Canvas details = SELECT_FOLDER;
 
-	final static Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selectsyndication"));
+	static final Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selectsyndication"));
 
 	public SyndicationsPanel() {
 		super("syndication");

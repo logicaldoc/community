@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.RpcRequestBuilder;
  * @since 8.1.2
  */
 public class LDRpcRequestBuilder extends RpcRequestBuilder {
-	private final static int DEFAULT_TIMEOUT = 2;
+	private static final int DEFAULT_TIMEOUT = 2;
 
 	@Override
 	protected RequestBuilder doCreate(String serviceEntryPoint) {

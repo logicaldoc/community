@@ -17,10 +17,10 @@ import com.logicaldoc.core.PersistentObject;
 public abstract class Message extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
-	
-	public final static int TYPE_SYSTEM = 0;
 
-	public final static int TYPE_NOTIFICATION = 1;
+	public static final int TYPE_SYSTEM = 0;
+
+	public static final int TYPE_NOTIFICATION = 1;
 
 	private String messageText = "";
 

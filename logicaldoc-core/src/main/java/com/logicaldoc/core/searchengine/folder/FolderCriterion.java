@@ -19,39 +19,39 @@ public class FolderCriterion implements Serializable {
 
 	private String fieldName = "id";
 
-	public final static String OPERATOR_EQUALS = "equals";
+	public static final String OPERATOR_EQUALS = "equals";
 
-	public final static String OPERATOR_NOTEQUAL = "notequal";
+	public static final String OPERATOR_NOTEQUAL = "notequal";
 
-	public final static String OPERATOR_CONTAINS = "contains";
+	public static final String OPERATOR_CONTAINS = "contains";
 
-	public final static String OPERATOR_NOTCONTAINS = "notcontains";
+	public static final String OPERATOR_NOTCONTAINS = "notcontains";
 
-	public final static String OPERATOR_BEGINSWITH = "beginswith";
+	public static final String OPERATOR_BEGINSWITH = "beginswith";
 
-	public final static String OPERATOR_ENDSWITH = "endswith";
+	public static final String OPERATOR_ENDSWITH = "endswith";
 
-	public final static String OPERATOR_GREATER = "greaterthan";
+	public static final String OPERATOR_GREATER = "greaterthan";
 
-	public final static String OPERATOR_LESSER = "lessthan";
+	public static final String OPERATOR_LESSER = "lessthan";
 
-	public final static String OPERATOR_NULL = "null";
+	public static final String OPERATOR_NULL = "null";
 
-	public final static String OPERATOR_NOTNULL = "notnull";
+	public static final String OPERATOR_NOTNULL = "notnull";
 
-	public final static String OPERATOR_IN = "in";
+	public static final String OPERATOR_IN = "in";
 
-	public final static String OPERATOR_INORSUBFOLDERS = "inorsubfolders";
+	public static final String OPERATOR_INORSUBFOLDERS = "inorsubfolders";
 
 	private String composition = "and";
 
 	private String operator = OPERATOR_EQUALS;
 
-	public final static int TYPE_LANGUAGE = 100;
+	public static final int TYPE_LANGUAGE = 100;
 
-	public final static int TYPE_FOLDER = 101;
+	public static final int TYPE_FOLDER = 101;
 
-	public final static int TYPE_TEMPLATE = 102;
+	public static final int TYPE_TEMPLATE = 102;
 
 	private String stringValue;
 

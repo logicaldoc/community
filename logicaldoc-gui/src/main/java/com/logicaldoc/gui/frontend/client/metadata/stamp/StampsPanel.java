@@ -50,7 +50,7 @@ public class StampsPanel extends AdminPanel {
 
 	private Canvas details = SELECT_STAMP;
 
-	final static Canvas SELECT_STAMP = new HTMLPanel("&nbsp;" + I18N.message("selectstamp"));
+	static final Canvas SELECT_STAMP = new HTMLPanel("&nbsp;" + I18N.message("selectstamp"));
 
 	public StampsPanel() {
 		super("stamps");

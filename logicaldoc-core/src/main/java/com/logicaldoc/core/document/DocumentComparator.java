@@ -19,84 +19,84 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	private DocumentComparator() {
 	};
 
-	private final static DocumentComparator ID_SORT = new DocumentComparator() {
+	private static final DocumentComparator ID_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return Long.valueOf(d1.getId()).compareTo(d2.getId());
 		}
 	};
 
-	private final static DocumentComparator FILENAME_SORT_CS = new DocumentComparator() {
+	private static final DocumentComparator FILENAME_SORT_CS = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getFileName().compareTo(d2.getFileName());
 		}
 	};
 
-	private final static DocumentComparator FILENAME_SORT_CI = new DocumentComparator() {
+	private static final DocumentComparator FILENAME_SORT_CI = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getFileName().toLowerCase().compareTo(d2.getFileName().toLowerCase());
 		}
 	};
 
-	private final static DocumentComparator FILESIZE_SORT = new DocumentComparator() {
+	private static final DocumentComparator FILESIZE_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return Long.valueOf(d1.getFileSize()).compareTo(d2.getFileSize());
 		}
 	};
 
-	private final static DocumentComparator VERSION_SORT = new DocumentComparator() {
+	private static final DocumentComparator VERSION_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getVersion().compareTo(d2.getVersion());
 		}
 	};
 
-	private final static DocumentComparator FILEVERSION_SORT = new DocumentComparator() {
+	private static final DocumentComparator FILEVERSION_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getFileVersion().compareTo(d2.getFileVersion());
 		}
 	};
 
-	private final static DocumentComparator LASTMODIFIED_SORT = new DocumentComparator() {
+	private static final DocumentComparator LASTMODIFIED_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getLastModified().compareTo(d2.getLastModified());
 		}
 	};
 
-	private final static DocumentComparator PUBLISHED_SORT = new DocumentComparator() {
+	private static final DocumentComparator PUBLISHED_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getDate().compareTo(d2.getDate());
 		}
 	};
 
-	private final static DocumentComparator CREATED_SORT = new DocumentComparator() {
+	private static final DocumentComparator CREATED_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getCreation().compareTo(d2.getCreation());
 		}
 	};
 
-	private final static DocumentComparator CUSTOMID_SORT = new DocumentComparator() {
+	private static final DocumentComparator CUSTOMID_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getCustomId().compareTo(d2.getCustomId());
 		}
 	};
 
-	private final static DocumentComparator TYPE_SORT = new DocumentComparator() {
+	private static final DocumentComparator TYPE_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return d1.getType().compareTo(d2.getType());
 		}
 	};
 
-	private final static DocumentComparator COMMENT_SORT_CS = new DocumentComparator() {
+	private static final DocumentComparator COMMENT_SORT_CS = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			String val1 = d1.getComment();
@@ -112,7 +112,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator COMMENT_SORT_CI = new DocumentComparator() {
+	private static final DocumentComparator COMMENT_SORT_CI = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			String val1 = d1.getComment();
@@ -128,7 +128,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator STARTPUB_SORT = new DocumentComparator() {
+	private static final DocumentComparator STARTPUB_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			Date val1 = d1.getStartPublishing();
@@ -144,7 +144,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator STOPPUB_SORT = new DocumentComparator() {
+	private static final DocumentComparator STOPPUB_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			Date val1 = d1.getStopPublishing();
@@ -160,7 +160,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator WFSTATUS_SORT_CS = new DocumentComparator() {
+	private static final DocumentComparator WFSTATUS_SORT_CS = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			String val1 = d1.getWorkflowStatus();
@@ -176,7 +176,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator WFSTATUS_SORT_CI = new DocumentComparator() {
+	private static final DocumentComparator WFSTATUS_SORT_CI = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			String val1 = d1.getWorkflowStatus();
@@ -192,14 +192,14 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator PUBSTATUS_SORT = new DocumentComparator() {
+	private static final DocumentComparator PUBSTATUS_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return Integer.valueOf(d1.getPublished()).compareTo(d2.getPublished());
 		}
 	};
 
-	private final static DocumentComparator TEMPLATE_NAME_SORT_CS = new DocumentComparator() {
+	private static final DocumentComparator TEMPLATE_NAME_SORT_CS = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			if (d1.getTemplate() != null && d2.getTemplate() != null)
@@ -209,7 +209,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator TEMPLATE_NAME_SORT_CI = new DocumentComparator() {
+	private static final DocumentComparator TEMPLATE_NAME_SORT_CI = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			if (d1.getTemplate() != null && d2.getTemplate() != null)
@@ -219,7 +219,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	private final static DocumentComparator descending(final Comparator<AbstractDocument> other) {
+	private static final DocumentComparator descending(final Comparator<AbstractDocument> other) {
 		return new DocumentComparator() {
 			public int compare(AbstractDocument d1, AbstractDocument d2) {
 				return -1 * other.compare(d1, d2);
@@ -227,7 +227,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		};
 	}
 
-	private final static DocumentComparator newComparatorForExtendedAttribute(final String attribute, boolean caseSensitive) {
+	private static final DocumentComparator newComparatorForExtendedAttribute(final String attribute, boolean caseSensitive) {
 		return new DocumentComparator() {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public int compare(AbstractDocument d1, AbstractDocument d2) {
@@ -253,7 +253,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	 * Map of comparators for legacy fields, Key is fieldname-CS or
 	 * fieldName-CI, value is the comparator
 	 */
-	private final static Map<String, DocumentComparator> legacyComparators = new HashMap<>();
+	private static final Map<String, DocumentComparator> legacyComparators = new HashMap<>();
 
 	static {
 		legacyComparators.put("fileName-CS", FILENAME_SORT_CS);

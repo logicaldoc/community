@@ -17,6 +17,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.IndexedListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -91,13 +92,15 @@ public class SearchIndexHistoryPanel extends VLayout {
 		path.setCanFilter(true);
 		path.setWidth(300);
 
+		ListGridField indexable = new IndexedListGridField("reason");
+
 		final RefreshableListGrid list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setDataSource(new DocumentHistoryDS(Session.get().getTenantId(), EVENTS,
 				Session.get().getConfigAsInt("gui.maxhistories")));
-		list.setFields(date, eventLabel, fileName, size, path, comment);
+		list.setFields(date, eventLabel, fileName, size, path, indexable, comment);
 
 		list.addCellDoubleClickHandler(evnt -> {
 			Record rec = evnt.getRecord();

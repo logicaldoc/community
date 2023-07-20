@@ -39,17 +39,17 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	private static Logger log = LoggerFactory.getLogger(Session.class);
 
-	public final static int STATUS_OPEN = 0;
+	public static final int STATUS_OPEN = 0;
 
-	public final static int STATUS_EXPIRED = 1;
+	public static final int STATUS_EXPIRED = 1;
 
-	public final static int STATUS_CLOSED = 2;
+	public static final int STATUS_CLOSED = 2;
 
-	private final static String ERROR = "ERROR";
+	private static final String ERROR = "ERROR";
 
-	private final static String WARN = "WARN";
+	private static final String WARN = "WARN";
 
-	private final static String INFO = "INFO";
+	private static final String INFO = "INFO";
 
 	// Map docId - Password used to unprotect it
 	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<>());

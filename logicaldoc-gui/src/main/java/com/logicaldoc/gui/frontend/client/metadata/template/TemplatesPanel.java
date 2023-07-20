@@ -48,7 +48,7 @@ public class TemplatesPanel extends VLayout {
 
 	private InfoPanel infoPanel;
 
-	final static Canvas SELECT_TEMPLATE = new HTMLPanel("&nbsp;" + I18N.message("selecttemplate"));
+	static final Canvas SELECT_TEMPLATE = new HTMLPanel("&nbsp;" + I18N.message("selecttemplate"));
 
 	public TemplatesPanel() {
 		setWidth100();

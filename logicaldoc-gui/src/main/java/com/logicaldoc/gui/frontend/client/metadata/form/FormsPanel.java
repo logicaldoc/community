@@ -51,7 +51,7 @@ public class FormsPanel extends AdminPanel {
 
 	private Canvas details = SELECT_FORM;
 
-	final static Canvas SELECT_FORM = new HTMLPanel("&nbsp;" + I18N.message("selectform"));
+	static final Canvas SELECT_FORM = new HTMLPanel("&nbsp;" + I18N.message("selectform"));
 
 	public FormsPanel() {
 		super("forms");

@@ -8,7 +8,7 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
- * A filed to display dates in cells that contains a user reference
+ * A filed to display dates in cells that contains a date
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.6.1
@@ -42,11 +42,11 @@ public class DateListGridField extends ColoredListGridField {
 	 */
 	public class DateCellFormatter extends ColoredCellFormatter {
 
-		public final static int FORMAT_DEFAULT = 0;
+		public static final int FORMAT_DEFAULT = 0;
 
-		public final static int FORMAT_SHORT = 1;
+		public static final int FORMAT_SHORT = 1;
 
-		public final static int FORMAT_LONG = 2;
+		public static final int FORMAT_LONG = 2;
 
 		private int format = FORMAT_DEFAULT;
 

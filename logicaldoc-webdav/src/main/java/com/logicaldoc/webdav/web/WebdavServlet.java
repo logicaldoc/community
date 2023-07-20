@@ -32,7 +32,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	public static final String INIT_PARAM_AUTHENTICATE_HEADER = "authenticate-header";
 
-	public final static String INIT_PARAM_MISSING_AUTH_MAPPING = "missing-auth-mapping";
+	public static final String INIT_PARAM_MISSING_AUTH_MAPPING = "missing-auth-mapping";
 
 	public static final String INIT_PARAM_RESOURCE_CONFIG = "resource-config";
 

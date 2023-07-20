@@ -51,7 +51,7 @@ public class TenantsPanel extends AdminPanel {
 
 	private Layout detailsContainer = new VLayout();
 
-	final static Canvas SELECT_TENANT = new HTMLPanel("&nbsp;" + I18N.message("selecttenant"));
+	static final Canvas SELECT_TENANT = new HTMLPanel("&nbsp;" + I18N.message("selecttenant"));
 
 	private Canvas details = SELECT_TENANT;
 

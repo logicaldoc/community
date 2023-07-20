@@ -30,19 +30,19 @@ public final class Constants {
 
 	public static final String TENANT_DEFAULTDISPLAYNAME = "Default";
 
-	public final static String TIME_MINUTE = "minute";
+	public static final String TIME_MINUTE = "minute";
 
-	public final static String TIME_HOUR = "hour";
+	public static final String TIME_HOUR = "hour";
 
-	public final static String TIME_BUSINESS_HOUR = "businesshour";
+	public static final String TIME_BUSINESS_HOUR = "businesshour";
 
-	public final static String TIME_DAY = "day";
+	public static final String TIME_DAY = "day";
 
-	public final static String TIME_BUSINESS_DAY = "businessday";
+	public static final String TIME_BUSINESS_DAY = "businessday";
 
-	public final static String TIME_WEEK = "week";
+	public static final String TIME_WEEK = "week";
 
-	public final static String TIME_BUSINESS_WEEK = "businessweek";
+	public static final String TIME_BUSINESS_WEEK = "businessweek";
 
 	public static final String PERMISSION_DELETE = "delete";
 
@@ -108,33 +108,33 @@ public final class Constants {
 
 	public static final String GROUP_GUEST = "guest";
 
-	public final static String EVENT_LOCKED = "event.locked";
+	public static final String EVENT_LOCKED = "event.locked";
 
-	public final static String EVENT_CHECKEDOUT = "event.checkedout";
+	public static final String EVENT_CHECKEDOUT = "event.checkedout";
 
 	public static final String EVENT_DOWNLOADED = "event.downloaded";
 
-	public final static String EVENT_CHANGED = "event.changed";
+	public static final String EVENT_CHANGED = "event.changed";
 
-	public final static String EVENT_CHECKEDIN = "event.checkedin";
+	public static final String EVENT_CHECKEDIN = "event.checkedin";
 
 	/**
 	 * The document must be indexed, both metadata and content
 	 */
-	public final static int INDEX_TO_INDEX = 0;
+	public static final int INDEX_TO_INDEX = 0;
 
 	/**
 	 * The document must be indexed, just the metadata
 	 */
-	public final static int INDEX_TO_INDEX_METADATA = 3;
+	public static final int INDEX_TO_INDEX_METADATA = 3;
 
 	/**
 	 * The document has already been indexed
 	 */
-	public final static int INDEX_INDEXED = 1;
+	public static final int INDEX_INDEXED = 1;
 
 	// The document is un-indexable
-	public final static int INDEX_SKIP = 2;
+	public static final int INDEX_SKIP = 2;
 
 	public static final String LOCALE = "locale";
 

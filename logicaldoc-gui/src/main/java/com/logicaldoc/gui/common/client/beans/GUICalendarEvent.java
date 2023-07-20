@@ -14,13 +14,13 @@ public class GUICalendarEvent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public final static int STATUS_NONE = 0;
+	public static final int STATUS_NONE = 0;
 
-	public final static int STATUS_WORKING = 1;
+	public static final int STATUS_WORKING = 1;
 
-	public final static int STATUS_COMPLETED = 2;
+	public static final int STATUS_COMPLETED = 2;
 
-	public final static int STATUS_CANCELED = 3;
+	public static final int STATUS_CANCELED = 3;
 
 	private long id = 0;
 

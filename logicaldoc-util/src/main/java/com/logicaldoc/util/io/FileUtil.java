@@ -765,7 +765,7 @@ public class FileUtil {
 		return chunks;
 	}
 
-	static private void readWrite(RandomAccessFile raf, BufferedOutputStream bw, long numBytes) throws IOException {
+	private static void readWrite(RandomAccessFile raf, BufferedOutputStream bw, long numBytes) throws IOException {
 		byte[] buf = new byte[(int) numBytes];
 		int val = raf.read(buf);
 		if (val != -1) {

@@ -43,13 +43,14 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 3.5.0
  */
 public abstract class Task implements Runnable {
+
 	protected Logger log = LoggerFactory.getLogger(Task.class);
 
-	public final static int STATUS_IDLE = 0;
+	public static final int STATUS_IDLE = 0;
 
-	public final static int STATUS_RUNNING = 1;
+	public static final int STATUS_RUNNING = 1;
 
-	public final static int STATUS_STOPPING = 2;
+	public static final int STATUS_STOPPING = 2;
 
 	private int status = STATUS_IDLE;
 
@@ -409,7 +410,7 @@ public abstract class Task implements Runnable {
 	 * 
 	 * @throws IndexException If something goes wrong this exception is raised
 	 */
-	abstract protected void runTask() throws TaskException;
+	protected abstract void runTask() throws TaskException;
 
 	/**
 	 * Concrete implementations must override this method declaring if the task
@@ -418,7 +419,7 @@ public abstract class Task implements Runnable {
 	 * 
 	 * @return true if the task is indeterminate
 	 */
-	abstract public boolean isIndeterminate();
+	public abstract boolean isIndeterminate();
 
 	/**
 	 * Concrete implementations must override this method declaring if the task
@@ -426,7 +427,7 @@ public abstract class Task implements Runnable {
 	 * 
 	 * @return true if the task is concurrent
 	 */
-	abstract public boolean isConcurrent();
+	public abstract boolean isConcurrent();
 
 	public String getReportRecipients() {
 		return reportRecipients;

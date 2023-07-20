@@ -16,13 +16,13 @@ public class GUIDashlet implements Serializable {
 	private static List<String> systemDashlets = Arrays.asList(
 			new String[] { "checkin", "checkout", "locked", "download", "locket", "change", "tagcloud", "notes", "lastaccessed" });
 
-	public final static String TYPE_DOCEVENT = "docevent";
+	public static final String TYPE_DOCEVENT = "docevent";
 
-	public final static String TYPE_DOCUMENT = "document";
+	public static final String TYPE_DOCUMENT = "document";
 
-	public final static String TYPE_NOTE = "note";
+	public static final String TYPE_NOTE = "note";
 
-	public final static String TYPE_CONTENT = "content";
+	public static final String TYPE_CONTENT = "content";
 
 	private static final long serialVersionUID = 1L;
 

@@ -21,10 +21,12 @@ import com.logicaldoc.util.Context;
  */
 public abstract class History extends PersistentObject implements Comparable<History> {
 
+	public static final String ASPECT = "saveHistory";
+	
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(History.class);
-
+	
 	protected Long docId;
 
 	private Long folderId;
@@ -39,8 +41,14 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private String event = "";
 
+	/**
+	 * Comment left in regards of this event
+	 */
 	private String comment = "";
 
+	/**
+	 * Something to better qualify the event
+	 */
 	private String reason = null;
 
 	private String version = null;
@@ -96,8 +104,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 	// Not persistent, indicates if this event has to be notified by the events
 	// collector
 	private boolean notifyEvent = true;
-
-	public static final String ASPECT = "saveHistory";
 
 	private String ip;
 

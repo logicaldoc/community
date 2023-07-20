@@ -8,7 +8,7 @@ package com.logicaldoc.core.security.authentication;
  */
 public class WrongPasswordException extends AuthenticationException {
 
-	public final static String CODE = "wrongpassword";
+	public static final String CODE = "wrongpassword";
 
 	private static final long serialVersionUID = 1L;
 

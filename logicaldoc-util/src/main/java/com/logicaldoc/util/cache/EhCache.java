@@ -87,13 +87,13 @@ public class EhCache<K extends Serializable, V extends Object> implements com.lo
 		return cache.getSize();
 	}
 
-	public synchronized static final void reloadManager() {
+	public static final synchronized void reloadManager() {
 		if (manager != null)
 			manager.shutdown();
 		getManager();
 	}
 
-	public synchronized static final CacheManager getManager() {
+	public static final synchronized CacheManager getManager() {
 		if (manager == null) {
 			try {
 				System.setProperty(CacheManager.ENABLE_SHUTDOWN_HOOK_PROPERTY, "TRUE");

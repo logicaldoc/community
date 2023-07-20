@@ -17,9 +17,9 @@ import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
  */
 public interface DocumentsGrid {
 
-	public final static int MODE_LIST = 0;
+	public static final int MODE_LIST = 0;
 
-	public final static int MODE_GALLERY = 1;
+	public static final int MODE_GALLERY = 1;
 
 	/**
 	 * Updates the visualization of the proper document element

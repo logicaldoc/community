@@ -47,7 +47,7 @@ public class AttributeSetsPanel extends VLayout {
 
 	private ToolStrip toolStrip;
 
-	final static Canvas SELECT_SET = new HTMLPanel("&nbsp;" + I18N.message("selecttattributeset"));
+	static final Canvas SELECT_SET = new HTMLPanel("&nbsp;" + I18N.message("selecttattributeset"));
 
 	public AttributeSetsPanel() {
 		setWidth100();

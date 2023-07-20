@@ -27,7 +27,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
  */
 public class User extends PersistentObject implements Serializable {
 
-	private final static Logger log = LoggerFactory.getLogger(User.class);
+	private static final Logger log = LoggerFactory.getLogger(User.class);
 
 	public static int TYPE_DEFAULT = 0;
 

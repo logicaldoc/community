@@ -16,11 +16,11 @@ public class SystemMessage extends Message {
 
 	private static final long serialVersionUID = 1L;
 
-	public final static int STATUS_NEW = 0;
+	public static final int STATUS_NEW = 0;
 
-	public final static int STATUS_DELIVERED = 1;
+	public static final int STATUS_DELIVERED = 1;
 
-	public final static int STATUS_ERROR = 2;
+	public static final int STATUS_ERROR = 2;
 
 	private int dateScope = 10;
 

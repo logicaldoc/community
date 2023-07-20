@@ -293,9 +293,10 @@ public class IndexerTask extends Task {
 		if (StringUtils.isNotEmpty(sortingCustom))
 			sorting = sortingCustom;
 
-		String where = " (" + PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX + " or "
-				+ PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX_METADATA + ") and not "
-				+ PersistentObjectDAO.ENTITY + ".status = " + AbstractDocument.DOC_ARCHIVED;
+		String where = PersistentObjectDAO.ENTITY + ".deleted = 0 and (" + PersistentObjectDAO.ENTITY + ".indexed = "
+				+ AbstractDocument.INDEX_TO_INDEX + " or " + PersistentObjectDAO.ENTITY + ".indexed = "
+				+ AbstractDocument.INDEX_TO_INDEX_METADATA + ") and not " + PersistentObjectDAO.ENTITY + ".status = "
+				+ AbstractDocument.DOC_ARCHIVED;
 
 		return new String[] { where, sorting };
 	}
@@ -397,7 +398,7 @@ public class IndexerTask extends Task {
 									doc.getFileName());
 						} else {
 							Date beforeIndexing = new Date();
-							parsingTime += documentManager.reindex(id, null, new DocumentHistory(transaction));
+							parsingTime += documentManager.index(id, null, new DocumentHistory(transaction));
 							long indexingDiff = TimeDiff.getTimeDifference(beforeIndexing, new Date(),
 									TimeField.MILLISECOND);
 							indexingTime += indexingDiff;

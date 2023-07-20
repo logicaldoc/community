@@ -121,7 +121,7 @@ public class DocumentProtectionManager {
 		notifyUnprotected(handler, document);
 	}
 
-	public static abstract class DocumentProtectionHandler {
+	public abstract static class DocumentProtectionHandler {
 		public abstract void onUnprotected(GUIDocument document);
 	}
 }

@@ -136,12 +136,9 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 			writer.print("<immutable>blank</immutable>");
 		else if (Integer.parseInt(cols[11].toString()) == 1)
 			writer.print("<immutable>stop</immutable>");
-		if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_TO_INDEX)
-			writer.print("<indexed>blank</indexed>");
-		else if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_INDEXED)
-			writer.print("<indexed>indexed</indexed>");
-		else if (Integer.parseInt(cols[12].toString()) == Constants.INDEX_SKIP)
-			writer.print("<indexed>unindexable</indexed>");
+
+		writer.print("<indexed>" + cols[12] + "</indexed>");
+
 		if (Integer.parseInt(cols[15].toString()) == Constants.DOC_LOCKED)
 			writer.print("<locked>lock</locked>");
 		else if (Integer.parseInt(cols[15].toString()) == Constants.DOC_CHECKED_OUT)

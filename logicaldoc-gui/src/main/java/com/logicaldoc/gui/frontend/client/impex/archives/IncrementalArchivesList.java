@@ -43,7 +43,7 @@ public class IncrementalArchivesList extends VLayout {
 
 	protected Canvas details = SELECT_ELEMENT;
 
-	final static Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectconfig"));
+	static final Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectconfig"));
 
 	protected int archivesType = GUIArchive.TYPE_DEFAULT;
 

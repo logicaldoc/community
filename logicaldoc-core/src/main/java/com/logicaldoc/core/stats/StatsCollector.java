@@ -51,7 +51,7 @@ public class StatsCollector extends Task {
 
 	public static final String STAT = "stat";
 
-	public final static String NAME = "StatsCollector";
+	public static final String NAME = "StatsCollector";
 
 	private DocumentDAO documentDAO;
 

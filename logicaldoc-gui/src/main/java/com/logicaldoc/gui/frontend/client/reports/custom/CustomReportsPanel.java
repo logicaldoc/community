@@ -57,7 +57,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 	private Canvas details = SELECT_REPORT;
 
-	final static Canvas SELECT_REPORT = new HTMLPanel("&nbsp;" + I18N.message("selectareport"));
+	static final Canvas SELECT_REPORT = new HTMLPanel("&nbsp;" + I18N.message("selectareport"));
 
 	private Timer timer;
 

@@ -16,12 +16,12 @@ public abstract class PersistentObject implements Serializable {
 	/**
 	 * This is used to mark a deletion that must be shown in the trash bin
 	 */
-	public final static int DELETED_CODE_DEFAULT = 1;
+	public static final int DELETED_CODE_DEFAULT = 1;
 
 	/**
 	 * This is used to mark a deletion that must be physically removed
 	 */
-	public final static int DELETED_CODE_STRONG = 2;
+	public static final int DELETED_CODE_STRONG = 2;
 
 	private long id = 0;
 

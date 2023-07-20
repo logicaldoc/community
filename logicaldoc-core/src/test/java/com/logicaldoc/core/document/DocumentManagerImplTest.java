@@ -318,7 +318,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
-		documentManager.reindex(doc.getId(), null, transaction);
+		documentManager.index(doc.getId(), null, transaction);
 
 		doc = docDao.findById(1);
 		Assert.assertEquals(1, doc.getIndexed());
@@ -333,7 +333,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
-		documentManager.reindex(alias.getId(), null, transaction);
+		documentManager.index(alias.getId(), null, transaction);
 
 		doc = docDao.findById(1);
 		Assert.assertEquals(1, doc.getIndexed());

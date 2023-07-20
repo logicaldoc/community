@@ -43,7 +43,7 @@ public class ImportArchivesList extends VLayout {
 
 	private Canvas details = SELECT_ELEMENT;
 
-	final static Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
+	static final Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
 
 	public ImportArchivesList() {
 		setWidth100();

@@ -108,13 +108,18 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		if (showSid)
 			writer.print("<sid><![CDATA[" + (historyRecord[10] == null ? "" : historyRecord[10]) + "]]></sid>");
 		writer.print("<userId>" + historyRecord[11] + "</userId>");
-		writer.print("<reason><![CDATA[" + (historyRecord[12] == null ? "" : historyRecord[12]) + "]]></reason>");
+
+		if (historyRecord[12] != null)
+			writer.print("<reason><![CDATA[" + historyRecord[12] + "]]></reason>");
+
 		writer.print("<ip><![CDATA[" + (historyRecord[13] == null ? "" : historyRecord[13]) + "]]></ip>");
 		writer.print("<device><![CDATA[" + (historyRecord[14] == null ? "" : historyRecord[14]) + "]]></device>");
 		writer.print(
 				"<geolocation><![CDATA[" + (historyRecord[15] == null ? "" : historyRecord[15]) + "]]></geolocation>");
+
 		if (historyRecord[16] != null)
 			writer.write("<color><![CDATA[" + historyRecord[16] + "]]></color>");
+
 		writer.print("<fileVersion>" + (historyRecord[17] == null ? "" : historyRecord[17]) + "</fileVersion>");
 		writer.print("<fileSize>" + (historyRecord[18] == null ? "" : historyRecord[18]) + "</fileSize>");
 		writer.print("</history>");

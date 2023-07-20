@@ -63,7 +63,7 @@ import com.logicaldoc.webdav.session.WebdavSession;
 /**
  * A base for building a WebDAV servlet
  */
-abstract public class AbstractWebdavServlet extends HttpServlet implements DavConstants {
+public abstract class AbstractWebdavServlet extends HttpServlet implements DavConstants {
 
 	protected static ServletContext context;
 
@@ -85,21 +85,21 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * 
 	 * @return if the precondition is valid
 	 */
-	abstract protected boolean isPreconditionValid(WebdavRequest request, DavResource resource);
+	protected abstract boolean isPreconditionValid(WebdavRequest request, DavResource resource);
 
 	/**
 	 * Returns the <code>DavLocatorFactory</code>
 	 * 
 	 * @return the locator factory
 	 */
-	abstract public DavLocatorFactory getLocatorFactory();
+	public abstract DavLocatorFactory getLocatorFactory();
 
 	/**
 	 * Returns the <code>DavResourceFactory</code>
 	 * 
 	 * @return the resource factory
 	 */
-	abstract public DavResourceFactory getResourceFactory();
+	public abstract DavResourceFactory getResourceFactory();
 
 	/**
 	 * Service the given request

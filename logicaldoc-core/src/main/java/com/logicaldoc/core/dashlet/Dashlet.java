@@ -12,13 +12,13 @@ public class Dashlet extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
-	public final static String TYPE_DOCEVENT = "docevent";
+	public static final String TYPE_DOCEVENT = "docevent";
 
-	public final static String TYPE_DOCUMENT = "document";
+	public static final String TYPE_DOCUMENT = "document";
 
-	public final static String TYPE_NOTE = "note";
+	public static final String TYPE_NOTE = "note";
 
-	public final static String TYPE_CONTENT = "content";
+	public static final String TYPE_CONTENT = "content";
 
 	private String type = TYPE_DOCEVENT;
 

@@ -368,7 +368,7 @@ public abstract class FolderSearchForm extends VLayout {
 	 * 
 	 * @param options The filter options
 	 */
-	abstract protected void search(GUISearchOptions options);
+	protected abstract void search(GUISearchOptions options);
 
 	@Override
 	protected void onDraw() {

@@ -50,7 +50,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 	private Canvas details = SELECT_POLICY;
 
-	final static Canvas SELECT_POLICY = new HTMLPanel("&nbsp;" + I18N.message("selectpolicy"));
+	static final Canvas SELECT_POLICY = new HTMLPanel("&nbsp;" + I18N.message("selectpolicy"));
 
 	public RetentionPoliciesPanel() {
 		super("retentionpolicies");

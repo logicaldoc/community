@@ -42,7 +42,7 @@ public class GroupsPanel extends AdminPanel {
 
 	private RefreshableListGrid list;
 
-	final static Canvas SELECT_GROUP = new HTMLPanel("&nbsp;" + I18N.message("selectgroup"));
+	static final Canvas SELECT_GROUP = new HTMLPanel("&nbsp;" + I18N.message("selectgroup"));
 
 	private Canvas details = SELECT_GROUP;
 

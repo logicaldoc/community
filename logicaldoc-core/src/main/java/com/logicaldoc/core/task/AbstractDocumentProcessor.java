@@ -23,7 +23,7 @@ import com.logicaldoc.i18n.I18N;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.3
  */
-abstract public class AbstractDocumentProcessor extends Task {
+public abstract class AbstractDocumentProcessor extends Task {
 
 	protected int processed = 0;
 

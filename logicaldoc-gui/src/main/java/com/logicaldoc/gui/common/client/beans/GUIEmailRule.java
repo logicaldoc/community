@@ -6,13 +6,13 @@ public class GUIEmailRule implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public final static int FIELD_SUBJECT = 0;
+	public static final int FIELD_SUBJECT = 0;
 
-	public final static int FIELD_SENDER = 1;
+	public static final int FIELD_SENDER = 1;
 
-	public final static int POLICY_CONTAINS = 0;
+	public static final int POLICY_CONTAINS = 0;
 
-	public final static int POLICY_NOT_CONTAINS = 1;
+	public static final int POLICY_NOT_CONTAINS = 1;
 
 	private int field = FIELD_SUBJECT;
 

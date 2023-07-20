@@ -15,15 +15,15 @@ public class GUIWFState implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public final static int TYPE_UNDEFINED = -1;
+	public static final int TYPE_UNDEFINED = -1;
 
-	public final static int TYPE_TASK = 0;
+	public static final int TYPE_TASK = 0;
 
-	public final static int TYPE_END = 1;
+	public static final int TYPE_END = 1;
 
-	public final static int TYPE_JOIN = 2;
+	public static final int TYPE_JOIN = 2;
 
-	public final static int TYPE_FORK = 3;
+	public static final int TYPE_FORK = 3;
 
 	private int type = TYPE_TASK;
 

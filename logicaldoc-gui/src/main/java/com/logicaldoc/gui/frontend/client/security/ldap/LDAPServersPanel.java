@@ -49,7 +49,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 	private Canvas details = SELECT_SERVER;
 
-	final static Canvas SELECT_SERVER = new HTMLPanel("&nbsp;" + I18N.message("selectserver"));
+	static final Canvas SELECT_SERVER = new HTMLPanel("&nbsp;" + I18N.message("selectserver"));
 
 	public LDAPServersPanel() {
 		super("extauth");

@@ -15,21 +15,22 @@ import com.logicaldoc.gui.common.client.ServerException;
  */
 @RemoteServiceRelativePath("split")
 public interface SplitService extends RemoteService {
-	public final static int POLICY_ALLPAGES = 0;
+	
+	public static final int POLICY_ALLPAGES = 0;
 
-	public final static int POLICY_SELECTION = 1;
+	public static final int POLICY_SELECTION = 1;
 
-	public final static int POLICY_BLANKPAGE = 2;
+	public static final int POLICY_BLANKPAGE = 2;
 
-	public final static int POLICY_BARCODE = 3;
+	public static final int POLICY_BARCODE = 3;
 
-	public final static int POLICY_TEXT = 4;
+	public static final int POLICY_TEXT = 4;
 
-	public final static int SEPARATOR_SKIP = 0;
+	public static final int SEPARATOR_SKIP = 0;
 
-	public final static int SEPARATOR_CURRENTSEG = 1;
+	public static final int SEPARATOR_CURRENTSEG = 1;
 
-	public final static int SEPARATOR_NEXTSEG = 2;
+	public static final int SEPARATOR_NEXTSEG = 2;
 
 	/**
 	 * Splits a document using different options, the splitted segments are

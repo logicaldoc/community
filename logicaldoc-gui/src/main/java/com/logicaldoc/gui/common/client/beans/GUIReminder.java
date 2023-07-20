@@ -13,11 +13,11 @@ public class GUIReminder implements Comparable<GUIReminder>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public final static String TIME_UNIT_MINUTE = "minute";
+	public static final String TIME_UNIT_MINUTE = "minute";
 
-	public final static String TIME_UNIT_HOUR = "hour";
+	public static final String TIME_UNIT_HOUR = "hour";
 
-	public final static String TIME_UNIT_DAY = "day";
+	public static final String TIME_UNIT_DAY = "day";
 
 	/**
 	 * Time before the event start date when the recipients need to be notified.

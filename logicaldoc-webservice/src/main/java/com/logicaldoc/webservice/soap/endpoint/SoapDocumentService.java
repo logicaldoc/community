@@ -837,7 +837,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
 		transaction.setUser(user);
-		documentManager.reindex(docId, content, transaction);
+		documentManager.index(docId, content, transaction);
 	}
 
 	@Override

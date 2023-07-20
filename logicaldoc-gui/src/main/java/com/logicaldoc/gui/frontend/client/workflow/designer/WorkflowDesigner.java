@@ -24,13 +24,13 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class WorkflowDesigner extends AdminPanel {
 
-	public final static int TYPE_TASK = 0;
+	public static final int TYPE_TASK = 0;
 
-	public final static int TYPE_END = 1;
+	public static final int TYPE_END = 1;
 
-	public final static int TYPE_JOIN = 2;
+	public static final int TYPE_JOIN = 2;
 
-	public final static int TYPE_FORK = 3;
+	public static final int TYPE_FORK = 3;
 
 	private VLayout drawingPanelLayout = new VLayout();
 

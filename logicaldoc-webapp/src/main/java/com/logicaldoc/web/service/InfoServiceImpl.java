@@ -292,7 +292,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		}
 	}
 
-	static protected GUIValue[] getBundle(String locale, String tenantName) {
+	protected static GUIValue[] getBundle(String locale, String tenantName) {
 
 		Locale l = getLocaleForBundle(tenantName, LocaleUtil.toLocale(locale));
 

@@ -55,7 +55,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	/**
 	 * Extend this method to implement the conversion
 	 */
-	abstract protected void internalConvert(String sid, Document document, File src, File dest) throws IOException;
+	protected abstract void internalConvert(String sid, Document document, File src, File dest) throws IOException;
 
 	protected ContextProperties config() {
 		ContextProperties config = null;

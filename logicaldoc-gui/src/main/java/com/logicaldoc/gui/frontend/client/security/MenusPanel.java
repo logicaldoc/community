@@ -33,7 +33,7 @@ public class MenusPanel extends VLayout {
 
 	private Layout rightsContainer = new VLayout();
 
-	final static Canvas SELECT_MENU = new HTMLPanel("&nbsp;" + I18N.message("selectmenu"));
+	static final Canvas SELECT_MENU = new HTMLPanel("&nbsp;" + I18N.message("selectmenu"));
 
 	private Canvas rights = SELECT_MENU;
 

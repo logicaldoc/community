@@ -70,7 +70,7 @@ public class UsersPanel extends AdminPanel {
 
 	private Layout detailsContainer = null;
 
-	final static Canvas SELECT_USER = new HTMLPanel("&nbsp;" + I18N.message("selectuser"));
+	static final Canvas SELECT_USER = new HTMLPanel("&nbsp;" + I18N.message("selectuser"));
 
 	private Canvas details = SELECT_USER;
 

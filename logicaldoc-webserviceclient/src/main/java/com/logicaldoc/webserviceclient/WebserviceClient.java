@@ -40,7 +40,7 @@ public class WebserviceClient {
 
 	private static final String WS_NAMESPACE = "http://ws.logicaldoc.com";
 
-	private final static int SOAP_VERSION = SoapEnvelope.VER11;
+	private static final int SOAP_VERSION = SoapEnvelope.VER11;
 
 	private static WebserviceClient instance;
 

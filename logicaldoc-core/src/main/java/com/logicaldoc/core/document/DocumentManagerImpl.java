@@ -479,11 +479,13 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public long reindex(long docId, String content, DocumentHistory transaction)
+	public long index(long docId, String content, DocumentHistory transaction)
 			throws PersistenceException, ParseException {
 		Document doc = getExistingDocument(docId);
 
-		log.debug("Reindexing document {} - {}", doc.getId(), doc.getFileName());
+		log.debug("Indexing document {} - {}", doc.getId(), doc.getFileName());
+		int currentIndexed=doc.getIndexed();
+		
 		
 		long parsingTime;
 		String cont;
@@ -496,7 +498,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (realDoc != null) {
 					if (realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
 							|| realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
-						parsingTime = reindex(realDoc.getId(), content, new DocumentHistory(transaction));
+						parsingTime = index(realDoc.getId(), content, new DocumentHistory(transaction));
 
 					// Take the content from the real document to avoid double
 					// parsing
@@ -533,6 +535,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.INDEXED.toString());
 			transaction.setComment(StringUtils.abbreviate(cont, 100));
+			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
 		}
 

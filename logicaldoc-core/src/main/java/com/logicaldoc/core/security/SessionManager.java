@@ -60,7 +60,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		log.info("Starting the session timeout watchdog");
 	}
 
-	public final static SessionManager get() {
+	public static final SessionManager get() {
 		return (SessionManager) Context.get().getBean(SessionManager.class);
 	}
 

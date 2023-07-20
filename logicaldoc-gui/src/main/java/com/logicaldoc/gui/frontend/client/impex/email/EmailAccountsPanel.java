@@ -56,7 +56,7 @@ public class EmailAccountsPanel extends AdminPanel {
 
 	private Canvas details = SELECT_ACCOUNT;
 
-	final static Canvas SELECT_ACCOUNT = new HTMLPanel("&nbsp;" + I18N.message("selectaccount"));
+	static final Canvas SELECT_ACCOUNT = new HTMLPanel("&nbsp;" + I18N.message("selectaccount"));
 
 	public EmailAccountsPanel() {
 		super("emailaccounts");

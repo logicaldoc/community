@@ -160,7 +160,7 @@ public abstract class AbstractParser implements Parser {
 	/**
 	 * Invoked by the parse method
 	 */
-	abstract protected void internalParse(InputStream is, ParseParameters parameters, StringBuilder output)
+	protected abstract void internalParse(InputStream is, ParseParameters parameters, StringBuilder output)
 			throws IOException, ParseException;
 
 	@Override

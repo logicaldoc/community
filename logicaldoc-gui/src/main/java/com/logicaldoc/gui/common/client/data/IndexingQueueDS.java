@@ -9,6 +9,7 @@ import com.smartgwt.client.data.DataSourceField;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -44,7 +45,8 @@ public class IndexingQueueDS extends DataSource {
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 		DataSourceDateTimeField published = new DataSourceDateTimeField("published");
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
-		
+		DataSourceIntegerField indexed = new DataSourceIntegerField("indexed");
+
 		List<DataSourceField> fields = new ArrayList<>();
 		fields.add(id);
 		fields.add(icon);
@@ -59,6 +61,7 @@ public class IndexingQueueDS extends DataSource {
 		fields.add(created);
 		fields.add(creator);
 		fields.add(customId);
+		fields.add(indexed);
 
 		String[] extNames = Session.get().getInfo().getConfig("search.extattr").split(",");
 		for (String name : extNames) {
@@ -70,9 +73,7 @@ public class IndexingQueueDS extends DataSource {
 
 		setFields(fields.toArray(new DataSourceField[0]));
 		setClientOnly(true);
-		
-		
-		
+
 		setDataURL("data/indexingqueue.xml?locale=" + Session.get().getUser().getLanguage() + "&max="
 				+ (max != null ? max : DEFAULT_MAX));
 	}

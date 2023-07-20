@@ -52,7 +52,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 
 	private Canvas details = SELECT_FOLDER;
 
-	final static Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selecttrigger"));
+	static final Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selecttrigger"));
 
 	private FolderSelector folderSelector;
 

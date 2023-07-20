@@ -170,7 +170,7 @@ public interface DocumentManager {
 	 * @throws PersistenceException error at data layer
 	 * @throws ParseException error during parsing
 	 */
-	public long reindex(long docId, String content, DocumentHistory transaction) throws PersistenceException, ParseException;
+	public long index(long docId, String content, DocumentHistory transaction) throws PersistenceException, ParseException;
 
 	/**
 	 * Rename an existing document filename.

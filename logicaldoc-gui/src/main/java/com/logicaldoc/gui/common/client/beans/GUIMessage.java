@@ -9,9 +9,10 @@ import java.io.Serializable;
  * @since 6.0
  */
 public class GUIMessage implements Serializable {
-	public final static int PRIO_WARN = 2;
+		
+	public static final int PRIO_WARN = 2;
 
-	public final static int PRIO_INFO = 1;
+	public static final int PRIO_INFO = 1;
 
 	private static final long serialVersionUID = 1L;
 
