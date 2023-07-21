@@ -87,7 +87,7 @@ public abstract class AbstractParser implements Parser {
 		// Invoke in a separate thread
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		try {
-			String ret = null;
+			String ret = "";
 			try {
 				ret = executor.invokeAll(Arrays.asList(new InternalParseTask(input, parameters, content)), timeout,
 						TimeUnit.SECONDS).get(0).get();
