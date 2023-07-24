@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.parser.wordperfect.WordPerfectParser;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
@@ -85,9 +84,6 @@ public class ParserFactory {
 		parsers.put("kwd", new KOfficeParser());
 		parsers.put("ksp", new KOfficeParser());
 		parsers.put("kpr", new KOfficeParser());
-
-		// WordPerfect
-		parsers.put("wpd", new WordPerfectParser());
 
 		// AbiWord http://www.abisource.com/
 		parsers.put("abw", new AbiWordParser());

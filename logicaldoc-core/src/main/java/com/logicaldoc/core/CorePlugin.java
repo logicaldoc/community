@@ -54,8 +54,12 @@ public class CorePlugin extends LogicalDOCPlugin {
 			log.error(e.getMessage(), e);
 		}
 
-		addServlet("DashletContent", DashletContent.class.getName(), "/data/dashletcontent");
-
+		try {
+			addServlet("DashletContent", DashletContent.class.getName(), "/data/dashletcontent");
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+		
 		setRestartRequired();
 	}
 }
