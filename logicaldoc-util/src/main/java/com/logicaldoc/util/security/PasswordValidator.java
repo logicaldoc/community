@@ -30,7 +30,7 @@ public class PasswordValidator {
 	 * Constructor
 	 * 
 	 * @param criteria minimum size of the password
-	 * @param mesages optional map with error codes and messages
+	 * @param messages optional map with error codes and messages
 	 */
 	public PasswordValidator(PasswordCriteria criteria, Properties messages) {
 		MessageResolver resolver;

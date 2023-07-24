@@ -130,6 +130,8 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param setId The attribute set's id
 	 * 
+	 * @return the attribute set
+	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session

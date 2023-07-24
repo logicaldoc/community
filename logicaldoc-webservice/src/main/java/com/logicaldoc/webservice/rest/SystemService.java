@@ -52,8 +52,6 @@ public interface SystemService {
 	 * Retrieves the languages enabled in the server.
 	 * 
 	 * @return Array of active languages (en, it, es ....)
-	 * 
-	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/getLanguages")	

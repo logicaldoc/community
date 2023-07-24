@@ -42,7 +42,9 @@ public interface TagService {
 	 */
 	@POST
 	@Path("/setDocumentTags")
-	public void setDocumentTags(@FormParam("docId") long docId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void setDocumentTags(@FormParam("docId")
+	long docId, @FormParam("tag")
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Adds tags to a document
@@ -58,7 +60,9 @@ public interface TagService {
 	 */
 	@POST
 	@Path("/addDocumentTags")
-	public void addDocumentTags(@FormParam("docId") long docId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void addDocumentTags(@FormParam("docId")
+	long docId, @FormParam("tag")
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves all the tags of a document
@@ -75,7 +79,8 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getDocumentTags")
-	public String[] getDocumentTags(@QueryParam("docId") long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
+	public String[] getDocumentTags(@QueryParam("docId")
+	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Sets the tags of a folder
@@ -91,7 +96,9 @@ public interface TagService {
 	 */
 	@POST
 	@Path("/setFolderTags")
-	public void setFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void setFolderTags(@FormParam("folderId")
+	long folderId, @FormParam("tag")
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Adds tags to a folder
@@ -107,7 +114,9 @@ public interface TagService {
 	 */
 	@POST
 	@Path("/addFolderTags")
-	public void addFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void addFolderTags(@FormParam("folderId")
+	long folderId, @FormParam("tag")
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves all the tags of a folder
@@ -124,15 +133,16 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getFolderTags")
-	public String[] getFolderTags(@QueryParam("folderId") long folderId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
+	public String[] getFolderTags(@QueryParam("folderId")
+	long folderId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Retrieves all the tags in the repository
 	 * 
 	 * @return The tags in the repository
-	 * @throws WebserviceException 
-	 * @throws PersistenceException 
-	 * @throws AuthenticationException 
+	 * @throws WebserviceException Error in the webservice
+	 * @throws PersistenceException Error in the database
+	 * @throws AuthenticationException Invalid session
 	 * 
 	 * @throws Exception error in the server application
 	 */
@@ -163,11 +173,12 @@ public interface TagService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-
+	 * 
 	 */
 	@GET
 	@Path("/findDocumentsByTag")
-	public WSDocument[] findDocumentsByTag(@QueryParam("tag") String tag) throws AuthenticationException, PersistenceException, WebserviceException;
+	public WSDocument[] findDocumentsByTag(@QueryParam("tag")
+	String tag) throws AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Finds authorized folders for the current user having a specified tag.
@@ -182,8 +193,9 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/findFoldersByTag")
-	public WSFolder[] findFoldersByTag(@QueryParam("tag") String tag) throws AuthenticationException, WebserviceException, PersistenceException;
-	
+	public WSFolder[] findFoldersByTag(@QueryParam("tag")
+	String tag) throws AuthenticationException, WebserviceException, PersistenceException;
+
 	/**
 	 * Retrieves all the tags in the preset (if the input mode is preset).
 	 * 
@@ -195,5 +207,5 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getTagsPreset")
-	public String[] getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException;	
+	public String[] getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException;
 }

@@ -70,6 +70,8 @@ public interface SecurityService {
 	 * 
 	 * @param sid identifier of the session, must be an administrator
 	 * @param user Web service value object containing the user's metadata
+	 *
+	 * @return the identifier of the created/updated user
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice

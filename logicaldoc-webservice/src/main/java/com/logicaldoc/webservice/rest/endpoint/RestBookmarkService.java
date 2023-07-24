@@ -52,12 +52,6 @@ public class RestBookmarkService extends SoapBookmarkService implements Bookmark
 		return super.bookmarkFolder(sid, folderId);
 	}
 
-	/**
-	 * Retrieves all the bookmarks of the current user.
-	 * @throws PersistenceException 
-	 * @throws WebserviceException 
-	 * @throws AuthenticationException 
-	 */
 	@GET
 	@Path("/getBookmarks")
 	public WSBookmark[] getBookmarks() throws AuthenticationException, WebserviceException, PersistenceException {

@@ -37,8 +37,6 @@ public interface SearchService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-	 * @throws PermissionException The user does not have the required
-	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "searchResult")

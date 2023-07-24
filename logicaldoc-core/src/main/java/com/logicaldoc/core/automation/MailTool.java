@@ -62,8 +62,6 @@ public class MailTool {
 	 * 
 	 * @throws MessagingException Cannot send the email
 	 * @throws IOException I/O error
-	 * 
-	 * @throws Exception error sending the email
 	 */
 	public void sendDocuments(Collection<Document> documents, String from, String to, String subject, String message)
 			throws IOException, MessagingException {

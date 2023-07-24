@@ -163,7 +163,6 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @param where The where clause expression (for parameters, please use
 	 *        JPA-style: :paramA, :paramB ...)
-	 * @param values Parameters used in the where expression
 	 * @param parameters The map of the parameters
 	 * @param order The order clause expression
 	 * @param max Maximum results number (optional)

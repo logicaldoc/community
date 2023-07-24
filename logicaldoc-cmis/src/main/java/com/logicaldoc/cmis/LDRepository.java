@@ -537,8 +537,6 @@ public class LDRepository {
 	 * @param contentStream binary content of the file to append
 	 * @param isLastChunk if this is the last chunk
 	 * 
-	 * @return the new document's identifier
-	 * 
 	 * @throws IOException I/O error
 	 * @throws PersistenceException Error in the data layer
 	 */

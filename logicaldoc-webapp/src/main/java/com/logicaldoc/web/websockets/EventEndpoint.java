@@ -99,6 +99,7 @@ public class EventEndpoint implements EventListener {
 	 * Returns the number of canched events of the given type
 	 * 
 	 * @param historyClass a class of History
+	 * @param T an History implementation
 	 * 
 	 * @return number of cached events
 	 */
