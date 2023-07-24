@@ -1,5 +1,6 @@
 package com.logicaldoc.cmis;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -31,6 +32,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisStorageException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderListImpl;
 import org.apache.chemistry.opencmis.commons.impl.server.AbstractCmisService;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
@@ -304,6 +306,17 @@ public class LDCmisService extends AbstractCmisService {
 			Acl removeAces, ExtensionsData extension) {
 		validateSession();
 		return getRepository().createDocument(getCallContext(), properties, folderId, contentStream);
+	}
+
+	@Override
+	public void appendContentStream(String repositoryId, Holder<String> objectId, Holder<String> changeToken,
+			ContentStream contentStream, boolean isLastChunk, ExtensionsData extension) {
+		validateSession();
+		try {
+			getRepository().appendContent(getCallContext(), objectId.getValue(), contentStream, isLastChunk);
+		} catch (IOException | PersistenceException e) {
+			throw new CmisStorageException(e.getMessage(), e);
+		}
 	}
 
 	@Override

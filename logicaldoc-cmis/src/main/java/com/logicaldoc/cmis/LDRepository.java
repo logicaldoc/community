@@ -1,10 +1,17 @@
 package com.logicaldoc.cmis;
 
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +31,7 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.Acl;
@@ -102,6 +110,7 @@ import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfoHandler;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -521,6 +530,79 @@ public class LDRepository {
 	}
 
 	/**
+	 * Appends content into existing file
+	 * 
+	 * @param context call context
+	 * @param documentId identifier of the document
+	 * @param contentStream binary content of the file to append
+	 * @param isLastChunk if this is the last chunk
+	 * 
+	 * @return the new document's identifier
+	 * 
+	 * @throws IOException I/O error
+	 * @throws PersistenceException Error in the data layer
+	 */
+	public void appendContent(CallContext context, String documentId, ContentStream contentStream, boolean isLastChunk)
+			throws IOException, PersistenceException {
+		log.debug("appendContent {}", documentId);
+		AbstractDocument doc = getDocument(documentId);
+
+		validatePermission(ID_PREFIX_FLD + doc.getFolder().getId(), context, Permission.WRITE);
+
+		NumberFormat nd = new DecimalFormat("0000000000");
+
+		Storer storer = (Storer) Context.get().getBean(Storer.class);
+
+		File chunksFolder = getChunksFolder(documentId);
+		String resourceName = storer.getResourceName(doc.getId(), doc.getFileVersion(), null);
+		if (FileUtils.isEmptyDirectory(chunksFolder)) {
+			// Copy the current file's content
+			File firstChunk = new File("chunk-" + nd.format(1));
+			storer.writeToFile(doc.getId(), resourceName, firstChunk);
+		}
+
+		int totalChunks = chunksFolder.list().length;
+		File currentChunk = new File("chunk-" + nd.format(totalChunks + 1));
+		storer.writeToFile(doc.getId(), resourceName, currentChunk);
+
+		if (isLastChunk) {
+			File mergeFile = getMergedContent(chunksFolder);
+			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setUser(getSessionUser());
+			transaction.setSessionId(sid);
+			manager.replaceFile(doc.getId(), doc.getFileVersion(), mergeFile, transaction);
+
+			FileUtil.strongDelete(chunksFolder);
+		}
+	}
+
+	private File getChunksFolder(String documentId) throws IOException {
+		return FileUtil.createTempDirectory("cmis" + sid + documentId);
+	}
+
+	private File getMergedContent(File chunksDir) throws IOException {
+		List<Path> chunks;
+		try (Stream<Path> pStream = Files.list(chunksDir.toPath()).sorted()) {
+			chunks = pStream.collect(Collectors.toList());
+		}
+
+		File merge = new File(chunksDir, "merge");
+		boolean created = merge.createNewFile();
+		if (!created)
+			throw new IOException("Cannot create file " + merge.getAbsolutePath());
+
+		for (Path path : chunks) {
+			File chunk = path.toFile();
+			Files.write(merge.toPath(), Files.readAllBytes(chunk.toPath()), StandardOpenOption.APPEND);
+			FileUtil.strongDelete(chunk);
+		}
+
+		return merge;
+	}
+
+	/**
 	 * CMIS createDocument
 	 * 
 	 * @param context call context
@@ -538,7 +620,6 @@ public class LDRepository {
 		validatePermission(folderId, context, Permission.WRITE);
 
 		try {
-
 			// check properties
 			if ((properties == null) || (properties.getProperties() == null))
 				throw new CmisInvalidArgumentException("Properties must be set!");
