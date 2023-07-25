@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.document.Document;
@@ -55,6 +56,8 @@ abstract public class AbstractDocumentProcessor extends Task {
 
 			if (size > 0) {
 				String idsStr = ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
+				if (StringUtils.isNotEmpty(idsStr))
+					idsStr = "(" + idsStr + ")";
 
 				// Mark all these documents as belonging to the current
 				// transaction
@@ -171,7 +174,7 @@ abstract public class AbstractDocumentProcessor extends Task {
 	public void setDocumentDao(DocumentDAO documentDao) {
 		this.documentDao = documentDao;
 	}
-	
+
 	@Override
 	protected String prepareReport(Locale locale) {
 		StringBuilder sb = new StringBuilder();
