@@ -30,7 +30,7 @@ public interface SystemService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "info")
-	@WebMethod
+	@WebMethod(action = "getInfo")
 	@WSDoc(description = "retrieves the Installation informations")
 	public WSSystemInfo getInfo() throws WebserviceException;
 
@@ -46,7 +46,7 @@ public interface SystemService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "parameter")
-	@WebMethod
+	@WebMethod(action = "getStatistics")
 	@WSDoc(description = "gets a set of statisticts of the system")
 	public WSParameter[] getStatistics(@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
@@ -59,6 +59,7 @@ public interface SystemService {
 	 * @param tenantOrSid Tenant name or session identifier (optional)
 	 */
 	@WebResult(name = "language")
+	@WebMethod(action = "getLanguages")
 	@WSDoc(description = "retrieves the languages enabled in the server")
 	public String[] getLanguages(@WSDoc(description = "a session's identifier or a tenant's name")
 	@WebParam(name = "tenantOrSid")

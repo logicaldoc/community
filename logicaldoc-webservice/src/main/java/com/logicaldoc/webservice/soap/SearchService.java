@@ -38,7 +38,7 @@ public interface SearchService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "find")
 	@WebResult(name = "searchResult")
 	@WSDoc(description = "performs a search by the search options")
 	public WSSearchResult find(@WSDoc(description = "identifier of the session", required = true)
@@ -59,7 +59,7 @@ public interface SearchService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "findByFilename")
 	@WebResult(name = "document")
 	@WSDoc(description = "finds authorized documents for the current user with the given filename (like '%' operator is used)")
 	public WSDocument[] findByFilename(@WSDoc(description = "identifier of the session", required = true)
@@ -80,7 +80,7 @@ public interface SearchService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "findFolders")
 	@WebResult(name = "folder")
 	@WSDoc(description = "finds authorized folders for the current user containing the given name (like '%' operator is used)")
 	public WSFolder[] findFolders(@WSDoc(description = "identifier of the session", required = true)

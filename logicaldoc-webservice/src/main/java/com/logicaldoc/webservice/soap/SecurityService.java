@@ -35,7 +35,7 @@ public interface SecurityService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "listUsers")
 	@WebResult(name = "user")
 	@WSDoc(description = "gets all existing users")
 	public WSUser[] listUsers(
@@ -55,7 +55,7 @@ public interface SecurityService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 */
-	@WebMethod
+	@WebMethod(action = "listGroups")
 	@WebResult(name = "group")
 	@WSDoc(description = "gets all existing groups")
 	public WSGroup[] listGroups(
@@ -77,7 +77,7 @@ public interface SecurityService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "userId")
-	@WebMethod
+	@WebMethod(action = "storeUser")
 	@WSDoc(description = "creates/updates a user; you can completely customize the user through a value object containing the user's metadata;"
 			+ "<br/>the current user must be an administrator;"
 			+ "<br/>returns the identifier of the created/updated user")
@@ -99,7 +99,7 @@ public interface SecurityService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "groupId")
-	@WebMethod
+	@WebMethod(action = "storeGroup")
 	@WSDoc(description = "creates/updates a group; you can completely customize the group through a value object containing the group's metadata;"
 			+ "<br/>the current user must be an administrator;"
 			+ "<br/>returns the identifier of the created/updated user")
@@ -119,7 +119,7 @@ public interface SecurityService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "deleteUser")
 	@WSDoc(description = "deletes an existing user")
 	public void deleteUser(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -137,7 +137,7 @@ public interface SecurityService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "deleteGroup")
 	@WSDoc(description = "deletes an existing group")
 	public void deleteGroup(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -163,7 +163,7 @@ public interface SecurityService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "changeResult")
-	@WebMethod
+	@WebMethod(action = "changePassword")
 	@WSDoc(description = "changes the password of a user.<br/>"
 			+ "<b>0</b> if all is ok, <b>1</b> if the password is incorrect, <b>2</b> if the new "
 			+ "password cannot be notified, otherwise a positive number grater than <b>2</b>")
@@ -187,7 +187,7 @@ public interface SecurityService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "user")
-	@WebMethod
+	@WebMethod(action = "getUser")
 	@WSDoc(description = "gets an existing user")
 	public WSUser getUser(@WSDoc(description = "identifier of the session, must be an administrator", required = true)
 	@WebParam(name = "sid")
@@ -206,7 +206,7 @@ public interface SecurityService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "user")
-	@WebMethod
+	@WebMethod(action = "getUserByUsername")
 	@WSDoc(description = "finds a user by his username")
 	public WSUser getUserByUsername(
 			@WSDoc(description = "identifier of the session, must be an administrator", required = true)
@@ -226,7 +226,7 @@ public interface SecurityService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "group")
-	@WebMethod
+	@WebMethod(action = "getGroup")
 	@WSDoc(description = "gets an existing group")
 	public WSGroup getGroup(@WSDoc(description = "identifier of the session, must be an administrator", required = true)
 	@WebParam(name = "sid")

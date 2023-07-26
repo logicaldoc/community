@@ -38,7 +38,7 @@ public interface TagService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "setDocumentTags")
 	@WSDoc(description = "sets the tags of a document")
 	public void setDocumentTags(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -60,7 +60,7 @@ public interface TagService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "addDocumentTags")
 	@WSDoc(description = "adds tags to a document")
 	public void addDocumentTags(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -83,7 +83,7 @@ public interface TagService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "getDocumentTags")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags of a document")
 	public String[] getDocumentTags(@WSDoc(description = "identifier of the session", required = true)
@@ -105,7 +105,7 @@ public interface TagService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "setFolderTags")
 	@WSDoc(description = "sets the tags of a folder")
 	public void setFolderTags(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -126,7 +126,7 @@ public interface TagService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "addFolderTags")
 	@WSDoc(description = "adds tags to a folder")
 	public void addFolderTags(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -148,7 +148,7 @@ public interface TagService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod
+	@WebMethod(action = "getFolderTags")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags of a folder")
 	public String[] getFolderTags(@WSDoc(description = "identifier of the session", required = true)
@@ -167,7 +167,7 @@ public interface TagService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "getTags")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags in the repository")
 	public String[] getTags(@WSDoc(description = "identifier of the session", required = true)
@@ -185,7 +185,7 @@ public interface TagService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "getTagsPreset")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags specified in the preset, empty if input mode is free")
 	public String[] getTagsPreset(@WSDoc(description = "identifier of the session", required = true)
@@ -203,7 +203,7 @@ public interface TagService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "getTagCloud")
 	@WebResult(name = "tagCloud")
 	@WSDoc(description = "retrieves all tag clouds in the repository")
 	public WSTagCloud[] getTagCloud(@WSDoc(description = "identifier of the session", required = true)
@@ -222,7 +222,7 @@ public interface TagService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "findDocumentsByTag")
 	@WebResult(name = "document")
 	@WSDoc(description = "finds authorized documents for the current user having a specified tag")
 	public WSDocument[] findDocumentsByTag(@WSDoc(description = "identifier of the session", required = true)
@@ -242,7 +242,7 @@ public interface TagService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "findFoldersByTag")
 	@WebResult(name = "folder")
 	@WSDoc(description = "finds authorized folders for the current user having a specified tag")
 	public WSFolder[] findFoldersByTag(@WSDoc(description = "identifier of the session", required = true)

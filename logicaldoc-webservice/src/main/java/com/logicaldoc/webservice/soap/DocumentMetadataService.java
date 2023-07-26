@@ -31,7 +31,7 @@ public interface DocumentMetadataService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "template")
-	@WebMethod
+	@WebMethod(action = "listTemplates")
 	@WSDoc(description = "lists all the templates")
 	public WSTemplate[] listTemplates(@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
@@ -49,7 +49,7 @@ public interface DocumentMetadataService {
 	 * @throws AuthenticationException Invalid sessionon
 	 */
 	@WebResult(name = "template")
-	@WebMethod
+	@WebMethod(action = "getTemplate")
 	@WSDoc(description = "gets an existing template by it's name")
 	public WSTemplate getTemplate(@WebParam(name = "sid")
 	String sid, @WebParam(name = "name")
@@ -68,7 +68,7 @@ public interface DocumentMetadataService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "template")
-	@WebMethod
+	@WebMethod(action = "getTemplateById")
 	@WSDoc(description = "gets an existing template by it's identifier")
 	public WSTemplate getTemplateById(@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
@@ -89,7 +89,7 @@ public interface DocumentMetadataService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "templateId")
-	@WebMethod
+	@WebMethod(action = "storeTemplate")
 	@WSDoc(description = "creates/updates a template; you can completely customize the template through a value object; returns the identifier of the created/updated template")
 	public long storeTemplate(@WebParam(name = "sid")
 	String sid, @WebParam(name = "template")
@@ -106,7 +106,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "deleteTemplate")
 	@WSDoc(description = "deletes an existing template")
 	public void deleteTemplate(@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
@@ -123,7 +123,7 @@ public interface DocumentMetadataService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "attributeSet")
-	@WebMethod
+	@WebMethod(action = "listAttributeSets")
 	@WSDoc(description = "lists all the attribute sets")
 	public WSAttributeSet[] listAttributeSets(@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
@@ -141,7 +141,7 @@ public interface DocumentMetadataService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "attributeSet")
-	@WebMethod
+	@WebMethod(action = "getAttributeSet")
 	@WSDoc(description = "gets an attribute set by it's name")
 	public WSAttributeSet getAttributeSet(@WebParam(name = "sid")
 	String sid, @WebParam(name = "name")
@@ -160,7 +160,7 @@ public interface DocumentMetadataService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "attributeSet")
-	@WebMethod
+	@WebMethod(action = "getAttributeSetById")
 	@WSDoc(description = "gets an attribute set by it's identifier")
 	public WSAttributeSet getAttributeSetById(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
@@ -181,7 +181,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "setId")
-	@WebMethod
+	@WebMethod(action = "storeAttributeSet")
 	@WSDoc(description = "creates/updates an attribute set; you can completely customize the set through a value object; returns the identifier of the created/updated set")
 	public long storeAttributeSet(@WebParam(name = "sid")
 	String sid, @WebParam(name = "attributeSet")
@@ -196,7 +196,7 @@ public interface DocumentMetadataService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 */
-	@WebMethod
+	@WebMethod(action = "deleteAttributeSet")
 	@WSDoc(description = "deletes an existing attribute set")
 	public void deleteAttributeSet(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
@@ -213,7 +213,7 @@ public interface DocumentMetadataService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 */
-	@WebMethod
+	@WebMethod(action = "setAttributeOptions")
 	@WSDoc(description = "saves the options for the given attribute")
 	public void setAttributeOptions(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
@@ -234,7 +234,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "getAttributeOptions")
 	@WSDoc(description = "retrieves the options for the given attribute")
 	public String[] getAttributeOptions(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
@@ -255,7 +255,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "getAttributeOptionsByCategory")
 	@WSDoc(description = "retrieves the options for the given attribute inside a given category")
 	public WSAttributeOption[] getAttributeOptionsByCategory(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
@@ -276,7 +276,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "isTemplateReadable")
 	@WSDoc(description = "tests if a template is readable")
 	public boolean isTemplateReadable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -295,7 +295,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "isTemplateWritable")
 	@WSDoc(description = "tests if a template is writable")
 	public boolean isTemplateWritable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -316,7 +316,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "grantUserToTemplate")
 	@WSDoc(description = "grants user permission to the template")
 	public void grantUserToTemplate(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -342,7 +342,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "grantGroupToTemplate")
 	@WSDoc(description = "grants group permission to the template")
 	public void grantGroupToTemplate(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -367,7 +367,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "getGrantedUsers")
 	@WSDoc(description = "retrieves the list of granted users for the given folder")
 	public WSRight[] getGrantedUsers(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -386,7 +386,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod
+	@WebMethod(action = "getGrantedGroups")
 	@WSDoc(description = "retrieves the list of granted groups for the given folder")
 	public WSRight[] getGrantedGroups(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -406,7 +406,7 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws PersistenceException Error in the database
 	 */
-	@WebMethod
+	@WebMethod(action = "addAttributeOption")
 	@WSDoc(description = "Adds a new option for the given attribute")	
 	public void addAttributeOption(
 			@WebParam(name = "sid") String sid, 
