@@ -560,7 +560,7 @@ public class LDRepository {
 		}
 
 		int totalChunks = chunksFolder.list().length;
-		File currentChunk = new File("chunk-" + nd.format(totalChunks + 1));
+		File currentChunk = new File("chunk-" + nd.format(totalChunks + 1L));
 		storer.writeToFile(doc.getId(), resourceName, currentChunk);
 
 		if (isLastChunk) {
