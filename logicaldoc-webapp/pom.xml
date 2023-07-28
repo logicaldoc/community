@@ -576,7 +576,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<tasks>
+							<target>
 								<unzip
 									src="target/${project.artifactId}-${project.version}.war"
 									dest="target/war" />
@@ -625,7 +625,7 @@
 								<zip
 									destfile="target/${project.artifactId}-${project.version}.war"
 									basedir="target/war" />
-							</tasks>
+							</target>
 						</configuration>
 					</execution>
 				</executions>
