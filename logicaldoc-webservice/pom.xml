@@ -311,7 +311,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<tasks>
+							<target>
 								<delete dir="target/plugin" quiet="true" />
 								<unzip
 									src="target/${project.artifactId}-${project.version}-plugin.zip"
@@ -331,7 +331,7 @@
 								<move
 									file="target/${project.artifactId}-${project.version}-plugin2.zip"
 									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
-							</tasks>
+							</target>
 						</configuration>
 					</execution>
 				</executions>
