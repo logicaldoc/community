@@ -327,7 +327,6 @@
 											}
 										}
 										this.popup = new AcePopup(parentElement);
-										
 									]]></replacevalue>
 								</replace>
 
