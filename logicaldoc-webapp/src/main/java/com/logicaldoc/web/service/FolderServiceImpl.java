@@ -2,7 +2,6 @@ package com.logicaldoc.web.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -949,7 +948,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			folder = fdao.findFolder(folderId);
 
 			if (!fdao.isWriteEnabled(folder.getId(), session.getUserId()))
-				throw new AccessControlException("Cannot write in folder " + folder.getName());
+				throw new ServerException("Cannot write in folder " + folder.getName());
 
 			if (action.equals(Clipboard.CUT))
 				cut(session, docIds, folder.getId());
