@@ -88,7 +88,6 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 		wsFolder = folderServiceImpl.getFolder("", wsFolder.getId());
 		assertNotNull(wsFolder);
-		System.out.println(">>>>>> "+wsFolder.getId() +"    "+wsFolder.getName()+"    "+wsFolder.getDescription());
 		
 		assertEquals("folder test", wsFolder.getName());
 		assertEquals(103, wsFolder.getParentId());
