@@ -55,7 +55,7 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 
 			// Load the database driver
 			Class.forName(conf.getProperty("jdbc.driver"));
-		} catch (ClassNotFoundException | IOException e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 			return null;
 		}
