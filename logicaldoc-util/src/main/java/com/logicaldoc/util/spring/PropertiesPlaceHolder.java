@@ -54,9 +54,10 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 			conf = new ContextProperties();
 
 			// Load the database driver
-			Class.forName(conf.getProperty("jdbc.driver"));
+			if (conf.getProperty("jdbc.driver") != null)
+				Class.forName(conf.getProperty("jdbc.driver"));
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.warn(e.getMessage());
 			return null;
 		}
 
@@ -80,6 +81,6 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 			return null;
-		} 
+		}
 	}
 }
