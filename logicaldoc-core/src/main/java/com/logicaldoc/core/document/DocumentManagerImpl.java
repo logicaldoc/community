@@ -56,6 +56,7 @@ import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
@@ -534,7 +535,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.INDEXED.toString());
-			transaction.setComment(StringUtils.abbreviate(cont, 100));
+			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
 		}
