@@ -26,7 +26,7 @@ public interface AuthService {
 	 * 
 	 * @throws AuthenticationException the user was not authenticated
 	 */
-	@WebMethod
+	@WebMethod(action = "login")
 	@WSDoc(description = "starts a new session; returns the session identifier(SID)")
 	public String login(@WebParam(name = "username")
 	String username, @WebParam(name = "password")
@@ -37,7 +37,7 @@ public interface AuthService {
 	 * 
 	 * @param sid The session identifier
 	 */
-	@WebMethod
+	@WebMethod(action = "logout")
 	@WSDoc(description = "closes a session")
 	public void logout(@WSDoc(description = "the session identifier")
 	@WebParam(name = "sid")
@@ -50,7 +50,7 @@ public interface AuthService {
 	 * 
 	 * @return if the session is valid
 	 */
-	@WebMethod
+	@WebMethod(action = "valid")
 	@WSDoc(description = "checks if a SID is valid; returns true only if the session is valid")
 	public boolean valid(@WSDoc(description = "the session identifier")
 	@WebParam(name = "sid")
@@ -61,7 +61,7 @@ public interface AuthService {
 	 * 
 	 * @param sid identifier of the session
 	 */
-	@WebMethod
+	@WebMethod(action = "renew")
 	@WSDoc(description = "renews an existing session")
 	public void renew(@WSDoc(description = "the session identifier")
 	@WebParam(name = "sid")
