@@ -280,8 +280,8 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		legacyComparators.put("date-CS", PUBLISHED_SORT);
 		legacyComparators.put("date-CI", PUBLISHED_SORT);
 
-		legacyComparators.put("created-CS", CREATED_SORT);
-		legacyComparators.put("created-CI", CREATED_SORT);
+		legacyComparators.put("creation-CS", CREATED_SORT);
+		legacyComparators.put("creation-CI", CREATED_SORT);
 
 		legacyComparators.put("customId-CS", CUSTOMID_SORT);
 		legacyComparators.put("customId-CI", CUSTOMID_SORT);

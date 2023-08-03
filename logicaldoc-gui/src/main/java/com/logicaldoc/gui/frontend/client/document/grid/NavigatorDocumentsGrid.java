@@ -64,7 +64,7 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 			 */
 			if (lastChangedSortFolder == getFolder().getId() && getGridCursor().getTotalPages() > 1) {
 				// if we have more pages, it is required to retrieve again
-				// the recodrs from the server using the right sorting
+				// the records from the server using the right sorting
 				DocumentsDSParameters pars = new DocumentsDSParameters(getFolder().getId(), null,
 						getGridCursor().getPageSize(), getGridCursor().getCurrentPage(),
 						DocumentGridUtil.getSortSpec(event.getSortSpecifiers()));
