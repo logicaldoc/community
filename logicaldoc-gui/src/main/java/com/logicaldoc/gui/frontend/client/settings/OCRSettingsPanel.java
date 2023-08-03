@@ -111,11 +111,13 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		TextItem includes = ItemFactory.newTextItem("ocr_includes", "include",
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.includes"));
-		includes.setEndRow(true);
+		includes.setWidth(300);
+		includes.setColSpan(4);
 
 		TextItem excludes = ItemFactory.newTextItem("ocr_excludes", "exclude",
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.excludes"));
-		excludes.setEndRow(true);
+		excludes.setWidth(300);
+		excludes.setColSpan(4);
 		
 		SpinnerItem timeout = prepareTimeoutSpinner(params);
 
