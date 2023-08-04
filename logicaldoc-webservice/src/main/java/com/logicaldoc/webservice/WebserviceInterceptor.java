@@ -108,11 +108,11 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 		try {
 			if (RunLevel.current().aspectEnabled(WebserviceCall.ASPECT)
-					&& settings.getBoolean("webservice.call.gridRecord", false)) {
+					&& settings.getBoolean("webservice.call.record", false)) {
 				WebserviceCall call = new WebserviceCall();
 				call.setTenantId(Tenant.SYSTEM_ID);
 
-				if (Context.get().getProperties().getBoolean("webservice.call.gridRecord.payload", false)) {
+				if (Context.get().getProperties().getBoolean("webservice.call.record.payload", false)) {
 					/*
 					 * Retrieve the full payload
 					 */
