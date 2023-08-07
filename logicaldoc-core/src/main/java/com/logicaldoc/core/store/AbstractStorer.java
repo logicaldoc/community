@@ -256,7 +256,7 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public boolean test() {
-		String resource = "1.0";
+		String resource = "test";
 		File tmpFile = null;
 		try {
 			tmpFile = FileUtil.createTempFile("st-test", ".txt");
@@ -270,7 +270,7 @@ public abstract class AbstractStorer implements Storer {
 			FileUtil.strongDelete(tmpFile);
 			try {
 				if (exists(0L, resource))
-					delete(0L);
+					delete(0L, resource);
 			} catch (Exception t) {
 				// Noting to do
 			}
