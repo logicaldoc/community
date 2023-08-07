@@ -10,8 +10,10 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -331,9 +333,8 @@ public class MailUtil {
 		if (msg.getContent() instanceof MimeMultipart) {
 			MimeMultipart multipart = (MimeMultipart) msg.getContent();
 			int count = multipart.getCount();
-			for (int i = 1; i < count; i++) {
+			for (int i = 0; i < count; i++) {
 				BodyPart bp = multipart.getBodyPart(i);
-
 				if (bp.getFileName() != null && bp.getFileName().toLowerCase().contains(".p7s")) {
 					MimeBodyPart smimeBody = SmimeUtil.getSignedContent(multipart);
 					addAttachments(smimeBody, email, extractAttachmentContent);

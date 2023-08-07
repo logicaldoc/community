@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -95,6 +96,13 @@ public class MailUtilTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+	public void testMessageToMailWithAttachments() throws Exception {
+		EMail mail = MailUtil.messageToMail(new File("src/test/resources/New email with attachments.eml"), true);
+		Assert.assertNotNull(mail);
+		Assert.assertEquals(1, mail.getAttachmentsCount());
+	}
+
+	@Test
 	public void testMessageToMailB() throws Exception {
 		EMail mail = MailUtil.messageToMail(new File("src/test/resources/parche 2.eml"), true);
 		Assert.assertNotNull(mail);
@@ -137,6 +145,6 @@ public class MailUtilTest extends AbstractCoreTestCase {
 	public void testSMIME() throws MessagingException, IOException {
 		EMail mail = MailUtil.messageToMail(new File("src/test/resources/ArchivBelege_vom_12_05_2023.eml"), true);
 		Assert.assertNotNull(mail);
-		Assert.assertEquals(3, mail.getAttachmentsCount());
+		Assert.assertEquals(6, mail.getAttachmentsCount());
 	}
 }

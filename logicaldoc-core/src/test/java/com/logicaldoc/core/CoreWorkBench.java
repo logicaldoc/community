@@ -11,12 +11,24 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import javax.mail.Authenticator;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
@@ -37,164 +49,95 @@ import com.talanlabs.avatargenerator.IdenticonAvatar;
 
 public class CoreWorkBench {
 
-	public static void main(String[] args) throws Exception {
-String test="\r\n"
-		+ "I72MAALF\r\n"
-		+ "0001-004483\r\n"
-		+ "\r\n"
-		+ "\f\r\n"
-		+ "\f\r\n"
-		+ " \b\r\n"
-		+ " \r\n"
-		+ " ";
+	 public static void sendEmailWithAttachments(String host, String port,
+	            final String userName, final String password, String toAddress,
+	            String subject, String message, String[] attachFiles)
+	            throws AddressException, MessagingException {
+	        // sets SMTP server properties
+	        Properties properties = new Properties();
+	        properties.put("mail.smtp.host", host);
+	        properties.put("mail.smtp.port", port);
+	        properties.put("mail.smtp.auth", "true");
+	        properties.put("mail.smtp.starttls.enable", "true");
+	        properties.put("mail.user", userName);
+	        properties.put("mail.password", password);
+	 
+	        // creates a new session with an authenticator
+	        Authenticator auth = new Authenticator() {
+	            public PasswordAuthentication getPasswordAuthentication() {
+	                return new PasswordAuthentication(userName, password);
+	            }
+	        };
+	        Session session = Session.getInstance(properties, auth);
+	 
+	        // creates a new e-mail message
+	        Message msg = new MimeMessage(session);
+	 
+	        msg.setFrom(new InternetAddress(userName));
+	        InternetAddress[] toAddresses = { new InternetAddress(toAddress) };
+	        msg.setRecipients(Message.RecipientType.TO, toAddresses);
+	        msg.setSubject(subject);
+	        msg.setSentDate(new Date());
+	 
+	        // creates message part
+//	        MimeBodyPart messageBodyPart = new MimeBodyPart();
+//	        messageBodyPart.setContent(message, "text/html");
+	 
+	        // creates multi-part
+	        Multipart multipart = new MimeMultipart();
+//	        multipart.addBodyPart(messageBodyPart);
+	 
+	        // adds attachments
+	        if (attachFiles != null && attachFiles.length > 0) {
+	            for (String filePath : attachFiles) {
+	                MimeBodyPart attachPart = new MimeBodyPart();
+	 
+	                try {
+	                    attachPart.attachFile(filePath);
+	                } catch (IOException ex) {
+	                    ex.printStackTrace();
+	                }
+	 
+	                multipart.addBodyPart(attachPart);
 
-System.out.println("A: " + test.replaceAll("\\p{Cntrl}", ""));
-System.out.println("B: " + test.replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
-
-
-
-//		StringBuilder sb = new StringBuilder();
-//		Exec.exec("wmic cpu get loadpercentage", null, null, sb, 20);
-//		
-//		try {
-//			Thread.sleep(500);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//		}
-//		
-//		String output = sb.toString();
-//		int load = 0;
-//
-//		try (Scanner scanner = new Scanner(output)) {
-//			while (scanner.hasNextLine()) {
-//				// trim and remove all non printable chars
-//				String line = scanner.nextLine().trim().replaceAll("\\p{Zs}+", "");
-//				if (line.matches("^\\d+$")) {
-//					load = Integer.parseInt(line);
-//				}
-//			}
-//		}
-
-//		String[] timezones = TimeZone.getAvailableIDs();
-//		for (String timezone : timezones) {
-//			System.out.println(timezone);
-//		}
-//		
-//		System.out.println(ExceptionUtils.getStackTrace(new Exception()));
-//
-//		// Getting the current date from java.util.Date class
-//		Date currentTime = new Date();
-//		System.out.println("currentTime : " + currentTime);
-//
-//		// Date time to current timezone
-//		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		String ISTTime = dateFormatter.format(currentTime);
-//		System.out.println("local time : " + ISTTime);
-//
-//		// Date time to PST
-//		// Creating PST timezone
-//		TimeZone pstTimezone = TimeZone.getTimeZone("America/Los_Angeles");
-//
-//		// setting pst timezone to formatter.
-//		dateFormatter.setTimeZone(pstTimezone);
-//
-//		// converting IST to PST
-//		String PSTTime = dateFormatter.format(currentTime);
-//		System.out.println("PST time : " + PSTTime);
-//
-//		// Date time to GST - Dubai Gulf
-//		// Creating GST timezone
-//		TimeZone gstTimezone = TimeZone.getTimeZone("Asia/Dubai");
-//
-//		// setting pst timezone to formatter.
-//		dateFormatter.setTimeZone(gstTimezone);
-//
-//		// converting IST to PST
-//		String GSTTime = dateFormatter.format(currentTime);
-//		System.out.println("GST time : " + GSTTime);
-//
-//		dateFormatter.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
-//		System.out.println("Rome time : " + dateFormatter.format(currentTime));
-
-		// getting the diff b/w two los angeles and dubai times.
-
-		// printDurationBetweenTwoDates(losAngelesDateTime, dubaiDateTime);
-
-//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-//		Date date= df.parse("2021-11-26T10:08:55+01:00");
-//		System.out.println("date1: "+date);
-//
-//		df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-//		date= df.parse("2021-11-26T10:08:55+04:00");
-//		System.out.println("date2: "+date);
-//		
-//		df.setTimeZone(TimeZone.getTimeZone("GMT+07:00"));
-//		System.out.println("format: "+df.format(date));
-//		
-
-//		EMail email = MailUtil.msgToMail(new File("C:\\Users\\marco\\Downloads\\hebrewemail.msg"), false);
-//		System.out.println("subject: " + email.getSubject());
-
-//		avatarStuff();
-
-//		statsStuff();
-
-//		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-//		Document doc1 = new Document();
-//		doc1.setId(1L);
-//		doc1.setFileName("doc001.pdf");
-//		doc1.setDate(df.parse("2020-05-20"));
-//
-//		Document doc2 = new Document();
-//		doc2.setId(2L);
-//		doc2.setFileName("doc002.pdf");
-//		doc2.setDate(df.parse("2020-05-15"));
-//
-//		Document doc3 = new Document();
-//		doc3.setId(3L);
-//		doc3.setFileName("doc003.pdf");
-//		doc3.setDate(df.parse("2020-05-16"));
-//		
-//		Document doc4 = new Document();
-//		doc4.setId(4L);
-//		doc4.setFileName("doc004.pdf");
-//		doc4.setDate(df.parse("2020-05-21"));
-//		
-//		List<Document> docs = new ArrayList<>();
-//		docs.add(doc1);
-//		docs.add(doc2);
-//		docs.add(doc3);
-//		docs.add(doc4);
-//
-//		Collections.sort(docs, DocumentComparator.getComparator("fileName desc, date asc"));
-//		for (Document doc : docs) {
-//			System.out.println(doc.getFileName()+" > "+df.format(doc.getDate()));
-//		}
-		//
-		// File xslt = new File("target/xslt");
-		// FileUtils.copyURLToFile(
-		// new
-		// URL("https://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2.1/fatturaPA_v1.2.1.xsl"),
-		// xslt);
-
-//		ZipUtil zipUtil = new ZipUtil();
-//		List<String> entries = zipUtil.listEntries(new File("c:/tmp/ld831-index.zip"));
-//		for (String entry : entries) {
-//			System.out.println(entry);
-//		}
-
-//		String inputFile = "src/test/resources/aliceDynamic.epub";
-//		Reader reader = new Reader();
-//		reader.setIsIncludingTextContent(true);
-//		reader.setFullContent(inputFile);
-//		
-//		BookSection bookSection = reader.readSection(1);
-//		
-//		System.out.println(bookSection.getSectionContent());
-//		FileUtil.writeFile(bookSection.getSectionContent(), "c:/tmp/ebook.html");
-
-//		emailStuff();
-	}
+					System.out.println("added attachment " + attachPart.getFileName());
+	            }
+	        }
+	 
+	        // sets the multi-part as e-mail's content
+	        msg.setContent(multipart);
+	 
+	        // sends the e-mail
+	        Transport.send(msg); 
+	    }
+	 
+	    /**
+	     * Test sending e-mail with attachments
+	     */
+	    public static void main(String[] args) {
+	        // SMTP info
+	        String host = "smtp.logicaldoc.com";
+	        String port = "25";
+	        String mailFrom = "info@logicaldoc.com";
+	        String password = "#pachlgA8oGufr8";
+	 
+	        // message info
+	        String mailTo = "newteam@logicaldoc.com";
+	        String subject = "New email with attachments 2";
+	 
+	        // attachments
+	        String[] attachFiles = new String[1];
+	        attachFiles[0] = "C:\\Users\\marco\\Downloads\\Zahlungsavis vom 14.07.2023.pdf";
+	 
+	        try {
+	            sendEmailWithAttachments(host, port, mailFrom, password, mailTo,
+	                subject, "none", attachFiles);
+	            System.out.println("Email sent.");
+	        } catch (Exception ex) {
+	            System.out.println("Could not send email.");
+	            ex.printStackTrace();
+	        }
+	    }
 
 	private static void avatarStuff() {
 		Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(128, 128).build();
