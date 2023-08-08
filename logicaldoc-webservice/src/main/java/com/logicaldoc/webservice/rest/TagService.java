@@ -144,7 +144,9 @@ public interface TagService {
 	 * @throws PersistenceException Error in the database
 	 * @throws AuthenticationException Invalid session
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getTags")
