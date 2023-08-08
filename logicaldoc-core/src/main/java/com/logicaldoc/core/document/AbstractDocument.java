@@ -53,26 +53,59 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Document's status unlocked: 0
+	 */
 	public static final int DOC_UNLOCKED = 0;
 
+	/**
+	 * Document's status checked out: 1
+	 */
 	public static final int DOC_CHECKED_OUT = 1;
 
+	/**
+	 * Document's status locked: 2
+	 */
 	public static final int DOC_LOCKED = 2;
 
+	/**
+	 * Document's status archived: 3
+	 */
 	public static final int DOC_ARCHIVED = 3;
 
+	/**
+	 * Document's export status unlocked: 0
+	 */
 	public static final int EXPORT_UNLOCKED = 0;
 
+	/**
+	 * Document's export status unlocked: 0
+	 */
 	public static final int EXPORT_LOCKED = 1;
 
+	/**
+	 * Document's indexed status to index: 0
+	 */
 	public static final int INDEX_TO_INDEX = 0;
 
+	/**
+	 * Document's indexed status indexed: 1
+	 */
 	public static final int INDEX_INDEXED = 1;
 
+	/**
+	 * Document's indexed status skip: 2
+	 */
 	public static final int INDEX_SKIP = 2;
 
+	/**
+	 * Document's indexed status index just metadata: 3
+	 */
 	public static final int INDEX_TO_INDEX_METADATA = 3;
 
+	/**
+	 * Document's nature regular document: 0
+	 */
 	public static final int NATURE_DOC = 0;
 
 	private String comment;

@@ -29,7 +29,6 @@ import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Abstract test case that of database and context initialization.
- * <p>
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 8.8.5

@@ -23,6 +23,13 @@ import com.orange.links.client.utils.MovablePoint;
 import com.orange.links.client.utils.Segment;
 import com.orange.links.client.utils.SegmentPath;
 
+/**
+ * A connection line between two nodes
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * 
+ * @since 6.8
+ */
 public abstract class AbstractConnection implements Connection {
 
 	protected Shape startShape;

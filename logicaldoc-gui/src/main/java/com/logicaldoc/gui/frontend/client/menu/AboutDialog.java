@@ -20,6 +20,9 @@ import com.smartgwt.client.widgets.layout.VStack;
  */
 public class AboutDialog extends Window {
 
+	/**
+	 * Public constructor
+	 */
 	public AboutDialog() {
 		super();
 

@@ -10,6 +10,9 @@ package com.logicaldoc.core.metadata;
 public class AbstractAttributeSet extends ExtensibleObject {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The AttributeSet's default type: 0
+	 */
 	public static int TYPE_DEFAULT = 0;
 
 	private String name;
