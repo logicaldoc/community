@@ -135,7 +135,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 			 */
 			for (GUIDashlet dashlet : dashlets) {
 				Generic generic = new Generic("usersetting", "dashlet-" + dashlet.getName(), session.getUserId());
-				generic.setInteger1((long) dashlet.getId());
+				generic.setInteger1(dashlet.getId());
 				generic.setInteger2((long) dashlet.getColumn());
 				generic.setInteger3((long) dashlet.getRow());
 				generic.setString1(Long.toString(dashlet.getIndex()));

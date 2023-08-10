@@ -50,9 +50,8 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 				FileUtils.copyFile(test, dest);
 
 				// And delete all other pages
-				String[] pages = dest.getParentFile().list((File dir, String name) -> {
-					return name.startsWith(basename + "-") && name.endsWith("." + outExt);
-				});
+				String[] pages = dest.getParentFile()
+						.list((dir, name) -> name.startsWith(basename + "-") && name.endsWith("." + outExt));
 				for (String page : pages) {
 					FileUtils.deleteQuietly(new File(page));
 				}

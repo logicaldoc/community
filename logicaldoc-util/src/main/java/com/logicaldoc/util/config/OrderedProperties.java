@@ -52,8 +52,8 @@ public class OrderedProperties extends Properties {
 		String thevalue;
 
 		for (int i = 0; i < keys.size(); i++) {
-			thekey = (String) keys.get(i);
-			thevalue = (String) this.getProperty(thekey);
+			thekey = keys.get(i);
+			thevalue = this.getProperty(thekey);
 			thevalue = doubleSlash(thevalue);
 
 			oneline = thekey + "=" + thevalue + "\n";

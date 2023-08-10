@@ -153,7 +153,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 	}
 
-	private static void checkPasswordStrength(User user) throws PersistenceException {
+	private static void checkPasswordStrength(User user) {
 
 		// Skip the tests in case of new tenant creation
 		if (user.getId() == 0L && user.getTenantId() != Tenant.DEFAULT_ID && "Administrator".equals(user.getFirstName())
@@ -736,7 +736,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (!checkStoringAspect())
 			return;
 
-		User user = (User) findById(userId);
+		User user = findById(userId);
 		Group userGroup = user.getUserGroup();
 
 		user.setDeleted(PersistentObject.DELETED_CODE_DEFAULT);

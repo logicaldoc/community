@@ -65,7 +65,7 @@ public class MailTool {
 	 */
 	public void sendDocuments(Collection<Document> documents, String from, String to, String subject, String message)
 			throws IOException, MessagingException {
-		sendDocuments(documents, from, Arrays.asList(new String[] { to }), subject, message);
+		sendDocuments(documents, from, Arrays.asList(to), subject, message);
 	}
 
 	/**
@@ -128,8 +128,7 @@ public class MailTool {
 	 */
 	public void sendDocument(Document document, String from, String to, String subject, String message)
 			throws IOException, MessagingException {
-		sendDocuments(Arrays.asList(new Document[] { document }), from, Arrays.asList(new String[] { to }), subject,
-				message);
+		sendDocuments(Arrays.asList(document), from, Arrays.asList(new String[] { to }), subject, message);
 	}
 
 	/**
@@ -146,7 +145,7 @@ public class MailTool {
 	 */
 	public void sendDocument(Document document, String from, Collection<String> to, String subject, String message)
 			throws IOException, MessagingException {
-		sendDocuments(Arrays.asList(new Document[] { document }), from, to, subject, message);
+		sendDocuments(Arrays.asList(document), from, to, subject, message);
 	}
 
 	/**
@@ -202,7 +201,7 @@ public class MailTool {
 	 */
 	public void sendMessage(long tenantId, String from, String to, String subject, String message)
 			throws MessagingException {
-		this.sendMessage(tenantId, from, to != null ? Arrays.asList(new String[] { to }) : null, subject, message);
+		this.sendMessage(tenantId, from, to != null ? Arrays.asList( to ) : null, subject, message);
 	}
 
 	/**
@@ -217,9 +216,9 @@ public class MailTool {
 	 * @return The object representation of the email
 	 * 
 	 * @throws IOException I/O error getting the document's contents
-	 * @throws MessagingException  Cannot read the source message
+	 * @throws MessagingException Cannot read the source message
 	 */
-	public EMail documentToEMail(Document document, boolean extractAttachments) throws MessagingException, IOException  {
+	public EMail documentToEMail(Document document, boolean extractAttachments) throws MessagingException, IOException {
 		if (!(document.getFileName().toLowerCase().endsWith(".eml")
 				|| document.getFileName().toLowerCase().endsWith(".msg")))
 			throw new IllegalArgumentException("Filename must end with .msg or .eml");
@@ -232,9 +231,10 @@ public class MailTool {
 					extractAttachments);
 		else
 			try {
-				email = MailUtil.msgToMail(storer.getStream(document.getId(), storer.getResourceName(document, null, null)),
+				email = MailUtil.msgToMail(
+						storer.getStream(document.getId(), storer.getResourceName(document, null, null)),
 						extractAttachments);
-			}  catch (CMSException e) {
+			} catch (CMSException e) {
 				throw new MessagingException(e.getMessage(), e);
 			}
 		return email;

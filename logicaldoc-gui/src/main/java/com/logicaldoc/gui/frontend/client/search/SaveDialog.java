@@ -14,7 +14,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 
 /**
  * This is the form used to save and update the current search
@@ -25,6 +24,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 public class SaveDialog extends Window {
 
 	private static final String DESCRIPTION = "description";
+
 	private ValuesManager vm = new ValuesManager();
 
 	public SaveDialog() {
@@ -58,9 +58,7 @@ public class SaveDialog extends Window {
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler((ClickEvent event) -> {
-			onSave();
-		});
+		save.addClickHandler(event -> onSave());
 
 		form.setFields(name, description, save);
 		addItem(form);

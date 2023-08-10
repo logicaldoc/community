@@ -247,8 +247,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public Session get(Object sid) {
 		if (sid == null)
 			return null;
-		Session session = super.get(sid);
-		return session;
+		return super.get(sid);
 	}
 
 	/**

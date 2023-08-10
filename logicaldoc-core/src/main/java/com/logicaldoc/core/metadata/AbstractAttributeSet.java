@@ -13,7 +13,7 @@ public class AbstractAttributeSet extends ExtensibleObject {
 	/**
 	 * The AttributeSet's default type: 0
 	 */
-	public static int TYPE_DEFAULT = 0;
+	public static final int TYPE_DEFAULT = 0;
 
 	private String name;
 

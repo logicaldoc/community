@@ -21,7 +21,6 @@ import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.imageio.IIOImage;
@@ -124,8 +123,7 @@ public class ImageUtil {
 		int w = (int) (zone.getWidth() * width);
 		int h = (int) (zone.getHeight() * height);
 
-		BufferedImage subImgage = originalImage.getSubimage(x, y, w, h);
-		return subImgage;
+		return originalImage.getSubimage(x, y, w, h);
 	}
 
 	/**
@@ -145,8 +143,7 @@ public class ImageUtil {
 		int w = width < squareSize ? width : squareSize;
 		int h = height < squareSize ? height : squareSize;
 
-		BufferedImage subImgage = originalImage.getSubimage(x, y, w, h);
-		return subImgage;
+		return originalImage.getSubimage(x, y, w, h);
 	}
 
 	/**
@@ -255,9 +252,8 @@ public class ImageUtil {
 	 * @return the encoded image
 	 * 
 	 * @throws IOException error in the elaboration of the image
-	 * @throws FileNotFoundException error accessing the file
 	 */
-	public static String encodeImage(File image) throws FileNotFoundException, IOException {
+	public static String encodeImage(File image) throws IOException {
 		byte[] bytes = IOUtils.toByteArray(new FileInputStream(image));
 		return Base64.encodeBase64String(bytes);
 	}

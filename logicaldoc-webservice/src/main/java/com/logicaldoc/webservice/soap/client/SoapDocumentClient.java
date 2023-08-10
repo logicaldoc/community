@@ -31,11 +31,11 @@ import com.logicaldoc.webservice.soap.DocumentService;
 @WebService(name = "Document", serviceName = "Document")
 public class SoapDocumentClient extends SoapClient<DocumentService> implements DocumentService {
 
-	public SoapDocumentClient(String endpoint, int gzipThreshold, boolean log, int timeout) throws IOException {
+	public SoapDocumentClient(String endpoint, int gzipThreshold, boolean log, int timeout) {
 		super(endpoint, DocumentService.class, gzipThreshold, log, timeout);
 	}
 
-	public SoapDocumentClient(String endpoint) throws IOException {
+	public SoapDocumentClient(String endpoint) {
 		super(endpoint, DocumentService.class, -1, true, -1);
 	}
 
@@ -268,94 +268,114 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 		client.uploadResource(sid, docId, fileVersion, suffix, content);
 	}
 
-	public void uploadResource(String sid, long docId, String fileVersion, String suffix, File content) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	public void uploadResource(String sid, long docId, String fileVersion, String suffix, File content)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		uploadResource(sid, docId, fileVersion, suffix, new DataHandler(new FileDataSource(content)));
 	}
 
 	@Override
-	public String getExtractedText(String sid, long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+	public String getExtractedText(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.getExtractedText(sid, docId);
 	}
 
 	@Override
 	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+			Integer maxDownloads)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		return client.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
 	}
 
 	@Override
-	public void setPassword(String sid, long docId, String password) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void setPassword(String sid, long docId, String password)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.setPassword(sid, docId, password);
 	}
 
 	@Override
-	public void unsetPassword(String sid, long docId, String currentPassword) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void unsetPassword(String sid, long docId, String currentPassword)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.unsetPassword(sid, docId, currentPassword);
 	}
 
 	@Override
-	public boolean unprotect(String sid, long docId, String password) throws PersistenceException, AuthenticationException, WebserviceException {
+	public boolean unprotect(String sid, long docId, String password)
+			throws PersistenceException, AuthenticationException, WebserviceException {
 		return client.unprotect(sid, docId, password);
 	}
 
 	@Override
-	public WSNote addNote(String sid, long docId, String note) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSNote addNote(String sid, long docId, String note)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.addNote(sid, docId, note);
 	}
 
 	@Override
-	public void deleteNote(String sid, long noteId) throws AuthenticationException, WebserviceException, PersistenceException {
+	public void deleteNote(String sid, long noteId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		client.deleteNote(sid, noteId);
 	}
 
 	@Override
-	public WSNote[] getNotes(String sid, long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSNote[] getNotes(String sid, long docId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.getNotes(sid, docId);
 	}
 
 	@Override
-	public WSRating rateDocument(String sid, long docId, int vote) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSRating rateDocument(String sid, long docId, int vote)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.rateDocument(sid, docId, vote);
 	}
 
 	@Override
-	public WSRating[] getRatings(String sid, long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSRating[] getRatings(String sid, long docId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.getRatings(sid, docId);
 	}
 
 	@Override
-	public String deleteVersion(String sid, long docId, String version) throws AuthenticationException, WebserviceException, PersistenceException {
+	public String deleteVersion(String sid, long docId, String version)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.deleteVersion(sid, docId, version);
 	}
 
 	@Override
-	public void replaceFile(String sid, long docId, String fileVersion, String comment, DataHandler content) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	public void replaceFile(String sid, long docId, String fileVersion, String comment, DataHandler content)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
 		client.replaceFile(sid, docId, fileVersion, comment, content);
 	}
 
 	@Override
-	public void promoteVersion(String sid, long docId, String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+	public void promoteVersion(String sid, long docId, String version) throws AuthenticationException,
+			PermissionException, WebserviceException, PersistenceException, IOException {
 		client.promoteVersion(sid, docId, version);
 	}
 
 	@Override
-	public WSNote saveNote(String sid, long docId, WSNote note) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSNote saveNote(String sid, long docId, WSNote note)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.saveNote(sid, docId, note);
 	}
 
 	@Override
 	public long upload(String sid, Long docId, Long folderId, boolean release, String filename, String language,
-			DataHandler content) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
+			DataHandler content) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, IOException {
 		return client.upload(sid, docId, folderId, release, filename, language, content);
 	}
 
 	@Override
-	public WSDocument[] getVersions(String sid, long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSDocument[] getVersions(String sid, long docId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.getVersions(sid, docId);
 	}
 
 	@Override
-	public WSDocument getVersion(String sid, long docId, String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSDocument getVersion(String sid, long docId, String version)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.getVersion(sid, docId, version);
 	}
 }

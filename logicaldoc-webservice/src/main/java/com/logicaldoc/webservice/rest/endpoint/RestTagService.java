@@ -122,8 +122,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Operation(summary = "Finds authorized documents for the current user having a specified tag")
 	public WSDocument[] findDocumentsByTag(@Parameter(description = "The tag", required = true) @QueryParam("tag") String tag) throws AuthenticationException, PersistenceException, WebserviceException{
 		String sid = validateSession();
-		WSDocument[] docs = super.findDocumentsByTag(sid, tag);
-		return docs;
+		return super.findDocumentsByTag(sid, tag);
 	}
 
 	@Override

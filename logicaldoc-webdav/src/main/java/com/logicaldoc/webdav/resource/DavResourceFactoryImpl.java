@@ -88,9 +88,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	public DavResource createResource(DavResourceLocator locator, WebdavSession session) throws DavException {
 		try {
 			Resource res = resourceService.getResource(locator.getResourcePath(), session);
-			DavResource resource = createResource(locator, session, res);
-
-			return resource;
+			return createResource(locator, session, res);
 		} catch (Exception e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}
@@ -109,10 +107,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	@Override
 	public DavResource createRangeResource(DavResourceLocator locator, WebdavSession session,
 			Pair<String, String> parsedRange) throws DavException {
-
 		Resource res = resourceService.getResource(locator.getResourcePath(), session);
-
-		RangeResourceImpl rangeRes = new RangeResourceImpl(locator, this, session, resourceConfig, res, parsedRange);
-		return rangeRes;
+		return new RangeResourceImpl(locator, this, session, resourceConfig, res, parsedRange);
 	}
 }

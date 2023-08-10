@@ -115,7 +115,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		String sql = "select ld_docid from ld_bookmark where ld_type=" + Bookmark.TYPE_DOCUMENT
 				+ " and ld_deleted = 0 and ld_userid = " + session.getUserId();
 		@SuppressWarnings("unchecked")
-		List<Long> bookmarks = (List<Long>) dao.queryForList(sql, Long.class);
+		List<Long> bookmarks = dao.queryForList(sql, Long.class);
 
 		// The list of documents to be returned
 		List<Document> documentsInCurrentPage = new ArrayList<>();
@@ -365,9 +365,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		Long hiliteDocId = getHiliteDocId(request);
 
-		Document hiliteDoc = retrieveHiliteDoc(documentsInCurrentPage, folderId, hiliteDocId);
-
-		return hiliteDoc;
+		return retrieveHiliteDoc(documentsInCurrentPage, folderId, hiliteDocId);
 	}
 
 	private List<Document> exeucuteQuey(HttpServletRequest request, List<String> extendedAttributes,
@@ -398,10 +396,9 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		List<Object> records = new ArrayList<>();
 		if (folderId != null || filename != null || formId != null
 				|| StringUtils.isNotEmpty(request.getParameter(INDEXED)))
-			records = (List<Object>) docDao.findByQuery(query.toString(), params, null);
+			records = docDao.findByQuery(query.toString(), params, null);
 
-		List<Document> documents = enrichRecords(records, extendedAttributes, extendedAttributesValues, user);
-		return documents;
+		return enrichRecords(records, extendedAttributes, extendedAttributesValues, user);
 	}
 
 	private List<Document> enrichRecords(List<Object> records, List<String> extendedAttributes,

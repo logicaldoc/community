@@ -346,7 +346,7 @@ public class UserPropertiesPanel extends HLayout {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values =  vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			user.setUsername((String) values.get("username"));

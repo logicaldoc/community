@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -95,16 +93,17 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 			id.setTooltip(I18N.message("thisisalias") + ": " + document.getDocRef());
 
 		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon",
-				Util.textWithAvatar(document.getCreatorId(), Util.padLeft(I18N.formatDate((Date) document.getCreation())
-						+ " " + I18N.message("by") + " " + document.getCreator(), 40)));
-		creation.setTooltip(I18N.formatDate((Date) document.getCreation()) + " " + I18N.message("by") + " "
-				+ document.getCreator());
+				Util.textWithAvatar(document.getCreatorId(), Util.padLeft(I18N.formatDate(document.getCreation()) + " "
+						+ I18N.message("by") + " " + document.getCreator(), 40)));
+		creation.setTooltip(
+				I18N.formatDate(document.getCreation()) + " " + I18N.message("by") + " " + document.getCreator());
 
 		StaticTextItem published = ItemFactory.newStaticTextItem("date", "publishedon",
-				Util.textWithAvatar(document.getPublisherId(), Util.padLeft(I18N.formatDate((Date) document.getDate())
-						+ " " + I18N.message("by") + " " + document.getPublisher(), 40)));
+				Util.textWithAvatar(document.getPublisherId(), Util.padLeft(
+						I18N.formatDate(document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher(),
+						40)));
 		published.setTooltip(
-				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
+				I18N.formatDate(document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
 
 		StaticTextItem size = ItemFactory.newStaticTextItem("size",
 				Util.formatSizeW7(document.getFileSize()) + " (" + Util.formatSizeBytes(document.getFileSize()) + ")");
@@ -282,7 +281,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, document.getId(), null);
 
-		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) document.getTags());
+		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, document.getTags());
 		tagItem.setEndRow(true);
 		tagItem.setDisabled(!updateEnabled);
 		tagItem.addChangedHandler(changedHandler);
@@ -389,22 +388,21 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 						: I18N.message("ratethisdocument"));
 		rating.setEndRow(true);
 		if (updateEnabled)
-			rating.addClickHandler((ClickEvent event) -> {
-				DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<GUIRating>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIRating rating) {
-						if (rating != null) {
-							RatingDialog dialog = new RatingDialog(document.getRating(), rating);
-							dialog.show();
+			rating.addClickHandler(
+					event -> DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<GUIRating>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
 						}
-					}
-				});
-			});
+
+						@Override
+						public void onSuccess(GUIRating rating) {
+							if (rating != null) {
+								RatingDialog dialog = new RatingDialog(document.getRating(), rating);
+								dialog.show();
+							}
+						}
+					}));
 		rating.setDisabled(!updateEnabled);
 		if (Menu.enabled(Menu.BRANDING))
 			items.add(rating);
@@ -413,7 +411,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		if (Boolean.TRUE.equals(vm.validate())) {
 			document.setFileName((String) values.get("filename"));
 			document.setLanguage((String) values.get("language"));

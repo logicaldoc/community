@@ -31,8 +31,7 @@ public abstract class AbstractDataServlet extends HttpServlet {
 	protected static Logger log = LoggerFactory.getLogger(AbstractDataServlet.class);
 
 	protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-	
-	
+
 	protected AbstractDataServlet() {
 
 	}
@@ -40,12 +39,11 @@ public abstract class AbstractDataServlet extends HttpServlet {
 	protected boolean isSessionRequired() {
 		return true;
 	}
-	
+
 	protected DateFormat getDateFormat() {
-		DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-		return df;
+		return new SimpleDateFormat(DATE_FORMAT);
 	}
-	
+
 	/**
 	 * Standard implementation of the service method that perform the session
 	 * checks. It does not throws exception++ to avoid DoS.

@@ -261,18 +261,15 @@ public class Setup implements EntryPoint {
 		dbEngine.setVisible(false);
 		dbEngine.setName(DB_ENGINE);
 		LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
-		for (Map.Entry<String, String[]> entry : engines.entrySet()) 
+		for (Map.Entry<String, String[]> entry : engines.entrySet())
 			valueMap.put(entry.getKey(), entry.getValue()[0]);
-	
+
 		dbEngine.setValueMap(valueMap);
 		dbEngine.setValue(MYSQL);
-		dbEngine.setShowIfCondition((item, value, form) -> {
-			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-		});
+		dbEngine.setShowIfCondition(
+				(item, value, form) -> !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE)));
 		RequiredIfValidator ifValidator = new RequiredIfValidator();
-		ifValidator.setExpression((formItem, value) -> {
-			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-		});
+		ifValidator.setExpression((formItem, value) -> !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE)));
 		dbEngine.setValidators(ifValidator);
 		dbEngine.addChangeHandler(event -> {
 			String selectedItem = (String) event.getValue();
@@ -285,9 +282,8 @@ public class Setup implements EntryPoint {
 		dbDriver.setVisible(false);
 		dbDriver.setWrapTitle(false);
 		dbDriver.setWidth(300);
-		dbDriver.setShowIfCondition((item, value, form) -> {
-			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-		});
+		dbDriver.setShowIfCondition(
+				(item, value, form) -> !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE)));
 		dbDriver.setValidators(ifValidator);
 
 		// The connection URL to external DB
@@ -295,18 +291,15 @@ public class Setup implements EntryPoint {
 		dbUrl.setWidth(400);
 		dbUrl.setVisible(false);
 		dbUrl.setWrapTitle(false);
-		dbUrl.setShowIfCondition((item, value, form) -> {
-			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-		});
+		dbUrl.setShowIfCondition((item, value, form) -> !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE)));
 		dbUrl.setValidators(ifValidator);
 
 		// The username to access the external DB
 		TextItem dbUsername = ItemFactory.newTextItem(DB_USERNAME, "username", info.getConfig("jdbc.username"));
 		dbUsername.setVisible(false);
 		dbUsername.setWrapTitle(false);
-		dbUsername.setShowIfCondition((item, value, form) -> {
-			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-		});
+		dbUsername.setShowIfCondition(
+				(item, value, form) -> !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE)));
 
 		// The password to access the external DB
 		PasswordItem dbPassword = new PasswordItem();
@@ -315,9 +308,8 @@ public class Setup implements EntryPoint {
 		dbPassword.setName(DB_PASSWORD);
 		dbPassword.setWrapTitle(false);
 		dbPassword.setValue(info.getConfig("jdbc.password"));
-		dbPassword.setShowIfCondition((item, value, form) -> {
-			return !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE));
-		});
+		dbPassword.setShowIfCondition(
+				(item, value, form) -> !I18N.message(EMBEDDED).equals(databaseForm.getValue(DB_TYPE)));
 
 		databaseForm.setFields(dbType, dbEngine, dbDriver, dbUrl, dbUsername, dbPassword);
 		databaseTab.setPane(databaseForm);

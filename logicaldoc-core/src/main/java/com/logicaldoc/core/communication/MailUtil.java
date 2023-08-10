@@ -2,7 +2,6 @@ package com.logicaldoc.core.communication;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -10,10 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -216,12 +213,11 @@ public class MailUtil {
 	 * @return the EMail object
 	 * 
 	 * @throws IOException I/O error
-	 * @throws FileNotFoundException cannot open the file
 	 * @throws CMSException cannot read the content
 	 * @throws MessagingException cannot read the content
 	 */
 	public static EMail msgToMail(File msgFile, boolean extractAttachmentContent)
-			throws FileNotFoundException, IOException, MessagingException, CMSException {
+			throws IOException, MessagingException, CMSException {
 		try (InputStream is = new FileInputStream(msgFile)) {
 			return msgToMail(is, extractAttachmentContent);
 		}
@@ -263,8 +259,7 @@ public class MailUtil {
 
 		try {
 			Session mailSession = Session.getInstance(props, null);
-			MimeMessage msg = new MimeMessage(mailSession, is);
-			return msg;
+			return new MimeMessage(mailSession, is);
 		} catch (Exception t) {
 			log.warn(t.getMessage());
 		}
@@ -462,7 +457,7 @@ public class MailUtil {
 	}
 
 	private static void addAttachments(BodyPart p, EMail email, boolean extractAttachmentContent)
-			throws UnsupportedEncodingException, MessagingException, IOException {
+			throws MessagingException, IOException {
 		if (p.getContent() instanceof Multipart) {
 			Multipart mp = (Multipart) p.getContent();
 			int count = mp.getCount();

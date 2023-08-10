@@ -54,7 +54,7 @@ public class StatusDialog extends Window {
 		save.addClickHandler(new ClickHandler() {
 			@SuppressWarnings("unchecked")
 			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
+				Map<String, Object> values =  vm.getValues();
 
 				if (Boolean.TRUE.equals(vm.validate())) {
 					StatusDialog.this.widget.getWfState().setName((String) values.get("name"));

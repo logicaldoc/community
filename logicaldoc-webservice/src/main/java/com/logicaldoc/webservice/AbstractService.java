@@ -140,7 +140,7 @@ public class AbstractService {
 	}
 
 	protected void checkPermission(Permission permission, User user, long folderId)
-			throws WebserviceException, PersistenceException, PermissionException {
+			throws PersistenceException, PermissionException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
@@ -150,7 +150,7 @@ public class AbstractService {
 		}
 	}
 
-	protected void checkMenu(User user, long menuId) throws WebserviceException, PermissionException {
+	protected void checkMenu(User user, long menuId) throws PermissionException {
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, user.getId())) {
 			String message = String.format("User %s doesn't have read permission on menu %s", user.getUsername(),
@@ -160,8 +160,7 @@ public class AbstractService {
 		}
 	}
 
-	protected void checkWriteEnable(User user, long folderId)
-			throws PermissionException, WebserviceException, PersistenceException {
+	protected void checkWriteEnable(User user, long folderId) throws PermissionException, PersistenceException {
 		checkPermission(Permission.WRITE, user, folderId);
 	}
 
@@ -175,8 +174,7 @@ public class AbstractService {
 		}
 	}
 
-	protected void checkDownloadEnable(User user, long folderId)
-			throws PersistenceException, WebserviceException, PermissionException {
+	protected void checkDownloadEnable(User user, long folderId) throws PersistenceException, PermissionException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(Permission.DOWNLOAD, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have download permission on folder %s", user.getUsername(),

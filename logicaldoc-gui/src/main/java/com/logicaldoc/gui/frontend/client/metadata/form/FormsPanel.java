@@ -27,7 +27,6 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -170,38 +169,36 @@ public class FormsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
-				if (Boolean.TRUE.equals(value)) {
-					FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
+			if (Boolean.TRUE.equals(value)) {
+				FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-							list.deselectAllRecords();
-							showFormDetails(null);
-						}
-					});
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showFormDetails(null);
+					}
+				});
+			}
+		}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler((MenuItemClickEvent event) -> onEdit());
+		edit.addClickHandler(event -> onEdit());
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message(PREVIEW));
-		preview.addClickHandler((MenuItemClickEvent event) -> WindowUtils.openUrlInNewTab(webformURL(formId)));
+		preview.addClickHandler(event -> WindowUtils.openUrlInNewTab(webformURL(formId)));
 		preview.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
 
 		MenuItem invite = new MenuItem();
 		invite.setTitle(I18N.message("invite"));
-		invite.addClickHandler((MenuItemClickEvent event) -> {
+		invite.addClickHandler(event -> {
 			GUIForm selectedForm = getSelectedForm();
 			if (selectedForm != null) {
 				new WebFormInvitationDialog(selectedForm.getId()).show();
@@ -211,7 +208,7 @@ public class FormsPanel extends AdminPanel {
 
 		MenuItem getPrefilledLink = new MenuItem();
 		getPrefilledLink.setTitle(I18N.message("getprefilledlink"));
-		getPrefilledLink.addClickHandler((MenuItemClickEvent event) -> {
+		getPrefilledLink.addClickHandler(event -> {
 			GUIForm selectedForm = getSelectedForm();
 			if (selectedForm != null) {
 				new WebFormPrefilledLink(selectedForm.getId()).show();
@@ -292,7 +289,6 @@ public class FormsPanel extends AdminPanel {
 	}
 
 	public static String webformURL(String formId) {
-		String url = Util.contextPath() + "webform/" + formId;
-		return url;
+		return Util.contextPath() + "webform/" + formId;
 	}
 }

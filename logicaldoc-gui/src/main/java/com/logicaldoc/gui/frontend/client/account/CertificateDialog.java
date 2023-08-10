@@ -112,28 +112,26 @@ public class CertificateDialog extends Window {
 
 		IButton delete = new IButton(I18N.message("deletecert"));
 		delete.setAutoFit(true);
-		delete.addClickHandler(event -> {
-			SC.ask(I18N.message("deletecertwarn"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					LD.contactingServer();
-					SignService.Instance.get().deleteCertificate(new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> SC.ask(I18N.message("deletecertwarn"), (Boolean value) -> {
+			if (Boolean.TRUE.equals(value)) {
+				LD.contactingServer();
+				SignService.Instance.get().deleteCertificate(new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void arg) {
-							LD.clearPrompt();
-							Session.get().getUser().setCertDN(null);
-							Session.get().getUser().setCertExpire(null);
-							refresh();
-						}
-					});
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void arg) {
+						LD.clearPrompt();
+						Session.get().getUser().setCertDN(null);
+						Session.get().getUser().setCertExpire(null);
+						refresh();
+					}
+				});
+			}
+		}));
 
 		if (crtAlreadyGenerated) {
 			form.setItems(details);

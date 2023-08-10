@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.util.Context;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.LocalFileHeader;
 import net.lingala.zip4j.model.ZipParameters;
@@ -87,23 +85,19 @@ public class ZipUtil {
 
 		try (java.util.zip.ZipFile zFile = new java.util.zip.ZipFile(zipFile)) {
 			if (zipFile.length() > maxSize)
-				throw new IOException(String.format(
-						ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
-						zipFile.length(), FileUtil.getDisplaySize(maxSize, "en")));
+				throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE, zipFile.length(),
+						FileUtil.getDisplaySize(maxSize, "en")));
 
 			Enumeration<? extends ZipEntry> e = zFile.entries();
 			while (e.hasMoreElements()) {
-				ZipEntry zipEntry = (ZipEntry) e.nextElement();
+				ZipEntry zipEntry = e.nextElement();
 				files.add(zipEntry);
 
 				if (files.size() > maxEntries)
-					throw new IOException(String.format(
-							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES,
-							zipFile.getName(), maxEntries));
+					throw new IOException(
+							String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES, zipFile.getName(), maxEntries));
 			}
-			files.sort((ZipEntry o1, ZipEntry o2) -> {
-				return o1.getName().compareTo(o2.getName());
-			});
+			files.sort((entry1, entry2) -> entry1.getName().compareTo(entry2.getName()));
 		} catch (Exception e) {
 			logError(e.getMessage());
 		}
@@ -181,14 +175,12 @@ public class ZipUtil {
 				totalEntryArchive++;
 
 				if (totalSizeArchive > maxSize)
-					throw new IOException(String.format(
-							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
-							zipStream, FileUtil.getDisplaySize(maxSize, "en")));
+					throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE, zipStream,
+							FileUtil.getDisplaySize(maxSize, "en")));
 
 				if (totalEntryArchive > maxEntries)
-					throw new IOException(String.format(
-							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES,
-							zipStream, maxEntries));
+					throw new IOException(
+							String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES, zipStream, maxEntries));
 			}
 		}
 
@@ -280,8 +272,7 @@ public class ZipUtil {
 							"Zip file %s looks like a Zip Bomb Attack: ratio between compressed and uncompressed data %f is highly suspicious and is over the maximum allowed of %f",
 							zipFile.getAbsolutePath(), compressionRatio, maxCompressionRatio));
 				if (totalSizeEntry > maxSize)
-					throw new IOException(String.format(
-							ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
+					throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE,
 							zipFile.getAbsolutePath(), FileUtil.getDisplaySize(maxSize, "en")));
 			}
 
@@ -325,7 +316,7 @@ public class ZipUtil {
 		}
 	}
 
-	private void setCharset(ZipFile zipFile) throws ZipException {
+	private void setCharset(ZipFile zipFile) {
 		if (fileNameCharset != null && !"auto".equals(fileNameCharset))
 			zipFile.setCharset(Charset.forName(fileNameCharset));
 	}
@@ -352,7 +343,7 @@ public class ZipUtil {
 		}
 	}
 
-	public String getEntryContent(File zip, String entry) throws FileNotFoundException, IOException {
+	public String getEntryContent(File zip, String entry) throws IOException {
 		return IOUtil.getStringFromInputStream(getEntryStream(zip, entry));
 	}
 

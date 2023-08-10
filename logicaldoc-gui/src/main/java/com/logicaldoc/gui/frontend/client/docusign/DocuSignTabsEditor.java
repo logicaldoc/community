@@ -40,14 +40,13 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
 				|| note.getUserId() == Session.get().getUser().getId()) {
 			DocuSignTabContextMenu contextMenu = new DocuSignTabContextMenu(drawItem, note);
-			contextMenu.addDeleteClickHandler(event -> {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						notes.remove(note);
-						drawItem.erase();
-					}
-				});
-			});
+			contextMenu.addDeleteClickHandler(
+					event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+						if (Boolean.TRUE.equals(answer)) {
+							notes.remove(note);
+							drawItem.erase();
+						}
+					}));
 			drawItem.setContextMenu(contextMenu);
 		}
 		return drawItem;

@@ -1,12 +1,10 @@
 package com.logicaldoc.web;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,8 +81,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 	}
 
 	private void download(HttpServletRequest request, HttpServletResponse response, long docId, String fileVersion,
-			String filename, Document doc)
-			throws MessagingException, IOException, CMSException, FileNotFoundException, ServletException {
+			String filename, Document doc) throws MessagingException, IOException, CMSException {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(docId, fileVersion, null);
 

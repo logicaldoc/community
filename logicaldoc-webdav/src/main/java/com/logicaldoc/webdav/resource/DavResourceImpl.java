@@ -304,16 +304,15 @@ public class DavResourceImpl implements DavResource, Serializable {
 			if (!isCollection() && !resource.isFolder()) {
 				val = "RDNVW";
 			}
-			DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<>("permissions", val,
-					nameSpace);
+			DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<>("permissions", val, nameSpace);
 			properties.add(defaultDavProperty);
 		}
 	}
 
 	private void addSizeProperty(DavPropertyName name, Namespace nameSpace) {
 		if (name.getName().equals("size") && !isCollection() && !resource.isFolder()) {
-			DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<>("size",
-					resource.getContentLength(), nameSpace);
+			DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<>("size", resource.getContentLength(),
+					nameSpace);
 			properties.add(defaultDavProperty);
 		}
 	}
@@ -602,9 +601,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 					log.debug("Join the parts in a unique filename");
 
 					// This filter will only include files ending with .py
-					FilenameFilter filter = (dir, fileName) -> {
-						return fileName.contains(chunkString + "-" + chunkID);
-					};
+					FilenameFilter filter = (dir, fileName) -> fileName.contains(chunkString + "-" + chunkID);
 
 					// We apply the filter
 					File[] chunkfiles = webdavChunking.listFiles(filter);

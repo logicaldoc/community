@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.soap.client;
 
-import java.io.IOException;
-
 import javax.jws.WebService;
 
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -16,7 +14,7 @@ import com.logicaldoc.webservice.soap.AuthService;
 @WebService(name = "Auth", serviceName = "Auth")
 public class SoapAuthClient extends SoapClient<AuthService> implements AuthService {
 
-	public SoapAuthClient(String endpoint) throws IOException {
+	public SoapAuthClient(String endpoint) {
 		super(endpoint, AuthService.class, -1, true, -1);
 	}
 

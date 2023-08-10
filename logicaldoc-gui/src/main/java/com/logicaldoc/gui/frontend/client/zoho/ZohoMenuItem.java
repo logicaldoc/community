@@ -27,17 +27,15 @@ public class ZohoMenuItem extends MenuItem {
 		menu.setShadowDepth(3);
 
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler((MenuItemClickEvent authorizeClick) -> {
-			new ZohoAuthorization().show();
-		});
+		authorize.addClickHandler(authorizeClick -> new ZohoAuthorization().show());
 
 		final MenuItem importDocs = new MenuItem(I18N.message("importfromzoho"));
-		importDocs.addClickHandler((MenuItemClickEvent importDocsClick) -> {
+		importDocs.addClickHandler(importDocsClick -> {
 			ZohoDialog dialog = new ZohoDialog(false);
 			dialog.show();
 		});
 		final MenuItem exportDocs = new MenuItem(I18N.message("exporttozoho"));
-		exportDocs.addClickHandler((MenuItemClickEvent exportDocsClick) -> {
+		exportDocs.addClickHandler(exportDocsClick -> {
 			ZohoDialog dialog = new ZohoDialog(true);
 			dialog.show();
 		});

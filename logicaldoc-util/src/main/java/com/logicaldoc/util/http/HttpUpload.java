@@ -6,7 +6,6 @@ import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -42,7 +41,7 @@ public class HttpUpload {
 
 	private FileBodyCounter.ProgressListener listener;
 
-	public void upload() throws ClientProtocolException, IOException {
+	public void upload() throws IOException {
 		HttpPost filePost = new HttpPost(url);
 
 		String f = fileName;
@@ -73,7 +72,7 @@ public class HttpUpload {
 				log.debug("Upload complete, response: {}", respBody);
 			} else {
 				log.debug("Upload failed, response: {}", status);
-				throw new IOException(""+status);
+				throw new IOException("" + status);
 			}
 		}
 	}

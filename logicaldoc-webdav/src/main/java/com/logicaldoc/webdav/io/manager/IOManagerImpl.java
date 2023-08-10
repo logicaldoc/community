@@ -37,7 +37,7 @@ public class IOManagerImpl implements IOManager {
 	}
 
 	public IOHandler[] getIOHandlers() {
-		return (IOHandler[]) ioHandlers.toArray(new IOHandler[ioHandlers.size()]);
+		return ioHandlers.toArray(new IOHandler[ioHandlers.size()]);
 	}
 
 	public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException {

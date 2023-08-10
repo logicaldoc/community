@@ -127,9 +127,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 		pageCursor.setHint("/" + (firstSelectedDoc.getPreviewPages() > 0 ? firstSelectedDoc.getPreviewPages() : 1));
 		pageCursor.setSaveOnEnter(true);
 		pageCursor.setImplicitSave(true);
-		pageCursor.addChangedHandler(event -> {
-			showPage((Integer) pageCursor.getValue());
-		});
+		pageCursor.addChangedHandler(event -> showPage((Integer) pageCursor.getValue()));
 
 		toolStrip.addFormItem(pageCursor);
 		toolStrip.addButton(zoomIn);

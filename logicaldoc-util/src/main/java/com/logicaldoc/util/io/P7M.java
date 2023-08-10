@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,23 +62,21 @@ public class P7M {
 	 * 
 	 * @param is The inputStream
 	 * 
-	 * @throws IOException I/O error 
+	 * @throws IOException I/O error
 	 */
 	public void read(InputStream is) throws IOException {
 		byte[] buffer = new byte[4096];
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			while (is.read(buffer) > 0) {
-				baos.write(buffer);
-			}
+		while (is.read(buffer) > 0) {
+			baos.write(buffer);
+		}
 
 		byte[] tmp = baos.toByteArray();
 
-
-			// if the content is on Base64, we must decode it into DER format
-			content = Base64.decode(tmp);
-			log.debug("Decoding on Base64 completed");
-			log.debug("The signed file is in DER format");
-		
+		// if the content is on Base64, we must decode it into DER format
+		content = Base64.decode(tmp);
+		log.debug("Decoding on Base64 completed");
+		log.debug("The signed file is in DER format");
 
 		read(content);
 	}
@@ -113,10 +110,9 @@ public class P7M {
 	 * @param outFile The file in which will contained the original file
 	 *        content.
 	 * @throws IOException I/O exception
-	 * @throws FileNotFoundException file not found
 	 * @throws CMSException in case the embedded file cannot be extracted
 	 */
-	public void extractOriginalFile(File outFile) throws FileNotFoundException, IOException, CMSException {
+	public void extractOriginalFile(File outFile) throws IOException, CMSException {
 		try (OutputStream os = new FileOutputStream(outFile)) {
 			cms.getSignedContent().write(os);
 			os.flush();

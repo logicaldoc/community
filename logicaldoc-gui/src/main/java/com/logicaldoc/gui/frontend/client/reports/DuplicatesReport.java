@@ -96,7 +96,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		groupBy.setValueMap(map);
 		groupBy.setPickListWidth(100);
 		groupBy.addChangedHandler((ChangedEvent event) -> {
-			if (event.getValue() != null && !"".equals((String) event.getValue())) {
+			if (event.getValue() != null && !"".equals(event.getValue())) {
 				list.ungroup();
 				list.groupBy((String) event.getValue());
 			}
@@ -193,13 +193,11 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		list.setGroupByField(DIGEST);
 
 		filename.setGroupTitleRenderer((groupValue, groupNode, field, fieldName, grid) -> {
-			String baseTitle = I18N.message(FILENAME) + ": " + groupValue.toString();
-			return baseTitle;
+			return I18N.message(FILENAME) + ": " + groupValue.toString();
 		});
 
 		digest.setGroupTitleRenderer((groupValue, groupNode, field, fieldName, grid) -> {
-			String baseTitle = I18N.message(DIGEST) + ": " + groupValue.toString();
-			return baseTitle;
+			return I18N.message(DIGEST) + ": " + groupValue.toString();
 		});
 
 		list.setCanDrag(true);

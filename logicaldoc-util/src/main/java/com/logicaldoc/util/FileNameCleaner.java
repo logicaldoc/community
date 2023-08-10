@@ -22,7 +22,7 @@ public class FileNameCleaner {
 	public static String cleanFileName(String badFileName) {
 		StringBuilder cleanName = new StringBuilder();
 		for (int i = 0; i < badFileName.length(); i++) {
-			int c = (int) badFileName.charAt(i);
+			int c = badFileName.charAt(i);
 			if (Arrays.binarySearch(illegalChars, c) < 0) {
 				cleanName.append((char) c);
 			} else
@@ -34,7 +34,7 @@ public class FileNameCleaner {
 	public static String cleanPath(String badPath) {
 		StringBuilder cleanName = new StringBuilder();
 		for (int i = 0; i < badPath.length(); i++) {
-			int c = (int) badPath.charAt(i);
+			int c = badPath.charAt(i);
 			if (c == '/' || c == '\\' || c == ':' || Arrays.binarySearch(illegalChars, c) < 0) {
 				cleanName.append((char) c);
 			} else

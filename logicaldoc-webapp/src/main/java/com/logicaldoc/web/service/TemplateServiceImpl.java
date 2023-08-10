@@ -259,9 +259,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				return null;
 			dao.initialize(template);
 
-			GUITemplate guiTemplate = toGuiTemplate(templateId, template, session);
-
-			return guiTemplate;
+			return toGuiTemplate(templateId, template, session);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
@@ -403,9 +401,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					attributes = prepareGUIAttributes(template, null, sessionUser);
 			}
 
-			Arrays.sort(attributes, (o1, o2) -> {
-				return Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition()));
-			});
+			Arrays.sort(attributes,
+					(o1, o2) -> Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition())));
 
 			return attributes;
 		} catch (Exception t) {

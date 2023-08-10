@@ -115,7 +115,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		template.setMultiple(false);
 		template.setColSpan(3);
 		template.addChangedHandler(event -> {
-			if (event.getValue() != null && !"".equals((String) event.getValue()))
+			if (event.getValue() != null && !"".equals(event.getValue()))
 				prepareFields(Long.parseLong((String) event.getValue()));
 			else
 				prepareFields(null);

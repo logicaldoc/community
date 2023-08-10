@@ -396,7 +396,7 @@ public class TaskEditor extends Window {
 		addGroup.setWidth(110);
 		addGroup.setRequired(false);
 		addGroup.addChangedHandler(event -> {
-			if (event.getValue() != null && !"".equals((String) event.getValue())) {
+			if (event.getValue() != null && !"".equals(event.getValue())) {
 				final ListGridRecord selectedRecord = addGroup.getSelectedRecord();
 				if (selectedRecord == null)
 					return;
@@ -419,7 +419,7 @@ public class TaskEditor extends Window {
 		addUser.setWidth(110);
 		addUser.setRequired(false);
 		addUser.addChangedHandler(event -> {
-			if (event.getValue() != null && !"".equals((String) event.getValue())) {
+			if (event.getValue() != null && !"".equals(event.getValue())) {
 				final ListGridRecord selectedRecord = addUser.getSelectedRecord();
 				if (selectedRecord == null)
 					return;

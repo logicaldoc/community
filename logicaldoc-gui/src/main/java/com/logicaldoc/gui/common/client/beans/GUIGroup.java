@@ -20,9 +20,9 @@ public class GUIGroup implements Serializable {
 
 	private String description = "";
 
-	public static int TYPE_DEFAULT = 0;
+	public static final int TYPE_DEFAULT = 0;
 
-	public static int TYPE_USER = 1;
+	public static final int TYPE_USER = 1;
 
 	private int type = TYPE_DEFAULT;
 

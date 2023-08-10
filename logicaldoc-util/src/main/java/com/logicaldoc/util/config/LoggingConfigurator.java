@@ -60,7 +60,7 @@ public class LoggingConfigurator {
 		List<Element> list = appenders.getChildren("RollingFile");
 		Iterator<Element> iter = list.iterator();
 		while (iter.hasNext()) {
-			Element elem = (Element) iter.next();
+			Element elem = iter.next();
 			result.add(elem.getAttributeValue("name"));
 		}
 		return result;
@@ -110,7 +110,7 @@ public class LoggingConfigurator {
 		Element model = xml.findElement("//RollingFile[@name='DMS']");
 
 		// Clone the model and add to the appenders
-		Element newAppender = (Element) model.clone();
+		Element newAppender = model.clone();
 		Element appenders = xml.findElement(APPENDERS);
 		appenders.addContent(0, newAppender);
 
@@ -131,7 +131,7 @@ public class LoggingConfigurator {
 		Element model = xml.findElement("//RollingFile[@name='DMS_WEB']");
 
 		// Clone the model and add to the appenders
-		Element newAppender = (Element) model.clone();
+		Element newAppender = model.clone();
 		Element appenders = xml.findElement(APPENDERS);
 		appenders.addContent(0, newAppender);
 

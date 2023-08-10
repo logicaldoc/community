@@ -223,9 +223,9 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
-				if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler(event -> 
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
 					TenantService.Instance.get().delete(id, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -241,8 +241,7 @@ public class TenantsPanel extends AdminPanel {
 						}
 					});
 				}
-			});
-		});
+			}));
 
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));

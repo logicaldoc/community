@@ -244,7 +244,6 @@ public class EventEndpoint implements EventListener {
 		ServerSerializationStreamWriter serverSerializationStreamWriter = new ServerSerializationStreamWriter(
 				new SimpleSerializationPolicy());
 		serverSerializationStreamWriter.writeObject(messageDto);
-		String result = serverSerializationStreamWriter.toString();
-		return result;
+		return serverSerializationStreamWriter.toString();
 	}
 }

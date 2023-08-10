@@ -145,17 +145,13 @@ public class CalendarEventDialog extends Window {
 		save.setMargin(3);
 		save.setHeight(30);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> {
-			onSave();
-		});
+		save.addClickHandler(event -> onSave());
 
 		IButton delete = new IButton();
 		delete.setMargin(3);
 		delete.setHeight(30);
 		delete.setTitle(I18N.message(DDELETE));
-		delete.addClickHandler((ClickEvent event) -> {
-			onDelete();
-		});
+		delete.addClickHandler(event -> onDelete());
 
 		if (calendarEvent.getId() != 0)
 			buttonsPanel.setMembers(save, delete);
@@ -178,9 +174,7 @@ public class CalendarEventDialog extends Window {
 		layout.setMembersMargin(3);
 
 		IButton addReminder = new IButton(I18N.message("newreminder"));
-		addReminder.addClickHandler((ClickEvent event) -> {
-			addNewReminder();
-		});
+		addReminder.addClickHandler(event -> addNewReminder());
 
 		HLayout buttons = new HLayout();
 		buttons.setAlign(Alignment.RIGHT);
@@ -219,18 +213,17 @@ public class CalendarEventDialog extends Window {
 					Button deleteIcon = AwesomeFactory.newIconButton("trash-alt", DDELETE);
 					deleteIcon.setBaseStyle("statusIcon");
 					deleteIcon.setMargin(2);
-					deleteIcon.addClickHandler((ClickEvent event) -> {
-						LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean answer) -> {
-							if (Boolean.TRUE.equals(answer)) {
-								remindersGrid.removeData(rec);
-							}
-						});
-					});
+					deleteIcon.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"),
+							(Boolean answer) -> {
+								if (Boolean.TRUE.equals(answer)) {
+									remindersGrid.removeData(rec);
+								}
+							}));
 
 					Button addIcon = AwesomeFactory.newIconButton("plus", "add");
 					addIcon.setBaseStyle("statusIcon");
 					addIcon.setMargin(2);
-					addIcon.addClickHandler((ClickEvent event) -> addNewReminder());
+					addIcon.addClickHandler(event -> addNewReminder());
 
 					iconCanvas.setMembers(deleteIcon, addIcon);
 					return iconCanvas;

@@ -37,9 +37,9 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	private static final String PARENT = "parent";
 
-	public static String FOLDER_PAGE_SIZE = "ld-folder-page-size";
+	public static final String FOLDER_PAGE_SIZE = "ld-folder-page-size";
 
-	public static String FOLDER_START_RECORD = "ld-folder-start-gridRecord";
+	public static final String FOLDER_START_RECORD = "ld-folder-start-gridRecord";
 
 	private static final long serialVersionUID = 1L;
 

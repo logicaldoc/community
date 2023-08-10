@@ -145,7 +145,7 @@ public class LDAPBrowser extends VLayout {
 	private void onSearch() {
 		users.setData(new ListGridRecord[0]);
 
-		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		final Map<String, Object> values =  vm.getValues();
 
 		if (Boolean.TRUE.equals(vm.validate())) {
 			String username = (String) values.get(USERNAME);

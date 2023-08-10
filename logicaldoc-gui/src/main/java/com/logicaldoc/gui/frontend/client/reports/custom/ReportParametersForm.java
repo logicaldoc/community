@@ -159,7 +159,7 @@ public class ReportParametersForm extends Window {
 		if (!form.validate())
 			return;
 
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 
 		ArrayList<GUIAttribute> params = new ArrayList<>();
 		for (Map.Entry<String, Object> entry : values.entrySet()) {

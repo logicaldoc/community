@@ -180,9 +180,7 @@ public class WorkflowDashlet extends Portlet {
 		/*
 		 * Save the layout of the grid at every change
 		 */
-		list.addViewStateChangedHandler(event -> {
-			gridState = list.getViewState();
-		});
+		list.addViewStateChangedHandler(event -> gridState = list.getViewState());
 
 		/*
 		 * Restore any previously saved view state for this grid

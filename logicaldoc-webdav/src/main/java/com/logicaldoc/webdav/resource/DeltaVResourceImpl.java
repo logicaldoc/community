@@ -34,7 +34,6 @@ import com.logicaldoc.webdav.session.WebdavSession;
  * {@link org.apache.jackrabbit.webdav.simple.DeltaVResourceImpl}
  * 
  * @author Sebastian Wenzky
- * 
  */
 public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResource, Serializable {
 
@@ -91,8 +90,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 		}
 
 		if (supportedReports.isSupportedReport(reportInfo)) {
-			Report report = ReportType.getType(reportInfo).createReport(this, reportInfo);
-			return report;
+			return ReportType.getType(reportInfo).createReport(this, reportInfo);
 		} else {
 			throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY,
 					"Unkown report " + reportInfo.getReportName() + "requested.");
@@ -124,14 +122,11 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 	}
 
 	protected DavResourceLocator getLocatorFromNodePath() {
-		DavResourceLocator loc = getLocator().getFactory().createResourceLocator(getLocator().getPrefix(), "/", "",
-				false);
-		return loc;
+		return getLocator().getFactory().createResourceLocator(getLocator().getPrefix(), "/", "", false);
 	}
 
 	protected DavResource createResourceFromLocator(DavResourceLocator loc) throws DavException {
-		DavResource res = getFactory().createResource(loc, getSession());
-		return res;
+		return getFactory().createResource(loc, getSession());
 	}
 
 	protected void initSupportedReports() {

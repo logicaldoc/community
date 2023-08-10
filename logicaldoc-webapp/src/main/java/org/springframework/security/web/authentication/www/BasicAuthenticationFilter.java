@@ -263,15 +263,10 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * @LOGICALDOC
-	 * 
-	 *             Decodes the header into a username and password. All the
-	 *             browsers other than Chrome
-	 *
-	 * @throws BadCredentialsException if the Basic header is not present or is
-	 *         not valid Base64
+	 * Decodes the header into a username and password. All the browsers other
+	 * than Chrome
 	 */
-	private String[] extractAndDecodeHeaderAll(String header) throws IOException {
+	private String[] extractAndDecodeHeaderAll(String header) {
 
 		String encoded = header.substring(6);
 		String decoded = null;

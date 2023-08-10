@@ -193,24 +193,24 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 	}
 
 	private void collectTags(Map<String, Object> values) {
-		if (values.get("tags") != null || !"".equals((String) values.get("tags")))
+		if (values.get("tags") != null || !"".equals(values.get("tags")))
 			importFolder.setTags((String) values.get("tags"));
 		else
 			importFolder.setTags(null);
 	}
 
 	private void collectTemplates(Map<String, Object> values) {
-		if (values.get(TEMPLATE) == null || "".equals((String) values.get(TEMPLATE)))
+		if (values.get(TEMPLATE) == null || "".equals(values.get(TEMPLATE)))
 			importFolder.setTemplateId(null);
 		else
 			importFolder.setTemplateId(Long.parseLong((String) values.get(TEMPLATE)));
 
-		if (values.get(OCRTEMPLATE) == null || "".equals((String) values.get(OCRTEMPLATE)))
+		if (values.get(OCRTEMPLATE) == null || "".equals(values.get(OCRTEMPLATE)))
 			importFolder.setOcrTemplateId(null);
 		else
 			importFolder.setOcrTemplateId(Long.parseLong((String) values.get(OCRTEMPLATE)));
 
-		if (values.get(BARCODETEMPLATE) == null || "".equals((String) values.get(BARCODETEMPLATE)))
+		if (values.get(BARCODETEMPLATE) == null || "".equals(values.get(BARCODETEMPLATE)))
 			importFolder.setBarcodeTemplateId(null);
 		else
 			importFolder.setBarcodeTemplateId(Long.parseLong((String) values.get(BARCODETEMPLATE)));

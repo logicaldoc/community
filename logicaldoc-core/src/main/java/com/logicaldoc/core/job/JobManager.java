@@ -210,9 +210,7 @@ public class JobManager {
 	}
 
 	public List<Trigger> getTriggersOfJob(String name, String group) throws SchedulerException {
-		List<Trigger> triggers = scheduler.getTriggersOfJob(JobKey.jobKey(name, group)).stream()
-				.collect(Collectors.toList());
-		return triggers;
+		return scheduler.getTriggersOfJob(JobKey.jobKey(name, group)).stream().collect(Collectors.toList());
 	}
 
 	public void unscheduleJob(String name, String group) throws SchedulerException {

@@ -124,7 +124,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		form.validate();
 		if (Boolean.FALSE.equals(form.hasErrors())) {
 			account.setMailAddress((String) values.get("mailaddress"));
@@ -137,7 +137,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 				account.setPort((Integer) values.get("port"));
 			else
 				account.setPort(Integer.parseInt((String) values.get("port")));
-			account.setSsl("yes".equals((String) values.get("ssl")));
+			account.setSsl("yes".equals(values.get("ssl")));
 			account.setFoldering(Integer.parseInt((String) values.get("foldering")));
 
 			account.setPassword((String) values.get("password_hidden"));

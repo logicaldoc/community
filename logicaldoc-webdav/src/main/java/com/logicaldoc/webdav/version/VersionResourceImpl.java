@@ -3,8 +3,6 @@ package com.logicaldoc.webdav.version;
 import java.util.Collections;
 import java.util.List;
 
-import javax.jcr.RepositoryException;
-import javax.jcr.version.VersionHistory;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jackrabbit.server.io.IOUtil;
@@ -52,32 +50,32 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 
 	}
 
-    @Override
+	@Override
 	public DavResourceIterator getMembers() {
 		return new DavResourceIteratorImpl(Collections.emptyList());
 	}
 
-    @Override
+	@Override
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
-    @Override
+	@Override
 	public void removeMember(DavResource member) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
-    @Override
+	@Override
 	public void setProperty(DavProperty<?> property) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
-    @Override
+	@Override
 	public void removeProperty(DavPropertyName propertyName) throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
-    @Override
+	@Override
 	public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
 			throws DavException {
 		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
@@ -99,11 +97,6 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 		return null;
 	}
 
-	@SuppressWarnings("unused")
-	private VersionHistory getVersionHistoryItem() throws RepositoryException {
-		return null;
-	}
-
 	@Override
 	protected void initSupportedReports() {
 		super.initSupportedReports();
@@ -114,7 +107,6 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 
 	@Override
 	protected void initProperties() {
-
 		if (!propsInitialized) {
 			super.initProperties();
 

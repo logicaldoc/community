@@ -99,7 +99,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		form.validate();
 		if (Boolean.FALSE.equals(form.hasErrors())) {
 			account.setIncludes((String) values.get("include"));

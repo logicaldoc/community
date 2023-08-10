@@ -122,9 +122,7 @@ public class ReportsMenu extends VLayout {
 		Button deletedFolders = new Button(I18N.message("deletedfolders"));
 		deletedFolders.setWidth100();
 		deletedFolders.setHeight(25);
-		deletedFolders.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new DeletedFoldersReport());
-		});
+		deletedFolders.addClickHandler(event -> AdminScreen.get().setContent(new DeletedFoldersReport()));
 		if (Menu.enabled(Menu.DELETED_FOLDERS))
 			addMember(deletedFolders);
 	}
@@ -133,7 +131,7 @@ public class ReportsMenu extends VLayout {
 		Button archivedDocs = new Button(I18N.message("archiveddocs"));
 		archivedDocs.setWidth100();
 		archivedDocs.setHeight(25);
-		archivedDocs.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ArchivedDocsReport()));
+		archivedDocs.addClickHandler(event -> AdminScreen.get().setContent(new ArchivedDocsReport()));
 		if (Feature.visible(Feature.ARCHIVING) && Menu.enabled(Menu.ARCHIVED_DOCS)) {
 			addMember(archivedDocs);
 			if (!Feature.enabled(Feature.ARCHIVING)) {
@@ -146,9 +144,7 @@ public class ReportsMenu extends VLayout {
 		Button deletedDocs = new Button(I18N.message("deleteddocs"));
 		deletedDocs.setWidth100();
 		deletedDocs.setHeight(25);
-		deletedDocs.addClickHandler((ClickEvent event) -> {
-			AdminScreen.get().setContent(new DeletedDocsReport());
-		});
+		deletedDocs.addClickHandler(event -> AdminScreen.get().setContent(new DeletedDocsReport()));
 		if (Menu.enabled(Menu.DELETED_DOCS))
 			addMember(deletedDocs);
 	}
@@ -157,7 +153,7 @@ public class ReportsMenu extends VLayout {
 		Button lockedDocs = new Button(I18N.message("lockeddocs"));
 		lockedDocs.setWidth100();
 		lockedDocs.setHeight(25);
-		lockedDocs.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new LockedDocsReport()));
+		lockedDocs.addClickHandler(event -> AdminScreen.get().setContent(new LockedDocsReport()));
 		if (Menu.enabled(Menu.LOCKED_DOCS))
 			addMember(lockedDocs);
 	}
@@ -166,7 +162,7 @@ public class ReportsMenu extends VLayout {
 		Button lastChanges = new Button(I18N.message("lastchanges"));
 		lastChanges.setWidth100();
 		lastChanges.setHeight(25);
-		lastChanges.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new LastChangesReport()));
+		lastChanges.addClickHandler(event -> AdminScreen.get().setContent(new LastChangesReport()));
 		if (Menu.enabled(Menu.LAST_CHANGES))
 			addMember(lastChanges);
 	}

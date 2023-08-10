@@ -142,14 +142,14 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print(",");
 		writer.print(session.getTenantName());
 		writer.print(",");
-		writer.print(df.format((Date) session.getCreation()));
+		writer.print(df.format(session.getCreation()));
 		writer.print(",");
 
 		if (showSid) {
 			if (SessionManager.get().get(session.getSid()) != null)
 				writer.print(SessionManager.get().get(session.getSid()).getLastRenew());
 			else
-				writer.print(df.format((Date) session.getLastRenew()));
+				writer.print(df.format(session.getLastRenew()));
 		}
 
 		writer.print(",");
@@ -180,11 +180,11 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		final Serializable client = session.getClient() != null ? session.getClient() : "";
 		writer.print("<client><![CDATA[" + (showSid ? client : "") + "]]></client>");
 		writer.print("<tenant><![CDATA[" + session.getTenantName() + "]]></tenant>");
-		writer.print("<created>" + df.format((Date) session.getCreation()) + "</created>");
+		writer.print("<created>" + df.format(session.getCreation()) + "</created>");
 		if (SessionManager.get().get(session.getSid()) != null)
 			writer.print("<renew>" + df.format(SessionManager.get().get(session.getSid()).getLastRenew()) + "</renew>");
 		else
-			writer.print("<renew>" + df.format((Date) session.getLastRenew()) + "</renew>");
+			writer.print("<renew>" + df.format(session.getLastRenew()) + "</renew>");
 		writer.print("</session>");
 	}
 

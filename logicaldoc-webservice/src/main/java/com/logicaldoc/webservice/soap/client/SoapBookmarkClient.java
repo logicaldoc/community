@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.soap.client;
 
-import java.io.IOException;
-
 import javax.jws.WebService;
 
 import com.logicaldoc.core.PersistenceException;
@@ -20,11 +18,11 @@ import com.logicaldoc.webservice.soap.BookmarkService;
 @WebService(name = "Bookmark", serviceName = "Bookmark")
 public class SoapBookmarkClient extends SoapClient<BookmarkService> implements BookmarkService {
 
-	public SoapBookmarkClient(String endpoint, int gzipThreshold, boolean log, int timeout) throws IOException {
+	public SoapBookmarkClient(String endpoint, int gzipThreshold, boolean log, int timeout) {
 		super(endpoint, BookmarkService.class, gzipThreshold, log, timeout);
 	}
 
-	public SoapBookmarkClient(String endpoint) throws IOException {
+	public SoapBookmarkClient(String endpoint) {
 		super(endpoint, BookmarkService.class, -1, true, -1);
 	}
 

@@ -58,9 +58,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		ListGridField scope = new ListGridField(SCOPE, I18N.message(SCOPE), 80);
 		scope.setCanFilter(true);
 		scope.setCanSort(true);
-		scope.setCellFormatter((val, rec, rowNum, colNum) -> {
-			return I18N.message(val.toString());
-		});
+		scope.setCellFormatter((val, rec, rowNum, colNum) -> I18N.message(val.toString()));
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));

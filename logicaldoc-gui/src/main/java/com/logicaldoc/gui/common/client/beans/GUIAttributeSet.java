@@ -9,7 +9,7 @@ public class GUIAttributeSet implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static int TYPE_DEFAULT = 0;
+	public static final int TYPE_DEFAULT = 0;
 
 	private long id = 0;
 
@@ -55,9 +55,8 @@ public class GUIAttributeSet implements Serializable {
 		if (attributes == null)
 			return new GUIAttribute[0];
 
-		Arrays.sort(attributes, (arg0, arg1) -> {
-			return Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition()));
-		});
+		Arrays.sort(attributes,
+				(arg0, arg1) -> Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition())));
 		return attributes;
 	}
 

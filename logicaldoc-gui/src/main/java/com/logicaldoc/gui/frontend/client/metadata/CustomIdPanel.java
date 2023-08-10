@@ -223,7 +223,7 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.addEditCompleteHandler(event -> {
 			ListGridRecord rec = sequences.getRecord(event.getRowNum());
 			SchemeService.Instance.get().resetSequence(Long.parseLong(rec.getAttribute("id")),
-					(Integer) rec.getAttributeAsInt(VALUE), new AsyncCallback<Void>() {
+					rec.getAttributeAsInt(VALUE), new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

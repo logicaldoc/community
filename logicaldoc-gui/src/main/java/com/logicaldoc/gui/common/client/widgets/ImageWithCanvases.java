@@ -130,7 +130,7 @@ public class ImageWithCanvases extends Canvas {
 		if (newHeight <= 0)
 			return;
 
-		int newWidth = (int) ((double) newHeight * getImageAspectRatio());
+		int newWidth = (int) (newHeight * getImageAspectRatio());
 
 		for (Canvas canvas : canvases) {
 			double proportionW = (double) img.getWidth() / (double) canvas.getWidth();
@@ -138,10 +138,10 @@ public class ImageWithCanvases extends Canvas {
 			double proportionX = (double) img.getWidth() / (double) canvas.getLeft();
 			double proportionY = (double) img.getHeight() / (double) canvas.getTop();
 
-			int newCanvasHeight = (int) ((double) newHeight / proportionH);
-			int newCanvasWidth = (int) ((double) newWidth / proportionW);
-			int newCanvasTop = (int) ((double) newHeight / proportionY);
-			int newCanvasLeft = (int) ((double) newWidth / proportionX);
+			int newCanvasHeight = (int) (newHeight / proportionH);
+			int newCanvasWidth = (int) (newWidth / proportionW);
+			int newCanvasTop = (int) (newHeight / proportionY);
+			int newCanvasLeft = (int) (newWidth / proportionX);
 
 			if (newHeight > 100) {
 				canvas.setLeft(newCanvasLeft);
@@ -208,7 +208,7 @@ public class ImageWithCanvases extends Canvas {
 	 * @return the converted left coordinate in range 0..1
 	 */
 	public double getLeft(int letfPixel) {
-		return (double) letfPixel / img.getWidth().doubleValue();
+		return letfPixel / img.getWidth().doubleValue();
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class ImageWithCanvases extends Canvas {
 	 * @return the converted top coordinate in range 0..1
 	 */
 	public double getTop(int topPixel) {
-		return (double) topPixel / img.getHeight().doubleValue();
+		return topPixel / img.getHeight().doubleValue();
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class ImageWithCanvases extends Canvas {
 	 * @return the converted width size in range 0..1
 	 */
 	public double getWidth(int widthPixel) {
-		return (double) widthPixel / img.getWidth().doubleValue();
+		return widthPixel / img.getWidth().doubleValue();
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class ImageWithCanvases extends Canvas {
 	 * @return the converted height size in range 0..1
 	 */
 	public double getHeight(int heightPixel) {
-		return (double) heightPixel / img.getHeight().doubleValue();
+		return heightPixel / img.getHeight().doubleValue();
 	}
 
 	public int getCanvasHeight(Canvas canvas) {

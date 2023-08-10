@@ -42,7 +42,7 @@ public class DocumentsDSParameters {
 	/**
 	 * The sort specification (optional)
 	 */
-	public String sortSpec;
+	private String sortSpec;
 
 	public DocumentsDSParameters(Long folderId, String fileFilter, Integer max, int page, String sortSpec) {
 		this.folderId = folderId;

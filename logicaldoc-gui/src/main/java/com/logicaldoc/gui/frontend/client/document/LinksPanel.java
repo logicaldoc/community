@@ -74,7 +74,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 		prepareContextMenu();
 
-		treeGrid.addDoubleClickHandler(event -> {
+		treeGrid.addDoubleClickHandler(event -> 
 			treeGrid.addCellDoubleClickHandler(evnt -> {
 				final ListGridRecord rec = evnt.getRecord();
 
@@ -95,8 +95,7 @@ public class LinksPanel extends DocumentDetailTab {
 									onPreview(rec);
 							}
 						});
-			});
-		});
+			}));
 	}
 
 	private void prepareContextMenu() {
@@ -112,10 +111,10 @@ public class LinksPanel extends DocumentDetailTab {
 
 			final MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler((MenuItemClickEvent evnt) -> {
+			delete.addClickHandler(evnt -> 
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+					if (Boolean.TRUE.equals(answer)) {
 						DocumentService.Instance.get().deleteLinks(ids, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -132,8 +131,7 @@ public class LinksPanel extends DocumentDetailTab {
 							}
 						});
 					}
-				});
-			});
+				}));
 
 			final MenuItem preview = new MenuItem();
 			preview.setTitle(I18N.message("preview"));

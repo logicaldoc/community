@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -182,7 +181,7 @@ public class XMLConverter extends AbstractFormatConverter {
 	}
 
 	private String getXsltOutputFormat(Document document, File xslt, File xml, SAXBuilder builder,
-			org.jdom2.Document domDocument) throws IOException, MalformedURLException, JDOMException {
+			org.jdom2.Document domDocument) throws IOException, JDOMException {
 
 		/*
 		 * Search for the XSL declaration
@@ -235,12 +234,11 @@ public class XMLConverter extends AbstractFormatConverter {
 	 * 
 	 * @return The expected output format
 	 * 
-	 * @throws IOException
-	 * @throws MalformedURLException
-	 * @throws JDOMException
+	 * @throws IOException Generic I/O error
+	 * @throws JDOMException JDOM parsing error
 	 */
 	private String chectStyleSheet(File xslt, SAXBuilder builder, ProcessingInstruction pi)
-			throws IOException, MalformedURLException, JDOMException {
+			throws IOException, JDOMException {
 		String xsltOutFormat = null;
 		try {
 			FileUtils.copyURLToFile(new URL(pi.getPseudoAttributeValue("href")), xslt);

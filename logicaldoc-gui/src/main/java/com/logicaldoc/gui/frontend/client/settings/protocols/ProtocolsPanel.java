@@ -269,7 +269,7 @@ public class ProtocolsPanel extends AdminPanel {
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values =  vm.getValues();
 		if (Session.get().isDefaultTenant()) {
 			webservicesPanel.save();
 

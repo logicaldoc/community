@@ -156,9 +156,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(event -> {
-			refresh();
-		});
+		refresh.addClickHandler(event -> refresh());
 		toolStrip.addFill();
 
 		listing.setMembers(toolStrip, grid);
@@ -189,23 +187,21 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					MessageService.Instance.get().delete(ids, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				MessageService.Instance.get().delete(ids, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							grid.removeSelectedData();
-						}
-					});
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						grid.removeSelectedData();
+					}
+				});
+			}
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

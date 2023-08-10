@@ -91,7 +91,6 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		query.append(" order by A.date desc ");
 
 		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
-		return records;
+		return dao.findByQuery(query.toString(), params, max != null ? max : 100);
 	}
 }

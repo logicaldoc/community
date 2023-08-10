@@ -63,7 +63,7 @@ public class ApplyTemplateDialog extends Dialog {
 			if (!form.validate())
 				return;
 
-			final TreeNode selectedNode = (TreeNode) FolderNavigator.get().getSelectedRecord();
+			final TreeNode selectedNode = FolderNavigator.get().getSelectedRecord();
 			final long folderId = Long.parseLong(selectedNode.getAttributeAsString("folderId"));
 			long templateId = Long.parseLong(form.getValueAsString("foldertemplate"));
 

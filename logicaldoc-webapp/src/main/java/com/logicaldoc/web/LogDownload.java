@@ -3,7 +3,6 @@ package com.logicaldoc.web;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,8 +87,7 @@ public class LogDownload extends HttpServlet {
 		}
 	}
 
-	private void downloadLogFile(HttpServletResponse response, String appender, File file)
-			throws IOException, FileNotFoundException {
+	private void downloadLogFile(HttpServletResponse response, String appender, File file) throws IOException {
 		try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
 			if (file.length() > 1) {
 				response.setHeader("Content-Length", Long.toString(file.length()));
@@ -195,7 +193,7 @@ public class LogDownload extends HttpServlet {
 		return "";
 	}
 
-	private void writeTomcatLogs(ZipOutputStream out, File webappDescriptor) throws FileNotFoundException, IOException {
+	private void writeTomcatLogs(ZipOutputStream out, File webappDescriptor) throws IOException {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		String today = df.format(new Date());
 		File logsDir = new File(webappDescriptor.getPath() + "/logs");
@@ -213,7 +211,7 @@ public class LogDownload extends HttpServlet {
 		}
 	}
 
-	private OrderedProperties writeContextProperties(ZipOutputStream out) throws IOException, FileNotFoundException {
+	private OrderedProperties writeContextProperties(ZipOutputStream out) throws IOException {
 		File buf = FileUtil.createTempFile("context", ".properties");
 		ContextProperties cp = Context.get().getProperties();
 		OrderedProperties prop = new OrderedProperties();
@@ -230,8 +228,7 @@ public class LogDownload extends HttpServlet {
 		return prop;
 	}
 
-	public void writeEntry(ZipOutputStream out, String entry, File file) throws FileNotFoundException, IOException {
-
+	public void writeEntry(ZipOutputStream out, String entry, File file) throws IOException {
 		byte[] b;
 		int count;
 

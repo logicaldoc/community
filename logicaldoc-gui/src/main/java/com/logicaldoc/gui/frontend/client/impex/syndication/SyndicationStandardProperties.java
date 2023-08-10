@@ -163,7 +163,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		form.validate();
 		if (Boolean.FALSE.equals(form.hasErrors())) {
 			syndication.setName((String) values.get("name"));

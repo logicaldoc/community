@@ -33,7 +33,6 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -178,125 +177,116 @@ public class ImportFoldersPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					ImportFolderService.Instance.get().delete(id, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImportFolderService.Instance.get().delete(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-							list.deselectAllRecords();
-							showShareDetails(null);
-						}
-					});
-				}
-			});
-		});
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+								showShareDetails(null);
+							}
+						});
+					}
+				}));
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler((MenuItemClickEvent event) -> {
-			ImportFolderService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
-					new AsyncCallback<Boolean>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		test.addClickHandler(event -> ImportFolderService.Instance.get()
+				.test(Long.parseLong(rec.getAttributeAsString("id")), new AsyncCallback<Boolean>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Boolean result) {
-							if (Boolean.TRUE.equals(result))
-								SC.say(I18N.message("connectionestablished"));
-							else
-								SC.warn(I18N.message("connectionfailed"));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Boolean result) {
+						if (Boolean.TRUE.equals(result))
+							SC.say(I18N.message("connectionestablished"));
+						else
+							SC.warn(I18N.message("connectionfailed"));
+					}
+				}));
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler((MenuItemClickEvent event) -> {
-			ImportFolderService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true,
-					new AsyncCallback<Void>() {
+		enable.addClickHandler(event -> ImportFolderService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							rec.setAttribute(EENABLED, "0");
-							list.refreshRow(list.getRecordIndex(rec));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "0");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler((MenuItemClickEvent event) -> {
-			ImportFolderService.Instance.get().changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false,
-					new AsyncCallback<Void>() {
+		disable.addClickHandler(event -> ImportFolderService.Instance.get()
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							rec.setAttribute(EENABLED, "2");
-							list.refreshRow(list.getRecordIndex(rec));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						rec.setAttribute(EENABLED, "2");
+						list.refreshRow(list.getRecordIndex(rec));
+					}
+				}));
 
 		MenuItem resetCache = new MenuItem();
 		resetCache.setTitle(I18N.message("resetcache"));
-		resetCache.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message(QUESTION), I18N.message("confirmresetcache"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					ImportFolderService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		resetCache.addClickHandler(
+				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmresetcache"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImportFolderService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(Void result) {
-							GuiLog.info(I18N.message("cachedeleted"), null);
-						}
-					});
-				}
-			});
-		});
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("cachedeleted"), null);
+							}
+						});
+					}
+				}));
 
 		MenuItem resetCounter = new MenuItem();
 		resetCounter.setTitle(I18N.message("resetcounter"));
-		resetCounter.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message(QUESTION), I18N.message("confirmresetcounter"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					ImportFolderService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		resetCounter.addClickHandler(
+				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmresetcounter"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						ImportFolderService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(Void result) {
-							GuiLog.info(I18N.message("counterreseted"), null);
-							rec.setAttribute("docs", "0");
-							list.refreshRow(list.getRecordIndex(rec));
-						}
-					});
-				}
-			});
-		});
+							@Override
+							public void onSuccess(Void result) {
+								GuiLog.info(I18N.message("counterreseted"), null);
+								rec.setAttribute("docs", "0");
+								list.refreshRow(list.getRecordIndex(rec));
+							}
+						});
+					}
+				}));
 
 		if ("0".equals(rec.getAttributeAsString(EENABLED)))
 			contextMenu.setItems(test, disable, delete, resetCache, resetCounter);

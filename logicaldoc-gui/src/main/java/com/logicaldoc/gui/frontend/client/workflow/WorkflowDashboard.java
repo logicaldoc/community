@@ -21,17 +21,17 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class WorkflowDashboard extends VLayout {
 
-	public static int TASKS_ASSIGNED = 0;
+	public static final int TASKS_ASSIGNED = 0;
 
-	public static int TASKS_I_CAN_OWN = 1;
+	public static final int TASKS_I_CAN_OWN = 1;
 
-	public static int TASKS_SUSPENDED = 2;
+	public static final int TASKS_SUSPENDED = 2;
 
-	public static int TASKS_ALL = 3;
+	public static final int TASKS_ALL = 3;
 
-	public static int TASKS_SUPERVISOR = 4;
+	public static final int TASKS_SUPERVISOR = 4;
 
-	public static int TASKS_INVOLVED = 5;
+	public static final int TASKS_INVOLVED = 5;
 
 	private static WorkflowDashboard instance;
 

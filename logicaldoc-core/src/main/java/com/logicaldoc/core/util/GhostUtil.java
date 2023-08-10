@@ -111,9 +111,7 @@ public class GhostUtil {
 
 		if (page == null) {
 			File root = dst.getParentFile();
-			File[] children = root.listFiles((File dir, String name) -> {
-				return name.startsWith(FileUtil.getBaseName(dst.getName()));
-			});
+			File[] children = root.listFiles((dir, name) -> name.startsWith(FileUtil.getBaseName(dst.getName())));
 			pages.addAll(Arrays.asList(children));
 		}
 

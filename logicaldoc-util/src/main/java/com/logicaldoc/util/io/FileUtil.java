@@ -8,7 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,9 +70,8 @@ public class FileUtil {
 	 * @param filepath the target file path
 	 * 
 	 * @throws IOException I/O error
-	 * @throws FileNotFoundException Unexisting output file
 	 */
-	public static void writeFile(InputStream in, String filepath) throws FileNotFoundException, IOException {
+	public static void writeFile(InputStream in, String filepath) throws IOException {
 		try (OutputStream os = new FileOutputStream(filepath);) {
 			while (true) {
 				synchronized (buffer) {
@@ -154,7 +152,7 @@ public class FileUtil {
 			String strUnsignedValue = null;
 			for (int i = 0; i < size; i++) {
 				// convert each messageDigest byte to unsigned
-				unsignedValue = ((int) messageDigest[i]) & 0xff;
+				unsignedValue = messageDigest[i] & 0xff;
 				strUnsignedValue = Integer.toHexString(unsignedValue);
 				// at least two letters
 				if (strUnsignedValue.length() == 1)
@@ -244,8 +242,7 @@ public class FileUtil {
 				while ((len = is.read(message)) != -1) {
 					sha.update(message, 0, len);
 				}
-				byte[] messageDigest = sha.digest();
-				return messageDigest;
+				return sha.digest();
 			}
 		} catch (IOException io) {
 			log.error("Error generating SHA-1: ", io);
@@ -810,7 +807,7 @@ public class FileUtil {
 
 	/**
 	 * Creates an empty file in the default temporary-file directory, using the
-	 * given prefix and suffix to generate its name. 
+	 * given prefix and suffix to generate its name.
 	 * 
 	 * @param prefix The prefix string to be used in generating the file'sname;
 	 *        must be at least three characters longsuffix
@@ -826,8 +823,8 @@ public class FileUtil {
 	}
 
 	/**
-	 * Creates an empty folder in the default temporary-file directory, using the
-	 * given prefix to generate its name. 
+	 * Creates an empty folder in the default temporary-file directory, using
+	 * the given prefix to generate its name.
 	 * 
 	 * @param prefix The prefix string to be used in generating the file'sname;
 	 *        must be at least three characters longsuffix

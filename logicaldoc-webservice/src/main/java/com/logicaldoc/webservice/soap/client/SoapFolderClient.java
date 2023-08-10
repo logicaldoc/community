@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.soap.client;
 
-import java.io.IOException;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -18,11 +16,11 @@ import com.logicaldoc.webservice.soap.FolderService;
  */
 public class SoapFolderClient extends SoapClient<FolderService> implements FolderService {
 
-	public SoapFolderClient(String endpoint, int gzipThreshold, boolean log, int timeout) throws IOException {
+	public SoapFolderClient(String endpoint, int gzipThreshold, boolean log, int timeout) {
 		super(endpoint, FolderService.class, gzipThreshold, log, timeout);
 	}
 
-	public SoapFolderClient(String endpoint) throws IOException {
+	public SoapFolderClient(String endpoint) {
 		super(endpoint, FolderService.class, -1, true, -1);
 	}
 
@@ -123,42 +121,50 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public void grantUser(String sid, long folderId, long userId, int permissions, boolean recursive) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
+	public void grantUser(String sid, long folderId, long userId, int permissions, boolean recursive)
+			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
 		client.grantUser(sid, folderId, userId, permissions, recursive);
 	}
 
 	@Override
-	public void update(String sid, WSFolder folder) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void update(String sid, WSFolder folder)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.update(sid, folder);
 	}
 
 	@Override
-	public WSFolder createPath(String sid, long parentId, String path) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSFolder createPath(String sid, long parentId, String path)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.createPath(sid, parentId, path);
 	}
 
 	@Override
-	public WSFolder[] listWorkspaces(String sid) throws AuthenticationException, WebserviceException, PersistenceException {
+	public WSFolder[] listWorkspaces(String sid)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.listWorkspaces(sid);
 	}
 
 	@Override
-	public WSFolder findByPath(String sid, String path) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSFolder findByPath(String sid, String path)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.findByPath(sid, path);
 	}
 
 	@Override
-	public boolean isGranted(String sid, long folderId, int permission) throws AuthenticationException, WebserviceException, PersistenceException {
+	public boolean isGranted(String sid, long folderId, int permission)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.isGranted(sid, folderId, permission);
 	}
 
 	@Override
-	public WSFolder createAlias(String sid, long parentId, long foldRef) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSFolder createAlias(String sid, long parentId, long foldRef)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.createAlias(sid, parentId, foldRef);
 	}
 
 	@Override
-	public void merge(String sid, long sourceId, long targetId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void merge(String sid, long sourceId, long targetId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.merge(sid, sourceId, targetId);
 	}
 }

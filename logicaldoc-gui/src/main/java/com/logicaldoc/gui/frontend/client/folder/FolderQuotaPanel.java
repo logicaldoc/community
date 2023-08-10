@@ -106,7 +106,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
 	@Override
 	public boolean validate() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 
 		vm.validate();
 		if (Boolean.TRUE.equals(vm.hasErrors()))

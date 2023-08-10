@@ -19,7 +19,6 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -144,9 +143,8 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		maxItem.setSaveOnEnter(true);
 		maxItem.setImplicitSave(true);
 		maxItem.setHint(I18N.message("elements"));
-		maxItem.addChangedHandler((ChangedEvent evnt) -> {
-			list.refresh(new ImportFolderHistoryDS(importFolder.getId(), Integer.parseInt(maxItem.getValueAsString())));
-		});
+		maxItem.addChangedHandler(evnt -> list.refresh(
+				new ImportFolderHistoryDS(importFolder.getId(), Integer.parseInt(maxItem.getValueAsString()))));
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
 		refresh.addClickHandler(evnt -> list.refresh(

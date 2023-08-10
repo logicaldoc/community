@@ -88,13 +88,12 @@ public class HttpUtil {
 
 			RequestConfig requestConfig = requestBuilder.build();
 
-			CloseableHttpClient httpclient = clientBuilder.setHostnameVerifier(new AllowAllHostnameVerifier())
+			return clientBuilder.setHostnameVerifier(new AllowAllHostnameVerifier())
 					.setSslcontext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
 						public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 							return true;
 						}
 					}).build()).setDefaultRequestConfig(requestConfig).build();
-			return httpclient;
 		} catch (Exception t) {
 			return null;
 		}

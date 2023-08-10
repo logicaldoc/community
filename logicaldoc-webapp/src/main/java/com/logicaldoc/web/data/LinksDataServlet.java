@@ -49,7 +49,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 			query.append(" and not A.document2.id = " + docId);
 		}
 
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		/*
 		 * Iterate over records composing the response XML document

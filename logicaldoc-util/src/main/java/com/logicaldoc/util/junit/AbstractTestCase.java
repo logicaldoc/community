@@ -3,7 +3,6 @@ package com.logicaldoc.util.junit;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -46,7 +45,7 @@ public abstract class AbstractTestCase {
 	private String userHome;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws IOException, SQLException {
 		loadDevelSettings();
 
 		updateUserHome();
@@ -100,9 +99,8 @@ public abstract class AbstractTestCase {
 	 * them as Java variables
 	 * 
 	 * @throws IOException Error reading the development file
-	 * @throws FileNotFoundException Unexisting development file nm,
 	 */
-	private void loadDevelSettings() throws IOException, FileNotFoundException {
+	private void loadDevelSettings() throws IOException {
 		Properties devSettings = new Properties();
 		try (FileReader reader = new FileReader(
 				new File(System.getProperty(USER_HOME) + "/logicaldoc-dev.properties"))) {
@@ -112,7 +110,7 @@ public abstract class AbstractTestCase {
 		}
 	}
 
-	protected void createTestDirs() throws IOException {
+	protected void createTestDirs() {
 		FileUtil.strongDelete(tempDir);
 		FileUtil.strongDelete(tempDir);
 		FileUtil.strongDelete(tempDir);

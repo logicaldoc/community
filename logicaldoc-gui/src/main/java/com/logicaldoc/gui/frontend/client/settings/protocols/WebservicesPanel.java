@@ -145,10 +145,8 @@ public class WebservicesPanel extends VLayout {
 		tenantStat.setColSpan(4);
 		tenantStat.setWidth("*");
 		tenantStat.setAllowEmptyValue(true);
-		tenantStat.addChangedHandler(tenantStatChanged -> {
-			refreshStats(tenantStatChanged.getValue() != null ? Long.parseLong(tenantStatChanged.getValue().toString())
-					: null);
-		});
+		tenantStat.addChangedHandler(tenantStatChanged -> refreshStats(
+				tenantStatChanged.getValue() != null ? Long.parseLong(tenantStatChanged.getValue().toString()) : null));
 		return tenantStat;
 	}
 

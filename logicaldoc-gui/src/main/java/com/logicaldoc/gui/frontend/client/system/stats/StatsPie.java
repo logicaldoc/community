@@ -158,11 +158,11 @@ public class StatsPie extends HLayout {
 		if (type == STATS_REPOSITORY)
 			total.setValue(Util.formatSize(count));
 		else if (type == STATS_DOCUMENTS)
-			total.setValue(Util.formatLong((long) count) + " " + I18N.message("documents").toLowerCase());
+			total.setValue(Util.formatLong(count) + " " + I18N.message("documents").toLowerCase());
 		else if (type == STATS_PAGES)
-			total.setValue(Util.formatLong((long) count) + " " + I18N.message("pages").toLowerCase());
+			total.setValue(Util.formatLong(count) + " " + I18N.message("pages").toLowerCase());
 		else if (type == STATS_FOLDERS)
-			total.setValue(Util.formatLong((long) count) + " " + I18N.message("folders").toLowerCase());
+			total.setValue(Util.formatLong(count) + " " + I18N.message("folders").toLowerCase());
 		total.setRequired(true);
 		total.setShouldSaveValue(false);
 		items[i++] = total;

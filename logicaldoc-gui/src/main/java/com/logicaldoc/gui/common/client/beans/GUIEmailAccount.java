@@ -15,13 +15,13 @@ public class GUIEmailAccount implements Serializable {
 
 	private Long id;
 
-	public static String PROVIDER_POP3 = "pop3";
+	public static final String PROVIDER_POP3 = "pop3";
 
-	public static String PROVIDER_IMAP = "imap";
+	public static final String PROVIDER_IMAP = "imap";
 
-	public static int FORMAT_MULTIPLE = 0;
+	public static final int FORMAT_MULTIPLE = 0;
 
-	public static int FORMAT_EML = 1;
+	public static final int FORMAT_EML = 1;
 
 	private String mailAddress;
 

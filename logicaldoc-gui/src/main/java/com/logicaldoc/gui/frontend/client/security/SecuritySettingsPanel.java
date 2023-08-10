@@ -336,7 +336,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		generatePassword.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
 			if (passwordForm.validate()) {
 				@SuppressWarnings("unchecked")
-				final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+				final Map<String, Object> values =  vm.getValues();
 				PasswordGenerator generator = new PasswordGenerator((Integer) values.get(PWD_SIZE),
 						(Integer) values.get(PWD_UPPER_CASE), (Integer) values.get(PWD_LOWER_CASE),
 						(Integer) values.get(PWD_DIGIT), (Integer) values.get(PWD_SPECIAL),

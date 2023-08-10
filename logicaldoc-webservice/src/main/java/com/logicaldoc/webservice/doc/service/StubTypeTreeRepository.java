@@ -16,13 +16,11 @@ public class StubTypeTreeRepository {
 	private Map<Class<?>, StubTypeTree> repository = new HashMap<>();
 
 	public StubTypeTree getStubTypeTree(Class<?> type) {
-		StubTypeTree stt = repository.computeIfAbsent(type, k -> {
+		return repository.computeIfAbsent(type, k -> {
 			StubTypeTree tree = new StubTypeTree();
 			tree.setType(type);
 			return tree;
 		});
-
-		return stt;
 	}
 
 	public Collection<StubTypeTree> getAllTrees() {

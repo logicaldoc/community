@@ -2071,7 +2071,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				GUIDocument buf = bulkUpdateDocument(docId, vo, ignoreEmptyFields, session);
 				if (buf != null)
 					updatedDocs.add(save(buf));
-			} catch (ServerException | PersistenceException e) {
+			} catch (ServerException e) {
 				log.error(e.getMessage(), e);
 			}
 		}
@@ -2079,7 +2079,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private GUIDocument bulkUpdateDocument(long docId, GUIDocument guiDocument, boolean ignoreEmptyFields,
-			Session session) throws ServerException, PersistenceException {
+			Session session) throws ServerException {
 		GUIDocument document = getById(docId);
 
 		if (document.getImmutable() == 1 || document.getStatus() != AbstractDocument.DOC_UNLOCKED) {
@@ -2821,30 +2821,29 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 			@SuppressWarnings("unchecked")
-			List<Document> duplications = (List<Document>) docDao.query(duplicationsQuery.toString(), 
-					new RowMapper<Document>() {
-						public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
-							Document doc = new Document();
-							doc.setTenantId(session.getTenantId());
-							doc.setId(rs.getLong(1));
-							doc.setDigest(rs.getString(2));
-							doc.setDate(new Date(rs.getTimestamp(3).getTime()));
-							doc.setFileName(rs.getString(5));
-							doc.setVersion(rs.getString(6));
+			List<Document> duplications = docDao.query(duplicationsQuery.toString(), new RowMapper<Document>() {
+				public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
+					Document doc = new Document();
+					doc.setTenantId(session.getTenantId());
+					doc.setId(rs.getLong(1));
+					doc.setDigest(rs.getString(2));
+					doc.setDate(new Date(rs.getTimestamp(3).getTime()));
+					doc.setFileName(rs.getString(5));
+					doc.setVersion(rs.getString(6));
 
-							Folder folder = new Folder();
-							folder.setId(rs.getLong(4));
-							folder.setTenantId(session.getTenantId());
-							doc.setFolder(folder);
-							try {
-								folder.setPathExtended(folderDao.computePathExtended(folder.getId()));
-							} catch (PersistenceException e) {
-								log.error(e.getMessage(), e);
-							}
+					Folder folder = new Folder();
+					folder.setId(rs.getLong(4));
+					folder.setTenantId(session.getTenantId());
+					doc.setFolder(folder);
+					try {
+						folder.setPathExtended(folderDao.computePathExtended(folder.getId()));
+					} catch (PersistenceException e) {
+						log.error(e.getMessage(), e);
+					}
 
-							return doc;
-						}
-					}, null);
+					return doc;
+				}
+			}, null);
 			log.info("Found {} duplicated files to deduplicate", duplications.size());
 
 			List<Document> currentDuplications = new ArrayList<>();

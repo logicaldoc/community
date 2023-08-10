@@ -19,7 +19,6 @@ import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
-import com.dropbox.core.v2.files.ListFolderErrorException;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.files.SearchMatch;
@@ -101,7 +100,7 @@ public class Dropbox {
 		return null;
 	}
 
-	public List<Metadata> list(String path) throws ListFolderErrorException, DbxException {
+	public List<Metadata> list(String path) throws DbxException {
 		String normalizedPath = path;
 		if (normalizedPath.endsWith("/"))
 			normalizedPath = normalizedPath.substring(0, path.length() - 1);
@@ -111,8 +110,7 @@ public class Dropbox {
 			normalizedPath = "";
 
 		ListFolderResult result = client.files().listFolder(normalizedPath);
-		List<Metadata> list = result.getEntries();
-		return list;
+		return result.getEntries();
 	}
 
 	private void treeList(String parentPath, List<FileMetadata> files) throws DbxException {

@@ -132,18 +132,8 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public byte[] getBytes(long docId, String resource) throws IOException {
-		InputStream is = null;
-		try {
-			is = getStream(docId, resource);
-			byte[] bytes = IOUtils.toByteArray(is);
-			return bytes;
-		} finally {
-			if (is != null)
-				try {
-					is.close();
-				} catch (IOException e) {
-					// Noting to do
-				}
+		try (InputStream is = getStream(docId, resource);) {
+			return IOUtils.toByteArray(is);
 		}
 	}
 
@@ -161,7 +151,7 @@ public abstract class AbstractStorer implements Storer {
 	public void writeToStream(long docId, String resource, OutputStream output) throws IOException {
 		try {
 			IOUtils.copyLarge(getStream(docId, resource), output);
-		} catch (IOException ioe) {;
+		} catch (IOException ioe) {
 			throw ioe;
 		}
 	}

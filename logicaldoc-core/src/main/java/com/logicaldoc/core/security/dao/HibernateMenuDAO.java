@@ -617,7 +617,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 						user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 				query1.append(")");
 
-				ids = (List<Long>) queryForList(query1.toString(), Long.class);
+				ids = queryForList(query1.toString(), Long.class);
 
 				/*
 				 * Now search for those menus that references the previously
@@ -652,7 +652,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public void delete(long menuId, int code) throws PersistenceException {
-		Menu menu = (Menu) findById(menuId);
+		Menu menu = findById(menuId);
 		menu.setDeleted(code);
 		store(menu);
 	}
@@ -723,7 +723,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query2.append(query1.toString());
 				query2.append(")");
 
-				List<Long> menuids2 = (List<Long>) queryForList(query2.toString(), Long.class);
+				List<Long> menuids2 = queryForList(query2.toString(), Long.class);
 				for (Long menuid : menuids2) {
 					if (!ids.contains(menuid))
 						ids.add(menuid);

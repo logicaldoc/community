@@ -23,7 +23,6 @@ import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -95,17 +94,17 @@ public class EMailSender {
 
 	private int connectionSecurity = SECURITY_NONE;
 
-	public static int FOLDERING_NONE = 0;
+	public static final int FOLDERING_NONE = 0;
 
-	public static int FOLDERING_YEAR = 1;
+	public static final int FOLDERING_YEAR = 1;
 
-	public static int FOLDERING_MONTH = 2;
+	public static final int FOLDERING_MONTH = 2;
 
-	public static int FOLDERING_DAY = 3;
+	public static final int FOLDERING_DAY = 3;
 
-	public int foldering = FOLDERING_DAY;
+	private int foldering = FOLDERING_DAY;
 
-	public Long folderId;
+	private Long folderId;
 
 	public EMailSender(long tenant) {
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
@@ -456,7 +455,7 @@ public class EMailSender {
 		return mime;
 	}
 
-	private Transport buildTransport(Session sess) throws NoSuchProviderException, MessagingException {
+	private Transport buildTransport(Session sess) throws MessagingException {
 		Transport trans = null;
 		if (authEncrypted)
 			trans = sess.getTransport("smtps");

@@ -101,7 +101,7 @@ public class WSFolder implements Serializable {
 	private String tile;
 
 	public void addAttribute(WSAttribute att) {
-		List<WSAttribute> buf = (List<WSAttribute>) Arrays.asList(getAttributes());
+		List<WSAttribute> buf = Arrays.asList(getAttributes());
 		buf.add(att);
 		setAttributes(buf.toArray(new WSAttribute[0]));
 	}

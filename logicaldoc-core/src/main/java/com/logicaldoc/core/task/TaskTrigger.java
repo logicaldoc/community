@@ -28,9 +28,9 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
 	private CronTriggerFactoryBean cronTrigger = null;
 
-	public static String MODE_CRON = "cron";
+	public static final String MODE_CRON = "cron";
 
-	public static String MODE_SIMPLE = "simple";
+	public static final String MODE_SIMPLE = "simple";
 
 	private ContextProperties config;
 
@@ -81,7 +81,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
 	@Override
 	public Trigger getObject() {
-		if ("simple".equals(config.getProperty("schedule.mode." + getName()))) {
+		if (MODE_SIMPLE.equals(config.getProperty("schedule.mode." + getName()))) {
 			if (simpleTrigger == null) {
 				simpleTrigger = new SimpleTriggerFactoryBean();
 				simpleTrigger.setName(getName());

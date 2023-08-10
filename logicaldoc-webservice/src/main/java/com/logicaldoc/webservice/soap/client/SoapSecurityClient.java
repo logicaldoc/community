@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.soap.client;
 
-import java.io.IOException;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -18,7 +16,7 @@ import com.logicaldoc.webservice.soap.SecurityService;
  */
 public class SoapSecurityClient extends SoapClient<SecurityService> implements SecurityService {
 
-	public SoapSecurityClient(String endpoint) throws IOException {
+	public SoapSecurityClient(String endpoint) {
 		super(endpoint, SecurityService.class, -1, true, -1);
 	}
 

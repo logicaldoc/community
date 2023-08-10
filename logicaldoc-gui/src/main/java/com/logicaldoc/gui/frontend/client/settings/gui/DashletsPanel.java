@@ -105,15 +105,11 @@ public class DashletsPanel extends VLayout {
 
 		ListGridField title = new ListGridField(TITLE, I18N.message(TITLE));
 		title.setWidth(120);
-		title.setCellFormatter((value, rec, rowNum, colNum) -> {
-			return value != null ? I18N.message(value.toString()) : "";
-		});
+		title.setCellFormatter((value, rec, rowNum, colNum) -> value != null ? I18N.message(value.toString()) : "");
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setWidth(125);
-		type.setCellFormatter((value, rec, rowNum, colNum) -> {
-			return I18N.message("dashlet.type." + value);
-		});
+		type.setCellFormatter((value, rec, rowNum, colNum) -> I18N.message("dashlet.type." + value));
 
 		ListGridField max = new ListGridField("max", I18N.message("max"));
 		max.setType(ListGridFieldType.INTEGER);

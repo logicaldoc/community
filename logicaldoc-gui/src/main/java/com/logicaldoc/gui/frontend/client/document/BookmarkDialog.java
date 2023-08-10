@@ -60,7 +60,7 @@ public class BookmarkDialog extends Window {
 		save.addClickHandler(new ClickHandler() {
 			@SuppressWarnings("unchecked")
 			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
+				Map<String, Object> values = vm.getValues();
 				vm.validate();
 				if (Boolean.FALSE.equals(vm.hasErrors())) {
 					if ((String) values.get("name") != null && !((String) values.get("name")).trim().isEmpty()) {

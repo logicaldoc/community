@@ -46,11 +46,11 @@ public class JavaLanguageVariableFactory {
 			variable.setDescription(getVariableDescription(annotation));
 		}
 
-		if (isClassArrayOrCollection((Class<?>) field.getType()))
+		if (isClassArrayOrCollection(field.getType()))
 			variable.setType(field.getType().getComponentType());
 		else
 			variable.setType(GenericsUtils.getFieldGenericType(field));
-		variable.setMultiOccurs(isClassArrayOrCollection((Class<?>) field.getType()));
+		variable.setMultiOccurs(isClassArrayOrCollection(field.getType()));
 		return variable;
 	}
 

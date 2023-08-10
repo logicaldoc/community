@@ -30,9 +30,7 @@ public class DateBean extends Date {
 		SimpleDateFormat targetFormat = new SimpleDateFormat();
 		targetFormat.applyPattern(YYYY_MMDD_HMMSS);
 
-		String result = targetFormat.format(new DateBean());
-
-		return result;
+		return targetFormat.format(new DateBean());
 	}
 
 	/**

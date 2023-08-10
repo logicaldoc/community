@@ -42,7 +42,7 @@ public class HTMLColor {
 		if (null == color) {
 			throw new IllegalArgumentException("NULL_COLOR_PARAMETER_ERROR");
 		}
-		Color c = (Color) colorNames.get(color.trim().toLowerCase());
+		Color c = colorNames.get(color.trim().toLowerCase());
 		if (null == c) {
 			try {
 				c = Color.decode(color.trim());

@@ -76,9 +76,7 @@ public class RatingDialog extends Window {
 		totalVotes.addClickHandler(event -> {
 			ListGridField vote = new ListGridField("vote", I18N.message("vote"), 94);
 			vote.setAlign(Alignment.CENTER);
-			vote.setCellFormatter((value, rec, rowNum, colNum) -> {
-				return DocUtil.getRatingIcon((Integer) value);
-			});
+			vote.setCellFormatter((value, rec, rowNum, colNum) -> DocUtil.getRatingIcon((Integer) value));
 
 			ListGridField user = new ListGridField("user", I18N.message("user"), 140);
 			ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_SHORT);
@@ -174,20 +172,19 @@ public class RatingDialog extends Window {
 					alreadyVotedForm.setItems(alreadyVoted);
 
 					ButtonItem delete = new ButtonItem("delete", I18N.message("deleteyourvote"));
-					delete.addClickHandler(event -> {
-						DocumentService.Instance.get().deleteRating(vote.getId(), new AsyncCallback<Integer>() {
+					delete.addClickHandler(event -> DocumentService.Instance.get().deleteRating(vote.getId(),
+							new AsyncCallback<Integer>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-							@Override
-							public void onSuccess(Integer rating) {
-								afterSaveOrDelete();
-							}
-						});
-					});
+								@Override
+								public void onSuccess(Integer rating) {
+									afterSaveOrDelete();
+								}
+							}));
 
 					alreadyVotedForm.setItems(alreadyVoted, delete);
 					layout.addMember(alreadyVotedForm);

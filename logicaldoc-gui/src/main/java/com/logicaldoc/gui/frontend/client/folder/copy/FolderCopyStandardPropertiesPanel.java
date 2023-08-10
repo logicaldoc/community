@@ -113,7 +113,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
 
-		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) folder.getTags());
+		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, folder.getTags());
 		tagItem.setEndRow(true);
 		tagItem.setDisabled(!folder.isWrite());
 

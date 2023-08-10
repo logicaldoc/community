@@ -368,68 +368,62 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem prepareDisableUserMenuItem() {
 		MenuItem disableUser = new MenuItem();
 		disableUser.setTitle(I18N.message("disable"));
-		disableUser.addClickHandler(event -> {
-			SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false,
-					new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		disableUser.addClickHandler(event -> SecurityService.Instance.get()
+				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.getSelectedRecord().setAttribute(ENABLED_ICON, "2");
-							list.getSelectedRecord().setAttribute(EENABLED, false);
-							list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
-							onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						list.getSelectedRecord().setAttribute(ENABLED_ICON, "2");
+						list.getSelectedRecord().setAttribute(EENABLED, false);
+						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+						onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
+					}
+				}));
 		return disableUser;
 	}
 
 	private MenuItem prepareEnableUserMenuItem() {
 		MenuItem enableUser = new MenuItem();
 		enableUser.setTitle(I18N.message("enable"));
-		enableUser.addClickHandler(event -> {
-			SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true,
-					new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		enableUser.addClickHandler(event -> SecurityService.Instance.get()
+				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.getSelectedRecord().setAttribute(ENABLED_ICON, "0");
-							list.getSelectedRecord().setAttribute(EENABLED, true);
-							list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
-							onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						list.getSelectedRecord().setAttribute(ENABLED_ICON, "0");
+						list.getSelectedRecord().setAttribute(EENABLED, true);
+						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+						onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
+					}
+				}));
 		return enableUser;
 	}
 
 	private MenuItem prepareTwoFactorsAuth(final ListGridRecord[] selectedUsers) {
 		MenuItem twoTactorsAuth = new MenuItem();
 		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
-		twoTactorsAuth.addClickHandler(event -> {
-			SecurityService.Instance.get().getUser(selectedUsers[0].getAttributeAsLong("id"),
-					new AsyncCallback<GUIUser>() {
+		twoTactorsAuth.addClickHandler(event -> SecurityService.Instance.get()
+				.getUser(selectedUsers[0].getAttributeAsLong("id"), new AsyncCallback<GUIUser>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIUser user) {
-							TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
-							dialog.show();
-						}
-					});
-		});
+					@Override
+					public void onSuccess(GUIUser user) {
+						TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
+						dialog.show();
+					}
+				}));
 		return twoTactorsAuth;
 	}
 
@@ -449,10 +443,8 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem preparePasswordMenuItem(final ListGridRecord[] selectedUsers) {
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));
-		password.addClickHandler(event -> {
-			SetPassword dialog = new SetPassword(Long.parseLong(selectedUsers[0].getAttributeAsString("id")));
-			dialog.show();
-		});
+		password.addClickHandler(event -> 
+			new SetPassword(Long.parseLong(selectedUsers[0].getAttributeAsString("id"))).show());
 		return password;
 	}
 

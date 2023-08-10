@@ -12,7 +12,6 @@ import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.clipboard.ClipboardObserver;
 import com.logicaldoc.gui.frontend.client.clipboard.ClipboardWindow;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
@@ -40,30 +39,26 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 
 	private StatusBarIcons() {
 
-		clipboardCounter.addClickHandler((ClickEvent event) -> {
+		clipboardCounter.addClickHandler(event -> {
 			if (!Clipboard.getInstance().isEmpty())
 				ClipboardWindow.getInstance().show();
 		});
 
-		lockedCounter.addClickHandler((ClickEvent event) -> {
-			MainPanel.get().selectUserTab();
-		});
+		lockedCounter.addClickHandler(event -> MainPanel.get().selectUserTab());
 
-		checkoutCounter.addClickHandler((ClickEvent event) -> {
-			MainPanel.get().selectUserTab();
-		});
+		checkoutCounter.addClickHandler(event -> MainPanel.get().selectUserTab());
 
-		messagesCounter.addClickHandler((ClickEvent event) -> {
+		messagesCounter.addClickHandler(event -> {
 			if (Menu.enabled(Menu.MESSAGES))
 				MainPanel.get().selectMessagesTab();
 		});
 
-		workflowsCounter.addClickHandler((ClickEvent event) -> {
+		workflowsCounter.addClickHandler(event -> {
 			if (Feature.enabled(Feature.WORKFLOW))
 				MainPanel.get().selectWorkflowTab();
 		});
 
-		eventsCounter.addClickHandler((ClickEvent event) -> {
+		eventsCounter.addClickHandler(event -> {
 			if (Menu.enabled(Menu.DASHBOARD_CALENDAR))
 				MainPanel.get().selectCalendarTab();
 		});
@@ -71,7 +66,7 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 		addMember(clipboardCounter);
 		addMember(lockedCounter);
 		addMember(checkoutCounter);
-
+ 
 		if (Feature.enabled(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
 			addMember(messagesCounter);
 		}

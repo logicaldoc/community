@@ -88,7 +88,7 @@
 <!ELEMENT value (#PCDATA)>
 ]>
 
-<plugin id="logicaldoc-webservice" version="8.8.5" class="com.logicaldoc.webservice.WebservicePlugin">
+<plugin id="logicaldoc-webservice" version="8.8.6" class="com.logicaldoc.webservice.WebservicePlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>

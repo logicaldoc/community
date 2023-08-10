@@ -16,9 +16,9 @@ public class MessageTemplate extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
-	public static String TYPE_SYSTEM = "system";
+	public static final String TYPE_SYSTEM = "system";
 
-	public static String TYPE_USER = "user";
+	public static final String TYPE_USER = "user";
 
 	private String name = "";
 

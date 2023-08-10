@@ -107,7 +107,7 @@ public class WorkflowSettings extends Window {
 
 	private void onSave(GUIWorkflow workflow, MultiComboBoxItem supervisors) {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values =  vm.getValues();
 
 		if (values.get(WORKFLOWDESCR) != null)
 			WorkflowSettings.this.workflow.setDescription(values.get(WORKFLOWDESCR).toString());

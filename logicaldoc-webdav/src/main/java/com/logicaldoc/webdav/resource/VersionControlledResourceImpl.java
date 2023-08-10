@@ -331,7 +331,6 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 */
 	@Override
 	protected DavResource createResourceFromLocator(DavResourceLocator loc) throws DavException {
-		DavResource res = getFactory().createResource(loc, getSession());
-		return res;
+		return getFactory().createResource(loc, getSession());
 	}
 }

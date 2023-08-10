@@ -23,7 +23,6 @@ import com.logicaldoc.gui.frontend.client.search.SearchMenu;
 import com.logicaldoc.gui.frontend.client.search.SearchPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -186,9 +185,8 @@ public class MainPanel extends VLayout implements SessionObserver {
 	}
 
 	private void prepareIncomingMessage() {
-		incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(), (ClickEvent event) -> {
-			MainPanel.this.getIncomingMessage().setVisible(false);
-		});
+		incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(),
+				event -> MainPanel.this.getIncomingMessage().setVisible(false));
 		incomingMessage.setVisible(
 				Session.get().getIncomingMessage() != null && !Session.get().getIncomingMessage().isEmpty());
 	}

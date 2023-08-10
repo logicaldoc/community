@@ -23,19 +23,21 @@ public class ImageDeskew {
 	/**
 	 * Representation of a line in the image.
 	 */
-	public class HoughLine {
+	private class HoughLine {
 
 		// count of points in the line
-		public int count = 0;
+		private int count = 0;
 
 		// index in matrix.
-		public int index = 0;
+		private int index = 0;
 
 		// the line is represented as all x, y that solve y * cos(alpha) - x *
 		// sin(alpha) = d
-		public double alpha;
+		private double alpha;
 
-		public double d;
+		private double d;
+		
+		
 	}
 
 	// the source image

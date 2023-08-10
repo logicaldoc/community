@@ -32,9 +32,8 @@ public class UserTool {
 	 */
 	public User getUser(String username) {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
+		return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
 				: userDao.findByUsername("_system");
-		return user;
 	}
 
 	/**

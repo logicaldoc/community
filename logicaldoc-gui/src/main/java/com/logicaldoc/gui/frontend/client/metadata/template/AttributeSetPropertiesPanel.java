@@ -30,7 +30,6 @@ import com.smartgwt.client.widgets.form.fields.SpacerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -88,7 +87,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	private AttributeSetDetailsPanel detailsPanel;
 
-	public String updatingAttributeName = "";
+	private String updatingAttributeName = "";
 
 	private ListGrid attributesList;
 
@@ -309,8 +308,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			att.setHidden((Boolean) hidden.getValue());
 			att.setReadonly((Boolean) readonly.getValue());
 			att.setMultiple((Boolean) multiple.getValue());
-			att.setType(Integer.parseInt((String) type.getValueAsString()));
-			att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
+			att.setType(Integer.parseInt(type.getValueAsString()));
+			att.setEditor(Integer.parseInt(editor.getValueAsString()));
 			att.setValidation(validation.getValueAsString());
 			att.setInitialization(initialization.getValueAsString());
 
@@ -330,7 +329,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			att.setReadonly((Boolean) readonly.getValue());
 			att.setMultiple((Boolean) multiple.getValue());
 			att.setType(Integer.parseInt(type.getValueAsString()));
-			att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
+			att.setEditor(Integer.parseInt(editor.getValueAsString()));
 
 			if (att.getType() == GUIAttribute.TYPE_USER)
 				att.setStringValue(group.getValueAsString());
@@ -437,9 +436,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		type.setDefaultValue("" + GUIAttribute.TYPE_STRING);
 		type.setValue("" + GUIAttribute.TYPE_STRING);
 		type.setDisabled(attributeSet.isReadonly());
-		type.addChangedHandler((ChangedEvent typeChanged) -> {
-			refreshFieldForm();
-		});
+		type.addChangedHandler(typeChanged -> refreshFieldForm());
 	}
 
 	private void addEditorItem() {
@@ -452,9 +449,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		editor.setWrapTitle(false);
 		editor.setDefaultValue("" + GUIAttribute.EDITOR_DEFAULT);
 		editor.setDisabled(attributeSet.isReadonly());
-		editor.addChangedHandler((ChangedEvent editorChanged) -> {
-			refreshFieldForm();
-		});
+		editor.addChangedHandler(editorChanged -> refreshFieldForm());
 	}
 
 	private TextItem addAttributeNameItem() {
@@ -571,7 +566,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	@SuppressWarnings("unchecked")
 	protected boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			attributeSet.setName((String) values.get("name"));

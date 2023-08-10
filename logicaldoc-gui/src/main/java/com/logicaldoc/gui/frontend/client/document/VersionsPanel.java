@@ -23,7 +23,6 @@ import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -105,14 +104,10 @@ public class VersionsPanel extends DocumentDetailTab {
 		buttons.setWidth100();
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
-		export.addClickHandler((ClickEvent clkEvent) -> {
-			GridUtil.exportCSV(list, true);
-		});
+		export.addClickHandler(clkEvent -> GridUtil.exportCSV(list, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler((ClickEvent printEvent) -> {
-			GridUtil.print(list);
-		});
+		print.addClickHandler(printEvent -> GridUtil.print(list));
 
 		buttons.addButton(export);
 		buttons.addButton(print);
@@ -161,8 +156,7 @@ public class VersionsPanel extends DocumentDetailTab {
 			long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
 			String fileVer = rec.getAttributeAsString(FILE_VERSION);
 			String downloadUrl = Util.downloadURL(docId, fileVer);
-			String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message(DOWNLOAD) + "</a>";
-			return perma;
+			return "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message(DOWNLOAD) + "</a>";
 		});
 		return permalink;
 	}

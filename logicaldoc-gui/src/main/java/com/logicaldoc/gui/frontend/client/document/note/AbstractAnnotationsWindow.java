@@ -166,16 +166,16 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			if (note.isMovedOrResized()) {
 				if (item instanceof DrawLine) {
 					DrawLine line = (DrawLine) item;
-					note.setLeft(line.getStartLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
-					note.setTop(line.getStartTopAsDouble() / (double) pageDrawingPane.getImageHeight());
-					note.setWidth(line.getEndLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
-					note.setHeight(line.getEndTopAsDouble() / (double) pageDrawingPane.getImageHeight());
+					note.setLeft(line.getStartLeftAsDouble() / pageDrawingPane.getImageWidth());
+					note.setTop(line.getStartTopAsDouble() / pageDrawingPane.getImageHeight());
+					note.setWidth(line.getEndLeftAsDouble() / pageDrawingPane.getImageWidth());
+					note.setHeight(line.getEndTopAsDouble() / pageDrawingPane.getImageHeight());
 				} else {
 					Double[] box = item.getBoundingBoxAsDouble();
-					note.setLeft(box[0] / (double) pageDrawingPane.getImageWidth());
-					note.setTop(box[1] / (double) pageDrawingPane.getImageHeight());
-					note.setWidth((box[2] - box[0]) / (double) pageDrawingPane.getImageWidth());
-					note.setHeight((box[3] - box[1]) / (double) pageDrawingPane.getImageHeight());
+					note.setLeft(box[0] / pageDrawingPane.getImageWidth());
+					note.setTop(box[1] / pageDrawingPane.getImageHeight());
+					note.setWidth((box[2] - box[0]) / pageDrawingPane.getImageWidth());
+					note.setHeight((box[3] - box[1]) / pageDrawingPane.getImageHeight());
 				}
 			}
 		}
@@ -317,10 +317,10 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 * @return the proper item
 	 */
 	protected DrawItem newAnnotationItem(GUIDocumentNote note) {
-		double left = (note.getLeft() * (double) pageDrawingPane.getImageWidth());
-		double top = (note.getTop() * (double) pageDrawingPane.getImageHeight());
-		double width = (note.getWidth() * (double) pageDrawingPane.getImageWidth());
-		double height = (note.getHeight() * (double) pageDrawingPane.getImageHeight());
+		double left = (note.getLeft() * pageDrawingPane.getImageWidth());
+		double top = (note.getTop() * pageDrawingPane.getImageHeight());
+		double width = (note.getWidth() * pageDrawingPane.getImageWidth());
+		double height = (note.getHeight() * pageDrawingPane.getImageHeight());
 
 		final DrawItem drawItem;
 
@@ -388,14 +388,14 @@ public abstract class AbstractAnnotationsWindow extends Window {
 
 		if (!(drawItem instanceof DrawLine)) {
 			drawItem.setFillColor(note.getColor());
-			drawItem.setFillOpacity((float) note.getOpacity() / 100.0f);
+			drawItem.setFillOpacity(note.getOpacity() / 100.0f);
 		}
 
 		drawItem.setCursor(Cursor.HAND);
 		drawItem.setCanHover(true);
 		drawItem.setLineColor(note.getLineColor());
 		drawItem.setLineWidth(note.getLineWidth());
-		drawItem.setLineOpacity((float) note.getLineOpacity() / 100.0f);
+		drawItem.setLineOpacity(note.getLineOpacity() / 100.0f);
 		drawItem.setShowResizeOutline(false);
 		drawItem.setKeepInParentRect(true);
 		drawItem.setTitleAutoFit(true);

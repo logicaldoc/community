@@ -17,7 +17,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
@@ -291,57 +290,49 @@ public class TenantKeystorePanel extends VLayout {
 	private IButton prepareDownloadCertButton() {
 		IButton downloadCert = new IButton(I18N.message("downloadcert"));
 		downloadCert.setAutoFit(true);
-		downloadCert.addClickHandler((ClickEvent event) -> {
-			Util.download(Util.contextPath() + "export-keystore?cert=true&tenantId=" + tenantId);
-		});
+		downloadCert.addClickHandler(
+				event -> Util.download(Util.contextPath() + "export-keystore?cert=true&tenantId=" + tenantId));
 		return downloadCert;
 	}
 
 	private IButton prepareImportButto() {
 		IButton _import = new IButton(I18N.message("iimport"));
 		_import.setAutoFit(true);
-		_import.addClickHandler((ClickEvent event) -> {
-			KeystoreUploader uploader = new KeystoreUploader(TenantKeystorePanel.this);
-			uploader.show();
-		});
+		_import.addClickHandler(event -> new KeystoreUploader(TenantKeystorePanel.this).show());
 		return _import;
 	}
 
 	private IButton prepareDeleteButton() {
 		IButton delete = new IButton(I18N.message("ddelete"));
 		delete.setAutoFit(true);
-		delete.addClickHandler((ClickEvent event) -> {
-			SC.ask(I18N.message("deletekeystorewarn"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes))
-					SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> SC.ask(I18N.message("deletekeystorewarn"), answer -> {
+			if (Boolean.TRUE.equals(answer))
+				SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void arg) {
-							initGUI();
-						}
-					});
-			});
-		});
+					@Override
+					public void onSuccess(Void arg) {
+						initGUI();
+					}
+				});
+		}));
 		return delete;
 	}
 
 	private IButton prepareExportButton() {
 		IButton export = new IButton(I18N.message("export"));
 		export.setAutoFit(true);
-		export.addClickHandler((ClickEvent event) -> {
-			Util.download(Util.contextPath() + "export-keystore?tenantId=" + tenantId);
-		});
+		export.addClickHandler(event -> Util.download(Util.contextPath() + "export-keystore?tenantId=" + tenantId));
 		return export;
 	}
 
 	private IButton prepareSaveButton() {
 		IButton save = new IButton(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler((ClickEvent event) -> {
+		save.addClickHandler(event -> {
 			if (!validate())
 				return;
 
@@ -365,7 +356,7 @@ public class TenantKeystorePanel extends VLayout {
 	private IButton prepareCreateNewButton() {
 		IButton createNew = new IButton(I18N.message("generatenewkeystore"));
 		createNew.setAutoFit(true);
-		createNew.addClickHandler((ClickEvent event) -> {
+		createNew.addClickHandler(event -> {
 			if (!validate())
 				return;
 			LD.contactingServer();
@@ -390,7 +381,7 @@ public class TenantKeystorePanel extends VLayout {
 	boolean validate() {
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+			Map<String, Object> values = vm.getValues();
 			keystore.setTenantId(tenantId);
 			keystore.setOrganizationAlias((String) values.get("localCAalias"));
 			keystore.setValidity(Integer.parseInt(values.get("validity").toString()));

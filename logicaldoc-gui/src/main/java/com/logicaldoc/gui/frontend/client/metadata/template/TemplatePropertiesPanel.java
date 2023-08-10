@@ -81,8 +81,6 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	protected ChangedHandler changedHandler;
 
-	public String updatingAttributeName = "";
-
 	private ListGrid attributesList;
 
 	private HLayout container = new HLayout();
@@ -316,12 +314,11 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareResetInitializationItem() {
 		MenuItem resetInitialization = new MenuItem();
 		resetInitialization.setTitle(I18N.message("resetinitialization"));
-		resetInitialization.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes))
-					resetInitialization();
-			});
-		});
+		resetInitialization.addClickHandler(event -> LD.ask(I18N.message("resetinitialization"),
+				I18N.message("resetinitializationnquestion"), answer -> {
+					if (Boolean.TRUE.equals(answer))
+						resetInitialization();
+				}));
 		return resetInitialization;
 	}
 
@@ -406,12 +403,11 @@ public class TemplatePropertiesPanel extends HLayout {
 	private MenuItem prepareResetValidationItem() {
 		MenuItem resetValidation = new MenuItem();
 		resetValidation.setTitle(I18N.message("resetvalidation"));
-		resetValidation.addClickHandler(event -> {
-			LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes))
-					resetValidation();
-			});
-		});
+		resetValidation.addClickHandler(
+				event -> LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), answer -> {
+					if (Boolean.TRUE.equals(answer))
+						resetValidation();
+				}));
 		return resetValidation;
 	}
 
@@ -684,7 +680,7 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	@SuppressWarnings("unchecked")
 	protected boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {

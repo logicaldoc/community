@@ -87,10 +87,8 @@ public class StatChartServlet extends HttpServlet {
 			plot.setIgnoreNullValues(false);
 			plot.setDrawingSupplier(new ChartDrawingSupplier());
 
-			if (plot instanceof PiePlot) {
-				PiePlot piePlot = (PiePlot) plot;
-				piePlot.setInteriorGap(0.05);
-			}
+			if (plot instanceof PiePlot)
+				plot.setInteriorGap(0.05);
 
 			ChartUtilities.saveChartAsPNG(chartFile, chrt, 250, 250);
 
@@ -141,7 +139,7 @@ public class StatChartServlet extends HttpServlet {
 		for (int i = 0; i < parameters[index].length; i++) {
 			GUIParameter param = parameters[index][i];
 			if (param != null) {
-				double val = (double) parseLong(param);
+				double val = parseLong(param);
 				if (total > 0) {
 					val = val * 100 / total;
 					if (val >= 1)

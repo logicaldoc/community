@@ -194,7 +194,7 @@ public class XMLBean {
 	}
 
 	private List<Element> getChildren(Element elem, String name) {
-		List<Element> list = (List<Element>) elem.getChildren(name, elem.getNamespace());
+		List<Element> list = elem.getChildren(name, elem.getNamespace());
 		if (list == null || list.isEmpty())
 			list = elem.getChildren(name);
 		return list;

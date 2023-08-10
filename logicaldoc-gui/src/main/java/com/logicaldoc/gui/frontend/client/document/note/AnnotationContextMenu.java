@@ -64,9 +64,7 @@ public class AnnotationContextMenu extends Menu {
 				AbstractAnnotationsWindow.showKnowbs(drawItem);
 		});
 
-		moveOrResize.setCheckIfCondition((target, menu, item) -> {
-			return drawItem.getCanDrag();
-		});
+		moveOrResize.setCheckIfCondition((target, menu, item) -> drawItem.getCanDrag());
 
 		MenuItem fillMenuItem = prepareFillMenuItem();
 
@@ -118,7 +116,7 @@ public class AnnotationContextMenu extends Menu {
 		fillOpacity.setDisabled(!editEnabled);
 		fillOpacity.addChangedHandler(event -> {
 			note.setOpacity(Integer.parseInt(event.getValue().toString()));
-			drawItem.setFillOpacity((float) note.getOpacity() / 100f);
+			drawItem.setFillOpacity(note.getOpacity() / 100f);
 		});
 
 		final DynamicForm fillForm = new DynamicForm();
@@ -197,7 +195,7 @@ public class AnnotationContextMenu extends Menu {
 		opacity.setMax(100);
 		opacity.addChangedHandler(event -> {
 			note.setLineOpacity(Integer.parseInt(event.getValue().toString()));
-			drawItem.setLineOpacity((float) note.getLineOpacity() / 100f);
+			drawItem.setLineOpacity(note.getLineOpacity() / 100f);
 		});
 		opacity.setVisible(!(drawItem instanceof DrawLabel));
 		opacity.setDisabled(!editEnabled);

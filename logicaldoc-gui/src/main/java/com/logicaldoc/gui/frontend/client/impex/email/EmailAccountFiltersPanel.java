@@ -151,9 +151,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		final ListGridField target = new ListGridField(TARGET_NAME, I18N.message("targetfolder"));
 		target.setWidth(150);
 		target.setCanEdit(false);
-		target.setCellFormatter((value, rec, rowNum, colNum) -> {
-			return "";
-		});
+		target.setCellFormatter((value, rec, rowNum, colNum) -> "");
 		return target;
 	}
 

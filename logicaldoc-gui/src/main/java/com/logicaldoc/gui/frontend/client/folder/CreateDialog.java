@@ -102,7 +102,7 @@ public class CreateDialog extends Dialog {
 												+ Long.toString(newFolder.getId()));
 								FolderNavigator.get().getTree().add(newNode, FolderNavigator.get().getTree().getRoot());
 							} else {
-								TreeNode selectedNode = (TreeNode) FolderNavigator.get().getSelectedRecord();
+								TreeNode selectedNode = FolderNavigator.get().getSelectedRecord();
 
 								newNode.setAttribute("id", selectedNode.getAttributeAsString("id") + "-"
 										+ Long.toString(newFolder.getId()));

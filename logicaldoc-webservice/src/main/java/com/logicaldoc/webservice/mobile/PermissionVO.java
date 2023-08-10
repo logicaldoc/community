@@ -6,9 +6,33 @@ public class PermissionVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public boolean create = false;
+	private boolean create = false;
 
-	public boolean edit = false;
+	private boolean edit = false;
 
-	public boolean delete = false;
+	private boolean delete = false;
+
+	public boolean isCreate() {
+		return create;
+	}
+
+	public void setCreate(boolean create) {
+		this.create = create;
+	}
+
+	public boolean isEdit() {
+		return edit;
+	}
+
+	public void setEdit(boolean edit) {
+		this.edit = edit;
+	}
+
+	public boolean isDelete() {
+		return delete;
+	}
+
+	public void setDelete(boolean delete) {
+		this.delete = delete;
+	}
 }

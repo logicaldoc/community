@@ -76,15 +76,11 @@ public class DashletEditor extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-			onSave();
-		});
+		save.addClickHandler(event -> onSave());
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-			destroy();
-		});
+		close.addClickHandler(event -> destroy());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);

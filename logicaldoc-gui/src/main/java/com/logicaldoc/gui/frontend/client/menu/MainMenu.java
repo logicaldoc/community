@@ -619,27 +619,25 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	private void addRegistration(Menu menu, MenuItem develConsole) {
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			MenuItem registration = new MenuItem(I18N.message("registration"));
-			registration.addClickHandler(registrationClick -> {
-				SettingService.Instance.get().loadSettingsByNames(
-						new String[] { "reg.name", "reg.email", "reg.organization", "reg.website" },
-						new AsyncCallback<GUIParameter[]>() {
+			registration.addClickHandler(registrationClick -> SettingService.Instance.get().loadSettingsByNames(
+					new String[] { "reg.name", "reg.email", "reg.organization", "reg.website" },
+					new AsyncCallback<GUIParameter[]>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIParameter[] reg) {
-								String[] values = new String[reg.length];
-								for (int j = 0; j < reg.length; j++) {
-									values[j] = reg[j].getValue();
-								}
-								Registration r = new Registration(values);
-								r.show();
+						@Override
+						public void onSuccess(GUIParameter[] reg) {
+							String[] values = new String[reg.length];
+							for (int j = 0; j < reg.length; j++) {
+								values[j] = reg[j].getValue();
 							}
-						});
-			});
+							Registration r = new Registration(values);
+							r.show();
+						}
+					}));
 			menu.addItem(registration);
 
 			if (Session.get().isDevel()) {

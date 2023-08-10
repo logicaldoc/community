@@ -287,7 +287,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	}
 
 	private void readAttributeOptions(Attribute extAttr, GUIAttribute att) {
-		String buf = (String) extAttr.getStringValue();
+		String buf = extAttr.getStringValue();
 		List<String> list = new ArrayList<>();
 		if (buf != null) {
 			if (buf.contains(",")) {

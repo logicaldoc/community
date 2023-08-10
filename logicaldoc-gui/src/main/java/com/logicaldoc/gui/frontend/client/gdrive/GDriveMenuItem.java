@@ -59,9 +59,7 @@ public class GDriveMenuItem extends MenuItem {
 
 	private MenuItem prepareGDriveAuthorizeMenuItem() {
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler((MenuItemClickEvent authorizeClick) -> {
-			new GDriveAuthorization().show();
-		});
+		authorize.addClickHandler((MenuItemClickEvent authorizeClick) -> new GDriveAuthorization().show());
 		authorize.setEnabled(Feature.enabled(Feature.GDRIVE));
 		return authorize;
 	}

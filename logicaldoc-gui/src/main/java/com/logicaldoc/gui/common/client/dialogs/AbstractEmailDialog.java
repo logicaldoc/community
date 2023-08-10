@@ -20,13 +20,10 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.EditCompleteEvent;
-import com.smartgwt.client.widgets.grid.events.EditorExitEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -131,7 +128,7 @@ public abstract class AbstractEmailDialog extends Window {
 
 			onSend(mail);
 		});
-		
+
 		addItem(recipientsStack);
 		addItem(form);
 		addItem(prepareButtons());
@@ -199,10 +196,8 @@ public abstract class AbstractEmailDialog extends Window {
 		FormItem emailItem = ItemFactory.newEmailComboSelector(EMAIL, EMAIL);
 		emailItem.setRequired(true);
 		emailItem.setWidth("*");
-		emailItem.addKeyPressHandler((KeyPressEvent event) -> {
-			// Delete the row
-			handleBackspace(event);
-		});
+		// Delete the row
+		emailItem.addKeyPressHandler((event) -> handleBackspace(event));
 		email.setEditorType(emailItem);
 		email.setValidators(new EmailValidator());
 
@@ -222,15 +217,11 @@ public abstract class AbstractEmailDialog extends Window {
 		recipientsGrid.setEditEvent(ListGridEditEvent.CLICK);
 		recipientsGrid.setFields(type, email);
 
-		recipientsGrid.addEditCompleteHandler((EditCompleteEvent event) -> {
-			addEmptyRow();
-		});
+		recipientsGrid.addEditCompleteHandler((event) -> addEmptyRow());
 
-		recipientsGrid.addEditorExitHandler((EditorExitEvent event) -> {
-			addEmptyRow();
-		});
+		recipientsGrid.addEditorExitHandler((event) -> addEmptyRow());
 
-		recipientsGrid.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		recipientsGrid.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if (value == null)
 				return null;
 			if (colNum == 0)
@@ -246,7 +237,7 @@ public abstract class AbstractEmailDialog extends Window {
 
 		final SelectItem contactsSelector = ItemFactory.newEmailSelector("contacts", "contacts");
 		contactsSelector.setWidth(200);
-		contactsSelector.addChangedHandler((ChangedEvent event) -> {
+		contactsSelector.addChangedHandler((event) -> {
 			ListGridRecord[] newSelection = contactsSelector.getSelectedRecords();
 			if (newSelection == null || newSelection.length < 1)
 				return;

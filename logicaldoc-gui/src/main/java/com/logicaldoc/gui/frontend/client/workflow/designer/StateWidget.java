@@ -71,12 +71,11 @@ public class StateWidget extends Label {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(click -> {
-			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes))
+		delete.addClickHandler(click -> 
+			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean answer) -> {
+				if (Boolean.TRUE.equals(answer))
 					delete();
-			});
-		});
+			}));
 
 		MenuItem makeStart = new MenuItem();
 		makeStart.setTitle(I18N.message("startstate"));

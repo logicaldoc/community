@@ -178,7 +178,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenant = tDao.getTenantName(user.getTenantId());
-		ContextProperties config = (ContextProperties) Context.get().getProperties();
+		ContextProperties config = Context.get().getProperties();
 		if (!config.getBoolean(tenant + ".2fa.enabled", false)
 				|| !config.getBoolean(tenant + ".2fa." + user.getSecondFactor().toLowerCase() + ".enabled", false))
 			return false;
@@ -205,10 +205,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 		// Generate an initial password(that must be changed)
 		ContextProperties config = Context.get().getProperties();
-		String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
+		return PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
 				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
 				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1),
 				config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
-		return password;
 	}
 }

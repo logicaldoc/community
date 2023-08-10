@@ -119,13 +119,11 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	private String getTenant(Locale locale, String tenant) {
-		String tnt = locale != null ? tenant : Tenant.DEFAULT_NAME;
-		return tnt;
+		return locale != null ? tenant : Tenant.DEFAULT_NAME;
 	}
 
 	private Locale getLocale(Locale locale) {
-		Locale lcl = locale != null ? locale : Locale.ENGLISH;
-		return lcl;
+		return locale != null ? locale : Locale.ENGLISH;
 	}
 
 	/**

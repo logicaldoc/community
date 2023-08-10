@@ -485,9 +485,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		Document doc = getExistingDocument(docId);
 
 		log.debug("Indexing document {} - {}", doc.getId(), doc.getFileName());
-		int currentIndexed=doc.getIndexed();
-		
-		
+		int currentIndexed = doc.getIndexed();
+
 		long parsingTime;
 		String cont;
 		try {
@@ -1460,8 +1459,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			urlPrefix = config.getProperty("server.url");
 		if (!urlPrefix.endsWith("/"))
 			urlPrefix += "/";
-		String address = urlPrefix + "download-ticket?ticketId=" + ticket.getTicketId();
-		return address;
+		return urlPrefix + "download-ticket?ticketId=" + ticket.getTicketId();
 	}
 
 	public void setTicketDAO(TicketDAO ticketDAO) {
@@ -1621,9 +1619,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			// Now collect and sort each PDF
 			File[] pdfs = tempDir.listFiles();
 
-			Arrays.sort(pdfs, (File o1, File o2) -> {
-				return o1.getName().compareTo(o2.getName());
-			});
+			Arrays.sort(pdfs, (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
 			// Merge all the PDFs
 			bigPdf = mergePdf(pdfs);

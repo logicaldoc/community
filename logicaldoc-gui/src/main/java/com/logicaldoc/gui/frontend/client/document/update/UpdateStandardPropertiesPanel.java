@@ -100,7 +100,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			String mode = Session.get().getConfig("tag.mode");
 			final DataSource ds = new TagsDS(null, true, document.getId(), null);
 
-			tagItem = ItemFactory.newMultiComboBoxItem("tag", "tag", ds, (Object[]) document.getTags());
+			tagItem = ItemFactory.newMultiComboBoxItem("tag", "tag", ds, document.getTags());
 			tagItem.setPrompt(I18N.message("typeatag"));
 			tagItem.setValueField("word");
 			tagItem.setDisplayField("word");
@@ -202,7 +202,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			document.setLanguage((String) values.get(LANGUAGE));

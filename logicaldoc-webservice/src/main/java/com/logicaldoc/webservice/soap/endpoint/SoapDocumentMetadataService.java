@@ -364,7 +364,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 				rightsList.add(new WSRight(group.getId(), tg.getPermissions()));
 		}
 
-		return (WSRight[]) rightsList.toArray(new WSRight[rightsList.size()]);
+		return rightsList.toArray(new WSRight[rightsList.size()]);
 	}
 
 	@Override

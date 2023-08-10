@@ -145,16 +145,11 @@ public class DefaultHandler implements IOHandler {
 		if (!canExport(context, isCollection)) {
 			throw new IOException(getName() + CANNOT_EXPORT);
 		}
-		try {
-			if (context.hasStream())
-				exportData(context, context.getResource());
 
-			return true;
-		} catch (WebDavStorageException e) {
-			// should never occur, since the proper structure of the content
-			// node must be asserted in the 'canExport' call.
-			throw new IOException(e.getMessage());
-		}
+		if (context.hasStream())
+			exportData(context, context.getResource());
+
+		return true;
 	}
 
 	public boolean exportContent(ExportContext context, DavResource resource) throws IOException {
@@ -164,7 +159,7 @@ public class DefaultHandler implements IOHandler {
 		return exportContent(context, resource.isCollection());
 	}
 
-	protected void exportData(ExportContext context, Resource resource) throws IOException, WebDavStorageException {
+	protected void exportData(ExportContext context, Resource resource) throws IOException {
 		try {
 			InputStream is = resourceService.streamOut(resource);
 			if (is != null)
@@ -174,8 +169,7 @@ public class DefaultHandler implements IOHandler {
 		}
 	}
 
-	protected synchronized boolean setContentData(ImportContext context, boolean isCollection)
-			throws WebDavStorageException, DavException {
+	protected synchronized boolean setContentData(ImportContext context, boolean isCollection) throws DavException {
 
 		Resource resource = context.getResource();
 		String name = context.getSystemId();
@@ -192,7 +186,7 @@ public class DefaultHandler implements IOHandler {
 		}
 	}
 
-	protected Resource getContentNode(ExportContext context) throws WebDavStorageException {
+	protected Resource getContentNode(ExportContext context) {
 		return context.getResource();
 	}
 
@@ -239,20 +233,14 @@ public class DefaultHandler implements IOHandler {
 			throw new IOException(getName() + CANNOT_EXPORT);
 		}
 
-		try {
-			if (context.hasStream())
-				exportData(context, context.getResource(), left, rangeLength);
+		if (context.hasStream())
+			exportData(context, context.getResource(), left, rangeLength);
 
-			return true;
-		} catch (WebDavStorageException e) {
-			// should never occur, since the proper structure of the content
-			// node must be asserted in the 'canExport' call.
-			throw new IOException(e.getMessage());
-		}
+		return true;
 	}
 
 	protected void exportData(ExportContext context, Resource resource, Long left, Long rangeLength)
-			throws IOException, WebDavStorageException {
+			throws IOException {
 		try {
 			InputStream is = resourceService.streamOut(resource);
 			if (is != null) {

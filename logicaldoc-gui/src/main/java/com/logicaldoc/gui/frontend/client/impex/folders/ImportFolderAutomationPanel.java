@@ -65,7 +65,7 @@ public class ImportFolderAutomationPanel extends ImportFolderDetailsTab {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		form.validate();
 		if (Boolean.FALSE.equals(form.hasErrors())) {
 			importFolder.setAutomation((String) values.get("automationBefore"));

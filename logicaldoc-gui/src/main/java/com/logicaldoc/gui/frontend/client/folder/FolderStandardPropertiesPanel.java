@@ -106,10 +106,10 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 			description.setDisabled(true);
 
 		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon",
-				Util.textWithAvatar(folder.getCreatorId(), Util.padLeft(I18N.formatDate((Date) folder.getCreation())
+				Util.textWithAvatar(folder.getCreatorId(), Util.padLeft(I18N.formatDate(folder.getCreation())
 						+ " " + I18N.message("by") + " " + folder.getCreator(), 40)));
 		creation.setTooltip(
-				I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator());
+				I18N.formatDate(folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator());
 		creation.setWidth(DEFAULT_ITEM_WIDTH);
 
 		LinkItem pathItem = preparePathItem();
@@ -334,7 +334,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		String mode = Session.get().getConfig("tag.mode");
 		final TagsDS ds = new TagsDS(null, true, null, folder.getId());
 
-		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) folder.getTags());
+		tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, folder.getTags());
 		tagItem.setEndRow(true);
 		tagItem.setDisabled(!folder.isWrite());
 		if (folder.isWrite())

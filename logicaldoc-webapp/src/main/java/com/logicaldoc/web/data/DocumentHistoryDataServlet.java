@@ -59,7 +59,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		Map<String, Object> params = prepareQueryParams(request, query);
 
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		List<Object> records = dao.findByQuery(query.toString(), params, max != null ? max : 100);
 
 		// Used only to cache the already encountered documents when the
 		// history

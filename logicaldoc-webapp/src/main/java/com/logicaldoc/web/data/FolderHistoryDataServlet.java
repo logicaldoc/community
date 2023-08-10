@@ -42,7 +42,7 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 			query.append(" and A.folderId=" + request.getParameter("id"));
 		query.append(" order by A.date desc ");
 
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null,
+		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null,
 				max != null ? max : 100);
 
 		/*

@@ -168,7 +168,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 	private TextItem prepareCronItem() {
 		TextItem cronItem = ItemFactory.newCronExpressionItem("cron", I18N.message("triggeroncron"), trigger.getCron(),
 				(ChangedEvent event) -> {
-					FormItem cron = (FormItem) vm.getItem("cron");
+					FormItem cron = vm.getItem("cron");
 					if (cron.getValue() != null) {
 						vm.getItem(EVENTS).setDisabled(true);
 						vm.getItem(EVENTS).clearValue();
@@ -202,8 +202,8 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 			timeItem.setValue(df.format(trigger.getDate()));
 		}
 		timeItem.addChangedHandler((ChangedEvent event) -> {
-			FormItem time = (FormItem) vm.getItem("time");
-			FormItem date = (FormItem) vm.getItem("date");
+			FormItem time = vm.getItem("time");
+			FormItem date = vm.getItem("date");
 			if (time.getValue() != null || date.getValue() != null) {
 				vm.getItem(EVENTS).setDisabled(true);
 				vm.getItem(EVENTS).clearValue();
@@ -229,8 +229,8 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		DateItem dateItem = ItemFactory.newDateItem("date", I18N.message("triggerondate"));
 		dateItem.setValue(trigger.getDate());
 		dateItem.addChangedHandler((ChangedEvent event) -> {
-			FormItem time = (FormItem) vm.getItem("time");
-			FormItem date = (FormItem) vm.getItem("date");
+			FormItem time = vm.getItem("time");
+			FormItem date = vm.getItem("date");
 			if (time.getValue() != null || date.getValue() != null) {
 				vm.getItem(EVENTS).setDisabled(true);
 				vm.getItem(EVENTS).clearValue();
@@ -254,7 +254,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values =  vm.getValues();
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 

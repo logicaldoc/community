@@ -34,7 +34,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class SearchToolbar extends ToolStrip {
 
 	private static final String TOGGLE_OFF = "toggle-off";
+
 	private static final String CLOSESELEFTPANEL = "closeseleftpanel";
+
 	private static final String TOGGLE_ON = "toggle-on";
 
 	public SearchToolbar(final HitsListPanel hitsPanel) {
@@ -82,14 +84,12 @@ public class SearchToolbar extends ToolStrip {
 		ToolStripButton showSnippets = AwesomeFactory.newToolStripButton("file", "showsnippets");
 		showSnippets.setDisabled(Search.get().getOptions().getType() != GUISearchOptions.TYPE_FULLTEXT);
 		addButton(showSnippets);
-		showSnippets.addClickHandler((ClickEvent event) -> {
-			hitsPanel.getGrid().expandVisibleRows();
-		});
+		showSnippets.addClickHandler(event -> hitsPanel.getGrid().expandVisibleRows());
 	}
 
 	private void addSaveButton() {
 		ToolStripButton save = AwesomeFactory.newToolStripButton("save", "savesearch");
-		save.addClickHandler((ClickEvent event) -> new SaveDialog().show());
+		save.addClickHandler(event -> new SaveDialog().show());
 		if (Feature.visible(Feature.SAVED_SEARCHES)) {
 			addSeparator();
 			addButton(save);
@@ -105,7 +105,7 @@ public class SearchToolbar extends ToolStrip {
 
 	private void addPrint(final HitsListPanel hitsPanel) {
 		ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
-		print.addClickHandler((ClickEvent event) -> {
+		print.addClickHandler(event -> {
 			if (hitsPanel.getGrid() instanceof ListGrid)
 				GridUtil.print((ListGrid) hitsPanel.getGrid());
 			else
@@ -118,7 +118,7 @@ public class SearchToolbar extends ToolStrip {
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
 			addButton(export);
-			export.addClickHandler((ClickEvent event) -> GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false));
+			export.addClickHandler(event -> GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false));
 			if (!Feature.enabled(Feature.EXPORT_CSV))
 				setFeatureDisabled(export);
 		}
@@ -126,7 +126,7 @@ public class SearchToolbar extends ToolStrip {
 
 	private void addSaveLayout() {
 		ToolStripButton saveLayout = AwesomeFactory.newToolStripButton("save", "savelayoutinuserprofile");
-		saveLayout.addClickHandler((ClickEvent event) -> saveGridState());
+		saveLayout.addClickHandler(event -> saveGridState());
 		addButton(saveLayout);
 	}
 
@@ -156,7 +156,7 @@ public class SearchToolbar extends ToolStrip {
 				setFeatureDisabled(bulkUpdate);
 			}
 
-			bulkUpdate.addClickHandler((ClickEvent event) -> {
+			bulkUpdate.addClickHandler(event -> {
 				if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
 						|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
 					return;
@@ -210,7 +210,7 @@ public class SearchToolbar extends ToolStrip {
 			togglePreview.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
 			togglePreview.setTooltip(I18N.message("openpreview"));
 		}
-		togglePreview.addClickHandler((ClickEvent event) -> {
+		togglePreview.addClickHandler(event -> {
 			if (SearchPanel.get().getPreviewPanel().isVisible() && SearchPanel.get().getPreviewPanel().getWidth() > 1) {
 				SearchPanel.get().getPreviewPanel().setWidth(0);
 				togglePreview.setTitle(AwesomeFactory.getIconHtml(TOGGLE_OFF));
@@ -234,7 +234,7 @@ public class SearchToolbar extends ToolStrip {
 		ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
 		gallery.setActionType(SelectionType.RADIO);
 		gallery.setRadioGroup("mode");
-		gallery.addClickHandler((ClickEvent event) -> {
+		gallery.addClickHandler(event -> {
 			if (FolderController.get().getCurrentFolder() != null)
 				CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_GALLERY);
 			hitsPanel.setVisualizationMode(DocumentsGrid.MODE_GALLERY);
@@ -249,7 +249,7 @@ public class SearchToolbar extends ToolStrip {
 		ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
 		list.setActionType(SelectionType.RADIO);
 		list.setRadioGroup("mode");
-		list.addClickHandler((ClickEvent event) -> {
+		list.addClickHandler(event -> {
 			CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_LIST);
 			hitsPanel.setVisualizationMode(DocumentsGrid.MODE_LIST);
 			hitsPanel.initialize();

@@ -280,9 +280,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	 */
 	private void unpackPlugins(ServletContext context) throws IOException {
 		File pluginsDir = PluginRegistry.getPluginsDir();
-		File[] archives = pluginsDir.listFiles((dir, fileName) -> {
-			return fileName.toLowerCase().contains("plugin") && fileName.toLowerCase().endsWith(".zip");
-		});
+		File[] archives = pluginsDir.listFiles((dir, fileName) -> fileName.toLowerCase().contains("plugin")
+				&& fileName.toLowerCase().endsWith(".zip"));
 		File webappDir = new File(context.getRealPath("/"));
 		if (archives != null)
 			for (File archive : archives) {
@@ -299,9 +298,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				pluginName = pluginName.substring(0, pluginName.lastIndexOf('-'));
 				log.info("Remove installation marker of plugin {}", pluginName);
 				File pluginDir = new File(pluginsDir, pluginName);
-				File[] installationMarkers = pluginDir.listFiles((File dir, String fileName) -> {
-					return fileName.toLowerCase().startsWith("install-");
-				});
+				File[] installationMarkers = pluginDir
+						.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith("install-"));
 				for (File file : installationMarkers)
 					FileUtils.deleteQuietly(file);
 

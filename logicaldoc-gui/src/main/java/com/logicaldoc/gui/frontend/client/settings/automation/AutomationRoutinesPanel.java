@@ -21,13 +21,11 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -135,9 +133,8 @@ public class AutomationRoutinesPanel extends VLayout {
 						});
 		});
 
-		list.addDataArrivedHandler((DataArrivedEvent event) -> {
-			infoPanel.setMessage(I18N.message("showroutines", Integer.toString(list.getTotalRows())));
-		});
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showroutines", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -160,25 +157,23 @@ public class AutomationRoutinesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					AutomationService.Instance.get().deleteRoutines(new long[] { id }, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				AutomationService.Instance.get().deleteRoutines(new long[] { id }, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-							list.deselectAllRecords();
-							showRoutineDetails(null);
-						}
-					});
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showRoutineDetails(null);
+					}
+				});
+			}
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

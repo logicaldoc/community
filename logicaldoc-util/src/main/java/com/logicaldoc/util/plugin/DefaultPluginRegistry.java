@@ -23,7 +23,7 @@ public class DefaultPluginRegistry extends PluginRegistry {
 		Set<String> keys = plugins.keySet();
 		Iterator<String> iterator = keys.iterator();
 		while (iterator.hasNext()) {
-			String manifest = (String) iterator.next();
+			String manifest = iterator.next();
 			System.out.println("manifestURL: " + manifest);
 
 			PluginDescriptor pluginDescriptor = (PluginDescriptor) plugins.get(manifest);

@@ -224,9 +224,8 @@ public class MailPreviewPanel extends VLayout {
 	}
 
 	private StaticTextItem prepareFromItem(final GUIEmail mail) {
-		StaticTextItem from = ItemFactory.newStaticTextItem("from",
+		return ItemFactory.newStaticTextItem("from",
 				mail.getFrom() != null ? mail.getFrom().displayLink() : "");
-		return from;
 	}
 
 	private StaticTextItem prepareReplyToItem(final GUIEmail mail) {
@@ -245,7 +244,7 @@ public class MailPreviewPanel extends VLayout {
 	private Menu prepareButtonMenu(final GUIDocument doc, final GUIDocument attachment) {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler(event -> {
+		copy.addClickHandler(event -> 
 			DocumentService.Instance.get().saveEmailAttachment(doc.getId(), doc.getFileVersion(),
 					attachment.getFileName(), new AsyncCallback<GUIDocument>() {
 
@@ -259,8 +258,7 @@ public class MailPreviewPanel extends VLayout {
 							if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)
 								FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 						}
-					});
-		});
+					}));
 		copy.setEnabled(doc.getFolder().isWrite());
 
 		MenuItem download = new MenuItem();

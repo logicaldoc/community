@@ -72,8 +72,8 @@ public class SearchTool {
 	 * @since 8.7.4
 	 */
 	public List<Hit> search(long tenantId, String expression, String expressionLanguage) {
-		return search(tenantId, expression,
-				Arrays.asList(new String[] { HitField.TENANT_ID.getName() + ":" + tenantId }), expressionLanguage);
+		return search(tenantId, expression, Arrays.asList(HitField.TENANT_ID.getName() + ":" + tenantId),
+				expressionLanguage);
 	}
 
 	/**
@@ -91,10 +91,10 @@ public class SearchTool {
 	 */
 	public List<Hit> search(long tenantId, String expression, List<String> filters, String expressionLanguage) {
 		filters.add(HitField.TENANT_ID.getName() + ":" + tenantId);
-		
+
 		SearchEngine engine = (SearchEngine) Context.get().getBean(SearchEngine.class);
 		Hits result = engine.search(expression, filters.toArray(new String[0]), expressionLanguage, null);
-		
+
 		Map<Long, Hit> hitsMap = new HashMap<>();
 		while (result.hasNext()) {
 			Hit hit = result.next();
@@ -103,19 +103,19 @@ public class SearchTool {
 
 		List<Hit> hits = new ArrayList<>();
 		if (!hitsMap.isEmpty()) {
-			
+
 			Set<Long> hitsIds = hitsMap.keySet();
 			StringBuilder hitsIdsCondition = new StringBuilder();
 			if (!hitsIds.isEmpty()) {
 				hitsIdsCondition.append(" and (");
-				
+
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 				if (fdao.isOracle()) {
 					/*
 					 * In Oracle The limit of 1000 elements applies to sets of
-					 * single items: (x) IN ((1), (2), (3), ...). There is no limit
-					 * if the sets contain two or more items: (x, 0) IN ((1,0),
-					 * (2,0), (3,0), ...):
+					 * single items: (x) IN ((1), (2), (3), ...). There is no
+					 * limit if the sets contain two or more items: (x, 0) IN
+					 * ((1,0), (2,0), (3,0), ...):
 					 */
 					hitsIdsCondition.append(" (A.ld_id,0) in ( ");
 					hitsIdsCondition
@@ -127,7 +127,7 @@ public class SearchTool {
 
 				hitsIdsCondition.append(")");
 			}
-			
+
 			// Find real documents
 			StringBuilder richQuery = new StringBuilder(
 					"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");

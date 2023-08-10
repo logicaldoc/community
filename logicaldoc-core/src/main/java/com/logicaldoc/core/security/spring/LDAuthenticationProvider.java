@@ -136,8 +136,7 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 
 			throw new CredentialsExpiredException(owte.getMessage());
 		} catch (com.logicaldoc.core.security.authentication.AuthenticationException ae) {
-			LoginThrottle.recordFailure(username, client,
-					(com.logicaldoc.core.security.authentication.AuthenticationException) ae);
+			LoginThrottle.recordFailure(username, client, ae);
 			throw new CredentialsExpiredException(ae.getMessage() != null
 					? String.format("Security checks failed for user %s - %s", username, ae.getMessage())
 					: "badcredentials");

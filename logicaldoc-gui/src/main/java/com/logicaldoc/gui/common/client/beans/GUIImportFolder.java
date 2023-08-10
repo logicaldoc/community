@@ -13,19 +13,19 @@ public class GUIImportFolder implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static String PROVIDER_SMB = "smb";
+	public static final String PROVIDER_SMB = "smb";
 
-	public static String PROVIDER_SMB2 = "smb2";
+	public static final String PROVIDER_SMB2 = "smb2";
 
-	public static String PROVIDER_SMB3 = "smb3";
+	public static final String PROVIDER_SMB3 = "smb3";
 
-	public static String PROVIDER_FILE = "file";
+	public static final String PROVIDER_FILE = "file";
 
-	public static String PROVIDER_FTP = "ftp";
+	public static final String PROVIDER_FTP = "ftp";
 
-	public static String PROVIDER_FTPS = "ftps";
+	public static final String PROVIDER_FTPS = "ftps";
 
-	public static String PROVIDER_SFTP = "sftp";
+	public static final String PROVIDER_SFTP = "sftp";
 
 	private long id = 0;
 

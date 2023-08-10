@@ -24,7 +24,6 @@ import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ResizedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -107,9 +106,7 @@ public class PreviewPanel extends VLayout {
 			}
 		});
 
-		addResizedHandler((ResizedEvent event) -> {
-			doResize();
-		});
+		addResizedHandler((event) -> doResize());
 	}
 
 	private void doResize() {

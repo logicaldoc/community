@@ -159,8 +159,7 @@ public class BruteForcePanel extends AdminPanel {
 		ListGridField entity = new ListGridField("entity", I18N.message("blockedusernameip"));
 		entity.setWidth(200);
 		entity.setCellFormatter((value, rec, rowNum, colNum) -> {
-			String name = ((String) value).substring(((String) value).lastIndexOf('-') + 1);
-			return name;
+			return ((String) value).substring(((String) value).lastIndexOf('-') + 1);
 		});
 
 		ListGridField attempts = new ListGridField(ATTEMPTS, I18N.message(ATTEMPTS));
@@ -233,7 +232,7 @@ public class BruteForcePanel extends AdminPanel {
 			return;
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values =  vm.getValues();
 		GUIParameter[] params = new GUIParameter[5];
 		params[0] = new GUIParameter(THROTTLE_ENABLED,
 				"yes".equals(values.get("eenabled").toString()) ? "true" : "false");

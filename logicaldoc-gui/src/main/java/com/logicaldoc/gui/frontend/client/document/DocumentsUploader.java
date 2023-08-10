@@ -17,7 +17,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -74,20 +73,18 @@ public class DocumentsUploader extends Window {
 		layout.addMember(sendButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler((CloseClickEvent event) -> {
-			DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-				@Override
-				public void onSuccess(Void result) {
-					destroy();
-				}
-			});
-		});
+			@Override
+			public void onSuccess(Void result) {
+				destroy();
+			}
+		}));
 
 		addItem(layout);
 
@@ -128,7 +125,7 @@ public class DocumentsUploader extends Window {
 		zipItem.setValue(!zipImport);
 		zipItem.setTitleAlign(Alignment.LEFT);
 		zipItem.addChangedHandler((ChangedEvent event) -> {
-			if (Boolean.TRUE.equals((Boolean) event.getValue()))
+			if (Boolean.TRUE.equals(event.getValue()))
 				charset.show();
 			else
 				charset.hide();

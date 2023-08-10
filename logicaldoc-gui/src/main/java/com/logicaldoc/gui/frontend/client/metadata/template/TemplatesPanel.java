@@ -169,9 +169,9 @@ public class TemplatesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler( event -> 
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
 					TemplateService.Instance.get().delete(id, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -186,8 +186,7 @@ public class TemplatesPanel extends VLayout {
 						}
 					});
 				}
-			});
-		});
+			}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

@@ -161,7 +161,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
-			LD.askForValue(I18N.message("email"), I18N.message("email"), (String) vm.getValueAsString(SENDEREMAIL),
+			LD.askForValue(I18N.message("email"), I18N.message("email"), vm.getValueAsString(SENDEREMAIL),
 					(String value) -> {
 						LD.contactingServer();
 						SettingService.Instance.get().testEmail(value, new AsyncCallback<Boolean>() {
@@ -194,7 +194,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 				return;
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+			Map<String, Object> values =  vm.getValues();
 
 			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpserver"));
 			if (values.get("port") instanceof Integer)

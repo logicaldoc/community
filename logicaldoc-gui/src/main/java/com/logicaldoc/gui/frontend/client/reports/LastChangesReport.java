@@ -303,7 +303,7 @@ public class LastChangesReport extends AdminPanel {
 	private void onSearch() {
 		histories.setData(new ListGridRecord[0]);
 
-		final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		final Map<String, Object> values =  vm.getValues();
 
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;

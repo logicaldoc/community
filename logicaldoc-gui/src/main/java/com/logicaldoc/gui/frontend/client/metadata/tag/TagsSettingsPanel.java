@@ -102,7 +102,7 @@ public class TagsSettingsPanel extends VLayout {
 		save.addClickHandler(new ClickHandler() {
 			@SuppressWarnings("unchecked")
 			public void onClick(ClickEvent event) {
-				final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+				final Map<String, Object> values = vm.getValues();
 
 				if (Boolean.TRUE.equals(vm.validate())) {
 					List<GUIParameter> params = new ArrayList<>();

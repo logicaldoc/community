@@ -117,61 +117,61 @@ public class ContactsImportSettings extends Window {
 
 	public String getSeparator() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return values.get("separatedby").toString();
 	}
 
 	public String getTextDelimiter() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return values.get("textdelimiter").toString();
 	}
 
 	public boolean isSkipFirstRow() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return "yes".equals(values.get("skipfirstrow").toString());
 	}
 
 	public int getFirstNameIndex() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return Integer.parseInt(values.get("firstname").toString());
 	}
 
 	public int getLastNameIndex() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return Integer.parseInt(values.get("lastname").toString());
 	}
 
 	public int getEmailIndex() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return Integer.parseInt(values.get("email").toString());
 	}
 
 	public int getCompanyIndex() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return Integer.parseInt(values.get("company").toString());
 	}
 
 	public int getPhoneIndex() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return Integer.parseInt(values.get("phone").toString());
 	}
 
 	public int getMobileIndex() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return Integer.parseInt(values.get("mobile").toString());
 	}
 
 	public int getAddressIndex() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) form.getValues();
+		Map<String, Object> values = form.getValues();
 		return Integer.parseInt(values.get("address").toString());
 	}
 

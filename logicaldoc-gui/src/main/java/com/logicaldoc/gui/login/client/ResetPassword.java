@@ -71,7 +71,7 @@ public class ResetPassword extends Window {
 		resetButton.addClickHandler(new ClickHandler() {
 			@SuppressWarnings("unchecked")
 			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
+				Map<String, Object> values =  vm.getValues();
 
 				if (Boolean.TRUE.equals(vm.validate()))  {
 					final String userName = (String) values.get("username");

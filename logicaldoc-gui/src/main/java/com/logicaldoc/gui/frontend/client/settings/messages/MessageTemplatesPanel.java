@@ -242,20 +242,18 @@ public class MessageTemplatesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> {
-			MessageService.Instance.get().deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"),
-					new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> MessageService.Instance.get()
+				.deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void arg) {
-							reload();
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void arg) {
+						reload();
+					}
+				}));
 
 		delete.setEnabled(!"system".equals(list.getSelectedRecord().getAttributeAsString("type")));
 		copyFromDefault.setEnabled(!"en".equals(langSelector.getValueAsString()));

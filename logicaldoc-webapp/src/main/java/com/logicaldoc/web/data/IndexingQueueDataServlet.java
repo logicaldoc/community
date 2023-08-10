@@ -54,7 +54,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		 * Execute the Query
 		 */
 		@SuppressWarnings("unchecked")
-		List<Object[]> records = (List<Object[]>) dao.query(query.toString(), new RowMapper<Object[]>() {
+		List<Object[]> records = dao.query(query.toString(), new RowMapper<Object[]>() {
 
 			@Override
 			public Object[] mapRow(ResultSet rs, int row) throws SQLException {

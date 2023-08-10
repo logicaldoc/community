@@ -11,9 +11,9 @@ import java.util.Date;
  */
 public class GUIReport implements Serializable {
 
-	public static int STATUS_IDLE = 0;
+	public static final int STATUS_IDLE = 0;
 
-	public static int STATUS_RUNNING = 1;
+	public static final int STATUS_RUNNING = 1;
 
 	private static final long serialVersionUID = 1L;
 

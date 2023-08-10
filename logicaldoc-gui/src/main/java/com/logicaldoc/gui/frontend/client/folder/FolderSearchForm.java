@@ -150,7 +150,7 @@ public abstract class FolderSearchForm extends VLayout {
 			template.setMultiple(false);
 			template.setEndRow(true);
 			template.addChangedHandler(event -> {
-				if (event.getValue() != null && !"".equals((String) event.getValue())) {
+				if (event.getValue() != null && !"".equals(event.getValue())) {
 					TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
 							new AsyncCallback<GUITemplate>() {
 								@Override

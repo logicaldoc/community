@@ -116,7 +116,7 @@ public class ImageDrawingPane extends DrawPane {
 	@Override
 	public void zoom(double zoomLevel) {
 		super.zoom(zoomLevel);
-		setWidth((int) ((double) imageWidth * zoomLevel));
-		setHeight((int) ((double) imageHeight * zoomLevel));
+		setWidth((int) (imageWidth * zoomLevel));
+		setHeight((int) (imageHeight * zoomLevel));
 	}
 }

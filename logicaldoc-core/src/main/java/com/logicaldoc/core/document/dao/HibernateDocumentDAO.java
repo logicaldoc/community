@@ -786,12 +786,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(query.toString(), params, Long.class, null);
-		List<Document> coll = findByWhere(
-				ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
-						+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED,
-				null, null);
-
-		return coll;
+		return findByWhere(ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+				+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
 	}
 
 	@Override
@@ -1381,9 +1377,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
 
-		return query(digestQuery.toString(), (rs, rowNum) -> {
-			return rs.getString(1);
-		}, null);
+		return query(digestQuery.toString(), (rs, rowNum) -> rs.getString(1), null);
 
 	}
 }

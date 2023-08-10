@@ -95,8 +95,7 @@ public class PrivilegedRunner {
 	}
 
 	public static boolean isWindows() {
-		boolean windows = System.getProperty(OS_NAME).toLowerCase().indexOf("win") >= 0;
-		return windows;
+		return System.getProperty(OS_NAME).toLowerCase().indexOf("win") >= 0;
 	}
 
 	public static boolean isMac() {

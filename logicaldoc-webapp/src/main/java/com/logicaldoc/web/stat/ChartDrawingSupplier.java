@@ -16,11 +16,11 @@ public class ChartDrawingSupplier extends DefaultDrawingSupplier {
 
 	private static final long serialVersionUID = 1L;
 
-	public transient Paint[] paintSequence;
+	private transient Paint[] paintSequence;
 
-	public int paintIndex;
+	private int paintIndex;
 
-	public int fillPaintIndex;
+	private int fillPaintIndex;
 
 	public ChartDrawingSupplier() {
 		paintSequence = new Paint[] { new Color(128, 255, 128), new Color(128, 128, 255), new Color(255, 128, 128),

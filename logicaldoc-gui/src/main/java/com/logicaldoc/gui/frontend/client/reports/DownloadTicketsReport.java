@@ -42,8 +42,11 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class DownloadTicketsReport extends ReportPanel {
 
 	private static final String DOC_ID = "docId";
+
 	private static final String VALID = "valid";
+
 	private static final String EENABLED = "eenabled";
+
 	private SpinnerItem max;
 
 	public DownloadTicketsReport() {
@@ -162,35 +165,34 @@ public class DownloadTicketsReport extends ReportPanel {
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler((MenuItemClickEvent event) -> {
-				String id = rec.getAttribute(DOC_ID);
-				WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + id);
+			String id = rec.getAttribute(DOC_ID);
+			WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + id);
 		});
 
 		MenuItem ticketURL = new MenuItem();
 		ticketURL.setTitle(I18N.message("ticketurl"));
 		ticketURL.addClickHandler((MenuItemClickEvent event) -> {
-				String ticketId = rec.getAttributeAsString("ticketId");
+			String ticketId = rec.getAttributeAsString("ticketId");
 
-				String url = Session.get().getConfig("server.url");
-				if (!url.endsWith("/"))
-					url += "/";
-				url += "download-ticket?ticketId=" + ticketId;
+			String url = Session.get().getConfig("server.url");
+			if (!url.endsWith("/"))
+				url += "/";
+			url += "download-ticket?ticketId=" + ticketId;
 
-				SC.confirm(I18N.message("downloadticket") + " - " + ticketId,
-						"<a href='" + url + "' target='_blank'>" + url + "</a>", null);
+			SC.confirm(I18N.message("downloadticket") + " - " + ticketId,
+					"<a href='" + url + "' target='_blank'>" + url + "</a>", null);
 		});
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
-				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
-						Long.parseLong(rec.getAttributeAsString(DOC_ID)));
-		});
+		openInFolder.addClickHandler(
+				event -> DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
+						Long.parseLong(rec.getAttributeAsString(DOC_ID))));
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler((MenuItemClickEvent event) -> {
-				DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"), new AsyncCallback<Void>() {
+		enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
+				new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -203,13 +205,12 @@ public class DownloadTicketsReport extends ReportPanel {
 						rec.setAttribute(VALID, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
-				});
-		});
+				}));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler((MenuItemClickEvent event) -> {
-				DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"), new AsyncCallback<Void>() {
+		disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
+				new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -222,29 +223,27 @@ public class DownloadTicketsReport extends ReportPanel {
 						rec.setAttribute(VALID, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
-				});
-		});
+				}));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value))
-						DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"),
-								new AsyncCallback<Void>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+		delete.addClickHandler(event -> 
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer))
+					DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"),
+							new AsyncCallback<Void>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-									@Override
-									public void onSuccess(Void result) {
-										list.removeSelectedData();
-										list.deselectAllRecords();
-									}
-								});
-				});
-		});
+								@Override
+								public void onSuccess(Void result) {
+									list.removeSelectedData();
+									list.deselectAllRecords();
+								}
+							});
+			}));
 
 		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {
 			ticketURL.setEnabled(false);

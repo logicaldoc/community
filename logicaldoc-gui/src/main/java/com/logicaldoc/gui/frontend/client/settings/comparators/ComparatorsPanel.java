@@ -230,9 +230,8 @@ public class ComparatorsPanel extends AdminPanel {
 
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
-		comparator.setCellFormatter((value, rec, rowNum, colNum) -> {
-			return getComparatorShortName(value != null ? value.toString() : null);
-		});
+		comparator.setCellFormatter(
+				(value, rec, rowNum, colNum) -> getComparatorShortName(value != null ? value.toString() : null));
 
 		settingsGrid.setFields(enabled, comparator);
 		settingsGrid.addCellContextClickHandler(event -> {
@@ -394,82 +393,76 @@ public class ComparatorsPanel extends AdminPanel {
 	private MenuItem prepareDisableMenuItem() {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(event -> {
-			SettingService.Instance.get()
-					.saveSettings(new GUIParameter[] { new GUIParameter(
-							settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled",
-							"false") }, new AsyncCallback<Void>() {
+		disable.addClickHandler(event -> SettingService.Instance.get()
+				.saveSettings(new GUIParameter[] { new GUIParameter(
+						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "false") },
+						new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void arg0) {
+								settingsGrid.getSelectedRecord().setAttribute(EENABLED, false);
+								settingsGrid.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
+
+								// Update the associations table
+								Record[] associations = associationsGrid.findAll(new AdvancedCriteria(gridAttributeName,
+										OperatorId.EQUALS,
+										settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
+								if (associations != null)
+									for (Record rec : associations)
+										rec.setAttribute(EENABLED, false);
+
+								// Refresh the visualization
+								associationsGrid.invalidateRecordComponents();
+								ListGridRecord[] recs = associationsGrid.getRecords();
+								for (ListGridRecord rec : recs) {
+									associationsGrid.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
 								}
-
-								@Override
-								public void onSuccess(Void arg0) {
-									settingsGrid.getSelectedRecord().setAttribute(EENABLED, false);
-									settingsGrid
-											.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
-
-									// Update the associations table
-									Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
-											gridAttributeName, OperatorId.EQUALS,
-											settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
-									if (associations != null)
-										for (Record rec : associations)
-											rec.setAttribute(EENABLED, false);
-
-									// Refresh the visualization
-									associationsGrid.invalidateRecordComponents();
-									ListGridRecord[] recs = associationsGrid.getRecords();
-									for (ListGridRecord rec : recs) {
-										associationsGrid.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
-									}
-									associationsGrid.refreshFields();
-								}
-							});
-		});
+								associationsGrid.refreshFields();
+							}
+						}));
 		return disable;
 	}
 
 	private MenuItem prepareEnableMenuItem() {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(event -> {
-			SettingService.Instance.get()
-					.saveSettings(new GUIParameter[] { new GUIParameter(
-							settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled",
-							"true") }, new AsyncCallback<Void>() {
+		enable.addClickHandler(event -> SettingService.Instance.get()
+				.saveSettings(new GUIParameter[] { new GUIParameter(
+						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "true") },
+						new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void arg0) {
+								settingsGrid.getSelectedRecord().setAttribute(EENABLED, true);
+								settingsGrid.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
+
+								// Update the associations table
+								Record[] associations = associationsGrid.findAll(new AdvancedCriteria(gridAttributeName,
+										OperatorId.EQUALS,
+										settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
+								if (associations != null)
+									for (Record rec : associations)
+										rec.setAttribute(EENABLED, true);
+
+								// Refresh the visualization
+								associationsGrid.invalidateRecordComponents();
+								ListGridRecord[] recs = associationsGrid.getRecords();
+								for (ListGridRecord rec : recs) {
+									associationsGrid.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
 								}
-
-								@Override
-								public void onSuccess(Void arg0) {
-									settingsGrid.getSelectedRecord().setAttribute(EENABLED, true);
-									settingsGrid
-											.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
-
-									// Update the associations table
-									Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
-											gridAttributeName, OperatorId.EQUALS,
-											settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
-									if (associations != null)
-										for (Record rec : associations)
-											rec.setAttribute(EENABLED, true);
-
-									// Refresh the visualization
-									associationsGrid.invalidateRecordComponents();
-									ListGridRecord[] recs = associationsGrid.getRecords();
-									for (ListGridRecord rec : recs) {
-										associationsGrid.refreshRecordComponent(associationsGrid.getRecordIndex(rec));
-									}
-									associationsGrid.refreshFields();
-								}
-							});
-		});
+								associationsGrid.refreshFields();
+							}
+						}));
 		return enable;
 	}
 }

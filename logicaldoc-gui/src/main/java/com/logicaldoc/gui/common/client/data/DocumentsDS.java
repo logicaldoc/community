@@ -42,9 +42,11 @@ public class DocumentsDS extends DataSource {
 		if (!parameters.isBarcoded() && !parameters.isOcrd()) {
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
 					+ defaultValue(parameters.getFolderId()) + "&filename=" + defaultValue(parameters.getFileFilter())
-					+ "&max=" + maxValue(parameters.getMax()) + "&indexed="
-					+ defaultValue(parameters.getIndexed()) + PAGE + parameters.getPage()
-					+ (parameters.sortSpec != null && !parameters.sortSpec.isEmpty() ? "&sort=" + parameters.sortSpec : "")
+					+ "&max=" + maxValue(parameters.getMax()) + "&indexed=" + defaultValue(parameters.getIndexed())
+					+ PAGE + parameters.getPage()
+					+ (parameters.getSortSpec() != null && !parameters.getSortSpec().isEmpty()
+							? "&sort=" + parameters.getSortSpec()
+							: "")
 					+ "&hiliteDocId=" + defaultValue(Session.get().getHiliteDocId()));
 		} else if (parameters.isBarcoded())
 			setDataURL("data/barcodequeue.xml?max=" + maxValue(parameters.getMax()) + PAGE + parameters.getPage());

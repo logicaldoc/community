@@ -73,7 +73,7 @@ public class DownloadServlet extends HttpServlet {
 	}
 
 	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Session session)
-			throws FileNotFoundException, IOException, ServletException, PersistenceException {
+			throws IOException, ServletException, PersistenceException {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 
@@ -213,7 +213,7 @@ public class DownloadServlet extends HttpServlet {
 
 	private void download(HttpServletRequest request, HttpServletResponse response, Session session,
 			String downloadText, Long docId, String fileVersion, String filename, String suffix, Document doc)
-			throws FileNotFoundException, IOException, PersistenceException, ServletException {
+			throws IOException, PersistenceException, ServletException {
 		if (doc != null) {
 			if ("true".equals(downloadText)) {
 				ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());

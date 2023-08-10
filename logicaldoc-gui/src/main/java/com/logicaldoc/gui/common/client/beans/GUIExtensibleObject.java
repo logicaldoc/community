@@ -112,9 +112,7 @@ public class GUIExtensibleObject implements Serializable {
 					values.add(att);
 			}
 
-		values.sort((GUIAttribute arg0, GUIAttribute arg1) -> {
-			return arg0.getName().compareTo(arg1.getName());
-		});
+		values.sort((guiAttr1, guiAttr2) -> guiAttr1.getName().compareTo(guiAttr2.getName()));
 
 		return values;
 	}

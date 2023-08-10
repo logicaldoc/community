@@ -86,7 +86,7 @@ public class SplitDialog extends Window {
 
 		split.addClickHandler(event -> {
 			@SuppressWarnings("unchecked")
-			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+			Map<String, Object> values = vm.getValues();
 			vm.validate();
 			if (Boolean.FALSE.equals(vm.hasErrors())) {
 				LD.contactingServer();

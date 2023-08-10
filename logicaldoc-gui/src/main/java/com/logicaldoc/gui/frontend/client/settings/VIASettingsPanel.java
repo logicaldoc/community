@@ -15,7 +15,6 @@ import com.logicaldoc.gui.frontend.client.services.VIAService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -197,9 +196,7 @@ public class VIASettingsPanel extends AdminPanel {
 
 	private IButton prepareSaveButton() {
 		IButton save = new IButton(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> {
-			onSave();
-		});
+		save.addClickHandler(event -> onSave());
 		return save;
 	}
 
@@ -282,7 +279,7 @@ public class VIASettingsPanel extends AdminPanel {
 	boolean validate() {
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			Map<String, Object> values = (Map<String, Object>) vm.getValues();
+			Map<String, Object> values = vm.getValues();
 			settings.setEnabled("yes".equals(values.get("eenabled").toString()));
 			settings.setMaxAttachments(Integer.parseInt(values.get("maxattachments").toString()));
 			settings.setMaxAttachmentSize(Long.parseLong(values.get(MAXATTACHMENTSIZE).toString()) * 1024L);
@@ -302,7 +299,7 @@ public class VIASettingsPanel extends AdminPanel {
 				account.setPort((Integer) values.get("port"));
 			else
 				account.setPort(Integer.parseInt((String) values.get("port")));
-			account.setSsl("yes".equals((String) values.get("ssl")));
+			account.setSsl("yes".equals(values.get("ssl")));
 			account.setMailFolder((String) values.get("mailfolder"));
 
 			if (account.getMailAddress() == null || account.getMailAddress().trim().isEmpty())

@@ -45,8 +45,7 @@ public class PluginDescriptorConfigurator extends XMLBean {
 		Set<String> deps = new HashSet<>();
 		Element requires = getRootElement().getChild("requires");
 		if (requires != null) {
-			@SuppressWarnings("unchecked")
-			List<Element> imports = (List<Element>) requires.getChildren("import");
+			List<Element> imports = requires.getChildren("import");
 			for (Element imp : imports) {
 				deps.add(imp.getAttributeValue("plugin-id"));
 			}

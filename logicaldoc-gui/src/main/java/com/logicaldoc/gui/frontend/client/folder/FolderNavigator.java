@@ -277,7 +277,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			if (Session.get().getConfigAsBoolean("gui.folder.openonselect")) {
 				// Expand the selected node if it is not already expanded
-				TreeNode selectedNode = (TreeNode) getSelectedRecord();
+				TreeNode selectedNode = getSelectedRecord();
 				openFolder(selectedNode);
 			}
 		});
@@ -478,7 +478,6 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		MenuItem reload = new MenuItem();
 		reload.setTitle(I18N.message("reload"));
 		reload.addClickHandler(click -> reload());
-		
 
 		MenuItem move = prepareMoveMenuItem(selectedFolder);
 
@@ -555,9 +554,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		if (Feature.visible(Feature.AUTOMATION)) {
 			MenuItem automation = new MenuItem();
 			automation.setTitle(I18N.message("executeautomation"));
-			automation.addClickHandler((MenuItemClickEvent eaClick) -> {
-				onAutomation(selectedFolder.getId());
-			});
+			automation.addClickHandler(eaClick -> onAutomation(selectedFolder.getId()));
+
 			contextMenu.addItem(automation);
 			if (!Feature.enabled(Feature.AUTOMATION)
 					|| !selectedFolder.hasPermission(Constants.PERMISSION_AUTOMATION)) {
@@ -785,7 +783,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * Adds a bookmark to the currently selected folder.
 	 */
 	private void onAddBookmark() {
-		final TreeNode selectedNode = (TreeNode) getSelectedRecord();
+		final TreeNode selectedNode = getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
 
 		DocumentService.Instance.get().addBookmarks(new Long[] { folderId }, 1, new AsyncCallback<Void>() {
@@ -1106,7 +1104,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * folder
 	 */
 	public void reload() {
-		TreeNode selectedNode = (TreeNode) getSelectedRecord();
+		TreeNode selectedNode = getSelectedRecord();
 		getTree().reloadChildren(selectedNode);
 		selectFolder(selectedNode.getAttributeAsLong(FOLDER_ID));
 	}
@@ -1115,7 +1113,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * Reloads the children of the current node
 	 */
 	public void reloadChildren() {
-		TreeNode selectedNode = (TreeNode) getSelectedRecord();
+		TreeNode selectedNode = getSelectedRecord();
 		getTree().reloadChildren(selectedNode);
 	}
 
@@ -1127,7 +1125,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	private void onRename() {
-		final TreeNode selectedNode = (TreeNode) getSelectedRecord();
+		final TreeNode selectedNode = getSelectedRecord();
 		LD.askForValue(I18N.message("rename"), I18N.message("name"), selectedNode.getAttributeAsString("name"),
 				value -> {
 					if (value == null || "".equals(value.trim()))
@@ -1158,7 +1156,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	private void onPaste() {
-		TreeNode selectedNode = (TreeNode) getSelectedRecord();
+		TreeNode selectedNode = getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
 		final long[] docIds = new long[Clipboard.getInstance().size()];
 		int i = 0;
@@ -1183,7 +1181,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	private void onPasteAsAlias() {
-		TreeNode selectedNode = (TreeNode) getSelectedRecord();
+		TreeNode selectedNode = getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
 		final long[] docIds = new long[Clipboard.getInstance().size()];
 		int i = 0;
@@ -1487,13 +1485,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	private void onAutomation(final long folderId) {
-		AutomationDialog dialog = new AutomationDialog(folderId, null);
-		dialog.show();
+		new AutomationDialog(folderId, null).show();
 	}
 
 	public TreeNode getNode(long folderId) {
-		TreeNode node = getTree().find(FOLDER_ID, Long.toString(folderId));
-		return node;
+		return getTree().find(FOLDER_ID, Long.toString(folderId));
 	}
 
 	public long getSelectedFolderId() {
@@ -1501,8 +1497,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	public TreeNode getRootNode() {
-		TreeNode node = getTree().getRoot();
-		return node;
+		return getTree().getRoot();
 	}
 
 	private void reloadParentsOfSelection() {
@@ -1557,64 +1552,61 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		MenuItem actionItem = new MenuItem(I18N.message(menuAction.getName()));
 		customActionsMenu.addItem(actionItem);
 
-		actionItem.addClickHandler(event -> {
-			/**
-			 * Check on the server if the action has been modified
-			 */
-			SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+		actionItem.addClickHandler(event ->
+		/**
+		 * Check on the server if the action has been modified
+		 */
+		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-				@Override
-				public void onSuccess(GUIMenu action) {
-					Session.get().getUser().updateCustomAction(action);
+			@Override
+			public void onSuccess(GUIMenu action) {
+				Session.get().getUser().updateCustomAction(action);
 
-					if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
-							&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
-						/*
-						 * An automation cript is specified directly, so launch
-						 * it's execution
-						 */
-						GUIAutomationRoutine routine = new GUIAutomationRoutine();
-						routine.setAutomation(action.getAutomation());
-						executeRoutine(folderId, null, routine);
-					} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
-						AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-								new AsyncCallback<GUIAutomationRoutine>() {
+				if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
+						&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
+					/*
+					 * An automation cript is specified directly, so launch it's
+					 * execution
+					 */
+					GUIAutomationRoutine routine = new GUIAutomationRoutine();
+					routine.setAutomation(action.getAutomation());
+					executeRoutine(folderId, null, routine);
+				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
+					AutomationService.Instance.get().getRoutine(action.getRoutineId(),
+							new AsyncCallback<GUIAutomationRoutine>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(GUIAutomationRoutine routine) {
+									if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
+										/*
+										 * A routine with parameters is
+										 * referenced, so open the input popup
+										 */
+										FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
+												folderId, null);
+										dialog.show();
+									} else {
+										/*
+										 * A routine without parameters is
+										 * referenced, so launch directly
+										 */
+										executeRoutine(folderId, null, routine);
 									}
-
-									@Override
-									public void onSuccess(GUIAutomationRoutine routine) {
-										if (routine.getTemplateId() != null
-												&& routine.getTemplateId().longValue() != 0L) {
-											/*
-											 * A routine with parameters is
-											 * referenced, so open the input
-											 * popup
-											 */
-											FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
-													folderId, null);
-											dialog.show();
-										} else {
-											/*
-											 * A routine without parameters is
-											 * referenced, so launch directly
-											 */
-											executeRoutine(folderId, null, routine);
-										}
-									}
-								});
-					}
+								}
+							});
 				}
-			});
-		});
+			}
+		}));
 	}
 
 	private void executeRoutine(long folderId, Long[] docIds, GUIAutomationRoutine routine) {

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +60,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 	private static final String INDEX_DIR = "index.dir";
 
-	public static Version VERSION = Version.LUCENE_8_11_2;
+	public static final Version VERSION = Version.LUCENE_8_11_2;
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
@@ -162,7 +161,7 @@ public class StandardSearchEngine implements SearchEngine {
 		}
 	}
 
-	private void setContent(String content, SolrInputDocument hit) throws CharacterCodingException {
+	private void setContent(String content, SolrInputDocument hit) {
 		int maxText = getMaxText();
 		if (content != null) {
 			String utf8Content = StringUtil.removeNonUtf8Chars(content);
@@ -441,11 +440,7 @@ public class StandardSearchEngine implements SearchEngine {
 				directory.obtainLock(IndexWriter.WRITE_LOCK_NAME).close();
 		} catch (Exception e) {
 			log.warn("unlock {}", e.getMessage());
-			try {
-				FileUtil.strongDelete(new File(getIndexDataFolder(), "write.lock"));
-			} catch (IOException e1) {
-				log.warn("unlock {}", e1.getMessage());
-			}
+			FileUtil.strongDelete(new File(getIndexDataFolder(), "write.lock"));
 		}
 	}
 
@@ -566,7 +561,7 @@ public class StandardSearchEngine implements SearchEngine {
 		return new NIOFSDirectory(getIndexDataFolder().toPath());
 	}
 
-	File getIndexDataFolder() throws IOException {
+	File getIndexDataFolder() {
 		File indexdir = new File(config.getProperty(INDEX_DIR));
 		indexdir = new File(indexdir, LOGICALDOC);
 		indexdir = new File(indexdir, "data");

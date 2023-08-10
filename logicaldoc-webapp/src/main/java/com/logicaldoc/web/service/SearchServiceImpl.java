@@ -1,6 +1,5 @@
 package com.logicaldoc.web.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -138,7 +137,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		guiHit.setAttributes(extList.toArray(new GUIAttribute[0]));
 	}
 
-	private List<Hit> doSearch(GUISearchOptions options, Session session, GUIResult result) throws ServerException {
+	private List<Hit> doSearch(GUISearchOptions options, Session session, GUIResult result) {
 		SearchOptions searchOptions = prepareSearchOptions(options, session);
 
 		// Retrieve the search machinery
@@ -160,7 +159,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		return hits;
 	}
 
-	private SearchOptions prepareSearchOptions(GUISearchOptions options, Session session) throws ServerException {
+	private SearchOptions prepareSearchOptions(GUISearchOptions options, Session session) {
 		SearchOptions searchOptions = toSearchOptions(options);
 		searchOptions.setTenantId(session.getTenantId());
 
@@ -243,9 +242,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	 * @return the list of search options
 	 * 
 	 * @throws PersistenceException A problem at db level
-	 * @throws IOException a generic IO error
 	 */
-	public static List<SearchOptions> getSearches(Session session) throws PersistenceException, IOException {
+	public static List<SearchOptions> getSearches(Session session) throws PersistenceException {
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		Map<String, SearchOptions> map = new HashMap<>();
@@ -263,7 +261,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				.collect(Collectors.toList());
 	}
 
-	protected GUISearchOptions toGUIOptions(SearchOptions searchOptions) throws ServerException {
+	protected GUISearchOptions toGUIOptions(SearchOptions searchOptions) {
 		GUISearchOptions op = new GUISearchOptions();
 		op.setType(searchOptions.getType());
 		op.setDescription(searchOptions.getDescription());
@@ -374,7 +372,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	}
 
 	private com.logicaldoc.core.searchengine.saved.SavedSearch loadSavedSearch(String name, Session session)
-			throws PersistenceException, ServerException {
+			throws PersistenceException {
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 		return dao.findByUserIdAndName(session.getUserId(), name);
 	}
@@ -388,7 +386,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		return cal.getTime();
 	}
 
-	protected SearchOptions toSearchOptions(GUISearchOptions options) throws ServerException {
+	protected SearchOptions toSearchOptions(GUISearchOptions options) {
 		SearchOptions searchOptions = Search.newOptions(options.getType());
 		searchOptions.setTopOperator(options.getTopOperator());
 		searchOptions.setDescription(options.getDescription());

@@ -74,12 +74,10 @@ public class MessagesWindow extends Window {
 		grid.setCanResizeFields(true);
 		addItem(grid);
 
-		grid.addDoubleClickHandler(event -> {
-			LD.askForValue(I18N.message(DETAIL), I18N.message(DETAIL),
-					grid.getSelectedRecord().getAttributeAsString(DETAIL), value -> {
-						// Nothing to do
-					});
-		});
+		grid.addDoubleClickHandler(event -> LD.askForValue(I18N.message(DETAIL), I18N.message(DETAIL),
+				grid.getSelectedRecord().getAttributeAsString(DETAIL), value -> {
+					// Nothing to do
+				}));
 	}
 
 	public void addEvent(GUIEvent event) {

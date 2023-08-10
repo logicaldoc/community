@@ -10,7 +10,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.CharacterCodingException;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -150,7 +149,7 @@ public class StringUtil {
 		return String.join(separator, collection.stream().map(o -> o.toString()).collect(Collectors.toList()));
 	}
 
-	public static String removeNonUtf8Chars(String src) throws CharacterCodingException {
+	public static String removeNonUtf8Chars(String src) {
 		return src.replace('\uFFFF', ' ').replace('\uD835', ' ');
 	}
 

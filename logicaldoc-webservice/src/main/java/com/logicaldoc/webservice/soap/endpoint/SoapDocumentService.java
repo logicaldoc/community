@@ -302,9 +302,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (StringUtils.isNotEmpty(suffix))
 			fileName = suffix;
 		String mime = MimeType.getByFilename(fileName);
-		DataHandler content = new DataHandler(
+		return new DataHandler(
 				new InputStreamDataSource(storer.getStream(doc.getId(), resourceName), mime));
-		return content;
 	}
 
 	@Override
@@ -609,9 +608,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Document> docs = docDao.findByFolder(folderId, null);
 		if (docs.size() > 1)
-			Collections.sort(docs, (doc1, doc2) -> {
-				return doc1.getFileName().compareTo(doc2.getFileName());
-			});
+			Collections.sort(docs, (doc1, doc2) -> doc1.getFileName().compareTo(doc2.getFileName()));
 
 		List<WSDocument> wsDocs = new ArrayList<>();
 		for (Document doc : docs) {
@@ -665,7 +662,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		StringBuilder query = new StringBuilder(
 				"select docId from DocumentHistory where deleted=0 and (docId is not NULL) and userId=" + user.getId());
 		query.append(" order by date desc");
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, max);
+		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, max);
 
 		Set<Long> docIds = new HashSet<>();
 
@@ -691,7 +688,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		ContextProperties config = (ContextProperties) Context.get().getProperties();
+		ContextProperties config = Context.get().getProperties();
 		Session session = SessionManager.get().get(sid);
 
 		EMail mail = new EMail();

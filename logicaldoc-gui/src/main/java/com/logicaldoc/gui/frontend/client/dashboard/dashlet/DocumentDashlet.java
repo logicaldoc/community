@@ -171,21 +171,20 @@ public class DocumentDashlet extends Dashlet {
 		if (document.getStatus() == Constants.DOC_LOCKED || document.getStatus() == Constants.DOC_CHECKED_OUT) {
 			MenuItem unlock = new MenuItem();
 			unlock.setTitle(I18N.message("unlock"));
-			unlock.addClickHandler(event -> {
-				DocumentService.Instance.get().unlock(new Long[] { document.getId() }, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(new Long[] { document.getId() },
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-					@Override
-					public void onSuccess(Void result) {
-						Session.get().getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
-						list.removeSelectedData();
-						list.refresh(getDataSource());
-					}
-				});
-			});
+						@Override
+						public void onSuccess(Void result) {
+							Session.get().getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
+							list.removeSelectedData();
+							list.refresh(getDataSource());
+						}
+					}));
 			contextMenu.addItem(unlock);
 		}
 		return contextMenu;

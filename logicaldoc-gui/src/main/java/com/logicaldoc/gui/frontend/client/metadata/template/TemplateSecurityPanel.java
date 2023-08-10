@@ -15,14 +15,12 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -113,9 +111,7 @@ public class TemplateSecurityPanel extends VLayout {
 				}
 				event.cancel();
 			});
-			list.addEditCompleteHandler(event -> {
-				changedHandler.onChanged(null);
-			});
+			list.addEditCompleteHandler(event -> changedHandler.onChanged(null));
 		}
 
 		addButons(template);
@@ -197,16 +193,12 @@ public class TemplateSecurityPanel extends VLayout {
 		Button exportButton = new Button(I18N.message("export"));
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
-		exportButton.addClickHandler((ClickEvent event) -> {
-			GridUtil.exportCSV(list, true);
-		});
+		exportButton.addClickHandler(event -> GridUtil.exportCSV(list, true));
 
 		Button printButton = new Button(I18N.message("print"));
 		printButton.setAutoFit(true);
 		buttons.addMember(printButton);
-		printButton.addClickHandler((ClickEvent event) -> {
-			GridUtil.print(list);
-		});
+		printButton.addClickHandler(event -> GridUtil.print(list));
 	}
 
 	private void prepareList(GUITemplate template) {
@@ -221,9 +213,7 @@ public class TemplateSecurityPanel extends VLayout {
 		list.setMinWidth(300);
 		dataSource = new TemplateRightsDS(template.getId());
 		list.setDataSource(dataSource);
-		list.addDataArrivedHandler((DataArrivedEvent event) -> {
-			rightsInitialized = true;
-		});
+		list.addDataArrivedHandler(event -> rightsInitialized = true);
 	}
 
 	/**

@@ -7,22 +7,24 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * User: Niraj Singh
- * Date: 06/05/14
+ * User: Niraj Singh Date: 06/05/14
  */
-@XmlRootElement(name="CommentList")
+@XmlRootElement(name = "CommentList")
 public class CommentListVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private int total;
+
 	private int pageSize;
+
 	private int startIndex;
-	private int itemCount;	
-    
-    public PermissionVO nodePermissions = new PermissionVO();
-    
-    private List<CommentVO> items = new ArrayList<>();
+
+	private int itemCount;
+
+	private PermissionVO nodePermissions = new PermissionVO();
+
+	private List<CommentVO> items = new ArrayList<>();
 
 	public void setTotal(int total) {
 		this.total = total;
@@ -39,7 +41,7 @@ public class CommentListVO implements Serializable {
 	public void setItemCount(int itemCount) {
 		this.itemCount = itemCount;
 	}
-    
+
 	public int getTotal() {
 		return total;
 	}
@@ -55,13 +57,17 @@ public class CommentListVO implements Serializable {
 	public int getItemCount() {
 		return itemCount;
 	}
-    
-    public List<CommentVO> getItems() {
-        return items;
-    }
 
-    public void setItems(List<CommentVO> commentList) {
-        this.items = commentList;
-    }
+	public List<CommentVO> getItems() {
+		return items;
+	}
+
+	public void setItems(List<CommentVO> commentList) {
+		this.items = commentList;
+	}
+
+	public PermissionVO getNodePermissions() {
+		return nodePermissions;
+	}
 
 }

@@ -166,7 +166,6 @@ public class Automation {
 				dictionary.put(key, instance);
 			} catch (ClassNotFoundException e) {
 				log.error(e.getMessage(), e);
-				continue;
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}

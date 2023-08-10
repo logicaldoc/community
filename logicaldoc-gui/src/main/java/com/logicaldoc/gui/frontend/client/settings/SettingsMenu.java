@@ -131,21 +131,21 @@ public class SettingsMenu extends VLayout {
 		Button smtp = new Button(I18N.message("outgoingemail"));
 		smtp.setWidth100();
 		smtp.setHeight(25);
-		smtp.addClickHandler((ClickEvent event) -> {
-			SettingService.Instance.get().loadEmailSettings(new AsyncCallback<GUIEmailSettings>() {
+		smtp.addClickHandler(
+				event -> SettingService.Instance.get().loadEmailSettings(new AsyncCallback<GUIEmailSettings>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(GUIEmailSettings settings) {
-					AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
-				}
+					@Override
+					public void onSuccess(GUIEmailSettings settings) {
+						AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
+					}
 
-			});
-		});
+				}));
+
 		if (Session.get().isDemo())
 			setFeatureDisabled(smtp);
 
@@ -157,7 +157,7 @@ public class SettingsMenu extends VLayout {
 		Button protocols = new Button(I18N.message("protocols"));
 		protocols.setWidth100();
 		protocols.setHeight(25);
-		protocols.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ProtocolsPanel()));
+		protocols.addClickHandler(event -> AdminScreen.get().setContent(new ProtocolsPanel()));
 		if (Feature.visible(Feature.PROTOCOLS) && Menu.enabled(Menu.CLIENTS)) {
 			addMember(protocols);
 			if (!Feature.enabled(Feature.PROTOCOLS))
@@ -169,7 +169,7 @@ public class SettingsMenu extends VLayout {
 		Button ocr = new Button(I18N.message("ocr"));
 		ocr.setWidth100();
 		ocr.setHeight(25);
-		ocr.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new OCRSettingsPanel()));
+		ocr.addClickHandler(event -> AdminScreen.get().setContent(new OCRSettingsPanel()));
 		if (Feature.visible(Feature.OCR) && Menu.enabled(Menu.OCR)) {
 			addMember(ocr);
 			if (!Feature.enabled(Feature.OCR))
@@ -181,7 +181,7 @@ public class SettingsMenu extends VLayout {
 		Button guiSettings = new Button(I18N.message("guisettings"));
 		guiSettings.setWidth100();
 		guiSettings.setHeight(25);
-		guiSettings.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new GUISettingsPanel()));
+		guiSettings.addClickHandler(event -> AdminScreen.get().setContent(new GUISettingsPanel()));
 		if (Menu.enabled(Menu.GUI_SETTINGS))
 			addMember(guiSettings);
 	}
@@ -190,7 +190,7 @@ public class SettingsMenu extends VLayout {
 		Button repositories = new Button(I18N.message("repositories"));
 		repositories.setWidth100();
 		repositories.setHeight(25);
-		repositories.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new RepositoriesPanel()));
+		repositories.addClickHandler(event -> AdminScreen.get().setContent(new RepositoriesPanel()));
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.REPOSITORIES))
 			addMember(repositories);
 	}
@@ -199,8 +199,7 @@ public class SettingsMenu extends VLayout {
 		Button searchAndIndexing = new Button(I18N.message("searchandindexing"));
 		searchAndIndexing.setWidth100();
 		searchAndIndexing.setHeight(25);
-		searchAndIndexing
-				.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new SearchIndexPanel()));
+		searchAndIndexing.addClickHandler(event -> AdminScreen.get().setContent(new SearchIndexPanel()));
 		if (Menu.enabled(Menu.SEARCH_AND_INDEXING))
 			addMember(searchAndIndexing);
 	}

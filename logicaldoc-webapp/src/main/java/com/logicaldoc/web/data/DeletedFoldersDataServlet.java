@@ -69,7 +69,7 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 		query.append(" order by ld_creation desc ");
 
 		@SuppressWarnings("unchecked")
-		List<Folder> records = (List<Folder>) fldDao.query(query.toString(), new RowMapper<Folder>() {
+		List<Folder> records = fldDao.query(query.toString(), new RowMapper<Folder>() {
 			public Folder mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Folder folder = new Folder();
 				folder.setTenantId(session.getTenantId());

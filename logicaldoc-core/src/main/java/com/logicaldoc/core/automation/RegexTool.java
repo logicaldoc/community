@@ -22,17 +22,17 @@ public class RegexTool {
 		/**
 		 * @see #getStart()
 		 */
-		public int start;
+		private int start;
 
 		/**
 		 * @see #getEnd()
 		 */
-		public int end;
+		private int end;
 
 		/**
 		 * @see #getGroup()
 		 */
-		public String group;
+		private String group;
 
 		/**
 		 * @param start see {@link #getStart()}

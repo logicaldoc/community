@@ -169,13 +169,13 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		Menu contextMenu = new Menu();
 		MenuItem inviteToChat = new MenuItem();
 		inviteToChat.setTitle(I18N.message("invitetochat"));
-		inviteToChat.addClickHandler(event -> {
-			LD.askForValue(I18N.message("invitetochat"), I18N.message("message"), null, value -> {
+		inviteToChat.addClickHandler(event -> 
+			LD.askForValue(I18N.message("invitetochat"), I18N.message("message"), null, answer -> {
 				final String[] users = new String[selection.length];
 				for (int i = 0; i < selection.length; i++)
 					users[i] = selection[i].getAttributeAsString(USERNAME);
 
-				ChatService.Instance.get().invite(users, value, new AsyncCallback<Void>() {
+				ChatService.Instance.get().invite(users, answer, new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -187,8 +187,8 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 						GuiLog.info(I18N.message("invitationsent"));
 					}
 				});
-			});
-		});
+			})
+		);
 
 		contextMenu.setItems(inviteToChat);
 		return contextMenu;

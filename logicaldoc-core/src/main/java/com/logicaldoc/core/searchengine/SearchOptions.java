@@ -100,7 +100,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		this.type = type;
 	}
 
-	public static SearchOptions read(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
+	public static SearchOptions read(File file) throws IOException, ClassNotFoundException {
 		SearchOptions searchOptions = null;
 
 		// Deserialize from a file (binary format)
@@ -116,7 +116,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		return searchOptions;
 	}
 
-	public void write(File file) throws FileNotFoundException, IOException {
+	public void write(File file) throws IOException {
 		try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(file)))) {
 			encoder.writeObject(this);
 		} catch (FileNotFoundException fileNotFound) {

@@ -91,7 +91,7 @@ public abstract class PluginRegistry {
 		if (pluginLocations.size() > 0) {
 			Map<String, Identity> plugins = null;
 			try {
-				PluginManager.PluginLocation[] pLocations = (PluginManager.PluginLocation[]) pluginLocations
+				PluginManager.PluginLocation[] pLocations = pluginLocations
 						.toArray(new PluginManager.PluginLocation[0]);
 				plugins = manager.publishPlugins(pLocations);
 			} catch (JpfException e) {
@@ -121,9 +121,7 @@ public abstract class PluginRegistry {
 
 		System.out.println("Searching for plugins in " + pluginDirectory.getAbsolutePath());
 
-		FilenameFilter filter = (dir, fileName) -> {
-			return (fileName.endsWith(".jar") && fileName.contains("-plugin"));
-		};
+		FilenameFilter filter = (dir, fileName) -> (fileName.endsWith(".jar") && fileName.contains("-plugin"));
 
 		if (!pluginDirectory.isDirectory()) {
 			System.out.println("No Plugins Found");
@@ -136,7 +134,7 @@ public abstract class PluginRegistry {
 			Iterator<String> i = pluginsList.iterator();
 
 			while (i.hasNext()) {
-				String pluginFilename = (String) i.next();
+				String pluginFilename = i.next();
 
 				File pluginZIPFile = new File(pluginDirectory.getPath() + "/" + pluginFilename);
 

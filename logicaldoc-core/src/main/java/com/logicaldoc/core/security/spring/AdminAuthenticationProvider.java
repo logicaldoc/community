@@ -95,8 +95,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 
 		// Return an authenticated token, containing user data and
 		// authorities
-		LDAuthenticationToken a = new LDAuthenticationToken(user, null, authorities);
-		return a;
+		return new LDAuthenticationToken(user, null, authorities);
 	}
 
 	@Override

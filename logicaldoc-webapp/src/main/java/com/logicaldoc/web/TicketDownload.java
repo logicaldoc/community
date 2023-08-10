@@ -1,12 +1,10 @@
 package com.logicaldoc.web;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -172,8 +170,7 @@ public class TicketDownload extends HttpServlet {
 	}
 
 	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Document doc,
-			String fileVersion, String suffix, String ticket)
-			throws FileNotFoundException, IOException, ServletException, PersistenceException {
+			String fileVersion, String suffix, String ticket) throws IOException, PersistenceException {
 
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(doc, fileVersion, suffix);

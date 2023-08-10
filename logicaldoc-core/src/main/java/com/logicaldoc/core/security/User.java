@@ -29,15 +29,15 @@ public class User extends PersistentObject implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(User.class);
 
-	public static int TYPE_DEFAULT = 0;
+	public static final int TYPE_DEFAULT = 0;
 
-	public static int TYPE_SYSTEM = 1;
+	public static final int TYPE_SYSTEM = 1;
 
-	public static int TYPE_READONLY = 2;
+	public static final int TYPE_READONLY = 2;
 
-	public static int SOURCE_DEFAULT = 0;
+	public static final int SOURCE_DEFAULT = 0;
 
-	public static int SOURCE_LDAP = 1;
+	public static final int SOURCE_LDAP = 1;
 
 	public static final long USERID_ADMIN = 1;
 

@@ -117,9 +117,7 @@ public class SystemMenu extends VLayout {
 		final Button license = new Button(I18N.message("license"));
 		license.setWidth100();
 		license.setHeight(25);
-		license.addClickHandler((ClickEvent event) -> {
-			WindowUtils.openUrlInNewTab(Util.licenseUrl());
-		});
+		license.addClickHandler(event -> WindowUtils.openUrlInNewTab(Util.licenseUrl()));
 		if (Session.get().isDefaultTenant() && "admin".equals(Session.get().getUser().getUsername())
 				&& !Session.get().isDemo() && Feature.enabled(Feature.LICENSE)) {
 			addMember(license);
@@ -133,24 +131,22 @@ public class SystemMenu extends VLayout {
 				"<span style='color:red;'><b>" + I18N.message("confirmupdate") + "</b></span>");
 		confirmUpdate.setWidth100();
 		confirmUpdate.setHeight(25);
-		confirmUpdate.addClickHandler((ClickEvent event) -> {
-			SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
+		confirmUpdate.addClickHandler(event -> SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-				@Override
-				public void onSuccess(Void arg) {
-					Session.get().getInfo().setConfig("runlevel", "default");
-					confirmUpdate.setVisible(false);
-					updates.setVisible(true);
+			@Override
+			public void onSuccess(Void arg) {
+				Session.get().getInfo().setConfig("runlevel", "default");
+				confirmUpdate.setVisible(false);
+				updates.setVisible(true);
 
-					SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
-				}
-			});
-		});
+				SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
+			}
+		}));
 		addMember(confirmUpdate);
 		confirmUpdate.setVisible(Session.get().isDefaultTenant());
 		return confirmUpdate;

@@ -25,9 +25,7 @@ public class GroupSelectorCombo extends MultiComboBoxItem {
 
 		setWidth("*");
 
-		setValueFormatter((value, rec, form, item) -> {
-			return AwesomeFactory.getIconHtml("user-friends") + "&nbsp;" + value;
-		});
+		setValueFormatter((value, rec, form, item) -> AwesomeFactory.getIconHtml("user-friends") + "&nbsp;" + value);
 	}
 
 	public long[] getGroupIds() {

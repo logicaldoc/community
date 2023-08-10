@@ -3,7 +3,6 @@ package com.logicaldoc.webservice;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,12 +92,10 @@ public class WebserviceServletUtil {
 	 * @param file file to serve
 	 * @param fileName client file name
 	 * 
-	 * @throws FileNotFoundException cannot find the file to download
 	 * @throws IOException generic I/O error
-	 * @throws ServletException error in the servlet container
 	 */
 	public static void downloadFile(HttpServletRequest request, HttpServletResponse response, File file,
-			String fileName) throws FileNotFoundException, IOException, ServletException {
+			String fileName) throws IOException {
 
 		String filename = fileName;
 		if (filename == null)

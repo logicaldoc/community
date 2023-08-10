@@ -76,9 +76,9 @@ public class CommentService extends AbstractService {
 		}
 
 		if (writeEnabled) {
-			comments.nodePermissions.create = true;
-			comments.nodePermissions.delete = true;
-			comments.nodePermissions.edit = true;
+			comments.getNodePermissions().setCreate(true);
+			comments.getNodePermissions().setDelete(true);
+			comments.getNodePermissions().setEdit(true);
 		}
 
 		return Response.ok(comments).build();

@@ -150,7 +150,7 @@ public class TaskSchedulingPanel extends VLayout {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values =  vm.getValues();
 		if (((String) values.get(SIMPLE)).equals("true"))
 			task.getScheduling().setSimple(true);
 		else

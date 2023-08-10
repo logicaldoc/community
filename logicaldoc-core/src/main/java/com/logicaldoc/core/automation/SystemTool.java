@@ -53,8 +53,7 @@ public class SystemTool {
 	 * @throws IOException error executing the command or command not found
 	 */
 	public int exec(String commandline) throws IOException {
-		int ret = new Exec().exec(commandline, null, null, -1);
-		return ret;
+		return new Exec().exec(commandline, null, null, -1);
 	}
 
 	/**
@@ -69,7 +68,6 @@ public class SystemTool {
 	 * @throws IOException error executing the command or command not found
 	 */
 	public int exec(String commandline, String path) throws IOException {
-		int ret = new Exec().exec(commandline, null, new File(path), -1);
-		return ret;
+		return new Exec().exec(commandline, null, new File(path), -1);
 	}
 }

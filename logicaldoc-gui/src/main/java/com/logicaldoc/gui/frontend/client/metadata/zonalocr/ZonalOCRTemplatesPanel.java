@@ -134,18 +134,15 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addCloseButton(ToolStrip toolStrip) {
 		close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler((ClickEvent event) -> {
-			setSelectedOcrTemplate(null);
-		});
+		close.addClickHandler(event -> setSelectedOcrTemplate(null));
 		close.setDisabled(selectedOcrTemplate == null);
 		toolStrip.addButton(close);
 	}
 
 	private void addPrintButton(ToolStrip toolStrip) {
 		print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler((ClickEvent event) -> {
-			PrintUtil.printScreenShot(sample.getID(), I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName());
-		});
+		print.addClickHandler(event -> PrintUtil.printScreenShot(sample.getID(),
+				I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName()));
 		print.setDisabled(selectedOcrTemplate == null);
 		toolStrip.addButton(print);
 	}
@@ -153,7 +150,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addZoomOutButton(ToolStrip toolStrip) {
 		zoomOut = new ToolStripButton();
 		zoomOut.setTitle(I18N.message("zoomout"));
-		zoomOut.addClickHandler((ClickEvent event) -> {
+		zoomOut.addClickHandler(event -> {
 			if (sample != null) {
 				sample.clearCanvases();
 				sample.resize(-100);
@@ -167,7 +164,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addZoomInButton(ToolStrip toolStrip) {
 		zoomIn = new ToolStripButton();
 		zoomIn.setTitle(I18N.message("zoomin"));
-		zoomIn.addClickHandler((ClickEvent event) -> {
+		zoomIn.addClickHandler(event -> {
 			if (sample != null) {
 				sample.clearCanvases();
 				sample.resize(+100);
@@ -181,14 +178,13 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addDeleteZonesButton(ToolStrip toolStrip) {
 		deleteZones = new ToolStripButton();
 		deleteZones.setTitle(I18N.message("deletezones"));
-		deleteZones.addClickHandler((ClickEvent event) -> {
-			LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes)) {
-					selectedOcrTemplate.setZones(new GUIZone[0]);
-					setSelectedOcrTemplate(selectedOcrTemplate);
-				}
-			});
-		});
+		deleteZones.addClickHandler(
+				event -> LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), (Boolean answer) -> {
+					if (Boolean.TRUE.equals(answer)) {
+						selectedOcrTemplate.setZones(new GUIZone[0]);
+						setSelectedOcrTemplate(selectedOcrTemplate);
+					}
+				}));
 		deleteZones.setDisabled(selectedOcrTemplate == null);
 		toolStrip.addButton(deleteZones);
 	}
@@ -226,20 +222,19 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addSaveButton(ToolStrip toolStrip) {
 		save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> {
-			ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<GUIOCRTemplate>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+		save.addClickHandler(
+				event -> ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<GUIOCRTemplate>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(GUIOCRTemplate template) {
-					ZonalOCRTemplatesPanel.this.selectedOcrTemplate = template;
-					setSelectedOcrTemplate(template);
-				}
-			});
-		});
+					@Override
+					public void onSuccess(GUIOCRTemplate template) {
+						ZonalOCRTemplatesPanel.this.selectedOcrTemplate = template;
+						setSelectedOcrTemplate(template);
+					}
+				}));
 		save.setDisabled(selectedOcrTemplate == null);
 		toolStrip.addButton(save);
 	}
@@ -247,7 +242,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addDeleteButton(ToolStrip toolStrip) {
 		delete = new ToolStripButton();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((ClickEvent event) -> {
+		delete.addClickHandler(event -> {
 			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L)
 				LD.ask(I18N.message("question"), I18N.message("confirmdeleteocrtemplate"), (Boolean yes) -> {
 					if (Boolean.TRUE.equals(yes)) {
@@ -273,7 +268,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addSettingsButton(ToolStrip toolStrip) {
 		settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
-		settings.addClickHandler((ClickEvent event) -> {
+		settings.addClickHandler(event -> {
 			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L) {
 				ZonalOCRTemplateSettings editor = new ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel.this);
 				editor.show();
@@ -286,7 +281,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addNewButton(ToolStrip toolStrip) {
 		add = new ToolStripButton();
 		add.setTitle(I18N.message("new"));
-		add.addClickHandler((ClickEvent event) -> {
+		add.addClickHandler(event -> {
 			selectedOcrTemplate = new GUIOCRTemplate();
 			selectedOcrTemplate.setTemplate(selectedDocumentTemplate);
 			ZonalOCRTemplateSettings editor = new ZonalOCRTemplateSettings(ZonalOCRTemplatesPanel.this);
@@ -301,7 +296,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		ocrTemplateSelector.setWrapTitle(false);
 		ocrTemplateSelector.setMultiple(false);
 		ocrTemplateSelector.setEndRow(false);
-		ocrTemplateSelector.addChangedHandler((ChangedEvent event) -> {
+		ocrTemplateSelector.addChangedHandler(event -> {
 			ListGridRecord rec = ocrTemplateSelector.getSelectedRecord();
 			ZonalOCRService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
 					new AsyncCallback<GUIOCRTemplate>() {

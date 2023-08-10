@@ -12,11 +12,11 @@ public class WebserviceCall extends History {
 
 	private static final long serialVersionUID = 1L;
 
-	public static String SOAP = "soap";
+	public static final String SOAP = "soap";
 
-	public static String REST = "rest";
+	public static final String REST = "rest";
 
-	public static String ASPECT = "saveApiCall";
+	public static final String ASPECT = "saveApiCall";
 
 	/**
 	 * The protocol used for the communication, can be WebserviceCall.SOAP or

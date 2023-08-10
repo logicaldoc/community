@@ -184,13 +184,13 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	}
 
 	public DocumentsGrid getGrid() {
-		return ((HitsListPanel) listingPanel).getList();
+		return listingPanel.getList();
 	}
 
 	public DocumentsGrid getDocumentsGrid() {
 		DocumentsGrid grid = getGrid();
 		if (grid instanceof DocumentsListGrid)
-			return (DocumentsGrid) grid;
+			return grid;
 		else
 			return null;
 	}

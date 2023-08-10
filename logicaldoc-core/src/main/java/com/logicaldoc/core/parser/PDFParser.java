@@ -101,7 +101,7 @@ public class PDFParser extends AbstractParser {
 	/**
 	 * Extract the text from the form fields
 	 */
-	private void parseForm(PDDocument pdfDocument, StringBuilder content) throws IOException {
+	private void parseForm(PDDocument pdfDocument, StringBuilder content) {
 		PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
 		if (docCatalog == null)
 			return;

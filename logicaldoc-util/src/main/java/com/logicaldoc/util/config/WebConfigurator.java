@@ -93,7 +93,7 @@ public class WebConfigurator extends XMLBean {
 
 		if (contextParam == null) {
 			// Retrieve the last <servlet> element
-			Element lastContextParam = (Element) contextParams.get(contextParams.size() - 1);
+			Element lastContextParam = contextParams.get(contextParams.size() - 1);
 
 			List<Element> children = getRootElement().getChildren();
 
@@ -122,14 +122,14 @@ public class WebConfigurator extends XMLBean {
 
 		if (append.equals(INIT_PARAM.PARAM_APPEND)) {
 
-			Element paramValue = (Element) contextParam.getChildren().get(1);
+			Element paramValue = contextParam.getChildren().get(1);
 			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
-			Element paramValue = (Element) contextParam.getChildren().get(1);
+			Element paramValue = contextParam.getChildren().get(1);
 			paramValue.setText(value);
 			writeXMLDoc();
 			return;
@@ -253,7 +253,7 @@ public class WebConfigurator extends XMLBean {
 			paramElement.getChildren().add(param);
 		}
 
-		Element loadOnStartUpElem = (Element) servlet.getChildren().get(servlet.getChildren().size() - 1);
+		Element loadOnStartUpElem = servlet.getChildren().get(servlet.getChildren().size() - 1);
 
 		// sorting the elements in that way, that element "load-on-startup"
 		// always stays at the tail
@@ -410,7 +410,7 @@ public class WebConfigurator extends XMLBean {
 		} else {
 
 			// Retrieve the last <filter> element
-			Element lastFilter = (Element) filters.get(filters.size() - 1);
+			Element lastFilter = filters.get(filters.size() - 1);
 
 			List<Element> children = getRootElement().getChildren();
 
@@ -453,7 +453,7 @@ public class WebConfigurator extends XMLBean {
 		if (listener == null) {
 			// The listener doesn't exist, so create it
 			// Retrieve the last <listener> element
-			Element lastListener = (Element) listeners.get(listeners.size() - 1);
+			Element lastListener = listeners.get(listeners.size() - 1);
 
 			List<Element> children = getRootElement().getChildren();
 
@@ -487,7 +487,7 @@ public class WebConfigurator extends XMLBean {
 		// Search for the specified mapping
 		List<Element> mappings = getRootElement().getChildren("servlet-mapping", getRootElement().getNamespace());
 		for (Iterator<Element> iterator = mappings.iterator(); iterator.hasNext();) {
-			Element elem = (Element) iterator.next();
+			Element elem = iterator.next();
 			Element servletName = elem.getChild(SERVLET_NAME, elem.getNamespace());
 			Element urlPattern = elem.getChild(URL_PATTERN, elem.getNamespace());
 
@@ -498,7 +498,7 @@ public class WebConfigurator extends XMLBean {
 		}
 
 		// Retrieve the last <servlet-mapping> element
-		Element lastMapping = (Element) mappings.get(mappings.size() - 1);
+		Element lastMapping = mappings.get(mappings.size() - 1);
 
 		List<Element> children = getRootElement().getChildren();
 		// Find the index of the element to add the new element after.
@@ -529,12 +529,11 @@ public class WebConfigurator extends XMLBean {
 	 * @param filter The name of the filter
 	 * @param pattern The mapping pattern
 	 */
-	@SuppressWarnings("unchecked")
 	public void addFilterMapping(String filter, String pattern) {
 		// Search for the specified mapping
 		List<Element> mappings = getRootElement().getChildren("filter-mapping", getRootElement().getNamespace());
 		for (Iterator<Element> iterator = mappings.iterator(); iterator.hasNext();) {
-			Element elem = (Element) iterator.next();
+			Element elem = iterator.next();
 			Element filterName = elem.getChild(FILTER_NAME, elem.getNamespace());
 			Element urlPattern = elem.getChild(URL_PATTERN, elem.getNamespace());
 
@@ -545,7 +544,7 @@ public class WebConfigurator extends XMLBean {
 		}
 
 		// Retrieve the last <servlet-mapping> element
-		Element lastMapping = (Element) mappings.get(mappings.size() - 1);
+		Element lastMapping = mappings.get(mappings.size() - 1);
 
 		List<Element> children = getRootElement().getChildren();
 		// Find the index of the element to add the new element after.

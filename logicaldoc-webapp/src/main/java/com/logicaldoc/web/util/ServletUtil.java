@@ -134,7 +134,7 @@ public class ServletUtil {
 	 * @return if at least one of the menus is accessible
 	 * 
 	 * @throws ServletException error in the servlet container
-	 * @throws InvalidSessionException if the session is not valid
+	 * @throws InvalidSessionException the session is not valid
 	 */
 	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds)
 			throws ServletException, InvalidSessionException {
@@ -160,13 +160,11 @@ public class ServletUtil {
 	 * @param fileName Optional file name to give to the downloaded content
 	 * @param sid identifier of the session
 	 * 
-	 * @throws FileNotFoundException cannot find the plugin dir
 	 * @throws IOException generic I/O error
-	 * @throws ServletException error in the servlet container
+	 * @throws InvalidSessionException the session is not valid
 	 */
 	public static void downloadPluginResource(HttpServletRequest request, HttpServletResponse response, String sid,
-			String pluginName, String resourcePath, String fileName)
-			throws FileNotFoundException, IOException, ServletException, InvalidSessionException {
+			String pluginName, String resourcePath, String fileName) throws IOException, InvalidSessionException {
 
 		if (sid != null)
 			validateSession(sid);
@@ -214,13 +212,12 @@ public class ServletUtil {
 	 * @param user current user
 	 * 
 	 * @throws ServletException error in the servlet container
-	 * @throws FileNotFoundException resource's file not found
 	 * @throws IOException generic I/O error
 	 * @throws PersistenceException error at data layer
 	 */
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
 			long docId, String fileVersion, String fileName, String suffix, User user)
-			throws FileNotFoundException, IOException, ServletException, PersistenceException {
+			throws IOException, ServletException, PersistenceException {
 
 		Session session = getSession(request, sid);
 
@@ -341,7 +338,7 @@ public class ServletUtil {
 	}
 
 	private static List<Range> getRanges(HttpServletRequest request, HttpServletResponse response, long length,
-			long lastModified, String eTag, Range rangeFull) throws IOException {
+			long lastModified, String eTag, Range rangeFull) {
 		// Validate and process Range and If-Range headers.
 		String range = request.getHeader("Range");
 		if (range == null) {
@@ -550,12 +547,10 @@ public class ServletUtil {
 	 * @param file file to serve
 	 * @param fileName client file name
 	 * 
-	 * @throws FileNotFoundException cannot find the file to download
 	 * @throws IOException generic I/O error
-	 * @throws ServletException error in the servlet container
 	 */
 	public static void downloadFile(HttpServletRequest request, HttpServletResponse response, File file,
-			String fileName) throws FileNotFoundException, IOException, ServletException {
+			String fileName) throws IOException {
 
 		String filename = fileName;
 		if (filename == null)
@@ -630,12 +625,11 @@ public class ServletUtil {
 	 * @param docId identifier of the document
 	 * @param user current user
 	 * 
-	 * @throws FileNotFoundException cannot find the file to download
 	 * @throws IOException generic I/O error
 	 * @throws PersistenceException error at database level
 	 */
 	public static void downloadDocumentText(HttpServletRequest request, HttpServletResponse response, long docId,
-			User user) throws FileNotFoundException, IOException, PersistenceException {
+			User user) throws IOException, PersistenceException {
 
 		response.setCharacterEncoding(UTF_8);
 
@@ -691,7 +685,6 @@ public class ServletUtil {
 	 * @param fileName name of the file
 	 * @param user current user
 	 * 
-	 * @throws FileNotFoundException the document's file cannot be found
 	 * @throws IOException generic I/O exception retrieving the document's file
 	 * @throws ServletException error in the servlet container
 	 * @throws NumberFormatException error if docId is not a number
@@ -699,7 +692,7 @@ public class ServletUtil {
 	 */
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
 			String docId, String fileVersion, String fileName, User user)
-			throws FileNotFoundException, IOException, NumberFormatException, ServletException, PersistenceException {
+			throws IOException, NumberFormatException, ServletException, PersistenceException {
 		downloadDocument(request, response, sid, Integer.parseInt(docId), fileVersion, fileName, null, user);
 	}
 

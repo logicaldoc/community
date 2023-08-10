@@ -45,8 +45,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	private static final String DATA_SOURCE = "DataSource";
 
-	private static final String PARAM = ":param";
-
 	private static final String AND = " and (";
 
 	private static final String ORDER_BY = "order by";
@@ -257,7 +255,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				for (String name : extensibleEntity.getAttributes().keySet()) {
 					Attribute att = extensibleEntity.getAttribute(name);
 					if (att.getMultiple() == 1 && att.getType() == Attribute.TYPE_STRING) {
-						String vals = extensibleEntity.getValues(name).stream().map(n -> n.toString())
+						String vals = extensibleEntity.getValues(name).stream().map(Object::toString)
 								.collect(Collectors.joining(","));
 						att.setStringValues(vals);
 					} else
@@ -304,85 +302,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected void evict(Object entity) {
 		sessionFactory.getCurrentSession().evict(entity);
-	}
-
-	/**
-	 * Utility method useful for preparing an Hibernate query for updates
-	 * 
-	 * @param expression The expression for the query
-	 * @param values The parameters values to be used (optional, if the query is
-	 *        parametric)
-	 * @param max Optional maximum number of wanted results
-	 * 
-	 * @return The Hibernate query
-	 */
-	@SuppressWarnings("rawtypes")
-	protected Query prepareQueryForUpdate(String expression, Object[] values, Integer max) {
-		if (values != null)
-			for (int i = 0; i < values.length; i++)
-				expression = expression.replace("?" + (i + 1), PARAM + (i + 1));
-		Query queryObject = sessionFactory.getCurrentSession().createQuery(expression);
-		applyParamsAndLimit(values, max, queryObject);
-		return queryObject;
-	}
-
-	/**
-	 * Utility method useful for preparing an Hibernate query for objects of
-	 * this type
-	 * 
-	 * @param expression The expression for the query
-	 * @param values The parameters values to be used (optional, if the query is
-	 *        parametric)
-	 * @param max Optional maximum number of wanted results
-	 * 
-	 * @return The Hibernate query
-	 */
-	protected Query<T> prepareQueryForObject(String expression, Object[] values, Integer max) {
-		if (values != null)
-			for (int i = 0; i < values.length; i++)
-				expression = expression.replace("?" + (i + 1), PARAM + (i + 1));
-		Query<T> queryObject = sessionFactory.getCurrentSession().createQuery(expression, entityClass);
-		applyParamsAndLimit(values, max, queryObject);
-		return queryObject;
-	}
-
-	/**
-	 * Utility method useful for preparing an Hibernate query for generic result
-	 * 
-	 * @param expression The expression for the query
-	 * @param values The parameters values to be used (optional, if the query is
-	 *        parametric)
-	 * @param max Optional maximum number of wanted results
-	 * 
-	 * @return The Hibernate query
-	 */
-	protected Query<Object[]> prepareQuery(String expression, Object[] values, Integer max) {
-		if (values != null)
-			for (int i = 0; i < values.length; i++)
-				expression = expression.replace("?" + (i + 1), PARAM + (i + 1));
-		Query<Object[]> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Object[].class);
-		applyParamsAndLimit(values, max, queryObject);
-		return queryObject;
-	}
-
-	/**
-	 * Applies the params
-	 * 
-	 * @param values the values
-	 * @param max max number of results
-	 * @param queryObject the query
-	 * 
-	 * @deprecated
-	 */
-	@Deprecated(since = "8.8")
-	private void applyParamsAndLimit(Object[] values, Integer max, @SuppressWarnings("rawtypes")
-	Query queryObject) {
-		if (values != null && values.length > 0)
-			for (int i = 0; i < values.length; i++)
-				queryObject.setParameter("param" + (i + 1), values[i]);
-
-		if (max != null && max > 0)
-			queryObject.setMaxResults(max);
 	}
 
 	/**

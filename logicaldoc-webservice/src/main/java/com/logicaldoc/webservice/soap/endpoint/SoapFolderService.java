@@ -474,7 +474,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 				rightsList.add(new WSRight(group.getId(), mg.getPermissions()));
 		}
 
-		return (WSRight[]) rightsList.toArray(new WSRight[rightsList.size()]);
+		return rightsList.toArray(new WSRight[rightsList.size()]);
 	}
 
 	@Override

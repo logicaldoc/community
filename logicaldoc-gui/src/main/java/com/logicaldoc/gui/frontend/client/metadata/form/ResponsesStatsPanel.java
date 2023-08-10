@@ -79,7 +79,7 @@ public class ResponsesStatsPanel extends VLayout {
 		grid = new TileGrid();
 		grid.setEmptyMessage(I18N.message("nostastoshow"));
 		grid.setTileWidth(tileWidth);
-		grid.setTileHeight((int) ((double) tileWidth * 1.25d));
+		grid.setTileHeight((int) (tileWidth * 1.25d));
 		grid.setAutoFetchData(true);
 		grid.setSelectionType(SelectionStyle.MULTIPLE);
 		grid.setShowAllRecords(false);

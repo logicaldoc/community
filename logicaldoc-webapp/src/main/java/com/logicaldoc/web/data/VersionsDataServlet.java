@@ -31,6 +31,7 @@ import com.logicaldoc.util.io.FileUtil;
 public class VersionsDataServlet extends AbstractDataServlet {
 
 	private static final String DOC_ID = "docId";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -43,10 +44,10 @@ public class VersionsDataServlet extends AbstractDataServlet {
 		 * Iterate over records composing the response XML document
 		 */
 		DateFormat df = getDateFormat();
-		
+
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
-		
+
 		for (Object gridRecord : records) {
 			Object[] cols = (Object[]) gridRecord;
 
@@ -105,7 +106,6 @@ public class VersionsDataServlet extends AbstractDataServlet {
 		}
 		query.append(" order by A.versionDate desc ");
 
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max != null ? max : 100);
-		return records;
+		return dao.findByQuery(query.toString(), params, max != null ? max : 100);
 	}
 }

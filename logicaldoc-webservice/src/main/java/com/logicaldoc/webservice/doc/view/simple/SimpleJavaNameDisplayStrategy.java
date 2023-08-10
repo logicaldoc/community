@@ -57,9 +57,7 @@ public class SimpleJavaNameDisplayStrategy extends JavaNameDisplayStrategy {
 				capitalized.add(!capitalized.isEmpty() ? StringUtils.capitalize(word) : word);
 			}
 
-			String capitalizedName = StringUtils.join(capitalized, "");
-
-			return capitalizedName;
+			return StringUtils.join(capitalized, "");
 		}
 	}
 

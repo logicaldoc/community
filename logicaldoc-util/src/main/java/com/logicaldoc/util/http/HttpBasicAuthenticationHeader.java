@@ -22,8 +22,7 @@ public class HttpBasicAuthenticationHeader {
 	public static String[] decode(final String encodedString) {
 		final byte[] decodedBytes = org.apache.commons.codec.binary.Base64.decodeBase64(encodedString.getBytes());
 		final String pair = new String(decodedBytes);
-		final String[] userDetails = pair.split(":", 2);
-		return userDetails;
+		return pair.split(":", 2);
 	}
 
 	public static String createEncodedText(final String username, final String password) {

@@ -162,7 +162,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		}
 	}
 
-	protected Locale currentLocale(Session session) throws InvalidSessionServerException {
+	protected Locale currentLocale(Session session) {
 		return (Locale) session.getDictionary().get(LOCALE);
 	}
 

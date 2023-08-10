@@ -32,7 +32,6 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.InputContextImpl;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.io.OutputContextImpl;
-import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.PropEntry;
@@ -171,8 +170,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	private WebdavResponse getDavResponse(HttpServletResponse response, WebdavRequest webdavRequest, int methodCode) {
 		boolean noCache = DavMethods.isDeltaVMethod(webdavRequest)
 				&& !(DavMethods.DAV_VERSION_CONTROL == methodCode || DavMethods.DAV_REPORT == methodCode);
-		WebdavResponse webdavResponse = new WebdavResponseImpl(response, noCache);
-		return webdavResponse;
+		return new WebdavResponseImpl(response, noCache);
 	}
 
 	private void handleException(HttpServletRequest request, int methodCode, Throwable e) throws DavException {
@@ -458,7 +456,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			DavPropertyNameIterator iter = requestProperties.iterator();
 			StringBuilder sb = new StringBuilder("Requested properties: ");
 			while (iter.hasNext()) {
-				sb.append(((DavPropertyName) iter.next()).getName());
+				sb.append(iter.next().getName());
 				sb.append(",");
 			}
 			log.debug(sb.toString());

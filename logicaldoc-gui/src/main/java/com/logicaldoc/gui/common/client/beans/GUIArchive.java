@@ -12,35 +12,35 @@ import java.util.Date;
 public class GUIArchive implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public long id = 0;
+	private long id = 0;
 
-	public static int STATUS_OPENED = 0;
+	public static final int STATUS_OPENED = 0;
 
-	public static int STATUS_READY_TO_IMPORT = 0;
+	public static final int STATUS_READY_TO_IMPORT = 0;
 
-	public static int STATUS_CLOSED = 1;
+	public static final int STATUS_CLOSED = 1;
 
-	public static int STATUS_FINALIZED = 2;
+	public static final int STATUS_FINALIZED = 2;
 
-	public static int STATUS_READYTOSIGN = 3;
+	public static final int STATUS_READYTOSIGN = 3;
 
-	public static int STATUS_ERROR = 4;
+	public static final int STATUS_ERROR = 4;
 
-	public static int TYPE_DEFAULT = 0;
+	public static final int TYPE_DEFAULT = 0;
 
-	public static int TYPE_STORAGE = 1;
+	public static final int TYPE_STORAGE = 1;
 
-	public static int MODE_IMPORT = 0;
+	public static final int MODE_IMPORT = 0;
 
-	public static int MODE_EXPORT = 1;
+	public static final int MODE_EXPORT = 1;
 
-	public static int CUSTOMID_NOT_IMPORT = 0;
+	public static final int CUSTOMID_NOT_IMPORT = 0;
 
-	public static int CUSTOMID_IMPORT_AND_NEW_RELEASE = 1;
+	public static final int CUSTOMID_IMPORT_AND_NEW_RELEASE = 1;
 
-	public static int CUSTOMID_IMPORT_AND_NEW_SUBVERSION = 2;
+	public static final int CUSTOMID_IMPORT_AND_NEW_SUBVERSION = 2;
 
-	public static int CUSTOMID_IMPORT_AND_NEW_DOCUMENT = 3;
+	public static final int CUSTOMID_IMPORT_AND_NEW_DOCUMENT = 3;
 
 	private String name = "";
 

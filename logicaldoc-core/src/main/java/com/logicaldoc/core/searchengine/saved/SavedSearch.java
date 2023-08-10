@@ -63,7 +63,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 		setOptions(sb.toString());
 	}
 
-	public SearchOptions readOptions() throws IOException {
+	public SearchOptions readOptions() {
 		try (XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(getOptions().getBytes()))) {
 			SearchOptions searchOptions = (SearchOptions) decoder.readObject();
 			searchOptions.setName(getName());

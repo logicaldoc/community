@@ -49,7 +49,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -485,9 +484,8 @@ public class SearchIndexPanel extends AdminPanel {
 
 		TextItem customSorting = ItemFactory.newTextItem("customsorting", this.searchEngine.getCustomSorting());
 		customSorting.setWidth(300);
-		customSorting.addChangeHandler((ChangeEvent changeEvent) -> {
-			sorting.setDisabled(changeEvent.getValue() != null && !changeEvent.getValue().toString().isEmpty());
-		});
+		customSorting.addChangeHandler(changeEvent -> 
+			sorting.setDisabled(changeEvent.getValue() != null && !changeEvent.getValue().toString().isEmpty()));
 
 		// The optional batch
 		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", this.searchEngine.getBatch());
@@ -578,9 +576,9 @@ public class SearchIndexPanel extends AdminPanel {
 	private IButton preparePurgeButton() {
 		IButton purge = new IButton(I18N.message("purge"));
 		purge.setAutoFit(true);
-		purge.addClickHandler((ClickEvent purgeClick) -> {
-			SC.ask(I18N.message("purgeconfirmation"), yes -> {
-				if (Boolean.TRUE.equals(yes)) {
+		purge.addClickHandler(purgeClick -> 
+			SC.ask(I18N.message("purgeconfirmation"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
 					LD.contactingServer();
 					SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
 						@Override
@@ -595,8 +593,7 @@ public class SearchIndexPanel extends AdminPanel {
 						}
 					});
 				}
-			});
-		});
+			}));
 		return purge;
 	}
 

@@ -6,20 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.wisepersist.gwt.uploader.client.Uploader;
-import org.wisepersist.gwt.uploader.client.events.FileDialogCompleteEvent;
-import org.wisepersist.gwt.uploader.client.events.FileDialogStartEvent;
-import org.wisepersist.gwt.uploader.client.events.FileQueueErrorEvent;
 import org.wisepersist.gwt.uploader.client.events.FileQueuedEvent;
-import org.wisepersist.gwt.uploader.client.events.UploadCompleteEvent;
-import org.wisepersist.gwt.uploader.client.events.UploadErrorEvent;
-import org.wisepersist.gwt.uploader.client.events.UploadProgressEvent;
-import org.wisepersist.gwt.uploader.client.events.UploadSuccessEvent;
 import org.wisepersist.gwt.uploader.client.progress.ProgressBar;
 
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.DragLeaveEvent;
-import com.google.gwt.event.dom.client.DragOverEvent;
-import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -58,15 +48,13 @@ public class MultipleUpload extends HorizontalPanel {
 		if (Uploader.isAjaxUploadWithProgressEventsSupported()) {
 			final Label dropFilesLabel = new Label(I18N.message("dropfileshere"));
 			dropFilesLabel.setStyleName("dropFilesLabel");
-			dropFilesLabel.addDragOverHandler((DragOverEvent event) -> {
+			dropFilesLabel.addDragOverHandler(event -> {
 				if (!uploader.getButtonDisabled()) {
 					dropFilesLabel.addStyleName(DROP_FILES_LABEL_HOVER);
 				}
 			});
-			dropFilesLabel.addDragLeaveHandler((DragLeaveEvent event) -> {
-				dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER);
-			});
-			dropFilesLabel.addDropHandler((DropEvent event) -> {
+			dropFilesLabel.addDragLeaveHandler((event) -> dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER));
+			dropFilesLabel.addDropHandler(event -> {
 				dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER);
 
 				if (uploader.getStats().getUploadsInProgress() <= 0) {
@@ -93,24 +81,24 @@ public class MultipleUpload extends HorizontalPanel {
 		uploader.setUploadURL(Util.contextPath() + "upload").setButtonText(I18N.message("clicktoupload"))
 				.setButtonHeight(22).setFileSizeLimit(Session.get().getConfig("upload.maxsize") + " MB")
 				.setButtonCursor(Uploader.Cursor.HAND).setButtonAction(Uploader.ButtonAction.SELECT_FILES)
-				.setFileQueuedHandler((final FileQueuedEvent fileQueuedEvent) -> {
-					return handleQueueEvent(progressBarPanel, progressBars, cancelButtons, fileQueuedEvent);
-				}).setUploadProgressHandler((UploadProgressEvent uploadProgressEvent) -> {
+				.setFileQueuedHandler(fileQueuedEvent -> handleQueueEvent(progressBarPanel, progressBars, cancelButtons,
+						fileQueuedEvent))
+				.setUploadProgressHandler(uploadProgressEvent -> {
 					ProgressBar progressBar = progressBars.get(uploadProgressEvent.getFile().getId());
 					progressBar.setProgress(
 							(double) uploadProgressEvent.getBytesComplete() / uploadProgressEvent.getBytesTotal());
 					return true;
-				}).setUploadCompleteHandler((UploadCompleteEvent uploadCompleteEvent) -> {
+				}).setUploadCompleteHandler(uploadCompleteEvent -> {
 					if (!uploadedFiles.contains(uploadCompleteEvent.getFile().getName()))
 						uploadedFiles.add(uploadCompleteEvent.getFile().getName());
 					cancelButtons.get(uploadCompleteEvent.getFile().getId()).removeFromParent();
 					uploader.startUpload();
 					return true;
-				}).setUploadSuccessHandler((UploadSuccessEvent uploadSuccessEvent) -> {
+				}).setUploadSuccessHandler(uploadSuccessEvent -> {
 					if (confirmButton != null)
 						confirmButton.setDisabled(false);
 					return false;
-				}).setFileDialogStartHandler((FileDialogStartEvent fileDialogStartEvent) -> {
+				}).setFileDialogStartHandler(fileDialogStartEvent -> {
 					if (uploader.getStats().getUploadsInProgress() <= 0) {
 						// Clear the uploads that have completed, if none
 						// are in process
@@ -119,20 +107,20 @@ public class MultipleUpload extends HorizontalPanel {
 						cancelButtons.clear();
 					}
 					return true;
-				}).setFileDialogCompleteHandler((FileDialogCompleteEvent fileDialogCompleteEvent) -> {
+				}).setFileDialogCompleteHandler(fileDialogCompleteEvent -> {
 					if (fileDialogCompleteEvent.getTotalFilesInQueue() > 0
 							&& uploader.getStats().getUploadsInProgress() <= 0) {
 						uploader.startUpload();
 					}
 					return true;
-				}).setFileQueueErrorHandler((FileQueueErrorEvent fileQueueErrorEvent) -> {
+				}).setFileQueueErrorHandler(fileQueueErrorEvent -> {
 					if (!uploadedFiles.contains(fileQueueErrorEvent.getFile().getName()))
 						uploadedFiles.add(fileQueueErrorEvent.getFile().getName());
 					SC.warn(I18N.message("uploadoffile") + " " + fileQueueErrorEvent.getFile().getName() + " "
 							+ I18N.message("failedueto") + " [" + fileQueueErrorEvent.getErrorCode().toString() + "]: "
 							+ fileQueueErrorEvent.getMessage());
 					return true;
-				}).setUploadErrorHandler((UploadErrorEvent uploadErrorEvent) -> {
+				}).setUploadErrorHandler(uploadErrorEvent -> {
 					if (!uploadedFiles.contains(uploadErrorEvent.getFile().getName()))
 						uploadedFiles.add(uploadErrorEvent.getFile().getName());
 					cancelButtons.get(uploadErrorEvent.getFile().getId()).removeFromParent();

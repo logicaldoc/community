@@ -119,7 +119,7 @@ public class Validator {
 	}
 
 	private void executeObjectValidation(ExtensibleObject object, Template template, History transaction,
-			Map<String, String> errors) throws ValidationException {
+			Map<String, String> errors) {
 
 		Map<String, Object> automationDictionary = new HashMap<>();
 		automationDictionary.put("object", object);

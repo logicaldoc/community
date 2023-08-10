@@ -279,9 +279,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
+		return userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
 				client);
-		return history;
 	}
 
 	public String getUsername() {

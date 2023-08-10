@@ -158,8 +158,8 @@ public class TrashPanel extends VLayout {
 	private MenuItem prepareEmptyTrashItem() {
 		MenuItem emptyTrash = new MenuItem();
 		emptyTrash.setTitle(I18N.message("emptytrash"));
-		emptyTrash.addClickHandler( event -> {
-				LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), (Boolean response) -> {
+		emptyTrash.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), (Boolean response) -> {
 					if (Boolean.TRUE.equals(response)) {
 						DocumentService.Instance.get().emptyTrash(new AsyncCallback<Void>() {
 
@@ -174,8 +174,7 @@ public class TrashPanel extends VLayout {
 							}
 						});
 					}
-				});
-		});
+				}));
 		return emptyTrash;
 	}
 

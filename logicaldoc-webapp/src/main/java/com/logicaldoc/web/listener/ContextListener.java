@@ -44,7 +44,7 @@ public class ContextListener extends ContextLoaderListener {
 				SessionDAO sessionDAO = (SessionDAO) Context.get().getBean(SessionDAO.class);
 				sessionDAO.deleteCurrentNodeSessions();
 
-				ContextProperties config = (ContextProperties) Context.get().getProperties();
+				ContextProperties config = Context.get().getProperties();
 				int sessionTtl = config.getInt("session.ttl", -1);
 				sessionDAO.cleanOldSessions(sessionTtl);
 			}

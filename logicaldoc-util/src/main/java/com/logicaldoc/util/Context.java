@@ -58,8 +58,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * @return the instance of ContextProperties in the application context
 	 */
 	public ContextProperties getProperties() {
-		ContextProperties registry = (ContextProperties) getBean(ContextProperties.class);
-		return registry;
+		return (ContextProperties) getBean(ContextProperties.class);
 	}
 
 	@Override

@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class ApplicationRestarting extends Window {
 
-	public static ApplicationRestarting instance;
+	private static ApplicationRestarting instance;
 
 	private HTMLFlow messageFlow;
 

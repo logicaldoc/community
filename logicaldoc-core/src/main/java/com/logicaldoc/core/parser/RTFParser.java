@@ -96,8 +96,7 @@ public class RTFParser extends AbstractParser {
 		RTFEditorKit rek = new RTFEditorKit();
 		DefaultStyledDocument doc = new DefaultStyledDocument();
 		rek.read(input, doc, 0);
-		String text = doc.getText(0, doc.getLength());
-		return text;
+		return doc.getText(0, doc.getLength());
 	}
 
 	@Override

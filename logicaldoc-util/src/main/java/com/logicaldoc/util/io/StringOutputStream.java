@@ -35,7 +35,7 @@ public class StringOutputStream extends OutputStream {
 		sb.append(new String(b));
 	}
 
-	public void write(byte b) throws IOException {
+	public void write(byte b) {
 		sb.append((char) b);
 	}
 

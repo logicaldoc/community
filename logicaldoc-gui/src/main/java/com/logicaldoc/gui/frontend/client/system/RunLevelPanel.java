@@ -123,9 +123,7 @@ public class RunLevelPanel extends VLayout {
 		id.setCanEdit(false);
 		id.setCanSort(false);
 		id.setAutoFitWidth(true);
-		id.setCellFormatter((value, rec, rowNum, colNum) -> {
-			return I18N.message(ASPECT + rec.getAttributeAsString("id"));
-		});
+		id.setCellFormatter((value, rec, rowNum, colNum) -> I18N.message(ASPECT + rec.getAttributeAsString("id")));
 
 		ListGridField _default = new ListGridField(DEFAULT, I18N.message(DEFAULT), 60);
 		_default.setType(ListGridFieldType.BOOLEAN);

@@ -140,9 +140,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (object.getTemplateId() != null)
 			templateItem.setValue(object.getTemplateId().toString());
 
-		templateItem.addChangedHandler((ChangedEvent event) -> {
-			handleTemplateChangedSelection(event);
-		});
+		templateItem.addChangedHandler((event) -> handleTemplateChangedSelection(event));
 
 		if (templateChangedHandler != null)
 			templateItem.addChangedHandler(templateChangedHandler);
@@ -473,7 +471,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	public boolean validate() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		vm.validate();
 
 		if (Boolean.TRUE.equals(vm.hasErrors()))
@@ -489,7 +487,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	private void validateExtendedAttributes() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 
 		if (!Feature.enabled(Feature.TEMPLATE))
 			return;
@@ -525,7 +523,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	 */
 	private void fixNullValues() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+		Map<String, Object> values = vm.getValues();
 
 		// Check the current doc's values
 		for (GUIAttribute att : object.getAttributes()) {
@@ -670,7 +668,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	 */
 	private void copyValuesToObject() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> valuesMap = (Map<String, Object>) attributesForm.getValues();
+		Map<String, Object> valuesMap = attributesForm.getValues();
 
 		for (Map.Entry<String, Object> entry : valuesMap.entrySet()) {
 			String name = entry.getKey();
@@ -750,15 +748,13 @@ public class ExtendedPropertiesPanel extends HLayout {
 					SelectItem select = (SelectItem) item;
 					select.setPickListFilterCriteriaFunction(itemContext -> {
 						String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
-						Criteria criteria = new Criteria("category", category);
-						return criteria;
+						return new Criteria("category", category);
 					});
 				} else if (item instanceof ComboBoxItem) {
 					ComboBoxItem combo = (ComboBoxItem) item;
 					combo.setPickListFilterCriteriaFunction(itemContext -> {
 						String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
-						Criteria criteria = new Criteria("category", category);
-						return criteria;
+						return new Criteria("category", category);
 					});
 				}
 			}

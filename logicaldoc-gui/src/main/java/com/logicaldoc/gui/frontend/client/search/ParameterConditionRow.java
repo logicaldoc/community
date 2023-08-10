@@ -17,7 +17,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -90,9 +89,8 @@ public class ParameterConditionRow extends HLayout {
 		removeImg.setSrc("[SKIN]/headerIcons/close.gif");
 		removeImg.setHeight(18);
 		removeImg.setWidth(18);
-		removeImg.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-			ParameterConditionRow.this.getParentCanvas().removeChild(ParameterConditionRow.this);
-		});
+		removeImg.addClickHandler(
+				event -> ParameterConditionRow.this.getParentCanvas().removeChild(ParameterConditionRow.this));
 
 		attribute = new SelectItem("fields", "fields");
 		attribute.setShowTitle(false);
@@ -127,7 +125,7 @@ public class ParameterConditionRow extends HLayout {
 		if (!operatorsMap.isEmpty())
 			operator.setValue(operatorsMap.keySet().iterator().next());
 
-		attribute.addChangedHandler((ChangedEvent event) -> {
+		attribute.addChangedHandler(event -> {
 			if (event.getValue() != null) {
 				fieldSelected = (String) event.getValue();
 				reload();
@@ -153,9 +151,7 @@ public class ParameterConditionRow extends HLayout {
 
 		addResizeHandler();
 
-		operator.addChangedHandler((ChangedEvent event) -> {
-			onOperatorChanged(event != null ? event.getValue().toString() : null);
-		});
+		operator.addChangedHandler(event -> onOperatorChanged(event != null ? event.getValue().toString() : null));
 
 		onOperatorChanged(operator.getValue() != null ? operator.getValue().toString() : null);
 	}

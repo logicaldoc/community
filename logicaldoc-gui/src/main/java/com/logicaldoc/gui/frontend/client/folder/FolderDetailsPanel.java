@@ -228,24 +228,22 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	private void prepareTabSet() {
-		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
-			FolderService.Instance.get().getFolder(getFolder().getId(), false, false, false,
-					new AsyncCallback<GUIFolder>() {
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> FolderService.Instance.get()
+				.getFolder(getFolder().getId(), false, false, false, new AsyncCallback<GUIFolder>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIFolder folder) {
-							folder.setPathExtended(folder.getPathExtended() != null ? folder.getPathExtended()
-									: FolderNavigator.get().getPath(folder.getId()));
-							setFolder(folder);
-							tabSet.hideSave();
-						}
-					});
-		});
+					@Override
+					public void onSuccess(GUIFolder folder) {
+						folder.setPathExtended(folder.getPathExtended() != null ? folder.getPathExtended()
+								: FolderNavigator.get().getPath(folder.getId()));
+						setFolder(folder);
+						tabSet.hideSave();
+					}
+				}));
 	}
 
 	private void refresh() {

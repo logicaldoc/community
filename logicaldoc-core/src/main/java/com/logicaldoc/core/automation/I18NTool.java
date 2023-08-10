@@ -22,7 +22,7 @@ public class I18NTool extends HashMap<String, String> {
 		this(I18N.getMessages(Locale.ENGLISH));
 	}
 	
-	public I18NTool(Map<? extends String, ? extends String> m) {
+	public I18NTool(Map<String, String> m) {
 		super(m);
 	}
 

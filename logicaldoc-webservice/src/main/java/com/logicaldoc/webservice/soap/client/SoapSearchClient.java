@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.soap.client;
 
-import java.io.IOException;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -20,11 +18,11 @@ import com.logicaldoc.webservice.soap.SearchService;
  */
 public class SoapSearchClient extends SoapClient<SearchService> implements SearchService {
 
-	public SoapSearchClient(String endpoint, int gzipThreshold, boolean log, int timeout) throws IOException {
+	public SoapSearchClient(String endpoint, int gzipThreshold, boolean log, int timeout) {
 		super(endpoint, SearchService.class, gzipThreshold, log, timeout);
 	}
 
-	public SoapSearchClient(String endpoint) throws IOException {
+	public SoapSearchClient(String endpoint) {
 		super(endpoint, SearchService.class, -1, true, -1);
 	}
 

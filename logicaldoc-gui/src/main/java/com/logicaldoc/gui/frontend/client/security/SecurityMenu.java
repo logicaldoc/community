@@ -53,21 +53,20 @@ public class SecurityMenu extends VLayout {
 		Button security = new Button(I18N.message("security"));
 		security.setWidth100();
 		security.setHeight(25);
-		security.addClickHandler((ClickEvent event) -> {
-			SecurityService.Instance.get().loadSettings(new AsyncCallback<GUISecuritySettings>() {
+		security.addClickHandler(
+				event -> SecurityService.Instance.get().loadSettings(new AsyncCallback<GUISecuritySettings>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(GUISecuritySettings settings) {
-					AdminScreen.get().setContent(new SecuritySettingsPanel(settings));
-				}
+					@Override
+					public void onSuccess(GUISecuritySettings settings) {
+						AdminScreen.get().setContent(new SecuritySettingsPanel(settings));
+					}
 
-			});
-		});
+				}));
 		addMember(security);
 	}
 
@@ -83,7 +82,7 @@ public class SecurityMenu extends VLayout {
 		Button users = new Button(I18N.message("users"));
 		users.setWidth100();
 		users.setHeight(25);
-		users.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new UsersPanel()));
+		users.addClickHandler(event -> AdminScreen.get().setContent(new UsersPanel()));
 		addMember(users);
 	}
 
@@ -91,7 +90,7 @@ public class SecurityMenu extends VLayout {
 		Button singleSingon = new Button(I18N.message("singlesignon"));
 		singleSingon.setWidth100();
 		singleSingon.setHeight(25);
-		singleSingon.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new SingleSignonPanel()));
+		singleSingon.addClickHandler(event -> AdminScreen.get().setContent(new SingleSignonPanel()));
 		if (Feature.visible(Feature.SINGLE_SIGNON) && Session.get().isDefaultTenant()
 				&& Menu.enabled(Menu.SINGLE_SIGNON)) {
 			addMember(singleSingon);
@@ -109,7 +108,7 @@ public class SecurityMenu extends VLayout {
 		Button extAuth = new Button(I18N.message("extauth"));
 		extAuth.setWidth100();
 		extAuth.setHeight(25);
-		extAuth.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new LDAPServersPanel()));
+		extAuth.addClickHandler(event -> AdminScreen.get().setContent(new LDAPServersPanel()));
 		if (Feature.visible(Feature.LDAP) && Menu.enabled(Menu.EXTERNAL_AUTHENTICATION)) {
 			addMember(extAuth);
 			if (!Feature.enabled(Feature.LDAP) || Session.get().isDemo())
@@ -121,8 +120,8 @@ public class SecurityMenu extends VLayout {
 		Button twoFactorsAuthentication = new Button(I18N.message("twofactorsauth"));
 		twoFactorsAuthentication.setWidth100();
 		twoFactorsAuthentication.setHeight(25);
-		twoFactorsAuthentication.addClickHandler(
-				(ClickEvent event) -> AdminScreen.get().setContent(new TwoFactorsAuthenticationSettings()));
+		twoFactorsAuthentication
+				.addClickHandler(event -> AdminScreen.get().setContent(new TwoFactorsAuthenticationSettings()));
 		if (Feature.visible(Feature.TWO_FACTORS_AUTHENTICATION) && Menu.enabled(Menu.TWO_FACTORS_AUTHENTICATION)) {
 			addMember(twoFactorsAuthentication);
 			if (!Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) || Session.get().isDemo())
@@ -147,7 +146,7 @@ public class SecurityMenu extends VLayout {
 		Button firewall = new Button(I18N.message("firewall"));
 		firewall.setWidth100();
 		firewall.setHeight(25);
-		firewall.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new FirewallPanel()));
+		firewall.addClickHandler(event -> AdminScreen.get().setContent(new FirewallPanel()));
 		if (Feature.enabled(Feature.FIREWALL) && Session.get().isDefaultTenant() && Menu.enabled(Menu.FIREWALL)) {
 			addMember(firewall);
 			if (!Feature.enabled(Feature.FIREWALL) || Session.get().isDemo())
@@ -159,7 +158,7 @@ public class SecurityMenu extends VLayout {
 		Button antivirus = new Button(I18N.message("antivirus"));
 		antivirus.setWidth100();
 		antivirus.setHeight(25);
-		antivirus.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new AntivirusPanel()));
+		antivirus.addClickHandler(event -> AdminScreen.get().setContent(new AntivirusPanel()));
 		if (Feature.visible(Feature.ANTIVIRUS)) {
 			addMember(antivirus);
 			if (!Feature.enabled(Feature.ANTIVIRUS) || Session.get().isDemo())

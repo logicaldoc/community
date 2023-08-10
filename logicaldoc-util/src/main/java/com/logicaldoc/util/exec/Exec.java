@@ -67,8 +67,7 @@ public class Exec {
 	 * @return true if the execution platform is Windows
 	 */
 	public boolean isWindows() {
-		boolean windows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
-		return windows;
+		return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
 	}
 
 	/**

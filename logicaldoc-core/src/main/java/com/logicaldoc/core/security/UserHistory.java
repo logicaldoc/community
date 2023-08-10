@@ -12,7 +12,7 @@ public class UserHistory extends History {
 
 	private static final long serialVersionUID = 1L;
 	
-	public String author;
+	private String author;
 	
 	public UserHistory() {
 		super();

@@ -223,25 +223,24 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	protected void prepareTabset() {
-		tabSet = new EditingTabSet(event -> onSave(), event -> {
-			// We have to reload the document because the tags may be
-			// reverted to the original tags list.
-			// This 'if condition' is necessary to know if the close image
-			// has been selected into the Documents list panel or into the
-			// Search list panel.
-			DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
+		tabSet = new EditingTabSet(event -> onSave(), event ->
+		// We have to reload the document because the tags may be
+		// reverted to the original tags list.
+		// This 'if condition' is necessary to know if the close image
+		// has been selected into the Documents list panel or into the
+		// Search list panel.
+		DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-				@Override
-				public void onSuccess(GUIDocument doc) {
-					DocumentController.get().selected(doc);
-				}
-			});
-		});
+			@Override
+			public void onSuccess(GUIDocument doc) {
+				DocumentController.get().selected(doc);
+			}
+		}));
 
 		tabSet.addTab(propertiesTab);
 

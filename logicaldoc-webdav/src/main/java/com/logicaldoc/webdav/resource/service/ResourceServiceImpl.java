@@ -34,7 +34,6 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.Group;
-import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
@@ -80,7 +79,7 @@ public class ResourceServiceImpl implements ResourceService {
 		this.documentManager = documentManager;
 	}
 
-	private Resource marshallFolder(Folder folder, WebdavSession session) throws PersistenceException {
+	private Resource marshallFolder(Folder folder, WebdavSession session) {
 		Resource resource = new ResourceImpl();
 		resource.setID(String.valueOf(folder.getId()));
 		resource.setContentLength(0L);
@@ -364,11 +363,7 @@ public class ResourceServiceImpl implements ResourceService {
 				throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 
-			try {
-				return this.marshallFolder(createdFolder, session);
-			} catch (PersistenceException e1) {
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
-			}
+			return this.marshallFolder(createdFolder, session);
 		}
 
 		// check permission to add document
@@ -603,45 +598,40 @@ public class ResourceServiceImpl implements ResourceService {
 		long currentParentFolder = currentFolder.getParentId();
 		long destinationParentFolder = Long.parseLong(destination.getID());
 
-		try {
-			// distinction between folder move and folder rename
-			if (currentParentFolder != destinationParentFolder) {
-				// Folder Move, verify the addchild permission on destination
-				// folders
-				boolean addchildEnabled = destination.isAddChildEnabled();
-				if (!addchildEnabled)
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN,
-							"AddChild Rights not granted to this user");
+		// distinction between folder move and folder rename
+		if (currentParentFolder != destinationParentFolder) {
+			// Folder Move, verify the addchild permission on destination
+			// folders
+			boolean addchildEnabled = destination.isAddChildEnabled();
+			if (!addchildEnabled)
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Rights not granted to this user");
 
-				assertResourceIsDeletable(source);
+			assertResourceIsDeletable(source);
 
-				User user = (User) session.getObject("user");
-				// Add a folder history entry
-				FolderHistory transaction = new FolderHistory();
-				transaction.setSessionId(sid);
-				transaction.setUser(user);
+			User user = (User) session.getObject("user");
+			// Add a folder history entry
+			FolderHistory transaction = new FolderHistory();
+			transaction.setSessionId(sid);
+			transaction.setUser(user);
 
-				// we are doing a folder move
-				moveFolder(currentFolder, destinationParentFolder, transaction);
+			// we are doing a folder move
+			moveFolder(currentFolder, destinationParentFolder, transaction);
 
-				return this.marshallFolder(currentFolder, session);
-			} else {
-				if (!source.isRenameEnabled())
-					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
+			return this.marshallFolder(currentFolder, session);
+		} else {
+			if (!source.isRenameEnabled())
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
 
-				User user = (User) session.getObject("user");
+			User user = (User) session.getObject("user");
 
-				FolderHistory transaction = new FolderHistory();
-				transaction.setUser(user);
-				transaction.setEvent(FolderEvent.RENAMED.toString());
-				transaction.setSessionId(sid);
+			FolderHistory transaction = new FolderHistory();
+			transaction.setUser(user);
+			transaction.setEvent(FolderEvent.RENAMED.toString());
+			transaction.setSessionId(sid);
 
-				renameFolder(currentFolder, source.getName(), destinationParentFolder, transaction);
+			renameFolder(currentFolder, source.getName(), destinationParentFolder, transaction);
 
-				return this.marshallFolder(currentFolder, session);
-			}
-		} catch (PersistenceException e) {
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
+			return this.marshallFolder(currentFolder, session);
 		}
 	}
 
@@ -929,7 +919,7 @@ public class ResourceServiceImpl implements ResourceService {
 		documentDAO.initialize(document);
 
 		Collection<Version> tmp = versionDAO.findByDocId(document.getId());
-		Version[] sortIt = (Version[]) tmp.toArray(new Version[0]);
+		Version[] sortIt = tmp.toArray(new Version[0]);
 
 		// clear collection and add sorted elements
 		Arrays.sort(sortIt);

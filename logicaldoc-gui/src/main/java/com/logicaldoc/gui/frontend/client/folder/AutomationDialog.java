@@ -130,8 +130,7 @@ public class AutomationDialog extends Window {
 	}
 
 	private Tab prepareParametersTab() {
-		Tab tab = new Tab(I18N.message("parameters"));
-		return tab;
+		return new Tab(I18N.message("parameters"));
 	}
 
 	private void onExecute(Long folderId, Long[] docIds) {

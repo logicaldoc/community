@@ -35,7 +35,6 @@ import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Img;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -44,7 +43,6 @@ import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpacerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -189,9 +187,7 @@ public class LoginPanel extends VLayout {
 		back.setAlign(Alignment.LEFT);
 		back.setColSpan(2);
 		back.setEndRow(false);
-		back.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
-			toggleInputForm();
-		});
+		back.addClickHandler(event -> toggleInputForm());
 
 		signIn.setBaseStyle("btn");
 		signIn.setHoverStyle("btn");
@@ -199,9 +195,7 @@ public class LoginPanel extends VLayout {
 		signIn.setAlign(Alignment.RIGHT);
 		signIn.setStartRow(false);
 		signIn.setWidth(120);
-		signIn.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
-			onSignin();
-		});
+		signIn.addClickHandler(event -> onSignin());
 
 		rememberMe.setTitle(I18N.message("rememberme"));
 		rememberMe.setRequired(false);
@@ -244,9 +238,7 @@ public class LoginPanel extends VLayout {
 		lostPassword.setLayoutAlign(Alignment.RIGHT);
 		lostPassword.setHoverDelay(0);
 		lostPassword.setMargin(0);
-		lostPassword.addClickHandler((ClickEvent event) -> {
-			showLostDialog(info.getBranding().getProductName());
-		});
+		lostPassword.addClickHandler(event -> showLostDialog(info.getBranding().getProductName()));
 
 		/*
 		 * Prepare the licensing canvas
@@ -333,7 +325,7 @@ public class LoginPanel extends VLayout {
 		secretKey.setAlign(Alignment.LEFT);
 		secretKey.setTextBoxStyle("secretkey-field");
 		secretKey.setColSpan(3);
-		secretKey.addKeyPressHandler((KeyPressEvent event) -> {
+		secretKey.addKeyPressHandler(event -> {
 			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
 				onSignin();
 		});
@@ -382,7 +374,7 @@ public class LoginPanel extends VLayout {
 		password.setAlign(Alignment.LEFT);
 		password.setWrapTitle(false);
 		password.setColSpan(3);
-		password.addKeyPressHandler((KeyPressEvent event) -> {
+		password.addKeyPressHandler(event -> {
 			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
 				onSignin();
 		});
@@ -400,7 +392,7 @@ public class LoginPanel extends VLayout {
 		username.setAlign(Alignment.LEFT);
 		username.setTextBoxStyle(LOGIN_FIELD);
 		username.setColSpan(3);
-		username.addKeyPressHandler((KeyPressEvent event) -> {
+		username.addKeyPressHandler(event -> {
 			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
 				onSignin();
 		});
@@ -731,8 +723,7 @@ public class LoginPanel extends VLayout {
 
 				String failure = user != null ? user.getLastLoginFailureReason() : null;
 				if (user != null && user.isPasswordExpired()) {
-					ChangePassword change = new ChangePassword(user, LoginPanel.this);
-					change.show();
+					new ChangePassword(user, LoginPanel.this).show();
 				} else if (user != null && (user.getQuotaCount() >= user.getQuota() && user.getQuota() >= 0)) {
 					SC.warn(I18N.message("quotadocsexceeded"));
 				} else if ("usernameblocked".equals(failure)) {

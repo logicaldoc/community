@@ -21,11 +21,8 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 
 /**
  * Dashlet specialized in listing document's history records
@@ -36,7 +33,7 @@ import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 public class DocumentHistoryDashlet extends DocumentDashlet {
 
 	private static final String EVENT_STR = "event";
-	
+
 	protected String event;
 
 	public DocumentHistoryDashlet(GUIDashlet guiDashlet) {
@@ -45,26 +42,26 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 		setEvent(guiDashlet);
 
 		HeaderControl markAsRead = new HeaderControl(HeaderControl.TRASH, e -> {
-				LD.contactingServer();
-				DocumentService.Instance.get().markHistoryAsRead(event, new AsyncCallback<Void>() {
+			LD.contactingServer();
+			DocumentService.Instance.get().markHistoryAsRead(event, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void ret) {
-						LD.clearPrompt();
-						RecordList l = list.getRecordList();
-						for (int i = 0; i < list.getTotalRows(); i++) {
-							l.get(i).setAttribute("new", false);
-						}
-						list.redraw();
-						setTitle(I18N.message(guiDashlet.getTitle(), Integer.toString(list.getTotalRows())));
+				@Override
+				public void onSuccess(Void ret) {
+					LD.clearPrompt();
+					RecordList l = list.getRecordList();
+					for (int i = 0; i < list.getTotalRows(); i++) {
+						l.get(i).setAttribute("new", false);
 					}
-				});
+					list.redraw();
+					setTitle(I18N.message(guiDashlet.getTitle(), Integer.toString(list.getTotalRows())));
+				}
+			});
 		});
 		markAsRead.setTooltip(I18N.message("maskallasread"));
 
@@ -98,7 +95,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 
 	@Override
 	protected RefreshableListGrid getListGrid() {
-		DocumentsListGrid grid = new DocumentsListGrid(guiDashlet.getExtendedAttributes()) {
+		return new DocumentsListGrid(guiDashlet.getExtendedAttributes()) {
 
 			@Override
 			protected void prepareFieldsMap() {
@@ -145,8 +142,6 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 				}
 			}
 		};
-
-		return grid;
 	}
 
 	@Override
@@ -172,9 +167,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 		}
 
 		// Count the total of events and the total of unchecked events
-		grid.addDataArrivedHandler((DataArrivedEvent e) -> {
-			onDataArrived(grid);
-		});
+		grid.addDataArrivedHandler(e -> onDataArrived(grid));
 
 		return fields;
 	}

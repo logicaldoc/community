@@ -91,8 +91,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 					.create(WebsocketsMessageService.class);
 			SerializationStreamWriter writer = factory.createStreamWriter();
 			writer.writeObject(message);
-			final String data = writer.toString();
-			return data;
+			return writer.toString();
 		} catch (final SerializationException e) {
 			GuiLog.error(e.getMessage(), null, e);
 		}
@@ -104,8 +103,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 			SerializationStreamFactory factory = (SerializationStreamFactory) GWT
 					.create(WebsocketsMessageService.class);
 			final SerializationStreamReader streamReader = factory.createStreamReader(data);
-			final WebsocketMessage message = (WebsocketMessage) streamReader.readObject();
-			return message;
+			return (WebsocketMessage) streamReader.readObject();
 		} catch (final SerializationException e) {
 			GuiLog.error(e.getMessage(), null, e);
 		}
@@ -118,7 +116,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 
 		if (!rememberHistory(event))
 			return;
-		
+
 		handleEvent(event);
 	}
 

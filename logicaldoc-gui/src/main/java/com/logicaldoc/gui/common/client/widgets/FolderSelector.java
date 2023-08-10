@@ -60,9 +60,8 @@ public class FolderSelector extends TextItem {
 		search.setWidth(12);
 		search.setHeight(12);
 
-		PickerIcon pick = new PickerIcon(PickerIcon.COMBO_BOX, event -> {
-			menu.showContextMenu();
-		});
+		PickerIcon pick = new PickerIcon(PickerIcon.COMBO_BOX, event ->
+			menu.showContextMenu());
 
 		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
 			clearValue();

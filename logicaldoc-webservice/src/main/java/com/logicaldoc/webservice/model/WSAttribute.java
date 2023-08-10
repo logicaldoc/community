@@ -270,7 +270,7 @@ public class WSAttribute implements Serializable {
 			XMLGregorianCalendar theXGCal = (XMLGregorianCalendar) value;
 			GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
 			Date theDate = theGCal.getTime();
-			attribute.setDateValue(DateUtil.format((Date) theDate));
+			attribute.setDateValue(DateUtil.format(theDate));
 		} else if (value != null && value instanceof Date) {
 			attribute.setDateValue(DateUtil.format((Date) value));
 		} else

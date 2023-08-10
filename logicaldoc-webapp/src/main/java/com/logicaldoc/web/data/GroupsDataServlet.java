@@ -38,7 +38,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
 				+ " and A.tenantId=" + session.getTenantId());
 
 		GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		/*
 		 * Iterate over records composing the response XML document

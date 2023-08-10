@@ -53,21 +53,20 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 
 		ListGridField label = new ListGridField("label", I18N.message("label"), 150);
 		label.setCanEdit(true);
-		label.addCellSavedHandler(event -> {
-			SecurityService.Instance.get().updateDeviceLabel(event.getRecord().getAttributeAsLong("id"),
-					event.getNewValue() != null ? event.getNewValue().toString() : null, new AsyncCallback<Void>() {
+		label.addCellSavedHandler(
+				event -> SecurityService.Instance.get().updateDeviceLabel(event.getRecord().getAttributeAsLong("id"),
+						event.getNewValue() != null ? event.getNewValue().toString() : null, new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(Void arg) {
-							// Nothing to do
-						}
-					});
-		});
+							@Override
+							public void onSuccess(Void arg) {
+								// Nothing to do
+							}
+						}));
 
 		ListGridField deviceId = new ListGridField("deviceId", I18N.message("deviceid"), 150);
 		deviceId.setHidden(true);
@@ -123,24 +122,23 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+					if (Boolean.TRUE.equals(value)) {
+						SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-							list.deselectAllRecords();
-						}
-					});
-				}
-			});
-		});
+							@Override
+							public void onSuccess(Void result) {
+								list.removeSelectedData();
+								list.deselectAllRecords();
+							}
+						});
+					}
+				}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

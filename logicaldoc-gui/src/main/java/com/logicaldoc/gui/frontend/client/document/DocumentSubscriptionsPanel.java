@@ -155,9 +155,9 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler(event -> 
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
 					AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -171,8 +171,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 						}
 					});
 				}
-			});
-		});
+			}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));

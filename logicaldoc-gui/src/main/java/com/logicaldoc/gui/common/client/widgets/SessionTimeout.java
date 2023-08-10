@@ -16,7 +16,8 @@ import com.smartgwt.client.widgets.Label;
 public class SessionTimeout extends Dialog {
 
 	private static final String WHITE = "white";
-	public static SessionTimeout instance;
+
+	private static SessionTimeout instance;
 
 	public static SessionTimeout get() {
 		if (instance == null)

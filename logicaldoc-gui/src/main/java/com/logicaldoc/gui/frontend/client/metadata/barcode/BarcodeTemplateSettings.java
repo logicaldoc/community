@@ -17,7 +17,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -79,20 +78,18 @@ public class BarcodeTemplateSettings extends Window {
 		addItem(layout);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler((CloseClickEvent event) -> {
-			DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-				@Override
-				public void onSuccess(Void result) {
-					destroy();
-				}
-			});
-		});
+			@Override
+			public void onSuccess(Void result) {
+				destroy();
+			}
+		}));
 
 		// Just to clean the upload folder
 		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
@@ -136,8 +133,7 @@ public class BarcodeTemplateSettings extends Window {
 		if (!Feature.enabled(Feature.ZONAL_BARCODE))
 			type.setValue("positonal");
 
-		type.addChangedHandler(
-				(ChangedEvent event) -> uploader.setVisible(ZONAL.equals(event.getValue().toString())));
+		type.addChangedHandler((ChangedEvent event) -> uploader.setVisible(ZONAL.equals(event.getValue().toString())));
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setHeight(150);
@@ -173,8 +169,7 @@ public class BarcodeTemplateSettings extends Window {
 	}
 
 	public void onSave() {
-		if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L
-				&& uploader.getUploadedFile() == null) {
+		if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L && uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}

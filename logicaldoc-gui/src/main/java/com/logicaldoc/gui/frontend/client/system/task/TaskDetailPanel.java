@@ -54,20 +54,19 @@ public class TaskDetailPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
-			SystemService.Instance.get().getTaskByName(task.getName(), I18N.getLocale(), new AsyncCallback<GUITask>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> SystemService.Instance.get()
+				.getTaskByName(task.getName(), I18N.getLocale(), new AsyncCallback<GUITask>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(GUITask task) {
-					setTask(task);
-					tabSet.hideSave();
-				}
-			});
-		});
+					@Override
+					public void onSuccess(GUITask task) {
+						setTask(task);
+						tabSet.hideSave();
+					}
+				}));
 
 		Tab schedulingTab = new Tab(I18N.message("scheduling"));
 		schedulingTabPanel = new HLayout();

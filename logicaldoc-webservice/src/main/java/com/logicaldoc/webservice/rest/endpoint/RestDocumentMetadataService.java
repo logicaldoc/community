@@ -184,14 +184,37 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	}
 
 	public class SetAttributeOptionsMultipartRequest {
-
 		@Schema(type = "integer", required = true, format = "int64", description = "Attribute set ID")
-		public String setId;
+		private String setId;
 
 		@Schema(type = "string", required = true, description = "Attribute name")
-		public String attribute;
+		private String attribute;
 
-		public WSAttributeOption[] options;
+		private WSAttributeOption[] options;
+
+		public String getSetId() {
+			return setId;
+		}
+
+		public void setSetId(String setId) {
+			this.setId = setId;
+		}
+
+		public String getAttribute() {
+			return attribute;
+		}
+
+		public void setAttribute(String attribute) {
+			this.attribute = attribute;
+		}
+
+		public WSAttributeOption[] getOptions() {
+			return options;
+		}
+
+		public void setOptions(WSAttributeOption[] options) {
+			this.options = options;
+		}
 	}
 
 	@Override

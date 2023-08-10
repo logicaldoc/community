@@ -86,9 +86,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 		language.setCanFilter(false);
 		language.setAlign(Alignment.CENTER);
 		language.setHidden(true);
-		language.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
-			return languages.get(rec.getAttribute(LANGUAGE));
-		});
+		language.setCellFormatter((value, rec, rowNum, colNum) -> languages.get(rec.getAttribute(LANGUAGE)));
 
 		ListGridField respondent = new ListGridField("_respondent", I18N.message("respondent"), 200);
 		respondent.setWidth(200);

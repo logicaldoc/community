@@ -237,24 +237,23 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		delete = new ToolStripButton();
 		delete.setAutoFit(true);
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((ClickEvent deleteClick) -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdeletebarcodetemplate"), (Boolean yes) -> {
-				if (Boolean.TRUE.equals(yes))
-					BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
+		delete.addClickHandler(deleteClick -> LD.ask(I18N.message("question"),
+				I18N.message("confirmdeletebarcodetemplate"), (Boolean yes) -> {
+					if (Boolean.TRUE.equals(yes))
+						BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-						@Override
-						public void onSuccess(Void arg0) {
-							selectedOcrTemplate = null;
-							refresh(selectedDocumentTemplate.getId(), null);
-						}
-					});
-			});
-		});
+							@Override
+							public void onSuccess(Void arg0) {
+								selectedOcrTemplate = null;
+								refresh(selectedDocumentTemplate.getId(), null);
+							}
+						});
+				}));
 		toolStrip.addButton(delete);
 	}
 
@@ -287,18 +286,15 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		save = new ToolStripButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent saveClick) -> {
-			onSave();
-		});
+		save.addClickHandler(saveClick -> onSave());
 		toolStrip.addButton(save);
 	}
 
 	private void addSettingsButton() {
 		settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
-		settings.addClickHandler((ClickEvent settingsClick) -> {
-			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, ((GUIBarcodeTemplate) selectedOcrTemplate)).show();
-		});
+		settings.addClickHandler(settingsClick -> new BarcodeTemplateSettings(BarcodeTemplatesPanel.this,
+				((GUIBarcodeTemplate) selectedOcrTemplate)).show());
 		toolStrip.addButton(settings);
 	}
 

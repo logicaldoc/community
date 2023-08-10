@@ -234,15 +234,13 @@ public class TasksPanel extends AdminPanel {
 		progressbar.setCanFilter(false);
 		progressbar.setCanSort(false);
 		progressbar.setAlign(Alignment.LEFT);
-		progressbar.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
-			return "";
-		});
+		progressbar.setCellFormatter((value, rec, rowNum, colNum) -> "");
 
 		ListGridField completion = new ListGridField(COMPLETION, " ", 35);
 		completion.setCanFilter(false);
 		completion.setCanSort(false);
 		completion.setAlign(Alignment.LEFT);
-		completion.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		completion.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if (value != null)
 				return value + "%";
 			else

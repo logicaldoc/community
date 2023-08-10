@@ -134,9 +134,8 @@ public class WorkflowToolStrip extends ToolStrip {
 
 	private void addExportButton() {
 		export = new ToolStripButton(I18N.message("eexport"));
-		export.addClickHandler(event -> {
-			Util.download(Util.contextPath() + "workflow/controller?command=export&wfId=" + currentWorkflow.getId());
-		});
+		export.addClickHandler(event -> Util
+				.download(Util.contextPath() + "workflow/controller?command=export&wfId=" + currentWorkflow.getId()));
 		addButton(export);
 	}
 
@@ -151,46 +150,43 @@ public class WorkflowToolStrip extends ToolStrip {
 
 	private void addCloneButton() {
 		clone = new ToolStripButton(I18N.message("clone"));
-		clone.addClickHandler(event -> {
-			// Ask for new name
-			LD.askForValue(I18N.message("clone"), I18N.message("newname"), "",
-					ItemFactory.newSimpleTextItem("name", "newname", ""), null, (String newName) -> {
-						if (newName == null || "".equals(newName.trim()))
-							return;
+		clone.addClickHandler(event ->
+		// Ask for new name
+		LD.askForValue(I18N.message("clone"), I18N.message("newname"), "",
+				ItemFactory.newSimpleTextItem("name", "newname", ""), null, (String newName) -> {
+					if (newName == null || "".equals(newName.trim()))
+						return;
 
-						// Set the new name in the designer, then
-						// request a save
-						currentWorkflow.setId(null);
-						currentWorkflow.setName(newName.trim());
-						currentWorkflow.setLabel(newName.trim());
-						onSave();
-						updateVersionSelect();
-					});
-		});
+					// Set the new name in the designer, then
+					// request a save
+					currentWorkflow.setId(null);
+					currentWorkflow.setName(newName.trim());
+					currentWorkflow.setLabel(newName.trim());
+					onSave();
+					updateVersionSelect();
+				}));
 		addButton(clone);
 	}
 
 	private void addDeleteButton() {
 		delete = new ToolStripButton(I18N.message("ddelete"));
-		delete.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
-				if (Boolean.TRUE.equals(yes)) {
-					WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							currentWorkflow = new GUIWorkflow();
-							AdminScreen.get().setContent(new WorkflowDesigner(currentWorkflow));
-							update();
-						}
-					});
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						currentWorkflow = new GUIWorkflow();
+						AdminScreen.get().setContent(new WorkflowDesigner(currentWorkflow));
+						update();
+					}
+				});
+			}
+		}));
 		addButton(delete);
 	}
 
@@ -225,9 +221,7 @@ public class WorkflowToolStrip extends ToolStrip {
 
 	private void addDeployButton() {
 		deploy = new ToolStripButton(I18N.message("deploy"));
-		deploy.addClickHandler(event -> {
-			onDeploy();
-		});
+		deploy.addClickHandler(event -> onDeploy());
 		addButton(deploy);
 	}
 
@@ -402,7 +396,7 @@ public class WorkflowToolStrip extends ToolStrip {
 	private void addWorkflowSelector() {
 		workflowSelector = ItemFactory.newWorkflowSelectorForAdministration(Session.get().getUser().getId());
 		workflowSelector.addChangedHandler(event -> {
-			if (event.getValue() != null && !"".equals((String) event.getValue())) {
+			if (event.getValue() != null && !"".equals(event.getValue())) {
 				WorkflowService.Instance.get().get(workflowSelector.getSelectedRecord().getAttributeAsString("name"),
 						null, new AsyncCallback<GUIWorkflow>() {
 							@Override
