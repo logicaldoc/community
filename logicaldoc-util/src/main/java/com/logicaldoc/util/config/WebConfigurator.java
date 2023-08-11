@@ -55,16 +55,16 @@ public class WebConfigurator extends XMLBean {
 	 *        </pre>
 	 * 
 	 *        tag
-	 * @param match_text The text for looking up whether exists
+	 * @param matchText The text for looking up whether exists
 	 * @param name The tag that should be right there for checking this value
 	 * 
 	 * @return the element
 	 */
 
-	private Element elementLookUp(List<Element> elements, String match_text, String name) {
+	private Element elementLookUp(List<Element> elements, String matchText, String name) {
 		for (Iterator<Element> iterator = elements.iterator(); iterator.hasNext();) {
 			Element elem = iterator.next();
-			Element elementName = elem.getChild(match_text, elem.getNamespace());
+			Element elementName = elem.getChild(matchText, elem.getNamespace());
 			if (elementName != null && elementName.getText().trim().equals(name)) {
 				// The element already exists
 				return elem;
@@ -136,8 +136,8 @@ public class WebConfigurator extends XMLBean {
 		}
 	}
 
-	public void addFilterInitParam(String filterName, String param_name, String param_value) {
-		this.addFilterInitParam(filterName, param_name, param_value, null, INIT_PARAM.PARAM_STOP);
+	public void addFilterInitParam(String filterName, String paramName, String paramValue) {
+		this.addFilterInitParam(filterName, paramName, paramValue, null, INIT_PARAM.PARAM_STOP);
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class WebConfigurator extends XMLBean {
 		param.setText(value);
 		paramElement.getChildren().add(param);
 
-		if (description != null && description.equals("") != true) {
+		if (description != null && !description.equals("")) {
 			param = new Element(DESCRIPTION, getRootElement().getNamespace());
 			param.setText(description);
 			paramElement.getChildren().add(param);
@@ -247,7 +247,7 @@ public class WebConfigurator extends XMLBean {
 		param.setText(value);
 		paramElement.getChildren().add(param);
 
-		if (description != null && description.equals("") != true) {
+		if (description != null && !description.equals("")) {
 			param = new Element(DESCRIPTION, getRootElement().getNamespace());
 			param.setText(description);
 			paramElement.getChildren().add(param);

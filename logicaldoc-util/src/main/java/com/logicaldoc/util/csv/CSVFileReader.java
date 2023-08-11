@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +33,7 @@ import java.util.List;
  * @version %I%, %G%
  */
 public class CSVFileReader extends CSVFile implements Closeable {
-	private static final String UTF_8 = "UTF-8";
-
+	
 	/**
 	 * The buffered reader linked to the CSV file to be read.
 	 */
@@ -51,7 +51,7 @@ public class CSVFileReader extends CSVFile implements Closeable {
 	 */
 	public CSVFileReader(String inputFileName) throws FileNotFoundException, UnsupportedEncodingException {
 		super();
-		InputStreamReader isr = new InputStreamReader(new FileInputStream(inputFileName), UTF_8);
+		InputStreamReader isr = new InputStreamReader(new FileInputStream(inputFileName), StandardCharsets.UTF_8);
 		in = new BufferedReader(isr);
 	}
 
@@ -67,7 +67,7 @@ public class CSVFileReader extends CSVFile implements Closeable {
 	 */
 	public CSVFileReader(String inputFileName, char sep) throws FileNotFoundException, UnsupportedEncodingException {
 		super(sep);
-		InputStreamReader isr = new InputStreamReader(new FileInputStream(inputFileName), UTF_8);
+		InputStreamReader isr = new InputStreamReader(new FileInputStream(inputFileName), StandardCharsets.UTF_8);
 		in = new BufferedReader(isr);
 	}
 
@@ -85,7 +85,7 @@ public class CSVFileReader extends CSVFile implements Closeable {
 	public CSVFileReader(String inputFileName, char sep, char qual)
 			throws FileNotFoundException, UnsupportedEncodingException {
 		super(sep, qual);
-		InputStreamReader isr = new InputStreamReader(new FileInputStream(inputFileName), UTF_8);
+		InputStreamReader isr = new InputStreamReader(new FileInputStream(inputFileName), StandardCharsets.UTF_8);
 		in = new BufferedReader(isr);
 	}
 

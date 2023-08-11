@@ -140,7 +140,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		startDate.setShowPickerIcon(true);
 		startDate.setDateFormatter(DateDisplayFormat.TOEUROPEANSHORTDATE);
 		startDate.addKeyPressHandler(event -> {
-			if ("delete".equals(event.getKeyName().toLowerCase())) {
+			if ("delete".equalsIgnoreCase(event.getKeyName())) {
 				startDate.clearValue();
 				startDate.setValue((Date) null);
 				changedHandler.onChanged(null);

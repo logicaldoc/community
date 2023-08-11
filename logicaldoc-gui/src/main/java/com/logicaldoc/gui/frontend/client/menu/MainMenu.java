@@ -76,8 +76,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private static final String FULLTEXT = "fulltext";
 
-	private ToolStripButton account;
-
 	private ToolStripButton tools;
 
 	private static MainMenu instance = null;
@@ -165,7 +163,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void addAccountButton() {
-		account = AwesomeFactory.newToolStripButton("user", I18N.message("loggedasintotenant",
+		ToolStripButton account = AwesomeFactory.newToolStripButton("user", I18N.message("loggedasintotenant",
 				Session.get().getUser().getUsername(), Session.get().getInfo().getTenant().getDisplayName()),
 				I18N.message("account"));
 		account.addClickHandler(event -> new AccountMenu().showContextMenu());
@@ -220,7 +218,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		searchBox.addKeyPressHandler(event -> {
 			if (event.getKeyName() == null)
 				return;
-			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase())) {
+			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName())) {
 				onSearch();
 			}
 		});

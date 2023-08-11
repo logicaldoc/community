@@ -17,8 +17,6 @@ import com.smartgwt.client.widgets.IButton;
  */
 public class BrandingPanel extends AdminPanel {
 
-	private TenantBrandingPanel tenantBranding;
-
 	private GUITenant tenant;
 
 	public BrandingPanel(long tenantId) {
@@ -38,7 +36,7 @@ public class BrandingPanel extends AdminPanel {
 	}
 
 	private void initGUI() {
-		tenantBranding = new TenantBrandingPanel(tenant, event -> {
+		TenantBrandingPanel tenantBranding = new TenantBrandingPanel(tenant, event -> {
 			// Nothing to do
 		});
 

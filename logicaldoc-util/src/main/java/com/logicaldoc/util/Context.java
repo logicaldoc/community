@@ -19,6 +19,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.util.CollectionUtils;
 
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.event.SystemEventListener;
@@ -183,7 +184,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	public static void removeListener(SystemEventListener evt) {
 		synchronized (systemEvents) {
 			LinkedList<SystemEventListener> evts = Context.systemEvents.get(evt.getSystemStatus());
-			if (evts == null || evts.size() == 0)
+			if (CollectionUtils.isEmpty(evts))
 				return;
 
 			evts.remove(evt);
@@ -231,7 +232,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 
 		// surely its possible that no one event have been
 		// registered to the current spring event
-		if (evts == null || evts.size() == 0)
+		if (CollectionUtils.isEmpty(evts))
 			return;
 
 		for (SystemEventListener evt : evts) {

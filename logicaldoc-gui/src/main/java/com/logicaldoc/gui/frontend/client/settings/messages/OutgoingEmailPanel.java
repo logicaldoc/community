@@ -194,7 +194,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 				return;
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> values =  vm.getValues();
+			Map<String, Object> values = vm.getValues();
 
 			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpserver"));
 			if (values.get("port") instanceof Integer)
@@ -205,11 +205,9 @@ public class OutgoingEmailPanel extends AdminPanel {
 			OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get(USERNAME));
 			OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get(PASSWORD));
 			OutgoingEmailPanel.this.emailSettings.setConnSecurity((String) values.get("connSecurity"));
-			OutgoingEmailPanel.this.emailSettings
-					.setSecureAuth(values.get("secureAuth").toString().equals("true") ? true : false);
+			OutgoingEmailPanel.this.emailSettings.setSecureAuth(values.get("secureAuth").toString().equals("true"));
 			OutgoingEmailPanel.this.emailSettings.setSenderEmail((String) values.get(SENDEREMAIL));
-			OutgoingEmailPanel.this.emailSettings
-					.setUserAsFrom(values.get(USERASFROM).toString().equals("true") ? true : false);
+			OutgoingEmailPanel.this.emailSettings.setUserAsFrom(values.get(USERASFROM).toString().equals("true"));
 			OutgoingEmailPanel.this.emailSettings.setFoldering(Integer.parseInt(values.get("foldering").toString()));
 			OutgoingEmailPanel.this.emailSettings.setTargetFolder(targetSelector.getFolder());
 

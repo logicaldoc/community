@@ -123,16 +123,16 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 					@Override
 					public void onSuccess(GUIInfo info) {
-						String alerts = "";
+						StringBuilder alerts = new StringBuilder();
 						for (GUIMessage warning : info.getAlerts()) {
 							if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()) {
-								if (!"".equals(alerts))
-									alerts += " -- ";
-								alerts += warning.getMessage();
+								if (!"".equals(alerts.toString()))
+									alerts.append(" -- ");
+								alerts.append(warning.getMessage());
 							}
 						}
-						if (!"".equals(alerts))
-							SC.warn(alerts);
+						if (!"".equals(alerts.toString()))
+							SC.warn(alerts.toString());
 					}
 				});
 	}

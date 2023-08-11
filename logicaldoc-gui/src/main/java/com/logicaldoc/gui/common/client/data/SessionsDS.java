@@ -30,9 +30,9 @@ public class SessionsDS extends DataSource {
 		DataSourceDateField created = new DataSourceDateField("created");
 		DataSourceDateField renew = new DataSourceDateField("renew");
 		DataSourceTextField client = new DataSourceTextField("client");
-		DataSourceTextField _node = new DataSourceTextField("node");
+		DataSourceTextField node = new DataSourceTextField("node");
 
-		setFields(sid, stat, statusLabel, username, tenant, created, renew, client, _node);
+		setFields(sid, stat, statusLabel, username, tenant, created, renew, client, node);
 		String url = "data/sessions.xml?locale=" + I18N.getLocale() + (status != null ? "&status=" + status : "");
 		setDataURL(url);
 		setClientOnly(true);

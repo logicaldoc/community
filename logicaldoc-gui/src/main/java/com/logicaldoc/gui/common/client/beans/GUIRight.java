@@ -24,7 +24,7 @@ public class GUIRight implements Serializable {
 
 	private boolean add = false;
 
-	private boolean _import = false;
+	private boolean iimport = false;
 
 	private boolean workflow = false;
 
@@ -53,7 +53,7 @@ public class GUIRight implements Serializable {
 	private boolean email = false;
 
 	private boolean automation = false;
-	
+
 	private boolean storage = false;
 
 	private String name;
@@ -101,11 +101,11 @@ public class GUIRight implements Serializable {
 	}
 
 	public boolean isImport() {
-		return _import;
+		return iimport;
 	}
 
-	public void setImport(boolean _import) {
-		this._import = _import;
+	public void setImport(boolean iimport) {
+		this.iimport = iimport;
 	}
 
 	public boolean isWorkflow() {

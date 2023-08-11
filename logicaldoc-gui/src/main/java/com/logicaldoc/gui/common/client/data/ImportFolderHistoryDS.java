@@ -36,13 +36,13 @@ public class ImportFolderHistoryDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
-		DataSourceBooleanField _new = new DataSourceBooleanField("new");
+		DataSourceBooleanField newField = new DataSourceBooleanField("new");
 		DataSourceTextField documentId = new DataSourceTextField("docId");
 		DataSourceTextField folderId = new DataSourceTextField("folderId");
 		DataSourceTextField path = new DataSourceTextField("path");
 		DataSourceTextField source = new DataSourceTextField("source");
 
-		setFields(filename, date, event, comment, icon, _new, documentId, folderId, path, source);
+		setFields(filename, date, event, comment, icon, newField, documentId, folderId, path, source);
 		setClientOnly(true);
 
 		setDataURL(url);

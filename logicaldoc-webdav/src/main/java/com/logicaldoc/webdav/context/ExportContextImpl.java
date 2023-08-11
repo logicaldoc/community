@@ -40,7 +40,7 @@ public class ExportContextImpl extends AbstractExportContext {
 	private OutputStream outStream;
 
 	public ExportContextImpl(Resource resource, OutputContext outputCtx) throws IOException {
-		super(resource, (outputCtx != null) ? outputCtx.hasStream() : false);
+		super(resource, (outputCtx != null) && outputCtx.hasStream());
 		this.outputCtx = outputCtx;
 		if (hasStream()) {
 			// we need a tmp file, since the export could fail

@@ -99,8 +99,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 					? conf.getProperty(session.getTenantName() + SMTP_PASSWORD)
 					: "");
 			emailSettings.setConnSecurity(conf.getProperty(session.getTenantName() + SMTP_CONNECTION_SECURITY));
-			emailSettings.setSecureAuth(
-					"true".equals(conf.getProperty(session.getTenantName() + SMTP_AUTH_ENCRYPTED)) ? true : false);
+			emailSettings.setSecureAuth("true".equals(conf.getProperty(session.getTenantName() + SMTP_AUTH_ENCRYPTED)));
 			emailSettings.setSenderEmail(conf.getProperty(session.getTenantName() + SMTP_SENDER));
 			emailSettings.setUserAsFrom(conf.getBoolean(session.getTenantName() + SMTP_USERASFROM, true));
 			emailSettings.setFoldering(conf.getInt(session.getTenantName() + SMTP_SAVE_FOLDERING, 3));

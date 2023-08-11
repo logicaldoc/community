@@ -19,7 +19,7 @@ import com.logicaldoc.webdav.session.WebdavSession;
  */
 public interface Resource {
 
-	public void setID(String ID);
+	public void setID(String id);
 
 	public String getID();
 

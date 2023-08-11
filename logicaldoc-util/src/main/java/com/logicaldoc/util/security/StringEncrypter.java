@@ -1,6 +1,5 @@
 package com.logicaldoc.util.security;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -32,8 +31,6 @@ public class StringEncrypter {
 
 	private Cipher cipher;
 
-	private static final String UNICODE_FORMAT = "UTF8";
-
 	public StringEncrypter(String encryptionScheme) throws EncryptionException {
 		this(encryptionScheme, DEFAULT_ENCRYPTION_KEY);
 	}
@@ -44,7 +41,7 @@ public class StringEncrypter {
 		if (encryptionKey.trim().length() < 24)
 			throw new IllegalArgumentException("encryption key was less than 24 characters");
 		try {
-			byte[] keyAsBytes = encryptionKey.getBytes(UNICODE_FORMAT);
+			byte[] keyAsBytes = encryptionKey.getBytes(StandardCharsets.UTF_8);
 			if (encryptionScheme.equals(DESEDE_ENCRYPTION_SCHEME)) {
 				keySpec = new DESedeKeySpec(keyAsBytes);
 			} else if (encryptionScheme.equals(DES_ENCRYPTION_SCHEME)) {
@@ -55,8 +52,6 @@ public class StringEncrypter {
 			keyFactory = SecretKeyFactory.getInstance(encryptionScheme);
 			cipher = Cipher.getInstance(encryptionScheme);
 		} catch (InvalidKeyException e) {
-			throw new EncryptionException(e);
-		} catch (UnsupportedEncodingException e) {
 			throw new EncryptionException(e);
 		} catch (NoSuchAlgorithmException e) {
 			throw new EncryptionException(e);
@@ -71,7 +66,7 @@ public class StringEncrypter {
 		try {
 			SecretKey key = keyFactory.generateSecret(keySpec);
 			cipher.init(Cipher.ENCRYPT_MODE, key);
-			byte[] cleartext = unencryptedString.getBytes(UNICODE_FORMAT);
+			byte[] cleartext = unencryptedString.getBytes(StandardCharsets.UTF_8);
 			byte[] ciphertext = cipher.doFinal(cleartext);
 			return new String(java.util.Base64.getMimeEncoder().encode(ciphertext), StandardCharsets.UTF_8);
 		} catch (Exception e) {

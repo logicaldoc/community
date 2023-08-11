@@ -51,8 +51,6 @@ public class CustomIdPanel extends AdminPanel {
 
 	private ListGrid sequences;
 
-	private VLayout sequencesPanel;
-
 	private GUIScheme[] schemesData;
 
 	public CustomIdPanel(GUIScheme[] schemesData) {
@@ -241,7 +239,7 @@ public class CustomIdPanel extends AdminPanel {
 			event.cancel();
 		});
 
-		sequencesPanel = new VLayout();
+		VLayout sequencesPanel = new VLayout();
 		sequencesPanel.setMembers(toolStrip, sequences);
 
 		refreshSequences();

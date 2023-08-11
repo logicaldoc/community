@@ -55,7 +55,7 @@ public class CreateDialog extends Dialog {
 		name.setWidth(250);
 		name.setRequired(true);
 		name.addKeyPressHandler(event -> {
-			if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName()))
 				onCreate(folder);
 		});
 

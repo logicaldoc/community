@@ -36,8 +36,7 @@ public class ImageDeskew {
 		private double alpha;
 
 		private double d;
-		
-		
+
 	}
 
 	// the source image
@@ -59,8 +58,6 @@ public class ImageDeskew {
 	private double cDMin;
 
 	private double cDStep = 1.0;
-
-	private int cDCount;
 
 	// count of points that fit in a line
 	private int[] cHMatrix;
@@ -190,8 +187,8 @@ public class ImageDeskew {
 
 		// range of d
 		this.cDMin = -this.image.getWidth();
-		this.cDCount = (int) (2.0 * (this.image.getWidth() + this.image.getHeight()) / this.cDStep);
-		this.cHMatrix = new int[this.cDCount * this.cSteps];
+		int cDCount = (int) (2.0 * (this.image.getWidth() + this.image.getHeight()) / this.cDStep);
+		this.cHMatrix = new int[cDCount * this.cSteps];
 	}
 
 	public double getAlpha(int index) {

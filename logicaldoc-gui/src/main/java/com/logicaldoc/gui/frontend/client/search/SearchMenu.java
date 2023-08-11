@@ -42,13 +42,13 @@ public class SearchMenu extends SectionStack {
 		addSavedSearchesSection();
 	}
 
-	private void addSearchSection(String SearchType) {
-		if (FULLTEXT.equals(SearchType)) {
+	private void addSearchSection(String searchType) {
+		if (FULLTEXT.equals(searchType)) {
 			SectionStackSection fulltextSection = new SectionStackSection(I18N.message(FULLTEXT));
 			fulltextSection.setName(FULLTEXT);
 			fulltextSection.setItems(new FulltextForm());
 			addSection(fulltextSection);
-		} else if ("tags".equals(SearchType) && Feature.visible(Feature.TAGS)) {
+		} else if ("tags".equals(searchType) && Feature.visible(Feature.TAGS)) {
 			SectionStackSection tagsSection = new SectionStackSection(I18N.message("tags"));
 			tagsSection.setName(TAGS_SECTION);
 			if (Feature.enabled(Feature.TAGS))
@@ -56,7 +56,7 @@ public class SearchMenu extends SectionStack {
 			else
 				tagsSection.setItems(new FeatureDisabled());
 			addSection(tagsSection);
-		} else if ("parameters".equals(SearchType) && Feature.visible(Feature.PARAMETRIC_SEARCHES)) {
+		} else if ("parameters".equals(searchType) && Feature.visible(Feature.PARAMETRIC_SEARCHES)) {
 			SectionStackSection parametricSection = new SectionStackSection(I18N.message("parameters"));
 			parametricSection.setName(PARAMETRIC_SECTION);
 			if (Feature.enabled(Feature.PARAMETRIC_SEARCHES))
@@ -64,7 +64,7 @@ public class SearchMenu extends SectionStack {
 			else
 				parametricSection.setItems(new FeatureDisabled());
 			addSection(parametricSection);
-		} else if (FOLDERS.equals(SearchType)) {
+		} else if (FOLDERS.equals(searchType)) {
 			SectionStackSection foldersSection = new SectionStackSection(I18N.message(FOLDERS));
 			foldersSection.setName(FOLDERS);
 			foldersSection.setExpanded(false);

@@ -219,13 +219,13 @@ public class StatsCollector extends Task {
 		long tags;
 		long versions;
 		long histories;
-		long user_histories;
+		long userHistories;
 		long votes;
 		try {
 			tags = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_tag");
 			versions = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_version");
 			histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
-			user_histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
+			userHistories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
 			votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
 		} catch (PersistenceException e) {
 			throw new TaskException(e.getMessage(), e);
@@ -281,7 +281,7 @@ public class StatsCollector extends Task {
 		postParams.add(new BasicNameValuePair("tags", Long.toString(tags)));
 		postParams.add(new BasicNameValuePair("versions", Long.toString(versions)));
 		postParams.add(new BasicNameValuePair("histories", Long.toString(histories)));
-		postParams.add(new BasicNameValuePair("user_histories", Long.toString(user_histories)));
+		postParams.add(new BasicNameValuePair("user_histories", Long.toString(userHistories)));
 		postParams.add(new BasicNameValuePair("votes", Long.toString(votes)));
 		postParams.add(new BasicNameValuePair("wscalls", Long.toString(wsCalls)));
 
@@ -504,14 +504,14 @@ public class StatsCollector extends Task {
 		}
 		postParams.add(new BasicNameValuePair("tenants", Long.toString(tenants)));
 
-		long workflow_histories = 0;
+		long workflowHistories = 0;
 		try {
-			workflow_histories = folderDAO
+			workflowHistories = folderDAO
 					.queryForLong("SELECT COUNT(ld_id) FROM ld_workflowhistory where ld_deleted=0");
 		} catch (Exception t) {
 			log.warn("Unable to calculate workflow statistics - {}", t.getMessage());
 		}
-		postParams.add(new BasicNameValuePair("workflow_histories", Long.toString(workflow_histories)));
+		postParams.add(new BasicNameValuePair("workflow_histories", Long.toString(workflowHistories)));
 
 		long templates = 0;
 		try {

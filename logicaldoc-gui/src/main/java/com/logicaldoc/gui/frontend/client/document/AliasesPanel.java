@@ -17,8 +17,6 @@ public class AliasesPanel extends DocumentDetailTab {
 
 	private DocumentAliasesDS dataSource;
 
-	private ListGrid listGrid;
-
 	public AliasesPanel(final GUIDocument document) {
 		super(document, null);
 	}
@@ -34,7 +32,7 @@ public class AliasesPanel extends DocumentDetailTab {
 		FileNameListGridField filename = new FileNameListGridField();
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 
-		listGrid = new ListGrid();
+		ListGrid listGrid = new ListGrid();
 		listGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		listGrid.setCanFreezeFields(true);
 		listGrid.setAutoFetchData(true);

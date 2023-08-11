@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -436,7 +437,7 @@ public class EMailSender {
 	private MimeBodyPart buildBodyPart(EMail email) throws MessagingException, UnsupportedEncodingException {
 		MimeBodyPart body = new MimeBodyPart();
 		if (email.isHtml()) {
-			body.setContent(new String(email.getMessageText().getBytes(UTF_8), UTF_8),
+			body.setContent(new String(email.getMessageText().getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8),
 					"text/html; charset=UTF-8; fileNameCharset=UTF-8");
 		} else {
 			body.setText(email.getMessageText(), UTF_8);

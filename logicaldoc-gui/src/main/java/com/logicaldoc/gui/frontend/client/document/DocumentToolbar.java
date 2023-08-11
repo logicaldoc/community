@@ -528,10 +528,12 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				if (selection.length == 1) {
 					DocUtil.downloadPdfConversion(document.getId(), document.getVersion());
 				} else {
-					String url = Util.contextPath() + "convertpdf?open=true&docId=";
-					for (long id : selection)
-						url += Long.toString(id) + ",";
-					Util.download(url);
+					StringBuilder url = new StringBuilder(Util.contextPath() + "convertpdf?open=true&docId=");
+					for (long id : selection) {
+						url.append(Long.toString(id));
+						url.append(",");
+					}
+					Util.download(url.toString());
 				}
 			});
 		}
@@ -549,16 +551,18 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				long id = selection[0].getId();
 				DocUtil.download(id, null);
 			} else {
-				String url = GWT.getHostPageBaseURL() + "zip-export?folderId="
-						+ FolderController.get().getCurrentFolder().getId();
+				StringBuilder url = new StringBuilder(GWT.getHostPageBaseURL());
+				url.append("zip-export?folderId=");
+				url.append(FolderController.get().getCurrentFolder().getId());
 				for (GUIDocument rec : selection) {
 					if (rec.isPasswordProtected()) {
 						SC.warn(I18N.message("somedocsprotected"));
 						break;
 					}
-					url += "&docId=" + rec.getId();
+					url.append("&docId=");
+					url.append(rec.getId());
 				}
-				Util.download(url);
+				Util.download(url.toString());
 			}
 		});
 	}

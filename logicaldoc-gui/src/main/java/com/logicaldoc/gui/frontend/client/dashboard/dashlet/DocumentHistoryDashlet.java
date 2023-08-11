@@ -128,9 +128,9 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 				user.setCanSort(true);
 				fieldsMap.put(user.getName(), user);
 
-				ListGridField _new = new ListGridField("new", "new");
-				_new.setHidden(true);
-				fieldsMap.put(_new.getName(), _new);
+				ListGridField newField = new ListGridField("new", "new");
+				newField.setHidden(true);
+				fieldsMap.put(newField.getName(), newField);
 			}
 
 			@Override

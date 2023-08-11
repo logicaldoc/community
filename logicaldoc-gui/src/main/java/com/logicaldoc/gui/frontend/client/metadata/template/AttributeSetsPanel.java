@@ -43,10 +43,6 @@ public class AttributeSetsPanel extends VLayout {
 
 	protected Canvas details = SELECT_SET;
 
-	private InfoPanel infoPanel;
-
-	private ToolStrip toolStrip;
-
 	static final Canvas SELECT_SET = new HTMLPanel("&nbsp;" + I18N.message("selecttattributeset"));
 
 	public AttributeSetsPanel() {
@@ -55,7 +51,7 @@ public class AttributeSetsPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		infoPanel = new InfoPanel("");
+		InfoPanel infoPanel = new InfoPanel("");
 
 		final Layout listing = new VLayout();
 		detailsContainer = new VLayout();
@@ -105,7 +101,7 @@ public class AttributeSetsPanel extends VLayout {
 		listing.addMember(infoPanel);
 		listing.addMember(list);
 
-		toolStrip = new ToolStrip();
+		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);

@@ -326,7 +326,7 @@ public class LoginPanel extends VLayout {
 		secretKey.setTextBoxStyle("secretkey-field");
 		secretKey.setColSpan(3);
 		secretKey.addKeyPressHandler(event -> {
-			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && ENTER.equalsIgnoreCase(event.getKeyName()))
 				onSignin();
 		});
 	}
@@ -375,7 +375,7 @@ public class LoginPanel extends VLayout {
 		password.setWrapTitle(false);
 		password.setColSpan(3);
 		password.addKeyPressHandler(event -> {
-			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && ENTER.equalsIgnoreCase(event.getKeyName()))
 				onSignin();
 		});
 	}
@@ -393,7 +393,7 @@ public class LoginPanel extends VLayout {
 		username.setTextBoxStyle(LOGIN_FIELD);
 		username.setColSpan(3);
 		username.addKeyPressHandler(event -> {
-			if (event.getKeyName() != null && ENTER.equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && ENTER.equalsIgnoreCase(event.getKeyName()))
 				onSignin();
 		});
 	}

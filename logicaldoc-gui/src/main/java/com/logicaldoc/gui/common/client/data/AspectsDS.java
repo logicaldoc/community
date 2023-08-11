@@ -17,12 +17,12 @@ public class AspectsDS extends DataSource {
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
 		
-		DataSourceBooleanField _default = new DataSourceBooleanField("default");
+		DataSourceBooleanField ddefault = new DataSourceBooleanField("default");
 		DataSourceBooleanField bulkload = new DataSourceBooleanField("bulkload");
 		DataSourceBooleanField devel = new DataSourceBooleanField("devel");
 		DataSourceBooleanField demo = new DataSourceBooleanField("demo");
 
-		setFields(id, _default, bulkload, devel, demo);
+		setFields(id, ddefault, bulkload, devel, demo);
 		setClientOnly(true);
 		setDataURL("data/aspects.xml");
 	}

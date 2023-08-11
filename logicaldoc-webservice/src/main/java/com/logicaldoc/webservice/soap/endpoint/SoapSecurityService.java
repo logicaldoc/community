@@ -39,7 +39,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	protected static Logger log = LoggerFactory.getLogger(SoapSecurityService.class);
 
 	@Override
-	public WSUser[] listUsers(String sid, String group) throws AuthenticationException, WebserviceException, PersistenceException {
+	public WSUser[] listUsers(String sid, String group)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		try {
@@ -122,7 +123,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (user.getId() != 0) {
 				usr = dao.findById(user.getId());
 				if (usr.getType() == User.TYPE_SYSTEM)
-					throw new PermissionException("You cannot edit user with id " + usr.getId() + " because it is a system user");
+					throw new PermissionException(
+							"You cannot edit user with id " + usr.getId() + " because it is a system user");
 				dao.initialize(usr);
 
 				usr.setCity(user.getCity());
@@ -204,8 +206,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				grp = dao.findById(group.getId());
 				dao.initialize(grp);
 				if (grp.getType() != Group.TYPE_DEFAULT) {
-					throw new PermissionException(String.format("You cannot edit group with id %s because it is a system group",
-							grp.getId()));
+					throw new PermissionException(String
+							.format("You cannot edit group with id %s because it is a system group", grp.getId()));
 				}
 				grp.setName(group.getName());
 				grp.setDescription(group.getDescription());
@@ -242,7 +244,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public void deleteUser(String sid, long userId) throws WebserviceException, PersistenceException, PermissionException {
+	public void deleteUser(String sid, long userId)
+			throws WebserviceException, PersistenceException, PermissionException {
 		checkAdministrator(sid);
 
 		if (userId == 1)
@@ -252,7 +255,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 			User usr = dao.findById(userId);
 			if (usr.getType() == User.TYPE_SYSTEM) {
-				throw new PermissionException("You cannot delete user with id " + usr.getId() + " because it is a system user");
+				throw new PermissionException(
+						"You cannot delete user with id " + usr.getId() + " because it is a system user");
 			}
 			dao.delete(userId);
 		} catch (Exception t) {
@@ -261,7 +265,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public void deleteGroup(String sid, long groupId) throws PermissionException, PersistenceException, WebserviceException {
+	public void deleteGroup(String sid, long groupId)
+			throws PermissionException, PersistenceException, WebserviceException {
 		checkAdministrator(sid);
 
 		if (groupId == 1)
@@ -271,7 +276,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			Group grp = dao.findById(groupId);
 			if (grp.getType() != Group.TYPE_DEFAULT) {
-				throw new PermissionException("You cannot delete group with id " + grp.getId() + " because it is a system group");
+				throw new PermissionException(
+						"You cannot delete group with id " + grp.getId() + " because it is a system group");
 			}
 			dao.delete(groupId);
 		} catch (Exception t) {
@@ -280,7 +286,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public int changePassword(String sid, long userId, String oldPassword, String newPassword) throws WebserviceException, PersistenceException {
+	public int changePassword(String sid, long userId, String oldPassword, String newPassword)
+			throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 
 		try {
@@ -289,7 +296,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (user == null)
 				throw new WebserviceException("User " + userId + " not found");
 
-			if (oldPassword != null && !CryptUtil.cryptString(oldPassword).equals(user.getPassword())) {
+			if (oldPassword != null && !CryptUtil.cryptString(oldPassword).equals(user.getPassword())
+					&& !CryptUtil.cryptStringLegacy(oldPassword).equals(user.getPassword())) {
 				return 1;
 			}
 
@@ -307,7 +315,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 
 			dao.store(user, history);
-			
+
 			return 0;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

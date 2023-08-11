@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -86,7 +87,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		try {
 			Collection<Group> coll = findByWhere(ENTITY + ".tenantId=" + tenantId + " and " + ENTITY + ".name = '"
 					+ SqlUtil.doubleQuotes(name) + "'", null, null);
-			if (coll.size() > 0) {
+			if (CollectionUtils.isNotEmpty(coll)) {
 				group = coll.iterator().next();
 				if (group.getDeleted() == 1)
 					group = null;

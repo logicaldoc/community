@@ -84,8 +84,8 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	@Override
 	public void handleMessage(Message message) throws Fault {
 		if (!settings.getBoolean("webservice.enabled", false)) {
-			final ResourceBundle BUNDLE = BundleUtils.getBundle(WebserviceInterceptor.class);
-			throw new Fault(new org.apache.cxf.common.i18n.Message("Webservices not enabled", BUNDLE));
+			final ResourceBundle bundle = BundleUtils.getBundle(WebserviceInterceptor.class);
+			throw new Fault(new org.apache.cxf.common.i18n.Message("Webservices not enabled", bundle));
 		}
 
 		String payload = getPayload(message, 2048L);

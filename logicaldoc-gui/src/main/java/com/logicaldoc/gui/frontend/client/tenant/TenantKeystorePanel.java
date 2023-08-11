@@ -39,8 +39,6 @@ public class TenantKeystorePanel extends VLayout {
 
 	private DynamicForm form = new DynamicForm();
 
-	private DynamicForm signatureForm = new DynamicForm();
-
 	private ValuesManager vm = new ValuesManager();
 
 	private long tenantId;
@@ -128,7 +126,7 @@ public class TenantKeystorePanel extends VLayout {
 
 		TextItem opensslCommand = prepareOpensslCommandItem();
 
-		signatureForm = new DynamicForm();
+		DynamicForm signatureForm = new DynamicForm();
 		signatureForm.setValuesManager(vm);
 		signatureForm.setWrapItemTitles(false);
 		signatureForm.setIsGroup(true);
@@ -168,7 +166,7 @@ public class TenantKeystorePanel extends VLayout {
 
 		IButton delete = prepareDeleteButton();
 
-		IButton _import = prepareImportButto();
+		IButton importButton = prepareImportButton();
 
 		IButton downloadCert = prepareDownloadCertButton();
 
@@ -193,7 +191,7 @@ public class TenantKeystorePanel extends VLayout {
 			layout.addMember(form);
 			layout.addMember(signatureForm);
 
-			buttons.setMembers(save, export, downloadCert, _import, delete);
+			buttons.setMembers(save, export, downloadCert, importButton, delete);
 		} else {
 			Label label = new Label(I18N.message("keystorenotgenerated"));
 			label.setHeight(50);
@@ -209,7 +207,7 @@ public class TenantKeystorePanel extends VLayout {
 			layout.addMember(form);
 			layout.addMember(signatureForm);
 
-			buttons.setMembers(createNew, _import);
+			buttons.setMembers(createNew, importButton);
 		}
 		layout.addMember(buttons);
 
@@ -295,11 +293,11 @@ public class TenantKeystorePanel extends VLayout {
 		return downloadCert;
 	}
 
-	private IButton prepareImportButto() {
-		IButton _import = new IButton(I18N.message("iimport"));
-		_import.setAutoFit(true);
-		_import.addClickHandler(event -> new KeystoreUploader(TenantKeystorePanel.this).show());
-		return _import;
+	private IButton prepareImportButton() {
+		IButton button = new IButton(I18N.message("iimport"));
+		button.setAutoFit(true);
+		button.addClickHandler(event -> new KeystoreUploader(TenantKeystorePanel.this).show());
+		return button;
 	}
 
 	private IButton prepareDeleteButton() {

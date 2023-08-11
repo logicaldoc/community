@@ -148,7 +148,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		newTagItem.addKeyPressHandler((KeyPressEvent newTagKeyPress) -> {
 			if (Boolean.FALSE.equals(newTagItem.validate()) || newTagItem.getValue() == null
 					|| newTagKeyPress.getKeyName() == null
-					|| !"enter".equals(newTagKeyPress.getKeyName().toLowerCase()))
+					|| !"enter".equalsIgnoreCase(newTagKeyPress.getKeyName()))
 				return;
 
 			String input = newTagItem.getValueAsString().trim();

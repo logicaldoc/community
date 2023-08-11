@@ -302,8 +302,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (StringUtils.isNotEmpty(suffix))
 			fileName = suffix;
 		String mime = MimeType.getByFilename(fileName);
-		return new DataHandler(
-				new InputStreamDataSource(storer.getStream(doc.getId(), resourceName), mime));
+		return new DataHandler(new InputStreamDataSource(storer.getStream(doc.getId(), resourceName), mime));
 	}
 
 	@Override
@@ -370,7 +369,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (doc.getImmutable() == 1)
 			throw new WebserviceException("The document is immutable");
 
-		if ("sign.p7m".equals(suffix.toLowerCase()))
+		if ("sign.p7m".equalsIgnoreCase(suffix))
 			throw new PermissionException("You cannot upload a signature");
 
 		Storer storer = (Storer) Context.get().getBean(Storer.class);

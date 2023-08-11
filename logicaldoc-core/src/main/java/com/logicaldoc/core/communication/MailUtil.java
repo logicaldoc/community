@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -552,7 +553,7 @@ public class MailUtil {
 		if (obj instanceof InputStream) {
 			InputStream is = (InputStream) obj;
 			StringWriter writer = new StringWriter();
-			IOUtils.copy(is, writer, "UTF-8");
+			IOUtils.copy(is, writer, StandardCharsets.UTF_8);
 			str = writer.toString();
 		} else {
 			str = (String) obj;

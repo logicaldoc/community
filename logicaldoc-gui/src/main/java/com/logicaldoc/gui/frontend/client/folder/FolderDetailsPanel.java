@@ -77,10 +77,6 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private EditingTabSet tabSet;
 
-	private Tab workflowTab = null;
-
-	private Tab subscriptionsTab = null;
-
 	private Tab quotaTab = null;
 
 	private Tab automationTab = null;
@@ -198,7 +194,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	private void prepareSubscriptionsTab(GUIFolder folder) {
-		subscriptionsTab = new Tab(I18N.message("subscriptions"));
+		Tab subscriptionsTab = new Tab(I18N.message("subscriptions"));
 		if (folder.hasPermission(Constants.PERMISSION_SUBSCRIPTION) && Feature.visible(Feature.AUDIT)) {
 			if (Feature.enabled(Feature.AUDIT)) {
 				subscriptionsTabPanel = new HLayout();
@@ -213,7 +209,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	private void prepareWorkflowTab(GUIFolder folder) {
-		workflowTab = new Tab(I18N.message("workflow"));
+		Tab workflowTab  = new Tab(I18N.message("workflow"));
 		if (folder.hasPermission(Constants.PERMISSION_WORKFLOW) && Feature.visible(Feature.WORKFLOW)) {
 			if (Feature.enabled(Feature.WORKFLOW)) {
 				workflowsTabPanel = new HLayout();

@@ -301,13 +301,13 @@ public class GUITenant implements Serializable {
 	public String getQuotaAlertRecipientsAsString() {
 		if (quotaAlertRecipients == null || quotaAlertRecipients.length == 0)
 			return null;
-		String str = "";
+		StringBuilder str = new StringBuilder();
 		for (String rec : quotaAlertRecipients) {
-			if (!str.isEmpty())
-				str += ",";
-			str += rec.trim();
+			if (!str.toString().isEmpty())
+				str.append(",");
+			str.append(rec.trim());
 		}
-		return str;
+		return str.toString();
 	}
 
 	public void setQuotaAlertRecipients(String[] quotaAlertRecipients) {

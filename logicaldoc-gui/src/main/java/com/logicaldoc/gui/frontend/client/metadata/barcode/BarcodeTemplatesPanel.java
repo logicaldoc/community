@@ -41,17 +41,11 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 
 	private PositionalBarcodesGrid positionalGrid;
 
-	private SelectItem templateSelector;
-
-	private SelectItem barcodeTemplateSelector;
-
 	private ToolStripButton save;
 
 	private ToolStripButton append;
 
 	private ToolStripButton settings;
-
-	private ToolStripButton newTemplate;
 
 	private ToolStripButton delete;
 
@@ -299,7 +293,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addNewTemplateButton() {
-		newTemplate = new ToolStripButton();
+		ToolStripButton newTemplate = new ToolStripButton();
 		newTemplate.setTitle(I18N.message("new"));
 		newTemplate.addClickHandler((ClickEvent newTemplateClick) -> {
 			GUIBarcodeTemplate newBarcodeTemplate = new GUIBarcodeTemplate();
@@ -310,7 +304,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addBarcodeTemplateSelector(Long documentTemplateId, Long barcodeTemplateId) {
-		barcodeTemplateSelector = ItemFactory.newBarcodeTemplateSelector(false, documentTemplateId, barcodeTemplateId);
+		SelectItem barcodeTemplateSelector = ItemFactory.newBarcodeTemplateSelector(false, documentTemplateId, barcodeTemplateId);
 		barcodeTemplateSelector.setWrapTitle(false);
 		barcodeTemplateSelector.setMultiple(false);
 		barcodeTemplateSelector.setEndRow(false);
@@ -334,7 +328,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addTemplateSelector(Long documentTemplateId) {
-		templateSelector = ItemFactory.newTemplateSelector(true, documentTemplateId);
+		SelectItem templateSelector = ItemFactory.newTemplateSelector(true, documentTemplateId);
 		templateSelector.setWrapTitle(false);
 		templateSelector.setMultiple(false);
 		templateSelector.setEndRow(false);

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +98,7 @@ public class ExportZip extends HttpServlet {
 			ZipExport exporter) throws PersistenceException {
 		ByteArrayOutputStream bos = null;
 
-		if (docIds != null && docIds.size() > 0) {
+		if (CollectionUtils.isNotEmpty(docIds)) {
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(session.getSid());

@@ -1,5 +1,9 @@
 package com.logicaldoc.core.security.authentication;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.HibernateUserDAO;
@@ -14,6 +18,8 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @since 4.5
  */
 public class DefaultAuthenticator extends AbstractAuthenticator {
+
+	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
 	protected UserDAO userDAO;
 
@@ -33,9 +39,19 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 		validateUser(user);
 
-		// Check the password match
-		if (user.getPassword() == null || !user.getPassword().equals(CryptUtil.cryptString(password)))
+		// Check the password match with one of the current or legacy algorithm
+		String test = CryptUtil.cryptString(password);
+		String testLegacy = CryptUtil.cryptStringLegacy(password);
+		if (user.getPassword() == null || (!user.getPassword().equals(test) && !user.getPassword().equals(testLegacy)))
 			throw new WrongPasswordException(this);
+
+		try {
+			// Make sure the password in the DB follows the current scheme
+			if (user.getPassword().equals(testLegacy))
+				userDAO.jdbcUpdate("update ld_user set ld_password='" + test + "' where ld_id " + user.getId());
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage());
+		}
 
 		return user;
 	}

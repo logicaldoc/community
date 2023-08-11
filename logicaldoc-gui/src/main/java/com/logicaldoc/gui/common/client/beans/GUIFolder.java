@@ -115,7 +115,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.id = id;
 	}
 
-
 	@Override
 	public long getId() {
 		return id;
@@ -210,12 +209,19 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	public void setPath(GUIFolder[] path) {
 		this.path = path;
 		this.pathExtended = "";
+
+		StringBuilder sb = new StringBuilder();
 		for (GUIFolder folder : path) {
 			if (folder != null && folder.getId() != folder.getParentId()
-					&& folder.getId() != Constants.DOCUMENTS_FOLDERID)
-				pathExtended += "/" + folder.getName();
+					&& folder.getId() != Constants.DOCUMENTS_FOLDERID) {
+				sb.append("/");
+				sb.append(folder.getName());
+			}
 		}
-		pathExtended += "/" + getName();
+		sb.append("/");
+		sb.append(getName());
+
+		this.pathExtended = sb.toString();
 	}
 
 	public GUIFolder getParent() {
@@ -433,13 +439,13 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	public String getQuotaAlertRecipientsAsString() {
 		if (quotaAlertRecipients == null || quotaAlertRecipients.length == 0)
 			return null;
-		String str = "";
+		StringBuilder str = new StringBuilder();
 		for (String rec : quotaAlertRecipients) {
-			if (!str.isEmpty())
-				str += ",";
-			str += rec.trim();
+			if (!str.toString().isEmpty())
+				str.append(",");
+			str.append(rec.trim());
 		}
-		return str;
+		return str.toString();
 	}
 
 	public void setQuotaAlertRecipients(String[] quotaAlertRecipients) {

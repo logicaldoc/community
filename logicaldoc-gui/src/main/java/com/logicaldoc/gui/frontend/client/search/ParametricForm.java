@@ -202,7 +202,7 @@ public class ParametricForm extends VLayout {
 		ParameterConditionRow row = new ParameterConditionRow(selectedTemplate, true, event -> {
 			if (event.getKeyName() == null)
 				return;
-			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase()))
+			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName()))
 				search();
 		});
 		row.setWidth(getWidth() - 10);

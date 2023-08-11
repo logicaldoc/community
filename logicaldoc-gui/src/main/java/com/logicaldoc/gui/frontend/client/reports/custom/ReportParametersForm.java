@@ -101,8 +101,8 @@ public class ReportParametersForm extends Window {
 				final DateItem item = ItemFactory.newDateItemForAttribute(att.getName(), att.getLabel());
 				item.setRequired(att.isMandatory());
 				item.addKeyPressHandler(event -> {
-					if ("backspace".equals(event.getKeyName().toLowerCase())
-							|| "delete".equals(event.getKeyName().toLowerCase())) {
+					if ("backspace".equalsIgnoreCase(event.getKeyName())
+							|| "delete".equalsIgnoreCase(event.getKeyName())) {
 						item.clearValue();
 						item.setValue((Date) null);
 					}
@@ -191,7 +191,7 @@ public class ReportParametersForm extends Window {
 	private void setAttributeValue(Object value, String parameterName, GUIAttribute attribute) {
 		if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			if (!(value == null || "".equals(value.toString().trim())))
-				attribute.setValue("1".equals(value.toString().trim()) ? true : false);
+				attribute.setValue("1".equals(value.toString().trim()));
 			else if (getParameter(parameterName) != null) {
 				GUIAttribute at = getParameter(parameterName);
 				if (at != null) {

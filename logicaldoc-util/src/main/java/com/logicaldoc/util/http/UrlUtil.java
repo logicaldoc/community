@@ -58,15 +58,15 @@ public class UrlUtil {
 	public static Map<String, String> getParams(String urlString)
 			throws UnsupportedEncodingException, MalformedURLException {
 		URL url = new URL(urlString);
-		Map<String, String> query_pairs = new LinkedHashMap<>();
+		Map<String, String> queryPairs = new LinkedHashMap<>();
 		String query = url.getQuery();
 		String[] pairs = query.split("&");
 		for (String pair : pairs) {
 			int idx = pair.indexOf("=");
-			query_pairs.put(URLDecoder.decode(pair.substring(0, idx), UTF_8),
+			queryPairs.put(URLDecoder.decode(pair.substring(0, idx), UTF_8),
 					URLDecoder.decode(pair.substring(idx + 1), UTF_8));
 		}
-		return query_pairs;
+		return queryPairs;
 	}
 
 	public static String getQueryParam(String url, String parameter) throws MalformedURLException {

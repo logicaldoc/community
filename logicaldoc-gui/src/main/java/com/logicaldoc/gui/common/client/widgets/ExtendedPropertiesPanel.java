@@ -353,7 +353,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			if ((att.isMultiple() || att.getParent() != null) && att.getType() != GUIAttribute.TYPE_USER
 					&& att.getType() != GUIAttribute.TYPE_FOLDER)
 				item.setIcons(multiValIcons.toArray(new FormItemIcon[0]));
-			item.setRequired(checkMandatory ? att.isMandatory() : false);
+			item.setRequired(checkMandatory && att.isMandatory());
 			if (att.isReadonly())
 				item.setDisabled(true);
 		}
@@ -389,8 +389,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (object.getValue(att.getName()) != null)
 			item.setValue((Date) object.getValue(att.getName()));
 		item.addKeyPressHandler((KeyPressEvent event) -> {
-			if ("backspace".equals(event.getKeyName().toLowerCase())
-					|| "delete".equals(event.getKeyName().toLowerCase())) {
+			if ("backspace".equalsIgnoreCase(event.getKeyName()) || "delete".equalsIgnoreCase(event.getKeyName())) {
 				item.clearValue();
 				item.setValue((Date) null);
 				changedHandler.onChanged(null);
@@ -404,7 +403,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	protected FormItem prepareBooleanItem(GUIAttribute att) {
 		FormItem item;
 		item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getLabel(),
-				checkMandatory ? !att.isMandatory() : true);
+				checkMandatory && !att.isMandatory());
 		if (object.getValue(att.getName()) != null)
 			item.setValue(((Boolean) object.getValue(att.getName())).booleanValue() ? "1" : "0");
 		return item;
@@ -595,7 +594,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	private void validateBoolean(Object value, String attributeName) {
 		if (!(value == null || "".equals(value.toString().trim())))
-			object.setValue(attributeName, "1".equals(value.toString().trim()) ? true : false);
+			object.setValue(attributeName, "1".equals(value.toString().trim()));
 		else if (object.getAttribute(attributeName) != null) {
 			GUIAttribute at = object.getAttribute(attributeName);
 			at.setBooleanValue(null);

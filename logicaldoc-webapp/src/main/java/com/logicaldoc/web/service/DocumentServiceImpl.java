@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -126,8 +127,6 @@ import com.logicaldoc.web.UploadServlet;
 public class DocumentServiceImpl extends AbstractRemoteService implements DocumentService {
 
 	private static final String DOCUMENT_STR = "Document ";
-
-	private static final String UTF_8 = "UTF-8";
 
 	private static final String UNEXISTING_DOCUMENT = "Unexisting document";
 
@@ -2234,9 +2233,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setEvent(DocumentEvent.STORED.toString());
 			Document document;
 			if (StringUtils.isEmpty(content))
-				document = documentManager.create(IOUtils.toInputStream(" ", UTF_8), doc, transaction);
+				document = documentManager.create(IOUtils.toInputStream(" ", StandardCharsets.UTF_8), doc, transaction);
 			else
-				document = documentManager.create(IOUtils.toInputStream(content, UTF_8), doc, transaction);
+				document = documentManager.create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc, transaction);
 
 			if (checkout) {
 				// Perform a checkout also
@@ -2496,7 +2495,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-			manager.checkin(docId, IOUtils.toInputStream(content, UTF_8), doc.getFileName(), false, null, transaction);
+			manager.checkin(docId, IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc.getFileName(), false, null, transaction);
 
 			return getById(docId);
 		} catch (PermissionException | PersistenceException | ServerException | IOException e) {
@@ -2556,7 +2555,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-			Document doc = manager.create(IOUtils.toInputStream(content, UTF_8), toDocument(document), transaction);
+			Document doc = manager.create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), toDocument(document), transaction);
 
 			return getById(doc.getId());
 		} catch (PersistenceException | IOException | ServerException e) {

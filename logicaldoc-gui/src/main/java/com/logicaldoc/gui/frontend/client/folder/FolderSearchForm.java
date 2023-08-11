@@ -193,7 +193,7 @@ public abstract class FolderSearchForm extends VLayout {
 		public void onKeyPress(KeyPressEvent event) {
 			if (event.getKeyName() == null)
 				return;
-			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase()))
+			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName()))
 				search();
 		}
 
@@ -269,7 +269,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 		if (fieldName.startsWith("_"))
 			fieldName = fieldName.substring(1);
-		
+
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
 				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
 			fieldValue = Long.parseLong(fieldValue.toString());
@@ -282,7 +282,7 @@ public abstract class FolderSearchForm extends VLayout {
 		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA)) {
 			fieldName = fieldName.replace(TYPE + GUIAttribute.TYPE_STRING_TEXTAREA, TYPE + GUIAttribute.TYPE_STRING);
 		}
-		
+
 		criterion.setField(fieldName);
 
 		setCriterionValue(criterion, fieldValue);

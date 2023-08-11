@@ -42,8 +42,6 @@ public class VIASettingsPanel extends AdminPanel {
 
 	private DynamicForm settingsForm = new DynamicForm();
 
-	private DynamicForm emailForm = new DynamicForm();
-
 	private ValuesManager vm = new ValuesManager();
 
 	private VLayout layout = null;
@@ -121,7 +119,7 @@ public class VIASettingsPanel extends AdminPanel {
 
 		settingsForm.setItems(enabled, maxAttachments, maxAttachmentSize);
 
-		emailForm = new DynamicForm();
+		DynamicForm emailForm = new DynamicForm();
 		emailForm.setValuesManager(vm);
 		emailForm.setWrapItemTitles(false);
 		emailForm.setTitleOrientation(TitleOrientation.TOP);

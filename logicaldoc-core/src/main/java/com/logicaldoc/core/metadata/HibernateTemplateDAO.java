@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
@@ -71,7 +72,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			List<Template> coll = findByWhere(
 					ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
 					null, null);
-			if (coll.size() > 0)
+			if (CollectionUtils.isNotEmpty(coll))
 				template = coll.iterator().next();
 			if (template != null && template.getDeleted() == 1)
 				template = null;

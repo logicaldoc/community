@@ -36,12 +36,12 @@ public class OCRHistoryDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
-		DataSourceBooleanField _new = new DataSourceBooleanField("new");
+		DataSourceBooleanField newField = new DataSourceBooleanField("new");
 		DataSourceTextField documentId = new DataSourceTextField("docId");
 		DataSourceTextField folderId = new DataSourceTextField("folderId");
 		DataSourceTextField path = new DataSourceTextField("path");
 
-		setFields(filename, date, event, comment, icon, _new, documentId, folderId, path);
+		setFields(filename, date, event, comment, icon, newField, documentId, folderId, path);
 		setClientOnly(true);
 
 		setDataURL(url);

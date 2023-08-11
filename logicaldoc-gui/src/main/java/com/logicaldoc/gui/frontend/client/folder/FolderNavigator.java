@@ -155,7 +155,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		 */
 		addKeyDownHandler(keyDown -> {
 			String key = EventHandler.getKey();
-			if ("space".equals(key.toLowerCase())) {
+			if ("space".equalsIgnoreCase(key)) {
 				selectFolder(getSelectedFolderId());
 				typed = null;
 				lastTyped = null;
@@ -1076,18 +1076,22 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	public String getNodePath(TreeNode leafNode) {
-		String path = "";
+		StringBuilder path = new StringBuilder();
 		if (leafNode == null)
-			return path;
+			return path.toString();
 
 		TreeNode[] parents = getTree().getParents(leafNode);
 		if (parents != null && parents.length > 0)
 			for (int i = parents.length - 1; i >= 0; i--) {
-				if (parents[i].getName() != null && !"/".equals(parents[i].getName()))
-					path += "/" + parents[i].getName();
+				if (parents[i].getName() != null && !"/".equals(parents[i].getName())) {
+					path.append("/");
+					path.append(parents[i].getName());
+				}
 			}
-		path += "/" + (leafNode.getName().equals("/") ? "" : leafNode.getName());
-		return path;
+
+		path.append("/");
+		path.append(leafNode.getName().equals("/") ? "" : leafNode.getName());
+		return path.toString();
 	}
 
 	public String getCurrentPath() {

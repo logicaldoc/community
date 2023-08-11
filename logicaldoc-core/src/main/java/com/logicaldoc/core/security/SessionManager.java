@@ -1,6 +1,6 @@
 package com.logicaldoc.core.security;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -481,7 +481,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (authorization != null && authorization.startsWith("Basic")) {
 			// Authorization: Basic base64credentials
 			String base64Credentials = authorization.substring("Basic".length()).trim();
-			String credentials = new String(Base64.getDecoder().decode(base64Credentials), Charset.forName("UTF-8"));
+			String credentials = new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
 
 			// credentials = username:password
 			return credentials.split(":", 2);

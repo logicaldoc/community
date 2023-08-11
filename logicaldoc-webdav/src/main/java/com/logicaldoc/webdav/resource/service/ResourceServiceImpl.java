@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.webdav.DavException;
@@ -138,7 +139,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			boolean hasAccess = isFolderAccessible(parentResource, folderID);
 
-			if (hasAccess == false)
+			if (!hasAccess)
 				return resourceList;
 
 			User user = userDAO.findById(parentResource.getRequestedPerson());
@@ -178,7 +179,7 @@ public class ResourceServiceImpl implements ResourceService {
 	private boolean isFolderAccessible(Resource parentResource, final Long folderID) throws PersistenceException {
 		boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
 
-		if (hasAccess == false) {
+		if (!hasAccess) {
 			// Check if the folder is a root and in that case we mark it as
 			// readable.
 			Folder folder = null;
@@ -253,7 +254,7 @@ public class ResourceServiceImpl implements ResourceService {
 			hasAccess = false;
 		}
 
-		if (hasAccess == false)
+		if (!hasAccess)
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN,
 					"You have no appropriated rights to read this document");
 
@@ -698,7 +699,7 @@ public class ResourceServiceImpl implements ResourceService {
 				List<Folder> notDeletableFolders = folderDAO.deleteTree(folder, PersistentObject.DELETED_CODE_DEFAULT,
 						transaction);
 
-				if (notDeletableFolders.size() > 0)
+				if (CollectionUtils.isNotEmpty(notDeletableFolders))
 					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 							"Unable to delete some subfolders.");
 			} else if (!resource.isFolder()) {
@@ -718,7 +719,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 				// Check if there are some shortcuts associated to the
 				// deleting document. All the shortcuts must be deleted.
-				if (documentDAO.findAliasIds(Long.parseLong(resource.getID())).size() > 0)
+				if (CollectionUtils.isNotEmpty(documentDAO.findAliasIds(Long.parseLong(resource.getID()))))
 					for (Long shortcutId : documentDAO.findAliasIds(Long.parseLong(resource.getID()))) {
 						documentDAO.delete(shortcutId, transaction);
 					}
@@ -762,7 +763,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if (destinationResource.isFolder() && Long.parseLong(destinationResource.getID()) == rootId)
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot write in the root");
 
-		if (resource.isFolder() == true) {
+		if (resource.isFolder()) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "FolderCopy not supported");
 		} else {
 			try {

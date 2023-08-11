@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +48,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name",
-					null);
+			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -59,9 +59,10 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	public AttributeSet findByName(String name, long tenantId) {
 		AttributeSet template = null;
 		try {
-			List<AttributeSet> coll = findByWhere(ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and "
-					+ ENTITY + TENANT_ID_EQUAL + tenantId, null, null);
-			if (coll.size() > 0)
+			List<AttributeSet> coll = findByWhere(
+					ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+					null, null);
+			if (CollectionUtils.isNotEmpty(coll))
 				template = coll.iterator().next();
 			if (template != null && template.getDeleted() == 1)
 				template = null;

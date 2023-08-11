@@ -91,7 +91,7 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 	}
 
 	public boolean isNotify() {
-		return getFactor() != null && !getFactor().isEmpty() ? notify.getValueAsBoolean() : false;
+		return getFactor() != null && !getFactor().isEmpty() && notify.getValueAsBoolean();
 	}
 
 	public String getKey() {

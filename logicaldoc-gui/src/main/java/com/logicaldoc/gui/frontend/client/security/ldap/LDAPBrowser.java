@@ -199,9 +199,9 @@ public class LDAPBrowser extends VLayout {
 		for (int i = 0; i < selection.length; i++)
 			usernames[i] = selection[i].getAttributeAsString(USERNAME);
 
-		MenuItem _import = new MenuItem();
-		_import.setTitle(I18N.message("iimport"));
-		_import.addClickHandler((MenuItemClickEvent event) -> {
+		MenuItem importItem = new MenuItem();
+		importItem.setTitle(I18N.message("iimport"));
+		importItem.addClickHandler((MenuItemClickEvent event) -> {
 			LD.contactingServer();
 			users.deselectAllRecords();
 			LDAPService.Instance.get().importUsers(usernames, server.getId(), new AsyncCallback<GUIValue[]>() {
@@ -225,7 +225,7 @@ public class LDAPBrowser extends VLayout {
 			});
 		});
 
-		contextMenu.setItems(_import);
+		contextMenu.setItems(importItem);
 		contextMenu.showContextMenu();
 	}
 

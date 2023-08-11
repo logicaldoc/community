@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -131,7 +133,7 @@ public class WSGroup implements Serializable {
 					if (user != null && user.getType() == User.TYPE_DEFAULT)
 						users.add(user);
 				}
-				if (users.size() > 0)
+				if (CollectionUtils.isNotEmpty(users))
 					group.setUsers(users);
 			}
 		} catch (Exception e) {
@@ -152,7 +154,7 @@ public class WSGroup implements Serializable {
 			wsGroup.setLastModified(DateUtil.format(group.getLastModified()));
 			wsGroup.setSource(group.getSource());
 
-			if (group.getUsers() != null && group.getUsers().size() > 0) {
+			if (CollectionUtils.isNotEmpty(group.getUsers())) {
 				long[] userIds = new long[group.getUsers().size()];
 				int i = 0;
 				for (User user : group.getUsers()) {

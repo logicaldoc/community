@@ -163,7 +163,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 	private void getPath(WebdavRequest webdavRequest) throws DavException {
 		String path = webdavRequest.getRequestLocator().getResourcePath();
-		if (path.startsWith("/store") == false && path.startsWith("/vstore") == false)
+		if (!path.startsWith("/store") && !path.startsWith("/vstore"))
 			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 	}
 

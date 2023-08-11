@@ -65,7 +65,7 @@ public class StatChartServlet extends HttpServlet {
 			Font font = prepareFont();
 
 			JFreeChart chrt = ChartFactory.createPieChart(font != null ? I18N.message(chart, user.getLocale()) : null,
-					dataset, font != null ? true : false, false, false);
+					dataset, font != null, false, false);
 			chrt.setBorderVisible(false);
 			PiePlot plot = (PiePlot) chrt.getPlot();
 			plot.setLabelGenerator(null);

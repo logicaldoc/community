@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -334,7 +335,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			params.put("id", Long.valueOf(id));
 
 			List<MenuGroup> coll = findByQuery(query.toString(), params, null);
-			result = coll.size() > 0;
+			result = CollectionUtils.isNotEmpty(coll);
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
@@ -386,7 +387,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public boolean hasWriteAccess(Menu menu, long userId) {
-		if (isWriteEnable(menu.getId(), userId) == false) {
+		if (!isWriteEnable(menu.getId(), userId)) {
 			return false;
 		}
 
@@ -533,8 +534,12 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
-			if (menu != null)
-				path = (menu.getId() != 1 ? menu.getName() : "") + "/" + path;
+			if (menu != null) {
+				StringBuilder sb = new StringBuilder(menu.getId() != 1 ? menu.getName() : "");
+				sb.append("/");
+				sb.append(path);
+				path = sb.toString();
+			}
 		}
 		if (!path.startsWith("/"))
 			path = "/" + path;

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +39,13 @@ import com.logicaldoc.webservice.soap.FolderService;
 public class SoapFolderService extends AbstractService implements FolderService {
 
 	private static final String FOLDER = "Folder ";
+
 	private static final String NOT_ALLOWED = "Not Allowed";
+
 	private static final String NO_CHANGES = "No Changes";
+
 	private static final String CANNOT_MOVE_FOLDERS_IN_THE_ROOT = "Cannot move folders in the root";
+
 	protected static Logger log = LoggerFactory.getLogger(SoapFolderService.class);
 
 	@Override
@@ -314,7 +319,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		folderDao.initialize(folder);
 
 		List<Folder> folders = folderDao.findByNameAndParentId(name, folder.getParentId());
-		if (folders.size() > 0 && folders.get(0).getId() != folder.getId()) {
+		if (CollectionUtils.isNotEmpty(folders)) {
 			throw new WebserviceException(String.format("duplicate folder name %s", name));
 		} else {
 			// Add a folder history entry
@@ -503,7 +508,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throw new WebserviceException(String.format("cannot find folder %s", folderId));
 
 		List<Folder> folders = folderDao.findByNameAndParentId(name, folder.getParentId());
-		if (folders.size() > 0 && folders.get(0).getId() != folder.getId()) {
+		if (CollectionUtils.isNotEmpty(folders) && folders.get(0).getId() != folder.getId()) {
 			throw new WebserviceException(String.format("duplicate folder name %s", name));
 		} else {
 			folderDao.initialize(folder);
@@ -592,7 +597,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public WSFolder[] listWorkspaces(String sid) throws AuthenticationException, WebserviceException, PersistenceException {
+	public WSFolder[] listWorkspaces(String sid)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -608,7 +614,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public void merge(String sid, long sourceId, long targetId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	public void merge(String sid, long sourceId, long targetId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 

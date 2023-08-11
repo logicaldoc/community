@@ -39,30 +39,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 
-	private SelectItem templateSelector;
-
-	private SelectItem ocrTemplateSelector;
-
-	private ToolStripButton settings;
-
-	private ToolStripButton add;
-
-	private ToolStripButton delete;
-
-	private ToolStripButton close;
-
-	private ToolStripButton save;
-
-	private ToolStripButton zoomIn;
-
-	private ToolStripButton zoomOut;
-
-	private ToolStripButton addZone;
-
-	private ToolStripButton deleteZones;
-
-	private ToolStripButton print;
-
 	private ToolStrip toolStrip;
 
 	private HLayout editorPanel = new HLayout();
@@ -132,7 +108,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addCloseButton(ToolStrip toolStrip) {
-		close = new ToolStripButton();
+		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
 		close.addClickHandler(event -> setSelectedOcrTemplate(null));
 		close.setDisabled(selectedOcrTemplate == null);
@@ -140,7 +116,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addPrintButton(ToolStrip toolStrip) {
-		print = new ToolStripButton(I18N.message("print"));
+		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		print.addClickHandler(event -> PrintUtil.printScreenShot(sample.getID(),
 				I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName()));
 		print.setDisabled(selectedOcrTemplate == null);
@@ -148,7 +124,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addZoomOutButton(ToolStrip toolStrip) {
-		zoomOut = new ToolStripButton();
+		ToolStripButton zoomOut = new ToolStripButton();
 		zoomOut.setTitle(I18N.message("zoomout"));
 		zoomOut.addClickHandler(event -> {
 			if (sample != null) {
@@ -162,7 +138,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addZoomInButton(ToolStrip toolStrip) {
-		zoomIn = new ToolStripButton();
+		ToolStripButton zoomIn = new ToolStripButton();
 		zoomIn.setTitle(I18N.message("zoomin"));
 		zoomIn.addClickHandler(event -> {
 			if (sample != null) {
@@ -176,7 +152,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addDeleteZonesButton(ToolStrip toolStrip) {
-		deleteZones = new ToolStripButton();
+		ToolStripButton deleteZones = new ToolStripButton();
 		deleteZones.setTitle(I18N.message("deletezones"));
 		deleteZones.addClickHandler(
 				event -> LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), (Boolean answer) -> {
@@ -190,7 +166,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addAddZoneButton(ToolStrip toolStrip) {
-		addZone = new ToolStripButton();
+		ToolStripButton addZone = new ToolStripButton();
 		addZone.setTitle(I18N.message("addzone"));
 		addZone.addClickHandler((ClickEvent event) -> {
 			FormItem select = new SelectItem("zone", I18N.message("zone"));
@@ -220,7 +196,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addSaveButton(ToolStrip toolStrip) {
-		save = new ToolStripButton();
+		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(
 				event -> ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<GUIOCRTemplate>() {
@@ -240,7 +216,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addDeleteButton(ToolStrip toolStrip) {
-		delete = new ToolStripButton();
+		ToolStripButton delete = new ToolStripButton();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> {
 			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L)
@@ -266,7 +242,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addSettingsButton(ToolStrip toolStrip) {
-		settings = new ToolStripButton();
+		ToolStripButton settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
 		settings.addClickHandler(event -> {
 			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L) {
@@ -279,7 +255,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addNewButton(ToolStrip toolStrip) {
-		add = new ToolStripButton();
+		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("new"));
 		add.addClickHandler(event -> {
 			selectedOcrTemplate = new GUIOCRTemplate();
@@ -292,7 +268,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addOcrTemplateSelector(Long templateId, Long barcodeTemplateId, ToolStrip toolStrip) {
-		ocrTemplateSelector = ItemFactory.newOCRTemplateSelector(false, templateId, barcodeTemplateId);
+		SelectItem ocrTemplateSelector = ItemFactory.newOCRTemplateSelector(false, templateId, barcodeTemplateId);
 		ocrTemplateSelector.setWrapTitle(false);
 		ocrTemplateSelector.setMultiple(false);
 		ocrTemplateSelector.setEndRow(false);
@@ -317,7 +293,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addTemplateSelector(Long templateId, ToolStrip toolStrip) {
-		templateSelector = ItemFactory.newTemplateSelector(true, templateId);
+		SelectItem templateSelector = ItemFactory.newTemplateSelector(true, templateId);
 		templateSelector.setWrapTitle(false);
 		templateSelector.setMultiple(false);
 		templateSelector.setEndRow(false);

@@ -43,8 +43,6 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 	private RefreshableListGrid grid;
 
-	private Layout listing;
-
 	private HTMLPane body;
 
 	public MessagesPanel() {
@@ -55,7 +53,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 	@Override
 	public void onDraw() {
-		listing = new VLayout();
+		Layout listing = new VLayout();
 		listing.setHeight("75%");
 		listing.setShowResizeBar(true);
 

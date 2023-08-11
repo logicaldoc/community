@@ -110,8 +110,7 @@ public class UserSecurityPanel extends VLayout {
 		} else {
 			maxInactivity.addChangedHandler(changedHandler);
 			maxInactivity.addKeyPressHandler((KeyPressEvent event) -> {
-				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| "delete".equals(event.getKeyName().toLowerCase())) {
+				if ("backspace".equalsIgnoreCase(event.getKeyName()) || "delete".equalsIgnoreCase(event.getKeyName())) {
 					maxInactivity.clearValue();
 					maxInactivity.setValue((Date) null);
 					changedHandler.onChanged(null);
@@ -131,8 +130,7 @@ public class UserSecurityPanel extends VLayout {
 		} else {
 			expire.addChangedHandler(changedHandler);
 			expire.addKeyPressHandler((KeyPressEvent event) -> {
-				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| "delete".equals(event.getKeyName().toLowerCase())) {
+				if ("backspace".equalsIgnoreCase(event.getKeyName()) || "delete".equalsIgnoreCase(event.getKeyName())) {
 					expire.clearValue();
 					expire.setValue((Date) null);
 					changedHandler.onChanged(null);
@@ -177,7 +175,7 @@ public class UserSecurityPanel extends VLayout {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values =  vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			user.setPasswordExpires(Boolean.parseBoolean(values.get("passwordExpires").toString()));

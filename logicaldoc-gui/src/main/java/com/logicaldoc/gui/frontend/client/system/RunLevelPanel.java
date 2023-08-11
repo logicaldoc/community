@@ -125,11 +125,11 @@ public class RunLevelPanel extends VLayout {
 		id.setAutoFitWidth(true);
 		id.setCellFormatter((value, rec, rowNum, colNum) -> I18N.message(ASPECT + rec.getAttributeAsString("id")));
 
-		ListGridField _default = new ListGridField(DEFAULT, I18N.message(DEFAULT), 60);
-		_default.setType(ListGridFieldType.BOOLEAN);
-		_default.setCanEdit(true);
-		_default.setAutoFitWidth(true);
-		_default.setCanSort(false);
+		ListGridField defaultField = new ListGridField(DEFAULT, I18N.message(DEFAULT), 60);
+		defaultField.setType(ListGridFieldType.BOOLEAN);
+		defaultField.setCanEdit(true);
+		defaultField.setAutoFitWidth(true);
+		defaultField.setCanSort(false);
 
 		ListGridField bulkload = new ListGridField(BULKLOAD, I18N.message(BULKLOAD), 60);
 		bulkload.setType(ListGridFieldType.BOOLEAN);
@@ -160,7 +160,7 @@ public class RunLevelPanel extends VLayout {
 		aspects.setCanFreezeFields(true);
 		aspects.setAutoFetchData(true);
 		aspects.setDataSource(new AspectsDS());
-		aspects.setFields(id, _default, bulkload, slave, devel, demo);
+		aspects.setFields(id, defaultField, bulkload, slave, devel, demo);
 		aspects.setHeaderHeight(44);
 		aspects.setHeaderSpans(
 				new HeaderSpan(I18N.message("runlevels"), new String[] { DEFAULT, BULKLOAD, SLAVE, DEVEL, "demo" }));

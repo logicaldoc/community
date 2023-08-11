@@ -74,28 +74,27 @@ public class LinksPanel extends DocumentDetailTab {
 
 		prepareContextMenu();
 
-		treeGrid.addDoubleClickHandler(event -> 
-			treeGrid.addCellDoubleClickHandler(evnt -> {
-				final ListGridRecord rec = evnt.getRecord();
+		treeGrid.addDoubleClickHandler(event -> treeGrid.addCellDoubleClickHandler(evnt -> {
+			final ListGridRecord rec = evnt.getRecord();
 
-				FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
-						new AsyncCallback<GUIFolder>() {
+			FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
+					new AsyncCallback<GUIFolder>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIFolder fld) {
-								if (fld.isDownload()
-										&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-									onDownload(rec);
-								else
-									onPreview(rec);
-							}
-						});
-			}));
+						@Override
+						public void onSuccess(GUIFolder fld) {
+							if (fld.isDownload()
+									&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
+								onDownload(rec);
+							else
+								onPreview(rec);
+						}
+					});
+		}));
 	}
 
 	private void prepareContextMenu() {
@@ -111,27 +110,27 @@ public class LinksPanel extends DocumentDetailTab {
 
 			final MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler(evnt -> 
+			delete.addClickHandler(evnt ->
 
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-					if (Boolean.TRUE.equals(answer)) {
-						DocumentService.Instance.get().deleteLinks(ids, new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
+					DocumentService.Instance.get().deleteLinks(ids, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(Void result) {
-								TreeNode parent = treeGrid.getTree().getParent(treeGrid.getSelectedRecord());
-								treeGrid.selectRecord(parent);
-								treeGrid.getTree().reloadChildren(parent);
-								document.setLinks(document.getLinks() - ids.length);
-								DocumentController.get().modified(document);
-							}
-						});
-					}
-				}));
+						@Override
+						public void onSuccess(Void result) {
+							TreeNode parent = treeGrid.getTree().getParent(treeGrid.getSelectedRecord());
+							treeGrid.selectRecord(parent);
+							treeGrid.getTree().reloadChildren(parent);
+							document.setLinks(document.getLinks() - ids.length);
+							DocumentController.get().modified(document);
+						}
+					});
+				}
+			}));
 
 			final MenuItem preview = new MenuItem();
 			preview.setTitle(I18N.message("preview"));
@@ -253,8 +252,10 @@ public class LinksPanel extends DocumentDetailTab {
 
 	protected void onDownloadPackage() {
 		if (document.getFolder().isDownload()) {
-			String url = GWT.getHostPageBaseURL() + "zip-export?folderId=" + document.getFolder().getId();
-			url += "&docId=" + document.getId();
+			StringBuilder url = new StringBuilder(GWT.getHostPageBaseURL());
+			url.append("zip-export?folderId=");
+			url.append(document.getFolder().getId());
+			url.append("&docId=" + document.getId());
 
 			treeGrid.getRecords();
 
@@ -266,9 +267,10 @@ public class LinksPanel extends DocumentDetailTab {
 
 				String docId = rec.getAttribute(DOCUMENT_ID);
 				docId = docId.substring(docId.indexOf('-') + 1);
-				url += "&docId=" + docId;
+				url.append("&docId=");
+				url.append(docId);
 			}
-			WindowUtils.openUrl(url);
+			WindowUtils.openUrl(url.toString());
 		}
 	}
 

@@ -152,7 +152,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 	}
 
 	private boolean intToBoolean(int val) {
-		return val == 1 ? true : false;
+		return val == 1;
 	}
 
 	private void menuRights(HttpServletResponse response, Long menuId, long tenantId)

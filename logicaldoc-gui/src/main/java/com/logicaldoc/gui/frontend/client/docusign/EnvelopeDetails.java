@@ -132,12 +132,14 @@ public class EnvelopeDetails extends Window {
 			public void onSuccess(Collection<GUIDocument> docs) {
 				LD.clearPrompt();
 				if (!docs.isEmpty()) {
-					String message = I18N.message("providesignheretabfordocs") + ": <ul>";
+					StringBuilder message = new StringBuilder(I18N.message("providesignheretabfordocs") + ": <ul>");
 					for (GUIDocument doc : docs) {
-						message += "\n<li>" + doc.getFileName() + "</li>";
+						message.append("\n<li>");
+						message.append(doc.getFileName());
+						message.append("</li>");
 					}
-					message += "\n</ol>";
-					SC.warn(I18N.message("error"), message);
+					message.append("\n</ol>");
+					SC.warn(I18N.message("error"), message.toString());
 				} else {
 					GUIDocuSignSettings settings = new GUIDocuSignSettings();
 					settings.setDocumentIds(docIds);

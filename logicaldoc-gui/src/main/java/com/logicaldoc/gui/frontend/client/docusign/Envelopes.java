@@ -133,10 +133,12 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 
 						@Override
 						public void onSuccess(Collection<String> signers) {
-							String message = "";
-							for (String signer : signers)
-								message += "\n" + signer;
-							SC.say(I18N.message("signers"), message);
+							StringBuilder message = new StringBuilder();
+							for (String signer : signers) {
+								message.append("\n");
+								message.append(signer);
+							}
+							SC.say(I18N.message("signers"), message.toString());
 						}
 					}));
 

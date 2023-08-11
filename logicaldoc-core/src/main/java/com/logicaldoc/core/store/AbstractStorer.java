@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -174,7 +175,7 @@ public abstract class AbstractStorer implements Storer {
 	public String getString(long docId, String resource) {
 		StringWriter writer = new StringWriter();
 		try {
-			IOUtils.copy(getStream(docId, resource), writer, "UTF-8");
+			IOUtils.copy(getStream(docId, resource), writer, StandardCharsets.UTF_8);
 			return writer.toString();
 		} catch (Exception e) {
 			log.error(e.getMessage());

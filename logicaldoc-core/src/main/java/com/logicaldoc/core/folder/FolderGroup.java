@@ -31,7 +31,7 @@ public class FolderGroup implements Serializable {
 
 	private int immutable = 0;
 
-	private int _import = 0;
+	private int iimport = 0;
 
 	private int export = 0;
 
@@ -76,7 +76,7 @@ public class FolderGroup implements Serializable {
 		this.delete = source.delete;
 		this.rename = source.rename;
 		this.immutable = source.immutable;
-		this._import = source._import;
+		this.iimport = source.iimport;
 		this.export = source.export;
 		this.sign = source.sign;
 		this.archive = source.archive;
@@ -228,11 +228,11 @@ public class FolderGroup implements Serializable {
 	}
 
 	public int getImport() {
-		return _import;
+		return iimport;
 	}
 
-	public void setImport(int _import) {
-		this._import = _import;
+	public void setImport(int iimport) {
+		this.iimport = iimport;
 	}
 
 	public int getExport() {

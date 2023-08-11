@@ -24,8 +24,6 @@ public class ExtensionAliasesDialog extends Window {
 
 	private static final String EXTENSION = "extension";
 
-	private ListGrid extensionsGrid;
-
 	public ExtensionAliasesDialog() {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -48,7 +46,7 @@ public class ExtensionAliasesDialog extends Window {
 		aliases.setCanEdit(true);
 		aliases.setWidth("*");
 
-		extensionsGrid = new ListGrid();
+		ListGrid extensionsGrid = new ListGrid();
 		extensionsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		extensionsGrid.setShowFilterEditor(true);
 		extensionsGrid.setFilterOnKeypress(true);

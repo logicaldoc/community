@@ -25,7 +25,7 @@ public class RightsDS extends DataSource {
 		DataSourceBooleanField add = new DataSourceBooleanField("add");
 		DataSourceBooleanField workflow = new DataSourceBooleanField("workflow");
 		DataSourceBooleanField sign = new DataSourceBooleanField("sign");
-		DataSourceBooleanField _import = new DataSourceBooleanField("import");
+		DataSourceBooleanField importField = new DataSourceBooleanField("import");
 		DataSourceBooleanField export = new DataSourceBooleanField("export");
 		DataSourceBooleanField immutable = new DataSourceBooleanField("immutable");
 		DataSourceBooleanField rename = new DataSourceBooleanField("rename");
@@ -41,7 +41,7 @@ public class RightsDS extends DataSource {
 		DataSourceBooleanField storage = new DataSourceBooleanField("storage");
 		DataSourceTextField type = new DataSourceTextField("type");
 
-		setFields(entityId, entity, read, print, write, delete, move, add, workflow, sign, _import, export, rename,
+		setFields(entityId, entity, read, print, write, delete, move, add, workflow, sign, importField, export, rename,
 				immutable, security, password, archive, type, download, email, calendar, subscription, automation,
 				storage);
 		setClientOnly(true);

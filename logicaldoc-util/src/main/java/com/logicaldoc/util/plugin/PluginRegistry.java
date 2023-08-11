@@ -88,7 +88,7 @@ public abstract class PluginRegistry {
 			throw new PluginException("Error locating plugins", e);
 		}
 
-		if (pluginLocations.size() > 0) {
+		if (!pluginLocations.isEmpty()) {
 			Map<String, Identity> plugins = null;
 			try {
 				PluginManager.PluginLocation[] pLocations = pluginLocations
@@ -130,7 +130,7 @@ public abstract class PluginRegistry {
 		// find the plugins
 		List<String> pluginsList = Arrays.asList(pluginDirectory.list(filter));
 
-		if (pluginsList.size() > 0) {
+		if (!pluginsList.isEmpty()) {
 			Iterator<String> i = pluginsList.iterator();
 
 			while (i.hasNext()) {

@@ -104,7 +104,7 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 				writer.print("<avatar>" + userId + "</avatar>");
 			}
 			writer.print("<read>true</read>");
-			writer.print("<write>" + (set.getInt(4) == 1 ? true : false) + "</write>");
+			writer.print("<write>" + (set.getInt(4) == 1) + "</write>");
 			writer.print("<type>" + groupType + "</type>");
 			writer.print("</right>");
 

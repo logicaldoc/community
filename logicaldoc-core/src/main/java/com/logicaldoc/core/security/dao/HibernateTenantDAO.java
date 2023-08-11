@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
@@ -58,7 +60,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 			Map<String, Object> params = new HashMap<>();
 			params.put("name", name);
 			Collection<Tenant> coll = findByWhere(ENTITY + ".name = :name", params, null, null);
-			if (coll.size() > 0) {
+			if (CollectionUtils.isNotEmpty(coll)) {
 				tenant = coll.iterator().next();
 				if (tenant.getDeleted() == 1)
 					tenant = null;

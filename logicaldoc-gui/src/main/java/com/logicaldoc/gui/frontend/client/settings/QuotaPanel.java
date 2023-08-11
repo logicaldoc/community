@@ -17,8 +17,6 @@ import com.smartgwt.client.widgets.IButton;
  */
 public class QuotaPanel extends AdminPanel {
 
-	private TenantQuotaPanel tenantQuota;
-
 	private GUITenant tenant;
 
 	public QuotaPanel(long tenantId) {
@@ -39,7 +37,7 @@ public class QuotaPanel extends AdminPanel {
 	}
 
 	private void initGUI() {
-		tenantQuota = new TenantQuotaPanel(tenant, event -> {
+		TenantQuotaPanel tenantQuota = new TenantQuotaPanel(tenant, event -> {
 			// Nothing to do
 		});
 

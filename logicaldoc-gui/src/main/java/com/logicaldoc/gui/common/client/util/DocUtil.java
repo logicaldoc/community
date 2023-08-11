@@ -153,12 +153,12 @@ public class DocUtil {
 	}
 
 	public static String getRatingIcon(Integer rating) {
-		String html = "";
+		StringBuilder html = new StringBuilder();
 		if (rating != null)
 			for (int i = 1; i <= rating; i++) {
-				html += AwesomeFactory.getIconHtml("star");
+				html.append(AwesomeFactory.getIconHtml("star"));
 			}
-		return html;
+		return html.toString();
 	}
 
 	public static String getFolderIcon(boolean open, int type, String name, String color) {

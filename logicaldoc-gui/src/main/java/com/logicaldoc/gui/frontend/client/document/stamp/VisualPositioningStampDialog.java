@@ -55,8 +55,6 @@ public class VisualPositioningStampDialog extends Window {
 
 	private DocumentsGrid sourceGrid;
 
-	private CheckboxItem maintainAspectRatio;
-
 	private ImageCropper cropper;
 
 	public VisualPositioningStampDialog(DocumentsGrid sourceGrid, GUIStamp stamp) {
@@ -212,7 +210,7 @@ public class VisualPositioningStampDialog extends Window {
 		pageCursor.setImplicitSave(true);
 		pageCursor.addChangedHandler(event -> showPage((Integer) pageCursor.getValue()));
 
-		maintainAspectRatio = ItemFactory.newCheckbox("maintainaspectratio", "maintainaspectratio");
+		CheckboxItem maintainAspectRatio = ItemFactory.newCheckbox("maintainaspectratio", "maintainaspectratio");
 		maintainAspectRatio.setVisible(stamp.getType() != GUIStamp.TYPE_TEXT);
 		maintainAspectRatio.setValue(stamp.getType() != GUIStamp.TYPE_TEXT);
 		maintainAspectRatio.addChangedHandler(event -> {

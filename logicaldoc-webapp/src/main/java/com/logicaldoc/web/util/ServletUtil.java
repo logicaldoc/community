@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -60,7 +60,6 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Sebastian Stein
  */
 public class ServletUtil {
-	private static final String UTF_8 = "UTF-8";
 
 	private static final String CONTENT_RANGE = "Content-Range";
 
@@ -589,7 +588,7 @@ public class ServletUtil {
 		if (userAgent.contains("msie") || userAgent.contains("opera")
 				|| (userAgent.contains("trident") && userAgent.contains("windows"))
 				|| (userAgent.contains("edge") && userAgent.contains("windows"))) {
-			encodedFileName = URLEncoder.encode(filename, UTF_8);
+			encodedFileName = URLEncoder.encode(filename, StandardCharsets.UTF_8.displayName());
 			encodedFileName = encodedFileName.replace("+", "%20");
 		} else if (userAgent.contains("safari") && !userAgent.contains("chrome")) {
 			// Safari User-Agent contains "chrome"
@@ -598,7 +597,9 @@ public class ServletUtil {
 			// Used by some LG phones
 			encodedFileName = filename;
 		} else {
-			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8) + "?=";
+			encodedFileName = "=?UTF-8?B?"
+					+ new String(Base64.encodeBase64(filename.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8)
+					+ "?=";
 		}
 
 		boolean asAttachment = true;
@@ -631,7 +632,7 @@ public class ServletUtil {
 	public static void downloadDocumentText(HttpServletRequest request, HttpServletResponse response, long docId,
 			User user) throws IOException, PersistenceException {
 
-		response.setCharacterEncoding(UTF_8);
+		response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
 
 		// get document
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -665,7 +666,7 @@ public class ServletUtil {
 			content = "";
 
 		try {
-			response.getOutputStream().write(content.getBytes(Charset.forName(UTF_8)));
+			response.getOutputStream().write(content.getBytes(StandardCharsets.UTF_8));
 		} finally {
 			response.getOutputStream().flush();
 			response.getOutputStream().close();

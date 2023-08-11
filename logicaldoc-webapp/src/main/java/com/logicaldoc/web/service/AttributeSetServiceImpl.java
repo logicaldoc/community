@@ -305,7 +305,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	}
 
 	private boolean intToBoolean(int val) {
-		return val == 1 ? true : false;
+		return val == 1;
 	}
 
 	@Override
@@ -333,7 +333,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 		try (CSVFileReader reader = new CSVFileReader(file.getPath());) {
 			List<String> row = reader.readFields();
-			if (row != null && "value".equals(row.get(0).toLowerCase()))
+			if (row != null && "value".equalsIgnoreCase(row.get(0)))
 				row = reader.readFields();
 			while (row != null && !row.isEmpty()) {
 				GUIValue option = new GUIValue();

@@ -281,13 +281,12 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute(SOURCE, user.getSource());
 
 		GUIGroup[] groups = user.getGroups();
-		String gnames = "";
+		StringBuilder gnames = new StringBuilder();
 		for (GUIGroup group : groups) {
 			if (!group.getName().startsWith("_user_")) {
-				if (!gnames.isEmpty())
-					gnames += ", " + group.getName();
-				else
-					gnames += group.getName();
+				if (!gnames.toString().isEmpty())
+					gnames.append(", ");
+				gnames.append(group.getName());
 			}
 		}
 		rec.setAttribute(GROUPS, gnames);
@@ -443,8 +442,8 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem preparePasswordMenuItem(final ListGridRecord[] selectedUsers) {
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));
-		password.addClickHandler(event -> 
-			new SetPassword(Long.parseLong(selectedUsers[0].getAttributeAsString("id"))).show());
+		password.addClickHandler(
+				event -> new SetPassword(Long.parseLong(selectedUsers[0].getAttributeAsString("id"))).show());
 		return password;
 	}
 

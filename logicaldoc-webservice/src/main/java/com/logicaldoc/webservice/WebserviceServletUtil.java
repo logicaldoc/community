@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +63,9 @@ public class WebserviceServletUtil {
 			// Used by some LG phones
 			encodedFileName = filename;
 		} else {
-			encodedFileName = "=?UTF-8?B?" + new String(Base64.encodeBase64(filename.getBytes(UTF_8)), UTF_8) + "?=";
+			encodedFileName = "=?UTF-8?B?"
+					+ new String(Base64.encodeBase64(filename.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8)
+					+ "?=";
 		}
 
 		boolean asAttachment = true;

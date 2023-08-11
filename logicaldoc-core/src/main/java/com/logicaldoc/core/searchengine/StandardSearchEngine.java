@@ -5,13 +5,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CheckIndex;
 import org.apache.lucene.index.CheckIndex.Status;
@@ -291,13 +292,7 @@ public class StandardSearchEngine implements SearchEngine {
 	}
 
 	private String getContent(ByteArrayOutputStream baos) {
-		String content = "";
-		try {
-			content = baos.toString("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// Nothing to do
-		}
-		return content;
+		return baos.toString(StandardCharsets.UTF_8);
 	}
 
 	/*
@@ -344,7 +339,7 @@ public class StandardSearchEngine implements SearchEngine {
 		try {
 			QueryResponse rsp = server.query(query);
 			SolrDocumentList docs = rsp.getResults();
-			if (docs.size() < 1)
+			if (CollectionUtils.isEmpty(docs))
 				return null;
 
 			SolrDocument doc = docs.get(0);
@@ -580,14 +575,14 @@ public class StandardSearchEngine implements SearchEngine {
 			System.setProperty("solr.http1", "true");
 
 			File indexHome = new File(config.getProperty(INDEX_DIR));
-			File solr_xml = new File(indexHome, "solr.xml");
+			File solrXml = new File(indexHome, "solr.xml");
 
 			if (!indexHome.exists()) {
 				indexHome.mkdirs();
 				indexHome.mkdir();
 			}
-			if (!solr_xml.exists()) {
-				FileUtil.copyResource("/index/solr.xml", solr_xml);
+			if (!solrXml.exists()) {
+				FileUtil.copyResource("/index/solr.xml", solrXml);
 			}
 
 			File ldoc = new File(config.getProperty(INDEX_DIR));
@@ -596,34 +591,34 @@ public class StandardSearchEngine implements SearchEngine {
 				ldoc.mkdirs();
 				ldoc.mkdir();
 			}
-			File core_prop = new File(ldoc, "core.properties");
-			if (!core_prop.exists())
-				FileUtil.copyResource("/index/logicaldoc/core.properties", core_prop);
+			File coreProp = new File(ldoc, "core.properties");
+			if (!coreProp.exists())
+				FileUtil.copyResource("/index/logicaldoc/core.properties", coreProp);
 
 			File conf = new File(ldoc, "conf");
 			if (!conf.exists()) {
 				conf.mkdirs();
 				conf.mkdir();
 			}
-			File solrconfig_xml = new File(conf, "solrconfig.xml");
-			if (!solrconfig_xml.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/solrconfig.xml", solrconfig_xml);
+			File solrconfigXml = new File(conf, "solrconfig.xml");
+			if (!solrconfigXml.exists()) {
+				FileUtil.copyResource("/index/logicaldoc/conf/solrconfig.xml", solrconfigXml);
 			}
-			File schema_xml = new File(conf, "schema.xml");
-			if (!schema_xml.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/schema.xml", schema_xml);
+			File schemaXml = new File(conf, "schema.xml");
+			if (!schemaXml.exists()) {
+				FileUtil.copyResource("/index/logicaldoc/conf/schema.xml", schemaXml);
 			}
-			File synonyms_txt = new File(conf, "synonyms.txt");
-			if (!synonyms_txt.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/synonyms.txt", synonyms_txt);
+			File synonymsTxt = new File(conf, "synonyms.txt");
+			if (!synonymsTxt.exists()) {
+				FileUtil.copyResource("/index/logicaldoc/conf/synonyms.txt", synonymsTxt);
 			}
-			File protwords_txt = new File(conf, "protwords.txt");
-			if (!protwords_txt.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/protwords.txt", protwords_txt);
+			File protwordsTxt = new File(conf, "protwords.txt");
+			if (!protwordsTxt.exists()) {
+				FileUtil.copyResource("/index/logicaldoc/conf/protwords.txt", protwordsTxt);
 			}
-			File alphatypes_txt = new File(conf, "alphatypes.txt");
-			if (!alphatypes_txt.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/alphatypes.txt", alphatypes_txt);
+			File alphatypesTxt = new File(conf, "alphatypes.txt");
+			if (!alphatypesTxt.exists()) {
+				FileUtil.copyResource("/index/logicaldoc/conf/alphatypes.txt", alphatypesTxt);
 			}
 
 			// Delete the lock file if it exists

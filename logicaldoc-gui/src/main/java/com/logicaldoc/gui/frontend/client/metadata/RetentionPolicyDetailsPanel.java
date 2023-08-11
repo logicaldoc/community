@@ -34,8 +34,6 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 
 	private GUIRetentionPolicy policy;
 
-	private Layout propertiesTabPanel;
-
 	private EditingTabSet tabSet;
 
 	private RetentionPoliciesPanel policiesPanel;
@@ -85,7 +83,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
-		propertiesTabPanel = new HLayout();
+		Layout propertiesTabPanel = new HLayout();
 		propertiesTabPanel.setWidth100();
 		propertiesTabPanel.setHeight100();
 		propertiesTab.setPane(propertiesTabPanel);

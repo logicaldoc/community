@@ -41,8 +41,6 @@ public class ZonalOCRQueuePanel extends VLayout {
 
 	private int maxRecords = 10;
 
-	private InfoPanel infoPanel = null;
-
 	public ZonalOCRQueuePanel(int maxRecords) {
 		this.maxRecords = maxRecords;
 		setWidth100();
@@ -96,7 +94,8 @@ public class ZonalOCRQueuePanel extends VLayout {
 							public void onSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
 								maxRecords = (Integer) max.getValue();
-								DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1, null);
+								DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1,
+										null);
 								params.setOcrd(true);
 								list.refresh(new DocumentsDS(params));
 							}
@@ -109,7 +108,7 @@ public class ZonalOCRQueuePanel extends VLayout {
 		toolStrip.addButton(reschedule);
 
 		// Prepare a panel containing a title and the documents number
-		infoPanel = new InfoPanel("");
+		InfoPanel infoPanel = new InfoPanel("");
 
 		ListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);

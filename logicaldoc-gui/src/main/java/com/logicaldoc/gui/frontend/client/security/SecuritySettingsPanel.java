@@ -62,8 +62,6 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 	private GUISecuritySettings settings;
 
-	private DynamicForm anonymousForm;
-
 	private SelectItem anonymousUser;
 
 	public SecuritySettingsPanel(GUISecuritySettings settings) {
@@ -266,11 +264,9 @@ public class SecuritySettingsPanel extends AdminPanel {
 		SecuritySettingsPanel.this.settings.setPwdOccurrence((Integer) values.get(PWD_OCCURRENCE));
 		SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
 		SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
-		SecuritySettingsPanel.this.settings.setSaveLogin(values.get("savelogin").equals("yes") ? true : false);
-		SecuritySettingsPanel.this.settings
-				.setEnableAnonymousLogin(values.get(ENABLEANONYMOUS).equals("yes") ? true : false);
-		SecuritySettingsPanel.this.settings
-				.setAlertNewDevice(values.get("alertnewdevice").equals("yes") ? true : false);
+		SecuritySettingsPanel.this.settings.setSaveLogin(values.get("savelogin").equals("yes"));
+		SecuritySettingsPanel.this.settings.setEnableAnonymousLogin(values.get(ENABLEANONYMOUS).equals("yes"));
+		SecuritySettingsPanel.this.settings.setAlertNewDevice(values.get("alertnewdevice").equals("yes"));
 
 		SecuritySettingsPanel.this.settings.setAnonymousKey((String) values.get("anonymousKey"));
 
@@ -289,23 +285,18 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 	private void collectDefaultTenantSettings(final Map<String, Object> values) {
 		if (Session.get().isDefaultTenant()) {
-			SecuritySettingsPanel.this.settings
-					.setAllowSidInRequest(values.get("allowsid").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setAllowSidInRequest(values.get("allowsid").equals("yes"));
 
-			SecuritySettingsPanel.this.settings
-					.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes") ? true : false);
-			SecuritySettingsPanel.this.settings
-					.setCookiesSecure(values.get("secureCookies").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes"));
+			SecuritySettingsPanel.this.settings.setCookiesSecure(values.get("secureCookies").equals("yes"));
 			SecuritySettingsPanel.this.settings.setCookiesSameSite(values.get("cookiessamesite").toString());
 
-			SecuritySettingsPanel.this.settings.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setForceSsl(values.get("forcessl").equals("yes"));
 			SecuritySettingsPanel.this.settings.setContentSecurityPolicy(
 					values.get(CONTENTSECURITYPOLICY) != null ? values.get(CONTENTSECURITYPOLICY).toString() : null);
 
-			SecuritySettingsPanel.this.settings
-					.setGeolocationEnabled(values.get("geoEnabled").equals("yes") ? true : false);
-			SecuritySettingsPanel.this.settings
-					.setGeolocationCache(values.get("geoCache").equals("yes") ? true : false);
+			SecuritySettingsPanel.this.settings.setGeolocationEnabled(values.get("geoEnabled").equals("yes"));
+			SecuritySettingsPanel.this.settings.setGeolocationCache(values.get("geoCache").equals("yes"));
 			SecuritySettingsPanel.this.settings.setGeolocationKey((String) values.get("geoKey"));
 		}
 	}
@@ -336,7 +327,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		generatePassword.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
 			if (passwordForm.validate()) {
 				@SuppressWarnings("unchecked")
-				final Map<String, Object> values =  vm.getValues();
+				final Map<String, Object> values = vm.getValues();
 				PasswordGenerator generator = new PasswordGenerator((Integer) values.get(PWD_SIZE),
 						(Integer) values.get(PWD_UPPER_CASE), (Integer) values.get(PWD_LOWER_CASE),
 						(Integer) values.get(PWD_DIGIT), (Integer) values.get(PWD_SPECIAL),
@@ -409,7 +400,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private Tab prepareAnonymousTab(GUISecuritySettings settings) {
 		Tab anonymous = new Tab(I18N.message("anonymous"));
 
-		anonymousForm = new DynamicForm();
+		DynamicForm anonymousForm = new DynamicForm();
 		anonymousForm.setValuesManager(vm);
 		anonymousForm.setTitleOrientation(TitleOrientation.TOP);
 		anonymousForm.setNumCols(1);

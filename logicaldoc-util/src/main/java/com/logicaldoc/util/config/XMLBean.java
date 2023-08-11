@@ -283,7 +283,7 @@ public class XMLBean {
 	@SuppressWarnings("rawtypes")
 	public String getAllChildText(String elemname, String attribute, String value, String separator1,
 			String separator2) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		try {
 			Element elem = getChild(elemname, attribute, value);
 			List list = elem.getChildren();
@@ -291,16 +291,16 @@ public class XMLBean {
 
 			while (iter.hasNext()) {
 				Element child = (Element) iter.next();
-				result += child.getName();
-				result += separator1;
-				result += child.getText();
-				result += separator2;
+				result.append(child.getName());
+				result.append(separator1);
+				result.append(child.getText());
+				result.append(separator2);
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 		}
 
-		return result;
+		return result.toString();
 	}
 
 	/**

@@ -328,10 +328,10 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		guiAttribute.setSetId(templateExtAttr.getSetId());
 		guiAttribute.setSet(aSet != null ? aSet.getName() : null);
 		guiAttribute.setPosition(templateExtAttr.getPosition());
-		guiAttribute.setMandatory(templateExtAttr.getMandatory() == 1 ? true : false);
-		guiAttribute.setHidden(templateExtAttr.getHidden() == 1 ? true : false);
-		guiAttribute.setReadonly(templateExtAttr.getReadonly() == 1 ? true : false);
-		guiAttribute.setMultiple(templateExtAttr.getMultiple() == 1 ? true : false);
+		guiAttribute.setMandatory(templateExtAttr.getMandatory() == 1);
+		guiAttribute.setHidden(templateExtAttr.getHidden() == 1);
+		guiAttribute.setReadonly(templateExtAttr.getReadonly() == 1);
+		guiAttribute.setMultiple(templateExtAttr.getMultiple() == 1);
 		guiAttribute.setParent(templateExtAttr.getParent());
 		guiAttribute.setDependsOn(templateExtAttr.getDependsOn());
 		guiAttribute.setStringValues(templateExtAttr.getStringValues());

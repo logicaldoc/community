@@ -48,8 +48,6 @@ public class WorkflowDashboard extends VLayout {
 	 */
 	private WorkflowDashlet involvedTasks = null;
 
-	private PortalLayout portalLayout = null;
-
 	public WorkflowDashboard() {
 		setWidth100();
 	}
@@ -70,7 +68,7 @@ public class WorkflowDashboard extends VLayout {
 		history.addClickHandler(event -> new WorkflowHistoryDialog().show());
 		toolStrip.addFill();
 
-		portalLayout = new PortalLayout();
+		PortalLayout portalLayout = new PortalLayout();
 		portalLayout.setShowColumnMenus(false);
 		portalLayout.setShowEdges(false);
 		portalLayout.setShowShadow(false);

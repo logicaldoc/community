@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,7 +249,7 @@ public class WSUser {
 	 */
 	public void setPassword(String passwd) {
 		decodedPassword = passwd;
-		password=null;
+		password = null;
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(passwd))
 			password = CryptUtil.cryptString(passwd);
 	}
@@ -441,7 +442,7 @@ public class WSUser {
 					if (group != null)
 						groups.add(group);
 				}
-				if (groups.size() > 0)
+				if (CollectionUtils.isNotEmpty(groups))
 					user.setGroups(groups);
 			}
 
@@ -502,7 +503,7 @@ public class WSUser {
 			wsUser.setKey(user.getKey());
 			wsUser.setSecondFactor(user.getSecondFactor());
 
-			if (user.getGroups() != null && user.getGroups().size() > 0) {
+			if (CollectionUtils.isNotEmpty(user.getGroups())) {
 				long[] groupIds = new long[user.getGroups().size()];
 				int i = 0;
 				for (Group group : user.getGroups()) {

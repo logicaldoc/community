@@ -22,8 +22,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class FolderCopyDetailsDialog extends StickyWindow {
 
-	private FolderCopyDetailsPanel detailsPanel;
-
 	private GUIFolder metadata;
 
 	private String securityPolicy;
@@ -51,7 +49,7 @@ public class FolderCopyDetailsDialog extends StickyWindow {
 	protected void onDraw() {
 		super.onDraw();
 
-		detailsPanel = new FolderCopyDetailsPanel(metadata);
+		FolderCopyDetailsPanel detailsPanel = new FolderCopyDetailsPanel(metadata);
 		detailsPanel.setWidth100();
 		detailsPanel.setHeight("*");
 		detailsPanel.setShowResizeBar(false);

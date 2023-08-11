@@ -926,9 +926,29 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public boolean isGranted(String myPassword) {
 		if (StringUtils.isEmpty(getPassword()))
 			return true;
+
 		try {
 			String test = CryptUtil.cryptString(myPassword);
-			return test.equals(getPassword());
+			if (test.equals(getPassword()))
+				return true;
+
+			// The test with current algorithm failed so we try with the legacy
+			// one
+			String testLegacy = CryptUtil.cryptStringLegacy(myPassword);
+			if (testLegacy.equals(getPassword())) {
+				// There is match with the old scheme, so update the database
+				// with the new one
+				setPassword(test);
+				try {
+					DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+					docDao.jdbcUpdate("update ld_document set ld_password='" + test + "' where ld_id=" + getId());
+				} catch (PersistenceException e) {
+					log.warn(e.getMessage());
+				}
+				return true;
+			}
+
+			return false;
 		} catch (Exception t) {
 			return false;
 		}

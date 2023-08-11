@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -35,7 +36,7 @@ public class HibernateDashletDAO extends HibernatePersistentObjectDAO<Dashlet> i
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
-		return dashlets != null && dashlets.size() > 0 ? dashlets.get(0) : null;
+		return CollectionUtils.isNotEmpty(dashlets) ? dashlets.get(0) : null;
 
 	}
 

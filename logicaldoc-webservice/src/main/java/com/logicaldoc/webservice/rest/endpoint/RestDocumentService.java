@@ -202,22 +202,22 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 		String sid = validateSession();
 		try {
-			Long doc_id = null;
-			Long folder_id = null;
-			boolean release_bool = false;
+			Long docIdLong = null;
+			Long folderIdLong = null;
+			boolean releaseBoolean = false;
 
 			if (docId != null) {
-				doc_id = Long.parseLong(docId);
+				docIdLong = Long.parseLong(docId);
 			}
 			if (!Strings.isNullOrEmpty(folderId)) {
-				folder_id = Long.parseLong(folderId);
+				folderIdLong = Long.parseLong(folderId);
 			}
 			if (!Strings.isNullOrEmpty(release)) {
-				release_bool = Boolean.parseBoolean(release);
+				releaseBoolean = Boolean.parseBoolean(release);
 			}
 			DataHandler datah = filedataDetail.getDataHandler();
 
-			return super.upload(sid, doc_id, folder_id, release_bool, filename, language, datah);
+			return super.upload(sid, docIdLong, folderIdLong, releaseBoolean, filename, language, datah);
 		} catch (Exception t) {
 			throw new WebApplicationException(t.getMessage(), 500);
 		}

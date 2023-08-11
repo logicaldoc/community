@@ -21,6 +21,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -441,7 +442,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private void setTags(Document doc) {
 		Set<Tag> src = doc.getTags();
-		if (src != null && src.size() > 0) {
+		if (CollectionUtils.isNotEmpty(src)) {
 			// Trim too long tags
 			Set<Tag> dst = new HashSet<>();
 			for (Tag str : src) {

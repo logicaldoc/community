@@ -22,8 +22,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class HtmlItemEditor extends Window {
 
-	private HTMLPane editorPanel = new HTMLPane();
-
 	private VLayout layout = null;
 
 	private FormItem item;
@@ -62,7 +60,7 @@ public class HtmlItemEditor extends Window {
 	private void prepareBody() {
 		setSavedHtmlContent(item.getValue() != null ? item.getValue().toString() : "");
 
-		editorPanel = new HTMLPane();
+		HTMLPane editorPanel = new HTMLPane();
 		editorPanel.setID("htmlEditorPanel");
 		editorPanel.setShowEdges(false);
 		editorPanel.setContentsURL(Util.webEditorUrl(getHeight() - 230));

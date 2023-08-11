@@ -164,7 +164,7 @@ public class LD {
 		item.setTitle(I18N.message(message));
 		item.setWrapTitle(false);
 		item.addKeyPressHandler((KeyPressEvent event) -> {
-			if (form.validate() && event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())
+			if (form.validate() && event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName())
 					&& callback != null) {
 				dialog.close();
 				callback.execute(form.getValue(VALUE).toString());
@@ -360,8 +360,7 @@ public class LD {
 				 * key, we consider he wants to confirm the input
 				 */
 				item.addKeyPressHandler((KeyPressEvent event) -> {
-					if (form.validate() && event.getKeyName() != null
-							&& "enter".equals(event.getKeyName().toLowerCase())) {
+					if (form.validate() && event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName())) {
 						dialog.close();
 						callback.execute(form.getValue(VALUE).toString());
 						dialog.destroy();

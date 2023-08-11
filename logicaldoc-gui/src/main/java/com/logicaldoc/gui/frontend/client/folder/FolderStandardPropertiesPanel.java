@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -106,8 +105,9 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 			description.setDisabled(true);
 
 		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon",
-				Util.textWithAvatar(folder.getCreatorId(), Util.padLeft(I18N.formatDate(folder.getCreation())
-						+ " " + I18N.message("by") + " " + folder.getCreator(), 40)));
+				Util.textWithAvatar(folder.getCreatorId(), Util.padLeft(
+						I18N.formatDate(folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator(),
+						40)));
 		creation.setTooltip(
 				I18N.formatDate(folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator());
 		creation.setWidth(DEFAULT_ITEM_WIDTH);
@@ -383,7 +383,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		newTagItem.setDisabled(!folder.isWrite());
 		newTagItem.addKeyPressHandler(event -> {
 			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
-					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
+					&& event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();
 
@@ -464,7 +464,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		items.add(applyTags);
 	}
 
-    @Override
+	@Override
 	public boolean validate() {
 		vm.validate();
 		if (Boolean.TRUE.equals(vm.hasErrors()))

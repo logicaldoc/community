@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -89,10 +90,10 @@ public class WSUtil {
 			setAttributesIntoWsDocument(document, wsDoc);
 
 			String[] tags = new String[0];
-			if (document.getTags() != null && document.getTags().size() > 0) {
+			if (CollectionUtils.isNotEmpty(document.getTags())) {
 				tags = new String[document.getTags().size()];
 				List<String> docTags = new ArrayList<>(document.getTagsAsWords());
-				if (docTags.size() > 0) {
+				if (CollectionUtils.isNotEmpty(docTags)) {
 					for (int j = 0; j < docTags.size(); j++) {
 						tags[j] = docTags.get(j);
 					}

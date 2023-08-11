@@ -19,8 +19,6 @@ public class AliasesPanel extends FolderDetailTab {
 
 	private FolderAliasesDS dataSource;
 
-	private ListGrid listGrid;
-
 	public AliasesPanel(final GUIFolder folder) {
 		super(folder, null);
 	}
@@ -41,7 +39,7 @@ public class AliasesPanel extends FolderDetailTab {
 		icon.setImageURLSuffix(".png");
 		icon.setCanFilter(false);
 
-		listGrid = new ListGrid();
+		ListGrid listGrid = new ListGrid();
 		listGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		listGrid.setCanFreezeFields(true);
 		listGrid.setAutoFetchData(true);

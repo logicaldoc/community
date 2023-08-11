@@ -41,8 +41,6 @@ public class BarcodeQueuePanel extends VLayout {
 
 	private int maxRecords = 10;
 
-	private InfoPanel infoPanel = null;
-
 	public BarcodeQueuePanel(int maxRecords) {
 		this.maxRecords = maxRecords;
 		setWidth100();
@@ -109,7 +107,7 @@ public class BarcodeQueuePanel extends VLayout {
 		toolStrip.addButton(reschedule);
 
 		// Prepare a panel containing a title and the documents number
-		infoPanel = new InfoPanel("");
+		InfoPanel infoPanel = new InfoPanel("");
 
 		ListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);

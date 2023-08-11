@@ -95,7 +95,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		expression.addKeyPressHandler(event -> {
 			if (event.getKeyName() == null)
 				return;
-			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase()))
+			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName()))
 				search();
 		});
 		expression.addClickHandler(event -> {

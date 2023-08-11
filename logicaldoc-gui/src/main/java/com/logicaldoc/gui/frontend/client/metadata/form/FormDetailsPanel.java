@@ -48,12 +48,6 @@ public class FormDetailsPanel extends VLayout {
 
 	private GUIForm form;
 
-	private Layout notificationsTabPanel;
-
-	private Layout propertiesTabPanel;
-
-	private Layout webTabPanel;
-
 	private EditingTabSet tabSet;
 
 	private FormsPanel formsPanel;
@@ -105,8 +99,8 @@ public class FormDetailsPanel extends VLayout {
 					}
 
 					@Override
-					public void onSuccess(GUIForm Form) {
-						setForm(Form);
+					public void onSuccess(GUIForm form) {
+						setForm(form);
 					}
 				});
 			} else {
@@ -139,7 +133,7 @@ public class FormDetailsPanel extends VLayout {
 			form2.destroy();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
-		propertiesTabPanel = new HLayout();
+		Layout propertiesTabPanel = new HLayout();
 		propertiesTabPanel.setAlign(VerticalAlignment.TOP);
 		propertiesTabPanel.setWidth100();
 		propertiesTabPanel.setHeight100();
@@ -190,7 +184,7 @@ public class FormDetailsPanel extends VLayout {
 			notificationForm.destroy();
 
 		Tab notificationsTab = new Tab(I18N.message("notifications"));
-		notificationsTabPanel = new HLayout();
+		Layout notificationsTabPanel = new HLayout();
 		notificationsTabPanel.setAlign(VerticalAlignment.TOP);
 		notificationsTabPanel.setWidth100();
 		notificationsTabPanel.setHeight100();
@@ -234,7 +228,7 @@ public class FormDetailsPanel extends VLayout {
 		if (!Feature.enabled(Feature.WEB_FORM)) {
 			tab.setPane(new FeatureDisabled());
 		} else {
-			webTabPanel = new HLayout();
+			Layout webTabPanel = new HLayout();
 			webTabPanel.setAlign(VerticalAlignment.TOP);
 			webTabPanel.setWidth100();
 			webTabPanel.setHeight100();

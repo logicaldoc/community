@@ -27,7 +27,6 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -46,8 +45,6 @@ public class TemplatesPanel extends VLayout {
 
 	protected Canvas details = SELECT_TEMPLATE;
 
-	private InfoPanel infoPanel;
-
 	static final Canvas SELECT_TEMPLATE = new HTMLPanel("&nbsp;" + I18N.message("selecttemplate"));
 
 	public TemplatesPanel() {
@@ -61,7 +58,7 @@ public class TemplatesPanel extends VLayout {
 			removeMember(canvas);
 		}
 
-		infoPanel = new InfoPanel("");
+		InfoPanel infoPanel = new InfoPanel("");
 
 		final Layout listing = new VLayout();
 		detailsContainer = new VLayout();

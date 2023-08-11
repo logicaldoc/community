@@ -162,7 +162,8 @@ public class MailPreviewPanel extends VLayout {
 						filename = filename.replace("?", "%3F");
 						filename = filename.replace(":", "%3A");
 
-						Util.download(Util.downloadAttachmentURL(document.getId(), document.getFileVersion(), filename));
+						Util.download(
+								Util.downloadAttachmentURL(document.getId(), document.getFileVersion(), filename));
 					});
 				button.setContextMenu(prepareButtonMenu(document, doc));
 				attachmentsPanel.addTile(button);
@@ -171,41 +172,41 @@ public class MailPreviewPanel extends VLayout {
 	}
 
 	private StaticTextItem prepareBccItem(final GUIEmail mail) {
-		String bccString = "";
+		StringBuilder bccString = new StringBuilder();
 		if (mail.getBccs() != null && mail.getBccs().length > 0)
 			for (GUIContact contact : mail.getBccs()) {
-				if (!bccString.isEmpty())
-					bccString += ", ";
-				bccString += contact.displayLink();
+				if (!bccString.toString().isEmpty())
+					bccString.append(", ");
+				bccString.append(contact.displayLink());
 			}
-		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", bccString);
-		bcc.setVisible(!bccString.isEmpty());
+		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", bccString.toString());
+		bcc.setVisible(!bccString.toString().isEmpty());
 		return bcc;
 	}
 
 	private StaticTextItem prepareCcItem(final GUIEmail mail) {
-		String ccString = "";
+		StringBuilder ccString = new StringBuilder();
 		if (mail.getCcs() != null && mail.getCcs().length > 0)
 			for (GUIContact contact : mail.getCcs()) {
-				if (!ccString.isEmpty())
-					ccString += ", ";
-				ccString += contact.displayLink();
+				if (!ccString.toString().isEmpty())
+					ccString.append(", ");
+				ccString.append(contact.displayLink());
 			}
-		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", ccString);
-		cc.setVisible(!ccString.isEmpty());
+		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", ccString.toString());
+		cc.setVisible(!ccString.toString().isEmpty());
 		return cc;
 	}
 
 	private StaticTextItem prepareToItem(final GUIEmail mail) {
-		String toString = "";
+		StringBuilder toString = new StringBuilder();
 		if (mail.getTos() != null && mail.getTos().length > 0)
 			for (GUIContact contact : mail.getTos()) {
-				if (!toString.isEmpty())
-					toString += ", ";
-				toString += contact.displayLink();
+				if (!toString.toString().isEmpty())
+					toString.append(", ");
+				toString.append(contact.displayLink());
 			}
-		StaticTextItem to = ItemFactory.newStaticTextItem("to", toString);
-		to.setVisible(!toString.isEmpty());
+		StaticTextItem to = ItemFactory.newStaticTextItem("to", toString.toString());
+		to.setVisible(!toString.toString().isEmpty());
 		return to;
 	}
 
@@ -224,41 +225,39 @@ public class MailPreviewPanel extends VLayout {
 	}
 
 	private StaticTextItem prepareFromItem(final GUIEmail mail) {
-		return ItemFactory.newStaticTextItem("from",
-				mail.getFrom() != null ? mail.getFrom().displayLink() : "");
+		return ItemFactory.newStaticTextItem("from", mail.getFrom() != null ? mail.getFrom().displayLink() : "");
 	}
 
 	private StaticTextItem prepareReplyToItem(final GUIEmail mail) {
-		String replyToString = "";
+		StringBuilder replyToString = new StringBuilder();
 		if (mail.getReplyTo() != null && mail.getReplyTo().length > 0)
 			for (GUIContact contact : mail.getReplyTo()) {
-				if (!replyToString.isEmpty())
-					replyToString += ", ";
-				replyToString += contact.displayLink();
+				if (!replyToString.toString().isEmpty())
+					replyToString.append(", ");
+				replyToString.append(contact.displayLink());
 			}
-		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", replyToString);
-		replyto.setVisible(!replyToString.isEmpty() && !replyToString.equals(mail.getFrom().getEmail()));
+		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", replyToString.toString());
+		replyto.setVisible(!replyToString.toString().isEmpty() && !replyToString.toString().equals(mail.getFrom().getEmail()));
 		return replyto;
 	}
 
 	private Menu prepareButtonMenu(final GUIDocument doc, final GUIDocument attachment) {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler(event -> 
-			DocumentService.Instance.get().saveEmailAttachment(doc.getId(), doc.getFileVersion(),
-					attachment.getFileName(), new AsyncCallback<GUIDocument>() {
+		copy.addClickHandler(event -> DocumentService.Instance.get().saveEmailAttachment(doc.getId(),
+				doc.getFileVersion(), attachment.getFileName(), new AsyncCallback<GUIDocument>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(GUIDocument doc) {
-							if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)
-								FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
-						}
-					}));
+					@Override
+					public void onSuccess(GUIDocument doc) {
+						if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)
+							FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
+					}
+				}));
 		copy.setEnabled(doc.getFolder().isWrite());
 
 		MenuItem download = new MenuItem();

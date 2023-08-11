@@ -136,7 +136,7 @@ public class XMLConverter extends AbstractFormatConverter {
 					// the result to the output file
 					xformer.transform(source, result);
 
-					if ("html".equals(xsltOutFormat.toLowerCase())) {
+					if ("html".equalsIgnoreCase(xsltOutFormat)) {
 						// Sometimes the converter adds a not closed
 						// element <META http-equiv="Content-Type"
 						// content="text/html; charset=UTF-8">, so

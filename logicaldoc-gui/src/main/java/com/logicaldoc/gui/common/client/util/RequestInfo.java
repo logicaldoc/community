@@ -119,6 +119,6 @@ public class RequestInfo {
 	}
 
 	public boolean isSecure() {
-		return "https".equals(protocol.toLowerCase());
+		return "https".equalsIgnoreCase(protocol);
 	}
 }

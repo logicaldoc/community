@@ -82,8 +82,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		startDate.setShowPickerIcon(true);
 		startDate.setDateFormatter(DateDisplayFormat.TOEUROPEANSHORTDATE);
 		startDate.addKeyPressHandler(event -> {
-			if ("backspace".equals(event.getKeyName().toLowerCase())
-					|| DELETE.equals(event.getKeyName().toLowerCase())) {
+			if ("backspace".equalsIgnoreCase(event.getKeyName()) || DELETE.equalsIgnoreCase(event.getKeyName())) {
 				startDate.clearValue();
 				startDate.setValue((Date) null);
 				changedHandler.onChanged(null);

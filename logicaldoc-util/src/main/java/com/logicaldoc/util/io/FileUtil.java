@@ -18,6 +18,7 @@ import java.io.RandomAccessFile;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,8 +52,6 @@ import com.logicaldoc.util.SystemUtil;
  */
 public class FileUtil {
 	private static final String CANNOT_CREATE_FILE = "Cannot create file ";
-
-	private static final String UTF_8 = "UTF-8";
 
 	static final int BUFF_SIZE = 8192;
 
@@ -100,7 +99,7 @@ public class FileUtil {
 
 	public static void writeFile(String text, String filepath) {
 		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filepath));) {
-			bos.write(text.getBytes(UTF_8));
+			bos.write(text.getBytes(StandardCharsets.UTF_8));
 			bos.flush();
 		} catch (Exception e) {
 			logError(e.getLocalizedMessage());
@@ -109,7 +108,7 @@ public class FileUtil {
 
 	public static String readFile(File file) throws IOException {
 		try (FileInputStream fisTargetFile = new FileInputStream(file);) {
-			return IOUtils.toString(fisTargetFile, UTF_8);
+			return IOUtils.toString(fisTargetFile, StandardCharsets.UTF_8);
 		}
 	}
 
@@ -164,9 +163,9 @@ public class FileUtil {
 
 			return digest;
 		} catch (IOException io) {
-			log.error("Error generating digest: ", io);
+			log.error("Error generating digest", io);
 		} catch (Exception t) {
-			log.error("Error generating digest: ", t);
+			log.error("Error generating digest", t);
 		} finally {
 			try {
 				is.close();
@@ -201,7 +200,7 @@ public class FileUtil {
 	 */
 	public static String computeDigest(String src) {
 		String digest = null;
-		try (InputStream is = IOUtils.toInputStream(src, UTF_8);) {
+		try (InputStream is = IOUtils.toInputStream(src, StandardCharsets.UTF_8);) {
 			digest = computeDigest(is);
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -500,7 +499,7 @@ public class FileUtil {
 
 	public static void writeUTF8(String content, File file, boolean append) {
 		try (BufferedWriter out = new BufferedWriter(
-				new OutputStreamWriter(new FileOutputStream(file, append), "UTF8"));) {
+				new OutputStreamWriter(new FileOutputStream(file, append), StandardCharsets.UTF_8));) {
 			out.write(content);
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -591,23 +590,27 @@ public class FileUtil {
 	}
 
 	public static void replaceInFile(String sourcePath, String token, String newValue) {
-		String oldContent = "";
+		StringBuilder oldContent = new StringBuilder();
 
 		File tmp = new File(sourcePath + ".tmp");
 		File file = new File(sourcePath);
 
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourcePath), UTF_8));
-				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp), UTF_8);) {
+		try (BufferedReader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(sourcePath), StandardCharsets.UTF_8));
+				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp),
+						StandardCharsets.UTF_8);) {
 			// Reading all the lines of input text file into oldContent
 			String line = reader.readLine();
 
 			while (line != null) {
-				oldContent = oldContent + line + System.lineSeparator();
+				oldContent.append(oldContent);
+				oldContent.append(line);
+				oldContent.append(System.lineSeparator());
 				line = reader.readLine();
 			}
 
 			// Replacing oldString with newString in the oldContent
-			String newContent = oldContent.replace(token, newValue);
+			String newContent = oldContent.toString().replace(token, newValue);
 
 			// Rewriting the input text file with newContent
 			writer.write(newContent);

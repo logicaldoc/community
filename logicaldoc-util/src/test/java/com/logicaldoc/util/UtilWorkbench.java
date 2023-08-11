@@ -2,6 +2,7 @@ package com.logicaldoc.util;
 
 import java.util.Date;
 
+import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.time.DateUtil;
 
 public class UtilWorkbench {
@@ -11,12 +12,13 @@ public class UtilWorkbench {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-
+		System.out.println(CryptUtil.cryptString("admin"));
+		
 		System.out.println(DateUtil.truncateToDay(new Date()));
 
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);
-//		context.setProperty("gui.welcome", "מגיע להופעה בישראל ואתם נהנים מהטבה ייחודית");
+//		context.setProperty("gui.welcome", "×ž×’×™×¢ ×œ×”×•×¤×¢×” ×‘×™×©×¨×�×œ ×•×�×ª×� × ×”× ×™×� ×ž×”×˜×‘×” ×™×™×—×•×“×™×ª");
 //		// context.setProperty("gui.welcome", "pollo");
 //		context.write();
 //		
@@ -25,7 +27,7 @@ public class UtilWorkbench {
 //		System.out.println(context.getProperty("store.2.dir"));
 
 //		Properties props=new Properties();
-//		props.setProperty("gui.welcome", "מגיע להופעה בישראל ואתם נהנים מהטבה ייחודית");
+//		props.setProperty("gui.welcome", "×ž×’×™×¢ ×œ×”×•×¤×¢×” ×‘×™×©×¨×�×œ ×•×�×ª×� × ×”× ×™×� ×ž×”×˜×‘×” ×™×™×—×•×“×™×ª");
 //		props.store(new FileOutputStream(file), null);
 
 //		File f = new File("C:/tmp/test-split.rar");

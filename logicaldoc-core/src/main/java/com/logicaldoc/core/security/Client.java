@@ -92,7 +92,7 @@ public class Client implements Serializable {
 		if ((id == null && other.id != null) || (id != null && other.id == null))
 			return false;
 
-		return id != null ? id.equals(other.id) : false;
+		return id != null && id.equals(other.id);
 	}
 
 	@Override

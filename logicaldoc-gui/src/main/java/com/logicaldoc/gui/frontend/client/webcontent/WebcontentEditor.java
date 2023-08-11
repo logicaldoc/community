@@ -24,8 +24,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class WebcontentEditor extends Window {
 
-	private HTMLPane editorPanel = new HTMLPane();
-
 	private VLayout layout = null;
 
 	private GUIDocument document;
@@ -60,7 +58,7 @@ public class WebcontentEditor extends Window {
 	 * Prepares the popup body
 	 */
 	private void prepareBody() {
-		editorPanel = new HTMLPane();
+		HTMLPane editorPanel = new HTMLPane();
 		editorPanel.setShowEdges(false);
 		editorPanel.setContentsURL(Util.webEditorUrl(document.getId(), document.getFileName(), getHeight() - 230));
 		editorPanel.setContentsType(ContentsType.PAGE);

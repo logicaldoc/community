@@ -103,7 +103,7 @@ public class IncrementalArchivesList extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(Event -> refresh(IncrementalArchivesList.this.archivesType));
+		refresh.addClickHandler(event -> refresh(IncrementalArchivesList.this.archivesType));
 
 		ToolStripButton addIncremental = new ToolStripButton();
 		addIncremental.setTitle(I18N.message("addincremental"));

@@ -20,8 +20,6 @@ public class EnvironmentPanel extends VLayout {
 
 	private static final String SCOPE = "scope";
 
-	private RefreshableListGrid grid;
-
 	public EnvironmentPanel() {
 		setWidth100();
 		setHeight100();
@@ -41,7 +39,7 @@ public class EnvironmentPanel extends VLayout {
 		scope.setCanFilter(true);
 		scope.setCanSort(true);
 
-		grid = new RefreshableListGrid();
+		RefreshableListGrid grid = new RefreshableListGrid();
 		grid.setWidth100();
 		grid.setHeight100();
 		grid.setEmptyMessage(I18N.message("notitemstoshow"));

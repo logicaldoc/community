@@ -119,7 +119,7 @@ public class AttributeInitializerComposer extends Window {
 
 	private void initializeDate(StringBuilder stringBuilder) {
 		Date date = (Date) vm.getValue("date");
-		boolean currentdate = vm.getValue(CURRENTDATE) != null ? (Boolean) vm.getValue(CURRENTDATE) : false;
+		boolean currentdate = vm.getValue(CURRENTDATE) != null && (Boolean) vm.getValue(CURRENTDATE);
 		if (currentdate) {
 			stringBuilder.append("#set($dt = $CURRENT_DATE)\n");
 		} else {

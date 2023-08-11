@@ -219,11 +219,12 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSession();
 		WSFolder[] sss = this.getPath(sid, folderId);
-		String pathString = "";
+		StringBuilder pathString = new StringBuilder();
 		for (WSFolder wsFolder : sss) {
-			pathString += "/" + wsFolder.getName();
+			pathString.append("/");
+			pathString.append(wsFolder.getName());
 		}
-		return pathString;
+		return pathString.toString();
 	}
 
 	@Override

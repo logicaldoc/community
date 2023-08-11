@@ -80,10 +80,6 @@ public class SearchIndexPanel extends AdminPanel {
 
 	private static final String EXTENSION = "extension";
 
-	private Layout searchEngineTabPanel;
-
-	private Layout parsersInfoTabPanel;
-
 	private Layout indexingQueueTabPanel;
 
 	private GUISearchEngine searchEngine;
@@ -152,7 +148,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 	private Tab fillParsersTab() {
 		Tab parsersInfoTab = new Tab(I18N.message("parsers"));
-		parsersInfoTabPanel = new HLayout();
+		Layout parsersInfoTabPanel = new HLayout();
 		parsersInfoTabPanel.setWidth100();
 		parsersInfoTabPanel.setHeight100();
 
@@ -397,7 +393,7 @@ public class SearchIndexPanel extends AdminPanel {
 	}
 
 	private void fillSearchEngineTab() {
-		searchEngineTabPanel = new VLayout();
+		Layout searchEngineTabPanel = new VLayout();
 		searchEngineTabPanel.setWidth100();
 		searchEngineTabPanel.setHeight100();
 

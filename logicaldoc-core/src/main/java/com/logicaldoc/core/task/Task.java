@@ -124,7 +124,7 @@ public abstract class Task implements Runnable {
 			boolean overload = false;
 
 			while (systemLoadMonitor.isAverageCpuOverLoaded() && !interruptRequested) {
-				if (overload == false) {
+				if (!overload) {
 					overload = true;
 					log.info("Execution paused because of system overload");
 				}

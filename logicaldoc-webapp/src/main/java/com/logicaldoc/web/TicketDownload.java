@@ -97,7 +97,7 @@ public class TicketDownload extends HttpServlet {
 			FormatConverterManager converter = (FormatConverterManager) Context.get()
 					.getBean(FormatConverterManager.class);
 			converter.convertToPdf(document, null);
-			if ("pdf".equals(FileUtil.getExtension(document.getFileName()).toLowerCase()))
+			if ("pdf".equalsIgnoreCase(FileUtil.getExtension(document.getFileName())))
 				suffix = null;
 		}
 		return suffix;

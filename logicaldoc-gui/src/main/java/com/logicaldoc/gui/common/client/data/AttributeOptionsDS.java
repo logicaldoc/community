@@ -17,8 +17,8 @@ public class AttributeOptionsDS extends DataSource {
 		id.setPrimaryKey(true);
 		id.setHidden(true);
 		id.setRequired(true);
-		DataSourceTextField _attribute = new DataSourceTextField("attribute");
-		_attribute.setHidden(true);
+		DataSourceTextField attributeField = new DataSourceTextField("attribute");
+		attributeField.setHidden(true);
 
 		DataSourceTextField value = new DataSourceTextField("value");
 		
@@ -27,10 +27,10 @@ public class AttributeOptionsDS extends DataSource {
 		DataSourceIntegerField position = new DataSourceIntegerField("position");
 		position.setHidden(true);
 
-		DataSourceTextField _templateId = new DataSourceTextField("templateId");
-		_templateId.setHidden(true);
+		DataSourceTextField templateIdField = new DataSourceTextField("templateId");
+		templateIdField.setHidden(true);
 
-		setFields(id, _attribute, value, cat, position, _templateId);
+		setFields(id, attributeField, value, cat, position, templateIdField);
 		setClientOnly(true);
 
 		setDataURL("data/attributeoptions.xml?setId=" + setId + "&" + "attribute=" + attribute + "&withempty="

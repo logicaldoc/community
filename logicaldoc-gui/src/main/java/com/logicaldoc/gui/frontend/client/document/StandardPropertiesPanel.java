@@ -325,7 +325,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler(event -> {
 			if (Boolean.TRUE.equals(newTagItem.validate()) && newTagItem.getValue() != null
-					&& event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase())) {
+					&& event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName())) {
 				String input = newTagItem.getValueAsString().trim();
 				newTagItem.clearValue();
 

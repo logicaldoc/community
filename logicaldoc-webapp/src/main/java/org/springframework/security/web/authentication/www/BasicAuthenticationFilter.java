@@ -17,6 +17,7 @@
 package org.springframework.security.web.authentication.www;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import javax.servlet.FilterChain;
@@ -244,7 +245,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	 *         not valid Base64
 	 */
 	private String[] extractAndDecodeHeaderChrome(String header) throws IOException {
-		byte[] base64Token = header.substring(6).getBytes("UTF-8");
+		byte[] base64Token = header.substring(6).getBytes(StandardCharsets.UTF_8);
 		byte[] decoded;
 		try {
 			decoded = Base64.getDecoder().decode(base64Token);

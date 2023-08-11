@@ -32,8 +32,6 @@ public class MostUsedTagsPortlet extends Portlet {
 
 	private ListGrid list;
 
-	private HLayout container = null;
-
 	public MostUsedTagsPortlet() {
 		if (Feature.enabled(Feature.TAGS)) {
 			initGUI();
@@ -62,7 +60,7 @@ public class MostUsedTagsPortlet extends Portlet {
 		list.setFields(word, count);
 		list.setSelectionType(SelectionStyle.SINGLE);
 
-		container = new HLayout();
+		HLayout container = new HLayout();
 		container.setWidth100();
 		container.setHeight100();
 		container.setAlign(Alignment.CENTER);

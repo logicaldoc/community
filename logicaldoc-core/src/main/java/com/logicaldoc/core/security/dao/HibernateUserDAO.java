@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -97,7 +98,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			params.put(USERNAME, username);
 
 			List<User> coll = findByWhere(ENTITY + ".username = :username", params, null, null);
-			if (coll.size() > 0)
+			if (CollectionUtils.isNotEmpty(coll))
 				user = coll.iterator().next();
 			initialize(user);
 		} catch (PersistenceException e) {
@@ -114,7 +115,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			params.put(USERNAME, username.toLowerCase());
 
 			List<User> coll = findByWhere(LOWER + ENTITY + ".username) = :username", params, null, null);
-			if (coll.size() > 0)
+			if (CollectionUtils.isNotEmpty(coll))
 				user = coll.iterator().next();
 			initialize(user);
 		} catch (PersistenceException e) {

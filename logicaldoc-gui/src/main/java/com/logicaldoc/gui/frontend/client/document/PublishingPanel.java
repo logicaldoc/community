@@ -65,8 +65,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		startPublishing.setWrapTitle(false);
 		startPublishing.setEndRow(true);
 		startPublishing.addKeyPressHandler(event -> {
-			if ("backspace".equals(event.getKeyName().toLowerCase())
-					|| "delete".equals(event.getKeyName().toLowerCase())) {
+			if ("backspace".equalsIgnoreCase(event.getKeyName()) || "delete".equalsIgnoreCase(event.getKeyName())) {
 				startPublishing.clearValue();
 				startPublishing.setValue((Date) null);
 				changedHandler.onChanged(null);
@@ -85,8 +84,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		stopPublishing.setEndRow(true);
 		stopPublishing.setWrapTitle(false);
 		stopPublishing.addKeyPressHandler(event -> {
-			if ("backspace".equals(event.getKeyName().toLowerCase())
-					|| "delete".equals(event.getKeyName().toLowerCase())) {
+			if ("backspace".equalsIgnoreCase(event.getKeyName()) || "delete".equalsIgnoreCase(event.getKeyName())) {
 				stopPublishing.clearValue();
 				stopPublishing.setValue((Date) null);
 				changedHandler.onChanged(null);

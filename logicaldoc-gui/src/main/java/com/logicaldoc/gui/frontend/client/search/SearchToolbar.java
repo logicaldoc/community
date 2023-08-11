@@ -138,12 +138,13 @@ public class SearchToolbar extends ToolStrip {
 					|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
 				return;
 
-			String url = GWT.getHostPageBaseURL() + "zip-export?1=1";
+			StringBuilder url = new StringBuilder(GWT.getHostPageBaseURL() + "zip-export?1=1");
 			for (GUIDocument rec : Search.get().getLastResult()) {
-				url += "&docId=" + rec.getId();
+				url.append("&docId=");
+				url.append(rec.getId());
 			}
 
-			Util.download(url);
+			Util.download(url.toString());
 		});
 	}
 

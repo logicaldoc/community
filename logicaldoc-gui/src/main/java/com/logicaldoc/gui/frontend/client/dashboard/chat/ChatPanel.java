@@ -62,7 +62,7 @@ public class ChatPanel extends VLayout {
 		setMembers(body, postForm);
 
 		postMessage.addKeyPressHandler(event -> {
-			if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
+			if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName()))
 				onPost(postForm.getValueAsString("post"));
 		});
 

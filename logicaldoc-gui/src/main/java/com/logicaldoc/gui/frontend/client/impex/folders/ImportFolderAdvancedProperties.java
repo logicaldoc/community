@@ -17,7 +17,6 @@ import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -143,7 +142,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		startDate.setShowPickerIcon(true);
 		startDate.setDateFormatter(DateDisplayFormat.TOEUROPEANSHORTDATE);
 		startDate.addKeyPressHandler(event -> {
-			if ("delete".equals(event.getKeyName().toLowerCase())) {
+			if ("delete".equalsIgnoreCase(event.getKeyName())) {
 				startDate.clearValue();
 				startDate.setValue((Date) null);
 				changedHandler.onChanged(null);

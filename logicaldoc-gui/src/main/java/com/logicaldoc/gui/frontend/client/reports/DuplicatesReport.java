@@ -205,9 +205,9 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		list.setFields(filename, folderName, lastModified, size, version, publisher, customId, digest, type);
 
 		list.addDoubleClickHandler(event -> {
-			String _id = list.getSelectedRecord().getAttribute("id");
+			String idValue = list.getSelectedRecord().getAttribute("id");
 			if (FolderController.get().getCurrentFolder().isDownload())
-				DocUtil.download(Long.parseLong(_id), null);
+				DocUtil.download(Long.parseLong(idValue), null);
 		});
 	}
 

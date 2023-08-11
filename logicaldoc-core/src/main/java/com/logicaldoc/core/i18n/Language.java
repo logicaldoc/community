@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -74,7 +75,7 @@ public class Language implements Comparable<Language> {
 			if (is == null) {
 				log.warn("No stopwords found for locale {}", getLocale());
 			} else {
-				InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+				InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 				BufferedReader br = new BufferedReader(isr);
 				String line = null;
 				while ((line = br.readLine()) != null) {

@@ -2,7 +2,6 @@ package com.logicaldoc.util.crypt;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -42,8 +41,6 @@ public class CryptUtil {
 
 	private Cipher cipher;
 
-	private static final String UNICODE_FORMAT = "UTF8";
-
 	public CryptUtil(String encryptionKey) throws EncryptionException {
 		this(DES_ENCRYPTION_SCHEME, encryptionKey);
 	}
@@ -56,7 +53,7 @@ public class CryptUtil {
 			String key = encryptionKey;
 			if (encryptionKey.length() < 32)
 				key = StringUtils.rightPad(encryptionKey, 32, '*');
-			byte[] keyAsBytes = key.getBytes(UNICODE_FORMAT);
+			byte[] keyAsBytes = key.getBytes(StandardCharsets.UTF_8);
 			if (encryptionScheme.equals(DESEDE_ENCRYPTION_SCHEME)) {
 				keySpec = new DESedeKeySpec(keyAsBytes);
 			} else if (encryptionScheme.equals(DES_ENCRYPTION_SCHEME)) {
@@ -66,8 +63,7 @@ public class CryptUtil {
 			}
 			keyFactory = SecretKeyFactory.getInstance(encryptionScheme);
 			cipher = Cipher.getInstance(encryptionScheme);
-		} catch (InvalidKeyException | UnsupportedEncodingException | NoSuchAlgorithmException
-				| NoSuchPaddingException e) {
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
 			throw new EncryptionException(e);
 		}
 	}
@@ -121,11 +117,10 @@ public class CryptUtil {
 		try {
 			SecretKey key = keyFactory.generateSecret(keySpec);
 			cipher.init(Cipher.ENCRYPT_MODE, key);
-			byte[] cleartext = unencryptedString.getBytes(UNICODE_FORMAT);
+			byte[] cleartext = unencryptedString.getBytes(StandardCharsets.UTF_8);
 			byte[] ciphertext = cipher.doFinal(cleartext);
 			return new String(java.util.Base64.getMimeEncoder().encode(ciphertext), StandardCharsets.UTF_8);
-		} catch (InvalidKeyException | InvalidKeySpecException | UnsupportedEncodingException
-				| IllegalBlockSizeException | BadPaddingException e) {
+		} catch (InvalidKeyException | InvalidKeySpecException | IllegalBlockSizeException | BadPaddingException e) {
 			throw new EncryptionException(e);
 		}
 	}
@@ -154,26 +149,52 @@ public class CryptUtil {
 	}
 
 	/**
-	 * This method encodes a given string using the SHA algorithm
+	 * This method encodes a given string using the SHA algorithm. This method
+	 * will be dismissed in the future.
 	 * 
-	 * @param original String to encode.
-	 * @return Encoded string.
+	 * @param original String to encode
+	 * 
+	 * @return Encoded string
 	 */
-	public static String cryptString(String original) {
-		String copy = "";
+	public static String cryptStringLegacy(String original) {
+		StringBuilder copy = new StringBuilder();
 
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA");
-			byte[] digest = md.digest(original.getBytes());
+			byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
 
 			for (int i = 0; i < digest.length; i++) {
-				copy += Integer.toHexString(digest[i] & 0xFF);
+				copy.append(Integer.toHexString(digest[i] & 0xFF));
 			}
 		} catch (NoSuchAlgorithmException nsae) {
 			log.error(nsae.getMessage());
 		}
 
-		return copy;
+		return copy.toString();
+	}
+
+	/**
+	 * This method encodes a given string using the SHA-256 algorithm
+	 * 
+	 * @param original String to encode
+	 * 
+	 * @return Encoded string
+	 */
+	public static String cryptString(String original) {
+		StringBuilder copy = new StringBuilder();
+
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
+
+			for (int i = 0; i < digest.length; i++) {
+				copy.append(String.format("%02X", digest[i]));
+			}
+		} catch (NoSuchAlgorithmException nsae) {
+			log.error(nsae.getMessage());
+		}
+
+		return copy.toString();
 	}
 
 	/**
@@ -236,13 +257,13 @@ public class CryptUtil {
 	}
 
 	public static String getHex(byte[] raw) {
-		String HEXES = "0123456789ABCDEF";
+		String hexes = "0123456789ABCDEF";
 		if (raw == null) {
 			return null;
 		}
 		final StringBuilder hex = new StringBuilder(2 * raw.length);
 		for (final byte b : raw) {
-			hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
+			hex.append(hexes.charAt((b & 0xF0) >> 4)).append(hexes.charAt((b & 0x0F)));
 		}
 		return hex.toString();
 	}

@@ -38,8 +38,6 @@ import com.smartgwt.client.widgets.notify.NotifySettings;
  */
 public class Frontend implements EntryPoint {
 
-	private WebSocket websocket = null;
-
 	/**
 	 * Configure some interface defaults
 	 */
@@ -166,7 +164,7 @@ public class Frontend implements EntryPoint {
 	 */
 	public void connectWebsockets() {
 		if (Session.get().isServerPushEnabled()) {
-			websocket = WebSocket.newWebSocketIfSupported();
+			WebSocket websocket = WebSocket.newWebSocketIfSupported();
 			websocket.setListener(new WebSocketListener());
 			websocket.connect(Util.websocketUrl());
 		}

@@ -23,7 +23,7 @@ public class SearchBox extends TextItem {
 		addKeyPressHandler(event -> {
 			if (event.getKeyName() == null)
 				return;
-			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase())) {
+			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName())) {
 				onSearch();
 			}
 		});

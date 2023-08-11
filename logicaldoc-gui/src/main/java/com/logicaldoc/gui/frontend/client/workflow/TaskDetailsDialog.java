@@ -82,8 +82,6 @@ public class TaskDetailsDialog extends Window {
 
 	private DocumentsListGrid appendedDocs;
 
-	private ListGrid notesGrid;
-
 	private SelectItem user = null;
 
 	private ValuesManager vm = new ValuesManager();
@@ -93,10 +91,6 @@ public class TaskDetailsDialog extends Window {
 	private HLayout form = null;
 
 	private VLayout sxLayout = null;
-
-	private DynamicForm workflowForm = null;
-
-	private DynamicForm taskForm = null;
 
 	private WorkflowDashboard workflowDashboard;
 
@@ -115,12 +109,6 @@ public class TaskDetailsDialog extends Window {
 	private VLayout notesPanel = null;
 
 	private VLayout appendedDocsPanel = null;
-
-	private StaticTextItem taskStartDate = null;
-
-	private StaticTextItem taskDueDate = null;
-
-	private StaticTextItem taskEndDate = null;
 
 	private boolean readOnly = false;
 
@@ -279,7 +267,7 @@ public class TaskDetailsDialog extends Window {
 	}
 
 	private void prepareTaskSection() {
-		taskForm = new DynamicForm();
+		DynamicForm taskForm = new DynamicForm();
 		taskForm.setColWidths(60, "*");
 		taskForm.setValuesManager(vm);
 
@@ -309,15 +297,15 @@ public class TaskDetailsDialog extends Window {
 				&& !workflow.getSelectedTask().getPooledActors().trim().isEmpty())
 			taskAssignee.setValue(workflow.getSelectedTask().getPooledActors());
 
-		taskStartDate = ItemFactory.newStaticTextItem("taskStartDate", "startdate", null);
+		StaticTextItem taskStartDate = ItemFactory.newStaticTextItem("taskStartDate", "startdate", null);
 		if (workflow.getSelectedTask().getStartDate() != null)
 			taskStartDate.setValue(I18N.formatDate(workflow.getSelectedTask().getStartDate()));
 
-		taskDueDate = ItemFactory.newStaticTextItem("taskDueDate", "duedate", null);
+		StaticTextItem taskDueDate = ItemFactory.newStaticTextItem("taskDueDate", "duedate", null);
 		if (workflow.getSelectedTask().getDueDate() != null)
 			taskDueDate.setValue(I18N.formatDate(workflow.getSelectedTask().getDueDate()));
 
-		taskEndDate = ItemFactory.newStaticTextItem("taskEndDate", "enddate", null);
+		StaticTextItem taskEndDate = ItemFactory.newStaticTextItem("taskEndDate", "enddate", null);
 		if (workflow.getSelectedTask().getEndDate() != null)
 			taskEndDate.setValue(I18N.formatDate(workflow.getSelectedTask().getEndDate()));
 
@@ -328,7 +316,7 @@ public class TaskDetailsDialog extends Window {
 	}
 
 	private void prepareWorkflowSection() {
-		workflowForm = new DynamicForm();
+		DynamicForm workflowForm = new DynamicForm();
 		workflowForm.setColWidths(60, "*");
 
 		StaticTextItem workflowTitle = ItemFactory.newStaticTextItem("workflowTitle", "",
@@ -588,7 +576,7 @@ public class TaskDetailsDialog extends Window {
 		ListGridField usr = new UserListGridField("user", USER_ID, "user");
 		ListGridField date = new DateListGridField("date", "date");
 
-		notesGrid = new ListGrid() {
+		ListGrid notesGrid = new ListGrid() {
 			@Override
 			protected Canvas getExpansionComponent(final ListGridRecord rec) {
 				return new HTMLFlow("<div class='details'>"

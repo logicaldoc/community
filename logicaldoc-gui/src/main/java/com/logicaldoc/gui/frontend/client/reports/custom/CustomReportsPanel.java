@@ -59,8 +59,6 @@ public class CustomReportsPanel extends AdminPanel {
 
 	static final Canvas SELECT_REPORT = new HTMLPanel("&nbsp;" + I18N.message("selectareport"));
 
-	private Timer timer;
-
 	public CustomReportsPanel() {
 		super("customreports");
 	}
@@ -160,9 +158,9 @@ public class CustomReportsPanel extends AdminPanel {
 		refresh();
 
 		/*
-		 * Create the timer that synchronize the view
+		 * Create the timer that synchronizes the view
 		 */
-		timer = new Timer() {
+		Timer timer = new Timer() {
 			public void run() {
 				update();
 			}
@@ -214,7 +212,7 @@ public class CustomReportsPanel extends AdminPanel {
 				rec.setAttribute(OUTPUT_DOC_ID, (String) null);
 			list.refreshRow(list.getRecordIndex(rec));
 
-			boolean selected = list.getSelectedRecord() != null ? rec.equals(list.getSelectedRecord()) : false;
+			boolean selected = list.getSelectedRecord() != null && rec.equals(list.getSelectedRecord());
 
 			// Decide if we have to refresh the properties
 			// panel

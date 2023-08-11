@@ -64,7 +64,7 @@ public class SearchIndexEntriesPanel extends VLayout {
 		query.addKeyPressHandler(event -> {
 			if (event.getKeyName() == null)
 				return;
-			if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase())) {
+			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName())) {
 				page.setValue(1);
 				onSearch();
 			}
@@ -162,21 +162,20 @@ public class SearchIndexEntriesPanel extends VLayout {
 		deleteEntry.addClickHandler(event -> SC.ask(I18N.message("deleteindexentriesconfirm"), confirm -> {
 			if (confirm.booleanValue()) {
 				LD.contactingServer();
-				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIds(),
-						new AsyncCallback<Void>() {
+				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIds(), new AsyncCallback<Void>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								LD.clearPrompt();
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						LD.clearPrompt();
+					}
 
-							@Override
-							public void onSuccess(Void arg) {
-								LD.clearPrompt();
-								onSearch();
-							}
-						});
+					@Override
+					public void onSuccess(Void arg) {
+						LD.clearPrompt();
+						onSearch();
+					}
+				});
 			}
 		}));
 

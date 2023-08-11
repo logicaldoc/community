@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 			sb.append(AND + ENTITY + ".qualifier is null");
 		try {
 			Collection<Generic> coll = findByWhere(sb.toString(), null, null);
-			if (coll.size() > 0)
+			if (CollectionUtils.isNotEmpty(coll))
 				generic = coll.iterator().next();
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
