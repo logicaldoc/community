@@ -77,7 +77,7 @@ public class WebserviceClient {
 		transport.call("", envelope);
 
 		AbstractList<SoapObject> response = new ArrayList<>();
-		if (envelope.getResponse() != null && envelope.getResponse() instanceof Vector) {
+		if (envelope.getResponse() instanceof Vector) {
 			// We have more elements
 			@SuppressWarnings("unchecked")
 			AbstractList<SoapObject> vector = (Vector<SoapObject>) envelope.getResponse();

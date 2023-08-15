@@ -420,7 +420,7 @@ public class LD {
 	 */
 	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
 			final ValueCallback callback, final ClickHandler cancelCallback) {
-		askForValues(title, message, Arrays.asList(new FormItem[] { item }), width, callback, cancelCallback);
+		askForValues(title, message, Arrays.asList(item), width, callback, cancelCallback);
 
 		if (defaultValue != null) {
 			item.setValue(defaultValue);

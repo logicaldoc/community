@@ -71,7 +71,7 @@ public class ClipboardWindow extends Window {
 		icon.setImageURLPrefix(Util.imagePrefix());
 		icon.setImageURLSuffix(".png");
 
-		grid.setFields(new ListGridField[] { id, icon, fileName });
+		grid.setFields(id, icon, fileName);
 		grid.setCanResizeFields(true);
 		addItem(grid);
 

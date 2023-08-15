@@ -81,7 +81,7 @@ public interface Parser {
 	 * </p>
 	 * 
 	 * @param input binary content from which to extract the text
-	 * @param parameterObject TODO
+	 * @param parameterObject the parameters
 	 * @return the extracted text
 	 * 
 	 * @throws ParseException error in the parsing

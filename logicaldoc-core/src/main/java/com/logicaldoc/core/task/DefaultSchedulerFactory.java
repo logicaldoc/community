@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +63,6 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 			super.afterPropertiesSet();
 		else
 			log.warn(ASPECT_DISABLED);
-	}
-
-	@Override
-	public void destroy() throws SchedulerException {
-		super.destroy();
 	}
 
 	@Override

@@ -57,10 +57,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		 */
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		for (User user : users) {
-			if (user.getType() == User.TYPE_SYSTEM)
-				continue;
-
-			if (skipdisabled && user.getEnabled() != 1)
+			if (user.getType() == User.TYPE_SYSTEM || (skipdisabled && user.getEnabled() != 1))
 				continue;
 
 			userDao.initialize(user);
@@ -93,7 +90,8 @@ public class UsersDataServlet extends AbstractDataServlet {
 		if (user.getUserGroup() != null)
 			writer.print("<usergroup><![CDATA[" + user.getUserGroup().getId() + "]]></usergroup>");
 
-		String[] groups = Arrays.stream(user.getGroupNames()).filter(g -> !g.startsWith("_user_")).toArray(String[]::new);
+		String[] groups = Arrays.stream(user.getGroupNames()).filter(g -> !g.startsWith("_user_"))
+				.toArray(String[]::new);
 		writer.print("<groups><![CDATA[" + StringUtil.arrayToString(groups, ", ") + "]]></groups>");
 		writer.print("<avatar>" + user.getId() + "</avatar>");
 

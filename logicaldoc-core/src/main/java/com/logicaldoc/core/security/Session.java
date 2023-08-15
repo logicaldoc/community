@@ -279,8 +279,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		return userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
-				client);
+		return userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid, client);
 	}
 
 	public String getUsername() {
@@ -294,7 +293,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	@Override
 	public int compareTo(Session o) {
-		int compare = Integer.valueOf(status).compareTo(Integer.valueOf(o.status));
+		int compare = Integer.compare(status, o.status);
 		if (compare == 0)
 			compare = o.getCreation().compareTo(creation);
 		return compare;

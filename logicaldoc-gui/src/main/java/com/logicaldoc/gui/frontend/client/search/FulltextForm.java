@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.search;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -189,9 +190,8 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		setTemplateCondition(values, options);
 
 		List<String> fields = new ArrayList<>();
-		if (searchinItem.getValues() != null && searchinItem.getValues().length > 0)
-			for (String fld : searchinItem.getValues())
-				fields.add(fld);
+		Collections.addAll(fields, searchinItem.getValues());
+		
 		if (fields.contains(Constants.FULLTEXT_FIELD_FILENAME) && !fields.contains(Constants.FULLTEXT_FIELD_TITLE))
 			fields.add(Constants.FULLTEXT_FIELD_TITLE);
 		if (fields.contains(Constants.FULLTEXT_FIELD_TITLE) && !fields.contains(Constants.FULLTEXT_FIELD_FILENAME))
@@ -303,7 +303,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		fieldsMap.put(Constants.FULLTEXT_FIELD_NOTES, I18N.message("notes"));
 
 		searchinItem.setValueMap(fieldsMap);
-		searchinItem.setValue(Constants.FULLTEXT_DEFAULT_FIELDS);
+		searchinItem.setValue(Constants.getFulltextDefaultFields());
 
 		fieldsForm.setItems(searchinItem);
 

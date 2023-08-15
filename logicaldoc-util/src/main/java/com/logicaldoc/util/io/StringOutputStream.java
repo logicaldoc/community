@@ -11,9 +11,14 @@ import java.io.OutputStream;
  */
 public class StringOutputStream extends OutputStream {
 
-	StringBuilder sb = new StringBuilder();
+	private StringBuilder sb = new StringBuilder();
 
 	public StringOutputStream() {
+	}
+
+	@Override
+	public void write(int b) throws IOException {
+		sb.append((char) b);
 	}
 
 	public StringOutputStream(StringBuilder sb) {
@@ -40,8 +45,10 @@ public class StringOutputStream extends OutputStream {
 	}
 
 	@Override
-	public void write(int i) throws IOException {
-		sb.append((char) i);
+	public void write(byte[] b, int off, int len) throws IOException {
+		for (byte c : b) {
+			write(c);
+		}
 	}
 
 	public String getData() {

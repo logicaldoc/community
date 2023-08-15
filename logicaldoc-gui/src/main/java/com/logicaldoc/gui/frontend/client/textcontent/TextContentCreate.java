@@ -71,10 +71,10 @@ public class TextContentCreate extends Window {
 		}
 
 		GUIDocument vo = new GUIDocument();
-		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE).toString()))
+		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE)))
 			vo.setTemplateId(null);
 		else {
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE).toString()));
+			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE)));
 		}
 
 		String ext = filename.substring(filename.indexOf('.') + 1);

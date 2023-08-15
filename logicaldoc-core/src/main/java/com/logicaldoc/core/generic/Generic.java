@@ -8,8 +8,7 @@ import com.logicaldoc.core.metadata.ExtensibleObject;
 
 /**
  * Instances of this class represents generic informations in the database. Use
- * this Business entity to store configurations or stuffs like this.
- * <br>
+ * this Business entity to store configurations or stuffs like this. <br>
  * 
  * Each Generic is identified by a type and subtype
  * 
@@ -19,7 +18,7 @@ import com.logicaldoc.core.metadata.ExtensibleObject;
 public class Generic extends ExtensibleObject implements Comparable<Generic> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String type;
 
 	private String subtype;
@@ -33,7 +32,7 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 	private String string3;
 
 	private String string4;
-	
+
 	private String string5;
 
 	private String string6;
@@ -167,6 +166,14 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 			return getType().compareTo(o.getType());
 		else
 			return getSubtype().compareTo(o.getSubtype());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Generic))
+			return false;
+		Generic other = (Generic) obj;
+		return other.getId() == this.getId();
 	}
 
 	public String getDisplayString1() {

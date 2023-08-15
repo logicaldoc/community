@@ -150,11 +150,8 @@ public class TaskSchedulingPanel extends VLayout {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		Map<String, Object> values =  vm.getValues();
-		if (((String) values.get(SIMPLE)).equals("true"))
-			task.getScheduling().setSimple(true);
-		else
-			task.getScheduling().setSimple(false);
+		Map<String, Object> values = vm.getValues();
+		task.getScheduling().setSimple(((String) values.get(SIMPLE)).equals("true"));
 
 		long max = Long.parseLong(values.get("maxduration").toString());
 		if (max <= 0)

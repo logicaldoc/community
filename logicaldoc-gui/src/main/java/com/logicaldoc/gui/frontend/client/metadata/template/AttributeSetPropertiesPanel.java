@@ -285,7 +285,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			String name = (String) attributeName.getValue();
 			if (GUIAttribute.isForbidden(name.trim())) {
 				final String message = I18N.message("attributenameforbidden",
-						Arrays.asList(GUIAttribute.FORBIDDEN_NAMES).toString().substring(1).replace("]", ""));
+						Arrays.asList(GUIAttribute.getForbiddenNames()).toString().substring(1).replace("]", ""));
 				SC.warn(I18N.message("error"), message);
 				return;
 			}
@@ -730,12 +730,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			editor.setVisible(true);
 			group.setVisible(false);
 			group.setValue("");
-
-			if (editor.getValueAsString().equals("" + GUIAttribute.EDITOR_LISTBOX)) {
-				options.setVisible(true);
-			} else {
-				options.setVisible(false);
-			}
+			options.setVisible(editor.getValueAsString().equals("" + GUIAttribute.EDITOR_LISTBOX));
 		} else if (type.getValueAsString().equals("" + GUIAttribute.TYPE_USER)) {
 			editor.setVisible(false);
 			group.setVisible(true);

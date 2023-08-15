@@ -52,7 +52,7 @@ public class ContextConfigurator {
 		}
 	}
 
-	public void addPropertyBeanRefList(String id, String propertyName, List<? extends String> values) {
+	public void addPropertyBeanRefList(String id, String propertyName, List<String> values) {
 		Element element = xml.getChild("bean", "id", id);
 		if (element == null)
 			return;
@@ -65,7 +65,7 @@ public class ContextConfigurator {
 		}
 	}
 
-	private void addPropertyListValues(Element property, List<? extends String> values) {
+	private void addPropertyListValues(Element property, List<String> values) {
 		Collection<Element> beanRefChildren = new LinkedList<>();
 		Element listElement = property.getChild("list", property.getNamespace());
 		if (listElement != null) {

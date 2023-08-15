@@ -67,7 +67,7 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 		query.append(" and " + ENTITY + ".type = :type");
 
 		List<DocumentLink> links = new ArrayList<>();
-		;
+
 		try {
 			Map<String, Object> params = new HashMap<>();
 			params.put("docId1", docId1);

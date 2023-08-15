@@ -90,12 +90,7 @@ public abstract class FolderSearchForm extends VLayout {
 		folderSelector.setTitle(I18N.message("parent"));
 		folderSelector.setEndRow(true);
 		folderSelector.setWidth(160);
-		folderSelector.addFolderChangeListener(folder -> {
-			if (folder != null)
-				subfolders.setValue(true);
-			else
-				subfolders.setValue(false);
-		});
+		folderSelector.addFolderChangeListener(folder -> subfolders.setValue(folder != null));
 
 		final DynamicForm folderForm = new DynamicForm();
 		folderForm.setValuesManager(vm);

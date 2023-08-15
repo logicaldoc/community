@@ -91,11 +91,11 @@ public class UserListGridField extends ColoredListGridField {
 
 			String formattedValue = super.format(value, rec, rowNum, colNum);
 			if (avatarId == null || !UserListGridField.this.displayAvatar)
-				return formattedValue != null ? formattedValue.toString() : "";
+				return formattedValue != null ? formattedValue : "";
 
 			String text = null;
 			if (avatarFieldName != null)
-				text = formattedValue != null ? formattedValue.toString() : null;
+				text = formattedValue != null ? formattedValue : null;
 
 			return format(avatarId, formattedValue, text);
 		}

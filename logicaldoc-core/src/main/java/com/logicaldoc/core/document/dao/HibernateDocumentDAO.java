@@ -632,7 +632,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(AND_LD_TENANTID + tenantId);
 		}
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		if (firstLetter != null) {
 			sb.append(" and lower(ld_tag) like :tagLike ");
 			params.put("tagLike", firstLetter.toLowerCase() + "%");
@@ -649,7 +649,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		List<Long> ids = findDocIdByUserIdAndTag(userId, tag);
 		if (!ids.isEmpty()) {
 			StringBuilder query = new StringBuilder("select A from Document A where A.id in (");
-			query.append(ids.stream().map(f -> f.toString()).collect(Collectors.joining(",")));
+			query.append(ids.stream().map(Object::toString).collect(Collectors.joining(",")));
 			query.append(")");
 			try {
 				coll = findByQuery(query.toString(), (Map<String, Object>) null, max);
@@ -782,12 +782,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		else if (direction.intValue() == 2)
 			query.append("select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2 = :docId)");
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("docId", docId);
 
 		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(query.toString(), params, Long.class, null);
-		return findByWhere(ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+		return findByWhere(ENTITY + ".id in (" + ids.stream().map(Object::toString).collect(Collectors.joining(","))
 				+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
 	}
 
@@ -1092,7 +1092,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		query.append(" and ld_startpublishing <= :now ");
 		query.append(" and ( ld_stoppublishing is null or ld_stoppublishing > :now )");
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("now", new Date());
 
 		@SuppressWarnings("unchecked")
@@ -1373,7 +1373,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (!tree.contains(folderId))
 				tree.add(folderId);
 			digestQuery.append(" and ld_folderid in (");
-			digestQuery.append(tree.stream().map(id -> id.toString()).collect(Collectors.joining(", ")));
+			digestQuery.append(tree.stream().map(Object::toString).collect(Collectors.joining(", ")));
 			digestQuery.append(" ) ");
 		}
 		digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");

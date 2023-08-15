@@ -19,6 +19,7 @@
             http://www.springframework.org/schema/security/spring-security.xsd">
 
     <!-- This post processor ensures placeholders substitutions -->
+    <bean id="DatabasePropertySource" class="com.logicaldoc.util.spring.DatabasePropertySource" />	 
     <bean id="PropertyPlaceholderConfigurer" class="com.logicaldoc.util.spring.PropertiesPlaceHolder"
         lazy-init="false" abstract="false" autowire="default" >
         <property name="locations">

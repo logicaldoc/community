@@ -197,22 +197,6 @@ public class SystemLoadMonitor {
 		log.info("System load monitor started");
 	}
 
-	/**
-	 * Get a sample and stores it in the FIFO of samples, each time also
-	 * calculates the average CPU load
-	 */
-	private void pickCpuLoad() {
-		// Get an actual sample and store it
-		int sample = getCpuLoad();
-		samples.add(sample);
-
-		// Calculate and save the average load
-		averageCpuLoad = (int) Math.round(samples.stream().mapToDouble(s -> Double.valueOf(s)).average().getAsDouble());
-
-		if (log.isTraceEnabled())
-			log.trace("Average CPU load: {}", averageCpuLoad);
-	}
-
 	/*
 	 * This thread collects statistics about the system load in the last time
 	 * (samples number * 1sec)
@@ -273,6 +257,22 @@ public class SystemLoadMonitor {
 				end();
 				Thread.currentThread().interrupt();
 			}
+		}
+
+		/**
+		 * Gets a sample and stores it in the FIFO of samples, each time also
+		 * calculates the average CPU load
+		 */
+		private void pickCpuLoad() {
+			// Get an actual sample and store it
+			int sample = getCpuLoad();
+			samples.add(sample);
+
+			// Calculate and save the average load
+			averageCpuLoad = (int) Math.round(samples.stream().mapToDouble(Double::valueOf).average().getAsDouble());
+
+			if (log.isTraceEnabled())
+				log.trace("Average CPU load: {}", averageCpuLoad);
 		}
 	}
 }

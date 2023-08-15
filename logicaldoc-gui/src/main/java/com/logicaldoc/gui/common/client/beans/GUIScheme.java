@@ -65,15 +65,6 @@ public class GUIScheme implements Serializable, Comparable<GUIScheme> {
 		this.templateName = templateName;
 	}
 
-	@Override
-	public int compareTo(GUIScheme o) {
-		int comp = this.type.compareTo(o.getType());
-		if (comp == 0)
-			return this.templateName.compareTo(o.templateName);
-		else
-			return comp;
-	}
-
 	public String getType() {
 		return type;
 	}
@@ -88,5 +79,31 @@ public class GUIScheme implements Serializable, Comparable<GUIScheme> {
 
 	public void setEvaluateAtUpdate(boolean evaluateAtUpdate) {
 		this.evaluateAtUpdate = evaluateAtUpdate;
+	}
+	
+	@Override
+	public int compareTo(GUIScheme o) {
+		int comp = this.type.compareTo(o.getType());
+		if (comp == 0)
+			return this.templateName.compareTo(o.templateName);
+		else
+			return comp;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof GUIScheme))
+			return false;
+		GUIScheme other = (GUIScheme) obj;
+		return this.getType().equals(other.getType()) && this.templateName.equals(other.getTemplateName());
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((templateName == null) ? 0 : templateName.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
 	}
 }

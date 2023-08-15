@@ -51,11 +51,7 @@ public class StringEncrypter {
 			}
 			keyFactory = SecretKeyFactory.getInstance(encryptionScheme);
 			cipher = Cipher.getInstance(encryptionScheme);
-		} catch (InvalidKeyException e) {
-			throw new EncryptionException(e);
-		} catch (NoSuchAlgorithmException e) {
-			throw new EncryptionException(e);
-		} catch (NoSuchPaddingException e) {
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
 			throw new EncryptionException(e);
 		}
 	}

@@ -53,7 +53,7 @@ public class MultipleUpload extends HorizontalPanel {
 					dropFilesLabel.addStyleName(DROP_FILES_LABEL_HOVER);
 				}
 			});
-			dropFilesLabel.addDragLeaveHandler((event) -> dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER));
+			dropFilesLabel.addDragLeaveHandler(event -> dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER));
 			dropFilesLabel.addDropHandler(event -> {
 				dropFilesLabel.removeStyleName(DROP_FILES_LABEL_HOVER);
 

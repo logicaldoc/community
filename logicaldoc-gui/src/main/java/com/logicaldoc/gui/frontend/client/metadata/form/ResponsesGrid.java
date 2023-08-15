@@ -1,8 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -79,7 +79,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 
 		ListGridField created = new DateListGridField("created", "created");
 
-		final LinkedHashMap<String, String> languages = I18N.getSupportedLanguages(false);
+		final Map<String, String> languages = I18N.getSupportedLanguages(false);
 
 		ListGridField language = new ListGridField(LANGUAGE, I18N.message(LANGUAGE), 100);
 		language.setType(ListGridFieldType.TEXT);

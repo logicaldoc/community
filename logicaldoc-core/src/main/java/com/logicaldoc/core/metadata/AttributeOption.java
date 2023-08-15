@@ -95,6 +95,14 @@ public class AttributeOption extends PersistentObject implements Comparable<Attr
 
 	@Override
 	public int compareTo(AttributeOption other) {
-		return Integer.valueOf(position).compareTo(Integer.valueOf(other.position));
+		return Integer.compare(position, other.position);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof AttributeOption))
+			return false;
+		AttributeOption other = (AttributeOption) obj;
+		return other.getId() == this.getId();
 	}
 }

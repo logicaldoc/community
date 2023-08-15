@@ -189,8 +189,6 @@ public class ContextProperties extends OrderedProperties {
 			try (FileOutputStream fos = new FileOutputStream(tmpFile);) {
 				store(fos, "");
 				log.info("Saved settings into temp file {}", tmpFile.getAbsolutePath());
-			} catch (IOException ex) {
-				throw ex;
 			}
 
 			Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE,
@@ -341,7 +339,7 @@ public class ContextProperties extends OrderedProperties {
 	public String getProperty(String property, String defaultValue) {
 		return StrSubstitutor.replaceSystemProperties(super.getProperty(property, defaultValue));
 	}
-	
+
 	public int getMaxBackups() {
 		return maxBackups;
 	}

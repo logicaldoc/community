@@ -25,9 +25,9 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 8.4.3
  */
 public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
-	
+
 	private static final String EBOOKCOVER = "ebookcover";
-	
+
 	protected static Logger log = LoggerFactory.getLogger(EpubThumbnailBuilder.class);
 
 	@Override
@@ -77,7 +77,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 					 */
 					tmp = FileUtil.createTempFile(EBOOKCOVER, ".txt");
 					List<NavPoint> navPoints = reader.getToc().getNavMap().getNavPoints();
-					String toc = navPoints.stream().map(p -> p.getNavLabel()).filter(p -> StringUtils.isNotEmpty(p))
+					String toc = navPoints.stream().map(p -> p.getNavLabel()).filter(StringUtils::isNotEmpty)
 							.collect(Collectors.joining("\n"));
 					FileUtil.writeFile(toc, tmp.getAbsolutePath());
 

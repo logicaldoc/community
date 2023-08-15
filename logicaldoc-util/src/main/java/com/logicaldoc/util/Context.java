@@ -3,9 +3,10 @@ package com.logicaldoc.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,8 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 
 	protected static Logger log = LoggerFactory.getLogger(Context.class);
 
-	private static HashMap<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new HashMap<>();
+	private static Map<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new EnumMap<>(
+			SystemEventStatus.class);
 
 	// Singleton instance
 	private static Context instance;

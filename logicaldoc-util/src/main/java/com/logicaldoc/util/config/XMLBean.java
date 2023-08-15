@@ -453,7 +453,7 @@ public class XMLBean {
 					list.add(elem);
 				}
 			} catch (Exception e) {
-				;
+				// Ignore
 			}
 		}
 

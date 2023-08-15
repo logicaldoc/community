@@ -210,17 +210,14 @@ public class ZipExport {
 	 */
 	protected void appendChildren(Folder folder, int depth, boolean pdfConversion, String sid)
 			throws PersistenceException {
-		if (!allLevel && (depth > 1)) {
-			return;
-		} else {
+		if (allLevel || depth < 1) {
 			addFolderDocuments(folder, pdfConversion, sid);
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Collection<Folder> children = folderDao.findByUserId(userId, folder.getId());
 			Iterator<Folder> iter = children.iterator();
 
-			while (iter.hasNext()) {
+			while (iter.hasNext())
 				appendChildren(iter.next(), depth + 1, pdfConversion, sid);
-			}
 		}
 	}
 

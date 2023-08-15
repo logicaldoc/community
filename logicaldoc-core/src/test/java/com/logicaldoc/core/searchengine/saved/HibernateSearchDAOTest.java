@@ -61,6 +61,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		search.saveOptions(opt);
 		dao.store(search);
 
+		opt.setExpression("prova test 2");
 		search = new SavedSearch();
 		search.setName("search2");
 		search.setUserId(1L);
@@ -119,9 +120,9 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		saved.setName("缺乏谦卑");
 		saved.saveOptions(opt);
 		xml = saved.getOptions();
+		
 		assertNotNull(xml);
-		// System.err.println(xml.length());
-		assertTrue(xml.length() > 800);
+		assertTrue(xml.length() > 700);
 
 		saved = new SavedSearch();
 		saved.setOptions(xml);

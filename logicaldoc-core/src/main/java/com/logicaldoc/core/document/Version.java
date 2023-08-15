@@ -148,6 +148,14 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Version))
+			return false;
+		Version other = (Version) obj;
+		return other.getId() == this.getId();
+	}
+
+	@Override
 	public String toString() {
 		return getVersion() + (getComment() != null ? "-" + getComment() : "");
 	}

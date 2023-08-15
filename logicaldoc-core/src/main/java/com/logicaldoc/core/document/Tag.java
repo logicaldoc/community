@@ -56,7 +56,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 		if (tagWord == null)
 			return "";
 		else
-			return tagWord.toString();
+			return tagWord;
 	}
 
 	@Override

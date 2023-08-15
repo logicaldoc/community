@@ -301,9 +301,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			} catch (Exception t) {
 				// Nothing to do
 			}
-			if (doc == null || doc.getDeleted() == 1)
-				continue;
-			if (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId()))
+			if ((doc == null || doc.getDeleted() == 1)
+					|| (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId())))
 				continue;
 			documentsInCurrentPage.add(doc);
 		}

@@ -20,7 +20,7 @@ public class PasswordHistory extends PersistentObject implements Serializable, C
 
 	private String password = "";
 
-	private Date date =new Date();
+	private Date date = new Date();
 
 	public long getUserId() {
 		return userId;
@@ -51,6 +51,14 @@ public class PasswordHistory extends PersistentObject implements Serializable, C
 		if (other.userId == userId)
 			return this.date.compareTo(other.date);
 		else
-			return Long.valueOf(userId).compareTo(Long.valueOf(other.userId));
+			return Long.compare(userId, other.userId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof PasswordHistory))
+			return false;
+		PasswordHistory other = (PasswordHistory) obj;
+		return other.getId() == this.getId();
 	}
 }

@@ -6,8 +6,6 @@ import org.apache.cxf.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
-
 /**
  * Logs the errors into the LogicalDOC main log
  * 
@@ -16,7 +14,7 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
  */
 public class WebserviceFaultInterceptor extends FaultOutInterceptor {
 
-	private Logger log = LoggerFactory.getLogger(HibernatePersistentObjectDAO.class);
+	private Logger log = LoggerFactory.getLogger(WebserviceFaultInterceptor.class);
 
 	public WebserviceFaultInterceptor() {
 		super();

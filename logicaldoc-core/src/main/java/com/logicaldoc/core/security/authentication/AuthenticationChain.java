@@ -100,22 +100,21 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	private User authenticateUsingAuthenticators(String username, String password, String key, Client client, User user,
 			List<AuthenticationException> errors) {
 		for (Authenticator cmp : authenticators) {
-			if (!cmp.isEnabled())
-				continue;
-
-			// Validates an user for valid login credentials if a specific
-			// component handles this user explicitly (e.g. admin is
-			// DefaultAuthentication)
-			if (cmp.canAuthenticateUser(username)) {
-				try {
-					user = cmp.authenticate(username, password, key, client);
-				} catch (AuthenticationException ae) {
-					errors.add(ae);
+			if (cmp.isEnabled()) {
+				// Validates an user for valid login credentials if a specific
+				// component handles this user explicitly (e.g. admin is
+				// DefaultAuthentication)
+				if (cmp.canAuthenticateUser(username)) {
+					try {
+						user = cmp.authenticate(username, password, key, client);
+					} catch (AuthenticationException ae) {
+						errors.add(ae);
+					}
 				}
-			}
 
-			if (user != null)
-				break;
+				if (user != null)
+					break;
+			}
 		}
 		return user;
 	}
@@ -153,22 +152,21 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 		User user = null;
 		for (Authenticator cmp : authenticators) {
-			if (!cmp.isEnabled())
-				continue;
-
-			// Validates an user for valid login credentials if a specific
-			// component handles this user explicitly (e.g. admin is
-			// DefaultAuthentication)
-			if (cmp.canAuthenticateUser(username)) {
-				try {
-					user = cmp.pickUser(username);
-				} catch (Exception t) {
-					log.warn("Cannot pick user {} using authenticator {}", username, cmp.getClass().getName(), t);
+			if (cmp.isEnabled()) {
+				// Validates an user for valid login credentials if a specific
+				// component handles this user explicitly (e.g. admin is
+				// DefaultAuthentication)
+				if (cmp.canAuthenticateUser(username)) {
+					try {
+						user = cmp.pickUser(username);
+					} catch (Exception t) {
+						log.warn("Cannot pick user {} using authenticator {}", username, cmp.getClass().getName(), t);
+					}
 				}
-			}
 
-			if (user != null)
-				break;
+				if (user != null)
+					break;
+			}
 		}
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);

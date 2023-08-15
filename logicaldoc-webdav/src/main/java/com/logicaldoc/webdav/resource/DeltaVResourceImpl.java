@@ -105,7 +105,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 	public DavResource[] getReferenceResources(DavPropertyName hrefPropertyName) throws DavException {
 		DavProperty prop = getProperty(hrefPropertyName);
 		List resources = new ArrayList();
-		if (prop != null && prop instanceof HrefProperty) {
+		if (prop instanceof HrefProperty) {
 			HrefProperty hp = (HrefProperty) prop;
 			// process list of hrefs
 			List hrefs = hp.getHrefs();

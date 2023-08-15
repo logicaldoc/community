@@ -143,7 +143,7 @@ public class LDAPBrowser extends VLayout {
 
 	@SuppressWarnings("unchecked")
 	private void onSearch() {
-		users.setData(new ListGridRecord[0]);
+		users.setData();
 
 		final Map<String, Object> values =  vm.getValues();
 

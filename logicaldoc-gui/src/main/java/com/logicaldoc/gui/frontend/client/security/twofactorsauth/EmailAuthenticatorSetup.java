@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.security.twofactorsauth;
 
-import com.logicaldoc.gui.common.client.beans.GUIUser;
-
 /**
  * Panel for setting up the YubiKey second factor.
  * 

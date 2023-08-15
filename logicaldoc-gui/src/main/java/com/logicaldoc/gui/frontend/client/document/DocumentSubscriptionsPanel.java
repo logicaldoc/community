@@ -101,7 +101,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 				return;
 			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeDocuments(new Long[] { document.getId() },
-					Constants.AUDIT_DEFAULT_EVENTS, null, groupId, new AsyncCallback<Void>() {
+					Constants.getAuditDefaultEvents(), null, groupId, new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -125,7 +125,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 				return;
 			long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeDocuments(new Long[] { document.getId() },
-					Constants.AUDIT_DEFAULT_EVENTS, userId, null, new AsyncCallback<Void>() {
+					Constants.getAuditDefaultEvents(), userId, null, new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

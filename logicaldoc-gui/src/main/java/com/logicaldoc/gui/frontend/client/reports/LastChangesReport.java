@@ -301,7 +301,7 @@ public class LastChangesReport extends AdminPanel {
 
 	@SuppressWarnings("unchecked")
 	private void onSearch() {
-		histories.setData(new ListGridRecord[0]);
+		histories.setData();
 
 		final Map<String, Object> values =  vm.getValues();
 

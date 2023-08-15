@@ -65,7 +65,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		ListGridField expression = new ListGridField(EXPRESSION, I18N.message(EXPRESSION));
 		expression.setWidth(150);
 		TextItem conditionEdit = ItemFactory.newTextItem(EXPRESSION, null);
-		expression.setEditorType(conditionEdit);
+		expression.setEditorProperties(conditionEdit);
 		conditionEdit.addChangedHandler(changedHandler);
 
 		final ListGridField target = prepareTargetField();
@@ -164,7 +164,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		map2.put("1", I18N.message("notcontains"));
 		map2.put("2", I18N.message("matches"));
 		conditionSelect.setValueMap(map2);
-		condition.setEditorType(conditionSelect);
+		condition.setEditorProperties(conditionSelect);
 		conditionSelect.addChangedHandler(changedHandler);
 		condition.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if ("0".equals(value))
@@ -181,7 +181,7 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 		ListGridField field = new ListGridField(FIELD, I18N.message(FIELD));
 		field.setWidth(120);
 		SelectItem fieldSelect = ItemFactory.newEmailFields(FIELD, FIELD);
-		field.setEditorType(fieldSelect);
+		field.setEditorProperties(fieldSelect);
 		fieldSelect.addChangedHandler(changedHandler);
 		field.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if ("0".equals(value))

@@ -1,7 +1,11 @@
 package com.logicaldoc.gui.common.client;
 
 public final class Constants {
-	
+
+	private Constants() {
+		// Nothing to do
+	}
+
 	// The currenly logged user name
 	public static final String AUTH_USERNAME = "authUser";
 
@@ -156,7 +160,8 @@ public final class Constants {
 
 	public static final String DOC_ID = "docId";
 
-	public static final String[] AUDIT_DEFAULT_EVENTS = new String[] { "event.stored", EVENT_CHANGED, EVENT_CHECKEDIN };
+	private static final String[] AUDIT_DEFAULT_EVENTS = new String[] { "event.stored", EVENT_CHANGED,
+			EVENT_CHECKEDIN };
 
 	public static final String FULLTEXT_FIELD_TITLE = "title";
 
@@ -180,10 +185,14 @@ public final class Constants {
 
 	public static final String TWOFA_DUO = "duo";
 
-	public static final String[] FULLTEXT_DEFAULT_FIELDS = new String[] { FULLTEXT_FIELD_FILENAME,
+	private static final String[] FULLTEXT_DEFAULT_FIELDS = new String[] { FULLTEXT_FIELD_FILENAME,
 			FULLTEXT_FIELD_CONTENT, FULLTEXT_FIELD_TAGS };
 
-	private Constants() {
-	  // Do nothing
+	public static String[] getAuditDefaultEvents() {
+		return AUDIT_DEFAULT_EVENTS;
+	}
+
+	public static String[] getFulltextDefaultFields() {
+		return FULLTEXT_DEFAULT_FIELDS;
 	}
 }

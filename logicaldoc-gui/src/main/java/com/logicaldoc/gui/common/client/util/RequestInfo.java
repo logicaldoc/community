@@ -102,7 +102,7 @@ public class RequestInfo {
 			for (int i = 0; i < kvPairs.length; i++) {
 				String[] kv = kvPairs[i].split("=");
 				if (kv.length > 1) {
-					paramMap.put(kv[0], URL.decodeComponent(kv[1]));
+					paramMap.put(kv[0], URL.decodeQueryString(kv[1]));
 				} else {
 					paramMap.put(kv[0], "");
 				}

@@ -61,8 +61,6 @@ public class LDHtmlLayout extends AbstractStringLayout {
 	// Print no location info by default
 	private final boolean locationInfo;
 
-	private final String title = DEFAULT_TITLE;
-
 	private final String contentType;
 
 	private final String font;
@@ -72,7 +70,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 	private final DatePatternConverter datePatternConverter;
 
 	/** Possible font sizes */
-	public static enum FontSize {
+	public enum FontSize {
 		SMALLER("smaller"), XXSMALL("xx-small"), XSMALL("x-small"), SMALL("small"), MEDIUM("medium"), LARGE(
 				"large"), XLARGE("x-large"), XXLARGE("xx-large"), LARGER("larger");
 
@@ -112,7 +110,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 	}
 
 	public String getTitle() {
-		return title;
+		return DEFAULT_TITLE;
 	}
 
 	public boolean isLocationInfo() {
@@ -288,7 +286,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 		append(sbuf, "<meta charset=\"");
 		append(sbuf, getCharset().toString());
 		appendLs(sbuf, "\"/>");
-		append(sbuf, "<title>").append(title);
+		append(sbuf, "<title>").append(DEFAULT_TITLE);
 		appendLs(sbuf, "</title>");
 		appendLs(sbuf, "<style type=\"text/css\">");
 		append(sbuf, "body, table {font-family:").append(font).append("; font-size: ");
@@ -419,8 +417,8 @@ public class LDHtmlLayout extends AbstractStringLayout {
 			if (contentType == null) {
 				contentType = DEFAULT_CONTENT_TYPE + CHARSET + charset;
 			}
-			return new LDHtmlLayout(locationInfo,  contentType, charset, fontName, fontSize.getFontSize(),
-					datePattern, timezone);
+			return new LDHtmlLayout(locationInfo, contentType, charset, fontName, fontSize.getFontSize(), datePattern,
+					timezone);
 		}
 	}
 }

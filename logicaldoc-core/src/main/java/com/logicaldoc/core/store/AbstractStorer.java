@@ -72,7 +72,7 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public int compareTo(Storer o) {
-		return Integer.valueOf(id).compareTo(o.getId());
+		return Integer.compare(id, o.getId());
 	}
 
 	@Override
@@ -141,20 +141,12 @@ public abstract class AbstractStorer implements Storer {
 	@Override
 	public void writeToStream(long docId, String resource, OutputStream output, long start, long length)
 			throws IOException {
-		try {
-			IOUtils.copyLarge(getStream(docId, resource), output, start, length);
-		} catch (IOException ioe) {
-			throw ioe;
-		}
+		IOUtils.copyLarge(getStream(docId, resource), output, start, length);
 	}
 
 	@Override
 	public void writeToStream(long docId, String resource, OutputStream output) throws IOException {
-		try {
-			IOUtils.copyLarge(getStream(docId, resource), output);
-		} catch (IOException ioe) {
-			throw ioe;
-		}
+		IOUtils.copyLarge(getStream(docId, resource), output);
 	}
 
 	@Override

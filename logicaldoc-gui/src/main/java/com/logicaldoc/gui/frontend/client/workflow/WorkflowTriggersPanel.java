@@ -88,14 +88,8 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		EventsListGridField events = new EventsListGridField("events", I18N.message("triggeron"));
 
-		list = new ListGrid() {
-			@Override
-			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				return super.getCellCSSText(rec, rowNum, colNum);
-			}
-		};
+		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
-
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);

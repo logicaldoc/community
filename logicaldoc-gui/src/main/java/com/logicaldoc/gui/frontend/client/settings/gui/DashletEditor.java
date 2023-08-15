@@ -155,7 +155,7 @@ public class DashletEditor extends Window {
 		});
 		controls.addFormItem(selector);
 
-		columnsGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
+		columnsGrid.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, controls);
 
 		for (String column : dashlet.getColumnsList()) {
 			ListGridRecord rec = new ListGridRecord();

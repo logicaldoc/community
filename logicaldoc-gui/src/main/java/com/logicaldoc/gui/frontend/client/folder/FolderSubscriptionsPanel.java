@@ -108,7 +108,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 			if (selectedRecord == null)
 				return;
 			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
-			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.AUDIT_DEFAULT_EVENTS, null,
+			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(), null,
 					groupId, new AsyncCallback<Void>() {
 
 						@Override
@@ -132,7 +132,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 			if (selectedRecord == null)
 				return;
 			long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
-			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.AUDIT_DEFAULT_EVENTS, userId,
+			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(), userId,
 					null, new AsyncCallback<Void>() {
 
 						@Override

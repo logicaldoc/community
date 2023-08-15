@@ -9,7 +9,6 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;

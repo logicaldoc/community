@@ -145,7 +145,7 @@ public abstract class PluginRegistry {
 
 					final URL manifestURL = new URL("jar:file:" + pluginZIPFile.getAbsolutePath() + "!/plugin.xml");
 
-					final URL contextURL = pluginZIPFile.toURL();
+					final URL contextURL = pluginZIPFile.toURI().toURL();
 
 					System.out.println("Found plugin file: " + pluginZIPFile.getName());
 

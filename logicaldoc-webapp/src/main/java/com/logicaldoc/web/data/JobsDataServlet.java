@@ -64,7 +64,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 				logger.warn(e.getMessage(), e);
 			}
 		} else {
-			
+
 			try {
 				writeJobs(writer, session, maxRecords, group);
 			} catch (SchedulerException e) {
@@ -74,15 +74,15 @@ public class JobsDataServlet extends AbstractDataServlet {
 		writer.write("</list>");
 	}
 
-	private void writeJobs(PrintWriter writer, Session session, int maxRecords, String group) throws SchedulerException {
+	private void writeJobs(PrintWriter writer, Session session, int maxRecords, String group)
+			throws SchedulerException {
 		DateFormat df = getDateFormat();
-		
+
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		Map<Long, String> tenants = tDao.findAll().stream()
-				.collect(Collectors.toMap(t -> t.getId(), t -> t.getName()));
+		Map<Long, String> tenants = tDao.findAll().stream().collect(Collectors.toMap(t -> t.getId(), Tenant::getName));
 
 		int count = 0;
-		
+
 		JobManager jobManager = (JobManager) Context.get().getBean(JobManager.class);
 		for (Trigger trigger : jobManager.getTriggers(group,
 				session.getTenantId() == Tenant.DEFAULT_ID ? null : session.getTenantId())) {
@@ -94,10 +94,9 @@ public class JobsDataServlet extends AbstractDataServlet {
 			writer.print("<group><![CDATA[" + trigger.getJobKey().getGroup() + "]]></group>");
 			writer.print("<trigger><![CDATA[" + trigger.getKey().getName() + "]]></trigger>");
 			if (trigger.getJobDataMap() != null && trigger.getJobDataMap().containsKey(JobManager.TENANT_ID)) {
-				writer.print(
-						"<tenantId>" + trigger.getJobDataMap().getLong(JobManager.TENANT_ID) + "</tenantId>");
-				writer.print("<tenant><![CDATA["
-						+ tenants.get(trigger.getJobDataMap().getLong(JobManager.TENANT_ID)) + "]]></tenant>");
+				writer.print("<tenantId>" + trigger.getJobDataMap().getLong(JobManager.TENANT_ID) + "</tenantId>");
+				writer.print("<tenant><![CDATA[" + tenants.get(trigger.getJobDataMap().getLong(JobManager.TENANT_ID))
+						+ "]]></tenant>");
 			}
 
 			JobDetail job = jobManager.getJob(trigger.getJobKey().getName(), trigger.getJobKey().getGroup());

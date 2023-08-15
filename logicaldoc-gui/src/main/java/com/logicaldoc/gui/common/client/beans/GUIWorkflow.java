@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
 import com.logicaldoc.gui.common.client.Constants;
@@ -167,11 +168,8 @@ public class GUIWorkflow implements Serializable {
 	}
 
 	public void addState(GUIWFState status) {
-		GUIWFState[] buf = new GUIWFState[getStates().length];
-		for (int i = 0; i < getStates().length; i++) {
-			buf[i] = getStates()[i];
-		}
-		buf[buf.length - 1] = status;
+		GUIWFState[] newStates = Arrays.copyOf(getStates(), getStates().length + 1);
+		newStates[newStates.length - 1] = status;
 	}
 
 	public Long getTemplateId() {

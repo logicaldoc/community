@@ -58,7 +58,7 @@ public class StampUsersPanel extends VLayout {
 			if (selection == null || selection.length == 0)
 				return;
 
-			long ids[] = new long[selection.length];
+			long[] ids = new long[selection.length];
 			for (int i = 0; i < ids.length; i++)
 				ids[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
 

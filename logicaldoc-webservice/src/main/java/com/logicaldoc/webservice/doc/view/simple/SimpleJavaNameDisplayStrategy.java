@@ -16,8 +16,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.webservice.doc.JavaNameDisplayStrategy;
 
-
-public class SimpleJavaNameDisplayStrategy extends JavaNameDisplayStrategy {
+public class SimpleJavaNameDisplayStrategy implements JavaNameDisplayStrategy {
 
 	private static final Map<Class<?>, String> PRIMITIVE_TYPE_DISPLAY = new HashMap<>();
 	static {
@@ -65,7 +64,7 @@ public class SimpleJavaNameDisplayStrategy extends JavaNameDisplayStrategy {
 	public String displayClassName(Class<?> clazz) {
 		String className = clazz.getSimpleName();
 		if (className.endsWith("Service"))
-			className=className.substring(0, className.length() - "Service".length());
+			className = className.substring(0, className.length() - "Service".length());
 		System.out.println(className);
 
 		return SimpleClassNameDisplayUtils.display(className);

@@ -17,12 +17,12 @@ import java.util.StringTokenizer;
 public abstract class DocumentComparator implements Comparator<AbstractDocument> {
 
 	private DocumentComparator() {
-	};
+	}
 
 	private static final DocumentComparator ID_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
-			return Long.valueOf(d1.getId()).compareTo(d2.getId());
+			return Long.compare(d1.getId(), d2.getId());
 		}
 	};
 
@@ -43,7 +43,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	private static final DocumentComparator FILESIZE_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
-			return Long.valueOf(d1.getFileSize()).compareTo(d2.getFileSize());
+			return Long.compare(d1.getFileSize(), d2.getFileSize());
 		}
 	};
 
@@ -195,7 +195,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	private static final DocumentComparator PUBSTATUS_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
-			return Integer.valueOf(d1.getPublished()).compareTo(d2.getPublished());
+			return Integer.compare(d1.getPublished(), d2.getPublished());
 		}
 	};
 
@@ -227,7 +227,8 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		};
 	}
 
-	private static final DocumentComparator newComparatorForExtendedAttribute(final String attribute, boolean caseSensitive) {
+	private static final DocumentComparator newComparatorForExtendedAttribute(final String attribute,
+			boolean caseSensitive) {
 		return new DocumentComparator() {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public int compare(AbstractDocument d1, AbstractDocument d2) {

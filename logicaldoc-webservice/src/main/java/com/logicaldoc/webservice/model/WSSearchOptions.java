@@ -157,11 +157,6 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 		this.searchInSubPath = searchInSubPath;
 	}
 
-	@Override
-	public int compareTo(WSSearchOptions o) {
-		return this.getName().compareTo(o.getName());
-	}
-
 	public String getExpressionLanguage() {
 		return expressionLanguage;
 	}
@@ -266,8 +261,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 		if (opt.getFilterIds() != null)
 			wopt.setFilterIds(opt.getFilterIds().toArray(new Long[0]));
 
-		switch (opt.getType()) {
-		case SearchOptions.TYPE_FULLTEXT:
+		if (opt.getType() == SearchOptions.TYPE_FULLTEXT) {
 			wopt.setCreationFrom(DateUtil.format(((FulltextSearchOptions) opt).getCreationFrom()));
 			wopt.setCreationTo(DateUtil.format(((FulltextSearchOptions) opt).getCreationTo()));
 			wopt.setDateFrom(DateUtil.format(((FulltextSearchOptions) opt).getDateFrom()));
@@ -278,9 +272,6 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 			wopt.setFormat(((FulltextSearchOptions) opt).getFormat());
 			wopt.setSizeMax(((FulltextSearchOptions) opt).getSizeMax());
 			wopt.setSizeMin(((FulltextSearchOptions) opt).getSizeMin());
-
-			break;
-		default:
 		}
 
 		return wopt;
@@ -288,8 +279,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 
 	public SearchOptions toSearchOptions() {
 		SearchOptions so = null;
-		switch (type) {
-		case SearchOptions.TYPE_FULLTEXT:
+		if (type == SearchOptions.TYPE_FULLTEXT) {
 			so = new FulltextSearchOptions();
 			so.setCaseSensitive(caseSensitive == 1);
 			so.setDescription(description);
@@ -318,9 +308,25 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 			((FulltextSearchOptions) so).setLanguage(language);
 			((FulltextSearchOptions) so).setSizeMax(sizeMax);
 			((FulltextSearchOptions) so).setSizeMin(sizeMin);
-			break;
-		default:
 		}
 		return so;
+	}
+
+	@Override
+	public int compareTo(WSSearchOptions o) {
+		return this.getName().compareTo(o.getName());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof WSSearchOptions))
+			return false;
+		WSSearchOptions other = (WSSearchOptions) obj;
+		return this.getName().equals(other.getName());
+	}
+
+	@Override
+	public int hashCode() {
+		return getName().hashCode();
 	}
 }

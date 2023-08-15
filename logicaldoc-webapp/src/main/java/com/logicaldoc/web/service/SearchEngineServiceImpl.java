@@ -121,8 +121,6 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		Thread recreateThread = new Thread(task);
 		recreateThread.start();
-
-		return;
 	}
 
 	@Override
@@ -333,7 +331,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
-	};
+	}
 
 	@Override
 	public GUIResult query(String query, int page, int size) throws ServerException {
@@ -358,7 +356,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 			// Now sort the hits by score desc
 			List<Hit> sortedHitsList = new ArrayList<>(hitsMap.values());
-			sortedHitsList.sort((h1, h2) -> Long.valueOf(h1.getId()).compareTo(Long.valueOf(h2.getId())));
+			sortedHitsList.sort((h1, h2) -> Long.compare(h1.getId(), h2.getId()));
 			for (Hit hit : sortedHitsList) {
 				guiResults.add(toDocument(hit));
 			}

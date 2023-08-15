@@ -257,7 +257,34 @@ public class MetadataDiff extends Window {
 			if (position == other.position)
 				return getName().compareTo(other.getName());
 			else
-				return Integer.valueOf(position).compareTo(Integer.valueOf(other.position));
+				return Integer.compare(position, other.position);
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + position;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			DiffRecord other = (DiffRecord) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			return position == other.position;
+		}
+
+		private MetadataDiff getEnclosingInstance() {
+			return MetadataDiff.this;
 		}
 	}
 }

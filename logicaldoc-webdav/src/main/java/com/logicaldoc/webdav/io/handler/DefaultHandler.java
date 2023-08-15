@@ -19,7 +19,6 @@ import com.logicaldoc.webdav.exception.WebDavStorageException;
 import com.logicaldoc.webdav.io.manager.IOManager;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
-import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
 /**
  * For more informations, please visit
@@ -36,7 +35,7 @@ public class DefaultHandler implements IOHandler {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractWebdavServlet.class);
+	protected static Logger log = LoggerFactory.getLogger(DefaultHandler.class);
 
 	private String collectionNodetype = JcrConstants.NT_FOLDER;
 
@@ -128,10 +127,7 @@ public class DefaultHandler implements IOHandler {
 	}
 
 	public boolean canExport(ExportContext context, boolean isCollection) {
-		if (context == null || context.isCompleted()) {
-			return false;
-		}
-		return true;
+		return context != null && !context.isCompleted();
 	}
 
 	public boolean canExport(ExportContext context, DavResource resource) {

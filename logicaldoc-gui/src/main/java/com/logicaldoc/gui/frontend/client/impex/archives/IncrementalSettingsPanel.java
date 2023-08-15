@@ -78,7 +78,7 @@ public class IncrementalSettingsPanel extends VLayout {
 		vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			incremental.setPrefix(vm.getValueAsString("prefix").toString());
+			incremental.setPrefix(vm.getValueAsString("prefix"));
 			incremental.setFrequency(Integer.parseInt(vm.getValueAsString(FREQUENCY_STR)));
 			incremental.setFolder(folderSelector.getFolder());
 

@@ -287,7 +287,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		public String fileVersion;
 
 		@Schema(type = "string", required = false, description = "Comment")
-		public String Comment;
+		public String comment;
 
 		@Schema(type = "string", format = "binary", required = true, description = "File data")
 		public Attachment filedata;

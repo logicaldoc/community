@@ -12,7 +12,7 @@ import java.util.Date;
 public class PasswordAlreadyUsedException extends AuthenticationException {
 	private static final long serialVersionUID = 1L;
 
-	private Date date;
+	private final Date date;
 
 	public PasswordAlreadyUsedException(Date date) {
 		super("passwordalreadyused");

@@ -66,6 +66,8 @@ public class PatchPanel extends VLayout {
 
 	private static final String INSTALLED = "installed";
 
+	private static final long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
+	
 	// Shows the install notes panel
 	VLayout notesPanel = new VLayout();
 
@@ -88,8 +90,6 @@ public class PatchPanel extends VLayout {
 	private TextAreaItem log;
 
 	private Date lastConfirmed = null;
-
-	private static long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
 
 	public PatchPanel() {
 		setMembersMargin(3);

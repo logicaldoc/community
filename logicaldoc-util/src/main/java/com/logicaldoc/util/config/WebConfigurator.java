@@ -37,7 +37,7 @@ public class WebConfigurator extends XMLBean {
 
 	private static final String PARAM_NAME = "param-name";
 
-	public static enum INIT_PARAM {
+	public enum INIT_PARAM {
 		PARAM_OVERWRITE, PARAM_APPEND, PARAM_STOP
 	}
 
@@ -132,7 +132,6 @@ public class WebConfigurator extends XMLBean {
 			Element paramValue = contextParam.getChildren().get(1);
 			paramValue.setText(value);
 			writeXMLDoc();
-			return;
 		}
 	}
 
@@ -602,17 +601,13 @@ public class WebConfigurator extends XMLBean {
 		List constraints = getRootElement().getChildren("security-constraint", namespace);
 		for (Iterator iterator = constraints.iterator(); iterator.hasNext();) {
 			Element constraint = (Element) iterator.next();
-			if (constraint == null)
-				continue;
 			Element userData = constraint.getChild("user-data-constraint", namespace);
-			if (userData == null)
-				continue;
-			Element transport = userData.getChild("transport-guarantee", namespace);
-			if (transport == null)
-				continue;
-			if (!transport.getText().equals(policy)) {
-				transport.setText(policy);
-				modified = true;
+			if (userData != null) {
+				Element transport = userData.getChild("transport-guarantee", namespace);
+				if (transport != null && !transport.getText().equals(policy)) {
+					transport.setText(policy);
+					modified = true;
+				}
 			}
 		}
 

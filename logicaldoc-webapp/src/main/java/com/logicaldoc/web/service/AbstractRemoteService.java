@@ -60,9 +60,9 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 
 	private static Logger log = LoggerFactory.getLogger(AbstractRemoteService.class);
 
-	protected final String LOCALE = "locale";
+	protected static final String LOCALE = "locale";
 
-	protected final String USER = "user";
+	protected static final String USER = "user";
 
 	protected AbstractRemoteService() {
 		super();

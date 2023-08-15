@@ -61,17 +61,16 @@ public abstract class Search {
 
 		for (Extension ext : extensions) {
 			int type = Integer.parseInt(ext.getParameter("type").valueAsString());
-			if (type != opt.getType())
-				continue;
-
-			String className = ext.getParameter("class").valueAsString();
-			try {
-				search = (Search) Class.forName(className).getDeclaredConstructor().newInstance();
-				search.setOptions(opt);
-			} catch (Exception e) {
-				log.error(e.getMessage());
+			if (type == opt.getType()) {
+				String className = ext.getParameter("class").valueAsString();
+				try {
+					search = (Search) Class.forName(className).getDeclaredConstructor().newInstance();
+					search.setOptions(opt);
+				} catch (Exception e) {
+					log.error(e.getMessage());
+				}
+				break;
 			}
-			break;
 		}
 
 		return search;
@@ -91,17 +90,16 @@ public abstract class Search {
 
 		for (Extension ext : extensions) {
 			int t = Integer.parseInt(ext.getParameter("type").valueAsString());
-			if (t != type)
-				continue;
-
-			String className = ext.getParameter("options").valueAsString();
-			try {
-				options = (SearchOptions) Class.forName(className).getDeclaredConstructor().newInstance();
-				options.setType(type);
-			} catch (Exception e) {
-				log.error(e.getMessage());
+			if (t == type) {
+				String className = ext.getParameter("options").valueAsString();
+				try {
+					options = (SearchOptions) Class.forName(className).getDeclaredConstructor().newInstance();
+					options.setType(type);
+				} catch (Exception e) {
+					log.error(e.getMessage());
+				}
+				break;
 			}
-			break;
 		}
 
 		if (options == null)
@@ -194,7 +192,6 @@ public abstract class Search {
 				log.error(e.getMessage(), e);
 			}
 
-			
 			copyExtendedAttributesToHits(attrs, extAtt);
 
 			log.debug("End searching for extended attributes");
@@ -202,7 +199,8 @@ public abstract class Search {
 
 		Date finish = new Date();
 		execTime = finish.getTime() - start.getTime();
-		log.info("Search completed in {} ms and found {} hits (estimated {})", execTime, hits.size(), estimatedHitsNumber);
+		log.info("Search completed in {} ms and found {} hits (estimated {})", execTime, hits.size(),
+				estimatedHitsNumber);
 
 		return hits;
 	}

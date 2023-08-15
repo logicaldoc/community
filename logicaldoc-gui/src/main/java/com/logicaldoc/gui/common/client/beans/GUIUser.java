@@ -342,22 +342,16 @@ public class GUIUser implements Serializable {
 
 	public void addGroup(GUIGroup group) {
 		if (!isMemberOf(group.getName())) {
-			GUIGroup[] tmp = new GUIGroup[groups.length + 1];
-			for (int i = 0; i < groups.length; i++) {
-				tmp[i] = groups[i];
-			}
-			tmp[groups.length] = group;
-			groups = tmp;
+			GUIGroup[] newGroups = Arrays.copyOf(groups, groups.length + 1);
+			newGroups[groups.length] = group;
+			groups = newGroups;
 		}
 	}
 
 	public void addDashlet(GUIDashlet dashlet) {
-		GUIDashlet[] tmp = new GUIDashlet[dashlets.length + 1];
-		for (int i = 0; i < dashlets.length; i++) {
-			tmp[i] = dashlets[i];
-		}
-		tmp[groups.length] = dashlet;
-		dashlets = tmp;
+		GUIDashlet[] newDashlets = Arrays.copyOf(dashlets, dashlets.length + 1);
+		newDashlets[groups.length] = dashlet;
+		dashlets = newDashlets;
 	}
 
 	public void removeGroup(String groupName) {

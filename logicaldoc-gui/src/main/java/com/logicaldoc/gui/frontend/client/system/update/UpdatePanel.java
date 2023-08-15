@@ -42,6 +42,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class UpdatePanel extends VLayout {
 
+	private static final long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
+	
 	// Shows the install notes panel
 	VLayout notesPanel;
 
@@ -56,8 +58,6 @@ public class UpdatePanel extends VLayout {
 	private ButtonItem ok;
 
 	private Date lastConfirmed = null;
-
-	private static long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
 
 	private String updateFileName;
 

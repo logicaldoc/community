@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.document.grid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,6 @@ import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
-import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
@@ -317,7 +315,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		rating.setHidden(true);
 		fieldsMap.put(rating.getName(), rating);
 
-		final LinkedHashMap<String, String> languages = I18N.getSupportedLanguages(false);
+		final Map<String, String> languages = I18N.getSupportedLanguages(false);
 
 		ListGridField language = new ColoredListGridField(LANGUAGE, 100);
 		language.setType(ListGridFieldType.TEXT);
@@ -796,12 +794,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			if (!selectedDocument.isPasswordProtected())
 				handler.onDoubleClick(event);
 			else
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-					@Override
-					public void onUnprotected(GUIDocument document) {
-						handler.onDoubleClick(event);
-					}
-				});
+				DocumentProtectionManager.askForPassword(selectedDocument.getId(),
+						document -> handler.onDoubleClick(event));
 		});
 	}
 
@@ -814,12 +808,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			if (!selectedDocument.isPasswordProtected())
 				handler.onSelectionChanged(event);
 			else
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-					@Override
-					public void onUnprotected(GUIDocument document) {
-						handler.onSelectionChanged(event);
-					}
-				});
+				DocumentProtectionManager.askForPassword(selectedDocument.getId(),
+						document -> handler.onSelectionChanged(event));
 		});
 	}
 
@@ -832,12 +822,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			if (!selectedDocument.isPasswordProtected())
 				handler.onCellContextClick(event);
 			else
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-					@Override
-					public void onUnprotected(GUIDocument document) {
-						handler.onCellContextClick(event);
-					}
-				});
+				DocumentProtectionManager.askForPassword(selectedDocument.getId(),
+						document -> handler.onCellContextClick(event));
 
 			if (event != null)
 				event.cancel();
@@ -888,7 +874,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		return ids;
 	}
-	
+
 	@Override
 	public void expandVisibleRows() {
 		Integer[] rows = getVisibleRows();
@@ -1099,7 +1085,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		if (getGridCursor() != null) {
 			getGridCursor().setPageSize(pageSize);
 			if (folder != null)
-				getGridCursor().setTotalRecords((int)folder.getDocumentCount());
+				getGridCursor().setTotalRecords((int) folder.getDocumentCount());
 		}
 
 		/*

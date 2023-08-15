@@ -140,7 +140,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (object.getTemplateId() != null)
 			templateItem.setValue(object.getTemplateId().toString());
 
-		templateItem.addChangedHandler((event) -> handleTemplateChangedSelection(event));
+		templateItem.addChangedHandler(this::handleTemplateChangedSelection);
 
 		if (templateChangedHandler != null)
 			templateItem.addChangedHandler(templateChangedHandler);

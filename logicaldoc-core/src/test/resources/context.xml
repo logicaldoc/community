@@ -19,15 +19,15 @@
             http://www.springframework.org/schema/security/spring-security.xsd">
     <import resource="classpath*:context/context-*.xml" />
     <!-- This post processor ensures placeholders substitutions -->
-    <bean id="PropertyPlaceholderConfigurer"
-        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-        lazy-init="false" abstract="false" autowire="default">
-        <property name="locations">
-            <list>
-                <value>classpath*:context.properties</value>
-            </list>
-        </property>
-    </bean>
+	<bean id="PropertyPlaceholderConfigurer"
+		class="com.logicaldoc.util.spring.PropertiesPlaceHolder" lazy-init="false" abstract="false"
+		autowire="default">
+		<property name="locations">
+			<list>
+				<value>classpath*:context.properties</value>
+			</list>
+		</property>
+	</bean>
     <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties">
     </bean>
     <bean id="Context" class="com.logicaldoc.util.Context" abstract="false"

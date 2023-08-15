@@ -40,7 +40,7 @@ public class WorkflowToolStrip extends ToolStrip {
 
 	private ToolStripButton export = null;
 
-	private ToolStripButton _import = null;
+	private ToolStripButton importButton = null;
 
 	private ToolStripButton save = null;
 
@@ -140,12 +140,12 @@ public class WorkflowToolStrip extends ToolStrip {
 	}
 
 	private void addImportButton() {
-		_import = new ToolStripButton(I18N.message("iimport"));
-		_import.addClickHandler(event -> {
+		importButton = new ToolStripButton(I18N.message("iimport"));
+		importButton.addClickHandler(event -> {
 			new WorkflowUploader(WorkflowToolStrip.this.designer).show();
 			update();
 		});
-		addButton(_import);
+		addButton(importButton);
 	}
 
 	private void addCloneButton() {
@@ -426,7 +426,7 @@ public class WorkflowToolStrip extends ToolStrip {
 	private void update() {
 		export.setDisabled(
 				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
-		_import.setDisabled(
+		importButton.setDisabled(
 				currentWorkflow == null || currentWorkflow.getName() == null || currentWorkflow.getName().isEmpty()
 						|| !currentWorkflow.isLatestVersion() || !currentWorkflow.isWrite());
 		save.setDisabled(

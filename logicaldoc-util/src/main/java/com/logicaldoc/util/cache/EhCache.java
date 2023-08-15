@@ -23,7 +23,8 @@ import net.sf.ehcache.Element;
  * see org.springframework.cache.ehcache.EhCacheManagerFactoryBean
  */
 public class EhCache<K extends Serializable, V extends Object> implements com.logicaldoc.util.cache.Cache<K, V> {
-	private static Logger log = LoggerFactory.getLogger(Cache.class);
+	
+	private static Logger log = LoggerFactory.getLogger(EhCache.class);
 
 	private net.sf.ehcache.Cache cache;
 

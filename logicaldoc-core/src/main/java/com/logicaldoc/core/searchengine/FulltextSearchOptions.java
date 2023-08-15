@@ -122,4 +122,17 @@ public class FulltextSearchOptions extends SearchOptions {
 	public void setExpressionLanguage(String expressionLanguage) {
 		this.expressionLanguage = expressionLanguage;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof FulltextSearchOptions))
+			return false;
+		FulltextSearchOptions other = (FulltextSearchOptions) obj;
+		return getName().equals(other.getName());
+	}
+
+	@Override
+	public int hashCode() {
+		return getName().hashCode();
+	}
 }

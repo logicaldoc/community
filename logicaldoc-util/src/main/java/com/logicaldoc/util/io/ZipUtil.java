@@ -46,7 +46,7 @@ public class ZipUtil {
 
 	private String fileNameCharset = "UTF-8";
 
-	protected static Logger log = LoggerFactory.getLogger(JarUtil.class);
+	protected static Logger log = LoggerFactory.getLogger(ZipUtil.class);
 
 	/**
 	 * Maximum number of entries in the compressed archive, config parameter

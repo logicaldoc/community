@@ -585,7 +585,6 @@ public class TaskEditor extends Window {
 				&& (TaskEditor.this.state.getParticipants() == null
 						|| TaskEditor.this.state.getParticipants().length == 0)) {
 			SC.warn(I18N.message("workflowtaskparticipantatleast"));
-			return;
 		}
 	}
 }

@@ -143,8 +143,8 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		addComputeStatsIcons(documents, subfolders, size);
 
 		List<FormItem> items = new ArrayList<>();
-		items.addAll(Arrays.asList(new FormItem[] { idItem, pathItem, name, description, storage, maxVersions, creation,
-				documents, subfolders, size, barcode }));
+		items.addAll(Arrays.asList(idItem, pathItem, name, description, storage, maxVersions, creation, documents,
+				subfolders, size, barcode));
 
 		if (!Feature.enabled(Feature.BARCODES))
 			items.remove(barcode);

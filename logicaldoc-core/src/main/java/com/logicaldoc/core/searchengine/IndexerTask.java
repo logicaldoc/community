@@ -226,7 +226,6 @@ public class IndexerTask extends Task {
 			for (IndexerThread iThread : threads) {
 				if (!iThread.isCompleted()) {
 					threadsCompleted = false;
-					;
 					break;
 				}
 			}

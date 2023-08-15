@@ -70,10 +70,10 @@ public class WebcontentCreate extends Window {
 		if (title.lastIndexOf('.') != -1)
 			title = title.substring(0, title.lastIndexOf('.'));
 
-		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE).toString()))
+		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE)))
 			vo.setTemplateId(null);
 		else {
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE).toString()));
+			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE)));
 		}
 
 		vo.setType("html");

@@ -79,7 +79,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 				linkForm.setNumCols(1);
 				linkForm.setWidth100();
 				linkForm.setItems(getLink, prefilledLink);
-				
+
 				addItem(linkForm);
 			}
 		});
@@ -87,14 +87,14 @@ public class WebFormPrefilledLink extends StickyWindow {
 	}
 
 	public void onGetLink() {
-		if (!vm.validate())
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		if (!extPanel.validate())
+		if (Boolean.FALSE.equals(extPanel.validate()))
 			return;
 
-		FormService.Instance.get().getPreFilledLink((GUIForm) extPanel.getObject(),
-				vm.getValueAsString(RESPONDEREMAIL), new AsyncCallback<String>() {
+		FormService.Instance.get().getPreFilledLink((GUIForm) extPanel.getObject(), vm.getValueAsString(RESPONDEREMAIL),
+				new AsyncCallback<String>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

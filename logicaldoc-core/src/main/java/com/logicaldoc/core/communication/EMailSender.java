@@ -286,12 +286,7 @@ public class EMailSender {
 			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc);
 		message.setSubject(email.getSubject(), UTF_8);
 
-		MimeBodyPart body;
-		try {
-			body = buildBodyPart(email);
-		} catch (UnsupportedEncodingException e) {
-			throw new MessagingException(e.getMessage(), e);
-		}
+		MimeBodyPart body = buildBodyPart(email);
 
 		/*
 		 * If we have to images, the parts must be 'related' otherwise 'mixed'
@@ -434,7 +429,7 @@ public class EMailSender {
 		return props;
 	}
 
-	private MimeBodyPart buildBodyPart(EMail email) throws MessagingException, UnsupportedEncodingException {
+	private MimeBodyPart buildBodyPart(EMail email) throws MessagingException {
 		MimeBodyPart body = new MimeBodyPart();
 		if (email.isHtml()) {
 			body.setContent(new String(email.getMessageText().getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8),
@@ -531,19 +526,15 @@ public class EMailSender {
 				ext.setStringValue(StringUtils.substring(from.getAddress(), 0, 3999));
 				attributes.put("from", ext);
 
-				{
-					ext = new Attribute();
-					ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddresses()).stream()
-							.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
-					attributes.put("to", ext);
-				}
+				ext = new Attribute();
+				ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddresses()).stream()
+						.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
+				attributes.put("to", ext);
 
-				{
-					ext = new Attribute();
-					ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddressesCC()).stream()
-							.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
-					attributes.put("cc", ext);
-				}
+				ext = new Attribute();
+				ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddressesCC()).stream()
+						.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
+				attributes.put("cc", ext);
 
 				ext = new Attribute();
 				ext.setStringValue(StringUtils.substring(email.getSubject(), 0, 3999));

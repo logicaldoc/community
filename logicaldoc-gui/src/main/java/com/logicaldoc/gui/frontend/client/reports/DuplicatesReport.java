@@ -192,13 +192,11 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		list.setGroupStartOpen(GroupStartOpen.ALL);
 		list.setGroupByField(DIGEST);
 
-		filename.setGroupTitleRenderer((groupValue, groupNode, field, fieldName, grid) -> {
-			return I18N.message(FILENAME) + ": " + groupValue.toString();
-		});
+		filename.setGroupTitleRenderer((groupValue, groupNode, field, fieldName, grid) -> I18N.message(FILENAME) + ": "
+				+ groupValue.toString());
 
-		digest.setGroupTitleRenderer((groupValue, groupNode, field, fieldName, grid) -> {
-			return I18N.message(DIGEST) + ": " + groupValue.toString();
-		});
+		digest.setGroupTitleRenderer(
+				(groupValue, groupNode, field, fieldName, grid) -> I18N.message(DIGEST) + ": " + groupValue.toString());
 
 		list.setCanDrag(true);
 		list.setCanDragRecordsOut(true);

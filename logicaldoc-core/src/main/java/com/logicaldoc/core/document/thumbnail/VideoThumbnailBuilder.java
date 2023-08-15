@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.FrameGrabber.Exception;
 import org.bytedeco.javacv.Java2DFrameUtils;
@@ -60,15 +59,9 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 
 			for (int i = startFrame; i < grabber.getLengthInFrames() && frameFile.length() == 0; i++) {
 				try {
-					Frame frame = grabber.grab();
-					if (frame == null)
-						continue;
-					BufferedImage img = Java2DFrameUtils.toBufferedImage(frame);
-					if (img == null)
-						continue;
-
+					BufferedImage img = Java2DFrameUtils.toBufferedImage(grabber.grab());
 					ImageIO.write(img, "png", frameFile);
-				} catch (IOException ioe) {
+				} catch (java.lang.Exception e) {
 					// Nothing to do
 				}
 			}
@@ -94,13 +87,7 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 						continue;
 					}
 
-					Frame frame = grabber.grab();
-					if (frame == null)
-						continue;
-					BufferedImage img = Java2DFrameUtils.toBufferedImage(frame);
-					if (img == null)
-						continue;
-
+					BufferedImage img = Java2DFrameUtils.toBufferedImage(grabber.grab());
 					ImageIO.write(img, "png", frameFile);
 				} catch (IOException ioe) {
 					// Nothing to do

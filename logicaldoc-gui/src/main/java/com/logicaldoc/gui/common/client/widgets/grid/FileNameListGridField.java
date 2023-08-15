@@ -63,7 +63,7 @@ public class FileNameListGridField extends ColoredListGridField {
 
 			String iconName = rec.getAttributeAsString(iconFieldName);
 			if (iconName == null || iconName.isEmpty())
-				return val != null ? val.toString() : "";
+				return val != null ? val : "";
 
 			if (iconName.contains("folder") || iconName.contains("workspace")) {
 				if (iconName.contains("alias"))
@@ -76,7 +76,7 @@ public class FileNameListGridField extends ColoredListGridField {
 					return super.format(DocUtil.getFolderIcon(false, GUIFolder.TYPE_DEFAULT, value.toString(), null),
 							rec, rowNum, colNum);
 			} else {
-				return Util.iconWithFilename(iconName, val != null ? val.toString() : "");
+				return Util.iconWithFilename(iconName, val != null ? val : "");
 			}
 		}
 	}

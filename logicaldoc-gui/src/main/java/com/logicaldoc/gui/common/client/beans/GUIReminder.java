@@ -87,4 +87,17 @@ public class GUIReminder implements Comparable<GUIReminder>, Serializable {
 		else
 			return this.date.compareTo(other.date);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof GUIReminder))
+			return false;
+		GUIReminder other = (GUIReminder) obj;
+		return this.date.equals(other.date);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.date.hashCode();
+	}
 }

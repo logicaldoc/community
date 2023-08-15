@@ -26,7 +26,6 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.task.DefaultSchedulerFactory;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
@@ -44,7 +43,7 @@ public class JobManager {
 
 	public static final String MISSFIRE_IGNORE = "ignore";
 
-	protected static Logger log = LoggerFactory.getLogger(DefaultSchedulerFactory.class);
+	protected static Logger log = LoggerFactory.getLogger(JobManager.class);
 
 	private Scheduler scheduler;
 

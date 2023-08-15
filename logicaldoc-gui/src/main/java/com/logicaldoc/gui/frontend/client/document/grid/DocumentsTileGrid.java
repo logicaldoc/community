@@ -15,18 +15,18 @@ import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
-import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
+import com.smartgwt.client.data.SortSpecifier;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
@@ -42,6 +42,7 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
  * @since 7.0
  */
 public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, DocumentObserver {
+
 	private static final String CLOSE_TD = "</td>";
 
 	private static final String SHOWNDOCUMENTS = "showndocuments";
@@ -74,7 +75,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		addDataArrivedHandler((DataArrivedEvent event) -> {
 			if (cursor != null)
 				cursor.setMessage(I18N.message(SHOWNDOCUMENTS, Integer.toString(getCount())));
-			sortByProperty("filename", true);
+			setSort(new SortSpecifier("filename", SortDirection.ASCENDING));
 		});
 
 		DocumentController.get().addObserver(this);
@@ -213,7 +214,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	public Long[] getSelectedIds() {
 		return DocumentGridUtil.getIds(getSelection());
 	}
-	
+
 	@Override
 	public Long[] getIds() {
 		return DocumentGridUtil.getIds(getRecordList().toArray());
@@ -278,12 +279,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
-			DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-				@Override
-				public void onUnprotected(GUIDocument document) {
-					handler.onDoubleClick(null);
-				}
-			});
+			DocumentProtectionManager.askForPassword(selectedDocument.getId(), document -> handler.onDoubleClick(null));
 		});
 	}
 
@@ -293,12 +289,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
-			DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-				@Override
-				public void onUnprotected(GUIDocument document) {
-					handler.onSelectionChanged(null);
-				}
-			});
+			DocumentProtectionManager.askForPassword(selectedDocument.getId(),
+					document -> handler.onSelectionChanged(null));
 		});
 	}
 
@@ -308,12 +300,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
-			DocumentProtectionManager.askForPassword(selectedDocument.getId(), new DocumentProtectionHandler() {
-				@Override
-				public void onUnprotected(GUIDocument document) {
-					handler.onCellContextClick(null);
-				}
-			});
+			DocumentProtectionManager.askForPassword(selectedDocument.getId(),
+					document -> handler.onCellContextClick(null));
 			if (event != null)
 				event.cancel();
 		});

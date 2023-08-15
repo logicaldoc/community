@@ -138,7 +138,7 @@ public class Language implements Comparable<Language> {
 		// Try to use constructor (Set<?> stopwords)
 		if (aClass != null && stopWords != null && (!stopWords.isEmpty())) {
 			try {
-				Constructor<?> constructor = aClass.getConstructor(new Class[] { java.util.Set.class });
+				Constructor<?> constructor = aClass.getConstructor(java.util.Set.class);
 				if (constructor != null)
 					analyzer = (Analyzer) constructor.newInstance(stopWords);
 			} catch (Exception e) {

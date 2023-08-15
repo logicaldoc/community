@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
 import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -115,7 +114,7 @@ public class SavedSearchesPanel extends VLayout {
 
 			final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
 
-			LD.askForValues("sharesearch", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }), 350,
+			LD.askForValues("sharesearch", null, Arrays.asList(usersSelector, groupsSelector), 350,
 					new ValuesCallback() {
 						@Override
 						public void execute(String value) {

@@ -38,9 +38,9 @@ public class ThreadPools {
 
 	private static final String THREADPOOL = "threadpool.";
 
-	private static String TYPE_DEFAULT = "default";
+	private static final String TYPE_DEFAULT = "default";
 
-	private static Logger log = LoggerFactory.getLogger(ThreadPools.class);
+	private static final Logger log = LoggerFactory.getLogger(ThreadPools.class);
 
 	private Map<String, ExecutorService> pools = new HashMap<>();
 

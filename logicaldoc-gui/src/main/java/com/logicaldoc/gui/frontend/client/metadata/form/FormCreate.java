@@ -69,10 +69,10 @@ public class FormCreate extends Window {
 		GUIForm vo = new GUIForm();
 		vo.setName(vm.getValueAsString("name").trim());
 
-		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE).toString()))
+		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE)))
 			vo.setTemplateId(null);
 		else
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE).toString()));
+			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE)));
 
 		FormService.Instance.get().save(vo, new AsyncCallback<GUIForm>() {
 			@Override

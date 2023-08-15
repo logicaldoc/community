@@ -27,7 +27,7 @@ public class I18N {
 	 */
 	private static Map<String, Locale> iso3LocaleMap;
 
-	public static final String[] bundles = new String[] { "i18n.messages" };
+	protected static final String[] bundles = new String[] { "i18n.messages" };
 
 	static {
 		String[] languages = Locale.getISOLanguages();

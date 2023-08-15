@@ -22,7 +22,6 @@ import com.smartgwt.client.widgets.calendar.Calendar;
 import com.smartgwt.client.widgets.calendar.CalendarEvent;
 import com.smartgwt.client.widgets.calendar.CalendarView;
 import com.smartgwt.client.widgets.calendar.DateHeaderCustomizer;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -52,7 +51,7 @@ public class WorkingTimePanel extends VLayout {
 			setMembersMargin(20);
 			setAlign(Alignment.LEFT);
 		}
-		
+
 		prepareGUI();
 	}
 
@@ -77,7 +76,7 @@ public class WorkingTimePanel extends VLayout {
 
 			final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
 
-			LD.askForValues("cloneworktime", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }), 350,
+			LD.askForValues("cloneworktime", null, Arrays.asList(usersSelector, groupsSelector), 350,
 					new ValuesCallback() {
 						@Override
 						public void execute(String value) {

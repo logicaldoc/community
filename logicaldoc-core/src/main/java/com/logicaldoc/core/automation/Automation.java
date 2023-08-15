@@ -75,10 +75,10 @@ public class Automation {
 	 */
 	private static final Map<String, Object> systemDictionary = new ConcurrentHashMap<>();
 
-	public static synchronized void initialize() {		
-		if(RuntimeSingleton.isInitialized())
-				return;
-		
+	public static synchronized void initialize() {
+		if (RuntimeSingleton.isInitialized())
+			return;
+
 		Properties settings = null;
 		try (InputStream is = Automation.class.getResourceAsStream("/automation.properties")) {
 			if (is != null) {
@@ -164,8 +164,6 @@ public class Automation {
 
 				Object instance = beanClass.getDeclaredConstructor().newInstance();
 				dictionary.put(key, instance);
-			} catch (ClassNotFoundException e) {
-				log.error(e.getMessage(), e);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}

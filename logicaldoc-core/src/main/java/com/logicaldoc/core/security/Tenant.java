@@ -234,9 +234,7 @@ public class Tenant extends PersistentObject implements Serializable {
 	public boolean isAvailable() {
 		if (enabled == 0)
 			return false;
-		if (expire != null && expire.before(new Date()))
-			return false;
-		return true;
+		return expire == null || expire.before(new Date());
 	}
 
 	public Date getExpire() {

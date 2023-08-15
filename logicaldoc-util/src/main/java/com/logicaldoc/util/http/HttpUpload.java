@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.MimeType;
-import com.logicaldoc.util.exec.Exec;
 
 /**
  * 
@@ -27,7 +26,7 @@ import com.logicaldoc.util.exec.Exec;
  */
 public class HttpUpload {
 
-	protected static Logger log = LoggerFactory.getLogger(Exec.class);
+	protected static Logger log = LoggerFactory.getLogger(HttpUpload.class);
 
 	private static final String UTF_8 = "UTF-8";
 

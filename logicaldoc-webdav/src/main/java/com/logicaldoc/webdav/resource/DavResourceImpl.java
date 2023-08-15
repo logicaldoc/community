@@ -505,10 +505,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 					list.add(childRes);
 				}
 
-			}
-
-			catch (DavException e) {
-				throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			} catch (Exception e) {
 				throw new UncheckedDavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
@@ -560,7 +556,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 				log.debug("filext {}", filext);
 
 				// get chunk part and total chunks
-				String ssss[] = filext.split("-");
+				String[] ssss = filext.split("-");
 				String chunkString = ssss[1];
 				int chunkID = Integer.parseInt(ssss[2]);
 				int chunkTotal = Integer.parseInt(ssss[3]);

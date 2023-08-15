@@ -167,11 +167,10 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		ContextProperties conf = Context.get().getProperties();
 		for (Object key : conf.keySet()) {
 			String name = key.toString();
-			if (name.endsWith(HIDDEN) || name.endsWith("readonly")
-					|| (conf.containsKey(name + HIDDEN) && "true".equals(conf.getProperty(name + HIDDEN))))
-				continue;
 
-			if (name.startsWith("product") || name.startsWith("skin") || name.startsWith("conf")
+			if (name.endsWith(HIDDEN) || name.endsWith("readonly")
+					|| (conf.containsKey(name + HIDDEN) && "true".equals(conf.getProperty(name + HIDDEN)))
+					|| name.startsWith("product") || name.startsWith("skin") || name.startsWith("conf")
 					|| name.startsWith("ldap") || name.startsWith("schedule") || name.contains(".smtp.")
 					|| name.contains("password") || name.startsWith("ad") || name.startsWith("webservice")
 					|| name.startsWith("webdav") || name.startsWith("cmis") || name.startsWith("runlevel")

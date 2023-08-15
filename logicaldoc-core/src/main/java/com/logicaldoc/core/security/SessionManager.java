@@ -45,7 +45,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	private static final long serialVersionUID = 1L;
 
 	// The maximum number of closed session maintained in memory
-	private static int MAX_CLOSED_SESSIONS = 50;
+	private static final int MAX_CLOSED_SESSIONS = 50;
 
 	private transient AuthenticationChain authenticationChain;
 
@@ -357,7 +357,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			return sid;
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && auth instanceof LDAuthenticationToken)
+		if (auth instanceof LDAuthenticationToken)
 			return ((LDAuthenticationToken) auth).getSid();
 
 		if (request != null) {
@@ -382,7 +382,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		else if (request.getParameter(PARAM_SID) != null)
 			sid = request.getParameter(PARAM_SID);
 		else {
-			Cookie cookies[] = request.getCookies();
+			Cookie[] cookies = request.getCookies();
 			if (cookies != null)
 				for (Cookie cookie : cookies) {
 					if (COOKIE_SID.equals(cookie.getName())) {

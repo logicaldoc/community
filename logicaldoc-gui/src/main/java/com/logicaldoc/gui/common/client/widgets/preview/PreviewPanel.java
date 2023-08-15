@@ -11,7 +11,6 @@ import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
-import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.MessageLabel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -69,44 +68,40 @@ public class PreviewPanel extends VLayout {
 			return;
 		}
 
-		DocumentProtectionManager.askForPassword(docId, new DocumentProtectionHandler() {
+		DocumentProtectionManager.askForPassword(docId, doc -> {
+			accessGranted = true;
 
-			@Override
-			public void onUnprotected(GUIDocument doc) {
-				accessGranted = true;
+			if (Util.isMediaFile(document.getFileName().toLowerCase())) {
+				reloadMedia();
+			} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
+				reloadHTML();
+			} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
+				reloadMail();
+			} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
+				FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
+						new AsyncCallback<GUIFolder>() {
 
-				if (Util.isMediaFile(document.getFileName().toLowerCase())) {
-					reloadMedia();
-				} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
-					reloadHTML();
-				} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
-					reloadMail();
-				} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-					FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-							new AsyncCallback<GUIFolder>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(GUIFolder folder) {
-									if (folder.isDownload())
-										reloadDICOM();
-									else
-										reloadPreview();
-								}
-							});
-				} else {
-					reloadPreview();
-				}
-
-				redraw();
+							@Override
+							public void onSuccess(GUIFolder folder) {
+								if (folder.isDownload())
+									reloadDICOM();
+								else
+									reloadPreview();
+							}
+						});
+			} else {
+				reloadPreview();
 			}
+
+			redraw();
 		});
 
-		addResizedHandler((event) -> doResize());
+		addResizedHandler(event -> doResize());
 	}
 
 	private void doResize() {

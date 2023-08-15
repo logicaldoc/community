@@ -28,7 +28,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -188,12 +187,11 @@ public class Profile extends Window {
 		showDocsDefinition.setPrompt(I18N.message("editlayout"));
 		showDocsDefinition.setWidth(12);
 		showDocsDefinition.setHeight(12);
-		showDocsDefinition.addFormItemClickHandler( event -> {
+		showDocsDefinition.addFormItemClickHandler(event -> {
 			TextAreaItem textArea = ItemFactory.newTextAreaItem(DOCSGRIDLAYOUT, null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message(DOCSGRIDLAYOUT), I18N.message(DOCSGRIDLAYOUT),
-					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400,
-					(final String value) -> user.setDocsGrid(value));
+					user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, user::setDocsGrid);
 			event.cancel();
 		});
 
@@ -202,12 +200,11 @@ public class Profile extends Window {
 		showHitsDefinition.setPrompt(I18N.message("editlayout"));
 		showHitsDefinition.setWidth(12);
 		showHitsDefinition.setHeight(12);
-		showHitsDefinition.addFormItemClickHandler( event -> {
+		showHitsDefinition.addFormItemClickHandler(event -> {
 			TextAreaItem textArea = ItemFactory.newTextAreaItem(HITSGRIDLAYOUT, null);
 			textArea.setHeight(300);
 			LD.askForValue(I18N.message(HITSGRIDLAYOUT), I18N.message(HITSGRIDLAYOUT),
-					user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400,
-					(final String value) -> user.setHitsGrid(value));
+					user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400, user::setHitsGrid);
 			event.cancel();
 		});
 

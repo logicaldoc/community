@@ -48,7 +48,7 @@ public class GUISearchOptions implements Serializable {
 
 	private Long folder = null;
 
-	private String[] fields = Constants.FULLTEXT_DEFAULT_FIELDS;
+	private String[] fields = Constants.getFulltextDefaultFields();
 
 	private String language = null;
 

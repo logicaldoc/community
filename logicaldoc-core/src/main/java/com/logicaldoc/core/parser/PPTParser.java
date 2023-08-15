@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
-import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.apache.poi.hslf.usermodel.HSLFShape;
+import org.apache.poi.hslf.usermodel.HSLFSlideShow;
 import org.apache.poi.hslf.usermodel.HSLFSlideShowImpl;
+import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
+import org.apache.poi.sl.extractor.SlideShowExtractor;
+import org.apache.poi.sl.usermodel.SlideShow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +29,14 @@ public class PPTParser extends AbstractParser {
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
 
-		try (PowerPointExtractor extractor = new PowerPointExtractor(input);) {
-			String tmp = extractor.getText(true, true);
+		try (SlideShow<HSLFShape, HSLFTextParagraph> slideshow = new HSLFSlideShow(input);
+				SlideShowExtractor<HSLFShape, HSLFTextParagraph> slideShowExtractor = new SlideShowExtractor<>(
+						slideshow);) {
+
+			slideShowExtractor.setCommentsByDefault(true);
+			slideShowExtractor.setMasterByDefault(true);
+			slideShowExtractor.setNotesByDefault(true);
+			String tmp = slideShowExtractor.getText();
 
 			// Replace Control characters
 			if (tmp != null)

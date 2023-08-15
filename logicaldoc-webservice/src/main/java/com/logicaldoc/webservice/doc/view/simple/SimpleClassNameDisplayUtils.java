@@ -75,8 +75,7 @@ public class SimpleClassNameDisplayUtils {
 		return CharType.OTHER;
 	}
 
-	private static enum CharType {
+	private enum CharType {
 		LOWER_CASE, OTHER
 	}
-
 }

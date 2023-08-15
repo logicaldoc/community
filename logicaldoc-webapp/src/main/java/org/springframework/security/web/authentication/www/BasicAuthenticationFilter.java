@@ -320,11 +320,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		// detected (and
 		// in doing so replace
 		// any existing AnonymousAuthenticationToken). See SEC-610.
-		if (existingAuth instanceof AnonymousAuthenticationToken) {
-			return true;
-		}
-
-		return false;
+		return existingAuth instanceof AnonymousAuthenticationToken;
 	}
 
 	protected void onSuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,

@@ -374,7 +374,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				if (grid.getSelectedCount() == 0)
 					return;
 
-				GUIDocument docs[] = grid.getSelectedDocuments();
+				GUIDocument[] docs = grid.getSelectedDocuments();
 				List<Long> unlockedIds = new ArrayList<>();
 				for (GUIDocument doc : docs)
 					if (doc.getStatus() == 0 && doc.getImmutable() == 0)
@@ -487,11 +487,9 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				Util.openEditWithOffice(document.getId());
 			});
 
-			if (!Feature.enabled(Feature.OFFICE) || (document != null && !Util.isOfficeFile(document.getFileName()))
-					|| !downloadEnabled || !writeEnabled)
-				office.setDisabled(true);
-			else
-				office.setDisabled(false);
+			office.setDisabled(
+					!Feature.enabled(Feature.OFFICE) || (document != null && !Util.isOfficeFile(document.getFileName()))
+							|| !downloadEnabled || !writeEnabled);
 
 			if (!Feature.enabled(Feature.OFFICE))
 				setFeatureDisabled(office);

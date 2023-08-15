@@ -28,10 +28,15 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 public class SubscriptionDialog extends Window {
 
 	private static final String EVENT = "event";
+
 	private static final String SELECTION = "selection";
+
 	private static final String NOTIFYON = "notifyon";
+
 	private static final String SUBFOLDERS = "subfolders";
+
 	private static final String CURRENT = "current";
+
 	private static final String OPTION = "option";
 
 	public SubscriptionDialog(final ListGrid grid) {
@@ -83,12 +88,8 @@ public class SubscriptionDialog extends Window {
 		if (events != null)
 			event.setValues(events);
 
-		notifyon.addChangedHandler((ChangedEvent e) -> {
-			if (SELECTION.equals(form.getValueAsString(NOTIFYON)))
-				event.setDisabled(false);
-			else
-				event.setDisabled(true);
-		});
+		notifyon.addChangedHandler(
+				(ChangedEvent e) -> event.setDisabled(!SELECTION.equals(form.getValueAsString(NOTIFYON))));
 
 		ButtonItem save = prepareSaveButton(grid, form);
 
@@ -216,12 +217,8 @@ public class SubscriptionDialog extends Window {
 
 		final SelectItem event = prepareEventSelector(folderId);
 
-		notifyon.addChangedHandler((ChangedEvent e) -> {
-			if (SELECTION.equals(form.getValueAsString(NOTIFYON)))
-				event.setDisabled(false);
-			else
-				event.setDisabled(true);
-		});
+		notifyon.addChangedHandler(
+				(ChangedEvent e) -> event.setDisabled(!SELECTION.equals(form.getValueAsString(NOTIFYON))));
 
 		ButtonItem subscribe = prepareSubscribeButton(folderId, docIds, form);
 

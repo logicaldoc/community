@@ -12,12 +12,13 @@ public class AccountInactiveException extends AuthenticationException {
 
 	private static final long serialVersionUID = 1L;
 
-	private int days;
+	private final int days;
 
 	public AccountInactiveException() {
 		super(CODE);
+		this.days = 0;
 	}
-	
+
 	public AccountInactiveException(int days) {
 		super(CODE);
 		this.days = days;
@@ -25,11 +26,12 @@ public class AccountInactiveException extends AuthenticationException {
 
 	public AccountInactiveException(Authenticator authenticator) {
 		super(authenticator, CODE);
+		this.days = 0;
 	}
 
 	@Override
 	public String getMessage() {
-		if(days<=0)
+		if (days <= 0)
 			return super.getMessage();
 		else
 			return super.getMessage() + " - more than " + days + " days since last interaction";

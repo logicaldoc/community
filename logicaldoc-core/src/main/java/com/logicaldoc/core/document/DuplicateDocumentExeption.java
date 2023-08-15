@@ -10,16 +10,12 @@ public class DuplicateDocumentExeption extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	private String customId;
+	private final String customId;
 
 	public String getCustomId() {
 		return customId;
 	}
-
-	public void setCustomId(String customId) {
-		this.customId = customId;
-	}
-
+	
 	public DuplicateDocumentExeption(String customId, Throwable cause) {
 		super("Duplicate Document. customid: " + customId, cause);
 		this.customId = customId;

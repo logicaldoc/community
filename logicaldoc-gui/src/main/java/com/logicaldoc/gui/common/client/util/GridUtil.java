@@ -67,7 +67,7 @@ public class GridUtil {
 	 * @param listGrid Grid containing the data
 	 */
 	public static void print(ListGrid listGrid) {
-		scrollGrid(listGrid, lg -> Canvas.showPrintPreview(lg));
+		scrollGrid(listGrid, Canvas::showPrintPreview);
 	}
 
 	/**

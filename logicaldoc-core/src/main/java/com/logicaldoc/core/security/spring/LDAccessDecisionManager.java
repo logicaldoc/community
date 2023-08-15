@@ -29,7 +29,7 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class LDAccessDecisionManager extends UnanimousBased {
 
-	private static Logger log = LoggerFactory.getLogger(LDAuthenticationSuccessHandler.class);
+	private static Logger log = LoggerFactory.getLogger(LDAccessDecisionManager.class);
 
 	static final String REQUESTED_URL = "RequestedUrl";
 

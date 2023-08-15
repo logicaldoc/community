@@ -106,11 +106,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		if (rs != null) {
 			long i = 0;
 			while (rs.next()) {
-				if (startRecord != null && i < startRecord) {
-					i++;
-					continue;
-				}
-				if (endRecord != null && i > endRecord) {
+				if ((startRecord != null && i < startRecord) || (endRecord != null && i > endRecord)) {
 					i++;
 					continue;
 				}

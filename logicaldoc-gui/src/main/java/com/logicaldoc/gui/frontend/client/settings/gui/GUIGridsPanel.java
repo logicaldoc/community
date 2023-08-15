@@ -118,8 +118,7 @@ public class GUIGridsPanel extends VLayout {
 		});
 		controls.addFormItem(selector);
 
-		documentsFieldsGrid
-				.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
+		documentsFieldsGrid.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, controls);
 
 		String columns = Session.get().getConfig("gui.document.columns");
 
@@ -207,7 +206,7 @@ public class GUIGridsPanel extends VLayout {
 		searchHits.setStep(5);
 		controls.addFormItem(searchHits);
 
-		searchGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
+		searchGrid.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, controls);
 
 		String columns = Session.get().getConfig("gui.search.columns");
 

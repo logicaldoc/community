@@ -409,18 +409,22 @@ public class TasksPanel extends AdminPanel {
 
 	private void updateRecords(GUITask guiTask) {
 		for (ListGridRecord rec : tasksGrid.getRecords()) {
+			boolean found = false;
 			if (rec.getAttribute("name").equals(guiTask.getName()) && guiTask.getStatus() != GUITask.STATUS_IDLE) {
 				rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
 				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
 				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
-				break;
+				found = true;
 			} else if (rec.getAttribute("name").equals(guiTask.getName())
 					&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
 				rec.setAttribute(RUNNING_ICON, IDLE_TASK);
 				rec.setAttribute(COMPLETION, guiTask.getCompletionPercentage());
 				tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
-				break;
+				found = true;
 			}
+
+			if (found)
+				break;
 		}
 	}
 }

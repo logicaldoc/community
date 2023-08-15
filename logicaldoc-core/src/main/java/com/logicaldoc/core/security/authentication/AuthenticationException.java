@@ -10,10 +10,11 @@ public class AuthenticationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	private transient Authenticator authenticator;
+	private final transient Authenticator authenticator;
 
 	public AuthenticationException() {
 		super();
+		authenticator = null;
 	}
 
 	public AuthenticationException(Authenticator authenticator) {
@@ -45,9 +46,5 @@ public class AuthenticationException extends RuntimeException {
 		else
 			return authenticator.getClass().getSimpleName() + " > " + baseString;
 
-	}
-
-	public void setAuthenticator(Authenticator authenticator) {
-		this.authenticator = authenticator;
 	}
 }

@@ -35,9 +35,9 @@ public class Dropbox {
 
 	// Get your app key and secret from the Dropbox developers website -
 	// https://www.dropbox.com/developers/apps
-	private final String APP_KEY = "s7erzz9am7ikbl2";
+	private static final String APP_KEY = "s7erzz9am7ikbl2";
 
-	private final String APP_SECRET = "9shfsbeilgfizam";
+	private static final String APP_SECRET = "9shfsbeilgfizam";
 
 	private String accessToken;
 

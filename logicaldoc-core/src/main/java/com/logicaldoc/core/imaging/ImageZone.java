@@ -1,7 +1,5 @@
 package com.logicaldoc.core.imaging;
 
-import java.io.Serializable;
-
 /**
  * A zone specification inside an image.
  * 

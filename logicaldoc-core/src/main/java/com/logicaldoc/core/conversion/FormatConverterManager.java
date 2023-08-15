@@ -350,7 +350,7 @@ public class FormatConverterManager {
 		String inExt = AbstractFormatConverter.getExtension(srcFilename);
 		List<String> formats = new ArrayList<>();
 		for (String key : getConverters().keySet()) {
-			String inOut[] = key.split("-");
+			String[] inOut = key.split("-");
 			FormatConverter assignedConverter = getConverter(srcFilename, inOut[1]);
 			// The actually assigned converter must be anabled
 			if (!formats.contains(inOut[1]) && assignedConverter.isEnabled() && !inExt.equalsIgnoreCase(inOut[1])
@@ -373,7 +373,7 @@ public class FormatConverterManager {
 			inExt = FileUtil.getExtension(inFileName);
 		List<String> formats = new ArrayList<>();
 		for (String key : getConverters().keySet()) {
-			String inOut[] = key.split("-");
+			String[] inOut = key.split("-");
 			if (!formats.contains(inOut[1]) && (inExt.equalsIgnoreCase(inOut[0]) || "*".equals(inOut[0]))
 					&& !inExt.equalsIgnoreCase(inOut[1]))
 				formats.add(inOut[1]);
@@ -389,7 +389,7 @@ public class FormatConverterManager {
 	public List<String> getAvailableInputFormats() {
 		List<String> formats = new ArrayList<>();
 		for (String key : getConverters().keySet()) {
-			String inOut[] = key.split("-");
+			String[] inOut = key.split("-");
 			if (!formats.contains(inOut[0]) && !"*".equals(inOut[0]))
 				formats.add(inOut[0]);
 		}

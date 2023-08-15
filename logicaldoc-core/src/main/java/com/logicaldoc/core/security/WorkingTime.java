@@ -166,8 +166,6 @@ public class WorkingTime implements Serializable {
 			return false;
 		if (hourEnd != other.hourEnd)
 			return false;
-		if (hourStart != other.hourStart)
-			return false;
-		return true;
+		return hourStart == other.hourStart;
 	}
 }

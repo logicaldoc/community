@@ -42,7 +42,7 @@ public class DefaultPluginRegistry extends PluginRegistry {
 			} catch (IllegalArgumentException e) {
 				System.err.println("PluginRegistry -> IllegalArgumentException: " + e.getMessage());
 			} catch (PluginLifecycleException e) {
-				System.err.println("PluginRegistry -> IllegalArgumentException: " + e.getMessage());
+				System.err.println("PluginRegistry -> PluginLifecycleException: " + e.getMessage());
 			} catch (Exception e) {
 				System.err.println("PluginRegistry -> Error: " + e.getMessage());
 			}

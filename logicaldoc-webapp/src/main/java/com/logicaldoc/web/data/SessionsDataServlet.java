@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,7 +23,6 @@ import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.SessionDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.EchoServlet;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**
@@ -35,7 +33,7 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class SessionsDataServlet extends AbstractDataServlet {
 
-	protected static Logger log = LoggerFactory.getLogger(EchoServlet.class);
+	protected static Logger log = LoggerFactory.getLogger(SessionsDataServlet.class);
 
 	private static final String CLOSE_STATUS_LABEL = "</statusLabel>";
 
@@ -102,9 +100,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			boolean showSid, PrintWriter writer) {
 
 		for (Session session : sessions) {
-			if (tenant != null && !tenant.equals(session.getTenantName()))
-				continue;
-			if (status != null && status != session.getStatus())
+			if ((tenant != null && !tenant.equals(session.getTenantName()))
+					|| (status != null && status != session.getStatus()))
 				continue;
 
 			if (csvFormat) {

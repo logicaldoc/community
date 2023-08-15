@@ -614,12 +614,12 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			try {
 				checkPublished(user, doc);
 				checkNotArchived(doc);
+
+				if (fileName != null && !FileUtil.matches(doc.getFileName(), new String[] { fileName }, null))
+					throw new ParseException("no match");
 			} catch (Exception t) {
 				continue;
 			}
-
-			if (fileName != null && !FileUtil.matches(doc.getFileName(), new String[] { fileName }, null))
-				continue;
 
 			docDao.initialize(doc);
 			wsDocs.add(WSUtil.toWSDocument(doc));
@@ -671,9 +671,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		for (Object gridRecord : records) {
 			Long id = (Long) gridRecord;
 			// Discard a gridRecord if already visited
-			if (docIds.contains(id))
-				continue;
-			else
+			if (!docIds.contains(id))
 				docIds.add(id);
 		}
 

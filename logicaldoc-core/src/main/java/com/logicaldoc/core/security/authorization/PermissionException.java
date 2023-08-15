@@ -12,14 +12,14 @@ public class PermissionException extends AuthorizationException {
 
 	private static final long serialVersionUID = 1L;
 
-	private String username;
+	private final String username;
 
 	/**
 	 * Identifier of the security object the permission refers to
 	 */
-	private String securityObject;
+	private final String securityObject;
 
-	private String permission;
+	private final String permission;
 
 	public PermissionException(String username, String securityObject, Permission permission) {
 		this(username, securityObject, permission.toString());
@@ -44,18 +44,30 @@ public class PermissionException extends AuthorizationException {
 	}
 
 	public PermissionException() {
+		username = null;
+		securityObject = null;
+		permission = null;
 	}
 
 	public PermissionException(String message) {
 		super(message);
+		username = null;
+		securityObject = null;
+		permission = null;
 	}
 
 	public PermissionException(Throwable cause) {
 		super(cause);
+		username = null;
+		securityObject = null;
+		permission = null;
 	}
 
 	public PermissionException(String message, Throwable cause) {
 		super(message, cause);
+		username = null;
+		securityObject = null;
+		permission = null;
 	}
 
 	public String getUsername() {

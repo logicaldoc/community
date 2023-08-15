@@ -37,7 +37,7 @@ public interface ImpexService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIArchive deleteVersions(long archiveId, Long versionIds[]) throws ServerException;
+	public GUIArchive deleteVersions(long archiveId, Long[] versionIds) throws ServerException;
 
 	/**
 	 * Change the status of the given Archive

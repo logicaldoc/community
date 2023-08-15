@@ -65,7 +65,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		listing.clear();
 		if (list != null)
 			listing.removeMember(list);
-		if (details != null && details instanceof ImportFolderDetailsPanel) {
+		if (details instanceof ImportFolderDetailsPanel) {
 			detailsContainer.removeMember(details);
 			details = SELECT_POLICY;
 		}

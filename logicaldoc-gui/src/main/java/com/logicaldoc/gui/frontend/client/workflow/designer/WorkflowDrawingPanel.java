@@ -111,7 +111,7 @@ public class WorkflowDrawingPanel extends VStack {
 				for (String token : tokens) {
 					if (token == null || token.equals(""))
 						continue;
-					String coords[] = token.split(",");
+					String[] coords = token.split(",");
 					c.addMovablePoint(new Point(Integer.parseInt(coords[0]), Integer.parseInt(coords[1])));
 				}
 			}

@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -221,9 +222,7 @@ public class Feature {
 	
 	public static void init(GUIInfo info) {
 		features.clear();
-		for (String feature : info.getFeatures()) {
-			features.add(feature);
-		}
+		Collections.addAll(features, info.getFeatures());
 	}
 
 	public static boolean enabled(int feature) {

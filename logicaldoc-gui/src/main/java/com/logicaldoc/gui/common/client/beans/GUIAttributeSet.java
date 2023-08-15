@@ -55,8 +55,7 @@ public class GUIAttributeSet implements Serializable {
 		if (attributes == null)
 			return new GUIAttribute[0];
 
-		Arrays.sort(attributes,
-				(arg0, arg1) -> Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition())));
+		Arrays.sort(attributes, (arg0, arg1) -> Integer.compare(arg0.getPosition(), arg1.getPosition()));
 		return attributes;
 	}
 

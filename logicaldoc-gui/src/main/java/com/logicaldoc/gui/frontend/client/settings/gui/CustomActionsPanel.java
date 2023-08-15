@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -196,8 +197,7 @@ public class CustomActionsPanel extends VLayout {
 						actions.clear();
 
 						if (mns != null)
-							for (GUIMenu menu : mns)
-								actions.add(menu);
+							Collections.addAll(actions, mns);
 						fillGrid();
 					}
 				});
@@ -274,29 +274,28 @@ public class CustomActionsPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event ->
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
-					if (Boolean.TRUE.equals(confirm)) {
-						long menuId = selectedRecord.getAttributeAsLong("id");
-						if (menuId == 0L) {
-							int index = grid.getRecordIndex(selectedRecord);
-							actions.remove(index);
-						} else {
-							SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
-									new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				long menuId = selectedRecord.getAttributeAsLong("id");
+				if (menuId == 0L) {
+					int index = grid.getRecordIndex(selectedRecord);
+					actions.remove(index);
+				} else {
+					SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
+							new AsyncCallback<Void>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-										@Override
-										public void onSuccess(Void arg) {
-											reload();
-										}
-									});
-						}
-					}
-				}));
+								@Override
+								public void onSuccess(Void arg) {
+									reload();
+								}
+							});
+				}
+			}
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

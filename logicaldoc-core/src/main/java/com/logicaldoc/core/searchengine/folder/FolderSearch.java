@@ -619,5 +619,5 @@ public class FolderSearch extends Search {
 
 			return hit;
 		}
-	};
+	}
 }

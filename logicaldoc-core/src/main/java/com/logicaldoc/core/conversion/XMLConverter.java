@@ -189,7 +189,7 @@ public class XMLConverter extends AbstractFormatConverter {
 		List<Content> contents = domDocument.getContent();
 		boolean containsStyleReference = false;
 		String xsltOutFormat = null;
-		for (Object content : contents) {
+		for (Content content : contents) {
 			if (content instanceof ProcessingInstruction) {
 				ProcessingInstruction pi = (ProcessingInstruction) content;
 				if ("text/xsl".equals(pi.getPseudoAttributeValue("type"))) {
@@ -275,6 +275,6 @@ public class XMLConverter extends AbstractFormatConverter {
 
 	@Override
 	public List<String> getParameterNames() {
-		return Arrays.asList(new String[] { STYLE_SHEETS });
+		return Arrays.asList(STYLE_SHEETS);
 	}
 }

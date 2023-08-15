@@ -258,7 +258,7 @@ public class ApiCallsReport extends AdminPanel {
 
 	@SuppressWarnings("unchecked")
 	private void onSearch() {
-		calls.setData(new ListGridRecord[0]);
+		calls.setData();
 
 		final Map<String, Object> values =  vm.getValues();
 

@@ -77,7 +77,7 @@ public class FolderCopyDialog extends Dialog {
 		else
 			form.setItems(name, copy);
 
-		folders.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, form });
+		folders.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, form);
 
 		SectionStackSection section = new SectionStackSection(I18N.message("targetfolder"));
 		section.setCanCollapse(false);

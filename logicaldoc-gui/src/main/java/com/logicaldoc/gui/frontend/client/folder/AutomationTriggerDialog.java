@@ -141,7 +141,7 @@ public class AutomationTriggerDialog extends Window {
 
 			String eventsStr = null;
 			if (vm.getValueAsString(EVENTS) != null) {
-				String buf = vm.getValueAsString(EVENTS).toString().trim().toLowerCase();
+				String buf = vm.getValueAsString(EVENTS).trim().toLowerCase();
 				buf = buf.replace('[', ' ');
 				buf = buf.replace(']', ' ');
 				eventsStr = buf.replace(" ", "");

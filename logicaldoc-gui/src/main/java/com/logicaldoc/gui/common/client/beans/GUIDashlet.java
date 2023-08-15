@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class GUIDashlet implements Serializable {
 
-	private static List<String> systemDashlets = Arrays.asList(
-			new String[] { "checkin", "checkout", "locked", "download", "locket", "change", "tagcloud", "notes", "lastaccessed" });
+	private static List<String> systemDashlets = Arrays.asList("checkin", "checkout", "locked", "download", "locket",
+			"change", "tagcloud", "notes", "lastaccessed");
 
 	public static final String TYPE_DOCEVENT = "docevent";
 

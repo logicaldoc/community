@@ -64,7 +64,7 @@ public class AttributeTypeFormatter implements CellFormatter {
 		case GUIAttribute.TYPE_FOLDER:
 			return I18N.message("folder");
 		default:
-			return value.toString();
+			return value;
 		}
 	}
 }

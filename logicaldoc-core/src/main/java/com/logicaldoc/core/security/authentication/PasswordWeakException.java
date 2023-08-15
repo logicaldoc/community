@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.authentication;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,11 +17,11 @@ public class PasswordWeakException extends AuthenticationException {
 	/**
 	 * The reasons to explain the weakness
 	 */
-	private List<String> messages = new ArrayList<>();
+	private final List<String> messages = new ArrayList<>();
 
 	public PasswordWeakException(List<String> messages) {
 		super("passwordweak");
-		this.messages = messages;
+		Collections.copy(this.messages, messages);
 	}
 
 	public PasswordWeakException() {
@@ -29,7 +30,7 @@ public class PasswordWeakException extends AuthenticationException {
 
 	@Override
 	public String getMessage() {
-		if (messages == null || messages.isEmpty())
+		if (messages.isEmpty())
 			return super.getMessage();
 		else {
 			return super.getMessage() + " - " + messages.stream().collect(Collectors.joining(" "));

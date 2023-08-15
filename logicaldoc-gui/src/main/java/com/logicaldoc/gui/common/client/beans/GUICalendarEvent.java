@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -67,7 +68,7 @@ public class GUICalendarEvent implements Serializable {
 	private Date deadline;
 
 	private String automation;
-	
+
 	@Override
 	public String toString() {
 		return getId() + "-" + getTitle();
@@ -156,10 +157,7 @@ public class GUICalendarEvent implements Serializable {
 	public void addParticipant(GUIUser newPart) {
 		if (getParticipant(newPart.getId()) != null)
 			return;
-		GUIUser[] newParts = new GUIUser[participants.length + 1];
-		for (int i = 0; i < participants.length; i++) {
-			newParts[i] = participants[i];
-		}
+		GUIUser[] newParts = Arrays.copyOf(participants, participants.length + 1);
 		newParts[participants.length] = newPart;
 		participants = newParts;
 	}
@@ -168,11 +166,7 @@ public class GUICalendarEvent implements Serializable {
 		if (getParticipantGroup(newPart.getId()) != null)
 			return;
 
-		GUIGroup[] newParts = new GUIGroup[participantsGroups.length + 1];
-		for (int i = 0; i < participantsGroups.length; i++) {
-			newParts[i] = participantsGroups[i];
-		}
-
+		GUIGroup[] newParts = Arrays.copyOf(participantsGroups, participantsGroups.length + 1);
 		newParts[participantsGroups.length] = newPart;
 		participantsGroups = newParts;
 	}
@@ -210,10 +204,8 @@ public class GUICalendarEvent implements Serializable {
 	public void addDocument(GUIDocument newDoc) {
 		if (getDocument(newDoc.getId()) != null)
 			return;
-		GUIDocument[] newDocs = new GUIDocument[documents.length + 1];
-		for (int i = 0; i < documents.length; i++) {
-			newDocs[i] = documents[i];
-		}
+
+		GUIDocument[] newDocs = Arrays.copyOf(documents, documents.length + 1);
 		newDocs[documents.length] = newDoc;
 		documents = newDocs;
 	}
@@ -230,10 +222,7 @@ public class GUICalendarEvent implements Serializable {
 	}
 
 	public void addReminder(GUIReminder reminder) {
-		GUIReminder[] newRem = new GUIReminder[reminders.length + 1];
-		for (int i = 0; i < reminders.length; i++) {
-			newRem[i] = reminders[i];
-		}
+		GUIReminder[] newRem = Arrays.copyOf(reminders, reminders.length + 1);
 		newRem[reminders.length] = reminder;
 		reminders = newRem;
 	}

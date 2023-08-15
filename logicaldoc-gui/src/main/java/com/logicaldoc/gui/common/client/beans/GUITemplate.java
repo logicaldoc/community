@@ -109,8 +109,8 @@ public class GUITemplate implements Serializable {
 		if (attributes == null)
 			return new GUIAttribute[0];
 
-		Arrays.sort(attributes, (guiAttr1, guiAttr2) -> Integer.valueOf(guiAttr1.getPosition())
-				.compareTo(Integer.valueOf(guiAttr2.getPosition())));
+		Arrays.sort(attributes,
+				(guiAttr1, guiAttr2) -> Integer.compare(guiAttr1.getPosition(), guiAttr2.getPosition()));
 		return attributes;
 	}
 

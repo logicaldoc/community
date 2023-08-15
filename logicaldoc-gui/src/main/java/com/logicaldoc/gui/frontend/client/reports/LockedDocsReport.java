@@ -107,22 +107,17 @@ public class LockedDocsReport extends ReportPanel {
 			String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
 
 			// Put the status icon
-			{
-				if (rec.getAttribute("status") != null) {
-					Integer status = rec.getAttributeAsInt("status");
-					if (status != null && status.intValue() > 0)
-						content += AwesomeFactory.getLockedButtonHTML(status, rec.getAttributeAsString("lockUser"),
-								color);
-				}
+			if (rec.getAttribute("status") != null) {
+				Integer status = rec.getAttributeAsInt("status");
+				if (status != null && status.intValue() > 0)
+					content += AwesomeFactory.getLockedButtonHTML(status, rec.getAttributeAsString("lockUser"), color);
 			}
 
 			// Put the immutable icon
-			{
-				if (rec.getAttribute(IMMUTABLE) != null) {
-					Integer immutable = rec.getAttributeAsInt(IMMUTABLE);
-					if (immutable != null && immutable.intValue() == 1)
-						content += AwesomeFactory.getIconButtonHTML("hand-paper", null, IMMUTABLE, color, null);
-				}
+			if (rec.getAttribute(IMMUTABLE) != null) {
+				Integer immutable = rec.getAttributeAsInt(IMMUTABLE);
+				if (immutable != null && immutable.intValue() == 1)
+					content += AwesomeFactory.getIconButtonHTML("hand-paper", null, IMMUTABLE, color, null);
 			}
 
 			content += "</div>";

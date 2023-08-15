@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
  * @since 4.5
  */
 public class NetUtil {
-	protected static Logger log = LoggerFactory.getLogger(JarUtil.class);
+
+	protected static Logger log = LoggerFactory.getLogger(NetUtil.class);
 
 	private NetUtil() {
 	}
@@ -36,7 +37,6 @@ public class NetUtil {
 
 	private static boolean createSocket(int port) {
 		try (ServerSocket socket = new ServerSocket(port)) {
-			socket.close();
 			return true;
 		} catch (IOException e) {
 			return false;

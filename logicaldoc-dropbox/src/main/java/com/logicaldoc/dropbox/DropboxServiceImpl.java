@@ -3,6 +3,7 @@ package com.logicaldoc.dropbox;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -171,8 +172,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 			// First of all put all single selected documents
 			List<Long> dIds = new ArrayList<>();
-			for (int i = 0; i < docIds.length; i++)
-				dIds.add(docIds[i]);
+			Collections.addAll(dIds, docIds);
 
 			for (Document document : docDao.findByIds(dIds.toArray(new Long[0]), null))
 				documents.put(document.getId(), document.getFileName());
@@ -250,9 +250,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		folders.put(parentId, parentPath);
 		for (Folder folder : fDao.findChildren(parentId, userId)) {
-			if (parentId == folder.getId())
-				continue;
-			else
+			if (parentId != folder.getId())
 				loadFoldersTree(folder.getId(), parentPath + folder.getName() + "/", userId, folders);
 		}
 	}

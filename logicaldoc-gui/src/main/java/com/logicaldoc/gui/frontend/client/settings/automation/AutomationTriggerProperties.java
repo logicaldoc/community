@@ -106,10 +106,8 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 			@Override
 			protected boolean condition(Object value) {
-				if ((automation.getValue() == null || automation.getValue().toString().isEmpty())
-						&& routine.getValue() == null)
-					return false;
-				return true;
+				return !((automation.getValue() == null || automation.getValue().toString().isEmpty())
+						&& routine.getValue() == null);
 			}
 		};
 		atLeastOneValidator.setErrorMessage(I18N.message("automtriggervalidationmessage"));
@@ -138,26 +136,25 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 	}
 
 	private SelectItem prepareEventsSelector() {
-		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeronevents"),
-				event -> {
-					SelectItem item = (SelectItem) vm.getItem(EVENTS);
-					if (item.getValues() != null && item.getValues().length > 0) {
-						vm.getItem("date").setDisabled(true);
-						vm.getItem("date").clearValue();
-						vm.getItem("time").setDisabled(true);
-						vm.getItem("time").clearValue();
-						vm.getItem("cron").setDisabled(true);
-						vm.getItem("cron").clearValue();
-					} else {
-						vm.getItem(FOLDER).setDisabled(false);
-						vm.getItem("date").setDisabled(false);
-						vm.getItem("time").setDisabled(false);
-						vm.getItem("cron").setDisabled(false);
-					}
+		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeronevents"), event -> {
+			SelectItem item = (SelectItem) vm.getItem(EVENTS);
+			if (item.getValues() != null && item.getValues().length > 0) {
+				vm.getItem("date").setDisabled(true);
+				vm.getItem("date").clearValue();
+				vm.getItem("time").setDisabled(true);
+				vm.getItem("time").clearValue();
+				vm.getItem("cron").setDisabled(true);
+				vm.getItem("cron").clearValue();
+			} else {
+				vm.getItem(FOLDER).setDisabled(false);
+				vm.getItem("date").setDisabled(false);
+				vm.getItem("time").setDisabled(false);
+				vm.getItem("cron").setDisabled(false);
+			}
 
-					if (changedHandler != null)
-						changedHandler.onChanged(event);
-				}, true, true, true, true, true);
+			if (changedHandler != null)
+				changedHandler.onChanged(event);
+		}, true, true, true, true, true);
 		events.setRowSpan(2);
 		events.setColSpan(4);
 		events.setValues(trigger.getEventsArray());
@@ -254,7 +251,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values =  vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
@@ -275,7 +272,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 		String eventsStr = null;
 		if (vm.getValueAsString(EVENTS) != null && !vm.getValueAsString(EVENTS).isEmpty()) {
-			String buf = vm.getValueAsString(EVENTS).toString().trim().toLowerCase();
+			String buf = vm.getValueAsString(EVENTS).trim().toLowerCase();
 			buf = buf.replace('[', ' ');
 			buf = buf.replace(']', ' ');
 			eventsStr = buf.replace(" ", "");

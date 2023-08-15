@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
@@ -106,7 +106,7 @@ public class WorkflowDashboard extends VLayout {
 	 * 
 	 * @param instanceIds Id of the instances to kill
 	 */
-	public void killWorkflows(ArrayList<String> instanceIds) {
+	public void killWorkflows(List<String> instanceIds) {
 		LD.contactingServer();
 		WorkflowService.Instance.get().deleteInstances(instanceIds.toArray(new String[0]), new AsyncCallback<Void>() {
 			@Override
@@ -123,7 +123,7 @@ public class WorkflowDashboard extends VLayout {
 		});
 	}
 
-	private void refreshGridsAfterWorkflowsKilled(ArrayList<String> instanceIds) {
+	private void refreshGridsAfterWorkflowsKilled(List<String> instanceIds) {
 		for (String id : instanceIds) {
 			if (assignedTasks != null)
 				assignedTasks.onDeletedWorkflow(id);

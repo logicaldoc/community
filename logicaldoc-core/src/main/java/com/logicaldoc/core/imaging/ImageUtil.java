@@ -178,8 +178,8 @@ public class ImageUtil {
 			for (int y = 1; y < srcImage.getHeight(); y++) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
 				if (!pixelColor.equals(Color.WHITE) && x > right) {
-						right = x;
-						break;
+					right = x;
+					break;
 				}
 			}
 		}
@@ -192,8 +192,8 @@ public class ImageUtil {
 			for (int y = 1; y < srcImage.getHeight(); y++) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
 				if (!pixelColor.equals(Color.WHITE) && x < left) {
-						left = x;
-						break;
+					left = x;
+					break;
 				}
 			}
 		}
@@ -206,8 +206,8 @@ public class ImageUtil {
 			for (int y = 0; y < srcImage.getHeight(); y++) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
 				if (!pixelColor.equals(Color.WHITE) && y > bottom) {
-						bottom = y;
-						break;
+					bottom = y;
+					break;
 				}
 			}
 		}
@@ -220,8 +220,8 @@ public class ImageUtil {
 			for (int y = srcImage.getHeight() - 1; y > 0; y--) {
 				Color pixelColor = new Color(srcImage.getRGB(x, y));
 				if (!pixelColor.equals(Color.WHITE) && y < top) {
-						top = y;
-						break;
+					top = y;
+					break;
 				}
 			}
 		}
@@ -358,8 +358,10 @@ public class ImageUtil {
 		int width = image.getWidth(null);
 		int height = image.getHeight(null);
 
-		int minX, minY, maxX, maxY;
-		minX = minY = maxX = maxY = 0;
+		int minX = 0;
+		int minY = 0;
+		int maxX = 0;
+		int maxY = 0;
 
 		int[] corners = { 0, 0, width, 0, width, height, 0, height };
 

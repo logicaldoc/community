@@ -76,7 +76,6 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 					// we can't find out, we have to reject anyway.
 					// Better use absolute paths in DAV:href
 					// elements!
-					// TODO enable or disable the comment below while testing
 					throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 				}
 			} catch (URISyntaxException e) {

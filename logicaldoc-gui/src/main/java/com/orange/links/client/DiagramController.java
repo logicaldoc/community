@@ -9,7 +9,6 @@ import com.allen_sauer.gwt.dnd.client.DragController;
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.DragHandlerAdapter;
 import com.allen_sauer.gwt.dnd.client.DragStartEvent;
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Position;
@@ -31,7 +30,6 @@ import com.logicaldoc.gui.frontend.client.workflow.designer.StateWidget;
 import com.orange.links.client.canvas.BackgroundCanvas;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.canvas.MultiBrowserDiagramCanvas;
-import com.orange.links.client.connection.AbstractConnection;
 import com.orange.links.client.connection.Connection;
 import com.orange.links.client.connection.ConnectionFactory;
 import com.orange.links.client.event.ChangeOnDiagramEvent;
@@ -78,13 +76,13 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	 * If the distance between the mouse and segment is under this number in
 	 * pixels, then, the mouse is considered over the segment
 	 */
-	public static int minDistanceToSegment = 5;
+	public static final int MIN_DISTANCE_TO_SEGMENT = 5;
 
 	/**
 	 * Timer refresh duration, in milliseconds. It defers if the application is
 	 * running in development mode or in the web mode
 	 */
-	public static int refreshRate = 80;
+	public static final int REFERESH_RATE = 80;
 
 	private DiagramCanvas topCanvas;
 
@@ -115,15 +113,15 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	private Point mouseOffsetPoint = new Point(0, 0);
 
 	// Drag Edition status
-	public boolean inEditionDragMovablePoint = false;
+	private boolean inEditionDragMovablePoint = false;
 
-	public boolean inEditionSelectableShapeToDrawConnection = false;
+	private boolean inEditionSelectableShapeToDrawConnection = false;
 
-	public boolean inDragBuildArrow = false;
+	private boolean inDragBuildArrow = false;
 
-	public boolean inDragMovablePoint = false;
+	private boolean inDragMovablePoint = false;
 
-	public boolean inDragWidget = false;
+	private boolean inDragWidget = false;
 
 	private Point highlightPoint;
 
@@ -174,7 +172,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		initMouseHandlers(topCanvas);
 		initMenu();
 
-		timer.scheduleRepeating(refreshRate);
+		timer.scheduleRepeating(REFERESH_RATE);
 		frameTimer.scheduleRepeating(1000);
 
 		ContextMenu.disableBrowserContextMenu(widgetPanel.asWidget().getElement());
@@ -182,11 +180,11 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	}
 
 	protected void initMouseHandlers(final DiagramCanvas canvas) {
-		canvas.addDomHandler(event -> DiagramController.this.onMouseMove(event), MouseMoveEvent.getType());
+		canvas.addDomHandler(DiagramController.this::onMouseMove, MouseMoveEvent.getType());
 
-		canvas.addDomHandler(event -> DiagramController.this.onMouseDown(event), MouseDownEvent.getType());
+		canvas.addDomHandler(DiagramController.this::onMouseDown, MouseDownEvent.getType());
 
-		canvas.addDomHandler(event -> DiagramController.this.onMouseUp(event), MouseUpEvent.getType());
+		canvas.addDomHandler(DiagramController.this::onMouseUp, MouseUpEvent.getType());
 	}
 
 	protected void initWidgetPanel(final DiagramCanvas canvas) {
@@ -210,7 +208,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	}
 
 	public void runRefresh() {
-		timer.scheduleRepeating(refreshRate);
+		timer.scheduleRepeating(REFERESH_RATE);
 	}
 
 	/**
@@ -253,8 +251,6 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget, GUITransition transition) {
 		Connection c = drawConnection(ConnectionFactory.ARROW, startWidget, endWidget);
-		if (transition.getColor() != null)
-			((AbstractConnection) c).connectionColor = CssColor.make(transition.getColor());
 
 		functionsMap.get(startWidget).put(endWidget, c);
 		StateWidget widget = new StateWidget(c, this, transition);
@@ -441,7 +437,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 		widget.addDragStopHandler(event -> {
 			inDragWidget = false;
-			FunctionShape shape = (FunctionShape) widgetShapeMap.get(widget);
+			FunctionShape shape = widgetShapeMap.get(widget);
 			shape.setSynchronized(true);
 			shape.getConnections().setAllowSynchronized(true);
 			shape.getConnections().setSynchronized(true);
@@ -449,7 +445,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 		widget.addDragStartHandler(nevent -> {
 			inDragWidget = true;
-			FunctionShape shape = (FunctionShape) widgetShapeMap.get(widget);
+			FunctionShape shape = widgetShapeMap.get(widget);
 			shape.setSynchronized(false);
 			shape.getConnections().setSynchronized(false);
 			shape.getConnections().setAllowSynchronized(false);
@@ -737,7 +733,6 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 			movablePoint.setTrackPoint(mousePoint);
 			// Set canvas foreground to avoid dragging over a widget
 			topCanvas.setForeground();
-			return;
 		}
 	}
 

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.DocumentValidator;
 import com.logicaldoc.core.metadata.validation.Validator;
 
 /**
@@ -20,7 +19,7 @@ public class FolderValidator extends Validator implements FolderListener {
 
 	private static final String VALIDATED_FLAG = "validated";
 
-	protected static Logger log = LoggerFactory.getLogger(DocumentValidator.class);
+	protected static Logger log = LoggerFactory.getLogger(FolderValidator.class);
 
 	@Override
 	public void beforeStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary)

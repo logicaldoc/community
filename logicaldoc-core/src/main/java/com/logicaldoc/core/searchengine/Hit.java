@@ -57,10 +57,17 @@ public class Hit extends Document implements Comparable<Hit> {
 				else
 					return 0;
 			} else
-				return -1 * (Integer.valueOf(this.score).compareTo(Integer.valueOf(other.score)));
+				return -1 * Integer.compare(this.score, other.score);
 		} catch (Exception t) {
 			return 0;
 		}
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Hit))
+			return false;
+		Hit other = (Hit) obj;
+		return other.getId() == this.getId();
+	}
 }

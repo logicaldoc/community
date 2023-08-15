@@ -266,12 +266,12 @@ public class WSAttribute implements Serializable {
 
 	private static void setDateValue(WSAttribute attribute, Object value) {
 		attribute.type = TYPE_DATE;
-		if (value != null && value instanceof XMLGregorianCalendar) {
+		if (value instanceof XMLGregorianCalendar) {
 			XMLGregorianCalendar theXGCal = (XMLGregorianCalendar) value;
 			GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
 			Date theDate = theGCal.getTime();
 			attribute.setDateValue(DateUtil.format(theDate));
-		} else if (value != null && value instanceof Date) {
+		} else if (value instanceof Date) {
 			attribute.setDateValue(DateUtil.format((Date) value));
 		} else
 			attribute.setDateValue(null);

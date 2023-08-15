@@ -3,6 +3,7 @@ package com.logicaldoc.gui.common.client.i18n;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
@@ -126,7 +127,7 @@ public class I18N {
 		I18N.locale = locale;
 	}
 
-	public static LinkedHashMap<String, String> getSupportedLanguages(boolean addEmpty) {
+	public static Map<String, String> getSupportedLanguages(boolean addEmpty) {
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		if (addEmpty)
 			map.put("", " ");
@@ -136,7 +137,7 @@ public class I18N {
 		return map;
 	}
 
-	public static LinkedHashMap<String, String> getSupportedGuiLanguages(boolean addEmpty) {
+	public static Map<String, String> getSupportedGuiLanguages(boolean addEmpty) {
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		if (addEmpty)
 			map.put("", " ");

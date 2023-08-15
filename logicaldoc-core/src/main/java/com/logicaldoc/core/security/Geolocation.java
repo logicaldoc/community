@@ -157,7 +157,7 @@ public class Geolocation {
 
 			log.info("Downloading geolocation database {}", downloadUrl);
 
-			HttpGet get = new HttpGet(downloadUrl.toString());
+			HttpGet get = new HttpGet(downloadUrl);
 			CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
 
 			try (CloseableHttpResponse response = httpclient.execute(get)) {

@@ -3,6 +3,7 @@ package com.logicaldoc.webservice.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -178,7 +179,7 @@ public class WSDocument implements Serializable {
 
 	@WSDoc(required = false, description = "optional color assigned to the document")
 	private String color;
-	
+
 	@WSDoc(required = false, description = "if it is not set to <b>1</b>, the document is marked as not published")
 	private int published = 1;
 
@@ -522,8 +523,7 @@ public class WSDocument implements Serializable {
 		if (attributes == null)
 			attributes = new WSAttribute[0];
 		List<WSAttribute> buf = new ArrayList<>();
-		for (WSAttribute tmp : attributes)
-			buf.add(tmp);
+		Collections.addAll(buf, attributes);
 		buf.add(att);
 		setAttributes(buf.toArray(new WSAttribute[0]));
 	}
@@ -532,8 +532,7 @@ public class WSDocument implements Serializable {
 		if (tags == null)
 			tags = new String[0];
 		List<String> buf = new ArrayList<>();
-		for (String tmp : tags)
-			buf.add(tmp);
+		Collections.addAll(buf, tags);
 		if (!buf.contains(tag))
 			buf.add(tag);
 		setTags(buf.toArray(new String[0]));

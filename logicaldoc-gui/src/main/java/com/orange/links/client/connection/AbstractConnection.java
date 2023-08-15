@@ -44,9 +44,9 @@ public abstract class AbstractConnection implements Connection {
 
 	protected DecorationShape decoration;
 
-	public static CssColor defaultConnectionColor = CssColor.make("#000000");
+	public static final CssColor defaultConnectionColor = CssColor.make("#000000");
 
-	public CssColor connectionColor = defaultConnectionColor;
+	public static final CssColor connectionColor = defaultConnectionColor;
 
 	protected CssColor highlightPointColor = CssColor.make("#cccccc 1");
 
@@ -175,7 +175,7 @@ public abstract class AbstractConnection implements Connection {
 
 	private Point findHighlightPoint(Point p) {
 		for (Segment s : segmentSet) {
-			if (ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
+			if (ConnectionUtils.distanceToSegment(s, p) < DiagramController.MIN_DISTANCE_TO_SEGMENT) {
 				Point hPoint = ConnectionUtils.projectionOnSegment(s, p);
 				highlightSegment = s;
 				highlightPoint = hPoint;
@@ -215,7 +215,7 @@ public abstract class AbstractConnection implements Connection {
 	public boolean isMouseNearConnection(Point p) {
 		for (Segment s : segmentSet) {
 			if (!s.getP1().equals(s.getP2())
-					&& ConnectionUtils.distanceToSegment(s, p) < DiagramController.minDistanceToSegment) {
+					&& ConnectionUtils.distanceToSegment(s, p) < DiagramController.MIN_DISTANCE_TO_SEGMENT) {
 				return true;
 			}
 		}

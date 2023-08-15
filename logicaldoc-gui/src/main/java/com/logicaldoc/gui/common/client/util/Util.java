@@ -333,7 +333,7 @@ public abstract class Util {
 		if (src == null)
 			return null;
 		else
-			return src.replaceAll("\\<.*?\\>", "").replace(NBSP, " ");
+			return src.replaceAll("\\<.*\\>", "").replace(NBSP, " ");
 	}
 
 	public static String toString(Object[] elements) {

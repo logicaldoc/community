@@ -120,7 +120,7 @@ public class TimeDiff {
 		return out.toString();
 	}
 
-	public static enum TimeField {
+	public enum TimeField {
 		DAY, HOUR, MINUTE, SECOND, MILLISECOND;
 	}
 }

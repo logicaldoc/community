@@ -401,8 +401,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					attributes = prepareGUIAttributes(template, null, sessionUser);
 			}
 
-			Arrays.sort(attributes,
-					(o1, o2) -> Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition())));
+			Arrays.sort(attributes, (o1, o2) -> Integer.compare(o1.getPosition(), o2.getPosition()));
 
 			return attributes;
 		} catch (Exception t) {
@@ -605,12 +604,12 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	private Template loadExtensibleObjectTemplate(Template template, ExtensibleObject extensibleObject)
 			throws PersistenceException {
 		Template currentTemplate = null;
-		if (extensibleObject != null && extensibleObject instanceof Document) {
+		if (extensibleObject instanceof Document) {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document doc = docDao.findDocument(extensibleObject.getId());
 			if (doc != null)
 				currentTemplate = doc.getTemplate();
-		} else if (extensibleObject != null && extensibleObject instanceof Folder) {
+		} else if (extensibleObject instanceof Folder) {
 			FolderDAO foldDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Folder folder = foldDao.findFolder(extensibleObject.getId());
 			if (folder != null)

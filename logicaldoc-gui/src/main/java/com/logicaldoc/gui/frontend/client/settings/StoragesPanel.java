@@ -223,11 +223,8 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private static boolean isParameterAttribute(String name) {
-		if ("type".equals(name) || "id".equals(name) || "name".equals(name) || "path".equals(name) || WRITE.equals(name)
-				|| name.startsWith("_"))
-			return false;
-		else
-			return true;
+		return !("type".equals(name) || "id".equals(name) || "name".equals(name) || "path".equals(name)
+				|| WRITE.equals(name) || name.startsWith("_"));
 	}
 
 	private void refresh() {

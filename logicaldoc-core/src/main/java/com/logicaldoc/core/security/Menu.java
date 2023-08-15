@@ -224,6 +224,14 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 		return this.name.compareTo(o.name);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Menu))
+			return false;
+		Menu other = (Menu) obj;
+		return other.getId() == this.getId();
+	}
+
 	public int getPosition() {
 		return position;
 	}

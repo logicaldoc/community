@@ -44,13 +44,8 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 	protected static Logger log = LoggerFactory.getLogger(FilteredAnalyzer.class);
 
-	public static final ThreadLocal<String> lang = new ThreadLocal<String>() {
-		@Override
-		protected String initialValue() {
-			return "en";
-		}
-	};
-
+	public static final ThreadLocal<String> lang = ThreadLocal.withInitial(() -> "en");
+	
 	public FilteredAnalyzer() {
 		super(GLOBAL_REUSE_STRATEGY);
 	}
@@ -124,7 +119,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 		if (aClass != null) {
 			try {
 				@SuppressWarnings({ "rawtypes", "unchecked" })
-				Constructor constructor = aClass.getConstructor(new Class[] { java.util.Map.class });
+				Constructor constructor = aClass.getConstructor(java.util.Map.class);
 
 				TokenFilterFactory factory = (TokenFilterFactory) constructor.newInstance(configs);
 

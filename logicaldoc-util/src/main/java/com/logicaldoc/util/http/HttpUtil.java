@@ -13,14 +13,14 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
 import com.logicaldoc.util.Context;
@@ -88,8 +88,8 @@ public class HttpUtil {
 
 			RequestConfig requestConfig = requestBuilder.build();
 
-			return clientBuilder.setHostnameVerifier(new AllowAllHostnameVerifier())
-					.setSslcontext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+			return clientBuilder.setSSLHostnameVerifier(new NoopHostnameVerifier())
+					.setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
 						public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 							return true;
 						}

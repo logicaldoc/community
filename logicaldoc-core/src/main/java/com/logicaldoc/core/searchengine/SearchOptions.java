@@ -140,11 +140,6 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		this.description = description;
 	}
 
-	@Override
-	public int compareTo(SearchOptions o) {
-		return this.getName().compareTo(o.getName());
-	}
-
 	public int getMaxHits() {
 		return maxHits;
 	}
@@ -239,5 +234,23 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = parameters;
+	}
+
+	@Override
+	public int compareTo(SearchOptions o) {
+		return this.getName().compareTo(o.getName());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof SearchOptions))
+			return false;
+		SearchOptions other = (SearchOptions) obj;
+		return getName().equals(other.getName());
+	}
+	
+	@Override
+	public int hashCode() {
+		return getName().hashCode();
 	}
 }

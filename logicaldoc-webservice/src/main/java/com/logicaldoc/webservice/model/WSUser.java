@@ -34,22 +34,22 @@ public class WSUser {
 	protected static Logger log = LoggerFactory.getLogger(WSUser.class);
 
 	@WSDoc(documented = false)
-	public static int TYPE_DEFAULT = 0;
+	public static final int TYPE_DEFAULT = 0;
 
 	@WSDoc(documented = false)
-	public static int TYPE_SYSTEM = 1;
+	public static final int TYPE_SYSTEM = 1;
 
 	@WSDoc(documented = false)
-	public static int TYPE_GUEST = 2;
+	public static final int TYPE_GUEST = 2;
 
 	@WSDoc(documented = false)
-	public static int SOURCE_DEFAULT = 0;
+	public static final int SOURCE_DEFAULT = 0;
 
 	@WSDoc(documented = false)
-	public static int SOURCE_LDAP = 1;
+	public static final int SOURCE_LDAP = 1;
 
 	@WSDoc(documented = false)
-	public static int SOURCE_ACTIVE_DIRECTORY = 2;
+	public static final int SOURCE_ACTIVE_DIRECTORY = 2;
 
 	@WSDoc(documented = false)
 	public static final long USERID_ADMIN = 1;

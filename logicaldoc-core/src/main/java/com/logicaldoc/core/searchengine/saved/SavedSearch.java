@@ -3,7 +3,10 @@ package com.logicaldoc.core.searchengine.saved;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -11,7 +14,7 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.io.StringOutputStream;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * A search saved in the database
@@ -50,17 +53,25 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	public void saveOptions(SearchOptions opt) throws IOException {
 		this.setType(opt.getType());
-		StringBuilder sb = new StringBuilder();
 
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenantName = tenantDao.getTenantName(getTenantId());
 		String charset = Context.get().getProperties().getProperty(tenantName + ".charset", "UTF-8");
 
-		try (StringOutputStream out = new StringOutputStream(sb);
-				XMLEncoder encoder = new XMLEncoder(out, charset, true, 0)) {
+		File tmpFile = FileUtil.createTempFile("ser", ".txt");
+		try (OutputStream out = new FileOutputStream(tmpFile);
+				XMLEncoder encoder = new XMLEncoder(out, charset, false, 0)) {
 			encoder.writeObject(opt);
+		} catch (IOException ioe) {
+			FileUtil.strongDelete(tmpFile);
+			throw ioe;
 		}
-		setOptions(sb.toString());
+
+		try {
+			setOptions(FileUtil.readFile(tmpFile).trim());
+		} finally {
+			FileUtil.strongDelete(tmpFile);
+		}
 	}
 
 	public SearchOptions readOptions() {
@@ -74,7 +85,15 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	@Override
 	public int compareTo(SavedSearch other) {
-		return this.options.compareTo(other.options);
+		return this.getOptions().compareTo(other.getOptions());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof SavedSearch))
+			return false;
+		SavedSearch other = (SavedSearch) obj;
+		return getOptions().equals(other.getOptions());
 	}
 
 	public long getUserId() {

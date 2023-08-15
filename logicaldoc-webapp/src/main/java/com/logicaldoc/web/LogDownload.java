@@ -216,9 +216,7 @@ public class LogDownload extends HttpServlet {
 		ContextProperties cp = Context.get().getProperties();
 		OrderedProperties prop = new OrderedProperties();
 		for (String key : cp.getKeys()) {
-			if (key.contains("password"))
-				continue;
-			else
+			if (!key.contains("password"))
 				prop.put(key, cp.get(key));
 		}
 		prop.store(new FileOutputStream(buf), "Support Request");

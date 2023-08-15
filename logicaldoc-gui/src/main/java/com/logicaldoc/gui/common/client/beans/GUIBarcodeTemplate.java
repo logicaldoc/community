@@ -19,10 +19,6 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 
 	private boolean zonal = false;
 
-	public void setZones(GUIBarcodeZone[] barcodeZones) {
-		super.setZones(barcodeZones);
-	}
-
 	public Integer getThreshold() {
 		return threshold;
 	}

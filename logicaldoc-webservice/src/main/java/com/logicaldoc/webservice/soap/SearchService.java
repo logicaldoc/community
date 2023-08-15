@@ -8,7 +8,6 @@ import javax.jws.WebService;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
-import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.model.WSDocument;

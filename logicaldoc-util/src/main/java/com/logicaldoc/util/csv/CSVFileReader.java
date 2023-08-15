@@ -33,7 +33,7 @@ import java.util.List;
  * @version %I%, %G%
  */
 public class CSVFileReader extends CSVFile implements Closeable {
-	
+
 	/**
 	 * The buffered reader linked to the CSV file to be read.
 	 */
@@ -149,13 +149,14 @@ public class CSVFileReader extends CSVFile implements Closeable {
 		int j;
 		int len = s.length();
 		for (j = i; j < len; j++) {
+			boolean stopCycle = false;
 			if ((s.charAt(j) == textQualifier) && (j + 1 < len)) {
 				if (s.charAt(j + 1) == textQualifier) {
 					j++; // skip escape char
 				} else if (s.charAt(j + 1) == fieldSeparator) { // next
 					// delimiter
 					j++; // skip end quotes
-					break;
+					stopCycle = true;
 				}
 			} else if ((s.charAt(j) == textQualifier) && (j + 1 == len)) { // end
 				// quotes
@@ -163,8 +164,12 @@ public class CSVFileReader extends CSVFile implements Closeable {
 				// end
 				// of
 				// line
-				break; // done
+				stopCycle = true; // done
 			}
+
+			if (stopCycle)
+				break;
+
 			sb.append(s.charAt(j)); // regular character
 		}
 		return j;

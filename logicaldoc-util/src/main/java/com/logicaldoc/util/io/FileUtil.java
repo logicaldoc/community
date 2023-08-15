@@ -2,7 +2,6 @@ package com.logicaldoc.util.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
@@ -450,10 +448,7 @@ public class FileUtil {
 		if (matchesIncludes)
 			return true;
 
-		if (includes == null || includes.length == 0)
-			return true;
-		else
-			return false;
+		return includes == null || includes.length == 0;
 	}
 
 	private static boolean matchesFilters(String str, String[] filters) {
@@ -589,39 +584,9 @@ public class FileUtil {
 		}
 	}
 
-	public static void replaceInFile(String sourcePath, String token, String newValue) {
-		StringBuilder oldContent = new StringBuilder();
-
-		File tmp = new File(sourcePath + ".tmp");
-		File file = new File(sourcePath);
-
-		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(new FileInputStream(sourcePath), StandardCharsets.UTF_8));
-				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp),
-						StandardCharsets.UTF_8);) {
-			// Reading all the lines of input text file into oldContent
-			String line = reader.readLine();
-
-			while (line != null) {
-				oldContent.append(oldContent);
-				oldContent.append(line);
-				oldContent.append(System.lineSeparator());
-				line = reader.readLine();
-			}
-
-			// Replacing oldString with newString in the oldContent
-			String newContent = oldContent.toString().replace(token, newValue);
-
-			// Rewriting the input text file with newContent
-			writer.write(newContent);
-		} catch (IOException ioe) {
-			log.error(ioe.getMessage(), ioe);
-		} finally {
-			FileUtil.strongDelete(file);
-			boolean renamed = tmp.renameTo(file);
-			if (!renamed)
-				log.warn("Cannot rename to {}", file.getAbsolutePath());
-		}
+	public static void replaceInFile(String sourcePath, String token, String newValue) throws IOException {
+		String content = readFile(sourcePath);
+		writeFile(content.replace(token, newValue), sourcePath);
 	}
 
 	/**

@@ -307,6 +307,14 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		return this.name.compareTo(o.name);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Folder))
+			return false;
+		Folder other = (Folder) obj;
+		return other.getId() == this.getId();
+	}
+
 	public String getName() {
 		return name;
 	}

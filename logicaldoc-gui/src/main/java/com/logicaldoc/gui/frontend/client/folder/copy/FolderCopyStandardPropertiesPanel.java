@@ -79,9 +79,9 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 		description.setWidth(250);
 
 		List<FormItem> items = new ArrayList<>();
-		items.addAll(Arrays.asList(new FormItem[] { name, description }));
+		items.addAll(Arrays.asList(name, description));
 
-		form1.setItems(items.toArray(new FormItem[0]));
+		form1.setItems();
 
 		rows.addMember(form1);
 

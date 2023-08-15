@@ -241,9 +241,7 @@ public class GUITenant implements Serializable {
 	public boolean isAvailable() {
 		if (!enabled)
 			return false;
-		if (expire != null && expire.before(new Date()))
-			return false;
-		return true;
+		return expire == null || expire.before(new Date());
 	}
 
 	public long getUsers() {

@@ -139,7 +139,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		MainPanel.get().selectDocumentsTab();
 		FolderNavigator.get().openFolder(folderId, docId);
 		documentsMenu.expandSection(0);
-		if (detailPanel != null && detailPanel instanceof DocumentDetailsPanel)
+		if (detailPanel instanceof DocumentDetailsPanel)
 			((DocumentDetailsPanel) detailPanel).selectDefaultTab();
 	}
 
@@ -221,7 +221,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void changePageSize() {
-		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
+		if (listingPanel instanceof DocumentsListPanel
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
 			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
@@ -252,7 +252,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	private void updateListingPanel(GUIFolder folder) {
-		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
+		if (listingPanel instanceof DocumentsListPanel
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
 			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
@@ -462,7 +462,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	public void onFolderSelected(GUIFolder folder) {
 		this.folder = folder;
 		// Reset the cursor to the first page
-		if (listingPanel != null && listingPanel instanceof DocumentsListPanel)
+		if (listingPanel instanceof DocumentsListPanel)
 			((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
 		refresh();
 	}
@@ -501,7 +501,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public String getDocsGridViewState() {
-		if (listingPanel != null && listingPanel instanceof DocumentsListPanel) {
+		if (listingPanel instanceof DocumentsListPanel) {
 			DocumentsListPanel docsListingPanel = (DocumentsListPanel) listingPanel;
 			if (docsListingPanel.getGrid() instanceof NavigatorDocumentsGrid)
 				return ((NavigatorDocumentsGrid) docsListingPanel.getGrid()).getGridLayout();

@@ -128,7 +128,7 @@ public class MailTool {
 	 */
 	public void sendDocument(Document document, String from, String to, String subject, String message)
 			throws IOException, MessagingException {
-		sendDocuments(Arrays.asList(document), from, Arrays.asList(new String[] { to }), subject, message);
+		sendDocuments(Arrays.asList(document), from, Arrays.asList(to), subject, message);
 	}
 
 	/**

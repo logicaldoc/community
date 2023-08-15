@@ -32,7 +32,7 @@ public class MessagesWindow extends Window {
 	public MessagesWindow() {
 		super();
 
-		HeaderControl trash = new HeaderControl(HeaderControl.TRASH, event -> grid.setData(new ListGridRecord[0]));
+		HeaderControl trash = new HeaderControl(HeaderControl.TRASH, event -> grid.setData());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, trash, HeaderControls.CLOSE_BUTTON);
 		setTitle(AwesomeFactory.getIconHtml("clipboard-list", "lastevents"));

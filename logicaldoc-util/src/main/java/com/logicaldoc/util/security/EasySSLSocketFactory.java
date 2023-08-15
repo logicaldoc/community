@@ -34,9 +34,7 @@ public class EasySSLSocketFactory extends SSLSocketFactory {
 			sslcontent.init(null, // KeyManager not required
 					new TrustManager[] { new EasyX509TrustManager() }, new java.security.SecureRandom());
 			factory = sslcontent.getSocketFactory();
-		} catch (NoSuchAlgorithmException e) {
-			log.debug(e.getMessage());
-		} catch (KeyManagementException e) {
+		} catch (NoSuchAlgorithmException | KeyManagementException e) {
 			log.debug(e.getMessage());
 		}
 	}

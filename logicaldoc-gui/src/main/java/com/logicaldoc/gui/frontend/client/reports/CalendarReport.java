@@ -265,7 +265,7 @@ public class CalendarReport extends AdminPanel {
 
 	@SuppressWarnings("unchecked")
 	private void onSearch() {
-		list.setData(new ListGridRecord[0]);
+		list.setData();
 
 		final Map<String, Object> values =  vm.getValues();
 

@@ -939,18 +939,27 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 				// There is match with the old scheme, so update the database
 				// with the new one
 				setPassword(test);
-				try {
-					DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-					docDao.jdbcUpdate("update ld_document set ld_password='" + test + "' where ld_id=" + getId());
-				} catch (PersistenceException e) {
-					log.warn(e.getMessage());
-				}
+				fixEncryptedPassword(test);
 				return true;
 			}
 
 			return false;
 		} catch (Exception t) {
 			return false;
+		}
+	}
+
+	/**
+	 * Saves the password encrypted with current algorithm into the database
+	 * 
+	 * @param encryptedPassword The encrypted password to write
+	 */
+	private void fixEncryptedPassword(String encryptedPassword) {
+		try {
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			docDao.jdbcUpdate("update ld_document set ld_password='" + encryptedPassword + "' where ld_id=" + getId());
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage());
 		}
 	}
 

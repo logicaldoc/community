@@ -74,7 +74,7 @@ public class DropboxDataServlet extends HttpServlet {
 
 	private void printEntries(Dropbox dbox, boolean folders, String parent, PrintWriter writer) throws DbxException {
 		Metadata ent = dbox.get(parent);
-		if ((ent == null && "/".equals(parent)) || (ent != null && ent instanceof FolderMetadata)) {
+		if ((ent == null && "/".equals(parent)) || ent instanceof FolderMetadata) {
 			printEntries(dbox, folders, parent, writer);
 		}
 

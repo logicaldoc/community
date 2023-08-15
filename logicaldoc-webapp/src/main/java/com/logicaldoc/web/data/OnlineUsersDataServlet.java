@@ -45,9 +45,7 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 		List<Session> sessions = sessionDao.findByNode(null);
 		Set<User> users = new HashSet<>();
 		for (Session sess : sessions) {
-			if (sess.getStatus() != Session.STATUS_OPEN)
-				continue;
-			if (!tenant.equals(sess.getTenantName()))
+			if (sess.getStatus() != Session.STATUS_OPEN || !tenant.equals(sess.getTenantName()))
 				continue;
 
 			User user = userDao.findByUsername(sess.getUsername());

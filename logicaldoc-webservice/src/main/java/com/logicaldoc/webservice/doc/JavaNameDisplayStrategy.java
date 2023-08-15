@@ -3,7 +3,7 @@ package com.logicaldoc.webservice.doc;
 /**
  * To display a java-style name? for example, orderId =&gt; Order ID
  */
-public abstract class JavaNameDisplayStrategy {
+public interface JavaNameDisplayStrategy {
 
 	public abstract String displayElementName(String stubName);
 

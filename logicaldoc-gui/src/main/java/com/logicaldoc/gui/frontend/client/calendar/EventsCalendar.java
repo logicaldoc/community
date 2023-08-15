@@ -38,7 +38,7 @@ public class EventsCalendar extends Calendar {
 		setDateFormatter(I18N.getDateDisplayFormat(false));
 		setTimeFormatter(TimeDisplayFormat.TOSHORT24HOURTIME);
 		setCanCreateEvents(false);
-		setCanResizeTimelineEvents(false);
+		setCanResizeEvents(false);
 		setCanDragEvents(false);
 		setCanDragReposition(false);
 		setCanDragResize(false);

@@ -112,7 +112,7 @@ public class FulltextSearch extends Search {
 
 			return hit;
 		}
-	};
+	}
 
 	protected FulltextSearch() {
 	}
@@ -310,11 +310,9 @@ public class FulltextSearch extends Search {
 			}
 			Hit hit = iter.next();
 
-			if (StringUtils.isEmpty(hit.getFileName()))
-				continue;
-
-			if ((searchUser.isMemberOf(Group.GROUP_ADMIN) && opt.getFolderId() == null)
-					|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId())))
+			if (StringUtils.isNotEmpty(hit.getFileName())
+					&& ((searchUser.isMemberOf(Group.GROUP_ADMIN) && opt.getFolderId() == null)
+							|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId()))))
 				hits.add(hit);
 		}
 	}

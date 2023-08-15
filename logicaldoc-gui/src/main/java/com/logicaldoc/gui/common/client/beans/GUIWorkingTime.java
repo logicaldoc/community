@@ -68,4 +68,17 @@ public class GUIWorkingTime implements Serializable, Comparable<GUIWorkingTime> 
 	public int compareTo(GUIWorkingTime o) {
 		return this.start.compareTo(o.start);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof GUIWorkingTime))
+			return false;
+		GUIWorkingTime other = (GUIWorkingTime) obj;
+		return this.start.equals(other.start);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.start.hashCode();
+	}
 }

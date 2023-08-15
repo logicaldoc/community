@@ -36,7 +36,7 @@ public class WebFormInvitationDialog extends AbstractEmailDialog {
 
 	@Override
 	protected void onSend(GUIEmail mail) {
-		if (prefillFields.getValueAsBoolean()) {
+		if (Boolean.TRUE.equals(prefillFields.getValueAsBoolean())) {
 			new WebFormPrefilledEmail(mail, formId).show();
 			destroy();
 		} else {

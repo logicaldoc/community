@@ -46,10 +46,9 @@ public class UserGroup implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
+		
 		UserGroup other = (UserGroup) obj;
-		if (groupId != other.groupId)
-			return false;
-		return true;
+		return groupId == other.groupId;
 	}
 
 	@Override

@@ -10,9 +10,10 @@ public class InvalidSessionException extends AuthenticationException {
 
 	private static final long serialVersionUID = 1L;
 
-	private String sid;
+	private final String sid;
 
 	public InvalidSessionException() {
+		sid = null;
 	}
 
 	public InvalidSessionException(String sid) {

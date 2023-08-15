@@ -2280,7 +2280,6 @@ public class LDRepository {
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
 
-			// TODO if the folder has been renamed the right event could be
 			// FolderEvent.RENAMED for the LDSynch
 			transaction.setEvent(FolderEvent.CHANGED.toString());
 			folderDao.store(folder, transaction);

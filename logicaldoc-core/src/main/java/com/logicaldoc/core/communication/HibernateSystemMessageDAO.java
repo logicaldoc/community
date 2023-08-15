@@ -54,7 +54,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 
 			return message;
 		}
-	};
+	}
 
 	public HibernateSystemMessageDAO() {
 		super(SystemMessage.class);
@@ -63,8 +63,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 
 	@Override
 	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read) {
-		String sql = SELECT
-				+ " from ld_systemmessage where ld_deleted = 0 and ld_type = " + type
+		String sql = SELECT + " from ld_systemmessage where ld_deleted = 0 and ld_type = " + type
 				+ " and exists (select Q.ld_messageid from ld_recipient Q where Q.ld_name = '"
 				+ SqlUtil.doubleQuotes(recipient) + "' and Q.ld_messageid=ld_id)";
 		if (read != null)
@@ -182,9 +181,8 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 
 	@Override
 	public List<SystemMessage> findMessagesToBeSent(int type, int maxTrial) {
-		String sql = SELECT
-				+ " from ld_systemmessage where ld_deleted = 0 and not ld_status = " + SystemMessage.STATUS_DELIVERED
-				+ " and ld_type = " + type;
+		String sql = SELECT + " from ld_systemmessage where ld_deleted = 0 and not ld_status = "
+				+ SystemMessage.STATUS_DELIVERED + " and ld_type = " + type;
 		if (maxTrial > 0)
 			sql = sql + " and ld_trials < " + maxTrial;
 		sql = sql + " order by ld_sentdate desc";

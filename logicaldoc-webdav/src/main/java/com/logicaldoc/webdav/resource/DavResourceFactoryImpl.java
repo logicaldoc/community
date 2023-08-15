@@ -30,7 +30,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 
 	protected static Logger log = LoggerFactory.getLogger(DavResourceFactoryImpl.class);
 
-	private static final Pattern versionRequestPattern = Pattern.compile("/vstore/([0-9].[0-9])/(.*)");
+	private static final Pattern versionRequestPattern = Pattern.compile("/vstore/(\\d.\\d)/(.*)");
 
 	private final ResourceConfig resourceConfig;
 

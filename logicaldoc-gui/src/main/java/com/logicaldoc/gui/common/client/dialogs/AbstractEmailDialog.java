@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.dialogs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.beans.GUIContact;
@@ -146,18 +147,17 @@ public abstract class AbstractEmailDialog extends Window {
 
 	private void fillRecipients(List<String> to, List<String> cc, List<String> bcc, ListGridRecord[] records) {
 		for (int i = 0; i < records.length; i++) {
-			if (Boolean.FALSE.equals(recipientsGrid.validateCell(i, EMAIL)))
-				continue;
-
-			ListGridRecord rec = records[i];
-			if (rec.getAttribute(EMAIL) == null || rec.getAttribute("type").trim().equals(""))
-				continue;
-			if ("to".equals(rec.getAttribute("type")))
-				to.add(rec.getAttribute(EMAIL).trim());
-			else if ("cc".equals(rec.getAttribute("type")))
-				cc.add(rec.getAttribute(EMAIL).trim());
-			else
-				bcc.add(rec.getAttribute(EMAIL).trim());
+			if (Boolean.TRUE.equals(recipientsGrid.validateCell(i, EMAIL))) {
+				ListGridRecord rec = records[i];
+				if (rec.getAttribute(EMAIL) == null || rec.getAttribute("type").trim().equals(""))
+					continue;
+				if ("to".equals(rec.getAttribute("type")))
+					to.add(rec.getAttribute(EMAIL).trim());
+				else if ("cc".equals(rec.getAttribute("type")))
+					cc.add(rec.getAttribute(EMAIL).trim());
+				else
+					bcc.add(rec.getAttribute(EMAIL).trim());
+			}
 		}
 	}
 
@@ -197,15 +197,15 @@ public abstract class AbstractEmailDialog extends Window {
 		emailItem.setRequired(true);
 		emailItem.setWidth("*");
 		// Delete the row
-		emailItem.addKeyPressHandler((event) -> handleBackspace(event));
-		email.setEditorType(emailItem);
+		emailItem.addKeyPressHandler(this::handleBackspace);
+		email.setEditorProperties(emailItem);
 		email.setValidators(new EmailValidator());
 
 		ListGridField type = new ListGridField("type", I18N.message(" "));
 		type.setCanFilter(true);
 		type.setWidth(50);
 		type.setCanEdit(true);
-		type.setEditorType(ItemFactory.newRecipientTypeSelector("type"));
+		type.setEditorProperties(ItemFactory.newRecipientTypeSelector("type"));
 
 		recipientsGrid = new ListGrid();
 		recipientsGrid.setShowRecordComponents(true);
@@ -217,9 +217,9 @@ public abstract class AbstractEmailDialog extends Window {
 		recipientsGrid.setEditEvent(ListGridEditEvent.CLICK);
 		recipientsGrid.setFields(type, email);
 
-		recipientsGrid.addEditCompleteHandler((event) -> addEmptyRow());
+		recipientsGrid.addEditCompleteHandler(event -> addEmptyRow());
 
-		recipientsGrid.addEditorExitHandler((event) -> addEmptyRow());
+		recipientsGrid.addEditorExitHandler(event -> addEmptyRow());
 
 		recipientsGrid.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if (value == null)
@@ -237,7 +237,7 @@ public abstract class AbstractEmailDialog extends Window {
 
 		final SelectItem contactsSelector = ItemFactory.newEmailSelector("contacts", "contacts");
 		contactsSelector.setWidth(200);
-		contactsSelector.addChangedHandler((event) -> {
+		contactsSelector.addChangedHandler(event -> {
 			ListGridRecord[] newSelection = contactsSelector.getSelectedRecords();
 			if (newSelection == null || newSelection.length < 1)
 				return;
@@ -297,7 +297,7 @@ public abstract class AbstractEmailDialog extends Window {
 	private void handleBackspace(KeyPressEvent event) {
 		if (event.getKeyName().equals("Backspace")) {
 			ListGridRecord selection = recipientsGrid.getSelectedRecord();
-			if ((selection.getAttribute(EMAIL) == null || selection.getAttribute(EMAIL).toString().equals(""))
+			if ((selection.getAttribute(EMAIL) == null || selection.getAttribute(EMAIL).equals(""))
 					&& recipientsGrid.getDataAsRecordList().getLength() > 1)
 				recipientsGrid.removeSelectedData();
 		}
@@ -311,9 +311,7 @@ public abstract class AbstractEmailDialog extends Window {
 				return;
 		}
 
-		ListGridRecord[] newRecords = new ListGridRecord[records.length + 1];
-		for (int i = 0; i < records.length; i++)
-			newRecords[i] = records[i];
+		ListGridRecord[] newRecords = Arrays.copyOf(records, records.length + 1);
 		newRecords[records.length] = new ListGridRecord();
 		newRecords[records.length].setAttribute("type", "to");
 		newRecords[records.length].setAttribute(EMAIL, "");

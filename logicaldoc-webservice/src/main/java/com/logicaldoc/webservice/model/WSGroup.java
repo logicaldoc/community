@@ -31,10 +31,10 @@ public class WSGroup implements Serializable {
 	public static final long GROUPID_ADMIN = 1;
 
 	@WSDoc(documented = false)
-	public static int TYPE_DEFAULT = 0;
+	public static final int TYPE_DEFAULT = 0;
 
 	@WSDoc(documented = false)
-	public static int TYPE_USER = 1;
+	public static final int TYPE_USER = 1;
 
 	@WSDoc(description = "unique identifier")
 	private long id;

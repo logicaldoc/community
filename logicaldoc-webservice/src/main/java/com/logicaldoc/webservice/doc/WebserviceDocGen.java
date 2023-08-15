@@ -1,12 +1,10 @@
 package com.logicaldoc.webservice.doc;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.webservice.doc.model.WebMethodStubSet;
 import com.logicaldoc.webservice.doc.model.WebServiceStubSet;
 import com.logicaldoc.webservice.doc.service.WebServiceStubSetFactory;
@@ -16,7 +14,7 @@ import com.logicaldoc.webservice.doc.view.simple.SimpleJavaNameDisplayStrategy;
 
 public class WebserviceDocGen {
 
-	public static void main(String[] args) throws IOException, ClassNotFoundException {
+	public static void main(String[] args) throws ClassNotFoundException {
 		String release = args[0];
 		File outputDir = new File(args[1]);
 
@@ -40,7 +38,7 @@ public class WebserviceDocGen {
 		}
 	}
 
-	public void indexPage(String release, File outputDir, List<Class<?>> services) throws IOException {
+	public void indexPage(String release, File outputDir, List<Class<?>> services) {
 		outputDir.mkdirs();
 
 		FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine
@@ -62,12 +60,12 @@ public class WebserviceDocGen {
 		String html = displayEngine.displayWebService(serviceStubSet);
 		String fileName = "index.html";
 		File outputFile = new File(outputDir, fileName);
-		FileUtils.writeStringToFile(outputFile, html);
+		FileUtil.writeFile(html, outputFile.getAbsolutePath());
 
 		System.out.println("Please find the HTML files at " + outputFile.getAbsolutePath());
 	}
 
-	public void singleReport(File outputDir, Class<?> webServiceClass) throws IOException {
+	public void singleReport(File outputDir, Class<?> webServiceClass) {
 		WebServiceStubSet serviceStubSet = WebServiceStubSetFactory.createWebServiceStubSet(webServiceClass);
 
 		outputDir.mkdirs();
@@ -80,7 +78,7 @@ public class WebserviceDocGen {
 		fileName += ".html";
 		fileName = fileName.replace("Service.", ".");
 		File outputFile = new File(outputDir, fileName);
-		FileUtils.writeStringToFile(outputFile, html);
+		FileUtil.writeFile(html, outputFile.getAbsolutePath());
 
 		System.out.println("Please find the HTML files at " + outputFile.getAbsolutePath());
 	}

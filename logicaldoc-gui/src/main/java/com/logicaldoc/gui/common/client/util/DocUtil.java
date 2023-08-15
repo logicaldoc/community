@@ -6,7 +6,6 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.UserController;
-import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 
 /**
  * Some utility methods for the documents
@@ -24,28 +23,20 @@ public class DocUtil {
 	}
 
 	public static void download(final long docId, final String fileVersion, final String suffix) {
-		DocumentProtectionManager.askForPassword(docId, new DocumentProtectionHandler() {
-
-			@Override
-			public void onUnprotected(GUIDocument document) {
-				if (suffix != null)
-					Util.download(Util.downloadURL(docId, fileVersion, false) + suffix);
-				else
-					Util.download(Util.downloadURL(docId, fileVersion, false));
-			}
+		DocumentProtectionManager.askForPassword(docId, document -> {
+			if (suffix != null)
+				Util.download(Util.downloadURL(docId, fileVersion, false) + suffix);
+			else
+				Util.download(Util.downloadURL(docId, fileVersion, false));
 		});
 	}
 
 	public static void downloadPdfConversion(final long docId, final String fileVersion) {
-		DocumentProtectionManager.askForPassword(docId, new DocumentProtectionHandler() {
-
-			@Override
-			public void onUnprotected(GUIDocument document) {
-				if (fileVersion != null)
-					Util.download(Util.contextPath() + "convertpdf?docId=" + docId + "&version=" + fileVersion);
-				else
-					Util.download(Util.contextPath() + "convertpdf?docId=" + docId);
-			}
+		DocumentProtectionManager.askForPassword(docId, document -> {
+			if (fileVersion != null)
+				Util.download(Util.contextPath() + "convertpdf?docId=" + docId + "&version=" + fileVersion);
+			else
+				Util.download(Util.contextPath() + "convertpdf?docId=" + docId);
 		});
 	}
 

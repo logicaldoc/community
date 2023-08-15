@@ -146,7 +146,7 @@ public class StringUtil {
 	}
 
 	public static String collectionToString(Collection<?> collection, String separator) {
-		return String.join(separator, collection.stream().map(o -> o.toString()).collect(Collectors.toList()));
+		return String.join(separator, collection.stream().map(Object::toString).collect(Collectors.toList()));
 	}
 
 	public static String removeNonUtf8Chars(String src) {
@@ -178,10 +178,7 @@ public class StringUtil {
 		if (matchesInclusions)
 			return true;
 
-		if (includes == null || includes.length == 0)
-			return true;
-		else
-			return false;
+		return includes == null || includes.length == 0;
 	}
 
 	private static boolean filtersCheck(String str, String[] filters) {

@@ -185,7 +185,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			options.setExpression(value);
 			options.setExpressionLanguage(I18N.getLocale());
 			options.setType(GUISearchOptions.TYPE_FULLTEXT);
-			options.setFields(Constants.FULLTEXT_DEFAULT_FIELDS);
+			options.setFields(Constants.getFulltextDefaultFields());
 			options.setCriteria(null);
 		} else {
 			options.setType(GUISearchOptions.TYPE_PARAMETRIC);

@@ -2,6 +2,7 @@ package com.logicaldoc.web.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -449,9 +450,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	private void putFilterIdOptions(GUISearchOptions options, SearchOptions searchOptions) {
 		if (options.getFilterIds() != null && options.getFilterIds().length > 0) {
 			Set<Long> ids = new HashSet<>();
-			for (Long id : options.getFilterIds()) {
-				ids.add(id);
-			}
+			Collections.addAll(ids, options.getFilterIds());
 			searchOptions.setFilterIds(ids);
 		}
 	}

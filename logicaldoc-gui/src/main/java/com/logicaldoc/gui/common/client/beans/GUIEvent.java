@@ -29,6 +29,19 @@ public class GUIEvent implements Comparable<GUIEvent> {
 		return this.date.compareTo(o.date);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof GUIEvent))
+			return false;
+		GUIEvent other = (GUIEvent) obj;
+		return this.date == other.date;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.date.hashCode();
+	}
+
 	public String getDetail() {
 		return detail;
 	}

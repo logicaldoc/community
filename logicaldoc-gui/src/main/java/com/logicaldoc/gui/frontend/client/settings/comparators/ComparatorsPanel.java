@@ -299,11 +299,8 @@ public class ComparatorsPanel extends AdminPanel {
 	}
 
 	protected boolean isParameterAttribute(String name) {
-		if ("id".equals(name) || gridAttributeName.equals(name) || "out".equals(name) || "in".equals(name)
-				|| LABEL.equals(name) || EENABLED.equals(name) || name.startsWith("_"))
-			return false;
-		else
-			return true;
+		return !("id".equals(name) || gridAttributeName.equals(name) || "out".equals(name) || "in".equals(name)
+				|| LABEL.equals(name) || EENABLED.equals(name) || name.startsWith("_"));
 	}
 
 	private void onSave() {
@@ -353,13 +350,13 @@ public class ComparatorsPanel extends AdminPanel {
 		if (attrs != null && attrs.length > 0) {
 			for (String attr : attrs) {
 				String attributeValue = comparatorRecord.getAttributeAsString(attr);
-				if (!isParameterAttribute(attr))
-					continue;
-				String settingName = settingsPrefix + comparatorShort + "." + attr;
-				if (settingNames.contains(settingName))
-					continue;
-				settingNames.add(settingName);
-				settings.add(new GUIParameter(settingName, attributeValue));
+				if (isParameterAttribute(attr)) {
+					String settingName = settingsPrefix + comparatorShort + "." + attr;
+					if (settingNames.contains(settingName))
+						continue;
+					settingNames.add(settingName);
+					settings.add(new GUIParameter(settingName, attributeValue));
+				}
 			}
 		}
 	}

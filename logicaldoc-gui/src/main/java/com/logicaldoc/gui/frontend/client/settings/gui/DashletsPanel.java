@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -245,8 +246,7 @@ public class DashletsPanel extends VLayout {
 
 			@Override
 			public void onSuccess(GUIDashlet[] dashlts) {
-				for (GUIDashlet dashlet : dashlts)
-					dashlets.add(dashlet);
+				Collections.addAll(dashlets, dashlts);
 				refreshGrid();
 			}
 		});

@@ -45,4 +45,17 @@ public class FolderSearchOptions extends SearchOptions {
 	public void setOrder(List<String> order) {
 		this.order = order;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof FolderSearchOptions))
+			return false;
+		FolderSearchOptions other = (FolderSearchOptions) obj;
+		return getName().equals(other.getName());
+	}
+	
+	@Override
+	public int hashCode() {
+		return getName().hashCode();
+	}
 }

@@ -48,7 +48,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
+	private static Logger log = LoggerFactory.getLogger(LoginServiceImpl.class);
 
 	@Override
 	public GUIValue changePassword(long userId, String oldPassword, String newPassword) {

@@ -20,11 +20,11 @@ import org.slf4j.LoggerFactory;
  */
 public class SystemUtil {
 
-	private static Logger log = LoggerFactory.getLogger(SystemUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(SystemUtil.class);
 
 	public static final String SUN_JAVA_COMMAND = "sun.java.command";
 
-	private static String OS = System.getProperty("os.name").toLowerCase();
+	private static final String OS = System.getProperty("os.name").toLowerCase();
 
 	public static void main(String[] args) {
 		printEnvironment();
@@ -43,11 +43,10 @@ public class SystemUtil {
 		StringBuilder sb = new StringBuilder();
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		for (StackTraceElement element : elements) {
-			if (element.getClassName().equals(Thread.class.getName())
+			if ((element.getClassName().equals(Thread.class.getName())
 					&& element.getMethodName().equals("getStackTrace"))
-				continue;
-			if (element.getClassName().equals(SystemUtil.class.getName())
-					&& element.getMethodName().equals("printStackTrace"))
+					|| (element.getClassName().equals(SystemUtil.class.getName())
+							&& element.getMethodName().equals("printStackTrace")))
 				continue;
 			sb.append(element.getClassName());
 			sb.append(".");

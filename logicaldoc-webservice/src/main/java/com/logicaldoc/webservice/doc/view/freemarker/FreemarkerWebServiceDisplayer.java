@@ -46,12 +46,9 @@ public class FreemarkerWebServiceDisplayer {
 			template.process(rootMap, out);
 			return out.toString();
 
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		} catch (TemplateException e) {
+		} catch (IOException | TemplateException e) {
 			throw new IllegalStateException(e);
 		}
-
 	}
 
 	private Class<?> toClass(String className) {
@@ -132,7 +129,7 @@ public class FreemarkerWebServiceDisplayer {
 		}
 	}
 
-	private static final class UnkownType {
+	private interface UnkownType {
 		// Nothing to do
 	}
 }

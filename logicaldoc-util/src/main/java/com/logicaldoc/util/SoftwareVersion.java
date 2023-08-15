@@ -22,7 +22,7 @@ public class SoftwareVersion implements Comparable<SoftwareVersion> {
 		if (version.length() > 20)
 			throw new IllegalArgumentException("Version can not be more than 20 characters");
 		
-		if (!version.matches("[0-9]+(\\.[0-9]+)*"))
+		if (!version.matches("\\d+(\\.\\d+)*"))
 			throw new IllegalArgumentException("Invalid version format");
 		
 		this.version = version;

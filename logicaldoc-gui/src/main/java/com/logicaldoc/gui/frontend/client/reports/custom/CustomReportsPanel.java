@@ -191,36 +191,38 @@ public class CustomReportsPanel extends AdminPanel {
 	}
 
 	private void updateReportRecord(GUIReport report) {
-		for (ListGridRecord rec : list.getRecords()) {
-			if (Long.parseLong(rec.getAttributeAsString("id")) != report.getId())
-				continue;
-
-			long oldVersion = rec.getAttributeAsLong("recordVersion");
-
-			rec.setAttribute("runningIcon",
-					rec.getAttribute("name").equals(report.getName()) && report.getStatus() != GUIReport.STATUS_IDLE
-							? "running_task"
-							: "idle_task");
-			rec.setAttribute("status", report.getStatus());
-			rec.setAttribute("lastRun", report.getLastRun());
-			rec.setAttribute("lastModified", report.getLastModified());
-			rec.setAttribute("recordVersion", report.getRecordVersion());
-
-			if (report.getOutputDocId() != null)
-				rec.setAttribute(OUTPUT_DOC_ID, "" + report.getOutputDocId());
-			else
-				rec.setAttribute(OUTPUT_DOC_ID, (String) null);
-			list.refreshRow(list.getRecordIndex(rec));
-
-			boolean selected = list.getSelectedRecord() != null && rec.equals(list.getSelectedRecord());
-
-			// Decide if we have to refresh the properties
-			// panel
-			if (selected && report.getRecordVersion() != oldVersion) {
-				onSelectedReport();
+		for (ListGridRecord rcd : list.getRecords()) {
+			if (Long.parseLong(rcd.getAttributeAsString("id")) == report.getId()) {
+				updateRecord(rcd, report);
+				break;
 			}
+		}
+	}
 
-			break;
+	private void updateRecord(ListGridRecord rcd, GUIReport report) {
+		long oldVersion = rcd.getAttributeAsLong("recordVersion");
+
+		rcd.setAttribute("runningIcon",
+				rcd.getAttribute("name").equals(report.getName()) && report.getStatus() != GUIReport.STATUS_IDLE
+						? "running_task"
+						: "idle_task");
+		rcd.setAttribute("status", report.getStatus());
+		rcd.setAttribute("lastRun", report.getLastRun());
+		rcd.setAttribute("lastModified", report.getLastModified());
+		rcd.setAttribute("recordVersion", report.getRecordVersion());
+
+		if (report.getOutputDocId() != null)
+			rcd.setAttribute(OUTPUT_DOC_ID, "" + report.getOutputDocId());
+		else
+			rcd.setAttribute(OUTPUT_DOC_ID, (String) null);
+		list.refreshRow(list.getRecordIndex(rcd));
+
+		boolean selected = list.getSelectedRecord() != null && rcd.equals(list.getSelectedRecord());
+
+		// Decide if we have to refresh the properties
+		// panel
+		if (selected && report.getRecordVersion() != oldVersion) {
+			onSelectedReport();
 		}
 	}
 

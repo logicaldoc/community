@@ -48,7 +48,7 @@ public class RTFParser extends AbstractParser {
 			bis0.reset();
 			File tempFile = FileUtil.createTempFile("rtf", ".rtf");
 			try (OutputStream out = new FileOutputStream(tempFile)) {
-				byte buf[] = new byte[512];
+				byte[] buf = new byte[512];
 				int len;
 				while ((len = bis0.read(buf)) > 0)
 					out.write(buf, 0, len);

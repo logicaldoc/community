@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
-	public static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation", "creator",
+	private static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation", "creator",
 			"version", "fileVersion", "published", "publisher", "name", "description" };
 
 	private static final long serialVersionUID = 1L;
@@ -272,7 +272,20 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		if (o.getPosition() == getPosition())
 			return getName().compareTo(o.getName());
 		else
-			return Integer.valueOf(getPosition()).compareTo(o.getPosition());
+			return Integer.compare(getPosition(), o.getPosition());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof GUIAttribute))
+			return false;
+		GUIAttribute other = (GUIAttribute) obj;
+		return getName().equals(other.getName()) && getPosition() == other.getPosition();
+	}
+
+	@Override
+	public int hashCode() {
+		return getName().hashCode();
 	}
 
 	public String getName() {
@@ -405,5 +418,9 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	@Override
 	public String toString() {
 		return getName() + "=" + getValue();
+	}
+
+	public static String[] getForbiddenNames() {
+		return FORBIDDEN_NAMES;
 	}
 }
