@@ -169,11 +169,13 @@ public class StatsCollector extends Task {
 		long totaldocs;
 		long archiveddocs;
 		long docdir;
+		long trash;
 		try {
 			long[] docStats = extractDocStats(Tenant.SYSTEM_ID);
 			totaldocs = docStats[3];
 			archiveddocs = docStats[4];
 			docdir = docStats[5];
+			trash = docStats[7];
 
 			calculateAllTenantsDocsStats();
 		} catch (PersistenceException e) {
@@ -303,6 +305,7 @@ public class StatsCollector extends Task {
 		 * Quotas
 		 */
 		postParams.add(new BasicNameValuePair("docdir", Long.toString(docdir)));
+		postParams.add(new BasicNameValuePair("trash", Long.toString(trash)));
 		postParams.add(new BasicNameValuePair("indexdir", Long.toString(indexdir)));
 		postParams.add(new BasicNameValuePair("quota",
 				Long.toString(docdir + indexdir + userdir + importdir + exportdir + plugindir + dbdir + logdir)));
@@ -587,12 +590,13 @@ public class StatsCollector extends Task {
 	 *         <li>archiveddocs</li>
 	 *         <li>docdir (total size of the whole repository)</li>
 	 *         <li>notindexabledocs</li>
+	 *         <li>trash (total size of the trash)</li>
 	 *         </ol>
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
 	private long[] extractDocStats(long tenantId) throws PersistenceException {
-		long[] stats = new long[7];
+		long[] stats = new long[8];
 		stats[0] = 0;
 		try {
 			stats[0] = documentDAO.queryForLong(
@@ -648,6 +652,8 @@ public class StatsCollector extends Task {
 			log.error(e.getMessage(), e);
 		}
 
+		stats[7] = stats[5] - documentDAO.computeTotalSize(tenantId, null, false);
+
 		saveStatistic("notindexeddocs", stats[0], tenantId);
 		saveStatistic("indexeddocs", stats[1], tenantId);
 		saveStatistic("deleteddocs", stats[2], tenantId);
@@ -655,6 +661,7 @@ public class StatsCollector extends Task {
 		saveStatistic("archiveddocs", stats[4], tenantId);
 		saveStatistic("docdir", stats[5], tenantId);
 		saveStatistic("notindexabledocs", stats[6], tenantId);
+		saveStatistic("trash", stats[7], tenantId);
 
 		return stats;
 	}

@@ -145,58 +145,66 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
-		GUIParameter[][] parameters = new GUIParameter[5][8];
+		GUIParameter[][] parameters = new GUIParameter[5][9];
 
 		/*
 		 * Repository statistics
 		 */
-		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "docdir", null, session.getTenantId());
+		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "trash", null, session.getTenantId());
+		GUIParameter trashSize = new GUIParameter();
+		trashSize.setName("trash");
+		setLongValue(gen, trashSize);
+		parameters[0][1] = trashSize;
+
+		gen = genDao.findByAlternateKey(StatsCollector.STAT, "docdir", null, session.getTenantId());
 		GUIParameter docDirSize = new GUIParameter();
 		docDirSize.setName("documents");
 		setLongValue(gen, docDirSize);
+		docDirSize
+				.setValue(Long.toString(Long.parseLong(docDirSize.getValue()) - Long.parseLong(trashSize.getValue())));
 		parameters[0][0] = docDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "userdir", null, Tenant.SYSTEM_ID);
 		GUIParameter userDirSize = new GUIParameter();
 		userDirSize.setName("users");
 		setLongValue(gen, userDirSize);
-		parameters[0][1] = userDirSize;
+		parameters[0][2] = userDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexdir", null, Tenant.SYSTEM_ID);
 		GUIParameter indexDirSize = new GUIParameter();
 		indexDirSize.setName("fulltextindex");
 		setLongValue(gen, indexDirSize);
-		parameters[0][2] = indexDirSize;
+		parameters[0][3] = indexDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "importdir", null, Tenant.SYSTEM_ID);
 		GUIParameter importDirSize = new GUIParameter();
 		importDirSize.setName("iimport");
 		setLongValue(gen, importDirSize);
-		parameters[0][3] = importDirSize;
+		parameters[0][4] = importDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "exportdir", null, Tenant.SYSTEM_ID);
 		GUIParameter exportDirSize = new GUIParameter();
 		exportDirSize.setName("eexport");
 		setLongValue(gen, exportDirSize);
-		parameters[0][4] = exportDirSize;
+		parameters[0][5] = exportDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "plugindir", null, Tenant.SYSTEM_ID);
 		GUIParameter pluginsDirSize = new GUIParameter();
 		pluginsDirSize.setName("plugins");
 		setLongValue(gen, pluginsDirSize);
-		parameters[0][5] = pluginsDirSize;
+		parameters[0][6] = pluginsDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "dbdir", null, Tenant.SYSTEM_ID);
 		GUIParameter dbDirSize = new GUIParameter();
 		dbDirSize.setName("database");
 		setLongValue(gen, dbDirSize);
-		parameters[0][6] = dbDirSize;
+		parameters[0][7] = dbDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "logdir", null, Tenant.SYSTEM_ID);
 		GUIParameter logsDirSize = new GUIParameter();
 		logsDirSize.setName("logs");
 		setLongValue(gen, logsDirSize);
-		parameters[0][7] = logsDirSize;
+		parameters[0][8] = logsDirSize;
 
 		/*
 		 * Documents statistics
@@ -666,7 +674,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			appendFolderCondition("F", rootFolderId, query);
 			appendEventsCondition("F", events, query);
 		}
-		
+
 		query.append(" order by 3 desc ");
 
 		try {
