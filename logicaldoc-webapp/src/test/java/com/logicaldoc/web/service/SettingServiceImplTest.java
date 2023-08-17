@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
@@ -14,6 +16,8 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
 public class SettingServiceImplTest extends AbstractWebappTestCase {
+
+	private static Logger log = LoggerFactory.getLogger(SettingServiceImplTest.class);
 
 	// Instance under test
 	private SettingServiceImpl service = new SettingServiceImpl();
@@ -39,7 +43,7 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 			service.saveEmailSettings(emailSettings);
 			notThrownTest = "ok";
 		} catch (Exception t) {
-			// Nothing to do
+			t.printStackTrace();
 		}
 		Assert.assertNotNull(notThrownTest);
 	}
@@ -57,7 +61,7 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 			service.saveSettings(params);
 			notThrownTest = "ok";
 		} catch (Exception t) {
-			// Nothing to do
+			log.error(t.getMessage(), t);
 		}
 		Assert.assertNotNull(notThrownTest);
 	}
@@ -82,7 +86,7 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 			service.saveSettings(settings);
 			notThrownTest = "ok";
 		} catch (Exception t) {
-			// Nothing to do
+			log.error(t.getMessage(), t);
 		}
 		Assert.assertNotNull(notThrownTest);
 	}

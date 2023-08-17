@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
@@ -633,6 +634,15 @@ public class FileUtil {
 		}
 		if (file != null && file.exists())
 			deleteUsingOSCommand(file);
+	}
+
+	public static void moveQuitely(File source, File target) {
+		try {
+			Files.move(source.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE,
+					StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			log.warn("Cannot move {} into {}", source.getAbsolutePath(), target.getAbsolutePath());
+		}
 	}
 
 	private static void deleteUsingOSCommand(File file) {

@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,8 +190,7 @@ public class ContextProperties extends OrderedProperties {
 				log.info("Saved settings into temp file {}", tmpFile.getAbsolutePath());
 			}
 
-			Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE,
-					StandardCopyOption.REPLACE_EXISTING);
+			FileUtil.moveQuitely(tmpFile, file);
 		} finally {
 			FileUtil.strongDelete(tmpFile);
 		}
