@@ -14,6 +14,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
@@ -38,7 +39,8 @@ public class TicketsDataServlet extends AbstractDataServlet {
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 		StringBuilder query = new StringBuilder(
-				"select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix, A.ld_enabled, B.ld_filename, B.ld_folderid from ld_ticket as A, ld_document as B where A.ld_deleted = 0 and A.ld_type = 0 and A.ld_tenantid="
+				"select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix, A.ld_enabled, B.ld_filename, B.ld_folderid, A.ld_views, A.ld_maxviews, A.ld_type from ld_ticket as A, ld_document as B where A.ld_deleted = 0 and (A.ld_type = "
+						+ Ticket.DOWNLOAD + " or A.ld_type = " + Ticket.VIEW + ") and A.ld_tenantid="
 						+ session.getTenantId()
 						+ " and B.ld_deleted=0 and A.ld_docid=B.ld_id order by A.ld_creation desc");
 
@@ -52,6 +54,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 		while (set.next()) {
 			Integer count = set.getInt(6);
 			Integer maxCount = set.getInt(7);
+			Integer maxViews = set.getInt(13);
 			Date creation = set.getDate(4);
 			Date expired = set.getDate(5);
 			boolean enabled = set.getInt(9) == 1;
@@ -63,12 +66,19 @@ public class TicketsDataServlet extends AbstractDataServlet {
 			writer.print("<ticket>");
 			writer.print("<id>" + set.getInt(1) + "</id>");
 			writer.print("<ticketId><![CDATA[" + set.getString(2) + "]]></ticketId>");
+			
+			writer.print("<type><![CDATA[" + set.getInt(14) + "]]></type>");
 			writer.print("<docId>" + set.getLong(3) + "</docId>");
 			writer.print("<creation>" + df.format(creation) + "</creation>");
 			writer.print("<expired>" + df.format(expired) + "</expired>");
+			
 			writer.print("<count>" + count + "</count>");
 			if (maxCount != null)
 				writer.print("<maxCount>" + maxCount + "</maxCount>");
+			
+			writer.print("<views>" + set.getInt(12) + "</views>");
+			if (maxViews != null)
+				writer.print("<maxViews>" + maxViews + "</maxViews>");
 			if (StringUtils.isNotEmpty(suffix))
 				writer.print("<suffix><![CDATA[" + suffix + "]]></suffix>");
 			writer.print("<eenabled>" + (enabled ? "0" : "2") + "</eenabled>");

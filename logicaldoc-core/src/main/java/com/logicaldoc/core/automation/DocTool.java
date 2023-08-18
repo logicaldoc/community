@@ -167,8 +167,64 @@ public class DocTool {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 		try {
-			Ticket ticket = manager.createDownloadTicket(docId, pdfConversion ? "" : "conversion.pdf", expireHours,
-					expireDate, maxDownloads, urlPrefix, transaction);
+			Ticket ticket = new Ticket();
+			ticket.setTenantId(user.getTenantId());
+			ticket.setType(Ticket.DOWNLOAD);
+			ticket.setDocId(docId);
+			ticket.setSuffix(pdfConversion ? "" : "conversion.pdf");
+			ticket.setExpireHours(expireHours);
+			ticket.setExpired(expireDate);
+			ticket.setMaxCount(maxDownloads);
+			ticket.setUrl(urlPrefix);
+
+			ticket = manager.createTicket(ticket, transaction);
+			return ticket.getUrl();
+		} catch (PermissionException | PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	/**
+	 * Creates a new view ticket for a document
+	 * 
+	 * @param docId identifier of the document
+	 * @param pdfConversion if the pdf conversion should be downloaded instead
+	 *        of the original file
+	 * @param expireHours number of hours after which the ticket expires
+	 * @param expireDate a specific expiration date
+	 * @param maxDownloads number of downloads over which the ticket expires
+	 * @param maxDownloads number of views over which the ticket expires
+	 * @param username the user in whose name the method is run
+	 * 
+	 * @return the complete download ticket's URL
+	 */
+	public String viewTicket(final long docId, boolean pdfConversion, Integer expireHours, Date expireDate,
+			Integer maxDownloads, Integer maxViews, String username) {
+
+		ContextProperties config = Context.get().getProperties();
+		String urlPrefix = config.getProperty(SERVER_URL);
+		if (!urlPrefix.endsWith("/"))
+			urlPrefix += "/";
+
+		User user = new SecurityTool().getUser(username);
+
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUser(user);
+		try {
+			Ticket ticket = new Ticket();
+			ticket.setTenantId(user.getTenantId());
+			ticket.setType(Ticket.VIEW);
+			ticket.setDocId(docId);
+			ticket.setSuffix(pdfConversion ? "" : "conversion.pdf");
+			ticket.setExpireHours(expireHours);
+			ticket.setExpired(expireDate);
+			ticket.setMaxCount(maxDownloads);
+			ticket.setMaxViews(maxViews);
+			ticket.setUrl(urlPrefix);
+
+			ticket = manager.createTicket(ticket, transaction);
 			return ticket.getUrl();
 		} catch (PermissionException | PersistenceException e) {
 			log.error(e.getMessage(), e);

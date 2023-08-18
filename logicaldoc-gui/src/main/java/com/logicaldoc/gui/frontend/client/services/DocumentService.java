@@ -296,18 +296,20 @@ public interface DocumentService extends RemoteService {
 	 * Creates a download ticket
 	 * 
 	 * @param docId identifier of the document
+	 * @param type the ticket type (0='download'  2='view')
 	 * @param suffix the suffix(null or 'pdf')
 	 * @param expireHours how many validity hours
 	 * @param expireDate the exact expiration date
 	 * @param maxDownloads maximum number of allowed downloads
+	 * @param maxViews maximum number of allowed views
 	 * 
 	 * @return the generated ticket ID, a sample URL using the browser's URL, a
 	 *         sample URL using the server.url setting
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads) throws ServerException;
+	public String[] createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
+			Integer maxDownloads, Integer maxViews) throws ServerException;
 
 	public void deleteTicket(long ticketId) throws ServerException;
 

@@ -243,7 +243,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testCreateDownloadTicket() throws ServerException, PersistenceException {
-		String[] ticket = service.createDownloadTicket(5, null, null, null, null);
+		String[] ticket = service.createDownloadTicket(5L, 0, null, null, null, null, null);
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
 		assertEquals("http://server:port/download-ticket?ticketId=" + ticket[0], ticket[1]);
@@ -256,7 +256,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testDeleteEnableDisableTicket() throws ServerException, PersistenceException {
-		String[] ticket = service.createDownloadTicket(5, null, null, null, null);
+		String[] ticket = service.createDownloadTicket(5, 0, null, null, null, null, null);
 
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID

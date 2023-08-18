@@ -1400,34 +1400,30 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, String urlPrefix, DocumentHistory transaction)
+	public Ticket createTicket(Ticket ticket, DocumentHistory transaction)
 			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
-		Document document = documentDAO.findById(docId);
+		Document document = documentDAO.findById(ticket.getDocId());
 		if (document == null)
-			throw new PersistenceException("Unexisting document " + docId);
+			throw new PersistenceException("Unexisting document " + ticket.getDocId());
 
 		if (!folderDAO.isDownloadEnabled(document.getFolder().getId(), transaction.getUserId()))
 			throw new PermissionException(transaction.getUsername(), "Folder " + document.getFolder().getId(),
 					Permission.DOWNLOAD);
 
-		Ticket ticket = prepareTicket(docId, transaction.getUser());
-		ticket.setSuffix(suffix);
-		ticket.setEnabled(1);
-		ticket.setMaxCount(maxDownloads);
+		ticket.setUserId(transaction.getUserId());
 
 		Calendar cal = Calendar.getInstance();
-		if (expireDate != null) {
-			cal.setTime(expireDate);
+		if (ticket.getExpired() != null) {
+			cal.setTime(ticket.getExpired());
 			cal.set(Calendar.HOUR_OF_DAY, 23);
 			cal.set(Calendar.MINUTE, 59);
 			cal.set(Calendar.SECOND, 59);
 			cal.set(Calendar.MILLISECOND, 999);
 			ticket.setExpired(cal.getTime());
-		} else if (expireHours != null) {
-			cal.add(Calendar.HOUR_OF_DAY, expireHours.intValue());
+		} else if (ticket.getExpireHours() != null) {
+			cal.add(Calendar.HOUR_OF_DAY, ticket.getExpireHours().intValue());
 			ticket.setExpired(cal.getTime());
 		} else {
 			cal.add(Calendar.HOUR_OF_DAY, config.getInt("ticket.ttl"));
@@ -1442,7 +1438,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		// Try to clean the DB from old tickets
 		ticketDAO.deleteExpired();
 
-		ticket.setUrl(composeTicketUrl(ticket, urlPrefix));
+		ticket.setUrl(composeTicketUrl(ticket, ticket.getUrl()));
 
 		return ticket;
 	}

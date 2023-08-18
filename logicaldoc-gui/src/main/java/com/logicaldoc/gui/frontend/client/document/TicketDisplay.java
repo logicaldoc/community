@@ -17,11 +17,11 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.5
  */
-public class DownloadTicketDisplay extends Window {
+public class TicketDisplay extends Window {
 
-	public DownloadTicketDisplay(String ticketId, String sampleUrl1, String sampleUrl2) {
+	public TicketDisplay(String ticketId, String sampleUrl1, String sampleUrl2) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("downloadticket"));
+		setTitle(I18N.message("ticket"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -36,7 +36,7 @@ public class DownloadTicketDisplay extends Window {
 		ticketIdItem.setWrap(false);
 		ticketIdItem.setWrapTitle(false);
 
-		StaticTextItem sampleUrl1Item = ItemFactory.newStaticTextItem("sampleurl1",
+		StaticTextItem sampleUrl1Item = ItemFactory.newStaticTextItem("sampleurl1", I18N.message("sampleurl"),
 				"<a href='" + sampleUrl1 + "' target='_blank'>" + sampleUrl1 + "</a>");
 		sampleUrl1Item.setWrap(false);
 		sampleUrl1Item.setWrapTitle(false);
@@ -53,7 +53,7 @@ public class DownloadTicketDisplay extends Window {
 		advice.setTitleOrientation(TitleOrientation.TOP);
 
 		ButtonItem close = new ButtonItem("close", I18N.message("close"));
-		close.addClickHandler(event -> DownloadTicketDisplay.this.destroy());
+		close.addClickHandler(event -> TicketDisplay.this.destroy());
 
 		if (sampleUrl1.equalsIgnoreCase(sampleUrl2))
 			form.setItems(advice, new RowSpacerItem(), ticketIdItem, sampleUrl1Item, close);

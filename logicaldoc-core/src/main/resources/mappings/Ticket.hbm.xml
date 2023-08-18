@@ -24,5 +24,7 @@
 		<property name="count" type="int" column="ld_count" not-null="true" />
 		<property name="maxCount" type="int" column="ld_maxcount" not-null="false" />
 		<property name="enabled" type="int" column="ld_enabled" not-null="true" />
+		<property name="views" type="int" column="ld_views" not-null="true" />
+		<property name="maxViews" type="int" column="ld_maxviews" not-null="false" />
 	</class>
 </hibernate-mapping>

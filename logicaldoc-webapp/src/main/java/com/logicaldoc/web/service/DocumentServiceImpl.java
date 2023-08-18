@@ -1576,8 +1576,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 
 			Document doc = documentDao.findDocument(email.getDocIds()[0]);
-			Ticket ticket = manager.createDownloadTicket(email.getDocIds()[0], null, null, null, null, null,
-					transaction);
+
+			Ticket ticket = new Ticket();
+			ticket.setTenantId(session.getTenantId());
+			ticket.setType(Ticket.DOWNLOAD);
+			ticket.setDocId(email.getDocIds()[0]);
+
+			ticket = manager.createTicket(ticket, transaction);
 			String ticketDiv = "<div style='margin-top:10px; border-top:1px solid black; background-color:#CCCCCC;'><b>&nbsp;"
 					+ I18N.message("clicktodownload", LocaleUtil.toLocale(locale)) + ": <a href='" + ticket.getUrl()
 					+ "'>" + doc.getFileName() + "</a></b></div>";
@@ -2235,7 +2240,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			if (StringUtils.isEmpty(content))
 				document = documentManager.create(IOUtils.toInputStream(" ", StandardCharsets.UTF_8), doc, transaction);
 			else
-				document = documentManager.create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc, transaction);
+				document = documentManager.create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc,
+						transaction);
 
 			if (checkout) {
 				// Perform a checkout also
@@ -2362,8 +2368,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public String[] createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads) throws ServerException {
+	public String[] createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
+			Integer maxDownloads, Integer maxViews) throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
 
 		String urlPrefix = "";
@@ -2376,8 +2382,17 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
 		try {
-			Ticket ticket = manager.createDownloadTicket(docId, suffix, expireHours, expireDate, maxDownloads,
-					urlPrefix, transaction);
+			Ticket ticket = new Ticket();
+			ticket.setTenantId(session.getTenantId());
+			ticket.setType(type);
+			ticket.setDocId(docId);
+			ticket.setSuffix(suffix);
+			ticket.setExpireHours(expireHours);
+			ticket.setExpired(expireDate);
+			ticket.setMaxCount(maxDownloads);
+			ticket.setMaxViews(maxViews);
+
+			ticket = manager.createTicket(ticket, transaction);
 
 			String[] result = new String[3];
 			result[0] = ticket.getTicketId();
@@ -2495,7 +2510,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-			manager.checkin(docId, IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc.getFileName(), false, null, transaction);
+			manager.checkin(docId, IOUtils.toInputStream(content, StandardCharsets.UTF_8), doc.getFileName(), false,
+					null, transaction);
 
 			return getById(docId);
 		} catch (PermissionException | PersistenceException | ServerException | IOException e) {
@@ -2555,7 +2571,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-			Document doc = manager.create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), toDocument(document), transaction);
+			Document doc = manager.create(IOUtils.toInputStream(content, StandardCharsets.UTF_8), toDocument(document),
+					transaction);
 
 			return getById(doc.getId());
 		} catch (PersistenceException | IOException | ServerException e) {

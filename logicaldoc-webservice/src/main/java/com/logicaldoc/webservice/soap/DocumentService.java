@@ -48,7 +48,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="create")
+	@WebMethod(action = "create")
 	@WebResult(name = "document")
 	@WSDoc(description = "creates a new document; the user can completely customize the document through a value object containing the document's metadata; returns the newly created document.")
 	public WSDocument create(@WSDoc(description = "identifier of the session", required = true)
@@ -71,7 +71,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="delete")
+	@WebMethod(action = "delete")
 	@WSDoc(description = "deletes an existing document with the given identifier")
 	public void delete(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -91,7 +91,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="lock")
+	@WebMethod(action = "lock")
 	@WSDoc(description = "locks an existing document with the given identifier")
 	public void lock(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -111,7 +111,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="unlock")
+	@WebMethod(action = "unlock")
 	@WSDoc(description = "unlocks an existing document with the given identifier")
 	public void unlock(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -132,7 +132,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="rename")
+	@WebMethod(action = "rename")
 	@WSDoc(description = "renames the title of an existing document with the given identifier")
 	public void rename(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -154,7 +154,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="move")
+	@WebMethod(action = "move")
 	@WSDoc(description = "moves an existing document with the given identifier")
 	public void move(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -180,7 +180,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="copy")
+	@WebMethod(action = "copy")
 	@WebResult(name = "document")
 	@WSDoc(description = "copies a document into a folder")
 	public WSDocument copy(@WSDoc(description = "identifier of the session", required = true)
@@ -206,7 +206,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getDocument")
+	@WebMethod(action = "getDocument")
 	@WebResult(name = "document")
 	@WSDoc(description = "gets the metadata of an existing document with the given identifier; returns the document's representation")
 	public WSDocument getDocument(@WSDoc(description = "identifier of the session", required = true)
@@ -230,7 +230,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getDocumentByCustomId")
+	@WebMethod(action = "getDocumentByCustomId")
 	@WebResult(name = "document")
 	@WSDoc(description = "gets document metadata of an existing document with the given custom identifier")
 	public WSDocument getDocumentByCustomId(@WSDoc(description = "identifier of the session", required = true)
@@ -251,7 +251,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="getDocuments")
+	@WebMethod(action = "getDocuments")
 	@WebResult(name = "documents")
 	@WSDoc(description = "gets document metadata of a collection of existing documents with the given identifiers; returns an array of WSDocument")
 	public WSDocument[] getDocuments(@WSDoc(description = "identifier of the session", required = true)
@@ -270,7 +270,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="getAliases")
+	@WebMethod(action = "getAliases")
 	@WebResult(name = "aliases")
 	@WSDoc(description = "gets the aliases of the given document; returns an array of WSDocument that are aliases")
 	public WSDocument[] getAliases(@WSDoc(description = "identifier of the session", required = true)
@@ -292,7 +292,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="update")
+	@WebMethod(action = "update")
 	@WSDoc(description = "updates an existing document with the value object containing the document's metadata")
 	public void update(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -314,7 +314,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="getContent")
+	@WebMethod(action = "getContent")
 	@WSDoc(description = "gets the content of an existing document with the given identifier; returns the raw content of the file")
 	public DataHandler getContent(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -335,7 +335,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="getExtractedText")
+	@WebMethod(action = "getExtractedText")
 	@WebResult(name = "text")
 	@WSDoc(description = "gets the document's text stored in the full-text index")
 	public String getExtractedText(@WSDoc(description = "identifier of the session", required = true)
@@ -360,7 +360,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="getVersionContent")
+	@WebMethod(action = "getVersionContent")
 	@WSDoc(description = "gets the content of a specific version of a document; returns the raw content of the file")
 	public DataHandler getVersionContent(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -389,7 +389,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="getResource")
+	@WebMethod(action = "getResource")
 	@WSDoc(description = "gets the content of a resource associated to the given document; returns the raw content of the file")
 	public DataHandler getResource(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -415,7 +415,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="checkout")
+	@WebMethod(action = "checkout")
 	@WSDoc(description = "checks out an existing document with the given identifier")
 	public void checkout(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -442,7 +442,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="checkin")
+	@WebMethod(action = "checkin")
 	@WSDoc(description = "checks in an existing document to create a new version")
 	public void checkin(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -476,7 +476,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="checkinDocument")
+	@WebMethod(action = "checkinDocument")
 	@WSDoc(description = "checks in an existing document to create a new version and also updates the metadata")
 	public void checkinDocument(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -508,7 +508,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="replaceFile")
+	@WebMethod(action = "replaceFile")
 	@WSDoc(description = "replaces the file associated to a given version")
 	public void replaceFile(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -517,7 +517,8 @@ public interface DocumentService {
 	long docId, @WebParam(name = "fileVersion")
 	String fileVersion, @WebParam(name = "comment")
 	String comment, @WebParam(name = "content")
-	DataHandler content) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException;
+	DataHandler content)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException;
 
 	/**
 	 * Promotes an old version to the current default one. If you promote a
@@ -535,14 +536,15 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="promoteVersion")
+	@WebMethod(action = "promoteVersion")
 	@WSDoc(description = "promotes an old version to the current default one")
 	public void promoteVersion(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "version")
-	String version) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException;
+	String version)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException;
 
 	/**
 	 * Creates a new document or updates an existing one.
@@ -565,7 +567,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O erro
 	 */
-	@WebMethod(action="upload")
+	@WebMethod(action = "upload")
 	@WebResult(name = "docId")
 	@WSDoc(description = "creates a new document or updates an existing one; returns the newly created document's ID")
 	public long upload(@WSDoc(description = "identifier of the session", required = true)
@@ -603,7 +605,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="uploadResource")
+	@WebMethod(action = "uploadResource")
 	@WSDoc(description = "uploads a new resource attached to the given document. If the resource already exists it is overwritten")
 	public void uploadResource(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -631,7 +633,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="isReadable")
+	@WebMethod(action = "isReadable")
 	@WSDoc(description = "tests if a document is readable")
 	public boolean isReadable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -650,7 +652,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="restore")
+	@WebMethod(action = "restore")
 	@WSDoc(description = "restores a deleted document")
 	public void restore(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -675,7 +677,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getVersions")
+	@WebMethod(action = "getVersions")
 	@WebResult(name = "version")
 	@WSDoc(description = "gets the versions' history of a document; returns an array of versions")
 	public WSDocument[] getVersions(@WSDoc(description = "identifier of the session", required = true)
@@ -699,7 +701,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getVersion")
+	@WebMethod(action = "getVersion")
 	@WebResult(name = "version")
 	@WSDoc(description = "gets a version of a document; returns the version")
 	public WSDocument getVersion(@WSDoc(description = "identifier of the session", required = true)
@@ -725,7 +727,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="listDocuments")
+	@WebMethod(action = "listDocuments")
 	@WebResult(name = "document")
 	@WSDoc(description = "gets the documents in a specific folder")
 	public WSDocument[] listDocuments(@WSDoc(description = "identifier of the session", required = true)
@@ -747,7 +749,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="getRecentDocuments")
+	@WebMethod(action = "getRecentDocuments")
 	@WebResult(name = "document")
 	@WSDoc(description = "lists of last modified documents in the current session")
 	public WSDocument[] getRecentDocuments(@WSDoc(description = "identifier of the session", required = true)
@@ -771,7 +773,7 @@ public interface DocumentService {
 	 * @throws IOException I/O error
 	 * @throws MessagingException error sending the email
 	 */
-	@WebMethod(action="sendEmail")
+	@WebMethod(action = "sendEmail")
 	@WSDoc(description = "sends a set of documents as mail attachments")
 	public void sendEmail(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -801,7 +803,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="createAlias")
+	@WebMethod(action = "createAlias")
 	@WebResult(name = "document")
 	@WSDoc(description = "creates a new document alias for the given document inside a specified folder")
 	public WSDocument createAlias(@WSDoc(description = "identifier of the session", required = true)
@@ -830,7 +832,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="link")
+	@WebMethod(action = "link")
 	@WebResult(name = "link")
 	@WSDoc(description = "creates a new link between two documents")
 	public WSLink link(@WSDoc(description = "identifier of the session", required = true)
@@ -857,7 +859,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getLinks")
+	@WebMethod(action = "getLinks")
 	@WebResult(name = "link")
 	@WSDoc(description = "gets all the links of a specific document; returns an array of links")
 	public WSLink[] getLinks(@WSDoc(description = "identifier of the session", required = true)
@@ -876,7 +878,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="deleteLink")
+	@WebMethod(action = "deleteLink")
 	@WSDoc(description = "removes an existing link")
 	public void deleteLink(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -896,7 +898,7 @@ public interface DocumentService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws ParseException Error in adding the entry into fulltext index
 	 */
-	@WebMethod(action="reindex")
+	@WebMethod(action = "reindex")
 	@WSDoc(description = "re-indexes(or indexes from scratch) a document")
 	public void reindex(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -921,7 +923,7 @@ public interface DocumentService {
 	 *         permission
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="createPdf")
+	@WebMethod(action = "createPdf")
 	@WSDoc(description = "creates the PDF conversion of the given document; if the conversion was already created, nothing will happen")
 	public void createPdf(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -947,7 +949,7 @@ public interface DocumentService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws IOException I/O error
 	 */
-	@WebMethod(action="createThumbnail")
+	@WebMethod(action = "createThumbnail")
 	@WSDoc(description = "creates the thumbail of the given document; if the thumbnail was already created, nothing will happen")
 	public void createThumbnail(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -976,10 +978,11 @@ public interface DocumentService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-	 * @throws PermissionException  The user does not have the download permission
+	 * @throws PermissionException The user does not have the download
+	 *         permission
 	 */
 	@WebResult(name = "ticket")
-	@WebMethod(action="createDownloadTicket")
+	@WebMethod(action = "createDownloadTicket")
 	@WSDoc(description = "creates a new download ticket to the original document or it's PDF conversion")
 	public String createDownloadTicket(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -994,7 +997,49 @@ public interface DocumentService {
 			@WebParam(name = "expireDate")
 			String expireDate, @WSDoc(description = "maximum number of downloads allowed", required = false)
 			@WebParam(name = "maxDownloads")
-			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+			Integer maxDownloads)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+
+	/**
+	 * Creates a new view ticket
+	 * 
+	 * @param sid identifier of the session
+	 * @param docId identifier of the document
+	 * @param suffix can be null or 'conversion.pdf'
+	 * @param expireHours expiration time expressed in hours
+	 * @param expireDate exact expiration date expressed in the format
+	 *        yyyy-MM-dd
+	 * @param maxDownloads maximum number of downloads allowed
+	 * @param maxViews maximum number of downloads allowed
+	 * 
+	 * @return the download ticket
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the download
+	 *         permission
+	 */
+	@WebResult(name = "ticket")
+	@WebMethod(action = "createViewTicket")
+	@WSDoc(description = "creates a new view ticket to the original document or it's PDF conversion")
+	public String createViewTicket(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WSDoc(description = "the document id", required = true)
+	@WebParam(name = "docId")
+	long docId, @WSDoc(description = "can be null or 'conversion.pdf'", required = false)
+	@WebParam(name = "suffix")
+	String suffix, @WSDoc(description = "expiration time expressed in hours", required = false)
+	@WebParam(name = "expireHours")
+	Integer expireHours,
+			@WSDoc(description = "exact expiration date expressed in the format yyyy-MM-dd", required = false)
+			@WebParam(name = "expireDate")
+			String expireDate, @WSDoc(description = "maximum number of downloads allowed", required = false)
+			@WebParam(name = "maxDownloads")
+			Integer maxDownloads, @WSDoc(description = "maximum number of views allowed", required = false)
+			@WebParam(name = "maxViews")
+			Integer maxViews)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Puts a password protection to the document
@@ -1009,7 +1054,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="setPassword")
+	@WebMethod(action = "setPassword")
 	@WSDoc(description = "protects with a password the given document")
 	public void setPassword(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -1031,7 +1076,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="unsetPassword")
+	@WebMethod(action = "unsetPassword")
 	@WSDoc(description = "removes the password protection from the document")
 	public void unsetPassword(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -1057,7 +1102,7 @@ public interface DocumentService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "unprotect")
-	@WebMethod(action="unprotect")
+	@WebMethod(action = "unprotect")
 	@WSDoc(description = "unprotects a document that is password protected. If the given password is right, the document remains unprotected for the duration of the session.")
 	public boolean unprotect(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -1081,7 +1126,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="addNote")
+	@WebMethod(action = "addNote")
 	@WebResult(name = "note")
 	@WSDoc(description = "adds a new note for the given document")
 	public WSNote addNote(@WSDoc(description = "identifier of the session", required = true)
@@ -1106,7 +1151,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="saveNote")
+	@WebMethod(action = "saveNote")
 	@WebResult(name = "note")
 	@WSDoc(description = "adds/modifies a note for the given document")
 	public WSNote saveNote(@WSDoc(description = "identifier of the session", required = true)
@@ -1126,7 +1171,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="deleteNote")
+	@WebMethod(action = "deleteNote")
 	@WSDoc(description = "deletes a note, only the author or the administrator can delete the note")
 	public void deleteNote(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -1147,7 +1192,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getNotes")
+	@WebMethod(action = "getNotes")
 	@WebResult(name = "note")
 	@WSDoc(description = "gets the notes for the given document")
 	public WSNote[] getNotes(@WSDoc(description = "identifier of the session", required = true)
@@ -1170,7 +1215,7 @@ public interface DocumentService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="deleteVersion")
+	@WebMethod(action = "deleteVersion")
 	@WebResult(name = "latest-version")
 	@WSDoc(description = "deletes a version of a document with the given identifiers")
 	public String deleteVersion(@WSDoc(description = "identifier of the session", required = true)
@@ -1196,7 +1241,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="rateDocument")
+	@WebMethod(action = "rateDocument")
 	@WebResult(name = "rating")
 	@WSDoc(description = "rates the given document")
 	public WSRating rateDocument(@WSDoc(description = "identifier of the session", required = true)
@@ -1220,7 +1265,7 @@ public interface DocumentService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getRatings")
+	@WebMethod(action = "getRatings")
 	@WebResult(name = "rating")
 	@WSDoc(description = "gets all the ratings of the given document")
 	public WSRating[] getRatings(@WSDoc(description = "identifier of the session", required = true)

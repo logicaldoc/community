@@ -971,8 +971,41 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(SessionManager.get().get(sid));
 
-		Ticket ticket = manager.createDownloadTicket(docId, suffix, expireHours, convertStringToDate(expireDate),
-				maxDownloads, null, transaction);
+		Ticket ticket = new Ticket();
+		ticket.setType(Ticket.DOWNLOAD);
+		ticket.setTenantId(transaction.getTenantId());
+		ticket.setDocId(docId);
+		ticket.setSuffix(suffix);
+		ticket.setExpireHours(expireHours);
+		ticket.setExpired(convertStringToDate(expireDate));
+		ticket.setMaxCount(maxDownloads);
+
+		ticket = manager.createTicket(ticket, transaction);
+
+		return ticket.getUrl();
+	}
+
+	@Override
+	public String createViewTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
+			Integer maxDownloads, Integer maxViews)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		validateSession(sid);
+
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setSession(SessionManager.get().get(sid));
+
+		Ticket ticket = new Ticket();
+		ticket.setType(Ticket.VIEW);
+		ticket.setTenantId(transaction.getTenantId());
+		ticket.setDocId(docId);
+		ticket.setSuffix(suffix);
+		ticket.setExpireHours(expireHours);
+		ticket.setExpired(convertStringToDate(expireDate));
+		ticket.setMaxCount(maxDownloads);
+		ticket.setMaxViews(maxViews);
+
+		ticket = manager.createTicket(ticket, transaction);
 
 		return ticket.getUrl();
 	}

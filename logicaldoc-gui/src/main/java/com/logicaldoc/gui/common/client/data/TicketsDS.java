@@ -29,16 +29,19 @@ public class TicketsDS extends DataSource {
 		DataSourceDateTimeField creation = new DataSourceDateTimeField("creation");
 		DataSourceDateTimeField expired = new DataSourceDateTimeField("expired");
 		DataSourceIntegerField count = new DataSourceIntegerField("count");
+		DataSourceIntegerField views = new DataSourceIntegerField("views");
 		DataSourceIntegerField maxCount = new DataSourceIntegerField("maxCount");
-		DataSourceTextField suffix = new DataSourceTextField("maxCount");
+		DataSourceIntegerField maxViews = new DataSourceIntegerField("maxViews");
+		DataSourceTextField suffix = new DataSourceTextField("suffix");
 		DataSourceBooleanField valid = new DataSourceBooleanField("valid");
 		DataSourceTextField fileName = new DataSourceTextField("filename");
+		DataSourceIntegerField type = new DataSourceIntegerField("type");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
 		DataSourceImageField enabled = new DataSourceImageField("eenabled");
 
-		setFields(id, ticketId, docId, creation, expired, count, maxCount, suffix, enabled, valid, icon, fileName,
-				folderId);
+		setFields(id, ticketId, type, docId, creation, expired, count, maxCount, views, maxViews, suffix, enabled,
+				valid, icon, fileName, folderId);
 		setClientOnly(true);
 
 		String url = "data/tickets.xml?1=1";

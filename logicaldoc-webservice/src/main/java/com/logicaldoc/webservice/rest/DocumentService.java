@@ -601,6 +601,30 @@ public interface DocumentService {
 			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
+	 * Creates a new download ticket
+	 * 
+	 * @param docId identifier of the document
+	 * @param suffix can be null or 'conversion.pdf'
+	 * @param expireHours expiration time expressed in hours
+	 * @param expireDate exact expiration date expressed in the format
+	 *        yyyy-MM-dd
+	 * @param maxDownloads maximum number of admitted downloads
+	 * @param maxViews maximum number of admitted views
+	 * 
+	 * @return the download ticket
+	 * 
+	 * @throws PersistenceException Error in the database 
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws AuthenticationException Invalid credentials 
+	 * @throws PermissionException  The user does not have the download permission
+	 */
+	@POST
+	@Path("/createViewTicket")
+	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
+	public String createViewTicket(long docId, String suffix, Integer expireHours, String expireDate,
+			Integer maxDownloads, Integer maxViews) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+	
+	/**
 	 * Removes an existing link
 	 * 
 	 * @param id ID of the link

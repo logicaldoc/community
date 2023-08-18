@@ -36,7 +36,7 @@ public class ReportsMenu extends VLayout {
 
 		addCalendarButton();
 
-		addDownloadTicketsButton();
+		addTicketsButton();
 
 		addSubscriptionsButton();
 
@@ -67,7 +67,7 @@ public class ReportsMenu extends VLayout {
 		apiCalls.setWidth100();
 		apiCalls.setHeight(25);
 		apiCalls.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ApiCallsReport()));
-		if (Menu.enabled(Menu.DOWNLOAD_TICKETS))
+		if (Menu.enabled(Menu.TICKETS))
 			addMember(apiCalls);
 	}
 
@@ -83,14 +83,14 @@ public class ReportsMenu extends VLayout {
 		}
 	}
 
-	private void addDownloadTicketsButton() {
-		Button downloadTickets = new Button(I18N.message("downloadtickets"));
-		downloadTickets.setWidth100();
-		downloadTickets.setHeight(25);
-		downloadTickets
-				.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new DownloadTicketsReport()));
-		if (Menu.enabled(Menu.DOWNLOAD_TICKETS))
-			addMember(downloadTickets);
+	private void addTicketsButton() {
+		Button tickets = new Button(I18N.message("tickets"));
+		tickets.setWidth100();
+		tickets.setHeight(25);
+		tickets
+				.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new TicketsReport()));
+		if (Menu.enabled(Menu.TICKETS))
+			addMember(tickets);
 	}
 
 	private void addCalendarButton() {

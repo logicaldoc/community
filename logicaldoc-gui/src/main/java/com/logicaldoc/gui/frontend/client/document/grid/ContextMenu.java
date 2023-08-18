@@ -26,7 +26,7 @@ import com.logicaldoc.gui.frontend.client.document.ComparisonWindow;
 import com.logicaldoc.gui.frontend.client.document.ConversionDialog;
 import com.logicaldoc.gui.frontend.client.document.DocumentCheckin;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
-import com.logicaldoc.gui.frontend.client.document.DownloadTicketDialog;
+import com.logicaldoc.gui.frontend.client.document.TicketDialog;
 import com.logicaldoc.gui.frontend.client.document.EmailDialog;
 import com.logicaldoc.gui.frontend.client.document.SendToArchiveDialog;
 import com.logicaldoc.gui.frontend.client.document.StartWorkflowDialog;
@@ -108,7 +108,7 @@ public class ContextMenu extends Menu {
 
 	private MenuItem preview;
 
-	private MenuItem downloadTicket;
+	private MenuItem ticket;
 
 	private MenuItem convert;
 
@@ -201,8 +201,8 @@ public class ContextMenu extends Menu {
 
 		preview = preparePreview();
 
-		downloadTicket = new MenuItem(I18N.message("downloadticket"));
-		downloadTicket.addClickHandler(event -> new DownloadTicketDialog(selection[0]).show());
+		ticket = new MenuItem(I18N.message("ticket"));
+		ticket.addClickHandler(event -> new TicketDialog(selection[0]).show());
 
 		convert = new MenuItem(I18N.message("convert"));
 		convert.addClickHandler(event -> new ConversionDialog(selection[0]).show());
@@ -231,7 +231,7 @@ public class ContextMenu extends Menu {
 		indexing.setSubmenu(indexingMenu);
 
 		moreMenu = new Menu();
-		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, downloadTicket, replaceAlias);
+		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
 
 		removeOfficeItem(office);
 		addArchiveItem(archive);
@@ -332,7 +332,7 @@ public class ContextMenu extends Menu {
 	}
 
 	private void applyDownloadSecurity(final GUIFolder folder, boolean someSelection, boolean justOneSelected) {
-		downloadTicket.setEnabled(justOneSelected && folder.isDownload());
+		ticket.setEnabled(justOneSelected && folder.isDownload());
 		download.setEnabled(someSelection && folder.isDownload());
 	}
 

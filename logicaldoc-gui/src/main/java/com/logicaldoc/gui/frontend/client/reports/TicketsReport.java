@@ -21,10 +21,7 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -34,12 +31,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * This panel shows a list of download tickets
+ * This panel shows a list of tickets
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4
  */
-public class DownloadTicketsReport extends ReportPanel {
+public class TicketsReport extends ReportPanel {
 
 	private static final String DOC_ID = "docId";
 
@@ -49,8 +46,8 @@ public class DownloadTicketsReport extends ReportPanel {
 
 	private SpinnerItem max;
 
-	public DownloadTicketsReport() {
-		super("downloadtickets", "showntickets");
+	public TicketsReport() {
+		super("tickets", "showntickets");
 	}
 
 	@Override
@@ -59,11 +56,11 @@ public class DownloadTicketsReport extends ReportPanel {
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler((ChangedEvent event) -> refresh());
+		max.addChangedHandler(event -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler((ClickEvent event) -> {
+		display.addClickHandler(event -> {
 			if (Boolean.TRUE.equals(max.validate()))
 				refresh();
 		});
@@ -91,6 +88,14 @@ public class DownloadTicketsReport extends ReportPanel {
 		ticketId.setCanFilter(true);
 		ticketId.setCanGroupBy(false);
 
+		ListGridField type = new ListGridField("type", I18N.message("type"));
+		type.setAutoFitWidth(true);
+		type.setAlign(Alignment.CENTER);
+		type.setCanFilter(true);
+		type.setCanGroupBy(false);
+		type.setCellFormatter(
+				(value, record, rowNum, colNum) -> I18N.message("0".equals(value.toString()) ? "download" : "view"));
+
 		ListGridField creation = new DateListGridField("creation", "createdon");
 		creation.setCanGroupBy(false);
 
@@ -111,10 +116,19 @@ public class DownloadTicketsReport extends ReportPanel {
 		maxCount.setCanFilter(false);
 		maxCount.setCanGroupBy(false);
 
-		list.addDoubleClickHandler(
-				(DoubleClickEvent event) -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+		ListGridField views = new ListGridField("views", I18N.message("views"), 80);
+		views.setAlign(Alignment.CENTER);
+		views.setCanFilter(false);
+		views.setCanGroupBy(false);
 
-		list.setFields(enabled, id, ticketId, count, maxCount, creation, expired, fileName);
+		ListGridField maxViews = new ListGridField("maxViews", I18N.message("maxviews"), 100);
+		maxViews.setAlign(Alignment.CENTER);
+		maxViews.setCanFilter(false);
+		maxViews.setCanGroupBy(false);
+
+		list.addDoubleClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+
+		list.setFields(enabled, id, ticketId, type, count, maxCount, views, maxViews, creation, expired, fileName);
 	}
 
 	@Override
@@ -227,23 +241,21 @@ public class DownloadTicketsReport extends ReportPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-				if (Boolean.TRUE.equals(answer))
-					DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"),
-							new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer))
+				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-									list.deselectAllRecords();
-								}
-							});
-			}));
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+					}
+				});
+		}));
 
 		if (!(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1)) {
 			ticketURL.setEnabled(false);

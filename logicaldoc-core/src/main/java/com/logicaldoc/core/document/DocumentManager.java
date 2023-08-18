@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Date;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
@@ -105,7 +104,8 @@ public interface DocumentManager {
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
-	public void promoteVersion(long docId, String version, DocumentHistory transaction) throws PersistenceException, IOException;
+	public void promoteVersion(long docId, String version, DocumentHistory transaction)
+			throws PersistenceException, IOException;
 
 	/**
 	 * Locks the given document
@@ -170,7 +170,8 @@ public interface DocumentManager {
 	 * @throws PersistenceException error at data layer
 	 * @throws ParseException error during parsing
 	 */
-	public long index(long docId, String content, DocumentHistory transaction) throws PersistenceException, ParseException;
+	public long index(long docId, String content, DocumentHistory transaction)
+			throws PersistenceException, ParseException;
 
 	/**
 	 * Rename an existing document filename.
@@ -261,7 +262,8 @@ public interface DocumentManager {
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
-	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException, IOException;
+	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction)
+			throws PersistenceException, IOException;
 
 	/**
 	 * Create an alias(shortcut) associated to the given doc to the specified
@@ -277,7 +279,8 @@ public interface DocumentManager {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public Document createAlias(Document doc, Folder folder, String type, DocumentHistory transaction) throws PersistenceException;
+	public Document createAlias(Document doc, Folder folder, String type, DocumentHistory transaction)
+			throws PersistenceException;
 
 	/**
 	 * Replaces an alias with a copy of the original file
@@ -340,26 +343,20 @@ public interface DocumentManager {
 	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException;
 
 	/**
-	 * Creates a new download ticket.
+	 * Creates a new ticket.
 	 * 
-	 * @param docId The document id
-	 * @param suffix can be null or 'conversion.pdf'
-	 * @param expireHours expiration time expressed in hours
-	 * @param expireDate exact expiration date expressed in the format
-	 *        yyyy-MM-dd
-	 * @param maxDownloads maximum number of admitted downloads
-	 * @param urlPrefix prefiz of the url, by default the general setting
-	 *        'server.url' will be used
+	 * @param ticket Value object carrying the metadata for the ticket to create
 	 * @param transaction entry to log the event (set the user)
 	 * 
 	 * @return The created ticket with the url property filled
 	 * 
 	 * @throws PersistenceException raised if the download ticket cannot be
 	 *         created
-	 * @throws PermissionException  raised if the user does not have the download permission
+	 * @throws PermissionException raised if the user does not have the download
+	 *         permission
 	 */
-	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException, PermissionException;
+	public Ticket createTicket(Ticket ticket, DocumentHistory transaction)
+			throws PersistenceException, PermissionException;
 
 	/**
 	 * Tries to unprotect a document, If the password is correct, the document
@@ -385,7 +382,8 @@ public interface DocumentManager {
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
-	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws PersistenceException, IOException;
+	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction)
+			throws PersistenceException, IOException;
 
 	/**
 	 * Merges a set of documents into a single PDF file

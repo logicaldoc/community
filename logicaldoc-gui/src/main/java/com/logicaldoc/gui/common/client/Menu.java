@@ -13,7 +13,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
  */
 public class Menu {
 
-	public static final long DOWNLOAD_TICKETS = -7;
+	public static final long TICKETS = -7;
 	
 	public static final long DELETED_FOLDERS = -6;
 

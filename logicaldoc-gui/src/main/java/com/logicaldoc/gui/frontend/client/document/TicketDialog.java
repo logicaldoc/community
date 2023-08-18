@@ -4,13 +4,16 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
@@ -26,7 +29,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.4.1
  */
-public class DownloadTicketDialog extends Window {
+public class TicketDialog extends Window {
 
 	private static final String DUEDATENUMBER = "duedatenumber";
 
@@ -36,9 +39,9 @@ public class DownloadTicketDialog extends Window {
 
 	private GUIDocument document;
 
-	public DownloadTicketDialog(GUIDocument document) {
+	public TicketDialog(GUIDocument document) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("createdownloadticket"));
+		setTitle(I18N.message("ticket"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -79,12 +82,13 @@ public class DownloadTicketDialog extends Window {
 		form.setAlign(Alignment.LEFT);
 		form.setNumCols(4);
 
-		SelectItem type = ItemFactory.newAliasTypeSelector();
-		type.setName("type");
-		type.setValue("");
-		type.setEndRow(true);
-		type.setColSpan(4);
-		type.setWrapTitle(false);
+		SelectItem docOrPdfConversion = ItemFactory.newAliasTypeSelector();
+		docOrPdfConversion.setTitle(I18N.message("content"));
+		docOrPdfConversion.setName("content");
+		docOrPdfConversion.setValue("");
+		docOrPdfConversion.setEndRow(true);
+		docOrPdfConversion.setColSpan(4);
+		docOrPdfConversion.setWrapTitle(false);
 
 		DateItem date = ItemFactory.newDateItem("date", I18N.message("expireson"));
 		date.setEndRow(true);
@@ -109,14 +113,33 @@ public class DownloadTicketDialog extends Window {
 		duedateTime.setValueMap(map);
 		duedateTime.setValue("hour");
 
-		form.setItems(type, duedateTimeItem, duedateTime, date, maxDownloads);
+		SelectItem action = ItemFactory.newSelectItem("action");
+		action.setEndRow(true);
+		action.setColSpan(4);
+		action.setWrapTitle(false);
+		LinkedHashMap<String, String> types = new LinkedHashMap<>();
+		types.put("0", I18N.message("download"));
+		types.put("2", I18N.message("view"));
+		action.setValueMap(types);
+		action.setValue("0");
+		action.setVisible(Feature.enabled(Feature.VIEW_TICKET));
+
+		SpinnerItem maxViews = ItemFactory.newSpinnerItem("maxviews", (Integer) null);
+		maxViews.setEndRow(true);
+		maxViews.setColSpan(4);
+		maxViews.setWrapTitle(false);
+		maxViews.setRequired(false);
+		maxViews.setMin(0);
+		maxViews.setVisibleWhen(new AdvancedCriteria("action", OperatorId.EQUALS, "2"));
+
+		form.setItems(action, docOrPdfConversion, duedateTimeItem, duedateTime, date, maxDownloads, maxViews);
 	}
 
 	public void onSave() {
 		if (!form.validate())
 			return;
 
-		String suffix = form.getValue("type").toString();
+		String suffix = form.getValue("content").toString();
 		Date date = (Date) form.getValue("date");
 
 		Integer expireHours = null;
@@ -130,10 +153,16 @@ public class DownloadTicketDialog extends Window {
 
 		Integer maxDownloads = null;
 		String val = form.getValueAsString("maxdownloads");
-		if (val != null && !val.trim().isEmpty() && !"0".equals(val.trim()))
+		if (val != null && !val.trim().isEmpty())
 			maxDownloads = Integer.parseInt(val.trim());
 
-		DocumentService.Instance.get().createDownloadTicket(document.getId(), suffix, expireHours, date, maxDownloads,
+		Integer maxViews = null;
+		val = form.getValueAsString("maxdownloads");
+		if (val != null && !val.trim().isEmpty())
+			maxViews = Integer.parseInt(val.trim());
+
+		DocumentService.Instance.get().createDownloadTicket(document.getId(),
+				Integer.parseInt(form.getValueAsString("action")), suffix, expireHours, date, maxDownloads, maxViews,
 				new AsyncCallback<String[]>() {
 
 					@Override
@@ -145,7 +174,7 @@ public class DownloadTicketDialog extends Window {
 					@Override
 					public void onSuccess(String[] ret) {
 						destroy();
-						new DownloadTicketDisplay(ret[0], ret[1], ret[2]).show();
+						new TicketDisplay(ret[0], ret[1], ret[2]).show();
 					}
 				});
 	}

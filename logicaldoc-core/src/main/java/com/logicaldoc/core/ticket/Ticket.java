@@ -14,10 +14,12 @@ import com.logicaldoc.core.PersistentObject;
 public class Ticket extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final int DOWNLOAD = 0;
 
 	public static final int PSW_RECOVERY = 1;
+
+	public static final int VIEW = 2;
 
 	private String ticketId = UUID.randomUUID().toString();
 
@@ -29,13 +31,27 @@ public class Ticket extends PersistentObject {
 
 	private Date creation = new Date();
 
+	
+	/**
+	 * A date when this ticket expires
+	 */
 	private Date expired = null;
 
 	private int count = 0;
 
+	/**
+	 * Maximum number of downloads
+	 */
 	private Integer maxCount;
 
 	private int enabled = 1;
+
+	private int views = 0;
+
+	/**
+	 * Maximum number of views
+	 */
+	private Integer maxViews;
 
 	private String suffix;
 
@@ -43,6 +59,11 @@ public class Ticket extends PersistentObject {
 	 * Not persistent field
 	 */
 	private String url;
+
+	/**
+	 * Not persistent field
+	 */
+	private Integer expireHours;
 
 	public long getDocId() {
 		return docId;
@@ -141,5 +162,29 @@ public class Ticket extends PersistentObject {
 
 	public void setEnabled(int enabled) {
 		this.enabled = enabled;
+	}
+
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
+	}
+
+	public Integer getMaxViews() {
+		return maxViews;
+	}
+
+	public void setMaxViews(Integer maxViews) {
+		this.maxViews = maxViews;
+	}
+
+	public Integer getExpireHours() {
+		return expireHours;
+	}
+
+	public void setExpireHours(Integer expireHours) {
+		this.expireHours = expireHours;
 	}
 }

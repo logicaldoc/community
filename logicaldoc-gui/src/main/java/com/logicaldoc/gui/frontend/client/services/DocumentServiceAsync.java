@@ -91,8 +91,8 @@ public interface DocumentServiceAsync {
 
 	void unarchiveDocuments(long[] docIds, AsyncCallback<Void> callback);
 
-	void createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate, Integer maxDownloads,
-			AsyncCallback<String[]> callback);
+	void createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
+			Integer maxDownloads, Integer maxViews, AsyncCallback<String[]> callback);
 
 	void setPassword(long docId, String password, AsyncCallback<Void> callback);
 

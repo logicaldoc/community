@@ -288,6 +288,13 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
+	public String createViewTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
+			Integer maxDownloads, Integer maxViews)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		return client.createViewTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, maxViews);
+	}
+
+	@Override
 	public void setPassword(String sid, long docId, String password)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.setPassword(sid, docId, password);

@@ -66,7 +66,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	@Override
 	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
-		
+
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
 		verDao = (VersionDAO) context.getBean("VersionDAO");
 		userDao = (UserDAO) context.getBean("UserDAO");
@@ -112,7 +112,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCreateDownloadTicket() throws PersistenceException, PermissionException, InterruptedException {
+	public void testcreateTicket() throws PersistenceException, PermissionException, InterruptedException {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 
@@ -122,22 +122,32 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		transaction.setUserId(1L);
 		transaction.setNotified(0);
 
-		Ticket t = documentManager.createDownloadTicket(1L, null, null, null, null, null, transaction);
+		Ticket t = new Ticket();
+		t.setDocId(1L);
+		t = documentManager.createTicket(t, transaction);
 		Assert.assertNotNull(t.getUrl());
 
-		t = documentManager.createDownloadTicket(1L, null, 2, null, null, null, transaction);
+		t = new Ticket();
+		t.setDocId(1L);
+		t.setExpireHours(2);
+		t = documentManager.createTicket(t, transaction);
 		Assert.assertNotNull(t.getUrl());
 
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, -2);
-		t = documentManager.createDownloadTicket(1L, null, null, cal.getTime(), null, null, transaction);
+		t = new Ticket();
+		t.setDocId(1L);
+		t.setExpired(cal.getTime());
+		t = documentManager.createTicket(t, transaction);
 		Assert.assertNotNull(t.getUrl());
 		Assert.assertTrue(t.isTicketExpired());
 
 		// Unexisting document
 		boolean exceptionHappened = false;
 		try {
-			documentManager.createDownloadTicket(99L, null, 2, null, null, null, transaction);
+			t = new Ticket();
+			t.setDocId(99L);
+			documentManager.createTicket(t, transaction);
 		} catch (PersistenceException e) {
 			exceptionHappened = true;
 			Assert.assertEquals("Unexisting document 99", e.getMessage());
@@ -156,7 +166,10 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 			Assert.assertFalse(folderDao.isDownloadEnabled(doc.getFolder().getId(), userWithourPermission.getId()));
 
-			documentManager.createDownloadTicket(1L, null, 2, null, null, null, transaction);
+			t = new Ticket();
+			t.setDocId(1L);
+			t.setExpireHours(2);
+			documentManager.createTicket(t, transaction);
 		} catch (PermissionException e) {
 			exceptionHappened = true;
 			Assert.assertTrue(e.getMessage().contains("does not have permission"));

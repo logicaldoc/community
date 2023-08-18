@@ -560,11 +560,33 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	Integer expireHours, @FormParam("expireDate")
 	@Parameter(description = "exact expiration date expressed in the format yyyy-MM-dd")
 	String expireDate, @FormParam("maxDownloads")
-	@Parameter(description = "maximum number of downloads allowed", required = true)
+	@Parameter(description = "maximum number of downloads allowed")
 	Integer maxDownloads)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSession();
 		return super.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
+	}
+
+	@Override
+	@POST
+	@Path("/createViewTicket")
+	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
+	@Operation(summary = "Creates a new view ticket", description = "Creates a new view ticket to the original document or it's PDF conversion")
+	public String createViewTicket(@FormParam("docId")
+	@Parameter(description = "Source document ID", required = true)
+	long docId, @FormParam("suffix")
+	@Parameter(description = "can be null or 'conversion.pdf'")
+	String suffix, @FormParam("expireHours")
+	@Parameter(description = "expiration time expressed in hours")
+	Integer expireHours, @FormParam("expireDate")
+	@Parameter(description = "exact expiration date expressed in the format yyyy-MM-dd")
+	String expireDate, @FormParam("maxDownloads")
+	@Parameter(description = "maximum number of downloads allowed")
+	Integer maxDownloads, @FormParam("maxViews")
+	@Parameter(description = "maximum number of downloads views")
+	Integer maxViews) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		String sid = validateSession();
+		return super.createViewTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, maxViews);
 	}
 
 	@Override
