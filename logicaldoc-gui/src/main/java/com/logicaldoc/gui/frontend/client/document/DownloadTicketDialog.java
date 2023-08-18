@@ -145,8 +145,7 @@ public class DownloadTicketDialog extends Window {
 					@Override
 					public void onSuccess(String[] ret) {
 						destroy();
-						DownloadTicketDisplay display = new DownloadTicketDisplay(ret[0], ret[1], ret[2]);
-						display.show();
+						new DownloadTicketDisplay(ret[0], ret[1], ret[2]).show();
 					}
 				});
 	}
