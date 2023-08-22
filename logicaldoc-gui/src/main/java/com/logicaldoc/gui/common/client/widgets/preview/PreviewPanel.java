@@ -33,78 +33,87 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class PreviewPanel extends VLayout {
 
-	private HTMLFlow preview = null;
+	protected HTMLFlow preview = null;
 
-	private HTMLFlow media = null;
+	protected HTMLFlow media = null;
 
-	private HTMLFlow html = null;
+	protected HTMLFlow html = null;
 
-	private HTMLFlow dicom = null;
+	protected HTMLFlow dicom = null;
 
-	private MailPreviewPanel mail = null;
+	protected MailPreviewPanel mail = null;
 
-	private Canvas reload = null;
+	protected Canvas reload = null;
 
-	private Label disabled = null;
+	protected Label disabled = null;
 
-	private long docId;
+	protected long docId;
 
-	private boolean accessGranted = false;
+	protected boolean accessGranted = false;
 
-	private GUIDocument document;
+	protected GUIDocument document;
 
-	private int width;
+	protected int width;
 
-	private int height;
+	protected int height;
 
-	private boolean redrawing = false;
+	protected boolean redrawing = false;
 
 	public PreviewPanel(final GUIDocument document) {
 		this.document = document;
 		this.docId = document.getId();
+	}
 
-		if (!Menu.enabled(Menu.PREVIEW)) {
+	@Override
+	protected void onDraw() {
+		if (!isPreviewAvailable()) {
 			showDisabledPanel();
 			return;
 		}
 
-		DocumentProtectionManager.askForPassword(docId, doc -> {
-			accessGranted = true;
-
-			if (Util.isMediaFile(document.getFileName().toLowerCase())) {
-				reloadMedia();
-			} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
-				reloadHTML();
-			} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
-				reloadMail();
-			} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-				FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-						new AsyncCallback<GUIFolder>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIFolder folder) {
-								if (folder.isDownload())
-									reloadDICOM();
-								else
-									reloadPreview();
-							}
-						});
-			} else {
-				reloadPreview();
-			}
-
-			redraw();
-		});
+		DocumentProtectionManager.askForPassword(docId, doc -> onAccessGranted(document));
 
 		addResizedHandler(event -> doResize());
 	}
 
-	private void doResize() {
+	protected void onAccessGranted(final GUIDocument document) {
+		accessGranted = true;
+
+		if (Util.isMediaFile(document.getFileName().toLowerCase())) {
+			reloadMedia();
+		} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
+			reloadHTML();
+		} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
+			reloadMail();
+		} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
+			FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
+					new AsyncCallback<GUIFolder>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							if (folder.isDownload())
+								reloadDICOM();
+							else
+								reloadPreview();
+						}
+					});
+		} else {
+			reloadPreview();
+		}
+
+		redraw();
+	}
+
+	protected boolean isPreviewAvailable() {
+		return Menu.enabled(Menu.PREVIEW);
+	}
+
+	protected void doResize() {
 		if (getWidth() < 10L) {
 			// The panel has been closed
 			clearContent();
@@ -131,7 +140,7 @@ public class PreviewPanel extends VLayout {
 			clearContent();
 			width = getWidth();
 			height = getHeight();
-			if (!Menu.enabled(Menu.PREVIEW)) {
+			if (!isPreviewAvailable()) {
 				showDisabledPanel();
 				return;
 			}
@@ -248,12 +257,8 @@ public class PreviewPanel extends VLayout {
 			contents = "<div><br><center><b>" + I18N.message("doctoobigtoberendered") + "</b></center></br></div>";
 		} else {
 			try {
-				String locale = Session.get().getUser().getLanguage();
-				String url = Util.contextPath() + "prev/index.jsp?docId=" + docId
-						+ (document.getFileVersion() != null ? "&fileVersion=" + document.getFileVersion() : "")
-						+ "&control=preview&locale=" + locale + "#locale=" + locale.replace('_', '-');
-				contents = "<iframe src='" + url + "' style='border:0px solid white; width:" + (getWidth() - 1)
-						+ "px; height:" + (getHeight() - 1)
+				contents = "<iframe src='" + generalPreviewUrl() + "' style='border:0px solid white; width:"
+						+ (getWidth() - 1) + "px; height:" + (getHeight() - 1)
 						+ "px; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";
 			} catch (Exception t) {
 				// Nothing to do
@@ -263,7 +268,15 @@ public class PreviewPanel extends VLayout {
 		addMember(preview);
 	}
 
-	private void clearContent() {
+	protected String generalPreviewUrl() {
+		String locale = Session.get().getUser().getLanguage();
+		String url = Util.contextPath() + "prev/index.jsp?docId=" + docId
+				+ (document.getFileVersion() != null ? "&fileVersion=" + document.getFileVersion() : "")
+				+ "&control=preview&locale=" + locale + "#locale=" + locale.replace('_', '-');
+		return url;
+	}
+
+	protected void clearContent() {
 		if (reload != null) {
 			removeMember(reload);
 		}

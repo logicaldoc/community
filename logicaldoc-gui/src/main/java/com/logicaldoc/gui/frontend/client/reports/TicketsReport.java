@@ -191,7 +191,10 @@ public class TicketsReport extends ReportPanel {
 			String url = Session.get().getConfig("server.url");
 			if (!url.endsWith("/"))
 				url += "/";
-			url += "download-ticket?ticketId=" + ticketId;
+			if ("2".equals(rec.getAttributeAsString("type")))
+				url += "view/" + ticketId;
+			else
+				url += "download-ticket?ticketId=" + ticketId;
 
 			SC.confirm(I18N.message("downloadticket") + " - " + ticketId,
 					"<a href='" + url + "' target='_blank'>" + url + "</a>", null);

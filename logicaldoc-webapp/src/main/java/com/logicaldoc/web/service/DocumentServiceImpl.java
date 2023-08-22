@@ -767,7 +767,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return document;
 	}
 
-	public static GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser)
+	public GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser)
 			throws PersistenceException {
 		boolean isFolder = doc.getType() != null && doc.getType().startsWith("folder");
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -867,7 +867,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return document;
 	}
 
-	private static void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) {
+	private void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) {
 		if (sessionUser != null && !isFolder) {
 			BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 			document.setBookmarked(bDao.isDocBookmarkedByUser(document.getId(), sessionUser.getId()));

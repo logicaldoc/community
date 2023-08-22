@@ -61,22 +61,30 @@ public class TicketDownload extends HttpServlet {
 
 			Ticket ticket = getTicket(ticketId);
 
+			if (ticket.isTicketExpired() && !isPreviewDownload(ticketId, request))
+				throw new IOException("Expired ticket");
+
 			Document document = getDocument(ticket);
 
-			String suffix = getSuffix(ticket, document);
+			String suffix = getSuffix(ticket, document, request);
 
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			String tenantName = tenantDao.getTenantName(ticket.getTenantId());
 
-			request.setAttribute("open", Boolean.toString("display".equals(
-					Context.get().getProperties().getProperty(tenantName + ".downloadticket.behavior", "download"))));
+			String behavior = request.getParameter("behavior");
+			if (behavior == null)
+				behavior = Context.get().getProperties().getProperty(tenantName + ".downloadticket.behavior",
+						"download");
+			request.setAttribute("open", Boolean.toString("display".equals(behavior)));
 
 			downloadDocument(request, response, document, null, suffix, ticketId);
-			ticket.setCount(ticket.getCount() + 1);
 
-			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
-
-			ticketDao.store(ticket);
+			if (!isPreviewDownload(ticketId, request)) {
+				ticket.setCount(ticket.getCount() + 1);
+				TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
+				ticketDao.store(ticket);
+			} else
+				request.getSession().removeAttribute(getPreviewAttributeName(ticketId));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 
@@ -89,8 +97,20 @@ public class TicketDownload extends HttpServlet {
 		}
 	}
 
-	private String getSuffix(Ticket ticket, Document document) throws IOException {
+	private boolean isPreviewDownload(String ticketId, HttpServletRequest request) {
+		return request.getSession() != null
+				&& request.getSession().getAttribute(getPreviewAttributeName(ticketId)) != null;
+	}
+
+	protected String getPreviewAttributeName(String ticketId) {
+		return "preview-" + ticketId;
+	}
+
+	private String getSuffix(Ticket ticket, Document document, HttpServletRequest request) throws IOException {
 		String suffix = ticket.getSuffix();
+		if (request.getParameter("suffix") != null)
+			suffix = request.getParameter("suffix");
+
 		if ("pdf".equals(suffix))
 			suffix = "conversion.pdf";
 		if ("conversion.pdf".equals(suffix)) {
@@ -118,9 +138,6 @@ public class TicketDownload extends HttpServlet {
 		Ticket ticket = tktDao.findByTicketId(ticketId);
 		if (ticket == null || ticket.getDocId() == 0)
 			throw new IOException("Unexisting ticket");
-
-		if (ticket.isTicketExpired())
-			throw new IOException("Expired ticket");
 		return ticket;
 	}
 

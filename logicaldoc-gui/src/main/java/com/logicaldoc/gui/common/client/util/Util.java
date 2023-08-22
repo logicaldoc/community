@@ -159,6 +159,15 @@ public abstract class Util {
 		download(downloadURL(docId));
 	}
 
+	public static String downloadTicketURL(String ticketId) {
+		String url = Util.contextPath() + "download-ticket?ticketId=" + ticketId;
+		return url;
+	}
+
+	public static void downloadTicket(String ticketId) {
+		download(downloadTicketURL(ticketId));
+	}
+
 	public static String displayURL(Long docId, Long folderId) {
 		String url = contextPath() + "display?";
 		if (docId != null)
@@ -536,19 +545,35 @@ public abstract class Util {
 		return str;
 	}-*/;
 
-	public static String formatLong(long number) {
-		String str;
+	public static String formatLong(Long number) {
+		String str = "";
+		if (number == null)
+			return str;
 		NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
 		str = fmt.format(number);
 		str = str.replace(',', I18N.groupingSepator());
 		return str;
 	}
 
-	public static String formatInt(int number) {
-		String str;
+	public static String formatInt(Integer number) {
+		String str = "";
+		if (number == null)
+			return str;
 		NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
 		str = fmt.format(number);
 		str = str.replace(',', I18N.groupingSepator());
+		return str;
+	}
+
+	public static String formatDouble(Double number) {
+		String str = "";
+		if (number == null)
+			return str;
+		NumberFormat fmt = NumberFormat.getFormat("#,###.##");
+		str = fmt.format(number);
+		str = str.replace(',', '#');
+		str = str.replace('.', I18N.decimalSepator());
+		str = str.replace('#', I18N.groupingSepator());
 		return str;
 	}
 
@@ -928,7 +953,7 @@ public abstract class Util {
 
 		return val;
 	}
-	
+
 	public static Map<String, String> getParameters() {
 		Map<String, String> val = new HashMap<>();
 
@@ -941,7 +966,6 @@ public abstract class Util {
 
 		return val;
 	}
-	
 
 	/**
 	 * Detect skin specification from the request

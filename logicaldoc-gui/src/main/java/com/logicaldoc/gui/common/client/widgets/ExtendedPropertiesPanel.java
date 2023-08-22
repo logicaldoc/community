@@ -82,7 +82,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		this.allowTemplateSelection = allowTemplateSelection;
 
 		setWidth100();
-		setHeight100();
+		setHeight("*");
 		setMembersMargin(20);
 		refresh();
 

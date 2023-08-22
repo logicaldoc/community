@@ -193,13 +193,13 @@ public class EventEndpoint implements EventListener {
 			// Put ID 0 in order to convert to GUIDocument without
 			// picking up ifos from DB
 			clone.setId(0L);
-			document = DocumentServiceImpl.fromDocument(clone, null, null);
+			document = new DocumentServiceImpl().fromDocument(clone, null, null);
 			document.setId(event.getDocId());
 		} else if (event.getDocId() != null) {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document d = docDao.findById(event.getDocId());
 			if (d != null) {
-				document = DocumentServiceImpl.fromDocument(d, null, null);
+				document = new DocumentServiceImpl().fromDocument(d, null, null);
 			} else {
 				document = new GUIDocument();
 				document.setId(event.getDocId());

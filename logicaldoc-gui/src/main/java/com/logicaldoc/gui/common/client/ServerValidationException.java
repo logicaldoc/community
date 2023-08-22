@@ -13,10 +13,9 @@ public class ServerValidationException extends ServerException {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * A map of error descriptions: key is the attribute's name, value is the
-	 * error description
+	 * Array of errors
 	 */
-	private final ServerValidationError[] errors;
+	private ServerValidationError[] errors;
 
 	public ServerValidationException() {
 		super();

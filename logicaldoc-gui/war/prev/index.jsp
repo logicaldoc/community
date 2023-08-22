@@ -2,23 +2,36 @@
 <%@ page import="javax.servlet.http.*" %>
 <%@ page import="java.util.regex.*" %>
 <%@ page import="java.util.*" %>
+<%@ page import="com.logicaldoc.core.ticket.*" %>
 <%@ page import="com.logicaldoc.core.security.*" %>
 <%@ page import="com.logicaldoc.util.*" %>
 <%@ page import="com.logicaldoc.web.util.*" %>
-
 <%
-  com.logicaldoc.core.security.Session ldSession = ServletUtil.validateSession(request); 
+  Long docId = null;
+  String ticketId = request.getParameter("ticketId");
+    
+  com.logicaldoc.core.security.SecurityManager security = (com.logicaldoc.core.security.SecurityManager)Context.get().getBean(com.logicaldoc.core.security.SecurityManager.class);
   
-  Long userId = ldSession.getUserId();
-  Long docId = Long.parseLong(request.getParameter("docId"));
-  
-  com.logicaldoc.core.security.SecurityManager security = (com.logicaldoc.core.security.SecurityManager)Context.get().getBean(com.logicaldoc.core.security.SecurityManager.class);  
-  if(!security.isReadEnabled(docId, userId))
+  Long userId = null;
+  Ticket ticket = null;
+  if(ticketId != null) {
+    com.logicaldoc.core.ticket.TicketDAO tDao = (com.logicaldoc.core.ticket.TicketDAO)Context.get().getBean(com.logicaldoc.core.ticket.TicketDAO.class);
+    ticket = tDao.findByTicketId(ticketId);
+  	if(ticket != null && ticket.isTicketViewExpired())
+  	   ticket = null;
+    else
+       docId = ticket.getDocId();
+  } else {
+    docId = Long.parseLong(request.getParameter("docId"));
+    com.logicaldoc.core.security.Session ldSession = ServletUtil.validateSession(request);
+    userId = ldSession.getUserId();
+  }  
+ 
+  if(ticket == null && !security.isReadEnabled(docId, userId))
       throw new Exception("Permission Denied");
   
-  boolean print = security.isPrintEnabled(docId, userId);
-  boolean download = security.isDownloadEnabled(docId, userId);
-  
+  boolean print = ticket !=null ? !ticket.isTicketExpired() : security.isPrintEnabled(docId, userId);
+  boolean download = ticket !=null ? !ticket.isTicketExpired() : security.isDownloadEnabled(docId, userId);
   
   /*
    * Prepares an hash so the servlet could check that this request comes from a real preview panel.
@@ -40,6 +53,14 @@
   String path = "convertpdf";
   if(request.getParameter("path")!=null)
   	path = request.getParameter("path");
+  if(ticket!=null)
+  path = "download-ticket";
+  
+  String query = request.getQueryString();
+  if(previewCheck!=null)
+    query += "&previewcheck="+previewCheck;
+  if(ticket != null)
+  	query += "&suffix=conversion.pdf";  
 %>
 
 <!DOCTYPE html>
@@ -60,7 +81,7 @@
     <script src="viewer.js"></script>
     
     <script>
-        var pdfUrl='<%=request.getContextPath()%>/<%=path%>?<%=request.getQueryString()%><%=previewCheck!=null ? "&previewcheck="+previewCheck : "" %>';
+        var pdfUrl='<%=request.getContextPath()%>/<%=path%>?<%=query%>';
                 
         window.addEventListener('load', function() {
           // PDFViewerApplication.appConfig.toolbar.viewBookmark;

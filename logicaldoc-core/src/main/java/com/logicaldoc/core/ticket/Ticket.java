@@ -31,7 +31,6 @@ public class Ticket extends PersistentObject {
 
 	private Date creation = new Date();
 
-	
 	/**
 	 * A date when this ticket expires
 	 */
@@ -128,8 +127,13 @@ public class Ticket extends PersistentObject {
 	}
 
 	public boolean isTicketExpired() {
-		return enabled == 0 || new Date().getTime() > expired.getTime()
+		return enabled == 0 || (expired != null && new Date().getTime() > expired.getTime())
 				|| (maxCount != null && maxCount > 0 && count >= maxCount);
+	}
+
+	public boolean isTicketViewExpired() {
+		return enabled == 0 || (expired != null && new Date().getTime() > expired.getTime())
+				|| (maxViews != null && maxViews > 0 && views >= maxViews);
 	}
 
 	public String getSuffix() {

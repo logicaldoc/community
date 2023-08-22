@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
- * The Login entry point
+ * The banner panel
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
@@ -30,7 +30,7 @@ public class TopPanel extends HLayout {
 			logoImage.setTooltip(Session.get().getInfo().getBranding().getProductName());
 			addMember(logoImage);
 
-			Img separator = ItemFactory.newImg("blank.png");
+			Img separator = ItemFactory.newImg("blank.gif");
 			separator.setWidth100();
 			addMember(separator);
 

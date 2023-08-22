@@ -1400,7 +1400,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public Ticket createTicket(Ticket ticket, DocumentHistory transaction)
+	public Ticket createTicket(
+			Ticket ticket, DocumentHistory transaction)
 			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
@@ -1443,19 +1444,15 @@ public class DocumentManagerImpl implements DocumentManager {
 		return ticket;
 	}
 
-	private Ticket prepareTicket(long docId, User user) {
-		Ticket ticket = new Ticket();
-		ticket.setDocId(docId);
-		ticket.setUserId(user.getId());
-		return ticket;
-	}
-
 	private String composeTicketUrl(Ticket ticket, String urlPrefix) {
 		if (StringUtils.isEmpty(urlPrefix))
 			urlPrefix = config.getProperty("server.url");
 		if (!urlPrefix.endsWith("/"))
 			urlPrefix += "/";
-		return urlPrefix + "download-ticket?ticketId=" + ticket.getTicketId();
+		if (ticket.getType() == Ticket.VIEW)
+			return urlPrefix + "view/" + ticket.getTicketId();
+		else
+			return urlPrefix + "download-ticket?ticketId=" + ticket.getTicketId();
 	}
 
 	public void setTicketDAO(TicketDAO ticketDAO) {
