@@ -94,7 +94,7 @@ public class TicketsReport extends ReportPanel {
 		type.setCanFilter(true);
 		type.setCanGroupBy(false);
 		type.setCellFormatter(
-				(value, record, rowNum, colNum) -> I18N.message("0".equals(value.toString()) ? "download" : "view"));
+				(value, rcrd, rowNum, colNum) -> I18N.message("0".equals(value.toString()) ? "download" : "view"));
 
 		ListGridField creation = new DateListGridField("creation", "createdon");
 		creation.setCanGroupBy(false);

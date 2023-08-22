@@ -160,8 +160,7 @@ public abstract class Util {
 	}
 
 	public static String downloadTicketURL(String ticketId) {
-		String url = Util.contextPath() + "download-ticket?ticketId=" + ticketId;
-		return url;
+		return Util.contextPath() + "download-ticket?ticketId=" + ticketId;
 	}
 
 	public static void downloadTicket(String ticketId) {

@@ -82,8 +82,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 			if (StringUtils.isNotEmpty(suffix))
 				writer.print("<suffix><![CDATA[" + suffix + "]]></suffix>");
 			writer.print("<eenabled>" + (enabled ? "0" : "2") + "</eenabled>");
-			writer.print("<valid>" + (enabled && (maxCount == null || maxCount <= 0 || maxCount > count)
-					&& (expired == null || expired.after(new Date()))) + "</valid>");
+			writer.print("<valid>" + isValidTicket(count, maxCount, expired, enabled) + "</valid>");
 			writer.print("<filename><![CDATA[" + fileName + "]]></filename>");
 			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(fileName)))
 					+ "</icon>");
@@ -91,5 +90,10 @@ public class TicketsDataServlet extends AbstractDataServlet {
 			writer.print("</ticket>");
 		}
 		writer.write("</list>");
+	}
+
+	protected boolean isValidTicket(Integer count, Integer maxCount, Date expired, boolean enabled) {
+		return enabled && (maxCount == null || maxCount <= 0 || maxCount > count)
+				&& (expired == null || expired.after(new Date()));
 	}
 }

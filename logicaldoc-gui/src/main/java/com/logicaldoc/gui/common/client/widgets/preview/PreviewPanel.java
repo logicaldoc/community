@@ -270,10 +270,9 @@ public class PreviewPanel extends VLayout {
 
 	protected String generalPreviewUrl() {
 		String locale = Session.get().getUser().getLanguage();
-		String url = Util.contextPath() + "prev/index.jsp?docId=" + docId
+		return Util.contextPath() + "prev/index.jsp?docId=" + docId
 				+ (document.getFileVersion() != null ? "&fileVersion=" + document.getFileVersion() : "")
 				+ "&control=preview&locale=" + locale + "#locale=" + locale.replace('_', '-');
-		return url;
 	}
 
 	protected void clearContent() {

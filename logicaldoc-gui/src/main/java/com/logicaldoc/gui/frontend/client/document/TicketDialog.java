@@ -31,6 +31,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TicketDialog extends Window {
 
+	private static final String ACTION2 = "action";
+
+	private static final String MAXDOWNLOADS2 = "maxdownloads";
+
+	private static final String CONTENT = "content";
+
 	private static final String DUEDATENUMBER = "duedatenumber";
 
 	private IButton save;
@@ -83,8 +89,8 @@ public class TicketDialog extends Window {
 		form.setNumCols(4);
 
 		SelectItem docOrPdfConversion = ItemFactory.newAliasTypeSelector();
-		docOrPdfConversion.setTitle(I18N.message("content"));
-		docOrPdfConversion.setName("content");
+		docOrPdfConversion.setTitle(I18N.message(CONTENT));
+		docOrPdfConversion.setName(CONTENT);
 		docOrPdfConversion.setValue("");
 		docOrPdfConversion.setEndRow(true);
 		docOrPdfConversion.setColSpan(4);
@@ -95,7 +101,7 @@ public class TicketDialog extends Window {
 		date.setColSpan(4);
 		date.setWrapTitle(false);
 
-		SpinnerItem maxDownloads = ItemFactory.newSpinnerItem("maxdownloads", (Integer) null);
+		SpinnerItem maxDownloads = ItemFactory.newSpinnerItem(MAXDOWNLOADS2, (Integer) null);
 		maxDownloads.setEndRow(true);
 		maxDownloads.setColSpan(4);
 		maxDownloads.setWrapTitle(false);
@@ -113,7 +119,7 @@ public class TicketDialog extends Window {
 		duedateTime.setValueMap(map);
 		duedateTime.setValue("hour");
 
-		SelectItem action = ItemFactory.newSelectItem("action");
+		SelectItem action = ItemFactory.newSelectItem(ACTION2);
 		action.setEndRow(true);
 		action.setColSpan(4);
 		action.setWrapTitle(false);
@@ -130,7 +136,7 @@ public class TicketDialog extends Window {
 		maxViews.setWrapTitle(false);
 		maxViews.setRequired(false);
 		maxViews.setMin(0);
-		maxViews.setVisibleWhen(new AdvancedCriteria("action", OperatorId.EQUALS, "2"));
+		maxViews.setVisibleWhen(new AdvancedCriteria(ACTION2, OperatorId.EQUALS, "2"));
 
 		form.setItems(action, docOrPdfConversion, duedateTimeItem, duedateTime, date, maxDownloads, maxViews);
 	}
@@ -139,7 +145,7 @@ public class TicketDialog extends Window {
 		if (!form.validate())
 			return;
 
-		String suffix = form.getValue("content").toString();
+		String suffix = form.getValue(CONTENT).toString();
 		Date date = (Date) form.getValue("date");
 
 		Integer expireHours = null;
@@ -152,17 +158,17 @@ public class TicketDialog extends Window {
 			SC.warn(I18N.message("providexepinfo"));
 
 		Integer maxDownloads = null;
-		String val = form.getValueAsString("maxdownloads");
+		String val = form.getValueAsString(MAXDOWNLOADS2);
 		if (val != null && !val.trim().isEmpty())
 			maxDownloads = Integer.parseInt(val.trim());
 
 		Integer maxViews = null;
-		val = form.getValueAsString("maxdownloads");
+		val = form.getValueAsString(MAXDOWNLOADS2);
 		if (val != null && !val.trim().isEmpty())
 			maxViews = Integer.parseInt(val.trim());
 
 		DocumentService.Instance.get().createDownloadTicket(document.getId(),
-				Integer.parseInt(form.getValueAsString("action")), suffix, expireHours, date, maxDownloads, maxViews,
+				Integer.parseInt(form.getValueAsString(ACTION2)), suffix, expireHours, date, maxDownloads, maxViews,
 				new AsyncCallback<String[]>() {
 
 					@Override
