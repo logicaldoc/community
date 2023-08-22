@@ -79,12 +79,15 @@ public class TicketDownload extends HttpServlet {
 
 			downloadDocument(request, response, document, null, suffix, ticketId);
 
-			if (!isPreviewDownload(ticketId, request)) {
-				ticket.setCount(ticket.getCount() + 1);
-				TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
-				ticketDao.store(ticket);
-			} else
+			if (isPreviewDownload(ticketId, request)) {
 				request.getSession().removeAttribute(getPreviewAttributeName(ticketId));
+				ticket.setViews(ticket.getViews() + 1);
+			} else {
+				ticket.setCount(ticket.getCount() + 1);
+			}
+
+			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
+			ticketDao.store(ticket);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 
@@ -238,7 +241,8 @@ public class TicketDownload extends HttpServlet {
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
-		history.setEvent(DocumentEvent.DOWNLOADED.toString());
+		history.setEvent(isPreviewDownload(ticket, request) ? DocumentEvent.VIEWED.toString()
+				: DocumentEvent.DOWNLOADED.toString());
 		history.setFilename(doc.getFileName());
 		history.setFolderId(doc.getFolder().getId());
 		history.setComment("Ticket " + ticket);
