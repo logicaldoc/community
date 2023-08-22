@@ -59,8 +59,10 @@
   String query = request.getQueryString();
   if(previewCheck!=null)
     query += "&previewcheck="+previewCheck;
-  if(ticket != null)
-  	query += "&suffix=conversion.pdf";  
+  if(ticket != null) {
+  	query += "&suffix=conversion.pdf";
+    session.setAttribute("preview-"+ticketId, new Date());   
+  }
 %>
 
 <!DOCTYPE html>
