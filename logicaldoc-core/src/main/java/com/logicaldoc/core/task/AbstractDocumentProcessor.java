@@ -137,7 +137,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 		log.info("Found a total of {} documents to be processed", size);
 	}
 
-	private User loadUser() {
+	private User loadUser() throws PersistenceException {
 		User user = userDao.findByUsername(getDefaultUser());
 		if (user == null)
 			user = userDao.findByUsername("_system");

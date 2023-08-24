@@ -35,7 +35,12 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 	@Override
 	public User authenticate(String username, String password, String key, Client client)
 			throws AuthenticationException {
-		User user = pickUser(username);
+		User user;
+		try {
+			user = pickUser(username);
+		} catch (PersistenceException e) {
+			throw new AuthenticationException(this, "dataerror", e);
+		}
 
 		validateUser(user);
 
@@ -57,7 +62,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 	}
 
 	@Override
-	public User pickUser(String username) {
+	public User pickUser(String username) throws PersistenceException {
 		User user = null;
 		if (HibernateUserDAO.ignoreCaseLogin())
 			user = userDAO.findByUsernameIgnoreCase(username);

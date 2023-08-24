@@ -720,10 +720,12 @@ public class LoginPanel extends VLayout {
 			@Override
 			public void onSuccess(GUIUser user) {
 				unlockInput();
-
+				
 				String failure = user != null ? user.getLastLoginFailureReason() : null;
 				if (user != null && user.isPasswordExpired()) {
 					new ChangePassword(user, LoginPanel.this).show();
+				} if (user != null && !user.isEnabled()) {
+					SC.warn(I18N.message("userdisabledwarn"));				
 				} else if (user != null && (user.getQuotaCount() >= user.getQuota() && user.getQuota() >= 0)) {
 					SC.warn(I18N.message("quotadocsexceeded"));
 				} else if ("usernameblocked".equals(failure)) {

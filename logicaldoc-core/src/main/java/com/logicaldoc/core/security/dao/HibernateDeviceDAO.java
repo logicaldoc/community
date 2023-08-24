@@ -108,7 +108,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	}
 
 	@Override
-	public boolean isTrustedDevice(String username, HttpServletRequest request) {
+	public boolean isTrustedDevice(String username, HttpServletRequest request) throws PersistenceException {
 		User user = userDAO.findByUsername(username);
 		if (user == null)
 			return false;

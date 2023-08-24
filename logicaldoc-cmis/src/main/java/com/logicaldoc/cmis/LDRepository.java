@@ -2764,18 +2764,19 @@ public class LDRepository {
 
 	private boolean checkPermission(PersistentObject object, CallContext context, Permission permission) {
 		long userId = 0;
-		if (sid != null) {
-			if (SessionManager.get().getStatus(sid) != Session.STATUS_OPEN)
-				return false;
-			else
-				SessionManager.get().renew(sid);
-			userId = SessionManager.get().get(sid).getUserId();
-		} else if (context != null) {
-			User user = userDao.findByUsername(context.getUsername());
-			userId = user.getId();
-		}
 
 		try {
+			if (sid != null) {
+				if (SessionManager.get().getStatus(sid) != Session.STATUS_OPEN)
+					return false;
+				else
+					SessionManager.get().renew(sid);
+				userId = SessionManager.get().get(sid).getUserId();
+			} else if (context != null) {
+				User user = userDao.findByUsername(context.getUsername());
+				userId = user.getId();
+			}
+
 			return checkPermission(object, userId, permission);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

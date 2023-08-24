@@ -112,7 +112,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByUserName() {
+	public void testFindByUserName() throws PersistenceException {
 		User user = dao.findByUsername("admin");
 		Assert.assertNotNull(user);
 		Assert.assertEquals("admin", user.getUsername());
@@ -130,7 +130,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByUserNameIgnoreCase() {
+	public void testFindByUserNameIgnoreCase() throws PersistenceException {
 		User user = dao.findByUsernameIgnoreCase("admin");
 		Assert.assertNotNull(user);
 		Assert.assertEquals("admin", user.getUsername());

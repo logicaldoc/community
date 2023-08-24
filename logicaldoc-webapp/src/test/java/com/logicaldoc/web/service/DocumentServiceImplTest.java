@@ -519,7 +519,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testAddDocuments() throws ServerException, IOException, InterruptedException {
+	public void testAddDocuments() throws ServerException, IOException, InterruptedException, PersistenceException {
 		GUIDocument doc = service.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);

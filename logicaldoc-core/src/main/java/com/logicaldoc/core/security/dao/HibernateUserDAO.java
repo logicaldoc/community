@@ -91,36 +91,28 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public User findByUsername(String username) {
+	public User findByUsername(String username) throws PersistenceException {
 		User user = null;
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put(USERNAME, username);
+		Map<String, Object> params = new HashMap<>();
+		params.put(USERNAME, username);
 
-			List<User> coll = findByWhere(ENTITY + ".username = :username", params, null, null);
-			if (CollectionUtils.isNotEmpty(coll))
-				user = coll.iterator().next();
-			initialize(user);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		List<User> coll = findByWhere(ENTITY + ".username = :username", params, null, null);
+		if (CollectionUtils.isNotEmpty(coll))
+			user = coll.iterator().next();
+		initialize(user);
 		return user;
 	}
 
 	@Override
-	public User findByUsernameIgnoreCase(String username) {
+	public User findByUsernameIgnoreCase(String username) throws PersistenceException {
 		User user = null;
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put(USERNAME, username.toLowerCase());
+		Map<String, Object> params = new HashMap<>();
+		params.put(USERNAME, username.toLowerCase());
 
-			List<User> coll = findByWhere(LOWER + ENTITY + ".username) = :username", params, null, null);
-			if (CollectionUtils.isNotEmpty(coll))
-				user = coll.iterator().next();
-			initialize(user);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		List<User> coll = findByWhere(LOWER + ENTITY + ".username) = :username", params, null, null);
+		if (CollectionUtils.isNotEmpty(coll))
+			user = coll.iterator().next();
+		initialize(user);
 		return user;
 	}
 
@@ -862,7 +854,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public User findAdminUser(String tenantName) {
+	public User findAdminUser(String tenantName) throws PersistenceException {
 		if ("default".equals(tenantName))
 			return findByUsername(ADMIN);
 		else
@@ -904,7 +896,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public User getUser(String username) {
+	public User getUser(String username) throws PersistenceException {
 		User user = null;
 		if (HibernateUserDAO.ignoreCaseLogin())
 			user = findByUsernameIgnoreCase(username);

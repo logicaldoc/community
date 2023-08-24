@@ -40,6 +40,8 @@ public class User extends PersistentObject implements Serializable {
 	public static final int SOURCE_LDAP = 1;
 
 	public static final long USERID_ADMIN = 1;
+	
+	public static final long USERID_SYSTEM = -1010;
 
 	private static final long serialVersionUID = 8093874904302301982L;
 

@@ -1,5 +1,6 @@
 package com.logicaldoc.core.security.authentication;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.User;
 
@@ -73,6 +74,8 @@ public interface Authenticator {
 	 * @param username username of the user to find
 	 * 
 	 * @return object representation of the user
+	 * 
+	 * @throws PersistenceException Error in data layer 
 	 */
-	public User pickUser(String username);
+	public User pickUser(String username) throws PersistenceException;
 }

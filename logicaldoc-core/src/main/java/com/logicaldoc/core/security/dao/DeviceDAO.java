@@ -60,8 +60,10 @@ public interface DeviceDAO extends PersistentObjectDAO<Device> {
 	 * @param request the current request
 	 * 
 	 * @return true only if the request's device is trusted by the user
+	 * 
+	 * @throws PersistenceException Error in the data layer
 	 */
-	public boolean isTrustedDevice(String username, HttpServletRequest request);
+	public boolean isTrustedDevice(String username, HttpServletRequest request) throws PersistenceException;
 
 	/**
 	 * Trusts a device for a user

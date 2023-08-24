@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -55,14 +56,14 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 
 		try {
 			prepareSession("admin", "admin");
-		} catch (ServerException e) {
+		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		}
 		Assert.assertNotNull(guiSession);
 		Assert.assertNotNull(SessionManager.get().get(guiSession.getSid()));
 	}
 
-	protected void prepareSession(String username, String password) throws ServerException {
+	protected void prepareSession(String username, String password) throws ServerException, PersistenceException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
 		guiSession = new GUISession();

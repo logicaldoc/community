@@ -61,7 +61,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testAddUserToGroup() throws ServerException {
+	public void testAddUserToGroup() throws ServerException, PersistenceException {
 		User test = userDAO.findByUsername("test");
 		Assert.assertNotNull(test);
 		Group group = groupDAO.findByName("author", Tenant.DEFAULT_ID);
@@ -95,7 +95,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testDeleteUser() throws ServerException {
+	public void testDeleteUser() throws ServerException, PersistenceException {
 		User user = userDAO.findByUsername("author");
 		Assert.assertEquals(2, user.getGroups().size());
 		service.deleteUser(user.getId());
@@ -104,7 +104,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testRemoveFromGroup() throws ServerException {
+	public void testRemoveFromGroup() throws ServerException, PersistenceException {
 		long[] users = new long[2];
 		users[0] = 5;
 		users[1] = 1;

@@ -256,7 +256,7 @@ public class ParametricForm extends VLayout {
 				criterion.setOperator("inorsubfolders");
 			criteria.add(criterion);
 		}
-
+		
 		options.setCriteria(criteria.toArray(new GUICriterion[0]));
 
 		addSearchInHitsCondition(options);

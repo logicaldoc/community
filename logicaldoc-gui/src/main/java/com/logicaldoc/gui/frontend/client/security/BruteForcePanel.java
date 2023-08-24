@@ -48,6 +48,8 @@ public class BruteForcePanel extends AdminPanel {
 
 	private static final String THROTTLE_USERNAME_MAX = "throttle.username.max";
 
+	private static final String THROTTLE_USERNAME_DISABLEUSER = "throttle.username.disableuser";
+
 	private static final String THROTTLE_ENABLED = "throttle.enabled";
 
 	private ValuesManager vm = new ValuesManager();
@@ -65,9 +67,8 @@ public class BruteForcePanel extends AdminPanel {
 		addMember(save);
 
 		SettingService.Instance.get()
-				.loadSettingsByNames(
-						new String[] { THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
-								THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT },
+				.loadSettingsByNames(new String[] { THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
+						THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT },
 						new AsyncCallback<GUIParameter[]>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -113,6 +114,14 @@ public class BruteForcePanel extends AdminPanel {
 		} catch (Exception t) {
 			// Nothing to do
 		}
+		usernameWait.setDisabled("true".equals(params.get(THROTTLE_USERNAME_DISABLEUSER)));
+
+		RadioGroupItem usernameDisableUser = ItemFactory.newBooleanSelector("usernamedisableuser",
+				"disableuserafterfailedusername");
+		usernameDisableUser.setValue("true".equals(params.get(THROTTLE_USERNAME_DISABLEUSER)) ? "yes" : "no");
+		usernameDisableUser.setWrapTitle(false);
+		usernameDisableUser.setTitleOrientation(TitleOrientation.LEFT);
+		usernameDisableUser.addChangedHandler(event -> usernameWait.setDisabled("yes".equals(event.getValue())));
 
 		SpinnerItem ipMax = ItemFactory.newSpinnerItem("ipmax", "maxsameipfailedattempts", (Integer) null);
 		ipMax.setMin(0);
@@ -133,7 +142,7 @@ public class BruteForcePanel extends AdminPanel {
 			// Nothing to do
 		}
 
-		form.setItems(enabled, usernameMax, usernameWait, ipMax, ipWait);
+		form.setItems(enabled, usernameMax, usernameDisableUser, usernameWait, ipMax, ipWait);
 
 		body.addMember(form);
 
@@ -232,13 +241,15 @@ public class BruteForcePanel extends AdminPanel {
 
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = vm.getValues();
-		GUIParameter[] params = new GUIParameter[5];
+		GUIParameter[] params = new GUIParameter[8];
 		params[0] = new GUIParameter(THROTTLE_ENABLED,
 				"yes".equals(values.get("eenabled").toString()) ? "true" : "false");
 		params[1] = new GUIParameter(THROTTLE_USERNAME_MAX, values.get("usernamemax").toString());
 		params[2] = new GUIParameter(THROTTLE_USERNAME_WAIT, values.get("usernamewait").toString());
 		params[3] = new GUIParameter(THROTTLE_IP_MAX, values.get("ipmax").toString());
 		params[4] = new GUIParameter(THROTTLE_IP_WAIT, values.get("ipwait").toString());
+		params[6] = new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
+				"yes".equals(values.get("usernamedisableuser").toString()) ? "true" : "false");
 
 		SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
 

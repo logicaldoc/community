@@ -998,9 +998,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ANONYMOUS_KEY)))
 			securitySettings.setAnonymousKey(pbean.getProperty(session.getTenantName() + ANONYMOUS_KEY));
 		if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ANONYMOUS_USER))) {
-			User user = userDao.findByUsername(pbean.getProperty(session.getTenantName() + ANONYMOUS_USER));
-			if (user != null)
-				securitySettings.setAnonymousUser(getUser(user.getId()));
+			try {
+				User user = userDao.findByUsername(pbean.getProperty(session.getTenantName() + ANONYMOUS_USER));
+				if (user != null)
+					securitySettings.setAnonymousUser(getUser(user.getId()));
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 		}
 		if (StringUtils.isNotEmpty(pbean.getProperty(SSL_REQUIRED)))
 			securitySettings.setForceSsl("true".equals(pbean.getProperty(SSL_REQUIRED)));

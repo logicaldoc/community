@@ -32,8 +32,13 @@ public class UserTool {
 	 */
 	public User getUser(String username) {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
-				: userDao.findByUsername("_system");
+		try {
+			return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
+					: userDao.findByUsername("_system");
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -61,7 +66,12 @@ public class UserTool {
 	 * @return the avatar in Base64
 	 */
 	public String getAvatar(String username) {
-		return UserUtil.getAvatarImage(username);
+		try {
+			return UserUtil.getAvatarImage(username);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return "";
+		}
 	}
 
 	/**
@@ -73,11 +83,16 @@ public class UserTool {
 	 * @return the avatar in Base64
 	 */
 	public String getAvatarImg(String username, int size) {
-		String content = UserUtil.getAvatarImage(username);
-		return "<img src='data:image/png;base64," + content + "' style='border: 0px height: " + size + "px; width: "
-				+ size + "px; vertical-align:middle;' />";
+		try {
+			String content = UserUtil.getAvatarImage(username);
+			return "<img src='data:image/png;base64," + content + "' style='border: 0px height: " + size + "px; width: "
+					+ size + "px; vertical-align:middle;' />";
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return "";
+		}
 	}
-	
+
 	/**
 	 * Generates the HTML img tag for displaying an avatar
 	 * 
@@ -87,8 +102,13 @@ public class UserTool {
 	 * @return the avatar in Base64
 	 */
 	public String getAvatarImg(long userId, int size) {
-		String content = UserUtil.getAvatarImage(""+userId);
-		return "<img src='data:image/png;base64," + content + "' style='border: 0px height: " + size + "px; width: "
-				+ size + "px; vertical-align:middle;' />";
+		try {
+			String content = UserUtil.getAvatarImage("" + userId);
+			return "<img src='data:image/png;base64," + content + "' style='border: 0px height: " + size + "px; width: "
+					+ size + "px; vertical-align:middle;' />";
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return "";
+		}
 	}
 }

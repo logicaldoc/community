@@ -25,9 +25,18 @@ public class AuthenticationException extends RuntimeException {
 		super(code);
 		this.authenticator = authenticator;
 	}
+	
+	public AuthenticationException(Authenticator authenticator, String code, Throwable cause) {
+		super(code, cause);
+		this.authenticator = authenticator;
+	}
 
 	public AuthenticationException(String message) {
 		this(null, message);
+	}
+	
+	public AuthenticationException(String message, Throwable cause) {
+		this(null, message, cause);
 	}
 
 	public Authenticator getAuthenticator() {

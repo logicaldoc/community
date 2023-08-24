@@ -83,14 +83,18 @@ public class LoginThrottle {
 
 		// Record the failed login attempt
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = uDao.findByUsername(username);
-		if (user == null) {
-			user = new User();
-			user.setUsername(username);
-			user.setName(username);
+		try {
+			User user = uDao.findByUsername(username);
+			if (user == null) {
+				user = new User();
+				user.setUsername(username);
+				user.setName(username);
+			}
+			UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+			dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), exception.getMessage(), null, client);
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
 		}
-		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), exception.getMessage(), null, client);
 	}
 
 	/**
@@ -152,6 +156,7 @@ public class LoginThrottle {
 		ContextProperties config = Context.get().getProperties();
 		int wait = config.getInt("throttle.username.wait", 0);
 		int maxTrials = config.getInt("throttle.username.max", 0);
+		boolean disableUser = config.getBoolean("throttle.username.disableuser", false);
 
 		if (maxTrials > 0 && wait > 0) {
 			String counterName = LOGINFAIL_USERNAME + username;
@@ -163,6 +168,26 @@ public class LoginThrottle {
 					Date oldestDate = cal.getTime();
 					if (oldestDate.before(seq.getLastModified())) {
 						log.warn("Possible brute force attack detected for username {}", username);
+
+						if (disableUser) {
+							try {
+								UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+								User user = userDao.findByUsername(username);
+								if (user != null && user.getEnabled() == 1) {
+									user.setEnabled(0);
+
+									UserHistory transaction = new UserHistory();
+									transaction.setEvent(UserEvent.DISABLED.toString());
+									transaction.setUser(user);
+									transaction.setComment("too many login failures");
+
+									userDao.store(user, transaction);
+								}
+							} catch (PersistenceException e) {
+								log.warn("Error trying to disable user{}", username, e);
+							}
+						}
+
 						throw new UsernameBlockedException();
 					} else {
 						log.info("Login block for username {} expired", username);

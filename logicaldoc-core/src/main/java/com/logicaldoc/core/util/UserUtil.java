@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.imaging.ImageUtil;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -246,7 +247,7 @@ public class UserUtil {
 		return avatarImage;
 	}
 
-	public static String getAvatarImage(String userIdOrName) {
+	public static String getAvatarImage(String userIdOrName) throws PersistenceException {
 		String content = TRANSPARENT_IMAGE;
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);

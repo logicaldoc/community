@@ -33,8 +33,13 @@ public class SecurityTool {
 	 */
 	public User getUser(String username) {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
-				: userDao.findByUsername("_system");
+		try {
+			return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
+					: userDao.findByUsername("_system");
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**

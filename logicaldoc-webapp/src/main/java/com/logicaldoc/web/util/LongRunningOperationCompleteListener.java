@@ -60,9 +60,15 @@ public class LongRunningOperationCompleteListener implements ThreadCompleteListe
 		Date now = new Date();
 
 		for (String username : usernames) {
-			User user = uDao.findByUsername(username);
-			if (user == null)
+			User user;
+			try {
+				user = uDao.findByUsername(username);
+				if (user == null)
+					throw new PersistenceException("Unexisting user " + username);
+			} catch (PersistenceException e) {
+				log.warn("Error retrieving user {}", username);
 				continue;
+			}
 
 			Recipient recipient = new Recipient();
 			recipient.setName(user.getUsername());

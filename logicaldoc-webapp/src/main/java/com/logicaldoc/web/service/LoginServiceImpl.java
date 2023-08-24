@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
@@ -70,6 +71,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			// Get just a few informations needed by the login
 			GUIUser usr = new GUIUser();
 			usr.setId(user.getId());
+			usr.setEnabled(user.getEnabled() == 1);
 			usr.setUsername(user.getUsername());
 			usr.setTenant(SecurityServiceImpl.getTenant(user.getTenantId()));
 			usr.setPasswordExpires(user.getPasswordExpires() == 1);
@@ -79,7 +81,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			usr.setName(user.getName());
 			usr.setFirstName(user.getFirstName());
 			usr.setSecondFactor(user.getSecondFactor());
-
+			
 			Tenant tenant = tenantDao.findById(user.getTenantId());
 
 			ContextProperties config = Context.get().getProperties();
@@ -100,12 +102,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public void resetPassword(String username, String emailAddress, String productName) throws ServerException {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = userDao.findByUsername(username);
-
-		if (user == null)
-			throw new ServerException(String.format("User %s not found", username));
-		else if (!user.getEmail().trim().equals(emailAddress.trim()))
+		User user = pickUser(username);
+		if (!user.getEmail().trim().equals(emailAddress.trim()))
 			throw new ServerException(String.format("Email %s is wrong", emailAddress));
 
 		try {
@@ -164,12 +162,28 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		}
 	}
 
+	private User pickUser(String username) throws ServerException {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user;
+		try {
+			user = userDao.findByUsername(username);
+		} catch (PersistenceException e) {
+			throw new ServerException(String.format("Error in the data layer for user %s", username));
+		}
+		if (user == null)
+			throw new ServerException(String.format("User %s not found", username));
+		return user;
+	}
+
 	@Override
 	public boolean isSecretKeyRequired(String username, String deviceId) throws ServerException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = userDao.findByUsername(username);
-		if (user == null)
+		User user;
+		try {
+			user = pickUser(username);
+		} catch (ServerException e) {
 			return false;
+		}
 
 		userDao.initialize(user);
 
@@ -188,17 +202,27 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			request.setAttribute(Device.PARAM_DEVICE, deviceId);
 
 			DeviceDAO deviceDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
-			return !deviceDao.isTrustedDevice(username, request);
+			try {
+				return !deviceDao.isTrustedDevice(username, request);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+				return false;
+			}
 		} else
 			return true;
 	}
 
 	@Override
 	public String generatePassword(String username) {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = userDao.findByUsername(username);
-		if (user == null)
+		User user;
+		try {
+			user = pickUser(username);
+			if (user == null)
+				return "";
+		} catch (ServerException e) {
+			log.warn(e.getMessage(), e);
 			return "";
+		}
 
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenant = tDao.getTenantName(user.getTenantId());

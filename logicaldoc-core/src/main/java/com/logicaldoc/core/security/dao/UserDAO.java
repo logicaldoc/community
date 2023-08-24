@@ -43,8 +43,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param username username of wanted User.
 	 * 
 	 * @return Wanted User or null if user doesn't exist.
+	 * 
+	 * @throws PersistenceException Error in the data layer
 	 */
-	public User findByUsername(String username);
+	public User findByUsername(String username) throws PersistenceException;
 
 	/**
 	 * This method finds an User by its username. The search is case
@@ -53,8 +55,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param username username of wanted User.
 	 * 
 	 * @return Wanted User or null if user doesn't exist.
+	 * 
+	 * @throws PersistenceException Error in the data layer
 	 */
-	public User findByUsernameIgnoreCase(String username);
+	public User findByUsernameIgnoreCase(String username) throws PersistenceException;
 
 	/**
 	 * Depending on the global setting, it invokes findByUsername or
@@ -63,8 +67,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param username The username of the user
 	 * 
 	 * @return The found user
+	 * 
+	 * @throws PersistenceException Error in the data layer 
 	 */
-	public User getUser(String username);
+	public User getUser(String username) throws PersistenceException;
 
 	/**
 	 * This method finds an User by username.
@@ -157,8 +163,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param tenantName name of the tenant
 	 * 
 	 * @return the user to administrate the tenant
+	 * 
+	 * @throws PersistenceException Error in the data layer 
 	 */
-	public User findAdminUser(String tenantName);
+	public User findAdminUser(String tenantName) throws PersistenceException;
 
 	/**
 	 * Retrieves the users belonging to a given group.
