@@ -156,7 +156,6 @@ public class LoginThrottle {
 		ContextProperties config = Context.get().getProperties();
 		int wait = config.getInt("throttle.username.wait", 0);
 		int maxTrials = config.getInt("throttle.username.max", 0);
-		boolean disableUser = config.getBoolean("throttle.username.disableuser", false);
 
 		if (maxTrials > 0 && wait > 0) {
 			String counterName = LOGINFAIL_USERNAME + username;
@@ -169,24 +168,7 @@ public class LoginThrottle {
 					if (oldestDate.before(seq.getLastModified())) {
 						log.warn("Possible brute force attack detected for username {}", username);
 
-						if (disableUser) {
-							try {
-								UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-								User user = userDao.findByUsername(username);
-								if (user != null && user.getEnabled() == 1) {
-									user.setEnabled(0);
-
-									UserHistory transaction = new UserHistory();
-									transaction.setEvent(UserEvent.DISABLED.toString());
-									transaction.setUser(user);
-									transaction.setComment("too many login failures");
-
-									userDao.store(user, transaction);
-								}
-							} catch (PersistenceException e) {
-								log.warn("Error trying to disable user{}", username, e);
-							}
-						}
+						disableUser(username);
 
 						throw new UsernameBlockedException();
 					} else {
@@ -194,6 +176,27 @@ public class LoginThrottle {
 						deleteSequence(seq);
 					}
 				}
+			}
+		}
+	}
+
+	protected static void disableUser(String username) {
+		if (Context.get().getProperties().getBoolean("throttle.username.disableuser", false)) {
+			try {
+				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+				User user = userDao.findByUsername(username);
+				if (user != null && user.getEnabled() == 1) {
+					user.setEnabled(0);
+
+					UserHistory transaction = new UserHistory();
+					transaction.setEvent(UserEvent.DISABLED.toString());
+					transaction.setUser(user);
+					transaction.setComment("too many login failures");
+
+					userDao.store(user, transaction);
+				}
+			} catch (PersistenceException e) {
+				log.warn("Error trying to disable user{}", username, e);
 			}
 		}
 	}

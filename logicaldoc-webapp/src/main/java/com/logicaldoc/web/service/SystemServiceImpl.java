@@ -152,7 +152,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		 */
 		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, TRASH, null, session.getTenantId());
 		GUIParameter trashSize = new GUIParameter();
-		trashSize.setName("trash");
+		trashSize.setName(TRASH);
 		setLongValue(gen, trashSize);
 		parameters[0][1] = trashSize;
 

@@ -81,7 +81,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			usr.setName(user.getName());
 			usr.setFirstName(user.getFirstName());
 			usr.setSecondFactor(user.getSecondFactor());
-			
+
 			Tenant tenant = tenantDao.findById(user.getTenantId());
 
 			ContextProperties config = Context.get().getProperties();
@@ -217,8 +217,6 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		User user;
 		try {
 			user = pickUser(username);
-			if (user == null)
-				return "";
 		} catch (ServerException e) {
 			log.warn(e.getMessage(), e);
 			return "";
