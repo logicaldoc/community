@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.DataSourceField;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
@@ -28,8 +27,6 @@ public class DocumentsDS extends DataSource {
 	private static final String PAGE = "&page=";
 
 	public static final Integer DEFAULT_MAX = 100;
-
-	private GUIFolder folder = null;
 
 	/**
 	 * Constructor.
@@ -215,9 +212,5 @@ public class DocumentsDS extends DataSource {
 		}
 
 		fields.add(ext);
-	}
-
-	public GUIFolder getFolder() {
-		return folder;
 	}
 }

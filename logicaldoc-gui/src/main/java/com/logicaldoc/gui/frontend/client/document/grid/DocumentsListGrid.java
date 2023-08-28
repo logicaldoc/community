@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -19,8 +17,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
-import com.logicaldoc.gui.common.client.observer.FolderController;
-import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
@@ -30,11 +26,12 @@ import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RatingListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.StatusIconsListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.RatingDialog;
-import com.logicaldoc.gui.frontend.client.folder.FolderCursor;
+import com.logicaldoc.gui.frontend.client.folder.browser.FolderCursor;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.workflow.WorkflowTaskNameListGridField;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -76,10 +73,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	private static final String FILENAME = "filename";
 
-	private static final String SIGNED = "signed";
-
-	private static final String BOOKMARKED = "bookmarked";
-
 	private static final String IMMUTABLE = "immutable";
 
 	private static final String STATUS_ICONS = "statusIcons";
@@ -93,8 +86,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	private static final String SUMMARY = "summary";
 
 	private static final String VERSION = "version";
-
-	private static final String STAMPED = "stamped";
 
 	private static final String PUBLISHED_STATUS = "publishedStatus";
 
@@ -413,7 +404,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			if (keyPress.isCtrlKeyDown()) {
 				GUIDocument[] selection = getSelectedDocuments();
 				if ("C".equalsIgnoreCase(keyPress.getKeyName())) {
-					// we could thake the action to copy (CTRL + C) into the
+					// we could take the action to copy (CTRL + C) into the
 					// clipboard
 					addSelectionToClipboard(selection);
 					Clipboard.getInstance().setLastAction(Clipboard.COPY);
@@ -431,128 +422,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	private void prepareStatusIcons() {
-		ListGridField statusIcons = new ColoredListGridField(STATUS_ICONS, " ");
-		statusIcons.setWidth(110);
-		statusIcons.setCanFilter(false);
-		statusIcons.setCanSort(false);
+		ListGridField statusIcons = new StatusIconsListGridField();
 		fieldsMap.put(statusIcons.getName(), statusIcons);
-		statusIcons.setCellFormatter(
-				(Object value, ListGridRecord rec, int rowNum, int colNum) -> formatStatusIconCell(rec));
-	}
-
-	private String formatStatusIconCell(ListGridRecord rec) {
-		String color = rec.getAttributeAsString("color");
-
-		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-
-		// Put the bookmark icon
-		content = putBookmarkStatusIcon(rec, color, content);
-
-		// Put the indexing icon
-		content = putIndexedStatusIcon(rec, color, content);
-
-		// Put the status icon
-		if (rec.getAttribute("status") != null) {
-			Integer status = rec.getAttributeAsInt("status");
-			if (status != null && status.intValue() > 0)
-				content += AwesomeFactory.getLockedButtonHTML(status, rec.getAttributeAsString("lockUser"), color);
-		}
-
-		// Put the immutable icon
-		content = putImmutableStatusIcon(rec, color, content);
-
-		// Put the password protection icon
-		if (rec.getAttribute("password") != null) {
-			Boolean password = rec.getAttributeAsBoolean("password");
-			if (password != null && password.booleanValue())
-				content += AwesomeFactory.getIconButtonHTML("key", null, "passwordprotected", color, null);
-		}
-
-		// Put the signed icon
-		content = putSignedStatusIcon(rec, color, content);
-
-		// Put the stamped icon
-		content = putStampedStatusIcon(rec, color, content);
-
-		// Put the links icon
-		content = putLinksStatusIcon(rec, color, content);
-
-		content += "</div>";
-		return content;
-	}
-
-	private String putLinksStatusIcon(ListGridRecord rec, String color, String content) {
-		if (rec.getAttribute("links") != null) {
-			Integer links = rec.getAttributeAsInt("links");
-			if (links != null && links.intValue() > 0)
-				content += AwesomeFactory.getIconButtonHTML("link", null, "withlinks", color, null);
-		}
-		return content;
-	}
-
-	private String putImmutableStatusIcon(ListGridRecord rec, String color, String content) {
-		if (rec.getAttribute(IMMUTABLE) != null) {
-			Integer immutable = rec.getAttributeAsInt(IMMUTABLE);
-			if (immutable != null && immutable.intValue() == 1)
-				content += AwesomeFactory.getIconButtonHTML("hand-paper", null, IMMUTABLE, color, null);
-		}
-		return content;
-	}
-
-	private String putBookmarkStatusIcon(ListGridRecord rec, String color, String content) {
-		if (rec.getAttribute(BOOKMARKED) != null) {
-			Boolean bookmarked = rec.getAttributeAsBoolean(BOOKMARKED);
-			if (bookmarked != null && bookmarked)
-				content += AwesomeFactory.getIconButtonHTML("bookmark", null, BOOKMARKED, color, null);
-		}
-		return content;
-	}
-
-	private String putIndexedStatusIcon(ListGridRecord rec, String color, String content) {
-		if (rec.getAttribute(INDEXED) != null) {
-			Integer indexed = rec.getAttributeAsInt(INDEXED);
-			if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
-					&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
-				Long idValue = rec.getAttributeAsLong("id");
-				content += AwesomeFactory.getIndexedIconButtonHTML(idValue,
-						FolderController.get().getCurrentFolder().isDownload(), indexed, color);
-			}
-		}
-		return content;
-	}
-
-	private String putStampedStatusIcon(ListGridRecord rec, String color, String content) {
-		if (rec.getAttribute(STAMPED) != null) {
-			Integer stamped = rec.getAttributeAsInt(STAMPED);
-			if (stamped != null && stamped.intValue() == 1) {
-				Long docId = rec.getAttributeAsLong("id");
-				String fileVersion = rec.getAttribute(FILE_VERSION);
-				if (FolderController.get().getCurrentFolder().isDownload())
-					content += AwesomeFactory.getIconButtonHTML("tint", null, STAMPED, color,
-							(Feature.enabled(Feature.STAMP) ? Util.downloadPdfURL(docId, fileVersion) : null));
-				else
-					content += AwesomeFactory.getIconButtonHTML("tint", null, STAMPED, color, null);
-			}
-		}
-		return content;
-	}
-
-	private String putSignedStatusIcon(ListGridRecord rec, String color, String content) {
-		if (rec.getAttribute(SIGNED) != null) {
-			Integer signed = rec.getAttributeAsInt(SIGNED);
-			if (signed != null && signed.intValue() == 1) {
-				Long docId = rec.getAttributeAsLong("id");
-				if (FolderController.get().getCurrentFolder().isDownload())
-					content += AwesomeFactory.getIconButtonHTML("badge-check", null, SIGNED, color,
-							(rec.getAttributeAsString(FILENAME) != null
-									&& rec.getAttributeAsString(FILENAME).toLowerCase().endsWith(".pdf")
-											? Util.downloadURL(docId, null)
-											: Util.downloadPdfURL(docId, null)));
-				else
-					content += AwesomeFactory.getIconButtonHTML("badge-check", null, SIGNED, color, null);
-			}
-		}
-		return content;
 	}
 
 	private void addExtendedAttributesFields() {
@@ -1057,10 +928,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	public void fetchNewData(DocumentsDS ds) {
-		if (ds.getFolder() != null) {
-			this.folder = ds.getFolder();
-			setCanDrag(folder.isMove());
-		}
 		refresh(ds);
 	}
 

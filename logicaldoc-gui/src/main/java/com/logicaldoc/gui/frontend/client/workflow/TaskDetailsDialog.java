@@ -23,12 +23,14 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.StatusIconsListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentCheckin;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
+import com.logicaldoc.gui.frontend.client.document.selector.DocumentSelectorDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
@@ -465,7 +467,7 @@ public class TaskDetailsDialog extends Window {
 
 			SubmitItem saveButton = new SubmitItem("save", I18N.message("save"));
 			saveButton.setAlign(Alignment.LEFT);
-			saveButton.addClickHandler( saveClick -> {
+			saveButton.addClickHandler(saveClick -> {
 				if (user.getSelectedRecord() == null)
 					return;
 				setUser(user.getSelectedRecord().getAttribute("id"));
@@ -618,7 +620,7 @@ public class TaskDetailsDialog extends Window {
 			Menu contextMenu = new Menu();
 			MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler( evnt -> WorkflowService.Instance.get()
+			delete.addClickHandler(evnt -> WorkflowService.Instance.get()
 					.deleteNote(notesGrid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<Void>() {
 
 						@Override
@@ -666,8 +668,7 @@ public class TaskDetailsDialog extends Window {
 		docLastModified.setShowDefaultContextMenu(false);
 		docLastModified.setHidden(false);
 
-		ListGridField statusIcons = new ListGridField("statusIcons", " ");
-		statusIcons.setWidth(90);
+		ListGridField statusIcons = new StatusIconsListGridField();
 		statusIcons.setCanFilter(false);
 		statusIcons.setCanSort(false);
 		statusIcons.setHidden(false);
@@ -719,52 +720,70 @@ public class TaskDetailsDialog extends Window {
 		Button addDocuments = new Button(I18N.message("adddocuments"));
 		addDocuments.setAutoFit(true);
 		addDocuments.setVisible(workflow.getSelectedTask().getTaskState().equals("started"));
-		addDocuments.addClickHandler(eevnt -> {
+		addDocuments.addClickHandler(evnt -> new DocumentSelectorDialog() {
+
+			@Override
+			protected void onSelection(GUIDocument[] selection) {
+				appendDocuments(selection);
+				close();
+			}
+		}.show());
+
+		Button addDocumentsFromClipboard = new Button(I18N.message("adddocumentsfromclipboard"));
+		addDocumentsFromClipboard.setAutoFit(true);
+		addDocumentsFromClipboard.setVisible(workflow.getSelectedTask().getTaskState().equals("started"));
+		addDocumentsFromClipboard.addClickHandler(eevnt -> {
 			Clipboard clipboard = Clipboard.getInstance();
 			if (clipboard.isEmpty()) {
 				SC.warn(I18N.message("nodocsinclipboard"));
 				return;
 			}
 
-			Long[] ids = new Long[clipboard.size()];
-			int i = 0;
-			for (GUIDocument doc : clipboard)
-				ids[i++] = doc.getId();
-
-			WorkflowService.Instance.get().appendDocuments(workflow.getSelectedTask().getId(), ids,
-					new AsyncCallback<Void>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void ret) {
-							WorkflowService.Instance.get().getWorkflowDetailsByTask(workflow.getSelectedTask().getId(),
-									new AsyncCallback<GUIWorkflow>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(GUIWorkflow result) {
-											TaskDetailsDialog.this.workflow
-													.setAppendedDocIds(result.getAppendedDocIds());
-											refreshAppendedDocsTab();
-											tabs.selectTab(1);
-											Clipboard.getInstance().clear();
-										}
-									});
-						}
-					});
+			appendDocuments(clipboard.toArray(new GUIDocument[0]));
 		});
 
+		HLayout buttons = new HLayout();
+		buttons.setMembersMargin(4);
+		buttons.setMembers(addDocuments, addDocumentsFromClipboard);
+
 		if (workflow.getSelectedTask().getEndDate() == null && !readOnly) {
-			appendedDocsPanel.addMember(addDocuments);
+			appendedDocsPanel.addMember(buttons);
 		}
+	}
+
+	private void appendDocuments(GUIDocument[] documents) {
+		Long[] ids = new Long[documents.length];
+		int i = 0;
+		for (GUIDocument doc : documents)
+			ids[i++] = doc.getId();
+
+		WorkflowService.Instance.get().appendDocuments(workflow.getSelectedTask().getId(), ids,
+				new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void ret) {
+						WorkflowService.Instance.get().getWorkflowDetailsByTask(workflow.getSelectedTask().getId(),
+								new AsyncCallback<GUIWorkflow>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
+
+									@Override
+									public void onSuccess(GUIWorkflow result) {
+										TaskDetailsDialog.this.workflow.setAppendedDocIds(result.getAppendedDocIds());
+										refreshAppendedDocsTab();
+										tabs.selectTab(1);
+									}
+								});
+					}
+				});
 	}
 
 	public GUIWorkflow getWorkflow() {

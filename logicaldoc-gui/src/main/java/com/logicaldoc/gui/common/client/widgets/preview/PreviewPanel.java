@@ -233,8 +233,7 @@ public class PreviewPanel extends VLayout {
 			removeMember(dicom);
 
 		dicom = new HTMLFlow();
-		String url = Util.contextPath() + "dicom/index.html?input=" + URL.encodeQueryString(
-				Util.downloadURL(docId, document.getFileVersion()) + "&sid=" + Session.get().getSid());
+		String url = dicomUrl();
 		dicom.setContents(
 				"<iframe src='" + url + "' style='border:0px solid white; width:" + (getWidth() - 1) + "px; height:"
 						+ (getHeight() - 1) + "px; overflow:hidden;' scrolling='no' seamless='seamless'></iframe>");
@@ -275,6 +274,11 @@ public class PreviewPanel extends VLayout {
 				+ "&control=preview&locale=" + locale + "#locale=" + locale.replace('_', '-');
 	}
 
+	protected String dicomUrl() {
+		return Util.contextPath() + "dicom/index.jsp?input=" + URL.encodeQueryString(
+				Util.downloadURL(docId, document.getFileVersion()) + "&sid=" + Session.get().getSid());
+	}
+	
 	protected void clearContent() {
 		if (reload != null) {
 			removeMember(reload);

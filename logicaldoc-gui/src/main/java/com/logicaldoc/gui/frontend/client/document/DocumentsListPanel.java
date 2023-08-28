@@ -43,6 +43,10 @@ public class DocumentsListPanel extends VLayout {
 		return visualizationMode;
 	}
 
+	public DocumentsListPanel(GUIFolder folder) {
+		this(folder, DocumentsGrid.MODE_LIST);
+	}
+
 	public DocumentsListPanel(GUIFolder folder, int visualizationMode) {
 		this.visualizationMode = visualizationMode;
 
@@ -131,8 +135,9 @@ public class DocumentsListPanel extends VLayout {
 	public void updateData(GUIFolder folder) {
 		if (grid.getFolder() == null || (grid.getFolder() != null && grid.getFolder().getId() != folder.getId()))
 			grid.loadGridLayout(folder);
-		
-		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null, grid.getGridCursor().getPageSize(), grid.getGridCursor().getCurrentPage(),
+
+		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null,
+				grid.getGridCursor().getPageSize(), grid.getGridCursor().getCurrentPage(),
 				grid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) grid) : null);
 		DocumentsDS dataSource = new DocumentsDS(params);
 		grid.fetchNewData(dataSource);

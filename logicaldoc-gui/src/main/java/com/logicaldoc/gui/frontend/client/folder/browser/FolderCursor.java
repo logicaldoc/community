@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.folder;
+package com.logicaldoc.gui.frontend.client.folder.browser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +10,8 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
+import com.logicaldoc.gui.frontend.client.folder.FolderPagination;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -35,17 +37,23 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 	private FolderPagination currentPagination = new FolderPagination(0L, 1000, 0, 1);
 
-	private Map<Long, FolderPagination> paginations = new HashMap<>();
+	/**
+	 * A cache with the pagination infos for all the folders
+	 */
+	private static final Map<Long, FolderPagination> paginations = new HashMap<>();
 
 	public static FolderCursor get() {
-		if (instance == null)
+		if (instance == null) {
 			instance = new FolderCursor();
+			FolderController.get().addObserver(instance);
+		}
 		return instance;
 	}
 
-	private FolderCursor() {
+	public FolderCursor() {
 		setNumCols(3);
 		setHeight(1);
+		setWidth(1);
 		setAlign(Alignment.RIGHT);
 
 		maxItem = ItemFactory.newSpinnerItem("max", "display", Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN), 2,
@@ -72,8 +80,6 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		spacer2.setTitle("|");
 
 		setItems(maxItem, spacer2, pageItem);
-
-		FolderController.get().addObserver(this);
 	}
 
 	public void setPageSizeAndTotalRecords(int pageSize, int totalRecords) {
@@ -113,21 +119,24 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 	@Override
 	public void onFolderSelected(GUIFolder folder) {
 		FolderPagination pagination = paginations.get(folder.getId());
+
 		if (pagination == null) {
 			pagination = new FolderPagination(folder.getId(), Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN),
 					(int) folder.getSubfolderCount(), 1);
-			// Save it only if there are more than one page
-			if (pagination.getTotalPages() >= 2)
+			if (folder.getGrid() != null && !folder.getGrid().isEmpty())
+				pagination.setPageSize(DocumentGridUtil.getFolderPageSizeFromSpec(folder.getGrid()));
+			else if (Session.get().getUser().getDocsGrid() != null && !Session.get().getUser().getDocsGrid().isEmpty())
+				pagination
+						.setPageSize(DocumentGridUtil.getFolderPageSizeFromSpec(Session.get().getUser().getDocsGrid()));
+
+			// Save it only if there is more than one page
+			if (pagination.getTotalPages() > 1)
 				paginations.put(folder.getId(), pagination);
-			currentPagination = pagination;
 		} else {
 			pagination.setTotalElements((int) folder.getSubfolderCount());
-			currentPagination = pagination;
-
-			// Remove from client and server if there are less than two pages
-			if (pagination.getTotalPages() < 2)
-				paginations.remove(folder.getId());
 		}
+
+		currentPagination = pagination;
 		update();
 	}
 
@@ -138,8 +147,9 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 	private void updateClient() {
 		maxItem.setValue(currentPagination.getPageSize());
-		pageItem.setValue(currentPagination.getPage());
+
 		pageItem.setMax(currentPagination.getTotalPages());
+		pageItem.setValue(currentPagination.getPage());
 		pageItem.setHint("/" + (currentPagination.getTotalPages() > 0 ? currentPagination.getTotalPages() : 1));
 	}
 

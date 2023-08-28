@@ -422,10 +422,6 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public void fetchNewData(DocumentsDS ds) {
-		if (ds.getFolder() != null) {
-			this.folder = ds.getFolder();
-			setCanDrag(folder.isMove());
-		}
 		getDataSource().destroy();
 		setDataSource(ds, fields.toArray(new DetailViewerField[0]));
 		fetchData();
