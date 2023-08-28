@@ -226,7 +226,7 @@ public class DownloadServlet extends HttpServlet {
 		}
 	}
 
-	private void processSafeHtml(String suffix, Version version, Document doc) throws IOException {
+	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException {
 		if ("safe.html".equals(suffix)) {
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			if (doc != null) {

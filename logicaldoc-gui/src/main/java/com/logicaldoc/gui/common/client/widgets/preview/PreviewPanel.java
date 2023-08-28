@@ -194,7 +194,7 @@ public class PreviewPanel extends VLayout {
 		String contents = "";
 
 		try {
-			String url = Util.downloadURL(docId, document.getFileVersion(), false);
+			String url = mediaUrl();
 
 			if (Util.isAudioFile(document.getFileName()))
 				contents = Util.audioHTML(url);
@@ -218,10 +218,9 @@ public class PreviewPanel extends VLayout {
 
 		html = new HTMLPane();
 		html.setShowEdges(false);
-		html.setContentsURL(Util.downloadURL(docId, document.getFileVersion(), "safe.html", false));
+		html.setContentsURL(htmlUrl());
 		html.setContentsType(ContentsType.FRAGMENT);
 
-		setWidth100();
 		addMember(html);
 	}
 
@@ -276,6 +275,14 @@ public class PreviewPanel extends VLayout {
 	protected String dicomUrl() {
 		return Util.contextPath() + "dicom/index.jsp?input=" + URL.encodeQueryString(
 				Util.downloadURL(docId, document.getFileVersion()) + "&sid=" + Session.get().getSid());
+	}
+	
+	protected String htmlUrl() {
+		return Util.downloadURL(docId, document.getFileVersion(), "safe.html", false);
+	}
+	
+	protected String mediaUrl() {
+		return Util.downloadURL(docId, document.getFileVersion(), false);
 	}
 	
 	protected void clearContent() {

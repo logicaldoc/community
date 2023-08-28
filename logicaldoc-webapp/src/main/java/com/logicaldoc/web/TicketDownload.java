@@ -36,6 +36,11 @@ public class TicketDownload extends HttpServlet {
 
 	private static final long serialVersionUID = 9088160958327454062L;
 
+	private static final String[] videoExts = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov",
+			".rm", ".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v" };
+
+	private static final String[] audioExts = new String[] { ".mp3", ".m4p", ".m4a", ".wav" };
+
 	protected static Logger log = LoggerFactory.getLogger(TicketDownload.class);
 
 	/**
@@ -61,10 +66,10 @@ public class TicketDownload extends HttpServlet {
 
 			Ticket ticket = getTicket(ticketId);
 
-			if (ticket.isTicketExpired() && !isPreviewDownload(ticketId, request))
-				throw new IOException("Expired ticket");
-
 			Document document = getDocument(ticket);
+
+			if (ticket.isTicketExpired() && !isPreviewDownload(ticketId, request, document))
+				throw new IOException("Expired ticket");
 
 			String suffix = getSuffix(ticket, document, request);
 
@@ -79,13 +84,13 @@ public class TicketDownload extends HttpServlet {
 
 			downloadDocument(request, response, document, null, suffix, ticketId);
 
-			if (isPreviewDownload(ticketId, request)) {
+			if (isPreviewDownload(ticketId, request, document)) {
 				request.getSession().removeAttribute(getPreviewAttributeName(ticketId));
 				ticket.setViews(ticket.getViews() + 1);
+				if (isHtml(document))
+					suffix = "safe.html";
 			} else {
-				if (!(document.getFileName().toLowerCase().endsWith(".dcm")
-						&& "preview".equals(request.getParameter("control"))))
-					ticket.setCount(ticket.getCount() + 1);
+				increaseDownloadCount(request, ticket, document);
 			}
 
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
@@ -102,9 +107,24 @@ public class TicketDownload extends HttpServlet {
 		}
 	}
 
-	private boolean isPreviewDownload(String ticketId, HttpServletRequest request) {
-		return request.getSession() != null
-				&& request.getSession().getAttribute(getPreviewAttributeName(ticketId)) != null;
+	private boolean isHtml(Document document) {
+		return document.getFileName().toLowerCase().endsWith(".html")
+				|| document.getFileName().toLowerCase().endsWith(".htm")
+				|| document.getFileName().toLowerCase().endsWith(".xhtml");
+	}
+
+	private void increaseDownloadCount(HttpServletRequest request, Ticket ticket, Document document) {
+		if (!((document.getFileName().toLowerCase().endsWith(".dcm") || isHtml(document))
+				&& "preview".equals(request.getParameter("control"))))
+			ticket.setCount(ticket.getCount() + 1);
+	}
+
+	private boolean isPreviewDownload(String ticketId, HttpServletRequest request, Document document) {
+		return (request.getSession() != null
+				&& request.getSession().getAttribute(getPreviewAttributeName(ticketId)) != null)
+				|| ((isHtml(document) || com.logicaldoc.gui.common.client.util.Util.isMediaFile(document.getFileName()))
+						&& "preview".equals(request.getParameter("control")));
+
 	}
 
 	protected String getPreviewAttributeName(String ticketId) {
@@ -191,18 +211,23 @@ public class TicketDownload extends HttpServlet {
 		}
 	}
 
-	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Document doc,
+	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Document document,
 			String fileVersion, String suffix, String ticket) throws IOException, PersistenceException {
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(doc, fileVersion, suffix);
-		OutputStream os = null;
-		try (InputStream is = storer.getStream(doc.getId(), resource)) {
-			String filename = doc.getFileName();
-			if (suffix != null && suffix.contains("pdf"))
-				filename = doc.getFileName() + ".pdf";
+		/*
+		 * In case the client asks for a safe version of the HTML content
+		 */
+		DownloadServlet.processSafeHtml(suffix, null, document);
 
-			long size = storer.size(doc.getId(), resource);
+		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		String resource = storer.getResourceName(document, fileVersion, suffix);
+		OutputStream os = null;
+		try (InputStream is = storer.getStream(document.getId(), resource)) {
+			String filename = document.getFileName();
+			if (suffix != null && suffix.contains("pdf"))
+				filename = document.getFileName() + ".pdf";
+
+			long size = storer.size(document.getId(), resource);
 
 			// get the mimetype
 			String mimetype = MimeType.getByFilename(filename);
@@ -224,7 +249,7 @@ public class TicketDownload extends HttpServlet {
 				os.write(letter);
 			}
 		} catch (IOException ioe) {
-			log.error("Cannot open the stream {} {} {} of for ticket {}", doc, fileVersion, suffix, ticket);
+			log.error("Cannot open the stream {} {} {} of for ticket {}", document, fileVersion, suffix, ticket);
 			throw ioe;
 		} finally {
 			try {
@@ -239,19 +264,19 @@ public class TicketDownload extends HttpServlet {
 
 		// Add an history entry to track the download of the document
 		DocumentHistory history = new DocumentHistory();
-		history.setDocument(doc);
+		history.setDocument(document);
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
-		history.setEvent(isPreviewDownload(ticket, request) ? DocumentEvent.VIEWED.toString()
+		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
+		history.setEvent(isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED.toString()
 				: DocumentEvent.DOWNLOADED.toString());
-		history.setFilename(doc.getFileName());
-		history.setFolderId(doc.getFolder().getId());
+		history.setFilename(document.getFileName());
+		history.setFolderId(document.getFolder().getId());
 		history.setComment("Ticket " + ticket);
 
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
-			ddao.saveDocumentHistory(doc, history);
+			ddao.saveDocumentHistory(document, history);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}
