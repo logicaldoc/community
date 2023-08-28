@@ -83,7 +83,9 @@ public class TicketDownload extends HttpServlet {
 				request.getSession().removeAttribute(getPreviewAttributeName(ticketId));
 				ticket.setViews(ticket.getViews() + 1);
 			} else {
-				ticket.setCount(ticket.getCount() + 1);
+				if (!(document.getFileName().toLowerCase().endsWith(".dcm")
+						&& "preview".equals(request.getParameter("control"))))
+					ticket.setCount(ticket.getCount() + 1);
 			}
 
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);

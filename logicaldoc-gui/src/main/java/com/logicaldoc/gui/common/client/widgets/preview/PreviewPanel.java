@@ -166,7 +166,7 @@ public class PreviewPanel extends VLayout {
 	/**
 	 * Reloads a mail preview
 	 */
-	private void reloadMail() {
+	protected void reloadMail() {
 		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new AsyncCallback<GUIEmail>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -186,7 +186,7 @@ public class PreviewPanel extends VLayout {
 	/**
 	 * Reloads a media preview
 	 */
-	private void reloadMedia() {
+	protected void reloadMedia() {
 		if (media != null)
 			removeMember(media);
 
@@ -212,7 +212,7 @@ public class PreviewPanel extends VLayout {
 	/**
 	 * Reloads a preview for HTML documents.
 	 */
-	private void reloadHTML() {
+	protected void reloadHTML() {
 		if (html != null)
 			removeMember(html);
 
@@ -228,7 +228,7 @@ public class PreviewPanel extends VLayout {
 	/**
 	 * Reloads a preview for DICOM documents.
 	 */
-	private void reloadDICOM() {
+	protected void reloadDICOM() {
 		if (dicom != null)
 			removeMember(dicom);
 
@@ -237,14 +237,13 @@ public class PreviewPanel extends VLayout {
 		dicom.setContents(
 				"<iframe src='" + url + "' style='border:0px solid white; width:" + (getWidth() - 1) + "px; height:"
 						+ (getHeight() - 1) + "px; overflow:hidden;' scrolling='no' seamless='seamless'></iframe>");
-		setWidth100();
 		addMember(dicom);
 	}
 
 	/**
 	 * Reloads a preview.
 	 */
-	private void reloadPreview() {
+	protected void reloadPreview() {
 		if (preview != null)
 			removeMember(preview);
 
