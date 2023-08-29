@@ -1241,6 +1241,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		return getTree().find(FOLDER_ID, Long.toString(folderId));
 	}
 
+	@Override
 	public long getSelectedFolderId() {
 		return getSelectedRecord().getAttributeAsLong(FOLDER_ID);
 	}

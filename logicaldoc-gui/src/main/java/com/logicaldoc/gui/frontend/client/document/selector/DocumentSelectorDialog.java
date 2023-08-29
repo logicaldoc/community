@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public abstract class DocumentSelectorDialog extends StickyWindow {
 
-	public DocumentSelectorDialog() {
+	protected DocumentSelectorDialog() {
 		super("documentselector");
 	}
 

@@ -36,11 +36,6 @@ public class TicketDownload extends HttpServlet {
 
 	private static final long serialVersionUID = 9088160958327454062L;
 
-	private static final String[] videoExts = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov",
-			".rm", ".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v" };
-
-	private static final String[] audioExts = new String[] { ".mp3", ".m4p", ".m4a", ".wav" };
-
 	protected static Logger log = LoggerFactory.getLogger(TicketDownload.class);
 
 	/**

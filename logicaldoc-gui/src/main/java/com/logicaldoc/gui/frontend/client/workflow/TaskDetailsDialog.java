@@ -74,6 +74,8 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class TaskDetailsDialog extends Window {
 
+	private static final String STARTED = "started";
+
 	private static final String COMMENT = "comment";
 
 	private static final String USER_ID = "userId";
@@ -194,7 +196,7 @@ public class TaskDetailsDialog extends Window {
 				buttonsPanel.addMember(completionDiagram);
 			}
 
-			if (workflow.getSelectedTask().getTaskState().equals("started")
+			if (workflow.getSelectedTask().getTaskState().equals(STARTED)
 					&& workflow.getSelectedTask().getOwner() != null) {
 				prepareTransitionButtons();
 			}
@@ -719,7 +721,7 @@ public class TaskDetailsDialog extends Window {
 
 		Button addDocuments = new Button(I18N.message("adddocuments"));
 		addDocuments.setAutoFit(true);
-		addDocuments.setVisible(workflow.getSelectedTask().getTaskState().equals("started"));
+		addDocuments.setVisible(workflow.getSelectedTask().getTaskState().equals(STARTED));
 		addDocuments.addClickHandler(evnt -> new DocumentSelectorDialog() {
 
 			@Override
@@ -731,7 +733,7 @@ public class TaskDetailsDialog extends Window {
 
 		Button addDocumentsFromClipboard = new Button(I18N.message("adddocumentsfromclipboard"));
 		addDocumentsFromClipboard.setAutoFit(true);
-		addDocumentsFromClipboard.setVisible(workflow.getSelectedTask().getTaskState().equals("started"));
+		addDocumentsFromClipboard.setVisible(workflow.getSelectedTask().getTaskState().equals(STARTED));
 		addDocumentsFromClipboard.addClickHandler(eevnt -> {
 			Clipboard clipboard = Clipboard.getInstance();
 			if (clipboard.isEmpty()) {
