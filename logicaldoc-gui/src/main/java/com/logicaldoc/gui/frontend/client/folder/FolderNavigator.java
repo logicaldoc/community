@@ -323,17 +323,11 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler(event -> {
-			FolderCopyDialog dialog = new FolderCopyDialog();
-			dialog.show();
-		});
+		copy.addClickHandler(event -> new FolderCopyDialog().show());
 
 		MenuItem merge = new MenuItem();
 		merge.setTitle(I18N.message("merge"));
-		merge.addClickHandler(event -> {
-			MergeDialog dialog = new MergeDialog();
-			dialog.show();
-		});
+		merge.addClickHandler(event -> new MergeDialog().show());
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));

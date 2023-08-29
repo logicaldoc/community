@@ -2,12 +2,11 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.FolderTree;
+import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tree.TreeGrid;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This is the form used to copy some folders into another target folder
@@ -26,22 +25,15 @@ public class MergeDialog extends Dialog {
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setAutoSize(true);
+		setWidth(440);
+		setHeight(500);
 
-		VLayout content = new VLayout();
-		content.setWidth100();
-		content.setHeight100();
-		content.setMembersMargin(3);
-
-		final TreeGrid folders = new FolderTree();
+		final FolderBrowser folders = new FolderBrowser();
 		folders.setWidth100();
 		folders.setHeight100();
 		folders.setMinHeight(300);
 
-		VLayout buttons = new VLayout();
-		buttons.setWidth100();
-
-		Button merge = new Button(I18N.message(MERGE));
+		ToolStripButton merge = new ToolStripButton(I18N.message(MERGE));
 		merge.setAutoFit(true);
 		merge.setMargin(1);
 		merge.addClickHandler(event -> {
@@ -62,8 +54,11 @@ public class MergeDialog extends Dialog {
 					});
 		});
 
-		buttons.setMembers(merge);
-		content.setMembers(folders, buttons);
-		addItem(content);
+		ToolStrip buttons = new ToolStrip();
+		buttons.setWidth100();
+		buttons.addButton(merge);
+
+		addMember(folders);
+		addMember(buttons);
 	}
 }

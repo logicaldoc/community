@@ -7,8 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.document.DocumentsListPanel;
-import com.logicaldoc.gui.frontend.client.folder.browser.FolderCursor;
-import com.logicaldoc.gui.frontend.client.folder.browser.FolderTree;
+import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
@@ -24,7 +23,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class DocumentSelectorPanel extends HLayout {
 
-	private FolderTree folders;
+	private FolderBrowser folders;
 
 	private Canvas documents = new VLayout();
 
@@ -35,23 +34,15 @@ public class DocumentSelectorPanel extends HLayout {
 		documents.setAlign(Alignment.CENTER);
 		documents.setWidth100();
 		documents.setShowResizeBar(true);
-
-		setMembers(prepareFolderTree(), documents);
+		
+		prepareFolderBrowser();
+		setMembers(folders, documents);
 	}
 
-	private VLayout prepareFolderTree() {
-		VLayout layout = new VLayout();
-		layout.setWidth(250);
-		layout.setShowResizeBar(true);
-		
-		if (Session.get().isFolderPagination()) {
-			FolderCursor cursor = new FolderCursor();
-			layout.addMember(cursor);
-			folders = new FolderTree(cursor);
-		} else {
-			folders = new FolderTree();
-		}
-		
+	private void prepareFolderBrowser() {
+		folders = new FolderBrowser();
+		folders.setWidth(250);
+		folders.setShowResizeBar(true);
 		folders.addCellClickHandler(event -> FolderService.Instance.get().getFolder(folders.getSelectedFolderId(),
 				false, false, Session.get().isFolderPagination(), new AsyncCallback<GUIFolder>() {
 					@Override
@@ -67,10 +58,6 @@ public class DocumentSelectorPanel extends HLayout {
 						addMember(documents);
 					}
 				}));
-
-		layout.addMember(folders);
-
-		return layout;
 	}
 
 	public GUIDocument[] getSelection() {

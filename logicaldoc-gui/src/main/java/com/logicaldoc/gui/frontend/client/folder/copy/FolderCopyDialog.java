@@ -7,19 +7,16 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
+import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridComponent;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
 /**
@@ -43,13 +40,10 @@ public class FolderCopyDialog extends Dialog {
 		centerInPage();
 		setWidth(440);
 		setHeight(600);
-		setMembersMargin(1);
 
-		TreeGrid folders = new FolderTree();
+		FolderBrowser folders = new FolderBrowser();
 		folders.setWidth100();
 		folders.setHeight100();
-		folders.setMinHeight(300);
-		folders.setMinWidth(400);
 
 		long[] selectedSourceIds = FolderNavigator.get().getSelectedIds();
 
@@ -70,26 +64,15 @@ public class FolderCopyDialog extends Dialog {
 		CheckboxItem foldersOnly = ItemFactory.newCheckbox(FOLDERS_ONLY, "copyfoldersonly");
 		foldersOnly.setValue(false);
 
-		ButtonItem copy = prepareCopyButton(folders, selectedSourceIds, securityOptionEnabled, form);
+		ButtonItem copy = prepareCopyButton(folders.getFolderTree(), selectedSourceIds, securityOptionEnabled, form);
 
 		if (securityOptionEnabled)
 			form.setItems(name, foldersOnly, securityOption, copy);
 		else
 			form.setItems(name, copy);
 
-		folders.setGridComponents(ListGridComponent.HEADER, ListGridComponent.BODY, form);
-
-		SectionStackSection section = new SectionStackSection(I18N.message("targetfolder"));
-		section.setCanCollapse(false);
-		section.setExpanded(true);
-		section.setItems(folders);
-
-		SectionStack stack = new SectionStack();
-		stack.setWidth100();
-		stack.setHeight100();
-		stack.setSections(section);
-
-		addItem(stack);
+		addMember(folders);
+		addMember(form);
 	}
 
 	private ButtonItem prepareCopyButton(TreeGrid folders, long[] selectedSourceIds,

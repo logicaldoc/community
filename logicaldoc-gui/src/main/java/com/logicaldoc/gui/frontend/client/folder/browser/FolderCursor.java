@@ -51,7 +51,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 	}
 
 	public FolderCursor() {
-		setNumCols(3);
+		setNumCols(4);
 		setHeight(1);
 		setWidth(1);
 		setAlign(Alignment.RIGHT);
@@ -75,7 +75,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		pageItem.addChangedHandler(event -> onPageChange());
 		pageItem.setHint("/" + (currentPagination.getTotalPages() > 0 ? currentPagination.getTotalPages() : 1));
 
-		SpacerItem spacer2 = new SpacerItem("spc2");
+		SpacerItem spacer2 = new SpacerItem();
 		spacer2.setWidth(6);
 		spacer2.setTitle("|");
 
