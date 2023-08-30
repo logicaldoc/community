@@ -70,7 +70,8 @@ public class AutomationRoutineProperties extends AutomationRoutineDetailsTab {
 		formsContainer.setMembers(form1, form2);
 	}
 
-	boolean validate() {
+	@Override
+	public boolean validate() {
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			routine.setName(vm.getValueAsString("name"));

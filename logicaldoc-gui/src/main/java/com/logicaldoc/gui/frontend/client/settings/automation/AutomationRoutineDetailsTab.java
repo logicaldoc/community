@@ -21,6 +21,8 @@ public abstract class AutomationRoutineDetailsTab extends HLayout {
 		this.routine = routine;
 		this.changedHandler = changedHandler;
 	}
+	
+	public abstract boolean validate();
 
 	public GUIAutomationRoutine getRoutine() {
 		return routine;

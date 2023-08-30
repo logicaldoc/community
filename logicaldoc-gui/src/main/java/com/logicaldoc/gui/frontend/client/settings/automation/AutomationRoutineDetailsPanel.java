@@ -19,6 +19,7 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 8.1
  */
 public class AutomationRoutineDetailsPanel extends VLayout {
+
 	private GUIAutomationRoutine routine;
 
 	private Layout standardTabPanel;
@@ -29,14 +30,18 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 
 	private AutomationRoutineParametersPanel parametersPanel;
 
+	private Layout securityTabPanel;
+
+	private AutomationRoutineSecurity securityPanel;
+
 	private EditingTabSet tabSet;
 
 	private AutomationRoutinesPanel routinesPanel;
 
-	public AutomationRoutineDetailsPanel(AutomationRoutinesPanel foldersPanel) {
+	public AutomationRoutineDetailsPanel(AutomationRoutinesPanel routinesPanel) {
 		super();
 
-		this.routinesPanel = foldersPanel;
+		this.routinesPanel = routinesPanel;
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
@@ -75,6 +80,13 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 		parametersTab.setPane(parametersTabPanel);
 		tabSet.addTab(parametersTab);
 
+		Tab securityTab = new Tab(I18N.message("security"));
+		securityTabPanel = new HLayout();
+		securityTabPanel.setWidth100();
+		securityTabPanel.setHeight100();
+		securityTab.setPane(securityTabPanel);
+		tabSet.addTab(securityTab);
+
 		addMember(tabSet);
 	}
 
@@ -93,6 +105,12 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 				parametersTabPanel.removeMember(parametersPanel);
 		}
 
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
+				securityTabPanel.removeMember(securityPanel);
+		}
+
 		ChangedHandler changeHandler = event -> onModified();
 
 		standardPanel = new AutomationRoutineProperties(routine, changeHandler);
@@ -100,6 +118,9 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 
 		parametersPanel = new AutomationRoutineParametersPanel(routine, changeHandler);
 		parametersTabPanel.addMember(parametersPanel);
+
+		securityPanel = new AutomationRoutineSecurity(routine, changeHandler);
+		securityTabPanel.addMember(securityPanel);
 	}
 
 	public GUIAutomationRoutine getTrigger() {
@@ -122,7 +143,10 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 		boolean inputValid = parametersPanel.validate();
 		if (!inputValid)
 			tabSet.selectTab(1);
-		return stdValid && inputValid;
+		boolean securityValid = securityPanel.validate();
+		if (!securityValid)
+			tabSet.selectTab(1);
+		return stdValid && inputValid && securityValid;
 	}
 
 	public void onSave() {
