@@ -152,7 +152,18 @@ public class WorkflowHistoryDialog extends Window {
 		documentIds.setHidden(true);
 		ListGridField initiator = new UserListGridField("initiator", "initiatorId", "initiator");
 
-		instancesGrid = new RefreshableListGrid();
+		instancesGrid = new RefreshableListGrid() {
+			@Override
+			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+				String color = record.getAttributeAsString("wfDisplay");
+				if (color != null && !color.isEmpty()) {
+					return "background-color:" + color;
+				} else {
+					return super.getCellCSSText(record, rowNum, colNum);
+				}
+			}
+		};
+		
 		instancesGrid.setCanFreezeFields(true);
 		instancesGrid.setAutoFetchData(true);
 		instancesGrid.setShowHeader(true);
@@ -163,7 +174,7 @@ public class WorkflowHistoryDialog extends Window {
 		instancesGrid.setBorder("1px solid #E1E1E1");
 		instancesGrid.sort(STARTDATE, SortDirection.DESCENDING);
 		instancesGrid.setFields(id, version, templateId, tag, startDate, endDate, documents, initiator, documentIds);
-
+		
 		instancesGrid.addCellDoubleClickHandler(event -> onInstanceSelected());
 		instancesGrid.addCellContextClickHandler(event -> {
 			showInstanceContextMenu();

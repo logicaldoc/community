@@ -2247,8 +2247,8 @@ public class ItemFactory {
 		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setWidth(200);
 		item.setWrapTitle(false);
-		ListGridField name = new ListGridField("name");
-		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
+		ListGridField name = new ColoredListGridField("name");
+		ListGridField label = new ColoredListGridField(LABEL, I18N.message(WORKFLOW));
 		item.setDisplayField(LABEL);
 		item.setValueField("id");
 		item.setPickListWidth(300);
