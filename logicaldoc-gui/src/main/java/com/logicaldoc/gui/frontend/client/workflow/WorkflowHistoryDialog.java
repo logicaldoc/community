@@ -154,12 +154,12 @@ public class WorkflowHistoryDialog extends Window {
 
 		instancesGrid = new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				String color = record.getAttributeAsString("wfDisplay");
+			protected String getCellCSSText(ListGridRecord rcd, int rowNum, int colNum) {
+				String color = rcd.getAttributeAsString("wfDisplay");
 				if (color != null && !color.isEmpty()) {
 					return "background-color:" + color;
 				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rcd, rowNum, colNum);
 				}
 			}
 		};

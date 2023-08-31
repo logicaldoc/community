@@ -135,12 +135,12 @@ public class WorkflowDashlet extends Portlet {
 
 		list = new RefreshableListGrid() {
 			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				String color = record.getAttributeAsString("wfcolor");
+			protected String getCellCSSText(ListGridRecord rcd, int rowNum, int colNum) {
+				String color = rcd.getAttributeAsString("wfcolor");
 				if (color != null && !color.isEmpty()) {
 					return "background-color:" + color;
 				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
+					return super.getCellCSSText(rcd, rowNum, colNum);
 				}
 			}
 		};
