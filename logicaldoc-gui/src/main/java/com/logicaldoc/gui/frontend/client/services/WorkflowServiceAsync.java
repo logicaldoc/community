@@ -20,7 +20,7 @@ public interface WorkflowServiceAsync {
 	void saveTrigger(String folderId, String workflowId, String templateId, String events,
 			AsyncCallback<Void> callback);
 
-	void startWorkflow(String workflowName, String workflowDescription, String tag, Long[] docIds,
+	void startWorkflow(String workflowName, String workflowDescription, String tag, String color, Long[] docIds,
 			AsyncCallback<Void> callback);
 
 	void getWorkflowDetailsByTask(String taskId, AsyncCallback<GUIWorkflow> callback);

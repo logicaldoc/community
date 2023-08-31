@@ -60,6 +60,7 @@ import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.common.client.widgets.automation.AutomationItemEditor;
 import com.logicaldoc.gui.common.client.widgets.automation.HtmlItemEditor;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
@@ -332,7 +333,7 @@ public class ItemFactory {
 	private ItemFactory() {
 	}
 
-	public static ColorPickerItem newColorItemPicker(String name, String title, String value, boolean clearOption,
+	public static ColorPickerItem newColorPickerItem(String name, String title, String value, boolean clearOption,
 			ChangedHandler changedHandler) {
 		ColorPickerItem item = new ColorPickerItem(originalItemName(name));
 
@@ -359,8 +360,8 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static ColorPickerItem newColorItemPicker(String value, boolean clearOption, ChangedHandler changedHandler) {
-		return newColorItemPicker("color", "color", value, clearOption, changedHandler);
+	public static ColorPickerItem newColorPickerItem(String value, boolean clearOption, ChangedHandler changedHandler) {
+		return newColorPickerItem("color", "color", value, clearOption, changedHandler);
 	}
 
 	/**
@@ -2185,14 +2186,15 @@ public class ItemFactory {
 		item.setShowHintInField(true);
 		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
-		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
+		
+		ListGridField label = new ColoredListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
 
-		ListGridField name = new ListGridField("name");
+		ListGridField name = new ColoredListGridField("name");
 		name.setWidth(150);
 		name.setHidden(true);
 
-		ListGridField description = new ListGridField(DESCRIPTION);
+		ListGridField description = new ColoredListGridField(DESCRIPTION);
 		description.setWidth(500);
 
 		item.setWidth(250);
@@ -2204,6 +2206,7 @@ public class ItemFactory {
 		item.setOptionDataSource(new WorkflowsDS(false, deployedOnly, userId));
 		if (!Feature.enabled(Feature.WORKFLOW))
 			item.setDisabled(true);
+
 		return item;
 	}
 
@@ -2212,17 +2215,18 @@ public class ItemFactory {
 		item.setShowHintInField(true);
 		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
-		ListGridField label = new ListGridField(LABEL, I18N.message(WORKFLOW));
+		
+		ListGridField label = new ColoredListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
 
-		ListGridField name = new ListGridField("name");
+		ListGridField name = new ColoredListGridField("name");
 		name.setWidth(150);
 		name.setHidden(true);
 
 		ListGridField deployed = new ListGridField("deployed");
 		deployed.setAutoFitWidth(true);
 
-		ListGridField description = new ListGridField(DESCRIPTION);
+		ListGridField description = new ColoredListGridField(DESCRIPTION);
 		description.setWidth(500);
 
 		item.setWidth(250);

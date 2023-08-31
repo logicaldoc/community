@@ -21,6 +21,8 @@ public class GUIWorkflow implements Serializable {
 	private String name = "";
 	
 	private String label = "";
+	
+	private String color = null;
 
 	private String description = "";
 
@@ -255,5 +257,13 @@ public class GUIWorkflow implements Serializable {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 }

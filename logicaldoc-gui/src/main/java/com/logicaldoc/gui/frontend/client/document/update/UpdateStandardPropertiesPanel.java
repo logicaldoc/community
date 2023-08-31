@@ -92,7 +92,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		language.setValue(document.getLanguage());
 		items.add(language);
 
-		ColorItem color = ItemFactory.newColorItemPicker(document.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorPickerItem(document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
 		items.add(color);
 

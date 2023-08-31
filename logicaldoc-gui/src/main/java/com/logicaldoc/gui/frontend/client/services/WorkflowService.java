@@ -66,7 +66,7 @@ public interface WorkflowService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void deleteInstances(String[] ids) throws ServerException;
-	
+
 	/**
 	 * Imports a new workflow schema already uploaded
 	 * 
@@ -155,12 +155,13 @@ public interface WorkflowService extends RemoteService {
 	 * @param workflowName name of the workflow
 	 * @param workflowDescription description of the workflow
 	 * @param tag a tak to mark this new execution
+	 * @param color a color to mark this new execution
 	 * @param docIds identifiers of the documents appended to the new workflow
 	 *        instance
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public void startWorkflow(String workflowName, String workflowDescription, String tag, Long[] docIds)
+	public void startWorkflow(String workflowName, String workflowDescription, String tag, String color, Long[] docIds)
 			throws ServerException;
 
 	/**
@@ -276,7 +277,7 @@ public interface WorkflowService extends RemoteService {
 
 		private Instance() {
 		}
-		
+
 		public static WorkflowServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(WorkflowService.class);

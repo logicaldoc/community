@@ -123,16 +123,27 @@ public class WorkflowDashlet extends Portlet {
 		ListGridField documentIds = new ListGridField("documentIds", I18N.message("documentids"), 200);
 		documentIds.setHidden(true);
 		ListGridField tag = new ListGridField("tag", I18N.message("tag"), 120);
+
 		ListGridField lastnote = new ListGridField("lastnote", I18N.message("lastnote"), 120);
 
-		ListGridField startdate = new DateListGridField(STARTDATE, STARTDATE);
+		DateListGridField startdate = new DateListGridField(STARTDATE, STARTDATE);
 
 		ListGridField duedate = new DateListGridField("duedate", "duedate");
 
 		ListGridField enddate = new DateListGridField("enddate", "enddate");
 		enddate.setHidden(true);
 
-		list = new RefreshableListGrid();
+		list = new RefreshableListGrid() {
+			@Override
+			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+				String color = record.getAttributeAsString("wfcolor");
+				if (color != null && !color.isEmpty()) {
+					return "background-color:" + color;
+				} else {
+					return super.getCellCSSText(record, rowNum, colNum);
+				}
+			}
+		};
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
@@ -143,6 +154,7 @@ public class WorkflowDashlet extends Portlet {
 		list.setBorder("0px");
 		list.setDataSource(new WorkflowTasksDS(type, null, max.getValueAsInteger()));
 		list.sort(STARTDATE, SortDirection.ASCENDING);
+
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ALL
 				|| type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
 			list.setFields(workflow, workflowDisplay, templateVersion, tag, startdate, duedate, enddate, name, id,

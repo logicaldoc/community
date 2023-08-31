@@ -245,7 +245,7 @@ public class TaskEditor extends Window {
 		taskName.setRequired(true);
 		taskName.setWidth(220);
 
-		ColorPickerItem taskColor = ItemFactory.newColorItemPicker("taskColor", "color", this.state.getDisplay(), true,
+		ColorPickerItem taskColor = ItemFactory.newColorPickerItem("taskColor", "color", this.state.getDisplay(), true,
 				null);
 
 		TextAreaItem taskDescr = ItemFactory.newTextAreaItem("taskDescr", "description", this.state.getDescription());

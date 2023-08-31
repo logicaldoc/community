@@ -122,7 +122,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		LinkItem folder = prepareFolderItem();
 
-		ColorItem color = ItemFactory.newColorItemPicker(document.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorPickerItem(document.getColor(), true, changedHandler);
 		color.setDisabled(!updateEnabled);
 
 		String downloadUrl = Util.downloadURL(document.getId());

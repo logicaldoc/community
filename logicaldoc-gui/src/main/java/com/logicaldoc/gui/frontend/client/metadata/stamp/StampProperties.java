@@ -99,7 +99,7 @@ public class StampProperties extends StampDetailsTab {
 
 		prepareTextItem();
 
-		final ColorItem color = ItemFactory.newColorItemPicker(stamp.getColor(), true, changedHandler);
+		final ColorItem color = ItemFactory.newColorPickerItem(stamp.getColor(), true, changedHandler);
 
 		final RadioGroupItem barcodeLabel = prepareBarcodeLabelSelector();
 

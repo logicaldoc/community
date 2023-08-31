@@ -296,7 +296,7 @@ public class FormDetailsPanel extends VLayout {
 			targetFolder.addFolderChangeListener(folder -> changedHandler.onChanged(null));
 			targetFolder.setRequiredWhen(new Criteria(WEB_ENABLED, "yes"));
 
-			TextItem backgroundColor = ItemFactory.newColorItemPicker("backgroundColor", "background",
+			TextItem backgroundColor = ItemFactory.newColorPickerItem("backgroundColor", "background",
 					form.getBackgroundColor(), true, changedHandler);
 
 			form3 = new DynamicForm();

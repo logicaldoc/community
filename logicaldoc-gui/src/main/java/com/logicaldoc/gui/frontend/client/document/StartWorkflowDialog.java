@@ -11,6 +11,7 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -29,6 +30,8 @@ public class StartWorkflowDialog extends Window {
 
 	private TextItem tag;
 
+	private ColorPickerItem color;
+
 	public StartWorkflowDialog(Long[] ids) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("startworkflow"));
@@ -42,18 +45,24 @@ public class StartWorkflowDialog extends Window {
 		workflow.setTitle(I18N.message("chooseworkflow"));
 		workflow.setWrapTitle(false);
 		workflow.setRequired(true);
+		workflow.addChangedHandler(event -> color.setValue(workflow.getSelectedRecord().getAttributeAsString("color")));
 
 		tag = ItemFactory.newTextItem("tag", null);
 		tag.setWrapTitle(false);
 		tag.setRequired(false);
+
+		color = ItemFactory.newColorPickerItem(null, true, null);
+		color.setWrapTitle(false);
+		color.setRequired(false);
 
 		ButtonItem start = new ButtonItem();
 		start.setTitle(I18N.message("startworkflow"));
 		start.setAutoFit(true);
 		start.addClickHandler(event -> onStart(ids));
 
+		form.setNumCols(3);
 		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setFields(workflow, tag, start);
+		form.setFields(workflow, tag, color, start);
 		addItem(form);
 	}
 
@@ -64,7 +73,8 @@ public class StartWorkflowDialog extends Window {
 		ListGridRecord selection = workflow.getSelectedRecord();
 
 		WorkflowService.Instance.get().startWorkflow(selection.getAttributeAsString("name"),
-				selection.getAttributeAsString("description"), tag.getValueAsString(), ids, new AsyncCallback<Void>() {
+				selection.getAttributeAsString("description"), tag.getValueAsString(), color.getValueAsString(), ids,
+				new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

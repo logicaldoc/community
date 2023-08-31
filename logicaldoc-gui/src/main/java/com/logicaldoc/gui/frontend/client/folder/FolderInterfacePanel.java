@@ -81,7 +81,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 
 		SpinnerItem position = ItemFactory.newSpinnerItem(POSITION, folder.getPosition());
 
-		ColorItem color = ItemFactory.newColorItemPicker(folder.getColor(), true, changedHandler);
+		ColorItem color = ItemFactory.newColorPickerItem(folder.getColor(), true, changedHandler);
 
 		StaticTextItem docsGrid = ItemFactory.newStaticTextItem("grid", DOCSGRIDLAYOUT,
 				folder.getGrid() != null && !folder.getGrid().isEmpty() ? I18N.message(CUSTOMIZED)

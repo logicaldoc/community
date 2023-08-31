@@ -25,7 +25,9 @@ public class WorkflowsDS extends DataSource {
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 		DataSourceTextField description = new DataSourceTextField("description");
 		DataSourceBooleanField deployed = new DataSourceBooleanField("deployed");
-		setFields(id, name, label, version, date, deployed, description);
+		DataSourceTextField color = new DataSourceTextField("color");
+		color.setHidden(true);
+		setFields(id, name, label, version, date, deployed, description, color);
 		setDataURL("data/workflows.xml?locale=" + I18N.getLocale()
 				+ (retrieveDefinitions ? "&retrievedefinitions=true" : "") + (deployedOnly ? "&deployedOnly=true" : "")
 				+ (workflowName != null ? "&name=" + workflowName : "") + (userId != null ? "&userId=" + userId : "")

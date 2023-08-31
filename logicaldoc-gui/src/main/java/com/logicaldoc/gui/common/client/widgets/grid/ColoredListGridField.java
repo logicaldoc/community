@@ -38,7 +38,7 @@ public class ColoredListGridField extends ListGridField {
 	}
 
 	public ColoredListGridField(String name) {
-		this(name, null);
+		this(name, I18N.message(name));
 	}
 
 	public class ColoredCellFormatter implements CellFormatter {

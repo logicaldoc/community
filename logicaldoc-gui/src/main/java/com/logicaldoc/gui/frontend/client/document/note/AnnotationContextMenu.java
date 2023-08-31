@@ -101,7 +101,7 @@ public class AnnotationContextMenu extends Menu {
 	}
 
 	private MenuItem prepareFillMenuItem() {
-		ColorPickerItem fillColor = ItemFactory.newColorItemPicker("fillColor", I18N.message("color"), note.getColor(),
+		ColorPickerItem fillColor = ItemFactory.newColorPickerItem("fillColor", I18N.message("color"), note.getColor(),
 				false, event -> {
 					note.setColor((String) event.getValue());
 					drawItem.setFillColor((String) event.getValue());
@@ -181,7 +181,7 @@ public class AnnotationContextMenu extends Menu {
 	}
 
 	private MenuItem prepareLineMenuItem() {
-		ColorPickerItem lineColor = ItemFactory.newColorItemPicker("lineColor", I18N.message("color"),
+		ColorPickerItem lineColor = ItemFactory.newColorPickerItem("lineColor", I18N.message("color"),
 				note.getLineColor(), false, event -> {
 					note.setLineColor((String) event.getValue());
 					drawItem.setLineColor((String) event.getValue());

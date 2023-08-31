@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.workflow.designer;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.UsersDS;
@@ -13,11 +11,11 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 
 /**
  * This window contains a form with the main settings of the workflow.
@@ -26,6 +24,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
  * @since 7.0
  */
 public class WorkflowSettings extends Window {
+
+	private static final String COLOR = "color";
 
 	private static final String WORKFLOWDESCR = "workflowdescr";
 
@@ -76,6 +76,10 @@ public class WorkflowSettings extends Window {
 		workflowDescr.setWidth("*");
 		workflowDescr.setColSpan(2);
 
+		ColorPickerItem color = ItemFactory.newColorPickerItem(workflow.getColor(), true, null);
+		color.setWrapTitle(false);
+		color.setEndRow(true);
+
 		Long[] supervisorIds = getSupervisorsIds(workflow);
 		MultiComboBoxItem supervisors = ItemFactory.newMultiComboBoxItem("supervisors", "supervisors",
 				new UsersDS(null, false, false), supervisorIds);
@@ -86,7 +90,7 @@ public class WorkflowSettings extends Window {
 
 		ButtonItem save = prepareSaveButton(workflow, supervisors);
 
-		form.setItems(workflowName, workflowLabel, id, version, workflowDescr, supervisors, save);
+		form.setItems(workflowName, workflowLabel, id, version, workflowDescr, color, supervisors, save);
 		setMembers(form);
 
 		addItem(form);
@@ -95,29 +99,18 @@ public class WorkflowSettings extends Window {
 	private ButtonItem prepareSaveButton(GUIWorkflow workflow, MultiComboBoxItem supervisors) {
 		ButtonItem save = new ButtonItem("save", I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler((ClickEvent event) -> {
-			if (Boolean.FALSE.equals(vm.validate()))
-				return;
-
-			onSave(workflow, supervisors);
+		save.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(vm.validate()))
+				onSave(workflow, supervisors);
 		});
 		save.setDisabled(!workflow.isLatestVersion());
 		return save;
 	}
 
 	private void onSave(GUIWorkflow workflow, MultiComboBoxItem supervisors) {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values =  vm.getValues();
-
-		if (values.get(WORKFLOWDESCR) != null)
-			WorkflowSettings.this.workflow.setDescription(values.get(WORKFLOWDESCR).toString());
-		else
-			WorkflowSettings.this.workflow.setDescription(null);
-
-		if (values.get(WORKFLOW_LABEL) != null)
-			WorkflowSettings.this.workflow.setLabel(values.get(WORKFLOW_LABEL).toString());
-		else
-			WorkflowSettings.this.workflow.setLabel(null);
+		WorkflowSettings.this.workflow.setDescription(vm.getValueAsString(WORKFLOWDESCR));
+		WorkflowSettings.this.workflow.setLabel(vm.getValueAsString(WORKFLOW_LABEL));
+		WorkflowSettings.this.workflow.setColor(vm.getValueAsString(COLOR));
 
 		String[] supervisorIds = supervisors.getValues();
 		GUIUser[] users = new GUIUser[supervisorIds != null ? supervisorIds.length : 0];
