@@ -15,6 +15,7 @@ import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.crypt.CryptUtil;
 
 /**
  * This Authentication provider extends the standard
@@ -85,13 +86,17 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		if (adminPasswd == null || adminPasswd.isEmpty())
 			throw new BadCredentialsException(BADCREDENTIALS);
 
+		// Check the password match with one of the current or legacy algorithm
+		String testLegacy = CryptUtil.cryptStringLegacy(password);
 		user.setDecodedPassword(password);
 
-		if (!user.getPassword().equals(adminPasswd))
+		if (!user.getPassword().equals(adminPasswd) && !testLegacy.equals(adminPasswd))
 			throw new BadCredentialsException(BADCREDENTIALS);
 
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(ADMIN));
+
+		System.out.println("XXXXX");
 
 		// Return an authenticated token, containing user data and
 		// authorities

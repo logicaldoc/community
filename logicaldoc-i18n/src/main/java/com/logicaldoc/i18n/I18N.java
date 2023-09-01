@@ -67,7 +67,15 @@ public class I18N {
 
 		return key;
 	}
+	
+	public static String message(String key, Locale locale, String value1, String value2, String value3) {
+		return message(key, locale, new Object[] { value1, value2, value3 });
+	}
 
+	public static String message(String key, Locale locale, String value1, String value2) {
+		return message(key, locale, new Object[] { value1, value2 });
+	}
+	
 	public static String message(String key, Locale locale, String value) {
 		return message(key, locale, new Object[] { value });
 	}

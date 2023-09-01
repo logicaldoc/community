@@ -53,26 +53,15 @@ public class I18N {
 	}
 
 	public static String message(String key, String val) {
-		return message(key, val, null);
+		return message(key, val, "");
 	}
 
 	public static String message(String key, String val1, String val2) {
-		String tmp = message(key);
+		return message(key, val1, val2, "");
+	}
 
-		if (val1 != null)
-			try {
-				tmp = tmp.replace("{0}", val1);
-			} catch (Exception t) {
-				// Nothing to do
-			}
-
-		if (val2 != null)
-			try {
-				tmp = tmp.replace("{1}", val2);
-			} catch (Exception t) {
-				// Nothing to do
-			}
-		return tmp;
+	public static String message(String key, String val1, String val2, String val3) {
+		return message(key, new String[] { val1, val2, val3 });
 	}
 
 	public static String message(String key, String[] vals) {

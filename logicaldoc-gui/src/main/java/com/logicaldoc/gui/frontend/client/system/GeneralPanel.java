@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.system.plugin.PluginsPanel;
 import com.logicaldoc.gui.frontend.client.system.stats.StatsPanel;
+import com.logicaldoc.gui.frontend.client.system.usage.UsagePanel;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -24,6 +25,13 @@ public class GeneralPanel extends AdminPanel {
 	public void onDraw() {
 		tab.setPane(new StatsPanel());
 
+		Tab usage = new Tab();
+		usage.setTitle(I18N.message("usage"));
+		if (Menu.enabled(Menu.USAGE) && Session.get().isDefaultTenant()) {
+			usage.setPane(new UsagePanel());
+			tabs.addTab(usage);
+		}
+		
 		Tab sessions = new Tab();
 		sessions.setTitle(I18N.message("sessions"));
 		sessions.setPane(new SessionsPanel());
@@ -48,7 +56,7 @@ public class GeneralPanel extends AdminPanel {
 			logs.setPane(new LogPanel("DMS_WEB"));
 			tabs.addTab(logs);
 		}
-		
+
 		Tab environment = new Tab();
 		environment.setTitle(I18N.message("environment"));
 		environment.setPane(new EnvironmentPanel());

@@ -695,7 +695,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public int count(Long tenantId) {
-		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_DEFAULT + " and not(ld_deleted=1) "
+		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_DEFAULT + " and ld_deleted=0 "
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
 
 		try {
@@ -708,7 +708,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public int countGuests(Long tenantId) {
-		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_READONLY + " and not(ld_deleted=1) "
+		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_READONLY + " and ld_deleted=0 "
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
 
 		try {

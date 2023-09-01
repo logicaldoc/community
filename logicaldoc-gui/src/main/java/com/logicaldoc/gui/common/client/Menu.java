@@ -167,6 +167,8 @@ public class Menu {
 
 	public static final long SESSIONS = 1601;
 
+	public static final long USAGE = 1615;
+	
 	public static final long QUOTA = 1700;
 
 	public static final long FORMAT_CONVERTERS = 1750;

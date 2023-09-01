@@ -439,3 +439,13 @@
   background-color: #f0f0f0;
   border: 1px solid #d0d0d0;
 }
+
+.systemusage-low {
+  color: red;
+}
+
+.systemusage-progress-low, .systemusage-progress-lowOver, .systemusage-progressProgress-lowDown, .systemusage-progressProgress-lowSelected {
+  background-color: red;
+  border-radius: 0px;
+  outline: none;
+}
