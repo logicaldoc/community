@@ -15,6 +15,8 @@ public class UtilWorkbench {
 		System.out.println(CryptUtil.cryptString("admin"));
 		
 		System.out.println(DateUtil.truncateToDay(new Date()));
+		
+		System.out.println(StringUtil.printFileSize(205971L*1024*1024));
 
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);

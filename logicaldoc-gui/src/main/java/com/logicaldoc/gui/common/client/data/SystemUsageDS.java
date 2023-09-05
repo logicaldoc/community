@@ -12,7 +12,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 8.8.6
  */
 public class SystemUsageDS extends DataSource {
-	public SystemUsageDS() {
+	public SystemUsageDS(long tenantId) {
 		setTitleField("measure");
 		setRecordXPath("/list/usage");
 
@@ -27,6 +27,6 @@ public class SystemUsageDS extends DataSource {
 
 		setFields(measure, label, max, used, available, use);
 		setClientOnly(true);
-		setDataURL("data/systemusage.xml?locale=" + I18N.getLocale());
+		setDataURL("data/systemusage.xml?locale=" + I18N.getLocale() + "&tenantId=" + tenantId);
 	}
 }

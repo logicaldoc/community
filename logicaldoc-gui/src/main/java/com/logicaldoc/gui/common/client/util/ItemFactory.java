@@ -864,6 +864,10 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newTenantSelector() {
+		return newTenantSelector(false);
+	}
+	
+	public static SelectItem newTenantSelector(boolean appendSystemTenant) {
 		SelectItem tenant = new SelectItem("tenant");
 		tenant.setTitle(I18N.message("tenant"));
 		tenant.setWrapTitle(false);
@@ -878,7 +882,7 @@ public class ItemFactory {
 		tenant.setPickListWidth(300);
 		tenant.setWidth(150);
 		tenant.setPickListFields(id, nname, displayName);
-		tenant.setOptionDataSource(new TenantsDS());
+		tenant.setOptionDataSource(new TenantsDS(appendSystemTenant));
 		tenant.setEmptyDisplayValue(" ");
 		return tenant;
 	}

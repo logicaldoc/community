@@ -14,6 +14,10 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class TenantsDS extends DataSource {
 	public TenantsDS() {
+		this(false);
+	}
+
+	public TenantsDS(boolean appendSystemTenant) {
 		setTitleField("label");
 		setRecordXPath("/list/tenant");
 
@@ -35,7 +39,7 @@ public class TenantsDS extends DataSource {
 
 		setFields(id, name, enabledIcon, enabled, expire, displayName, email, city, country, telephone, postalCode,
 				state, address);
-		setDataURL("data/tenants.xml");
+		setDataURL("data/tenants.xml" + (appendSystemTenant ? "?appendSystemTenant=true" : ""));
 		setClientOnly(true);
 	}
 }

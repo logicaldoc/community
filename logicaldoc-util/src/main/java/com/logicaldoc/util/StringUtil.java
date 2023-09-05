@@ -10,9 +10,12 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -207,11 +210,29 @@ public class StringUtil {
 	 * @return the formatted string
 	 */
 	public static String printFileSize(long size) {
+		return printFileSize(size, Locale.getDefault());
+	}
+
+	/**
+	 * Formats a file size in human readable form (KB, MB, GB, TB)
+	 * 
+	 * @param size the size to format
+	 * @param locale the locale to use for the separators and decimals
+	 * 
+	 * @return the formatted string
+	 */
+	public static String printFileSize(long size, Locale locale) {
 		if (size <= 0)
 			return "0";
 		if (size < 1024)
 			return size + " B";
 		int z = (63 - Long.numberOfLeadingZeros(size)) / 10;
-		return String.format("%.1f %sB", (double) size / (1L << (z * 10)), " KMGTPE".charAt(z));
+		double value = (double) size / (1L << (z * 10));
+
+		DecimalFormat df = new DecimalFormat("##,###.#", new DecimalFormatSymbols(locale));
+		String numberPart = df.format(value);
+
+		// Append the measure unit
+		return numberPart + String.format(" %sB", " KMGTPE".charAt(z));
 	}
 }

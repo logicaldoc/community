@@ -17,14 +17,13 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.6
  */
-public class UsageGrid extends ListGrid {
+public class SystemUsageGrid extends ListGrid {
 
-	
-	public UsageGrid() {
-		this(true);
+	public SystemUsageGrid() {
+		this(true, -1L);
 	}
-	
-	public UsageGrid(boolean withContextMenu) {
+
+	public SystemUsageGrid(boolean withContextMenu, long tenantId) {
 		super();
 
 		setEmptyMessage(I18N.message("notitemstoshow"));
@@ -63,7 +62,7 @@ public class UsageGrid extends ListGrid {
 
 		setFields(label, max, used, available, use, progress);
 
-		setDataSource(new SystemUsageDS());
+		setDataSource(new SystemUsageDS(tenantId));
 
 		if (withContextMenu)
 			addCellContextClickHandler(contextClickEvent -> {
@@ -80,8 +79,9 @@ public class UsageGrid extends ListGrid {
 	private Menu prepateContextMenu() {
 		MenuItem history = new MenuItem();
 		history.setTitle(I18N.message("usagehistory"));
-		history.addClickHandler(event -> new UsageHistoryChart(getSelectedRecord().getAttributeAsString("measure"),
-				getSelectedRecord().getAttributeAsString("label")).show());
+		history.addClickHandler(
+				event -> new SystemUsageHistoryChart(getSelectedRecord().getAttributeAsString("measure"),
+						getSelectedRecord().getAttributeAsString("label")).show());
 
 		Menu contextMenu = new Menu();
 		contextMenu.setItems(history);

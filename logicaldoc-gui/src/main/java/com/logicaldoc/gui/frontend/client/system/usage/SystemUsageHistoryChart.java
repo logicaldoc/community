@@ -18,13 +18,13 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.6
  */
-public class UsageHistoryChart extends Dialog {
+public class SystemUsageHistoryChart extends Dialog {
 
 	private static final int DEFAULT_MONTHS = 24;
 
 	private HTMLPanel html = new HTMLPanel("");
 
-	public UsageHistoryChart(String measure, String label) {
+	public SystemUsageHistoryChart(String measure, String label) {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("usagehistory") + " - " + I18N.message(label));
