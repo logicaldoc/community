@@ -66,7 +66,7 @@ public class SystemUsageGrid extends ListGrid {
 
 		if (withContextMenu)
 			addCellContextClickHandler(contextClickEvent -> {
-				prepateContextMenu().showContextMenu();
+				prepateContextMenu(tenantId).showContextMenu();
 				contextClickEvent.cancel();
 			});
 	}
@@ -76,12 +76,12 @@ public class SystemUsageGrid extends ListGrid {
 	 * 
 	 * @return the prepared context menu
 	 */
-	private Menu prepateContextMenu() {
+	private Menu prepateContextMenu(long tenantId) {
 		MenuItem history = new MenuItem();
 		history.setTitle(I18N.message("usagehistory"));
 		history.addClickHandler(
 				event -> new SystemUsageHistoryChart(getSelectedRecord().getAttributeAsString("measure"),
-						getSelectedRecord().getAttributeAsString("label")).show());
+						getSelectedRecord().getAttributeAsString("label"), tenantId).show());
 
 		Menu contextMenu = new Menu();
 		contextMenu.setItems(history);

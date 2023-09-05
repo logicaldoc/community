@@ -24,7 +24,7 @@ public class SystemUsageHistoryChart extends Dialog {
 
 	private HTMLPanel html = new HTMLPanel("");
 
-	public SystemUsageHistoryChart(String measure, String label) {
+	public SystemUsageHistoryChart(String measure, String label, long tenantId) {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("usagehistory") + " - " + I18N.message(label));
@@ -41,7 +41,7 @@ public class SystemUsageHistoryChart extends Dialog {
 		months.setHint(I18N.message("months").toLowerCase());
 		months.setMin(6);
 		months.setRequired(true);
-		months.addChangedHandler(event -> loadChartImage(measure, Integer.parseInt(event.getValue().toString())));
+		months.addChangedHandler(event -> loadChartImage(measure, tenantId, Integer.parseInt(event.getValue().toString())));
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addFormItem(months);
@@ -49,14 +49,14 @@ public class SystemUsageHistoryChart extends Dialog {
 		addMember(toolStrip);
 		addMember(html);
 
-		loadChartImage(measure, DEFAULT_MONTHS);
+		loadChartImage(measure, tenantId, DEFAULT_MONTHS);
 	}
 
-	private void loadChartImage(String measure, int months) {
+	private void loadChartImage(String measure, long tenantId, int months) {
 		html.setContents(AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("calculatingstatspleasewait")));
 
 		String chartUrl = Util.contextPath() + "systemusagechart?measure=" + measure + "&locale=" + I18N.getLocale()
-				+ "&height=" + (WindowUtils.getHeight() - 100 + "&months=" + months);
+				+ "&height=" + (WindowUtils.getHeight() - 100 + "&months=" + months + "&tenantId=" + tenantId);
 
 		ImageLoader.loadImages(new String[] { chartUrl }, imageElements -> {
 			int width = imageElements[0].getWidth();
