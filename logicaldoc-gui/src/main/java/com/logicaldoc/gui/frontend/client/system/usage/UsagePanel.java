@@ -17,6 +17,6 @@ public class UsagePanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		setMembers(new SystemUsage());
+		setMembers(new UsageGrid());
 	}
 }

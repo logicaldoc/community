@@ -8,6 +8,8 @@ import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 
 /**
  * A grid to display current usage of the system usage
@@ -15,9 +17,14 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.6
  */
-public class SystemUsage extends ListGrid {
+public class UsageGrid extends ListGrid {
 
-	public SystemUsage() {
+	
+	public UsageGrid() {
+		this(true);
+	}
+	
+	public UsageGrid(boolean withContextMenu) {
 		super();
 
 		setEmptyMessage(I18N.message("notitemstoshow"));
@@ -26,10 +33,10 @@ public class SystemUsage extends ListGrid {
 		setShowRecordComponents(true);
 		setShowRecordComponentsByCell(true);
 
-		ListGridField measure = new ListGridField("measure", I18N.message("measure"));
-		measure.setCellFormatter((value, rec, rowNum, colNum) -> stylize(I18N.message(value.toString()), rec));
-		measure.setAutoFitWidth(true);
-		measure.setMinWidth(150);
+		ListGridField label = new ListGridField("label", I18N.message("measure"));
+		label.setCellFormatter((value, rec, rowNum, colNum) -> stylize(I18N.message(value.toString()), rec));
+		label.setAutoFitWidth(true);
+		label.setMinWidth(150);
 
 		ListGridField max = new ListGridField("max", I18N.message("max"));
 		max.setAutoFitWidth(true);
@@ -54,9 +61,32 @@ public class SystemUsage extends ListGrid {
 		ListGridField progress = new ListGridField("progress", I18N.message("progress"));
 		progress.setWidth(200);
 
-		setFields(measure, max, used, available, use, progress);
+		setFields(label, max, used, available, use, progress);
 
 		setDataSource(new SystemUsageDS());
+
+		if (withContextMenu)
+			addCellContextClickHandler(contextClickEvent -> {
+				prepateContextMenu().showContextMenu();
+				contextClickEvent.cancel();
+			});
+	}
+
+	/**
+	 * Prepares the context menu for multiple selection
+	 * 
+	 * @return the prepared context menu
+	 */
+	private Menu prepateContextMenu() {
+		MenuItem history = new MenuItem();
+		history.setTitle(I18N.message("usagehistory"));
+		history.addClickHandler(event -> new UsageHistoryChart(getSelectedRecord().getAttributeAsString("measure"),
+				getSelectedRecord().getAttributeAsString("label")).show());
+
+		Menu contextMenu = new Menu();
+		contextMenu.setItems(history);
+
+		return contextMenu;
 	}
 
 	private String stylize(String value, ListGridRecord rec) {
@@ -83,5 +113,4 @@ public class SystemUsage extends ListGrid {
 			return null;
 		}
 	}
-
 }

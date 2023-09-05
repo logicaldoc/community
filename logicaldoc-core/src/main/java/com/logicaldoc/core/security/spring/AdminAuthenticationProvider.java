@@ -96,8 +96,6 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(ADMIN));
 
-		System.out.println("XXXXX");
-
 		// Return an authenticated token, containing user data and
 		// authorities
 		return new LDAuthenticationToken(user, null, authorities);

@@ -10,7 +10,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.text.DecimalFormat;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -210,8 +209,9 @@ public class StringUtil {
 	public static String printFileSize(long size) {
 		if (size <= 0)
 			return "0";
-		final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
-		int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+		if (size < 1024)
+			return size + " B";
+		int z = (63 - Long.numberOfLeadingZeros(size)) / 10;
+		return String.format("%.1f %sB", (double) size / (1L << (z * 10)), " KMGTPE".charAt(z));
 	}
 }

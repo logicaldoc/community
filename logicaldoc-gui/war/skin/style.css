@@ -444,7 +444,7 @@
   color: red;
 }
 
-.systemusage-progress-low, .systemusage-progress-lowOver, .systemusage-progressProgress-lowDown, .systemusage-progressProgress-lowSelected {
+.systemusage-progress-low, .systemusage-progress-lowOver, .systemusage-progress-lowDown, .systemusage-progressProgress-lowDown, .systemusage-progressProgress-lowSelected {
   background-color: red;
   border-radius: 0px;
   outline: none;

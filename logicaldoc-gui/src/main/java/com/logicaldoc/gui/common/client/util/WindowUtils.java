@@ -76,6 +76,14 @@ public class WindowUtils {
 			$wnd.parent.document.title = title;
 	}-*/;
 
+	public static int getWidth() {
+		return com.google.gwt.user.client.Window.getClientWidth();
+	}
+	
+	public static int getHeight() {
+		return com.google.gwt.user.client.Window.getClientHeight();
+	}
+
 	public static void setTitle(GUIInfo info, String prefix) {
 		String buf = info.getBranding().getProductName() + " " + info.getRelease()
 				+ (info.getLicensee() != null ? " - " + I18N.message("licensedto") + " " + info.getLicensee() : "");

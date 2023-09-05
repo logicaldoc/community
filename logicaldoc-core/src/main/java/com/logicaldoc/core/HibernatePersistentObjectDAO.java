@@ -577,6 +577,35 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
+	public double queryForDouble(String sql) throws PersistenceException {
+		try {
+			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
+			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+			return jdbcTemplate.queryForObject(sql, Double.class);
+		} catch (NullPointerException | EmptyResultDataAccessException e) {
+			return 0D;
+		} catch (Exception e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public double queryForDouble(String sql, Map<String, Object> parameters) throws PersistenceException {
+		if (MapUtils.isEmpty(parameters))
+			return queryForLong(sql);
+
+		try {
+			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
+			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+			return jdbcTemplate.queryForObject(sql, parameters, Double.class);
+		} catch (NullPointerException | EmptyResultDataAccessException e) {
+			return 0D;
+		} catch (Exception e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
 	public String queryForString(String sql) throws PersistenceException {
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);

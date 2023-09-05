@@ -152,7 +152,7 @@ public class User extends PersistentObject implements Serializable {
 
 	private Set<UserGroup> userGroups = new HashSet<>();
 
-	private Date creation;
+	private Date creation = new Date();
 
 	/**
 	 * Description of the grid that displays the list of documents

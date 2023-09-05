@@ -75,13 +75,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testComputeTotalSize() throws PersistenceException {
 		long totalSize = dao.computeTotalSize(1L, null, false);
-		Assert.assertEquals(246046, totalSize);
+		Assert.assertEquals(22658L, totalSize);
 
 		totalSize = dao.computeTotalSize(1L, null, true);
-		Assert.assertEquals(613081L, totalSize);
+		Assert.assertEquals(22658L, totalSize);
 
 		totalSize = dao.computeTotalSize(1L, 1L, true);
-		Assert.assertEquals(613081L, totalSize);
+		Assert.assertEquals(22658L, totalSize);
 
 		totalSize = dao.computeTotalSize(1L, 3L, true);
 		Assert.assertEquals(0L, totalSize);

@@ -633,8 +633,9 @@ public class StatsCollector extends Task {
 
 		stats[4] = 0;
 		try {
-			stats[4] = documentDAO.queryForLong(
-					"SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_status = " + AbstractDocument.DOC_ARCHIVED
+			stats[4] = documentDAO
+					.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_deleted=0 and A.ld_status = "
+							+ AbstractDocument.DOC_ARCHIVED
 							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : ""));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -644,10 +645,11 @@ public class StatsCollector extends Task {
 
 		stats[6] = 0;
 		try {
-			stats[6] = documentDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = "
-					+ AbstractDocument.INDEX_SKIP + " and A.ld_deleted = 0 "
-					+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "") + AND_NOT_A_LD_STATUS
-					+ AbstractDocument.DOC_ARCHIVED);
+			stats[6] = documentDAO
+					.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_deleted = 0 and A.ld_indexed = "
+							+ AbstractDocument.INDEX_SKIP
+							+ (tenantId != Tenant.SYSTEM_ID ? AND_A_LD_TENANTID + tenantId : "") + AND_NOT_A_LD_STATUS
+							+ AbstractDocument.DOC_ARCHIVED);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

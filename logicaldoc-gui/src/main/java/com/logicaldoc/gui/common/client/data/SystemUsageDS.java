@@ -18,12 +18,14 @@ public class SystemUsageDS extends DataSource {
 
 		DataSourceTextField measure = new DataSourceTextField("measure");
 		measure.setPrimaryKey(true);
+		measure.setHidden(true);
+		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField max = new DataSourceTextField("max");
 		DataSourceTextField used = new DataSourceTextField("used");
 		DataSourceTextField available = new DataSourceTextField(I18N.message("available"));
 		DataSourceIntegerField use = new DataSourceIntegerField(I18N.message("use"));
 
-		setFields(measure, max, used, available, use);
+		setFields(measure, label, max, used, available, use);
 		setClientOnly(true);
 		setDataURL("data/systemusage.xml?locale=" + I18N.getLocale());
 	}

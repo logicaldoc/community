@@ -356,6 +356,41 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	public long queryForLong(String sql, Map<String, Object> parameters) throws PersistenceException;
+	
+	/**
+	 * Execute a query that results in a double value, given static SQL. Uses a
+	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
+	 * query with a PreparedStatement, use the overloaded queryForInt method
+	 * with null as argument array. This method is useful for running static SQL
+	 * with a known outcome. The query is expected to be a single row/single
+	 * column query that results in a long value.
+	 * 
+	 * @param sql SQL query to execute
+	 * 
+	 * @return the double value, or 0 in case of SQL NULL
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public double queryForDouble(String sql) throws PersistenceException;
+	
+	/**
+	 * Execute a query that results in a double value, given static SQL. Uses a
+	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
+	 * query with a PreparedStatement, use the overloaded queryForInt method
+	 * with null as argument array. This method is useful for running static SQL
+	 * with a known outcome. The query is expected to be a single row/single
+	 * column query that results in a long value.
+	 * 
+	 * @param sql SQL query to execute (for parameters please use JPA-style:
+	 *        :paramA, :paramB ...)
+	 * @param parameters Parameters used in the where expression (map
+	 *        name-value)
+	 * 
+	 * @return the double value, or 0 in case of SQL NULL
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public double queryForDouble(String sql, Map<String, Object> parameters) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in an string value, given static SQL. Uses a
@@ -468,7 +503,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 
 	/**
 	 * Get the DBMS name currently connected(possible values are: <b>mysql</b>,
-	 * <b>hsqldb</b>, <b>oracle</b>, <b>mssql</b>)
+	 * <b>mariadb</b>, <b>postgresql</b>, <b>hsqldb</b>, <b>oracle</b>,
+	 * <b>mssql</b>)
 	 * 
 	 * @return the database identifier
 	 */
