@@ -136,7 +136,7 @@ public class DocumentsListPanel extends VLayout {
 				grid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) grid) : null);
 		DocumentsDS dataSource = new DocumentsDS(params);
 		grid.fetchNewData(dataSource);
-
+		grid.setCanDrag(folder.isMove());
 	}
 
 	@Override

@@ -462,8 +462,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	public void onFolderSelected(GUIFolder folder) {
 		this.folder = folder;
 		// Reset the cursor to the first page
-		if (listingPanel != null && listingPanel instanceof DocumentsListPanel)
+		if (listingPanel != null && listingPanel instanceof DocumentsListPanel) {
 			((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
+		}
 		refresh();
 	}
 
