@@ -256,7 +256,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		sess.getDictionary().put(USER, user);
 
 		ContextProperties config = Context.get().getProperties();
-		guiUser.setPasswordMinLenght(Integer.parseInt(config.getProperty(sess.getTenantName() + PASSWORD_SIZE)));
+		guiUser.setPasswordMinLenght(config.getInt(sess.getTenantName() + PASSWORD_SIZE, 12));
 
 		return session;
 	}
@@ -518,8 +518,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setTenant(getTenant(user.getTenantId()));
 
 				ContextProperties config = Context.get().getProperties();
-				guiUser.setPasswordMinLenght(
-						Integer.parseInt(config.getProperty(guiUser.getTenant().getName() + PASSWORD_SIZE)));
+				guiUser.setPasswordMinLenght(config.getInt(guiUser.getTenant().getName() + PASSWORD_SIZE, 12));
 
 				loadDashlets(guiUser);
 

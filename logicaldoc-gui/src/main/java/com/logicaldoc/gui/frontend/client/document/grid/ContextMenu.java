@@ -26,10 +26,11 @@ import com.logicaldoc.gui.frontend.client.document.ComparisonWindow;
 import com.logicaldoc.gui.frontend.client.document.ConversionDialog;
 import com.logicaldoc.gui.frontend.client.document.DocumentCheckin;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
-import com.logicaldoc.gui.frontend.client.document.TicketDialog;
 import com.logicaldoc.gui.frontend.client.document.EmailDialog;
 import com.logicaldoc.gui.frontend.client.document.SendToArchiveDialog;
 import com.logicaldoc.gui.frontend.client.document.StartWorkflowDialog;
+import com.logicaldoc.gui.frontend.client.document.TicketDialog;
+import com.logicaldoc.gui.frontend.client.document.reading.ReadingRequestDialog;
 import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignatureDialog;
 import com.logicaldoc.gui.frontend.client.document.split.SplitDialog;
 import com.logicaldoc.gui.frontend.client.document.stamp.StampDialog;
@@ -65,6 +66,8 @@ public class ContextMenu extends Menu {
 	private MenuItem delete;
 
 	private MenuItem sendMail;
+
+	private MenuItem readingRequest;
 
 	private MenuItem links;
 
@@ -218,6 +221,10 @@ public class ContextMenu extends Menu {
 
 		customActionsItem = prepareCustomActionsItem(folder.getId(), selectionIds);
 
+		readingRequest = new MenuItem();
+		readingRequest.setTitle(I18N.message("requestreading"));
+		readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
+
 		setItems(download, preview, cut, copy, rename, delete, bookmark, sendMail, links, office, checkout, checkin,
 				lock, unlock);
 
@@ -234,6 +241,7 @@ public class ContextMenu extends Menu {
 		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
 
 		removeOfficeItem(office);
+
 		addArchiveItem(archive);
 		addCustomActionsItem(customActionsItem);
 
@@ -242,6 +250,7 @@ public class ContextMenu extends Menu {
 		addSignItem(sign, moreMenu);
 		addStampItem(stamp, moreMenu);
 		addSplitItem(split, moreMenu);
+		addReadingRequestItem(readingRequest, moreMenu);
 
 		moreMenu.addItem(merge);
 
@@ -308,6 +317,8 @@ public class ContextMenu extends Menu {
 		workflow.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_WORKFLOW)
 				&& Feature.enabled(Feature.WORKFLOW));
 		replaceAlias.setEnabled(justOneSelected && folder.isWrite() && selection[0].getDocRef() != null);
+		readingRequest.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_EMAIL)
+				&& Feature.enabled(Feature.READING_CONFIRMATION));
 
 		applySplitSecurity(folder, selection, moreSelected, justOneSelected);
 
@@ -401,6 +412,11 @@ public class ContextMenu extends Menu {
 	private void addWorkflowItem(MenuItem startWorkflow, Menu moreMenu) {
 		if (Feature.visible(Feature.WORKFLOW))
 			moreMenu.addItem(startWorkflow);
+	}
+
+	private void addReadingRequestItem(MenuItem readingRequest, Menu moreMenu) {
+		if (Feature.visible(Feature.READING_CONFIRMATION))
+			moreMenu.addItem(readingRequest);
 	}
 
 	private void addSendToArchiveItem(MenuItem sendToExpArchive, Menu moreMenu) {

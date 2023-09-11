@@ -50,7 +50,9 @@ public enum DocumentEvent {
 	COPYED("event.copyed"),
 	ESIGNED("event.esigned"),
 	FORM_SUBMITTED("event.form.submitted"),
-	FORM_EDITED("event.form.edited");
+	FORM_EDITED("event.form.edited"),
+	READING_CONFIRMED("event.reading.confirmed"),
+	READING_REQUESTRED("event.reading.requested");
 	
     private String event;
 

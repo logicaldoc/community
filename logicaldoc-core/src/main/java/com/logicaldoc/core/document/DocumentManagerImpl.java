@@ -1557,8 +1557,10 @@ public class DocumentManagerImpl implements DocumentManager {
 					targetStorage);
 
 			List<Document> documents = documentDAO.findByFolder(folderId, null);
+			
 			for (Document document : documents) {
 				int movedFiles = storer.moveResourcesToStore(document.getId(), targetStorage);
+			
 				if (movedFiles > 0) {
 					totalMovedFiles += movedFiles;
 					try {

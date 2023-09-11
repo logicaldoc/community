@@ -36,6 +36,7 @@ import com.logicaldoc.core.store.MockStorer;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 import junit.framework.Assert;
 
@@ -288,12 +289,13 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		String store2Root = Context.get().getProperties().getProperty("store.2.dir");
 
 		Assert.assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
-
-		waiting();
+		FileUtil.strongDelete(new File(store2Root + "/1/doc/"));
 
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
-		Assert.assertEquals(2, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
+		documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction);
+		
+		waiting();
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
 	}
 

@@ -1,13 +1,17 @@
 package com.logicaldoc.gui.common.client.widgets.preview;
 
+import java.util.List;
+
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
+import com.logicaldoc.gui.common.client.beans.GUIReading;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
@@ -15,6 +19,7 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.MessageLabel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
+import com.logicaldoc.gui.frontend.client.services.ReadingService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -24,6 +29,8 @@ import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel is used to show the document preview.
@@ -59,9 +66,15 @@ public class PreviewPanel extends VLayout {
 
 	protected boolean redrawing = false;
 
+	protected ToolStrip readCompletedToolStrip = new ToolStrip();
+
+	protected ToolStripButton confirmReadingButton = new ToolStripButton(I18N.message("confirmreading"));
+
 	public PreviewPanel(final GUIDocument document) {
 		this.document = document;
 		this.docId = document.getId();
+
+		declareOnReadCompleted(this);
 	}
 
 	@Override
@@ -74,6 +87,28 @@ public class PreviewPanel extends VLayout {
 		DocumentProtectionManager.askForPassword(docId, doc -> onAccessGranted(document));
 
 		addResizedHandler(event -> doResize());
+
+		if (Feature.enabled(Feature.READING_CONFIRMATION) && Session.get().isReadingConfirmRequired(document.getId())) {
+			showConfirmReadingPanel();
+		}
+	}
+
+	private void confirmReading() {
+		readCompletedToolStrip.removeMember(confirmReadingButton);
+
+		ReadingService.Instance.get().confirmReadings(Session.get().getUnconfirmedReadingIds(document.getId()),
+				document.getVersion(), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void v) {
+						Session.get().confirmReading(document.getId());
+						readCompletedToolStrip.addMember(new Label(I18N.message("readingconfirmthanks")));
+					}
+				});
 	}
 
 	protected void onAccessGranted(final GUIDocument document) {
@@ -276,15 +311,15 @@ public class PreviewPanel extends VLayout {
 		return Util.contextPath() + "dicom/index.jsp?input=" + URL.encodeQueryString(
 				Util.downloadURL(docId, document.getFileVersion()) + "&sid=" + Session.get().getSid());
 	}
-	
+
 	protected String htmlUrl() {
 		return Util.downloadURL(docId, document.getFileVersion(), "safe.html", false);
 	}
-	
+
 	protected String mediaUrl() {
 		return Util.downloadURL(docId, document.getFileVersion(), false);
 	}
-	
+
 	protected void clearContent() {
 		if (reload != null) {
 			removeMember(reload);
@@ -337,4 +372,58 @@ public class PreviewPanel extends VLayout {
 		disabled.setShowEdges(false);
 		addMember(disabled);
 	}
+
+	public void onReadCompleted() {
+		if (Feature.enabled(Feature.READING_CONFIRMATION))
+			confirmReadingButton.setDisabled(false);
+	}
+
+	private void showConfirmReadingPanel() {
+		readCompletedToolStrip.setWidth100();
+		readCompletedToolStrip.setAlign(Alignment.RIGHT);
+
+		confirmReadingButton.addClickHandler(event -> confirmReading());
+		confirmReadingButton.setDisabled(true);
+		confirmReadingButton.setTooltip(I18N.message("readalldoctoenablebutton"));
+
+		Label label = new Label(I18N.message("usersrequirereading"));
+		List<GUIReading> unconfirmedReadings = Session.get().getUnconfirmedReadings(document.getId());
+		if (unconfirmedReadings.size() == 1)
+			label = new Label(I18N.message("userrequiresreading", unconfirmedReadings.get(0).getRequestorName()));
+		label.setWrap(false);
+		label.setAlign(Alignment.LEFT);
+
+		StringBuilder sb = new StringBuilder();
+		for (GUIReading reading : unconfirmedReadings) {
+			sb.append("<b>");
+			sb.append(reading.getRequestorName());
+			sb.append("</b>");
+			if (reading.getRequestComment() != null && !reading.getRequestComment().isEmpty()) {
+				sb.append(": ");
+				sb.append(reading.getRequestComment());
+			}
+		}
+		sb.append("<br />");
+		label.setTooltip(sb.toString());
+
+		readCompletedToolStrip.addMember(label);
+		readCompletedToolStrip.addFill();
+		readCompletedToolStrip.addButton(confirmReadingButton);
+
+		redrawing = true;
+		addMember(readCompletedToolStrip, 0);
+		redrawing = false;
+	}
+
+	/**
+	 * Declares the javascript function used to notify when the document has
+	 * been completely read
+	 * 
+	 * @param login the preview panel
+	 */
+	public static native void declareOnReadCompleted(PreviewPanel previewPanel) /*-{
+		$wnd.onReadCompleted = function() {
+			return previewPanel.@com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel::onReadCompleted()();
+		};
+	}-*/;
 }

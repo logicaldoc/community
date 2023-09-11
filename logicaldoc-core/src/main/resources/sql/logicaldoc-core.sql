@@ -176,7 +176,7 @@ create table ld_foldergroup (ld_folderid bigint not null, ld_groupid bigint not 
                              ld_email int not null, ld_automation int not null, ld_storage int not null, constraint PK_LD_FOLDERGROUP primary key (ld_folderid, ld_groupid));
 create table ld_rating (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint not null, 
-                        ld_userid bigint not null, ld_vote int not null, ld_username varchar(255), primary key (ld_id));
+                        ld_userid bigint not null, ld_vote int not null, ld_username varchar(255), primary key (ld_id));                       
 create table ld_note (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                       ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint not null, 
                       ld_username varchar(255), ld_userid bigint, ld_date timestamp, ld_filename varchar(255), 
@@ -202,7 +202,7 @@ create table ld_tenant (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_city varchar(255), ld_country varchar(255), ld_state varchar(255),
                         ld_email varchar(255), ld_telephone varchar(255),
                         ld_maxusers int, ld_maxsessions int, ld_maxrepodocs bigint,
-                        ld_maxreposize bigint, ld_type int not null, ld_creation timestamp not null,
+                        ld_maxreposize bigint, ld_type int not null, ld_creation timestamp,
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_maxguests int, primary key (ld_id));   
 create table ld_sequence (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null,
@@ -313,8 +313,8 @@ create index LD_DEV_USERID on ld_device (ld_userid);
 create index LD_PHIST_USERID on ld_password_history (ld_userid);
 
 
-insert into ld_tenant(ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion)
-values     (1,CURRENT_TIMESTAMP,0,1,'default','Default',0,1,null,1);
+insert into ld_tenant(ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion,ld_creation)
+values     (1,CURRENT_TIMESTAMP,0,1,'default','Default',0,1,null,1,CURRENT_TIMESTAMP);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)

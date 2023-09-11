@@ -75,8 +75,6 @@ public class EmailDialog extends AbstractEmailDialog {
 
 							@Override
 							public void onSuccess(GUIMessageTemplate t) {
-								GuiLog.info(t.getSubject());
-
 								subject.setValue(t.getSubject());
 								message.setValue(t.getBody());
 								updateSignature();

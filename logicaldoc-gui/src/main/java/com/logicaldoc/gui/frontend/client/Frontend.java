@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
+import com.logicaldoc.gui.common.client.beans.GUIReading;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -23,6 +24,7 @@ import com.logicaldoc.gui.common.client.websockets.WebSocketListener;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
+import com.logicaldoc.gui.frontend.client.services.ReadingService;
 import com.smartgwt.client.types.EdgeName;
 import com.smartgwt.client.types.MultiMessageMode;
 import com.smartgwt.client.types.NotifyTransition;
@@ -113,7 +115,23 @@ public class Frontend implements EntryPoint {
 									session.getInfo().setUserNo(info.getUserNo());
 									init(session.getInfo());
 									Session.get().init(session);
-									showMain();
+
+									if (Feature.enabled(Feature.READING_CONFIRMATION)) {
+										ReadingService.Instance.get()
+												.getUnconfimedReadings(new AsyncCallback<GUIReading[]>() {
+													@Override
+													public void onFailure(Throwable caught) {
+														showMain();
+													}
+
+													@Override
+													public void onSuccess(GUIReading[] unconfirmedReadings) {
+														Session.get().addUnconfirmedReadings(unconfirmedReadings);
+														showMain();
+													}
+												});
+									}
+
 									connectWebsockets();
 									declareReloadTrigger(Frontend.this);
 								}

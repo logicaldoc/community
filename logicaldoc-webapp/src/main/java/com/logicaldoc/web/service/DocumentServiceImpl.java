@@ -767,8 +767,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return document;
 	}
 
-	public GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser)
-			throws PersistenceException {
+	public GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser) throws PersistenceException {
 		boolean isFolder = doc.getType() != null && doc.getType().startsWith("folder");
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		if (doc.getId() != 0L && !isFolder)

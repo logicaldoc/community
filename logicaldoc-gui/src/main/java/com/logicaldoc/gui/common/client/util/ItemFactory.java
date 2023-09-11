@@ -944,6 +944,10 @@ public class ItemFactory {
 		item.setTitle(I18N.message(title));
 		return item;
 	}
+	
+	public static CheckboxItem newCheckbox(String name) {
+		return newCheckbox(name, name);
+	}
 
 	public static MultiComboBoxItem newMultiComboBoxItem(String name, String title, DataSource options,
 			Object[] values) {

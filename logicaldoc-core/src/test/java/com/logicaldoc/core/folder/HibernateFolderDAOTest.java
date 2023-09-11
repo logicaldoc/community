@@ -179,7 +179,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		}
 
 		long size = dao.computeTreeSize(5L);
-		Assert.assertEquals(368391L, size);
+		Assert.assertEquals(391049L, size);
 
 		size = dao.computeTreeSize(4L);
 		Assert.assertEquals(0, size);

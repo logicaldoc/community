@@ -159,8 +159,10 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (allowTemplateSelection)
 			addMember(templateForm);
 
-		if (Feature.enabled(Feature.TEMPLATE))
+		if (Feature.enabled(Feature.TEMPLATE)) {
 			prepareExtendedAttributes(object.getTemplateId());
+			handleTemplateChangedSelection(null);
+		}
 	}
 
 	private void putCustomIdField() {
@@ -177,7 +179,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		Object templateValue = templateItem.getValue();
 		if (templateValue != null && !"".equals(templateValue.toString())) {
 			object.setAttributes(new GUIAttribute[0]);
-			long templateId = Long.parseLong(event.getValue().toString());
+			long templateId = Long.parseLong(templateValue.toString());
 			prepareExtendedAttributes(templateId);
 			object.setTemplateId(templateId);
 		} else {

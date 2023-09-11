@@ -11,9 +11,9 @@ import com.smartgwt.client.data.DataSource;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class DcoumentHistoryPanel extends DocumentDetailTab {
+public class DocumentHistoryPanel extends DocumentDetailTab {
 
-	public DcoumentHistoryPanel(final GUIDocument document) {
+	public DocumentHistoryPanel(final GUIDocument document) {
 		super(document, null);
 	}
 

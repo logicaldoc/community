@@ -19,6 +19,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class SystemUsageGrid extends ListGrid {
 
+	private static final String PROGRESS = "progress";
+
 	public SystemUsageGrid() {
 		this(true, -1L);
 	}
@@ -57,7 +59,7 @@ public class SystemUsageGrid extends ListGrid {
 		use.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		use.setCellFormatter((value, rec, rowNum, colNum) -> stylize(value + "%", rec));
 
-		ListGridField progress = new ListGridField("progress", I18N.message("progress"));
+		ListGridField progress = new ListGridField(PROGRESS, I18N.message(PROGRESS));
 		progress.setWidth(200);
 
 		setFields(label, max, used, available, use, progress);
@@ -100,7 +102,7 @@ public class SystemUsageGrid extends ListGrid {
 	@Override
 	protected Canvas createRecordComponent(final ListGridRecord rec, Integer colNum) {
 		String fieldName = this.getFieldName(colNum);
-		if (fieldName.equals("progress")) {
+		if (fieldName.equals(PROGRESS)) {
 			Progressbar prgBar = new Progressbar();
 			prgBar.setLength(200);
 			prgBar.setBreadth(15);

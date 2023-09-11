@@ -20,7 +20,7 @@
 				<echo message="Deploying into @{webroot}" />
 				<unzip
 					src="target/${pom.artifactId}-${pom.version}-plugin.zip"
-					dest="@{webroot}" />
+					dest="@{webroot}" overwrite="true"/>
 
 				<copy todir="@{webroot}/fontawesome" overwrite="true"
 					failonerror="false">
@@ -38,7 +38,7 @@
 		<for list="${logicaldoc.webroot}" param="webroot">
 			<sequential>
 				<echo message="Deploying resources into @{webroot}" />
-				<copy todir="@{webroot}">
+				<copy todir="@{webroot}" overwrite="true">
 					<fileset dir="war">
 						<exclude name="fontawesome/" />
 						<!-- exclude name="frontend/ace/**" />

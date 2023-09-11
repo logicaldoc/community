@@ -227,7 +227,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		 */
 		GUIInfo info = new GUIInfo();
 		info.setTenant(tenant);
-		info.setSessionHeartbeat(Integer.parseInt(config.getProperty(tname + ".session.heartbeat")));
+		info.setSessionHeartbeat(config.getInt(tname + ".session.heartbeat", 60));
 
 		SystemInfo inf = SystemInfo.get(tenant.getId());
 		info.setLicensee(inf.getLicensee());

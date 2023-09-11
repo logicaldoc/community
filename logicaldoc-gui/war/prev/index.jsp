@@ -85,6 +85,21 @@
     <script>
         var pdfUrl='<%=request.getContextPath()%>/<%=path%>?<%=query%>';
                 
+        var visitedPages = new Set();
+        
+        var readCompleted = false;
+                
+        function checkReadCompleted() {
+            if(!readCompleted && PDFViewerApplication.pdfViewer.pdfDocument.numPages == visitedPages.size){
+                   if (typeof onReadCompleted === "function") {
+                     window.onReadCompleted();
+                   } else {
+                     parent.window.onReadCompleted();
+                   }
+                   readCompleted = true;
+            }            
+        }        
+                
         window.addEventListener('load', function() {
           // PDFViewerApplication.appConfig.toolbar.viewBookmark;
           // PDFViewerApplication.appConfig.secondaryToolbar;
@@ -93,8 +108,42 @@
           // PDFViewerApplication._initializeL10n
           // PDFViewerApplication.preferences.set('pdfBugEnabled', true);
 
-          PDFViewerApplication.open(pdfUrl);   
+            
+            PDFViewerApplication.initializedPromise.then(() => {
+                PDFViewerApplication.eventBus.on("documentloaded", (e) => {
+                console.log("The document has now been loaded");
+                console.log('total pages:' + PDFViewerApplication.pdfViewer.pdfDocument.numPages);
+   
+                if(!visitedPages.has(1))
+                    visitedPages.add(1);
+                
+                checkReadCompleted();
+            });
+
+            PDFViewerApplication.eventBus.on("pagechanging", (e) => {
+                console.log('pagechanging, from ' + e.previous + ' to ' + e.pageNumber);
+                
+                if(!visitedPages.has(e.previous))
+                    visitedPages.add(e.previous);
+                if(!visitedPages.has(pageNumber))
+                    visitedPages.add(e.pageNumber);
+                    
+                console.log('visited pages: ' + visitedPages.size);
+            
+                checkReadCompleted();
+            });
+
+            PDFViewerApplication.eventBus.on("scalechanging", (e) => {
+                console.log('scalechanging, scale ' + e.scale);
+            });
+          });
+
+          PDFViewerApplication.open(pdfUrl);
+          
         });
+        
+        
+        
     </script>
     
     <style>
@@ -153,7 +202,7 @@
       <div id="mainContainer">
         <div class="findbar hidden doorHanger" id="findbar">
           <div id="findbarInputContainer">
-            <input id="findInput" class="toolbarField" title="Find" placeholder="Find in documentâ€¦" tabindex="91" data-l10n-id="find_input">
+            <input id="findInput" class="toolbarField" title="Find" placeholder="Find in document…" tabindex="91" data-l10n-id="find_input">
             <div class="splitToolbarButton">
               <button id="findPrevious" class="toolbarButton findPrevious" title="Find the previous occurrence of the phrase" tabindex="92" data-l10n-id="find_previous">
                 <span data-l10n-id="find_previous_label">Previous</span>
@@ -257,8 +306,8 @@
 
             <div class="horizontalToolbarSeparator spreadModeButtons"></div>
 
-            <button id="documentProperties" class="secondaryToolbarButton documentProperties" title="Document Propertiesâ€¦" tabindex="68" data-l10n-id="document_properties">
-              <span data-l10n-id="document_properties_label">Document Propertiesâ€¦</span>
+            <button id="documentProperties" class="secondaryToolbarButton documentProperties" title="Document Properties…" tabindex="68" data-l10n-id="document_properties">
+              <span data-l10n-id="document_properties_label">Document Properties…</span>
             </button>
           </div>
         </div>  <!-- secondaryToolbar -->
@@ -444,7 +493,7 @@
         <div id="printServiceOverlay" class="container hidden">
           <div class="dialog">
             <div class="row">
-              <span data-l10n-id="print_progress_message">Preparing document for printingâ€¦</span>
+              <span data-l10n-id="print_progress_message">Preparing document for printing…</span>
             </div>
             <div class="row">
               <progress value="0" max="100"></progress>
@@ -480,4 +529,3 @@
 	document.getElementById("secondaryPrint").style.display = 'none';
 </script>
 <% } %>
-

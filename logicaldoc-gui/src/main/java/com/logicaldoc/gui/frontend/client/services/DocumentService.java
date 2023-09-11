@@ -296,7 +296,7 @@ public interface DocumentService extends RemoteService {
 	 * Creates a download ticket
 	 * 
 	 * @param docId identifier of the document
-	 * @param type the ticket type (0='download'  2='view')
+	 * @param type the ticket type (0='download' 2='view')
 	 * @param suffix the suffix(null or 'pdf')
 	 * @param expireHours how many validity hours
 	 * @param expireDate the exact expiration date
@@ -689,6 +689,7 @@ public interface DocumentService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIDocument merge(Long[] docIds, long targetFolderId, String fileName) throws ServerException;
+
 
 	/**
 	 * Counts the pages of a document and updates the DB.

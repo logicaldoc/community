@@ -53,19 +53,7 @@ public class SystemMenu extends VLayout {
 
 		Button updates = addUpdatesButton();
 
-		Button confirmUpdate = addConfirmUpdate(updates);
-
-		if ((Feature.enabled(Feature.UPDATES) || Feature.enabled(Feature.PATCHES))
-				&& Menu.enabled(Menu.UPDATES_AND_PATCHES) && Session.get().isDefaultTenant()) {
-			String runlevel = Session.get().getConfig("runlevel");
-			if ("updated".equals(runlevel)) {
-				confirmUpdate.setVisible(true);
-				updates.setVisible(false);
-			} else {
-				updates.setVisible(true);
-				confirmUpdate.setVisible(false);
-			}
-		}
+		addConfirmUpdate(updates);
 
 		addLicenseButton();
 
@@ -126,7 +114,7 @@ public class SystemMenu extends VLayout {
 		license.setVisible(Session.get().isDefaultTenant());
 	}
 
-	private Button addConfirmUpdate(Button updates) {
+	private void addConfirmUpdate(Button updatesButton) {
 		Button confirmUpdate = new Button(
 				"<span style='color:red;'><b>" + I18N.message("confirmupdate") + "</b></span>");
 		confirmUpdate.setWidth100();
@@ -142,14 +130,25 @@ public class SystemMenu extends VLayout {
 			public void onSuccess(Void arg) {
 				Session.get().getInfo().setConfig("runlevel", "default");
 				confirmUpdate.setVisible(false);
-				updates.setVisible(true);
+				updatesButton.setVisible(true);
 
 				SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
 			}
 		}));
-		addMember(confirmUpdate);
-		confirmUpdate.setVisible(Session.get().isDefaultTenant());
-		return confirmUpdate;
+
+		if ((Feature.enabled(Feature.UPDATES) || Feature.enabled(Feature.PATCHES))
+				&& Menu.enabled(Menu.UPDATES_AND_PATCHES) && Session.get().isDefaultTenant()) {
+			addMember(confirmUpdate);
+
+			String runlevel = Session.get().getConfig("runlevel");
+			if ("updated".equals(runlevel)) {
+				confirmUpdate.setVisible(true);
+				updatesButton.setVisible(false);
+			} else {
+				updatesButton.setVisible(true);
+				confirmUpdate.setVisible(false);
+			}
+		}
 	}
 
 	private Button addUpdatesButton() {

@@ -41,7 +41,8 @@ public class SystemUsageHistoryChart extends Dialog {
 		months.setHint(I18N.message("months").toLowerCase());
 		months.setMin(6);
 		months.setRequired(true);
-		months.addChangedHandler(event -> loadChartImage(measure, tenantId, Integer.parseInt(event.getValue().toString())));
+		months.addChangedHandler(
+				event -> loadChartImage(measure, tenantId, Integer.parseInt(event.getValue().toString())));
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.addFormItem(months);
@@ -61,9 +62,7 @@ public class SystemUsageHistoryChart extends Dialog {
 		ImageLoader.loadImages(new String[] { chartUrl }, imageElements -> {
 			int width = imageElements[0].getWidth();
 			int height = imageElements[0].getHeight();
-			html.setContents("<div style='overflow:scroll; border: 1px solid green' width='" + width + "px' height='"
-					+ height + "px' ><img src='" + chartUrl + "' width='" + width + "' height='" + height
-					+ "' /></div>");
+			html.setContents("<img src='" + chartUrl + "' width='" + width + "' height='" + height + "' />");
 			html.setWidth100();
 			html.setHeight100();
 		});

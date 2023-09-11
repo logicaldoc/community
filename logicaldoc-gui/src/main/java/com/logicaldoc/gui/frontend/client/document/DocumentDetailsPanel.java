@@ -72,7 +72,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected VersionsPanel versionsPanel;
 
-	protected DcoumentHistoryPanel historyPanel;
+	protected DocumentHistoryPanel historyPanel;
 
 	protected DigitalSignaturePanel signaturePanel;
 
@@ -484,7 +484,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				historyTabPanel.removeMember(historyPanel);
 		}
 		try {
-			historyPanel = new DcoumentHistoryPanel(document);
+			historyPanel = new DocumentHistoryPanel(document);
 			historyTabPanel.addMember(historyPanel);
 		} catch (Exception t) {
 			// Nothing to do

@@ -51,4 +51,11 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 		// Store the file of document 3
 		FileUtil.copyResource("/small.pdf", new File(storePath + "/3/doc/1.3"));
 	}
+
+	@Override
+	public void tearDown() throws SQLException {
+		super.tearDown();
+		FileUtil.strongDelete(new File("target/store"));
+		FileUtil.strongDelete(new File("target/store2"));
+	}
 }

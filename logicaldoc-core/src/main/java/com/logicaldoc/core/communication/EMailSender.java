@@ -328,8 +328,6 @@ public class EMailSender {
 
 		message.setContent(mpMessage);
 
-		Transport trans = buildTransport(sess);
-
 		Address[] adr = message.getAllRecipients();
 
 		MailDateFormat formatter = new MailDateFormat();
@@ -338,10 +336,17 @@ public class EMailSender {
 		Date now = new Date();
 		message.setHeader("Date", formatter.format(now));
 
-		trans.sendMessage(message, adr);
-		trans.close();
+		if (!Context.get().getProperties().getBoolean("smtp.nosend", false)) {
+			Transport trans = buildTransport(sess);
+			trans.sendMessage(message, adr);
+			trans.close();
 
-		log.info("Sent email with subject '{}' to recipients {}", email.getSubject(), email.getAllRecipientsEmails());
+			log.info("Sent email with subject '{}' to recipients {}", email.getSubject(),
+					email.getAllRecipientsEmails());
+		} else {
+			log.info("Email with subject '{}' not sent because of the config parameter smtp.nosend", email.getSubject(),
+					email.getAllRecipientsEmails());
+		}
 
 		/*
 		 * If the case, we save the email as document in LogicalDOC's repository

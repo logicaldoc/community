@@ -215,6 +215,8 @@ public class Feature {
 	public static final int DIGITAL_SIGNATURE_CLIENT = 100;
 	
 	public static final int VIEW_TICKET = 101;
+	
+	public static final int READING_CONFIRMATION = 102;
 
 	private static Set<String> features = new HashSet<>();
 
