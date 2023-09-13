@@ -228,6 +228,12 @@ public class MainPanel extends VLayout implements SessionObserver {
 		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR);
 		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR);
 	}
+	
+	public void selectReadingsTab() {
+		selectDashboardTab();
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.READINGREQUESTS);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.READINGREQUESTS);
+	}
 
 	public boolean isOnDocumentsTab() {
 		return DOCUMENT.equals(tabSet.getSelectedTab().getName());

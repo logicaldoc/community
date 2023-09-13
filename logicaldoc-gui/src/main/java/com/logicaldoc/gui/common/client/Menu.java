@@ -99,6 +99,8 @@ public class Menu {
 	
 	public static final long DASHBOARD_WORKFLOW_WORKFLOWSYOUSUPERVISE = 1583;
 
+	public static final long DASHBOARD_READINGS = 1590;
+	
 	public static final long BARCODES = 30;
 
 	public static final long REPORTS = 90;

@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.common.client.observer;
+package com.logicaldoc.gui.common.client.controllers;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 

@@ -91,10 +91,10 @@
                 
         function checkReadCompleted() {
             if(!readCompleted && PDFViewerApplication.pdfViewer.pdfDocument.numPages == visitedPages.size){
-                   if (typeof onReadCompleted === "function") {
-                     window.onReadCompleted();
+                   if (typeof onReadingCompleted === "function") {
+                     window.onReadingCompleted();
                    } else {
-                     parent.window.onReadCompleted();
+                     parent.window.onReadingCompleted();
                    }
                    readCompleted = true;
             }            

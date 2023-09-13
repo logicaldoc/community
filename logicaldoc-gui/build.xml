@@ -38,7 +38,7 @@
 		<for list="${logicaldoc.webroot}" param="webroot">
 			<sequential>
 				<echo message="Deploying resources into @{webroot}" />
-				<copy todir="@{webroot}" overwrite="true">
+				<copy todir="@{webroot}" >
 					<fileset dir="war">
 						<exclude name="fontawesome/" />
 						<!-- exclude name="frontend/ace/**" />

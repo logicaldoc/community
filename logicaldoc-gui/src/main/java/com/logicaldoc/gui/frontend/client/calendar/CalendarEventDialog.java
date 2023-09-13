@@ -38,7 +38,6 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
@@ -426,7 +425,7 @@ public class CalendarEventDialog extends Window {
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler((MenuItemClickEvent event) -> {
+		preview.addClickHandler(event -> {
 			// Detect the selected rec
 			ListGridRecord selection = documentsGrid.getSelectedRecord();
 
@@ -451,7 +450,7 @@ public class CalendarEventDialog extends Window {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message(DDELETE));
-		delete.addClickHandler((MenuItemClickEvent event) -> {
+		delete.addClickHandler(event -> {
 			// Detect selected records
 			ListGridRecord[] selection = documentsGrid.getSelectedRecords();
 			if (selection.length > 0) {
@@ -464,7 +463,7 @@ public class CalendarEventDialog extends Window {
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+		openInFolder.addClickHandler(event -> {
 			ListGridRecord selection = documentsGrid.getSelectedRecord();
 			DocumentsPanel.get().openInFolder(Long.parseLong(selection.getAttributeAsString(FOLDER_ID)),
 					Long.parseLong(selection.getAttributeAsString("id")));
@@ -485,7 +484,7 @@ public class CalendarEventDialog extends Window {
 
 		IButton addDocuments = new IButton();
 		addDocuments.setTitle(I18N.message("adddocuments"));
-		addDocuments.addClickHandler((ClickEvent event) -> {
+		addDocuments.addClickHandler(event -> {
 			Clipboard clipboard = Clipboard.getInstance();
 			if (clipboard.isEmpty()) {
 				SC.warn(I18N.message("nodocsinclipboard"));

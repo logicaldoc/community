@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIReading;
+import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 
 /**
  * The client side stub for the Reading Service. This service allows the reading
@@ -15,8 +15,8 @@ import com.logicaldoc.gui.common.client.beans.GUIReading;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.6
  */
-@RemoteServiceRelativePath("reading")
-public interface ReadingService extends RemoteService {
+@RemoteServiceRelativePath("readingrequest")
+public interface ReadingRequestService extends RemoteService {
 
 	/**
 	 * Asks some users to confirm the reading of a set of documents
@@ -41,21 +41,39 @@ public interface ReadingService extends RemoteService {
 	public void confirmReadings(long[] readingIds, String version) throws ServerException;
 	
 	/**
+	 * Deletes a reading request.
+	 * 
+	 * @param readingId identifier of the reading request to delete
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void delete(long readingId) throws ServerException;
+
+	/**
+	 * Notifies again a reading request.
+	 * 
+	 * @param readingId identifier of the reading request to notify
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void notityReadingRequest(long readingId) throws ServerException;
+	
+	/**
 	 * Retrieves all the unconfirmed readings by the current user
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIReading[] getUnconfimedReadings() throws ServerException;
+	public GUIReadingRequest[] getUnconfimedReadings() throws ServerException;
 
 	public static class Instance {
-		private static ReadingServiceAsync inst;
+		private static ReadingRequestServiceAsync inst;
 
 		private Instance() {
 		}
 
-		public static ReadingServiceAsync get() {
+		public static ReadingRequestServiceAsync get() {
 			if (inst == null) {
-				inst = GWT.create(ReadingService.class);
+				inst = GWT.create(ReadingRequestService.class);
 				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return inst;

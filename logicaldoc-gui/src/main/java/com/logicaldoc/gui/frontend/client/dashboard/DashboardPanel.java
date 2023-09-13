@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.calendar.UserCalendarPanel;
 import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatPanel;
+import com.logicaldoc.gui.frontend.client.dashboard.reading.ReadingRequestsPanel;
 import com.logicaldoc.gui.frontend.client.workflow.WorkflowDashboard;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -19,6 +20,8 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 6.0
  */
 public class DashboardPanel extends VLayout {
+
+	public static final String READINGREQUESTS = "readingrequests";
 
 	public static final String WORKFLOW = "workflow";
 
@@ -47,6 +50,8 @@ public class DashboardPanel extends VLayout {
 	private Tab tagsTab = null;
 
 	private Tab chatTab = null;
+
+	private Tab readingsTab = null;
 
 	private String defaultOpenTab = USER_ID;
 
@@ -84,6 +89,10 @@ public class DashboardPanel extends VLayout {
 		calendarTab.setID(CALENDAR);
 		calendarTab.setPane(UserCalendarPanel.get());
 
+		readingsTab = new Tab(I18N.message(READINGREQUESTS));
+		readingsTab.setID(READINGREQUESTS);
+		readingsTab.setPane(ReadingRequestsPanel.get());
+
 		tabSet.addTab(userTab);
 
 		addTagsTab();
@@ -96,9 +105,19 @@ public class DashboardPanel extends VLayout {
 
 		addWorkflowTab();
 
+		addReadingsTab();
+
 		setMembers(tabSet);
 
 		tabSet.selectTab(defaultOpenTab);
+	}
+
+	private void addReadingsTab() {
+		if (Feature.visible(Feature.READING_CONFIRMATION) && Menu.enabled(Menu.DASHBOARD_READINGS)) {
+			tabSet.addTab(readingsTab);
+			if (!Feature.enabled(Feature.READING_CONFIRMATION))
+				readingsTab.setPane(new FeatureDisabled());
+		}
 	}
 
 	private void addWorkflowTab() {
@@ -193,6 +212,11 @@ public class DashboardPanel extends VLayout {
 	public void updateWorkflowTab() {
 		tabSet.setTabPane(WORKFLOW, new WorkflowDashboard());
 		tabSet.selectTab(WORKFLOW);
+	}
+
+	public void updateReadingsTab() {
+		tabSet.setTabPane(READINGREQUESTS, new WorkflowDashboard());
+		tabSet.selectTab(READINGREQUESTS);
 	}
 
 	public String getDefaultOpenTab() {

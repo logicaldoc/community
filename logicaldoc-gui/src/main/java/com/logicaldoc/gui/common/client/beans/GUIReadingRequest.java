@@ -10,12 +10,12 @@ import java.util.Date;
  * 
  * @since 8.8.6
  */
-public class GUIReading implements Serializable {
+public class GUIReadingRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private long id;
-	
+
 	private Date creation = new Date();
 
 	private long docId;
@@ -36,7 +36,7 @@ public class GUIReading implements Serializable {
 
 	private String requestorName = "";
 
-	private boolean confirmed = false;
+	private Date confirmed;
 
 	private int alertConfirmation = 1;
 
@@ -122,7 +122,6 @@ public class GUIReading implements Serializable {
 		this.requestorName = requestorName;
 	}
 
-
 	public int getAlertConfirmation() {
 		return alertConfirmation;
 	}
@@ -163,17 +162,17 @@ public class GUIReading implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		GUIReading other = (GUIReading) obj;
+		GUIReadingRequest other = (GUIReadingRequest) obj;
 		if (id != other.id)
 			return false;
 		return true;
 	}
 
-	public boolean isConfirmed() {
+	public Date getConfirmed() {
 		return confirmed;
 	}
 
-	public void setConfirmed(boolean confirmed) {
+	public void setConfirmed(Date confirmed) {
 		this.confirmed = confirmed;
 	}
 }

@@ -65,6 +65,7 @@ public class EventEndpoint implements EventListener {
 			DocumentEvent.DELETED.toString(), DocumentEvent.RENAMED.toString(), DocumentEvent.INDEXED.toString(),
 			DocumentEvent.RESTORED.toString(), DocumentEvent.PASSWORD_PROTECTED.toString(),
 			DocumentEvent.MOVED.toString(), DocumentEvent.PASSWORD_UNPROTECTED.toString(),
+			DocumentEvent.READING_CONFIRMED.toString(), DocumentEvent.READING_REQUESTRED.toString(),
 			FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(), FolderEvent.CHANGED.toString(),
 			FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(), UserEvent.MESSAGE_RECEIVED.toString(),
 			UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(), UserEvent.TIMEOUT.toString(),

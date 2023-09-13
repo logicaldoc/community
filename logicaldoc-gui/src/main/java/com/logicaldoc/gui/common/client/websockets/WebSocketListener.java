@@ -11,6 +11,7 @@ import org.realityforge.gwt.websockets.client.WebSocket;
 import org.realityforge.gwt.websockets.client.WebSocketListenerAdapter;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.client.rpc.SerializationStreamFactory;
 import com.google.gwt.user.client.rpc.SerializationStreamReader;
@@ -18,14 +19,17 @@ import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
+import com.logicaldoc.gui.common.client.controllers.DocumentController;
+import com.logicaldoc.gui.common.client.controllers.FolderController;
+import com.logicaldoc.gui.common.client.controllers.ReadingRequestController;
+import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.observer.DocumentController;
-import com.logicaldoc.gui.common.client.observer.FolderController;
-import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.util.LimitedQueue;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatController;
+import com.logicaldoc.gui.frontend.client.services.ReadingRequestService;
 import com.smartgwt.client.types.EdgeName;
 import com.smartgwt.client.widgets.notify.Notify;
 import com.smartgwt.client.widgets.notify.NotifySettings;
@@ -52,7 +56,8 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 				"event.password.protected", "event.password.unprotected", "event.stored", "event.moved",
 				"event.deleted", "event.folder.renamed", "event.folder.changed", "event.folder.deleted",
 				"event.folder.created", "event.folder.moved", "event.workflowstatus", "event.user.messagereceived",
-				"event.chat.newmessage", "event.user.login", "event.user.logout", "event.user.timeout", COMMAND));
+				"event.chat.newmessage", "event.user.login", "event.user.logout", "event.user.timeout",
+				"event.reading.confirmed", "event.reading.requested", COMMAND));
 	}
 
 	/**
@@ -145,6 +150,24 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 			UserController.get().loggedOut(event.getUsername());
 		} else if ("event.chat.newmessage".equals(event.getEvent())) {
 			ChatController.get().newMessage(event.getId(), event.getDate(), event.getUsername(), event.getComment());
+		} else if ("event.reading.confirmed".equals(event.getEvent())) {
+			ReadingRequestController.get().confirmReading(event.getDocId());
+		} else if ("event.reading.requested".equals(event.getEvent())) {
+			String recipient = event.getComment().substring(event.getComment().indexOf(':') + 1).trim();
+			if (Session.get().getUser().getUsername().equals(recipient)) {
+				ReadingRequestService.Instance.get().getUnconfimedReadings(new AsyncCallback<GUIReadingRequest[]>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIReadingRequest[] readings) {
+						ReadingRequestController.get().addUnconfirmedReadings(readings);
+					}
+				});
+			}
 		} else if (isCommandEvent(event)) {
 			processCommand(event);
 		}

@@ -35,6 +35,7 @@ public class DocumentsPreviewPanel extends VLayout {
 		this.widthCookieName = widthCookieName;
 		setAlign(Alignment.CENTER);
 		selectLabel = new Label("&nbsp;" + selectLabelString);
+		selectLabel.setAlign(Alignment.CENTER);
 		selectLabel.setOverflow(Overflow.HIDDEN);
 
 		setInitialSize();
@@ -55,8 +56,9 @@ public class DocumentsPreviewPanel extends VLayout {
 
 			child = new com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel(document);
 			addMember(child);
-		} else
+		} else {
 			reset();
+		}
 	}
 
 	public void reset() {

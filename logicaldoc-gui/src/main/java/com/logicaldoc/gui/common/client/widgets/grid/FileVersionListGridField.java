@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.widgets.grid;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 
 /**
  * A field to display a file name with icon
@@ -22,7 +23,8 @@ public class FileVersionListGridField extends ColoredListGridField {
 	public FileVersionListGridField(String name, String title) {
 		super(name, I18N.message(title));
 		setAutoFitWidth(true);
-		setMinWidth(50);
+		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		setMinWidth(55);
 		setAlign(Alignment.CENTER);
 	}
 }

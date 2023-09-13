@@ -110,7 +110,7 @@ public class EventCollector {
 			clone.setStatus(history.getDocument().getStatus());
 			history.setDocument(clone);
 		}
-
+		
 		Runnable notifier = () -> {
 				log.debug("Notify history {}", history);
 				for (EventListener listener : listeners) {

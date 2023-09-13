@@ -20,6 +20,8 @@ public class CookiesManager {
 
 	public static final String COOKIE_DOCSLIST_PREV_W = "ldoc-docslist-prev-w";
 
+	public static final String COOKIE_READINGS_PREV_W = "ldoc-readings-prev-w";
+
 	public static final String COOKIE_DOCSMENU_W = "ldoc-docsmenu-w";
 
 	public static final String COOKIE_SAVELOGIN = "ldoc-savelogin";
@@ -83,6 +85,12 @@ public class CookiesManager {
 
 		try {
 			Offline.remove(COOKIE_DOCSLIST_PREV_W);
+		} catch (Exception t) {
+			// Nothing to do
+		}
+
+		try {
+			Offline.remove(COOKIE_READINGS_PREV_W);
 		} catch (Exception t) {
 			// Nothing to do
 		}

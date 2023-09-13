@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.StickyWindow;
 import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
-import com.logicaldoc.gui.frontend.client.services.ReadingService;
+import com.logicaldoc.gui.frontend.client.services.ReadingRequestService;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -15,7 +15,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * This popup window is used to allow the user to place a reding request
+ * This popup window is used to allow the user to place a reading request
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.6
@@ -63,7 +63,7 @@ public class ReadingRequestDialog extends StickyWindow {
 		sendButton.addClickHandler(event -> {
 			if (form.validate()) {
 				LD.contactingServer();
-				ReadingService.Instance.get().askReadingConfirmation(docIds, usersItem.getUserIds(),
+				ReadingRequestService.Instance.get().askReadingConfirmation(docIds, usersItem.getUserIds(),
 						Boolean.parseBoolean(form.getValueAsString("notifyreadingconfirmation")),
 						form.getValueAsString("message"), new AsyncCallback<Void>() {
 

@@ -2,9 +2,9 @@ package com.logicaldoc.gui.frontend.client.security.twofactorsauth;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.TwoFactorsAuthenticationService;
 import com.smartgwt.client.types.HeaderControls;

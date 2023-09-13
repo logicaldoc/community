@@ -46,6 +46,8 @@ public class GUIInfo implements Serializable {
 	private GUIValue[] bundle = new GUIValue[0];
 
 	private GUIValue[] config = new GUIValue[0];
+	
+	private GUIReadingRequest[] unconfirmedReagings = new GUIReadingRequest[0];
 
 	// The definitions of attributes
 	private GUIAttribute[] attributeDefinitions = new GUIAttribute[0];
@@ -309,5 +311,13 @@ public class GUIInfo implements Serializable {
 
 	public void setAttributeDefinitions(GUIAttribute[] attributeDefinitions) {
 		this.attributeDefinitions = attributeDefinitions;
+	}
+
+	public GUIReadingRequest[] getUnconfirmedReagings() {
+		return unconfirmedReagings;
+	}
+
+	public void setUnconfirmedReagings(GUIReadingRequest[] unconfirmedReagings) {
+		this.unconfirmedReagings = unconfirmedReagings;
 	}
 }

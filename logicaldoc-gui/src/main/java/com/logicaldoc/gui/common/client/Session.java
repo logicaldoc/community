@@ -1,25 +1,20 @@
 package com.logicaldoc.gui.common.client;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
-import com.logicaldoc.gui.common.client.beans.GUIReading;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
+import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.observer.DocumentObserver;
-import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -51,45 +46,6 @@ public class Session implements DocumentObserver {
 
 	// Flag indicating that the system is installing a update or patch
 	private boolean updating;
-
-	// Map docId - list of unconfirmed readings
-	private Map<Long, List<GUIReading>> unconfirmedReadings = new HashMap<>();
-
-	public void addUnconfirmedReadings(GUIReading[] readings) {
-		if (readings == null)
-			return;
-
-		for (GUIReading guiReading : readings) {
-			List<GUIReading> docReadings = unconfirmedReadings.get(guiReading.getDocId());
-			if (docReadings == null) {
-				docReadings = new ArrayList<>();
-				unconfirmedReadings.put(guiReading.getDocId(), docReadings);
-			}
-			docReadings.add(guiReading);
-		}
-	}
-
-	public boolean isReadingConfirmRequired(long docId) {
-		return unconfirmedReadings.containsKey(docId) && !unconfirmedReadings.get(docId).isEmpty();
-	}
-
-	public List<GUIReading> getUnconfirmedReadings(long docId) {
-		return unconfirmedReadings.get(docId);
-	}
-
-	public long[] getUnconfirmedReadingIds(long docId) {
-		long[] readingIds = new long[0];
-		if (isReadingConfirmRequired(docId)) {
-			List<Long> values = unconfirmedReadings.get(docId).stream().map(r -> r.getId())
-					.collect(Collectors.toList());
-			readingIds = values.stream().mapToLong(l -> l).toArray();
-		}
-		return readingIds;
-	}
-
-	public void confirmReading(long docId) {
-		unconfirmedReadings.remove(docId);
-	}
 
 	public static Session get() {
 		if (instance == null)
@@ -186,6 +142,7 @@ public class Session implements DocumentObserver {
 						user.setUpcomingEvents(Integer.parseInt(parameter.getValue()));
 					else if (parameter.getName().equals("valid"))
 						validSession = Boolean.parseBoolean(parameter.getValue());
+
 				}
 
 				return validSession;

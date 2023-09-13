@@ -11,7 +11,8 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
-import com.logicaldoc.gui.common.client.beans.GUIReading;
+import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
+import com.logicaldoc.gui.common.client.controllers.ReadingRequestController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
@@ -19,7 +20,7 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.MessageLabel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
-import com.logicaldoc.gui.frontend.client.services.ReadingService;
+import com.logicaldoc.gui.frontend.client.services.ReadingRequestService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -66,15 +67,17 @@ public class PreviewPanel extends VLayout {
 
 	protected boolean redrawing = false;
 
-	protected ToolStrip readCompletedToolStrip = new ToolStrip();
+	protected ToolStrip confirmReadingToolStrip = new ToolStrip();
 
 	protected ToolStripButton confirmReadingButton = new ToolStripButton(I18N.message("confirmreading"));
+
+	protected Label confirmReadingLabel;
 
 	public PreviewPanel(final GUIDocument document) {
 		this.document = document;
 		this.docId = document.getId();
 
-		declareOnReadCompleted(this);
+		declareOnReadingCompleted(this);
 	}
 
 	@Override
@@ -88,16 +91,18 @@ public class PreviewPanel extends VLayout {
 
 		addResizedHandler(event -> doResize());
 
-		if (Feature.enabled(Feature.READING_CONFIRMATION) && Session.get().isReadingConfirmRequired(document.getId())) {
+		if (Feature.enabled(Feature.READING_CONFIRMATION)
+				&& ReadingRequestController.get().isReadingConfirmRequired(document.getId())) {
 			showConfirmReadingPanel();
 		}
 	}
 
 	private void confirmReading() {
-		readCompletedToolStrip.removeMember(confirmReadingButton);
+		confirmReadingToolStrip.removeMember(confirmReadingButton);
 
-		ReadingService.Instance.get().confirmReadings(Session.get().getUnconfirmedReadingIds(document.getId()),
-				document.getVersion(), new AsyncCallback<Void>() {
+		ReadingRequestService.Instance.get().confirmReadings(
+				ReadingRequestController.get().getUnconfirmedReadingIds(document.getId()), document.getVersion(),
+				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -105,8 +110,8 @@ public class PreviewPanel extends VLayout {
 
 					@Override
 					public void onSuccess(Void v) {
-						Session.get().confirmReading(document.getId());
-						readCompletedToolStrip.addMember(new Label(I18N.message("readingconfirmthanks")));
+						ReadingRequestController.get().confirmReading(document.getId());
+						confirmReadingLabel.setContents(I18N.message("readingconfirmthanks"));
 					}
 				});
 	}
@@ -373,28 +378,32 @@ public class PreviewPanel extends VLayout {
 		addMember(disabled);
 	}
 
-	public void onReadCompleted() {
-		if (Feature.enabled(Feature.READING_CONFIRMATION))
+	public void onReadingCompleted() {
+		if (Feature.enabled(Feature.READING_CONFIRMATION)) {
 			confirmReadingButton.setDisabled(false);
+			confirmReadingButton.setTooltip("");
+		}
 	}
 
 	private void showConfirmReadingPanel() {
-		readCompletedToolStrip.setWidth100();
-		readCompletedToolStrip.setAlign(Alignment.RIGHT);
+		confirmReadingToolStrip.setWidth100();
+		confirmReadingToolStrip.setAlign(Alignment.RIGHT);
 
 		confirmReadingButton.addClickHandler(event -> confirmReading());
 		confirmReadingButton.setDisabled(true);
 		confirmReadingButton.setTooltip(I18N.message("readalldoctoenablebutton"));
 
-		Label label = new Label(I18N.message("usersrequirereading"));
-		List<GUIReading> unconfirmedReadings = Session.get().getUnconfirmedReadings(document.getId());
+		confirmReadingLabel = new Label(I18N.message("usersrequirereading"));
+		List<GUIReadingRequest> unconfirmedReadings = ReadingRequestController.get()
+				.getUnconfirmedReadings(document.getId());
 		if (unconfirmedReadings.size() == 1)
-			label = new Label(I18N.message("userrequiresreading", unconfirmedReadings.get(0).getRequestorName()));
-		label.setWrap(false);
-		label.setAlign(Alignment.LEFT);
+			confirmReadingLabel = new Label(
+					I18N.message("userrequiresreading", unconfirmedReadings.get(0).getRequestorName()));
+		confirmReadingLabel.setWrap(false);
+		confirmReadingLabel.setAlign(Alignment.LEFT);
 
 		StringBuilder sb = new StringBuilder();
-		for (GUIReading reading : unconfirmedReadings) {
+		for (GUIReadingRequest reading : unconfirmedReadings) {
 			sb.append("<b>");
 			sb.append(reading.getRequestorName());
 			sb.append("</b>");
@@ -404,14 +413,14 @@ public class PreviewPanel extends VLayout {
 			}
 		}
 		sb.append("<br />");
-		label.setTooltip(sb.toString());
+		confirmReadingLabel.setTooltip(sb.toString());
 
-		readCompletedToolStrip.addMember(label);
-		readCompletedToolStrip.addFill();
-		readCompletedToolStrip.addButton(confirmReadingButton);
+		confirmReadingToolStrip.addMember(confirmReadingLabel);
+		confirmReadingToolStrip.addFill();
+		confirmReadingToolStrip.addButton(confirmReadingButton);
 
 		redrawing = true;
-		addMember(readCompletedToolStrip, 0);
+		addMember(confirmReadingToolStrip, 0);
 		redrawing = false;
 	}
 
@@ -421,9 +430,9 @@ public class PreviewPanel extends VLayout {
 	 * 
 	 * @param login the preview panel
 	 */
-	public static native void declareOnReadCompleted(PreviewPanel previewPanel) /*-{
-		$wnd.onReadCompleted = function() {
-			return previewPanel.@com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel::onReadCompleted()();
+	public static native void declareOnReadingCompleted(PreviewPanel previewPanel) /*-{
+		$wnd.onReadingCompleted = function() {
+			return previewPanel.@com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel::onReadingCompleted()();
 		};
 	}-*/;
 }

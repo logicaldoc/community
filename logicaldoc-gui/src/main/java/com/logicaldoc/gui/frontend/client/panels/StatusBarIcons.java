@@ -4,9 +4,12 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
-import com.logicaldoc.gui.common.client.observer.UserController;
-import com.logicaldoc.gui.common.client.observer.UserObserver;
+import com.logicaldoc.gui.common.client.controllers.ReadingRequestController;
+import com.logicaldoc.gui.common.client.controllers.ReadingRequestObserver;
+import com.logicaldoc.gui.common.client.controllers.UserController;
+import com.logicaldoc.gui.common.client.controllers.UserObserver;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.clipboard.ClipboardObserver;
@@ -20,7 +23,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class StatusBarIcons extends HLayout implements ClipboardObserver, UserObserver {
+public class StatusBarIcons extends HLayout implements ClipboardObserver, UserObserver, ReadingRequestObserver {
 	private static final String CLIPBOARD = "clipboard";
 
 	private static StatusBarIcons instance;
@@ -37,8 +40,9 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 
 	private Button eventsCounter = AwesomeFactory.newIconButton("calendar", "upcomingevents");
 
-	private StatusBarIcons() {
+	private Button readingsCounter = AwesomeFactory.newIconButton("glasses", "readingrequests", "0");
 
+	private StatusBarIcons() {
 		clipboardCounter.addClickHandler(event -> {
 			if (!Clipboard.getInstance().isEmpty())
 				ClipboardWindow.getInstance().show();
@@ -63,10 +67,15 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 				MainPanel.get().selectCalendarTab();
 		});
 
+		readingsCounter.addClickHandler(event -> {
+			if (Menu.enabled(Menu.DASHBOARD_READINGS))
+				MainPanel.get().selectReadingsTab();
+		});
+
 		addMember(clipboardCounter);
 		addMember(lockedCounter);
 		addMember(checkoutCounter);
- 
+
 		if (Feature.enabled(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
 			addMember(messagesCounter);
 		}
@@ -79,9 +88,15 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 			addMember(workflowsCounter);
 		}
 
+		if (Feature.enabled(Feature.READING_CONFIRMATION)) {
+			addMember(readingsCounter);
+		}
+
 		Clipboard.getInstance().addObserver(this);
 		UserController.get().addObserver(this);
+		ReadingRequestController.get().addObserver(this);
 		onUserChanged(Session.get().getUser());
+		onNewReadingRequests(null);
 	}
 
 	public static StatusBarIcons get() {
@@ -135,5 +150,16 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 	protected void onDestroy() {
 		destroy();
 		super.onDestroy();
+	}
+
+	@Override
+	public void onConfirmReading(long docId) {
+		readingsCounter.setTitle(AwesomeFactory.getIconHtml("glasses",
+				Integer.toString(ReadingRequestController.get().countUnconfirmedReadings())));
+	}
+
+	@Override
+	public void onNewReadingRequests(GUIReadingRequest[] readings) {
+		onConfirmReading(0L);
 	}
 }

@@ -2,7 +2,7 @@ package com.logicaldoc.gui.common.client.widgets.grid;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
