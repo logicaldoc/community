@@ -452,7 +452,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 	@Override
 	@PUT
-	@Path("/move")
+	@Path("/copy")
 	@Operation(summary = "Copies a document into a folder")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponses(value = {
