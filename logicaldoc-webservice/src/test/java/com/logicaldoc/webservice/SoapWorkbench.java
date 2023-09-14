@@ -527,9 +527,9 @@ public class SoapWorkbench {
 
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
-		WSDocument doc = documentClient.getDocument(sid, 324730881L);
-		doc.getAttribute("VatID").setStringValue("pippo");
-		documentClient.update(sid, doc);
+		WSDocument doc = documentClient.getDocument(sid, 723734049L);
+		
+		documentClient.move(sid, 723734049L, 253984768L);
 		
 		
 		// WSDocument doc = documentClient.getDocument(sid, 735L);

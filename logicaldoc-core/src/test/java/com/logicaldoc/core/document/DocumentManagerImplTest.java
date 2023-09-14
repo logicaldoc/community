@@ -237,6 +237,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
+		Assert.assertEquals(1L, doc.getId());
 		Assert.assertEquals(newFolder, doc.getFolder());
 	}
 

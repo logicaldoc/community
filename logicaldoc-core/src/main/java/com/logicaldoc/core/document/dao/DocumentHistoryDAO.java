@@ -74,7 +74,7 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	public List<DocumentHistory> findNotNotified(Integer max);
 
 	/**
-	 * This method deletes all the document history entries oldest than the
+	 * This method deletes all the document history entries older than the
 	 * given days from now. If <code>ttl</code> is 0 or -1, the deletion is not
 	 * made.
 	 * 
