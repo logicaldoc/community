@@ -43,6 +43,37 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 	private Button readingsCounter = AwesomeFactory.newIconButton("glasses", "readingrequests", "0");
 
 	private StatusBarIcons() {
+
+		prepareIconsClickHandlers();
+
+		addMember(clipboardCounter);
+		addMember(lockedCounter);
+		addMember(checkoutCounter);
+
+		if (Feature.enabled(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
+			addMember(messagesCounter);
+		}
+
+		if (Feature.enabled(Feature.CALENDAR) && Menu.enabled(Menu.DASHBOARD_CALENDAR)) {
+			addMember(eventsCounter);
+		}
+
+		if (Feature.enabled(Feature.WORKFLOW)) {
+			addMember(workflowsCounter);
+		}
+
+		if (Feature.enabled(Feature.READING_CONFIRMATION)) {
+			addMember(readingsCounter);
+		}
+
+		Clipboard.getInstance().addObserver(this);
+		UserController.get().addObserver(this);
+		ReadingRequestController.get().addObserver(this);
+		onUserChanged(Session.get().getUser());
+		onNewReadingRequests(null);
+	}
+
+	private void prepareIconsClickHandlers() {
 		clipboardCounter.addClickHandler(event -> {
 			if (!Clipboard.getInstance().isEmpty())
 				ClipboardWindow.getInstance().show();
@@ -71,32 +102,6 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 			if (Menu.enabled(Menu.DASHBOARD_READINGS))
 				MainPanel.get().selectReadingsTab();
 		});
-
-		addMember(clipboardCounter);
-		addMember(lockedCounter);
-		addMember(checkoutCounter);
-
-		if (Feature.enabled(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
-			addMember(messagesCounter);
-		}
-
-		if (Feature.enabled(Feature.CALENDAR) && Menu.enabled(Menu.DASHBOARD_CALENDAR)) {
-			addMember(eventsCounter);
-		}
-
-		if (Feature.enabled(Feature.WORKFLOW)) {
-			addMember(workflowsCounter);
-		}
-
-		if (Feature.enabled(Feature.READING_CONFIRMATION)) {
-			addMember(readingsCounter);
-		}
-
-		Clipboard.getInstance().addObserver(this);
-		UserController.get().addObserver(this);
-		ReadingRequestController.get().addObserver(this);
-		onUserChanged(Session.get().getUser());
-		onNewReadingRequests(null);
 	}
 
 	public static StatusBarIcons get() {

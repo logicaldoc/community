@@ -55,6 +55,8 @@ public class GUIRight implements Serializable {
 	private boolean automation = false;
 
 	private boolean storage = false;
+	
+	private boolean readingreq = false;
 
 	private String name;
 
@@ -252,6 +254,14 @@ public class GUIRight implements Serializable {
 		this.storage = storage;
 	}
 
+	public boolean isReadingreq() {
+		return readingreq;
+	}
+
+	public void setReadingreq(boolean readingreq) {
+		this.readingreq = readingreq;
+	}
+	
 	@Override
 	public String toString() {
 		return getName();

@@ -149,9 +149,9 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 				log.debug("Replicate all ACLs from group {}", parentGroupId);
 				jdbcUpdate(sql);
 
-				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage) "
+				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq) "
 						+ "select B.ld_folderid," + groupId
-						+ ", B.ld_write, B.ld_add, B.ld_security, B.ld_immutable, B.ld_delete, B.ld_rename, B.ld_import, B.ld_export, B.ld_sign, B.ld_archive, B.ld_workflow, B.ld_download, B.ld_calendar, B.ld_subscription, B.ld_print, B.ld_password, B.ld_move, B.ld_email, B.ld_automation, B.ld_storage from ld_foldergroup B "
+						+ ", B.ld_write, B.ld_add, B.ld_security, B.ld_immutable, B.ld_delete, B.ld_rename, B.ld_import, B.ld_export, B.ld_sign, B.ld_archive, B.ld_workflow, B.ld_download, B.ld_calendar, B.ld_subscription, B.ld_print, B.ld_password, B.ld_move, B.ld_email, B.ld_automation, B.ld_storage, B.ld_readingreq from ld_foldergroup B "
 						+ "where B.ld_groupid= " + parentGroupId;
 				jdbcUpdate(sql);
 			} else {
@@ -162,8 +162,8 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 						+ ",1 from ld_menu B where B.ld_deleted=0";
 				jdbcUpdate(sql);
 
-				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage) "
-						+ "select B.ld_id," + groupId + ",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 from ld_folder B "
+				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq) "
+						+ "select B.ld_id," + groupId + ",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 from ld_folder B "
 						+ "where B.ld_deleted=0";
 				jdbcUpdate(sql);
 			}

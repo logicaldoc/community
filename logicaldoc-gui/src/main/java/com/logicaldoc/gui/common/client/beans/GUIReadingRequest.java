@@ -163,9 +163,7 @@ public class GUIReadingRequest implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		GUIReadingRequest other = (GUIReadingRequest) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return id == other.id;
 	}
 
 	public Date getConfirmed() {

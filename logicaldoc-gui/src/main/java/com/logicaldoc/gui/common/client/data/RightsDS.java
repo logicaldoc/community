@@ -39,11 +39,12 @@ public class RightsDS extends DataSource {
 		DataSourceBooleanField email = new DataSourceBooleanField("email");
 		DataSourceBooleanField automation = new DataSourceBooleanField("automation");
 		DataSourceBooleanField storage = new DataSourceBooleanField("storage");
+		DataSourceBooleanField readingreq = new DataSourceBooleanField("readingreq");
 		DataSourceTextField type = new DataSourceTextField("type");
 
 		setFields(entityId, entity, read, print, write, delete, move, add, workflow, sign, importField, export, rename,
 				immutable, security, password, archive, type, download, email, calendar, subscription, automation,
-				storage);
+				storage, readingreq);
 		setClientOnly(true);
 		setDataURL("data/rights.xml?" + (folder ? "folderId" : "menuId") + "=" + id + "&locale=" + I18N.getLocale());
 	}

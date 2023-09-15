@@ -783,6 +783,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			setEmail(right, isAdmin, fg);
 			setAutomation(right, isAdmin, fg);
 			setStorage(right, isAdmin, fg);
+			setReadingreq(right, isAdmin, fg);
 		}
 
 		folder.getFolderGroups().clear();
@@ -795,6 +796,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		fdao.store(folder, history);
 
 		return !sqlerrors;
+	}
+
+	private void setReadingreq(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isReadingreq())
+			fg.setReadingreq(1);
+		else
+			fg.setReadingreq(0);
 	}
 
 	private void setStorage(GUIRight right, boolean isAdmin, FolderGroup fg) {

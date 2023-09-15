@@ -85,6 +85,8 @@ public final class Constants {
 	public static final String PERMISSION_AUTOMATION = "automation";
 
 	public static final String PERMISSION_STORAGE = "storage";
+	
+	public static final String PERMISSION_READINGREQ = "readingreq";
 
 	public static final int DOC_UNLOCKED = 0;
 

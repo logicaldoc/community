@@ -134,14 +134,8 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 			handleMovedEvent(event);
 		} else if ("event.deleted".equals(event.getEvent())) {
 			DocumentController.get().deleted(new GUIDocument[] { event.getDocument() });
-		} else if (isFolderModifiedEvent(event)) {
-			FolderController.get().modified(event.getFolder());
-		} else if ("event.folder.deleted".equals(event.getEvent())) {
-			FolderController.get().deleted(event.getFolder());
-		} else if ("event.folder.created".equals(event.getEvent())) {
-			FolderController.get().created(event.getFolder());
-		} else if ("event.folder.moved".equals(event.getEvent())) {
-			FolderController.get().moved(event.getFolder());
+		} else if (isFolderEvent(event)) {
+			handleFolderEvent(event);
 		} else if ("event.user.messagereceived".equals(event.getEvent()) && Menu.enabled(Menu.MESSAGES)) {
 			handleMessageReceived(event);
 		} else if ("event.user.login".equals(event.getEvent())) {
@@ -173,12 +167,28 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		}
 	}
 
+	private boolean isFolderEvent(WebsocketMessage event) {
+		return event.getEvent().startsWith("event.folder.");
+	}
+
 	private boolean isCommandEvent(WebsocketMessage event) {
 		return COMMAND.equals(event.getEvent()) && Session.get().getSid().equals(event.getSid());
 	}
 
 	private boolean isLogoutEvent(WebsocketMessage event) {
 		return "event.user.logout".equals(event.getEvent()) || "event.user.timeout".equals(event.getEvent());
+	}
+
+	private void handleFolderEvent(WebsocketMessage event) {
+		if ("event.folder.renamed".equals(event.getEvent()) || "event.folder.changed".equals(event.getEvent())) {
+			FolderController.get().modified(event.getFolder());
+		} else if ("event.folder.deleted".equals(event.getEvent())) {
+			FolderController.get().deleted(event.getFolder());
+		} else if ("event.folder.created".equals(event.getEvent())) {
+			FolderController.get().created(event.getFolder());
+		} else if ("event.folder.moved".equals(event.getEvent())) {
+			FolderController.get().moved(event.getFolder());
+		}
 	}
 
 	private void handleDocumentModifiedEvent(WebsocketMessage event) {
@@ -213,10 +223,6 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 					"<b>" + I18N.message("newmessagefrom", event.getAuthor()) + "</b>:<br/><br/>" + event.getComment(),
 					null, null, settings);
 		}
-	}
-
-	private boolean isFolderModifiedEvent(WebsocketMessage event) {
-		return "event.folder.renamed".equals(event.getEvent()) || "event.folder.changed".equals(event.getEvent());
 	}
 
 	private boolean isDocumentModifiedEvent(WebsocketMessage event) {

@@ -30,6 +30,7 @@ import java.util.Set;
  * <li>EMAIL: ability to send emails</li>
  * <li>AUTOMATION: ability to handle the automation</li>
  * <li>STORAGE: ability to handle the storage</li>
+ * <li>READINGREQ: ability to send reading requests</li>
  * </ul>
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -40,7 +41,7 @@ public enum Permission {
 			"immutable"), DELETE("delete"), RENAME("rename"), IMPORT("import"), EXPORT("export"), SIGN("sign"), ARCHIVE(
 					"archive"), WORKFLOW("workflow"), CALENDAR("calendar"), SUBSCRIPTION("subscription"), PRINT(
 							"print"), PASSWORD("password"), MOVE(
-									"move"), EMAIL("email"), AUTOMATION("automation"), STORAGE("storage");
+									"move"), EMAIL("email"), AUTOMATION("automation"), STORAGE("storage"),READINGREQ("readingreq");
 
 	private final String name;
 
@@ -50,27 +51,28 @@ public enum Permission {
 		this.name = name;
 
 		Map<String, String> masks = new HashMap<>();
-		masks.put("read", "000000000000000000001");
-		masks.put("write", "000000000000000000010");
-		masks.put("add", "000000000000000000100");
-		masks.put("security", "000000000000000001000");
-		masks.put("immutable", "000000000000000010000");
-		masks.put("delete", "000000000000000100000");
-		masks.put("rename", "000000000000001000000");
-		masks.put("import", "000000000000010000000");
-		masks.put("export", "000000000000100000000");
-		masks.put("sign", "000000000001000000000");
-		masks.put("archive", "000000000010000000000");
-		masks.put("workflow", "000000000100000000000");
-		masks.put("download", "000000001000000000000");
-		masks.put("calendar", "000000010000000000000");
-		masks.put("subscription", "000000100000000000000");
-		masks.put("print", "000001000000000000000");
-		masks.put("password", "000010000000000000000");
-		masks.put("move", "000100000000000000000");
-		masks.put("email", "001000000000000000000");
-		masks.put("automation", "010000000000000000000");
-		masks.put("storage", "100000000000000000000");
+		masks.put("read", "0000000000000000000001");
+		masks.put("write", "0000000000000000000010");
+		masks.put("add", "0000000000000000000100");
+		masks.put("security", "0000000000000000001000");
+		masks.put("immutable", "0000000000000000010000");
+		masks.put("delete", "0000000000000000100000");
+		masks.put("rename", "0000000000000001000000");
+		masks.put("import", "0000000000000010000000");
+		masks.put("export", "0000000000000100000000");
+		masks.put("sign", "0000000000001000000000");
+		masks.put("archive", "0000000000010000000000");
+		masks.put("workflow", "0000000000100000000000");
+		masks.put("download", "0000000001000000000000");
+		masks.put("calendar", "0000000010000000000000");
+		masks.put("subscription", "0000000100000000000000");
+		masks.put("print", "0000001000000000000000");
+		masks.put("password", "0000010000000000000000");
+		masks.put("move", "0000100000000000000000");
+		masks.put("email", "0001000000000000000000");
+		masks.put("automation", "0010000000000000000000");
+		masks.put("storage", "0100000000000000000000");
+		masks.put("readingreq", "1000000000000000000000");
 
 		this.mask = Integer.parseInt(masks.get(name), 2);
 	}

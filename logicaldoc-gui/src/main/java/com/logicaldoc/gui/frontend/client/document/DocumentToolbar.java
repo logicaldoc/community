@@ -27,6 +27,7 @@ import com.logicaldoc.gui.common.client.widgets.DropSpotPopup;
 import com.logicaldoc.gui.frontend.client.calendar.CalendarEventDialog;
 import com.logicaldoc.gui.frontend.client.document.form.AddDocumentUsingForm;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
+import com.logicaldoc.gui.frontend.client.document.reading.ReadingRequestDialog;
 import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignatureDialog;
 import com.logicaldoc.gui.frontend.client.document.stamp.StampDialog;
 import com.logicaldoc.gui.frontend.client.document.update.UpdateDialog;
@@ -82,6 +83,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	protected ToolStripButton stamp = AwesomeFactory.newToolStripButton("tint", "stamp");
 
 	protected ToolStripButton sign = AwesomeFactory.newToolStripButton("badge-check", "sign");
+
+	protected ToolStripButton readingRequest = AwesomeFactory.newToolStripButton("glasses", "requestreading");
 
 	protected ToolStripButton bulkCheckout = AwesomeFactory.newToolStripButton("check", "bulkcheckout");
 
@@ -155,6 +158,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		addStamp();
 
 		addDigitalSignature();
+
+		addReadingRequest();
 
 		addStartWorkflow();
 
@@ -340,6 +345,23 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 				DigitalSignatureDialog dialog = new DigitalSignatureDialog(grid.getSelectedIds());
 				dialog.show();
+			});
+		}
+	}
+
+	private void addReadingRequest() {
+		if (Feature.visible(Feature.READING_CONFIRMATION)) {
+			addButton(readingRequest);
+			readingRequest.setTooltip(I18N.message("requestreading"));
+			if (!Feature.enabled(Feature.READING_CONFIRMATION))
+				setFeatureDisabled(readingRequest);
+
+			readingRequest.addClickHandler(event -> {
+				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+				if (grid.getSelectedCount() == 0)
+					return;
+
+				new ReadingRequestDialog(grid.getSelectedIds()).show();
 			});
 		}
 	}
@@ -607,6 +629,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				sign.setDisabled(true);
 				office.setDisabled(true);
 				addForm.setDisabled(true);
+				readingRequest.setDisabled(true);
 			}
 
 			updateUsingFolder(document, folder);
@@ -627,6 +650,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 					|| !Feature.enabled(Feature.IMPEX));
 			startWorkflow.setDisabled(document == null || !folder.hasPermission(Constants.PERMISSION_WORKFLOW)
 					|| !Feature.enabled(Feature.WORKFLOW));
+			readingRequest.setDisabled(document == null || !folder.hasPermission(Constants.PERMISSION_READINGREQ)
+					|| !Feature.enabled(Feature.READING_CONFIRMATION));
 			addCalendarEvent.setDisabled(
 					!folder.hasPermission(Constants.PERMISSION_CALENDAR) || !Feature.enabled(Feature.CALENDAR));
 			list.setDisabled(false);
@@ -647,6 +672,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			list.setDisabled(false);
 			gallery.setDisabled(false);
 			togglePreview.setDisabled(false);
+			readingRequest.setDisabled(false);
 		}
 	}
 

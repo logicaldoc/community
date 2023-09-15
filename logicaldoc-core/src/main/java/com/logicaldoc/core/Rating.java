@@ -1,7 +1,5 @@
 package com.logicaldoc.core;
 
-import com.logicaldoc.core.PersistentObject;
-
 /**
  * A rating over a document
  * 

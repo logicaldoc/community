@@ -317,7 +317,7 @@ public class ContextMenu extends Menu {
 		workflow.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_WORKFLOW)
 				&& Feature.enabled(Feature.WORKFLOW));
 		replaceAlias.setEnabled(justOneSelected && folder.isWrite() && selection[0].getDocRef() != null);
-		readingRequest.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_EMAIL)
+		readingRequest.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_READINGREQ)
 				&& Feature.enabled(Feature.READING_CONFIRMATION));
 
 		applySplitSecurity(folder, selection, moreSelected, justOneSelected);

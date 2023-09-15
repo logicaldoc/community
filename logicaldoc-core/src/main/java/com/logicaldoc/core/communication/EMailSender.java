@@ -344,8 +344,7 @@ public class EMailSender {
 			log.info("Sent email with subject '{}' to recipients {}", email.getSubject(),
 					email.getAllRecipientsEmails());
 		} else {
-			log.info("Email with subject '{}' not sent because of the config parameter smtp.nosend", email.getSubject(),
-					email.getAllRecipientsEmails());
+			log.info("Email with subject '{}' not sent because of the config parameter smtp.nosend", email.getSubject());
 		}
 
 		/*

@@ -61,6 +61,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private static final String STORAGE = "storage";
 
+	private static final String READINGREQ = "readingreq";
+
 	private static final String EMAIL = "email";
 
 	private static final String PASSWORD = "password";
@@ -221,6 +223,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		addSubscription(fields);
 		addAutomation(fields);
 		addStorage(fields);
+		addReadingReq(fields);
 
 		list.setFields(fields.toArray(new ListGridField[0]));
 
@@ -275,6 +278,16 @@ public class FolderSecurityPanel extends FolderDetailTab {
 				});
 	}
 
+	private void addReadingReq(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.READING_CONFIRMATION)) {
+			ListGridField readingreq = new ListGridField(READINGREQ, prepareHeaderLabel(READINGREQ));
+			readingreq.setType(ListGridFieldType.BOOLEAN);
+			readingreq.setCanEdit(true);
+			readingreq.setAutoFitWidth(true);
+			fields.add(readingreq);
+		}
+	}
+
 	private void addStorage(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.MULTI_STORAGE)) {
 			ListGridField storage = new ListGridField(STORAGE, prepareHeaderLabel(STORAGE));
@@ -304,7 +317,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			fields.add(subscription);
 		}
 	}
-	
+
 	private void addCalendar(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.CALENDAR)) {
 			ListGridField calendar = new ListGridField(CALENDAR, prepareHeaderLabel(CALENDAR));
@@ -316,7 +329,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addWorkflow(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.WORKFLOW)) {
-			ListGridField workflow = new ListGridField(WORKFLOW,prepareHeaderLabel(WORKFLOW));
+			ListGridField workflow = new ListGridField(WORKFLOW, prepareHeaderLabel(WORKFLOW));
 			workflow.setType(ListGridFieldType.BOOLEAN);
 			workflow.setCanEdit(true);
 			fields.add(workflow);
@@ -334,13 +347,12 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void addSign(List<ListGridField> fields) {
 		if (Feature.enabled(Feature.DIGITAL_SIGNATURE)) {
-			ListGridField sign = new ListGridField("sign",prepareHeaderLabel("sign"));
+			ListGridField sign = new ListGridField("sign", prepareHeaderLabel("sign"));
 			sign.setType(ListGridFieldType.BOOLEAN);
 			sign.setCanEdit(true);
 			fields.add(sign);
 		}
 	}
-	
 
 	private void addButtons(GUIFolder folder) {
 		HLayout buttons = new HLayout();
@@ -519,26 +531,27 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 			right.setName(rec.getAttributeAsString(ENTITY));
 			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			right.setPrint("true".equals(rec.getAttributeAsString(PRINT)));
-			right.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
-			right.setDelete("true".equals(rec.getAttributeAsString(DELETE)));
-			right.setAdd("true".equals(rec.getAttributeAsString("add")));
-			right.setWorkflow("true".equals(rec.getAttributeAsString(WORKFLOW)));
-			right.setSign("true".equals(rec.getAttributeAsString("sign")));
-			right.setImport("true".equals(rec.getAttributeAsString(IMPORT)));
-			right.setExport("true".equals(rec.getAttributeAsString(EXPORT)));
-			right.setImmutable("true".equals(rec.getAttributeAsString(IMMUTABLE)));
-			right.setRename("true".equals(rec.getAttributeAsString(RENAME)));
-			right.setSecurity("true".equals(rec.getAttributeAsString(SECURITY)));
-			right.setArchive("true".equals(rec.getAttributeAsString(ARCHIVE)));
-			right.setDownload("true".equals(rec.getAttributeAsString(DOWNLOAD)));
-			right.setCalendar("true".equals(rec.getAttributeAsString(CALENDAR)));
-			right.setSubscription("true".equals(rec.getAttributeAsString(SUBSCRIPTION)));
-			right.setPassword("true".equals(rec.getAttributeAsString(PASSWORD)));
-			right.setMove("true".equals(rec.getAttributeAsString("move")));
-			right.setEmail("true".equals(rec.getAttributeAsString(EMAIL)));
-			right.setAutomation("true".equals(rec.getAttributeAsString(AUTOMATION)));
-			right.setStorage("true".equals(rec.getAttributeAsString(STORAGE)));
+			right.setPrint(rec.getAttributeAsBoolean(PRINT));
+			right.setWrite(rec.getAttributeAsBoolean(WRITE));
+			right.setDelete(rec.getAttributeAsBoolean(DELETE));
+			right.setAdd(rec.getAttributeAsBoolean("add"));
+			right.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
+			right.setSign(rec.getAttributeAsBoolean("sign"));
+			right.setImport(rec.getAttributeAsBoolean(IMPORT));
+			right.setExport(rec.getAttributeAsBoolean(EXPORT));
+			right.setImmutable(rec.getAttributeAsBoolean(IMMUTABLE));
+			right.setRename(rec.getAttributeAsBoolean(RENAME));
+			right.setSecurity(rec.getAttributeAsBoolean(SECURITY));
+			right.setArchive(rec.getAttributeAsBoolean(ARCHIVE));
+			right.setDownload(rec.getAttributeAsBoolean(DOWNLOAD));
+			right.setCalendar(rec.getAttributeAsBoolean(CALENDAR));
+			right.setSubscription(rec.getAttributeAsBoolean(SUBSCRIPTION));
+			right.setPassword(rec.getAttributeAsBoolean(PASSWORD));
+			right.setMove(rec.getAttributeAsBoolean("move"));
+			right.setEmail(rec.getAttributeAsBoolean(EMAIL));
+			right.setAutomation(rec.getAttributeAsBoolean(AUTOMATION));
+			right.setStorage(rec.getAttributeAsBoolean(STORAGE));
+			right.setReadingreq(rec.getAttributeAsBoolean(READINGREQ));
 
 			tmp.add(right);
 		}

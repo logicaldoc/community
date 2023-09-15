@@ -915,7 +915,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		StringBuilder query = new StringBuilder(
-				"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION, A.ld_storage LDSTORAGE");
+				"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION, A.ld_storage LDSTORAGE, A.ld_readingreq LDREADINGREQ");
 		query.append(" from ld_foldergroup A");
 		query.append(WHERE);
 		query.append(" A.ld_folderid=" + id);
@@ -944,7 +944,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		permissionColumn.put("LDEMAIL", Permission.EMAIL);
 		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
 		permissionColumn.put("LDSTORAGE", Permission.STORAGE);
-
+		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
+		
 		/**
 		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
 		 * probable that the connection pool will leave open it indefinitely.

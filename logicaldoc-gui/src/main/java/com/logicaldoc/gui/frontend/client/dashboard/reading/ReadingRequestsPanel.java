@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.frontend.client.dashboard.reading;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -45,6 +47,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
  * @since 8.8.6
  */
 public class ReadingRequestsPanel extends VLayout implements ReadingRequestObserver {
+
+	private static final String DOC_ID = "docId";
+
+	private static final String CONFIRMED = "confirmed";
 
 	private static final String RECEIVED = "received";
 
@@ -96,15 +102,16 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 		ListGridField recipient = new UserListGridField("user", "userId", "recipient");
 		ListGridField requestor = new UserListGridField("requestor", "requestorId", "requestor");
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
-		ListGridField confirmed = new DateListGridField("confirmed", "confirmedon", DateCellFormatter.FORMAT_LONG);
+		ListGridField confirmed = new DateListGridField(CONFIRMED, "confirmedon", DateCellFormatter.FORMAT_LONG);
 		ListGridField message = new ListGridField("message", I18N.message("message"));
 		FileNameListGridField fileName = new FileNameListGridField();
 		ListGridField fileVersion = new FileVersionListGridField();
 		ListGridField icon = new IconGridField();
 
 		readingsGrid = new RefreshableListGrid(new ReadingRequestsDS(true, null)) {
+			@Override
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				return rec.getAttribute("confirmed") == null ? "font-weight: bold;"
+				return rec.getAttribute(CONFIRMED) == null ? "font-weight: bold;"
 						: super.getCellCSSText(rec, rowNum, colNum);
 			}
 		};
@@ -116,7 +123,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 		readingsGrid.setSelectionType(SelectionStyle.SINGLE);
 		readingsGrid.setFields(id, date, icon, fileName, confirmed, fileVersion, recipient, requestor, message);
 		readingsGrid.addSelectionChangedHandler(event -> DocumentService.Instance.get()
-				.getById(event.getSelectedRecord().getAttributeAsLong("docId"), new AsyncCallback<GUIDocument>() {
+				.getById(event.getSelectedRecord().getAttributeAsLong(DOC_ID), new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -132,6 +139,25 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 			contextClickEvent.cancel();
 		});
 
+		// When the data arrives we may notify the unconfirmed readings
+		readingsGrid.addDataArrivedHandler(event -> {
+			ListGridRecord[] records = readingsGrid.getRecords();
+			List<GUIReadingRequest> requests = new ArrayList<>();
+			for (ListGridRecord rcd : records) {
+				long recipientId = rcd.getAttributeAsLong("userId");
+				if (rcd.getAttribute(CONFIRMED) == null && recipientId == Session.get().getUser().getId()) {
+					GUIReadingRequest req = new GUIReadingRequest();
+					req.setId(rcd.getAttributeAsLong("id"));
+					req.setDocId(rcd.getAttributeAsLong(DOC_ID));
+					req.setFileName(rcd.getAttributeAsString("filename"));
+					req.setUserId(recipientId);
+					req.setRequestorId(rcd.getAttributeAsLong("requestId"));
+					requests.add(req);
+				}
+			}
+			ReadingRequestController.get().addUnconfirmedReadings(requests.toArray(new GUIReadingRequest[0]));
+		});
+
 		content.setWidth100();
 		content.setHeight100();
 		addMember(content);
@@ -141,7 +167,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 	}
 
 	private Menu prepateContextMenu() {
-		long selectedDocId = readingsGrid.getSelectedRecord().getAttributeAsLong("docId");
+		long selectedDocId = readingsGrid.getSelectedRecord().getAttributeAsLong(DOC_ID);
 		long selectedReadingId = readingsGrid.getSelectedRecord().getAttributeAsLong("id");
 
 		MenuItem openInFolder = new MenuItem();
@@ -187,19 +213,18 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 
 		MenuItem invite = new MenuItem();
 		invite.setTitle(I18N.message("inviteandremind"));
-		invite.addClickHandler(event -> {
-			ReadingRequestService.Instance.get().notityReadingRequest(selectedReadingId, new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+		invite.addClickHandler(event -> ReadingRequestService.Instance.get().notityReadingRequest(selectedReadingId,
+				new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(Void arg) {
-					GuiLog.info("invitationsent");
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void arg) {
+						GuiLog.info("invitationsent");
+					}
+				}));
 
 		delete.setEnabled(Session.get().getUser().getId() == readingsGrid.getSelectedRecord()
 				.getAttributeAsLong("requestorId").longValue());
@@ -222,10 +247,10 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 	@Override
 	public void onConfirmReading(long docId) {
 		com.smartgwt.client.data.Record[] records = readingsGrid
-				.findAll(new AdvancedCriteria("docId", OperatorId.EQUALS, docId));
+				.findAll(new AdvancedCriteria(DOC_ID, OperatorId.EQUALS, docId));
 		if (records != null)
-			for (com.smartgwt.client.data.Record record : records) {
-				record.setAttribute("confirmed", new Date());
+			for (com.smartgwt.client.data.Record rcd : records) {
+				rcd.setAttribute(CONFIRMED, new Date());
 			}
 	}
 

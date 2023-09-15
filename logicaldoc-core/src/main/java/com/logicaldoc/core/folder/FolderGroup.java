@@ -56,6 +56,8 @@ public class FolderGroup implements Serializable {
 	private int automation = 0;
 
 	private int storage = 0;
+	
+	private int readingreq = 0;
 
 	private long groupId;
 
@@ -89,6 +91,7 @@ public class FolderGroup implements Serializable {
 		this.email = source.email;
 		this.automation = source.automation;
 		this.storage = source.storage;
+		this.readingreq = source.readingreq;
 		this.groupId = source.groupId;
 	}
 
@@ -112,10 +115,11 @@ public class FolderGroup implements Serializable {
 	 */
 	public int getPermissions() {
 		/**
-		 * Very important, see the Permission enumeration in order u replicate
+		 * Very important, see the Permission enumeration in order to replicate
 		 * the same mask order.
 		 */
 		StringBuilder sb = new StringBuilder();
+		sb.append(codeFlag(getReadingreq()));
 		sb.append(codeFlag(getStorage()));
 		sb.append(codeFlag(getAutomation()));
 		sb.append(codeFlag(getEmail()));
@@ -173,6 +177,7 @@ public class FolderGroup implements Serializable {
 		setEmail(decodeFlag(Permission.EMAIL.match(permissions)));
 		setAutomation(decodeFlag(Permission.AUTOMATION.match(permissions)));
 		setStorage(decodeFlag(Permission.STORAGE.match(permissions)));
+		setStorage(decodeFlag(Permission.READINGREQ.match(permissions)));
 	}
 
 	private int decodeFlag(boolean flagValue) {
@@ -353,5 +358,13 @@ public class FolderGroup implements Serializable {
 
 	public void setStorage(int storage) {
 		this.storage = storage;
+	}
+
+	public int getReadingreq() {
+		return readingreq;
+	}
+
+	public void setReadingreq(int readingreq) {
+		this.readingreq = readingreq;
 	}
 }
