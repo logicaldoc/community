@@ -34,6 +34,7 @@ import com.logicaldoc.gui.frontend.client.docusign.Envelopes;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorizationWizard;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
 import com.logicaldoc.gui.frontend.client.gdrive.GDriveMenuItem;
+import com.logicaldoc.gui.frontend.client.menu.features.Features;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.Search;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
@@ -108,7 +109,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		addAccountButton();
 		addToolsButton(FolderController.get().getCurrentFolder(), null);
-
+		
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.INTERFACE_DENSITY)) {
 			addSeparator();
 			addFormItem(getDensitySelector());
@@ -139,6 +140,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			addFormItem(tenantItem);
 		}
 
+		addSeparator();
+		addActivableFeaturesButton();
 		addSeparator();
 		addSupportButton();
 		addLogoutButton();
@@ -661,9 +664,19 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		return density;
 	}
 
+	private void addActivableFeaturesButton() {
+		ToolStripButton activable = AwesomeFactory.newToolStripButton("star", I18N.message("activablefeatures"),
+				I18N.message("activablefeatures"));
+		activable.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> Features.get().show());
+
+		if (Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
+				&& Feature.enabled(Feature.OFFICE) && com.logicaldoc.gui.common.client.Menu
+						.enabled(com.logicaldoc.gui.common.client.Menu.ACTIVABLE_FEATURES))
+			addButton(activable);
+	}
+	
 	private void addSupportButton() {
 		Menu menu = buildSupportMenu();
-
 		ToolStripButton supportButton = AwesomeFactory.newToolStripButton("question-circle", "support");
 		supportButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> menu.showContextMenu());
 

@@ -67,7 +67,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	public static final long INTERFACE_DENSITY = 1535;
 
 	public static final long CUSTOM_ACTIONS = 1300;
-
+	
 	public static final int TYPE_DEFAULT = 1;
 
 	public static final int TYPE_CUSTOM_ACTION = 2;

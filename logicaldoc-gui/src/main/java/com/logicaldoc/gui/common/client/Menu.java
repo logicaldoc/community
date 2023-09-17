@@ -197,6 +197,8 @@ public class Menu {
 	
 	public static final long SCAN = 550;
 	
+	public static final long ACTIVABLE_FEATURES = 19;
+	
 	private static Set<Long> menus = new HashSet<>();
 
 	private Menu() {}
