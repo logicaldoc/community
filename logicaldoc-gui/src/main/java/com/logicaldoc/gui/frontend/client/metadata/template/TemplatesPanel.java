@@ -16,13 +16,10 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -108,11 +105,11 @@ public class TemplatesPanel extends VLayout {
 
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addtemplate"));
-		add.addClickHandler((ClickEvent event) -> onAddingTemplate());
+		add.addClickHandler(event -> onAddingTemplate());
 
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
-		refresh.addClickHandler((ClickEvent event) -> {
+		refresh.addClickHandler(event -> {
 			list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
 			detailsContainer.removeMembers(detailsContainer.getMembers());
 			details = SELECT_TEMPLATE;
@@ -123,7 +120,7 @@ public class TemplatesPanel extends VLayout {
 		toolStrip.addButton(add);
 		toolStrip.addFill();
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+		list.addCellContextClickHandler(event -> {
 			ListGridRecord rec = list.getSelectedRecord();
 			if (!"true".equals(rec.getAttributeAsString("readonly"))) {
 				showContextMenu();
@@ -131,7 +128,7 @@ public class TemplatesPanel extends VLayout {
 			event.cancel();
 		});
 
-		list.addSelectionChangedHandler((SelectionEvent event) -> {
+		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				TemplateService.Instance.get().getTemplate(Long.parseLong(rec.getAttributeAsString("id")),
@@ -166,24 +163,23 @@ public class TemplatesPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler( event -> 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-				if (Boolean.TRUE.equals(answer)) {
-					TemplateService.Instance.get().delete(id, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				TemplateService.Instance.get().delete(id, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-							list.deselectAllRecords();
-							showTemplateDetails(null);
-						}
-					});
-				}
-			}));
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showTemplateDetails(null);
+					}
+				});
+			}
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

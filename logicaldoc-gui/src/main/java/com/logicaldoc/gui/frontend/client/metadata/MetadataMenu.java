@@ -20,7 +20,6 @@ import com.logicaldoc.gui.frontend.client.services.TagService;
 import com.logicaldoc.gui.frontend.client.workflow.designer.WorkflowDesigner;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -62,7 +61,7 @@ public class MetadataMenu extends VLayout {
 			if (!Feature.enabled(Feature.ZONAL_OCR))
 				setFeatureDisabled(zonalOcr);
 		}
-		zonalOcr.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ZonalOCRPanel(null, null)));
+		zonalOcr.addClickHandler(event -> AdminScreen.get().setContent(new ZonalOCRPanel(null, null)));
 	}
 
 	private void setFeatureDisabled(Button button) {
@@ -74,7 +73,7 @@ public class MetadataMenu extends VLayout {
 		Button barcode = new Button(I18N.message("barcodes"));
 		barcode.setWidth100();
 		barcode.setHeight(25);
-		barcode.addClickHandler((ClickEvent barcodeClick) -> AdminScreen.get().setContent(new BarcodesPanel()));
+		barcode.addClickHandler(barcodeClick -> AdminScreen.get().setContent(new BarcodesPanel()));
 		if (Feature.visible(Feature.BARCODES) && Menu.enabled(Menu.BARCODES)) {
 			addMember(barcode);
 			if (!Feature.enabled(Feature.BARCODES))
@@ -86,7 +85,7 @@ public class MetadataMenu extends VLayout {
 		Button forms = new Button(I18N.message("forms"));
 		forms.setWidth100();
 		forms.setHeight(25);
-		forms.addClickHandler((ClickEvent formsClick) -> AdminScreen.get().setContent(new FormsPanel()));
+		forms.addClickHandler(formsClick -> AdminScreen.get().setContent(new FormsPanel()));
 		if (Feature.visible(Feature.FORM) && Menu.enabled(Menu.FORMS)) {
 			addMember(forms);
 			if (!Feature.enabled(Feature.FORM))
@@ -98,7 +97,7 @@ public class MetadataMenu extends VLayout {
 		Button stamps = new Button(I18N.message("stamps"));
 		stamps.setWidth100();
 		stamps.setHeight(25);
-		stamps.addClickHandler((ClickEvent stampsClick) -> AdminScreen.get().setContent(new StampsPanel()));
+		stamps.addClickHandler(stampsClick -> AdminScreen.get().setContent(new StampsPanel()));
 		if (Feature.visible(Feature.STAMP) && Menu.enabled(Menu.STAMPS)) {
 			addMember(stamps);
 			if (!Feature.enabled(Feature.STAMP))
@@ -110,8 +109,8 @@ public class MetadataMenu extends VLayout {
 		Button retentionPolicies = new Button(I18N.message("retentionpolicies"));
 		retentionPolicies.setWidth100();
 		retentionPolicies.setHeight(25);
-		retentionPolicies.addClickHandler(
-				(ClickEvent retentionPoliciesClick) -> AdminScreen.get().setContent(new RetentionPoliciesPanel()));
+		retentionPolicies
+				.addClickHandler(retentionPoliciesClick -> AdminScreen.get().setContent(new RetentionPoliciesPanel()));
 		if (Feature.visible(Feature.RETENTION_POLICIES) && Menu.enabled(Menu.RETENTION_POLICIES)) {
 			addMember(retentionPolicies);
 			if (!Feature.enabled(Feature.RETENTION_POLICIES))
@@ -123,8 +122,8 @@ public class MetadataMenu extends VLayout {
 		Button folderTemplates = new Button(I18N.message("foldertemplates"));
 		folderTemplates.setWidth100();
 		folderTemplates.setHeight(25);
-		folderTemplates.addClickHandler(
-				(ClickEvent folderTemplatesClick) -> AdminScreen.get().setContent(new FolderTemplatesPanel()));
+		folderTemplates
+				.addClickHandler(folderTemplatesClick -> AdminScreen.get().setContent(new FolderTemplatesPanel()));
 		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
 			addMember(folderTemplates);
 			if (!Feature.enabled(Feature.FOLDER_TEMPLATE))
@@ -137,7 +136,7 @@ public class MetadataMenu extends VLayout {
 		workflow.setWidth100();
 		workflow.setHeight(25);
 		workflow.addClickHandler(
-				(ClickEvent workflowClick) -> AdminScreen.get().setContent(new WorkflowDesigner(new GUIWorkflow())));
+				workflowClick -> AdminScreen.get().setContent(new WorkflowDesigner(new GUIWorkflow())));
 		if (Feature.visible(Feature.WORKFLOW) && Menu.enabled(Menu.WORKFLOW)) {
 			addMember(workflow);
 			if (!Feature.enabled(Feature.WORKFLOW))
@@ -149,8 +148,8 @@ public class MetadataMenu extends VLayout {
 		Button customidAndAutonaming = new Button(I18N.message("customidandnaming"));
 		customidAndAutonaming.setWidth100();
 		customidAndAutonaming.setHeight(25);
-		customidAndAutonaming.addClickHandler((ClickEvent customidAndAutonamingClick) -> SchemeService.Instance.get()
-				.load(new AsyncCallback<GUIScheme[]>() {
+		customidAndAutonaming.addClickHandler(
+				customidAndAutonamingClick -> SchemeService.Instance.get().load(new AsyncCallback<GUIScheme[]>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -175,8 +174,7 @@ public class MetadataMenu extends VLayout {
 		Button templates = new Button(I18N.message("templates"));
 		templates.setWidth100();
 		templates.setHeight(25);
-		templates.addClickHandler(
-				(ClickEvent templatesClick) -> AdminScreen.get().setContent(new TemplatesAndAttributesPanel()));
+		templates.addClickHandler(templatesClick -> AdminScreen.get().setContent(new TemplatesAndAttributesPanel()));
 		if (Feature.visible(Feature.TEMPLATE)) {
 			addMember(templates);
 			if (!Feature.enabled(Feature.TEMPLATE))
@@ -193,18 +191,17 @@ public class MetadataMenu extends VLayout {
 			if (!Feature.enabled(Feature.TAGS_ADMIN))
 				setFeatureDisabled(tags);
 		}
-		tags.addClickHandler(
-				(ClickEvent tagsClick) -> TagService.Instance.get().getSettings(new AsyncCallback<GUIParameter[]>() {
+		tags.addClickHandler(tagsClick -> TagService.Instance.get().getSettings(new AsyncCallback<GUIParameter[]>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIParameter[] parameters) {
-						AdminScreen.get().setContent(new TagsPanel(parameters));
-					}
-				}));
+			@Override
+			public void onSuccess(GUIParameter[] parameters) {
+				AdminScreen.get().setContent(new TagsPanel(parameters));
+			}
+		}));
 	}
 }
