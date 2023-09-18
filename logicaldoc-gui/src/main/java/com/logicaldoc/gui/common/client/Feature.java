@@ -148,8 +148,6 @@ public class Feature {
 
 	public static final int REPO_ENCRYPTION = 67;
 
-	public static final int ADVANCED_OCR = 68;
-
 	public static final int EXPORT_CSV = 69;
 
 	public static final int RETENTION_POLICIES = 70;
