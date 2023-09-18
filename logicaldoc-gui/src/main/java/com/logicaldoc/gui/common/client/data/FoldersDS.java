@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.data;
 
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
@@ -19,14 +20,14 @@ public class FoldersDS extends DataSource {
 
 	public static FoldersDS get() {
 		if (instance == null)
-			instance = new FoldersDS(null, false, null);
+			instance = new FoldersDS(null, !Session.get().getConfigAsBoolean("gui.folder.pagination"), null);
 		return instance;
 	}
 
 	public FoldersDS(String id, boolean nopagination) {
 		this(id, nopagination, null);
 	}
-	
+
 	public FoldersDS(String id, boolean nopagination, Long max) {
 		String dsId = id;
 		if (dsId == null)
