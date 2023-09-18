@@ -611,6 +611,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			if (guiFolder.getFoldRef() != null) {
 				// The user is editing an alias
 				folder.setName(folderName);
+				folder.setPosition(guiFolder.getPosition());
+				folder.setColor(guiFolder.getColor());
 				folderDao.store(folder);
 
 				folder = folderDao.findById(folder.getFoldRef());
@@ -619,6 +621,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				// The user is editing a real folder
 				folder.setType(guiFolder.getType());
 				folder.setStorage(guiFolder.getStorage());
+				folder.setPosition(guiFolder.getPosition());
+				folder.setColor(guiFolder.getColor());
 
 				if (folder.isWorkspace()) {
 					folder.setMaxVersions(guiFolder.getMaxVersions());
@@ -641,8 +645,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			}
 
 			folder.setDescription(guiFolder.getDescription());
-			folder.setPosition(guiFolder.getPosition());
-			folder.setColor(guiFolder.getColor());
 			folder.setTile(guiFolder.getTile());
 			folder.setTemplateLocked(guiFolder.getTemplateLocked());
 			folder.setQuotaDocs(guiFolder.getQuotaDocs());
