@@ -7,6 +7,8 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.contact.Contact;
 import com.logicaldoc.core.contact.ContactDAO;
@@ -25,9 +27,8 @@ public class ContactsDataServlet extends AbstractDataServlet {
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
-			Locale locale)
-			throws PersistenceException, IOException {
-		
+			Locale locale) throws PersistenceException, IOException {
+
 		long userId = Long.parseLong(request.getParameter("userId"));
 
 		if (userId != session.getUserId())
@@ -48,12 +49,13 @@ public class ContactsDataServlet extends AbstractDataServlet {
 			writer.print("<contact>");
 			writer.print("<id>" + contact.getId() + "</id>");
 			writer.print("<email><![CDATA[" + contact.getEmail() + "]]></email>");
-			if (contact.getFirstName() != null)
-				writer.print("<firstName><![CDATA[" + contact.getFirstName() + "]]></firstName>");
-			if (contact.getLastName() != null)
-				writer.print("<lastName><![CDATA[" + contact.getLastName() + "]]></lastName>");
-			if (contact.getCompany() != null)
-				writer.print("<company><![CDATA[" + contact.getCompany() + "]]></company>");
+			writer.print(
+					"<firstName><![CDATA[" + StringUtils.defaultString(contact.getFirstName()) + "]]></firstName>");
+			writer.print("<lastName><![CDATA[" + StringUtils.defaultString(contact.getLastName()) + "]]></lastName>");
+			writer.print("<company><![CDATA[" + StringUtils.defaultString(contact.getCompany()) + "]]></company>");
+			writer.print("<mobile><![CDATA[" + StringUtils.defaultString(contact.getMobile()) + "]]></mobile>");
+			writer.print("<phone><![CDATA[" + StringUtils.defaultString(contact.getPhone()) + "]]></phone>");
+			writer.print("<address><![CDATA[" + StringUtils.defaultString(contact.getAddress()) + "]]></address>");
 			writer.print("</contact>");
 		}
 

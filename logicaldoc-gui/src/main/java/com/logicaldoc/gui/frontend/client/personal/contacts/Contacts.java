@@ -17,7 +17,6 @@ import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -165,7 +164,6 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setSelectionType(SelectionStyle.SIMPLE);
-		list.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new ContactsDS());
@@ -279,8 +277,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 					@Override
 					public void onSuccess(GUIContact result) {
 						if (result != null) {
-							ContactDetails dialog = new ContactDetails(result, Contacts.this);
-							dialog.show();
+							new ContactDetails(result, Contacts.this).show();
 						}
 					}
 				});
