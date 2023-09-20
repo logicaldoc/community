@@ -19,6 +19,7 @@ import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -106,14 +107,63 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 	@Override
 	public void store(Template template) throws PersistenceException {
+		boolean isNew=template.getId()==0L;
 		super.store(template);
 
+		if(isNew) {
+			flush();
+			storeSecurityAsync(template);
+		}else {
+			storeSecurity(template);
+		}
+	}
+
+	/**
+	 * Saves the security settings in another thread waiting for the referenced
+	 * template to be available into the database.
+	 * 
+	 * @param template the template to save
+	 */
+	private void storeSecurityAsync(Template template) {
+		/*
+		 * Probably the document's record has not been written yet, we should
+		 * fork a thread to wait for it's write.
+		 */
+		ThreadPools.get().schedule(() -> {
+			try {
+				// Wait for the document's record write
+				String documentWriteCheckQuery = "select count(*) from ld_template where ld_id=" + template.getId();
+				int count = 0;
+				int tests = 0;
+				while (count == 0 && tests < 100) {
+					count = queryForInt(documentWriteCheckQuery);
+					Thread.sleep(1000L);
+					tests++;
+				}
+
+				if (count > 0) {
+					if (log.isDebugEnabled())
+						log.debug("Record of template {} has been written", template.getId());
+					storeSecurity(template);
+				}
+			} catch (PersistenceException ex) {
+				log.error(ex.getMessage(), ex);
+			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
+			}
+		}, "TemplateSecuritySave", 100L);
+	}
+
+	private void storeSecurity(Template template) throws PersistenceException {
 		jdbcUpdate("delete from ld_templategroup where ld_templateid=" + template.getId());
 		if (template.getTemplateGroups() != null)
 			for (TemplateGroup tg : template.getTemplateGroups()) {
 				jdbcUpdate("insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) values ("
 						+ template.getId() + ", " + tg.getGroupId() + ", " + tg.getWrite() + ")");
 			}
+
+		if (log.isDebugEnabled())
+			log.debug("Stored security settings of template {}", template.getId());
 	}
 
 	public int countFolders(long id) {
@@ -157,8 +207,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			// Manually initialize the collegtion of templateGroups
 			template.getTemplateGroups().clear();
 			SqlRowSet groupSet = queryForRowSet(
-					"select ld_groupid,ld_write from ld_templategroup where ld_templateid=" + template.getId(), 
-					null);
+					"select ld_groupid,ld_write from ld_templategroup where ld_templateid=" + template.getId(), null);
 			while (groupSet.next()) {
 				TemplateGroup tg = new TemplateGroup(groupSet.getLong(1));
 				tg.setWrite(groupSet.getInt(2));
@@ -221,7 +270,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(" and ld_groupid in (");
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(")");
-			
+
 			/**
 			 * IMPORTANT: the connection MUST be explicitly closed, otherwise it
 			 * is probable that the connection pool will leave open it

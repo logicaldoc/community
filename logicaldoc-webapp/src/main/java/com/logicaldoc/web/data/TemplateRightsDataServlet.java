@@ -33,7 +33,7 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		long workflowId = Long.parseLong(request.getParameter("templateId"));
+		long templateId = Long.parseLong(request.getParameter("templateId"));
 
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
@@ -43,7 +43,7 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 		response.setHeader("Cache-Control", "no-store");
 		response.setDateHeader("Expires", 0);
 
-		templateRights(response, workflowId);
+		templateRights(response, templateId);
 	}
 
 	/**
@@ -61,10 +61,10 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 		return users;
 	}
 
-	private void templateRights(HttpServletResponse response, Long workflowId)
+	private void templateRights(HttpServletResponse response, long templateId)
 			throws IOException, PersistenceException {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		Template template = tDao.findById(workflowId);
+		Template template = tDao.findById(templateId);
 		tDao.initialize(template);
 
 		// Prepare a map of users

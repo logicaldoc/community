@@ -669,7 +669,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				I18N.message("activablefeatures"));
 		activable.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> Features.get().show());
 
-		if (Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
+		if (!Session.get().isDemo() && Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
 				&& Feature.enabled(Feature.OFFICE) && com.logicaldoc.gui.common.client.Menu
 						.enabled(com.logicaldoc.gui.common.client.Menu.ACTIVABLE_FEATURES))
 			addButton(activable);

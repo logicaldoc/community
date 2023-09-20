@@ -945,7 +945,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
 		permissionColumn.put("LDSTORAGE", Permission.STORAGE);
 		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
-		
+
 		/**
 		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
 		 * probable that the connection pool will leave open it indefinitely.
@@ -1785,6 +1785,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		int records = jdbcUpdate("update ld_folder set ld_deleted=" + delCode + " where  ld_id in " + treeIdsString);
 		log.warn("Deleted {} folders in tree {} - {}", records, folder.getName(), folder.getId());
 
+		jdbcUpdate("update ld_folder set ld_deleteuserid=" + transaction.getUserId() + " where  ld_id in "
+				+ treeIdsString);
+		jdbcUpdate("update ld_folder set ld_deleteuser=:user where ld_id in "
+				+ treeIdsString, Map.of("user", transaction.getUser().getFullName()));
+
 		/*
 		 * Delete the aliases
 		 */
@@ -1799,6 +1804,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				"update ld_document set ld_deleted=" + delCode + " where ld_folderid in " + treeIdsString);
 		log.warn("Deleted {} documents in tree {} - {}", documents, folder.getName(), folder.getId());
 
+		jdbcUpdate("update ld_document set ld_deleteuserid=" + transaction.getUserId() + " where  ld_folderid in "
+				+ treeIdsString);
+		jdbcUpdate("update ld_document set ld_deleteuser=:user where  ld_folderid in "
+				+ treeIdsString, Map.of("user", transaction.getUser().getFullName()));
+		
 		if (getSessionFactory().getCache() != null)
 			getSessionFactory().getCache().evictEntityData(Folder.class);
 
