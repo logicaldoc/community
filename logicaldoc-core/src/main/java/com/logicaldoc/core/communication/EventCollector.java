@@ -88,10 +88,10 @@ public class EventCollector {
 
 		if (!history.isNotifyEvent())
 			return;
-
+		
 		if (!rememberHistory(history))
 			return;
-
+		
 		if (history.getDocId() != null && history.getDocument() == null) {
 			DocumentDAO docDao = (DocumentDAO) com.logicaldoc.util.Context.get().getBean(DocumentDAO.class);
 			try {

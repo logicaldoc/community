@@ -47,8 +47,6 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		Long maxChildren = getMaxChildren(session, max);
-
 		if (request.getParameter(PARENT) != null
 				&& (request.getParameter(PARENT).startsWith("d-") || request.getParameter(PARENT).equals("null"))) {
 			// The user clicked on a file
@@ -76,7 +74,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		 * Check if we have to paginate and what should be the start and end
 		 * gridRecord numbers
 		 */
-		Long[] indexes = getCurrentPageExtents(session, maxChildren, nopagination, parentFolderId, parentFolder);
+		Long[] indexes = getCurrentPageExtents(session, nopagination, parentFolderId, parentFolder);
 		Long startRecord = indexes[0];
 		Long endRecord = indexes[1];
 
@@ -241,7 +239,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		}
 	}
 
-	private Long[] getCurrentPageExtents(Session session, Long maxChildren, boolean nopagination, long parentFolderId,
+	private Long[] getCurrentPageExtents(Session session, boolean nopagination, long parentFolderId,
 			Folder parentFolder) {
 		Long startRecord = null;
 		Long endRecord = null;
@@ -251,10 +249,11 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			// per page
 			if (parentFolder != null && StringUtils.isNotEmpty(parentFolder.getGrid()))
 				endRecord = getFolderPageSizeFromSpec(parentFolder.getGrid());
-	
+
 			// Go with the default page size
 			if (endRecord == null)
-				endRecord = Long.MAX_VALUE;
+				endRecord = Context.get().getProperties().getLong(session.getTenantName() + ".gui.folder.maxchildren",
+						2000L);
 
 			Integer[] pagination = new Integer[] {
 					(Integer) session.getDictionary().get(FOLDER_START_RECORD + ":" + parentFolderId),
@@ -315,14 +314,6 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			parent = "" + root.getId();
 		}
 		return parent;
-	}
-
-	private long getMaxChildren(Session session, Integer max) {
-		long maxChildren = Context.get().getProperties().getLong(session.getTenantName() + ".gui.folder.maxchildren",
-				2000L);
-		if (max != null)
-			maxChildren = max;
-		return maxChildren;
 	}
 
 	private static Long getFolderPageSizeFromSpec(String spec) {

@@ -690,7 +690,7 @@ $I18N.get(''askedtochangepswdatlogin'')',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(3, CURRENT_TIMESTAMP,0,'psw.rec2','system','en', '$product - $I18N.get(''passwordrequest'')',
-'$product - $I18N.get(''passwordrequest'')<br/>
+'$product - $I18N.get(''passwordrequest'')<br/><br/>
 $I18N.get(''clickhere''): <a href="$url">$url</a>',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)

@@ -23,6 +23,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class Features extends Window {
 
+	private static final String DETAILS = "details";
+
 	private static Features instance = new Features();
 
 	private ListGrid grid;
@@ -43,29 +45,27 @@ public class Features extends Window {
 		name.setWidth("*");
 		name.setCellFormatter((value, rcd, rowNum, colNum) -> I18N.message("feature." + value));
 
-		ListGridField details = new ListGridField("details");
+		ListGridField details = new ListGridField(DETAILS);
 		details.setAutoFitWidth(true);
 		details.setMinWidth(100);
 		details.setAlign(Alignment.CENTER);
-		
+
 		ListGridField quote = new ListGridField("quote");
 		quote.setAutoFitWidth(true);
 		quote.setMinWidth(100);
 		quote.setAlign(Alignment.CENTER);
-		
+
 		grid = new ListGrid() {
 			@Override
 			protected Canvas createRecordComponent(final ListGridRecord rcd, Integer colNum) {
 
 				String fieldName = this.getFieldName(colNum);
 
-				if (fieldName.equals("details")) {
-					IButton button = new IButton(I18N.message("details").toLowerCase());
+				if (fieldName.equals(DETAILS)) {
+					IButton button = new IButton(I18N.message(DETAILS).toLowerCase());
 					button.setAutoFit(true);
 					button.setMargin(3);
-					button.addClickHandler(event -> {
-						WindowUtils.openUrl(rcd.getAttributeAsString("url"), "_blank");
-					});
+					button.addClickHandler(event -> WindowUtils.openUrl(rcd.getAttributeAsString("url"), "_blank"));
 					return button;
 				} else if (fieldName.equals("quote")) {
 					IButton button = new IButton(I18N.message("requestquote").toLowerCase());
@@ -73,14 +73,15 @@ public class Features extends Window {
 					button.setMargin(3);
 					button.addClickHandler(event -> {
 						String featureName = I18N.message("feature." + rcd.getAttribute("name"));
-						String body = "Hi, please send me a quote for adding this new optional feature: "+featureName+".%0D%0A";
+						String body = "Hi, please send me a quote for adding this new optional feature: " + featureName
+								+ ".%0D%0A";
 						body += "%0D%0AFeaure code: " + rcd.getAttribute("name");
 						body += "%0D%0AUserNo: " + Session.get().getInfo().getUserNo();
 						body += "%0D%0AProduct: " + Session.get().getInfo().getBranding().getProductName();
 						body += "%0D%0ALicensee: " + Session.get().getInfo().getLicensee();
 						body += "%0D%0A%0D%0A";
 						Util.uninstallCloseWindowAlert();
-						WindowUtils.openUrl("mailto:"+Session.get().getInfo().getBranding().getSales() + "?subject="
+						WindowUtils.openUrl("mailto:" + Session.get().getInfo().getBranding().getSales() + "?subject="
 								+ "Quote request, feature " + featureName + "&body=" + body);
 						Util.installCloseWindowAlert();
 					});
@@ -104,7 +105,6 @@ public class Features extends Window {
 		grid.setShowHeader(false);
 		grid.setShowRecordComponents(true);
 		grid.setShowRecordComponentsByCell(true);
-
 
 		grid.setFields(name, details, quote);
 		grid.setCanResizeFields(true);
