@@ -17,10 +17,8 @@ import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -166,7 +164,6 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setSelectionType(SelectionStyle.SIMPLE);
-		list.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new ContactsDS());
@@ -241,32 +238,31 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 
 		final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
 
-		LD.askForValues("sharecontacts", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }), 350,
-				new ValuesCallback() {
-					@Override
-					public void execute(String value) {
-						// Nothing to do
-					}
+		LD.askForValues("sharecontacts", null, Arrays.asList(usersSelector, groupsSelector), 350, new ValuesCallback() {
+			@Override
+			public void execute(String value) {
+				// Nothing to do
+			}
 
-					@Override
-					public void execute(Map<String, Object> values) {
-						LD.contactingServer();
-						ContactService.Instance.get().shareContacts(ids, usersSelector.getUserIds(),
-								groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+			@Override
+			public void execute(Map<String, Object> values) {
+				LD.contactingServer();
+				ContactService.Instance.get().shareContacts(ids, usersSelector.getUserIds(),
+						groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-									}
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(Void arg0) {
-										LD.clearPrompt();
-									}
-								});
-					}
-				});
+							@Override
+							public void onSuccess(Void arg0) {
+								LD.clearPrompt();
+							}
+						});
+			}
+		});
 	}
 
 	private void onEdit() {
@@ -281,8 +277,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 					@Override
 					public void onSuccess(GUIContact result) {
 						if (result != null) {
-							ContactDetails dialog = new ContactDetails(result, Contacts.this);
-							dialog.show();
+							new ContactDetails(result, Contacts.this).show();
 						}
 					}
 				});

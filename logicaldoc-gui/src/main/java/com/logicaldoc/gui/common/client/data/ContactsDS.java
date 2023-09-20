@@ -23,8 +23,11 @@ public class ContactsDS extends DataSource {
 		DataSourceTextField firstName = new DataSourceTextField("firstName");
 		DataSourceTextField lastName = new DataSourceTextField("lastName");
 		DataSourceTextField company = new DataSourceTextField("company");
+		DataSourceTextField phone = new DataSourceTextField("phone");
+		DataSourceTextField mobile = new DataSourceTextField("mobile");
+		DataSourceTextField address = new DataSourceTextField("address");
 
-		setFields(id, email, firstName, lastName, company);
+		setFields(id, email, firstName, lastName, company, mobile, phone, address);
 		setDataURL("data/contacts.xml?userId=" + Session.get().getUser().getId());
 		setClientOnly(true);
 	}
