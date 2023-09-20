@@ -174,9 +174,7 @@ public class UserUtil {
 				userDao.jdbcUpdate("update ld_user set ld_avatar = :avatar where ld_username = :username", params);
 			}
 		} catch (Exception t) {
-			if (user.getType() == User.TYPE_DEFAULT)
-				log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
-			else
+			if (log.isDebugEnabled())
 				log.debug(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 		} finally {
 			FileUtil.strongDelete(tmpAvatarImage);
