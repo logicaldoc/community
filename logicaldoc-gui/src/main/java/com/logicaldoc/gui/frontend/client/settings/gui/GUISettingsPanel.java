@@ -146,6 +146,10 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem reactToRemoteEvents = ItemFactory.newBooleanSelector("reacttoremoteevents");
 		reactToRemoteEvents.setWrapTitle(false);
 		reactToRemoteEvents.setValue(yesNo(settings, "gui.serverpush"));
+		
+		RadioGroupItem showPushErrors = ItemFactory.newBooleanSelector("reacttoremoteeventsshowerrors");
+		showPushErrors.setWrapTitle(false);
+		showPushErrors.setValue(yesNo(settings, "gui.serverpush.showerror"));
 
 		RadioGroupItem showLicenseAlertsInLogin = ItemFactory.newBooleanSelector("showlicensealertsinlogin");
 		showLicenseAlertsInLogin.setWrapTitle(false);
@@ -338,10 +342,6 @@ public class GUISettingsPanel extends AdminPanel {
 		foldOpenSelect.setWrapTitle(false);
 		foldOpenSelect.setValue(yesNo(settings, "gui.folder.openonselect"));
 
-		SpinnerItem foldMaxChildren = ItemFactory.newSpinnerItem("foldmaxchildren",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.folder.maxchildren").trim()));
-		foldMaxChildren.setWrapTitle(false);
-
 		SpinnerItem maxHistories = ItemFactory.newSpinnerItem("maxhistories",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.maxhistories").trim()));
 		maxHistories.setStep(10);
@@ -350,6 +350,10 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem foldPagination = ItemFactory.newBooleanSelector("foldpagination");
 		foldPagination.setWrapTitle(false);
 		foldPagination.setValue(yesNo(settings, "gui.folder.pagination"));
+		
+		SpinnerItem foldPageSize = ItemFactory.newSpinnerItem("foldpagesize",
+				Integer.parseInt(Util.getParameterValue(settings, "gui.folder.maxchildren").trim()));
+		foldPageSize.setWrapTitle(false);
 
 		RadioGroupItem autocloseFolderNodes = ItemFactory.newBooleanSelector("autoclosefoldernodes");
 		autocloseFolderNodes.setValue(yesNo(settings, "gui.folder.autoclose"));
@@ -441,10 +445,10 @@ public class GUISettingsPanel extends AdminPanel {
 				thumbSize, thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, avatarSize, uploadDisallow,
 				showAvatarsInGrids, textExtensions, attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize,
 				emailMaxSize, wfDashletRows, ondoubleclick, docTab, foldSorting, securityOption,
-				securitySecurityOptionDefault, foldOpentree, foldOpenSelect, foldPagination, foldMaxChildren,
+				securitySecurityOptionDefault, foldOpentree, foldOpenSelect, foldPagination, foldPageSize,
 				openPreviewPanel, maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled, allowNotesEditing,
 				webcontentFolders, downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout, sessionHeartbeat,
-				popupTimeout, charset, lockOnEditing, askVersionCommentOnSave, reactToRemoteEvents, saveInputs,
+				popupTimeout, charset, lockOnEditing, askVersionCommentOnSave, reactToRemoteEvents, showPushErrors, saveInputs,
 				showVersionAlertsInLogin, showLicenseAlertsInLogin, showQuotaAlertsInLogin, showUpdateAlertsInLogin,
 				showPatchAlertsInLogin, showLanguageInLogin, showLostPassword, save);
 	}
@@ -517,7 +521,7 @@ public class GUISettingsPanel extends AdminPanel {
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.sorting",
 				values.get("foldsorting").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.maxchildren",
-				values.get("foldmaxchildren").toString()));
+				values.get("foldpagesize").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.maxhistories",
 				values.get("maxhistories").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".upload.maxsize",
@@ -560,6 +564,8 @@ public class GUISettingsPanel extends AdminPanel {
 				trueFalse("autoclosefoldernodes")));
 		params.add(
 				new GUIParameter(Session.get().getTenantName() + ".gui.serverpush", trueFalse("reacttoremoteevents")));
+		params.add(
+				new GUIParameter(Session.get().getTenantName() + ".gui.serverpush.showerror", trueFalse("reacttoremoteeventsshowerrors")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.license.showloginalerts",
 				trueFalse("showlicensealertsinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.quota.showloginalerts",

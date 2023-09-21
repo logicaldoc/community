@@ -263,6 +263,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 
 	@Override
 	public void onError(WebSocket webSocket) {
-		GuiLog.warn("Server connection error", null);
+		if (Session.get().getConfigAsBoolean("gui.serverpush.showerror"))
+			GuiLog.warn(I18N.message("serverconnectionerror"), null);
 	}
 }
