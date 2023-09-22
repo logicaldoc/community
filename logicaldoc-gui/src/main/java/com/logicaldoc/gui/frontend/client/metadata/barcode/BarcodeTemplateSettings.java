@@ -19,6 +19,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -132,8 +133,10 @@ public class BarcodeTemplateSettings extends Window {
 			type.setValue(template.isZonal() ? ZONAL : "positonal");
 		if (!Feature.enabled(Feature.ZONAL_BARCODE))
 			type.setValue("positonal");
-
 		type.addChangedHandler((ChangedEvent event) -> uploader.setVisible(ZONAL.equals(event.getValue().toString())));
+
+		RadioGroupItem saveChangeEvent = ItemFactory.newBooleanSelector("savechangeevent");
+		saveChangeEvent.setValue(template.isSaveChangeEvent() ? "yes" : "no");
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setHeight(150);
@@ -163,9 +166,9 @@ public class BarcodeTemplateSettings extends Window {
 		rendRes.setStep(100);
 
 		if (Session.get().isDefaultTenant() && template.getId() != 0L)
-			form.setItems(id, type, name, description, batch, threshold, rendRes);
+			form.setItems(id, type, saveChangeEvent, name, description, batch, threshold, rendRes);
 		else
-			form.setItems(id, type, name, description);
+			form.setItems(id, type, saveChangeEvent, name, description);
 	}
 
 	public void onSave() {
@@ -184,6 +187,8 @@ public class BarcodeTemplateSettings extends Window {
 			template.setZonal(ZONAL.equals(vm.getValueAsString("type")));
 		else
 			template.setZonal(false);
+
+		template.setSaveChangeEvent("yes".equals(vm.getValue("savechangeevent")));
 
 		if (Session.get().isDefaultTenant() && template.getId() != 0L) {
 			template.setBatch(Integer.parseInt(vm.getValueAsString("batch")));

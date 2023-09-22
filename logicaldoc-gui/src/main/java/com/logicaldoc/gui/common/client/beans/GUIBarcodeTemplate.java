@@ -18,6 +18,8 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 	private Integer rendRes = 100;
 
 	private boolean zonal = false;
+	
+	private boolean saveChangeEvent = true;
 
 	public Integer getThreshold() {
 		return threshold;
@@ -63,5 +65,13 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 				newSpecs.add((GUIBarcodeZone)barcodeZone);
 		newSpecs.add(a);
 		setZones(newSpecs.toArray(new GUIBarcodeZone[0]));
+	}
+
+	public boolean isSaveChangeEvent() {
+		return saveChangeEvent;
+	}
+
+	public void setSaveChangeEvent(boolean saveChangeEvent) {
+		this.saveChangeEvent = saveChangeEvent;
 	}
 }
