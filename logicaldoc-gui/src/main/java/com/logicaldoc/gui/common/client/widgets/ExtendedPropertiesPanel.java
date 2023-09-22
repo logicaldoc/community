@@ -159,10 +159,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (allowTemplateSelection)
 			addMember(templateForm);
 
-		if (Feature.enabled(Feature.TEMPLATE)) {
+		if (Feature.enabled(Feature.TEMPLATE))
 			prepareExtendedAttributes(object.getTemplateId());
-			handleTemplateChangedSelection(null);
-		}
 	}
 
 	private void putCustomIdField() {
@@ -645,7 +643,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	private void onValueDelete(GUIAttribute att) {
 		// Copy the current filled values into the attributes
 		validateExtendedAttributes();
-		
+
 		// Remove the attribute and re-display
 		object.removeAttribute(att.getName());
 		displayAttributeItems();
