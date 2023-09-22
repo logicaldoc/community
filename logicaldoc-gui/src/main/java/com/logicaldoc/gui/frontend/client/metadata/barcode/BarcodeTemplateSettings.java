@@ -136,6 +136,7 @@ public class BarcodeTemplateSettings extends Window {
 		type.addChangedHandler((ChangedEvent event) -> uploader.setVisible(ZONAL.equals(event.getValue().toString())));
 
 		RadioGroupItem saveChangeEvent = ItemFactory.newBooleanSelector("savechangeevent");
+		saveChangeEvent.setWrapTitle(false);
 		saveChangeEvent.setValue(template.isSaveChangeEvent() ? "yes" : "no");
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
@@ -166,9 +167,9 @@ public class BarcodeTemplateSettings extends Window {
 		rendRes.setStep(100);
 
 		if (Session.get().isDefaultTenant() && template.getId() != 0L)
-			form.setItems(id, type, saveChangeEvent, name, description, batch, threshold, rendRes);
+			form.setItems(id, type, name, description, saveChangeEvent, batch, threshold, rendRes);
 		else
-			form.setItems(id, type, saveChangeEvent, name, description);
+			form.setItems(id, type, name, description, saveChangeEvent);
 	}
 
 	public void onSave() {

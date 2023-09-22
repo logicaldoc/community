@@ -43,6 +43,8 @@ public class GUIOCRTemplate implements Serializable {
 
 	private int batch = 200;
 
+	private boolean saveChangeEvent = true;
+
 	public GUIOCRTemplate() {
 		try {
 			batch = Session.get().getConfigAsInt("zonalocr.batch");
@@ -136,5 +138,13 @@ public class GUIOCRTemplate implements Serializable {
 
 	public void setBatch(int batch) {
 		this.batch = batch;
+	}
+
+	public boolean isSaveChangeEvent() {
+		return saveChangeEvent;
+	}
+
+	public void setSaveChangeEvent(boolean saveChangeEvent) {
+		this.saveChangeEvent = saveChangeEvent;
 	}
 }
