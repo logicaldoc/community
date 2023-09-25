@@ -199,11 +199,11 @@ public class ZonalOCRQueuePanel extends VLayout {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
+		list.setFields(locked, immutable, filename, size, lastModified, version, publisher, published, creator, created,
+				customId);
 		DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1, null);
 		params.setOcrd(true);
 		list.setDataSource(new DocumentsDS(params));
-		list.setFields(locked, immutable, filename, size, lastModified, version, publisher, published, creator, created,
-				customId);
 
 		setMembers(toolStrip, infoPanel, list);
 	}
