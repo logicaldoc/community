@@ -11,7 +11,7 @@
     <version>8.8.6</version>
     <packaging>pom</packaging>
     <name>logicaldoc</name>
-    <description>LogicalDOC is an open-source enterprise class Document Management System developed by LogicalDOC Srl, based on the Java Platform.</description>
+    <description>LogicalDOC is an open-source enterprise class Document Management System developed by LogicalDOC Srl, based on the Java Platform</description>
     <organization>
         <name>LogicalDOC</name>
         <url>http://www.logicaldoc.com</url>
