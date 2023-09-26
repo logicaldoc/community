@@ -56,6 +56,31 @@ public class ClassTool {
 	}
 
 	/**
+	 * Retrieves the class specification
+	 * 
+	 * @param className name of the class, if the class is inside the package
+	 *        com.logicaldoc you can just avoid the prefix, e.g.: for
+	 *        com.logicaldoc.stamp.automation.StampTool you can simply use
+	 *        stamp.automation.StampTool)
+	 * 
+	 * @return the class object
+	 * 
+	 * @throws ClassNotFoundException you specified an unexisting class
+	 */
+	public Class<?> forName(String className) throws ClassNotFoundException {
+		if (className.equals("java.lang.Runtime"))
+			throw new SecurityException("Class java.lang.Runtime is forbidden and cannot be instanciated");
+
+		try {
+			return Class.forName(className);
+		} catch (Exception t) {
+			// The classname as is was not found, so try to prefix with our root
+			// package
+			return Class.forName("com.logicaldoc." + className);
+		}
+	}
+
+	/**
 	 * Checks if a given instance is null
 	 * 
 	 * @param instance the object to evaluate

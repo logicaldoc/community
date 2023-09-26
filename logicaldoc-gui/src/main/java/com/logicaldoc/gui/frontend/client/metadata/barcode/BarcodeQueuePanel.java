@@ -73,6 +73,7 @@ public class BarcodeQueuePanel extends VLayout {
 			if (Boolean.TRUE.equals(max.validate())) {
 				maxRecords = (Integer) max.getValue();
 				DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1, null);
+				params.setBarcoded(true);
 				list.refresh(new DocumentsDS(params));
 			}
 		});
@@ -196,11 +197,11 @@ public class BarcodeQueuePanel extends VLayout {
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
 
+		list.setFields(locked, immutable, filename, size, lastModified, version, publisher, published, creator, created,
+				customId);
 		DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1, null);
 		params.setBarcoded(true);
 		list.setDataSource(new DocumentsDS(params));
-		list.setFields(locked, immutable, filename, size, lastModified, version, publisher, published, creator, created,
-				customId);
 
 		setMembers(toolStrip, infoPanel, list);
 	}
