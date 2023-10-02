@@ -260,7 +260,14 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 
 	@Override
 	public boolean validate() {
-		routine.setRights(this.getRights());
+		// the grid could not be initialized already so scroll it
+		if (list != null) {
+			try {
+				routine.setRights(this.getRights());
+			} catch (Exception e) {
+				// Nothing to do
+			}
+		}
 		return true;
 	}
 }
