@@ -41,6 +41,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class BruteForcePanel extends AdminPanel {
 
+	private static final String RECIPIENTS = "recipients";
+
 	private static final String ATTEMPTS = "attempts";
 
 	private static final String THROTTLE_IP_WAIT = "throttle.ip.wait";
@@ -147,10 +149,10 @@ public class BruteForcePanel extends AdminPanel {
 			// Nothing to do
 		}
 
-		MultiComboBoxItem recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients",
+		MultiComboBoxItem recipients = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
 				new UsersDS(null, false, false),
 				params.get(THROTTLE_ALERT_RECIPIENTS) != null && !params.get(THROTTLE_ALERT_RECIPIENTS).trim().isEmpty()
-						? params.get(THROTTLE_ALERT_RECIPIENTS).trim().split("[,]")
+						? params.get(THROTTLE_ALERT_RECIPIENTS).trim().split(",")
 						: null);
 		recipients.setValueField("username");
 		recipients.setDisplayField("username");
@@ -264,9 +266,9 @@ public class BruteForcePanel extends AdminPanel {
 		params[5] = new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
 				"yes".equals(values.get("usernamedisableuser").toString()) ? "true" : "false");
 
-		if (values.get("recipients") != null) {
+		if (values.get(RECIPIENTS) != null) {
 			@SuppressWarnings("unchecked")
-			ArrayList<String> usernames = (ArrayList<String>) values.get("recipients");
+			ArrayList<String> usernames = (ArrayList<String>) values.get(RECIPIENTS);
 			params[6] = new GUIParameter(THROTTLE_ALERT_RECIPIENTS,
 					usernames.stream().collect(Collectors.joining(",")));
 		} else {

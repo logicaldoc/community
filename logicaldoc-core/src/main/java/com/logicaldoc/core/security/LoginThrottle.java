@@ -288,7 +288,7 @@ public class LoginThrottle {
 	}
 
 	private static List<User> getRecipients() throws PersistenceException {
-		List<User> recipients = new ArrayList<User>();
+		List<User> recipients = new ArrayList<>();
 		String setting = Context.get().getProperties().getProperty("throttle.alert.recipients", "");
 		if (StringUtils.isNotEmpty(setting)) {
 			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
