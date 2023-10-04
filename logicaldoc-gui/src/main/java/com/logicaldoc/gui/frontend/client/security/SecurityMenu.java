@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
+import com.logicaldoc.gui.frontend.client.security.group.GroupsPanel;
 import com.logicaldoc.gui.frontend.client.security.ldap.LDAPServersPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationSettings;
 import com.logicaldoc.gui.frontend.client.security.user.UsersPanel;

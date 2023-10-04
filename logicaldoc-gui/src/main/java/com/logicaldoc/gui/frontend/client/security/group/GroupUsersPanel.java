@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.security;
+package com.logicaldoc.gui.frontend.client.security.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.UsersDS;

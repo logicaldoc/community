@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.security;
+package com.logicaldoc.gui.frontend.client.security.group;
 
 import java.util.Map;
 

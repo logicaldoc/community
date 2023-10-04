@@ -54,15 +54,12 @@ public class UserSelector extends SelectItem {
 		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
 			clearValue();
 			setValue((String) null);
-			fireEvent(new ChangedEvent(getJsObj()));
+			fireUserChanged();
 		});
 		clear.setWidth(12);
 		clear.setHeight(12);
 
-		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, event -> {
-			UserSearchDialog dialog = new UserSearchDialog(UserSelector.this);
-			dialog.show();
-		});
+		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, event -> new UserSearchDialog(UserSelector.this).show());
 		search.setWidth(12);
 		search.setHeight(12);
 
@@ -84,5 +81,9 @@ public class UserSelector extends SelectItem {
 			user.setUsername(selection.getAttributeAsString(USERNAME));
 		}
 		return user;
+	}
+	
+	void fireUserChanged() {
+		fireEvent(new ChangedEvent(getJsObj()));
 	}
 }
