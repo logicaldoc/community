@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.security;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.UsersDS;
+import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -61,32 +62,38 @@ public class GroupUsersPanel extends VLayout {
 
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		username.setCanFilter(true);
+		username.setCellFormatter(new UserCellFormatter());
 
 		ListGridField name = new ListGridField("name", I18N.message("lastname"), 100);
 		name.setCanFilter(true);
+		name.setCellFormatter(new UserCellFormatter());
 
 		ListGridField firstName = new ListGridField(FIRST_NAME, I18N.message("firstname"), 100);
 		firstName.setCanFilter(true);
+		firstName.setCellFormatter(new UserCellFormatter());
 
 		ListGridField phone = new ListGridField(PHONE, I18N.message(PHONE), 90);
 		phone.setCanFilter(true);
+		phone.setCellFormatter(new UserCellFormatter());
 
 		ListGridField cell = new ListGridField("cell", I18N.message("cell"), 90);
 		cell.setCanFilter(true);
+		cell.setCellFormatter(new UserCellFormatter());
 
 		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 200);
 		email.setCanFilter(true);
+		email.setCellFormatter(new UserCellFormatter());
 
-		ListGridField eenabled = new ListGridField(EENABLED, " ", 24);
-		eenabled.setType(ListGridFieldType.IMAGE);
-		eenabled.setCanSort(false);
-		eenabled.setAlign(Alignment.CENTER);
-		eenabled.setShowDefaultContextMenu(false);
-		eenabled.setImageURLPrefix(Util.imagePrefix());
-		eenabled.setImageURLSuffix(".gif");
-		eenabled.setCanFilter(false);
-
-		ListGridField enabled = new ListGridField("_enabled", I18N.message("enabled"), 55);
+		ListGridField enabledIcon = new ListGridField("enabledIcon", " ", 24);
+		enabledIcon.setType(ListGridFieldType.IMAGE);
+		enabledIcon.setCanSort(false);
+		enabledIcon.setAlign(Alignment.CENTER);
+		enabledIcon.setShowDefaultContextMenu(false);
+		enabledIcon.setImageURLPrefix(Util.imagePrefix());
+		enabledIcon.setImageURLSuffix(".gif");
+		enabledIcon.setCanFilter(false);
+		
+		ListGridField enabled = new ListGridField(EENABLED, I18N.message("enabled"), 55);
 		enabled.setCanFilter(true);
 		enabled.setHidden(true);
 
@@ -104,7 +111,7 @@ public class GroupUsersPanel extends VLayout {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(UsersDS.get(groupId));
-		list.setFields(id, eenabled, avatar, username, firstName, name, email, cell, phone, enabled, guest);
+		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, cell, phone, enabled, guest, enabled);
 
 		HLayout buttons = new HLayout();
 		buttons.setHeight(25);

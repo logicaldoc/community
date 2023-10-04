@@ -71,11 +71,11 @@ public class StateWidget extends Label {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(click -> 
-			LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean answer) -> {
-				if (Boolean.TRUE.equals(answer))
-					delete();
-			}));
+		delete.addClickHandler(
+				click -> LD.ask(I18N.message("ddelete"), I18N.message("confirmdelete"), (Boolean answer) -> {
+					if (Boolean.TRUE.equals(answer))
+						delete();
+				}));
 
 		MenuItem makeStart = new MenuItem();
 		makeStart.setTitle(I18N.message("startstate"));
@@ -163,14 +163,11 @@ public class StateWidget extends Label {
 
 	private void edit() {
 		if (isTask() || isEnd()) {
-			TaskEditor dialog = new TaskEditor(StateWidget.this);
-			dialog.show();
+			new TaskEditor(StateWidget.this).show();
 		} else if (isJoin() || isFork()) {
-			StatusDialog dialog = new StatusDialog(StateWidget.this);
-			dialog.show();
+			new StatusDialog(StateWidget.this).show();
 		} else {
-			TransitionEditor dialog = new TransitionEditor(StateWidget.this);
-			dialog.show();
+			new TransitionEditor(StateWidget.this).show();
 		}
 	}
 
