@@ -15,7 +15,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class LockedDocsDS extends DataSource {
 
-	public LockedDocsDS(Long userId) {
+	public LockedDocsDS(Long userId, Integer max) {
 		setTitleField("filename");
 		setRecordXPath("/list/document");
 
@@ -42,9 +42,11 @@ public class LockedDocsDS extends DataSource {
 				immutable, folderId, type, status);
 		setClientOnly(true);
 
-		String url = "data/lockeddocs.xml";
+		String url = "data/lockeddocs.xml?1=1";
 		if (userId != null)
-			url += "?userId=" + userId;
+			url += "&userId=" + userId;
+		if (max != null)
+			url += "&max=" + max;
 		setDataURL(url);
 	}
 }

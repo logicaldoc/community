@@ -16,11 +16,13 @@ import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel shows a list of deleted documents
@@ -34,13 +36,14 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 
 	private FolderSelector folderSelector;
 
+	private SpinnerItem max;
+	
 	public DeletedDocsReport() {
 		super("deleteddocs", "showndocuments");
 	}
 
 	@Override
 	protected void prepareListGrid() {
-
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 		id.setCanGroupBy(false);
@@ -84,6 +87,22 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 
 	@Override
 	protected void fillToolBar(ToolStrip toolStrip) {
+		max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
+		max.setHint(I18N.message("elements"));
+		max.setStep(10);
+		max.setShowTitle(false);
+		max.addChangedHandler(event -> refresh());
+
+		ToolStripButton display = new ToolStripButton();
+		display.setTitle(I18N.message("display"));
+		display.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refresh();
+		});
+		toolStrip.addButton(display);
+		toolStrip.addFormItem(max);
+		toolStrip.addSeparator();
+		
 		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
@@ -96,14 +115,14 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 		folderSelector.addFolderChangeListener(this);
 		toolStrip.addFormItem(folderSelector);
 	}
-
+	
 	@Override
 	protected void refresh() {
 		Long folderId = folderSelector.getFolderId();
 		Long userId = null;
 		if (userSelector.getValueAsString() != null && !"".equals(userSelector.getValueAsString()))
 			userId = Long.parseLong(userSelector.getValueAsString());
-		list.refresh(new DeletedDocsDS(userId, folderId));
+		list.refresh(new DeletedDocsDS(userId, folderId, max.getValueAsInteger()));
 	}
 
 	@Override

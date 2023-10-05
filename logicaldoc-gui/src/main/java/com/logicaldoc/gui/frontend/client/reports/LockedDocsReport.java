@@ -21,6 +21,7 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -28,6 +29,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel shows a list of locked documents
@@ -41,12 +43,30 @@ public class LockedDocsReport extends ReportPanel {
 
 	private SelectItem userSelector;
 
+	private SpinnerItem max;
+
 	public LockedDocsReport() {
 		super("lockeddocs", "showndocuments");
 	}
 
 	@Override
 	protected void fillToolBar(ToolStrip toolStrip) {
+		max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
+		max.setHint(I18N.message("elements"));
+		max.setStep(10);
+		max.setShowTitle(false);
+		max.addChangedHandler(event -> refresh());
+
+		ToolStripButton display = new ToolStripButton();
+		display.setTitle(I18N.message("display"));
+		display.addClickHandler(event -> {
+			if (Boolean.TRUE.equals(max.validate()))
+				refresh();
+		});
+		toolStrip.addButton(display);
+		toolStrip.addFormItem(max);
+		toolStrip.addSeparator();
+
 		userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
@@ -206,6 +226,6 @@ public class LockedDocsReport extends ReportPanel {
 		Long userId = null;
 		if (userSelector.getValueAsString() != null && !"".equals(userSelector.getValueAsString()))
 			userId = Long.parseLong(userSelector.getValueAsString());
-		list.refresh(new LockedDocsDS(userId));
+		list.refresh(new LockedDocsDS(userId, max.getValueAsInteger()));
 	}
 }

@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
 /**
- * This is the form used to restore a selection of documents.
+ * This is the form used to restore a selection of documents or folders.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1

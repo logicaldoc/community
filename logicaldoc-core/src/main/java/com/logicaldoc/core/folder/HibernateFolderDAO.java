@@ -1457,8 +1457,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Folder folder = findFolder(parent.getId());
 
 		while (st.hasMoreTokens()) {
-			initialize(folder);
-
 			String name = st.nextToken();
 
 			Map<String, Object> params = new HashMap<>();
@@ -1474,12 +1472,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				Folder folderVO = new Folder();
 				folderVO.setName(name);
 				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
+				initialize(folder);
 				folder = create(folder, folderVO, inheritSecurity,
 						transaction != null ? new FolderHistory(transaction) : null);
 				flush();
 			} else {
 				folder = findById(child);
-				initialize(folder);
 			}
 		}
 		return folder;

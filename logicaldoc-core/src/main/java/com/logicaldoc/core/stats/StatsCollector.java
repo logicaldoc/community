@@ -641,7 +641,7 @@ public class StatsCollector extends Task {
 			log.error(e.getMessage(), e);
 		}
 
-		stats[5] = documentDAO.computeTotalSize(tenantId, null, true);
+		stats[5] = documentDAO.computeTotalSize(tenantId != Tenant.SYSTEM_ID ? tenantId : null, null, true);
 
 		stats[6] = 0;
 		try {

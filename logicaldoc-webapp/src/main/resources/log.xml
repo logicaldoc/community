@@ -530,6 +530,7 @@
     <Logger name="org.apache.cxf" level="error" additivity="true">
       <Appender-Ref ref="WEBSERVICE" />
     </Logger>
+    <Logger name="org.jgroups.protocols" level="error" additivity="true" />
     <Logger name="org.apache.pdfbox" level="error" additivity="true" />
     <Logger name="org.apache.solr" level="error" additivity="true" />
     <Logger name="org.jgroups.protocols" level="error" additivity="true" />

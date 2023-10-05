@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
@@ -67,16 +68,20 @@ public class ApplyTemplateDialog extends Dialog {
 			final long folderId = Long.parseLong(selectedNode.getAttributeAsString("folderId"));
 			long templateId = Long.parseLong(form.getValueAsString("foldertemplate"));
 
+			LD.contactingServer();
+			
 			FolderService.Instance.get().applyTemplate(folderId, templateId,
 					"true".equals(form.getValueAsString("inheritSecurity")), new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void arg0) {
+							LD.clearPrompt();
 							FolderNavigator.get().getTree().reloadChildren(selectedNode);
 							GuiLog.info(I18N.message("templateapplied"), null);
 							destroy();
