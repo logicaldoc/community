@@ -111,7 +111,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 
 				return doc;
 			}
-		}, max != null ? max : 100);
+		}, max);
 
 		/*
 		 * Iterate over records composing the response XML document
