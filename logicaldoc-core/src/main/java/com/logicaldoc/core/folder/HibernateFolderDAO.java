@@ -1426,9 +1426,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void replicateParentMetadata(Folder folder, Folder folderVO, Folder parent) {
 		if (parent.getTemplate() != null && folderVO.getTemplate() == null && folderVO.getFoldRef() == null) {
-			initialize(parent);
 			folder.setTemplate(parent.getTemplate());
-
 			for (String att : parent.getAttributeNames()) {
 				Attribute ext = new Attribute(parent.getAttributes().get(att));
 				folder.getAttributes().put(att, ext);
