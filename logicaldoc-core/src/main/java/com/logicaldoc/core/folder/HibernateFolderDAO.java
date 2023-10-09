@@ -1348,7 +1348,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public Folder create(Folder parent, Folder folderVO, boolean inheritSecurity, FolderHistory transaction)
 			throws PersistenceException {
 		parent = findFolder(parent);
-
+		if(!org.hibernate.Hibernate.isInitialized(parent.getAttributes()))
+			initialize(parent);
+		
 		Folder folder = new Folder();
 		folder.setName(folderVO.getName());
 		folder.setType(folderVO.getType());
@@ -1938,7 +1940,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void initialize(Folder folder) {
 		refresh(folder);
-
+		
 		if (folder.getFolderGroups() != null)
 			log.trace("Initialized {} folder groups", folder.getFolderGroups().size());
 

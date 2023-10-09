@@ -661,6 +661,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testCreate() throws PersistenceException {
 		Folder parent = dao.findById(1202L);
+//		dao.initialize(parent);
 
 		Folder folderVO = new Folder();
 		folderVO.setName("xxxx");
