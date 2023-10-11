@@ -188,13 +188,13 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<tasks>
+							<target>
 								<delete dir="war/common" quiet="true" />
 								<delete dir="war/frontend" quiet="true" />
 								<delete dir="war/setup" quiet="true" />
 								<delete dir="war/login" quiet="true" />
 								<delete dir="war/WEB-INF/deploy" quiet="true" />
-							</tasks>
+							</target>
 						</configuration>
 					</execution>
 					<execution>
@@ -204,7 +204,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<tasks>
+							<target>
 								<delete dir="target/api" quiet="true" />
 								<unzip
 									src="target/${project.artifactId}-${project.version}.jar"
@@ -366,7 +366,7 @@
 								<move
 									file="target/${project.artifactId}-${project.version}-plugin2.zip"
 									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
-							</tasks>
+							</target>
 						</configuration>
 					</execution>
 				</executions>
