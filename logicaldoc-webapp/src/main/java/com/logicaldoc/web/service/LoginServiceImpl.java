@@ -72,8 +72,11 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			usr.setId(user.getId());
 			usr.setUsername(user.getUsername());
 			usr.setTenant(SecurityServiceImpl.getTenant(user.getTenantId()));
-			usr.setPasswordExpires(user.getPasswordExpires() == 1);
-			usr.setPasswordExpired(userDao.isPasswordExpired(username));
+			usr.setPasswordExpires(false);
+			usr.setPasswordExpired(false);
+			
+//			usr.setPasswordExpires(user.getPasswordExpires() == 1);
+//			usr.setPasswordExpired(userDao.isPasswordExpired(username));
 			usr.setEmail(user.getEmail());
 			usr.setEmail2(user.getEmail2());
 			usr.setName(user.getName());

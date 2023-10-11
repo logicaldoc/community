@@ -86,7 +86,7 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 				folder.setColor(rs.getString(8));
 				return folder;
 			}
-		}, max);
+		}, null);
 
 		/*
 		 * Iterate over records composing the response XML document
