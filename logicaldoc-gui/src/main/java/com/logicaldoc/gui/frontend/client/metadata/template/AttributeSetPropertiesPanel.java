@@ -616,8 +616,39 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		MenuItem applyInitializationToTemplates = prepareApplyInitializationToTemplatesContextMenuItem();
 
-		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, delete);
+		MenuItem applyAllToTemplates = prepareApplyAllToTemplatesContextMenuItem();
+
+		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, applyAllToTemplates, delete);
 		contextMenu.showContextMenu();
+	}
+
+	private MenuItem prepareApplyAllToTemplatesContextMenuItem() {
+		MenuItem applyToTemplates = new MenuItem();
+		applyToTemplates.setTitle(I18N.message("applyalltotemplates"));
+		applyToTemplates.addClickHandler(applyInitializationToTemplatesClick -> {
+			final ListGridRecord selection = attributesList.getSelectedRecord();
+
+			LD.ask(I18N.message("applyalltotemplates"), I18N.message("applyalltotemplatestotemplatesquestion"), yes -> {
+				if (Boolean.TRUE.equals(yes)) {
+					LD.contactingServer();
+					AttributeSetService.Instance.get().applyAllToTemplates(attributeSet.getId(),
+							selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+									LD.clearPrompt();
+								}
+
+								@Override
+								public void onSuccess(Void arg0) {
+									LD.clearPrompt();
+								}
+							});
+				}
+			});
+		});
+		applyToTemplates.setEnabled(attributeSet.getId() != 0L);
+		return applyToTemplates;
 	}
 
 	private MenuItem prepareApplyInitializationToTemplatesContextMenuItem() {

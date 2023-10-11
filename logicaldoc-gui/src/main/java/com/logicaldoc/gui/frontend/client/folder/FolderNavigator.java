@@ -495,10 +495,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		if (Feature.visible(Feature.AUDIT)) {
 			MenuItem subscribe = new MenuItem();
 			subscribe.setTitle(I18N.message("subscribe"));
-			subscribe.addClickHandler(click -> {
-				SubscriptionDialog dialog = new SubscriptionDialog(folder.getId(), null);
-				dialog.show();
-			});
+			subscribe.addClickHandler(click -> new SubscriptionDialog(folder.getId(), null).show());
 			subscribe.setEnabled(Feature.enabled(Feature.AUDIT));
 			contextMenu.addItem(subscribe);
 		}
@@ -507,20 +504,14 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	private MenuItem prepareCopyMenuItem() {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
-		copy.addClickHandler(copyClick -> {
-			FolderCopyDialog dialog = new FolderCopyDialog();
-			dialog.show();
-		});
+		copy.addClickHandler(copyClick -> new FolderCopyDialog().show());
 		return copy;
 	}
 
 	private MenuItem prepareCreateAliasMenuItem() {
 		MenuItem createAlias = new MenuItem();
 		createAlias.setTitle(I18N.message("createalias"));
-		createAlias.addClickHandler(caClick -> {
-			CreateAliasDialog dialog = new CreateAliasDialog();
-			dialog.show();
-		});
+		createAlias.addClickHandler(caClick -> new CreateAliasDialog().show());
 		createAlias.setEnabled(getSelectedRecord().getAttributeAsString(FOLD_REF) == null);
 		return createAlias;
 	}

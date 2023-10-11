@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -114,44 +113,6 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 		// Enforce the set specifications in all the attributes
 		enforceSetSpecInAllAttributes(set);
-
-		/*
-		 * Update the attributes referenced in the templates
-		 */
-		List<Template> templates = templateDao.findAll(set.getTenantId());
-		for (Template template : templates) {
-			templateDao.initialize(template);
-			List<String> names = template.getAttributeNames(set.getId());
-			for (String name : names) {
-				Attribute setAttribute = set.getAttribute(name);
-				replicateAttributeToTemplate(name, setAttribute, template);
-			}
-			templateDao.store(template);
-		}
-	}
-
-	private void replicateAttributeToTemplate(String name, Attribute attribute, Template template) {
-		if (attribute != null) {
-			// the attribute exists both in template and set so update
-			// it but preserve the position and the validation(if any)
-			// declared in the template
-			Attribute templateAttribute = template.getAttribute(name);
-			int currentPosition = templateAttribute.getPosition();
-			String currentValidation = templateAttribute.getValidation();
-			String currentInitialization = templateAttribute.getInitialization();
-
-			Attribute clonedAttribute = new Attribute(attribute);
-			clonedAttribute.setPosition(currentPosition);
-			if (StringUtils.isNotEmpty(currentValidation))
-				clonedAttribute.setValidation(currentValidation);
-			if (StringUtils.isNotEmpty(currentInitialization))
-				clonedAttribute.setInitialization(currentInitialization);
-			template.getAttributes().put(name, clonedAttribute);
-		} else {
-			// the attribute exists in template but not in the set so
-			// remove it
-			template.removeAttribute(name);
-		}
 	}
 
 	private void enforceSetSpecInAllAttributes(AttributeSet set) throws PersistenceException {

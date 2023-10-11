@@ -18,6 +18,8 @@ import com.logicaldoc.core.metadata.AttributeOption;
 import com.logicaldoc.core.metadata.AttributeOptionDAO;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -398,6 +400,30 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 					"update ld_template_ext set ld_initialization = :initialization where ld_setid = :setId and ld_name = :name",
 					params);
 			log.info("Updated the initialization of {} template attributes named {}", count, attribute);
+		} catch (Exception t) {
+			throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void applyAllToTemplates(long setId, String attributeName) throws ServerException {
+		Session session = validateSession(getThreadLocalRequest());
+		try {
+			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSet set = dao.findById(setId);
+			Attribute setAttribute = set.getAttribute(attributeName);
+
+			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+
+			/*
+			 * Update the attributes referenced in the templates
+			 */
+			List<Template> templates = templateDao.findAll(set.getTenantId());
+			for (Template template : templates) {
+				templateDao.initialize(template);
+				template.getAttributes().put(attributeName, new Attribute(setAttribute));
+				templateDao.store(template);
+			}
 		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
