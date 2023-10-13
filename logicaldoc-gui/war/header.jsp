@@ -125,7 +125,7 @@ body {
 }
 </style>
 
-<link href="./fontawesome/css/all.css" rel="stylesheet">
+<link href="./fontawesome/css/all.min.css" rel="stylesheet">
 
 <link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style.css" TYPE="text/css" />
 <link id="favicon" rel="shortcut icon" type="image/png" href='' />
