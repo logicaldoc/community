@@ -47,6 +47,7 @@
 						<exclude name="setup/" />
 						<exclude name="login/" / -->
 						<exclude name="WEB-INF/**" />
+						<exclude name="**/*.jsp" />
 						<!-- exclude name="skin/" />
 						<exclude name="skin-Tahoe/" />
 						<exclude name="prev/" />

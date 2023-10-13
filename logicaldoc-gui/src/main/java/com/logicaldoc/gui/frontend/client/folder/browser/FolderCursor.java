@@ -123,11 +123,15 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		if (pagination == null) {
 			pagination = new FolderPagination(folder.getId(), Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN),
 					(int) folder.getSubfolderCount(), 1);
-			if (folder.getGrid() != null && !folder.getGrid().isEmpty())
-				pagination.setPageSize(DocumentGridUtil.getFolderPageSizeFromSpec(folder.getGrid()));
-			else if (Session.get().getUser().getDocsGrid() != null && !Session.get().getUser().getDocsGrid().isEmpty())
-				pagination
-						.setPageSize(DocumentGridUtil.getFolderPageSizeFromSpec(Session.get().getUser().getDocsGrid()));
+			Integer pageSizeFromSpec = null;
+			if (folder.getGrid() != null && !folder.getGrid().isEmpty()) {
+				pageSizeFromSpec = DocumentGridUtil.getFolderPageSizeFromSpec(folder.getGrid());
+			} else if (Session.get().getUser().getDocsGrid() != null
+					&& !Session.get().getUser().getDocsGrid().isEmpty()) {
+				pageSizeFromSpec = DocumentGridUtil.getFolderPageSizeFromSpec(Session.get().getUser().getDocsGrid());
+			}
+			if (pageSizeFromSpec != null)
+				pagination.setPageSize(pageSizeFromSpec);
 
 			// Save it only if there is more than one page
 			if (pagination.getTotalPages() > 1)
