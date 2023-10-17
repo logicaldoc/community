@@ -39,7 +39,7 @@ public enum DocumentEvent {
 	REMOVED_FROM_CALEVENT("event.caldel"),
 	SUBSCRIBED("event.subscribed"),
 	STAMPED("event.stamped"),
-	DTICKET_CREATED("event.dticket.created"),
+	TICKET_CREATED("event.ticket.created"),
 	PASSWORD_PROTECTED("event.password.protected"),
 	PASSWORD_UNPROTECTED("event.password.unprotected"),
 	RATING_NEW("event.rating.new"),

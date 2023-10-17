@@ -107,6 +107,9 @@
           // PDFViewerApplication._initializeL10n
           // PDFViewerApplication.preferences.set('pdfBugEnabled', true);
 
+		  // In order to avoid the side panel to appear on load, please edit the file viewer.js and replace
+		  // "sidebarViewOnLoad": -1, with "sidebarViewOnLoad": false,
+
             
             PDFViewerApplication.initializedPromise.then(() => {
                 PDFViewerApplication.eventBus.on("documentloaded", (e) => {

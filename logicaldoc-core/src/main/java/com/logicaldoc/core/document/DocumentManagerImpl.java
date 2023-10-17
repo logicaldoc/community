@@ -1431,7 +1431,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			ticket.setExpired(cal.getTime());
 		}
 
-		transaction.setEvent(DocumentEvent.DTICKET_CREATED.toString());
+		transaction.setEvent(DocumentEvent.TICKET_CREATED.toString());
 		transaction.setSessionId(transaction.getSessionId());
 
 		ticketDAO.store(ticket, transaction);
