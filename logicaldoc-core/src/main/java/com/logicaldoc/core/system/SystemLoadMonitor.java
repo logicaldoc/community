@@ -95,7 +95,7 @@ public class SystemLoadMonitor {
 		try {
 			Exec exec = new Exec();
 			exec.setOutPrefix(null);
-			exec.exec("wmic cpu get loadpercentage", null, null, sb, 5);
+			exec.exec("Powershell \"[string][int](Get-Counter '\\Processor(*)\\% Processor Time').Countersamples[0].CookedValue", null, null, sb, 5);
 		} catch (IOException e1) {
 			log.warn(e1.getMessage(), e1);
 			return 0;
