@@ -737,26 +737,26 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			validateSession(session.getSid());
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Document doc = docDao.findById(docId);
+		Document document = docDao.findById(docId);
 
-		GUIDocument document = null;
+		GUIDocument guiDocument = null;
 		GUIFolder folder = null;
 
-		if (doc != null) {
+		if (document != null) {
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			fDao.initialize(doc.getFolder());
-			folder = new FolderServiceImpl().fromFolder(doc.getFolder(), false);
+			fDao.initialize(document.getFolder());
+			folder = new FolderServiceImpl().fromFolder(document.getFolder(), false);
 
 			if (session != null)
-				checkPublished(session.getUser(), doc);
+				checkPublished(session.getUser(), document);
 
-			docDao.initialize(doc);
+			docDao.initialize(document);
 
-			document = fromDocument(doc, folder, session != null ? session.getUser() : null);
+			guiDocument = fromDocument(document, folder, session != null ? session.getUser() : null);
 
 			if (session != null && folder != null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-				Set<Permission> permissions = fdao.getEnabledPermissions(doc.getFolder().getId(), session.getUserId());
+				Set<Permission> permissions = fdao.getEnabledPermissions(document.getFolder().getId(), session.getUserId());
 				List<String> permissionsList = new ArrayList<>();
 				for (Permission permission : permissions)
 					permissionsList.add(permission.toString());
@@ -764,7 +764,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 		}
 
-		return document;
+		return guiDocument;
 	}
 
 	public GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser) throws PersistenceException {
@@ -1358,9 +1358,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private static void setDateValue(GUIAttribute attr, Attribute extAttr) {
-		if (attr.getValue() != null)
-			extAttr.setDateValue((Date) attr.getValue());
-		else
+		if (attr.getValue() != null) {
+			extAttr.setDateValue(fixDateForDB((Date) attr.getValue()));
+		} else
 			extAttr.setDateValue(null);
 	}
 

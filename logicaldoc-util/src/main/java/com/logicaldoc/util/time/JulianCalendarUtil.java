@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -77,6 +78,19 @@ public class JulianCalendarUtil {
 	private JulianCalendarUtil() {
 	}
 
+	/**
+	 * Checks if a date is before the institution of the gregorian calendar on
+	 * Oct 4th 1582.
+	 * 
+	 * @param date The date to check
+	 * 
+	 * @return true only if the date falls in the julian period
+	 */
+	public static boolean isJulianDate(Date date) {
+		GregorianCalendar cal = new GregorianCalendar();
+		return cal.getGregorianChange().after(date);
+	}
+
 	public static Date toGregorian(Date julianDate) {
 		Period matchedPeriod = getMatchingPeriod(julianDate);
 
@@ -104,6 +118,9 @@ public class JulianCalendarUtil {
 	}
 
 	private static Period getMatchingPeriod(Date date) {
+		if (date == null)
+			return null;
+
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		String str = df.format(date);
 		String[] tokens = str.split("\\-", 0);

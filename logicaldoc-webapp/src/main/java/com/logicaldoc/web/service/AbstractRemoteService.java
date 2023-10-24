@@ -42,6 +42,7 @@ import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.time.JulianCalendarUtil;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.util.LongRunningOperationCompleteListener;
 import com.logicaldoc.web.util.ServletUtil;
@@ -396,7 +397,34 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	}
 
 	private void normalizeDate(GUIAttribute att) {
-		if (att.getValue() instanceof Date)
+		if (att.getValue() instanceof Date) {
 			att.setValue(convertToDate((Date) att.getValue()));
+		}
+	}
+
+	/**
+	 * Converts into Gregorian date in case it is before Oct 4th 1582
+	 * 
+	 * @param date the date to treat
+	 * 
+	 * @return the converted date
+	 */
+	protected static final Date fixDateForDB(Date date) {
+		if (date != null && JulianCalendarUtil.isJulianDate(date))
+			date = JulianCalendarUtil.toGregorian(date);
+		return date;
+	}
+	
+	/**
+	 * Converts into Julian date in case it is before Oct 4th 1582
+	 * 
+	 * @param date the date to treat
+	 * 
+	 * @return the converted date
+	 */
+	protected static final Date fixDateForGUI(Date date) {
+		if (date != null && JulianCalendarUtil.isJulianDate(date))
+			date = JulianCalendarUtil.toJulian(date);
+		return date;
 	}
 }

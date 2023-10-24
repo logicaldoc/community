@@ -498,7 +498,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				guiAttribute.setIntValue(attribute.getIntValue());
 				guiAttribute.setBooleanValue(attribute.getBooleanValue());
 				guiAttribute.setDoubleValue(attribute.getDoubleValue());
-				guiAttribute.setDateValue(attribute.getDateValue());
+				guiAttribute.setDateValue(fixDateForGUI(attribute.getDateValue()));
 				if (attribute.getType() == Attribute.TYPE_USER)
 					guiAttribute.setUsername(attribute.getStringValue());
 			} else

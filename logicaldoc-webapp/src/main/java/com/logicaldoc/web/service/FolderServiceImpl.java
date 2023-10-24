@@ -1190,6 +1190,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			case Attribute.TYPE_BOOLEAN:
 				extAttr.setValue(guiAttribute.getBooleanValue());
 				break;
+			case Attribute.TYPE_DATE:
+				extAttr.setValue(fixDateForGUI(guiAttribute.getDateValue()));
+				break;
 			default:
 				extAttr.setValue(guiAttribute.getValue());
 				break;
