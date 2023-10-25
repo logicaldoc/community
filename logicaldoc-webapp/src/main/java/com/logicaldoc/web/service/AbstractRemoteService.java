@@ -77,7 +77,11 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		return UploadServlet.getReceivedFiles(sid);
 	}
 
-	protected Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
+	protected Session validateSession() throws InvalidSessionServerException {
+		return validateSession(getThreadLocalRequest());
+	}
+	
+	private Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
 		try {
 			return ServletUtil.validateSession(request);
 		} catch (InvalidSessionException e) {

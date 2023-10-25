@@ -44,7 +44,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public void delete(long[] ids) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 		Context context = Context.get();
 		SystemMessageDAO dao = (SystemMessageDAO) context.getBean(SystemMessageDAO.class);
 		for (long id : ids) {
@@ -58,7 +58,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public GUIMessage getMessage(long messageId, boolean markAsRead) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			Context context = Context.get();
@@ -114,7 +114,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public void save(GUIMessage message, long[] recipientIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			for (long id : recipientIds)
@@ -162,7 +162,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public GUIMessageTemplate[] loadTemplates(String language, String type) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		Context context = Context.get();
 
 		try {
@@ -203,7 +203,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public void saveTemplates(GUIMessageTemplate[] templates) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 
@@ -239,7 +239,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public void deleteTemplates(long[] ids) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			MessageTemplateDAO dao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
@@ -264,7 +264,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public void deleteTemplates(String name) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			Context context = Context.get();
@@ -282,7 +282,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	@Override
 	public GUIMessageTemplate getTemplate(long templateId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			Context context = Context.get();

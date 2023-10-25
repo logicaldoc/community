@@ -67,7 +67,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public GUIFolder inheritRights(long folderId, long rightsFolderId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		/*
 		 * Just apply the current security settings to the whole subtree
@@ -87,7 +87,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void applyRights(GUIFolder folder, boolean subtree) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
@@ -118,7 +118,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void applyMetadata(long parentId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		executeLongRunningOperation("Apply Folder Metadata", () -> {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -135,7 +135,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void delete(final long[] folderIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		for (int i = 0; i < folderIds.length; i++)
 			try {
 				delete(session, folderIds[i]);
@@ -218,7 +218,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public long[] computeStats(long folderId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			long[] docs = countDocsInTree(folderId);
 			return new long[] { docs[0], countSubfoldersInTree(folderId), docs[1] };
@@ -395,7 +395,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	@Override
 	public GUIFolder getFolder(long folderId, boolean computePath, boolean computeDocs, boolean computeSubfolders)
 			throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		GUIFolder folder = getFolder(session, folderId);
 		if (folder == null)
@@ -449,7 +449,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	@Override
 	public void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, String securityOption,
 			GUIFolder model) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			for (int i = 0; i < folderIds.length; i++) {
@@ -506,7 +506,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void move(long[] folderIds, long targetId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			for (long folderId : folderIds) {
@@ -563,7 +563,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void rename(long folderId, String name) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -593,7 +593,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public GUIFolder save(GUIFolder guiFolder) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -674,7 +674,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public GUIFolder create(GUIFolder newFolder, boolean inheritSecurity) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -723,7 +723,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public GUIFolder createAlias(long parentId, long foldRef) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -949,7 +949,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void paste(long[] docIds, long folderId, String action) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -1057,7 +1057,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void pasteAsAlias(long[] docIds, long folderId, String type) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -1214,7 +1214,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void restore(Long[] folderIds, long parentId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -1234,7 +1234,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void deleteFromTrash(Long[] ids) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		if (ids == null || ids.length < 1)
 			return;
 
@@ -1250,7 +1250,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void applyTags(long parentId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		executeLongRunningOperation("Apply Tags", () -> {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -1266,7 +1266,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void setFolderPagination(long folderId, Integer startRecord, Integer pageSize) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		if (pageSize != null && startRecord != null) {
 			session.getDictionary().put(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + folderId, pageSize);
@@ -1279,7 +1279,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void applyGridLayout(long folderId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		/*
 		 * Just apply the current security settings to the whole subtree
@@ -1298,7 +1298,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void applyOCR(long parentId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		executeLongRunningOperation("Apply OCR", () -> {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -1314,7 +1314,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void applyStorage(long parentId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		executeLongRunningOperation("Apply Storage", () -> {
 			try {
@@ -1331,7 +1331,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public void merge(long[] folderIds, long targetId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		checkPermission(Permission.ADD, session.getUser(), targetId);
 		checkPermission(Permission.WRITE, session.getUser(), targetId);
@@ -1358,7 +1358,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	@Override
 	public String readImage() throws ServerException {
-		final Session session = validateSession(getThreadLocalRequest());
+		final Session session = validateSession();
 		List<String> allowedExts = Arrays.asList("png", "gif", "jpg", "jpeg", "webp", "jfif");
 
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());

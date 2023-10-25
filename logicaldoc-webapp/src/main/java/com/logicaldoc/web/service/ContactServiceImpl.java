@@ -40,7 +40,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 	@Override
 	public void delete(long[] ids) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
@@ -54,7 +54,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 	@Override
 	public void save(GUIContact contact) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 		ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 		try {
 			Contact cnt = dao.findById(contact.getId());
@@ -77,7 +77,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 	@Override
 	public GUIContact load(long id) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
@@ -108,7 +108,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	@Override
 	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters)
 			throws ServerException {
-		final Session session = validateSession(getThreadLocalRequest());
+		final Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
@@ -172,7 +172,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 	@Override
 	public void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 		HashSet<Long> users = new HashSet<>();
 		if (userIds != null)
 			for (Long uId : userIds) {

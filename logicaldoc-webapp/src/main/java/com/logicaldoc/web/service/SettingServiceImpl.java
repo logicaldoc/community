@@ -341,7 +341,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	@Override
 	public GUIParameter[] loadSettingsByNames(String[] names) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		List<GUIParameter> values = new ArrayList<>();
 		try {
@@ -401,7 +401,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	@Override
 	public boolean testEmail(String email) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		ContextProperties config = Context.get().getProperties();
 		EMailSender sender = new EMailSender(session.getTenantName());
@@ -430,7 +430,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	@Override
 	public boolean testStorage(int id) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 		try {
 			Storer storer = StorerManager.get().newStorer(id);
 			log.info("Testing storer {}", storer);
@@ -444,7 +444,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	@Override
 	public void saveRegistration(String name, String email, String organization, String website)
 			throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			ContextProperties conf = Context.get().getProperties();
@@ -463,7 +463,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	@Override
 	public GUIParameter[] loadConverterParameters(String converter) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		List<GUIParameter> parameters = new ArrayList<>();
 		try {
@@ -479,7 +479,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	@Override
 	public void saveExtensionAliases(String extension, String aliases) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			ContextProperties config = Context.get().getProperties();
@@ -512,7 +512,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	@Override
 	public GUIParameter[] loadWebserviceStats(Long tenantId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
