@@ -81,7 +81,17 @@ public class TicketDownload extends HttpServlet {
 
 			if (isPreviewDownload(ticketId, request, document)) {
 				request.getSession().removeAttribute(getPreviewAttributeName(ticketId));
-				ticket.setViews(ticket.getViews() + 1);
+
+				/**
+				 * The user may resize the view panel that will trigger a reload
+				 * so we must mark the read in the session and count it just the
+				 * first time
+				 */
+				String viewMarker = "ticketviewed-" + ticketId;
+				if (request.getSession().getAttribute(viewMarker) == null) {
+					ticket.setViews(ticket.getViews() + 1);
+					request.getSession().setAttribute(viewMarker, true);
+				}
 				if (isHtml(document))
 					suffix = "safe.html";
 			} else {

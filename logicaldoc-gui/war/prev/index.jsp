@@ -54,7 +54,7 @@
   if(request.getParameter("path")!=null)
   	path = request.getParameter("path");
   if(ticket!=null)
-  path = "download-ticket";
+  	path = "download-ticket";
   
   String query = request.getQueryString();
   if(previewCheck!=null)
