@@ -428,7 +428,7 @@ public class PreviewPanel extends VLayout {
 	 * Declares the javascript function used to notify when the document has
 	 * been completely read
 	 * 
-	 * @param login the preview panel
+	 * @param previewPanel the preview panel
 	 */
 	public static native void declareOnReadingCompleted(PreviewPanel previewPanel) /*-{
 		$wnd.onReadingCompleted = function() {

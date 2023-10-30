@@ -256,6 +256,11 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 */
 	protected abstract void prepareAdditionalActions(ToolStrip toolStrip);
 
+	/**
+	 * Retrieves the internal panel containing the image 
+	 * 
+	 * @return panel containing the image
+	 */
 	public ImageDrawingPane getPageDrawingPane() {
 		return pageDrawingPane;
 	}
