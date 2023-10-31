@@ -307,8 +307,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				copyFolderMetadata(doc);
 			}
 
-			if (!RunLevel.current().aspectEnabled("customId"))
+			if (!RunLevel.current().aspectEnabled("customId")) {
 				doc.setCustomId(UUID.randomUUID().toString());
+				log.debug("Aspect customId is disabled so force the the Custom ID to a random UUID");
+			}
 
 			log.debug("Invoke listeners before store");
 			Map<String, Object> dictionary = new HashMap<>();
