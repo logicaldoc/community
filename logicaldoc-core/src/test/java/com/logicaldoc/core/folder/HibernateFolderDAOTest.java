@@ -138,7 +138,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertEquals(4, docCount);
 		assertEquals(7, docCountDelete);
 	}
-
 	@Test
 	public void testFind() throws PersistenceException {
 		Folder folder = dao.findByPathExtended("/test", 1L);
