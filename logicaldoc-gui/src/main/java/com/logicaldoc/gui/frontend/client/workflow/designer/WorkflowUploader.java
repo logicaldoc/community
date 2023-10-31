@@ -35,8 +35,8 @@ public class WorkflowUploader extends Window {
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
-		setMinWidth(400);
-		setMinHeight(180);
+		setWidth(400);
+		setHeight(180);
 		centerInPage();
 
 		layout.setMembersMargin(2);

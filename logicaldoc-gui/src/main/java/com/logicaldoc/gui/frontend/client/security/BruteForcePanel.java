@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
+import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -22,6 +24,7 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -38,11 +41,15 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class BruteForcePanel extends AdminPanel {
 
+	private static final String RECIPIENTS = "recipients";
+
 	private static final String ATTEMPTS = "attempts";
 
 	private static final String THROTTLE_IP_WAIT = "throttle.ip.wait";
 
 	private static final String THROTTLE_IP_MAX = "throttle.ip.max";
+
+	private static final String THROTTLE_ALERT_RECIPIENTS = "throttle.alert.recipients";
 
 	private static final String THROTTLE_USERNAME_WAIT = "throttle.username.wait";
 
@@ -68,8 +75,8 @@ public class BruteForcePanel extends AdminPanel {
 
 		SettingService.Instance.get()
 				.loadSettingsByNames(new String[] { THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
-						THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT },
-						new AsyncCallback<GUIParameter[]>() {
+						THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT,
+						THROTTLE_ALERT_RECIPIENTS }, new AsyncCallback<GUIParameter[]>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -142,7 +149,15 @@ public class BruteForcePanel extends AdminPanel {
 			// Nothing to do
 		}
 
-		form.setItems(enabled, usernameMax, usernameDisableUser, usernameWait, ipMax, ipWait);
+		MultiComboBoxItem recipients = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
+				new UsersDS(null, false, false),
+				params.get(THROTTLE_ALERT_RECIPIENTS) != null && !params.get(THROTTLE_ALERT_RECIPIENTS).trim().isEmpty()
+						? params.get(THROTTLE_ALERT_RECIPIENTS).trim().split(",")
+						: null);
+		recipients.setValueField("username");
+		recipients.setDisplayField("username");
+
+		form.setItems(enabled, usernameMax, usernameDisableUser, usernameWait, ipMax, ipWait, recipients);
 
 		body.addMember(form);
 
@@ -241,15 +256,24 @@ public class BruteForcePanel extends AdminPanel {
 
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = vm.getValues();
-		GUIParameter[] params = new GUIParameter[8];
+		GUIParameter[] params = new GUIParameter[7];
 		params[0] = new GUIParameter(THROTTLE_ENABLED,
 				"yes".equals(values.get("eenabled").toString()) ? "true" : "false");
 		params[1] = new GUIParameter(THROTTLE_USERNAME_MAX, values.get("usernamemax").toString());
 		params[2] = new GUIParameter(THROTTLE_USERNAME_WAIT, values.get("usernamewait").toString());
 		params[3] = new GUIParameter(THROTTLE_IP_MAX, values.get("ipmax").toString());
 		params[4] = new GUIParameter(THROTTLE_IP_WAIT, values.get("ipwait").toString());
-		params[6] = new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
+		params[5] = new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
 				"yes".equals(values.get("usernamedisableuser").toString()) ? "true" : "false");
+
+		if (values.get(RECIPIENTS) != null) {
+			@SuppressWarnings("unchecked")
+			ArrayList<String> usernames = (ArrayList<String>) values.get(RECIPIENTS);
+			params[6] = new GUIParameter(THROTTLE_ALERT_RECIPIENTS,
+					usernames.stream().collect(Collectors.joining(",")));
+		} else {
+			params[6] = new GUIParameter(THROTTLE_ALERT_RECIPIENTS, "");
+		}
 
 		SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
 

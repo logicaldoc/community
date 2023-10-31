@@ -90,6 +90,16 @@ public interface AttributeSetService extends RemoteService {
 	public GUIValue[] parseOptions(long setId, String attribute) throws ServerException;
 
 	/**
+	 * Forces all the settings of an attribute to all those templates that use it
+	 * 
+	 * @param setId identifier of the set
+	 * @param attribute name of the attribute
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	void applyAllToTemplates(long setId, String attribute) throws ServerException;
+	
+	/**
 	 * Forces the validation of an attribute to all those templates that use it
 	 * 
 	 * @param setId identifier of the set

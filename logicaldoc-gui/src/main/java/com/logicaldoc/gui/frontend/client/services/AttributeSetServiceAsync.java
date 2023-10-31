@@ -20,6 +20,8 @@ public interface AttributeSetServiceAsync {
 
 	void getAttributeSets(AsyncCallback<GUIAttributeSet[]> callback);
 
+	void applyAllToTemplates(long setId, String attribute, AsyncCallback<Void> callback);
+	
 	void applyValidationToTemplates(long setId, String attribute, AsyncCallback<Void> callback);
 	
 	void applyInitializationToTemplates(long setId, String attribute, AsyncCallback<Void> callback);

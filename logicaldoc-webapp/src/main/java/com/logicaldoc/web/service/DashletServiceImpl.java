@@ -33,7 +33,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 
 	@Override
 	public void save(GUIDashlet guiDashlet) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
@@ -67,7 +67,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 
 	@Override
 	public GUIDashlet[] loadDashlets() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			List<Dashlet> dashlets = dao.findAll(session.getTenantId());
@@ -82,7 +82,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 
 	@Override
 	public GUIDashlet get(long dashletId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			Dashlet dashlet = dao.findById(dashletId);
@@ -96,7 +96,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 
 	@Override
 	public GUIDashlet get(String name) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 		Dashlet dashlet = dao.findByName(name, session.getTenantId());
 		if (dashlet == null)
@@ -106,7 +106,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 
 	@Override
 	public void delete(long dashletId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
@@ -118,7 +118,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 
 	@Override
 	public void saveUserDashlets(GUIDashlet[] dashlets) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 

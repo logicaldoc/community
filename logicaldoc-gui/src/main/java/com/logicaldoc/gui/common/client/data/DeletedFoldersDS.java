@@ -13,7 +13,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class DeletedFoldersDS extends DataSource {
 
-	public DeletedFoldersDS(Long userId, Long parentId) {
+	public DeletedFoldersDS(Long userId, Long parentId, Integer max) {
 		setTitleField("name");
 		setRecordXPath("/list/folder");
 
@@ -37,6 +37,8 @@ public class DeletedFoldersDS extends DataSource {
 			url += "&userId=" + userId;
 		if (parentId != null)
 			url += "&parentId=" + parentId;
+		if (max != null)
+			url += "&max=" + max;
 		setDataURL(url);
 	}
 }

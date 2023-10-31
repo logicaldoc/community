@@ -31,7 +31,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 
 	@Override
 	public GUITag[] getTagCloud() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			ArrayList<GUITag> ret = new ArrayList<>();
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -79,7 +79,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 
 	@Override
 	public GUIParameter[] getSettings() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		ContextProperties conf = Context.get().getProperties();
 		List<GUIParameter> params = new ArrayList<>();

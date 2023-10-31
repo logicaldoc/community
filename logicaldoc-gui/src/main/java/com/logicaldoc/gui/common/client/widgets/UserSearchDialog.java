@@ -124,6 +124,7 @@ public class UserSearchDialog extends Window {
 
 	public void onSelect(long id) {
 		selector.setValue(Long.toString(id));
+		selector.fireUserChanged();
 		destroy();
 	}
 }

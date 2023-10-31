@@ -58,9 +58,10 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		super.store(entity);
 
 		if (transaction != null) {
-			transaction.setEvent(DocumentEvent.DTICKET_CREATED.toString());
+			transaction.setEvent(DocumentEvent.TICKET_CREATED.toString());
 			transaction.setDocId(entity.getDocId());
-			transaction.setComment("Ticket " + entity.getTicketId());
+			transaction.setComment(
+					(entity.getType() == Ticket.DOWNLOAD ? "Download" : "View") + " ticket " + entity.getTicketId());
 
 			try {
 				documentDAO.saveDocumentHistory(documentDAO.findById(entity.getDocId()), transaction);

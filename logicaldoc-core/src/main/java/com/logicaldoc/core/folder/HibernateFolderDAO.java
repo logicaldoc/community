@@ -1348,7 +1348,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public Folder create(Folder parent, Folder folderVO, boolean inheritSecurity, FolderHistory transaction)
 			throws PersistenceException {
 		parent = findFolder(parent);
-
+		if(!org.hibernate.Hibernate.isInitialized(parent.getAttributes()))
+			initialize(parent);
+		
 		Folder folder = new Folder();
 		folder.setName(folderVO.getName());
 		folder.setType(folderVO.getType());
@@ -1426,9 +1428,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void replicateParentMetadata(Folder folder, Folder folderVO, Folder parent) {
 		if (parent.getTemplate() != null && folderVO.getTemplate() == null && folderVO.getFoldRef() == null) {
-			initialize(parent);
 			folder.setTemplate(parent.getTemplate());
-
 			for (String att : parent.getAttributeNames()) {
 				Attribute ext = new Attribute(parent.getAttributes().get(att));
 				folder.getAttributes().put(att, ext);
@@ -1457,8 +1457,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Folder folder = findFolder(parent.getId());
 
 		while (st.hasMoreTokens()) {
-			initialize(folder);
-
 			String name = st.nextToken();
 
 			Map<String, Object> params = new HashMap<>();
@@ -1474,12 +1472,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				Folder folderVO = new Folder();
 				folderVO.setName(name);
 				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
+				initialize(folder);
 				folder = create(folder, folderVO, inheritSecurity,
 						transaction != null ? new FolderHistory(transaction) : null);
 				flush();
 			} else {
 				folder = findById(child);
-				initialize(folder);
 			}
 		}
 		return folder;
@@ -1942,7 +1940,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void initialize(Folder folder) {
 		refresh(folder);
-
+		
 		if (folder.getFolderGroups() != null)
 			log.trace("Initialized {} folder groups", folder.getFolderGroups().size());
 

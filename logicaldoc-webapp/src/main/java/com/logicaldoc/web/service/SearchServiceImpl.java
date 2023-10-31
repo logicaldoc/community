@@ -57,7 +57,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	@Override
 	public GUIResult search(GUISearchOptions options) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		options.setUserId(session.getUserId());
 
 		GUIResult result = new GUIResult();
@@ -182,7 +182,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	@Override
 	public boolean save(GUISearchOptions options) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			SearchOptions opt = toSearchOptions(options);
@@ -206,7 +206,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	@Override
 	public void delete(String[] names) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
@@ -223,7 +223,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	@Override
 	public GUISearchOptions load(String name) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
@@ -319,7 +319,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	@Override
 	public void shareSearch(String name, long[] userIds, long[] groupIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			com.logicaldoc.core.searchengine.saved.SavedSearch search = loadSavedSearch(name, session);

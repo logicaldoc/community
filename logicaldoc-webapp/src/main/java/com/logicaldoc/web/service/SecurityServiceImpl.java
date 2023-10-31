@@ -266,7 +266,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		try {
 			Session sess = null;
 			if (StringUtils.isEmpty(sid))
-				sess = validateSession(getThreadLocalRequest());
+				sess = validateSession();
 			else
 				sess = validateSession(sid);
 			return loadSession(sess, locale);
@@ -279,7 +279,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	@Override
 	public void logout() {
 		try {
-			Session session = validateSession(getThreadLocalRequest());
+			Session session = validateSession();
 			if (session == null)
 				return;
 
@@ -424,7 +424,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	public GUIGroup getGroup(long groupId) throws ServerException {
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
-		validateSession(getThreadLocalRequest());
+		validateSession();
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		try {
 			Group group = groupDao.findById(groupId);
@@ -446,7 +446,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIUser getUser(long userId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		SequenceDAO seqDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
@@ -624,7 +624,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIUser saveUser(GUIUser guiUser, GUIInfo info) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		boolean createNew = false;
@@ -878,7 +878,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIUser saveProfile(GUIUser user) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
@@ -929,7 +929,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIUser saveInterfaceSettings(GUIUser user) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
@@ -1158,7 +1158,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void deleteMenu(long menuId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		try {
@@ -1176,7 +1176,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void saveMenus(GUIMenu[] menus, String locale) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		if (menus == null || menus.length < 1)
 			return;
@@ -1186,7 +1186,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIMenu saveMenu(GUIMenu guiMenu, String locale) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		try {
@@ -1224,7 +1224,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIMenu[] getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 
@@ -1249,7 +1249,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIMenu getMenu(long menuId, String locale) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
@@ -1335,7 +1335,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUIUser[] searchUsers(String username, String groupId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
@@ -1373,7 +1373,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public GUISequence[] loadBlockedEntities() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		if (session.getTenantId() != Tenant.DEFAULT_ID)
 			return new GUISequence[0];
 
@@ -1423,7 +1423,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void removeBlockedEntities(long[] ids) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		if (session.getTenantId() != Tenant.DEFAULT_ID)
 			return;
 
@@ -1440,7 +1440,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	@Override
 	public void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups)
 			throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		try {
@@ -1481,7 +1481,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void updateDeviceLabel(long deviceId, String label) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
 		try {
 			Device device = dDao.findById(deviceId);
@@ -1497,7 +1497,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public String trustDevice(String label) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		if (session.getClient() != null && session.getClient().getDevice() != null) {
 			Device device = session.getClient().getDevice();
 			if (label != null)
@@ -1516,7 +1516,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public Boolean isTrustedDevice(String deviceId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		// If the second factor is not enabled on the user, the device is
 		// always trusted
 		if (StringUtils.isEmpty(session.getUser().getSecondFactor()))
@@ -1530,7 +1530,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void deleteTrustedDevices(String[] ids) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		if (ids == null || ids.length < 1)
 			return;
 
@@ -1545,7 +1545,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public String syncGeolocationDB(String key) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		Context.get().getProperties().setProperty(SECURITY_GEOLOCATION_APIKEY, key != null ? key : "");
 		try {
 			Context.get().getProperties().write();
@@ -1560,7 +1560,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void saveAvatar(long userId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
@@ -1578,7 +1578,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void resetAvatar(long userId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -1593,7 +1593,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		Set<Long> uniqueUserIds = Arrays.stream(userIds).boxed().distinct().collect(Collectors.toSet());
 
@@ -1658,7 +1658,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	@Override
 	public String generatePassword() throws InvalidSessionServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		String tenant = session.getTenantName();
 
 		// Generate an initial password(that must be changed)

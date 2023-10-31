@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TaskSchedulingPanel extends VLayout {
 
-	private static final String REPEAT_INTERVAL = "repeatInterval";
+	private static final String REPEAT_INTERVAL = "repeatinterval";
 
 	private static final String INITIALDELAY_STR = "initialdelay";
 

@@ -110,6 +110,23 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(folder);
 		folder = dao.findById(folder.getParentId());
 		Assert.assertEquals("Capo d'Orlando 05-35632", folder.getName());
+		
+		/*
+		 * Test a folder with a template
+		 */
+		folder =  new Folder();
+		folder.setName("withTemplate");
+		folder.setTemplate(templateDao.findByName("email", Tenant.DEFAULT_ID));
+		folder.setValue("from", "test@acme.com");
+		folder.setParentId(dao.findDefaultWorkspace(Tenant.DEFAULT_ID).getId());
+		dao.store(folder);
+		
+		folder = dao.createPath(folder, "/A/B/C/D/E/F/G/H/I/L/M/N/O/P/Q/R/S/T/U/V/Z", false, null);
+		Assert.assertNotNull(folder);
+		f = dao.findByPathExtended("/Default/withTemplate/A/B/C/D/E/F/G/H/I/L/M/N/O/P", 1L);
+		dao.initialize(f);
+		Assert.assertEquals("P", f.getName());
+		Assert.assertEquals("test@acme.com", f.getValue("from"));
 	}
 
 	@Test
@@ -643,6 +660,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testCreate() throws PersistenceException {
 		Folder parent = dao.findById(1202L);
+//		dao.initialize(parent);
 
 		Folder folderVO = new Folder();
 		folderVO.setName("xxxx");

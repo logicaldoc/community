@@ -52,6 +52,7 @@ public class AutomationCompletionProvider implements AceCompletionProvider {
 				new AceCompletionValue("$FormTool", "$FormTool", VARIABLE, 10),
 				new AceCompletionValue("$ReportTool", "$ReportTool", VARIABLE, 10),
 				new AceCompletionValue("$CalendarTool", "$CalendarTool", VARIABLE, 10),
+				new AceCompletionValue("$ReadingRequestTool", "$ReadingRequestTool", VARIABLE, 10),
 				new AceCompletionValue("$I18N", "$I18N", VARIABLE, 10),
 				new AceCompletionValue("$log", "$log", VARIABLE, 10),
 				new AceCompletionValue("$systemDictionary", "$systemDictionary", VARIABLE, 10),

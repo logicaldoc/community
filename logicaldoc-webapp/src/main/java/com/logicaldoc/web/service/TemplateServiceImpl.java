@@ -62,7 +62,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	@Override
 	public void delete(long templateId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -90,7 +90,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	@Override
 	public long countDocuments(long templateId) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		return dao.countDocs(templateId);
@@ -98,7 +98,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	@Override
 	public GUITemplate save(GUITemplate guiTemplate) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		User sessionUser = session.getUser();
 
 		try {
@@ -250,7 +250,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	@Override
 	public GUITemplate getTemplate(long templateId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -364,7 +364,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		User sessionUser = null;
 		Session session = null;
 		try {
-			session = validateSession(getThreadLocalRequest());
+			session = validateSession();
 			sessionUser = session.getUser();
 		} catch (Exception t) {
 			// Nothing to do
@@ -498,7 +498,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				guiAttribute.setIntValue(attribute.getIntValue());
 				guiAttribute.setBooleanValue(attribute.getBooleanValue());
 				guiAttribute.setDoubleValue(attribute.getDoubleValue());
-				guiAttribute.setDateValue(attribute.getDateValue());
+				guiAttribute.setDateValue(fixDateForGUI(attribute.getDateValue()));
 				if (attribute.getType() == Attribute.TYPE_USER)
 					guiAttribute.setUsername(attribute.getStringValue());
 			} else

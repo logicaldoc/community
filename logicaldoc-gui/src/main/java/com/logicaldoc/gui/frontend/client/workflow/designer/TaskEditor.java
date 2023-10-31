@@ -549,7 +549,8 @@ public class TaskEditor extends Window {
 		if (Boolean.FALSE.equals(vm.validate()) && humanInteraction)
 			return;
 
-		TaskEditor.this.state.setName((String) values.get("taskName"));
+		// Remove the ' because of the WF engine would go in error saving into the DB
+		TaskEditor.this.state.setName(values.get("taskName").toString().trim().replace("'", ""));
 		TaskEditor.this.state.setDisplay((String) values.get("taskColor"));
 		TaskEditor.this.state.setDescription((String) values.get("taskDescr"));
 		TaskEditor.this.state.setOnCreation((String) values.get("onCreation"));

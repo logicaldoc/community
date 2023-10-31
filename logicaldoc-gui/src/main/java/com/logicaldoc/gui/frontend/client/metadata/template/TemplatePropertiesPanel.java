@@ -53,8 +53,6 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	private static final String PRESET = "preset";
 
-	private static final String DEPENDS_ON = "dependsOn";
-
 	private static final String INITIALIZATION = "initialization";
 
 	private static final String VALIDATION = "validation";
@@ -121,7 +119,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			att.setEditor(Integer.parseInt(rec.getAttributeAsString(EDITOR)));
 			att.setValidation(rec.getAttributeAsString(VALIDATION));
 			att.setInitialization(rec.getAttributeAsString(INITIALIZATION));
-			att.setDependsOn(rec.getAttributeAsString(DEPENDS_ON));
+			att.setDependsOn(rec.getAttributeAsString(DEPENDSON));
 
 			template.appendAttribute(att);
 
@@ -218,7 +216,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		preset.setAutoFitWidth(true);
 		preset.setMinWidth(70);
 
-		ListGridField dependsOn = new ListGridField(DEPENDS_ON, I18N.message(DEPENDSON));
+		ListGridField dependsOn = new ListGridField(DEPENDSON, I18N.message(DEPENDSON));
 		dependsOn.setCanEdit(false);
 		dependsOn.setCanSort(false);
 		dependsOn.setAutoFitWidth(true);
@@ -288,10 +286,12 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		MenuItem resetInitialization = prepareResetInitializationItem();
 
+		MenuItem reset = prepareResetItem();
+
 		MenuItem dependsOn = prepareDependsOnItem();
 
 		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeReadonly, makeHidden, dependsOn,
-				initialization, resetInitialization, validation, resetValidation, delete);
+				initialization, resetInitialization, validation, resetValidation, reset, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -300,9 +300,9 @@ public class TemplatePropertiesPanel extends HLayout {
 		dependsOn.setTitle(I18N.message(DEPENDSON));
 		dependsOn.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord selection = attributesList.getSelectedRecord();
-			LD.askForString(DEPENDSON, "attributename", selection.getAttributeAsString(DEPENDS_ON), (String value) -> {
+			LD.askForString(DEPENDSON, "attributename", selection.getAttributeAsString(DEPENDSON), (String value) -> {
 				ListGridRecord selectedRecord = attributesList.getSelectedRecord();
-				selectedRecord.setAttribute(DEPENDS_ON, value);
+				selectedRecord.setAttribute(DEPENDSON, value);
 				if (changedHandler != null)
 					changedHandler.onChanged(null);
 			});
@@ -320,6 +320,66 @@ public class TemplatePropertiesPanel extends HLayout {
 						resetInitialization();
 				}));
 		return resetInitialization;
+	}
+
+	private MenuItem prepareResetItem() {
+		MenuItem reset = new MenuItem();
+		reset.setTitle(I18N.message("reset"));
+		reset.addClickHandler(event -> LD.ask(I18N.message("reset"), I18N.message("resetattributequestion"), answer -> {
+			if (Boolean.TRUE.equals(answer))
+				reset();
+		}));
+		return reset;
+	}
+
+	private void reset() {
+		ListGridRecord[] selection = attributesList.getSelectedRecords();
+
+		LD.contactingServer();
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				LD.clearPrompt();
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUIAttributeSet[] sets) {
+				LD.clearPrompt();
+				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
+				for (GUIAttributeSet set : sets)
+					setsMap.put(set.getId(), set);
+
+				for (ListGridRecord rec : selection) {
+					GUIAttribute setAttribute = null;
+					GUIAttributeSet set = setsMap.get(rec.getAttributeAsLong(SET_ID));
+					String attributeName = rec.getAttributeAsString("name");
+					if (set != null)
+						setAttribute = set.getAttribute(attributeName);
+
+					if (setAttribute != null) {
+						template.getAttribute(attributeName).setInitialization(setAttribute.getInitialization());
+						template.removeAttribute(attributeName);
+						template.appendAttribute(setAttribute);
+						rec.setAttribute(INITIALIZATION, setAttribute.getInitialization());
+						rec.setAttribute(VALIDATION, setAttribute.getValidation());
+						rec.setAttribute(LABEL, setAttribute.getLabel());
+						rec.setAttribute(HIDDEN, setAttribute.isHidden());
+						rec.setAttribute(MANDATORY, setAttribute.isMandatory());
+						rec.setAttribute(MULTIPLE, setAttribute.isMultiple());
+						rec.setAttribute(READONLY, setAttribute.isReadonly());
+						rec.setAttribute(DEPENDSON, setAttribute.getDependsOn());
+						rec.setAttribute(EDITOR, setAttribute.getEditor());
+						rec.setAttribute("type", setAttribute.getType());
+						attributesList.refreshRow(attributesList.getRowNum(rec));
+					}
+				}
+
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
 	}
 
 	private void resetInitialization() {
@@ -602,7 +662,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			rec.setAttribute(VALIDATION, att.getValidation());
 			rec.setAttribute(INITIALIZATION, att.getInitialization());
 			rec.setAttribute(PRESET, att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
-			rec.setAttribute(DEPENDS_ON, att.getDependsOn());
+			rec.setAttribute(DEPENDSON, att.getDependsOn());
 			attributesList.getRecordList().add(rec);
 		}
 	}
@@ -703,7 +763,7 @@ public class TemplatePropertiesPanel extends HLayout {
 					att.setSet(rec.getAttributeAsString("set"));
 					att.setSetId(Long.parseLong(rec.getAttributeAsString(SET_ID)));
 					att.setEditor(Integer.parseInt(rec.getAttributeAsString(EDITOR)));
-					att.setDependsOn(rec.getAttributeAsString(DEPENDS_ON));
+					att.setDependsOn(rec.getAttributeAsString(DEPENDSON));
 					att.setMandatory(rec.getAttributeAsBoolean(MANDATORY));
 					att.setHidden(rec.getAttributeAsBoolean(HIDDEN));
 					att.setReadonly(rec.getAttributeAsBoolean(READONLY));

@@ -149,7 +149,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void addBookmarks(Long[] ids, int type) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		BookmarkDAO bookmarkDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -204,7 +204,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void indexDocuments(Long[] docIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		executeLongRunningOperation("Index Documents", () -> {
 			try {
@@ -224,7 +224,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public GUIDocument[] addDocuments(boolean importZip, String charset, boolean immediateIndexing,
 			final GUIDocument metadata) throws ServerException {
-		final Session session = validateSession(getThreadLocalRequest());
+		final Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 
@@ -363,7 +363,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument checkin(GUIDocument document, boolean major) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
@@ -540,7 +540,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public GUIDocument[] addDocuments(String language, long folderId, boolean importZip, String charset,
 			boolean immediateIndexing, final Long templateId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
 			if (folderId == fdao.findRoot(session.getTenantId()).getId())
@@ -558,7 +558,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument promoteVersion(long docId, String version) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		log.debug("Promoting version {} of document {}", version, docId);
 
 		try {
@@ -588,7 +588,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void checkout(Long[] docIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		// Checkout the document; throws an exception if something
 		// goes wrong
@@ -612,7 +612,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void lock(Long[] docIds, String comment) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		// Unlock the document; throws an exception if something
 		// goes wrong
@@ -638,7 +638,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void delete(Long[] ids) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		if (ids.length > 0) {
 			for (long docId : ids) {
@@ -695,7 +695,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void deleteBookmarks(long[] bookmarkIds) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 		BookmarkDAO dao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		for (long id : bookmarkIds) {
 			try {
@@ -708,7 +708,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void deleteLinks(long[] ids) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		DocumentLinkDAO dao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		for (long id : ids) {
@@ -722,7 +722,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument getById(long docId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			return getDocument(session, docId);
@@ -737,26 +737,26 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			validateSession(session.getSid());
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Document doc = docDao.findById(docId);
+		Document document = docDao.findById(docId);
 
-		GUIDocument document = null;
+		GUIDocument guiDocument = null;
 		GUIFolder folder = null;
 
-		if (doc != null) {
+		if (document != null) {
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			fDao.initialize(doc.getFolder());
-			folder = new FolderServiceImpl().fromFolder(doc.getFolder(), false);
+			fDao.initialize(document.getFolder());
+			folder = new FolderServiceImpl().fromFolder(document.getFolder(), false);
 
 			if (session != null)
-				checkPublished(session.getUser(), doc);
+				checkPublished(session.getUser(), document);
 
-			docDao.initialize(doc);
+			docDao.initialize(document);
 
-			document = fromDocument(doc, folder, session != null ? session.getUser() : null);
+			guiDocument = fromDocument(document, folder, session != null ? session.getUser() : null);
 
 			if (session != null && folder != null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-				Set<Permission> permissions = fdao.getEnabledPermissions(doc.getFolder().getId(), session.getUserId());
+				Set<Permission> permissions = fdao.getEnabledPermissions(document.getFolder().getId(), session.getUserId());
 				List<String> permissionsList = new ArrayList<>();
 				for (Permission permission : permissions)
 					permissionsList.add(permission.toString());
@@ -764,7 +764,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 		}
 
-		return document;
+		return guiDocument;
 	}
 
 	public GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser) throws PersistenceException {
@@ -877,7 +877,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIVersion[] getVersionsById(long id1, long id2) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 		Version docVersion;
@@ -1023,7 +1023,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void linkDocuments(Long[] inDocIds, Long[] outDocIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentLinkDAO linkDao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1053,7 +1053,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void makeImmutable(Long[] docIds, String comment) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -1083,14 +1083,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void markHistoryAsRead(String event) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		dao.markHistoriesAsRead(event, session.getUserId());
 	}
 
 	@Override
 	public void markIndexable(Long[] docIds, int policy) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1105,7 +1105,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void markUnindexable(Long[] docIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1119,7 +1119,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void restore(Long[] docIds, long folderId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
@@ -1139,7 +1139,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void validate(GUIDocument document) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			Document object = toDocument(document);
@@ -1160,7 +1160,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument save(GUIDocument guiDocument) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		if (guiDocument.getId() == 0L)
 			return null;
 
@@ -1358,9 +1358,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private static void setDateValue(GUIAttribute attr, Attribute extAttr) {
-		if (attr.getValue() != null)
-			extAttr.setDateValue((Date) attr.getValue());
-		else
+		if (attr.getValue() != null) {
+			extAttr.setDateValue(fixDateForDB((Date) attr.getValue()));
+		} else
 			extAttr.setDateValue(null);
 	}
 
@@ -1414,7 +1414,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public String sendAsEmail(GUIEmail guiMail, String locale) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		EMail mail = new EMail();
@@ -1717,7 +1717,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void unlock(Long[] docIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
@@ -1737,7 +1737,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void updateBookmark(GUIBookmark bookmark) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		BookmarkDAO bookmarkDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		Bookmark bk;
@@ -1761,7 +1761,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void updateLink(long id, String type) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentLinkDAO dao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		try {
@@ -1776,7 +1776,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void cleanUploadedFileFolder() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		UploadServlet.cleanReceivedFiles(session.getSid());
 
 		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + session.getSid());
@@ -1786,7 +1786,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIRating getRating(long docId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 
@@ -1814,7 +1814,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public int saveRating(GUIRating rating) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 		Rating rat = ratingDao.findByDocIdAndUserId(rating.getDocId(), rating.getUserId());
@@ -1842,7 +1842,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public long addNote(long docId, String message) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1874,7 +1874,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocumentNote[] getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		Document document;
 		try {
@@ -1924,7 +1924,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void saveNotes(long docId, GUIDocumentNote[] notes, Collection<String> types) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 		List<GUIDocumentNote> notesList = new ArrayList<>();
@@ -2053,7 +2053,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void deleteNotes(long[] ids) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 		for (long id : ids)
@@ -2066,7 +2066,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument[] bulkUpdate(Long[] ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		List<GUIDocument> updatedDocs = new ArrayList<>();
 		for (long docId : ids) {
@@ -2164,7 +2164,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void updateNote(long docId, long noteId, String message) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2198,7 +2198,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument deleteVersions(long[] ids) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		long docId = 0;
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -2219,7 +2219,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument createWithContent(GUIDocument vo, String content, boolean checkout) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -2257,7 +2257,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void deleteFromTrash(Long[] ids) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		if (ids == null || ids.length < 1)
 			return;
 
@@ -2273,7 +2273,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void emptyTrash() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2291,7 +2291,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void archiveDocuments(Long[] docIds, String comment) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -2305,7 +2305,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public long archiveFolder(long folderId, String comment) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -2320,7 +2320,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void unarchiveDocuments(long[] docIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
@@ -2339,7 +2339,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public long countDocuments(long[] folderIds, int status) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 		long count = 0;
 		for (int i = 0; i < folderIds.length; i++) {
 			count += countDocuments(folderIds[i], status);
@@ -2369,7 +2369,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public String[] createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
 			Integer maxDownloads, Integer maxViews) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		String urlPrefix = "";
 		HttpServletRequest request = this.getThreadLocalRequest();
@@ -2407,7 +2407,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void setPassword(long docId, String password) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
@@ -2428,7 +2428,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void unsetPassword(long docId, String currentPassword) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
@@ -2450,7 +2450,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public boolean unprotect(long docId, String password) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		return manager.unprotect(session.getSid(), docId, password);
@@ -2458,7 +2458,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public String getContentAsString(long docId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2489,7 +2489,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument checkinContent(long docId, String content) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2521,7 +2521,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void replaceFile(long docId, String fileVersion, String comment) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
@@ -2558,7 +2558,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument createDocument(GUIDocument document, String content) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -2581,7 +2581,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIRating getUserRating(long docId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		RatingDAO rDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 		GUIRating rating = null;
@@ -2603,7 +2603,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public Integer deleteRating(long id) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			RatingDAO rDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
@@ -2626,7 +2626,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument convert(long docId, String fileVersion, String format) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2654,7 +2654,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIEmail extractEmail(long docId, String fileVersion) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		GUIDocument emailDocument = getById(docId);
 		if (!emailDocument.getFileName().toLowerCase().endsWith(".eml")
@@ -2745,7 +2745,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public GUIDocument saveEmailAttachment(long docId, String fileVersion, String attachmentFileName)
 			throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		InputStream is = null;
 		File tmp = null;
@@ -2797,7 +2797,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument replaceAlias(long aliasId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -2812,7 +2812,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void deDuplicate(Long folderId, boolean retainNewest) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		checkMenu(getThreadLocalRequest(), Menu.REPORTS);
 
 		try {
@@ -2944,7 +2944,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void deleteTicket(long ticketId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 		try {
@@ -2956,7 +2956,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void enableTicket(long ticketId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 		try {
@@ -2970,7 +2970,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void disableTicket(long ticketId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 		try {
@@ -2984,7 +2984,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public void enforceFilesIntoFolderStorage(long folderId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		User user = session.getUser();
 
 		new Thread(() -> {
@@ -3071,7 +3071,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument merge(Long[] docIds, long targetFolderId, String fileName) throws ServerException {
-		final Session session = validateSession(getThreadLocalRequest());
+		final Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -3093,7 +3093,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public int updatePages(long docId) throws ServerException {
-		final Session session = validateSession(getThreadLocalRequest());
+		final Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -3114,7 +3114,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@Override
 	public GUIDocument rename(long documentId, String name) throws ServerException {
-		final Session session = validateSession(getThreadLocalRequest());
+		final Session session = validateSession();
 
 		User user = session.getUser();
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);

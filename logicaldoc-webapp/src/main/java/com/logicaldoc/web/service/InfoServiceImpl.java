@@ -354,7 +354,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 	@Override
 	public GUIParameter[] getSessionInfo() throws InvalidSessionServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		log.debug("Requested info for session {}", session.getSid());
 
 		try {
@@ -375,7 +375,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	@Override
 	public boolean ping() throws InvalidSessionServerException {
 		try {
-			Session session = validateSession(getThreadLocalRequest());
+			Session session = validateSession();
 			if (session == null)
 				return false;
 		} catch (Exception t) {
@@ -386,7 +386,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 	@Override
 	public String getCronDescription(String expression, String locale) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ);

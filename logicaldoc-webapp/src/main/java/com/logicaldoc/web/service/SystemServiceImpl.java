@@ -100,7 +100,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public boolean disableTask(String taskName) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		Task task = getTask(taskName);
 
@@ -118,7 +118,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public boolean enableTask(String taskName) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		Task task = getTask(taskName);
 		if (task == null)
@@ -141,7 +141,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public GUIParameter[][] getStatistics(String locale) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
@@ -327,7 +327,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public GUITask getTaskByName(String taskName, String locale) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		Task tsk = getTask(taskName);
 		if (tsk == null)
@@ -407,7 +407,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public GUITask[] loadTasks(String locale) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
 		GUITask[] tasks = new GUITask[manager.getTasks().size()];
@@ -454,7 +454,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public GUITask saveTask(GUITask task, String locale) throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
 		Task tsk = null;
@@ -538,7 +538,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void setGUILanguageStatus(String language, boolean active) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		ContextProperties conf = Context.get().getProperties();
 		conf.setProperty(session.getTenantName() + ".lang." + language + ".gui", active ? "enabled" : "disabled");
@@ -551,7 +551,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void confirmUpdate() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		ContextProperties conf = Context.get().getProperties();
 		String prevRunLevel = conf.getProperty("runlevel.back", RunLevel.DEFAULT.toString());
@@ -566,7 +566,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void restart() throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		try {
 			log.warn("Alerting the connected users about the shutdown");
@@ -603,7 +603,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	@Override
 	public GUIHistory[] search(Long userId, Date from, Date till, int maxResult, String historySid, String[] events,
 			Long rootFolderId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		// Search in the document/folder history
 		StringBuilder query = new StringBuilder(
@@ -785,7 +785,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	@Override
 	public GUIHistory[] searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri,
 			int maxResult) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Map<Long, String> tenants = dao.findAll().stream().collect(Collectors.toMap(Tenant::getId, Tenant::getName));
@@ -850,7 +850,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void unscheduleJobs(GUIValue[] jobs) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		JobManager jobManager = (JobManager) Context.get().getBean(JobManager.class);
 		for (GUIValue trigger : jobs)
 			try {
@@ -863,7 +863,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void uninstallPlugin(String pluginId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 			throw new AccessDeniedException();
@@ -915,7 +915,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void initializePlugin(String pluginId) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 			throw new AccessDeniedException();
@@ -957,7 +957,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void installPlugin() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 			throw new AccessDeniedException();
@@ -1052,7 +1052,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public GUIValue[] getPlugins() throws ServerException {
-		validateSession(getThreadLocalRequest());
+		validateSession();
 
 		Collection<PluginDescriptor> descriptors = PluginRegistry.getInstance().getPlugins();
 		List<GUIValue> plugins = new ArrayList<>();

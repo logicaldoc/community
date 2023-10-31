@@ -54,7 +54,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public GUISearchEngine getInfo() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			GUISearchEngine searchEngine = new GUISearchEngine();
@@ -97,7 +97,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void rescheduleAll(final boolean dropIndex) throws ServerException {
-		final Session session = validateSession(getThreadLocalRequest());
+		final Session session = validateSession();
 
 		if (dropIndex)
 			try {
@@ -125,7 +125,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void unlock() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
@@ -137,7 +137,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public String check() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
@@ -149,7 +149,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void save(GUISearchEngine searchEngine) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			ContextProperties conf = Context.get().getProperties();
@@ -186,7 +186,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void setLanguageStatus(String language, boolean active) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			ContextProperties conf = Context.get().getProperties();
@@ -199,7 +199,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void setAliases(String extension, String aliases) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			StringTokenizer st = new StringTokenizer(aliases, ",", false);
@@ -215,7 +215,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public long countEntries() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 			return indexer.getCount();
@@ -226,7 +226,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void reorderTokenFilters(String[] filters) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			ContextProperties conf = Context.get().getProperties();
 			int i = 1;
@@ -240,7 +240,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void saveTokenFilterSettings(String filter, GUIParameter[] settings) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			String prefix = INDEX_TOKENFILTER + filter + ".";
 			ContextProperties conf = Context.get().getProperties();
@@ -254,7 +254,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void setTokenFilterStatus(String filter, boolean active) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			ContextProperties conf = Context.get().getProperties();
 			conf.setProperty(INDEX_TOKENFILTER + filter, active ? "enabled" : "disabled");
@@ -266,7 +266,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void purge() throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			Runnable runnable = () -> {
@@ -282,7 +282,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public void remove(Long[] entryIds) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 
 		try {
 			Runnable runnable = () -> {
@@ -335,7 +335,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	@Override
 	public GUIResult query(String query, int page, int size) throws ServerException {
-		Session session = validateSession(getThreadLocalRequest());
+		Session session = validateSession();
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 			Hits hits = indexer.query(query, page, size);

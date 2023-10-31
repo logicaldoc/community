@@ -94,7 +94,7 @@ create table ld_ticket (ld_id bigint not null, ld_lastmodified datetime not null
                         ld_deleted int not null, ld_tenantid bigint not null, ld_ticketid varchar(255) not null, 
                         ld_docid bigint not null, ld_userid bigint not null, ld_type int not null, 
                         ld_creation datetime not null, ld_expired datetime, ld_count int not null, ld_suffix varchar(255),
-                        ld_enabled int not null, ld_maxcount int, ld_maxviews int, ld_views int not null, 
+                        ld_enabled int not null, ld_maxcount int, ld_maxviews int, ld_views int not null,
                         primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_user (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                       ld_deleted int not null, ld_tenantid bigint not null, ld_enabled int not null, 
@@ -170,7 +170,7 @@ create table ld_foldergroup (ld_folderid bigint not null, ld_groupid bigint not 
                              ld_rename int not null, ld_import int not null, ld_export int not null, ld_sign int not null, 
                              ld_archive int not null, ld_workflow int not null, ld_download int not null, ld_calendar int not null,
                              ld_subscription int not null, ld_print int not null, ld_password int not null, ld_move int not null,
-                             ld_email int not null, ld_automation int not null, ld_storage int not null, ld_readingreq int not null, 
+                             ld_email int not null, ld_automation int not null, ld_storage int not null, ld_readingreq int not null,
                              constraint PK_LD_FOLDERGROUP primary key (ld_folderid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_rating (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint not null, 
@@ -200,7 +200,7 @@ create table ld_tenant (ld_id bigint not null, ld_lastmodified datetime not null
                         ld_city varchar(255), ld_country varchar(255), ld_state varchar(255),
                         ld_email varchar(255), ld_telephone varchar(255),
                         ld_maxusers int, ld_maxsessions int, ld_maxrepodocs bigint,
-                        ld_maxreposize bigint, ld_type int not null, ld_creation datetime, 
+                        ld_maxreposize bigint, ld_type int not null, ld_creation datetime,
                         ld_qthreshold int, ld_qrecipients varchar(1000), ld_maxguests int, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_sequence (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null,
@@ -212,7 +212,7 @@ create table ld_extoption (ld_id bigint not null, ld_lastmodified datetime not n
                           ld_label varchar(1000), ld_position int not null, ld_category varchar(255),
                           primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_temp (ld_int bigint, ld_int1 bigint, ld_date datetime, ld_string varchar(4000)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-create table ld_uniquetag(ld_tag varchar(255), ld_tenantid bigint, ld_count bigint, primary key (ld_tag, ld_tenantid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+create table ld_uniquetag(ld_tag varchar(255),ld_int1 bigint, ld_tenantid bigint, ld_count bigint, primary key (ld_tag, ld_tenantid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_update (ld_update varchar(255), ld_date datetime, ld_version varchar(255)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_patch (ld_patch varchar(255), ld_date datetime, ld_version varchar(255)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_session(ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,

@@ -94,7 +94,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 
 				return doc;
 			}
-		}, null);
+		}, max);
 
 		/*
 		 * Iterate over records composing the response XML document

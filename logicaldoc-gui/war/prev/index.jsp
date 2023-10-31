@@ -54,7 +54,7 @@
   if(request.getParameter("path")!=null)
   	path = request.getParameter("path");
   if(ticket!=null)
-  path = "download-ticket";
+  	path = "download-ticket";
   
   String query = request.getQueryString();
   if(previewCheck!=null)
@@ -106,6 +106,9 @@
           // PDFViewerApplication.preferences;
           // PDFViewerApplication._initializeL10n
           // PDFViewerApplication.preferences.set('pdfBugEnabled', true);
+
+		  // In order to avoid the side panel to appear on load, please edit the file viewer.js and replace
+		  // "sidebarViewOnLoad": -1, with "sidebarViewOnLoad": false,
 
             
             PDFViewerApplication.initializedPromise.then(() => {

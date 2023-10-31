@@ -100,6 +100,9 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	private Set<Tag> tags = new HashSet<>();
 
+	/**
+	 * Comma-separated tags, used for searching only
+	 */
 	private String tgs;
 
 	/**
@@ -485,6 +488,12 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		return tgs;
 	}
 
+	/**
+	 * So not invoke this method directly, it is thought to be used by the ORM
+	 * inside the DAO.
+	 * 
+	 * @param tgs comma-separated string of tags
+	 */
 	public void setTgs(String tgs) {
 		this.tgs = tgs;
 	}

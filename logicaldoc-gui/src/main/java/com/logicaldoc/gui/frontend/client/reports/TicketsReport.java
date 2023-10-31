@@ -17,10 +17,10 @@ import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.document.TicketDisplay;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -187,17 +187,10 @@ public class TicketsReport extends ReportPanel {
 		ticketURL.setTitle(I18N.message("ticketurl"));
 		ticketURL.addClickHandler((MenuItemClickEvent event) -> {
 			String ticketId = rec.getAttributeAsString("ticketId");
+			String type = rec.getAttributeAsString("type");
 
-			String url = Session.get().getConfig("server.url");
-			if (!url.endsWith("/"))
-				url += "/";
-			if ("2".equals(rec.getAttributeAsString("type")))
-				url += "view/" + ticketId;
-			else
-				url += "download-ticket?ticketId=" + ticketId;
-
-			SC.confirm(I18N.message("downloadticket") + " - " + ticketId,
-					"<a href='" + url + "' target='_blank'>" + url + "</a>", null);
+			new TicketDisplay(ticketId, sampleTicketUrl(Session.get().getConfig("server.url"), ticketId, type),
+					sampleTicketUrl(Util.contextPath(), ticketId, type)).show();
 		});
 
 		MenuItem openInFolder = new MenuItem();
@@ -275,5 +268,15 @@ public class TicketsReport extends ReportPanel {
 		else
 			contextMenu.setItems(enable, ticketURL, download, preview, openInFolder, delete);
 		contextMenu.showContextMenu();
+	}
+
+	private String sampleTicketUrl(String urlBase, String ticketId, String type) {
+		if (!urlBase.endsWith("/"))
+			urlBase += "/";
+		if ("2".equals(type))
+			urlBase += "view/" + ticketId;
+		else
+			urlBase += "download-ticket?ticketId=" + ticketId;
+		return urlBase;
 	}
 }

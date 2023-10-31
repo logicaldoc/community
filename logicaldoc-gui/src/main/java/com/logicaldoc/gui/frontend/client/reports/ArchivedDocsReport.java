@@ -127,8 +127,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 	@Override
 	protected void refresh() {
 		Long folderId = folderSelector.getFolderId();
-		int maxElements = max.getValueAsInteger();
-		list.refresh(new ArchivedDocsDS(folderId, maxElements));
+		list.refresh(new ArchivedDocsDS(folderId, max.getValueAsInteger()));
 	}
 
 	@Override
