@@ -38,7 +38,19 @@ public interface SignService extends RemoteService {
 	 */
 	public void generateNewKeystore(GUIKeystore keystore) throws ServerException;
 
+	/**
+	 * Generates a self-signes certificate for the current user.
+	 * 
+	 * @throws ServerException an error happened manipulating the keystore
+	 */
 	public void generateNewCertificate() throws ServerException;
+
+	/**
+	 * Imports an uploaded certificate
+	 * 
+	 * @throws ServerException an error happened manipulating the keystore
+	 */
+	public void importCertificate(String privateKey) throws ServerException;
 
 	/**
 	 * Delete the certificate of the current user

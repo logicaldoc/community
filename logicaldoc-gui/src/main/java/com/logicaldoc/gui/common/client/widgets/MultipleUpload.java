@@ -37,6 +37,10 @@ public class MultipleUpload extends HorizontalPanel {
 	private List<String> uploadedFiles = new ArrayList<>();
 
 	public MultipleUpload(IButton confirmButton) {
+		this(confirmButton, "dropfileshere");
+	}
+
+	public MultipleUpload(IButton confirmButton, String label) {
 		final VerticalPanel progressBarPanel = new VerticalPanel();
 		final Map<String, ProgressBar> progressBars = new LinkedHashMap<>();
 		final Map<String, Image> cancelButtons = new LinkedHashMap<>();
@@ -46,7 +50,7 @@ public class MultipleUpload extends HorizontalPanel {
 		verticalPanel.add(uploader);
 
 		if (Uploader.isAjaxUploadWithProgressEventsSupported()) {
-			final Label dropFilesLabel = new Label(I18N.message("dropfileshere"));
+			final Label dropFilesLabel = new Label(I18N.message(label));
 			dropFilesLabel.setStyleName("dropFilesLabel");
 			dropFilesLabel.addDragOverHandler(event -> {
 				if (!uploader.getButtonDisabled()) {
@@ -171,6 +175,10 @@ public class MultipleUpload extends HorizontalPanel {
 
 	public void setFileTypes(String fileTypes) {
 		uploader.setFileTypes(fileTypes);
+	}
+
+	public void setMaxUploads(int maxUploads) {
+		uploader.setFileUploadLimit(maxUploads);
 	}
 
 	protected class CancelProgressBarTextFormatter extends ProgressBar.TextFormatter {

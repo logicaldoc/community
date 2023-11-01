@@ -53,7 +53,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		try {
 			// Make sure the password in the DB follows the current scheme
 			if (user.getPassword().equals(testLegacy))
-				userDAO.jdbcUpdate("update ld_user set ld_password='" + test + "' where ld_id " + user.getId());
+				userDAO.jdbcUpdate("update ld_user set ld_password='" + test + "' where ld_id = " + user.getId());
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage());
 		}
