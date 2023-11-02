@@ -106,21 +106,19 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	}
 
 	/**
-	 * Retrieves the path where the plugins jar archives are stored
+	 * Retrieves the path where the plugin jar archive is stored
 	 * 
-	 * @return the path where the plugins jar archives are stored
+	 * @return the path where the plugin jar archive is stored
 	 */
 	public String getPluginPath() {
-		String path = getManager().getPathResolver().resolvePath(getDescriptor(), "/").toString();
-		if (path.startsWith("jar:file:"))
-			path = path.substring("jar:file:".length());
-		path = path.substring(0, path.lastIndexOf("!"));
+		String path = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 		try {
 			// The path may contain URL-encoded sequences
 			path = URLDecoder.decode(path, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			// Nothing to do
 		}
+
 		return path;
 	}
 
@@ -274,7 +272,6 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	protected void addServlet(String name, String servletClass, String mapping, Integer loadOnStartup) {
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();
-
 		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
 		if (loadOnStartup != null)
 			config.addServlet(name, servletClass, loadOnStartup);
