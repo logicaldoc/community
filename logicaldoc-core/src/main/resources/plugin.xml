@@ -90,7 +90,6 @@
 
 <plugin id="logicaldoc-core" version="8.9.0" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
-    <parameter-def id="name" />
     <parameter-def id="sqlFile" />
     <parameter-def id="position" />
   </extension-point>
@@ -377,7 +376,6 @@
   
   <extension plugin-id="logicaldoc-core" point-id="DbInit" id="coreDbInit">
 	<parameter id="position" value="1" />
-	<parameter id="name" value="logicaldoc-core" />
 	<parameter id="sqlFile" value="sql/logicaldoc-core.sql" />
   </extension>
   
