@@ -15,8 +15,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewTile;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
@@ -197,25 +197,13 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 	private LinkItem prepareFolderItem() {
 		String path = document.getPathExtended();
 
-		FormItemIcon copyPath = new FormItemIcon();
-		copyPath.setPrompt(I18N.message("copypath"));
-		copyPath.setSrc("[SKIN]/page_white_paste.png");
-		copyPath.setWidth(16);
-		copyPath.setHeight(16);
-		copyPath.addFormItemClickHandler(event -> {
-			LD.askForValue(I18N.message("path"), I18N.message("path"), path, value -> {
-				// Nothing to do
-			});
-			event.cancel();
-		});
-
 		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40));
 		folder.setTitle(I18N.message("folder"));
 		folder.setValue(Util.displayURL(null, document.getFolder().getId()));
 		folder.setTooltip(document.getPathExtended());
 		folder.setWrap(false);
 		folder.setWidth(DEFAULT_ITEM_WIDTH);
-		folder.setIcons(copyPath);
+		folder.setIcons(new CopyTextFormItemIcon(path));
 		return folder;
 	}
 

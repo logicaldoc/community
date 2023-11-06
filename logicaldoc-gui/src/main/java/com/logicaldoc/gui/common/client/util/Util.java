@@ -28,6 +28,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.ApplicationRestarting;
 import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.smartgwt.client.widgets.Canvas;
@@ -507,6 +508,27 @@ public abstract class Util {
 	}
 
 	/**
+	 * Copies a text into the client's clipboard
+	 * 
+	 * @param text the content to put into the clipboards
+	 * @return The formated file size.
+	 */
+	public static void copyText(String text) {
+		writeToClipboard(text);
+		GuiLog.info(I18N.message("texthascopied"));
+	};
+
+	/**
+	 * Writes a text into the client's clipboard
+	 * 
+	 * @param text the content to put into the clipboards
+	 * @return The formated file size.
+	 */
+	private static native void writeToClipboard(String text) /*-{
+  		 navigator.clipboard.writeText(text);
+	}-*/;
+
+	/**
 	 * Format file size in Bytes, KBytes, MBytes or GBytes.
 	 * 
 	 * @param size The file size in bytes.
@@ -754,10 +776,6 @@ public abstract class Util {
 		} catch (e) {
 			return 'unknown'
 		}
-	}-*/;
-
-	public static native void copyToClipboard(String text) /*-{
-		new $wnd.copyToClipboard(text);
 	}-*/;
 
 	public static native boolean isValidEmail(String email) /*-{
