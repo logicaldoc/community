@@ -190,6 +190,11 @@ public class CustomIdPanel extends AdminPanel {
 		id.setWidth(60);
 		id.setCanEdit(false);
 		id.setHidden(true);
+		
+		ListGridField name = new ListGridField("name", I18N.message("name"));
+		name.setWidth(150);
+		name.setCanEdit(false);
+		name.setHidden(true);
 
 		ListGridField frequency = new ListGridField(FREQUENCY, I18N.message(FREQUENCY));
 		frequency.setWidth(80);
@@ -213,10 +218,9 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.setCanEdit(true);
 		sequences.setWidth100();
 		sequences.setHeight100();
-		sequences.setFields(template);
 		sequences.setSelectionType(SelectionStyle.SINGLE);
 		sequences.setModalEditing(true);
-		sequences.setFields(id, frequency, template, folder, value);
+		sequences.setFields(id, name, frequency, template, folder, value);
 
 		sequences.addEditCompleteHandler(event -> {
 			ListGridRecord rec = sequences.getRecord(event.getRowNum());
@@ -265,6 +269,7 @@ public class CustomIdPanel extends AdminPanel {
 						rec.setAttribute("month", cid.getMonth());
 						rec.setAttribute(FOLDER, cid.getFolder());
 						rec.setAttribute("id", cid.getId());
+						rec.setAttribute("name", cid.getName());
 						rec.setAttribute(VALUE, cid.getValue());
 						records.add(rec);
 					}
