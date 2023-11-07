@@ -318,7 +318,11 @@
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="psdThumb">
     <parameter id="extension" value="psd" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
-  </extension>  
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="heicThumb">
+    <parameter id="extension" value="heic" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
+  </extension>    
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="pdfThumb">
     <parameter id="extension" value="pdf" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.PdfThumbnailBuilder" />
@@ -447,7 +451,7 @@
   </extension>
   
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">
-		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd,webp"/>
+		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd,webp,heic"/>
 		<parameter id="out" value="pdf"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.ImageConverter"/>
   </extension>
