@@ -264,6 +264,7 @@ public class SystemMenu extends VLayout {
 		LinkItem support = new LinkItem();
 		support.setName(I18N.message("support"));
 		support.setLinkTitle(Session.get().getInfo().getBranding().getSupport());
+		support.setVisible(Feature.enabled(Feature.TECHNICAL_SUPPORT));
 
 		String mailTo = "mailto:" + Session.get().getInfo().getBranding().getSupport() + "?subject="
 				+ Session.get().getInfo().getBranding().getProductName() + " Support - ";
@@ -286,7 +287,7 @@ public class SystemMenu extends VLayout {
 		usernoItem.setWidth(250);
 		usernoItem.setRequired(true);
 		usernoItem.setShouldSaveValue(false);
-		usernoItem.setWrap(true);
+		usernoItem.setWrap(false);
 		usernoItem.setWrapTitle(false);
 
 		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", Session.get().getInfo().getHostName());

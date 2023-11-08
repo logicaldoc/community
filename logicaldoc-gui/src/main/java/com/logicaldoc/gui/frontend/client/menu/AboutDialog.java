@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.menu;
 
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -92,6 +93,7 @@ public class AboutDialog extends Window {
 		maillink.setPixelSize(300, 16);
 		maillink.setAlign(Alignment.CENTER);
 		maillink.setLayoutAlign(Alignment.CENTER);
+		maillink.setVisible(Feature.enabled(Feature.TECHNICAL_SUPPORT));
 
 		HTMLPane vspacer2 = new HTMLPane();
 		vspacer2.setContents("<div>&nbsp;</div>");
