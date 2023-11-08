@@ -866,7 +866,7 @@ public class ItemFactory {
 	public static SelectItem newTenantSelector() {
 		return newTenantSelector(false);
 	}
-	
+
 	public static SelectItem newTenantSelector(boolean appendSystemTenant) {
 		SelectItem tenant = new SelectItem("tenant");
 		tenant.setTitle(I18N.message("tenant"));
@@ -944,7 +944,7 @@ public class ItemFactory {
 		item.setTitle(I18N.message(title));
 		return item;
 	}
-	
+
 	public static CheckboxItem newCheckbox(String name) {
 		return newCheckbox(name, name);
 	}
@@ -1968,7 +1968,7 @@ public class ItemFactory {
 
 	public static SelectItem newTemplateSelector(boolean withEmpty, Long selectedTemplateId) {
 		SelectItem templateItem = new SelectItem("template", I18N.message("template"));
-		templateItem.setDisplayField("name");
+		templateItem.setDisplayField("label");
 		templateItem.setValueField("id");
 		templateItem.setWidth(150);
 		templateItem.setMultiple(false);
@@ -2040,7 +2040,7 @@ public class ItemFactory {
 		final SelectItem selectItem = new SelectItem("attributeset", I18N.message("attributeset"));
 		selectItem.setMultiple(false);
 		selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
-		selectItem.setDisplayField("name");
+		selectItem.setDisplayField("label");
 		selectItem.setValueField("id");
 		selectItem.setWidth(120);
 		selectItem.setOptionDataSource(new AttributeSetsDS(false, GUIAttributeSet.TYPE_DEFAULT));
@@ -2194,7 +2194,7 @@ public class ItemFactory {
 		item.setShowHintInField(true);
 		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
-		
+
 		ListGridField label = new ColoredListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
 
@@ -2223,7 +2223,7 @@ public class ItemFactory {
 		item.setShowHintInField(true);
 		item.setHint(I18N.message(WORKFLOWSELECT) + "...");
 		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
-		
+
 		ListGridField label = new ColoredListGridField(LABEL, I18N.message(WORKFLOW));
 		label.setWidth(150);
 

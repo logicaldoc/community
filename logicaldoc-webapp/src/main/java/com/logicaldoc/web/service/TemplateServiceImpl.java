@@ -135,6 +135,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	private void updateTemplate(GUITemplate guiTemplate, Template template, Session session) {
 		template.setTenantId(session.getTenantId());
 		template.setName(guiTemplate.getName());
+		template.setLabel(guiTemplate.getLabel());
 		template.setDescription(guiTemplate.getDescription());
 		template.setValidation(guiTemplate.getValidation());
 		template.setReadonly(guiTemplate.isReadonly() ? 1 : 0);
@@ -271,6 +272,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		GUITemplate guiTemplate = new GUITemplate();
 		guiTemplate.setId(templateId);
 		guiTemplate.setName(template.getName());
+		guiTemplate.setLabel(template.getLabel());
 		guiTemplate.setDescription(template.getDescription());
 		guiTemplate.setValidation(template.getValidation());
 		guiTemplate.setReadonly(template.getReadonly() == 1);

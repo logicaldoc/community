@@ -69,7 +69,7 @@ create table ld_systemmessage (ld_id bigint not null, ld_lastmodified datetime n
                                ld_lastnotified datetime, ld_status int not null, ld_trials int,
                                ld_type int not null, ld_html int not null, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_template (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
-                          ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, 
+                          ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_label varchar(255),
                           ld_description varchar(2000), ld_readonly int not null, ld_type int not null, ld_validation varchar(4000), 
                           primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                         
 create table ld_template_ext (ld_templateid bigint not null, ld_mandatory int not null, ld_type int not null, 

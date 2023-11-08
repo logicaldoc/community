@@ -8,6 +8,8 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
@@ -61,6 +63,7 @@ public class AttributeSetsDataServlet extends AbstractDataServlet {
 			writer.print("<attributeset>");
 			writer.print("<id>" + set.getId() + "</id>");
 			writer.print("<name><![CDATA[" + set.getName() + "]]></name>");
+			writer.print("<label><![CDATA[" + StringUtils.defaultIfEmpty(set.getLabel(), set.getName()) + "]]></label>");
 			writer.print("<description><![CDATA[" + set.getDescription() + "]]></description>");
 			writer.print("<readonly>" + Boolean.toString(set.getReadonly() == 1) + "</readonly>");
 			writer.print("<type>" + set.getType() + "</type>");
