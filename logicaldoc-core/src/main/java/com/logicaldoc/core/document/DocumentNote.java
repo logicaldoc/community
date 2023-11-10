@@ -2,6 +2,8 @@ package com.logicaldoc.core.document;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -114,8 +116,7 @@ public class DocumentNote extends PersistentObject {
 		this.type = source.type;
 		this.recipient = source.recipient;
 		this.recipientEmail = source.recipientEmail;
-
-		setFileVersion(source.getFileVersion());
+		this.setTenantId(source.getTenantId());
 	}
 
 	public long getDocId() {
@@ -292,5 +293,10 @@ public class DocumentNote extends PersistentObject {
 
 	public void setRotation(double rotation) {
 		this.rotation = rotation;
+	}
+
+	@Override
+	public String toString() {
+		return StringUtils.abbreviate(message, 40) + "(" + getId() + ")";
 	}
 }

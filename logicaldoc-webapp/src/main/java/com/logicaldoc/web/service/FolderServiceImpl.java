@@ -948,7 +948,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void paste(long[] docIds, long folderId, String action) throws ServerException {
+	public void paste(long[] docIds, long folderId, String action, boolean links, boolean notes)
+			throws ServerException {
 		Session session = validateSession();
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -963,7 +964,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			if (action.equals(Clipboard.CUT))
 				cut(session, docIds, folder.getId());
 			else if (action.equals(Clipboard.COPY))
-				copy(session, docIds, folder.getId());
+				copy(session, docIds, folder.getId(), links, notes);
 		} catch (PersistenceException e) {
 			log.error("Exception moving documents: {}", e.getMessage(), e);
 			throwServerException(session, null, e);
@@ -1025,7 +1026,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		}
 	}
 
-	private void copy(Session session, long[] docIds, long folderId) throws ServerException {
+	private void copy(Session session, long[] docIds, long folderId, boolean links, boolean notes)
+			throws ServerException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1041,11 +1043,11 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				transaction.setComment("");
 
 				if (doc.getDocRef() == null) {
-					docManager.copyToFolder(doc, selectedFolderFolder, transaction);
+					docManager.copyToFolder(doc, selectedFolderFolder, transaction, links, notes);
 				} else {
 					if (doc.getFolder().getId() != selectedFolderFolder.getId()) {
 						transaction.setEvent(DocumentEvent.SHORTCUT_STORED.toString());
-						docManager.copyToFolder(doc, selectedFolderFolder, transaction);
+						docManager.copyToFolder(doc, selectedFolderFolder, transaction, false, false);
 					}
 				}
 			}

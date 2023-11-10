@@ -95,9 +95,10 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSDocument copy(String sid, long docId, long folderId) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, IOException {
-		return client.copy(sid, docId, folderId);
+	public WSDocument copy(String sid, long docId, long folderId, boolean links, boolean notes)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException {
+		return client.copy(sid, docId, folderId, links, notes);
 	}
 
 	@Override

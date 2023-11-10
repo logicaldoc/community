@@ -328,11 +328,14 @@ public class DocTool {
 	 * 
 	 * @param doc the document
 	 * @param targetPath the full path of the target folder
+	 * @param links if the links must be copied too
+	 * @param notes if the notes must be copied too
+	 * 
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return the new document created
 	 */
-	public Document copy(Document doc, String targetPath, String username) {
+	public Document copy(Document doc, String targetPath, boolean links, boolean notes, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -344,11 +347,24 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			return manager.copyToFolder(doc, folder, transaction);
+			return manager.copyToFolder(doc, folder, transaction, links, notes);
 		} catch (PersistenceException | IOException e) {
 			log.error(e.getMessage(), e);
 			return null;
 		}
+	}
+
+	/**
+	 * Copies a document into a target folder
+	 * 
+	 * @param doc the document
+	 * @param targetPath the full path of the target folder
+	 * @param username the user in whose name the method is run
+	 * 
+	 * @return the new document created
+	 */
+	public Document copy(Document doc, String targetPath, String username) {
+		return copy(doc, targetPath, false, false, username);
 	}
 
 	/**

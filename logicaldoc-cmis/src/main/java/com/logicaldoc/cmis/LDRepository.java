@@ -487,7 +487,7 @@ public class LDRepository {
 			transaction.setUser(getSessionUser());
 			transaction.setComment("");
 
-			Document newDoc = documentManager.copyToFolder(doc, target, transaction);
+			Document newDoc = documentManager.copyToFolder(doc, target, transaction, true, true);
 			return getId(newDoc);
 
 		} catch (Exception t) {

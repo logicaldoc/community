@@ -343,15 +343,15 @@ public class LD {
 	private static void prepareItemsForAskValues(String message, List<FormItem> items, final ValueCallback callback,
 			final Window dialog, final DynamicForm form) {
 		for (FormItem item : items) {
-			if (items.size() == 1)
+			if (items.size() == 1) {
 				item.setName(VALUE);
+				if (message == null)
+					item.setShowTitle(false);
+				else
+					item.setTitle(I18N.message(message));
+			}
 
 			item.setWidth("100%");
-			if (message == null)
-				item.setShowTitle(false);
-			else
-				item.setTitle(I18N.message(message));
-
 			item.setWrapTitle(false);
 			if (!(item instanceof TextAreaItem) && !(item instanceof RichTextItem) && items.size() == 1
 					&& callback != null) {

@@ -478,8 +478,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSDocument copy(String sid, long docId, long folderId) throws AuthenticationException, WebserviceException,
-			PersistenceException, PermissionException, IOException {
+	public WSDocument copy(String sid, long docId, long folderId, boolean links, boolean notes)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			IOException {
 		User user = validateSession(sid);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		long rootId = fdao.findRoot(user.getTenantId()).getId();
@@ -503,7 +504,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		Folder folder = fdao.findFolder(folderId);
 
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		Document createdDoc = documentManager.copyToFolder(doc, folder, transaction);
+		Document createdDoc = documentManager.copyToFolder(doc, folder, transaction, links, notes);
 		return getDoc(createdDoc.getId());
 	}
 

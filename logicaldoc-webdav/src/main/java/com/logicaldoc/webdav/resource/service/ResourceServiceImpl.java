@@ -787,7 +787,7 @@ public class ResourceServiceImpl implements ResourceService {
 					document = documentDAO.findById(document.getDocRef());
 					documentManager.createAlias(document, folder, document.getDocRefType(), transaction);
 				} else {
-					documentManager.copyToFolder(document, folder, transaction);
+					documentManager.copyToFolder(document, folder, transaction, true, true);
 				}
 			} catch (DavException de) {
 				throw de;
