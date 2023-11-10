@@ -40,7 +40,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		DocumentNote note = notes.get(0);
 		Assert.assertEquals("message for note 1", note.getMessage());
 	}
-	
+
 	@Test
 	public void testFindByDocIdAndType() {
 		List<DocumentNote> notes = dao.findByDocIdAndType(1L, null, "x");
@@ -53,7 +53,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testCopyAnnotations() throws PersistenceException {
 		Assert.assertTrue(dao.findByDocId(4L, "2.0").isEmpty());
-		dao.copyAnnotations(4L, "1.0", "2.0");
-		Assert.assertEquals(1, dao.findByDocId(4L, "2.0").size());
+		dao.copyAnnotations(3L, "1.0", "2.0");
+		Assert.assertEquals(1, dao.findByDocId(3L, "2.0").size());
 	}
 }
