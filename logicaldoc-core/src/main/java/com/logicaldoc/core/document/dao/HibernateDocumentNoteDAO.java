@@ -39,19 +39,32 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
-		super.store(note);
-
+	public void store(DocumentNote note) throws PersistenceException {
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = documentDao.findById(note.getDocId());
-		if (doc != null && doc.getIndexed() == AbstractDocument.INDEX_INDEXED) {
+		if (doc == null)
+			throw new PersistenceException("Cannot save note for undexisting document " + note.getDocId());
+
+		if (note.getFileVersion() == null)
+			note.setFileVersion(doc.getFileVersion());
+
+		super.store(note);
+
+		if (doc.getIndexed() == AbstractDocument.INDEX_INDEXED) {
 			documentDao.initialize(doc);
 			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 			documentDao.store(doc);
 		}
-
+	}
+	
+	@Override
+	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
+		this.store(note);
+		
 		try {
 			if (transaction != null) {
+				DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				Document doc = documentDao.findById(note.getDocId());
 				transaction.setEvent(DocumentEvent.NEW_NOTE.toString());
 				documentDao.saveDocumentHistory(doc, transaction);
 			}

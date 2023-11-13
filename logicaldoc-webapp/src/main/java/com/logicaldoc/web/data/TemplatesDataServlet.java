@@ -66,6 +66,7 @@ public class TemplatesDataServlet extends AbstractDataServlet {
 				writer.print("<template>");
 				writer.print("<id>" + templ.getId() + "</id>");
 				writer.print("<name><![CDATA[" + templ.getName() + "]]></name>");
+				writer.print("<label><![CDATA[" + StringUtils.defaultIfEmpty(templ.getLabel(), templ.getName())+ "]]></label>");
 				writer.print("<description><![CDATA[" + templ.getDescription() + "]]></description>");
 				writer.print("<readonly>" + Boolean.toString(templ.getReadonly() == 1) + "</readonly>");
 				writer.print("<type>" + templ.getType() + "</type>");

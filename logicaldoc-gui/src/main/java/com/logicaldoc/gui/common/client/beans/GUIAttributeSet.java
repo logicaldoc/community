@@ -14,6 +14,8 @@ public class GUIAttributeSet implements Serializable {
 	private long id = 0;
 
 	private String name;
+	
+	private String label;
 
 	private String description;
 
@@ -118,5 +120,13 @@ public class GUIAttributeSet implements Serializable {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

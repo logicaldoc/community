@@ -22,6 +22,8 @@ public class GUITemplate implements Serializable {
 	private long id = 0;
 
 	private String name;
+	
+	private String label;
 
 	private String description;
 
@@ -169,5 +171,13 @@ public class GUITemplate implements Serializable {
 
 	public void setValidation(String validation) {
 		this.validation = validation;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

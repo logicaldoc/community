@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.http.client.RequestTimeoutException;
 import com.google.gwt.user.client.Window;
@@ -24,6 +25,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.RequestInfo;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
@@ -42,6 +44,8 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.util.EventHandler;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
@@ -230,7 +234,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				FolderService.Instance.get().paste(ids, folderId, "cut", new AsyncCallback<Void>() {
+				FolderService.Instance.get().paste(ids, folderId, "cut", false, false, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -917,20 +921,46 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			docIds[i++] = doc.getId();
 		}
 
-		FolderService.Instance.get().paste(docIds, folderId, Clipboard.getInstance().getLastAction(),
-				new AsyncCallback<Void>() {
+		List<FormItem> items = new ArrayList<>();
+		CheckboxItem copyDocuments = ItemFactory.newCheckbox("copydocuments");
+		copyDocuments.setValue(true);
+		copyDocuments.setDisabled(true);
+		items.add(copyDocuments);
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		CheckboxItem copyLinks = ItemFactory.newCheckbox("copylinks");
+		copyLinks.setValue(true);
+		items.add(copyLinks);
 
-					@Override
-					public void onSuccess(Void result) {
-						DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
-						Clipboard.getInstance().clear();
-					}
-				});
+		CheckboxItem copyNotes = ItemFactory.newCheckbox("copynotes");
+		copyNotes.setValue(true);
+		items.add(copyNotes);
+
+		LD.askForValues(I18N.message("copyoptions"), null, items, null, new ValuesCallback() {
+
+			@Override
+			public void execute(Map<String, Object> values) {
+				FolderService.Instance.get().paste(docIds, folderId, Clipboard.getInstance().getLastAction(),
+						Boolean.TRUE.equals(values.get("copylinks")), Boolean.TRUE.equals(values.get("copynotes")),
+						new AsyncCallback<Void>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
+								Clipboard.getInstance().clear();
+							}
+						});
+			}
+
+			@Override
+			public void execute(String value) {
+				// Not used
+			}
+		});
 	}
 
 	private void onPasteAsAlias() {

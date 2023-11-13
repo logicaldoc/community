@@ -706,6 +706,9 @@ public class TemplatePropertiesPanel extends HLayout {
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setDisabled(template.isReadonly() || !template.isWrite());
 
+		TextItem label = ItemFactory.newTextItem("label", template.getLabel());
+		label.setDisabled(template.isReadonly() || !template.isWrite());
+
 		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, event -> {
 			event.getItem().setValue(I18N.message("computing") + "...");
 			TemplateService.Instance.get().countDocuments(template.getId(), new AsyncCallback<Long>() {
@@ -730,10 +733,12 @@ public class TemplatePropertiesPanel extends HLayout {
 		docs.setIcons(computeStat);
 		docs.setWidth("1%");
 
-		if (!template.isReadonly() && template.isWrite())
+		if (!template.isReadonly() && template.isWrite()) {
 			description.addChangedHandler(changedHandler);
+			label.addChangedHandler(changedHandler);
+		}
 
-		templateForm.setItems(id, name, description, docs);
+		templateForm.setItems(id, name, label, description, docs);
 
 		container.addMember(templateForm);
 	}
@@ -746,6 +751,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			template.setName((String) values.get("name"));
 			template.setDescription((String) values.get("description"));
+			template.setLabel((String) values.get("label"));
 		}
 
 		if (template.getId() != 0L) {

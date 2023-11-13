@@ -30,6 +30,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentLinkDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -82,6 +83,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
 
 	private DocumentDAO documentDAO;
+
+	private DocumentLinkDAO documentLinkDAO;
 
 	private DocumentNoteDAO documentNoteDAO;
 
@@ -987,7 +990,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction)
+	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction, boolean links, boolean notes)
 			throws PersistenceException, IOException {
 		validateTransaction(transaction);
 
@@ -999,8 +1002,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 
 		String resource = storer.getResourceName(doc, null, null);
-		InputStream is = storer.getStream(doc.getId(), resource);
-		try {
+		try (InputStream is = storer.getStream(doc.getId(), resource);) {
 			Document cloned = new Document(doc);
 			cloned.setId(0);
 			if (doc.getFolder().getId() != folder.getId())
@@ -1026,11 +1028,51 @@ public class DocumentManagerImpl implements DocumentManager {
 			copyEvent.setComment(newPath + "/" + createdDocument.getFileName());
 			documentDAO.saveDocumentHistory(doc, copyEvent);
 
+			if (links)
+				copyLinks(doc, createdDocument);
+
+			if (notes)
+				copyNotes(doc, createdDocument);
+
 			return createdDocument;
-		} finally {
-			if (is != null)
-				is.close();
-			is = null;
+		}
+	}
+
+	private void copyNotes(Document sourceDocument, Document createdDocument) {
+		List<DocumentNote> docNotes = documentNoteDAO.findByDocId(sourceDocument.getId(), sourceDocument.getFileVersion());
+		for (DocumentNote docNote : docNotes) {
+			DocumentNote newNote = new DocumentNote(docNote);
+			newNote.setDocId(createdDocument.getId());
+			newNote.setFileVersion(null);
+					
+			try {
+				documentNoteDAO.store(newNote);
+			} catch (PersistenceException e) {
+				log.warn("Error copying note {}", docNote);
+			}
+		}
+	}
+
+	private void copyLinks(Document sourceDocument, Document createdDocument) {
+		List<DocumentLink> docLinks = documentLinkDAO.findByDocId(sourceDocument.getId());
+		
+		for (DocumentLink docLink : docLinks) {
+			DocumentLink newLink = new DocumentLink();
+			newLink.setTenantId(docLink.getTenantId());
+			newLink.setType(docLink.getType());
+			if (docLink.getDocument1().getId() == sourceDocument.getId()) {
+				newLink.setDocument1(createdDocument);
+				newLink.setDocument2(docLink.getDocument2());
+			} else {
+				newLink.setDocument2(createdDocument);
+				newLink.setDocument1(docLink.getDocument1());
+			}
+			
+			try {
+				documentLinkDAO.store(newLink);
+			} catch (PersistenceException e) {
+				log.warn("Error copying link {}", docLink);
+			}
 		}
 	}
 
@@ -1149,7 +1191,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		documentDAO.delete(aliasId, transaction);
 
 		try {
-			return copyToFolder(originalDoc, folder, new DocumentHistory(transaction));
+			return copyToFolder(originalDoc, folder, new DocumentHistory(transaction), true, true);
 		} catch (IOException e) {
 			throw new PersistenceException(e);
 		}
@@ -1400,8 +1442,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public Ticket createTicket(
-			Ticket ticket, DocumentHistory transaction)
+	public Ticket createTicket(Ticket ticket, DocumentHistory transaction)
 			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
@@ -1557,10 +1598,10 @@ public class DocumentManagerImpl implements DocumentManager {
 					targetStorage);
 
 			List<Document> documents = documentDAO.findByFolder(folderId, null);
-			
+
 			for (Document document : documents) {
 				int movedFiles = storer.moveResourcesToStore(document.getId(), targetStorage);
-			
+
 				if (movedFiles > 0) {
 					totalMovedFiles += movedFiles;
 					try {
@@ -1713,5 +1754,9 @@ public class DocumentManagerImpl implements DocumentManager {
 			if (tempDir != null && tempDir.exists())
 				FileUtil.strongDelete(tempDir);
 		}
+	}
+
+	public void setDocumentLinkDAO(DocumentLinkDAO documentLinkDAO) {
+		this.documentLinkDAO = documentLinkDAO;
 	}
 }

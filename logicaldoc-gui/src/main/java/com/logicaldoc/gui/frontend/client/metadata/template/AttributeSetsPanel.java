@@ -69,13 +69,13 @@ public class AttributeSetsPanel extends VLayout {
 		name.setCanFilter(true);
 		name.setCanSort(true);
 
+		ListGridField label = new ListGridField("label", I18N.message("label"), 200);
+		label.setCanFilter(true);
+		label.setCanSort(true);
+
 		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 300);
 		description.setCanFilter(true);
 		description.setCanSort(false);
-
-		ListGridField documents = new ListGridField("documents", I18N.message("documents"), 100);
-		documents.setCanSort(false);
-		documents.setCanFilter(false);
 
 		ListGridField typeSet = new ListGridField("type", I18N.message("type"), 100);
 		typeSet.setHidden(true);
@@ -89,7 +89,7 @@ public class AttributeSetsPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(name, description, documents);
+		list.setFields(name, label, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -218,6 +218,7 @@ public class AttributeSetsPanel extends VLayout {
 
 		rec.setAttribute("readonly", "" + set.isReadonly());
 		rec.setAttribute("name", set.getName());
+		rec.setAttribute("label", set.getLabel() != null ? set.getLabel() : set.getName());
 		rec.setAttribute(DESCRIPTION, set.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 

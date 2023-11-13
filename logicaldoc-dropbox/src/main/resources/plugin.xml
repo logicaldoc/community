@@ -95,7 +95,6 @@
 
 	<extension plugin-id="logicaldoc-core" point-id="DbInit" id="gdocsDbInit">
 		<parameter id="position" value="1500" />
-		<parameter id="name" value="logicaldoc-dropbox" />
 		<parameter id="sqlFile" value="sql/logicaldoc-dropbox.sql" />
 	</extension>
 	

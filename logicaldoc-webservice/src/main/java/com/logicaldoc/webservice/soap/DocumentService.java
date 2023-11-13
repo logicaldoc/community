@@ -170,6 +170,8 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param docId The document id
 	 * @param folderId Identifier of the new document's folder
+	 * @param links If links must be copied too
+	 * @param notes If notes and annotations must be copied too
 	 * 
 	 * @return The created copy
 	 * 
@@ -189,7 +191,11 @@ public interface DocumentService {
 	@WebParam(name = "docId")
 	long docId, @WSDoc(description = "identifier of the new document's folder")
 	@WebParam(name = "folderId")
-	long folderId)
+	long folderId, @WSDoc(description = "if the links must be copied too")
+	@WebParam(name = "links")
+	boolean links, @WSDoc(description = "if the notes and annotations must be copied too")
+	@WebParam(name = "notes")
+	boolean notes)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException;
 
 	/**

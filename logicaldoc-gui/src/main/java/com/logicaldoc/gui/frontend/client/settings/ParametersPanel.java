@@ -68,6 +68,7 @@ public class ParametersPanel extends AdminPanel {
 		parametersGrid.setHeight100();
 		parametersGrid.setAutoFetchData(true);
 		parametersGrid.setCanSelectAll(false);
+		parametersGrid.setCanSort(false);
 		parametersGrid.setSelectionType(SelectionStyle.SINGLE);
 		parametersGrid
 				.setCanEdit(!Session.get().isDemo() && Session.get().isAdmin() && Session.get().isDefaultTenant());

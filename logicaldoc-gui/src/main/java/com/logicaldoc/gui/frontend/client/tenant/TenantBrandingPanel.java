@@ -306,6 +306,7 @@ public class TenantBrandingPanel extends HLayout {
 		TextItem support = ItemFactory.newEmailItem(SUPPORT, SUPPORT, false);
 		support.setValue(tenant.getBranding().getSupport());
 		support.setDisabled(readonlyOrNotFullBranding);
+		support.setVisible(Feature.enabled(Feature.TECHNICAL_SUPPORT));
 		support.addChangedHandler(changedHandler);
 
 		TextItem sales = ItemFactory.newEmailItem(SALES, SALES, false);
@@ -328,6 +329,7 @@ public class TenantBrandingPanel extends HLayout {
 
 		TextItem bugs = ItemFactory.newTextItem("bugs", tenant.getBranding().getBugs());
 		bugs.setDisabled(readonlyOrNotFullBranding);
+		bugs.setVisible(Feature.enabled(Feature.TECHNICAL_SUPPORT));
 		bugs.setColSpan(2);
 		bugs.setWidth(360);
 		bugs.addChangedHandler(changedHandler);

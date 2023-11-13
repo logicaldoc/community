@@ -17,10 +17,11 @@ public class AttributeSetsDS extends DataSource {
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
 		DataSourceTextField name = new DataSourceTextField("name");
+		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField description = new DataSourceTextField("description");
 		DataSourceTextField readonly = new DataSourceTextField("readonly");
 		DataSourceIntegerField ttype = new DataSourceIntegerField("type");
-		setFields(id, name, description, readonly, ttype);
+		setFields(id, name, label, description, readonly, ttype);
 		setDataURL("data/attributesets.xml?withempty=" + withEmpty + (type != null ? "&type=" + type : ""));
 		setClientOnly(true);
 	}

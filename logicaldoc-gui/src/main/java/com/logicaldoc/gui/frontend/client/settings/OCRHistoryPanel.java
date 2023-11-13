@@ -79,11 +79,11 @@ public class OCRHistoryPanel extends VLayout {
 
 		FileNameListGridField fileName = new FileNameListGridField();
 		fileName.setAutoFitWidth(true);
-		
+
 		ColoredListGridField path = new ColoredListGridField("path", I18N.message("path"));
 		path.setCanFilter(true);
 		path.setWidth(300);
-		
+
 		final RefreshableListGrid list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
@@ -106,23 +106,22 @@ public class OCRHistoryPanel extends VLayout {
 
 		list.addCellContextClickHandler(e -> {
 			Menu contextMenu = new Menu();
+			Record selectedRecord = list.getSelectedRecord();
 
 			MenuItem openInFolder = new MenuItem();
 			openInFolder.setTitle(I18N.message("openinfolder"));
 			openInFolder.addClickHandler(evnt -> {
-				Record rec = list.getSelectedRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(DOC_ID)));
+				DocumentsPanel.get().openInFolder(Long.parseLong(selectedRecord.getAttributeAsString(DOC_ID)));
 			});
 
 			MenuItem preview = new MenuItem();
 			preview.setTitle(I18N.message("preview"));
 			preview.addClickHandler(evnt -> {
-				Record rec = list.getSelectedRecord();
 				GUIDocument doc = new GUIDocument();
-				doc.setId(rec.getAttributeAsLong(DOC_ID));
-				doc.setFileName(rec.getAttributeAsString("filename"));
+				doc.setId(selectedRecord.getAttributeAsLong(DOC_ID));
+				doc.setFileName(selectedRecord.getAttributeAsString("filename"));
 
-				GUIFolder folder = new GUIFolder(rec.getAttributeAsLong("folderId"));
+				GUIFolder folder = new GUIFolder(selectedRecord.getAttributeAsLong("folderId"));
 				doc.setFolder(folder);
 
 				PreviewPopup iv = new PreviewPopup(doc);
@@ -134,9 +133,8 @@ public class OCRHistoryPanel extends VLayout {
 			MenuItem downloadIndexed = new MenuItem();
 			downloadIndexed.setTitle(I18N.message("downloadindexedtext"));
 			downloadIndexed.addClickHandler(evnt -> {
-				Record rec = list.getSelectedRecord();
-				FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
-						new AsyncCallback<GUIFolder>() {
+				FolderService.Instance.get().getFolder(selectedRecord.getAttributeAsLong("folderId"), false, false,
+						false, new AsyncCallback<GUIFolder>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -146,12 +144,13 @@ public class OCRHistoryPanel extends VLayout {
 							@Override
 							public void onSuccess(GUIFolder folder) {
 								if (folder.isDownload())
-									Util.download(
-											Util.downloadURL(rec.getAttributeAsLong(DOC_ID)) + "&downloadText=true");
+									Util.download(Util.downloadURL(selectedRecord.getAttributeAsLong(DOC_ID))
+											+ "&downloadText=true");
 							}
 						});
 
 			});
+			downloadIndexed.setEnabled(selectedRecord.getAttributeAsString("event").contains("ocr.success"));
 
 			contextMenu.setItems(preview, downloadIndexed, openInFolder);
 			contextMenu.showContextMenu();

@@ -56,16 +56,19 @@
         <property name="mappingLocations">
             <value>classpath*:mappings/*.hbm.xml</value>
         </property>
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.dialect"> ${hibernate.dialect} 
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.HSQLDialect
+				</prop>
+				<prop key="hibernate.cache.use_second_level_cache">
+					true
+				</prop>
+                <prop key="hibernate.cache.region.factory_class">
+                    org.hibernate.cache.ehcache.EhCacheRegionFactory
                 </prop>
-                <prop key="hibernate.cache.use_second_level_cache"> true 
-                </prop>
-                <prop key="hibernate.cache.region.factory_class"> ${hibernate.cache.factory} 
-                </prop>
-            </props>
-        </property>
+			</props>
+		</property>
     </bean>
     <!--Transaction management -->
     <bean id="TransactionManager"

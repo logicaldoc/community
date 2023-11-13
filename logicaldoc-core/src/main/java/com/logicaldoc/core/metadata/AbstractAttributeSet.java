@@ -16,6 +16,8 @@ public class AbstractAttributeSet extends ExtensibleObject {
 	public static final int TYPE_DEFAULT = 0;
 
 	private String name;
+	
+	private String label;
 
 	private String description;
 
@@ -53,5 +55,13 @@ public class AbstractAttributeSet extends ExtensibleObject {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

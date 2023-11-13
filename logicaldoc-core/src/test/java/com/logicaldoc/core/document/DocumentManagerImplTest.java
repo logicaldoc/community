@@ -3,6 +3,7 @@ package com.logicaldoc.core.document;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +23,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.dao.DocumentLinkDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -58,6 +61,8 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 	private DocumentNoteDAO documentNoteDao;
 
+	private DocumentLinkDAO documentLinkDao;
+
 	private MockStorer storer;
 
 	// Instance under test
@@ -73,6 +78,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		userDao = (UserDAO) context.getBean("UserDAO");
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
 		documentNoteDao = (DocumentNoteDAO) context.getBean("DocumentNoteDAO");
+		documentLinkDao = (DocumentLinkDAO) context.getBean("DocumentLinkDAO");
 		storer = (MockStorer) context.getBean("Storer");
 
 		// Make sure that this is a DocumentManagerImpl instance
@@ -113,7 +119,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testcreateTicket() throws PersistenceException, PermissionException, InterruptedException {
+	public void testCreateTicket() throws PersistenceException, PermissionException, InterruptedException {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 
@@ -198,11 +204,43 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		Folder newFolder = folderDao.findById(6);
 		docDao.initialize(doc);
 
+		List<DocumentLink> originalLinks = documentLinkDao.findByDocId(doc.getId());
+		Assert.assertFalse(originalLinks.isEmpty());
+		
+		List<DocumentNote> originalNotes = documentNoteDao.findByDocId(doc.getId(), null);
+		Assert.assertFalse(originalNotes.isEmpty());
+		
 		try {
 			storer.setUseDummyFile(true);
-			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction);
+			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, false, false);
 			Assert.assertNotSame(doc.getId(), newDoc.getId());
 			Assert.assertEquals(newFolder, newDoc.getFolder());
+			Assert.assertTrue(documentLinkDao.findByDocId(newDoc.getId()).isEmpty());
+			Assert.assertTrue(documentNoteDao.findByDocId(newDoc.getId(), null).isEmpty());
+		} finally {
+			storer.setUseDummyFile(false);
+		}
+		
+		try {
+			storer.setUseDummyFile(true);
+			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, true, true);
+			Assert.assertNotSame(doc.getId(), newDoc.getId());
+			Assert.assertEquals(newFolder, newDoc.getFolder());
+			
+			List<DocumentLink> links = documentLinkDao.findByDocId(newDoc.getId());
+			Assert.assertEquals(originalLinks.size(), links.size());
+			for (DocumentLink link : links) {
+				assertNotNull(link.getDocument1());
+				assertNotNull(link.getDocument2());
+				assertTrue(newDoc.getId() == link.getDocument1().getId() || newDoc.getId() == link.getDocument2().getId()); 
+			}
+			
+			List<DocumentNote> notes = documentNoteDao.findByDocId(newDoc.getId(), null);
+			Assert.assertEquals(originalNotes.size(), notes.size());
+			for (DocumentNote note : notes) {
+				assertEquals(newDoc.getId(), note.getDocId());
+				assertEquals(newDoc.getFileVersion(), note.getFileVersion());
+			}
 		} finally {
 			storer.setUseDummyFile(false);
 		}
@@ -295,7 +333,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
 		documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction);
-		
+
 		waiting();
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
 	}

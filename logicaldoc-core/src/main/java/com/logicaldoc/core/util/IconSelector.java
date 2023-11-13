@@ -201,6 +201,6 @@ public class IconSelector {
 	public static boolean isPicture(String ext) {
 		return (ext.equals("jpg") || ext.equals("jpeg") || ext.equals("gif") || ext.equals("png") || ext.equals("bmp")
 				|| ext.equals("tif") || ext.equals("tiff") || ext.equals("psd") || ext.equals("svg")
-				|| ext.equals("jfif") || ext.equals("webp"));
+				|| ext.equals("jfif") || ext.equals("webp") || ext.equals("heic"));
 	}
 }

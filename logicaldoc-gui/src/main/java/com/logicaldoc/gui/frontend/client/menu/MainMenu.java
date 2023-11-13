@@ -109,7 +109,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		addAccountButton();
 		addToolsButton(FolderController.get().getCurrentFolder(), null);
-		
+
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.INTERFACE_DENSITY)) {
 			addSeparator();
 			addFormItem(getDensitySelector());
@@ -669,12 +669,13 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				I18N.message("activablefeatures"));
 		activable.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> Features.get().show());
 
-		if (!Session.get().isDemo() && Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
+		if (!Session.get().isDemo()
+				&& Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
 				&& Feature.enabled(Feature.OFFICE) && com.logicaldoc.gui.common.client.Menu
 						.enabled(com.logicaldoc.gui.common.client.Menu.ACTIVABLE_FEATURES))
 			addButton(activable);
 	}
-	
+
 	private void addSupportButton() {
 		Menu menu = buildSupportMenu();
 		ToolStripButton supportButton = AwesomeFactory.newToolStripButton("question-circle", "support");
@@ -714,7 +715,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		bugReport.addClickHandler((MenuItemClickEvent event) -> Window
 				.open(Session.get().getInfo().getBranding().getBugs(), BLANK, WINDOW_SETTNGS));
 		if (Session.get().getInfo().getBranding().getBugs() != null
-				&& !"-".equals(Session.get().getInfo().getBranding().getBugs()))
+				&& !"-".equals(Session.get().getInfo().getBranding().getBugs())
+				&& Feature.enabled(Feature.TECHNICAL_SUPPORT))
 			menu.addItem(bugReport);
 
 		MenuItem forum = new MenuItem(I18N.message("forum"));

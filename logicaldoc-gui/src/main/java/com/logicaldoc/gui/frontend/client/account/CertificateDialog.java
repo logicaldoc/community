@@ -3,6 +3,8 @@ package com.logicaldoc.gui.frontend.client.account;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.controllers.UserController;
+import com.logicaldoc.gui.common.client.controllers.UserObserver;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -16,7 +18,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -27,9 +28,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.2
  */
-public class CertificateDialog extends Window {
-
-	private ValuesManager vm = new ValuesManager();
+public class CertificateDialog extends Window implements UserObserver {
 
 	private VLayout layout = null;
 
@@ -44,13 +43,13 @@ public class CertificateDialog extends Window {
 		setAutoSize(true);
 		centerInPage();
 
+		UserController.get().addObserver(this);
+
 		refresh();
 	}
 
 	public void refresh() {
 		boolean crtAlreadyGenerated = Session.get().getUser().getCertDN() != null;
-		vm.clearValues();
-		vm.clearErrors(false);
 
 		if (layout != null) {
 			layout.destroy();
@@ -61,7 +60,6 @@ public class CertificateDialog extends Window {
 		layout.setHeight100();
 
 		DynamicForm form = new DynamicForm();
-		form.setValuesManager(vm);
 		form.setWrapItemTitles(false);
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
@@ -79,58 +77,58 @@ public class CertificateDialog extends Window {
 		IButton createNew = new IButton(I18N.message("generatecert"));
 		createNew.setAutoFit(true);
 		createNew.addClickHandler(event -> {
-			if (Boolean.TRUE.equals(vm.validate())) {
-				LD.contactingServer();
-				SignService.Instance.get().generateNewCertificate(new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+			LD.contactingServer();
+			SignService.Instance.get().generateNewCertificate(new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg) {
-						LD.clearPrompt();
-						SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-								new AsyncCallback<GUIUser>() {
+				@Override
+				public void onSuccess(Void arg) {
+					LD.clearPrompt();
+					SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
+							new AsyncCallback<GUIUser>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-									@Override
-									public void onSuccess(GUIUser user) {
-										Session.get().setUser(user);
-										refresh();
-									}
-								});
-					}
-				});
-			}
+								@Override
+								public void onSuccess(GUIUser user) {
+									Session.get().setUser(user);
+									refresh();
+								}
+							});
+				}
+			});
 		});
+
+		IButton upload = new IButton(I18N.message("uploadyourowncert"));
+		upload.setAutoFit(true);
+		upload.addClickHandler(event -> new CertificateUploadDialog().show());
 
 		IButton delete = new IButton(I18N.message("deletecert"));
 		delete.setAutoFit(true);
 		delete.addClickHandler(event -> SC.ask(I18N.message("deletecertwarn"), (Boolean value) -> {
-			if (Boolean.TRUE.equals(value)) {
-				LD.contactingServer();
-				SignService.Instance.get().deleteCertificate(new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
+			LD.contactingServer();
+			SignService.Instance.get().deleteCertificate(new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
 
-					@Override
-					public void onSuccess(Void arg) {
-						LD.clearPrompt();
-						Session.get().getUser().setCertDN(null);
-						Session.get().getUser().setCertExpire(null);
-						refresh();
-					}
-				});
-			}
+				@Override
+				public void onSuccess(Void arg) {
+					LD.clearPrompt();
+					Session.get().getUser().setCertDN(null);
+					Session.get().getUser().setCertExpire(null);
+					refresh();
+				}
+			});
 		}));
 
 		if (crtAlreadyGenerated) {
@@ -142,10 +140,30 @@ public class CertificateDialog extends Window {
 			label.setHeight(50);
 			label.setWrap(false);
 			layout.addMember(label);
-			buttons.setMembers(createNew);
+			buttons.setMembers(createNew, upload);
 		}
 		layout.addMember(buttons);
 
 		addItem(layout);
+	}
+
+	@Override
+	public void onUserChanged(GUIUser user) {
+		refresh();
+	}
+
+	@Override
+	public void onUserLogin(String username) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onUserLogout(String username) {
+		// Nothing to do
+	}
+
+	@Override
+	protected void onUnload() {
+		UserController.get().removeObserver(this);
 	}
 }

@@ -449,7 +449,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String sid = validateSession();
 		super.move(sid, docId, folderId);
 	}
-
+	
 	@Override
 	@PUT
 	@Path("/copy")
@@ -463,10 +463,14 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "Document ID", required = true)
 	long docId, @QueryParam("folderId")
 	@Parameter(description = "Target Folder ID", required = true)
-	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+	long folderId, @QueryParam("links")
+	@Parameter(description = "If links must be copied too", required = true)
+	boolean links, @QueryParam("notes")
+	@Parameter(description = "If notes and annotations must be copied too", required = true)
+	boolean notes) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			IOException {
 		String sid = validateSession();
-		return super.copy(sid, docId, folderId);
+		return super.copy(sid, docId, folderId, links, notes);
 	}
 
 	@Override

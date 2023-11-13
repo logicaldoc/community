@@ -298,6 +298,7 @@
             <property name="config" ref="ContextProperties" />
             <property name="documentDAO" ref="DocumentDAO" />
             <property name="documentNoteDAO" ref="DocumentNoteDAO" />
+            <property name="documentLinkDAO" ref="DocumentLinkDAO" />
             <property name="folderDAO" ref="FolderDAO" />
             <property name="versionDAO" ref="VersionDAO" />
             <property name="ticketDAO" ref="TicketDAO" />

@@ -73,6 +73,10 @@ public class TemplatesPanel extends VLayout {
 		name.setCanFilter(true);
 		name.setCanSort(true);
 
+		ListGridField label = new ListGridField("label", I18N.message("label"), 200);
+		label.setCanFilter(true);
+		label.setCanSort(true);
+
 		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 300);
 		description.setCanFilter(true);
 		description.setCanSort(false);
@@ -86,7 +90,7 @@ public class TemplatesPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(name, description);
+		list.setFields(name, label, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -215,6 +219,7 @@ public class TemplatesPanel extends VLayout {
 
 		rec.setAttribute("readonly", "" + template.isReadonly());
 		rec.setAttribute("name", template.getName());
+		rec.setAttribute("label", template.getLabel()!=null ? template.getLabel(): template.getName());
 		rec.setAttribute(DESCRIPTION, template.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 	}

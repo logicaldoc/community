@@ -553,13 +553,18 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (!attributeSet.isReadonly())
 			name.addChangedHandler(changedHandler);
 
+		TextItem label = ItemFactory.newTextItem("label", attributeSet.getLabel());
+		label.setDisabled(attributeSet.isReadonly());
+		if (!attributeSet.isReadonly())
+			label.addChangedHandler(changedHandler);
+
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", attributeSet.getDescription());
 		description.setDisabled(attributeSet.isReadonly());
 
 		if (!attributeSet.isReadonly())
 			description.addChangedHandler(changedHandler);
 
-		setPropertiesForm.setItems(id, name, description);
+		setPropertiesForm.setItems(id, name, label, description);
 
 		setPropertiesForm.setWidth(200);
 	}
@@ -571,6 +576,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			attributeSet.setName((String) values.get("name"));
 			attributeSet.setDescription((String) values.get("description"));
+			attributeSet.setLabel((String) values.get("label"));
 		}
 		return !vm.hasErrors();
 	}

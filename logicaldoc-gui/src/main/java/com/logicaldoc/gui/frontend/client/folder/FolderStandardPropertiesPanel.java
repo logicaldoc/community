@@ -16,6 +16,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
@@ -219,25 +220,12 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private LinkItem preparePathItem() {
 		String path = folder.getPathExtended() != null ? folder.getPathExtended()
 				: FolderNavigator.get().getPath(folder.getId());
-
-		FormItemIcon copyPath = new FormItemIcon();
-		copyPath.setPrompt(I18N.message("copypath"));
-		copyPath.setSrc("[SKIN]/page_white_paste.png");
-		copyPath.setWidth(16);
-		copyPath.setHeight(16);
-		copyPath.addFormItemClickHandler(copyPathClick -> {
-			LD.askForValue(I18N.message("path"), I18N.message("path"), path, value -> {
-				// Nothing to do
-			});
-			copyPathClick.cancel();
-		});
-
 		LinkItem pathItem = ItemFactory.newLinkItem("path", Util.padLeft(path, 150));
 		pathItem.setTooltip(path);
 		pathItem.setTitle(I18N.message("path"));
 		pathItem.setValue(Util.displayURL(null, folder.getId()));
 		pathItem.setWidth(400);
-		pathItem.setIcons(copyPath);
+		pathItem.setIcons(new CopyTextFormItemIcon(path));
 		return pathItem;
 	}
 
