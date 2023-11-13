@@ -53,7 +53,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		log.debug("Running filter query {}", query.toString());
 
 		/*
-		 * Execute the Query
+		 * Execute the Query.
 		 */
 		@SuppressWarnings("unchecked")
 		List<Object[]> records = dao.query(query.toString(), new RowMapper<Object[]>() {
