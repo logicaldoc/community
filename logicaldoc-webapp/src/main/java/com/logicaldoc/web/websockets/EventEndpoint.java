@@ -169,7 +169,7 @@ public class EventEndpoint implements EventListener {
 		message.setComment(event.getComment());
 		message.setDate(event.getDate());
 		message.setId(event.getId());
-		
+
 		if (event instanceof UserHistory)
 			message.setAuthor(((UserHistory) event).getAuthor());
 
@@ -230,14 +230,22 @@ public class EventEndpoint implements EventListener {
 	 * @param message The message to be sent
 	 */
 	public static void distributeMessage(WebsocketMessage message) {
-		for (Session peer : peers)
-			try {
-				String serializedMessage=serializeMessage(message);
-				if(peer.getAsyncRemote()!=null)
-					peer.getAsyncRemote().sendText(serializedMessage);
-			} catch (SerializationException e) {
-				log.error("Error preparing websocket message {}", message.getEvent(), e);
-			}
+		try {
+			String serializedMessage = serializeMessage(message);
+			for (Session peer : peers)
+				if (peer.getAsyncRemote() != null)
+					sendMessageToPear(message.getEvent(), serializedMessage, peer);
+		} catch (SerializationException e) {
+			log.error("Error preparing websocket message {}", message.getEvent(), e);
+		}
+	}
+
+	private synchronized static void sendMessageToPear(String event, String serializedMessage, Session peer) {
+		try {
+			peer.getBasicRemote().sendText(serializedMessage);
+		} catch (Exception e) {
+			log.error("Error sending websocket message {} to peer {}", event, peer.getRequestURI(), e);
+		}
 	}
 
 	private static String serializeMessage(final WebsocketMessage messageDto) throws SerializationException {
