@@ -50,8 +50,8 @@ public abstract class AbstractDocumentProcessor extends Task {
 			int max = getBatchSize();
 
 			@SuppressWarnings("unchecked")
-			List<Long> ids = documentDao.queryForList(
-					"select ld_id from ld_document where " + prepareQueueQuery(null, null), null, Long.class, max);
+			List<Long> ids = documentDao.queryForList("select ld_id from ld_document where " + prepareQueueQuery(null),
+					null, Long.class, max);
 			getSize(max, ids);
 
 			if (size > 0)
@@ -179,7 +179,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 	 * Prepares the query conditions for selecting the documents that have to be
 	 * processed
 	 */
-	protected abstract String prepareQueueQuery(String transaction, Long tenantId);
+	protected abstract String prepareQueueQuery(Long tenantId);
 
 	public void setDocumentDao(DocumentDAO documentDao) {
 		this.documentDao = documentDao;
