@@ -39,6 +39,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class OCRHistoryPanel extends VLayout {
 
+	private static final String EVENT = "event";
+
 	private static final String COMMENT = "comment";
 
 	private static final String DOC_ID = "docId";
@@ -56,7 +58,7 @@ public class OCRHistoryPanel extends VLayout {
 		ColoredListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);
 
-		ListGridField eventLabel = new ListGridField("event", I18N.message("event"));
+		ListGridField eventLabel = new ListGridField(EVENT, I18N.message(EVENT));
 		eventLabel.setAlign(Alignment.CENTER);
 		eventLabel.setAutoFitWidth(true);
 		eventLabel.setCanFilter(true);
@@ -110,9 +112,8 @@ public class OCRHistoryPanel extends VLayout {
 
 			MenuItem openInFolder = new MenuItem();
 			openInFolder.setTitle(I18N.message("openinfolder"));
-			openInFolder.addClickHandler(evnt -> {
-				DocumentsPanel.get().openInFolder(Long.parseLong(selectedRecord.getAttributeAsString(DOC_ID)));
-			});
+			openInFolder.addClickHandler(evnt -> DocumentsPanel.get()
+					.openInFolder(Long.parseLong(selectedRecord.getAttributeAsString(DOC_ID))));
 
 			MenuItem preview = new MenuItem();
 			preview.setTitle(I18N.message("preview"));
@@ -132,25 +133,22 @@ public class OCRHistoryPanel extends VLayout {
 
 			MenuItem downloadIndexed = new MenuItem();
 			downloadIndexed.setTitle(I18N.message("downloadindexedtext"));
-			downloadIndexed.addClickHandler(evnt -> {
-				FolderService.Instance.get().getFolder(selectedRecord.getAttributeAsLong("folderId"), false, false,
-						false, new AsyncCallback<GUIFolder>() {
+			downloadIndexed.addClickHandler(evnt -> FolderService.Instance.get().getFolder(
+					selectedRecord.getAttributeAsLong("folderId"), false, false, false, new AsyncCallback<GUIFolder>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-							@Override
-							public void onSuccess(GUIFolder folder) {
-								if (folder.isDownload())
-									Util.download(Util.downloadURL(selectedRecord.getAttributeAsLong(DOC_ID))
-											+ "&downloadText=true");
-							}
-						});
-
-			});
-			downloadIndexed.setEnabled(selectedRecord.getAttributeAsString("event").contains("ocr.success"));
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							if (folder.isDownload())
+								Util.download(Util.downloadURL(selectedRecord.getAttributeAsLong(DOC_ID))
+										+ "&downloadText=true");
+						}
+					}));
+			downloadIndexed.setEnabled(selectedRecord.getAttributeAsString(EVENT).contains("ocr.success"));
 
 			contextMenu.setItems(preview, downloadIndexed, openInFolder);
 			contextMenu.showContextMenu();

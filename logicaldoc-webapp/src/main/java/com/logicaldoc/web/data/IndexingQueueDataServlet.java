@@ -50,7 +50,8 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 						+ " ld_creation, ld_creator, ld_filesize, ld_immutable, ld_indexed, ld_lockuserid, ld_filename, ld_status,"
 						+ " ld_signed, ld_type, ld_fileversion, ld_color from ld_document where " + where);
 
-		log.debug("Running filter query {}", query.toString());
+		if(log.isDebugEnabled())
+			log.debug("Running filter query {}", query);
 
 		/*
 		 * Execute the Query.
@@ -92,7 +93,8 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 			}
 		}, max != null ? max : 100);
 
-		log.debug("Retrieved {} records", records.size());
+		if(log.isDebugEnabled())
+			log.debug("Retrieved {} records", records.size());
 
 		printDocuments(response, session, records);
 	}

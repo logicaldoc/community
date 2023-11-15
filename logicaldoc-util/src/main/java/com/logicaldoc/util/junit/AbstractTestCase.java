@@ -12,7 +12,6 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
 import org.hsqldb.cmdline.SqlFile;

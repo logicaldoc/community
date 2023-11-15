@@ -1968,7 +1968,7 @@ public class ItemFactory {
 
 	public static SelectItem newTemplateSelector(boolean withEmpty, Long selectedTemplateId) {
 		SelectItem templateItem = new SelectItem("template", I18N.message("template"));
-		templateItem.setDisplayField("label");
+		templateItem.setDisplayField(LABEL);
 		templateItem.setValueField("id");
 		templateItem.setWidth(150);
 		templateItem.setMultiple(false);
@@ -2040,7 +2040,7 @@ public class ItemFactory {
 		final SelectItem selectItem = new SelectItem("attributeset", I18N.message("attributeset"));
 		selectItem.setMultiple(false);
 		selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
-		selectItem.setDisplayField("label");
+		selectItem.setDisplayField(LABEL);
 		selectItem.setValueField("id");
 		selectItem.setWidth(120);
 		selectItem.setOptionDataSource(new AttributeSetsDS(false, GUIAttributeSet.TYPE_DEFAULT));

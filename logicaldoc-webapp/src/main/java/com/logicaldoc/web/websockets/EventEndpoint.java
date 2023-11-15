@@ -241,7 +241,7 @@ public class EventEndpoint implements EventListener {
 		}
 	}
 
-	private synchronized static void sendMessageToPear(String event, String serializedMessage, Session peer) {
+	private static synchronized void sendMessageToPear(String event, String serializedMessage, Session peer) {
 		try {
 			peer.getBasicRemote().sendText(serializedMessage);
 		} catch (Exception e) {

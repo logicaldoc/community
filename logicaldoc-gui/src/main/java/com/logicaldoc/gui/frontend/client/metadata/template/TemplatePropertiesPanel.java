@@ -706,7 +706,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setDisabled(template.isReadonly() || !template.isWrite());
 
-		TextItem label = ItemFactory.newTextItem("label", template.getLabel());
+		TextItem label = ItemFactory.newTextItem(LABEL, template.getLabel());
 		label.setDisabled(template.isReadonly() || !template.isWrite());
 
 		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, event -> {
@@ -751,7 +751,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			template.setName((String) values.get("name"));
 			template.setDescription((String) values.get("description"));
-			template.setLabel((String) values.get("label"));
+			template.setLabel((String) values.get(LABEL));
 		}
 
 		if (template.getId() != 0L) {

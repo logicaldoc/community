@@ -553,7 +553,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (!attributeSet.isReadonly())
 			name.addChangedHandler(changedHandler);
 
-		TextItem label = ItemFactory.newTextItem("label", attributeSet.getLabel());
+		TextItem label = ItemFactory.newTextItem(LABEL, attributeSet.getLabel());
 		label.setDisabled(attributeSet.isReadonly());
 		if (!attributeSet.isReadonly())
 			label.addChangedHandler(changedHandler);
@@ -576,7 +576,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			attributeSet.setName((String) values.get("name"));
 			attributeSet.setDescription((String) values.get("description"));
-			attributeSet.setLabel((String) values.get("label"));
+			attributeSet.setLabel((String) values.get(LABEL));
 		}
 		return !vm.hasErrors();
 	}

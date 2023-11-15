@@ -1,12 +1,14 @@
 package com.logicaldoc.core;
 
+import java.sql.SQLException;
+
 /**
  * Raised when a problem happens in the data layer.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.3.4
  */
-public class PersistenceException extends Exception {
+public class PersistenceException extends SQLException {
 
 	private static final long serialVersionUID = 1L;
 

@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class TemplatesPanel extends VLayout {
+	private static final String LABEL = "label";
+
 	private static final String DESCRIPTION = "description";
 
 	protected Layout detailsContainer;
@@ -73,7 +75,7 @@ public class TemplatesPanel extends VLayout {
 		name.setCanFilter(true);
 		name.setCanSort(true);
 
-		ListGridField label = new ListGridField("label", I18N.message("label"), 200);
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);
 		label.setCanFilter(true);
 		label.setCanSort(true);
 
@@ -219,7 +221,7 @@ public class TemplatesPanel extends VLayout {
 
 		rec.setAttribute("readonly", "" + template.isReadonly());
 		rec.setAttribute("name", template.getName());
-		rec.setAttribute("label", template.getLabel()!=null ? template.getLabel(): template.getName());
+		rec.setAttribute(LABEL, template.getLabel()!=null ? template.getLabel(): template.getName());
 		rec.setAttribute(DESCRIPTION, template.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 	}

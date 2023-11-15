@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class AttributeSetsPanel extends VLayout {
 
+	private static final String LABEL = "label";
+
 	private static final String DESCRIPTION = "description";
 
 	protected Layout detailsContainer;
@@ -69,7 +71,7 @@ public class AttributeSetsPanel extends VLayout {
 		name.setCanFilter(true);
 		name.setCanSort(true);
 
-		ListGridField label = new ListGridField("label", I18N.message("label"), 200);
+		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);
 		label.setCanFilter(true);
 		label.setCanSort(true);
 
@@ -218,7 +220,7 @@ public class AttributeSetsPanel extends VLayout {
 
 		rec.setAttribute("readonly", "" + set.isReadonly());
 		rec.setAttribute("name", set.getName());
-		rec.setAttribute("label", set.getLabel() != null ? set.getLabel() : set.getName());
+		rec.setAttribute(LABEL, set.getLabel() != null ? set.getLabel() : set.getName());
 		rec.setAttribute(DESCRIPTION, set.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 
