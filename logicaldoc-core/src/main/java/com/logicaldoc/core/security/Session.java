@@ -54,9 +54,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	// Map docId - Password used to unprotect it
 	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<>());
 
-	private Date creation = new Date();
-
-	private Date lastRenew = creation;
+	private Date lastRenew = new Date();
 
 	/**
 	 * Represents the auto generated identifier of the session
@@ -102,10 +100,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	public String getSid() {
 		return sid;
-	}
-
-	public Date getCreation() {
-		return creation;
 	}
 
 	public Date getLastRenew() {
@@ -197,7 +191,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.key = key;
 		this.client = client;
 		this.node = SystemInfo.get().getInstallationId();
-		this.setLastRenew(creation);
+		this.setLastRenew(getCreation());
 
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		this.tenantName = tenantDAO.getTenantName(tenantId);
@@ -219,7 +213,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 			device.setUserId(user.getId());
 			device.setUsername(user.getFullName());
-			device.setLastLogin(creation);
+			device.setLastLogin(getCreation());
 			device.setIp(client.getAddress());
 
 			try {
@@ -295,7 +289,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	public int compareTo(Session o) {
 		int compare = Integer.compare(status, o.status);
 		if (compare == 0)
-			compare = o.getCreation().compareTo(creation);
+			compare = o.getCreation().compareTo(getCreation());
 		return compare;
 	}
 
@@ -441,10 +435,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.node = node;
 	}
 
-	public void setCreation(Date creation) {
-		this.creation = creation;
-	}
-
 	public void setLastRenew(Date lastRenew) {
 		this.lastRenew = lastRenew;
 	}
@@ -475,7 +465,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		clone.setNode(node);
 		clone.setUsername(username);
 		clone.setPassword(password);
-		clone.setCreation(creation);
+		clone.setCreation(getCreation());
 		clone.setLastRenew(lastRenew);
 		clone.setClient(client);
 		return clone;

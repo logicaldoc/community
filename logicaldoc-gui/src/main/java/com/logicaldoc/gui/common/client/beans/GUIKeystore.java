@@ -27,7 +27,7 @@ public class GUIKeystore implements Serializable {
 
 	private String password = "";
 
-	private Date created = new Date();
+	private Date creation = new Date();
 
 	private String keytoolPath = "";
 
@@ -61,12 +61,12 @@ public class GUIKeystore implements Serializable {
 		this.password = password;
 	}
 
-	public Date getCreated() {
-		return created;
+	public Date getCreation() {
+		return creation;
 	}
 
-	public void setCreated(Date created) {
-		this.created = created;
+	public void setCreation(Date creation) {
+		this.creation = creation;
 	}
 
 	public long getId() {

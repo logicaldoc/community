@@ -73,15 +73,13 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	private String quotaAlertRecipients = null;
 
-	private Date creation = new Date();
-
 	public Tenant() {
 	}
 
 	public Tenant(Tenant source) {
 		this.name = source.name;
 		this.displayName = source.displayName;
-		this.creation = source.creation;
+		this.setCreation(source.getCreation());
 		this.street = source.street;
 		this.postalCode = source.postalCode;
 		this.city = source.city;
@@ -291,13 +289,5 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	public void setMaxGuests(Integer maxGuests) {
 		this.maxGuests = maxGuests;
-	}
-
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
 	}
 }

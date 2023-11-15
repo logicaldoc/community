@@ -11,7 +11,8 @@
 			</generator>
 		</id>
 		<version name="recordVersion" column="ld_recordversion" type="long" />
-		<property name="lastModified" type="timestamp" column="ld_lastmodified" />
+		<property name="lastModified" type="timestamp" column="ld_lastmodified" not-null="true"/>
+		<property name="creation" type="timestamp" column="ld_creation" not-null="true" />
 		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
 		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
 		<property name="enabled" type="int" column="ld_enabled" not-null="true" />
@@ -48,7 +49,6 @@
 		<property name="certDN" type="string" column="ld_certdn" length="1000" />
 		<property name="secondFactor" type="string" column="ld_secondfactor" length="255" />
 		<property name="key" type="string" column="ld_key" length="255" />
-        <property name="creation" type="timestamp" column="ld_creation" />
         <property name="docsGrid" type="string" column="ld_docsgrid" not-null="false" />
         <property name="hitsGrid" type="string" column="ld_hitsgrid" not-null="false" />
 		<property name="dateFormat" type="string" column="ld_dateformat" length="255" />
@@ -60,7 +60,6 @@
 		<property name="expire" type="timestamp" column="ld_expire" />
 		<property name="enforceWorkingTime" type="int" column="ld_enforcewrktime" not-null="true"/>
 		<property name="maxInactivity" type="int" column="ld_maxinactivity" />
-		
 		
 		<property name="timeZone" type="string" column="ld_timezone" />
 		

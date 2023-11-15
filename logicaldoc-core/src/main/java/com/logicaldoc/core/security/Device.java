@@ -50,11 +50,6 @@ public class Device extends PersistentObject implements Serializable {
 	private String type;
 
 	/**
-	 * Instant of gridRecord creation
-	 */
-	private Date creation = new Date();
-
-	/**
 	 * Instant of last login
 	 */
 	private Date lastLogin;
@@ -131,14 +126,6 @@ public class Device extends PersistentObject implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
 	}
 
 	public Date getLastLogin() {

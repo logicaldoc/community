@@ -4,7 +4,7 @@
 -- mediumtext -> clob
 -- double -> float
 
-create table ld_webservicecall (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_recordversion number(19,0) not null,
+create table ld_webservicecall (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion number(19,0) not null,
                                 ld_deleted int not null, ld_tenantid number(19,0) not null, 
                                 ld_userid number(19,0), ld_date timestamp, ld_username varchar(255), ld_event varchar(255), 
                                 ld_comment varchar(4000), ld_path varchar(4000), ld_sessionid varchar(255),

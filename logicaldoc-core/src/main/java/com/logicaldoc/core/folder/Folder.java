@@ -1,7 +1,6 @@
 package com.logicaldoc.core.folder;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,8 +44,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public static final int TYPE_ALIAS = 2;
 
-	private long id = 0;
-
 	private String name = "";
 
 	private long parentId = DEFAULTWORKSPACEID;
@@ -56,8 +53,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	private String description = "";
 
 	private int type = TYPE_DEFAULT;
-
-	private Date creation = new Date();
 
 	private String creator;
 
@@ -139,13 +134,13 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	}
 
 	public Folder(Folder source) {
-		this.id = source.id;
+		this.setId(source.getId());
 		this.name = source.name;
 		this.parentId = source.parentId;
 		this.securityRef = source.securityRef;
 		this.description = source.description;
 		this.type = source.type;
-		this.creation = source.creation;
+		this.setCreation(source.getCreation());
 		this.creator = source.creator;
 		this.creatorId = source.creatorId;
 		this.position = source.position;
@@ -221,11 +216,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		return type == TYPE_ALIAS;
 	}
 
-	@Override
-	public long getId() {
-		return id;
-	}
-
 	public long getParentId() {
 		return parentId;
 	}
@@ -237,11 +227,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	public void clearFolderGroups() {
 		folderGroups.clear();
 		folderGroups = new HashSet<>();
-	}
-
-	@Override
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public void setParentId(long parentId) {
@@ -348,14 +333,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public void setType(int type) {
 		this.type = type;
-	}
-
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
 	}
 
 	public String getCreator() {

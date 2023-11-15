@@ -29,8 +29,6 @@ public class Ticket extends PersistentObject {
 
 	private int type = DOWNLOAD;
 
-	private Date creation = new Date();
-
 	/**
 	 * A date when this ticket expires
 	 */
@@ -100,14 +98,6 @@ public class Ticket extends PersistentObject {
 
 	public void setType(int type) {
 		this.type = type;
-	}
-
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
 	}
 
 	public Date getExpired() {

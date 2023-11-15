@@ -40,7 +40,7 @@ public class User extends PersistentObject implements Serializable {
 	public static final int SOURCE_LDAP = 1;
 
 	public static final long USERID_ADMIN = 1;
-	
+
 	public static final long USERID_SYSTEM = -1010;
 
 	private static final long serialVersionUID = 8093874904302301982L;
@@ -151,8 +151,6 @@ public class User extends PersistentObject implements Serializable {
 	private String key;
 
 	private Set<UserGroup> userGroups = new HashSet<>();
-
-	private Date creation = new Date();
 
 	/**
 	 * Description of the grid that displays the list of documents
@@ -714,14 +712,6 @@ public class User extends PersistentObject implements Serializable {
 
 	public boolean isReadonly() {
 		return type == TYPE_READONLY;
-	}
-
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
 	}
 
 	public String getDocsGrid() {

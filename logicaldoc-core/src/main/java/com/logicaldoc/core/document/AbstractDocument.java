@@ -145,8 +145,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private String lockUser;
 
-	private Date creation = new Date();
-
 	private String language;
 
 	private String fileName;
@@ -548,19 +546,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public String getFileExtension() {
 		return FileUtil.getExtension(getFileName());
-	}
-
-	/**
-	 * The document's creation date
-	 * 
-	 * @return the creation date
-	 */
-	public Date getCreation() {
-		return creation;
-	}
-
-	public void setCreation(Date creation) {
-		this.creation = creation;
 	}
 
 	/**

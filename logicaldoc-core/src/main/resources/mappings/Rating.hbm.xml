@@ -11,7 +11,8 @@
 			</generator>
 		</id>
 		<version name="recordVersion" column="ld_recordversion" type="long" />
-		<property name="lastModified" type="timestamp" column="ld_lastmodified" />
+		<property name="lastModified" type="timestamp" column="ld_lastmodified" not-null="true"/>
+		<property name="creation" type="timestamp" column="ld_creation" not-null="true" />
 		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
 		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
 		<property name="docId" type="long" column="ld_docid" not-null="true" />
