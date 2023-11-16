@@ -56,9 +56,10 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 
 		try {
 			prepareSession("admin", "admin");
-		} catch (Exception e) {
-			throw new IOException(e.getMessage(), e);
+		} catch (ServerException e) {
+			throw new IOException(e);
 		}
+		
 		Assert.assertNotNull(guiSession);
 		Assert.assertNotNull(SessionManager.get().get(guiSession.getSid()));
 	}
