@@ -756,7 +756,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			if (session != null && folder != null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-				Set<Permission> permissions = fdao.getEnabledPermissions(document.getFolder().getId(), session.getUserId());
+				Set<Permission> permissions = fdao.getEnabledPermissions(document.getFolder().getId(),
+						session.getUserId());
 				List<String> permissionsList = new ArrayList<>();
 				for (Permission permission : permissions)
 					permissionsList.add(permission.toString());
@@ -2656,17 +2657,25 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public GUIEmail extractEmail(long docId, String fileVersion) throws ServerException {
 		Session session = validateSession();
 
-		GUIDocument emailDocument = getById(docId);
-		if (!emailDocument.getFileName().toLowerCase().endsWith(".eml")
-				&& !emailDocument.getFileName().toLowerCase().endsWith(".msg"))
-			throw new ServerException("Not an email file");
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document emailDocument = null;
+		try {
+			emailDocument = dao.findDocument(docId);
+			if (!emailDocument.getFileName().toLowerCase().endsWith(".eml")
+					&& !emailDocument.getFileName().toLowerCase().endsWith(".msg"))
+				throw new ServerException("Not an email file");
+		} catch (PersistenceException e1) {
+			return (GUIEmail) throwServerException(session, log, e1);
+		}
 
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(docId, fileVersion, null);
-
+		
+		GUIDocument guiDocument = getById(docId);
+		
 		try (InputStream is = storer.getStream(emailDocument.getId(), resource)) {
 			GUIEmail guiMail = new GUIEmail();
-			EMail email = readEmail(is, docId, emailDocument);
+			EMail email = readEmail(is, emailDocument.getId(), guiDocument);
 			if (email != null) {
 				if (email.getFrom() != null)
 					guiMail.setFrom(new GUIContact(email.getFrom().getName(), null, email.getFrom().getAddress()));
@@ -2681,7 +2690,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 				setEmailRecipients(email, guiMail);
 
-				setEmailAttachments(emailDocument, email, guiMail);
+				setEmailAttachments(guiDocument, email, guiMail);
 			}
 			return guiMail;
 		} catch (IOException e1) {
