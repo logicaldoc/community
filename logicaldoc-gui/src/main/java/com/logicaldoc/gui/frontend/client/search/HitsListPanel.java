@@ -47,8 +47,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	public HitsListPanel() {
 		try {
 			if (CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE) != null) {
-				visualizationMode = Integer
-						.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE));
+				visualizationMode = Integer.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE));
 			}
 		} catch (Exception t) {
 			// Nothing to do
@@ -266,6 +265,10 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
+		// Skip record update if it is not a folder
+		if (!isSelectionFolder())
+			return;
+
 		GUIDocument doc = grid.getSelectedDocument();
 		if (doc != null) {
 			doc.setFileName(folder.getName());
@@ -273,6 +276,16 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			doc.getFolder().setDescription(folder.getDescription());
 			grid.updateDocument(doc);
 		}
+	}
+
+	/**
+	 * This panel can show folders and documents depending on the search, so
+	 * this method check is the currently selected item is a folder
+	 * 
+	 * @return if the currently selection is a folder
+	 */
+	private boolean isSelectionFolder() {
+		return "folder".equals(grid.getSelectedDocument().getType());
 	}
 
 	@Override
@@ -302,6 +315,9 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	@Override
 	public void onDocumentModified(GUIDocument document) {
+		// Skip record update if it is a folder
+		if (isSelectionFolder())
+			return;
 		grid.updateDocument(document);
 	}
 
