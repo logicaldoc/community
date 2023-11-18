@@ -35,6 +35,18 @@ public interface TemplateService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUITemplate save(GUITemplate template) throws ServerException;
+	
+	/**
+	 * Makes a clone of an existing template
+	 * 
+	 * @param templateId identifier of the original template
+	 * @param cloneName name of the cloned template
+	 * 
+	 * @return the created clone
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUITemplate clone(long templateId, String cloneName) throws ServerException;
 
 	/**
 	 * Loads a given template from the database

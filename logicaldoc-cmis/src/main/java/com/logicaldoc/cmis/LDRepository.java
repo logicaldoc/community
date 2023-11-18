@@ -1932,7 +1932,7 @@ public class LDRepository {
 	}
 
 	private void compileDocumentOrVersionExtAttrsProperties(AbstractDocument doc, String typeId, PropertiesImpl result,
-			Set<String> filter) {
+			Set<String> filter) throws PersistenceException {
 
 		Template template = getTemplate(doc);
 
@@ -1983,7 +1983,7 @@ public class LDRepository {
 		}
 	}
 
-	private Template getTemplate(AbstractDocument doc) {
+	private Template getTemplate(AbstractDocument doc) throws PersistenceException {
 		Template template = doc.getTemplate();
 		if (doc instanceof Version && ((Version) doc).getTemplateName() != null)
 			template = templateDao.findByName(((Version) doc).getTemplateName(), doc.getTenantId());
@@ -2056,8 +2056,10 @@ public class LDRepository {
 	 * @param doc The document to update
 	 * @param properties The properties to use
 	 * @param create True if we are updating metadata for creating a new element
+	 * 
+	 * @throws PersistenceException Error in the data layer 
 	 */
-	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, boolean create) {
+	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, boolean create) throws PersistenceException {
 		log.debug("updateDocumentMetadata doc: {}", doc);
 		log.debug("updateDocumentMetadata properties: {}", properties);
 
@@ -2071,7 +2073,7 @@ public class LDRepository {
 	}
 
 	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, PropertyData<?> p, boolean create,
-			TypeDefinition type) {
+			TypeDefinition type) throws PersistenceException {
 		PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
 
 		// do we know that property?
@@ -2128,7 +2130,7 @@ public class LDRepository {
 		}
 	}
 
-	private void updateDocumentTemplate(AbstractDocument doc, PropertyData<?> p) {
+	private void updateDocumentTemplate(AbstractDocument doc, PropertyData<?> p) throws PersistenceException {
 		if (p.getFirstValue() == null) {
 			doc.setTemplate(null);
 			if (doc instanceof Document)
@@ -2143,7 +2145,7 @@ public class LDRepository {
 		}
 	}
 
-	private void updateDocumentExtendedAttribute(AbstractDocument doc, Properties properties, PropertyData<?> p) {
+	private void updateDocumentExtendedAttribute(AbstractDocument doc, Properties properties, PropertyData<?> p) throws PersistenceException {
 		// try to load the document template first
 		Template template = null;
 		PropertyData<?> tp = properties.getProperties().get(TypeManager.PROP_TEMPLATE);

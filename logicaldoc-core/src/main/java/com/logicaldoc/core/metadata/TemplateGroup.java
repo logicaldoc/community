@@ -25,6 +25,11 @@ public class TemplateGroup implements Serializable {
 	public TemplateGroup(long groupId) {
 		this.groupId = groupId;
 	}
+	
+	public TemplateGroup(long groupId, int write) {
+		this.groupId = groupId;
+		this.write = write;
+	}
 
 	public TemplateGroup(TemplateGroup source) {
 		this.write = source.write;

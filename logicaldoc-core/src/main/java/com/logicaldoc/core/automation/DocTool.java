@@ -879,7 +879,13 @@ public class DocTool {
 	 */
 	public Template findTemplateByName(String name, long tenantId) {
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		return dao.findByName(name, tenantId);
+
+		try {
+			return dao.findByName(name, tenantId);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**

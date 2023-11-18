@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,25 +62,22 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<>();
+			return new ArrayList<Template>();
 		}
 	}
 
 	@Override
-	public Template findByName(String name, long tenantId) {
+	public Template findByName(String name, long tenantId) throws PersistenceException {
 		Template template = null;
 
-		try {
-			List<Template> coll = findByWhere(
-					ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-					null, null);
-			if (CollectionUtils.isNotEmpty(coll))
-				template = coll.iterator().next();
-			if (template != null && template.getDeleted() == 1)
-				template = null;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		List<Template> coll = findByWhere(
+				ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+				null, null);
+		if (CollectionUtils.isNotEmpty(coll))
+			template = coll.iterator().next();
+		if (template != null && template.getDeleted() == 1)
+			template = null;
+
 		return template;
 	}
 
@@ -107,13 +105,13 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 	@Override
 	public void store(Template template) throws PersistenceException {
-		boolean isNew=template.getId()==0L;
+		boolean isNew = template.getId() == 0L;
 		super.store(template);
 
-		if(isNew) {
+		if (isNew) {
 			flush();
 			storeSecurityAsync(template);
-		}else {
+		} else {
 			storeSecurity(template);
 		}
 	}
@@ -176,24 +174,14 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	}
 
 	@Override
-	public int countDocs(long id) {
-		try {
-			return queryForInt("select count(*) from ld_document where ld_deleted=0 and ld_templateid=" + id);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
+	public int countDocs(long id) throws PersistenceException {
+		return queryForInt("select count(*) from ld_document where ld_deleted=0 and ld_templateid=" + id);
 	}
 
 	@Override
-	public List<Template> findByType(int type, long tenantId) {
-		try {
-			return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-					ORDER_BY + ENTITY + ".name asc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<Template> findByType(int type, long tenantId) throws PersistenceException {
+		return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+				ORDER_BY + ENTITY + ".name asc", null);
 	}
 
 	@Override
@@ -213,8 +201,9 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				tg.setWrite(groupSet.getInt(2));
 				template.getTemplateGroups().add(tg);
 			}
-		} catch (Exception t) {
-			// Nothing to do
+		} catch (Exception e) {
+			if (log.isErrorEnabled())
+				log.error(e.getMessage(), e);
 		}
 	}
 
@@ -290,5 +279,24 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		}
 
 		return permissions;
+	}
+
+	@Override
+	public Template clone(long id, String cloneName) throws PersistenceException {
+		Template originalTemplate = findById(id, true);
+		initialize(originalTemplate);
+		Template clonedTemplate = new Template();
+		clonedTemplate.setName(cloneName);
+		if (originalTemplate.getLabel() != null)
+			clonedTemplate.setLabel(originalTemplate.getLabel() + "-Clone");
+		clonedTemplate.setDescription(originalTemplate.getDescription());
+		clonedTemplate.setReadonly(originalTemplate.getReadonly());
+		clonedTemplate.setValidation(originalTemplate.getValidation());
+		clonedTemplate.setAttributes(originalTemplate.getAttributes().entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+		store(clonedTemplate);
+		jdbcUpdate("insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) select "+clonedTemplate.getId()+", ld_groupid, ld_write from ld_templategroup where ld_templateid="+id);
+		initialize(clonedTemplate);
+		return clonedTemplate;
 	}
 }

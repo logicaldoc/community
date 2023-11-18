@@ -92,7 +92,7 @@ public class TemplatesPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(name, label, description);
+		list.setFields(id, name, label, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -164,14 +164,14 @@ public class TemplatesPanel extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = Long.parseLong(rec.getAttributeAsString("id"));
+		final ListGridRecord selectedRecord = list.getSelectedRecord();
+		final long selectedTemplateId = selectedRecord.getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				TemplateService.Instance.get().delete(id, new AsyncCallback<Void>() {
+				TemplateService.Instance.get().delete(selectedTemplateId, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -187,7 +187,33 @@ public class TemplatesPanel extends VLayout {
 			}
 		}));
 
-		contextMenu.setItems(delete);
+		MenuItem clone = new MenuItem();
+		clone.setTitle(I18N.message("clone"));
+		clone.addClickHandler(event -> TemplateService.Instance.get().clone(selectedTemplateId,
+				selectedRecord.getAttribute("name") + "-Clone", new AsyncCallback<GUITemplate>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUITemplate templateClone) {
+						list.deselectAllRecords();
+						ListGridRecord newRecord = new ListGridRecord();
+						newRecord.setAttribute("id", templateClone.getId());
+						newRecord.setAttribute("readonly", "" + templateClone.isReadonly());
+						newRecord.setAttribute("name", templateClone.getName());
+						newRecord.setAttribute(LABEL,
+								templateClone.getLabel() != null ? templateClone.getLabel() : templateClone.getName());
+						newRecord.setAttribute(DESCRIPTION, templateClone.getDescription());
+						list.addData(newRecord);
+						list.selectRecord(newRecord);
+						list.scrollToRow(list.getRowNum(newRecord));
+						showTemplateDetails(templateClone);
+					}
+				}));
+
+		contextMenu.setItems(clone, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -221,7 +247,7 @@ public class TemplatesPanel extends VLayout {
 
 		rec.setAttribute("readonly", "" + template.isReadonly());
 		rec.setAttribute("name", template.getName());
-		rec.setAttribute(LABEL, template.getLabel()!=null ? template.getLabel(): template.getName());
+		rec.setAttribute(LABEL, template.getLabel() != null ? template.getLabel() : template.getName());
 		rec.setAttribute(DESCRIPTION, template.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 	}

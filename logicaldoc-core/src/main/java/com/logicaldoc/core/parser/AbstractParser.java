@@ -112,8 +112,10 @@ public abstract class AbstractParser implements Parser {
 		try {
 			internalParse(input, parameters, content);
 		} catch (ParseException pe) {
+			log.error(pe.getMessage(), pe);
 			throw pe;
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			throw new ParseException(e);
 		}
 	}

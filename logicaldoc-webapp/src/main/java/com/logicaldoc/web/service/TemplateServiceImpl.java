@@ -90,10 +90,14 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	@Override
 	public long countDocuments(long templateId) throws ServerException {
-		validateSession();
+		Session session = validateSession();
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		return dao.countDocs(templateId);
+		try {
+			return dao.countDocs(templateId);
+		} catch (Exception e) {
+			return (Long) throwServerException(session, log, e);
+		}
 	}
 
 	@Override
@@ -129,6 +133,18 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		} catch (Exception e) {
 			throw new ServerException(
 					String.format("Template has not been %s", template.getId() != 0L ? "updated" : "stored"), e);
+		}
+	}
+	
+	@Override
+	public GUITemplate clone(long templateId, String cloneName) throws ServerException {
+		try {
+			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			Template clone = dao.clone(templateId, cloneName);
+			return getTemplate(clone.getId());
+		} catch (Exception e) {
+			throw new ServerException(
+					String.format("Template %d has not been cloned", templateId, e));
 		}
 	}
 

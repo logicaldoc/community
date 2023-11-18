@@ -10,6 +10,8 @@ public interface TemplateServiceAsync {
 	void delete(long templateId, AsyncCallback<Void> callback);
 
 	void save(GUITemplate template, AsyncCallback<GUITemplate> callback);
+	
+	void clone(long templateId, String cloneName, AsyncCallback<GUITemplate> callback);
 
 	void getTemplate(long templateId, AsyncCallback<GUITemplate> callback);
 
