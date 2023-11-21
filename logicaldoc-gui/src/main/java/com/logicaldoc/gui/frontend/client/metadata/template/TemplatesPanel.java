@@ -19,7 +19,6 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -45,6 +44,8 @@ public class TemplatesPanel extends VLayout {
 	protected Canvas details = SELECT_TEMPLATE;
 
 	static final Canvas SELECT_TEMPLATE = new HTMLPanel("&nbsp;" + I18N.message("selecttemplate"));
+
+	protected Long templateIdToSelect;
 
 	public TemplatesPanel() {
 		setWidth100();
@@ -152,8 +153,18 @@ public class TemplatesPanel extends VLayout {
 						});
 		});
 
-		list.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
-				.setMessage(I18N.message("showtemplates", Integer.toString(list.getTotalRows()))));
+		list.addDataArrivedHandler(event -> {
+			infoPanel.setMessage(I18N.message("showtemplates", Integer.toString(list.getTotalRows())));
+			if (templateIdToSelect != null)
+				for (ListGridRecord rec : list.getRecords()) {
+					if (templateIdToSelect.longValue() == rec.getAttributeAsDouble("id").longValue()) {
+						list.scrollToRow(list.getRowNum(rec));
+						list.selectRecord(rec);
+						break;
+					}
+				}
+			templateIdToSelect = null;
+		});
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -191,6 +202,7 @@ public class TemplatesPanel extends VLayout {
 		clone.setTitle(I18N.message("clone"));
 		clone.addClickHandler(event -> TemplateService.Instance.get().clone(selectedTemplateId,
 				selectedRecord.getAttribute("name") + "-Clone", new AsyncCallback<GUITemplate>() {
+
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -199,18 +211,11 @@ public class TemplatesPanel extends VLayout {
 					@Override
 					public void onSuccess(GUITemplate templateClone) {
 						list.deselectAllRecords();
-						ListGridRecord newRecord = new ListGridRecord();
-						newRecord.setAttribute("id", templateClone.getId());
-						newRecord.setAttribute("readonly", "" + templateClone.isReadonly());
-						newRecord.setAttribute("name", templateClone.getName());
-						newRecord.setAttribute(LABEL,
-								templateClone.getLabel() != null ? templateClone.getLabel() : templateClone.getName());
-						newRecord.setAttribute(DESCRIPTION, templateClone.getDescription());
-						list.addData(newRecord);
-						list.selectRecord(newRecord);
-						list.scrollToRow(list.getRowNum(newRecord));
+						list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
+						templateIdToSelect = templateClone.getId();
 						showTemplateDetails(templateClone);
 					}
+
 				}));
 
 		contextMenu.setItems(clone, delete);

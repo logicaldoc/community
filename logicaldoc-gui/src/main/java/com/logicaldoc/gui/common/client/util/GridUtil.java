@@ -60,6 +60,47 @@ public class GridUtil {
 			timer.schedule(100);
 		}
 	}
+	
+	/**
+	 * Scrolls the grid all down
+	 * 
+	 * @param listGrid the grid to process
+	 * @param listener optional listener inoked at the end of the scroll
+	 */
+	public static void scrollDownGrid(ListGrid listGrid, EndScrollListener listener) {
+		if (listGrid.getTotalRows() > 0) {
+			LD.contactingServer();
+
+			listGrid.scrollToRow(0);
+			listGrid.draw();
+
+			if (listGrid.getVisibleRows()[0] == -1) {
+				LD.clearPrompt();
+				return;
+			}
+
+			/*
+			 * With a timer we scroll the grid in order to fetch all the data
+			 */
+			final Timer timer = new Timer() {
+				public void run() {
+					Integer[] visibleRows = listGrid.getVisibleRows();
+					if (visibleRows[1] >= listGrid.getTotalRows() - 1) {
+						try {
+							if (listener != null)
+								listener.endScroll(listGrid);
+						} finally {
+							LD.clearPrompt();
+						}
+					} else if (visibleRows[0] != -1 && visibleRows[1] < listGrid.getTotalRows() - 1) {
+						listGrid.scrollToRow(visibleRows[1] + 1);
+						schedule(100);
+					}
+				}
+			};
+			timer.schedule(100);
+		}
+	}
 
 	/**
 	 * Prints a grid

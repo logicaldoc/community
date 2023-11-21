@@ -481,8 +481,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	private void addUpload() {
 		add.addClickHandler(event -> {
-			DocumentsUploader uploader = new DocumentsUploader();
-			uploader.show();
+			new DocumentsUploader().show();
 			event.cancel();
 		});
 		addButton(add);
