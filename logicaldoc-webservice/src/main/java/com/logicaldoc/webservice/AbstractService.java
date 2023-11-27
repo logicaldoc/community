@@ -51,10 +51,8 @@ public class AbstractService {
 		this.validateSession = validateSession;
 	}
 
-	@Resource
 	protected WebServiceContext context;
 
-	@Resource
 	protected MessageContext messageContext;
 
 	/**

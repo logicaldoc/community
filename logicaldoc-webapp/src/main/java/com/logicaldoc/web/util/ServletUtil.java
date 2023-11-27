@@ -796,21 +796,45 @@ public class ServletUtil {
 	}
 
 	/**
-	 * Retrieves the original full URL of a request
-	 * 
-	 * @param request The request to inspect
-	 * 
-	 * @return The full URL
+	 * Returns the protocol + the current host + the port (if different than
+	 * common ports).
+	 *
+	 * @param request HttpServletRequest object to be processed
+	 *
+	 * @return the HOST URL
 	 */
-	public static String getFullURL(HttpServletRequest request) {
-		StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
+	public static String getSelfURLhost(HttpServletRequest request) {
+		String hostUrl = "";
+		final int serverPort = request.getServerPort();
+		if ((serverPort == 80) || (serverPort == 443) || serverPort == 0) {
+			hostUrl = String.format("%s://%s", request.getScheme(), request.getServerName());
+		} else {
+			hostUrl = String.format("%s://%s:%s", request.getScheme(), request.getServerName(), serverPort);
+		}
+		return hostUrl;
+	}
+
+	/**
+	 * Returns the URL of the current context + current view + query
+	 *
+	 * @param request HttpServletRequest object to be processed
+	 *
+	 * @return current context + current view + query
+	 */
+	public static String getSelfURL(HttpServletRequest request) {
+		String url = getSelfURLhost(request);
+
+		String requestUri = request.getRequestURI();
 		String queryString = request.getQueryString();
 
-		if (queryString == null) {
-			return requestURL.toString();
-		} else {
-			return requestURL.append('?').append(queryString).toString();
+		if (null != requestUri && !requestUri.isEmpty()) {
+			url += requestUri;
 		}
+
+		if (null != queryString && !queryString.isEmpty()) {
+			url += '?' + queryString;
+		}
+		return url;
 	}
 
 	/**

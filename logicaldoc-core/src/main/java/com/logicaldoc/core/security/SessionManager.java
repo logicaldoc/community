@@ -454,24 +454,24 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * Create a client identified using a concatenation of Basic authentication
 	 * credentials and remote IP.
 	 * 
-	 * @param req The request to process
+	 * @param request The request to process
 	 * 
 	 * @return The client
 	 */
-	public Client buildClient(HttpServletRequest req) {
-		Client client = new Client(req);
+	public Client buildClient(HttpServletRequest request) {
+		Client client = new Client(request);
 
 		/**
 		 * We extract the username used by the user from the basic credentials.
 		 * This may differ from the real username in case the login.ignorecase
 		 * flag is activates
 		 */
-		String[] credentials = getBasicCredentials(req);
+		String[] credentials = getBasicCredentials(request);
 		if (credentials.length > 0 && credentials[0] != null)
 			client.setUsername(credentials[0]);
 		if (credentials.length > 1)
 			client.setId(String.format("%s-%s-%s", credentials[0],
-					credentials[1] != null ? "0" : credentials[1].hashCode(), req.getRemoteAddr()));
+					credentials[1] != null ? "0" : credentials[1].hashCode(), request.getRemoteAddr()));
 		return client;
 
 	}

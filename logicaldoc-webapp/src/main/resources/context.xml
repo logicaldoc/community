@@ -22,6 +22,9 @@
             http://www.springframework.org/schema/aop/spring-aop.xsd
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <context:annotation-config />
+
 	<import resource="classpath*:context-security.xml" />
 	<import resource="classpath*:context/context-*.xml" />
 

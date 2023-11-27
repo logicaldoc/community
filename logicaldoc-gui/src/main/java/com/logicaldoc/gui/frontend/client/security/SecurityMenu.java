@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.security.group.GroupsPanel;
 import com.logicaldoc.gui.frontend.client.security.ldap.LDAPServersPanel;
+import com.logicaldoc.gui.frontend.client.security.saml.SamlPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationSettings;
 import com.logicaldoc.gui.frontend.client.security.user.UsersPanel;
 import com.smartgwt.client.types.Overflow;
@@ -46,6 +47,8 @@ public class SecurityMenu extends VLayout {
 		addTwoFactorsAuthButton();
 
 		addExtAuthButton();
+
+		addSamlButton();
 
 		addSingleSignonButton();
 	}
@@ -85,6 +88,18 @@ public class SecurityMenu extends VLayout {
 		users.setHeight(25);
 		users.addClickHandler(event -> AdminScreen.get().setContent(new UsersPanel()));
 		addMember(users);
+	}
+
+	private void addSamlButton() {
+		Button saml = new Button(I18N.message("singlesignonsaml"));
+		saml.setWidth100();
+		saml.setHeight(25);
+		saml.addClickHandler(event -> AdminScreen.get().setContent(new SamlPanel()));
+		if (Feature.visible(Feature.SINGLE_SIGNON) && Session.get().isDefaultTenant() && Menu.enabled(Menu.SAML)) {
+			addMember(saml);
+			if (!Feature.enabled(Feature.SINGLE_SIGNON) || Session.get().isDemo())
+				setFeatureDisabled(saml);
+		}
 	}
 
 	private void addSingleSignonButton() {

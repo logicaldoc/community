@@ -21,10 +21,14 @@ public class ResourceUtil {
 	private ResourceUtil() {
 	}
 
-	public static String readAsString(String resourceName) throws IOException {
+	public static byte[] readAsBytes(String resourcePath) throws IOException {
+		return ResourceUtil.class.getClassLoader().getResourceAsStream(resourcePath).readAllBytes();
+	}
+
+	public static String readAsString(String resourcePath) throws IOException {
 		StringBuilder resourceData = new StringBuilder(1000);
 		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(ResourceUtil.class.getResourceAsStream(resourceName)))) {
+				new InputStreamReader(ResourceUtil.class.getResourceAsStream(resourcePath)))) {
 			char[] buf = new char[1024];
 			int numRead = 0;
 			while ((numRead = reader.read(buf)) != -1) {

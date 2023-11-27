@@ -519,10 +519,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		final Set<String> fileNames = new HashSet<>();
 
 		StringBuilder query = new StringBuilder(
-				"select lower(ld_filename) from ld_document where ld_deleted=0 and ld_folderid=");
+				"select ld_filename from ld_document where ld_deleted=0 and ld_folderid=");
 		query.append(Long.toString(doc.getFolder().getId()));
-		query.append(" and lower(ld_filename) like '");
-		query.append(SqlUtil.doubleQuotes(baseName.toLowerCase()));
+		query.append(" and ld_filename like '");
+		query.append(SqlUtil.doubleQuotes(baseName));
 		query.append("%' and not ld_id=");
 		query.append(Long.toString(doc.getId()));
 

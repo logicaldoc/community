@@ -185,6 +185,10 @@ public class Menu {
 
 	public static final long SINGLE_SIGNON = 1875;
 	
+	public static final long SAML = 1876;
+	
+	public static final long SAMK = 1876;
+	
 	public static final long RESTART = -1190;
 	
 	public static final long SYNDICATION = 2000;

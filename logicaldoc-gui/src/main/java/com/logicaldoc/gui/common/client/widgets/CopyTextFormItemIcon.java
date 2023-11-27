@@ -11,8 +11,9 @@ import com.smartgwt.client.widgets.form.fields.FormItemIcon;
  * @since 8.9
  */
 public class CopyTextFormItemIcon extends FormItemIcon {
+
 	/**
-	 * The constructor
+	 * The constructor.
 	 * 
 	 * @param text the text to copy into the clipboard
 	 */
@@ -21,6 +22,19 @@ public class CopyTextFormItemIcon extends FormItemIcon {
 		setSrc("[SKIN]/page_white_paste.png");
 		setWidth(16);
 		setHeight(16);
-		addFormItemClickHandler(event -> Util.copyText(text));
+		addFormItemClickHandler(event -> {
+			if (text != null)
+				Util.copyText(text);
+			else
+				Util.copyText(event.getItem().getValue().toString());
+		});
+	}
+
+	/**
+	 * The constructor, the current item's text will be copied into the
+	 * clipboard.
+	 */
+	public CopyTextFormItemIcon() {
+		this(null);
 	}
 }
