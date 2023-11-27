@@ -33,9 +33,9 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	@Override
 	public void start() throws SchedulingException {
-		if (RunLevel.current().aspectEnabled(SCHEDULED_TASKS))
+		if (RunLevel.current().aspectEnabled(SCHEDULED_TASKS)) {
 			super.start();
-		else
+		} else
 			log.warn(ASPECT_DISABLED);
 	}
 
