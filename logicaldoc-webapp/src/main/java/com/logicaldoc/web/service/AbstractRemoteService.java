@@ -80,7 +80,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	protected Session validateSession() throws InvalidSessionServerException {
 		return validateSession(getThreadLocalRequest());
 	}
-	
+
 	private Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
 		try {
 			return ServletUtil.validateSession(request);
@@ -147,6 +147,27 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			throws InvalidSessionServerException, AccessDeniedException {
 		try {
 			return ServletUtil.checkMenu(request, menuId);
+		} catch (InvalidSessionException e) {
+			throw new InvalidSessionServerException(e.getMessage());
+		} catch (ServletException e) {
+			throw new AccessDeniedException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Check if a specific menu is accessible by the user in the current session
+	 * 
+	 * @param menuId identifier of the menus
+	 * 
+	 * @return the current session
+	 * 
+	 * @throws InvalidSessionServerException the session does not exist or is
+	 *         expired
+	 * @throws AccessDeniedException the user cannot access any menu
+	 */
+	protected Session checkMenu(long menuId) throws InvalidSessionServerException, AccessDeniedException {
+		try {
+			return ServletUtil.checkMenu(getThreadLocalRequest(), menuId);
 		} catch (InvalidSessionException e) {
 			throw new InvalidSessionServerException(e.getMessage());
 		} catch (ServletException e) {
@@ -418,7 +439,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			date = JulianCalendarUtil.toGregorian(date);
 		return date;
 	}
-	
+
 	/**
 	 * Converts into Julian date in case it is before Oct 4th 1582
 	 * 

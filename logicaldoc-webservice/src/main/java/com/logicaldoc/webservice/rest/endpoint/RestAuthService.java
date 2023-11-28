@@ -8,10 +8,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,33 +29,28 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 
 	private static Logger log = LoggerFactory.getLogger(RestAuthService.class);
 
-	@Context
-	@Override
-	public void setMessageContext(MessageContext messageContext) {
-		// https://docs.oracle.com/cd/E13222_01/wls/docs92/webserv/annotations.html
-		// https://jersey.java.net/documentation/latest/jaxrs-resources.html#d0e2790
-		// https://jersey.java.net/apidocs-javax.jax-rs/2.0.1/javax/ws/rs/core/Context.html
-		super.messageContext = messageContext;
-	}
-
 	@GET
-    @Path("/login")
+	@Path("/login")
 	@Override
-	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws AuthenticationException {
+	public String login(@QueryParam("u")
+	String username, @QueryParam("pw")
+	String password) throws AuthenticationException {
 		return super.login(username, password);
 	}
 
 	@POST
-    @Path("/loginForm")
+	@Path("/loginForm")
 	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Login with the credentials in a form POST")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Override
-	public String loginForm(@FormParam("username") String username, @FormParam("password") String password) {
+	public String loginForm(@FormParam("username")
+	String username, @FormParam("password")
+	String password) {
 		return super.login(username, password);
 	}
 
 	@POST
-    @Path("/login")
+	@Path("/login")
 	@Operation(operationId = "loginPostJSON", summary = "Login with POST in JSON format", description = "Login posting the credentials in JSON format")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Override
@@ -66,22 +59,23 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	}
 
 	@DELETE
-    @Path("/logout")
+	@Path("/logout")
 	@Override
-	public void logout(@QueryParam("sid") String sid) {
+	public void logout(@QueryParam("sid")
+	String sid) {
 		log.debug("logout({})", sid);
 		if (sid != null)
 			super.logout(sid);
 	}
 
 	@GET
-    @Path("/getSid")
+	@Path("/getSid")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
 	@Override
 	public String getSid() {
 		return getCurrentSessionId();
 	}
-	
+
 	/**
 	 * Renews a session
 	 * 
@@ -90,10 +84,11 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	@GET
 	@Path("/renew")
 	@Override
-	public void renew(@QueryParam("sid") String sid) {
+	public void renew(@QueryParam("sid")
+	String sid) {
 		super.renew(sid);
 	}
-	
+
 	/**
 	 * Renews the current session
 	 */

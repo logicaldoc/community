@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-autowire="no" default-lazy-init="false"
+<beans default-lazy-init="false"
     xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
     xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
@@ -25,6 +25,11 @@
             http://cxf.apache.org/schemas/jaxrs.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml" />
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+     
+    <!-- This allows to access the current Message in the MessageContext of CXF -->
+    <bean id="currentMessage" class="org.apache.cxf.phase.PhaseInterceptorChain" factory-method="getCurrentMessage" scope="request">
+		<aop:scoped-proxy/>
+    </bean>
     
     <bean id="WebserviceCallDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
@@ -33,7 +38,6 @@
          </bean>
       </property>
     </bean>  
-    
     
     <bean id="GZIPInInterceptor" class="org.apache.cxf.transport.common.gzip.GZIPInInterceptor" />
     <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.ThresholdGZIPOutInterceptor">

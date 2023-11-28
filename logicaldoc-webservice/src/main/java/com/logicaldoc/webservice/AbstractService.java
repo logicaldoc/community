@@ -4,14 +4,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.ws.WebServiceContext;
 
-import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
@@ -39,6 +39,7 @@ import com.logicaldoc.webservice.model.WSUtil;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
+@Component
 public class AbstractService {
 
 	private static final String FOLDER = "folder ";
@@ -51,9 +52,8 @@ public class AbstractService {
 		this.validateSession = validateSession;
 	}
 
-	protected WebServiceContext context;
-
-	protected MessageContext messageContext;
+	@Autowired
+	protected Message currentMessage;
 
 	/**
 	 * Utility method that validates the session and retrieve the associated
@@ -196,26 +196,6 @@ public class AbstractService {
 		return "true".equals(Context.get().getProperties().get("webservice.enabled"));
 	}
 
-	public WebServiceContext getContext() {
-		return context;
-	}
-
-	public void setContext(WebServiceContext context) {
-		this.context = context;
-	}
-
-	public MessageContext getMessageContext() {
-		return messageContext;
-	}
-
-	@javax.ws.rs.core.Context
-	public void setMessageContext(MessageContext messageContext) {
-		// https://docs.oracle.com/cd/E13222_01/wls/docs92/webserv/annotations.html
-		// https://jersey.java.net/documentation/latest/jaxrs-resources.html#d0e2790
-		// https://jersey.java.net/apidocs-javax.jax-rs/2.0.1/javax/ws/rs/core/Context.html
-		this.messageContext = messageContext;
-	}
-
 	/**
 	 * Gets the current Session ID following this logic:
 	 * <ol>
@@ -229,17 +209,20 @@ public class AbstractService {
 	 * @return The current Session ID
 	 */
 	protected String getCurrentSessionId() {
-		HttpServletRequest request = null;
-		if (context != null && context.getMessageContext() != null)
-			request = (HttpServletRequest) context.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
-		else if (messageContext != null)
-			request = (HttpServletRequest) messageContext.get(AbstractHTTPDestination.HTTP_REQUEST);
+		HttpServletRequest request = getCurrentRequest();
 
 		Session session = SessionManager.get().getSession(request);
 
 		if (session != null)
 			return session.getSid();
 		return null;
+	}
+
+	protected HttpServletRequest getCurrentRequest() {
+		HttpServletRequest request = null;
+		if (currentMessage != null)
+			request = (HttpServletRequest) currentMessage.get(AbstractHTTPDestination.HTTP_REQUEST);
+		return request;
 	}
 
 	/**
@@ -273,5 +256,13 @@ public class AbstractService {
 
 	public boolean isValidateSession() {
 		return validateSession;
+	}
+
+	public Message getCurrentMessage() {
+		return currentMessage;
+	}
+
+	public void setCurrentMessage(Message currentMessage) {
+		this.currentMessage = currentMessage;
 	}
 }

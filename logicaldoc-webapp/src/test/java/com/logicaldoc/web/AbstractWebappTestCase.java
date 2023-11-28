@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.logicaldoc.core.PersistenceException;
@@ -59,7 +61,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 		} catch (ServerException e) {
 			throw new IOException(e);
 		}
-		
+
 		Assert.assertNotNull(guiSession);
 		Assert.assertNotNull(SessionManager.get().get(guiSession.getSid()));
 	}
@@ -82,8 +84,8 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	protected String[] getContexts() {
-		return new String[] { "/contexttest.xml" };
+	protected ApplicationContext buildApplicationContext() {
+		return new ClassPathXmlApplicationContext(new String[] { "/contexttest.xml" });
 	}
 
 	@Override

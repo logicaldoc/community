@@ -1,9 +1,7 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.ws.handler.MessageContext;
 
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +22,7 @@ public class SoapAuthService extends AbstractService implements AuthService {
 
 	@Override
 	public String login(String username, String password) throws AuthenticationException {
-		HttpServletRequest request = null;
-		if (context != null) {
-			MessageContext ctx = context.getMessageContext();
-			if (ctx != null)
-				request = (HttpServletRequest) ctx.get(AbstractHTTPDestination.HTTP_REQUEST);
-		}
-
-		if (request == null)
-			request = messageContext.getHttpServletRequest();
+		HttpServletRequest request = getCurrentRequest();
 
 		Session session = SessionManager.get().newSession(username, password,
 				SessionManager.get().buildClient(request));

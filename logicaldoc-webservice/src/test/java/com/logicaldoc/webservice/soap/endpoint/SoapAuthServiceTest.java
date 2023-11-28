@@ -13,9 +13,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,10 +30,7 @@ import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 
 	@Mock
-	private WebServiceContext wscontext;
-
-	@Mock
-	private MessageContext messageContext;
+	private Message currentMessage;
 
 	@Mock
 	private HttpServletRequest httpRequest;
@@ -46,15 +42,12 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		super.setUp();
 
-		wscontext = mock(WebServiceContext.class, Answers.RETURNS_DEEP_STUBS);
-		messageContext = mock(MessageContext.class);
-
-		when(wscontext.getMessageContext()).thenReturn(messageContext);
-		when(messageContext.get(AbstractHTTPDestination.HTTP_REQUEST)).thenReturn(httpRequest);
+		currentMessage = mock(Message.class, Answers.RETURNS_DEEP_STUBS);
+		when(currentMessage.get(AbstractHTTPDestination.HTTP_REQUEST)).thenReturn(httpRequest);
 
 		// Make sure that this is a SoapAuthService instance
 		soapAuthServiceImpl = new SoapAuthService();
-		soapAuthServiceImpl.setContext(wscontext);
+		soapAuthServiceImpl.setCurrentMessage(currentMessage);
 	}
 
 	@Test

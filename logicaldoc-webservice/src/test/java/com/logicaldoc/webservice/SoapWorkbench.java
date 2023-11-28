@@ -60,7 +60,7 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-			documentStuff(sid);
+			//documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");

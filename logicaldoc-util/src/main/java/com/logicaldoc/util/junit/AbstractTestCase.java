@@ -52,7 +52,7 @@ public abstract class AbstractTestCase {
 
 		createTestDirs();
 
-		context = new ClassPathXmlApplicationContext(getContexts());
+		context = buildApplicationContext();
 
 		createTestDatabase();
 	}
@@ -75,15 +75,15 @@ public abstract class AbstractTestCase {
 	}
 
 	/**
-	 * Concrete implementations should return the array of context XML resources
-	 * to use to setup the database
-	 * 
-	 * @return array of resources(default is a single /context.xml)
+	 * Concrete implementations should  prepare and return the Spring ApplicationContext to use. 
+	 * By default it is used the ClassPathXmlApplicationContext loading the /context.xml resource.
+	 *  
+	 * @return the ApplicationContext
 	 */
-	protected String[] getContexts() {
-		return new String[] { "/context.xml" };
+	protected ApplicationContext buildApplicationContext() {
+		return new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
 	}
-
+	
 	/**
 	 * Concrete implementations should return the array of sql script resources
 	 * to use to setup the database
