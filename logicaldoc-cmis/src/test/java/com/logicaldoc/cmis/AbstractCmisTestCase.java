@@ -1,5 +1,8 @@
 package com.logicaldoc.cmis;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import com.logicaldoc.util.junit.AbstractTestCase;
 
 /**
@@ -19,8 +22,8 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	protected String[] getContexts() {
-		return new String[] { "/contexttest.xml" };
+	protected ApplicationContext buildApplicationContext() {
+		return new ClassPathXmlApplicationContext(new String[] { "/contexttest.xml" });
 	}
 
 	@Override
