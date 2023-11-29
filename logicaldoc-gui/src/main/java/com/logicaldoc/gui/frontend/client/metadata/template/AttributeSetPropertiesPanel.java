@@ -408,7 +408,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	private void addOptionsItem(final TextItem attributeName) {
-		options = ItemFactory.newLinkItem("options", I18N.message("options"));
+		options = new LinkItem("options");
+		options.setTitle(I18N.message("options"));
 		options.setLinkTitle(I18N.message("attributeoptions"));
 		options.addClickHandler(optionsClick -> {
 			if (attributeSet.getId() == 0L) {

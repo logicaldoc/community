@@ -270,6 +270,23 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
+	 * Gets the session with the specified dictionary value
+	 * 
+	 * @param key identifier of the value in the dictionary
+	 * @param value the value to match
+	 * 
+	 * @return the session
+	 */
+	public Session getByDictionaryValue(String key, Object value) {
+		for (Session session : getSessions()) {
+			if (value.equals(session.getDictionary().get(key)))
+				return session;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Counts the total number of opened sessions
 	 * 
 	 * @return number of opened sessions

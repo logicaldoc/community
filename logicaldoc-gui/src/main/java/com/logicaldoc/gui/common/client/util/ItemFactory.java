@@ -54,6 +54,7 @@ import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.validators.EmailValidator;
 import com.logicaldoc.gui.common.client.validators.EmailsValidator;
 import com.logicaldoc.gui.common.client.validators.SimpleTextValidator;
+import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.CronExpressionComposer;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
@@ -306,6 +307,7 @@ public class ItemFactory {
 		textAreaItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		textAreaItem.setHintStyle("hint");
 		textAreaItem.setBrowserSpellCheck(false);
+		textAreaItem.setIconVAlign(VerticalAlignment.CENTER);
 		TextAreaItem.setDefaultProperties(textAreaItem);
 
 		TimeItem timeItem = new TimeItem();
@@ -1844,13 +1846,21 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static LinkItem newLinkItem(String name, String title) {
+	public static LinkItem newLinkItem(String name, String title, String linkTitle, String url) {
+		return newLinkItem(name, title, linkTitle, url, null);
+	}
+
+	public static LinkItem newLinkItem(String name, String title, String linkTitle, String url, String textToCopy) {
 		LinkItem linkItem = new LinkItem(originalItemName(name));
-		if (!title.trim().isEmpty()) {
-			linkItem.setTitle(I18N.message(title));
-			linkItem.setLinkTitle(I18N.message(title));
-		}
+		linkItem.setTitle(I18N.message(title));
+		linkItem.setLinkTitle(I18N.message(linkTitle));
 		linkItem.setWrapTitle(false);
+
+		if (url != null)
+			linkItem.setValue(url);
+		
+		linkItem.setIcons(new CopyTextFormItemIcon(textToCopy != null ? textToCopy : url,
+				textToCopy != null ? "copytext" : "copylink"));
 		return linkItem;
 	}
 

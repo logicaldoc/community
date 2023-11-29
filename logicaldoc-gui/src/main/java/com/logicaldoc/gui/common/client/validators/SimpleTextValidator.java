@@ -14,6 +14,6 @@ public class SimpleTextValidator extends RegExpValidator {
 	public SimpleTextValidator() {
 		super();
 		setErrorMessage(I18N.message("simpetextinvalid"));
-		setExpression("^([a-zA-Z0-9\\-]+)$");
+		setExpression("^([a-zA-Z0-9]+)$");
 	}
 }

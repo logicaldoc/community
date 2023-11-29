@@ -46,9 +46,8 @@ public class SaveDialog extends Window {
 		form.setWidth(350);
 		form.setMargin(5);
 
-		TextItem name = ItemFactory.newTextItem("name", null);
+		TextItem name = ItemFactory.newSimpleTextItem("name", null);
 		name.setRequired(true);
-		name.setValidators(new SimpleTextValidator());
 		name.setWidth(200);
 
 		TextItem description = ItemFactory.newTextItem(DESCRIPTION, null);

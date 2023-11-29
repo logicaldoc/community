@@ -196,14 +196,10 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 	private LinkItem prepareFolderItem() {
 		String path = document.getPathExtended();
-
-		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40));
+		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40), Util.displayURL(null, document.getFolder().getId()), path);
 		folder.setTitle(I18N.message("folder"));
-		folder.setValue(Util.displayURL(null, document.getFolder().getId()));
-		folder.setTooltip(document.getPathExtended());
+		folder.setTooltip(path);
 		folder.setWrap(false);
-		folder.setWidth(DEFAULT_ITEM_WIDTH);
-		folder.setIcons(new CopyTextFormItemIcon(path));
 		return folder;
 	}
 

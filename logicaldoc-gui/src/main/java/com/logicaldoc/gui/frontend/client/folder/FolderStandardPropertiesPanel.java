@@ -115,10 +115,11 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		LinkItem pathItem = preparePathItem();
 
-		LinkItem barcode = ItemFactory.newLinkItem("barcode", I18N.message("generatebarcode"));
+		LinkItem barcode = ItemFactory.newLinkItem("barcode", I18N.message("generatebarcode"),
+				I18N.message("generatebarcode"),
+				GWT.getHostPageBaseURL() + "barcode?code=" + folder.getId() + "&width=400&height=150");
 		barcode.setTarget("_blank");
 		barcode.setTitle(I18N.message("barcode"));
-		barcode.setValue(GWT.getHostPageBaseURL() + "barcode?code=" + folder.getId() + "&width=400&height=150");
 
 		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents",
 				folder.getDocumentCount() > 0 ? Util.formatLong(folder.getDocumentCount()) : "-");
@@ -220,10 +221,10 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private LinkItem preparePathItem() {
 		String path = folder.getPathExtended() != null ? folder.getPathExtended()
 				: FolderNavigator.get().getPath(folder.getId());
-		LinkItem pathItem = ItemFactory.newLinkItem("path", Util.padLeft(path, 150));
+		LinkItem pathItem = ItemFactory.newLinkItem("path", Util.padLeft(path, 150), Util.padLeft(path, 150),
+				Util.displayURL(null, folder.getId()));
 		pathItem.setTooltip(path);
 		pathItem.setTitle(I18N.message("path"));
-		pathItem.setValue(Util.displayURL(null, folder.getId()));
 		pathItem.setWidth(400);
 		pathItem.setIcons(new CopyTextFormItemIcon(path));
 		return pathItem;

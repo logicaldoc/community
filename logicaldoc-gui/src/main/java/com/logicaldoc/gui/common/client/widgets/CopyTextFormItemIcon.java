@@ -16,9 +16,11 @@ public class CopyTextFormItemIcon extends FormItemIcon {
 	 * The constructor.
 	 * 
 	 * @param text the text to copy into the clipboard
+	 * @patram tooltip the tooltip to display
 	 */
-	public CopyTextFormItemIcon(String text) {
-		setPrompt(I18N.message("copytext"));
+	public CopyTextFormItemIcon(String text, String tooltip) {
+		setName("copy");
+		setPrompt(I18N.message(tooltip));
 		setSrc("[SKIN]/page_white_paste.png");
 		setWidth(16);
 		setHeight(16);
@@ -28,6 +30,15 @@ public class CopyTextFormItemIcon extends FormItemIcon {
 			else
 				Util.copyText(event.getItem().getValue().toString());
 		});
+	}
+
+	/**
+	 * The constructor.
+	 * 
+	 * @param text the text to copy into the clipboard
+	 */
+	public CopyTextFormItemIcon(String text) {
+		this(text, "copytext");
 	}
 
 	/**

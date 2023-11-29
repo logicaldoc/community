@@ -1,9 +1,12 @@
 package com.logicaldoc.gui.frontend.client.security.saml;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUIInfo;
-import com.logicaldoc.gui.common.client.beans.GUIParameter;
 
 public interface SamlServiceAsync {
 
+	void loadSettings(AsyncCallback<GUISamlSettings> callback);
+
+	public void saveSettings(GUISamlSettings settings, AsyncCallback<Void> callback);
+
+	public void importResource(String resourceName, AsyncCallback<String> callback);
 }
