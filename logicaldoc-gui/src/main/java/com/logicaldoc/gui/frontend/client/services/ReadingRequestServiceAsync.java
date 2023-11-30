@@ -5,8 +5,8 @@ import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 
 public interface ReadingRequestServiceAsync {
 
-	void askReadingConfirmation(Long[] docIds, long[] recipientIds, boolean alertConfirmation, String comment,
-			AsyncCallback<Void> callback);
+	void askReadingConfirmation(Long[] docIds, long[] userIds, long[] groupIds, boolean alertConfirmation,
+			String comment, AsyncCallback<Void> callback);
 
 	void confirmReadings(long[] readingIds, String version, AsyncCallback<Void> callback);
 

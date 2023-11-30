@@ -80,7 +80,7 @@ public class PreviewPopup extends Window {
 		prev.setShowRollOver(true);
 		prev.setShowDisabled(true);
 		prev.setShowDown(true);
-		prev.setIcon("[SKIN]/headerIcons/arrow_left.gif");
+		prev.setIcon("[SKIN]/headerIcons/arrow_left.png");
 		prev.addClickHandler(event -> {
 			if (currentIndex <= 0)
 				currentIndex = PreviewPopup.this.docs.length - 1;
@@ -95,7 +95,7 @@ public class PreviewPopup extends Window {
 		next.setShowRollOver(true);
 		next.setShowDisabled(true);
 		next.setShowDown(true);
-		next.setIcon("[SKIN]/headerIcons/arrow_right.gif");
+		next.setIcon("[SKIN]/headerIcons/arrow_right.png");
 		next.addClickHandler(event -> {
 				if (currentIndex >= PreviewPopup.this.docs.length)
 					currentIndex = 0;

@@ -57,6 +57,8 @@ public class SamlPanel extends VLayout {
 
 	private static final String NAMEID_ENCRYPTED = "nameidencrypted";
 
+	private static final String KEEPMEMBERSHIP = "keepmembership";
+
 	public SamlPanel() {
 		setWidth100();
 		setMembersMargin(5);
@@ -105,6 +107,10 @@ public class SamlPanel extends VLayout {
 
 		TextItem groups = ItemFactory.newTextItem(GROUPS, GROUPS, settings.getGroup());
 		groups.setWrapTitle(false);
+
+		RadioGroupItem keepMembership = ItemFactory.newBooleanSelector(KEEPMEMBERSHIP, "keepmembershiplocalgroups");
+		keepMembership.setValue(settings.isKeepLocalMemberships() ? "yes" : "no");
+		keepMembership.setRequired(true);
 
 		RadioGroupItem authnRequestSigned = ItemFactory.newBooleanSelector(AUTHNREQUEST_SIGNED);
 		authnRequestSigned.setWrapTitle(true);
@@ -183,11 +189,11 @@ public class SamlPanel extends VLayout {
 		attributeMappingsForm.setValuesManager(vm);
 		attributeMappingsForm.setIsGroup(true);
 		attributeMappingsForm.setGroupTitle(I18N.message("attrtibutemappings"));
-		attributeMappingsForm.setTitleOrientation(TitleOrientation.LEFT);
+		attributeMappingsForm.setTitleOrientation(TitleOrientation.TOP);
 		attributeMappingsForm.setAlign(Alignment.LEFT);
 		attributeMappingsForm.setHeight(1);
 		attributeMappingsForm.setWidth(590);
-		attributeMappingsForm.setFields(username, firstName, lastName, email, groups);
+		attributeMappingsForm.setFields(username, firstName, lastName, email, groups, keepMembership);
 
 		VLayout forms = new VLayout();
 		forms.setMembersMargin(10);
@@ -224,6 +230,7 @@ public class SamlPanel extends VLayout {
 			settings.setAuthnRequestSigned("yes".equals(form.getValue(AUTHNREQUEST_SIGNED)));
 			settings.setWantAssertionsEncrypted("yes".equals(form.getValue(ASSERTIONS_ENCRYPTED)));
 			settings.setWantNameIdEncrypted("yes".equals(form.getValue(NAMEID_ENCRYPTED)));
+			settings.setKeepLocalMemberships("yes".equals(form.getValue(KEEPMEMBERSHIP)));
 			settings.setCertificate(form.getValueAsString(CERTIFICATE));
 			settings.setPrivateKey(form.getValueAsString(PRIVATEKEY));
 			settings.setIdpMetadata(form.getValueAsString(IDP_METADATA));

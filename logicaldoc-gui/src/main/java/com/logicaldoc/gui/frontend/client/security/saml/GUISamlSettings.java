@@ -38,6 +38,8 @@ public class GUISamlSettings implements Serializable {
 
 	private String group = "group";
 
+	private boolean keepLocalMemberships = true;
+
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -140,5 +142,13 @@ public class GUISamlSettings implements Serializable {
 
 	public void setGroup(String group) {
 		this.group = group;
+	}
+
+	public boolean isKeepLocalMemberships() {
+		return keepLocalMemberships;
+	}
+
+	public void setKeepLocalMemberships(boolean keepLocalMemberships) {
+		this.keepLocalMemberships = keepLocalMemberships;
 	}
 }

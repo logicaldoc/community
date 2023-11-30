@@ -22,13 +22,14 @@ public interface ReadingRequestService extends RemoteService {
 	 * Asks some users to confirm the reading of a set of documents
 	 * 
 	 * @param docIds identifiers of the documents
-	 * @param recipientIds identifiers of the recipients
+	 * @param userIds identifiers of the recipients
+	 * @param groupIds identifiers of the groups
 	 * @param comment an optional message to include in the notification
 	 * @param alertConfirmation if the requestor must be notified on reading confirmation
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void askReadingConfirmation(Long[] docIds, long[] recipientIds, boolean alertConfirmation, String comment) throws ServerException;
+	public void askReadingConfirmation(Long[] docIds, long[] userIds, long[] groupIds, boolean alertConfirmation, String comment) throws ServerException;
 
 	/**
 	 * Confirms the read completion of a given file version
