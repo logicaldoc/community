@@ -1,5 +1,7 @@
 package com.logicaldoc.web.websockets;
 
+import java.util.Random;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,7 @@ public class WebsocketTool {
 		command.setUsername(session.getUsername());
 		command.setPayload(message);
 		command.setTarget(level);
+		command.setId(-new Random().nextLong());
 
 		EventEndpoint.distributeMessage(command);
 	}
@@ -54,6 +57,7 @@ public class WebsocketTool {
 		command.setUsername(session.getUsername());
 		command.setPayload(url);
 		command.setTarget(StringUtils.isNotEmpty(target) ? target : "_blank");
+		command.setId(-new Random().nextLong());
 
 		EventEndpoint.distributeMessage(command);
 	}
