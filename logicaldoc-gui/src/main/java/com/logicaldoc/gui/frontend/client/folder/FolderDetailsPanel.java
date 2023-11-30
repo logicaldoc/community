@@ -427,7 +427,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			propertiesTabPanel.removeMember(propertiesPanel);
 		}
 		propertiesPanel = new FolderStandardPropertiesPanel(folder, changeHandler);
-		propertiesTabPanel.addMember(propertiesPanel);
+	    propertiesTabPanel.addMember(propertiesPanel);
 	}
 
 	public GUIFolder getFolder() {

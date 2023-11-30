@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * Panle that contains both folder tool basr and folder navigator.
+ * Panel that contains both folder tool bar and folder navigator.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.3
