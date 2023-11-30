@@ -258,7 +258,6 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 	@Override
 	public void onMessage(WebSocket webSocket, String data) {
 		onEvent(deserializeMessage(data));
-
 	}
 
 	@Override
