@@ -55,8 +55,8 @@ public class EnvelopeDetails extends Window {
 		documents = MainPanel.get().isOnDocumentsTab() ? DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments()
 				: SearchPanel.get().getDocumentsGrid().getSelectedDocuments();
 
-		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(event -> onSend());
+		sendButton = new IButton(I18N.message("submit"));
+		sendButton.addClickHandler(event -> onSubmit());
 
 		prepareForm();
 
@@ -111,7 +111,7 @@ public class EnvelopeDetails extends Window {
 		form.setItems(items.toArray(new FormItem[0]));
 	}
 
-	public void onSend() {
+	public void onSubmit() {
 		if (!form.validate())
 			return;
 

@@ -52,8 +52,8 @@ public class KeystoreUploader extends Window {
 		layout.setMembersMargin(2);
 		layout.setMargin(2);
 
-		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(event -> onSend());
+		sendButton = new IButton(I18N.message("submit"));
+		sendButton.addClickHandler(event -> onSubmit());
 
 		prepareForm();
 
@@ -101,7 +101,7 @@ public class KeystoreUploader extends Window {
 		form.setItems(localCAalias, password);
 	}
 
-	public void onSend() {
+	public void onSubmit() {
 		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;

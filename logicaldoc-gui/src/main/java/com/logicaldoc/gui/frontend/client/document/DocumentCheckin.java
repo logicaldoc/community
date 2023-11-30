@@ -75,8 +75,8 @@ public class DocumentCheckin extends Window {
 
 		form.setItems(versionItem, filenameItem, commentItem);
 
-		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSend());
+		sendButton = new IButton(I18N.message("submit"));
+		sendButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSubmit());
 		sendButton.setDisabled(true);
 
 		VLayout layout = new VLayout();
@@ -105,7 +105,7 @@ public class DocumentCheckin extends Window {
 		});
 	}
 
-	public void onSend() {
+	public void onSubmit() {
 		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;

@@ -49,13 +49,13 @@ public class SendToArchiveDialog extends Window {
 		send.setStartRow(false);
 		send.setTitle(I18N.message("sendtoexparchive"));
 		send.setAutoFit(true);
-		send.addClickHandler(event -> onSend(ids, document));
+		send.addClickHandler(event -> onSubmit(ids, document));
 
 		form.setFields(archive, send);
 		addItem(form);
 	}
 
-	public void onSend(Long[] ids, boolean document) {
+	public void onSubmit(Long[] ids, boolean document) {
 		if (!form.validate())
 			return;
 

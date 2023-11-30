@@ -42,8 +42,8 @@ public class WorkflowUploader extends Window {
 		layout.setMembersMargin(2);
 		layout.setMargin(2);
 
-		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(event -> onSend());
+		sendButton = new IButton(I18N.message("submit"));
+		sendButton.addClickHandler(event -> onSubmit());
 
 		uploader = new Upload(sendButton);
 		layout.addMember(uploader);
@@ -51,7 +51,7 @@ public class WorkflowUploader extends Window {
 		addItem(layout);
 	}
 
-	public void onSend() {
+	public void onSubmit() {
 		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;

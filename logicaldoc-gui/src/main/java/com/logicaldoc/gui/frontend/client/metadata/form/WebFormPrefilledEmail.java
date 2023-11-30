@@ -65,8 +65,8 @@ public class WebFormPrefilledEmail extends StickyWindow {
 				addItem(extPanel);
 
 				SubmitItem send = new SubmitItem();
-				send.setTitle(I18N.message("send"));
-				send.addClickHandler(event -> onSend());
+				send.setTitle(I18N.message("submit"));
+				send.addClickHandler(event -> onSubmit());
 
 				DynamicForm sendForm = new DynamicForm();
 				sendForm.setTitleOrientation(TitleOrientation.TOP);
@@ -80,7 +80,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 
 	}
 
-	public void onSend() {
+	public void onSubmit() {
 		if (!extPanel.validate())
 			return;
 

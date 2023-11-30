@@ -103,7 +103,7 @@ public class MessageDialog extends Window {
 		SelectItem priority = ItemFactory.newPrioritySelector(PRIORITY, I18N.message(PRIORITY));
 
 		final IButton send = new IButton();
-		send.setTitle(I18N.message("send"));
+		send.setTitle(I18N.message("submit"));
 		send.setAutoFit(true);
 		send.setMargin(3);
 		send.addClickHandler(event -> {

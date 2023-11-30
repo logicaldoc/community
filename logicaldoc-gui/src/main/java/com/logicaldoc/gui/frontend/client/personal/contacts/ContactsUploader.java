@@ -40,10 +40,10 @@ public class ContactsUploader extends Window {
 		form.setValuesManager(vm);
 
 		sendButton = new SubmitItem();
-		sendButton.setTitle(I18N.message("send"));
+		sendButton.setTitle(I18N.message("submit"));
 		sendButton.setDisabled(true);
 		sendButton.setAlign(Alignment.RIGHT);
-		sendButton.addClickHandler(event -> onSend());
+		sendButton.addClickHandler(event -> onSubmit());
 
 		form.setItems(sendButton);
 
@@ -52,7 +52,7 @@ public class ContactsUploader extends Window {
 		addItem(form);
 	}
 
-	public void onSend() {
+	public void onSubmit() {
 		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;

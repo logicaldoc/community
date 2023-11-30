@@ -56,8 +56,8 @@ public class DocumentsUploader extends Window {
 		setMinWidth(450);
 		setAutoSize(true);
 
-		sendButton = new IButton(I18N.message("send"));
-		sendButton.addClickHandler(event -> onSend());
+		sendButton = new IButton(I18N.message("submit"));
+		sendButton.addClickHandler(event -> onSubmit());
 		sendButton.setDisabled(true);
 
 		prepareForm();
@@ -147,7 +147,7 @@ public class DocumentsUploader extends Window {
 		form.setItems(zipItem, charset, immediateIndexing, fileNameWaring);
 	}
 
-	public void onSend() {
+	public void onSubmit() {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 

@@ -127,7 +127,7 @@ public abstract class AbstractEmailDialog extends Window {
 
 			setRecipients(mail, to, cc, bcc);
 
-			onSend(mail);
+			onSubmit(mail);
 		});
 
 		addItem(recipientsStack);
@@ -178,7 +178,7 @@ public abstract class AbstractEmailDialog extends Window {
 		mail.setBccs(bccs.toArray(new GUIContact[0]));
 	}
 
-	protected abstract void onSend(GUIEmail mail);
+	protected abstract void onSubmit(GUIEmail mail);
 
 	private SectionStack prepareRecipientsGrid() {
 		SectionStack sectionStack = new SectionStack();

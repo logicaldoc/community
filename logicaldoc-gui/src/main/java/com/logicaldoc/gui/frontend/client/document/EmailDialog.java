@@ -157,7 +157,7 @@ public class EmailDialog extends AbstractEmailDialog {
 	}
 
 	@Override
-	protected void onSend(GUIEmail mail) {
+	protected void onSubmit(GUIEmail mail) {
 		LD.contactingServer();
 		DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(),
 				new AsyncCallback<String>() {
