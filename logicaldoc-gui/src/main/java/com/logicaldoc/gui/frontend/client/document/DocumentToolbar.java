@@ -193,6 +193,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			list.setSelected(true);
 		else
 			gallery.setSelected(true);
+		
+		addFill();
 	}
 
 	private void addTogglePreview() {
