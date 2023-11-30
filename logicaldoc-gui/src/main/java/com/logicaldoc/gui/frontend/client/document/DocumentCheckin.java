@@ -29,7 +29,7 @@ public class DocumentCheckin extends Window {
 
 	private static final String MAJORVERSION = "majorversion";
 
-	private IButton sendButton;
+	private IButton submitButton;
 
 	private Upload uploader;
 
@@ -65,7 +65,7 @@ public class DocumentCheckin extends Window {
 		filenameItem.setWrapTitle(false);
 		filenameItem.addChangedHandler((ChangedEvent event) -> {
 			if (Boolean.FALSE.equals(filenameItem.getValueAsBoolean()))
-				sendButton.setDisabled(false);
+				submitButton.setDisabled(false);
 		});
 
 		TextItem commentItem = ItemFactory.newTextItem("comment", null);
@@ -75,18 +75,18 @@ public class DocumentCheckin extends Window {
 
 		form.setItems(versionItem, filenameItem, commentItem);
 
-		sendButton = new IButton(I18N.message("submit"));
-		sendButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSubmit());
-		sendButton.setDisabled(true);
+		submitButton = new IButton(I18N.message("submit"));
+		submitButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSubmit());
+		submitButton.setDisabled(true);
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
 		layout.setWidth100();
 
 		layout.addMember(form);
-		uploader = new Upload(sendButton);
+		uploader = new Upload(submitButton);
 		layout.addMember(uploader);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 
 		addItem(layout);
 
@@ -115,7 +115,7 @@ public class DocumentCheckin extends Window {
 			return;
 
 		if ("true".equals(vm.getValueAsString(CHECKFILENAME)) && !uploader.getUploadedFile().equals(fileName)) {
-			sendButton.setDisabled(true);
+			submitButton.setDisabled(true);
 			SC.warn(I18N.message("nosamefilename"));
 			return;
 		}

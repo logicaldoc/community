@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.8.4
  */
 public class UpdateUploader extends Window {
-	private IButton sendButton;
+	private IButton submitButton;
 
 	private Upload uploader;
 
@@ -35,16 +35,16 @@ public class UpdateUploader extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		sendButton = new IButton(I18N.message("upload"));
-		sendButton.addClickHandler(event -> onSubmit());
+		submitButton = new IButton(I18N.message("upload"));
+		submitButton.addClickHandler(event -> onSubmit());
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
 		layout.setMargin(2);
 
-		uploader = new Upload(sendButton);
+		uploader = new Upload(submitButton);
 		layout.addMember(uploader);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 
 		addItem(layout);
 

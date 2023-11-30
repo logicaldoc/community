@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.form.fields.SubmitItem;
  */
 public class OptionsUploader extends Window {
 
-	private SubmitItem sendButton;
+	private SubmitItem submitButton;
 
 	private Upload uploader;
 
@@ -48,15 +48,15 @@ public class OptionsUploader extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
-		sendButton = new SubmitItem();
-		sendButton.setTitle(I18N.message("submit"));
-		sendButton.setDisabled(true);
-		sendButton.setAlign(Alignment.RIGHT);
-		sendButton.addClickHandler(event -> onSubmit());
+		submitButton = new SubmitItem();
+		submitButton.setTitle(I18N.message("submit"));
+		submitButton.setDisabled(true);
+		submitButton.setAlign(Alignment.RIGHT);
+		submitButton.addClickHandler(event -> onSubmit());
 
-		form.setItems(sendButton);
+		form.setItems(submitButton);
 
-		uploader = new Upload(sendButton);
+		uploader = new Upload(submitButton);
 		addItem(uploader);
 		addItem(form);
 	}

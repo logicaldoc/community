@@ -35,7 +35,7 @@ public class CertificateUploadDialog extends Window {
 
 	private MultipleUpload uploader;
 
-	private IButton sendButton;
+	private IButton submitButton;
 
 	public CertificateUploadDialog() {
 		super();
@@ -49,13 +49,13 @@ public class CertificateUploadDialog extends Window {
 		setHeight(620);
 		centerInPage();
 
-		sendButton = new IButton(I18N.message("submit"));
-		sendButton.addClickHandler(event -> onSubmit());
-		sendButton.setDisabled(true);
+		submitButton = new IButton(I18N.message("submit"));
+		submitButton.addClickHandler(event -> onSubmit());
+		submitButton.setDisabled(true);
 
 		prepareForm();
 
-		uploader = new MultipleUpload(sendButton, "dropyourcerthere");
+		uploader = new MultipleUpload(submitButton, "dropyourcerthere");
 		uploader.setFileTypes("*.crt");
 		uploader.setWidth("520");
 		uploader.setMaxUploads(1);
@@ -75,7 +75,7 @@ public class CertificateUploadDialog extends Window {
 		layout.addMember(uploader);
 		layout.addMember(spacer2);
 		layout.addMember(form);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 
 		// Clean the upload folder if the window is closed
 		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {

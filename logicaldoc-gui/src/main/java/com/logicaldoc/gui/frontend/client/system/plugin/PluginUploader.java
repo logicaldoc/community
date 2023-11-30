@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.7.4
  */
 public class PluginUploader extends Window {
-	private IButton sendButton;
+	private IButton submitButton;
 
 	private Upload uploader;
 
@@ -38,17 +38,17 @@ public class PluginUploader extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		sendButton = new IButton(I18N.message("install"));
-		sendButton.addClickHandler(event -> onSubmit());
+		submitButton = new IButton(I18N.message("install"));
+		submitButton.addClickHandler(event -> onSubmit());
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
 		layout.setMargin(2);
 
-		uploader = new Upload(sendButton);
+		uploader = new Upload(submitButton);
 		uploader.setFileTypes("*.zip");
 		layout.addMember(uploader);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 
 		addItem(layout);
 

@@ -22,7 +22,7 @@ public class WorkflowUploader extends Window {
 
 	private Upload uploader;
 
-	private IButton sendButton;
+	private IButton submitButton;
 
 	private VLayout layout = new VLayout();
 
@@ -42,12 +42,12 @@ public class WorkflowUploader extends Window {
 		layout.setMembersMargin(2);
 		layout.setMargin(2);
 
-		sendButton = new IButton(I18N.message("submit"));
-		sendButton.addClickHandler(event -> onSubmit());
+		submitButton = new IButton(I18N.message("submit"));
+		submitButton.addClickHandler(event -> onSubmit());
 
-		uploader = new Upload(sendButton);
+		uploader = new Upload(submitButton);
 		layout.addMember(uploader);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 		addItem(layout);
 	}
 

@@ -28,7 +28,7 @@ public class KeystoreUploader extends Window {
 
 	private Upload uploader;
 
-	private IButton sendButton;
+	private IButton submitButton;
 
 	private VLayout layout = new VLayout();
 
@@ -52,16 +52,16 @@ public class KeystoreUploader extends Window {
 		layout.setMembersMargin(2);
 		layout.setMargin(2);
 
-		sendButton = new IButton(I18N.message("submit"));
-		sendButton.addClickHandler(event -> onSubmit());
+		submitButton = new IButton(I18N.message("submit"));
+		submitButton.addClickHandler(event -> onSubmit());
 
 		prepareForm();
 
 		layout.addMember(form);
 
-		uploader = new Upload(sendButton);
+		uploader = new Upload(submitButton);
 		layout.addMember(uploader);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 		addItem(layout);
 
 		// Cleanup the upload folder

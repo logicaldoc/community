@@ -37,7 +37,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class EnvelopeDetails extends Window {
 
-	private IButton sendButton;
+	private IButton submitButton;
 
 	private DynamicForm form;
 
@@ -55,8 +55,8 @@ public class EnvelopeDetails extends Window {
 		documents = MainPanel.get().isOnDocumentsTab() ? DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments()
 				: SearchPanel.get().getDocumentsGrid().getSelectedDocuments();
 
-		sendButton = new IButton(I18N.message("submit"));
-		sendButton.addClickHandler(event -> onSubmit());
+		submitButton = new IButton(I18N.message("submit"));
+		submitButton.addClickHandler(event -> onSubmit());
 
 		prepareForm();
 
@@ -65,7 +65,7 @@ public class EnvelopeDetails extends Window {
 		layout.setWidth100();
 
 		layout.addMember(form);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 
 		addItem(layout);
 	}

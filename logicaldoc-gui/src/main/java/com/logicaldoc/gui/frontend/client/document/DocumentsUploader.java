@@ -36,7 +36,7 @@ public class DocumentsUploader extends Window {
 
 	private static final String CHARSET = "charset";
 
-	private IButton sendButton;
+	private IButton submitButton;
 
 	private ValuesManager vm;
 
@@ -56,9 +56,9 @@ public class DocumentsUploader extends Window {
 		setMinWidth(450);
 		setAutoSize(true);
 
-		sendButton = new IButton(I18N.message("submit"));
-		sendButton.addClickHandler(event -> onSubmit());
-		sendButton.setDisabled(true);
+		submitButton = new IButton(I18N.message("submit"));
+		submitButton.addClickHandler(event -> onSubmit());
+		submitButton.setDisabled(true);
 
 		prepareForm();
 
@@ -68,9 +68,9 @@ public class DocumentsUploader extends Window {
 
 		layout.addMember(form);
 
-		uploader = new MultipleUpload(sendButton);
+		uploader = new MultipleUpload(submitButton);
 		layout.addMember(uploader);
-		layout.addMember(sendButton);
+		layout.addMember(submitButton);
 
 		// Clean the upload folder if the window is closed
 		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
