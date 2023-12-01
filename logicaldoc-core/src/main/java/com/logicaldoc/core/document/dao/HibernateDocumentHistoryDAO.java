@@ -28,7 +28,9 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 		implements DocumentHistoryDAO {
 
 	private static final String DATE_ASC = ".date asc";
+
 	private static final String ORDER_BY = "order by ";
+
 	private static final String AND = " and ";
 
 	private HibernateDocumentHistoryDAO() {
@@ -126,11 +128,14 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	public void store(DocumentHistory history) throws PersistenceException {
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
+			if (history.getDate() == null)
+				history.setDate(new Date());
 			if (history.getComment() != null) {
-            	// trim to 4000 chars
+				// trim to 4000 chars
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
-            
-				// remove non printable chars, but maintanis the carriage returns and the tabs
+
+				// remove non printable chars, but maintanis the carriage
+				// returns and the tabs
 				history.setComment(history.getComment().trim().replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
 			}
 			super.store(history);
@@ -141,8 +146,8 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	@Override
 	public List<DocumentHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
-		StringBuilder query = new StringBuilder("(" + ENTITY + ".path like :pathExpression or " + ENTITY
-				+ ".pathOld like :pathExpression) ");
+		StringBuilder query = new StringBuilder(
+				"(" + ENTITY + ".path like :pathExpression or " + ENTITY + ".pathOld like :pathExpression) ");
 		Map<String, Object> params = new HashMap<>();
 		params.put("pathExpression", pathExpression);
 

@@ -25,6 +25,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.document.selector.DocumentSelectorDialog;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
@@ -482,9 +483,23 @@ public class CalendarEventDialog extends Window {
 			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(FOLDER_ID), rec.getAttributeAsLong("id"));
 		});
 
-		IButton addDocuments = new IButton();
-		addDocuments.setTitle(I18N.message("adddocuments"));
-		addDocuments.addClickHandler(event -> {
+		Button addDocuments = new Button(I18N.message("adddocuments"));
+		addDocuments.setAutoFit(true);
+		addDocuments.addClickHandler(evnt -> new DocumentSelectorDialog() {
+
+			@Override
+			protected void onSelection(GUIDocument[] selection) {
+				for (GUIDocument doc : selection) {
+					calendarEvent.addDocument(doc);
+				}
+				refreshDocumentsGrid(documentsGrid);
+				close();
+			}
+		}.show());
+
+		Button addDocumentsFromClipboard = new Button(I18N.message("adddocumentsfromclipboard"));
+		addDocumentsFromClipboard.setAutoFit(true);
+		addDocumentsFromClipboard.addClickHandler(eevnt -> {
 			Clipboard clipboard = Clipboard.getInstance();
 			if (clipboard.isEmpty()) {
 				SC.warn(I18N.message("nodocsinclipboard"));
@@ -494,7 +509,7 @@ public class CalendarEventDialog extends Window {
 			for (GUIDocument doc : clipboard) {
 				calendarEvent.addDocument(doc);
 			}
-			Clipboard.getInstance().clear();
+			clipboard.clear();
 			refreshDocumentsGrid(documentsGrid);
 		});
 
@@ -508,7 +523,8 @@ public class CalendarEventDialog extends Window {
 
 		HLayout buttons = new HLayout();
 		buttons.setAlign(Alignment.RIGHT);
-		buttons.setMembers(addDocuments);
+		buttons.setMembersMargin(4);
+		buttons.setMembers(addDocuments, addDocumentsFromClipboard);
 
 		if (!readOnly)
 			layout.setMembers(documentsGrid, buttons);

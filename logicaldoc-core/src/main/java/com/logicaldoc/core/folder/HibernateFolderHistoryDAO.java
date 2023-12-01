@@ -88,6 +88,8 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	public void store(FolderHistory history) throws PersistenceException {
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
+			if (history.getDate() == null)
+				history.setDate(new Date());
 			if (history.getComment() != null && history.getComment().length() > 4000)
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 			super.store(history);
@@ -98,8 +100,8 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
-		StringBuilder query = new StringBuilder("(" + ENTITY + ".path like :pathExpression or " + ENTITY
-				+ ".pathOld like :pathExpression) ");
+		StringBuilder query = new StringBuilder(
+				"(" + ENTITY + ".path like :pathExpression or " + ENTITY + ".pathOld like :pathExpression) ");
 		Map<String, Object> params = new HashMap<>();
 		params.put("pathExpression", pathExpression);
 

@@ -53,8 +53,7 @@ public class DocumentSelectorPanel extends HLayout {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						removeMember(documents);
-						documents = new DocumentsListPanel(folder);
-						documents.setCanDrag(false);
+						documents = new DocumentSelectorDocumentsPanel(folder);
 						addMember(documents);
 					}
 				}));

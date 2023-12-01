@@ -742,6 +742,7 @@ public class TaskDetailsDialog extends Window {
 			}
 
 			appendDocuments(clipboard.toArray(new GUIDocument[0]));
+			Clipboard.getInstance().clear();
 		});
 
 		HLayout buttons = new HLayout();

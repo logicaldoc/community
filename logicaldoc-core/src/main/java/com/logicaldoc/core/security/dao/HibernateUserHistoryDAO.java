@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,7 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 	public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
 		try {
 			if (StringUtils.isEmpty(event))
-				return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc",
-						null);
+				return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
 			else {
 				Map<String, Object> params = new HashMap<>();
 				params.put("userId", userId);
@@ -98,6 +98,8 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 	public void store(UserHistory history) throws PersistenceException {
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
+			if (history.getDate() == null)
+				history.setDate(new Date());
 			if (history.getComment() != null && history.getComment().length() > 4000)
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 			super.store(history);
