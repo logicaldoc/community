@@ -130,9 +130,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	/**
 	 * The list of all extended attribute names to display
 	 */
-	List<String> extendedAttributes = new ArrayList<>();
+	protected List<String> extendedAttributes = new ArrayList<>();
 
-	public DocumentsListGrid(GUIFolder folder, List<String> extendedAttributes) {
+	private DocumentsListGrid(GUIFolder folder, List<String> extendedAttributes) {
 		this.folder = folder;
 		if (extendedAttributes != null)
 			this.extendedAttributes = extendedAttributes;
@@ -156,7 +156,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		addDataArrivedHandler(this::onDataArrived);
 
-		DocumentController.get().addObserver(this);
+		// DocumentController.get().addObserver(this);
 	}
 
 	private void onDataArrived(DataArrivedEvent event) {

@@ -31,7 +31,7 @@ import com.smartgwt.client.widgets.menu.Menu;
  */
 public class DocumentsListPanel extends VLayout {
 
-	private DocumentsGrid grid;
+	protected DocumentsGrid documentsGrid;
 
 	private Cursor cursor;
 
@@ -39,9 +39,6 @@ public class DocumentsListPanel extends VLayout {
 
 	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
-	public int getVisualizationMode() {
-		return visualizationMode;
-	}
 
 	public DocumentsListPanel(GUIFolder folder) {
 		this(folder, DocumentsGrid.MODE_LIST);
@@ -52,20 +49,31 @@ public class DocumentsListPanel extends VLayout {
 
 		addCursor(folder);
 
-		if (visualizationMode == DocumentsGrid.MODE_LIST)
-			grid = new NavigatorDocumentsGrid(folder);
-		else if (visualizationMode == DocumentsGrid.MODE_GALLERY) {
-			grid = new DocumentsTileGrid(folder);
-		}
-		addMember((Canvas) grid);
-		grid.setGridCursor(cursor);
+		documentsGrid = prepareDocumentsGrid(folder, visualizationMode);
+		
+		addMember((Canvas) documentsGrid);
+		documentsGrid.setGridCursor(cursor);
 
 		registerGridHandlers();
 	}
 
+	protected DocumentsGrid prepareDocumentsGrid(GUIFolder folder, int visualizationMode) {
+		DocumentsGrid documentsGrid = null;
+		if (visualizationMode == DocumentsGrid.MODE_LIST)
+			documentsGrid = new NavigatorDocumentsGrid(folder);
+		else if (visualizationMode == DocumentsGrid.MODE_GALLERY) {
+			documentsGrid = new DocumentsTileGrid(folder);
+		}
+		return documentsGrid;
+	}
+
+	public int getVisualizationMode() {
+		return visualizationMode;
+	}
+	
 	private void registerGridHandlers() {
-		grid.registerDoubleClickHandler(event -> {
-			GUIDocument doc = grid.getSelectedDocument();
+		documentsGrid.registerDoubleClickHandler(event -> {
+			GUIDocument doc = documentsGrid.getSelectedDocument();
 			long id = doc.getId();
 
 			if (FolderController.get().getCurrentFolder().isDownload()
@@ -92,11 +100,22 @@ public class DocumentsListPanel extends VLayout {
 			event.cancel();
 		});
 
-		grid.registerSelectionChangedHandler(event -> {
+		registerSelectionHandler();
+
+		documentsGrid.registerCellContextClickHandler(event -> {
+			Menu contextMenu = new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid);
+			contextMenu.showContextMenu();
+			if (event != null)
+				event.cancel();
+		});
+	}
+
+	protected void registerSelectionHandler() {
+		documentsGrid.registerSelectionChangedHandler(event -> {
 			// Avoid server load in case of multiple selections
-			if (grid.getSelectedCount() != 1)
+			if (documentsGrid.getSelectedCount() != 1)
 				return;
-			GUIDocument selectedDocument = grid.getSelectedDocument();
+			GUIDocument selectedDocument = documentsGrid.getSelectedDocument();
 			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -108,13 +127,6 @@ public class DocumentsListPanel extends VLayout {
 					DocumentController.get().setCurrentDocument(doc);
 				}
 			});
-		});
-
-		grid.registerCellContextClickHandler(event -> {
-			Menu contextMenu = new ContextMenu(FolderController.get().getCurrentFolder(), grid);
-			contextMenu.showContextMenu();
-			if (event != null)
-				event.cancel();
 		});
 	}
 
@@ -133,29 +145,29 @@ public class DocumentsListPanel extends VLayout {
 	 * @param folder the folder being opened
 	 */
 	public void updateData(GUIFolder folder) {
-		if (grid.getFolder() == null || (grid.getFolder() != null && grid.getFolder().getId() != folder.getId()))
-			grid.loadGridLayout(folder);
+		if (documentsGrid.getFolder() == null || (documentsGrid.getFolder() != null && documentsGrid.getFolder().getId() != folder.getId()))
+			documentsGrid.loadGridLayout(folder);
 
 		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null,
-				grid.getGridCursor().getPageSize(), grid.getGridCursor().getCurrentPage(),
-				grid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) grid) : null);
+				documentsGrid.getGridCursor().getPageSize(), documentsGrid.getGridCursor().getCurrentPage(),
+				documentsGrid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) documentsGrid) : null);
 		DocumentsDS dataSource = new DocumentsDS(params);
-		grid.fetchNewData(dataSource);
-		grid.setCanDrag(folder.isMove());
+		documentsGrid.fetchNewData(dataSource);
+		documentsGrid.setCanDrag(folder.isMove());
 	}
 
 	@Override
 	public void destroy() {
-		if (grid != null)
-			grid.destroy();
+		if (documentsGrid != null)
+			documentsGrid.destroy();
 	}
 
 	public DocumentsGrid getGrid() {
-		return grid;
+		return documentsGrid;
 	}
 
 	public void toggleFilters() {
-		grid.showFilters(!filters);
+		documentsGrid.showFilters(!filters);
 		filters = !filters;
 	}
 }
