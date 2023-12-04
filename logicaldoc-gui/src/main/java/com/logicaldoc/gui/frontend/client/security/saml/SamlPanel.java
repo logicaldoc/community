@@ -174,6 +174,11 @@ public class SamlPanel extends VLayout {
 		spMetadata.setWrapTitle(false);
 		spMetadata.setWrap(false);
 
+		String loginUrl = Util.contextPath() + "saml/login";
+		LinkItem login = ItemFactory.newLinkItem("login", "login", loginUrl, loginUrl);
+		login.setWrapTitle(false);
+		login.setWrap(false);
+
 		DynamicForm generalForm = new DynamicForm();
 		generalForm.setValuesManager(vm);
 		generalForm.setTitleOrientation(TitleOrientation.TOP);
@@ -182,7 +187,7 @@ public class SamlPanel extends VLayout {
 		generalForm.setIsGroup(true);
 		generalForm.setHeight(1);
 		generalForm.setWidth(590);
-		generalForm.setFields(enabled, id, authnRequestSigned, assertionsEncrypted, nameIdEncrypted, certificate,
+		generalForm.setFields(enabled, id, login, authnRequestSigned, assertionsEncrypted, nameIdEncrypted, certificate,
 				privateKey, idpMetadata, spMetadata);
 
 		DynamicForm attributeMappingsForm = new DynamicForm();
