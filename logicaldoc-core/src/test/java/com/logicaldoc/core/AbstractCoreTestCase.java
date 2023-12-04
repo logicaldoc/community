@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
@@ -23,6 +25,8 @@ import com.logicaldoc.util.junit.AbstractTestCase;
  * @since 3.0
  */
 public abstract class AbstractCoreTestCase extends AbstractTestCase {
+
+	protected static Logger log = LoggerFactory.getLogger(AbstractCoreTestCase.class);
 
 	@Before
 	@Override
@@ -46,7 +50,11 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 		// Store the file of document 1
 		FileUtil.copyResource("/Digital_Day.pdf", new File(storePath + "/1/doc/1.0"));
-		FileUtil.copyResource("/Digital_Day.pdf", new File(storePath + "/1/doc/1.0-conversion.pdf"));
+		try {
+			FileUtil.copyResource("/Digital_Day.pdf", new File(storePath + "/1/doc/1.0-conversion.pdf"));
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+		}
 
 		// Store the file of document 3
 		FileUtil.copyResource("/small.pdf", new File(storePath + "/3/doc/1.3"));
