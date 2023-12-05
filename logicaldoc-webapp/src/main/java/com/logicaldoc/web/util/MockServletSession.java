@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSessionContext;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.3.3
  */
+@SuppressWarnings("deprecation")
 public class MockServletSession implements HttpSession {
 
 	private Map<String, Object> attributes = new HashMap<>();

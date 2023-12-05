@@ -36,6 +36,8 @@ public class MockServletRequest implements HttpServletRequest {
 
 	private Map<String, String> parameters = new HashMap<>();
 
+	private Map<String, Object> attributes = new HashMap<>();
+
 	public MockServletRequest() {
 		super();
 	}
@@ -88,6 +90,7 @@ public class MockServletRequest implements HttpServletRequest {
 		return null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration getAttributeNames() {
 		return null;
@@ -217,58 +220,51 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getServerName() {
-
 		return null;
 	}
 
 	@Override
 	public int getServerPort() {
-
 		return 0;
 	}
 
 	@Override
 	public boolean isSecure() {
-
 		return false;
 	}
 
 	@Override
-	public void removeAttribute(String arg0) {
-
+	public void removeAttribute(String attribute) {
+		attributes.remove(attribute);
 	}
 
 	@Override
-	public void setAttribute(String arg0, Object arg1) {
-
+	public void setAttribute(String attribute, Object value) {
+		attributes.put(attribute, value);
 	}
 
 	@Override
-	public void setCharacterEncoding(String arg0) throws UnsupportedEncodingException {
-
+	public void setCharacterEncoding(String encofing) throws UnsupportedEncodingException {
+		// Nothing to do
 	}
 
 	@Override
 	public String getAuthType() {
-
 		return null;
 	}
 
 	@Override
 	public String getContextPath() {
-
 		return null;
 	}
 
 	@Override
 	public Cookie[] getCookies() {
-
 		return null;
 	}
 
 	@Override
 	public long getDateHeader(String arg0) {
-
 		return 0;
 	}
 
@@ -280,27 +276,25 @@ public class MockServletRequest implements HttpServletRequest {
 			return null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration getHeaderNames() {
-
 		return null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration getHeaders(String arg0) {
-
 		return null;
 	}
 
 	@Override
 	public int getIntHeader(String arg0) {
-
 		return 0;
 	}
 
 	@Override
 	public String getMethod() {
-
 		return null;
 	}
 
@@ -311,31 +305,26 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getPathTranslated() {
-
 		return null;
 	}
 
 	@Override
 	public String getQueryString() {
-
 		return null;
 	}
 
 	@Override
 	public String getRemoteUser() {
-
 		return null;
 	}
 
 	@Override
 	public String getRequestURI() {
-
 		return null;
 	}
 
 	@Override
 	public StringBuffer getRequestURL() {
-
 		return null;
 	}
 
@@ -363,38 +352,31 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public Principal getUserPrincipal() {
-
 		return null;
 	}
 
 	@Override
 	public boolean isRequestedSessionIdFromCookie() {
-
 		return false;
 	}
 
 	@Override
 	public boolean isRequestedSessionIdFromURL() {
-
 		return false;
 	}
 
 	@Override
 	public boolean isRequestedSessionIdFromUrl() {
-
 		return false;
 	}
 
 	@Override
 	public boolean isRequestedSessionIdValid() {
-
 		return false;
 	}
 
 	@Override
 	public boolean isUserInRole(String arg0) {
-
 		return false;
 	}
-
 }
