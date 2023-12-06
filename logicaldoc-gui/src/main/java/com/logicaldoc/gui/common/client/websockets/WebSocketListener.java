@@ -192,9 +192,10 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 	}
 
 	private void handleDocumentModifiedEvent(WebsocketMessage event) {
-		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
+		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId()) {
 			event.getDocument().setFolder(FolderController.get().getCurrentFolder());
- 		DocumentController.get().modified(event.getDocument());
+		}
+		DocumentController.get().modified(event.getDocument());
 	}
 
 	private void handleStoredEvent(WebsocketMessage event) {

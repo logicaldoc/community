@@ -43,11 +43,11 @@ public class SamlPanel extends VLayout {
 
 	private static final String ENABLED = "enabled";
 
-	private static final String ENTITYID = "entityid";
+	private static final String SP_ENTITYID = "spentityid";
 
-	private static final String CERTIFICATE = "certificate.crt";
+	private static final String SP_CERTIFICATE = "certificate.crt";
 
-	private static final String PRIVATEKEY = "privatekey.txt";
+	private static final String SP_PRIVATEKEY = "privatekey.txt";
 
 	private static final String IDP_METADATA = "idpmetadata.xml";
 
@@ -88,7 +88,7 @@ public class SamlPanel extends VLayout {
 		enabled.setRequired(true);
 		enabled.setValue(settings.isEnabled() ? "yes" : "no");
 
-		TextItem id = ItemFactory.newTextItem(ENTITYID, ENTITYID, settings.getEntityId());
+		TextItem id = ItemFactory.newTextItem(SP_ENTITYID, SP_ENTITYID, settings.getEntityId());
 		id.setWidth(220);
 		id.setWrapTitle(false);
 		id.setRequired(true);
@@ -99,7 +99,7 @@ public class SamlPanel extends VLayout {
 		TextItem firstName = ItemFactory.newTextItem(FIRSTNAME, FIRSTNAME, settings.getFirstName());
 		firstName.setWrapTitle(false);
 
-		TextItem lastName = ItemFactory.newTextItem(LASTNAME, "lastname", settings.getLastName());
+		TextItem lastName = ItemFactory.newTextItem(LASTNAME, LASTNAME, settings.getLastName());
 		lastName.setWrapTitle(false);
 
 		TextItem email = ItemFactory.newTextItem(EMAIL, EMAIL, settings.getEmail());
@@ -136,27 +136,30 @@ public class SamlPanel extends VLayout {
 		nameIdEncrypted.setTitleOrientation(TitleOrientation.TOP);
 		nameIdEncrypted.setValue(settings.isWantNameIdEncrypted() ? "yes" : "no");
 
-		TextAreaItem certificate = ItemFactory.newTextAreaItem(CERTIFICATE, "certificate", settings.getCertificate());
-		certificate.setWrapTitle(false);
-		certificate.setColSpan(2);
-		certificate.setWidth(TEXTAREA_WIDTH);
-		certificate.setHeight(TEXTAREA_HEIGHT);
-		certificate.setIcons(new CopyTextFormItemIcon(),
+		TextAreaItem spCertificate = ItemFactory.newTextAreaItem(SP_CERTIFICATE, "spcertificate",
+				settings.getCertificate());
+		spCertificate.setWrapTitle(false);
+		spCertificate.setColSpan(2);
+		spCertificate.setWidth(TEXTAREA_WIDTH);
+		spCertificate.setHeight(TEXTAREA_HEIGHT);
+		spCertificate.setIcons(new CopyTextFormItemIcon(),
 				new DownloadFormItemIcon(Util.contextPath() + "saml/spcertificate"),
 				new UploadFormItemIcon("uploadspcertificate"));
-		certificate.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(ASSERTIONS_ENCRYPTED))
-				|| "yes".equals(form.getValueAsString(NAMEID_ENCRYPTED))
-				|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
+		spCertificate
+				.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(ASSERTIONS_ENCRYPTED))
+						|| "yes".equals(form.getValueAsString(NAMEID_ENCRYPTED))
+						|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
 
-		TextAreaItem privateKey = ItemFactory.newTextAreaItem(PRIVATEKEY, "privatekey", settings.getPrivateKey());
-		privateKey.setWrapTitle(false);
-		privateKey.setColSpan(2);
-		privateKey.setWidth(TEXTAREA_WIDTH);
-		privateKey.setHeight(TEXTAREA_HEIGHT);
-		privateKey.setIcons(new CopyTextFormItemIcon(),
+		TextAreaItem spPrivateKey = ItemFactory.newTextAreaItem(SP_PRIVATEKEY, "spprivatekey",
+				settings.getPrivateKey());
+		spPrivateKey.setWrapTitle(false);
+		spPrivateKey.setColSpan(2);
+		spPrivateKey.setWidth(TEXTAREA_WIDTH);
+		spPrivateKey.setHeight(TEXTAREA_HEIGHT);
+		spPrivateKey.setIcons(new CopyTextFormItemIcon(),
 				new DownloadFormItemIcon(Util.contextPath() + "saml/spprivatekey"),
 				new UploadFormItemIcon("uploadspprivetekey"));
-		privateKey.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(ASSERTIONS_ENCRYPTED))
+		spPrivateKey.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(ASSERTIONS_ENCRYPTED))
 				|| "yes".equals(form.getValueAsString(NAMEID_ENCRYPTED))
 				|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
 
@@ -187,8 +190,8 @@ public class SamlPanel extends VLayout {
 		generalForm.setIsGroup(true);
 		generalForm.setHeight(1);
 		generalForm.setWidth(590);
-		generalForm.setFields(enabled, id, login, authnRequestSigned, assertionsEncrypted, nameIdEncrypted, certificate,
-				privateKey, idpMetadata, spMetadata);
+		generalForm.setFields(enabled, id, login, authnRequestSigned, assertionsEncrypted, nameIdEncrypted,
+				spCertificate, spPrivateKey, spMetadata, idpMetadata);
 
 		DynamicForm attributeMappingsForm = new DynamicForm();
 		attributeMappingsForm.setValuesManager(vm);
@@ -221,12 +224,12 @@ public class SamlPanel extends VLayout {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(event -> {
-			if (!form.validate())
+			if (!Boolean.TRUE.equals(form.validate()))
 				return;
 
 			GUISamlSettings settings = new GUISamlSettings();
 			settings.setEnabled("yes".equals(form.getValue(ENABLED)));
-			settings.setEntityId(form.getValueAsString(ENTITYID));
+			settings.setEntityId(form.getValueAsString(SP_ENTITYID));
 			settings.setUsername(form.getValueAsString(USERNAME));
 			settings.setFirstName(form.getValueAsString(FIRSTNAME));
 			settings.setLastName(form.getValueAsString(LASTNAME));
@@ -236,8 +239,8 @@ public class SamlPanel extends VLayout {
 			settings.setWantAssertionsEncrypted("yes".equals(form.getValue(ASSERTIONS_ENCRYPTED)));
 			settings.setWantNameIdEncrypted("yes".equals(form.getValue(NAMEID_ENCRYPTED)));
 			settings.setKeepLocalMemberships("yes".equals(form.getValue(KEEPMEMBERSHIP)));
-			settings.setCertificate(form.getValueAsString(CERTIFICATE));
-			settings.setPrivateKey(form.getValueAsString(PRIVATEKEY));
+			settings.setCertificate(form.getValueAsString(SP_CERTIFICATE));
+			settings.setPrivateKey(form.getValueAsString(SP_PRIVATEKEY));
 			settings.setIdpMetadata(form.getValueAsString(IDP_METADATA));
 
 			SamlService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {

@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document.selector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Session;
@@ -9,10 +8,8 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
-import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
-import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGridField;
 

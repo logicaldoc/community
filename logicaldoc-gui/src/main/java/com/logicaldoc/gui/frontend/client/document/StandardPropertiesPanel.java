@@ -16,7 +16,6 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewTile;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
@@ -196,7 +195,8 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 	private LinkItem prepareFolderItem() {
 		String path = document.getPathExtended();
-		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40), Util.displayURL(null, document.getFolder().getId()), path);
+		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40),
+				Util.displayURL(null, document.getFolder().getId()), path);
 		folder.setTitle(I18N.message("folder"));
 		folder.setTooltip(path);
 		folder.setWrap(false);

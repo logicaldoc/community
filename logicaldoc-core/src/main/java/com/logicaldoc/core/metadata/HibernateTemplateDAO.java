@@ -62,7 +62,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Template>();
+			return new ArrayList<>();
 		}
 	}
 

@@ -58,13 +58,13 @@ public class DocumentsListPanel extends VLayout {
 	}
 
 	protected DocumentsGrid prepareDocumentsGrid(GUIFolder folder, int visualizationMode) {
-		DocumentsGrid documentsGrid = null;
+		DocumentsGrid docsGrid = null;
 		if (visualizationMode == DocumentsGrid.MODE_LIST)
-			documentsGrid = new NavigatorDocumentsGrid(folder);
+			docsGrid = new NavigatorDocumentsGrid(folder);
 		else if (visualizationMode == DocumentsGrid.MODE_GALLERY) {
-			documentsGrid = new DocumentsTileGrid(folder);
+			docsGrid = new DocumentsTileGrid(folder);
 		}
-		return documentsGrid;
+		return docsGrid;
 	}
 
 	public int getVisualizationMode() {

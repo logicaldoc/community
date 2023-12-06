@@ -285,7 +285,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	 * @return if the currently selection is a folder
 	 */
 	private boolean isSelectionFolder() {
-		return "folder".equals(grid.getSelectedDocument().getType());
+		return FOLDER.equals(grid.getSelectedDocument().getType());
 	}
 
 	@Override

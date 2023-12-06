@@ -135,7 +135,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					String.format("Template has not been %s", template.getId() != 0L ? "updated" : "stored"), e);
 		}
 	}
-	
+
 	@Override
 	public GUITemplate clone(long templateId, String cloneName) throws ServerException {
 		try {
@@ -143,8 +143,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			Template clone = dao.clone(templateId, cloneName);
 			return getTemplate(clone.getId());
 		} catch (Exception e) {
-			throw new ServerException(
-					String.format("Template %d has not been cloned", templateId, e));
+			throw new ServerException(String.format("Template %d has not been cloned", templateId), e);
 		}
 	}
 

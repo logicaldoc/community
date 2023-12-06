@@ -128,7 +128,7 @@ public class CalendarEventDialog extends Window {
 
 		Tab detailsTab = prepareDetails();
 		Tab participantsTab = prepareParticipants();
-		Tab documentsTab = prepareDocuments();
+		Tab documentsTab = prepareDocumentsTab();
 		Tab remindersTab = prepareReminders();
 
 		if (Feature.enabled(Feature.AUTOMATION)) {
@@ -405,7 +405,7 @@ public class CalendarEventDialog extends Window {
 		participantsGrid.setRecords(records);
 	}
 
-	private Tab prepareDocuments() {
+	private Tab prepareDocumentsTab() {
 		FileNameListGridField fileName = new FileNameListGridField();
 		fileName.setWidth("90%");
 		fileName.setCanEdit(!readOnly);
@@ -453,13 +453,10 @@ public class CalendarEventDialog extends Window {
 		delete.setTitle(I18N.message(DDELETE));
 		delete.addClickHandler(event -> {
 			// Detect selected records
-			ListGridRecord[] selection = documentsGrid.getSelectedRecords();
-			if (selection.length > 0) {
-				for (ListGridRecord rec : selection) {
-					calendarEvent.removeDocument(Long.parseLong(rec.getAttribute("id")));
-				}
-				refreshDocumentsGrid(documentsGrid);
+			for (ListGridRecord rec : documentsGrid.getSelectedRecords()) {
+				calendarEvent.removeDocument(Long.parseLong(rec.getAttribute("id")));
 			}
+			refreshDocumentsGrid(documentsGrid);
 		});
 
 		MenuItem openInFolder = new MenuItem();

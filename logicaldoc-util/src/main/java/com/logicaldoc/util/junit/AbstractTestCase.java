@@ -75,15 +75,16 @@ public abstract class AbstractTestCase {
 	}
 
 	/**
-	 * Concrete implementations should  prepare and return the Spring ApplicationContext to use. 
-	 * By default it is used the ClassPathXmlApplicationContext loading the /context.xml resource.
-	 *  
+	 * Concrete implementations should prepare and return the Spring
+	 * ApplicationContext to use. By default it is used the
+	 * ClassPathXmlApplicationContext loading the /context.xml resource.
+	 * 
 	 * @return the ApplicationContext
 	 */
 	protected ApplicationContext buildApplicationContext() {
-		return new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
+		return new ClassPathXmlApplicationContext("/context.xml");
 	}
-	
+
 	/**
 	 * Concrete implementations should return the array of sql script resources
 	 * to use to setup the database

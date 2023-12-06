@@ -165,7 +165,6 @@ public class PreviewPanel extends VLayout {
 			media = null;
 			mail = null;
 			reload = null;
-//		} else if (!redrawing && (width != getWidth() || height != getHeight())) {
 		} else if (!redrawing && (!isWithinTolerance(width, getWidth(),10) || !isWithinTolerance(height, getHeight(),10))) {
 			width = getWidth();
 			height = getHeight();
