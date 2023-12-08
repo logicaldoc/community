@@ -64,5 +64,7 @@
 		<property name="timeZone" type="string" column="ld_timezone" />
 		
 		<property name="avatar" type="text" column="ld_avatar" />
+		
+		<property name="lastLogin" type="timestamp" column="ld_lastlogin" />
 	</class>
 </hibernate-mapping>

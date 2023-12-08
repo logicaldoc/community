@@ -18,14 +18,13 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -57,8 +56,6 @@ public class UserPropertiesPanel extends HLayout {
 
 	private ChangedHandler changedHandler;
 
-	private Canvas idLabel;
-
 	private VLayout layout = new VLayout();
 
 	private MultiComboBoxItem groupsItem;
@@ -75,10 +72,6 @@ public class UserPropertiesPanel extends HLayout {
 			setMembersMargin(20);
 
 			layout.setWidth(300);
-
-			idLabel = new Label(I18N.message("id") + ": " + Long.toString(user.getId()));
-			idLabel.setHeight(15);
-			layout.addMember(idLabel, 0);
 
 			prepareGUI();
 		}
@@ -110,6 +103,12 @@ public class UserPropertiesPanel extends HLayout {
 		CheckboxItem notifyCredentials = new CheckboxItem("notifyCredentials", I18N.message("notifycredentials"));
 		notifyCredentials.setValue(true);
 		notifyCredentials.setVisible(user.getId() == 0);
+
+		StaticTextItem id = ItemFactory.newStaticTextItem("ID", Long.toString(user.getId()));
+		StaticTextItem lastLogin = ItemFactory.newStaticTextItem("lastlogin", "lastlogin",
+				I18N.formatDate(user.getLastLogin()));
+		StaticTextItem creation = ItemFactory.newStaticTextItem("createdon", "createdon",
+				I18N.formatDate(user.getCreation()));
 
 		TextItem username = prepareUsername(readonly);
 
@@ -143,8 +142,8 @@ public class UserPropertiesPanel extends HLayout {
 			form1.setItems(notifyCredentials, guest, username, email, firstname, name, email2, language, address,
 					postalcode, city, country, state, phone, cell, timeZone);
 		else
-			form1.setItems(username, notifyCredentials, guest, email, firstname, name, email2, language, address,
-					postalcode, city, country, state, phone, cell, timeZone);
+			form1.setItems(id, lastLogin, creation, username, notifyCredentials, guest, email, firstname, name, email2,
+					language, address, postalcode, city, country, state, phone, cell, timeZone);
 		addMember(layout);
 
 		prepareGroupsForm(readonly);
@@ -346,7 +345,7 @@ public class UserPropertiesPanel extends HLayout {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values =  vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			user.setUsername((String) values.get("username"));

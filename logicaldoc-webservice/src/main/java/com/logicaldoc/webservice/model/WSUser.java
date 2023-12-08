@@ -137,6 +137,9 @@ public class WSUser {
 	@WSDoc(required = false)
 	private String lastModified;
 
+	@WSDoc(required = false, description = "last time the user has logged in")
+	private String lastLogin;
+
 	@WSDoc(description = "date format to use when display dates")
 	private String dateFormat;
 
@@ -490,6 +493,7 @@ public class WSUser {
 			wsUser.setPasswordmd4(user.getPasswordmd4());
 			wsUser.setPasswordChanged(DateUtil.format(user.getPasswordChanged()));
 			wsUser.setLastModified(DateUtil.format(user.getLastModified()));
+			wsUser.setLastLogin(DateUtil.format(user.getLastLogin()));
 			wsUser.setEmailSignature(user.getEmailSignature());
 			wsUser.setEmailSignature2(user.getEmailSignature2());
 			wsUser.setDateFormat(user.getDateFormat());
@@ -660,5 +664,13 @@ public class WSUser {
 
 	public void setDecodedPassword(String decodedPassword) {
 		this.decodedPassword = decodedPassword;
+	}
+
+	public String getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(String lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 }

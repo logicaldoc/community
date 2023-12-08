@@ -87,6 +87,10 @@ public class UsersDataServlet extends AbstractDataServlet {
 		writer.print("<source>" + user.getSource() + "</source>");
 		if (user.getExpire() != null)
 			writer.print("<expire>" + df.format(user.getExpire()) + "</expire>");
+		if (user.getLastLogin() != null)
+			writer.print("<lastLogin>" + df.format(user.getLastLogin()) + "</lastLogin>");
+		if (user.getCreation() != null)
+			writer.print("<creation>" + df.format(user.getCreation()) + "</creation>");
 		if (user.getUserGroup() != null)
 			writer.print("<usergroup><![CDATA[" + user.getUserGroup().getId() + "]]></usergroup>");
 

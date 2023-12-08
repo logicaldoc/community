@@ -112,7 +112,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	/**
 	 * Checks if a user is inactive, that is a user without interactions in the
 	 * last X days after it has last enabled. We look at the
-	 * {@link User#getMaxInactivity()} first en then we fallback to the general
+	 * {@link User#getMaxInactivity()} first and then we fallback to the general
 	 * parameter security.user.maxinactivity
 	 * 
 	 * @param username identifier of the user

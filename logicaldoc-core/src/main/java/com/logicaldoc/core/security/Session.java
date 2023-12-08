@@ -196,7 +196,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		this.tenantName = tenantDAO.getTenantName(tenantId);
 
-		UserHistory history = saveUserHistory(user, client);
+		UserHistory history = saveLoginEvent(user, client);
 
 		/*
 		 * Add / update the device in the DB
@@ -257,7 +257,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		logInfo("Session started");
 	}
 
-	private UserHistory saveUserHistory(User user, Client client) {
+	private UserHistory saveLoginEvent(User user, Client client) {
 		/*
 		 * The history comment the remote host and IP
 		 */
@@ -273,7 +273,19 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		return userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid, client);
+		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
+				client);
+
+		// Update the last login into the DB
+		try {
+			user.setLastLogin(history.getDate());
+			userHistoryDAO.jdbcUpdate("update ld_user set ld_lastlogin = :lastLogin where ld_id = :userId",
+					Map.of("lastLogin", user.getLastLogin(), "userId", user.getId()));
+		} catch (PersistenceException e) {
+			log.warn("Last login of user {} not saved", user.getUsername());
+		}
+
+		return history;
 	}
 
 	public String getUsername() {

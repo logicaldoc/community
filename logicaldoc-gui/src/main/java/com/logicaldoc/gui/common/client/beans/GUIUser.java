@@ -161,6 +161,10 @@ public class GUIUser implements Serializable {
 	private String lastLoginFailureReason;
 
 	private int source = 0;
+	
+	private Date creation;
+	
+	private Date lastLogin;
 
 	public GUIUser() {
 		tenant = new GUITenant();
@@ -730,5 +734,21 @@ public class GUIUser implements Serializable {
 
 	public void setSource(int source) {
 		this.source = source;
+	}
+
+	public Date getCreation() {
+		return creation;
+	}
+
+	public void setCreation(Date creation) {
+		this.creation = creation;
+	}
+
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 }

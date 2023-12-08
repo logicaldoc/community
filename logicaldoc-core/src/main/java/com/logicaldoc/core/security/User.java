@@ -38,7 +38,7 @@ public class User extends PersistentObject implements Serializable {
 	public static final int SOURCE_DEFAULT = 0;
 
 	public static final int SOURCE_LDAP = 1;
-	
+
 	public static final int SOURCE_SAML = 2;
 
 	public static final long USERID_ADMIN = 1;
@@ -213,6 +213,11 @@ public class User extends PersistentObject implements Serializable {
 	private Set<WorkingTime> workingTimes = new HashSet<>();
 
 	private String timeZone;
+
+	/**
+	 * Last time the user successfully logged in
+	 */
+	private Date lastLogin = new Date();
 
 	public int getType() {
 		return type;
@@ -462,6 +467,7 @@ public class User extends PersistentObject implements Serializable {
 		avatar = null;
 		expire = null;
 		enforceWorkingTime = 0;
+		lastLogin = null;
 		workingTimes = new HashSet<>();
 	}
 
@@ -843,5 +849,13 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setTimeZone(String timeZone) {
 		this.timeZone = timeZone;
+	}
+
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
 	}
 }

@@ -109,7 +109,7 @@ create table ld_user (ld_id number(19,0) not null, ld_lastmodified timestamp not
                       ld_source int not null, ld_quota number(19,0) not null, ld_welcomescreen int null, ld_ipwhitelist varchar(1000), 
                       ld_ipblacklist varchar(1000), ld_passwordexpired int not null, ld_defworkspace number(19,0),
                       ld_email2 varchar(255), ld_emailsignature2 varchar(1000), ld_avatar clob, ld_expire timestamp,
-                      ld_certexpire timestamp, ld_certdn varchar(1000), ld_enforcewrktime int not null,
+                      ld_certexpire timestamp, ld_certdn varchar(1000), ld_enforcewrktime int not null, ld_lastlogin timestamp,
                       ld_secondfactor varchar(255), ld_key varchar(255), ld_lastenabled timestamp, ld_maxinactivity int,
                       ld_docsgrid varchar(4000), ld_hitsgrid varchar(4000), 
                       ld_dateformat varchar(255), ld_dateformatshort varchar(255), ld_dateformatlong varchar(255), 

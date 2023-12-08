@@ -27,6 +27,7 @@ import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuth
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
@@ -164,6 +165,19 @@ public class UsersPanel extends AdminPanel {
 				DateListGridField.DateCellFormatter.FORMAT_SHORT);
 		expire.setCellFormatter(new UserDateCellFormatter());
 
+		DateListGridField lastLogin = new DateListGridField("lastLogin", "lastlogin",
+				DateListGridField.DateCellFormatter.FORMAT_DEFAULT);
+		lastLogin.setAutoFitWidth(true);
+		lastLogin.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		lastLogin.setCellFormatter(new UserDateCellFormatter(false));
+		
+		DateListGridField creation = new DateListGridField("creation", "createdon",
+				DateListGridField.DateCellFormatter.FORMAT_DEFAULT);
+		creation.setAutoFitWidth(true);
+		creation.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		creation.setCellFormatter(new UserDateCellFormatter(false));
+		creation.setHidden(true);
+
 		ListGridField enabledIcon = new ListGridField(ENABLED_ICON, " ", 24);
 		enabledIcon.setType(ListGridFieldType.IMAGE);
 		enabledIcon.setCanSort(false);
@@ -207,7 +221,7 @@ public class UsersPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
-		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, expire, phone, cell, groups, enabled,
+		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire, phone, cell, groups, enabled,
 				guest, timeZone, source);
 
 		listing.addMember(infoPanel);

@@ -497,6 +497,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setMaxInactivity(user.getMaxInactivity());
 				guiUser.setTimeZone(user.getTimeZone());
 				guiUser.setSource(user.getSource());
+				guiUser.setCreation(user.getCreation());
+				guiUser.setLastLogin(user.getLastLogin());
 
 				GUIGroup[] grps = new GUIGroup[user.getGroups().size()];
 				int i = 0;
