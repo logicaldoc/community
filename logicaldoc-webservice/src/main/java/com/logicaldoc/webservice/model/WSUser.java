@@ -140,6 +140,9 @@ public class WSUser {
 	@WSDoc(required = false, description = "last time the user has logged in")
 	private String lastLogin;
 
+	@WSDoc(required = false, description = "when the user has been created")
+	private String creation;
+
 	@WSDoc(description = "date format to use when display dates")
 	private String dateFormat;
 
@@ -494,6 +497,7 @@ public class WSUser {
 			wsUser.setPasswordChanged(DateUtil.format(user.getPasswordChanged()));
 			wsUser.setLastModified(DateUtil.format(user.getLastModified()));
 			wsUser.setLastLogin(DateUtil.format(user.getLastLogin()));
+			wsUser.setCreation(DateUtil.format(user.getCreation()));
 			wsUser.setEmailSignature(user.getEmailSignature());
 			wsUser.setEmailSignature2(user.getEmailSignature2());
 			wsUser.setDateFormat(user.getDateFormat());
@@ -672,5 +676,13 @@ public class WSUser {
 
 	public void setLastLogin(String lastLogin) {
 		this.lastLogin = lastLogin;
+	}
+
+	public String getCreation() {
+		return creation;
+	}
+
+	public void setCreation(String creation) {
+		this.creation = creation;
 	}
 }
