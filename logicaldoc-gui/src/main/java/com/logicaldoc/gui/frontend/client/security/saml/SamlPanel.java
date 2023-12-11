@@ -124,7 +124,7 @@ public class SamlPanel extends VLayout {
 		authnRequestSigned.setValue(settings.isAuthnRequestSigned() ? "yes" : "no");
 
 		SelectItem signatureAlgorithm = ItemFactory.newSelectItem(SIGNATURE_ALGORITHM);
-		signatureAlgorithm.setValueMap("SHA-1", "SHA-256", "SHA-512");
+		signatureAlgorithm.setValueMap("SHA-1", "SHA-256");
 		signatureAlgorithm.setValue(settings.getSignatureAlgorithm());
 		signatureAlgorithm
 				.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
