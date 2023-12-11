@@ -13,8 +13,10 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -26,6 +28,8 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 8.1
  */
 public class SamlPanel extends VLayout {
+
+	private static final String SIGNATURE_ALGORITHM = "signaturealgorithm";
 
 	private static final String GROUPS = "groups";
 
@@ -45,7 +49,7 @@ public class SamlPanel extends VLayout {
 
 	private static final String SP_ENTITYID = "spentityid";
 
-	private static final String SP_CERTIFICATE = "certificate.crt";
+	private static final String SP_CERTIFICATE = "certificate.cer";
 
 	private static final String SP_PRIVATEKEY = "privatekey.txt";
 
@@ -116,15 +120,19 @@ public class SamlPanel extends VLayout {
 		authnRequestSigned.setWrapTitle(true);
 		authnRequestSigned.setRequired(true);
 		authnRequestSigned.setRedrawOnChange(true);
-		authnRequestSigned.setColSpan(2);
 		authnRequestSigned.setTitleOrientation(TitleOrientation.TOP);
 		authnRequestSigned.setValue(settings.isAuthnRequestSigned() ? "yes" : "no");
+
+		SelectItem signatureAlgorithm = ItemFactory.newSelectItem(SIGNATURE_ALGORITHM);
+		signatureAlgorithm.setValueMap("SHA-1", "SHA-256", "SHA-512");
+		signatureAlgorithm.setValue(settings.getSignatureAlgorithm());
+		signatureAlgorithm
+				.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
 
 		RadioGroupItem assertionsEncrypted = ItemFactory.newBooleanSelector(ASSERTIONS_ENCRYPTED);
 		assertionsEncrypted.setWrapTitle(true);
 		assertionsEncrypted.setRequired(true);
 		assertionsEncrypted.setRedrawOnChange(true);
-		assertionsEncrypted.setColSpan(2);
 		assertionsEncrypted.setTitleOrientation(TitleOrientation.TOP);
 		assertionsEncrypted.setValue(settings.isWantAssertionsEncrypted() ? "yes" : "no");
 
@@ -132,7 +140,6 @@ public class SamlPanel extends VLayout {
 		nameIdEncrypted.setWrapTitle(true);
 		nameIdEncrypted.setRequired(true);
 		nameIdEncrypted.setRedrawOnChange(true);
-		nameIdEncrypted.setColSpan(2);
 		nameIdEncrypted.setTitleOrientation(TitleOrientation.TOP);
 		nameIdEncrypted.setValue(settings.isWantNameIdEncrypted() ? "yes" : "no");
 
@@ -189,9 +196,10 @@ public class SamlPanel extends VLayout {
 		generalForm.setGroupTitle(I18N.message("general"));
 		generalForm.setIsGroup(true);
 		generalForm.setHeight(1);
-		generalForm.setWidth(590);
-		generalForm.setFields(enabled, id, login, authnRequestSigned, assertionsEncrypted, nameIdEncrypted,
-				spCertificate, spPrivateKey, spMetadata, idpMetadata);
+		generalForm.setWidth(1);
+		generalForm.setNumCols(2);
+		generalForm.setFields(enabled, login, id, authnRequestSigned, signatureAlgorithm, assertionsEncrypted,
+				nameIdEncrypted, spMetadata, spCertificate, spPrivateKey, idpMetadata);
 
 		DynamicForm attributeMappingsForm = new DynamicForm();
 		attributeMappingsForm.setValuesManager(vm);
@@ -200,10 +208,10 @@ public class SamlPanel extends VLayout {
 		attributeMappingsForm.setTitleOrientation(TitleOrientation.TOP);
 		attributeMappingsForm.setAlign(Alignment.LEFT);
 		attributeMappingsForm.setHeight(1);
-		attributeMappingsForm.setWidth(590);
+		attributeMappingsForm.setWidth(1);
 		attributeMappingsForm.setFields(username, firstName, lastName, email, groups, keepMembership);
 
-		VLayout forms = new VLayout();
+		HLayout forms = new HLayout();
 		forms.setMembersMargin(10);
 		forms.setMembers(generalForm, attributeMappingsForm);
 
@@ -236,6 +244,7 @@ public class SamlPanel extends VLayout {
 			settings.setEmail(form.getValueAsString(EMAIL));
 			settings.setGroup(form.getValueAsString(GROUPS));
 			settings.setAuthnRequestSigned("yes".equals(form.getValue(AUTHNREQUEST_SIGNED)));
+			settings.setSignatureAlgorithm(form.getValueAsString(SIGNATURE_ALGORITHM));
 			settings.setWantAssertionsEncrypted("yes".equals(form.getValue(ASSERTIONS_ENCRYPTED)));
 			settings.setWantNameIdEncrypted("yes".equals(form.getValue(NAMEID_ENCRYPTED)));
 			settings.setKeepLocalMemberships("yes".equals(form.getValue(KEEPMEMBERSHIP)));

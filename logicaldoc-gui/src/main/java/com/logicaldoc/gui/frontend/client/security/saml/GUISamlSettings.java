@@ -28,6 +28,8 @@ public class GUISamlSettings implements Serializable {
 
 	private boolean wantNameIdEncrypted = false;
 
+	private String signatureAlgorithm = "SHA-1";
+
 	private String username = "username";
 
 	private String firstName = "firstName";
@@ -150,5 +152,13 @@ public class GUISamlSettings implements Serializable {
 
 	public void setKeepLocalMemberships(boolean keepLocalMemberships) {
 		this.keepLocalMemberships = keepLocalMemberships;
+	}
+
+	public String getSignatureAlgorithm() {
+		return signatureAlgorithm;
+	}
+
+	public void setSignatureAlgorithm(String signatureAlgorithm) {
+		this.signatureAlgorithm = signatureAlgorithm;
 	}
 }
