@@ -56,7 +56,7 @@ public class CertificateUploadDialog extends Window {
 		prepareForm();
 
 		uploader = new MultipleUpload(submitButton, "dropyourcerthere");
-		uploader.setFileTypes("*.crt");
+		uploader.setFileTypes("*.cer,*.crt");
 		uploader.setWidth("520");
 		uploader.setMaxUploads(1);
 
