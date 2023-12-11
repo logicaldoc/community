@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,10 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.Version;
+import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
+import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
@@ -49,10 +54,16 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	private FolderDAO fdao;
+	
+	private DocumentDAO ddao;
 
 	protected static Logger log = LoggerFactory.getLogger(LDRepositoryTest.class);
 
 	protected SearchEngine engine;
+
+	protected Session session;
+
+	protected LDRepository testSubject;
 
 	@Before
 	@Override
@@ -68,8 +79,17 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 			throw new IOException(e.getMessage(), e);
 		}
 
-		// Retrieve the instance under test from spring context.
 		fdao = (FolderDAO) context.getBean("FolderDAO");
+		
+		ddao = (DocumentDAO) context.getBean("DocumentDAO");
+
+		session = SessionManager.get().newSession("admin", "admin", null);
+
+		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
+		assertNotNull(folder);
+		log.info(folder.getName());
+
+		testSubject = new LDRepository(folder, session.getSid());
 	}
 
 	private void activateCorePlugin() throws JpfException, IOException, PluginException {
@@ -144,40 +164,31 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testQuery() throws PluginLifecycleException, PersistenceException {
-
-		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
-		assertNotNull(folder);
-		log.info(folder.getName());
-
-		Session session = SessionManager.get().newSession("admin", "admin", null);
-
-		LDRepository ldrep = new LDRepository(folder, session.getSid());
-
 		// Search by filename
 		String query = "SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE cmis:name = 'test.doc'";
 
-		ObjectList ol = ldrep.query(query, 40);
+		ObjectList ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
 		assertEquals(4, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE cmis:name LIKE 'test%'";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		assertEquals(4, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE cmis:name LIKE '%.doc'";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		assertEquals(4, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE cmis:name LIKE '%.doc'";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		assertEquals(4, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE cmis:name LIKE '%flexspaces%'";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
 		assertEquals(1, ol.getObjects().size());
 
@@ -202,52 +213,44 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		// Search full text on: fileName, title, tags and content
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE CONTAINS('FLEXSPACE')";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
 		assertEquals(1, ol.getObjects().size());
 
 		// Search by tag
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE ldoc:tags = 'document'";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
 		assertEquals(1, ol.getObjects().size());
 
 		// Search by language
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE ldoc:language = 'en'";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
 		assertEquals(5, ol.getObjects().size());
 
 		// Search full text on: fileName, title, tags and content with folderId
 		// tree filter
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE CONTAINS('FLEXSPACE') in_tree ('fld.6')";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
 		assertEquals(1, ol.getObjects().size());
 
 		// Search full text on: content with folderId tree filter
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE ldoc:content CONTAINS('document') in_tree ('fld.5')";
-		ol = ldrep.query(query, 40);
+		ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
 		assertEquals(3, ol.getObjects().size());
 	}
 
 	@Test
 	public void testGetObjectInfo() throws PersistenceException {
-
-		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
-		log.info(folder.getName());
-
-		Session session = SessionManager.get().newSession("admin", "admin", null);
-
-		LDRepository ldrep = new LDRepository(folder, session.getSid());
-
-		ObjectInfo oi = ldrep.getObjectInfo("doc.5", null);
+		ObjectInfo oi = testSubject.getObjectInfo("doc.5", null);
 		assertNotNull(oi);
 		assertEquals("doc.5", oi.getId());
 		assertEquals("flexspaces.xlsx", oi.getFileName());
 
-		oi = ldrep.getObjectInfo("fld.4", null);
+		oi = testSubject.getObjectInfo("fld.4", null);
 		assertNotNull(oi);
 		assertEquals("fld.4", oi.getId());
 		assertEquals("Default", oi.getName());
@@ -255,15 +258,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testUpdateProperties() throws PersistenceException {
-
-		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
-		log.info(folder.getName());
-
-		Session session = SessionManager.get().newSession("admin", "admin", null);
-
-		LDRepository ldrep = new LDRepository(folder, session.getSid());
-
-		ObjectInfo oi = ldrep.getObjectInfo("doc.5", null);
+		ObjectInfo oi = testSubject.getObjectInfo("doc.5", null);
 		assertNotNull(oi);
 		assertEquals("doc.5", oi.getId());
 		assertEquals("flexspaces.xlsx", oi.getFileName());
@@ -281,9 +276,9 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		p.setQueryName(pid);
 		pimp.addProperty(p);
 
-		ldrep.updateProperties(null, objectId, pimp, null);
+		testSubject.updateProperties(null, objectId, pimp, null);
 
-		oi = ldrep.getObjectInfo("doc.5", null);
+		oi = testSubject.getObjectInfo("doc.5", null);
 		assertNotNull(oi);
 		assertEquals("doc.5", oi.getId());
 		assertEquals("snow angels.txt", oi.getFileName());
@@ -323,4 +318,52 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		System.out.println(id);
 	}
+
+	@Test
+	public void testCancelCheckOut() throws PersistenceException {
+		
+		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
+
+		Document document = new Document();
+		document.setFileName("newDocument");
+		document.setFolder(folder);
+		document.setStatus(2);
+		ddao.store(document);
+
+		testSubject.cancelCheckOut("doc." + document.getId());
+
+		document = ddao.findById(document.getId());
+		assertEquals(0, document.getStatus());
+	}
+
+	@Test
+	public void testGetAllVersions() throws PersistenceException {
+		VersionDAO vd = (VersionDAO) context.getBean("VersionDAO");
+		List<Version> versions = vd.findByDocId(1L);
+		assertEquals(2, versions.size());
+
+		List<ObjectData> list = testSubject.getAllVersions("doc.1");
+		assertEquals(2, list.size());
+	}
+
+	@Test
+	public void testGetContentChanges() throws PersistenceException {
+
+		DocumentHistoryDAO dao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
+		Collection histories = dao.findByDocId(1);
+		System.out.println(histories + " XXXXXXXXXXXXXXXXXXXXXXXXX");
+		Holder<String> holder = new Holder<String>("1000000000000");
+
+		testSubject.getContentChanges(holder, 10);
+
+	}
+
+	@Test
+	public void testAddUser() throws PersistenceException {
+		testSubject.addUser("Jim", false);
+		testSubject.addUser("Dwight", true);
+		testSubject.addUser(null, false);
+
+	}
+
 }

@@ -2882,7 +2882,7 @@ public class LDRepository {
 
 		List<ObjectData> odsDocs = getDocumentLastChanges(minDate, max);
 		List<ObjectData> odsFolders = getFolderLastChanges(minDate, max);
-
+		
 		// put together the 2 lists
 		List<ObjectData> complex = new ArrayList<>();
 		complex.addAll(odsDocs);
