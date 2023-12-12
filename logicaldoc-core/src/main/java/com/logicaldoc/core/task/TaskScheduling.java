@@ -74,11 +74,14 @@ public class TaskScheduling {
 	}
 
 	public Date getNextFireTime() {
-		Object trigger = Context.get().getBean(taskName + "Trigger");
+		Date nextFire = null;
 
-		if (!(trigger instanceof Trigger))
-			return null;
-		else return ((Trigger)trigger).getNextFireTime();
+		Object trigger = Context.get().getBean(taskName + "Trigger");
+		if (trigger instanceof Trigger)
+			nextFire = previousFireTime != null ? ((Trigger) trigger).getFireTimeAfter(previousFireTime)
+					: ((Trigger) trigger).getNextFireTime();
+
+		return nextFire;
 	}
 
 	public boolean isEnabled() {

@@ -3,6 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,10 +104,15 @@ public class JobsDataServlet extends AbstractDataServlet {
 			if (job.getDescription() != null)
 				writer.print("<description><![CDATA[" + job.getDescription() + "]]></description>");
 
-			if (trigger.getPreviousFireTime() != null)
-				writer.print("<previousFire>" + df.format(trigger.getPreviousFireTime()) + "</previousFire>");
-			if (trigger.getNextFireTime() != null)
-				writer.print("<nextFire>" + df.format(trigger.getNextFireTime()) + "</nextFire>");
+			final Date previousFireTime = trigger.getPreviousFireTime();
+			Date nextFireTime = trigger.getNextFireTime();
+			if (previousFireTime != null) {
+				writer.print("<previousFire>" + df.format(previousFireTime) + "</previousFire>");
+				nextFireTime=trigger.getFireTimeAfter(previousFireTime);
+			}
+			
+			if (nextFireTime != null )
+				writer.print("<nextFire>" + df.format(nextFireTime) + "</nextFire>");
 			writer.print("</job>");
 		}
 	}

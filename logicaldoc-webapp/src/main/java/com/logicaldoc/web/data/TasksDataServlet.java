@@ -3,6 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,11 +71,14 @@ public class TasksDataServlet extends AbstractDataServlet {
 		else
 			writer.print("<runningIcon>running_task</runningIcon>");
 
-		if (task.getScheduling().getPreviousFireTime() != null) {
-			writer.print("<lastStart>" + df.format(task.getScheduling().getPreviousFireTime()) + "</lastStart>");
+		final Date previousFireTime = task.getScheduling().getPreviousFireTime();
+		if (previousFireTime != null) {
+			final Date previousFireTime2 = task.getScheduling().getPreviousFireTime();
+			writer.print("<lastStart>" + df.format(previousFireTime2) + "</lastStart>");
 		}
 
-		if (task.getScheduling().getNextFireTime() != null) {
+		final Date nextFireTime = task.getScheduling().getNextFireTime();
+		if (nextFireTime != null) {
 			writer.print("<nextStart>" + df.format(task.getScheduling().getNextFireTime()) + "</nextStart>");
 		}
 		writer.print("<indeterminate>" + "" + task.isIndeterminate() + "</indeterminate>");
