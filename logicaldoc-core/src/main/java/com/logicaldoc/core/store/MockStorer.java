@@ -16,8 +16,8 @@ import com.logicaldoc.util.Context;
  * @since 8.4.2
  */
 public class MockStorer extends FSStorer {
-	
-	private static final String POM_XML = "pom.xml";
+
+	private File dummyFile = new File("pom.xml");
 
 	private boolean errorOnStore = false;
 
@@ -36,7 +36,7 @@ public class MockStorer extends FSStorer {
 		if (errorOnStore)
 			throw new IOException("error");
 		if (useDummyFile)
-			super.store(new File(POM_XML), docId, resource);
+			super.store(dummyFile, docId, resource);
 		else
 			super.store(file, docId, resource);
 	}
@@ -46,7 +46,7 @@ public class MockStorer extends FSStorer {
 		if (errorOnStore)
 			throw new IOException("error");
 		if (useDummyFile)
-			super.store(new FileInputStream(POM_XML), docId, resource);
+			super.store(new FileInputStream(dummyFile), docId, resource);
 		else
 			super.store(stream, docId, resource);
 	}
@@ -54,7 +54,7 @@ public class MockStorer extends FSStorer {
 	@Override
 	public InputStream getStream(long docId, String resource) throws IOException {
 		if (useDummyFile)
-			return new FileInputStream(POM_XML);
+			return new FileInputStream(dummyFile);
 		else
 			return super.getStream(docId, resource);
 	}
@@ -67,29 +67,36 @@ public class MockStorer extends FSStorer {
 		this.useDummyFile = useDummyFile;
 	}
 
-
 	@Override
 	public int moveResourcesToStore(long docId, int targetStorageId) throws IOException {
-		
+
 		String targetRoot = Context.get().getProperties().getProperty("store." + targetStorageId + ".dir");
-		
-		int moved=0;
+
+		int moved = 0;
 
 		// List the resources
 		List<String> resources = listResources(docId, null);
 		for (String resource : resources) {
 			File newFile = new File(targetRoot + "/" + computeRelativePath(docId) + "/" + resource);
-						
+
 			newFile.getParentFile().mkdirs();
 
 			// Extract the original file into a temporary location
 			writeToFile(docId, resource, newFile);
 			moved++;
-			
+
 			// Delete the original resource
 			delete(docId, resource);
 		}
-		
+
 		return moved;
+	}
+
+	public File getDummyFile() {
+		return dummyFile;
+	}
+
+	public void setDummyFile(File dummyFile) {
+		this.dummyFile = dummyFile;
 	}
 }

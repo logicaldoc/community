@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
@@ -411,6 +412,14 @@ public class DocumentManagerImpl implements DocumentManager {
 	private void storeFile(Document doc, File file) throws IOException {
 		String resource = storer.getResourceName(doc, null, null);
 		storer.store(file, doc.getId(), resource);
+
+		if (RunLevel.current().aspectEnabled("writeCheck")) {
+			long storedSize = storer.size(doc.getId(), resource);
+			if (storedSize != file.length())
+				throw new IOException(String.format(
+						"Wrong file size, the original file was %d bytes while the stored one is %d bytes",
+						file.length(), storedSize));
+		}
 	}
 
 	/**
@@ -1039,12 +1048,13 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	private void copyNotes(Document sourceDocument, Document createdDocument) {
-		List<DocumentNote> docNotes = documentNoteDAO.findByDocId(sourceDocument.getId(), sourceDocument.getFileVersion());
+		List<DocumentNote> docNotes = documentNoteDAO.findByDocId(sourceDocument.getId(),
+				sourceDocument.getFileVersion());
 		for (DocumentNote docNote : docNotes) {
 			DocumentNote newNote = new DocumentNote(docNote);
 			newNote.setDocId(createdDocument.getId());
 			newNote.setFileVersion(null);
-					
+
 			try {
 				documentNoteDAO.store(newNote);
 			} catch (PersistenceException e) {
@@ -1055,7 +1065,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	private void copyLinks(Document sourceDocument, Document createdDocument) {
 		List<DocumentLink> docLinks = documentLinkDAO.findByDocId(sourceDocument.getId());
-		
+
 		for (DocumentLink docLink : docLinks) {
 			DocumentLink newLink = new DocumentLink();
 			newLink.setTenantId(docLink.getTenantId());
@@ -1067,7 +1077,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				newLink.setDocument2(createdDocument);
 				newLink.setDocument1(docLink.getDocument1());
 			}
-			
+
 			try {
 				documentLinkDAO.store(newLink);
 			} catch (PersistenceException e) {

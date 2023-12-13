@@ -4,12 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -206,10 +208,10 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		List<DocumentLink> originalLinks = documentLinkDao.findByDocId(doc.getId());
 		Assert.assertFalse(originalLinks.isEmpty());
-		
+
 		List<DocumentNote> originalNotes = documentNoteDao.findByDocId(doc.getId(), null);
 		Assert.assertFalse(originalNotes.isEmpty());
-		
+
 		try {
 			storer.setUseDummyFile(true);
 			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, false, false);
@@ -220,21 +222,22 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		} finally {
 			storer.setUseDummyFile(false);
 		}
-		
+
 		try {
 			storer.setUseDummyFile(true);
 			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, true, true);
 			Assert.assertNotSame(doc.getId(), newDoc.getId());
 			Assert.assertEquals(newFolder, newDoc.getFolder());
-			
+
 			List<DocumentLink> links = documentLinkDao.findByDocId(newDoc.getId());
 			Assert.assertEquals(originalLinks.size(), links.size());
 			for (DocumentLink link : links) {
 				assertNotNull(link.getDocument1());
 				assertNotNull(link.getDocument2());
-				assertTrue(newDoc.getId() == link.getDocument1().getId() || newDoc.getId() == link.getDocument2().getId()); 
+				assertTrue(
+						newDoc.getId() == link.getDocument1().getId() || newDoc.getId() == link.getDocument2().getId());
 			}
-			
+
 			List<DocumentNote> notes = documentNoteDao.findByDocId(newDoc.getId(), null);
 			Assert.assertEquals(originalNotes.size(), notes.size());
 			for (DocumentNote note : notes) {
@@ -815,7 +818,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testPromoteVersion() throws PersistenceException, IOException {
+	public void testPromoteVersion() throws PersistenceException, IOException, InterruptedException {
 		Document doc = docDao.findById(3L);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals("1.3", doc.getVersion());
@@ -825,12 +828,38 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		history.setUsername("admin");
 		history.setSession(SessionManager.get().newSession("admin", "admin", null));
 
+		// Use a dummy file with wrong size
 		try {
 			storer.setUseDummyFile(true);
 			documentManager.promoteVersion(3L, "1.3", history);
+			fail("File size check did not reise an error?");
+		}catch(Exception e) {
+			// All ok, expected
+			documentManager.unlock(3L, history);
 		} finally {
 			storer.setUseDummyFile(false);
 		}
+
+		doc = docDao.findById(3L);
+		Assert.assertNotNull(doc);
+		Assert.assertEquals("1.3", doc.getVersion());
+		
+		// Use a dummy file with correct size
+		File dummyFile = new File("target/dummy.pdf");
+		try (RandomAccessFile raf = new RandomAccessFile(dummyFile, "rw");) {
+			raf.setLength(3116);
+		}
+				
+		try {
+			storer.setDummyFile(dummyFile);
+			storer.setUseDummyFile(true);
+		
+			documentManager.promoteVersion(3L, "1.3", history);
+		} finally {
+			storer.setUseDummyFile(false);
+			FileUtil.strongDelete(dummyFile);
+		}
+		
 		doc = docDao.findById(3L);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals("1.4", doc.getVersion());
