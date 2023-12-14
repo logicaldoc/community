@@ -382,9 +382,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			try {
 				int scoreValue = rec.getAttributeAsInt("score");
 				int red = 100 - scoreValue > 0 ? 100 - scoreValue : 0;
-				return "<img src='" + Util.imageUrl("dotblue.gif") + "' style='width: " + score
-						+ "px; height: 8px' title='" + score + "%'/>" + "<img src='" + Util.imageUrl("dotgrey.gif")
-						+ "' style='width: " + red + "px; height: 8px' title='" + score + "%'/>";
+				return "<img src='" + Util.imageUrl("dotblue.gif") + "' style='width: " + scoreValue
+						+ "px; height: 8px' title='" + scoreValue + "%'/>" + "<img src='" + Util.imageUrl("dotgrey.gif")
+						+ "' style='width: " + red + "px; height: 8px' title='" + scoreValue + "%'/>";
 			} catch (Exception e) {
 				return "";
 			}
