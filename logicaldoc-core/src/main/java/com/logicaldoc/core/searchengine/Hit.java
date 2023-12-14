@@ -44,23 +44,23 @@ public class Hit extends Document implements Comparable<Hit> {
 
 	@Override
 	public int compareTo(Hit other) {
-		try {
-			if (other == null)
-				return -1;
-
-			if (this.equals(other))
-				return 0;
-
-			if (other.score == this.score) {
-				if (this.getFileName() != null)
-					return this.getFileName().compareToIgnoreCase(other.getFileName());
-				else
-					return 0;
-			} else
-				return -1 * (Integer.valueOf(this.score).compareTo(Integer.valueOf(other.score)));
-		} catch (Exception t) {
+		if (this.equals(other))
 			return 0;
-		}
+
+		if (other.score == this.score) {
+			if (this.getFileName().equalsIgnoreCase(other.getFileName()))
+				return Long.compare(getId(), other.getId());
+			else
+				return this.getFileName().compareToIgnoreCase(other.getFileName());
+		} else
+			return Integer.compare(other.score, this.score);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Hit))
+			return false;
+		Hit other = (Hit) obj;
+		return other.getId() == this.getId();
+	}
 }
