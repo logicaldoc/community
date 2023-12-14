@@ -262,7 +262,8 @@ public class DocumentGridUtil {
 			rec.setAttribute("startPublishing", doc.getStartPublishing());
 			rec.setAttribute("stopPublishing", doc.getStopPublishing());
 			rec.setAttribute("publishedStatus", doc.getPublished() == 1 ? "yes" : "no");
-			rec.setAttribute("score", doc.getScore());
+			if (rec.getAttribute("score") == null)
+				rec.setAttribute("score", doc.getScore());
 			rec.setAttribute(SUMMARY, doc.getSummary());
 			rec.setAttribute("rating", doc.getRating());
 			rec.setAttribute("template", doc.getTemplate());
