@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system;
 
 import com.google.gwt.core.client.GWT;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.ContentsType;
@@ -49,7 +50,8 @@ public class LogPanel extends VLayout {
 		download.addClickHandler(event -> Util.download(Util.contextPath() + "log?appender=all"));
 
 		toolStrip.addButton(refresh);
-		toolStrip.addButton(download);
+		if (!Session.get().isDemo())
+			toolStrip.addButton(download);
 		toolStrip.addFill();
 		addMember(toolStrip);
 		addMember(htmlPane);

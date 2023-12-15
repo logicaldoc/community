@@ -21,6 +21,7 @@ public enum DocumentEvent {
 	UNLOCKED("event.unlocked"),
 	ARCHIVED("event.archived"),
 	DELETED("event.deleted"),
+	RESOURCE_DELETED("event.resource.deleted"),
 	SENT("event.sent"),
 	BARCODED("event.barcoded"),
 	ZONALOCRD("event.zonalocrd"),

@@ -28,7 +28,7 @@ public class GUISamlSettings implements Serializable {
 
 	private boolean wantNameIdEncrypted = false;
 
-	private String signatureAlgorithm = "SHA-1";
+	private String signatureAlgorithm = "SHA-256";
 
 	private String username = "username";
 

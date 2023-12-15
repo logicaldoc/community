@@ -2,7 +2,7 @@
 <Configuration packages="com.logicaldoc.util.log4j">
   <Properties>
     <Property name="root"><![CDATA[logs]]></Property>
-    <Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%c:%4L) -- %m%n</Property>
+    <Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%C:%4L) -- %m%n</Property>
     <Property name="dateformat">ISO8601</Property>
     <Property name="fontsize">x-small</Property>
   </Properties>
@@ -501,7 +501,16 @@
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
-    </RollingFile>    
+    </RollingFile>
+    <RollingFile name="STORAGE_DELETIONS" fileName="${root}/storage_deletions.log" filePattern="${root}/storage_deletions.log.%i">
+      <PatternLayout>
+        <Pattern>%d{dd.MM.yyyy HH:mm:ss,SSS} - %m%n</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="100 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>      
   </Appenders>
   <Loggers>
     <Logger name="com.logicaldoc.docusign.DocuSignPoller" level="info" additivity="false">
@@ -521,6 +530,9 @@
     </Logger>
     <Logger name="org.hibernate.cache" level="warn" additivity="true">
       <AppenderRef ref="DB" />
+    </Logger>    
+    <Logger name="STORAGE_DELETIONS" level="info" additivity="false">
+      <AppenderRef ref="STORAGE_DELETIONS" />
     </Logger>    
     <Logger name="com.logicaldoc.core" level="info" additivity="true" />
     <Logger name="com.logicaldoc.web" level="info" additivity="true" />

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +18,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -36,6 +41,8 @@ public abstract class AbstractStorer implements Storer {
 	protected static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractStorer.class);
+
+	protected static Logger deletionsLog = LoggerFactory.getLogger("STORAGE_DELETIONS");
 
 	protected ContextProperties config;
 
@@ -278,5 +285,35 @@ public abstract class AbstractStorer implements Storer {
 	@Override
 	public void destroy() {
 		// Noting to do
+	}
+
+	protected void logDeletion(long docId, String path) {
+		deletionsLog.info("str: {}, doc: {}, res: {}\n{}", getId(), docId, path,
+				Arrays.toString(Thread.currentThread().getStackTrace()).replace(',', '\n'));
+
+		DocumentHistoryDAO documentHistoryDAO = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistory history = new DocumentHistory();
+		history.setEvent(DocumentEvent.RESOURCE_DELETED.toString());
+		history.setDocId(docId);
+		history.setComment(path);
+		history.setFilename(StringUtils.right(path, 255));
+		history.setReason("deleted from store " + getId());
+		try {
+			SqlRowSet rows = documentHistoryDAO.queryForRowSet(
+					"select ld_tenantid, ld_filename, ld_version, ld_fileversion, ld_color, ld_folderid from ld_document where ld_id="
+							+ docId,
+					null);
+			if (rows.next()) {
+				history.setTenantId(rows.getLong(1));
+				history.setFilename(rows.getString(2));
+				history.setVersion(rows.getString(3));
+				history.setFileVersion(rows.getString(4));
+				history.setColor(rows.getString(5));
+				history.setFolderId(rows.getLong(6));
+			}
+			documentHistoryDAO.store(history);
+		} catch (PersistenceException e) {
+			log.warn("Cannot record in the database the deleteion of resource {} for document {}", path, docId, e);
+		}
 	}
 }

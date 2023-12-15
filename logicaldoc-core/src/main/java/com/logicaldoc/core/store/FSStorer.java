@@ -37,20 +37,18 @@ public class FSStorer extends AbstractStorer {
 	@Override
 	public void delete(long docId) {
 		File docDir = getContainer(docId);
-		int maxTrials = 20;
-		while (docDir.exists() && maxTrials > 0) {
+		while (docDir.exists()) {
 			FileUtil.strongDelete(docDir);
-			maxTrials--;
+			logDeletion(docId, docDir.getAbsolutePath());
 		}
 	}
 
 	@Override
 	public void delete(long docId, String resource) {
 		File file = new File(getContainer(docId), resource);
-		int maxTrials = 20;
-		while (file.exists() && maxTrials > 0) {
+		while (file.exists()) {
 			FileUtil.strongDelete(file);
-			maxTrials--;
+			logDeletion(docId, file.getAbsolutePath());
 		}
 	}
 
