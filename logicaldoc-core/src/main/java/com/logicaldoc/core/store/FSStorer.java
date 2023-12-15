@@ -70,17 +70,16 @@ public class FSStorer extends AbstractStorer {
 
 	@Override
 	public void store(File file, long docId, String resource) throws IOException {
-		// Do not store 0 byte files
-		if (file.length() == 0L)
-			throw new IOException("Do not store 0 byte file");
-
-		if (!isEnabled())
-			throw new IOException("Storer not enabled");
+		checkEnabled();
+		
+		checkNotEmpty(file);
 
 		File dir = getContainer(docId);
 		FileUtils.forceMkdir(dir);
 		File dest = new File(new StringBuilder(dir.getPath()).append("/").append(resource).toString());
 		FileUtil.copyFile(file, dest);
+
+		checkWriteAfterStore(docId, resource, file.length());
 	}
 
 	@Override

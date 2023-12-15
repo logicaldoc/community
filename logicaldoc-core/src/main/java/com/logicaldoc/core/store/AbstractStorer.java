@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -100,14 +101,55 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public void store(File file, long docId, String resource) throws IOException {
-		if (!isEnabled()) {
-			log.warn("Storer not enabled");
-			throw new IOException("Storer not enabled");
+		checkEnabled();
+
+		try (InputStream is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE)) {
+			store(is, docId, resource);
 		}
 
-		InputStream is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+		checkWriteAfterStore(docId, resource, docId);
+	}
 
-		store(is, docId, resource);
+	/**
+	 * Checks if the given file is empty
+	 * 
+	 * @param file The file to check
+	 * @throws IOException raised only if the file is 0 byte
+	 */
+	protected void checkNotEmpty(File file) throws IOException {
+		if (file.length() == 0L)
+			throw new IOException("Do not store 0 byte file");
+	}
+
+	/**
+	 * Checks if the stored resource matches the expected size
+	 * 
+	 * @param docId Identifier of the document
+	 * @param resource Name of the resource
+	 * @param expectedSize The expected size in bytes
+	 * 
+	 * @throws IOException raised just in case the size of the resource does not
+	 *         match the expected one+
+	 * 
+	 */
+	protected void checkWriteAfterStore(long docId, String resource, long expectedSize) throws IOException {
+		if (RunLevel.current().aspectEnabled("writeCheck")) {
+			long storedSize = size(docId, resource);
+			if (storedSize != expectedSize)
+				throw new IOException(String.format(
+						"Wrong file size, the original file was %d bytes while the stored one is %d bytes (docId: %d,  resource: %s",
+						expectedSize, storedSize, docId, resource));
+		}
+	}
+
+	/**
+	 * Checks if the current store is enabled
+	 * 
+	 * @throws IOException raised just in case of disabled storer
+	 */
+	protected void checkEnabled() throws IOException {
+		if (!isEnabled())
+			throw new IOException("Storer not enabled");
 	}
 
 	/**

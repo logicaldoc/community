@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
@@ -412,14 +411,6 @@ public class DocumentManagerImpl implements DocumentManager {
 	private void storeFile(Document doc, File file) throws IOException {
 		String resource = storer.getResourceName(doc, null, null);
 		storer.store(file, doc.getId(), resource);
-
-		if (RunLevel.current().aspectEnabled("writeCheck")) {
-			long storedSize = storer.size(doc.getId(), resource);
-			if (storedSize != file.length())
-				throw new IOException(String.format(
-						"Wrong file size, the original file was %d bytes while the stored one is %d bytes",
-						file.length(), storedSize));
-		}
 	}
 
 	/**
