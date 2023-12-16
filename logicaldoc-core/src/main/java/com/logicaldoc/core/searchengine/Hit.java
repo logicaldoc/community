@@ -1,5 +1,7 @@
 package com.logicaldoc.core.searchengine;
 
+import java.util.Objects;
+
 import com.logicaldoc.core.document.Document;
 
 /**
@@ -51,7 +53,7 @@ public class Hit extends Document implements Comparable<Hit> {
 			if (this.getFileName().equalsIgnoreCase(other.getFileName()))
 				return Long.compare(getId(), other.getId());
 			else
-				return this.getFileName().compareToIgnoreCase(other.getFileName());
+				return Objects.toString(this.getFileName(), "").compareToIgnoreCase(other.getFileName());
 		} else
 			return Integer.compare(other.score, this.score);
 	}
