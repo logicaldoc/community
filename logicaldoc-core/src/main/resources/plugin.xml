@@ -449,7 +449,10 @@
   <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspInitialization">
     <parameter id="code" value="initialization" />
   </extension>
-  
+  <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspWriteCheck">
+    <parameter id="code" value="writeChecks" />
+  </extension>  
+
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">
 		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd,webp,heic"/>
 		<parameter id="out" value="pdf"/>
