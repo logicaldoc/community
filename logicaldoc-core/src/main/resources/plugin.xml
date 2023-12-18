@@ -450,7 +450,7 @@
     <parameter id="code" value="initialization" />
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspWriteCheck">
-    <parameter id="code" value="writeChecks" />
+    <parameter id="code" value="writeCheck" />
   </extension>  
 
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">

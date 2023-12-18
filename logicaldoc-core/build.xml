@@ -21,15 +21,16 @@
 						<exclude name="plugin.xml" />
 					</patternset>
 				</unzip>
-				<move file="${logicaldoc.webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar" tofile="${logicaldoc.webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar.skip" />
-				<unzip src="${logicaldoc.webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar.skip" dest="${logicaldoc.webroot}/WEB-INF/lib/tmp" />
+				<move file="@{webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar" tofile="@{webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar.skip" />
+				<unzip src="@{webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar.skip" dest="@{webroot}/WEB-INF/lib/tmp" />
 				<delete>
-				  <fileset dir="${logicaldoc.webroot}/WEB-INF/lib/tmp">
+				  <fileset dir="@{webroot}/WEB-INF/lib/tmp">
 				  	<include name="com/logicaldoc/core/security/dao/HibernateTenant*" />
 				  	<include name="com/logicaldoc/core/security/authentication/AuthenticationChain*" />
 				  </fileset>
 				</delete>
-				<unzip basedir="${logicaldoc.webroot}/WEB-INF/lib/tmp" destfile="${logicaldoc.webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar" />
+				<zip basedir="@{webroot}/WEB-INF/lib/tmp" destfile="@{webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar" />
+				<delete dir="@{webroot}/WEB-INF/lib/tmp"/>
 			</sequential>
 		</for>
 
