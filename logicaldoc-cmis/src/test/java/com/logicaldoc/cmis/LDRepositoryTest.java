@@ -377,41 +377,50 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		testSubject.addUser(null, false);
 
 	}
-	
+
 	@Test
-	public void testGetContentStream() throws PersistenceException {
+	public void testGetContentStream() throws PersistenceException, IOException {
+		String storePath = Context.get().getProperties().getProperty("store.1.dir");
+		File store = new File(storePath);
+		File folder1 = new File(store, "1");
+		File docFolder = new File(folder1, "doc");
+        File file1_0 = new File(docFolder, "1.0");
+        File fileVer = new File(docFolder, "fileVer01");
+		folder1.mkdir();
+		docFolder.mkdirs();
+		file1_0.createNewFile();
+		fileVer.createNewFile();
+
 		ContentStream contentStreamDocument = testSubject.getContentStream(null, "doc.2", null, null);
 		ContentStream contentStreamFolder = testSubject.getContentStream(null, "ver.1", null, null);
 		assertNotNull(contentStreamDocument);
 		assertNotNull(contentStreamFolder);
-		System.out.println("XXXXXXXXXXXXXXXXXXXX" + contentStreamDocument);
 	}
-	
+
 	@Test
 	public void testGetObject() {
 		ObjectData od1 = testSubject.getObject(null, "fld.4", null, null, true, true, null);
 		ObjectData od2 = testSubject.getObject(null, null, "fld.4", null, true, true, null);
-				
-        Map<String, PropertyData<?>> properties1 = od1.getProperties().getProperties();
-        for(Map.Entry<String, PropertyData<?>> entry : properties1.entrySet()) {
-        	String key = entry.getKey();
-            PropertyData<?> propertyData = entry.getValue();
-            if(key.equals("cmis:objectId")) {
-            	propertyData.getValues().contains("fld.4");
-            }
-        }
-        
-        Map<String, PropertyData<?>> properties2 = od2.getProperties().getProperties();
-        for(Map.Entry<String, PropertyData<?>> entry : properties2.entrySet()) {
-        	String key = entry.getKey();
-            PropertyData<?> propertyData = entry.getValue();
-            if(key.equals("cmis:objectId")) {
-            	propertyData.getValues().contains("fld.4");
-            }
-        }
+
+		Map<String, PropertyData<?>> properties1 = od1.getProperties().getProperties();
+		for (Map.Entry<String, PropertyData<?>> entry : properties1.entrySet()) {
+			String key = entry.getKey();
+			PropertyData<?> propertyData = entry.getValue();
+			if (key.equals("cmis:objectId")) {
+				propertyData.getValues().contains("fld.4");
+			}
+		}
+
+		Map<String, PropertyData<?>> properties2 = od2.getProperties().getProperties();
+		for (Map.Entry<String, PropertyData<?>> entry : properties2.entrySet()) {
+			String key = entry.getKey();
+			PropertyData<?> propertyData = entry.getValue();
+			if (key.equals("cmis:objectId")) {
+				propertyData.getValues().contains("fld.4");
+			}
+		}
 
 	}
-	
 
 	@Test
 	public void testCheckOut() throws PersistenceException {
@@ -438,11 +447,10 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		status = ddao.findById(6L).getStatus();
 		assertEquals(1, status);
 
-		
 		ObjectInfoImpl cmisObject = (ObjectInfoImpl) testSubject.getObjectInfo("doc.6", null);
 		assertNotNull(cmisObject);
 		assertNotNull(cmisObject.getObject());
-		PropertiesImpl props =(PropertiesImpl) cmisObject.getObject().getProperties();
+		PropertiesImpl props = (PropertiesImpl) cmisObject.getObject().getProperties();
 		props.removeProperty(PropertyIds.OBJECT_ID);
 		props.removeProperty(PropertyIds.LAST_MODIFICATION_DATE);
 		props.removeProperty(PropertyIds.CHANGE_TOKEN);
@@ -466,17 +474,17 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		props.removeProperty(TypeManager.PROP_RATING);
 		props.removeProperty(TypeManager.PROP_FILEVERSION);
 		props.removeProperty(TypeManager.PROP_VERSION);
-						
+
 		String content = "aegif Mind Share Leader Generating New Paradigms by aegif corporation.";
 		byte[] buf = content.getBytes("UTF-8");
 		ByteArrayInputStream input = new ByteArrayInputStream(buf);
 		ContentStream contentStream = new ContentStreamImpl("pippo.txt", new BigInteger("" + buf.length),
 				"text/plain; fileNameCharset=UTF-8", input);
-		
+
 		stringHolder = new Holder<String>("doc.6");
-		
+
 		testSubject.checkIn(stringHolder, true, contentStream, props, content);
-		
+
 		status = ddao.findById(6L).getStatus();
 		assertEquals(0, status);
 	}

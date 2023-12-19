@@ -9,6 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 
@@ -37,6 +38,9 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		 */
 		String storePath = Context.get().getProperties().getProperty("store.1.dir");
 		File store = new File(storePath);
+		
+		FileUtil.strongDelete(store);
+		
 		store.mkdir();
 		new File(store, "5/doc").mkdirs();
 		
