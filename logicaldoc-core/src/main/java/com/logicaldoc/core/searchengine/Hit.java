@@ -50,10 +50,11 @@ public class Hit extends Document implements Comparable<Hit> {
 			return 0;
 
 		if (other.score == this.score) {
-			if (Objects.toString(this.getFileName(), "").equalsIgnoreCase(other.getFileName()))
+			if (Objects.toString(this.getFileName(), "").equalsIgnoreCase(Objects.toString(other.getFileName(), "")))
 				return Long.compare(getId(), other.getId());
 			else
-				return Objects.toString(this.getFileName(), "").compareToIgnoreCase(other.getFileName());
+				return Objects.toString(this.getFileName(), "")
+						.compareToIgnoreCase(Objects.toString(other.getFileName(), ""));
 		} else
 			return Integer.compare(other.score, this.score);
 	}
