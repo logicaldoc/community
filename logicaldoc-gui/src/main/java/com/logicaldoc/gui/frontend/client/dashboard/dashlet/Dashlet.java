@@ -68,6 +68,8 @@ public abstract class Dashlet extends Portlet {
 			dashlet = new DocumentDashlet(guiDashlet);
 		else if (GUIDashlet.TYPE_NOTE.equals(guiDashlet.getType()))
 			dashlet = new NotesDashlet(guiDashlet);
+		else if (GUIDashlet.TYPE_BOOKMARK.equals(guiDashlet.getType()))
+			dashlet = new BookmarkDashlet(guiDashlet);		
 		else if (GUIDashlet.TYPE_CONTENT.equals(guiDashlet.getType())) {
 			if (guiDashlet.getName().equals("tagcloud"))
 				dashlet = new TagCloudDashlet(guiDashlet);

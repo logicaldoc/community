@@ -77,8 +77,7 @@ public class DashletsPanel extends VLayout {
 
 				refreshGrid();
 
-				DashletEditor editor = new DashletEditor(dashlet, DashletsPanel.this);
-				editor.show();
+				new DashletEditor(dashlet, DashletsPanel.this).show();
 			});
 		});
 
@@ -95,7 +94,7 @@ public class DashletsPanel extends VLayout {
 		toolStrip.setWidth100();
 
 		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setWidth(80);
+		id.setAutoFitWidth(true);
 		id.setRequired(true);
 		id.setCanEdit(false);
 		id.setHidden(true);

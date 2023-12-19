@@ -15,6 +15,8 @@ public class Dashlet extends PersistentObject {
 	public static final String TYPE_DOCEVENT = "docevent";
 
 	public static final String TYPE_DOCUMENT = "document";
+	
+	public static final String TYPE_BOOKMARK = "bookmark";
 
 	public static final String TYPE_NOTE = "note";
 

@@ -765,6 +765,8 @@ values(8,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,1,'lastaccessed','lastaccessedd
 ''event.exportpdf'',''event.password.protected'',''event.password.unprotected'',''event.form.submitted'',''event.form.edited'',''event.copyed'') 
 and date >= ''$DateTool.formatSQL($DateTool.addDays($CURRENT_DATE, -10))'' 
 order by date desc',null,'docevent', 10, 1);
+insert into ld_dashlet	(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_recordversion, ld_tenantid, ld_name, ld_title, ld_query, ld_content, ld_type, ld_max, ld_unique)
+values(9,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,1,'bookmark','bookmarks','',null,'bookmark', 10, 0);
 
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_document', 100);
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_bookmark', 100);
