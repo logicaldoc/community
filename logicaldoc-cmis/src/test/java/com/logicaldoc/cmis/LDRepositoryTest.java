@@ -2,29 +2,38 @@ package com.logicaldoc.cmis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.FailedToDeleteData;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.ObjectList;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionContainer;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionList;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl;
+import org.apache.chemistry.opencmis.commons.impl.server.ObjectInfoImpl;
+import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
 import org.java.plugin.JpfException;
@@ -37,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
@@ -47,14 +57,17 @@ import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.mchange.v2.codegen.bean.PropsToStringGeneratorExtension;
 
 public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	private FolderDAO fdao;
-	
+
 	private DocumentDAO ddao;
 
 	protected static Logger log = LoggerFactory.getLogger(LDRepositoryTest.class);
@@ -80,7 +93,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		}
 
 		fdao = (FolderDAO) context.getBean("FolderDAO");
-		
+
 		ddao = (DocumentDAO) context.getBean("DocumentDAO");
 
 		session = SessionManager.get().newSession("admin", "admin", null);
@@ -169,22 +182,22 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		ObjectList ol = testSubject.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());
-		assertEquals(4, ol.getObjects().size());
+		assertEquals(5, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE cmis:name LIKE 'test%'";
 		ol = testSubject.query(query, 40);
-		assertEquals(4, ol.getObjects().size());
+		assertEquals(5, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE cmis:name LIKE '%.doc'";
 		ol = testSubject.query(query, 40);
-		assertEquals(4, ol.getObjects().size());
+		assertEquals(5, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE cmis:name LIKE '%.doc'";
 		ol = testSubject.query(query, 40);
-		assertEquals(4, ol.getObjects().size());
+		assertEquals(5, ol.getObjects().size());
 
 		// Search by filename
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE cmis:name LIKE '%flexspaces%'";
@@ -321,7 +334,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testCancelCheckOut() throws PersistenceException {
-		
+
 		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
 
 		Document document = new Document();
@@ -348,11 +361,10 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testGetContentChanges() throws PersistenceException {
-
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
-		Collection histories = dao.findByDocId(1);
+		List<DocumentHistory> histories = dao.findByDocId(1);
 		System.out.println(histories + " XXXXXXXXXXXXXXXXXXXXXXXXX");
-		Holder<String> holder = new Holder<String>("1000000000000");
+		Holder<String> holder = new Holder<String>("1262300400000");
 
 		testSubject.getContentChanges(holder, 10);
 
@@ -363,6 +375,307 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		testSubject.addUser("Jim", false);
 		testSubject.addUser("Dwight", true);
 		testSubject.addUser(null, false);
+
+	}
+	
+	@Test
+	public void testGetContentStream() throws PersistenceException {
+		ContentStream contentStreamDocument = testSubject.getContentStream(null, "doc.2", null, null);
+		ContentStream contentStreamFolder = testSubject.getContentStream(null, "ver.1", null, null);
+		assertNotNull(contentStreamDocument);
+		assertNotNull(contentStreamFolder);
+		System.out.println("XXXXXXXXXXXXXXXXXXXX" + contentStreamDocument);
+	}
+	
+	@Test
+	public void testGetObject() {
+		ObjectData od1 = testSubject.getObject(null, "fld.4", null, null, true, true, null);
+		ObjectData od2 = testSubject.getObject(null, null, "fld.4", null, true, true, null);
+				
+        Map<String, PropertyData<?>> properties1 = od1.getProperties().getProperties();
+        for(Map.Entry<String, PropertyData<?>> entry : properties1.entrySet()) {
+        	String key = entry.getKey();
+            PropertyData<?> propertyData = entry.getValue();
+            if(key.equals("cmis:objectId")) {
+            	propertyData.getValues().contains("fld.4");
+            }
+        }
+        
+        Map<String, PropertyData<?>> properties2 = od2.getProperties().getProperties();
+        for(Map.Entry<String, PropertyData<?>> entry : properties2.entrySet()) {
+        	String key = entry.getKey();
+            PropertyData<?> propertyData = entry.getValue();
+            if(key.equals("cmis:objectId")) {
+            	propertyData.getValues().contains("fld.4");
+            }
+        }
+
+	}
+	
+
+	@Test
+	public void testCheckOut() throws PersistenceException {
+		int status = ddao.findById(1L).getStatus();
+		assertEquals(0, status);
+
+		Holder<String> stringHolder = new Holder<String>("doc.1");
+		Holder<Boolean> booleanHolder = new Holder<Boolean>(true);
+		testSubject.checkOut(stringHolder, booleanHolder);
+
+		status = ddao.findById(1L).getStatus();
+		assertEquals(1, status);
+	}
+
+	@Test
+	public void testCheckIn() throws PersistenceException, UnsupportedEncodingException {
+		int status = ddao.findById(6L).getStatus();
+		assertEquals(0, status);
+
+		Holder<String> stringHolder = new Holder<String>("doc.6");
+		Holder<Boolean> booleanHolder = new Holder<Boolean>(true);
+		testSubject.checkOut(stringHolder, booleanHolder);
+
+		status = ddao.findById(6L).getStatus();
+		assertEquals(1, status);
+
+		
+		ObjectInfoImpl cmisObject = (ObjectInfoImpl) testSubject.getObjectInfo("doc.6", null);
+		assertNotNull(cmisObject);
+		assertNotNull(cmisObject.getObject());
+		PropertiesImpl props =(PropertiesImpl) cmisObject.getObject().getProperties();
+		props.removeProperty(PropertyIds.OBJECT_ID);
+		props.removeProperty(PropertyIds.LAST_MODIFICATION_DATE);
+		props.removeProperty(PropertyIds.CHANGE_TOKEN);
+		props.removeProperty(PropertyIds.CREATED_BY);
+		props.removeProperty(PropertyIds.LAST_MODIFIED_BY);
+		props.removeProperty(PropertyIds.CREATION_DATE);
+		props.removeProperty(PropertyIds.BASE_TYPE_ID);
+		props.removeProperty(PropertyIds.IS_LATEST_VERSION);
+		props.removeProperty(PropertyIds.IS_MAJOR_VERSION);
+		props.removeProperty(PropertyIds.VERSION_LABEL);
+		props.removeProperty(PropertyIds.VERSION_SERIES_ID);
+		props.removeProperty(PropertyIds.IS_VERSION_SERIES_CHECKED_OUT);
+		props.removeProperty(PropertyIds.VERSION_SERIES_CHECKED_OUT_BY);
+		props.removeProperty(PropertyIds.VERSION_SERIES_CHECKED_OUT_ID);
+		props.removeProperty(PropertyIds.CHECKIN_COMMENT);
+		props.removeProperty(PropertyIds.CONTENT_STREAM_LENGTH);
+		props.removeProperty(PropertyIds.CONTENT_STREAM_MIME_TYPE);
+		props.removeProperty(PropertyIds.CONTENT_STREAM_FILE_NAME);
+		props.removeProperty(PropertyIds.CONTENT_STREAM_ID);
+		props.removeProperty(PropertyIds.IS_IMMUTABLE);
+		props.removeProperty(TypeManager.PROP_RATING);
+		props.removeProperty(TypeManager.PROP_FILEVERSION);
+		props.removeProperty(TypeManager.PROP_VERSION);
+						
+		String content = "aegif Mind Share Leader Generating New Paradigms by aegif corporation.";
+		byte[] buf = content.getBytes("UTF-8");
+		ByteArrayInputStream input = new ByteArrayInputStream(buf);
+		ContentStream contentStream = new ContentStreamImpl("pippo.txt", new BigInteger("" + buf.length),
+				"text/plain; fileNameCharset=UTF-8", input);
+		
+		stringHolder = new Holder<String>("doc.6");
+		
+		testSubject.checkIn(stringHolder, true, contentStream, props, content);
+		
+		status = ddao.findById(6L).getStatus();
+		assertEquals(0, status);
+	}
+
+	@Test
+	public void testCreateFolder() throws PersistenceException {
+		PropertiesImpl props = new PropertiesImpl();
+
+		PropertyIdImpl p = new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+		p.setQueryName(PropertyIds.OBJECT_TYPE_ID);
+		props.addProperty(p);
+
+		p = new PropertyIdImpl(PropertyIds.NAME, "pippo.txt");
+		p.setQueryName(PropertyIds.NAME);
+		props.addProperty(p);
+
+		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
+		Session session = SessionManager.get().newSession("admin", "admin", null);
+
+		List<Folder> list = fdao.findAll();
+		assertEquals(7, list.size());
+
+		LDRepository ldrep = new LDRepository(folder, session.getSid());
+		String id = ldrep.createFolder(null, props, "fld.4");
+		Assert.assertNotNull(id);
+
+		list = fdao.findAll();
+		assertEquals(8, list.size());
+		assertTrue(list.get(4).getName().equals("pippo.txt"));
+	}
+
+	@Test
+	public void testMoveObject() throws PersistenceException {
+		Holder<String> stringHolder = new Holder<String>("doc.1");
+
+		Document document = ddao.findById(1L);
+		assertEquals(5, document.getFolder().getId());
+
+		Folder folder = fdao.findById(5);
+		fdao.initialize(folder);
+		testSubject.moveObject(null, stringHolder, "fld.4", null);
+
+		document = ddao.findById(1L);
+		assertEquals(4, document.getFolder().getId());
+
+		// now try to move a folder
+		Folder folder6 = fdao.findById(6L);
+		fdao.initialize(folder6);
+		assertEquals(5, folder6.getParentId());
+
+		stringHolder = new Holder<String>("fld.6");
+		testSubject.moveObject(null, stringHolder, "fld.4", null);
+
+		folder6 = fdao.findById(6L);
+		fdao.initialize(folder6);
+		assertEquals(4, folder6.getParentId());
+
+	}
+
+	@Test
+	public void testAppendContent() throws PersistenceException, IOException {
+		// Upload a first chunk
+		File content = new File("target/content1.txt");
+		FileUtil.writeFile("content1", content.getPath());
+		try (FileInputStream fis = new FileInputStream(content)) {
+			ContentStream contentStream = new ContentStreamImpl("file.txt", new BigInteger("" + content.length()),
+					"text/plain; fileNameCharset=UTF-8", fis);
+			testSubject.appendContent(null, "doc.5", contentStream, false);
+		} finally {
+			FileUtil.strongDelete(content);
+		}
+
+		// Upload a second chunk
+		content = new File("target/content2.txt");
+		FileUtil.writeFile("content2", content.getPath());
+		try (FileInputStream fis = new FileInputStream(content)) {
+			ContentStream contentStream = new ContentStreamImpl("file.txt", new BigInteger("" + content.length()),
+					"text/plain; fileNameCharset=UTF-8", fis);
+			testSubject.appendContent(null, "doc.5", contentStream, true);
+		} finally {
+			FileUtil.strongDelete(content);
+		}
+
+		Storer storer = (Storer) context.getBean("Storer");
+		String mergedContent = new String(storer.getBytes(5L, "1.0"));
+		assertTrue(mergedContent.contains("content1"));
+		assertTrue(mergedContent.contains("content2"));
+
+	}
+
+	@Test
+	public void testDeleteObject() throws PersistenceException {
+		Folder folder = fdao.findById(6L);
+		assertNotNull(folder);
+
+		testSubject.deleteObject(null, "fld.6");
+
+		folder = fdao.findById(6L);
+		assertNull(folder);
+
+		Document document = ddao.findById(1L);
+		assertNotNull(document);
+
+		testSubject.deleteObject(null, "doc.1");
+
+		document = ddao.findById(1L);
+		assertNull(document);
+	}
+
+	@Test
+	public void testDeleteObjectOrCancelCheckOut() throws PersistenceException {
+		int status = ddao.findById(1L).getStatus();
+		assertEquals(0, status);
+
+		Holder<String> stringHolder = new Holder<String>("doc.1");
+		Holder<Boolean> booleanHolder = new Holder<Boolean>(true);
+		testSubject.checkOut(stringHolder, booleanHolder);
+
+		status = ddao.findById(1L).getStatus();
+		assertEquals(1, status);
+
+		Document doc = ddao.findById(1L);
+		testSubject.deleteObjectOrCancelCheckOut(null, "doc.1");
+
+		status = ddao.findById(1L).getStatus();
+		assertEquals(0, status);
+
+		doc = ddao.findById(1L);
+		assertEquals(0, doc.getDeleted());
+
+		testSubject.deleteObjectOrCancelCheckOut(null, "doc.1");
+		doc = ddao.findById(1L);
+		assertNull(doc);
+
+		Folder folder = fdao.findById(6L);
+		assertEquals(0, folder.getDeleted());
+
+		testSubject.deleteObjectOrCancelCheckOut(null, "fld.6");
+		folder = fdao.findById(6L);
+		assertNull(folder);
+	}
+
+	@Test
+	public void testCreate() throws FileNotFoundException, IOException {
+		// test document
+		PropertiesImpl props = new PropertiesImpl();
+
+		PropertyIdImpl p = new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+		p.setQueryName(PropertyIds.OBJECT_TYPE_ID);
+		props.addProperty(p);
+
+		p = new PropertyIdImpl(PropertyIds.NAME, "pippo.txt");
+		p.setQueryName(PropertyIds.NAME);
+		props.addProperty(p);
+
+		String content = "aegif Mind Share Leader Generating New Paradigms by aegif corporation.";
+		byte[] buf = null;
+		try {
+			buf = content.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		ByteArrayInputStream input = new ByteArrayInputStream(buf);
+		ContentStream contentStream = new ContentStreamImpl("pippo.txt", new BigInteger("" + buf.length),
+				"text/plain; fileNameCharset=UTF-8", input);
+
+		ObjectData oj = testSubject.create(null, props, "fld.4", contentStream, null);
+		assertNotNull(oj);
+
+		// test folder
+		PropertiesImpl properties = new PropertiesImpl();
+
+		PropertyIdImpl folder = new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
+		folder.setQueryName(PropertyIds.OBJECT_TYPE_ID);
+		properties.addProperty(folder);
+
+		folder = new PropertyIdImpl(PropertyIds.NAME, "folder6");
+		folder.setQueryName(PropertyIds.NAME);
+		properties.addProperty(folder);
+
+		oj = testSubject.create(null, properties, "fld.4", contentStream, null);
+		assertNotNull(oj);
+	}
+
+	@Test
+	public void testDeleteTree() throws PersistenceException {
+		Folder folder = fdao.findById(6L);
+		assertNotNull(folder);
+		FailedToDeleteData ftdd = testSubject.deleteTree(null, "fld.6", false);
+		assertNotNull(ftdd);
+		folder = fdao.findById(6L);
+		assertNull(folder);
+
+		Document document = ddao.findById(1L);
+		assertNotNull(document);
+		ftdd = testSubject.deleteTree(null, "doc.1", false);
+		assertNotNull(ftdd);
+		document = ddao.findById(1L);
+		assertNull(document);
 
 	}
 

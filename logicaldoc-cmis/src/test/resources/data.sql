@@ -222,7 +222,7 @@ values     (-1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,5,1,'2006-12-20 0
 
 insert into ld_history 
 				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new,ld_tenantid,ld_recordversion)
-values     (-4,'2020-10-22 00:00:00','2020-10-22 00:00:00',0,1,5,1,'2018-12-20 00:00:00','author','data test 04','reason test 01','1.0',0,1,1,1);
+values     (-4,'2020-10-22 00:00:00','2020-10-22 00:00:00',0,1,5,1,'2023-01-01 00:00:00','author','data test 04','reason test 01','1.0',0,1,1,1);
 
 insert into ld_history 
 			    (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new,ld_tenantid,ld_recordversion)
@@ -326,3 +326,62 @@ values(500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'test','user','en', '$product
 insert into ld_session
 (ld_id, ld_lastmodified, ld_recordversion, ld_deleted, ld_tenantid, ld_tenantname, ld_sid, ld_username, ld_key, ld_node, ld_creation, ld_status, ld_clientid, ld_clientaddr, ld_clienthost)
 values (1, '2017-05-24 00:00:00', 1,0,1,'default','sid1','admin','key1','saert536yy','2017-05-24 00:00:00',0,'client1','addr1','host1');
+
+
+INSERT INTO ld_attributeset (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_name,ld_description,ld_readonly,ld_type,ld_label,ld_creation) 
+VALUES (105,CURRENT_TIMESTAMP,7,0,1,'library','',0,0,'',CURRENT_TIMESTAMP);
+
+INSERT INTO ld_attributeset_ext (ld_attsetid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (105,0,5,0,0,null,null,null,null,null,'','','boolean1','boolean1',105,0,0,0,null,null);
+INSERT INTO ld_attributeset_ext (ld_attsetid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson) 
+VALUES (105,0,3,0,0,null,null,null,null,null,'','','date1','date1',105,0,0,0,null,null);
+INSERT INTO ld_attributeset_ext (ld_attsetid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (105,0,2,0,0,null,null,null,null,null,null,null,'decimal1','decimal1',105,0,0,0,null,null);
+INSERT INTO ld_attributeset_ext (ld_attsetid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (105,0,6,0,0,null,null,null,null,null,'','','folder1','folder1',105,0,0,0,null,null);
+INSERT INTO ld_attributeset_ext (ld_attsetid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (105,0,1,0,0,null,null,null,null,null,'','','integer1','integer1',105,0,0,0,null,null);
+INSERT INTO ld_attributeset_ext (ld_attsetid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (105,0,0,0,0,null,null,null,null,null,'','','string1','string1',105,0,0,0,null,null);
+INSERT INTO ld_attributeset_ext (ld_attsetid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (105,0,4,0,0,'',null,null,null,null,'','','user1','user1',105,0,0,0,null,null);
+
+
+
+INSERT INTO ld_template (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_name,ld_description,ld_readonly,ld_type,ld_validation,ld_label,ld_creation)
+VALUES (103,CURRENT_TIMESTAMP,2,0,1,'test','',0,0,'','',CURRENT_TIMESTAMP);
+
+INSERT INTO ld_template_ext (ld_templateid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson) 
+VALUES (103,0,5,0,1,null,null,null,null,null,'','','boolean1','boolean1',105,0,0,0,null,null);
+INSERT INTO ld_template_ext (ld_templateid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson) 
+VALUES (103,0,3,0,0,null,null,null,null,null,'','','date1','date1',105,0,0,0,null,null);
+INSERT INTO ld_template_ext (ld_templateid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (103,0,2,0,2,null,null,null,null,null,null,null,'decimal1','decimal1',105,0,0,0,null,null);
+INSERT INTO ld_template_ext (ld_templateid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (103,0,6,0,3,null,null,null,null,null,'','','folder1','folder1',105,0,0,0,null,null);
+INSERT INTO ld_template_ext (ld_templateid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (103,0,1,0,5,null,null,null,null,null,'','','integer1','integer1',105,0,0,0,null,null);
+INSERT INTO ld_template_ext (ld_templateid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (103,0,0,0,6,null,null,null,null,null,'','','string1','string1',105,0,0,0,null,null);
+INSERT INTO ld_template_ext (ld_templateid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_validation,ld_initialization,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (103,0,4,0,4,null,null,null,null,null,'','','user1','user1',105,0,0,0,null,null);
+
+insert into ld_document
+           (ld_id,ld_templateid,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages)
+values     (6,103,5,'2008-10-22 00:00:00',0,0,'custmid5','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'PDF',3,'en','test.doc',1356,1,0,'',1,0,0,1,1,1,5,0,0,0,0,1);
+
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson) 
+VALUES (6,0,5,0,1,'aaa',null,1,1.0,null,'boolean1','boolean1',105,0,0,0,null,null);
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson) 
+VALUES (6,0,3,0,0,'bbb',null,2,2.0,null,'date1','date1',105,0,0,0,null,null);
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (6,0,2,0,2,'ccc',null,3,3.0,null,'decimal1','decimal1',105,0,0,0,null,null);
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (6,0,6,0,3,'ddd',null,4,4.0,null,'folder1','folder1',105,0,0,0,null,null);
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (6,0,1,0,5,'eee',null,5,5.0,null,'integer1','integer1',105,0,0,0,null,null);
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (6,0,0,0,6,'fff',null,6,6.0,null,'string1','string1',105,0,0,0,null,null);
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (6,0,4,0,4,'ggg',null,7,7.0,null,'user1','user1',105,0,0,0,null,null);
+

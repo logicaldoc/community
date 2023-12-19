@@ -555,29 +555,35 @@ public class LDRepository {
 		String resourceName = storer.getResourceName(doc.getId(), doc.getFileVersion(), null);
 		if (FileUtils.isEmptyDirectory(chunksFolder)) {
 			// Copy the current file's content
-			File firstChunk = new File("chunk-" + nd.format(1));
+			File firstChunk = new File(chunksFolder, "chunk-" + nd.format(1));
 			storer.writeToFile(doc.getId(), resourceName, firstChunk);
 		}
 
 		int totalChunks = chunksFolder.list().length;
-		File currentChunk = new File("chunk-" + nd.format(totalChunks + 1L));
-		storer.writeToFile(doc.getId(), resourceName, currentChunk);
+		File currentChunk = new File(chunksFolder, "chunk-" + nd.format(totalChunks + 1L));
+		FileUtil.writeFile(contentStream.getStream(), currentChunk.getPath());
 
 		if (isLastChunk) {
-			File mergeFile = getMergedContent(chunksFolder);
-			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+			try {
+				File mergeFile = getMergedContent(chunksFolder);
+				DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setUser(getSessionUser());
-			transaction.setSessionId(sid);
-			manager.replaceFile(doc.getId(), doc.getFileVersion(), mergeFile, transaction);
-
-			FileUtil.strongDelete(chunksFolder);
+				DocumentHistory transaction = new DocumentHistory();
+				transaction.setUser(getSessionUser());
+				transaction.setSessionId(sid);
+				manager.replaceFile(doc.getId(), doc.getFileVersion(), mergeFile, transaction);
+			} finally {
+				FileUtil.strongDelete(chunksFolder);
+			}
 		}
 	}
 
 	private File getChunksFolder(String documentId) throws IOException {
-		return FileUtil.createTempDirectory("cmis" + sid + documentId);
+		File tempDir = FileUtil.createTempDirectory("cmis" + sid + documentId);
+		tempDir.delete();
+		tempDir = new File(tempDir.getParent(), "cmis" + sid + documentId);
+		tempDir.mkdir();
+		return tempDir;
 	}
 
 	private File getMergedContent(File chunksDir) throws IOException {
@@ -2057,9 +2063,10 @@ public class LDRepository {
 	 * @param properties The properties to use
 	 * @param create True if we are updating metadata for creating a new element
 	 * 
-	 * @throws PersistenceException Error in the data layer 
+	 * @throws PersistenceException Error in the data layer
 	 */
-	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, boolean create) throws PersistenceException {
+	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, boolean create)
+			throws PersistenceException {
 		log.debug("updateDocumentMetadata doc: {}", doc);
 		log.debug("updateDocumentMetadata properties: {}", properties);
 
@@ -2068,7 +2075,9 @@ public class LDRepository {
 
 		// update properties
 		for (PropertyData<?> p : properties.getProperties().values()) {
-			updateDocumentMetadata(doc, properties, p, create, type);
+			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
+			if (propType!=null && propType.getUpdatability() != Updatability.ONCREATE)
+				updateDocumentMetadata(doc, properties, p, create, type);
 		}
 	}
 
@@ -2145,7 +2154,8 @@ public class LDRepository {
 		}
 	}
 
-	private void updateDocumentExtendedAttribute(AbstractDocument doc, Properties properties, PropertyData<?> p) throws PersistenceException {
+	private void updateDocumentExtendedAttribute(AbstractDocument doc, Properties properties, PropertyData<?> p)
+			throws PersistenceException {
 		// try to load the document template first
 		Template template = null;
 		PropertyData<?> tp = properties.getProperties().get(TypeManager.PROP_TEMPLATE);
@@ -2882,7 +2892,7 @@ public class LDRepository {
 
 		List<ObjectData> odsDocs = getDocumentLastChanges(minDate, max);
 		List<ObjectData> odsFolders = getFolderLastChanges(minDate, max);
-		
+
 		// put together the 2 lists
 		List<ObjectData> complex = new ArrayList<>();
 		complex.addAll(odsDocs);
@@ -3002,6 +3012,7 @@ public class LDRepository {
 			Map<String, Object> params = new HashMap<>();
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
+
 			entries = folderHistoryDao.findByWhere(query.toString(), params,
 					"order by " + PersistentObjectDAO.ENTITY + ".date", max);
 		} catch (PersistenceException e) {

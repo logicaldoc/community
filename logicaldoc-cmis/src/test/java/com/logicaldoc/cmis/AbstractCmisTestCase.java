@@ -1,8 +1,15 @@
 package com.logicaldoc.cmis;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 
 /**
@@ -19,6 +26,24 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 
 	static {
 		System.setProperty("LOGICALDOC_REPOSITORY", "target");
+	}
+
+	@Override
+	public void setUp() throws IOException, SQLException {
+		super.setUp();
+
+		/*
+		 * Prepare a test store file
+		 */
+		String storePath = Context.get().getProperties().getProperty("store.1.dir");
+		File store = new File(storePath);
+		store.mkdir();
+		new File(store, "5/doc").mkdirs();
+		
+		Storer storer = (Storer) context.getBean("Storer");
+		storer.init();
+		
+		ResourceUtil.copyResource("/data.sql", new File(store, "5/doc/1.0"));
 	}
 
 	@Override
