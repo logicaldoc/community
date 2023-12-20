@@ -116,7 +116,6 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 			
 		dao.store(bmark);
 		long bkmID = bmark.getId();
-		System.out.println(bkmID);
 		
 		dao.delete(bkmID);
 		bmark = dao.findByUserIdAndDocId(1, bkmID);
