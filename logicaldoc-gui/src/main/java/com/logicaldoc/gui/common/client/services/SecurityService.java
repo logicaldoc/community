@@ -24,7 +24,8 @@ public interface SecurityService extends RemoteService {
 	 * Logs-in a user by an existing session ID (session reuse)
 	 * 
 	 * @param locale the currently used language specification
-	 * @param sid the session ID (optional), if not provided it is taken by cookies
+	 * @param sid the session ID (optional), if not provided it is taken by
+	 *        cookies
 	 * 
 	 * @return session informations
 	 */
@@ -71,6 +72,23 @@ public interface SecurityService extends RemoteService {
 	 */
 	public String generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
 			int maxSequenceSize, int maxOccurrences);
+
+	/**
+	 * Validates a password
+	 * 
+	 * @param password the password to validate
+	 * @param length dimension of the password
+	 * @param uppercaseChars minimum number of upper case chars
+	 * @param lowercaseChars minimum number of lower case chars
+	 * @param digits minimum number of digits
+	 * @param specialChars minimum number of special chars
+	 * @param maxSequenceSize maximum size of a sequence
+	 * @param maxOccurrences maximum number of occurrences of the same char
+	 * 
+	 * @return the reasons for the failure or empty
+	 */
+	public String[] validatePassword(String password, int length, int uppercaseChars, int lowercaseChars, int digits,
+			int specialChars, int maxSequenceSize, int maxOccurrences);
 
 	/**
 	 * Changes the status of a user
@@ -418,8 +436,9 @@ public interface SecurityService extends RemoteService {
 	public static class Instance {
 		private static SecurityServiceAsync inst;
 
-		private Instance() {}
-		
+		private Instance() {
+		}
+
 		public static SecurityServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(SecurityService.class);

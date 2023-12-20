@@ -40,7 +40,7 @@ public interface SecurityServiceAsync {
 	void kill(String sid, AsyncCallback<Void> callback);
 
 	void saveProfile(GUIUser user, AsyncCallback<GUIUser> callback);
-	
+
 	void saveAvatar(long userId, AsyncCallback<Void> callback);
 
 	void applyRights(GUIMenu menu, AsyncCallback<Void> callback);
@@ -88,4 +88,7 @@ public interface SecurityServiceAsync {
 
 	void generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
 			int maxSequenceSize, int maxOccurrences, AsyncCallback<String> callback);
+
+	void validatePassword(String password, int length, int uppercaseChars, int lowercaseChars, int digits,
+			int specialChars, int maxSequenceSize, int maxOccurrences, AsyncCallback<String[]> callback);
 }

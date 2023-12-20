@@ -102,7 +102,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 			try {
 				Document doc = documentDao.findById(id);
-				if (doc == null || doc.getBarcoded() != 0 || doc.getBarcodeTemplateId() == null)
+				if (doc == null)
 					continue;
 				documentDao.initialize(doc);
 
@@ -171,7 +171,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 	 * @param user the user to process the document in the name of
 	 * 
 	 * @throws IOException I/O error
-	 * @throws PersistenceException Error in the persistrence layer
+	 * @throws PersistenceException Error in the persistence layer
 	 */
 	protected abstract void processDocument(Document document, User user) throws PersistenceException, IOException;
 

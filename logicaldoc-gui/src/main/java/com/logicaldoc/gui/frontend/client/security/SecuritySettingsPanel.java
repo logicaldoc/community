@@ -149,10 +149,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdOccurrence.setMin(1);
 		pwdOccurrence.setStep(1);
 
-		final ButtonItem generatePassword = prepareGeneratePasswordButton(passwordForm);
+		ButtonItem generatePassword = prepareGeneratePasswordButton(passwordForm);
+
+		ButtonItem tryPassword = prepareTryPasswordButton(passwordForm);
+		tryPassword.setColSpan(4);
 
 		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence,
-				pwdExp, pwdEnforce, generatePassword);
+				pwdExp, pwdEnforce, generatePassword, tryPassword);
 
 		DynamicForm securityForm = new DynamicForm();
 		securityForm.setValuesManager(vm);
@@ -320,11 +323,11 @@ public class SecuritySettingsPanel extends AdminPanel {
 	}
 
 	private ButtonItem prepareGeneratePasswordButton(DynamicForm passwordForm) {
-		final ButtonItem generatePassword = new ButtonItem(I18N.message("generate"));
+		ButtonItem generatePassword = new ButtonItem(I18N.message("generate"));
 		generatePassword.setStartRow(false);
 		generatePassword.setColSpan(2);
 		generatePassword.setAlign(Alignment.RIGHT);
-		generatePassword.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
+		generatePassword.addClickHandler(event -> {
 			if (passwordForm.validate()) {
 				@SuppressWarnings("unchecked")
 				final Map<String, Object> values = vm.getValues();
@@ -336,6 +339,25 @@ public class SecuritySettingsPanel extends AdminPanel {
 			}
 		});
 		return generatePassword;
+	}
+
+	private ButtonItem prepareTryPasswordButton(DynamicForm passwordForm) {
+		ButtonItem tryPassword = new ButtonItem(I18N.message("tryapassword"));
+		tryPassword.setStartRow(false);
+		tryPassword.setColSpan(2);
+		tryPassword.setAlign(Alignment.RIGHT);
+		tryPassword.addClickHandler(event -> {
+			if (passwordForm.validate()) {
+				@SuppressWarnings("unchecked")
+				final Map<String, Object> values = vm.getValues();
+				PasswordTrial trial = new PasswordTrial((Integer) values.get(PWD_SIZE),
+						(Integer) values.get(PWD_UPPER_CASE), (Integer) values.get(PWD_LOWER_CASE),
+						(Integer) values.get(PWD_DIGIT), (Integer) values.get(PWD_SPECIAL),
+						(Integer) values.get(PWD_SEQUENCE), (Integer) values.get(PWD_OCCURRENCE));
+				trial.show();
+			}
+		});
+		return tryPassword;
 	}
 
 	private Tab prepareGeolocationTab(GUISecuritySettings settings) {

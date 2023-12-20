@@ -61,7 +61,7 @@ public abstract class AbstractParser implements Parser {
 		parameters.setTenant(getTenant(parameters.getLocale(), parameters.getTenant()));
 
 		long timeout = getTimeout(parameters.getTenant());
-
+		
 		if (timeout <= 0) {
 			parseInCurrentThread(input, parameters, content);
 		} else {
@@ -76,7 +76,7 @@ public abstract class AbstractParser implements Parser {
 	private int getTimeout(String tenant) {
 		try {
 			Context context = Context.get();
-			return context != null ? Context.get().getProperties().getInt(tenant + ".parser.timeout", 120) : 120;
+			return context != null ? context.getProperties().getInt(tenant + ".parser.timeout", 120) : 120;
 		} catch (Exception e) {
 			return 120;
 		}

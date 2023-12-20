@@ -86,7 +86,9 @@ import com.logicaldoc.util.config.SecurityConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.config.WebContextConfigurator;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordGenerator;
+import com.logicaldoc.util.security.PasswordValidator;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.UploadServlet;
 
@@ -1676,5 +1678,17 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			int maxSequenceSize, int maxOccurrences) {
 		return PasswordGenerator.generate(length, uppercaseChars, lowercaseChars, digits, specialChars, maxSequenceSize,
 				maxOccurrences);
+	}
+
+	@Override
+	public String[] validatePassword(String password, int minLength, int uppercaseChars, int lowercaseChars, int digits,
+			int specialChars, int maxSequenceSize, int maxOccurrences) {
+		PasswordCriteria criteria = new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
+				specialChars);
+		criteria.setMaxSequenceSize(maxSequenceSize);
+		criteria.setMaxOccurrences(maxOccurrences);
+
+		PasswordValidator validator = new PasswordValidator(criteria, null);
+		return validator.validate(password).toArray(new String[0]);
 	}
 }
