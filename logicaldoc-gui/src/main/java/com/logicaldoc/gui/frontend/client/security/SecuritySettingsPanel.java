@@ -152,7 +152,6 @@ public class SecuritySettingsPanel extends AdminPanel {
 		ButtonItem generatePassword = prepareGeneratePasswordButton(passwordForm);
 
 		ButtonItem tryPassword = prepareTryPasswordButton(passwordForm);
-		tryPassword.setColSpan(4);
 
 		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence,
 				pwdExp, pwdEnforce, generatePassword, tryPassword);
@@ -344,7 +343,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private ButtonItem prepareTryPasswordButton(DynamicForm passwordForm) {
 		ButtonItem tryPassword = new ButtonItem(I18N.message("tryapassword"));
 		tryPassword.setStartRow(false);
-		tryPassword.setColSpan(2);
+		tryPassword.setColSpan(4);
 		tryPassword.setAlign(Alignment.RIGHT);
 		tryPassword.addClickHandler(event -> {
 			if (passwordForm.validate()) {

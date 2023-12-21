@@ -134,7 +134,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 				// trim to 4000 chars
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 
-				// remove non printable chars, but maintanis the carriage
+				// remove non printable chars, but maintains the carriage
 				// returns and the tabs
 				history.setComment(history.getComment().trim().replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
 			}

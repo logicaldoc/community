@@ -8,8 +8,8 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 
 /**
  * An utility to allow an administrator to check if a password would pass the
@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 public class PasswordTrial extends PasswordGenerator {
 
 	private StaticTextItem result = new StaticTextItem("");
-	
+
 	public PasswordTrial(Integer pwdSize, Integer pwdUpperCase, Integer pwdLowerCase, Integer pwdDigit,
 			Integer pwdSpecial, Integer pwdSequence, Integer pwdOccurrence) {
 		super(pwdSize, pwdUpperCase, pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence);
@@ -44,13 +44,16 @@ public class PasswordTrial extends PasswordGenerator {
 		submit.setTitle(I18N.message("validate"));
 		result.setShowTitle(false);
 		result.setColSpan(2);
-		
+
 		form.setItems(password, result, submit);
 	}
 
 	@Override
 	protected void onSubmit() {
-		if(form.getValueAsString("password")==null || !form.validate())
+		if (form.getValueAsString("password") == null || form.getValueAsString("password").isEmpty())
+			return;
+
+		if(!form.validate())
 			return;
 		
 		submit.setDisabled(true);
@@ -65,11 +68,11 @@ public class PasswordTrial extends PasswordGenerator {
 					@Override
 					public void onSuccess(String[] failures) {
 						if (failures == null || failures.length == 0) {
-							result.setValue("<span style='color:green'>"+ I18N.message("valid")+"</span>");
+							result.setValue("<p style='color:green'>" + I18N.message("thispasswdisvalid") + "</p>");
 						} else {
-							StringBuilder sb=new StringBuilder("<ol>");
+							StringBuilder sb = new StringBuilder("<ol>");
 							for (String failure : failures)
-								sb.append("<li>"+failure+"</li>");
+								sb.append("<li>" + failure + "</li>");
 							sb.append("</ol>");
 							result.setValue(sb.toString());
 						}
@@ -81,7 +84,8 @@ public class PasswordTrial extends PasswordGenerator {
 
 	@Override
 	protected FormItem preparePasswordItem() {
-		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", null, false);
+		TextItem password = ItemFactory.newTextItem("password", null);
+		password.setWidth(200);
 		password.setWrapTitle(false);
 		password.setRequired(true);
 		return password;
