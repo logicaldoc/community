@@ -47,8 +47,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	public void testFindByDocumentId() {
 		List<Version> versions = dao.findByDocId(1);
 		assertEquals(2, versions.size());
-		assertTrue(versions.contains(dao.findByVersion(1, "testVer01")));
-		assertTrue(versions.contains(dao.findByVersion(1, "testVer02")));
+		assertTrue(versions.contains(dao.findByVersion(1, "0.1")));
+		assertTrue(versions.contains(dao.findByVersion(1, "0.2")));
 
 		versions = dao.findByDocId(2);
 		assertEquals(0, versions.size());
@@ -59,9 +59,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByVersion() {
-		Version version = dao.findByVersion(1, "testVer02");
+		Version version = dao.findByVersion(1, "0.2");
 		assertNotNull(version);
-		assertEquals("testVer02", version.getVersion());
+		assertEquals("0.2", version.getVersion());
 
 		version = dao.findByVersion(1, "xxxx");
 		assertNull(version);
@@ -69,9 +69,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByFileVersion() {
-		Version version = dao.findByFileVersion(1, "testVer01");
+		Version version = dao.findByFileVersion(1, "0.1");
 		assertNotNull(version);
-		assertEquals("testVer01", version.getFileVersion());
+		assertEquals("0.1", version.getFileVersion());
 
 		version = dao.findByVersion(1, "30");
 		assertNull(version);
@@ -89,8 +89,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		user.setFirstName("xx");
 		Version version = Version.create(doc, user, "", DocumentEvent.STORED.toString(), true);
 		dao.store(version);
-		while(dao.findById(version.getId())==null)
-			Thread.sleep(500);
+
 		assertEquals("1.0", dao.findById(version.getId()).getVersion());
 		
 		version = Version.create(doc, user, "", DocumentEvent.CHANGED.toString(), true);

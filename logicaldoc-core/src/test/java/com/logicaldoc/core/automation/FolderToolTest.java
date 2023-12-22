@@ -107,8 +107,6 @@ public class FolderToolTest extends AbstractCoreTestCase {
 		Folder target = testSubject.findById(1202L);
 		assertNotNull(target);
 		String targetPath = testSubject.getPath(target.getId());
-
-		System.out.println(targetPath);
 		
 		testSubject.merge(source, target, "admin");
 		target = testSubject.findById(6L);
