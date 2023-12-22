@@ -254,9 +254,10 @@ public class LDRepository {
 
 		repositoryInfo.setId(id);
 
-		long rootId;
+		long rootId = root.getId();
 		try {
-			rootId = folderDao.findRoot(SessionManager.get().get(sid).getTenantId()).getId();
+			if (sid != null)
+				rootId = folderDao.findRoot(SessionManager.get().get(sid).getTenantId()).getId();
 		} catch (PersistenceException e) {
 			throw new IllegalArgumentException("Root folder not found", e);
 		}
@@ -484,7 +485,7 @@ public class LDRepository {
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.STORED.toString());
-			transaction.setUser(getSessionUser());
+			transaction.setUser(getSessionUser(context));
 			transaction.setComment("");
 
 			Document newDoc = documentManager.copyToFolder(doc, target, transaction, true, true);
@@ -569,7 +570,7 @@ public class LDRepository {
 				DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
 				DocumentHistory transaction = new DocumentHistory();
-				transaction.setUser(getSessionUser());
+				transaction.setUser(getSessionUser(context));
 				transaction.setSessionId(sid);
 				manager.replaceFile(doc.getId(), doc.getFileVersion(), mergeFile, transaction);
 			} finally {
@@ -634,7 +635,7 @@ public class LDRepository {
 			if (type == null)
 				throw new CmisObjectNotFoundException(String.format(TYPE_S_IS_UNKNOWN, typeId));
 
-			User user = getSessionUser();
+			User user = getSessionUser(context);
 
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
@@ -704,13 +705,13 @@ public class LDRepository {
 			Folder parent = getFolder(folderId);
 
 			FolderHistory transaction = new FolderHistory();
-			transaction.setUser(getSessionUser());
+			transaction.setUser(getSessionUser(context));
 			transaction.setSessionId(sid);
 
 			Folder folder = null;
 			Folder newFolder = new Folder(name);
 
-			newFolder.setTenantId(getSessionUser().getTenantId());
+			newFolder.setTenantId(getSessionUser(context).getTenantId());
 			folder = folderDao.create(parent, newFolder, true, transaction);
 
 			return getId(folder);
@@ -746,7 +747,7 @@ public class LDRepository {
 
 			if (object instanceof Document) {
 				DocumentHistory transaction = new DocumentHistory();
-				transaction.setUser(getSessionUser());
+				transaction.setUser(getSessionUser(context));
 				transaction.setSessionId(sid);
 				documentManager.moveToFolder((Document) object, target, transaction);
 
@@ -754,7 +755,7 @@ public class LDRepository {
 				return compileObjectType(context, doc, null, false, false, objectInfos);
 			} else {
 				FolderHistory transaction = new FolderHistory();
-				transaction.setUser(getSessionUser());
+				transaction.setUser(getSessionUser(context));
 				transaction.setSessionId(sid);
 				transaction.setEvent(FolderEvent.MOVED.toString());
 
@@ -871,7 +872,7 @@ public class LDRepository {
 			} else {
 				Document doc = (Document) object;
 				DocumentHistory transaction = new DocumentHistory();
-				transaction.setUser(getSessionUser());
+				transaction.setUser(getSessionUser(context));
 				transaction.setEvent(FolderEvent.DELETED.toString());
 				transaction.setSessionId(sid);
 
@@ -1108,7 +1109,7 @@ public class LDRepository {
 			debug("using normalized path " + fullPath);
 
 			// Try to check if the path is a folder
-			Folder folder = folderDao.findByPathExtended(fullPath, getSessionUser().getTenantId());
+			Folder folder = folderDao.findByPathExtended(fullPath, getSessionUser(context).getTenantId());
 
 			if (folder != null) {
 				out = getObject(context, ID_PREFIX_FLD + Long.toString(folder.getId()), null, filter,
@@ -1116,13 +1117,13 @@ public class LDRepository {
 			} else {
 				// Not a folder, probably a file
 				String parentPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
-				folder = folderDao.findByPathExtended(parentPath, getSessionUser().getTenantId());
+				folder = folderDao.findByPathExtended(parentPath, getSessionUser(context).getTenantId());
 
 				if (folder != null) {
 					String fileName = fullPath.substring(fullPath.lastIndexOf('/') + 1);
 
 					List<Document> docs = documentDao.findByFileNameAndParentFolderId(folder.getId(), fileName, null,
-							getSessionUser().getTenantId(), null);
+							getSessionUser(context).getTenantId(), null);
 
 					if (docs != null && (!docs.isEmpty())) {
 						out = getObject(context, ID_PREFIX_DOC + Long.toString(docs.get(0).getId()), null, filter,
@@ -1206,7 +1207,7 @@ public class LDRepository {
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
 			transaction.setComment("");
-			transaction.setUser(getSessionUser());
+			transaction.setUser(getSessionUser(context));
 			transaction.setDocId(doc.getId());
 			transaction.setVersion(doc.getVersion());
 			transaction.setFileVersion(doc.getFileVersion());
@@ -1428,7 +1429,7 @@ public class LDRepository {
 			// don't climb above the root folder
 			if (root.equals(object))
 				return Collections.emptyList();
-
+			
 			// set object info of the the object
 			if (context.isObjectInfoRequired())
 				compileObjectType(context, object, null, false, false, objectInfos);
@@ -1517,8 +1518,8 @@ public class LDRepository {
 		log.debug("filename: {}", filename);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(),
-				maxItems);
+		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null,
+				getSessionUser().getId(), maxItems);
 
 		for (int i = 0; i < docs.size(); i++) {
 			// Check permissions on the documents found
@@ -2076,7 +2077,7 @@ public class LDRepository {
 		// update properties
 		for (PropertyData<?> p : properties.getProperties().values()) {
 			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
-			if (propType!=null && propType.getUpdatability() != Updatability.ONCREATE)
+			if (propType != null && propType.getUpdatability() != Updatability.ONCREATE)
 				updateDocumentMetadata(doc, properties, p, create, type);
 		}
 	}
@@ -2271,7 +2272,8 @@ public class LDRepository {
 			updateDocumentMetadata(doc, result, false);
 
 			addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
-			addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
+			addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY,
+					getSessionUser().getFullName());
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUser(getSessionUser());
@@ -2286,7 +2288,8 @@ public class LDRepository {
 			updateFolderMetadata(folder, result, properties);
 
 			addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
-			addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
+			addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY,
+					getSessionUser().getFullName());
 
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(getSessionUser());
@@ -2729,11 +2732,28 @@ public class LDRepository {
 	 * Gets the user associated to the current session.
 	 */
 	private User getSessionUser() {
+		return getSessionUser(null);
+	}
+
+	/**
+	 * Gets the user associated to the current session.
+	 * 
+	 * @param callContext the optional CMIS context
+	 * 
+	 */
+	private User getSessionUser(CallContext callContext) {
 		if (sid != null) {
 			if (SessionManager.get().getStatus(sid) != Session.STATUS_OPEN)
 				throw new CmisPermissionDeniedException("Invalid session");
 			try {
 				return userDao.findById(SessionManager.get().get(sid).getUserId());
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+				throw new CmisPermissionDeniedException("User not found");
+			}
+		} else if (callContext != null) {
+			try {
+				return userDao.findByUsername(callContext.getUsername());
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
 				throw new CmisPermissionDeniedException("User not found");

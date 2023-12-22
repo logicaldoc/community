@@ -38,6 +38,5 @@ public class PSTWorkerTest extends AbstractCoreTestCase {
 		String emails = worker.printEmails();
 		Assert.assertNotNull(emails);
 		Assert.assertTrue(emails.contains("This line is in bold"));
-		System.out.println(emails);
 	}
 }

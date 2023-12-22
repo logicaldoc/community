@@ -4,36 +4,48 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.Acl;
+import org.apache.chemistry.opencmis.commons.data.AllowableActions;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.FailedToDeleteData;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
+import org.apache.chemistry.opencmis.commons.data.ObjectInFolderData;
+import org.apache.chemistry.opencmis.commons.data.ObjectInFolderList;
 import org.apache.chemistry.opencmis.commons.data.ObjectList;
+import org.apache.chemistry.opencmis.commons.data.ObjectParentData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
 import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
-import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionContainer;
 import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionList;
+import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl;
 import org.apache.chemistry.opencmis.commons.impl.server.ObjectInfoImpl;
-import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
 import org.java.plugin.JpfException;
@@ -46,6 +58,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -53,6 +66,9 @@ import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.folder.FolderEvent;
+import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.folder.FolderHistoryDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -62,7 +78,6 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
-import com.mchange.v2.codegen.bean.PropsToStringGeneratorExtension;
 
 public class LDRepositoryTest extends AbstractCmisTestCase {
 
@@ -295,6 +310,30 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		assertNotNull(oi);
 		assertEquals("doc.5", oi.getId());
 		assertEquals("snow angels.txt", oi.getFileName());
+
+		// now try with a folder
+		ObjectInfo oi2 = testSubject.getObjectInfo("fld.6", null);
+		assertNotNull(oi2);
+		assertEquals("fld.6", oi2.getId());
+		assertEquals("folder6", oi2.getName());
+
+		Holder<String> objectId2 = new Holder<String>("fld.6");
+
+		Properties props2 = oi2.getObject().getProperties();
+		log.debug((String) props2.getProperties().get("cmis:name").getFirstValue());
+
+		pimp = new PropertiesImpl();
+		pid = "cmis:name";
+		p = new PropertyStringImpl(pid, "donald.txt");
+		p.setQueryName(pid);
+		pimp.addProperty(p);
+
+		testSubject.updateProperties(null, objectId2, pimp, null);
+
+		oi = testSubject.getObjectInfo("fld.6", null);
+		assertNotNull(oi);
+		assertEquals("fld.6", oi.getId());
+		assertEquals("donald.txt", oi.getName());
 	}
 
 	@Test
@@ -329,7 +368,6 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		String id = ldrep.createDocument(null, props, "fld.4", contentStream);
 		Assert.assertNotNull(id);
 
-		System.out.println(id);
 	}
 
 	@Test
@@ -360,13 +398,74 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 	}
 
 	@Test
-	public void testGetContentChanges() throws PersistenceException {
+	public void testGetContentChanges() throws PersistenceException, ParseException {
+		Document document = ddao.findById(1L);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
-		List<DocumentHistory> histories = dao.findByDocId(1);
-		System.out.println(histories + " XXXXXXXXXXXXXXXXXXXXXXXXX");
-		Holder<String> holder = new Holder<String>("1262300400000");
+		DocumentHistory hist = new DocumentHistory();
+		hist.setEvent(DocumentEvent.STORED.toString());
+		hist.setDate(df.parse("2019-15-12"));
+		hist.setDocument(document);
+		dao.store(hist);
 
-		testSubject.getContentChanges(holder, 10);
+		hist = new DocumentHistory();
+		hist.setEvent(DocumentEvent.CHANGED.toString());
+		hist.setDate(df.parse("2020-15-12"));
+		hist.setDocument(document);
+		dao.store(hist);
+
+		hist.setEvent(DocumentEvent.MOVED.toString());
+		hist.setDate(df.parse("2018-15-12"));
+		hist.setDocument(document);
+		dao.store(hist);
+
+		hist.setEvent(DocumentEvent.DELETED.toString());
+		hist.setDate(df.parse("2021-15-12"));
+		hist.setDocument(document);
+		dao.store(hist);
+
+		Folder folder = fdao.findById(4L);
+		FolderHistoryDAO folderHistoryDao = (FolderHistoryDAO) context.getBean("FolderHistoryDAO");
+		FolderHistory folderHistory = new FolderHistory();
+		folderHistory.setEvent(FolderEvent.CREATED.toString());
+		folderHistory.setDate(df.parse("2018-15-12"));
+		folderHistory.setDocument(document);
+		folderHistory.setFolder(folder);
+		folderHistoryDao.store(folderHistory);
+
+		folderHistory = new FolderHistory();
+		folderHistory.setEvent(FolderEvent.RENAMED.toString());
+		folderHistory.setDate(df.parse("2019-15-12"));
+		folderHistory.setDocument(document);
+		folderHistory.setFolder(folder);
+		folderHistoryDao.store(folderHistory);
+
+		folderHistory = new FolderHistory();
+		folderHistory.setEvent(FolderEvent.CHANGED.toString());
+		folderHistory.setDate(df.parse("2020-15-12"));
+		folderHistory.setDocument(document);
+		folderHistory.setFolder(folder);
+		folderHistoryDao.store(folderHistory);
+
+		folderHistory = new FolderHistory();
+		folderHistory.setEvent(FolderEvent.DELETED.toString());
+		folderHistory.setDate(df.parse("2021-15-12"));
+		folderHistory.setDocument(document);
+		folderHistory.setFolder(folder);
+		folderHistoryDao.store(folderHistory);
+
+		Holder<String> holder = new Holder<String>("123");
+
+		ObjectList ol = testSubject.getContentChanges(holder, 10);
+		List<ObjectData> results = ol.getObjects();
+		for (Iterator<ObjectData> iterator = results.iterator(); iterator.hasNext();) {
+			ObjectData objectData = (ObjectData) iterator.next();
+
+			PropertyData<?> oid = objectData.getProperties().getProperties().get("cmis:objectId");
+
+			String cmisDocID = (String) oid.getFirstValue();
+			assertTrue(cmisDocID.equals("doc.1") || cmisDocID.equals("fld.5"));
+		}
 
 	}
 
@@ -377,15 +476,75 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		testSubject.addUser(null, false);
 
 	}
+	
+	@Test
+	public void testGetFolderParent() {
+		ObjectData od = testSubject.getFolderParent(new MockCallContext(null, session.getSid()), "fld.4");
+		assertNotNull(od);
+		assertEquals("fld.5", od.getId());
+	}
+	
+	@Test
+	public void testGetObjectParents() {
+		List<ObjectParentData> docList = testSubject.getObjectParents(new MockCallContext(null, session.getSid()), "doc.1", null, true, true, null);
+		List<ObjectParentData> fldList = testSubject.getObjectParents(new MockCallContext(null, session.getSid()), "fld.5", "x", true, true, null);
+		assertTrue(docList.stream().filter(dL -> "fld.5".equals(dL.getObject().getId())).count()>=1);
+		assertTrue(fldList.stream().filter(fL -> "fld.5".equals(fL.getObject().getId())).count()>=1);
+	}
+	
+	@Test
+	public void testGetChildren() throws PersistenceException {
+		Folder folder = fdao.findById(4);
+		assertEquals(5, folder.getParentId());
+		ObjectInFolderList oifl = testSubject.getChildren(new MockCallContext(null, session.getSid()), "fld.5", null, false, true, 10, 0, null);
+		assertTrue(oifl.getObjects().stream().filter(oi ->  "fld.4".equals(oi.getObject().getId())).count()>=1);
+		
+		oifl = testSubject.getChildren(new MockCallContext(null, session.getSid()), "fld.5", null, false, false, 1, 0, null);
+		assertTrue(oifl.getObjects().stream().filter(oi ->  "fld.4".equals(oi.getObject().getId())).count()>=1);
+		
+	}
+
+	@Test
+	public void testGetAllowableActions() {
+		AllowableActions aA = testSubject.getAllowableActions(new MockCallContext(null, session.getSid()), "doc.1");
+		assertNotNull(aA);
+	}
+	
+	@Test
+	public void testGetAcl() {
+		Acl acl = testSubject.getAcl(new MockCallContext(null, session.getSid()), "doc.1");
+		assertNotNull(acl);
+	}
+
+	@Test
+	public void testGetObjectByPath() throws IOException, PersistenceException {
+		Document doc = ddao.findById(5L);
+		Folder folder = doc.getFolder();
+		String path = fdao.computePathExtended(folder) + "/" + doc.getFileName();
+
+		ObjectData od = testSubject.getObjectByPath(null, path, null, false, null, null, false, false, null);
+		assertNotNull(od);
+		assertEquals("doc.5", od.getId());
+
+		try {
+			testSubject.getObjectByPath(null, "/Default/unexisting", null, false, null, null, false, false, null);
+			fail("No expception in presence of unexisting pat?");
+		} catch (CmisObjectNotFoundException conf) {
+			// It's expected an exception here
+		}
+	}
 
 	@Test
 	public void testGetContentStream() throws PersistenceException, IOException {
+		Document doc2 = ddao.findById(2L);
+		String doc2Name = doc2.getFileName();
+
 		String storePath = Context.get().getProperties().getProperty("store.1.dir");
 		File store = new File(storePath);
 		File folder1 = new File(store, "1");
 		File docFolder = new File(folder1, "doc");
-        File file1_0 = new File(docFolder, "1.0");
-        File fileVer = new File(docFolder, "fileVer01");
+		File file1_0 = new File(docFolder, "1.0");
+		File fileVer = new File(docFolder, "fileVer01");
 		folder1.mkdir();
 		docFolder.mkdirs();
 		file1_0.createNewFile();
@@ -393,7 +552,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		ContentStream contentStreamDocument = testSubject.getContentStream(null, "doc.2", null, null);
 		ContentStream contentStreamFolder = testSubject.getContentStream(null, "ver.1", null, null);
-		assertNotNull(contentStreamDocument);
+		assertTrue(contentStreamDocument.getFileName().equals(doc2Name));
 		assertNotNull(contentStreamFolder);
 	}
 
@@ -407,7 +566,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 			String key = entry.getKey();
 			PropertyData<?> propertyData = entry.getValue();
 			if (key.equals("cmis:objectId")) {
-				propertyData.getValues().contains("fld.4");
+				assertTrue(propertyData.getValues().contains("fld.4"));
 			}
 		}
 
@@ -416,7 +575,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 			String key = entry.getKey();
 			PropertyData<?> propertyData = entry.getValue();
 			if (key.equals("cmis:objectId")) {
-				propertyData.getValues().contains("fld.4");
+				assertTrue(propertyData.getValues().contains("fld.4"));
 			}
 		}
 
@@ -514,6 +673,12 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		list = fdao.findAll();
 		assertEquals(8, list.size());
 		assertTrue(list.get(4).getName().equals("pippo.txt"));
+		
+		
+		ldrep = new LDRepository(folder, null);
+		id = ldrep.createFolder(new MockCallContext(null, session.getSid()), props, "fld.4");
+		Assert.assertNotNull(id);
+
 	}
 
 	@Test

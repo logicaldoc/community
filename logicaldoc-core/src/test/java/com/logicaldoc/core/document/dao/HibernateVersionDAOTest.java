@@ -1,5 +1,10 @@
 package com.logicaldoc.core.document.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -14,8 +19,6 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.security.User;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateVersionDAO</code>
@@ -43,57 +46,56 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testFindByDocumentId() {
 		List<Version> versions = dao.findByDocId(1);
-		Assert.assertEquals(2, versions.size());
-		Assert.assertTrue(versions.contains(dao.findByVersion(1, "testVer01")));
-		Assert.assertTrue(versions.contains(dao.findByVersion(1, "testVer02")));
+		assertEquals(2, versions.size());
+		assertTrue(versions.contains(dao.findByVersion(1, "testVer01")));
+		assertTrue(versions.contains(dao.findByVersion(1, "testVer02")));
 
 		versions = dao.findByDocId(2);
-		Assert.assertEquals(0, versions.size());
+		assertEquals(0, versions.size());
 
 		versions = dao.findByDocId(99);
-		Assert.assertEquals(0, versions.size());
+		assertEquals(0, versions.size());
 	}
 
 	@Test
 	public void testFindByVersion() {
 		Version version = dao.findByVersion(1, "testVer02");
-		Assert.assertNotNull(version);
-		Assert.assertEquals("testVer02", version.getVersion());
+		assertNotNull(version);
+		assertEquals("testVer02", version.getVersion());
 
 		version = dao.findByVersion(1, "xxxx");
-		Assert.assertNull(version);
+		assertNull(version);
 	}
 
 	@Test
 	public void testFindByFileVersion() {
 		Version version = dao.findByFileVersion(1, "testVer01");
-		Assert.assertNotNull(version);
-		Assert.assertEquals("testVer01", version.getFileVersion());
+		assertNotNull(version);
+		assertEquals("testVer01", version.getFileVersion());
 
 		version = dao.findByVersion(1, "30");
-		Assert.assertNull(version);
+		assertNull(version);
 	}
 
 	@Test
-	public void testStore() throws PersistenceException {
-		Version version = new Version();
-		version.setDeleted(0);
-		version.setComment("pippo");
-		version.setUserId(1);
-		version.setUsername("matteo");
-		version.setDocId(1);
-		dao.store(version);
-		Assert.assertNotNull(dao.findById(2));
-		Assert.assertNotNull(dao.findById(1));
-
+	public void testStore() throws PersistenceException, InterruptedException {
 		Document doc = docDao.findById(1);
 		docDao.initialize(doc);
+		assertEquals("1.0", doc.getVersion());
 		User user = new User();
 		user.setId(1);
 		user.setUsername("admin");
 		user.setName("xx");
 		user.setFirstName("xx");
-		version = Version.create(doc, user, "", DocumentEvent.STORED.toString(), true);
+		Version version = Version.create(doc, user, "", DocumentEvent.STORED.toString(), true);
 		dao.store(version);
+		while(dao.findById(version.getId())==null)
+			Thread.sleep(500);
+		assertEquals("1.0", dao.findById(version.getId()).getVersion());
+		
+		version = Version.create(doc, user, "", DocumentEvent.CHANGED.toString(), true);
+		dao.store(version);
+		
+		assertEquals("2.0", version.getVersion());
 	}
 }

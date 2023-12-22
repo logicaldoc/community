@@ -117,9 +117,6 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 				List<Version> versions = findByDocId(version.getDocId());
 
 				if (versions.size() > maxVersions) {
-					// Inverse order the document versions
-					Collections.sort(versions, Collections.reverseOrder());
-
 					// Delete the oldest versions
 					deleteOldestVersions(versions, maxVersions);
 
@@ -156,19 +153,18 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		}
 	}
 
-	private void deleteOldestVersions(List<Version> versions, int maxVersions) {
-		for (int i = 0; i < versions.size(); i++) {
-			if (i >= maxVersions) {
-				// Delete the version
-				Version deleteVersion = versions.get(i);
-				initialize(deleteVersion);
-				deleteVersion.setDeleted(1);
-				try {
-					store(deleteVersion);
-				} catch (PersistenceException e) {
-					log.warn(e.getMessage(), e);
-				}
-			}
+	private void deleteOldestVersions(List<Version> versions, int maxVersions) throws PersistenceException {
+		// Inverse order to obtain the versions ordered by descending version
+		// number
+		Collections.sort(versions, Collections.reverseOrder());
+
+		List<Version> oldersVersionsToDelete = versions.stream().skip(Math.max(0, versions.size() - maxVersions))
+				.toList();
+		for (Version version : oldersVersionsToDelete) {
+			jdbcUpdate("update ld_version set ld_deleted=1 where ld_id = " + version.getId());
+			jdbcUpdate("update ld_version set ld_version='"
+					+ StringUtils.right(version.getId() + "." + version.getVersion(), 10) + "' where ld_id = "
+					+ version.getId());
 		}
 	}
 

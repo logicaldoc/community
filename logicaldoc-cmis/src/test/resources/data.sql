@@ -218,11 +218,11 @@ values     (5, 1,'numbered');
 
 insert into ld_history 
 				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new,ld_tenantid,ld_recordversion)
-values     (-1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,5,1,'2006-12-20 00:00:00','author','data test 01','reason test 01','1.0',0,1,1,1);
+values     (-1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,5,1,'2006-12-20 00:00:00','author','event.stored','reason test 01','1.0',0,1,1,1);
 
 insert into ld_history 
 				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new,ld_tenantid,ld_recordversion)
-values     (-4,'2020-10-22 00:00:00','2020-10-22 00:00:00',0,1,5,1,'2023-01-01 00:00:00','author','data test 04','reason test 01','1.0',0,1,1,1);
+values     (-4,'2020-10-22 00:00:00','2020-10-22 00:00:00',0,1,5,1,'2023-01-01 00:00:00','author','event.renamed','reason test 01','1.0',0,1,1,1);
 
 insert into ld_history 
 			    (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new,ld_tenantid,ld_recordversion)

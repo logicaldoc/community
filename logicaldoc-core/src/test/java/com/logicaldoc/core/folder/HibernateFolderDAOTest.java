@@ -132,9 +132,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testCount() throws PersistenceException {
 		int docCount = dao.count(false);
-		System.out.println("Deleted Documents count: " + docCount);
 		int docCountDelete = dao.count(true);
-		System.out.println("Total Documents count: " + docCountDelete);
 		assertEquals(4, docCount);
 		assertEquals(7, docCountDelete);
 	}
