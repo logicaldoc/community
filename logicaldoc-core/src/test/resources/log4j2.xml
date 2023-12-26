@@ -32,7 +32,10 @@
     <Logger name="com.logicaldoc.core.searchengine" level="error" additivity="false">
       <Appender-Ref ref="FILE" />
     </Logger>    
-    <Logger name="com.logicaldoc" level="info" additivity="false">
+    <Logger name="com.logicaldoc" level="warn" additivity="false">
+      <Appender-Ref ref="FILE" />
+    </Logger>
+    <Logger name="com.logicaldoc.util.spring.DatabasePropertySource" level="fatal" additivity="false">
       <Appender-Ref ref="FILE" />
     </Logger>
 	<Root level="fatal">

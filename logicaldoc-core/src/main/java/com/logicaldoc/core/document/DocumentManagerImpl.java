@@ -1323,6 +1323,9 @@ public class DocumentManagerImpl implements DocumentManager {
 				} catch (Exception t) {
 					log.warn("Unable to delete resource {} of document {}", resource, versionToDelete.getDocId());
 				}
+		} else {
+			log.warn("Cannot delete version {} of document {} because file version {} is still referenced",
+					versionToDelete.getVersion(), versionToDelete.getFileVersion(), versionToDelete.getDocId());
 		}
 
 		try {

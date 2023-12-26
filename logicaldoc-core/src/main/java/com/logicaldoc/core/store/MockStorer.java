@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+
 import com.logicaldoc.util.Context;
 
 /**
@@ -76,17 +78,19 @@ public class MockStorer extends FSStorer {
 
 		// List the resources
 		List<String> resources = listResources(docId, null);
-		for (String resource : resources) {
-			File newFile = new File(targetRoot + "/" + computeRelativePath(docId) + "/" + resource);
 
-			newFile.getParentFile().mkdirs();
+		for (String resource : resources) {
+			File sourceFile = new File(getContainer(docId), resource);
+
+			File targetFile = new File(targetRoot + "/" + computeRelativePath(docId) + "/" + resource);
+			targetFile.getParentFile().mkdirs();
 
 			// Extract the original file into a temporary location
-			writeToFile(docId, resource, newFile);
+			writeToFile(docId, resource, targetFile);
 			moved++;
 
 			// Delete the original resource
-			delete(docId, resource);
+			FileUtils.deleteQuietly(sourceFile);
 		}
 
 		return moved;

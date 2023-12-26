@@ -301,7 +301,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	public void testEnforceFilesIntoFolderStorage()
 			throws PersistenceException, ParseException, IOException, InterruptedException {
 		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
-
+		
 		DocumentHistory transaction = new DocumentHistory();
 		User user = userDao.findByUsername("admin");
 		transaction.setUser(user);
@@ -318,14 +318,14 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		folderDao.initialize(folder);
 		Assert.assertEquals(1, folder.getStorages().size());
 		Assert.assertEquals(Integer.valueOf(2), folder.getStorage());
-
+		
 		folder = folderDao.findByPathExtended("/Default/test/subfolder", 1L);
 		folderDao.initialize(folder);
 		Assert.assertNull(folder.getStorage());
 
 		Document doc = docDao.findById(1);
 		documentManager.moveToFolder(doc, folder, transaction);
-
+		
 		String storeRoot = Context.get().getProperties().getProperty("store.1.dir");
 		String store2Root = Context.get().getProperties().getProperty("store.2.dir");
 
@@ -335,8 +335,9 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
 		documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction);
-
+		
 		waiting();
+		
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
 	}
 

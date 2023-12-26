@@ -855,10 +855,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public long computeTotalSize(Long tenantId, Long userId, boolean computeDeleted) throws PersistenceException {
 		// Count all the versions of the documents related to file change
-		return queryForLong("select SUM(V.ld_filesize) from ld_version V where V.ld_version = V.ld_fileversion"
-				+ (computeDeleted ? "" : " and V.ld_deleted=0 ")
-				+ (userId != null ? " and V.ld_publisherid=" + userId : "")
-				+ (tenantId != null ? " and V.ld_tenantid=" + tenantId : ""));
+		final String query = "select sum(ld_filesize) from ld_version where ld_version = ld_fileversion"
+				+ (computeDeleted ? "" : " and ld_deleted=0 ")
+				+ (userId != null ? " and ld_publisherid=" + userId : "")
+				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
+		return queryForLong(query);
 	}
 
 	@Override

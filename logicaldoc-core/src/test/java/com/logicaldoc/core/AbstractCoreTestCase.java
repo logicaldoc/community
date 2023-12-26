@@ -42,8 +42,13 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	private void prepareStore() throws IOException {
 		String storePath = Context.get().getProperties().getProperty("store.1.dir");
-		new File(storePath).mkdir();
-		new File(Context.get().getProperties().getProperty("store.2.dir")).mkdir();
+		File store1 = new File(storePath);
+		FileUtil.strongDelete(store1);
+		store1.mkdir();
+		
+		File store2 = new File(Context.get().getProperties().getProperty("store.2.dir"));
+		FileUtil.strongDelete(store2);
+		store2.mkdir();
 
 		Storer storer = (Storer) context.getBean("Storer");
 		storer.init();
@@ -63,7 +68,5 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	@Override
 	public void tearDown() throws SQLException {
 		super.tearDown();
-		FileUtil.strongDelete(new File("target/store"));
-		FileUtil.strongDelete(new File("target/store2"));
 	}
 }

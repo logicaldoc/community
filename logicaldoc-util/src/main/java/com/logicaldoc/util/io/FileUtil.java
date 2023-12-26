@@ -619,19 +619,13 @@ public class FileUtil {
 	}
 
 	public static void strongDelete(File file) {
-		try {
-			if (file != null && file.exists())
-				FileUtils.forceDelete(file);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+		/*
+		 * Better to deleteQuitely first because the forceDelete seems to cause
+		 * locks at least on Windows when there are frequent deletions.
+		 */
+		if (file != null && file.exists())
+			FileUtils.deleteQuietly(file);
 
-		try {
-			if (file != null && file.exists())
-				Files.deleteIfExists(file.toPath());
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
 		if (file != null && file.exists())
 			deleteUsingOSCommand(file);
 	}
