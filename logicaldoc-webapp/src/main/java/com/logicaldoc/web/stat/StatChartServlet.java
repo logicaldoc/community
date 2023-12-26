@@ -46,9 +46,9 @@ public class StatChartServlet extends HttpServlet {
 			Session session = ServletUtil.validateSession(request);
 
 			// Avoid resource caching
+			response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+			response.setHeader("Expires", "0");
 			response.setHeader("Pragma", "no-cache");
-			response.setHeader("Cache-Control", "no-store");
-			response.setDateHeader("Expires", 0);
 
 			User user = session.getUser();
 

@@ -66,9 +66,9 @@ public class LogDownload extends HttpServlet {
 						"attachment; filename=\"" + ("ldoc-log-" + df.format(new Date()) + ".zip") + "\"");
 
 				// Avoid resource caching
+				response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+				response.setHeader("Expires", "0");
 				response.setHeader("Pragma", "no-cache");
-				response.setHeader("Cache-Control", "no-store");
-				response.setDateHeader("Expires", 0);
 
 				file = prepareAllSupportResources();
 			} else if (appender != null) {

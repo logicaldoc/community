@@ -45,11 +45,6 @@ public class SessionsDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		// Headers required by Internet Explorer
-		response.setHeader("Pragma", "public");
-		response.setHeader("Cache-Control", "must-revalidate, post-check=0,pre-check=0");
-		response.setHeader("Expires", "0");
-
 		if (request.getParameter("kill") != null) {
 			// Kill a specific session
 			SessionManager.get().kill(request.getParameter("kill"));

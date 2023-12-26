@@ -77,10 +77,10 @@ public class WebserviceServletUtil {
 		response.setHeader("Content-Disposition",
 				(asAttachment ? "attachment" : "inline") + "; filename=\"" + encodedFileName + "\"");
 
-		// Headers required by Internet Explorer
-		response.setHeader("Pragma", "public");
-		response.setHeader("Cache-Control", "must-revalidate, post-check=0,pre-check=0");
+		// Avoid resource caching
+		response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
 		response.setHeader("Expires", "0");
+		response.setHeader("Pragma", "no-cache");
 	}
 
 	/**

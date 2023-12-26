@@ -32,11 +32,6 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		// Headers required by Internet Explorer
-		response.setHeader("Pragma", "public");
-		response.setHeader("Cache-Control", "must-revalidate, post-check=0,pre-check=0");
-		response.setHeader("Expires", "0");
-
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		SessionDAO sessionDao = (SessionDAO) Context.get().getBean(SessionDAO.class);
 		Session currentSession = ServletUtil.validateSession(request);

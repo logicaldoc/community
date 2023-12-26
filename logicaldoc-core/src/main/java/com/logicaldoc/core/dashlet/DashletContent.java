@@ -76,9 +76,9 @@ public class DashletContent extends HttpServlet {
 			long dashletId = Long.parseLong(request.getParameter("dashletId"));
 
 			// Avoid resource caching
+			response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+			response.setHeader("Expires", "0");
 			response.setHeader("Pragma", "no-cache");
-			response.setHeader("Cache-Control", "no-store");
-			response.setDateHeader("Expires", 0);
 			response.setCharacterEncoding("UTF-8");
 
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);

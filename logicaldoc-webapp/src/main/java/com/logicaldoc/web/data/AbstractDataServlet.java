@@ -59,9 +59,9 @@ public abstract class AbstractDataServlet extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 
 			// Avoid resource caching
+			response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+			response.setHeader("Expires", "0");
 			response.setHeader("Pragma", "no-cache");
-			response.setHeader("Cache-Control", "no-store");
-			response.setDateHeader("Expires", 0);
 
 			Integer max = null;
 			if (StringUtils.isNotEmpty(request.getParameter("max")))

@@ -38,11 +38,6 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 
-		// Avoid resource caching
-		response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control", "no-store");
-		response.setDateHeader("Expires", 0);
-
 		templateRights(response, templateId);
 	}
 
