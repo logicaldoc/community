@@ -1,4 +1,4 @@
-package com.logicaldoc.web.xss;
+package com.logicaldoc.web.filter.xss;
 
 import java.util.regex.Pattern;
 

@@ -29,4 +29,4 @@
  * 
  * @since 8.7
  */
-package com.logicaldoc.web.xss;
+package com.logicaldoc.web.filter.xss;
