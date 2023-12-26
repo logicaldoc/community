@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
+import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -156,32 +156,18 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		}
 	}
 
-	private void deleteOldestVersions(List<Version> versions, int maxVersions) throws PersistenceException {
+	private void deleteOldestVersions(List<Version> versions, int maxVersions) {
 		if (versions.size() <= maxVersions)
 			return;
 
 		// Meke sure to sort the versions by descending version spec
 		Collections.sort(versions, Collections.reverseOrder());
 
-		List<Version> oldestVersionsToDelete = versions.stream().skip(Math.max(0, versions.size() - maxVersions)).collect(Collectors.toList());
+		List<Version> oldestVersionsToDelete = versions.stream().skip(Math.max(0, versions.size() - maxVersions))
+				.collect(Collectors.toList());
 		for (Version versionToDelete : oldestVersionsToDelete)
-			deleteVersion(versionToDelete, AbstractDocument.DELETED_CODE_DEFAULT);
+			deleteVersion(versionToDelete, PersistentObject.DELETED_CODE_DEFAULT);
 	}
-
-//	private void deleteOldestVersions(List<Version> versions, int maxVersions) throws PersistenceException {
-//		// Inverse order to obtain the versions ordered by descending version
-//		// number
-//		Collections.sort(versions, Collections.reverseOrder());
-//
-//		List<Version> oldersVersionsToDelete = versions.stream().skip(Math.max(0, versions.size() - maxVersions))
-//				.toList();
-//		for (Version version : oldersVersionsToDelete) {
-//			jdbcUpdate("update ld_version set ld_deleted=1 where ld_id = " + version.getId());
-//			jdbcUpdate("update ld_version set ld_version='"
-//					+ StringUtils.right(version.getId() + "." + version.getVersion(), 10) + "' where ld_id = "
-//					+ version.getId());
-//		}
-//	}
 
 	@Override
 	public void updateDigest(Version version) {

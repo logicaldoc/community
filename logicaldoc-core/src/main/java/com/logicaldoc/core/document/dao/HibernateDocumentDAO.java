@@ -858,7 +858,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		final String query = "select sum(ld_filesize) from ld_version where ld_version = ld_fileversion"
 				+ (computeDeleted ? "" : " and ld_deleted=0 ")
 				+ (userId != null ? " and ld_publisherid=" + userId : "")
-				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
+				+ (tenantId != null ? AND_LD_TENANTID + tenantId : "");
 		return queryForLong(query);
 	}
 

@@ -330,8 +330,9 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	protected void logDeletion(long docId, String path) {
-		deletionsLog.info("str: {}, doc: {}, res: {}\n{}", getId(), docId, path,
-				Arrays.toString(Thread.currentThread().getStackTrace()).replace(',', '\n'));
+		if (deletionsLog.isInfoEnabled())
+			deletionsLog.info("str: {}, doc: {}, res: {}\n{}", getId(), docId, path,
+					Arrays.toString(Thread.currentThread().getStackTrace()).replace(',', '\n'));
 
 		DocumentHistoryDAO documentHistoryDAO = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		DocumentHistory history = new DocumentHistory();

@@ -31,6 +31,8 @@ import com.smartgwt.client.widgets.menu.Menu;
  */
 public class BookmarkDashlet extends Dashlet {
 
+	private static final String TARGET_ID = "targetId";
+
 	protected RefreshableListGrid list;
 
 	protected int status;
@@ -59,10 +61,6 @@ public class BookmarkDashlet extends Dashlet {
 		return new DocumentsListGrid(guiDashlet.getExtendedAttributes());
 	}
 
-	public String getDocIdAttribute() {
-		return "targetId";
-	}
-
 	public void prepareClickHandlers(RefreshableListGrid ret, String docIdAttribute) {
 		ret.addCellContextClickHandler(event -> {
 			event.cancel();
@@ -87,9 +85,9 @@ public class BookmarkDashlet extends Dashlet {
 			Record rec = event.getRecord();
 			if (!"folder".equals(rec.getAttribute("icon")))
 				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("folderId"),
-						rec.getAttributeAsLong("targetId"));
+						rec.getAttributeAsLong(TARGET_ID));
 			else
-				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong("targetId"), null);
+				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(TARGET_ID), null);
 		});
 	}
 
@@ -124,7 +122,7 @@ public class BookmarkDashlet extends Dashlet {
 		ListGridField description = new ColoredListGridField("description", I18N.message("description"));
 		description.setWidth("*");
 		
-		ListGridField targetId = new ColoredListGridField("targetId", I18N.message("targetid"));
+		ListGridField targetId = new ColoredListGridField(TARGET_ID, I18N.message("targetid"));
 		targetId.setHidden(true);
 		targetId.setAutoFitWidth(true);
 
@@ -133,7 +131,7 @@ public class BookmarkDashlet extends Dashlet {
 
 		list.setFields(id, targetId, name, description);
 
-		prepareClickHandlers(list, getDocIdAttribute());
+		prepareClickHandlers(list, TARGET_ID);
 
 		addItem(list);
 	}

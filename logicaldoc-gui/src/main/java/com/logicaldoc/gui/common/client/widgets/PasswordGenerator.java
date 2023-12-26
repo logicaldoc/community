@@ -113,9 +113,9 @@ public class PasswordGenerator extends Window {
 	}
 
 	protected FormItem preparePasswordItem() {
-		StaticTextItem password = new StaticTextItem(I18N.message("password"));
-		password.setWrapTitle(false);
-		password.setWrap(false);
-		return password;
+		StaticTextItem pswd = new StaticTextItem(I18N.message("password"));
+		pswd.setWrapTitle(false);
+		pswd.setWrap(false);
+		return pswd;
 	}
 }

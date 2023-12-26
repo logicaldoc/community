@@ -13,9 +13,6 @@ import java.util.List;
  */
 public class GUIDashlet implements Serializable {
 
-	private static List<String> systemDashlets = Arrays.asList("checkin", "checkout", "locked", "download", "change",
-			"tagcloud", "notes", "lastaccessed", "bookmark");
-
 	public static final String TYPE_DOCEVENT = "docevent";
 
 	public static final String TYPE_DOCUMENT = "document";
@@ -26,6 +23,9 @@ public class GUIDashlet implements Serializable {
 
 	public static final String TYPE_BOOKMARK = "bookmark";
 
+	private static List<String> systemDashlets = Arrays.asList("checkin", "checkout", "locked", "download", "change",
+			"tagcloud", "notes", "lastaccessed", TYPE_BOOKMARK);
+	
 	private static final long serialVersionUID = 1L;
 
 	private long id;

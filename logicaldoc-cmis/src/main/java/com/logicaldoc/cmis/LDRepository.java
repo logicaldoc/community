@@ -581,7 +581,7 @@ public class LDRepository {
 
 	private File getChunksFolder(String documentId) throws IOException {
 		File tempDir = FileUtil.createTempDirectory("cmis" + sid + documentId);
-		tempDir.delete();
+		FileUtils.deleteQuietly(tempDir);
 		tempDir = new File(tempDir.getParent(), "cmis" + sid + documentId);
 		tempDir.mkdir();
 		return tempDir;

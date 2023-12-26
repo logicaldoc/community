@@ -82,7 +82,9 @@ public class MockStorer extends FSStorer {
 		for (String resource : resources) {
 			File sourceFile = new File(getContainer(docId), resource);
 
-			File targetFile = new File(targetRoot + "/" + computeRelativePath(docId) + "/" + resource);
+			File targetFile = new File(targetRoot);
+			targetFile = new File(targetFile, computeRelativePath(docId));
+			targetFile = new File(targetFile, resource);
 			targetFile.getParentFile().mkdirs();
 
 			// Extract the original file into a temporary location

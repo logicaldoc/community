@@ -20,6 +20,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class PasswordTrial extends PasswordGenerator {
 
+	private static final String PASSWORD = "password";
 	private StaticTextItem result = new StaticTextItem("");
 
 	public PasswordTrial(Integer pwdSize, Integer pwdUpperCase, Integer pwdLowerCase, Integer pwdDigit,
@@ -50,14 +51,14 @@ public class PasswordTrial extends PasswordGenerator {
 
 	@Override
 	protected void onSubmit() {
-		if (form.getValueAsString("password") == null || form.getValueAsString("password").isEmpty())
+		if (form.getValueAsString(PASSWORD) == null || form.getValueAsString(PASSWORD).isEmpty())
 			return;
 
 		if(!form.validate())
 			return;
 		
 		submit.setDisabled(true);
-		SecurityService.Instance.get().validatePassword(form.getValueAsString("password"), pwdSize, pwdUpperCase,
+		SecurityService.Instance.get().validatePassword(form.getValueAsString(PASSWORD), pwdSize, pwdUpperCase,
 				pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence, new AsyncCallback<String[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -84,7 +85,7 @@ public class PasswordTrial extends PasswordGenerator {
 
 	@Override
 	protected FormItem preparePasswordItem() {
-		TextItem password = ItemFactory.newTextItem("password", null);
+		TextItem password = ItemFactory.newTextItem(PASSWORD, null);
 		password.setWidth(200);
 		password.setWrapTitle(false);
 		password.setRequired(true);

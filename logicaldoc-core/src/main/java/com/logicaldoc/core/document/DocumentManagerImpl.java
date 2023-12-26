@@ -1289,15 +1289,11 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public Version deleteVersion(long versionId, DocumentHistory transaction) throws PersistenceException {
-		Version versionToDelete = versionDAO.findById(versionId);
-		if (versionToDelete == null)
-			throw new IllegalArgumentException("Unexisting version " + versionId);
+		Version versionToDelete = enforceExistingVersion(versionId);
 
 		String versionToDeleteSpec = versionToDelete.getVersion();
 
-		Document document = documentDAO.findById(versionToDelete.getDocId());
-		if (document == null)
-			throw new IllegalArgumentException("Unexisting referenced document " + versionToDelete.getDocId());
+		Document document = enforceExistingDocument(versionToDelete.getDocId());
 
 		List<Version> versions = versionDAO.findByDocId(versionToDelete.getDocId());
 
@@ -1354,6 +1350,20 @@ public class DocumentManagerImpl implements DocumentManager {
 		downgradeDocumentVersion(document, versionToDeleteSpec, transaction, lastVersion);
 
 		return lastVersion;
+	}
+
+	protected Document enforceExistingDocument(long docId) throws PersistenceException {
+		Document document = documentDAO.findById(docId);
+		if (document == null)
+			throw new IllegalArgumentException("Unexisting referenced document " + docId);
+		return document;
+	}
+
+	protected Version enforceExistingVersion(long versionId) throws PersistenceException {
+		Version versionToDelete = versionDAO.findById(versionId);
+		if (versionToDelete == null)
+			throw new IllegalArgumentException("Unexisting version " + versionId);
+		return versionToDelete;
 	}
 
 	private Version getLastVersion(List<Version> versions, Version versionToDelete) {

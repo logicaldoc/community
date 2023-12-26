@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -29,19 +28,13 @@ import org.apache.chemistry.opencmis.commons.data.AllowableActions;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.FailedToDeleteData;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
-import org.apache.chemistry.opencmis.commons.data.ObjectInFolderData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderList;
 import org.apache.chemistry.opencmis.commons.data.ObjectList;
 import org.apache.chemistry.opencmis.commons.data.ObjectParentData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
-import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
-import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
-import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionList;
-import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl;
@@ -470,38 +463,34 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 	}
 
 	@Test
-	public void testAddUser() throws PersistenceException {
-		testSubject.addUser("Jim", false);
-		testSubject.addUser("Dwight", true);
-		testSubject.addUser(null, false);
-
-	}
-	
-	@Test
 	public void testGetFolderParent() {
 		ObjectData od = testSubject.getFolderParent(new MockCallContext(null, session.getSid()), "fld.4");
 		assertNotNull(od);
 		assertEquals("fld.5", od.getId());
 	}
-	
+
 	@Test
 	public void testGetObjectParents() {
-		List<ObjectParentData> docList = testSubject.getObjectParents(new MockCallContext(null, session.getSid()), "doc.1", null, true, true, null);
-		List<ObjectParentData> fldList = testSubject.getObjectParents(new MockCallContext(null, session.getSid()), "fld.5", "x", true, true, null);
-		assertTrue(docList.stream().filter(dL -> "fld.5".equals(dL.getObject().getId())).count()>=1);
-		assertTrue(fldList.stream().filter(fL -> "fld.5".equals(fL.getObject().getId())).count()>=1);
+		List<ObjectParentData> docList = testSubject.getObjectParents(new MockCallContext(null, session.getSid()),
+				"doc.1", null, true, true, null);
+		List<ObjectParentData> fldList = testSubject.getObjectParents(new MockCallContext(null, session.getSid()),
+				"fld.5", "x", true, true, null);
+		assertTrue(docList.stream().filter(dL -> "fld.5".equals(dL.getObject().getId())).count() >= 1);
+		assertTrue(fldList.stream().filter(fL -> "fld.5".equals(fL.getObject().getId())).count() >= 1);
 	}
-	
+
 	@Test
 	public void testGetChildren() throws PersistenceException {
 		Folder folder = fdao.findById(4);
 		assertEquals(5, folder.getParentId());
-		ObjectInFolderList oifl = testSubject.getChildren(new MockCallContext(null, session.getSid()), "fld.5", null, false, true, 10, 0, null);
-		assertTrue(oifl.getObjects().stream().filter(oi ->  "fld.4".equals(oi.getObject().getId())).count()>=1);
-		
-		oifl = testSubject.getChildren(new MockCallContext(null, session.getSid()), "fld.5", null, false, false, 1, 0, null);
-		assertTrue(oifl.getObjects().stream().filter(oi ->  "fld.4".equals(oi.getObject().getId())).count()>=1);
-		
+		ObjectInFolderList oifl = testSubject.getChildren(new MockCallContext(null, session.getSid()), "fld.5", null,
+				false, true, 10, 0, null);
+		assertTrue(oifl.getObjects().stream().filter(oi -> "fld.4".equals(oi.getObject().getId())).count() >= 1);
+
+		oifl = testSubject.getChildren(new MockCallContext(null, session.getSid()), "fld.5", null, false, false, 1, 0,
+				null);
+		assertTrue(oifl.getObjects().stream().filter(oi -> "fld.4".equals(oi.getObject().getId())).count() >= 1);
+
 	}
 
 	@Test
@@ -509,7 +498,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		AllowableActions aA = testSubject.getAllowableActions(new MockCallContext(null, session.getSid()), "doc.1");
 		assertNotNull(aA);
 	}
-	
+
 	@Test
 	public void testGetAcl() {
 		Acl acl = testSubject.getAcl(new MockCallContext(null, session.getSid()), "doc.1");
@@ -552,7 +541,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		ContentStream contentStreamDocument = testSubject.getContentStream(null, "doc.2", null, null);
 		ContentStream contentStreamFolder = testSubject.getContentStream(null, "ver.1", null, null);
-		assertTrue(contentStreamDocument.getFileName().equals(doc2Name));
+		assertEquals(doc2Name, contentStreamDocument.getFileName());
 		assertNotNull(contentStreamFolder);
 	}
 
@@ -672,9 +661,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		list = fdao.findAll();
 		assertEquals(8, list.size());
-		assertTrue(list.get(4).getName().equals("pippo.txt"));
-		
-		
+		assertEquals("pippo.txt", list.get(4).getName());
+
 		ldrep = new LDRepository(folder, null);
 		id = ldrep.createFolder(new MockCallContext(null, session.getSid()), props, "fld.4");
 		Assert.assertNotNull(id);
