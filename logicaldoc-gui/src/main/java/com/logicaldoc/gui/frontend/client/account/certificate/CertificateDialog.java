@@ -106,7 +106,7 @@ public class CertificateDialog extends Window implements UserObserver {
 			});
 		});
 
-		IButton upload = new IButton(I18N.message("useyourowncert"));
+		IButton upload = new IButton(I18N.message("uploadyourowncert"));
 		upload.setAutoFit(true);
 		upload.addClickHandler(event -> new OwnCertificateDialog().show());
 
