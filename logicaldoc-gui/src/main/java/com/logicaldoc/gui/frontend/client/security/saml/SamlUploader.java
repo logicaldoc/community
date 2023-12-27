@@ -15,7 +15,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * This popup window is used to upload SAML resources to the server.
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 6.0
+ * @since 8.9
  */
 public class SamlUploader extends Window {
 

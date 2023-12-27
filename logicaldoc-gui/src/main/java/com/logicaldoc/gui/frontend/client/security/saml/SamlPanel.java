@@ -165,7 +165,7 @@ public class SamlPanel extends VLayout {
 		spPrivateKey.setHeight(TEXTAREA_HEIGHT);
 		spPrivateKey.setIcons(new CopyTextFormItemIcon(),
 				new DownloadFormItemIcon(Util.contextPath() + "saml/spprivatekey"),
-				new UploadFormItemIcon("uploadspprivetekey"));
+				new UploadFormItemIcon("uploadspprivatekey"));
 		spPrivateKey.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(ASSERTIONS_ENCRYPTED))
 				|| "yes".equals(form.getValueAsString(NAMEID_ENCRYPTED))
 				|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
