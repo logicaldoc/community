@@ -314,8 +314,8 @@ create index LD_DEV_USERID on ld_device (ld_userid);
 create index LD_PHIST_USERID on ld_password_history (ld_userid);
 
 
-insert into ld_tenant(ld_id,ld_lastmodified, ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion,ld_creation)
-values     (1,CURRENT_TIMESTAMP,0,1,'default','Default',0,1,null,1,CURRENT_TIMESTAMP);
+insert into ld_tenant(ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion,ld_creation)
+values     (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,'default','Default',0,1,null,1,CURRENT_TIMESTAMP);
 
 
 insert into ld_menu
