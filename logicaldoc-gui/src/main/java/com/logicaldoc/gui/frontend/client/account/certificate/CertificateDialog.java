@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.account;
+package com.logicaldoc.gui.frontend.client.account.certificate;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -106,9 +106,9 @@ public class CertificateDialog extends Window implements UserObserver {
 			});
 		});
 
-		IButton upload = new IButton(I18N.message("uploadyourowncert"));
+		IButton upload = new IButton(I18N.message("useyourowncert"));
 		upload.setAutoFit(true);
-		upload.addClickHandler(event -> new CertificateUploadDialog().show());
+		upload.addClickHandler(event -> new OwnCertificateDialog().show());
 
 		IButton delete = new IButton(I18N.message("deletecert"));
 		delete.setAutoFit(true);

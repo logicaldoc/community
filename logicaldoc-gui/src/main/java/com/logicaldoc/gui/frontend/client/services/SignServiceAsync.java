@@ -17,7 +17,9 @@ public interface SignServiceAsync {
 
 	void generateNewCertificate(AsyncCallback<Void> callback);
 
-	void importCertificate(String privateKey, AsyncCallback<Void> callback);
+	void importCertificate(String certificate, String privateKey, AsyncCallback<Void> callback);
+
+	void getUploadedContent(AsyncCallback<String> callback);
 
 	void deleteCertificate(AsyncCallback<Void> callback);
 

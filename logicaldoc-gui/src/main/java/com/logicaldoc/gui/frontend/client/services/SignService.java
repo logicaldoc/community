@@ -48,9 +48,21 @@ public interface SignService extends RemoteService {
 	/**
 	 * Imports an uploaded certificate
 	 * 
+	 * @param certificate the certificate to import (x509 format)
+	 * @param privateKey the private key to import (PKCS8 format)
+	 * 
 	 * @throws ServerException an error happened manipulating the keystore
 	 */
-	public void importCertificate(String privateKey) throws ServerException;
+	public void importCertificate(String certificate, String privateKey) throws ServerException;
+	
+	/**
+	 * Read the uploaded file and returns it's content
+	 * 
+	 * @return the file's content
+	 * 
+	 * @throws ServerException an error happened manipulating the keystore
+	 */
+	public String getUploadedContent() throws ServerException;
 
 	/**
 	 * Delete the certificate of the current user

@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.account;
+package com.logicaldoc.gui.frontend.client.account.certificate;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -9,17 +9,14 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.MultipleUpload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -29,15 +26,21 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9
  */
-public class CertificateUploadDialog extends Window {
+public class OwnCertificateDialog extends Window {
+
+	private static final String PRIVATEKEY = "privatekey";
+
+	private static final String CERTIFICATE = "certificate";
 
 	private DynamicForm form;
 
-	private MultipleUpload uploader;
-
 	private IButton submitButton;
 
-	public CertificateUploadDialog() {
+	private static final int TEXTAREA_HEIGHT = 120;
+
+	private static final int TEXTAREA_WIDTH = 530;
+
+	public OwnCertificateDialog() {
 		super();
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -45,35 +48,17 @@ public class CertificateUploadDialog extends Window {
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
-		setWidth(520);
-		setHeight(620);
+		setAutoSize(true);
 		centerInPage();
 
 		submitButton = new IButton(I18N.message("submit"));
 		submitButton.addClickHandler(event -> onSubmit());
-		submitButton.setDisabled(true);
 
 		prepareForm();
 
-		uploader = new MultipleUpload(submitButton, "dropyourcerthere");
-		uploader.setFileTypes("*.cer,*.crt");
-		uploader.setWidth("520");
-		uploader.setMaxUploads(1);
-
-		HLayout spacer1 = new HLayout();
-		spacer1.setWidth100();
-		spacer1.setHeight(6);
-
-		HLayout spacer2 = new HLayout();
-		spacer2.setWidth100();
-		spacer2.setHeight(6);
-		
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
 		layout.setWidth100();
-		layout.addMember(spacer1);
-		layout.addMember(uploader);
-		layout.addMember(spacer2);
 		layout.addMember(form);
 		layout.addMember(submitButton);
 
@@ -118,51 +103,58 @@ public class CertificateUploadDialog extends Window {
 		form.setColWidths("1px, 100%");
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextAreaItem privateKey = ItemFactory.newTextAreaItem("privatekey", null);
-		privateKey.setRequired(true);
-		privateKey.setMinHeight(400);
-		privateKey.setWidth(500);
+		TextAreaItem certificateItem = ItemFactory.newTextAreaItem(CERTIFICATE, CERTIFICATE, null);
+		certificateItem.setWrapTitle(false);
+		certificateItem.setRequired(true);
+		certificateItem.setColSpan(2);
+		certificateItem.setWidth(TEXTAREA_WIDTH);
+		certificateItem.setHeight(TEXTAREA_HEIGHT);
+		certificateItem.setIcons(new CertificateUploadFormItemIcon("uploadcertificate"));
 
-		form.setItems(privateKey);
+		TextAreaItem privateKeyItem = ItemFactory.newTextAreaItem(PRIVATEKEY, PRIVATEKEY, null);
+		privateKeyItem.setWrapTitle(false);
+		privateKeyItem.setRequired(true);
+		privateKeyItem.setColSpan(2);
+		privateKeyItem.setWidth(TEXTAREA_WIDTH);
+		privateKeyItem.setHeight(TEXTAREA_HEIGHT);
+		privateKeyItem.setIcons(new CertificateUploadFormItemIcon("uploadprivatekey"));
+
+		form.setItems(certificateItem, privateKeyItem);
 	}
 
 	public void onSubmit() {
 		if (Boolean.FALSE.equals(form.validate()))
 			return;
 
-		if (uploader.getUploadedFiles().isEmpty()) {
-			SC.warn(I18N.message("filerequired"));
-			return;
-		}
-
 		LD.contactingServer();
-		SignService.Instance.get().importCertificate(form.getValueAsString("privatekey"), new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
+		SignService.Instance.get().importCertificate(form.getValueAsString(CERTIFICATE),
+				form.getValueAsString(PRIVATEKEY), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						GuiLog.serverError(caught);
+					}
 
-			@Override
-			public void onSuccess(Void arg0) {
-				LD.clearPrompt();
-				cleanUploadFolder();
-				SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-						new AsyncCallback<GUIUser>() {
+					@Override
+					public void onSuccess(Void arg0) {
+						LD.clearPrompt();
+						cleanUploadFolder();
+						SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
+								new AsyncCallback<GUIUser>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-							@Override
-							public void onSuccess(GUIUser user) {
-								Session.get().setUser(user);
-								UserController.get().changed(user);
-								destroy();
-							}
-						});
-			}
-		});
+									@Override
+									public void onSuccess(GUIUser user) {
+										Session.get().setUser(user);
+										UserController.get().changed(user);
+										destroy();
+									}
+								});
+					}
+				});
 	}
 }
