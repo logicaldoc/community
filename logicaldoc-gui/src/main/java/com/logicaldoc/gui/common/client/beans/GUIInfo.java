@@ -18,7 +18,7 @@ public class GUIInfo implements Serializable {
 
 	private String release = "8.9";
 
-	private String year = "2006-2023";
+	private String year = "2006-2024";
 
 	private String userNo;
 

@@ -34,7 +34,7 @@ public class SystemInfo {
 
 	protected String release = "8.9";
 
-	protected String year = "2006-2023";
+	protected String year = "2006-2024";
 
 	protected String help = "https://docs.logicaldoc.com";
 
