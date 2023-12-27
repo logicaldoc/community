@@ -225,7 +225,7 @@ create table ld_dashlet(ld_id bigint not null, ld_lastmodified datetime not null
                         ld_type varchar(255), ld_query varchar(4000), ld_content varchar(4000), ld_max int, ld_columns varchar(1000), 
                         ld_unique int not null, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_device (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
-                        ld_deleted int not null, ld_tenantid bigint not null, , ld_creation datetime not null, ld_userid bigint, 
+                        ld_deleted int not null, ld_tenantid bigint not null, ld_creation datetime not null, ld_userid bigint, 
                         ld_deviceid varchar(255) not null, ld_username varchar(255),
                         ld_browser varchar(255), ld_browserversion varchar(255), ld_operativesystem varchar(255),
                         ld_type varchar(255), ld_ip varchar(255), ld_trusted int, ld_lastlogin datetime, ld_label varchar(255), 
