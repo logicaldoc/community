@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -295,7 +296,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		clonedTemplate.setAttributes(originalTemplate.getAttributes().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		store(clonedTemplate);
-		jdbcUpdate("insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) select "+clonedTemplate.getId()+", ld_groupid, ld_write from ld_templategroup where ld_templateid="+id);
+		jdbcUpdate("insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) select " + clonedTemplate.getId()
+				+ ", ld_groupid, ld_write from ld_templategroup where ld_templateid=" + id);
 		initialize(clonedTemplate);
 		return clonedTemplate;
 	}

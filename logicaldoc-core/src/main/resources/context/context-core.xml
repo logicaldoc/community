@@ -95,26 +95,22 @@
          <bean class="com.logicaldoc.core.metadata.HibernateAttributeSetDAO" />
       </property>
    </bean>
-   <bean id="TemplateDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="TemplateDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.metadata.HibernateTemplateDAO" lazy-init="default">
+         <bean class="com.logicaldoc.core.metadata.HibernateTemplateDAO" autowire="no">
             <property name="sessionFactory" ref="SessionFactory" />
             <property name="userDAO" ref="UserDAO" />
          </bean>
       </property>
    </bean>
-   <bean id="SystemMessageDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="SystemMessageDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.communication.HibernateSystemMessageDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.communication.HibernateSystemMessageDAO" />
       </property>
    </bean>
-   <bean id="MessageTemplateDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="MessageTemplateDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.communication.HibernateMessageTemplateDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.communication.HibernateMessageTemplateDAO" />
       </property>
    </bean>
    <bean id="DocumentLinkDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
