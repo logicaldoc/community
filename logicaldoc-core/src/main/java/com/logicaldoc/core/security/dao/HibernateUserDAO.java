@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -58,14 +59,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	private static final String USERNAME = "username";
 
+	@Autowired
 	private GenericDAO genericDAO;
 
+	@Autowired
 	private UserHistoryDAO userHistoryDAO;
 
+	@Autowired
 	private PasswordHistoryDAO passwordHistoryDAO;
 
+	@Autowired
 	private UserListenerManager userListenerManager;
 
+	@Autowired
 	private ContextProperties config;
 
 	private HibernateUserDAO() {

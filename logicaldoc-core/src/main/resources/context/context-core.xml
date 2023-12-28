@@ -30,38 +30,24 @@
    <bean id="SearchEngine" class="${searchengine}" destroy-method="close" init-method="init" />
    
    <!-- DAOs -->
-   <bean id="SessionDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="SessionDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateSessionDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernateSessionDAO" />
       </property>
    </bean>   
-   <bean id="UserDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="UserDAO" abstract="false" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateUserDAO" lazy-init="default">
-            <property name="config" ref="ContextProperties" />
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="userHistoryDAO" ref="UserHistoryDAO" />
-            <property name="genericDAO" ref="GenericDAO" />
-            <property name="passwordHistoryDAO" ref="PasswordHistoryDAO" />
-            <property name="userListenerManager" ref="UserListenerManager" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernateUserDAO" />
       </property>
    </bean>
-   <bean id="PasswordHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="PasswordHistoryDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernatePasswordHistoryDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernatePasswordHistoryDAO" />
       </property>
    </bean>   
-   <bean id="MenuDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="MenuDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateMenuDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="userDAO" ref="UserDAO" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernateMenuDAO" />
       </property>
    </bean>
    <bean id="FolderHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">

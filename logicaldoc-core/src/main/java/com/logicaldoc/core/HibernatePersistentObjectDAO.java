@@ -22,6 +22,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -53,6 +54,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected Class<T> entityClass;
 
+	@Autowired
 	protected SessionFactory sessionFactory;
 
 	protected static final String ASPECT_STORING = "storing";
