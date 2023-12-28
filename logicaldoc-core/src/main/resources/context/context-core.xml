@@ -92,13 +92,9 @@
          </bean>
       </property>
    </bean>
-   <bean id="AttributeSetDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="AttributeSetDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.metadata.HibernateAttributeSetDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="optionsDao" ref="AttributeOptionDAO" />
-            <property name="templateDao" ref="TemplateDAO" />
-         </bean>
+         <bean class="com.logicaldoc.core.metadata.HibernateAttributeSetDAO" />
       </property>
    </bean>
    <bean id="TemplateDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
