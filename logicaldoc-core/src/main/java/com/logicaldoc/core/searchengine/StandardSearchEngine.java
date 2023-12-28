@@ -33,6 +33,7 @@ import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Joiner;
 import com.logicaldoc.core.PersistenceException;
@@ -65,10 +66,13 @@ public class StandardSearchEngine implements SearchEngine {
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
+	@Autowired
 	private ContextProperties config;
 
+	@Autowired
 	protected DocumentDAO documentDao;
 
+	@Autowired
 	protected DocumentNoteDAO noteDao;
 
 	protected EmbeddedSolrServer server;

@@ -24,16 +24,10 @@
    
    <bean id="JobManager" class="com.logicaldoc.core.job.JobManager" />
    
-   <!-- Storer -->
    <bean id="StorerManager" class="com.logicaldoc.core.store.StorerManager" />
    <bean id="Storer" class="${store}" init-method="init" destroy-method="destroy" />
-   
-   <!-- SearchEngine -->
-   <bean id="SearchEngine" abstract="false" autowire="default" class="${searchengine}" destroy-method="close" init-method="init" lazy-init="default">
-      <property name="config" ref="ContextProperties" />
-      <property name="documentDao" ref="DocumentDAO" />
-      <property name="noteDao" ref="DocumentNoteDAO" />
-   </bean>
+      
+   <bean id="SearchEngine" class="${searchengine}" destroy-method="close" init-method="init" />
    
    <!-- DAOs -->
    <bean id="SessionDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
