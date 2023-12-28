@@ -27,7 +27,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 
 	private DocumentDAO documentDAO;
 
-	private ContextProperties contextProperties;
+	private ContextProperties config;
 
 	public HibernateTicketDAO() {
 		super(Ticket.class);
@@ -46,7 +46,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 
 		if (entity.getExpired() == null) {
 			// Retrieve the time to live
-			int ttl = contextProperties.getInt("ticket.ttl");
+			int ttl = config.getInt("ticket.ttl");
 			Calendar cal = Calendar.getInstance();
 			cal.add(Calendar.HOUR_OF_DAY, +ttl);
 			entity.setExpired(cal.getTime());
@@ -134,8 +134,8 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		return result;
 	}
 
-	public void setContextProperties(ContextProperties contextProperties) {
-		this.contextProperties = contextProperties;
+	public void setConfig(ContextProperties config) {
+		this.config = config;
 	}
 
 	@Override

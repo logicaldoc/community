@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
@@ -35,6 +36,7 @@ public class EventCollector {
 
 	private Set<EventListener> listeners = new HashSet<>();
 
+	@Autowired
 	private ContextProperties config;
 
 	// Maintain a fifos for the history IDs. Key is the class name, value is a

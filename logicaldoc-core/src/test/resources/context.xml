@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-autowire="no" default-lazy-init="false"
+<beans default-lazy-init="false"
     xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
     xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
@@ -18,6 +18,9 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
     <import resource="classpath*:context/context-*.xml" />
+    
+    <context:annotation-config />
+    
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"
 		class="com.logicaldoc.util.spring.PropertiesPlaceHolder" lazy-init="false" abstract="false"
@@ -28,8 +31,9 @@
 			</list>
 		</property>
 	</bean>
-    <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties">
-    </bean>
+	
+    <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
+    
     <bean id="Context" class="com.logicaldoc.util.Context" abstract="false"
         lazy-init="default" autowire="default" />
     

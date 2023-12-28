@@ -16,9 +16,7 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
    
-   <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector">
-      <property name="config" ref="ContextProperties" />
-   </bean>
+   <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" />
     
    <!-- System Load Monitor -->
    <bean id="SystemLoadMonitor" abstract="false" autowire="default" class="${load}" lazy-init="default" init-method="start" destroy-method="stop">
@@ -115,7 +113,7 @@
       <property name="target">
          <bean abstract="false" autowire="default" class="com.logicaldoc.core.ticket.HibernateTicketDAO" lazy-init="default">
             <property name="sessionFactory" ref="SessionFactory" />
-            <property name="contextProperties" ref="ContextProperties" />
+            <property name="config" ref="ContextProperties" />
             <property name="documentDAO" ref="DocumentDAO" />
          </bean>
       </property>
