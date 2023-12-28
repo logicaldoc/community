@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
@@ -45,8 +46,10 @@ public abstract class AbstractStorer implements Storer {
 
 	protected static Logger deletionsLog = LoggerFactory.getLogger("STORAGE_DELETIONS");
 
+	@Autowired
 	protected ContextProperties config;
 
+	@Autowired
 	protected StorerManager manager;
 
 	protected int id = 1;

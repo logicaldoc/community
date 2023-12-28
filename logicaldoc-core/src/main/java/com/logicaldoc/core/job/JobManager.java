@@ -25,6 +25,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -45,8 +46,10 @@ public class JobManager {
 
 	protected static Logger log = LoggerFactory.getLogger(JobManager.class);
 
+	@Autowired
 	private Scheduler scheduler;
 
+	@Autowired
 	private ContextProperties config;
 
 	/**

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -27,6 +28,7 @@ public class StorerManager {
 	// Key is the type, value is the associated builder
 	private Map<String, Storer> storers = new HashMap<>();
 
+	@Autowired
 	private ContextProperties config;
 
 	public static StorerManager get() {

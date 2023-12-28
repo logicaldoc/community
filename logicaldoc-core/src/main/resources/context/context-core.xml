@@ -18,24 +18,15 @@
    
    <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" />
     
-   <!-- System Load Monitor -->
    <bean id="SystemLoadMonitor" class="${load}" init-method="start" destroy-method="stop" />
    
    <bean id="ThreadPools" class="com.logicaldoc.core.threading.ThreadPools" destroy-method="shutdown" />
    
-   <bean id="JobManager" abstract="false" autowire="default" class="com.logicaldoc.core.job.JobManager">
-      <property name="config" ref="ContextProperties" />
-      <property name="scheduler" ref="Scheduler" />
-   </bean>
+   <bean id="JobManager" class="com.logicaldoc.core.job.JobManager" />
    
    <!-- Storer -->
-   <bean id="StorerManager" class="com.logicaldoc.core.store.StorerManager">
-      <property name="config" ref="ContextProperties" />
-   </bean>
-   <bean id="Storer" abstract="false" autowire="default" class="${store}" lazy-init="default" init-method="init" destroy-method="destroy">
-      <property name="config" ref="ContextProperties" />
-      <property name="manager" ref="StorerManager" />
-   </bean>
+   <bean id="StorerManager" class="com.logicaldoc.core.store.StorerManager" />
+   <bean id="Storer" class="${store}" init-method="init" destroy-method="destroy" />
    
    <!-- SearchEngine -->
    <bean id="SearchEngine" abstract="false" autowire="default" class="${searchengine}" destroy-method="close" init-method="init" lazy-init="default">
