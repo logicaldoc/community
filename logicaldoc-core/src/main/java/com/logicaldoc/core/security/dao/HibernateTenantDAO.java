@@ -23,7 +23,7 @@ import com.logicaldoc.util.config.ContextProperties;
 public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> implements TenantDAO {
 
 	@SuppressWarnings("unused")
-	private ContextProperties conf;
+	private ContextProperties config;
 
 	@SuppressWarnings("unused")
 	private FolderDAO folderDao;
@@ -96,8 +96,8 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 		this.userDao = userDao;
 	}
 
-	public void setConf(ContextProperties conf) {
-		this.conf = conf;
+	public void setConfig(ContextProperties config) {
+		this.config = config;
 	}
 
 	public void setGenericDao(GenericDAO genericDao) {

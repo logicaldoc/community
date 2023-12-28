@@ -3,6 +3,7 @@ package com.logicaldoc.core.folder;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.task.Task;
@@ -19,6 +20,7 @@ public class PathCalculator extends Task {
 
 	public static final String NAME = "PathCalculator";
 
+	@Autowired
 	private FolderDAO folderDao;
 
 	private long processed = 0;

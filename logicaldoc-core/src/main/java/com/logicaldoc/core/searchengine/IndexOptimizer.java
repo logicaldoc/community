@@ -3,6 +3,7 @@ package com.logicaldoc.core.searchengine;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -18,8 +19,10 @@ import com.logicaldoc.core.task.TaskException;
 public class IndexOptimizer extends Task {
 	public static final String NAME = "IndexOptimizer";
 
+	@Autowired
 	private SearchEngine indexer;
 
+	@Autowired
 	private DocumentDAO documentDao;
 
 	public IndexOptimizer() {
@@ -57,7 +60,7 @@ public class IndexOptimizer extends Task {
 	/**
 	 * Removes from index all documents deleted in the database
 	 * 
-	 * @throws PersistenceException error at data layer 
+	 * @throws PersistenceException error at data layer
 	 */
 	private void deleteOrphaned() throws PersistenceException {
 		List<Long> ids = documentDao.findDeletedDocIds();

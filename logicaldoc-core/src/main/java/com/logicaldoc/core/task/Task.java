@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
@@ -70,10 +71,13 @@ public abstract class Task implements Runnable {
 
 	protected Throwable lastRunError = null;
 
+	@Autowired
 	protected ContextProperties config;
 
+	@Autowired
 	protected EMailSender sender = null;
 
+	@Autowired
 	protected UserDAO userDao = null;
 
 	protected boolean sendActivityReport = false;
@@ -82,8 +86,10 @@ public abstract class Task implements Runnable {
 
 	protected String transactionId = null;
 
+	@Autowired
 	protected LockManager lockManager;
 
+	@Autowired
 	protected SystemLoadMonitor systemLoadMonitor;
 
 	private Random random = new Random();

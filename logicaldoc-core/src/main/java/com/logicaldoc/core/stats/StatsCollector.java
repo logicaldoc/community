@@ -17,6 +17,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.EMailSender;
@@ -53,16 +54,22 @@ public class StatsCollector extends Task {
 
 	public static final String NAME = "StatsCollector";
 
+	@Autowired
 	private DocumentDAO documentDAO;
 
+	@Autowired
 	private FolderDAO folderDAO;
 
+	@Autowired
 	private GroupDAO groupDAO;
 
+	@Autowired
 	protected GenericDAO genericDAO;
 
+	@Autowired
 	protected TenantDAO tenantDAO;
 
+	@Autowired
 	private SequenceDAO sequenceDAO;
 
 	private static String userno = "community";

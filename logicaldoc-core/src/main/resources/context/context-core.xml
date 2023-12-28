@@ -230,7 +230,7 @@
       <property name="target">
          <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateTenantDAO" lazy-init="default">
             <property name="sessionFactory" ref="SessionFactory" />
-            <property name="conf" ref="ContextProperties" />
+            <property name="config" ref="ContextProperties" />
             <property name="genericDao" ref="GenericDAO" />
             <property name="userDao" ref="UserDAO" />
             <property name="groupDao" ref="GroupDAO" />
@@ -279,7 +279,7 @@
    <bean id="SessionManager" class="com.logicaldoc.core.security.SessionManager" destroy-method="destroy" />
    
    
-   <bean id="EMailSender" abstract="false" autowire="default" class="com.logicaldoc.core.communication.EMailSender" lazy-init="default">
+   <bean id="EMailSender" class="com.logicaldoc.core.communication.EMailSender" lazy-init="default">
       <property name="host" value="${default.smtp.host}" />
       <property name="port" value="${default.smtp.port}" />
       <property name="username" value="${default.smtp.username}" />
@@ -292,15 +292,7 @@
    
    
    <!-- Tasks -->
-   <bean id="IndexOptimizer" class="com.logicaldoc.core.searchengine.IndexOptimizer">
-      <property name="indexer" ref="SearchEngine" />
-      <property name="documentDao" ref="DocumentDAO" />
-      <property name="config" ref="ContextProperties" />
-      <property name="sender" ref="EMailSender" />
-      <property name="userDao" ref="UserDAO" />
-      <property name="lockManager" ref="LockManager" />
-      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
-   </bean>
+   <bean id="IndexOptimizer" class="com.logicaldoc.core.searchengine.IndexOptimizer" />
    <bean id="IndexOptimizerJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="IndexOptimizer" />
       <property name="targetMethod" value="run" />
@@ -309,16 +301,8 @@
    <bean id="IndexOptimizerTrigger" class="com.logicaldoc.core.task.TaskTrigger">
       <property name="task" ref="IndexOptimizer" />
       <property name="jobDetail" ref="IndexOptimizerJob" />
-      <property name="config" ref="ContextProperties" />
    </bean>
-   <bean id="TagsProcessor" class="com.logicaldoc.core.document.TagsProcessor">
-      <property name="config" ref="ContextProperties" />
-      <property name="userDao" ref="UserDAO" />
-      <property name="lockManager" ref="LockManager" />
-      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
-      <property name="sender" ref="EMailSender" />
-      <property name="documentDao" ref="DocumentDAO" />
-   </bean>
+   <bean id="TagsProcessor" class="com.logicaldoc.core.document.TagsProcessor" />
    <bean id="TagsProcessorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="TagsProcessor" />
       <property name="targetMethod" value="run" />
@@ -329,17 +313,7 @@
       <property name="jobDetail" ref="TagsProcessorJob" />
       <property name="config" ref="ContextProperties" />
    </bean>
-   <bean id="IndexerTask" class="com.logicaldoc.core.searchengine.IndexerTask">
-      <property name="indexer" ref="SearchEngine" />
-      <property name="documentDao" ref="DocumentDAO" />
-      <property name="documentManager" ref="DocumentManager" />
-      <property name="tenantDao" ref="TenantDAO" />
-      <property name="config" ref="ContextProperties" />
-      <property name="sender" ref="EMailSender" />
-      <property name="userDao" ref="UserDAO" />
-      <property name="lockManager" ref="LockManager" />
-      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
-   </bean>
+   <bean id="IndexerTask" class="com.logicaldoc.core.searchengine.IndexerTask" />
    <bean id="IndexerTaskJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="IndexerTask" />
       <property name="targetMethod" value="run" />
@@ -350,19 +324,7 @@
       <property name="jobDetail" ref="IndexerTaskJob" />
       <property name="config" ref="ContextProperties" />
    </bean>
-   <bean id="StatsCollector" class="${stat}">
-      <property name="documentDAO" ref="DocumentDAO" />
-      <property name="folderDAO" ref="FolderDAO" />
-      <property name="genericDAO" ref="GenericDAO" />
-      <property name="groupDAO" ref="GroupDAO" />
-      <property name="tenantDAO" ref="TenantDAO" />
-      <property name="sequenceDAO" ref="SequenceDAO" />
-      <property name="config" ref="ContextProperties" />
-      <property name="sender" ref="EMailSender" />
-      <property name="userDao" ref="UserDAO" />
-      <property name="lockManager" ref="LockManager" />
-      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
-   </bean>
+   <bean id="StatsCollector" class="${stat}" />
    <bean id="StatsCollectorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="StatsCollector" />
       <property name="targetMethod" value="run" />
@@ -373,14 +335,7 @@
       <property name="jobDetail" ref="StatsCollectorJob" />
       <property name="config" ref="ContextProperties" />
    </bean>
-   <bean id="DigestProcessor" class="com.logicaldoc.core.document.DigestProcessor">
-      <property name="documentDao" ref="DocumentDAO" />
-      <property name="config" ref="ContextProperties" />
-      <property name="sender" ref="EMailSender" />
-      <property name="userDao" ref="UserDAO" />
-      <property name="lockManager" ref="LockManager" />
-      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
-   </bean>
+   <bean id="DigestProcessor" class="com.logicaldoc.core.document.DigestProcessor" />
    <bean id="DigestProcessorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="DigestProcessor" />
       <property name="targetMethod" value="run" />
@@ -391,15 +346,7 @@
       <property name="jobDetail" ref="DigestProcessorJob" />
       <property name="config" ref="ContextProperties" />
    </bean>
-   
-   <bean id="PathCalculator" class="com.logicaldoc.core.folder.PathCalculator">
-      <property name="folderDao" ref="FolderDAO" />
-      <property name="config" ref="ContextProperties" />
-      <property name="sender" ref="EMailSender" />
-      <property name="userDao" ref="UserDAO" />
-      <property name="lockManager" ref="LockManager" />
-      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
-   </bean>
+   <bean id="PathCalculator" class="com.logicaldoc.core.folder.PathCalculator" />
    <bean id="PathCalculatorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="PathCalculator" />
       <property name="targetMethod" value="run" />
@@ -411,8 +358,5 @@
       <property name="config" ref="ContextProperties" />
    </bean>   
    
-   <!-- Authentication -->
-   <bean id="DefaultAuthenticator" class="com.logicaldoc.core.security.authentication.DefaultAuthenticator">
-      <property name="userDAO" ref="UserDAO" />
-   </bean>
+   <bean id="DefaultAuthenticator" class="com.logicaldoc.core.security.authentication.DefaultAuthenticator" />
 </beans>

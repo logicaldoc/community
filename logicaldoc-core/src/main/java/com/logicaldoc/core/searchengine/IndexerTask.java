@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
@@ -54,12 +55,16 @@ public class IndexerTask extends Task {
 
 	public static final String NAME = "IndexerTask";
 
+	@Autowired
 	private DocumentManager documentManager;
 
+	@Autowired
 	private DocumentDAO documentDao;
 
+	@Autowired
 	private TenantDAO tenantDao;
 
+	@Autowired
 	private SearchEngine indexer;
 
 	private long indexed = 0;
