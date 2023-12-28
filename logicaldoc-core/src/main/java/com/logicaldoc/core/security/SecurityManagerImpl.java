@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -24,14 +25,19 @@ public class SecurityManagerImpl implements SecurityManager {
 
 	protected static Logger log = LoggerFactory.getLogger(SecurityManagerImpl.class);
 
+	@Autowired
 	protected UserDAO userDAO;
 
+	@Autowired
 	protected GroupDAO groupDAO;
 
+	@Autowired
 	protected MenuDAO menuDAO;
 
+	@Autowired
 	protected FolderDAO folderDAO;
 
+	@Autowired
 	protected DocumentDAO documentDAO;
 
 	private SecurityManagerImpl() {

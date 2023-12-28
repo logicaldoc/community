@@ -9,6 +9,7 @@ import java.util.Map;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -40,6 +41,7 @@ public class ThumbnailManager {
 
 	protected static Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
 
+	@Autowired
 	private Storer storer;
 
 	// Key is the extension, value is the associated builder

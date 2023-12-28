@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.Generic;
@@ -26,8 +27,10 @@ public class LockManager {
 
 	protected Logger log = LoggerFactory.getLogger(LockManager.class);
 
+	@Autowired
 	private GenericDAO genericDao;
 
+	@Autowired
 	private ContextProperties config;
 
 	/**

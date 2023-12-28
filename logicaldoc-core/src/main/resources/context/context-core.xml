@@ -266,50 +266,19 @@
    </bean>
    
    <!-- Managers -->   
-   <bean id="SecurityManager" abstract="false" autowire="default" class="com.logicaldoc.core.security.SecurityManagerImpl" lazy-init="default">
-            <property name="userDAO" ref="UserDAO" />
-            <property name="groupDAO" ref="GroupDAO" />
-            <property name="menuDAO" ref="MenuDAO" />
-            <property name="folderDAO" ref="FolderDAO" />
-            <property name="documentDAO" ref="DocumentDAO" />
-   </bean>   
-   <bean id="DocumentManager" class="com.logicaldoc.core.document.DocumentManagerImpl">
-            <property name="config" ref="ContextProperties" />
-            <property name="documentDAO" ref="DocumentDAO" />
-            <property name="documentNoteDAO" ref="DocumentNoteDAO" />
-            <property name="documentLinkDAO" ref="DocumentLinkDAO" />
-            <property name="folderDAO" ref="FolderDAO" />
-            <property name="versionDAO" ref="VersionDAO" />
-            <property name="ticketDAO" ref="TicketDAO" />
-            <property name="userDAO" ref="UserDAO" />
-            <property name="templateDAO" ref="TemplateDAO" />
-            <property name="storer" ref="Storer" />
-            <property name="indexer" ref="SearchEngine" />
-            <property name="listenerManager" ref="DocumentListenerManager" />
-   </bean>   
+   <bean id="SecurityManager" class="com.logicaldoc.core.security.SecurityManagerImpl" />
+   <bean id="DocumentManager" class="com.logicaldoc.core.document.DocumentManagerImpl" />
    <bean id="TaskManager" class="com.logicaldoc.core.task.TaskManager" />
    <bean id="DocumentListenerManager" class="com.logicaldoc.core.document.DocumentListenerManager" init-method="init" />
    <bean id="FolderListenerManager" class="com.logicaldoc.core.folder.FolderListenerManager" init-method="init" />
    <bean id="UserListenerManager" class="com.logicaldoc.core.security.UserListenerManager" />
-   <bean id="ThumbnailManager" class="com.logicaldoc.core.document.thumbnail.ThumbnailManager">
-      <property name="storer" ref="Storer" />
-   </bean>
-   <bean id="FormatConverterManager" class="com.logicaldoc.core.conversion.FormatConverterManager">
-      <property name="config" ref="ContextProperties" />
-      <property name="storer" ref="Storer" />
-      <property name="tenantDao" ref="TenantDAO" />
-      <property name="documentManager" ref="DocumentManager" />
-   </bean>
-   <bean id="LockManager" class="com.logicaldoc.core.lock.LockManager">
-      <property name="config" ref="ContextProperties" />
-      <property name="genericDao" ref="GenericDAO" />
-   </bean>
+   <bean id="ThumbnailManager" class="com.logicaldoc.core.document.thumbnail.ThumbnailManager" />
+   <bean id="FormatConverterManager" class="com.logicaldoc.core.conversion.FormatConverterManager" />
+   <bean id="LockManager" class="com.logicaldoc.core.lock.LockManager" />
    <bean id="AuthenticationChain" class="com.logicaldoc.core.security.authentication.AuthenticationChain" />
-   <bean id="SessionManager" class="com.logicaldoc.core.security.SessionManager" destroy-method="destroy">
-      <property name="authenticationChain" ref="AuthenticationChain" />
-      <property name="sessionDao" ref="SessionDAO" />
-   </bean>
-   <!-- Mail sender -->
+   <bean id="SessionManager" class="com.logicaldoc.core.security.SessionManager" destroy-method="destroy" />
+   
+   
    <bean id="EMailSender" abstract="false" autowire="default" class="com.logicaldoc.core.communication.EMailSender" lazy-init="default">
       <property name="host" value="${default.smtp.host}" />
       <property name="port" value="${default.smtp.port}" />
@@ -320,6 +289,8 @@
       <property name="folderId" value="${default.smtp.save.folderId}" />
       <property name="foldering" value="${default.smtp.save.foldering}" />
    </bean>
+   
+   
    <!-- Tasks -->
    <bean id="IndexOptimizer" class="com.logicaldoc.core.searchengine.IndexOptimizer">
       <property name="indexer" ref="SearchEngine" />

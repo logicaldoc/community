@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -47,8 +48,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	// The maximum number of closed session maintained in memory
 	private static final int MAX_CLOSED_SESSIONS = 50;
 
+	@Autowired
 	private transient AuthenticationChain authenticationChain;
 
+	@Autowired
 	private transient SessionDAO sessionDao;
 
 	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();

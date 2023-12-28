@@ -25,6 +25,7 @@ import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
@@ -82,28 +83,40 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
 
+	@Autowired
 	private DocumentDAO documentDAO;
 
+	@Autowired
 	private DocumentLinkDAO documentLinkDAO;
 
+	@Autowired
 	private DocumentNoteDAO documentNoteDAO;
 
+	@Autowired
 	private FolderDAO folderDAO;
 
+	@Autowired
 	private TemplateDAO templateDAO;
 
+	@Autowired
 	private DocumentListenerManager listenerManager;
 
+	@Autowired
 	private VersionDAO versionDAO;
 
+	@Autowired
 	private UserDAO userDAO;
 
+	@Autowired
 	private TicketDAO ticketDAO;
 
+	@Autowired
 	private SearchEngine indexer;
 
+	@Autowired
 	private Storer storer;
 
+	@Autowired
 	private ContextProperties config;
 
 	public void setListenerManager(DocumentListenerManager listenerManager) {

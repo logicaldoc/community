@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -54,12 +55,16 @@ public class FormatConverterManager {
 
 	protected static Logger log = LoggerFactory.getLogger(FormatConverterManager.class);
 
+	@Autowired
 	private Storer storer;
 
+	@Autowired
 	private TenantDAO tenantDao;
 
+	@Autowired
 	private DocumentManager documentManager;
 
+	@Autowired
 	private ContextProperties config;
 
 	// Key is the src_extension-dst_extension, value is a collection of
