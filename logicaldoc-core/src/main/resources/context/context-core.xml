@@ -19,13 +19,9 @@
    <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" />
     
    <!-- System Load Monitor -->
-   <bean id="SystemLoadMonitor" abstract="false" autowire="default" class="${load}" lazy-init="default" init-method="start" destroy-method="stop">
-      <property name="config" ref="ContextProperties" />
-   </bean>
+   <bean id="SystemLoadMonitor" class="${load}" init-method="start" destroy-method="stop" />
    
-   <bean id="ThreadPools" abstract="false" autowire="default" class="com.logicaldoc.core.threading.ThreadPools" lazy-init="default" destroy-method="shutdown">
-      <property name="config" ref="ContextProperties" />
-   </bean>
+   <bean id="ThreadPools" class="com.logicaldoc.core.threading.ThreadPools" destroy-method="shutdown" />
    
    <bean id="JobManager" abstract="false" autowire="default" class="com.logicaldoc.core.job.JobManager">
       <property name="config" ref="ContextProperties" />

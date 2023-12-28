@@ -10,6 +10,7 @@ import java.util.Scanner;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -25,6 +26,7 @@ public class SystemLoadMonitor {
 
 	protected static Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);
 
+	@Autowired
 	private ContextProperties config;
 
 	private CircularFifoQueue<Integer> samples = null;
