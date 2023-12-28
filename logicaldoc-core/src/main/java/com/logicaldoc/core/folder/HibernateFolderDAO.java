@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -93,12 +94,16 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String WHERE_GROUP_GROUPID_IN = " where _group.groupId in (";
 
+	@Autowired
 	private UserDAO userDAO;
 
+	@Autowired
 	private FolderHistoryDAO historyDAO;
 
+	@Autowired
 	private Storer storer;
 
+	@Autowired
 	private FolderListenerManager listenerManager;
 
 	protected HibernateFolderDAO() {

@@ -50,72 +50,39 @@
          <bean class="com.logicaldoc.core.security.dao.HibernateMenuDAO" />
       </property>
    </bean>
-   <bean id="FolderHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="FolderHistoryDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.folder.HibernateFolderHistoryDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.folder.HibernateFolderHistoryDAO" />
       </property>
    </bean>
-   <bean id="FolderDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="FolderDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.folder.HibernateFolderDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="userDAO" ref="UserDAO" />
-            <property name="historyDAO" ref="FolderHistoryDAO" />
-            <property name="storer" ref="Storer" />
-            <property name="listenerManager" ref="FolderListenerManager" />
-         </bean>
+         <bean class="com.logicaldoc.core.folder.HibernateFolderDAO" />
       </property>
    </bean>
-   <bean id="GroupDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="GroupDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateGroupDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="menuDAO" ref="MenuDAO" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernateGroupDAO" />
       </property>
    </bean>
-   <bean id="TicketDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="TicketDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.ticket.HibernateTicketDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="config" ref="ContextProperties" />
-            <property name="documentDAO" ref="DocumentDAO" />
-         </bean>
+         <bean class="com.logicaldoc.core.ticket.HibernateTicketDAO" />
       </property>
    </bean>
-   <bean id="DocumentHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="DocumentHistoryDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateDocumentHistoryDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.document.dao.HibernateDocumentHistoryDAO" />
       </property>
    </bean>
-   <bean id="VersionDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="VersionDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateVersionDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="folderDAO" ref="FolderDAO" />
-            <property name="storer" ref="Storer" />
-         </bean>
+         <bean class="com.logicaldoc.core.document.dao.HibernateVersionDAO" />
       </property>
    </bean>
-   <bean id="DocumentDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="DocumentDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateDocumentDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="noteDAO" ref="DocumentNoteDAO" />
-            <property name="documentHistoryDAO" ref="DocumentHistoryDAO" />
-            <property name="versionDAO" ref="VersionDAO" />
-            <property name="tenantDAO" ref="TenantDAO" />
-            <property name="folderDAO" ref="FolderDAO" />
-            <property name="userDAO" ref="UserDAO" />
-            <property name="linkDAO" ref="DocumentLinkDAO" />
-            <property name="storer" ref="Storer" />
-            <property name="config" ref="ContextProperties" />
-            <property name="listenerManager" ref="DocumentListenerManager" />
-         </bean>
+         <bean class="com.logicaldoc.core.document.dao.HibernateDocumentDAO" />
       </property>
    </bean>
    <bean id="AttributeOptionDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">

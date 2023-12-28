@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -21,6 +22,7 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> implements GroupDAO {
 
+	@Autowired
 	private MenuDAO menuDAO;
 
 	private HibernateGroupDAO() {

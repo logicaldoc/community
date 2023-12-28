@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -76,24 +77,34 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private static final String STATUS = ".status=";
 
+	@Autowired
 	private DocumentHistoryDAO documentHistoryDAO;
 
+	@Autowired
 	private VersionDAO versionDAO;
 
+	@Autowired
 	private TenantDAO tenantDAO;
 
+	@Autowired
 	private DocumentNoteDAO noteDAO;
 
+	@Autowired
 	private FolderDAO folderDAO;
 
+	@Autowired
 	private UserDAO userDAO;
 
+	@Autowired
 	private DocumentLinkDAO linkDAO;
 
+	@Autowired
 	private DocumentListenerManager listenerManager;
 
+	@Autowired
 	private Storer storer;
 
+	@Autowired
 	private ContextProperties config;
 
 	private HibernateDocumentDAO() {

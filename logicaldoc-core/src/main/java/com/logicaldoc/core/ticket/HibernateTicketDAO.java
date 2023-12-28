@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -25,8 +26,10 @@ import com.logicaldoc.util.config.ContextProperties;
 @SuppressWarnings("unchecked")
 public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> implements TicketDAO {
 
+	@Autowired
 	private DocumentDAO documentDAO;
 
+	@Autowired
 	private ContextProperties config;
 
 	public HibernateTicketDAO() {

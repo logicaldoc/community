@@ -1,8 +1,6 @@
 package com.logicaldoc.webservice;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import com.logicaldoc.util.junit.AbstractTestCase;
 
@@ -22,9 +20,7 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 		appContext.refresh();
 		return appContext;
 	}
-	
-	
-	
+
 	@Override
 	protected String[] getSqlScripts() {
 		return new String[] { "/sql/logicaldoc-core.sql", "/sql/logicaldoc-webservice.sql", "/data.sql" };
