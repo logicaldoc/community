@@ -85,11 +85,9 @@
          <bean class="com.logicaldoc.core.document.dao.HibernateDocumentDAO" />
       </property>
    </bean>
-   <bean id="AttributeOptionDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="AttributeOptionDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.metadata.HibernateAttributeOptionDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.metadata.HibernateAttributeOptionDAO" />
       </property>
    </bean>
    <bean id="AttributeSetDAO" parent="ApplicationBaseTransactionProxy">
