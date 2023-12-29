@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.CollectionUtils;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -22,31 +24,31 @@ import com.logicaldoc.util.config.ContextProperties;
 
 public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> implements TenantDAO {
 
-	@SuppressWarnings("unused")
+	@Resource(name="ContextProperties")
 	private ContextProperties config;
 
-	@SuppressWarnings("unused")
+	@Resource(name="FolderDAO")
 	private FolderDAO folderDao;
 
-	@SuppressWarnings("unused")
+	@Resource(name="GroupDAO")
 	private GroupDAO groupDao;
 
-	@SuppressWarnings("unused")
+	@Resource(name="UserDAO")
 	private UserDAO userDao;
 
-	@SuppressWarnings("unused")
+	@Resource(name="GenericDAO")
 	private GenericDAO genericDao;
 
-	@SuppressWarnings("unused")
+	@Resource(name="TemplateDAO")
 	private TemplateDAO templateDao;
 
-	@SuppressWarnings("unused")
+	@Resource(name="AttributeSetDAO")
 	private AttributeSetDAO attributeSetDao;
 
-	@SuppressWarnings("unused")
+	@Resource(name="MessageTemplateDAO")
 	private MessageTemplateDAO messageTemplateDao;
 
-	@SuppressWarnings("unused")
+	@Resource(name="DashletDAO")
 	private DashletDAO dashletDao;
 
 	protected HibernateTenantDAO() {

@@ -18,7 +18,7 @@
    
    <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" />
     
-   <bean id="SystemLoadMonitor" class="${load}" init-method="start" destroy-method="stop" />
+   <bean id="SystemLoadMonitor" class="com.logicaldoc.core.system.SystemLoadMonitor" init-method="start" destroy-method="stop" />
    
    <bean id="ThreadPools" class="com.logicaldoc.core.threading.ThreadPools" destroy-method="shutdown" />
    
