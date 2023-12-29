@@ -118,39 +118,53 @@
          <bean class="com.logicaldoc.core.document.dao.HibernateDocumentLinkDAO" />
       </property>
    </bean>
-   <bean id="GenericDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="GenericDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.generic.HibernateGenericDAO" />
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.generic.HibernateGenericDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
       </property>
    </bean>
-   <bean id="SequenceDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="SequenceDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.sequence.HibernateSequenceDAO" />
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.sequence.HibernateSequenceDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
       </property>
    </bean>
-   <bean id="UserHistoryDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="UserHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateUserHistoryDAO" />
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateUserHistoryDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
       </property>
    </bean>
-   <bean id="BookmarkDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="BookmarkDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateBookmarkDAO" />
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateBookmarkDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
       </property>
    </bean>
-   <bean id="RatingDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="RatingDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateRatingDAO" />
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateRatingDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
       </property>
    </bean>
-   <bean id="DocumentNoteDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="DocumentNoteDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateDocumentNoteDAO" />
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateDocumentNoteDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
       </property>
    </bean>
-   <bean id="ContactDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="ContactDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.contact.HibernateContactDAO" />
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.contact.HibernateContactDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
       </property>
    </bean>
    <bean id="TenantDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">

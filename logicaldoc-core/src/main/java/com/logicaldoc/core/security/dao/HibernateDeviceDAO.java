@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -25,8 +26,12 @@ import com.logicaldoc.core.security.User;
 public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> implements DeviceDAO {
 
 	private static final String USER_ID_EQUAL_USER_ID = ".userId = :userId";
+
 	private static final String AND = " and ";
+
 	private static final String USER_ID = "userId";
+
+	@Autowired
 	private UserDAO userDAO;
 
 	private HibernateDeviceDAO() {
