@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -31,7 +31,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 
 	private static final String USER_ID = "userId";
 
-	@Autowired
+	@Resource(name = "UserDAO")
 	private UserDAO userDAO;
 
 	private HibernateDeviceDAO() {

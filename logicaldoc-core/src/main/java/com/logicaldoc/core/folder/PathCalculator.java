@@ -2,8 +2,9 @@ package com.logicaldoc.core.folder;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.task.Task;
@@ -20,7 +21,7 @@ public class PathCalculator extends Task {
 
 	public static final String NAME = "PathCalculator";
 
-	@Autowired
+	@Resource(name = "FolderDAO")
 	private FolderDAO folderDao;
 
 	private long processed = 0;
@@ -79,7 +80,7 @@ public class PathCalculator extends Task {
 			String path = folderDao.computePath(id);
 			folderDao.jdbcUpdate("update ld_folder set ld_path='" + path + "' where ld_id=" + id);
 			processed++;
-			} catch (Exception t) {
+		} catch (Exception t) {
 			log.error("Error processing folder {}: {}", id, t.getMessage(), t);
 			errors++;
 		} finally {

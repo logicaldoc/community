@@ -1,7 +1,8 @@
 package com.logicaldoc.core.document;
 
+import javax.annotation.Resource;
+
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -19,7 +20,7 @@ public class TagsProcessor extends Task {
 
 	public static final String NAME = "TagsProcessor";
 
-	@Autowired
+	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDao;
 
 	public TagsProcessor() {

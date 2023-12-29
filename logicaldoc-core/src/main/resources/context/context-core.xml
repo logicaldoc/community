@@ -97,10 +97,7 @@
    </bean>
    <bean id="TemplateDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.metadata.HibernateTemplateDAO" autowire="no">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="userDAO" ref="UserDAO" />
-         </bean>
+         <bean class="com.logicaldoc.core.metadata.HibernateTemplateDAO" />
       </property>
    </bean>
    <bean id="SystemMessageDAO" parent="ApplicationBaseTransactionProxy">
@@ -123,11 +120,9 @@
          <bean class="com.logicaldoc.core.generic.HibernateGenericDAO" />
       </property>
    </bean>
-   <bean id="SequenceDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="SequenceDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.sequence.HibernateSequenceDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.sequence.HibernateSequenceDAO" />
       </property>
    </bean>
    <bean id="UserHistoryDAO" parent="ApplicationBaseTransactionProxy">
@@ -135,11 +130,9 @@
          <bean class="com.logicaldoc.core.security.dao.HibernateUserHistoryDAO" />
       </property>
    </bean>
-   <bean id="BookmarkDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="BookmarkDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateBookmarkDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.document.dao.HibernateBookmarkDAO" />
       </property>
    </bean>
    <bean id="RatingDAO" parent="ApplicationBaseTransactionProxy">
@@ -157,20 +150,9 @@
          <bean class="com.logicaldoc.core.contact.HibernateContactDAO" />
       </property>
    </bean>
-   <bean id="TenantDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="TenantDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateTenantDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="config" ref="ContextProperties" />
-            <property name="genericDao" ref="GenericDAO" />
-            <property name="userDao" ref="UserDAO" />
-            <property name="groupDao" ref="GroupDAO" />
-            <property name="folderDao" ref="FolderDAO" />
-            <property name="templateDao" ref="TemplateDAO" />
-            <property name="dashletDao" ref="DashletDAO" />
-            <property name="messageTemplateDao" ref="MessageTemplateDAO" />
-            <property name="attributeSetDao" ref="AttributeSetDAO" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernateTenantDAO" />
       </property>
    </bean>
    <bean id="DashletDAO" parent="ApplicationBaseTransactionProxy">
@@ -178,19 +160,14 @@
          <bean class="com.logicaldoc.core.dashlet.HibernateDashletDAO" />
       </property>
    </bean>
-   <bean id="DeviceDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="DeviceDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateDeviceDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-            <property name="userDAO" ref="UserDAO" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernateDeviceDAO" />
       </property>
    </bean>
-   <bean id="SearchDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="SearchDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.searchengine.saved.HibernateSearchDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.searchengine.saved.HibernateSearchDAO" />
       </property>
    </bean>
    

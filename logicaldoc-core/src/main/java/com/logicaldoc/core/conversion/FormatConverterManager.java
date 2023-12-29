@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -55,16 +57,16 @@ public class FormatConverterManager {
 
 	protected static Logger log = LoggerFactory.getLogger(FormatConverterManager.class);
 
-	@Autowired
+	@Resource(name = "Storer")
 	private Storer storer;
 
-	@Autowired
+	@Resource(name = "TenantDAO")
 	private TenantDAO tenantDao;
 
-	@Autowired
+	@Resource(name = "DocumentManager")
 	private DocumentManager documentManager;
 
-	@Autowired
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	// Key is the src_extension-dst_extension, value is a collection of

@@ -16,10 +16,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
@@ -71,26 +72,26 @@ public abstract class Task implements Runnable {
 
 	protected Throwable lastRunError = null;
 
-	@Autowired
+	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
 
-	@Autowired
+	@Resource(name = "EMailSender")
 	protected EMailSender sender = null;
 
-	@Autowired
+	@Resource(name = "UserDAO")
 	protected UserDAO userDao = null;
+
+	@Resource(name = "LockManager")
+	protected LockManager lockManager;
+
+	@Resource(name = "SystemLoadMonitor")
+	protected SystemLoadMonitor systemLoadMonitor;
 
 	protected boolean sendActivityReport = false;
 
 	private String reportRecipients = null;
 
 	protected String transactionId = null;
-
-	@Autowired
-	protected LockManager lockManager;
-
-	@Autowired
-	protected SystemLoadMonitor systemLoadMonitor;
 
 	private Random random = new Random();
 

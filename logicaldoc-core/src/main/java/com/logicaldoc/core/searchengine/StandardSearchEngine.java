@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CheckIndex;
@@ -33,7 +35,6 @@ import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Joiner;
 import com.logicaldoc.core.PersistenceException;
@@ -66,13 +67,13 @@ public class StandardSearchEngine implements SearchEngine {
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
-	@Autowired
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
-	@Autowired
+	@Resource(name = "DocumentDAO")
 	protected DocumentDAO documentDao;
 
-	@Autowired
+	@Resource(name = "DocumentNoteDAO")
 	protected DocumentNoteDAO noteDao;
 
 	protected EmbeddedSolrServer server;

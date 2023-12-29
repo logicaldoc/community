@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -26,7 +27,7 @@ public class SystemLoadMonitor {
 
 	protected static Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);
 
-	@Autowired
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	private CircularFifoQueue<Integer> samples = null;
@@ -97,7 +98,9 @@ public class SystemLoadMonitor {
 		try {
 			Exec exec = new Exec();
 			exec.setOutPrefix(null);
-			exec.exec("Powershell \"[string][int](Get-Counter '\\Processor(*)\\% Processor Time').Countersamples[0].CookedValue", null, null, sb, 5);
+			exec.exec(
+					"Powershell \"[string][int](Get-Counter '\\Processor(*)\\% Processor Time').Countersamples[0].CookedValue",
+					null, null, sb, 5);
 		} catch (IOException e1) {
 			log.warn(e1.getMessage(), e1);
 			return 0;

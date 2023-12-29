@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -83,40 +85,40 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
 
-	@Autowired
+	@Resource(name="DocumentDAO")
 	private DocumentDAO documentDAO;
 
-	@Autowired
+	@Resource(name="DocumentLinkDAO")
 	private DocumentLinkDAO documentLinkDAO;
 
-	@Autowired
+	@Resource(name="DocumentNoteDAO")
 	private DocumentNoteDAO documentNoteDAO;
 
-	@Autowired
+	@Resource(name="FolderDAO")
 	private FolderDAO folderDAO;
 
-	@Autowired
+	@Resource(name="TemplateDAO")
 	private TemplateDAO templateDAO;
 
-	@Autowired
+	@Resource(name="DocumentListenerManager")
 	private DocumentListenerManager listenerManager;
 
-	@Autowired
+	@Resource(name="VersionDAO")
 	private VersionDAO versionDAO;
 
-	@Autowired
+	@Resource(name="UserDAO")
 	private UserDAO userDAO;
 
-	@Autowired
+	@Resource(name="TicketDAO")
 	private TicketDAO ticketDAO;
 
-	@Autowired
+	@Resource(name="SearchEngine")
 	private SearchEngine indexer;
 
-	@Autowired
+	@Resource(name="Storer")
 	private Storer storer;
 
-	@Autowired
+	@Resource(name="ContextProperties")
 	private ContextProperties config;
 
 	public void setListenerManager(DocumentListenerManager listenerManager) {

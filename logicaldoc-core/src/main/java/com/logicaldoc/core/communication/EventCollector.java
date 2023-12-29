@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,7 @@ public class EventCollector {
 
 	private Set<EventListener> listeners = new HashSet<>();
 
-	@Autowired
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	// Maintain a fifos for the history IDs. Key is the class name, value is a

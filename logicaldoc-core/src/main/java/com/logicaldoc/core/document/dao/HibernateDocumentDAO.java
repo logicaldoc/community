@@ -21,6 +21,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -77,34 +79,34 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private static final String STATUS = ".status=";
 
-	@Autowired
+	@Resource(name="DocumentHistoryDAO")
 	private DocumentHistoryDAO documentHistoryDAO;
 
-	@Autowired
+	@Resource(name="VersionDAO")
 	private VersionDAO versionDAO;
 
-	@Autowired
+	@Resource(name="TenantDAO")
 	private TenantDAO tenantDAO;
 
-	@Autowired
+	@Resource(name="DocumentNoteDAO")
 	private DocumentNoteDAO noteDAO;
 
-	@Autowired
+	@Resource(name="FolderDAO")
 	private FolderDAO folderDAO;
 
-	@Autowired
+	@Resource(name="UserDAO")
 	private UserDAO userDAO;
 
-	@Autowired
+	@Resource(name="DocumentLinkDAO")
 	private DocumentLinkDAO linkDAO;
 
-	@Autowired
+	@Resource(name="DocumentListenerManager")
 	private DocumentListenerManager listenerManager;
 
-	@Autowired
+	@Resource(name="Storer")
 	private Storer storer;
 
-	@Autowired
+	@Resource(name="ContextProperties")
 	private ContextProperties config;
 
 	private HibernateDocumentDAO() {

@@ -1,8 +1,9 @@
 package com.logicaldoc.core.security.authentication;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
@@ -22,7 +23,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
-	@Autowired
+	@Resource(name ="UserDAO")
 	protected UserDAO userDAO;
 
 	public void setUserDAO(UserDAO userDAO) {

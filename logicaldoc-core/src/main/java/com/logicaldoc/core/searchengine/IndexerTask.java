@@ -13,10 +13,11 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
@@ -55,16 +56,16 @@ public class IndexerTask extends Task {
 
 	public static final String NAME = "IndexerTask";
 
-	@Autowired
+	@Resource(name = "DocumentManager")
 	private DocumentManager documentManager;
 
-	@Autowired
+	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDao;
 
-	@Autowired
+	@Resource(name = "TenantDAO")
 	private TenantDAO tenantDao;
 
-	@Autowired
+	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
 
 	private long indexed = 0;

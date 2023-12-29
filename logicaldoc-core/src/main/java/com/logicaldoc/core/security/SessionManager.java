@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,10 +49,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	// The maximum number of closed session maintained in memory
 	private static final int MAX_CLOSED_SESSIONS = 50;
 
-	@Autowired
+	@Resource(name="AuthenticationChain")
 	private transient AuthenticationChain authenticationChain;
 
-	@Autowired
+	@Resource(name="SessionDAO")
 	private transient SessionDAO sessionDao;
 
 	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();

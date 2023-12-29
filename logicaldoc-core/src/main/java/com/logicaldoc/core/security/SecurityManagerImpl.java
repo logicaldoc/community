@@ -3,6 +3,8 @@ package com.logicaldoc.core.security;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,19 +27,19 @@ public class SecurityManagerImpl implements SecurityManager {
 
 	protected static Logger log = LoggerFactory.getLogger(SecurityManagerImpl.class);
 
-	@Autowired
+	@Resource(name="UserDAO")
 	protected UserDAO userDAO;
 
-	@Autowired
+	@Resource(name="GroupDAO")
 	protected GroupDAO groupDAO;
 
-	@Autowired
+	@Resource(name="MenuDAO")
 	protected MenuDAO menuDAO;
 
-	@Autowired
+	@Resource(name="FolderDAO")
 	protected FolderDAO folderDAO;
 
-	@Autowired
+	@Resource(name="DocumentDAO")
 	protected DocumentDAO documentDAO;
 
 	private SecurityManagerImpl() {

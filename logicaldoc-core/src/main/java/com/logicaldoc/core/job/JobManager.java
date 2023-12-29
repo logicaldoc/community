@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -25,7 +27,6 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -46,10 +47,10 @@ public class JobManager {
 
 	protected static Logger log = LoggerFactory.getLogger(JobManager.class);
 
-	@Autowired
+	@Resource(name = "Scheduler")
 	private Scheduler scheduler;
 
-	@Autowired
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	/**

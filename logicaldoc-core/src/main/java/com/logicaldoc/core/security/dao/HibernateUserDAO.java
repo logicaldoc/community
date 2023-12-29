@@ -14,6 +14,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -59,19 +61,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	private static final String USERNAME = "username";
 
-	@Autowired
+	@Resource(name="GenericDAO")
 	private GenericDAO genericDAO;
 
-	@Autowired
+	@Resource(name="UserHistoryDAO")
 	private UserHistoryDAO userHistoryDAO;
 
-	@Autowired
+	@Resource(name="PasswordHistoryDAO")
 	private PasswordHistoryDAO passwordHistoryDAO;
 
-	@Autowired
+	@Resource(name="UserListenerManager")
 	private UserListenerManager userListenerManager;
 
-	@Autowired
+	@Resource(name="ContextProperties")
 	private ContextProperties config;
 
 	private HibernateUserDAO() {

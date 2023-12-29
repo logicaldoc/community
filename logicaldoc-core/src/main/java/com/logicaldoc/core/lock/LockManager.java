@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +29,10 @@ public class LockManager {
 
 	protected Logger log = LoggerFactory.getLogger(LockManager.class);
 
-	@Autowired
+	@Resource(name="GenericDAO")
 	private GenericDAO genericDao;
 
-	@Autowired
+	@Resource(name="ContextProperties")
 	private ContextProperties config;
 
 	/**

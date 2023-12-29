@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,7 @@ public class StorerManager {
 	// Key is the type, value is the associated builder
 	private Map<String, Storer> storers = new HashMap<>();
 
-	@Autowired
+	@Resource(name="ContextProperties")
 	private ContextProperties config;
 
 	public static StorerManager get() {

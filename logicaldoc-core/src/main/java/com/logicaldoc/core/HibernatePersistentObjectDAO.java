@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.apache.commons.collections.MapUtils;
@@ -54,7 +55,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected Class<T> entityClass;
 
-	@Autowired
+	@Resource(name = "SessionFactory")
 	protected SessionFactory sessionFactory;
 
 	protected static final String ASPECT_STORING = "storing";

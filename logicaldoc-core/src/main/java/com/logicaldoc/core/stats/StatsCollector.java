@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
@@ -54,22 +56,22 @@ public class StatsCollector extends Task {
 
 	public static final String NAME = "StatsCollector";
 
-	@Autowired
+	@Resource(name="DocumentDAO")
 	private DocumentDAO documentDAO;
 
-	@Autowired
+	@Resource(name="FolderDAO")
 	private FolderDAO folderDAO;
 
-	@Autowired
+	@Resource(name="GroupDAO")
 	private GroupDAO groupDAO;
 
-	@Autowired
+	@Resource(name="GenericDAO")
 	protected GenericDAO genericDAO;
 
-	@Autowired
+	@Resource(name="TenantDAO")
 	protected TenantDAO tenantDAO;
 
-	@Autowired
+	@Resource(name="SequenceDAO")
 	private SequenceDAO sequenceDAO;
 
 	private static String userno = "community";

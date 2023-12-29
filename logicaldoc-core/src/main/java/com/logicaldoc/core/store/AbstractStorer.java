@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -46,10 +48,10 @@ public abstract class AbstractStorer implements Storer {
 
 	protected static Logger deletionsLog = LoggerFactory.getLogger("STORAGE_DELETIONS");
 
-	@Autowired
+	@Resource(name="ContextProperties")
 	protected ContextProperties config;
 
-	@Autowired
+	@Resource(name="StorerManager")
 	protected StorerManager manager;
 
 	protected int id = 1;

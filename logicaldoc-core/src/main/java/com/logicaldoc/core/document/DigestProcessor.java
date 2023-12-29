@@ -3,8 +3,9 @@ package com.logicaldoc.core.document;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Resource;
+
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
@@ -22,7 +23,7 @@ import com.logicaldoc.i18n.I18N;
 public class DigestProcessor extends Task {
 	public static final String NAME = "DigestProcessor";
 
-	@Autowired
+	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDao;
 
 	private long processed = 0;

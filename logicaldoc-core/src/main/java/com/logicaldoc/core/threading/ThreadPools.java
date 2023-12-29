@@ -9,9 +9,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -45,7 +46,7 @@ public class ThreadPools {
 
 	private Map<String, ExecutorService> pools = new HashMap<>();
 
-	@Autowired
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	public void setConfig(ContextProperties config) {

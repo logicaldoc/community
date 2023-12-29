@@ -2,8 +2,9 @@ package com.logicaldoc.core.searchengine;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -19,10 +20,10 @@ import com.logicaldoc.core.task.TaskException;
 public class IndexOptimizer extends Task {
 	public static final String NAME = "IndexOptimizer";
 
-	@Autowired
+	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
 
-	@Autowired
+	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDao;
 
 	public IndexOptimizer() {

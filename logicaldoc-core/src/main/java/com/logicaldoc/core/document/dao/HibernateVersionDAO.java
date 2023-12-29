@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +36,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	private static final String DOC_ID = ".docId=";
 
-	@Autowired
+	@Resource(name= "Storer")
 	private Storer storer;
 
-	@Autowired
+	@Resource(name= "FolderDAO")
 	private FolderDAO folderDAO;
 
 	private HibernateVersionDAO() {

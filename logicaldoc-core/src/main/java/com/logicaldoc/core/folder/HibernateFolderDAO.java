@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,16 +96,16 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String WHERE_GROUP_GROUPID_IN = " where _group.groupId in (";
 
-	@Autowired
+	@Resource(name="UserDAO")
 	private UserDAO userDAO;
 
-	@Autowired
+	@Resource(name="FolderHistoryDAO")
 	private FolderHistoryDAO historyDAO;
 
-	@Autowired
+	@Resource(name="Storer")
 	private Storer storer;
 
-	@Autowired
+	@Resource(name="FolderListenerManager")
 	private FolderListenerManager listenerManager;
 
 	protected HibernateFolderDAO() {
