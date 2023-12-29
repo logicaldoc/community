@@ -130,11 +130,9 @@
          </bean>
       </property>
    </bean>
-   <bean id="UserHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="UserHistoryDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateUserHistoryDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.security.dao.HibernateUserHistoryDAO" />
       </property>
    </bean>
    <bean id="BookmarkDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
