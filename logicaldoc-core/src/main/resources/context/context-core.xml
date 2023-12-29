@@ -118,11 +118,9 @@
          <bean class="com.logicaldoc.core.document.dao.HibernateDocumentLinkDAO" />
       </property>
    </bean>
-   <bean id="GenericDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="GenericDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.generic.HibernateGenericDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.generic.HibernateGenericDAO" />
       </property>
    </bean>
    <bean id="SequenceDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
