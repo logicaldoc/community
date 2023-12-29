@@ -142,11 +142,9 @@
          </bean>
       </property>
    </bean>
-   <bean id="RatingDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="RatingDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateRatingDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.document.dao.HibernateRatingDAO" />
       </property>
    </bean>
    <bean id="DocumentNoteDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
