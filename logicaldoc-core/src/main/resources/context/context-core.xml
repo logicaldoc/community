@@ -152,11 +152,9 @@
          <bean class="com.logicaldoc.core.document.dao.HibernateDocumentNoteDAO" />
       </property>
    </bean>
-   <bean id="ContactDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="ContactDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.contact.HibernateContactDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.contact.HibernateContactDAO" />
       </property>
    </bean>
    <bean id="TenantDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
@@ -175,11 +173,9 @@
          </bean>
       </property>
    </bean>
-   <bean id="DashletDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="DashletDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.dashlet.HibernateDashletDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.core.dashlet.HibernateDashletDAO" />
       </property>
    </bean>
    <bean id="DeviceDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
