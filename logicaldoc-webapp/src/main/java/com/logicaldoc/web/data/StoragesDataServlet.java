@@ -16,7 +16,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.store.Storer;
-import com.logicaldoc.core.store.StorerManager;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -30,8 +29,11 @@ import com.logicaldoc.util.config.ContextProperties;
 public class StoragesDataServlet extends AbstractDataServlet {
 
 	private static final String STORE = "store.";
+
 	private static final String CLOSE_STORAGE = "</storage>";
+
 	private static final String STORAGE = "<storage>";
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -45,9 +47,10 @@ public class StoragesDataServlet extends AbstractDataServlet {
 
 		if (types) {
 			// Just list the different storers (types of storages)
-			Set<String> set = StorerManager.get().getDefinitions().keySet();
+			Storer manager = (Storer) Context.get().getBean(Storer.class);
+			Set<String> set = manager.getStorerDefinitions().keySet();
 			for (String type : set.stream().sorted().collect(Collectors.toList())) {
-				if (!StorerManager.get().getDefinitions().get(type).isEnabled())
+				if (!manager.getStorerDefinitions().get(type).isEnabled())
 					continue;
 
 				writer.print(STORAGE);
@@ -92,7 +95,7 @@ public class StoragesDataServlet extends AbstractDataServlet {
 			writer.print("<type>" + type + "</type>");
 
 			printParameters(writer, request, session, i, type);
-			
+
 			writer.print(CLOSE_STORAGE);
 
 		}
@@ -101,7 +104,8 @@ public class StoragesDataServlet extends AbstractDataServlet {
 	private void printParameters(PrintWriter writer, HttpServletRequest request, Session session, int i, String type) {
 		ContextProperties conf = Context.get().getProperties();
 		if (isParameters(request, session)) {
-			Storer st = StorerManager.get().getDefinitions().get(type);
+			Storer manager = (Storer) Context.get().getBean(Storer.class);
+			Storer st = manager.getStorerDefinitions().get(type);
 			if (st != null) {
 				for (String name : st.getParameterNames()) {
 					String value = conf.getProperty(STORE + i + "." + name, "");

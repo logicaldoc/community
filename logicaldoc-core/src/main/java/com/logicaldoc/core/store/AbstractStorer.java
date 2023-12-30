@@ -9,18 +9,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
@@ -34,6 +37,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
  * Common methods for all the Storer implementations.
@@ -42,21 +46,22 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 7.6.4
  */
 public abstract class AbstractStorer implements Storer {
+
 	protected static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractStorer.class);
 
 	protected static Logger deletionsLog = LoggerFactory.getLogger("STORAGE_DELETIONS");
 
-	@Resource(name="ContextProperties")
+	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
-
-	@Resource(name="StorerManager")
-	protected StorerManager manager;
 
 	protected int id = 1;
 
 	protected Map<String, String> parameters = new HashMap<>();
+
+	// Key is the type, value is the associated storer
+	protected Map<String, Storer> storerDefinitions = new HashMap<>();
 
 	protected AbstractStorer() {
 	}
@@ -65,10 +70,6 @@ public abstract class AbstractStorer implements Storer {
 		if (config == null)
 			config = Context.get().getProperties();
 		return config;
-	}
-
-	public void setManager(StorerManager manager) {
-		this.manager = manager;
 	}
 
 	public void setConfig(ContextProperties config) {
@@ -326,7 +327,38 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public void init() {
-		// Noting to do
+		if (!storerDefinitions.isEmpty())
+			return;
+
+		// Acquire the 'Storer' extensions
+		PluginRegistry registry = PluginRegistry.getInstance();
+		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Storer");
+
+		for (Extension ext : exts) {
+			String type = ext.getParameter("type").valueAsString();
+			String className = ext.getParameter("class").valueAsString();
+
+			try {
+				@SuppressWarnings("rawtypes")
+				Class clazz = Class.forName(className);
+				// Try to instantiate the builder
+				@SuppressWarnings("unchecked")
+				Object storer = clazz.getDeclaredConstructor().newInstance();
+				if (!(storer instanceof Storer))
+					throw new ClassNotFoundException(
+							String.format("The specified storer %s doesn't implement the Storer interface", className));
+				storerDefinitions.put(type, (Storer) storer);
+
+				Storer st = (Storer) storer;
+				for (String name : st.getParameterNames())
+					st.getParameters().put(name, null);
+
+				log.info("Added new storer {} for type {}", clazz.getSimpleName(), type);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
 	}
 
 	@Override
@@ -363,5 +395,41 @@ public abstract class AbstractStorer implements Storer {
 		} catch (PersistenceException e) {
 			log.warn("Cannot record in the database the deleteion of resource {} for document {}", path, docId, e);
 		}
+	}
+
+	/**
+	 * Instantiate a new storer and fully configures it.
+	 * 
+	 * @param id identifier of the storer to create
+	 * 
+	 * @return the created instance
+	 */
+	public Storer newStorer(int id) {
+		String type = config.getProperty("store." + id + ".type", "fs");
+		Storer definition = storerDefinitions.get(type);
+		if (definition == null) {
+			log.error("Unexisting definition for {}", type);
+			return null;
+		}
+
+		Storer storer = null;
+		try {
+			storer = definition.getClass().getDeclaredConstructor().newInstance();
+		} catch (Exception e) {
+			log.error("Unable to instanciate class {} / {}", definition.getClass(), e.getMessage(), e);
+			return null;
+		}
+		storer.setId(id);
+
+		Set<String> params = definition.getParameters().keySet();
+		for (String param : params)
+			storer.getParameters().put(param, config.getProperty("store." + id + "." + param, ""));
+
+		return storer;
+	}
+
+	@Override
+	public Map<String, Storer> getStorerDefinitions() {
+		return storerDefinitions;
 	}
 }

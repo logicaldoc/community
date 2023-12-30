@@ -169,7 +169,7 @@ public interface Storer extends Comparable<Storer> {
 	 * 
 	 * @return The document file's content
 	 * 
-	 * @throws IOException cannot open the stream 
+	 * @throws IOException cannot open the stream
 	 */
 	public InputStream getStream(long docId, String resource) throws IOException;
 
@@ -198,7 +198,7 @@ public interface Storer extends Comparable<Storer> {
 	 * @throws IOException cannot open the resource to get the bytes
 	 */
 	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException;
-	
+
 	/**
 	 * Moves all the resources of a document from it's original location to a
 	 * different storage
@@ -212,7 +212,6 @@ public interface Storer extends Comparable<Storer> {
 	 * @throws IOException In case of error during the process
 	 */
 	public int moveResourcesToStore(long docId, int targetStorageId) throws IOException;
-	
 
 	/**
 	 * Obtains the document's content as string for the specified resource
@@ -269,4 +268,20 @@ public interface Storer extends Comparable<Storer> {
 	 * Destroy method
 	 */
 	public void destroy();
+
+	/**
+	 * Instantiate a new storer and fully configures it.
+	 * 
+	 * @param id identifier of the storer to create
+	 * 
+	 * @return the created instance
+	 */
+	public Storer newStorer(int id);
+	
+	/**
+	 * Retrieves the storers definitions grouped by type 
+	 * 
+	 * @return a map with definitions  <b>type</b> - <b>storer prototype</b>
+	 */
+	public Map<String, Storer> getStorerDefinitions();
 }

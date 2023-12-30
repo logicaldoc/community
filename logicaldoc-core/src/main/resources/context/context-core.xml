@@ -24,7 +24,6 @@
    
    <bean id="JobManager" class="com.logicaldoc.core.job.JobManager" />
    
-   <bean id="StorerManager" class="com.logicaldoc.core.store.StorerManager" />
    <bean id="Storer" class="${store}" init-method="init" destroy-method="destroy" />
       
    <bean id="SearchEngine" class="${searchengine}" destroy-method="close" init-method="init" />

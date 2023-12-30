@@ -27,7 +27,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.store.Storer;
-import com.logicaldoc.core.store.StorerManager;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -432,7 +431,8 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	public boolean testStorage(int id) throws ServerException {
 		validateSession();
 		try {
-			Storer storer = StorerManager.get().newStorer(id);
+			Storer manager = (Storer) Context.get().getBean(Storer.class);
+			Storer storer = manager.newStorer(id);
 			log.info("Testing storer {}", storer);
 			return storer.test();
 		} catch (Exception e) {
