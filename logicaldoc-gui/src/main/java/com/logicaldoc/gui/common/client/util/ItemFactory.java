@@ -1539,7 +1539,7 @@ public class ItemFactory {
 			generator.setHeight(16);
 			generator.setSrc("[SKIN]/key.png");
 			generator.setPrompt(I18N.message("passwordgenerator"));
-			generator.addFormItemClickHandler((FormItemIconClickEvent event) -> new PasswordGenerator().show());
+			generator.addFormItemClickHandler(event -> new PasswordGenerator().show());
 			password.setIcons(newShowPasswordIcon(), generator);
 		}
 
@@ -1858,7 +1858,7 @@ public class ItemFactory {
 
 		if (url != null)
 			linkItem.setValue(url);
-		
+
 		linkItem.setIcons(new CopyTextFormItemIcon(textToCopy != null ? textToCopy : url,
 				textToCopy != null ? "copytext" : "copylink"));
 		return linkItem;
