@@ -2490,7 +2490,6 @@ public class ItemFactory {
 		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS))
 			opts.put(GUIImportFolder.PROVIDER_FILE, I18N.message("localfolder"));
 		if (Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS)) {
-			opts.put(GUIImportFolder.PROVIDER_SMB, I18N.message("smbshare"));
 			opts.put(GUIImportFolder.PROVIDER_SMB2, I18N.message("smb2share"));
 			opts.put(GUIImportFolder.PROVIDER_SMB3, I18N.message("smb3share"));
 			opts.put(GUIImportFolder.PROVIDER_FTP, I18N.message("fftp"));

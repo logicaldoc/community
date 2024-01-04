@@ -55,6 +55,11 @@ public class LogDownload extends HttpServlet {
 			ServletUtil.sendError(response, t.getMessage());
 		}
 
+		// Avoid resource caching
+		response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+		response.setHeader("Expires", "0");
+		response.setHeader("Pragma", "no-cache");
+
 		String appender = request.getParameter("appender");
 		File file = null;
 		try {
@@ -64,11 +69,6 @@ public class LogDownload extends HttpServlet {
 				response.setContentType("application/zip");
 				response.setHeader("Content-Disposition",
 						"attachment; filename=\"" + ("ldoc-log-" + df.format(new Date()) + ".zip") + "\"");
-
-				// Avoid resource caching
-				response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
-				response.setHeader("Expires", "0");
-				response.setHeader("Pragma", "no-cache");
 
 				file = prepareAllSupportResources();
 			} else if (appender != null) {

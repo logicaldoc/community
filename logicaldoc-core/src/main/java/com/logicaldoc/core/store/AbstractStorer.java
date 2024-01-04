@@ -390,8 +390,8 @@ public abstract class AbstractStorer implements Storer {
 				history.setFileVersion(rows.getString(4));
 				history.setColor(rows.getString(5));
 				history.setFolderId(rows.getLong(6));
+				documentHistoryDAO.store(history);
 			}
-			documentHistoryDAO.store(history);
 		} catch (PersistenceException e) {
 			log.warn("Cannot record in the database the deleteion of resource {} for document {}", path, docId, e);
 		}

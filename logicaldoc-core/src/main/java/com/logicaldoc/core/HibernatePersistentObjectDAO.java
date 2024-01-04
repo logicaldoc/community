@@ -23,7 +23,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -777,7 +776,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			updates = jdbcUpdate("UPDATE " + tableName + " SET ld_deleted = 1, ld_lastmodified = :today"
 					+ " WHERE ld_deleted = 0 AND " + dateColumn + " < :ldDate", params);
 
-			log.info("Removed {} old rows from table {}: ", updates, tableName);
+			log.info("Removed {} old rows from table {}", updates, tableName);
 		}
 		return updates;
 	}

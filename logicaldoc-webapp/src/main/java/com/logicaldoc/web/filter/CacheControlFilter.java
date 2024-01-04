@@ -57,23 +57,24 @@ public class CacheControlFilter implements javax.servlet.Filter {
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 			if (response.isCommitted()) {
-				if (log.isDebugEnabled()) {
+				if (log.isDebugEnabled())
 					log.debug("Request already committed {}", httpRequest.getRequestURL());
-				}
 				chain.doFilter(request, response);
 			} else {
-				String cacheControl = getMaxAge(httpRequest.getRequestURI());
-				if (cacheControl != null)
+				String cacheControl = getCacheControl(httpRequest.getRequestURI());
+				if (log.isDebugEnabled())
+					log.debug("{} -> Cache-Control: {}", httpRequest.getRequestURI(), cacheControl);
+				if (cacheControl != null && !"ignore".equals(cacheControl))
 					httpResponse.setHeader("Cache-Control", cacheControl);
-				chain.doFilter(request, response);
 
+				chain.doFilter(request, response);
 			}
 		} else {
 			chain.doFilter(request, response);
 		}
 	}
 
-	private String getMaxAge(String url) {
+	private String getCacheControl(String url) {
 		for (Map.Entry<String, String> rec : mappings.entrySet()) {
 			if (FileUtil.matches(url, rec.getKey(), null))
 				return rec.getValue();
@@ -84,7 +85,7 @@ public class CacheControlFilter implements javax.servlet.Filter {
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
 		try {
-			init(new ContextProperties().getProperty("cachecontrol", "*:max-age=2592000"));
+			init(new ContextProperties().getProperty("cachecontrol", "*:no-cache,no-store,must-revalidate"));
 		} catch (IOException e) {
 			throw new ServletException(e.getMessage(), e);
 		}
