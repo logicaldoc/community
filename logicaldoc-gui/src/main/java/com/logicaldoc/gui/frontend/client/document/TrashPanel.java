@@ -60,6 +60,11 @@ public class TrashPanel extends VLayout {
 		DateListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setHidden(true);
 
+		ListGridField idField = new ColoredListGridField("id", I18N.message("id"), 110);
+		idField.setType(ListGridFieldType.TEXT);
+		idField.setCanFilter(true);
+		idField.setHidden(true);
+
 		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setCanFilter(true);
@@ -70,7 +75,7 @@ public class TrashPanel extends VLayout {
 		list.setWidth100();
 		list.setHeight100();
 		list.setAutoFetchData(true);
-		list.setFields(fileName, customId, lastModified);
+		list.setFields(fileName, idField, customId, lastModified);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setDataSource(new GarbageDS());
 		list.setShowFilterEditor(true);
