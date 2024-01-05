@@ -16,7 +16,7 @@ public class CopyTextFormItemIcon extends FormItemIcon {
 	 * The constructor.
 	 * 
 	 * @param text the text to copy into the clipboard
-	 * @patram tooltip the tooltip to display
+	 * @param tooltip the tooltip to display
 	 */
 	public CopyTextFormItemIcon(String text, String tooltip) {
 		setName("copy");

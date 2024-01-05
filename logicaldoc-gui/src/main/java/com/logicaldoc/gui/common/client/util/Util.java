@@ -511,7 +511,6 @@ public abstract class Util {
 	 * Copies a text into the client's clipboard
 	 * 
 	 * @param text the content to put into the clipboards
-	 * @return The formated file size.
 	 */
 	public static void copyText(String text) {
 		writeToClipboard(text);
