@@ -19,7 +19,8 @@ public interface TaskListener extends EventListener {
 	public void progressChanged(long progress);
 
 	/**
-	 * Invoked when the progress changes
+	 * Invoked when the status
+	 *  changes
 	 * 
 	 * @param status the new status value(one of STATUS_RUNNING or STATUS_IDLE
 	 */
