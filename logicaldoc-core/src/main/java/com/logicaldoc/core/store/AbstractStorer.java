@@ -47,6 +47,8 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public abstract class AbstractStorer implements Storer {
 
+	private static final String STORE = "store.";
+
 	protected static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractStorer.class);
@@ -234,7 +236,7 @@ public abstract class AbstractStorer implements Storer {
 	 * Retrieves the setting "store." + id + ".dir"
 	 */
 	protected String getDir() {
-		return getConfig().getProperty("store." + id + ".dir");
+		return getConfig().getProperty(STORE + id + ".dir");
 	}
 
 	@Override
@@ -405,7 +407,7 @@ public abstract class AbstractStorer implements Storer {
 	 * @return the created instance
 	 */
 	public Storer newStorer(int id) {
-		String type = config.getProperty("store." + id + ".type", "fs");
+		String type = config.getProperty(STORE + id + ".type", "fs");
 		Storer definition = storerDefinitions.get(type);
 		if (definition == null) {
 			log.error("Unexisting definition for {}", type);
@@ -423,7 +425,7 @@ public abstract class AbstractStorer implements Storer {
 
 		Set<String> params = definition.getParameters().keySet();
 		for (String param : params)
-			storer.getParameters().put(param, config.getProperty("store." + id + "." + param, ""));
+			storer.getParameters().put(param, config.getProperty(STORE + id + "." + param, ""));
 
 		return storer;
 	}

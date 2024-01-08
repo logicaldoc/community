@@ -14,7 +14,6 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -36,10 +35,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	private static final String DOC_ID = ".docId=";
 
-	@Resource(name= "Storer")
+	@Resource(name = "Storer")
 	private Storer storer;
 
-	@Resource(name= "FolderDAO")
+	@Resource(name = "FolderDAO")
 	private FolderDAO folderDAO;
 
 	private HibernateVersionDAO() {

@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
@@ -92,10 +91,10 @@ public class EventCollector {
 
 		if (!history.isNotifyEvent())
 			return;
-		
+
 		if (!rememberHistory(history))
 			return;
-		
+
 		if (history.getDocId() != null && history.getDocument() == null) {
 			DocumentDAO docDao = (DocumentDAO) com.logicaldoc.util.Context.get().getBean(DocumentDAO.class);
 			try {
@@ -114,13 +113,13 @@ public class EventCollector {
 			clone.setStatus(history.getDocument().getStatus());
 			history.setDocument(clone);
 		}
-		
+
 		Runnable notifier = () -> {
-				log.debug("Notify history {}", history);
-				for (EventListener listener : listeners) {
-					listener.newEvent(history);
-				}
-				log.debug("Finished notification of history {}", history);
+			log.debug("Notify history {}", history);
+			for (EventListener listener : listeners) {
+				listener.newEvent(history);
+			}
+			log.debug("Finished notification of history {}", history);
 		};
 
 		ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);

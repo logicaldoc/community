@@ -57,8 +57,7 @@ public class CacheControlFilter implements javax.servlet.Filter {
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 			if (response.isCommitted()) {
-				if (log.isDebugEnabled())
-					log.debug("Request already committed {}", httpRequest.getRequestURL());
+				log.debug("Request already committed {}", httpRequest.getRequestURL());
 				chain.doFilter(request, response);
 			} else {
 				String cacheControl = getCacheControl(httpRequest.getRequestURI());
@@ -103,7 +102,7 @@ public class CacheControlFilter implements javax.servlet.Filter {
 		StringTokenizer st = new StringTokenizer(cacheControlSpecs, ";", false);
 		while (st.hasMoreElements()) {
 			String token = (String) st.nextElement();
-			token.trim();
+			token = token.trim();
 			try {
 				String[] spec = token.split(":");
 				mappings.put(spec[0].trim(), spec[1].trim());
