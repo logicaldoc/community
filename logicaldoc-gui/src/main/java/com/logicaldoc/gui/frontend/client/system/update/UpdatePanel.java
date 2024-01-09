@@ -43,7 +43,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 public class UpdatePanel extends VLayout {
 
 	private static final long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
-	
+
 	// Shows the install notes panel
 	VLayout notesPanel;
 
@@ -88,7 +88,11 @@ public class UpdatePanel extends VLayout {
 			return;
 		}
 
+		GuiLog.info("1");
+
 		LD.contactingServer();
+
+		GuiLog.info("2");
 		UpdateService.Instance.get().checkUpdate(new AsyncCallback<GUIParameter[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -101,7 +105,9 @@ public class UpdatePanel extends VLayout {
 			public void onSuccess(GUIParameter[] parameters) {
 				LD.clearPrompt();
 
-				if (parameters == null) {
+				GuiLog.info("3 -" + parameters);
+
+				if (parameters == null || parameters.length == 0) {
 					onUpdateUnavailable();
 				} else if (parameters.length == 1 && parameters[0].getName().equals("error")) {
 					onUpdateTemporarilyUnavailable(parameters[0].getValue());
