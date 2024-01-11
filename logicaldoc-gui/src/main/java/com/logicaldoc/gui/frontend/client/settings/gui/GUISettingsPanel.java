@@ -300,7 +300,7 @@ public class GUISettingsPanel extends AdminPanel {
 		previewMaxFileSize.setMin(0);
 		previewMaxFileSize.setStep(1);
 
-		TextItem uploadDisallow = ItemFactory.newTextItem("disallow", "disallowedext",
+		TextItem uploadDisallow = ItemFactory.newTextItem("disallow", "disallowedexts",
 				Util.getParameterValue(settings, "upload.disallow"));
 		uploadDisallow.setHint(I18N.message("separatedcomma"));
 		uploadDisallow.setWidth(350);
