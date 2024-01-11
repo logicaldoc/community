@@ -102,7 +102,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 			try {
 				Document doc = documentDao.findById(id);
-				if (doc == null || doc.getBarcoded() != 0 || doc.getBarcodeTemplateId() == null)
+				if (doc == null)
 					continue;
 				documentDao.initialize(doc);
 
