@@ -125,7 +125,7 @@ public abstract class AbstractStorer implements Storer {
 	 * @throws IOException raised only if the file is 0 byte
 	 */
 	protected void checkNotEmpty(File file) throws IOException {
-		if (file==null)
+		if (file == null)
 			throw new IOException("Do not store null file");
 		if (file.length() == 0L)
 			throw new IOException("Do not store 0 byte file");
@@ -143,7 +143,7 @@ public abstract class AbstractStorer implements Storer {
 	 * 
 	 */
 	protected void checkWriteAfterStore(long docId, String resource, long expectedSize) throws IOException {
-		if (RunLevel.current().aspectEnabled("writeCheck")) {
+		if (RunLevel.current().aspectEnabled("writeCheck") && docId != 0L) {
 			long storedSize = size(docId, resource);
 			if (storedSize != expectedSize)
 				throw new IOException(String.format(
