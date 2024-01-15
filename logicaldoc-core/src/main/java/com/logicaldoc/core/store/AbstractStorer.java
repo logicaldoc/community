@@ -115,7 +115,7 @@ public abstract class AbstractStorer implements Storer {
 			store(is, docId, resource);
 		}
 
-		checkWriteAfterStore(docId, resource, docId);
+		checkWriteAfterStore(docId, resource, file.length());
 	}
 
 	/**
