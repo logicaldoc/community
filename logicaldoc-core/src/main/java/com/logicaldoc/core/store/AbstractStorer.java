@@ -125,7 +125,7 @@ public abstract class AbstractStorer implements Storer {
 	 * @throws IOException raised only if the file is 0 byte
 	 */
 	protected void checkNotEmpty(File file) throws IOException {
-		if (file.length() == 0L)
+		if (file==null || file.length() == 0L)
 			throw new IOException("Do not store 0 byte file");
 	}
 
