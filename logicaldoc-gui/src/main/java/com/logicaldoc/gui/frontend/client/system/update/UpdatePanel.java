@@ -88,11 +88,8 @@ public class UpdatePanel extends VLayout {
 			return;
 		}
 
-		GuiLog.info("1");
-
 		LD.contactingServer();
 
-		GuiLog.info("2");
 		UpdateService.Instance.get().checkUpdate(new AsyncCallback<GUIParameter[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -104,8 +101,6 @@ public class UpdatePanel extends VLayout {
 			@Override
 			public void onSuccess(GUIParameter[] parameters) {
 				LD.clearPrompt();
-
-				GuiLog.info("3 -" + parameters);
 
 				if (parameters == null || parameters.length == 0) {
 					onUpdateUnavailable();
