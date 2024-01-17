@@ -92,7 +92,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Creates a new session by authenticated the given user and stores it in
+	 * Creates a new session by authenticating the given user and stores it in
 	 * the pool of opened sessions
 	 * 
 	 * @param username the username
@@ -109,7 +109,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Creates a new session by authenticated the given user and stores it in
+	 * Creates a new session by authenticating the given user and stores it in
 	 * the pool of opened sessions
 	 * 
 	 * @param username the username
@@ -136,7 +136,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Creates a new session by authenticated the given user and stores it in
+	 * Creates a new session by authenticating the given user and stores it in
 	 * the pool of opened sessions
 	 * 
 	 * @param user the user
