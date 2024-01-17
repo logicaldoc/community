@@ -31,9 +31,7 @@ public class ContextListener extends ContextLoaderListener {
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		super.contextInitialized(event);
-
 		cleanupSessions();
-		
 		log.info("Application started and ready");
 	}
 
