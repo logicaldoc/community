@@ -117,6 +117,10 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print(",");
 
 		if (showSid) {
+			int status = SessionManager.get().getStatus(session.getSid());
+			if (status < 0)
+				status = session.getStatus();
+			
 			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
 				writer.print(I18N.message("opened", locale));
 			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
@@ -157,11 +161,15 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print("<sid><![CDATA[" + (showSid ? session.getSid() : "--") + "]]></sid>");
 		writer.print("<status>" + (showSid ? session.getStatus() : "") + "</status>");
 		if (showSid) {
-			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
+			int status = SessionManager.get().getStatus(session.getSid());
+			if (status < 0)
+				status = session.getStatus();
+
+			if (status == Session.STATUS_OPEN)
 				writer.print(STATUS_LABEL + I18N.message("opened", locale) + CLOSE_STATUS_LABEL);
-			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
+			else if (status == Session.STATUS_CLOSED)
 				writer.print(STATUS_LABEL + I18N.message("closed", locale) + CLOSE_STATUS_LABEL);
-			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_EXPIRED)
+			else if (status == Session.STATUS_EXPIRED)
 				writer.print(STATUS_LABEL + I18N.message("expired", locale) + CLOSE_STATUS_LABEL);
 		} else {
 			writer.print("<statusLabel></statusLabel>");

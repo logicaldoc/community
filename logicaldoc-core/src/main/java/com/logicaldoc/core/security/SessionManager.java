@@ -28,6 +28,7 @@ import com.logicaldoc.core.security.dao.SessionDAO;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.sql.SqlUtil;
 
 /**
  * Repository of all current user sessions.
@@ -48,10 +49,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	// The maximum number of closed session maintained in memory
 	private static final int MAX_CLOSED_SESSIONS = 50;
 
-	@Resource(name="AuthenticationChain")
+	@Resource(name = "AuthenticationChain")
 	private transient AuthenticationChain authenticationChain;
 
-	@Resource(name="SessionDAO")
+	@Resource(name = "SessionDAO")
 	private transient SessionDAO sessionDao;
 
 	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();
@@ -189,6 +190,14 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 				} catch (Exception t) {
 					log.warn(t.getMessage(), t);
 				}
+		} else {
+			// Perhaps the session was not in memory but just on DB
+			try {
+				sessionDao.jdbcUpdate("update ld_session set ld_status=" + Session.STATUS_CLOSED + " where ld_sid='"
+						+ SqlUtil.doubleQuotes(sid) + "'");
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 		}
 	}
 
