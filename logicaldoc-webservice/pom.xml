@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.9.0</version>
+		<version>8.9.1</version>
 	</parent>
 	<artifactId>logicaldoc-webservice</artifactId>
 	<name>logicaldoc-webservice</name>
