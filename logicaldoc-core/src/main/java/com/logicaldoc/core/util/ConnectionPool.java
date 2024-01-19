@@ -48,12 +48,12 @@ public class ConnectionPool implements DataSource, Closeable {
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
-				
-				if(StringUtils.isNotEmpty(dbcpConfig.getConnectionInitSqls())) {
-					String[] sqls=dbcpConfig.getConnectionInitSqls().split(";");
+
+				if (StringUtils.isNotEmpty(dbcpConfig.getConnectionInitSqls())) {
+					String[] sqls = dbcpConfig.getConnectionInitSqls().split(";");
 					ds.setConnectionInitSqls(Arrays.asList(sqls));
 				}
-				
+
 				wrappedDataSource = ds;
 			} else {
 				wrappedDataSource = new HikariDataSource(hikariConfig);
@@ -108,8 +108,8 @@ public class ConnectionPool implements DataSource, Closeable {
 
 	@Override
 	public void close() throws IOException {
-		if (getWrappedDataSource() instanceof Closeable) {
-			((Closeable) getWrappedDataSource()).close();
+		if (getWrappedDataSource() instanceof Closeable closeable) {
+			closeable.close();
 		}
 	}
 

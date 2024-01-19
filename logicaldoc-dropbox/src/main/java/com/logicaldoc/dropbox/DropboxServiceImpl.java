@@ -293,8 +293,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void importEntry(Session session, Dropbox dbox, Folder root, Set<String> imported, Metadata entry)
 			throws DbxException, PersistenceException, IOException {
-		if (entry instanceof FileMetadata) {
-			importDocument(root, (FileMetadata) entry, dbox, session);
+		if (entry instanceof FileMetadata metadata) {
+			importDocument(root, metadata, dbox, session);
 			imported.add(entry.getPathDisplay());
 		} else {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);

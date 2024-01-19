@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 
@@ -161,7 +160,7 @@ public class XMLBean {
 				expr = xpath.compile(xpathExpression, Filters.element());
 			else
 				expr = xpath.compile(xpathExpression, Filters.element(), null, namespaces.keySet().stream()
-						.map(key -> Namespace.getNamespace(key, namespaces.get(key))).collect(Collectors.toList()));
+						.map(key -> Namespace.getNamespace(key, namespaces.get(key))).toList());
 			return expr.evaluateFirst(doc);
 		} catch (Exception e) {
 			log.error(e.getMessage());

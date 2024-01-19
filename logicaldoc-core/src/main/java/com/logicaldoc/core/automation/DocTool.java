@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -729,7 +728,7 @@ public class DocTool {
 	public List<Long> getIds(Collection<Document> docs) {
 		if (docs == null || docs.isEmpty())
 			return new ArrayList<>();
-		return docs.stream().map(d -> d.getId()).collect(Collectors.toList());
+		return docs.stream().map(d -> d.getId()).toList();
 	}
 
 	/**

@@ -318,14 +318,14 @@ public class DashletContent extends HttpServlet {
 			Object val = extValues.get(key);
 			if (val != null) {
 				writer.print("<ext_" + name + ">");
-				if (val instanceof Date)
-					writer.print(df.format((Date) val));
-				else if (val instanceof Integer)
-					writer.print(Integer.toString((Integer) val));
-				else if (val instanceof Long)
-					writer.print(Long.toString((Long) val));
-				else if (val instanceof Double)
-					writer.print(Double.toString((Double) val));
+				if (val instanceof Date date)
+					writer.print(df.format(date));
+				else if (val instanceof Integer integer)
+					writer.print(Integer.toString(integer));
+				else if (val instanceof Long longVal)
+					writer.print(Long.toString(longVal));
+				else if (val instanceof Double doubleVal)
+					writer.print(Double.toString(doubleVal));
 				else
 					writer.print("<![CDATA[" + val + "]]>");
 				writer.print("</ext_" + name + ">");
@@ -346,8 +346,8 @@ public class DashletContent extends HttpServlet {
 		if (value == null)
 			return;
 		writer.write("<" + fieldName + ">");
-		if (value instanceof String)
-			writer.write("<![CDATA[" + (String) value + "]]>");
+		if (value instanceof String string)
+			writer.write("<![CDATA[" + string + "]]>");
 		else
 			writer.write(value.toString());
 		writer.write("</" + fieldName + ">");

@@ -76,8 +76,8 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 		for (Task task : tasks) {
 			String name = task.getName();
 			Object trigger = applicationContext.getBean(name + "Trigger");
-			if (trigger instanceof Trigger) {
-				triggers.add((Trigger) trigger);
+			if (trigger instanceof Trigger trgr) {
+				triggers.add(trgr);
 			} else
 				log.warn("Cannot schedule task {}", name);
 		}

@@ -116,18 +116,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print(showSid ? session.getSid() : "--");
 		writer.print(",");
 
-		if (showSid) {
-			int status = SessionManager.get().getStatus(session.getSid());
-			if (status < 0)
-				status = session.getStatus();
-			
-			if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_OPEN)
-				writer.print(I18N.message("opened", locale));
-			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_CLOSED)
-				writer.print(I18N.message("closed", locale));
-			else if (SessionManager.get().getStatus(session.getSid()) == Session.STATUS_EXPIRED)
-				writer.print(I18N.message("expired", locale));
-		}
+		if (showSid)
+			printSessionStatusCsv(session, locale, writer);
 
 		writer.print(",");
 		if (showSid)
@@ -154,11 +144,42 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print("\n");
 	}
 
+	private void printSessionStatusCsv(Session session, Locale locale, PrintWriter writer) {
+		int status = SessionManager.get().getStatus(session.getSid());
+		if (status < 0)
+			status = session.getStatus();
+
+		if (status == Session.STATUS_OPEN)
+			writer.print(I18N.message("opened", locale));
+		else if (status == Session.STATUS_CLOSED)
+			writer.print(I18N.message("closed", locale));
+		else if (status == Session.STATUS_EXPIRED)
+			writer.print(I18N.message("expired", locale));
+	}
+
 	private void printSessionXml(PrintWriter writer, Session session, Locale locale, boolean showSid) {
 		DateFormat df = getDateFormat();
 
 		writer.print("<session>");
 		writer.print("<sid><![CDATA[" + (showSid ? session.getSid() : "--") + "]]></sid>");
+		
+		printSessionStatusXml(session, locale, showSid, writer);
+		
+		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
+		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
+
+		final Serializable client = session.getClient() != null ? session.getClient() : "";
+		writer.print("<client><![CDATA[" + (showSid ? client : "") + "]]></client>");
+		writer.print("<tenant><![CDATA[" + session.getTenantName() + "]]></tenant>");
+		writer.print("<created>" + df.format(session.getCreation()) + "</created>");
+		if (SessionManager.get().get(session.getSid()) != null)
+			writer.print("<renew>" + df.format(SessionManager.get().get(session.getSid()).getLastRenew()) + "</renew>");
+		else
+			writer.print("<renew>" + df.format(session.getLastRenew()) + "</renew>");
+		writer.print("</session>");
+	}
+
+	private void printSessionStatusXml(Session session, Locale locale, boolean showSid, PrintWriter writer) {
 		writer.print("<status>" + (showSid ? session.getStatus() : "") + "</status>");
 		if (showSid) {
 			int status = SessionManager.get().getStatus(session.getSid());
@@ -174,18 +195,6 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		} else {
 			writer.print("<statusLabel></statusLabel>");
 		}
-		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
-		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
-
-		final Serializable client = session.getClient() != null ? session.getClient() : "";
-		writer.print("<client><![CDATA[" + (showSid ? client : "") + "]]></client>");
-		writer.print("<tenant><![CDATA[" + session.getTenantName() + "]]></tenant>");
-		writer.print("<created>" + df.format(session.getCreation()) + "</created>");
-		if (SessionManager.get().get(session.getSid()) != null)
-			writer.print("<renew>" + df.format(SessionManager.get().get(session.getSid()).getLastRenew()) + "</renew>");
-		else
-			writer.print("<renew>" + df.format(session.getLastRenew()) + "</renew>");
-		writer.print("</session>");
 	}
 
 	private User getCurrentUser(HttpServletRequest request, Session currentSession) {

@@ -100,8 +100,8 @@ public class ThreadPools {
 	public void schedule(Runnable task, String poolName, long delay) {
 		try {
 			ExecutorService pool = getPool(poolName);
-			if (pool instanceof ScheduledExecutorService)
-				((ScheduledExecutorService) pool).schedule(task, delay, TimeUnit.MILLISECONDS);
+			if (pool instanceof ScheduledExecutorService executorService)
+				executorService.schedule(task, delay, TimeUnit.MILLISECONDS);
 			else {
 				log.debug("Pool {} does not support scheduling so the task has been started immediately", poolName);
 				execute(task, poolName);

@@ -52,8 +52,8 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 
 		String key = httpReq.getParameter("key");
 
-		if (authentication.getDetails() instanceof LDAuthenticationDetails) {
-			key = ((LDAuthenticationDetails) authentication.getDetails()).getSecretKey();
+		if (authentication.getDetails() instanceof LDAuthenticationDetails ldAuthenticationDetails) {
+			key = ldAuthenticationDetails.getSecretKey();
 		}
 
 		log.debug("Authenticate user {} with key {}", username, key != null ? key : "-");

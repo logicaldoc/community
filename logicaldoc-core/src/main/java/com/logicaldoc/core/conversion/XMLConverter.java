@@ -190,8 +190,7 @@ public class XMLConverter extends AbstractFormatConverter {
 		boolean containsStyleReference = false;
 		String xsltOutFormat = null;
 		for (Content content : contents) {
-			if (content instanceof ProcessingInstruction) {
-				ProcessingInstruction pi = (ProcessingInstruction) content;
+			if (content instanceof ProcessingInstruction pi) {
 				if ("text/xsl".equals(pi.getPseudoAttributeValue("type"))) {
 					containsStyleReference = true;
 

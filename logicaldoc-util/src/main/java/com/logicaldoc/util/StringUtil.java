@@ -16,7 +16,6 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -148,7 +147,7 @@ public class StringUtil {
 	}
 
 	public static String collectionToString(Collection<?> collection, String separator) {
-		return String.join(separator, collection.stream().map(Object::toString).collect(Collectors.toList()));
+		return String.join(separator, collection.stream().map(Object::toString).toList());
 	}
 
 	public static String removeNonUtf8Chars(String src) {

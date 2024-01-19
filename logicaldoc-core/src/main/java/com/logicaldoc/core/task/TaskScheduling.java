@@ -77,9 +77,8 @@ public class TaskScheduling {
 		Date nextFire = null;
 
 		Object trigger = Context.get().getBean(taskName + "Trigger");
-		if (trigger instanceof Trigger)
-			nextFire = previousFireTime != null ? ((Trigger) trigger).getFireTimeAfter(previousFireTime)
-					: ((Trigger) trigger).getNextFireTime();
+		if (trigger instanceof Trigger trgr)
+			nextFire = previousFireTime != null ? trgr.getFireTimeAfter(previousFireTime) : trgr.getNextFireTime();
 
 		return nextFire;
 	}

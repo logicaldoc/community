@@ -386,8 +386,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			return sid;
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth instanceof LDAuthenticationToken)
-			return ((LDAuthenticationToken) auth).getSid();
+		if (auth instanceof LDAuthenticationToken ldAuthenticationToken)
+			return ldAuthenticationToken.getSid();
 
 		if (request != null) {
 			Client client = buildClient(request);
@@ -467,8 +467,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 */
 	public static String getCurrentSid() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth instanceof LDAuthenticationToken)
-			return ((LDAuthenticationToken) auth).getSid();
+		if (auth instanceof LDAuthenticationToken ldAuthenticationToken)
+			return ldAuthenticationToken.getSid();
 		else
 			return null;
 	}

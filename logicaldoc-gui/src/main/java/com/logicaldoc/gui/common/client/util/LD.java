@@ -288,8 +288,8 @@ public class LD {
 		ok.addClickHandler(event -> {
 			if (form.validate() && callback != null) {
 				dialog.close();
-				if (callback instanceof ValuesCallback) {
-					((ValuesCallback) callback).execute(form.getValues());
+				if (callback instanceof ValuesCallback valuesCallback) {
+					valuesCallback.execute(form.getValues());
 				} else
 					callback.execute(form.getValue(VALUE) != null ? form.getValue(VALUE).toString() : null);
 				dialog.destroy();
@@ -424,10 +424,10 @@ public class LD {
 
 		if (defaultValue != null) {
 			item.setValue(defaultValue);
-			if (item instanceof TextItem) {
-				((TextItem) item).selectValue();
+			if (item instanceof TextItem textItem) {
+				textItem.selectValue();
 				if (defaultValue.length() > 0)
-					((TextItem) item).setSelectionRange(0, defaultValue.length());
+					textItem.setSelectionRange(0, defaultValue.length());
 			}
 		}
 	}

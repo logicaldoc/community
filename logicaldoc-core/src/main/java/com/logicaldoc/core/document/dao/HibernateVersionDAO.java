@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -168,7 +167,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		Collections.sort(versions, Collections.reverseOrder());
 
 		List<Version> oldestVersionsToDelete = versions.stream().skip(Math.max(0, versions.size() - maxVersions))
-				.collect(Collectors.toList());
+				.toList();
 		for (Version versionToDelete : oldestVersionsToDelete)
 			deleteVersion(versionToDelete, PersistentObject.DELETED_CODE_DEFAULT);
 	}

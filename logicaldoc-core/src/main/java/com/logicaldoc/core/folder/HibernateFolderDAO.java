@@ -95,16 +95,16 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String WHERE_GROUP_GROUPID_IN = " where _group.groupId in (";
 
-	@Resource(name="UserDAO")
+	@Resource(name = "UserDAO")
 	private UserDAO userDAO;
 
-	@Resource(name="FolderHistoryDAO")
+	@Resource(name = "FolderHistoryDAO")
 	private FolderHistoryDAO historyDAO;
 
-	@Resource(name="Storer")
+	@Resource(name = "Storer")
 	private Storer storer;
 
-	@Resource(name="FolderListenerManager")
+	@Resource(name = "FolderListenerManager")
 	private FolderListenerManager listenerManager;
 
 	protected HibernateFolderDAO() {
@@ -228,8 +228,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				session.logError(e.getMessage());
 		}
 		log.error(e.getMessage(), e);
-		if (e instanceof PersistenceException)
-			throw (PersistenceException) e;
+		if (e instanceof PersistenceException pe)
+			throw pe;
 		else
 			throw new PersistenceException(e);
 	}
@@ -472,7 +472,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (coll == null || coll.isEmpty())
 			return new ArrayList<>();
 		else
-			return coll.stream().map(Folder::getId).collect(Collectors.toList());
+			return coll.stream().map(Folder::getId).toList();
 	}
 
 	@Override
@@ -998,7 +998,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 */
 		StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A where 1=1 ");
 
-		List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).collect(Collectors.toList());
+		List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).toList();
 		if (!groupIds.isEmpty()) {
 			query1.append(AND_LDGROUPID_IN);
 			query1.append(StringUtil.arrayToString(groupIds.toArray(new Long[0]), ","));
@@ -1142,8 +1142,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	private void appendUserGroupIdsCondition(User user, StringBuilder query) {
-		List<String> groupIds = user.getUserGroups().stream().map(g -> Long.toString(g.getGroupId()))
-				.collect(Collectors.toList());
+		List<String> groupIds = user.getUserGroups().stream().map(g -> Long.toString(g.getGroupId())).toList();
 		if (!groupIds.isEmpty()) {
 			query.append(AND_LDGROUPID_IN);
 			query.append(groupIds.stream().collect(Collectors.joining(",")));
@@ -1354,9 +1353,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public Folder create(Folder parent, Folder folderVO, boolean inheritSecurity, FolderHistory transaction)
 			throws PersistenceException {
 		parent = findFolder(parent);
-		if(!org.hibernate.Hibernate.isInitialized(parent.getAttributes()))
+		if (!org.hibernate.Hibernate.isInitialized(parent.getAttributes()))
 			initialize(parent);
-		
+
 		Folder folder = new Folder();
 		folder.setName(folderVO.getName());
 		folder.setType(folderVO.getType());
@@ -1791,8 +1790,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		jdbcUpdate("update ld_folder set ld_deleteuserid=" + transaction.getUserId() + " where  ld_id in "
 				+ treeIdsString);
-		jdbcUpdate("update ld_folder set ld_deleteuser=:user where ld_id in "
-				+ treeIdsString, Map.of("user", transaction.getUser().getFullName()));
+		jdbcUpdate("update ld_folder set ld_deleteuser=:user where ld_id in " + treeIdsString,
+				Map.of("user", transaction.getUser().getFullName()));
 
 		/*
 		 * Delete the aliases
@@ -1810,9 +1809,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		jdbcUpdate("update ld_document set ld_deleteuserid=" + transaction.getUserId() + " where  ld_folderid in "
 				+ treeIdsString);
-		jdbcUpdate("update ld_document set ld_deleteuser=:user where  ld_folderid in "
-				+ treeIdsString, Map.of("user", transaction.getUser().getFullName()));
-		
+		jdbcUpdate("update ld_document set ld_deleteuser=:user where  ld_folderid in " + treeIdsString,
+				Map.of("user", transaction.getUser().getFullName()));
+
 		if (getSessionFactory().getCache() != null)
 			getSessionFactory().getCache().evictEntityData(Folder.class);
 
@@ -1946,7 +1945,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void initialize(Folder folder) {
 		refresh(folder);
-		
+
 		if (folder.getFolderGroups() != null)
 			log.trace("Initialized {} folder groups", folder.getFolderGroups().size());
 

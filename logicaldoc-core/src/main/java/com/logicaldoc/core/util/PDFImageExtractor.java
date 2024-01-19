@@ -194,10 +194,10 @@ public class PDFImageExtractor implements AutoCloseable {
 		for (COSName xObjectName : resources.getXObjectNames()) {
 			PDXObject xObject = resources.getXObject(xObjectName);
 
-			if (xObject instanceof PDFormXObject) {
-				images.putAll(getImagesFromResources(((PDFormXObject) xObject).getResources()));
-			} else if (xObject instanceof PDImageXObject) {
-				images.put(xObjectName, ((PDImageXObject) xObject));
+			if (xObject instanceof PDFormXObject pdFormXObject) {
+				images.putAll(getImagesFromResources(pdFormXObject.getResources()));
+			} else if (xObject instanceof PDImageXObject pdImageXObject) {
+				images.put(xObjectName, pdImageXObject);
 			}
 		}
 

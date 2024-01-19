@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
@@ -507,9 +506,9 @@ public class TypeManager {
 		} else if (tc != null) {
 			List<TypeDefinitionContainer> typeContainers = tc.getChildren().stream()
 					.skip(skipCount != null ? skipCount.intValue() : 0)
-					.limit(maxItems == null ? Integer.MAX_VALUE : maxItems.intValue()).collect(Collectors.toList());
-			result = new TypeDefinitionListImpl(typeContainers.stream()
-					.map(c -> copyTypeDefintion(c.getTypeDefinition())).collect(Collectors.toList()));
+					.limit(maxItems == null ? Integer.MAX_VALUE : maxItems.intValue()).toList();
+			result = new TypeDefinitionListImpl(
+					typeContainers.stream().map(c -> copyTypeDefintion(c.getTypeDefinition())).toList());
 		}
 
 		result.setHasMoreItems(tc != null && result.getList().size() < tc.getChildren().size());

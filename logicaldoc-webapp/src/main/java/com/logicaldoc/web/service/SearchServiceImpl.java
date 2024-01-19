@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -259,8 +258,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		}
 
 		return map.values().stream()
-				.sorted((SearchOptions s1, SearchOptions s2) -> s1.getName().compareTo(s2.getName()))
-				.collect(Collectors.toList());
+				.sorted((SearchOptions s1, SearchOptions s2) -> s1.getName().compareTo(s2.getName())).toList();
 	}
 
 	protected GUISearchOptions toGUIOptions(SearchOptions searchOptions) {

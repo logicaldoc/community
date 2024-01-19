@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import com.logicaldoc.core.PersistentObject;
 
@@ -106,7 +105,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 
 	public List<Object> getValues(String name) {
 		List<Attribute> attrs = getValueAttributes(name);
-		return attrs.stream().map(a -> a.getValue()).collect(Collectors.toList());
+		return attrs.stream().map(a -> a.getValue()).toList();
 	}
 
 	public Object getValue(String name) {

@@ -251,9 +251,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected void saveOrUpdate(Object entity) {
 		// Update the attributes
-		if (entity instanceof ExtensibleObject) {
+		if (entity instanceof ExtensibleObject extensibleEntity) {
 			try {
-				ExtensibleObject extensibleEntity = (ExtensibleObject) entity;
 				for (String name : extensibleEntity.getAttributes().keySet()) {
 					Attribute att = extensibleEntity.getAttribute(name);
 					if (att.getMultiple() == 1 && att.getType() == Attribute.TYPE_STRING) {

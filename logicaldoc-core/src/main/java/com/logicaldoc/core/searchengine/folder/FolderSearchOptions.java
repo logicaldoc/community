@@ -2,7 +2,6 @@ package com.logicaldoc.core.searchengine.folder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.logicaldoc.core.searchengine.SearchOptions;
 
@@ -27,9 +26,9 @@ public class FolderSearchOptions extends SearchOptions {
 	}
 
 	public List<FolderCriterion> getNotEmptyCriteria() {
-		return criteria.stream().filter(c -> !c.isEmpty()).collect(Collectors.toList());
+		return criteria.stream().filter(c -> !c.isEmpty()).toList();
 	}
-	
+
 	public void setCriteria(List<FolderCriterion> criteria) {
 		this.criteria = criteria;
 	}
@@ -45,7 +44,7 @@ public class FolderSearchOptions extends SearchOptions {
 	public void setOrder(List<String> order) {
 		this.order = order;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof FolderSearchOptions))
@@ -53,7 +52,7 @@ public class FolderSearchOptions extends SearchOptions {
 		FolderSearchOptions other = (FolderSearchOptions) obj;
 		return getName().equals(other.getName());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return getName().hashCode();

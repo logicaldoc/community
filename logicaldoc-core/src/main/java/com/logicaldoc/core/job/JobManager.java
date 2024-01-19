@@ -114,7 +114,7 @@ public class JobManager {
 		if (!triggersMap.get(triggerSpec).containsKey(TENANT_ID))
 			triggersMap.get(triggerSpec).put(TENANT_ID, job.getTenantId());
 
-		if (triggerSpec instanceof Date) {
+		if (triggerSpec instanceof Date dateSpec) {
 			// The job must be fired on a specific data
 
 			SimpleScheduleBuilder schedule = SimpleScheduleBuilder.simpleSchedule();
@@ -126,11 +126,11 @@ public class JobManager {
 			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
 			trig = TriggerBuilder.newTrigger()
 					.withIdentity(job.getName() + "-" + df.format(triggerSpec), job.getGroup())
-					.usingJobData(new JobDataMap(triggersMap.get(triggerSpec))).startAt((Date) triggerSpec)
-					.withSchedule(schedule).build();
-		} else if (triggerSpec instanceof String) {
+					.usingJobData(new JobDataMap(triggersMap.get(triggerSpec))).startAt(dateSpec).withSchedule(schedule)
+					.build();
+		} else if (triggerSpec instanceof String cronSpec) {
 			// The job must be fired on a specific data
-			CronScheduleBuilder schedule = CronScheduleBuilder.cronSchedule((String) triggerSpec);
+			CronScheduleBuilder schedule = CronScheduleBuilder.cronSchedule(cronSpec);
 			if (MISSFIRE_RUNNOW.equals(getMissfireInstruction(job.getGroup())))
 				schedule = schedule.withMisfireHandlingInstructionFireAndProceed();
 			else

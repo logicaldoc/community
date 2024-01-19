@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -60,19 +59,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	private static final String USERNAME = "username";
 
-	@Resource(name="GenericDAO")
+	@Resource(name = "GenericDAO")
 	private GenericDAO genericDAO;
 
-	@Resource(name="UserHistoryDAO")
+	@Resource(name = "UserHistoryDAO")
 	private UserHistoryDAO userHistoryDAO;
 
-	@Resource(name="PasswordHistoryDAO")
+	@Resource(name = "PasswordHistoryDAO")
 	private PasswordHistoryDAO passwordHistoryDAO;
 
-	@Resource(name="UserListenerManager")
+	@Resource(name = "UserListenerManager")
 	private UserListenerManager userListenerManager;
 
-	@Resource(name="ContextProperties")
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	private HibernateUserDAO() {
@@ -169,8 +168,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
 
 		Map<String, String> messages = I18N.getMessages(user.getLocale() != null ? user.getLocale() : Locale.ENGLISH);
-		List<String> errorKeys = messages.keySet().stream().filter(key -> key.startsWith("passwderror."))
-				.collect(Collectors.toList());
+		List<String> errorKeys = messages.keySet().stream().filter(key -> key.startsWith("passwderror.")).toList();
 		Properties props = new Properties();
 		for (String key : errorKeys)
 			props.put(key.substring(key.indexOf('.') + 1), messages.get(key));

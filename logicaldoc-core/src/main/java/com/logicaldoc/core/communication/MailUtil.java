@@ -134,8 +134,7 @@ public class MailUtil {
 
 		List<Attachment> atts = msg.getAttachments();
 		for (Attachment att : atts) {
-			if (att instanceof FileAttachment) {
-				FileAttachment fatt = (FileAttachment) att;
+			if (att instanceof FileAttachment fatt) {
 				if (StringUtils.isNotEmpty(fatt.getFilename()) && fatt.getSize() > 0) {
 					EMailAttachment emailAtt = new EMailAttachment();
 					emailAtt.setFileName(fatt.getFilename());
@@ -326,8 +325,7 @@ public class MailUtil {
 
 		setReplyTo(msg, email);
 
-		if (msg.getContent() instanceof MimeMultipart) {
-			MimeMultipart multipart = (MimeMultipart) msg.getContent();
+		if (msg.getContent() instanceof MimeMultipart multipart) {
 			int count = multipart.getCount();
 			for (int i = 0; i < count; i++) {
 				BodyPart bp = multipart.getBodyPart(i);
@@ -459,12 +457,11 @@ public class MailUtil {
 
 	private static void addAttachments(BodyPart p, EMail email, boolean extractAttachmentContent)
 			throws MessagingException, IOException {
-		if (p.getContent() instanceof Multipart) {
-			Multipart mp = (Multipart) p.getContent();
-			int count = mp.getCount();
+		if (p.getContent() instanceof Multipart multipart) {
+			int count = multipart.getCount();
 
 			for (int i = 0; i < count; i++) {
-				BodyPart bp = mp.getBodyPart(i);
+				BodyPart bp = multipart.getBodyPart(i);
 				if (bp.getFileName() != null && extractAttachmentContent) {
 					addAttachment(bp, email);
 				} else if (p.getContent() instanceof Multipart) {
@@ -550,8 +547,7 @@ public class MailUtil {
 		Object obj = p.getContent();
 		String str;
 
-		if (obj instanceof InputStream) {
-			InputStream is = (InputStream) obj;
+		if (obj instanceof InputStream is) {
 			StringWriter writer = new StringWriter();
 			IOUtils.copy(is, writer, StandardCharsets.UTF_8);
 			str = writer.toString();
@@ -742,13 +738,12 @@ public class MailUtil {
 	 * @throws IOException generic I/O error
 	 */
 	private static void extractPartText(Object content, StringBuilder textBody) throws MessagingException, IOException {
-		if (content instanceof String) {
-			textBody.append("\n" + content.toString());
+		if (content instanceof String string) {
+			textBody.append("\n" + string);
 			return;
 		}
 
-		if (content instanceof Part) {
-			Part part = (Part) content;
+		if (content instanceof Part part) {
 			String disposition = part.getDisposition();
 			String contentType = part.getContentType();
 
@@ -759,8 +754,8 @@ public class MailUtil {
 			return;
 		}
 
-		if (content instanceof Multipart) {
-			extractPartTextFromMultipart((Multipart) content, textBody);
+		if (content instanceof Multipart multipart) {
+			extractPartTextFromMultipart(multipart, textBody);
 		}
 	}
 

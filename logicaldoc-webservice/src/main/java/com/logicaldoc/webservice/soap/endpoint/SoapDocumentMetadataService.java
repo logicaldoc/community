@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -186,7 +185,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 
 		List<AttributeOption> options = dao.findByAttribute(setId, attribute);
-		return options.stream().map(o -> o.getValue()).collect(Collectors.toList()).toArray(new String[0]);
+		return options.stream().map(o -> o.getValue()).toList().toArray(new String[0]);
 	}
 
 	@Override
@@ -196,10 +195,9 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 
 		List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
-		
-		
-		return options.stream().map(o -> new WSAttributeOption(o.getValue(), o.getCategory()))
-				.collect(Collectors.toList()).toArray(new WSAttributeOption[0]);
+
+		return options.stream().map(o -> new WSAttributeOption(o.getValue(), o.getCategory())).toList()
+				.toArray(new WSAttributeOption[0]);
 	}
 
 	@Override
@@ -388,17 +386,18 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	}
 
 	@Override
-	public void addAttributeOption(String sid, long setId, String attribute, WSAttributeOption wsoption) throws AuthenticationException, WebserviceException, PersistenceException {
+	public void addAttributeOption(String sid, long setId, String attribute, WSAttributeOption wsoption)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 
 		validateSession(sid);
-	
+
 		if (wsoption == null)
 			return;
 
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
-		
+
 		AttributeOption option = new AttributeOption(setId, attribute, wsoption.getValue(), wsoption.getCategory());
 		dao.store(option);
 	}
-	
+
 }

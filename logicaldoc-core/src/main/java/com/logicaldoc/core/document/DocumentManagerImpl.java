@@ -482,8 +482,8 @@ public class DocumentManagerImpl implements DocumentManager {
 						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
 			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc, e);
-				if (e instanceof ParseException)
-					throw (ParseException) e;
+				if (e instanceof ParseException pe)
+					throw pe;
 				else
 					throw new ParseException(e);
 			}
@@ -627,8 +627,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			synchronizedUpdate(document, docVO, transaction);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			if (e instanceof PersistenceException)
-				throw (PersistenceException) e;
+			if (e instanceof PersistenceException pe)
+				throw pe;
 			else
 				throw new PersistenceException(e);
 		}
@@ -1674,7 +1674,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public Document merge(Collection<Document> documents, long targetFolderId, String fileName,
 			DocumentHistory transaction) throws IOException, PersistenceException {
-		List<Long> docIds = documents.stream().map(d -> d.getId()).collect(Collectors.toList());
+		List<Long> docIds = documents.stream().map(d -> d.getId()).toList();
 		File tempDir = null;
 		File bigPdf = null;
 		try {

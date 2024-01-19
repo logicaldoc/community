@@ -182,16 +182,16 @@ public class FolderCriterion implements Serializable {
 		case Attribute.TYPE_FOLDER:
 		case Attribute.TYPE_USER:
 		case Attribute.TYPE_BOOLEAN:
-			if (value instanceof Integer)
-				setLongValue(((Integer) value).longValue());
+			if (value instanceof Integer integer)
+				setLongValue(integer.longValue());
 			else
 				setLongValue((Long) value);
 			break;
 		case Attribute.TYPE_DOUBLE:
-			if (value instanceof Double)
-				setDoubleValue((Double) value);
-			else if (value instanceof Long)
-				setDoubleValue(((Long) value).doubleValue());
+			if (value instanceof Double doubleVal)
+				setDoubleValue(doubleVal);
+			else if (value instanceof Long longVal)
+				setDoubleValue(longVal.doubleValue());
 			else
 				setDoubleValue(((Float) value).doubleValue());
 			break;

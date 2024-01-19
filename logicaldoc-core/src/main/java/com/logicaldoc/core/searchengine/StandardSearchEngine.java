@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -324,7 +323,7 @@ public class StandardSearchEngine implements SearchEngine {
 	@Override
 	public synchronized void deleteHits(Collection<Long> ids) {
 		try {
-			server.deleteById(ids.stream().map(i -> Long.toString(i)).collect(Collectors.toList()));
+			server.deleteById(ids.stream().map(i -> Long.toString(i)).toList());
 			server.commit();
 		} catch (Exception e) {
 			log.debug("Unable to delete {} hits", ids.size(), e);

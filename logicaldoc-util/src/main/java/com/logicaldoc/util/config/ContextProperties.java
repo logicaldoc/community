@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
@@ -233,7 +232,7 @@ public class ContextProperties extends OrderedProperties {
 	private void deleteOldestBackups() throws IOException {
 		List<File> oldBackups = getBackups();
 		if (oldBackups.size() > maxBackups) {
-			List<File> backupsToRetain = oldBackups.stream().limit(maxBackups).collect(Collectors.toList());
+			List<File> backupsToRetain = oldBackups.stream().limit(maxBackups).toList();
 			for (File backupFile : oldBackups)
 				if (!backupsToRetain.contains(backupFile))
 					FileUtil.strongDelete(backupFile);

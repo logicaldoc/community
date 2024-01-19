@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlType;
 
@@ -532,7 +531,7 @@ public class WSUser {
 						// Nothing to do
 					}
 					return wswt;
-				}).collect(Collectors.toList());
+				}).toList();
 				wsUser.setWorkingTimes(tmp.toArray(new WSWorkingTime[0]));
 			}
 		} catch (Exception e) {

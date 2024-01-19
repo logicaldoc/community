@@ -45,7 +45,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 	protected static Logger log = LoggerFactory.getLogger(FilteredAnalyzer.class);
 
 	public static final ThreadLocal<String> lang = ThreadLocal.withInitial(() -> "en");
-	
+
 	public FilteredAnalyzer() {
 		super(GLOBAL_REUSE_STRATEGY);
 	}
@@ -123,7 +123,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 				TokenFilterFactory factory = (TokenFilterFactory) constructor.newInstance(configs);
 
-				if (factory instanceof WordDelimiterGraphFilterFactory) {
+				if (factory instanceof WordDelimiterGraphFilterFactory wdFactory) {
 					/**
 					 * This class may need initialization from files
 					 */
@@ -131,7 +131,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 							new File(Context.get().getProperties().getProperty("index.dir") + "/logicaldoc/conf")
 									.toPath(),
 							this.getClass().getClassLoader());
-					((WordDelimiterGraphFilterFactory) factory).inform(loader);
+					wdFactory.inform(loader);
 				}
 
 				ts = factory.create(ts);

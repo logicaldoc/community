@@ -105,16 +105,16 @@ public class SqlRowSetWrapper implements SqlRowSet {
 	}
 
 	private Date getDate(Object obj) {
-		if (obj instanceof Date)
-			return (Date) obj;
-		else if (obj instanceof Timestamp)
+		if (obj instanceof Date date)
+			return date;
+		else if (obj instanceof Timestamp timeStamp)
 			return new Date(java.util.Date
-					.from(((Timestamp) obj).toLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
-		else if (obj instanceof java.util.Date)
-			return new Date(((java.util.Date) obj).getTime());
-		else if (obj instanceof LocalDateTime)
+					.from(timeStamp.toLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()).getTime());
+		else if (obj instanceof java.util.Date utilDate)
+			return new Date(utilDate.getTime());
+		else if (obj instanceof LocalDateTime localDateTime)
 			return new Date(
-					java.util.Date.from(((LocalDateTime) obj).atZone(ZoneId.systemDefault()).toInstant()).getTime());
+					java.util.Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()).getTime());
 		return null;
 	}
 

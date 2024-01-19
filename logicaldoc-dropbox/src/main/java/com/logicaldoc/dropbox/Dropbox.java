@@ -141,8 +141,8 @@ public class Dropbox {
 		List<SearchMatch> matches = result.getMatches();
 		for (SearchMatch searchMatch : matches) {
 			Metadata metadata = searchMatch.getMetadata();
-			if (metadata instanceof FileMetadata)
-				list.add((FileMetadata) metadata);
+			if (metadata instanceof FileMetadata fileMetadata)
+				list.add(fileMetadata);
 		}
 		return list;
 	}

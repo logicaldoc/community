@@ -15,12 +15,10 @@ public class DaysCellFormatter implements CellFormatter {
 	public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
 		if (value == null)
 			return null;
-		if (value instanceof Long)
-			return value.toString() + " "
-					+ (((Long) value).longValue() > 1 ? I18N.message("ddays") : I18N.message("day"));
-		else if (value instanceof Integer)
-			return value.toString() + " "
-					+ (((Integer) value).intValue() > 1 ? I18N.message("ddays") : I18N.message("day"));
+		if (value instanceof Long longVal)
+			return value.toString() + " " + (longVal.longValue() > 1 ? I18N.message("ddays") : I18N.message("day"));
+		else if (value instanceof Integer integer)
+			return value.toString() + " " + (integer.intValue() > 1 ? I18N.message("ddays") : I18N.message("day"));
 		else
 			return value.toString();
 	}

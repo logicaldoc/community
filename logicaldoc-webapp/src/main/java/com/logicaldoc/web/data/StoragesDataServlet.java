@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +48,7 @@ public class StoragesDataServlet extends AbstractDataServlet {
 			// Just list the different storers (types of storages)
 			Storer manager = (Storer) Context.get().getBean(Storer.class);
 			Set<String> set = manager.getStorerDefinitions().keySet();
-			for (String type : set.stream().sorted().collect(Collectors.toList())) {
+			for (String type : set.stream().sorted().toList()) {
 				if (!manager.getStorerDefinitions().get(type).isEnabled())
 					continue;
 

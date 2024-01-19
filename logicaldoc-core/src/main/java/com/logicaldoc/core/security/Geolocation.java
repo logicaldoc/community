@@ -9,7 +9,6 @@ import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
@@ -191,8 +190,8 @@ public class Geolocation {
 			// Search for the .mmdb file
 			File mmdbFile = null;
 			try (Stream<Path> paths = Files.walk(tmpDir.toPath())) {
-				mmdbFile = paths.filter(p -> p.toFile().isFile() && p.toFile().getName().endsWith(".mmdb"))
-						.collect(Collectors.toList()).get(0).toFile();
+				mmdbFile = paths.filter(p -> p.toFile().isFile() && p.toFile().getName().endsWith(".mmdb")).toList()
+						.get(0).toFile();
 			}
 
 			if (!mmdbFile.exists())

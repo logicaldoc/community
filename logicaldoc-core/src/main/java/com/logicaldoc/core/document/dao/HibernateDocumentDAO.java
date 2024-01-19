@@ -380,8 +380,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		log.error(e.getMessage(), e);
 
-		if (e instanceof PersistenceException)
-			throw (PersistenceException) e;
+		if (e instanceof PersistenceException pe)
+			throw pe;
 		else
 			throw new PersistenceException(e);
 	}

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +114,7 @@ public class GhostUtil {
 			pages.addAll(Arrays.asList(children));
 		}
 
-		return pages.stream().sorted().collect(Collectors.toList());
+		return pages.stream().sorted().toList();
 	}
 
 	/**

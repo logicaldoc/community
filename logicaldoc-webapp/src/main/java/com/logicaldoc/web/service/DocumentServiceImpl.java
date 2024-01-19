@@ -1943,8 +1943,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			 */
 			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(), document.getFileVersion(),
 					types);
-			List<Long> actualNoteIds = documentNotes.stream().map(PersistentObject::getId).collect(Collectors.toList());
-			List<Long> noteIds = notesList.stream().map(GUIDocumentNote::getId).collect(Collectors.toList());
+			List<Long> actualNoteIds = documentNotes.stream().map(PersistentObject::getId).toList();
+			List<Long> noteIds = notesList.stream().map(GUIDocumentNote::getId).toList();
 			for (Long actualNoteId : actualNoteIds)
 				if (!noteIds.contains(actualNoteId))
 					dao.delete(actualNoteId);
@@ -2670,9 +2670,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(docId, fileVersion, null);
-		
+
 		GUIDocument guiDocument = getById(docId);
-		
+
 		try (InputStream is = storer.getStream(emailDocument.getId(), resource)) {
 			GUIEmail guiMail = new GUIEmail();
 			EMail email = readEmail(is, emailDocument.getId(), guiDocument);
@@ -2893,7 +2893,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				maintainedDoc.getDate());
 
 		duplications.remove(0);
-		List<Long> duplicatedIds = duplications.stream().map(d -> d.getId()).collect(Collectors.toList());
+		List<Long> duplicatedIds = duplications.stream().map(d -> d.getId()).toList();
 
 		log.warn("Deleting the duplicated documents {}", duplicatedIds);
 		StringBuilder updateStatement = new StringBuilder("update ld_document set ld_deleted=1 where ");

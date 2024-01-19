@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -241,7 +240,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			throw new ServerValidationException(ie.getMessage(),
 					ie.getErrors().values().stream()
 							.map(e -> new ServerValidationError(e.getAttribute(), e.getLabel(), e.getDescription()))
-							.collect(Collectors.toList()).toArray(new ServerValidationError[0]));
+							.toList().toArray(new ServerValidationError[0]));
 		} else if (t instanceof PermissionException) {
 			throw new AccessDeniedException(t.getMessage());
 		} else if (t instanceof ServerException) {

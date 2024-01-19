@@ -69,8 +69,7 @@ public class LDSecurityContextRepository implements SecurityContextRepository {
 
 		Object principal = context.getAuthentication().getPrincipal();
 
-		if (principal instanceof LDAuthenticationToken) {
-			LDAuthenticationToken token = (LDAuthenticationToken) principal;
+		if (principal instanceof LDAuthenticationToken token) {
 			SessionManager.get().saveSid(request, response, token.getSid());
 
 			HttpSession servletSession = request.getSession(false);
