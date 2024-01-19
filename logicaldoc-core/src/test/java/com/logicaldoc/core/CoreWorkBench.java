@@ -7,28 +7,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.management.MBeanServerConnection;
 
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
@@ -44,6 +34,7 @@ import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
+import com.sun.management.OperatingSystemMXBean;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
 
@@ -52,89 +43,41 @@ public class CoreWorkBench {
 	public static void sendEmailWithAttachments(String host, String port, final String userName, final String password,
 			String toAddress, String subject, String message, String[] attachFiles)
 			throws AddressException, MessagingException {
-		// sets SMTP server properties
-		Properties properties = new Properties();
-		properties.put("mail.smtp.host", host);
-		properties.put("mail.smtp.port", port);
-		properties.put("mail.smtp.auth", "true");
-		properties.put("mail.smtp.starttls.enable", "true");
-		properties.put("mail.user", userName);
-		properties.put("mail.password", password);
 
-		// creates a new session with an authenticator
-		Authenticator auth = new Authenticator() {
-			public PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(userName, password);
-			}
-		};
-		Session session = Session.getInstance(properties, auth);
-
-		// creates a new e-mail message
-		Message msg = new MimeMessage(session);
-
-		msg.setFrom(new InternetAddress(userName));
-		InternetAddress[] toAddresses = { new InternetAddress(toAddress) };
-		msg.setRecipients(Message.RecipientType.TO, toAddresses);
-		msg.setSubject(subject);
-		msg.setSentDate(new Date());
-
-		// creates message part
-//	        MimeBodyPart messageBodyPart = new MimeBodyPart();
-//	        messageBodyPart.setContent(message, "text/html");
-
-		// creates multi-part
-		Multipart multipart = new MimeMultipart();
-//	        multipart.addBodyPart(messageBodyPart);
-
-		// adds attachments
-		if (attachFiles != null && attachFiles.length > 0) {
-			for (String filePath : attachFiles) {
-				MimeBodyPart attachPart = new MimeBodyPart();
-
-				try {
-					attachPart.attachFile(filePath);
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
-
-				multipart.addBodyPart(attachPart);
-
-				System.out.println("added attachment " + attachPart.getFileName());
-			}
-		}
-
-		// sets the multi-part as e-mail's content
-		msg.setContent(multipart);
-
-		// sends the e-mail
-		Transport.send(msg);
 	}
 
 	/**
 	 * Test sending e-mail with attachments
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
-		// SMTP info
-		String host = "smtp.logicaldoc.com";
-		String port = "25";
-		String mailFrom = "info@logicaldoc.com";
-		String password = "#pachlgA8oGufr8";
+	public static void main(String[] args) throws IOException {
+//		OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+//		// What % CPU load this current JVM is taking, from 0.0-1.0
+//		System.out.println(osBean.getProcessCpuLoad());
+//		
+//		System.out.println(osBean.getProcessCpuTime());
 
-		// message info
-		String mailTo = "newteam@logicaldoc.com";
-		String subject = "New email with attachments 2";
+	
+		MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
 
-		// attachments
-		String[] attachFiles = new String[1];
-		attachFiles[0] = "C:\\Users\\marco\\Downloads\\Zahlungsavis vom 14.07.2023.pdf";
+		OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(
+		mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
 
-		try {
-			sendEmailWithAttachments(host, port, mailFrom, password, mailTo, subject, "none", attachFiles);
-			System.out.println("Email sent.");
-		} catch (Exception ex) {
-			System.out.println("Could not send email.");
-			ex.printStackTrace();
-		}
+		long nanoBefore = System.nanoTime();
+		long cpuBefore = osMBean.getProcessCpuTime();
+
+		// Call an expensive task, or sleep if you are monitoring a remote process
+
+		long cpuAfter = osMBean.getProcessCpuTime();
+		long nanoAfter = System.nanoTime();
+
+		long percent;
+		if (nanoAfter > nanoBefore)
+		 percent = ((cpuAfter-cpuBefore)*100L)/
+		   (nanoAfter-nanoBefore);
+		else percent = 0;
+
+		System.out.println("Cpu usage: "+percent+"%");
 	}
 
 	private static void avatarStuff() {

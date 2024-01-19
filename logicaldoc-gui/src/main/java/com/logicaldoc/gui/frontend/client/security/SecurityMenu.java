@@ -49,8 +49,6 @@ public class SecurityMenu extends VLayout {
 		addExtAuthButton();
 
 		addSamlButton();
-
-		addSingleSignonButton();
 	}
 
 	private void addSecurityButton() {
@@ -99,19 +97,6 @@ public class SecurityMenu extends VLayout {
 			addMember(saml);
 			if (!Feature.enabled(Feature.SINGLE_SIGNON) || Session.get().isDemo())
 				setFeatureDisabled(saml);
-		}
-	}
-
-	private void addSingleSignonButton() {
-		Button singleSingon = new Button(I18N.message("singlesignon"));
-		singleSingon.setWidth100();
-		singleSingon.setHeight(25);
-		singleSingon.addClickHandler(event -> AdminScreen.get().setContent(new SingleSignonPanel()));
-		if (Feature.visible(Feature.SINGLE_SIGNON) && Session.get().isDefaultTenant()
-				&& Menu.enabled(Menu.SINGLE_SIGNON)) {
-			addMember(singleSingon);
-			if (!Feature.enabled(Feature.SINGLE_SIGNON) || Session.get().isDemo())
-				setFeatureDisabled(singleSingon);
 		}
 	}
 

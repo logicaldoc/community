@@ -221,7 +221,7 @@ public abstract class Task implements Runnable {
 			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId)))
 				runTask();
 		} catch (Exception t) {
-			log.error("Error caught " + t.getMessage(), t);
+			log.error("Error caught {}", t.getMessage(), t);
 			log.error("The task is stopped");
 			lastRunError = t;
 		} finally {

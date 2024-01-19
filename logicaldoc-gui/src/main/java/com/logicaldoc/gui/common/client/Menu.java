@@ -182,8 +182,6 @@ public class Menu {
 	public static final long TWO_FACTORS_AUTHENTICATION = 1870;
 	
 	public static final long EXTERNAL_AUTHENTICATION = 1880;
-
-	public static final long SINGLE_SIGNON = 1875;
 	
 	public static final long SAML = 1876;
 	
