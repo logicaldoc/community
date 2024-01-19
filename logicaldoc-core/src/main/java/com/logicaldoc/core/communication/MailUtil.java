@@ -134,15 +134,14 @@ public class MailUtil {
 
 		List<Attachment> atts = msg.getAttachments();
 		for (Attachment att : atts) {
-			if (att instanceof FileAttachment fatt) {
-				if (StringUtils.isNotEmpty(fatt.getFilename()) && fatt.getSize() > 0) {
-					EMailAttachment emailAtt = new EMailAttachment();
-					emailAtt.setFileName(fatt.getFilename());
-					emailAtt.setSize(fatt.getSize());
-					if (extractAttachmentContent)
-						emailAtt.setData(fatt.getData());
-					email.addAttachment(emailAtt);
-				}
+			if (att instanceof FileAttachment fatt && StringUtils.isNotEmpty(fatt.getFilename())
+					&& fatt.getSize() > 0) {
+				EMailAttachment emailAtt = new EMailAttachment();
+				emailAtt.setFileName(fatt.getFilename());
+				emailAtt.setSize(fatt.getSize());
+				if (extractAttachmentContent)
+					emailAtt.setData(fatt.getData());
+				email.addAttachment(emailAtt);
 			}
 		}
 
