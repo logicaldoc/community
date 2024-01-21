@@ -156,7 +156,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		addDataArrivedHandler(this::onDataArrived);
 
-		// DocumentController.get().addObserver(this);
+		DocumentController.get().addObserver(this);
 	}
 
 	private void onDataArrived(DataArrivedEvent event) {

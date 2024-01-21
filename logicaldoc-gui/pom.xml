@@ -139,10 +139,10 @@
 					<extraJvmArgs>-XX:-UseGCOverheadLimit -Xmx4000m</extraJvmArgs>
 					<webappDirectory>./war</webappDirectory>
 					<modules>
-						<module>com.logicaldoc.gui.common.Common</module>
+						<!--module>com.logicaldoc.gui.common.Common</module -->
 						<module>com.logicaldoc.gui.frontend.Frontend</module>
-						<module>com.logicaldoc.gui.login.Login</module>
-						<module>com.logicaldoc.gui.setup.Setup</module>
+						<!--module>com.logicaldoc.gui.login.Login</module>
+						<module>com.logicaldoc.gui.setup.Setup</module -->
 					</modules>
 				</configuration>
 				<executions>
