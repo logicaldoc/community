@@ -164,7 +164,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		SearchOptions searchOptions = toSearchOptions(options);
 		searchOptions.setTenantId(session.getTenantId());
 
-		if (searchOptions instanceof FulltextSearchOptions) {
+		if (searchOptions instanceof FulltextSearchOptions fulltextOptions) {
 			Locale exprLoc = LocaleUtil.toLocale(options.getExpressionLanguage());
 
 			Language lang = LanguageManager.getInstance().getLanguage(exprLoc);
@@ -173,7 +173,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				exprLoc = LocaleUtil.toLocale(exprLoc.getLanguage());
 
 				if (exprLoc != null)
-					((FulltextSearchOptions) searchOptions).setExpressionLanguage(exprLoc.getLanguage());
+					fulltextOptions.setExpressionLanguage(exprLoc.getLanguage());
 			}
 		}
 		return searchOptions;

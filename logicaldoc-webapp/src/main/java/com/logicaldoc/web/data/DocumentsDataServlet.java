@@ -228,14 +228,14 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 				Object val = document.getValue(name);
 				if (val != null) {
 					writer.print("<ext_" + name + ">");
-					if (val instanceof Date)
-						writer.print(df.format((Date) val));
-					else if (val instanceof Integer)
-						writer.print(Integer.toString((Integer) val));
-					else if (val instanceof Long)
-						writer.print(Long.toString((Long) val));
-					else if (val instanceof Double)
-						writer.print(Double.toString((Double) val));
+					if (val instanceof Date date)
+						writer.print(df.format(date));
+					else if (val instanceof Integer intVal)
+						writer.print(Integer.toString(intVal));
+					else if (val instanceof Long longVal)
+						writer.print(Long.toString(longVal));
+					else if (val instanceof Double doubleVal)
+						writer.print(Double.toString(doubleVal));
 					else
 						writer.print("<![CDATA[" + val + "]]>");
 					writer.print("</ext_" + name + ">");

@@ -32,8 +32,8 @@ public class EasyX509TrustManager implements X509TrustManager {
 			tmf.init((KeyStore) null);
 
 			for (TrustManager tm : tmf.getTrustManagers()) {
-				if (tm instanceof X509TrustManager) {
-					dafaultTrustManager = (X509TrustManager) tm;
+				if (tm instanceof X509TrustManager x509) {
+					dafaultTrustManager = x509;
 					break;
 				}
 			}

@@ -176,18 +176,18 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 			syndication.setExcludes((String) values.get("exclude"));
 			syndication.setPassword((String) values.get("password_hidden"));
 
-			if (values.get(MAX_PACKET_SIZE) instanceof Long)
-				syndication.setMaxPacketSize((Long) values.get(MAX_PACKET_SIZE));
+			if (values.get(MAX_PACKET_SIZE) instanceof Long longValue)
+				syndication.setMaxPacketSize(longValue);
 			else
 				syndication.setMaxPacketSize(Long.parseLong(values.get(MAX_PACKET_SIZE).toString()));
 
-			if (values.get(BATCH) instanceof Long)
-				syndication.setBatch((Long) values.get(BATCH));
+			if (values.get(BATCH) instanceof Long longValue)
+				syndication.setBatch(longValue);
 			else
 				syndication.setBatch(Long.parseLong(values.get(BATCH).toString()));
 
-			if (values.get(TIMEOUT) instanceof Integer)
-				syndication.setTimeout((Integer) values.get(TIMEOUT));
+			if (values.get(TIMEOUT) instanceof Integer integer)
+				syndication.setTimeout(integer);
 			else
 				syndication.setTimeout(Integer.parseInt(values.get(TIMEOUT).toString()));
 

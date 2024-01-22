@@ -164,8 +164,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			}
 
 			if (note.isMovedOrResized()) {
-				if (item instanceof DrawLine) {
-					DrawLine line = (DrawLine) item;
+ 				if (item instanceof DrawLine line) {
 					note.setLeft(line.getStartLeftAsDouble() / pageDrawingPane.getImageWidth());
 					note.setTop(line.getStartTopAsDouble() / pageDrawingPane.getImageHeight());
 					note.setWidth(line.getEndLeftAsDouble() / pageDrawingPane.getImageWidth());

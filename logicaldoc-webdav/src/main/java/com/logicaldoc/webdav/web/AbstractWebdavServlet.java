@@ -352,9 +352,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		OutputStream outX = (sendContent) ? response.getOutputStream() : null;
 		OutputContext oc = getOutputContext(response, outX);
 
-		if (!resource.isCollection() && (resource instanceof DavResourceImpl)) {
+		if (!resource.isCollection() && resource instanceof DavResourceImpl dri) {
 			log.debug("resource instanceof DavResourceImpl");
-			DavResourceImpl dri = (DavResourceImpl) resource;
 
 			// Enforce download permission
 			ExportContext exportCtx = dri.getExportContext(oc);
@@ -816,8 +815,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		response.addHeader(DavConstants.HEADER_DAV, resource.getComplianceClass());
 		response.addHeader("Allow", resource.getSupportedMethods());
 		response.addHeader("MS-Author-Via", DavConstants.HEADER_DAV);
-		if (resource instanceof SearchResource) {
-			String[] langs = ((SearchResource) resource).getQueryGrammerSet().getQueryLanguages();
+		if (resource instanceof SearchResource searchResource) {
+			String[] langs = searchResource.getQueryGrammerSet().getQueryLanguages();
 			for (int i = 0; i < langs.length; i++) {
 				response.addHeader(SearchConstants.HEADER_DASL, "<" + langs[i] + ">");
 			}
@@ -825,8 +824,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		// with DeltaV the OPTIONS request may contain a Xml body.
 		OptionsResponse oR = null;
 		OptionsInfo oInfo = request.getOptionsInfo();
-		if (oInfo != null && resource instanceof DeltaVResource) {
-			oR = ((DeltaVResource) resource).getOptionResponse(oInfo);
+		if (oInfo != null && resource instanceof DeltaVResource deltaResource) {
+			oR = deltaResource.getOptionResponse(oInfo);
 		}
 		if (oR == null) {
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -926,10 +925,10 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		ReportInfo info = request.getReportInfo();
 		Report report;
-		if (resource instanceof DeltaVResource) {
-			report = ((DeltaVResource) resource).getReport(info);
-		} else if (resource instanceof AclResource) {
-			report = ((AclResource) resource).getReport(info);
+		if (resource instanceof DeltaVResource deltaResource) {
+			report = deltaResource.getReport(info);
+		} else if (resource instanceof AclResource aclResource) {
+			report = aclResource.getReport(info);
 		} else {
 			try {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);

@@ -52,10 +52,7 @@ public class CacheControlFilter implements javax.servlet.Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-		if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-			HttpServletRequest httpRequest = (HttpServletRequest) request;
-			HttpServletResponse httpResponse = (HttpServletResponse) response;
-
+		if (request instanceof HttpServletRequest httpRequest && response instanceof HttpServletResponse httpResponse) {
 			if (response.isCommitted()) {
 				log.debug("Request already committed {}", httpRequest.getRequestURL());
 				chain.doFilter(request, response);

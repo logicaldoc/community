@@ -72,12 +72,12 @@ public class UserQuotaPanel extends HLayout {
 
 	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values =  vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			long quota;
-			if (values.get(QUOTA) instanceof String)
-				quota = Integer.parseInt((String) values.get(QUOTA));
+			if (values.get(QUOTA) instanceof String string)
+				quota = Integer.parseInt(string);
 			else
 				quota = (Integer) values.get(QUOTA);
 			if (quota > 0)

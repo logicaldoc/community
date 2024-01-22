@@ -39,7 +39,6 @@ public class DocumentsListPanel extends VLayout {
 
 	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
-
 	public DocumentsListPanel(GUIFolder folder) {
 		this(folder, DocumentsGrid.MODE_LIST);
 	}
@@ -50,7 +49,7 @@ public class DocumentsListPanel extends VLayout {
 		addCursor(folder);
 
 		documentsGrid = prepareDocumentsGrid(folder, visualizationMode);
-		
+
 		addMember((Canvas) documentsGrid);
 		documentsGrid.setGridCursor(cursor);
 
@@ -70,7 +69,7 @@ public class DocumentsListPanel extends VLayout {
 	public int getVisualizationMode() {
 		return visualizationMode;
 	}
-	
+
 	private void registerGridHandlers() {
 		documentsGrid.registerDoubleClickHandler(event -> {
 			GUIDocument doc = documentsGrid.getSelectedDocument();
@@ -145,12 +144,14 @@ public class DocumentsListPanel extends VLayout {
 	 * @param folder the folder being opened
 	 */
 	public void updateData(GUIFolder folder) {
-		if (documentsGrid.getFolder() == null || (documentsGrid.getFolder() != null && documentsGrid.getFolder().getId() != folder.getId()))
+		if (documentsGrid.getFolder() == null
+				|| (documentsGrid.getFolder() != null && documentsGrid.getFolder().getId() != folder.getId()))
 			documentsGrid.loadGridLayout(folder);
 
 		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null,
 				documentsGrid.getGridCursor().getPageSize(), documentsGrid.getGridCursor().getCurrentPage(),
-				documentsGrid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) documentsGrid) : null);
+				documentsGrid instanceof DocumentsListGrid docsListGrid ? DocumentGridUtil.getSortSpec(docsListGrid)
+						: null);
 		DocumentsDS dataSource = new DocumentsDS(params);
 		documentsGrid.fetchNewData(dataSource);
 		documentsGrid.setCanDrag(folder.isMove());

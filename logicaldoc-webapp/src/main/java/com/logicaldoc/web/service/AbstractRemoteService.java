@@ -234,17 +234,16 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			message = I18N.message("dberrorretry", session.getUser().getLocale());
 		}
 
-		if (t instanceof ValidationException) {
+		if (t instanceof ValidationException ie) {
 			// Translate a validation error
-			ValidationException ie = (ValidationException) t;
 			throw new ServerValidationException(ie.getMessage(),
 					ie.getErrors().values().stream()
 							.map(e -> new ServerValidationError(e.getAttribute(), e.getLabel(), e.getDescription()))
 							.toList().toArray(new ServerValidationError[0]));
 		} else if (t instanceof PermissionException) {
 			throw new AccessDeniedException(t.getMessage());
-		} else if (t instanceof ServerException) {
-			throw (ServerException) t;
+		} else if (t instanceof ServerException se) {
+			throw se;
 		} else
 			throw new ServerException(message);
 	}
@@ -421,8 +420,8 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	}
 
 	private void normalizeDate(GUIAttribute att) {
-		if (att.getValue() instanceof Date) {
-			att.setValue(convertToDate((Date) att.getValue()));
+		if (att.getValue() instanceof Date date) {
+			att.setValue(convertToDate(date));
 		}
 	}
 

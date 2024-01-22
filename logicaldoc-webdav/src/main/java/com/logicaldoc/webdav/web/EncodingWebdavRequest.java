@@ -102,8 +102,8 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 	}
 
 	private DavResourceLocator createResourceLocator(boolean forDestination, String ref, String hrefPrefix) {
-		if (factory instanceof AbstractLocatorFactory) {
-			return ((AbstractLocatorFactory) factory).createResourceLocator(hrefPrefix, ref, forDestination);
+		if (factory instanceof AbstractLocatorFactory locatorFactory) {
+			return locatorFactory.createResourceLocator(hrefPrefix, ref, forDestination);
 		} else {
 			return factory.createResourceLocator(hrefPrefix, ref);
 		}

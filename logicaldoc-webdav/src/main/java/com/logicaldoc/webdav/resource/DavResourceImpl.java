@@ -630,8 +630,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	private void handleErrorDuringAddingMember(Exception error) throws DavException {
-		if (error instanceof DavException)
-			throw (DavException) error;
+		if (error instanceof DavException davException)
+			throw davException;
 
 		log.error(error.getMessage(), error);
 		throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, error.getMessage());
@@ -662,8 +662,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 			// Update the ImportContext: systemId and
 			// inputStream
-			if (ctx instanceof ImportContextImpl) {
-				ImportContextImpl ici = (ImportContextImpl) ctx;
+			if (ctx instanceof ImportContextImpl ici) {
 				ici.setSystemId(newResourceName);
 				ici.setInputFile(filePathObj.toFile());
 			}

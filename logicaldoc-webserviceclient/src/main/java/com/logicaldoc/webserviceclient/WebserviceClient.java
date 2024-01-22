@@ -84,9 +84,9 @@ public class WebserviceClient {
 			for (SoapObject soapObject : vector) {
 				response.add(soapObject);
 			}
-		} else if (envelope.getResponse() instanceof SoapObject) {
+		} else if (envelope.getResponse() instanceof SoapObject soapObject) {
 			// We have just one element
-			response.add((SoapObject) envelope.getResponse());
+			response.add(soapObject);
 		}
 
 		StringBuilder path = new StringBuilder();

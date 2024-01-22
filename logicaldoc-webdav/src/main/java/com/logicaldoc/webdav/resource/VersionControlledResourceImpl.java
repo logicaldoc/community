@@ -208,8 +208,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 
 		try {
 			DavResource[] resArr = this.getReferenceResources(CHECKED_IN);
-			if (resArr.length == 1 && resArr[0] instanceof VersionResource) {
-				((VersionResource) resArr[0]).label(labelInfo);
+			if (resArr.length == 1 && resArr[0] instanceof VersionResource versionResource) {
+				versionResource.label(labelInfo);
 			} else {
 				throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"DAV:checked-in property on '" + getHref() + "' did not point to a single VersionResource.");

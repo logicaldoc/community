@@ -162,14 +162,14 @@ public class TaskSchedulingPanel extends VLayout {
 
 		if (task.getScheduling().isSimple() || ((String) values.get(SIMPLE)).equals("true")) {
 			long longValue = 0;
-			if (values.get(INITIALDELAY_STR) instanceof String)
-				longValue = Long.parseLong((String) values.get(INITIALDELAY_STR));
+			if (values.get(INITIALDELAY_STR) instanceof String string)
+				longValue = Long.parseLong(string);
 			else
 				longValue = ((Integer) values.get(INITIALDELAY_STR)).longValue();
 			task.getScheduling().setDelay(longValue);
 
-			if (values.get(REPEAT_INTERVAL) instanceof String)
-				longValue = Long.parseLong((String) values.get(REPEAT_INTERVAL));
+			if (values.get(REPEAT_INTERVAL) instanceof String string)
+				longValue = Long.parseLong(string);
 			else
 				longValue = ((Integer) values.get(REPEAT_INTERVAL)).longValue();
 			task.getScheduling().setInterval(longValue);

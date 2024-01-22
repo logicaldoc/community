@@ -309,10 +309,10 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		widgetShapeMap.put(w, shape);
 		functionsMap.put(w, new HashMap<>());
 
-		if (w instanceof HasContextMenu) {
+		if (w instanceof HasContextMenu menu) {
 			w.addDomHandler(event -> {
 				if (event.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
-					showMenu((HasContextMenu) w, event.getClientX(), event.getClientY());
+					showMenu(menu, event.getClientX(), event.getClientY());
 				}
 			}, MouseUpEvent.getType());
 		}
@@ -584,8 +584,8 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 					RootPanel.getBodyElement().getStyle().setCursor(Cursor.POINTER);
 
 					Widget w = s.getWidget();
-					if (w instanceof StateWidget)
-						((StateWidget) w).update();
+					if (w instanceof StateWidget widget)
+						widget.update();
 					return;
 				}
 				inEditionSelectableShapeToDrawConnection = false;

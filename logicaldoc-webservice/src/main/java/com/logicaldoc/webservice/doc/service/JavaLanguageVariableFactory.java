@@ -133,8 +133,8 @@ public class JavaLanguageVariableFactory {
 
 	private static WebParam getXmlAnnotation(Annotation[] annotationForSingleParam) {
 		for (Annotation annotation : annotationForSingleParam) {
-			if (annotation instanceof WebParam) {
-				return (WebParam) annotation;
+			if (annotation instanceof WebParam webParam) {
+				return webParam;
 			}
 		}
 		return null;

@@ -47,10 +47,8 @@ public class TarUtil {
 					BufferedInputStream bis = new BufferedInputStream(fis);
 					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);) {
 
-				if (input instanceof TarArchiveInputStream) {
-					TarArchiveInputStream tarInput = null;
+				if (input instanceof TarArchiveInputStream tarInput) {
 					try {
-						tarInput = (TarArchiveInputStream) input;
 						TarArchiveEntry entry = tarInput.getNextTarEntry();
 						while (entry != null) {
 							String name = entry.getName();
@@ -78,8 +76,8 @@ public class TarUtil {
 					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);
 					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));) {
 
-				if (input instanceof TarArchiveInputStream) {
-					try (TarArchiveInputStream tarInput = (TarArchiveInputStream) input;) {
+				if (input instanceof TarArchiveInputStream tarInput) {
+					try (tarInput) {
 						int nBytes = -1;
 						byte[] buffer = new byte[4096];
 						int totalSizeEntry = 0;

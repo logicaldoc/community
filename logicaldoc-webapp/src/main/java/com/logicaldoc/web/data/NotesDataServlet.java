@@ -107,10 +107,9 @@ public class NotesDataServlet extends AbstractDataServlet {
 
 		Date date = null;
 		Object obj = set.getObject(4);
-		if (obj instanceof oracle.sql.TIMESTAMP) {
-			oracle.sql.TIMESTAMP ts = (oracle.sql.TIMESTAMP) obj;
+		if (obj instanceof oracle.sql.TIMESTAMP timestamp) {
 			try {
-				date = new Date(ts.dateValue().getTime());
+				date = new Date(timestamp.dateValue().getTime());
 			} catch (SQLException e) {
 				logger.warn(e.getMessage());
 			}

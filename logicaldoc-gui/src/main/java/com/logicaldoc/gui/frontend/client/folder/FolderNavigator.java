@@ -169,11 +169,10 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 				}
 
 				doMoveFolderOnDrop();
-			} else if (EventHandler.getDragTarget() instanceof DocumentsGrid) {
+			} else if (EventHandler.getDragTarget() instanceof DocumentsGrid grid) {
 				/*
 				 * In this case we are moving documents
 				 */
-				DocumentsGrid grid = (DocumentsGrid) EventHandler.getDragTarget();
 				final GUIDocument[] selection = grid.getSelectedDocuments();
 				if (selection == null || selection.length == 0)
 					return;

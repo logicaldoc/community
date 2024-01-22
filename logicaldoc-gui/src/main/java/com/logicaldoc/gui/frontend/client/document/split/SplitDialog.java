@@ -71,8 +71,7 @@ public class SplitDialog extends Window {
 				expression.setDisabled(true);
 				expression.setHint("");
 				break;
-			case SplitService.POLICY_BARCODE:
-			case SplitService.POLICY_TEXT:
+			case SplitService.POLICY_BARCODE, SplitService.POLICY_TEXT:
 			default:
 				separator.setDisabled(false);
 				expression.setDisabled(false);

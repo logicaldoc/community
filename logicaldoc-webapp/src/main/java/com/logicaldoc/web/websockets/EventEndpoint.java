@@ -171,8 +171,8 @@ public class EventEndpoint implements EventListener {
 		message.setDate(event.getDate());
 		message.setId(event.getId());
 
-		if (event instanceof UserHistory)
-			message.setAuthor(((UserHistory) event).getAuthor());
+		if (event instanceof UserHistory userHistory)
+			message.setAuthor(userHistory.getAuthor());
 
 		GUIFolder folder = null;
 		if (event.getFolder() != null) {

@@ -251,7 +251,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * Closes this context
 	 */
 	public void close() {
-		if ((applicationContext instanceof org.springframework.context.ConfigurableApplicationContext))
-			((org.springframework.context.ConfigurableApplicationContext) applicationContext).close();
+		if ((applicationContext instanceof org.springframework.context.ConfigurableApplicationContext configurableContext))
+			configurableContext.close();
 	}
 }

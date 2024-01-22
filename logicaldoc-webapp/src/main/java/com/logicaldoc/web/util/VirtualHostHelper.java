@@ -28,8 +28,8 @@ public class VirtualHostHelper {
 	}
 
 	private static HttpServletRequest getHttpServletRequest(ServletRequest request) {
-		if (request instanceof HttpServletRequest) {
-			return (HttpServletRequest) request;
+		if (request instanceof HttpServletRequest httpRequest) {
+			return httpRequest;
 		}
 		return null;
 	}

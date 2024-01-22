@@ -638,8 +638,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		DocumentService.Instance.get().save(document, new AsyncCallback<GUIDocument>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				if (caught instanceof ServerValidationException) {
-					handleValidationException((ServerValidationException) caught);
+				if (caught instanceof ServerValidationException sve) {
+					handleValidationException(sve);
 				} else {
 					GuiLog.serverError(caught);
 				}

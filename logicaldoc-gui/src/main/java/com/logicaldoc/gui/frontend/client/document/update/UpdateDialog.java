@@ -154,8 +154,8 @@ public class UpdateDialog extends StickyWindow {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					if (caught instanceof ServerValidationException)
-						bulkPanel.extendedPropertiesPanel.handleErrors((ServerValidationException) caught);
+					if (caught instanceof ServerValidationException sve)
+						bulkPanel.extendedPropertiesPanel.handleErrors(sve);
 					else
 						GuiLog.serverError(caught);
 				}

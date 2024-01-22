@@ -293,8 +293,8 @@ public class VIASettingsPanel extends AdminPanel {
 			account.setUsername((String) values.get(USERNAME));
 			account.setPassword((String) values.get(PASSWORD));
 			account.setProvider((String) values.get("protocol"));
-			if (values.get("port") instanceof Integer)
-				account.setPort((Integer) values.get("port"));
+			if (values.get("port") instanceof Integer integer)
+				account.setPort(integer);
 			else
 				account.setPort(Integer.parseInt((String) values.get("port")));
 			account.setSsl("yes".equals(values.get("ssl")));

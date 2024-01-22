@@ -152,11 +152,7 @@ public class FolderCriterion implements Serializable {
 			return false;
 
 		switch (getType()) {
-		case Attribute.TYPE_INT:
-		case Attribute.TYPE_BOOLEAN:
-		case Attribute.TYPE_USER:
-		case TYPE_FOLDER:
-		case TYPE_TEMPLATE:
+		case Attribute.TYPE_INT, Attribute.TYPE_BOOLEAN, Attribute.TYPE_USER, TYPE_FOLDER, TYPE_TEMPLATE:
 			return getLongValue() == null;
 		case Attribute.TYPE_DOUBLE:
 			return getDoubleValue() == null;
@@ -178,10 +174,7 @@ public class FolderCriterion implements Serializable {
 			else
 				setStringValue((String) value);
 			break;
-		case Attribute.TYPE_INT:
-		case Attribute.TYPE_FOLDER:
-		case Attribute.TYPE_USER:
-		case Attribute.TYPE_BOOLEAN:
+		case Attribute.TYPE_INT, Attribute.TYPE_FOLDER, Attribute.TYPE_USER, Attribute.TYPE_BOOLEAN:
 			if (value instanceof Integer integer)
 				setLongValue(integer.longValue());
 			else

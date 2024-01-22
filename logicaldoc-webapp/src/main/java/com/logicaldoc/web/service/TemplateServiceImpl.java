@@ -397,11 +397,10 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			if (extensibleObject == null) {
 				attributes = prepareGUIAttributes(template, null, sessionUser);
 			} else {
-				if (extensibleObject instanceof GUIDocument)
-					attributes = prepareGUIAttributes(template,
-							DocumentServiceImpl.toDocument((GUIDocument) extensibleObject), sessionUser);
-				else if (extensibleObject instanceof GUIFolder) {
-					GUIFolder guiFolder = (GUIFolder) extensibleObject;
+				if (extensibleObject instanceof GUIDocument guiDocument)
+					attributes = prepareGUIAttributes(template, DocumentServiceImpl.toDocument(guiDocument),
+							sessionUser);
+				else if (extensibleObject instanceof GUIFolder guiFolder) {
 					Folder folder = new Folder();
 					folder.setId(guiFolder.getId());
 					folder.setName(guiFolder.getName());
@@ -523,8 +522,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		}
 
 		// Normalize dates
-		if (guiAttribute.getValue() instanceof Date)
-			guiAttribute.setValue(convertToDate((Date) guiAttribute.getValue()));
+		if (guiAttribute.getValue() instanceof Date date)
+			guiAttribute.setValue(convertToDate(date));
 
 		guiAttribute.setType(templateExtAttr.getType());
 		attributes.add(guiAttribute);
@@ -582,8 +581,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					valAtt.setStringValues(null);
 
 					// Normalize dates
-					if (valAtt.getValue() instanceof Date)
-						valAtt.setValue(convertToDate((Date) valAtt.getValue()));
+					if (valAtt.getValue() instanceof Date date)
+						valAtt.setValue(convertToDate(date));
 
 					if (valAtt.getType() == Attribute.TYPE_USER)
 						valAtt.setUsername(valAttribute.getStringValue());
@@ -603,13 +602,13 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				extensibleObject.setAttributes(template.getAttributes());
 
 			History transaction = null;
-			if (extensibleObject instanceof Document) {
+			if (extensibleObject instanceof Document document) {
 				transaction = new DocumentHistory();
-				transaction.setDocument((Document) extensibleObject);
+				transaction.setDocument(document);
 				transaction.setUser(sessionUser);
-			} else if (extensibleObject instanceof Folder) {
+			} else if (extensibleObject instanceof Folder folder) {
 				transaction = new FolderHistory();
-				transaction.setFolder((Folder) extensibleObject);
+				transaction.setFolder(folder);
 				transaction.setUser(sessionUser);
 			}
 

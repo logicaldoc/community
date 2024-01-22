@@ -216,10 +216,7 @@ public class FolderSearch extends Search {
 				criteriaQueryPart.append("-%') and ");
 				columnName = "C" + joinsCounter + ".";
 				switch (criterion.getType()) {
-				case Attribute.TYPE_INT:
-				case Attribute.TYPE_USER:
-				case Attribute.TYPE_FOLDER:
-				case Attribute.TYPE_BOOLEAN:
+				case Attribute.TYPE_INT, Attribute.TYPE_USER, Attribute.TYPE_FOLDER, Attribute.TYPE_BOOLEAN:
 					columnName += "ld_intvalue";
 					break;
 				case Attribute.TYPE_DOUBLE:
@@ -307,9 +304,7 @@ public class FolderSearch extends Search {
 		case Attribute.TYPE_INT:
 			appendIntegerCriterion(query, columnName, criterion, params);
 			break;
-		case Attribute.TYPE_FOLDER:
-		case Attribute.TYPE_USER:
-		case FolderCriterion.TYPE_TEMPLATE:
+		case Attribute.TYPE_FOLDER, Attribute.TYPE_USER, FolderCriterion.TYPE_TEMPLATE:
 			appendFolderOrUserOrTemplateCriterion(query, columnName, criterion, params);
 			break;
 		case Attribute.TYPE_BOOLEAN:
