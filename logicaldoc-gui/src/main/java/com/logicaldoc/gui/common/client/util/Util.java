@@ -600,14 +600,14 @@ public abstract class Util {
 	public static String formatSizeKB(Object value) {
 		if (value == null)
 			return null;
-		if (value instanceof Double doubleVal)
-			return Util.formatSizeKB(doubleVal.doubleValue());
-		if (value instanceof Long longVal)
-			return Util.formatSizeKB(longVal.doubleValue());
-		else if (value instanceof Integer integer)
-			return Util.formatSizeKB(integer.doubleValue());
-		if (value instanceof String string)
-			return Util.formatSizeKB(Long.parseLong(string));
+		if (value instanceof Double)
+			return Util.formatSizeKB(((Double) value).doubleValue());
+		if (value instanceof Long)
+			return Util.formatSizeKB(((Long) value).doubleValue());
+		else if (value instanceof Integer)
+			return Util.formatSizeKB(((Integer) value).doubleValue());
+		if (value instanceof String)
+			return Util.formatSizeKB(Long.parseLong(value.toString()));
 		else
 			return Util.formatSizeKB(0L);
 	}
@@ -644,16 +644,16 @@ public abstract class Util {
 	public static String formatSizeW7(Object value) {
 		if (value == null)
 			return null;
-		if (value instanceof Float floatVal)
-			return Util.formatSizeKB(floatVal.doubleValue());
-		if (value instanceof Long longVal)
-			return Util.formatSizeW7(longVal.doubleValue());
-		else if (value instanceof Integer integer)
-			return Util.formatSizeW7(integer.doubleValue());
-		else if (value instanceof Float floatVal)
-			return Util.formatSizeW7(floatVal.doubleValue());
-		if (value instanceof String string)
-			return Util.formatSizeW7(Long.parseLong(string));
+		if (value instanceof Float)
+			return Util.formatSizeKB(((Float) value).doubleValue());
+		if (value instanceof Long)
+			return Util.formatSizeW7(((Long) value).doubleValue());
+		else if (value instanceof Integer)
+			return Util.formatSizeW7(((Integer) value).doubleValue());
+		else if (value instanceof Float)
+			return Util.formatSizeW7(((Float) value).doubleValue());
+		if (value instanceof String)
+			return Util.formatSizeW7(Long.parseLong(value.toString()));
 		else
 			return Util.formatSizeW7(0L);
 	}

@@ -61,8 +61,8 @@ public class VersionsPanel extends VLayout {
 		toolbar.addFormItem(maxItem);
 		display.addClickHandler((ClickEvent event) -> {
 			if (Boolean.TRUE.equals(maxItem.validate()) && maxItem.getValue() != null) {
-				if (maxItem.getValue() instanceof Integer integer)
-					max = integer;
+				if (maxItem.getValue() instanceof Integer)
+					max = (Integer) maxItem.getValue();
 				else
 					max = Integer.parseInt(maxItem.getValue().toString());
 				initListGrid(archiveId, readonly);

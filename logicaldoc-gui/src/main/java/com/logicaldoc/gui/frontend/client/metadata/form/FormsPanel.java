@@ -283,9 +283,9 @@ public class FormsPanel extends AdminPanel {
 
 	private void onEdit() {
 		GUIForm selectedForm = getSelectedForm();
-		if (selectedForm != null && details instanceof FormDetailsPanel formDetails
-				&& formDetails.getForm().getId() == selectedForm.getId())
-			formDetails.openContentEditor();
+		if (selectedForm != null && details instanceof FormDetailsPanel
+				&& ((FormDetailsPanel) details).getForm().getId() == selectedForm.getId())
+			((FormDetailsPanel) details).openContentEditor();
 	}
 
 	public static String webformURL(String formId) {

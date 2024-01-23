@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEventSearchCriteria;
+import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -267,7 +267,7 @@ public class CalendarReport extends AdminPanel {
 	private void onSearch() {
 		list.setData();
 
-		final Map<String, Object> values = vm.getValues();
+		final Map<String, Object> values =  vm.getValues();
 
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
@@ -301,22 +301,21 @@ public class CalendarReport extends AdminPanel {
 
 		int maxRecords = getMaxRecords(values);
 
-		GUICalendarEventSearchCriteria criteria = new GUICalendarEventSearchCriteria(fromValue, toValue, endDateFrom,
-				endDateTo, frequencyValue);
+		GUICalendarEventSearchCriteria criteria = new GUICalendarEventSearchCriteria(fromValue, toValue, endDateFrom, endDateTo, frequencyValue);
 		criteria.setStatus(statusValue);
 		criteria.setTitle(titleValue);
 		criteria.setType(typeValue);
 		criteria.setSubtype(subtypeValue);
 		criteria.setMaxRecords(maxRecords);
-
+		
 		doSearch(criteria);
 	}
 
 	private int getMaxRecords(final Map<String, Object> values) {
 		int maxRecords = 0;
 		if (values.get(DISPLAYMAX) != null) {
-			if (values.get(DISPLAYMAX) instanceof Integer integer)
-				maxRecords = integer;
+			if (values.get(DISPLAYMAX) instanceof Integer)
+				maxRecords = (Integer) values.get(DISPLAYMAX);
 			else
 				maxRecords = Integer.parseInt((String) values.get(DISPLAYMAX));
 		}
@@ -326,44 +325,44 @@ public class CalendarReport extends AdminPanel {
 	private void doSearch(GUICalendarEventSearchCriteria criteria) {
 		CalendarService.Instance.get().find(criteria, new AsyncCallback<GUICalendarEvent[]>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(GUICalendarEvent[] result) {
-				if (result != null && result.length > 0) {
-					ListGridRecord[] records = new ListGridRecord[result.length];
-					for (int i = 0; i < result.length; i++) {
-						ListGridRecord rec = new ListGridRecord();
-						rec.setAttribute("date", result[i].getStartDate());
-						rec.setAttribute(TITLE, result[i].getTitle());
-						rec.setAttribute("type", result[i].getType());
-						rec.setAttribute(SUBTYPE, result[i].getSubType());
-						rec.setAttribute(FREQUENCY, result[i].getFrequency());
-						rec.setAttribute(STATUS, result[i].getStatus());
-						rec.setAttribute(DESCRIPTION, result[i].getDescription());
-						rec.setAttribute("endDate", result[i].getDeadline());
-
-						StringBuilder participants = new StringBuilder();
-						GUIUser[] users = result[i].getParticipants();
-						for (GUIUser user : users) {
-							if (participants.length() > 0)
-								participants.append(", ");
-							participants.append(user.toString());
-						}
-						rec.setAttribute(PARTICIPANTS, participants.toString());
-
-						records[i] = rec;
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
 					}
-					list.setData(records);
-				}
-				layout.removeMember(infoPanel);
-				infoPanel = new InfoPanel("");
-				infoPanel.setMessage(I18N.message("showelements", Integer.toString(list.getTotalRows())));
-				layout.addMember(infoPanel, 2);
-			}
-		});
+
+					@Override
+					public void onSuccess(GUICalendarEvent[] result) {
+						if (result != null && result.length > 0) {
+							ListGridRecord[] records = new ListGridRecord[result.length];
+							for (int i = 0; i < result.length; i++) {
+								ListGridRecord rec = new ListGridRecord();
+								rec.setAttribute("date", result[i].getStartDate());
+								rec.setAttribute(TITLE, result[i].getTitle());
+								rec.setAttribute("type", result[i].getType());
+								rec.setAttribute(SUBTYPE, result[i].getSubType());
+								rec.setAttribute(FREQUENCY, result[i].getFrequency());
+								rec.setAttribute(STATUS, result[i].getStatus());
+								rec.setAttribute(DESCRIPTION, result[i].getDescription());
+								rec.setAttribute("endDate", result[i].getDeadline());
+
+								StringBuilder participants = new StringBuilder();
+								GUIUser[] users = result[i].getParticipants();
+								for (GUIUser user : users) {
+									if (participants.length() > 0)
+										participants.append(", ");
+									participants.append(user.toString());
+								}
+								rec.setAttribute(PARTICIPANTS, participants.toString());
+
+								records[i] = rec;
+							}
+							list.setData(records);
+						}
+						layout.removeMember(infoPanel);
+						infoPanel = new InfoPanel("");
+						infoPanel.setMessage(I18N.message("showelements", Integer.toString(list.getTotalRows())));
+						layout.addMember(infoPanel, 2);
+					}
+				});
 	}
 }

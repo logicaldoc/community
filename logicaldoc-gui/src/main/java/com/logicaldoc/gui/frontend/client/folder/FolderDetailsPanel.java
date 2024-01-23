@@ -209,7 +209,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	private void prepareWorkflowTab(GUIFolder folder) {
-		Tab workflowTab = new Tab(I18N.message("workflow"));
+		Tab workflowTab  = new Tab(I18N.message("workflow"));
 		if (folder.hasPermission(Constants.PERMISSION_WORKFLOW) && Feature.visible(Feature.WORKFLOW)) {
 			if (Feature.enabled(Feature.WORKFLOW)) {
 				workflowsTabPanel = new HLayout();
@@ -427,7 +427,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			propertiesTabPanel.removeMember(propertiesPanel);
 		}
 		propertiesPanel = new FolderStandardPropertiesPanel(folder, changeHandler);
-		propertiesTabPanel.addMember(propertiesPanel);
+	    propertiesTabPanel.addMember(propertiesPanel);
 	}
 
 	public GUIFolder getFolder() {
@@ -491,8 +491,8 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			FolderService.Instance.get().save(folder, new AsyncCallback<GUIFolder>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					if (caught instanceof ServerValidationException sve) {
-						handleValidationException(sve);
+					if (caught instanceof ServerValidationException) {
+						handleValidationException((ServerValidationException) caught);
 					} else {
 						GuiLog.serverError(caught);
 					}

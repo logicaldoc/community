@@ -13,8 +13,8 @@ import java.util.Date;
  */
 public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
-	private static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation",
-			"creator", "version", "fileVersion", "published", "publisher", "name", "description" };
+	private static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation", "creator",
+			"version", "fileVersion", "published", "publisher", "name", "description" };
 
 	private static final long serialVersionUID = 1L;
 
@@ -207,32 +207,32 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	 * @param value The attribute value.
 	 */
 	public void setValue(Object value) {
-		if (value instanceof java.lang.String string) {
+		if (value instanceof java.lang.String) {
 			this.type = TYPE_STRING;
-			setStringValue(string);
-		} else if (value instanceof Long longVal) {
+			setStringValue((String) value);
+		} else if (value instanceof Long) {
 			this.type = TYPE_INT;
-			setIntValue(longVal);
+			setIntValue((Long) value);
 		} else if (value instanceof Integer) {
 			this.type = TYPE_INT;
 			setIntValue(Long.parseLong(value.toString()));
-		} else if (value instanceof Boolean bool) {
+		} else if (value instanceof Boolean) {
 			this.type = TYPE_BOOLEAN;
-			setBooleanValue(bool);
-		} else if (value instanceof Double doubleVal) {
+			setBooleanValue((Boolean) value);
+		} else if (value instanceof Double) {
 			this.type = TYPE_DOUBLE;
-			setDoubleValue(doubleVal);
-		} else if (value instanceof Date date) {
+			setDoubleValue((Double) value);
+		} else if (value instanceof Date) {
 			this.type = TYPE_DATE;
-			setDateValue(date);
-		} else if (value instanceof GUIUser user) {
-			setIntValue(user.getId());
-			setStringValue(user.getUsername());
-			setUsername(user.getUsername());
+			setDateValue((Date) value);
+		} else if (value instanceof GUIUser) {
+			setIntValue(((GUIUser) value).getId());
+			setStringValue(((GUIUser) value).getUsername());
+			setUsername(((GUIUser) value).getUsername());
 			this.type = TYPE_USER;
-		} else if (value instanceof GUIFolder folder) {
-			setIntValue(folder.getId());
-			setStringValue(folder.getName());
+		} else if (value instanceof GUIFolder) {
+			setIntValue(((GUIFolder) value).getId());
+			setStringValue(((GUIFolder) value).getName());
 			this.type = TYPE_FOLDER;
 		} else if (value == null) {
 			setStringValue(null);

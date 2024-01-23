@@ -8,6 +8,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -29,6 +31,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 	protected int errors = 0;
 
+	@Resource(name = "DocumentDAO")
 	protected DocumentDAO documentDao;
 
 	protected AbstractDocumentProcessor(String name) {

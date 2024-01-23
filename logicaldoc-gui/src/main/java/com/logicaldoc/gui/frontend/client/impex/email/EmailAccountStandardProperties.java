@@ -133,11 +133,10 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 			account.setTarget(targetSelector.getFolder());
 			account.setLanguage((String) values.get("language"));
 			account.setProvider((String) values.get("protocol"));
-			if (values.get("port") instanceof Integer port) {
-				account.setPort(port);
-			} else {
+			if (values.get("port") instanceof Integer)
+				account.setPort((Integer) values.get("port"));
+			else
 				account.setPort(Integer.parseInt((String) values.get("port")));
-			}
 			account.setSsl("yes".equals(values.get("ssl")));
 			account.setFoldering(Integer.parseInt((String) values.get("foldering")));
 

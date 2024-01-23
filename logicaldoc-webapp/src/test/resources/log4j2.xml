@@ -47,6 +47,9 @@
 		<Logger name="org.hsqldb" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>		
+		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource" level="fataò" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>		
 		
 		<Root level="fatal">
 			<AppenderRef ref="CONSOLE" />

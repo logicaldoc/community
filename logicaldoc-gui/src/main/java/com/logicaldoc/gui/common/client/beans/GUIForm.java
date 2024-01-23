@@ -11,102 +11,36 @@ import java.io.Serializable;
 public class GUIForm extends GUIExtensibleObject implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public static final String DEFAULT_WEBCSS = """
-			.webform-header {
-			           margin-top: 10px;
-			           background-color: #fff;
-			           border: 1px solid #dadce0;
-			           border-radius: 8px;
-			           margin-bottom: 12px;
-			           padding: 24px;
-			         }
-			         .webform-title {
-			           font-family: Roboto,Arial,sans-serif;
-			           font-size: 32px;
-			           font-weight: 400;
-			           line-height: 40px;
-			           color: #202124;
-			           line-height: 135%;
-			           max-width: 100%;
-			           min-width: 0%;
-			         }
-			         .webform-description {
-			           font-family: Roboto,Arial,sans-serif;
-			           font-size: 14px;
-			           font-weight: 400;
-			           line-height: 20px;
-			           color: #202124;
-			           margin-top: 12px;
-			         }
-			         .webform-form, .webform-email {
-			           margin-top: 2px;
-			           background-color: #fff;
-			           border: 1px solid #dadce0;
-			           border-radius: 8px;
-			           margin-bottom: 5px;
-			           padding: 24px;
-			         }
-			         .webform-item label, .webform-itemFocused label, .webform-itemDisabled label{
-			             font-family: Roboto,Arial,sans-serif;
-			             font-size: 16px;
-			             font-weight: 500;
-			             letter-spacing: .1px;
-			             line-height: 24px;
-			             color: #202124;
-			             font-weight: 400;
-			             word-break: break-word;
-			         }
-			         .webform-footer {
-			           font-family: Roboto,Arial,sans-serif;
-			           font-size: 12px;
-			           font-weight: 400;
-			           line-height: 16px;
-			           color: #70757a;
-			           margin-top: 2px;
-			           padding: 5px;
-			         }
-			         .webform-submit{
-			           font-family: Roboto,Arial,sans-serif;
-			           background-color: #F56C13;
-			           color: #ffffff;
-			           border: 2px solid transparent;
-			           font-size: 16px;
-			           line-height: 30px;
-			           border-radius: 4px;
-			         }
-			         .webform-submitOver, .webform-submitFocused, .webform-submitFocusedOver {
-			           font-family: Roboto,Arial,sans-serif;
-			           background-color: #D8590A;
-			           color: #ffffff;
-			           border: 2px solid transparent;
-			           font-size: 16px;
-			           line-height: 30px;
-			           border-radius: 4px;
-			         }
-			         .webform-submitDown, .webform-submitFocusedDown {
-			           font-family: Roboto,Arial,sans-serif;
-			           background-color: #D8590A;
-			           color: black;
-			           border: 2px solid transparent;
-			           font-size: 16px;
-			           line-height: 30px;
-			           border-radius: 4px;
-			         }
-			          .webform-confirmation, .webform-disabled {
-			           font-family: Roboto,Arial,sans-serif;
-			           font-size: 14pt;
-			         }
-			         .webform-sendcopy, .webform-sendcopyOver {
-			           font-family: Roboto,Arial,sans-serif;
-			           font-size: 12px;
-			         }
-			         .contactingserver{
-			           font-family: Roboto,Arial,sans-serif;
-			           font-size: 16pt;
-			           font-weight: bold;
-			           white-space: nowrap;
-			         }
-			""";
+	public static final String DEFAULT_WEBCSS = ".webform-header {\n  margin-top: 10px;\n"
+			+ "  background-color: #fff;\n  border: 1px solid #dadce0;\n  border-radius: 8px;\n"
+			+ "  margin-bottom: 12px;\n  padding: 24px;\n}\n.webform-title {\n"
+			+ "  font-family: Roboto,Arial,sans-serif;\n  font-size: 32px; \n  font-weight: 400;\n"
+			+ "  line-height: 40px;\n  color: #202124;\n  line-height: 135%;\n  max-width: 100%;\n"
+			+ "  min-width: 0%;\n}\n.webform-description {\n  font-family: Roboto,Arial,sans-serif;\n"
+			+ "  font-size: 14px;\n  font-weight: 400;\n  line-height: 20px;\n  color: #202124;\n"
+			+ "  margin-top: 12px;\n}\n.webform-form, .webform-email {\n  margin-top: 2px;\n"
+			+ "  background-color: #fff;\n  border: 1px solid #dadce0;\n  border-radius: 8px;\n"
+			+ "  margin-bottom: 5px;\n  padding: 24px;\n}\n"
+			+ ".webform-item label, .webform-itemFocused label, .webform-itemDisabled label{\n"
+			+ "    font-family: Roboto,Arial,sans-serif;\n    font-size: 16px;\n    font-weight: 500;\n"
+			+ "    letter-spacing: .1px;\n    line-height: 24px;\n    color: #202124;\n"
+			+ "    font-weight: 400;\n    word-break: break-word;\n}\n.webform-footer {\n"
+			+ "  font-family: Roboto,Arial,sans-serif;\n  font-size: 12px;\n  font-weight: 400;\n"
+			+ "  line-height: 16px;\n  color: #70757a;\n  margin-top: 2px;\n  padding: 5px;\n}\n"
+			+ ".webform-submit{\n  font-family: Roboto,Arial,sans-serif;\n  background-color: #F56C13;\n"
+			+ "  color: #ffffff;\n  border: 2px solid transparent;\n  font-size: 16px;\n"
+			+ "  line-height: 30px;\n  border-radius: 4px;\n}\n"
+			+ ".webform-submitOver, .webform-submitFocused, .webform-submitFocusedOver {\n"
+			+ "  font-family: Roboto,Arial,sans-serif;\n  background-color: #D8590A;\n  color: #ffffff;\n"
+			+ "  border: 2px solid transparent;\n  font-size: 16px;\n  line-height: 30px;\n"
+			+ "  border-radius: 4px;\n}\n.webform-submitDown, .webform-submitFocusedDown {\n"
+			+ "  font-family: Roboto,Arial,sans-serif;\n  background-color: #D8590A;\n  color: black;\n"
+			+ "  border: 2px solid transparent;\n  font-size: 16px;\n  line-height: 30px;\n"
+			+ "  border-radius: 4px;\n}\n .webform-confirmation, .webform-disabled {\n"
+			+ "  font-family: Roboto,Arial,sans-serif;\n  font-size: 14pt;\n}\n"
+			+ ".webform-sendcopy, .webform-sendcopyOver {\n  font-family: Roboto,Arial,sans-serif;\n"
+			+ "  font-size: 12px;\n}\n.contactingserver{\n  font-family: Roboto,Arial,sans-serif;\n"
+			+ "  font-size: 16pt;\n  font-weight: bold;\n  white-space: nowrap;\n}";
 
 	private String name;
 

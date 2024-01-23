@@ -197,8 +197,8 @@ public class OutgoingEmailPanel extends AdminPanel {
 			Map<String, Object> values = vm.getValues();
 
 			OutgoingEmailPanel.this.emailSettings.setSmtpServer((String) values.get("smtpserver"));
-			if (values.get("port") instanceof Integer intVal)
-				OutgoingEmailPanel.this.emailSettings.setPort(intVal);
+			if (values.get("port") instanceof Integer)
+				OutgoingEmailPanel.this.emailSettings.setPort((Integer) values.get("port"));
 			else
 				OutgoingEmailPanel.this.emailSettings.setPort(Integer.parseInt(values.get("port").toString()));
 

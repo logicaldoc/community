@@ -71,7 +71,8 @@
 			<version>1.0.3</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- dependency> <groupId>com.sksamuel.gwt</groupId> <artifactId>gwt-websockets</artifactId> 
+		<!-- dependency> <groupId>com.sksamuel.gwt</groupId>
+		<artifactId>gwt-websockets</artifactId> 
 			<version>1.0.4</version> <scope>compile</scope> </dependency -->
 		<dependency>
 			<groupId>org.realityforge.gwt.websockets</groupId>
@@ -127,14 +128,29 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>9.5</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<outputDirectory>${gwt.output.directory}/WEB-INF/classes</outputDirectory>
 		<plugins>
 			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <release>11</release>
+                    <encoding>iso-8859-1</encoding>
+                </configuration>
+            </plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.8.2</version>
+				<version>${gwt.version}</version>
 				<configuration>
 					<extraJvmArgs>-XX:-UseGCOverheadLimit -Xmx4000m</extraJvmArgs>
 					<webappDirectory>./war</webappDirectory>
@@ -253,28 +269,34 @@
 								</copy>
 
 								<!-- Copy static resources in the skins -->
-								<copy todir="target/plugin/frontend/sc/skins/Enterprise"
+								<copy
+									todir="target/plugin/frontend/sc/skins/Enterprise"
 									overwrite="true">
 									<fileset dir="war/skin" includes="**" />
 								</copy>
-								<copy todir="target/plugin/frontend/sc/skins/Simplicity"
+								<copy
+									todir="target/plugin/frontend/sc/skins/Simplicity"
 									overwrite="true">
 									<fileset dir="war/skin" includes="**" />
 								</copy>
-								<copy todir="target/plugin/frontend/sc/skins/Tahoe"
+								<copy
+									todir="target/plugin/frontend/sc/skins/Tahoe"
 									overwrite="true">
 									<fileset dir="war/skin" includes="**" />
 								</copy>
-								<copy todir="target/plugin/frontend/sc/skins/Tahoe"
+								<copy
+									todir="target/plugin/frontend/sc/skins/Tahoe"
 									overwrite="true">
 									<fileset dir="war/skin-Tahoe" includes="**" />
 								</copy>
 
-								<copy todir="target/plugin/login/sc/skins/Enterprise"
+								<copy
+									todir="target/plugin/login/sc/skins/Enterprise"
 									overwrite="true">
 									<fileset dir="war/skin" includes="**" />
 								</copy>
-								<copy todir="target/plugin/login/sc/skins/Simplicity"
+								<copy
+									todir="target/plugin/login/sc/skins/Simplicity"
 									overwrite="true">
 									<fileset dir="war/skin" includes="**" />
 								</copy>
@@ -287,11 +309,13 @@
 									<fileset dir="war/skin-Tahoe" includes="**" />
 								</copy>
 
-								<copy todir="target/plugin/setup/sc/skins/Enterprise"
+								<copy
+									todir="target/plugin/setup/sc/skins/Enterprise"
 									overwrite="true">
 									<fileset dir="war/skin" includes="**" />
 								</copy>
-								<copy todir="target/plugin/setup/sc/skins/Simplicity"
+								<copy
+									todir="target/plugin/setup/sc/skins/Simplicity"
 									overwrite="true">
 									<fileset dir="war/skin" includes="**" />
 								</copy>
@@ -332,15 +356,18 @@
 								<delete dir="target/plugin/frontend/ace/"
 									includes="worker*,mode-*,theme-*"
 									excludes="mode-velocity.js,mode-java.js,theme-eclipse.js" />
-								<delete dir="target/plugin/frontend/ace/snippets"
+								<delete
+									dir="target/plugin/frontend/ace/snippets"
 									includes="*.js" excludes="velocity.js" />
 
 								<!-- Delete all .txt files -->
 								<delete>
-									<fileset dir="target/plugin" includes="**/*.txt" />
+									<fileset dir="target/plugin"
+										includes="**/*.txt" />
 								</delete>
 
-								<!-- Delete all the sources from the smartgwt jar -->
+								<!-- Delete all the sources from the smartgwt
+								jar -->
 								<delete dir="target/plugin/WEB-INF/lib/smartgwt"
 									failonerror="false" />
 								<unzip dest="target/plugin/WEB-INF/lib/smartgwt"
@@ -348,7 +375,8 @@
 								<delete
 									dir="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar" />
 								<delete>
-									<fileset dir="target/plugin/WEB-INF/lib/smartgwt"
+									<fileset
+										dir="target/plugin/WEB-INF/lib/smartgwt"
 										excludes="**/*.class" />
 								</delete>
 								<zip
@@ -363,7 +391,8 @@
 								<copy
 									todir="target/plugin/frontend/sc/skins/standard/images/"
 									file="./war/skin/images/blank.gif" />
-								<copy todir="target/plugin/setup/sc/skins/standard/images/"
+								<copy
+									todir="target/plugin/setup/sc/skins/standard/images/"
 									file="./war/skin/images/blank.gif" />
 								<zip
 									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"

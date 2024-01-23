@@ -42,10 +42,11 @@ public abstract class AbstractTestCase {
 
 	protected File tempDir = new File("target/tmp");
 
-	private String userHome;
+	private String userHome = System.getProperty(USER_HOME);
 
 	@Before
 	public void setUp() throws IOException, SQLException {
+
 		loadDevelSettings();
 
 		updateUserHome();
@@ -70,7 +71,6 @@ public abstract class AbstractTestCase {
 	}
 
 	private void updateUserHome() {
-		userHome = System.getProperty(USER_HOME);
 		System.setProperty(USER_HOME, tempDir.getPath());
 	}
 

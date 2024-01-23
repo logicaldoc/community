@@ -256,7 +256,7 @@ public class ParametricForm extends VLayout {
 				criterion.setOperator("inorsubfolders");
 			criteria.add(criterion);
 		}
-
+		
 		options.setCriteria(criteria.toArray(new GUICriterion[0]));
 
 		addSearchInHitsCondition(options);
@@ -304,10 +304,10 @@ public class ParametricForm extends VLayout {
 		// type.
 		if (condition.getValueFieldItem() instanceof IntegerItem)
 			fieldValue = Long.parseLong(fieldValue.toString());
-		if (condition.getValueFieldItem() instanceof UserSelector selector)
-			fieldValue = selector.getUser().getId();
-		if (condition.getValueFieldItem() instanceof FolderSelector selector)
-			fieldValue = selector.getFolder().getId();
+		if (condition.getValueFieldItem() instanceof UserSelector)
+			fieldValue = ((UserSelector) condition.getValueFieldItem()).getUser().getId();
+		if (condition.getValueFieldItem() instanceof FolderSelector)
+			fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
 
 		String fieldName = criterion.getField();
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
@@ -331,20 +331,20 @@ public class ParametricForm extends VLayout {
 	}
 
 	private void setCriterionValue(Object fieldValue, GUICriterion criterion) {
-		if (fieldValue instanceof Date date)
-			criterion.setDateValue(date);
-		else if (fieldValue instanceof Integer integer)
-			criterion.setLongValue(Long.valueOf(integer));
-		else if (fieldValue instanceof Long longValue)
-			criterion.setLongValue(longValue);
-		else if (fieldValue instanceof Float floatValue)
-			criterion.setDoubleValue(floatValue.doubleValue());
-		else if (fieldValue instanceof Double doubleValue)
-			criterion.setDoubleValue(doubleValue);
-		else if (fieldValue instanceof String string)
-			criterion.setStringValue(string);
-		else if (fieldValue instanceof JavaScriptObject js) {
-			JSOHelper.convertToMap(js);
+		if (fieldValue instanceof Date)
+			criterion.setDateValue((Date) fieldValue);
+		else if (fieldValue instanceof Integer)
+			criterion.setLongValue(Long.valueOf((Integer) fieldValue));
+		else if (fieldValue instanceof Long)
+			criterion.setLongValue((Long) fieldValue);
+		else if (fieldValue instanceof Float)
+			criterion.setDoubleValue(((Float) fieldValue).doubleValue());
+		else if (fieldValue instanceof Double)
+			criterion.setDoubleValue((Double) fieldValue);
+		else if (fieldValue instanceof String)
+			criterion.setStringValue((String) fieldValue);
+		else if (fieldValue instanceof JavaScriptObject) {
+			JSOHelper.convertToMap((JavaScriptObject) fieldValue);
 		}
 	}
 

@@ -17,14 +17,14 @@
             http://www.springframework.org/schema/aop/spring-aop.xsd
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
-    <import resource="classpath*:context/context-*.xml" />
-    
+   
     <context:annotation-config />
+
+    <import resource="classpath*:context/context-*.xml" />    
     
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"
-		class="com.logicaldoc.util.spring.PropertiesPlaceHolder" lazy-init="false" abstract="false"
-		autowire="default">
+		class="com.logicaldoc.util.spring.PropertiesPlaceHolder">
 		<property name="locations">
 			<list>
 				<value>classpath*:context.properties</value>
@@ -34,8 +34,7 @@
 	
     <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
     
-    <bean id="Context" class="com.logicaldoc.util.Context" abstract="false"
-        lazy-init="default" autowire="default" />
+    <bean id="Context" class="com.logicaldoc.util.Context" />
     
     <!-- DataSource -->
     <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">

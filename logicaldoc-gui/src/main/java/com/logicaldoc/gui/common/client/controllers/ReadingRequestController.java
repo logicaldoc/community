@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 
@@ -79,7 +80,8 @@ public class ReadingRequestController {
 	public long[] getUnconfirmedReadingIds(long docId) {
 		long[] readingIds = new long[0];
 		if (isReadingConfirmRequired(docId)) {
-			List<Long> values = unconfirmedReadings.get(docId).stream().map(r -> r.getId()).toList();
+			List<Long> values = unconfirmedReadings.get(docId).stream().map(r -> r.getId())
+					.collect(Collectors.toList());
 			readingIds = values.stream().mapToLong(l -> l).toArray();
 		}
 		return readingIds;

@@ -144,8 +144,8 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 			importFolder.setExcludes((String) values.get("exclude"));
 			importFolder.setHost((String) values.get(SERVER));
 			importFolder.setPort((Integer) values.get("port"));
-			if (values.get(BATCH) instanceof Long longVal)
-				importFolder.setBatch(longVal);
+			if (values.get(BATCH) instanceof Long)
+				importFolder.setBatch((Long) values.get(BATCH));
 			else
 				importFolder.setBatch(Long.valueOf(values.get(BATCH).toString()));
 

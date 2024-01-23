@@ -747,12 +747,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 			String dependsOn = att.getDependsOn();
 			if (dependsOn != null && !dependsOn.isEmpty()) {
 				FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));
-				if (item instanceof SelectItem select) {
+				if (item instanceof SelectItem) {
+					SelectItem select = (SelectItem) item;
 					select.setPickListFilterCriteriaFunction(itemContext -> {
 						String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
 						return new Criteria("category", category);
 					});
-				} else if (item instanceof ComboBoxItem combo) {
+				} else if (item instanceof ComboBoxItem) {
+					ComboBoxItem combo = (ComboBoxItem) item;
 					combo.setPickListFilterCriteriaFunction(itemContext -> {
 						String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
 						return new Criteria("category", category);

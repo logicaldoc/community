@@ -2353,6 +2353,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		List<Long> childrenFolderIds = fdao.findIdsByParentId(folderId);
+		childrenFolderIds =new ArrayList<>(childrenFolderIds);
 		childrenFolderIds.add(folderId);
 
 		StringBuilder query = new StringBuilder(

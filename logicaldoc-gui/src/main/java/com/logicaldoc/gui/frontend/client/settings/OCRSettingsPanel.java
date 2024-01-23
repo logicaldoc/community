@@ -118,7 +118,7 @@ public class OCRSettingsPanel extends AdminPanel {
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.excludes"));
 		excludes.setWidth(300);
 		excludes.setColSpan(4);
-
+		
 		SpinnerItem timeout = prepareTimeoutSpinner(params);
 
 		SpinnerItem batchTimeout = prepareBatchTimeoutSpinner(params);
@@ -369,9 +369,9 @@ public class OCRSettingsPanel extends AdminPanel {
 		params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
 				values.get(OCR_TEXT_THRESHOLD).toString()));
 
-		if (values.get(OCR_RESOLUTION_THRESHOLD) instanceof Integer integet)
-			params.add(
-					new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold", integet.toString()));
+		if (values.get(OCR_RESOLUTION_THRESHOLD) instanceof Integer)
+			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
+					((Integer) values.get(OCR_RESOLUTION_THRESHOLD)).toString()));
 		else
 			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
 					(String) values.get(OCR_RESOLUTION_THRESHOLD)));
@@ -390,33 +390,35 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		params.add(new GUIParameter("ocr.cropImage", values.get("ocr_cropimage").equals(YES) ? TRUE : FALSE));
 
-		if (values.get(OCR_TIMEOUT) instanceof Integer integer)
-			params.add(new GUIParameter(OCR_DOT_TIMEOUT, integer.toString()));
+		if (values.get(OCR_TIMEOUT) instanceof Integer)
+			params.add(new GUIParameter(OCR_DOT_TIMEOUT, ((Integer) values.get(OCR_TIMEOUT)).toString()));
 		else
 			params.add(new GUIParameter(OCR_DOT_TIMEOUT, (String) values.get(OCR_TIMEOUT)));
 
-		if (values.get(OCR_TIMEOUT_BATCH) instanceof Integer integer)
-			params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'), integer.toString()));
+		if (values.get(OCR_TIMEOUT_BATCH) instanceof Integer)
+			params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'),
+					((Integer) values.get(OCR_TIMEOUT_BATCH)).toString()));
 		else
 			params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'), (String) values.get(OCR_TIMEOUT_BATCH)));
 
-		if (values.get(OCR_MAXSIZE) instanceof Integer integer)
-			params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), integer.toString()));
+		if (values.get(OCR_MAXSIZE) instanceof Integer)
+			params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), ((Integer) values.get(OCR_MAXSIZE)).toString()));
 		else
 			params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), (String) values.get(OCR_MAXSIZE)));
 
-		if (values.get(OCR_RENDRES) instanceof Integer integer)
-			params.add(new GUIParameter("ocr.rendres", integer.toString()));
+		if (values.get(OCR_RENDRES) instanceof Integer)
+			params.add(new GUIParameter("ocr.rendres", ((Integer) values.get(OCR_RENDRES)).toString()));
 		else
 			params.add(new GUIParameter("ocr.rendres", (String) values.get(OCR_RENDRES)));
 
-		if (values.get(OCR_BATCH) instanceof Integer integer)
-			params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), integer.toString()));
+		if (values.get(OCR_BATCH) instanceof Integer)
+			params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), ((Integer) values.get(OCR_BATCH)).toString()));
 		else
 			params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), (String) values.get(OCR_BATCH)));
 
-		if (values.get(OCR_EVENTS_MAXTEXT) instanceof Integer integer)
-			params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'), integer.toString()));
+		if (values.get(OCR_EVENTS_MAXTEXT) instanceof Integer)
+			params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'),
+					((Integer) values.get(OCR_EVENTS_MAXTEXT)).toString()));
 		else
 			params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'), (String) values.get(OCR_EVENTS_MAXTEXT)));
 
@@ -429,13 +431,14 @@ public class OCRSettingsPanel extends AdminPanel {
 	}
 
 	private void collectThreadValues(Map<String, Object> values, List<GUIParameter> params) {
-		if (values.get(OCR_THREADS) instanceof Integer integer)
-			params.add(new GUIParameter(OCR_DOT_THREADS, integer.toString()));
+		if (values.get(OCR_THREADS) instanceof Integer)
+			params.add(new GUIParameter(OCR_DOT_THREADS, ((Integer) values.get(OCR_THREADS)).toString()));
 		else
 			params.add(new GUIParameter(OCR_DOT_THREADS, (String) values.get(OCR_THREADS)));
 
-		if (values.get(OCR_THREADS_WAIT) instanceof Integer integer)
-			params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'), integer.toString()));
+		if (values.get(OCR_THREADS_WAIT) instanceof Integer)
+			params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'),
+					((Integer) values.get(OCR_THREADS_WAIT)).toString()));
 		else
 			params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'), (String) values.get(OCR_THREADS_WAIT)));
 	}

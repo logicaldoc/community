@@ -106,8 +106,8 @@ public class SearchToolbar extends ToolStrip {
 	private void addPrint(final HitsListPanel hitsPanel) {
 		ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
 		print.addClickHandler(event -> {
-			if (hitsPanel.getGrid() instanceof ListGrid hits)
-				GridUtil.print(hits);
+			if (hitsPanel.getGrid() instanceof ListGrid)
+				GridUtil.print((ListGrid) hitsPanel.getGrid());
 			else
 				Canvas.printComponents(new Object[] { hitsPanel.getGrid() });
 		});

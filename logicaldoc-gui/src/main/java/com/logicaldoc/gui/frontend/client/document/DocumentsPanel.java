@@ -125,8 +125,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		setMembers(documentsMenu, body);
 
 		previewPanel.addVisibilityChangedHandler(event -> {
-			if (detailPanel instanceof DocumentDetailsPanel docDetailsPanel)
-				previewPanel.setDocument(docDetailsPanel.getDocument());
+			if (detailPanel instanceof DocumentDetailsPanel)
+				previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
 		});
 
 		initialized = true;
@@ -139,8 +139,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		MainPanel.get().selectDocumentsTab();
 		FolderNavigator.get().openFolder(folderId, docId);
 		documentsMenu.expandSection(0);
-		if (detailPanel instanceof DocumentDetailsPanel docDetailsPanel)
-			docDetailsPanel.selectDefaultTab();
+		if (detailPanel instanceof DocumentDetailsPanel)
+			((DocumentDetailsPanel) detailPanel).selectDefaultTab();
 	}
 
 	public void openInFolder(long docId) {
@@ -194,8 +194,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 				}
 
 				DocumentToolbar.get().update(result, null);
-				if (detailPanel instanceof DocumentDetailsPanel docDetailsPanel) {
-					docDetailsPanel.setDocument(result);
+				if (detailPanel instanceof DocumentDetailsPanel) {
+					((DocumentDetailsPanel) detailPanel).setDocument(result);
 					details.redraw();
 				}
 
@@ -221,9 +221,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void changePageSize() {
-		if (listingPanel instanceof DocumentsListPanel docsListPanel
-				&& docsListPanel.getVisualizationMode() == visualizationMode) {
-			docsListPanel.updateData(folder);
+		if (listingPanel instanceof DocumentsListPanel
+				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
+			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
 			if (listingPanel != null) {
 				listing.removeMember(listingPanel);
@@ -252,9 +252,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	private void updateListingPanel(GUIFolder folder) {
-		if (listingPanel instanceof DocumentsListPanel docsListPanel
-				&& docsListPanel.getVisualizationMode() == visualizationMode) {
-			docsListPanel.updateData(folder);
+		if (listingPanel instanceof DocumentsListPanel
+				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
+			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
 			if (listingPanel != null) {
 				listing.removeMember(listingPanel);
@@ -281,26 +281,26 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void toggleFilters() {
-		if (listingPanel instanceof DocumentsListPanel docsListPanel) {
-			docsListPanel.toggleFilters();
+		if (listingPanel instanceof DocumentsListPanel) {
+			((DocumentsListPanel) listingPanel).toggleFilters();
 		}
 	}
 
 	public void printPreview() {
-		if (listingPanel instanceof DocumentsListPanel docsListPanel) {
-			GridUtil.print((DocumentsListGrid) docsListPanel.getGrid());
+		if (listingPanel instanceof DocumentsListPanel) {
+			GridUtil.print((DocumentsListGrid) ((DocumentsListPanel) listingPanel).getGrid());
 		}
 	}
 
 	public void export() {
-		if (listingPanel instanceof DocumentsListPanel docsListPanel
-				&& docsListPanel.getGrid() instanceof DocumentsListGrid docsListGrid)
-			GridUtil.exportCSV(docsListGrid, false);
+		if (listingPanel instanceof DocumentsListPanel
+				&& ((DocumentsListPanel) listingPanel).getGrid() instanceof DocumentsListGrid)
+			GridUtil.exportCSV((DocumentsListGrid) ((DocumentsListPanel) listingPanel).getGrid(), false);
 	}
 
 	public GUIDocument getSelectedDocument() {
-		if (listingPanel instanceof DocumentsListPanel docsListPanel)
-			return docsListPanel.getGrid().getSelectedDocument();
+		if (listingPanel instanceof DocumentsListPanel)
+			return ((DocumentsListPanel) listingPanel).getGrid().getSelectedDocument();
 		else
 			return null;
 	}
@@ -378,8 +378,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		}
 
 		DocumentToolbar.get().update(document, null);
-		if (detailPanel instanceof DocumentDetailsPanel docsListPanel) {
-			docsListPanel.setDocument(document);
+		if (detailPanel instanceof DocumentDetailsPanel) {
+			((DocumentDetailsPanel) detailPanel).setDocument(document);
 			details.redraw();
 		}
 
@@ -462,8 +462,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	public void onFolderSelected(GUIFolder folder) {
 		this.folder = folder;
 		// Reset the cursor to the first page
-		if (listingPanel instanceof DocumentsListPanel docsListPanel)
-			docsListPanel.getGrid().getGridCursor().setCurrentPage(1);
+		if (listingPanel instanceof DocumentsListPanel)
+			((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
 		refresh();
 	}
 
@@ -475,9 +475,11 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	@Override
 	public void onFolderCancelEditing(GUIFolder folder) {
-		if (detailPanel instanceof FolderDetailsPanel folderDetailsPanel
-				&& folderDetailsPanel.getFolder().getId() == folder.getId())
-			enableAll();
+		if (detailPanel instanceof FolderDetailsPanel) {
+			FolderDetailsPanel fPanel = (FolderDetailsPanel) detailPanel;
+			if (fPanel.getFolder().getId() == folder.getId())
+				enableAll();
+		}
 	}
 
 	@Override
@@ -499,9 +501,10 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public String getDocsGridViewState() {
-		if (listingPanel instanceof DocumentsListPanel docsListPanel) {
-			if (docsListPanel.getGrid() instanceof NavigatorDocumentsGrid navigator)
-				return navigator.getGridLayout();
+		if (listingPanel instanceof DocumentsListPanel) {
+			DocumentsListPanel docsListingPanel = (DocumentsListPanel) listingPanel;
+			if (docsListingPanel.getGrid() instanceof NavigatorDocumentsGrid)
+				return ((NavigatorDocumentsGrid) docsListingPanel.getGrid()).getGridLayout();
 			else
 				return null;
 		} else

@@ -295,8 +295,8 @@ public class ApiCallsReport extends AdminPanel {
 	private int getDisplayMaxValue(final Map<String, Object> values) {
 		int displayMaxValue = 0;
 		if (values.get(DISPLAY_MAX) != null) {
-			if (values.get(DISPLAY_MAX) instanceof Integer integer)
-				displayMaxValue = integer;
+			if (values.get(DISPLAY_MAX) instanceof Integer)
+				displayMaxValue = (Integer) values.get(DISPLAY_MAX);
 			else
 				displayMaxValue = Integer.parseInt((String) values.get(DISPLAY_MAX));
 		}
@@ -306,8 +306,8 @@ public class ApiCallsReport extends AdminPanel {
 	private Long getUserId(final Map<String, Object> values) {
 		Long userId = null;
 		if (values.get("user") != null) {
-			if (values.get("user") instanceof Long longValue)
-				userId = longValue;
+			if (values.get("user") instanceof Long)
+				userId = (Long) values.get("user");
 			else
 				userId = Long.parseLong(values.get("user").toString());
 		}
