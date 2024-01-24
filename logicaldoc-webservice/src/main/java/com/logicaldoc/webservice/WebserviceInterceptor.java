@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
@@ -57,7 +58,11 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	protected static Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
 
+	@Resource(name = "SequenceDAO")
 	private SequenceDAO sequenceDAO;
+
+	@Resource(name = "ContextProperties")
+	private ContextProperties settings;
 
 	/**
 	 * A cache of counters: key=countername-tenantId name value=actual total
@@ -74,8 +79,6 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	 * Last time the oldest calls were cleaned
 	 */
 	private Date lastClean;
-
-	private ContextProperties settings;
 
 	public WebserviceInterceptor() {
 		super(Phase.RECEIVE);

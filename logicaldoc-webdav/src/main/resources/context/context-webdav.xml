@@ -19,24 +19,13 @@
             http://www.springframework.org/schema/security/spring-security.xsd">
 
 	<bean id="ResourceService"
-		class="com.logicaldoc.webdav.resource.service.ResourceServiceImpl">
-		<property name="documentDAO" ref="DocumentDAO" />
-		<property name="folderDAO" ref="FolderDAO" />
-		<property name="documentManager" ref="DocumentManager" />
-		<property name="userDAO" ref="UserDAO" />
-		<property name="versionDAO" ref="VersionDAO" />
-		<property name="storer" ref="Storer" />
-	</bean>
+		class="com.logicaldoc.webdav.resource.service.ResourceServiceImpl" />
 
 	<bean id="IOManager" class="com.logicaldoc.webdav.io.manager.DefaultIOManager">
 		<property name="IOHandler">
-			<bean class="com.logicaldoc.webdav.io.handler.DefaultHandler">
-				<property name="resourceService" ref="ResourceService" />
-			</bean>
+			<bean class="com.logicaldoc.webdav.io.handler.DefaultHandler" />
 		</property>
 	</bean>
 
-	<bean id="ResourceConfig" class="com.logicaldoc.webdav.resource.ResourceConfig">
-		<property name="IOManager" ref="IOManager" />
-	</bean>
+	<bean id="ResourceConfig" class="com.logicaldoc.webdav.resource.ResourceConfig" />
 </beans>

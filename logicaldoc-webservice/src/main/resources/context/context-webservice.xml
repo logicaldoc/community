@@ -31,11 +31,9 @@
 		<aop:scoped-proxy/>
     </bean>
     
-    <bean id="WebserviceCallDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+    <bean id="WebserviceCallDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.webservice.HibernateWebserviceCallDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
+         <bean class="com.logicaldoc.webservice.HibernateWebserviceCallDAO" />
       </property>
     </bean>  
     
@@ -43,10 +41,7 @@
     <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.ThresholdGZIPOutInterceptor">
         <property name="threshold" value="${webservice.gzip}" />
     </bean>
-    <bean id="WebserviceInterceptor" class="${webservice.interceptor}" destroy-method="shutdown">
-        <property name="settings" ref="ContextProperties" />
-    	<property name="sequenceDAO" ref="SequenceDAO" />
-    </bean>
+    <bean id="WebserviceInterceptor" class="${webservice.interceptor}" destroy-method="shutdown" />
     <bean id="WebserviceFaultInterceptor" class="com.logicaldoc.webservice.WebserviceFaultInterceptor" />
     
     

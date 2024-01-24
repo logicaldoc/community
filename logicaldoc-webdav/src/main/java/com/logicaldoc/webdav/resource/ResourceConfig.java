@@ -26,6 +26,7 @@ public class ResourceConfig implements Serializable {
 
 	private transient ItemFilter itemFilter;
 
+	@javax.annotation.Resource(name = "IOManager")
 	private transient IOManager ioManager;
 
 	private transient PropertyManager propManager;

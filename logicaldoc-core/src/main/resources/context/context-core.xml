@@ -216,7 +216,6 @@
    <bean id="TagsProcessorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
       <property name="task" ref="TagsProcessor" />
       <property name="jobDetail" ref="TagsProcessorJob" />
-      <property name="config" ref="ContextProperties" />
    </bean>
    <bean id="IndexerTask" class="com.logicaldoc.core.searchengine.IndexerTask" />
    <bean id="IndexerTaskJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -227,7 +226,6 @@
    <bean id="IndexerTaskTrigger" class="com.logicaldoc.core.task.TaskTrigger">
       <property name="task" ref="IndexerTask" />
       <property name="jobDetail" ref="IndexerTaskJob" />
-      <property name="config" ref="ContextProperties" />
    </bean>
    <bean id="StatsCollector" class="${stat}" />
    <bean id="StatsCollectorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -238,7 +236,6 @@
    <bean id="StatsCollectorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
       <property name="task" ref="StatsCollector" />
       <property name="jobDetail" ref="StatsCollectorJob" />
-      <property name="config" ref="ContextProperties" />
    </bean>
    <bean id="DigestProcessor" class="com.logicaldoc.core.document.DigestProcessor" />
    <bean id="DigestProcessorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -249,7 +246,6 @@
    <bean id="DigestProcessorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
       <property name="task" ref="DigestProcessor" />
       <property name="jobDetail" ref="DigestProcessorJob" />
-      <property name="config" ref="ContextProperties" />
    </bean>
    <bean id="PathCalculator" class="com.logicaldoc.core.folder.PathCalculator" />
    <bean id="PathCalculatorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -260,7 +256,6 @@
    <bean id="PathCalculatorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
       <property name="task" ref="PathCalculator" />
       <property name="jobDetail" ref="PathCalculatorJob" />
-      <property name="config" ref="ContextProperties" />
    </bean>   
    
    <bean id="DefaultAuthenticator" class="com.logicaldoc.core.security.authentication.DefaultAuthenticator" />

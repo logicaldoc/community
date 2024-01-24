@@ -47,6 +47,7 @@ public class DefaultHandler implements IOHandler {
 	 */
 	private String contentNodetype = JcrConstants.NT_UNSTRUCTURED;
 
+	@javax.annotation.Resource(name = "ResourceService")
 	private ResourceService resourceService;
 
 	public void setResourceService(ResourceService resourceService) {
