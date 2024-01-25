@@ -13,8 +13,8 @@ import java.util.Date;
  */
 public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
-	private static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation", "creator",
-			"version", "fileVersion", "published", "publisher", "name", "description" };
+	private static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation",
+			"creator", "version", "fileVersion", "published", "publisher", "name", "description" };
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,6 +35,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	public static final int TYPE_BOOLEAN = 5;
 
 	public static final int TYPE_FOLDER = 6;
+
+	public static final int TYPE_DOCUMENT = 7;
 
 	public static final int EDITOR_DEFAULT = 0;
 
@@ -196,6 +198,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			return getIntValue();
 		case TYPE_FOLDER:
 			return getIntValue();
+		case TYPE_DOCUMENT:
+			return getIntValue();
 		default:
 			return getStringValue();
 		}
@@ -234,6 +238,10 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			setIntValue(((GUIFolder) value).getId());
 			setStringValue(((GUIFolder) value).getName());
 			this.type = TYPE_FOLDER;
+		} else if (value instanceof GUIDocument) {
+			setIntValue(((GUIDocument) value).getId());
+			setStringValue(((GUIDocument) value).getFileName());
+			this.type = TYPE_DOCUMENT;
 		} else if (value == null) {
 			setStringValue(null);
 			setDoubleValue(null);

@@ -216,7 +216,7 @@ public class FolderSearch extends Search {
 				criteriaQueryPart.append("-%') and ");
 				columnName = "C" + joinsCounter + ".";
 				switch (criterion.getType()) {
-				case Attribute.TYPE_INT, Attribute.TYPE_USER, Attribute.TYPE_FOLDER, Attribute.TYPE_BOOLEAN:
+				case Attribute.TYPE_INT, Attribute.TYPE_USER, Attribute.TYPE_FOLDER, Attribute.TYPE_DOCUMENT, Attribute.TYPE_BOOLEAN:
 					columnName += "ld_intvalue";
 					break;
 				case Attribute.TYPE_DOUBLE:
@@ -304,8 +304,8 @@ public class FolderSearch extends Search {
 		case Attribute.TYPE_INT:
 			appendIntegerCriterion(query, columnName, criterion, params);
 			break;
-		case Attribute.TYPE_FOLDER, Attribute.TYPE_USER, FolderCriterion.TYPE_TEMPLATE:
-			appendFolderOrUserOrTemplateCriterion(query, columnName, criterion, params);
+		case Attribute.TYPE_FOLDER, Attribute.TYPE_DOCUMENT, Attribute.TYPE_USER, FolderCriterion.TYPE_TEMPLATE:
+			appendFolderOrDocumentOrUserOrTemplateCriterion(query, columnName, criterion, params);
 			break;
 		case Attribute.TYPE_BOOLEAN:
 			appendBooleanCriterion(query, columnName, criterion, params);
@@ -449,7 +449,7 @@ public class FolderSearch extends Search {
 		}
 	}
 
-	private void appendFolderOrUserOrTemplateCriterion(StringBuilder query, String columnName,
+	private void appendFolderOrDocumentOrUserOrTemplateCriterion(StringBuilder query, String columnName,
 			FolderCriterion criterion, Map<String, Object> params) {
 		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
 			query.append(columnName + IS_NULL);

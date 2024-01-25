@@ -151,7 +151,8 @@ public class DocumentFieldsDS extends DataSource {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS, OperatorId.IS_NULL, OperatorId.NOT_NULL);
 			name = name + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_BOOLEAN;
-		} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER) {
+		} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER
+				|| att.getType() == GUIAttribute.TYPE_DOCUMENT) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL, OperatorId.NOT_NULL);
 			name = name + Constants.BLANK_PLACEHOLDER + TYPE + att.getType();

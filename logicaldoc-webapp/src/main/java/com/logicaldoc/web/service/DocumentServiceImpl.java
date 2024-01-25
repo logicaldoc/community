@@ -1335,7 +1335,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			setDateValue(attr, extAttr);
 		} else if (templateType == Attribute.TYPE_STRING) {
 			setStringValue(attr, extAttr);
-		} else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER) {
+		} else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER
+				|| templateType == Attribute.TYPE_DOCUMENT) {
 			setUserValue(attr, extAttr, templateType);
 		}
 	}
@@ -1406,7 +1407,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
 			extAttr.setValue(attr.getBooleanValue());
 			extAttr.setType(Attribute.TYPE_BOOLEAN);
-		} else if (templateType == GUIAttribute.TYPE_USER || templateType == GUIAttribute.TYPE_FOLDER) {
+		} else if (templateType == GUIAttribute.TYPE_USER || templateType == GUIAttribute.TYPE_FOLDER
+				|| templateType == GUIAttribute.TYPE_DOCUMENT) {
 			extAttr.setIntValue(attr.getIntValue());
 			extAttr.setStringValue(attr.getStringValue());
 			extAttr.setType(templateType);
@@ -2353,7 +2355,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		List<Long> childrenFolderIds = fdao.findIdsByParentId(folderId);
-		childrenFolderIds =new ArrayList<>(childrenFolderIds);
+		childrenFolderIds = new ArrayList<>(childrenFolderIds);
 		childrenFolderIds.add(folderId);
 
 		StringBuilder query = new StringBuilder(

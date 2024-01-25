@@ -102,9 +102,9 @@ public class ZoneEditor extends Window {
 		TextItem groupingSeparator = ItemFactory.newTextItem("groupingseparator", zone.getGroupingSeparator());
 		groupingSeparator.setLength(1);
 		groupingSeparator.setWidth(50);
-		groupingSeparator
-				.setVisible(zone.getType() == GUIAttribute.TYPE_INT || zone.getType() == GUIAttribute.TYPE_DOUBLE
-						|| zone.getType() == GUIAttribute.TYPE_FOLDER || zone.getType() == GUIAttribute.TYPE_USER);
+		groupingSeparator.setVisible(zone.getType() == GUIAttribute.TYPE_INT
+				|| zone.getType() == GUIAttribute.TYPE_DOUBLE || zone.getType() == GUIAttribute.TYPE_FOLDER
+				|| zone.getType() == GUIAttribute.TYPE_USER || zone.getType() == GUIAttribute.TYPE_DOCUMENT);
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
 		language.setValue(zone.getLanguage());

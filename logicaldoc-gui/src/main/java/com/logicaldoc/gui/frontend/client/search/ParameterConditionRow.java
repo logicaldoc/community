@@ -235,7 +235,8 @@ public class ParameterConditionRow extends HLayout {
 			map.put(NOTNULL, I18N.message(ISNOTNULL).toLowerCase());
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_USER)
-				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)
+				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOCUMENT)) {
 			map.put(EQUALS, I18N.message(EQUALS).toLowerCase());
 			map.put(NOTEQUAL, I18N.message(NOTEQUAL).toLowerCase());
 			map.put("null", I18N.message(ISNULL).toLowerCase());
@@ -290,6 +291,12 @@ public class ParameterConditionRow extends HLayout {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
 			FormItem item = ItemFactory.newFolderSelectorForAttribute(VALUE_STR, att.getLabel(), null);
+			item.setName(VALUE_STR);
+			return item;
+		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOCUMENT)) {
+			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
+			GUIAttribute att = template.getAttribute(attributeName);
+			FormItem item = ItemFactory.newDocumentSelectorForAttribute(VALUE_STR, att.getLabel(), null);
 			item.setName(VALUE_STR);
 			return item;
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")

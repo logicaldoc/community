@@ -299,6 +299,8 @@ public class DocumentGridUtil {
 				value = att.getUsername();
 			else if (att.getType() == GUIAttribute.TYPE_FOLDER && att.getStringValues() == null)
 				value = att.getStringValue();
+			else if (att.getType() == GUIAttribute.TYPE_DOCUMENT && att.getStringValues() == null)
+				value = att.getStringValue();
 			rec.setAttribute("ext_" + name, value);
 		}
 	}

@@ -76,7 +76,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 				extAttributesValues.put(key, rs.getDouble(6));
 			} else if (type == Attribute.TYPE_DATE) {
 				extAttributesValues.put(key, rs.getTimestamp(7));
-			} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER) {
+			} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER
+					|| type == Attribute.TYPE_DOCUMENT) {
 				extAttributesValues.put(key, rs.getString(4));
 			} else if (type == Attribute.TYPE_BOOLEAN) {
 				extAttributesValues.put(key,
@@ -509,7 +510,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			String key = aliasId + "-" + name;
 			if (!extendedAttributesValues.containsKey(key) && doc.getValue(name) != null) {
 				Attribute att = doc.getAttribute(name);
-				if (att != null && (att.getType() == Attribute.TYPE_FOLDER || att.getType() == Attribute.TYPE_USER)) {
+				if (att != null && (att.getType() == Attribute.TYPE_FOLDER || att.getType() == Attribute.TYPE_USER
+						|| att.getType() == Attribute.TYPE_DOCUMENT)) {
 					extendedAttributesValues.put(key, att.getStringValue());
 					doc.setValue(name, att.getStringValue());
 				} else

@@ -266,7 +266,8 @@ public abstract class FolderSearchForm extends VLayout {
 			fieldName = fieldName.substring(1);
 
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
-				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOCUMENT)) {
 			fieldValue = Long.parseLong(fieldValue.toString());
 		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
 			fieldValue = Double.parseDouble(fieldValue.toString());

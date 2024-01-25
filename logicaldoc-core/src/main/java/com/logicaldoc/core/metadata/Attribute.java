@@ -3,6 +3,7 @@ package com.logicaldoc.core.metadata;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.User;
 
@@ -31,6 +32,8 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	public static final int TYPE_BOOLEAN = 5;
 
 	public static final int TYPE_FOLDER = 6;
+
+	public static final int TYPE_DOCUMENT = 7;
 
 	public static final int EDITOR_DEFAULT = 0;
 
@@ -183,15 +186,11 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	 */
 	public Object getValue() {
 		switch (type) {
-		case TYPE_INT:
-			return getIntValue();
 		case TYPE_DOUBLE:
 			return getDoubleValue();
 		case TYPE_DATE:
 			return getDateValue();
-		case TYPE_USER:
-			return getIntValue();
-		case TYPE_FOLDER:
+		case TYPE_USER, TYPE_FOLDER, TYPE_DOCUMENT, TYPE_INT:
 			return getIntValue();
 		case TYPE_BOOLEAN:
 			if (getIntValue() == null)
@@ -239,6 +238,10 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 				this.type = TYPE_FOLDER;
 				this.intValue = folder.getId();
 				this.stringValue = folder.getName();
+			} else if (value instanceof Document document) {
+				this.type = TYPE_DOCUMENT;
+				this.intValue = document.getId();
+				this.stringValue = document.getFileName();
 			} else if (value instanceof Boolean bool) {
 				this.type = TYPE_BOOLEAN;
 				this.intValue = bool.booleanValue() ? 1L : 0L;

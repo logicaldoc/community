@@ -607,7 +607,8 @@ public class DashletContent extends HttpServlet {
 				extValues.put(key, rs.getDouble(6));
 			} else if (type == Attribute.TYPE_DATE) {
 				extValues.put(key, rs.getTimestamp(7));
-			} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER) {
+			} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER
+					|| type == Attribute.TYPE_DOCUMENT) {
 				extValues.put(key, rs.getString(4));
 			} else if (type == Attribute.TYPE_BOOLEAN) {
 				extValues.put(key, rs.getLong(5) == 1L ? I18N.message("true", locale) : I18N.message("false", locale));

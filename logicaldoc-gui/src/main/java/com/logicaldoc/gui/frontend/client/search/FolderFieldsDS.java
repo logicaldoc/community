@@ -87,7 +87,8 @@ public class FolderFieldsDS extends DataSource {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS);
 			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + GUIAttribute.TYPE_BOOLEAN;
-		} else if (attribute.getType() == GUIAttribute.TYPE_USER || attribute.getType() == GUIAttribute.TYPE_FOLDER) {
+		} else if (attribute.getType() == GUIAttribute.TYPE_USER || attribute.getType() == GUIAttribute.TYPE_FOLDER
+				|| attribute.getType() == GUIAttribute.TYPE_DOCUMENT) {
 			field = new DataSourceIntegerField();
 			field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL, OperatorId.NOT_NULL);
 			fieldName = fieldName + Constants.BLANK_PLACEHOLDER + TYPE + attribute.getType();

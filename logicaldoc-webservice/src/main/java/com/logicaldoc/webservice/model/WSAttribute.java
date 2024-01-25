@@ -45,6 +45,9 @@ public class WSAttribute implements Serializable {
 	@WSDoc(documented = false)
 	public static final int TYPE_FOLDER = 6;
 
+	@WSDoc(documented = false)
+	public static final int TYPE_DOCUMENT = 7;
+
 	@WSDoc(required = true, description = "name of the attribute")
 	private String name;
 
@@ -60,7 +63,7 @@ public class WSAttribute implements Serializable {
 	@WSDoc(required = false, description = "the date value; format must be 'yyyy-MM-dd'")
 	private String dateValue;
 
-	@WSDoc(required = true, description = "<b>0</b> = String, <b>1</b> = int, <b>2</b> = double, <b>3</b> = date, <b>4</b> = user (intValue represents the user's id), <b>5</b> = boolean (intValue must be <b>0</b> or <b>1</b>), <b>6</b> = folder (intValue represents the folders's id)")
+	@WSDoc(required = true, description = "<b>0</b> = String, <b>1</b> = int, <b>2</b> = double, <b>3</b> = date, <b>4</b> = user (intValue represents the user's id), <b>5</b> = boolean (intValue must be <b>0</b> or <b>1</b>), <b>6</b> = folder (intValue represents the folders's id, <b>7</b> = document (intValue represents the document's id)")
 	private int type = TYPE_STRING;
 
 	@WSDoc(required = true)
@@ -193,17 +196,11 @@ public class WSAttribute implements Serializable {
 		switch (attribute.type) {
 		case TYPE_STRING:
 			return attribute.getStringValue();
-		case TYPE_INT:
-			return attribute.getIntValue();
-		case TYPE_BOOLEAN:
-			return attribute.getIntValue();
 		case TYPE_DOUBLE:
 			return attribute.getDoubleValue();
 		case TYPE_DATE:
 			return WSUtil.convertStringToDate(attribute.getDateValue());
-		case TYPE_USER:
-			return attribute.getIntValue();
-		case TYPE_FOLDER:
+		case TYPE_INT, TYPE_BOOLEAN, TYPE_USER, TYPE_FOLDER, TYPE_DOCUMENT:
 			return attribute.getIntValue();
 		default:
 			return attribute.getStringValue();
@@ -259,6 +256,10 @@ public class WSAttribute implements Serializable {
 			attribute.stringValue = folder.getName();
 			attribute.intValue = folder.getId();
 			attribute.type = TYPE_FOLDER;
+		} else if (value instanceof WSDocument document) {
+			attribute.stringValue = document.getFileName();
+			attribute.intValue = document.getId();
+			attribute.type = TYPE_DOCUMENT;
 		} else {
 			setDateValue(attribute, value);
 		}

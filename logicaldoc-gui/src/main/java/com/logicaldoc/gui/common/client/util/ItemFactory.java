@@ -56,6 +56,7 @@ import com.logicaldoc.gui.common.client.validators.EmailsValidator;
 import com.logicaldoc.gui.common.client.validators.SimpleTextValidator;
 import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.CronExpressionComposer;
+import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
@@ -448,13 +449,21 @@ public class ItemFactory {
 			item.setTitle(I18N.message(title));
 		return item;
 	}
-
+	
 	public static SelectItem newUserSelectorForAttribute(String name, String title, String groupIdOrName,
 			List<FormItemIcon> additionalIcons) {
 		return new UserSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), title, groupIdOrName, false, true,
 				additionalIcons);
 	}
 
+	public static StaticTextItem newDocumentSelectorForAttribute(String name, String title,
+			List<FormItemIcon> additionalIcons) {
+		final StaticTextItem item = new DocumentSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), additionalIcons);
+		if (title != null)
+			item.setTitle(I18N.message(title));
+		return item;
+	}
+	
 	public static SelectItem newRecipientTypeSelector(String name) {
 		SelectItem selector = new SelectItem();
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();

@@ -33,6 +33,8 @@ public class AttributeTypeFormatter implements CellFormatter {
 			return I18N.message("user");
 		case GUIAttribute.TYPE_FOLDER:
 			return I18N.message("folder");
+		case GUIAttribute.TYPE_DOCUMENT:
+			return I18N.message("document");			
 		default:
 			return value.toString();
 		}
@@ -63,6 +65,8 @@ public class AttributeTypeFormatter implements CellFormatter {
 			return I18N.message("user");
 		case GUIAttribute.TYPE_FOLDER:
 			return I18N.message("folder");
+		case GUIAttribute.TYPE_DOCUMENT:
+			return I18N.message("document");			
 		default:
 			return value;
 		}

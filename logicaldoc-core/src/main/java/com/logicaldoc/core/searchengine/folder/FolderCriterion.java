@@ -174,7 +174,7 @@ public class FolderCriterion implements Serializable {
 			else
 				setStringValue((String) value);
 			break;
-		case Attribute.TYPE_INT, Attribute.TYPE_FOLDER, Attribute.TYPE_USER, Attribute.TYPE_BOOLEAN:
+		case Attribute.TYPE_INT, Attribute.TYPE_FOLDER, Attribute.TYPE_DOCUMENT, Attribute.TYPE_USER, Attribute.TYPE_BOOLEAN:
 			if (value instanceof Integer integer)
 				setLongValue(integer.longValue());
 			else

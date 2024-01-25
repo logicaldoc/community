@@ -339,6 +339,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 			item = prepareUserItem(att, multiValIcons);
 		} else if (att.getType() == GUIAttribute.TYPE_FOLDER) {
 			item = prepareFolderItem(att, multiValIcons);
+		} else if (att.getType() == GUIAttribute.TYPE_DOCUMENT) {
+			item = prepareDocumentItem(att, multiValIcons);
 		} else {
 			item = null;
 		}
@@ -351,7 +353,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	private void prepareItemIconsAndVisibility(GUIAttribute att, List<FormItemIcon> multiValIcons, FormItem item) {
 		if (item != null) {
 			if ((att.isMultiple() || att.getParent() != null) && att.getType() != GUIAttribute.TYPE_USER
-					&& att.getType() != GUIAttribute.TYPE_FOLDER)
+					&& att.getType() != GUIAttribute.TYPE_FOLDER && att.getType() != GUIAttribute.TYPE_DOCUMENT)
 				item.setIcons(multiValIcons.toArray(new FormItemIcon[0]));
 			item.setRequired(checkMandatory && att.isMandatory());
 			if (att.isReadonly())
@@ -376,7 +378,22 @@ public class ExtendedPropertiesPanel extends HLayout {
 			selector.setFolder(att.getIntValue(), att.getStringValue());
 			item.setValue(att.getStringValue());
 		}
-		selector.addFolderChangeListener((GUIFolder folder) -> {
+		selector.addFolderChangeListener(folder -> {
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+		});
+		return item;
+	}
+
+	protected FormItem prepareDocumentItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
+		FormItem item;
+		item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), att.getLabel(), multiValIcons);
+		DocumentSelector selector = (DocumentSelector) item;
+		if (object.getValue(att.getName()) != null) {
+			selector.setDocument(att.getIntValue(), att.getStringValue());
+			item.setValue(att.getStringValue());
+		}
+		selector.addDocumentChangeListener(document -> {
 			if (changedHandler != null)
 				changedHandler.onChanged(null);
 		});
@@ -567,8 +584,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 			} else if (attribute.getType() == GUIAttribute.TYPE_DATE) {
 				object.getAttribute(attributeName).setDateValue(null);
 				attribute.setDateValue(null);
-			} else if (attribute.getType() == GUIAttribute.TYPE_USER
-					|| attribute.getType() == GUIAttribute.TYPE_FOLDER) {
+			} else if (attribute.getType() == GUIAttribute.TYPE_USER || attribute.getType() == GUIAttribute.TYPE_FOLDER
+					|| attribute.getType() == GUIAttribute.TYPE_DOCUMENT) {
 				GUIAttribute at = object.getAttribute(attributeName);
 				at.setIntValue(null);
 				at.setStringValue(null);
@@ -584,6 +601,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 			validateUser(itemName, value, attributeName);
 		} else if (attribute.getType() == GUIAttribute.TYPE_FOLDER) {
 			validateFolder(itemName, attributeName);
+		} else if (attribute.getType() == GUIAttribute.TYPE_DOCUMENT) {
+			validateDocument(itemName, attributeName);
 		} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			validateBoolean(value, attributeName);
 		} else {
@@ -612,6 +631,19 @@ public class ExtendedPropertiesPanel extends HLayout {
 			at.setIntValue(null);
 			at.setStringValue(null);
 			at.setType(GUIAttribute.TYPE_FOLDER);
+		}
+	}
+
+	private void validateDocument(String itemName, String attributeName) {
+		DocumentSelector documentItem = (DocumentSelector) attributesForm.getItem(itemName);
+		GUIDocument selectedDocument = documentItem.getDocument();
+		if (selectedDocument != null) {
+			object.setValue(attributeName, selectedDocument);
+		} else {
+			GUIAttribute at = object.getAttribute(attributeName);
+			at.setIntValue(null);
+			at.setStringValue(null);
+			at.setType(GUIAttribute.TYPE_DOCUMENT);
 		}
 	}
 

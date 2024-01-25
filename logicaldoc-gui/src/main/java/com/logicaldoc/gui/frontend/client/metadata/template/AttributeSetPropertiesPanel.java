@@ -432,6 +432,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		types.put("" + GUIAttribute.TYPE_BOOLEAN, I18N.message("boolean"));
 		types.put("" + GUIAttribute.TYPE_USER, I18N.message("user"));
 		types.put("" + GUIAttribute.TYPE_FOLDER, I18N.message("folder"));
+		types.put("" + GUIAttribute.TYPE_DOCUMENT, I18N.message("document"));
 		type.setValueMap(types);
 		type.setWrapTitle(false);
 		type.setDefaultValue("" + GUIAttribute.TYPE_STRING);

@@ -1168,7 +1168,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					extAttr.setValue(guiAttribute.getBooleanValue());
 					extAttr.setType(Attribute.TYPE_BOOLEAN);
 					break;
-				case GUIAttribute.TYPE_USER, GUIAttribute.TYPE_FOLDER:
+				case GUIAttribute.TYPE_USER, GUIAttribute.TYPE_FOLDER, GUIAttribute.TYPE_DOCUMENT:
 					extAttr.setIntValue(guiAttribute.getIntValue());
 					extAttr.setStringValue(guiAttribute.getStringValue());
 					break;
@@ -1178,7 +1178,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			}
 		} else {
 			switch (currentTemplateExtAttrType) {
-			case Attribute.TYPE_USER, Attribute.TYPE_FOLDER:
+			case Attribute.TYPE_USER, Attribute.TYPE_FOLDER, GUIAttribute.TYPE_DOCUMENT:
 				if (guiAttribute.getValue() != null) {
 					extAttr.setStringValue(guiAttribute.getStringValue());
 					extAttr.setIntValue(guiAttribute.getIntValue());

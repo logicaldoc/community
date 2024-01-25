@@ -256,7 +256,7 @@ public class ParametricForm extends VLayout {
 				criterion.setOperator("inorsubfolders");
 			criteria.add(criterion);
 		}
-		
+
 		options.setCriteria(criteria.toArray(new GUICriterion[0]));
 
 		addSearchInHitsCondition(options);
@@ -311,7 +311,8 @@ public class ParametricForm extends VLayout {
 
 		String fieldName = criterion.getField();
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
-				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)
+				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOCUMENT)) {
 			fieldValue = Long.parseLong(fieldValue.toString());
 		} else if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
 			fieldValue = Double.parseDouble(fieldValue.toString());
