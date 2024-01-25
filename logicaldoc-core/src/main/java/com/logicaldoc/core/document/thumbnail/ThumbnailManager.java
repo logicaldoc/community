@@ -6,11 +6,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -28,6 +30,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
+@Component("ThumbnailManager")
 public class ThumbnailManager {
 
 	public static final String SUFFIX_PREVIEW = "conversion.pdf";
@@ -260,8 +263,11 @@ public class ThumbnailManager {
 	/**
 	 * Initializes the builders map
 	 */
-	private void initBuilders() {
-		builders.clear();
+	@PostConstruct
+	public synchronized void init() {
+		if (!builders.isEmpty())
+			return;
+
 		// Acquire the 'ThumbnailBuilder' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "ThumbnailBuilder");
@@ -288,7 +294,7 @@ public class ThumbnailManager {
 
 	public Map<String, ThumbnailBuilder> getBuilders() {
 		if (builders.isEmpty())
-			initBuilders();
+			init();
 		return builders;
 	}
 

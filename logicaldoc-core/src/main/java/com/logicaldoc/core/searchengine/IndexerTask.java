@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
@@ -45,6 +46,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
+@Component("IndexerTask")
 public class IndexerTask extends Task {
 
 	private static Logger lg = LoggerFactory.getLogger(IndexerTask.class);

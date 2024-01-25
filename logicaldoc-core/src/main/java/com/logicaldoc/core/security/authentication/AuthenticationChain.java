@@ -8,6 +8,7 @@ import java.util.List;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
@@ -28,6 +29,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Sebastian Wenzky
  * @since 4.5
  */
+@Component("AuthenticationChain")
 public class AuthenticationChain extends AbstractAuthenticator {
 
 	private static Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
@@ -42,7 +44,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	@Override
 	public final User authenticate(String username, String password, String key, Client client)
 			throws AuthenticationException {
-
 		init();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -147,7 +148,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 	@Override
 	public User pickUser(String username) {
-
 		init();
 
 		User user = null;
@@ -212,11 +212,9 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	 * Populate the authenticators chain using the extension point
 	 * Authentication declared in the core plug-in.
 	 */
-	private void init() {
-		if (!authenticators.isEmpty()) {
-			// initialize only if not already initialized
+	public synchronized void init() {
+		if (!authenticators.isEmpty())
 			return;
-		}
 
 		Context context = Context.get();
 		PluginRegistry registry = PluginRegistry.getInstance();

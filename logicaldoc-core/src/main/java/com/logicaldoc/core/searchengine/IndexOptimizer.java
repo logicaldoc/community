@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -17,6 +18,7 @@ import com.logicaldoc.core.task.TaskException;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
+@Component("IndexOptimizer")
 public class IndexOptimizer extends Task {
 	public static final String NAME = "IndexOptimizer";
 

@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -407,30 +409,6 @@ public class StandardSearchEngine implements SearchEngine {
 		return query;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#close()
-	 */
-	@Override
-	public synchronized void close() {
-		log.warn("Closing the indexer");
-		try {
-			server.commit();
-			unlock();
-			server.getCoreContainer().shutdown();
-			server.close();
-			FileUtil.strongDelete(new File(getIndexDataFolder(), IndexWriter.WRITE_LOCK_NAME));
-		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#unlock()
-	 */
 	@Override
 	public synchronized void unlock() {
 		try {
@@ -567,10 +545,23 @@ public class StandardSearchEngine implements SearchEngine {
 		return new File(indexdir, "index");
 	}
 
-	/**
-	 * @see com.logicaldoc.core.searchengine.SearchEngine#init()
-	 */
 	@Override
+	@PreDestroy
+	public synchronized void close() {
+		log.warn("Closing the indexer");
+		try {
+			server.commit();
+			unlock();
+			server.getCoreContainer().shutdown();
+			server.close();
+			FileUtil.strongDelete(new File(getIndexDataFolder(), IndexWriter.WRITE_LOCK_NAME));
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+		}
+	}
+	
+	@Override
+	@PostConstruct
 	public void init() {
 		log.info("Initializing the full-text search engine");
 		try {

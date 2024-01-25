@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.Generic;
@@ -23,6 +24,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
+@Component("LockManager")
 public class LockManager {
 	private static final String LOCK = "lock";
 

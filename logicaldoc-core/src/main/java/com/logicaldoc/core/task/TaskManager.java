@@ -8,6 +8,7 @@ import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.document.TagsProcessor;
 import com.logicaldoc.core.searchengine.IndexOptimizer;
@@ -25,6 +26,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
+@Component("TaskManager")
 public class TaskManager {
 
 	protected static Logger log = LoggerFactory.getLogger(TaskManager.class);

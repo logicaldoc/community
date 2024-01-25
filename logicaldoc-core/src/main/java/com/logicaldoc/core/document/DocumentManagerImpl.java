@@ -27,6 +27,7 @@ import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
@@ -70,6 +71,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5
  */
+@Component("DocumentManager")
 public class DocumentManagerImpl implements DocumentManager {
 
 	private static final String NO_VALUE_OBJECT_HAS_BEEN_PROVIDED = "No value object has been provided";

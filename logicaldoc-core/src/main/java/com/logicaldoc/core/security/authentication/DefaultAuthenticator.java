@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
@@ -19,6 +20,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @author Sebastian Wenzky
  * @since 4.5
  */
+@Component("DefaultAuthenticator")
 public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
@@ -90,9 +92,6 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		// Check the type
 		if ((user.getType() != User.TYPE_DEFAULT && user.getType() != User.TYPE_READONLY))
 			throw new AccountTypeNotAllowedException();
-
-		if (userDAO.isPasswordExpired(user.getUsername()))
-			throw new PasswordExpiredException(this);
 
 		userDAO.initialize(user);
 

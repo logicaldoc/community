@@ -6,9 +6,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.plugin.PluginRegistry;
 
@@ -19,6 +22,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.4
  */
+@Component("FolderListenerManager")
 public class FolderListenerManager {
 
 	private static final String POSITION = "position";
@@ -27,6 +31,7 @@ public class FolderListenerManager {
 
 	private List<FolderListener> listeners = new ArrayList<>();
 
+	@PostConstruct
 	@SuppressWarnings("rawtypes")
 	public synchronized void init() {
 		if (!listeners.isEmpty())

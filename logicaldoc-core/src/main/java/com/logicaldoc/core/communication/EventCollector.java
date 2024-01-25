@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
@@ -27,6 +28,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.1
  */
+@Component("EventCollector")
 public class EventCollector {
 
 	private static final int FIFO_SIZE = 1000;

@@ -9,10 +9,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -36,6 +38,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.5.3
  */
+@Component("ThreadPools")
 public class ThreadPools {
 
 	private static final String THREADPOOL = "threadpool.";
@@ -140,6 +143,7 @@ public class ThreadPools {
 	/**
 	 * Shuts down all the pools
 	 */
+	@PreDestroy
 	public void shutdown() {
 		log.info("Shutting down {} thread pools", pools.size());
 		for (Map.Entry<String, ExecutorService> entry : pools.entrySet()) {

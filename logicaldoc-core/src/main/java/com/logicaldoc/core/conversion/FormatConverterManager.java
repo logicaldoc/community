@@ -10,12 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -47,6 +49,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1.3
  */
+@Component("FormatConverterManager")
 public class FormatConverterManager {
 
 	/*
@@ -516,8 +519,10 @@ public class FormatConverterManager {
 	/**
 	 * Initializes the converters map
 	 */
-	private void initConverters() {
-		converters.clear();
+	public synchronized void init() {
+		if (!converters.isEmpty())
+			return;
+		
 		// Acquire the 'ThumbnailBuilder' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "FormatConverter");
@@ -568,7 +573,7 @@ public class FormatConverterManager {
 
 	public Map<String, List<FormatConverter>> getConverters() {
 		if (converters.isEmpty())
-			initConverters();
+			init();
 		return converters;
 	}
 

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationChain;
@@ -36,6 +38,7 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.6
  */
+@Component("SessionManager")
 public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	public static final String COOKIE_SID = "ldoc-sid";
@@ -522,6 +525,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		this.authenticationChain = authenticationChain;
 	}
 
+	@PreDestroy
 	public void destroy() {
 		log.info("Stopping the session timeout watchdog");
 		timeoutWatchDog.finish();

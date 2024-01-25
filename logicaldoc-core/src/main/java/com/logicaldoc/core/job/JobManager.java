@@ -27,6 +27,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -37,6 +38,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * 
  * @since 8.7.4
  */
+@Component("JobManager")
 public class JobManager {
 
 	public static final String TENANT_ID = "tenantId";

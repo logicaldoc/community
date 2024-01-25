@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.IOUtils;
@@ -330,6 +332,7 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	@Override
+	@PostConstruct
 	public void init() {
 		if (!storerDefinitions.isEmpty())
 			return;
@@ -366,6 +369,7 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	@Override
+	@PreDestroy
 	public void destroy() {
 		// Noting to do
 	}

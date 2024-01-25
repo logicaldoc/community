@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.task.Task;
@@ -17,6 +18,7 @@ import com.logicaldoc.core.task.TaskException;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.3.3
  */
+@Component("PathCalculator")
 public class PathCalculator extends Task {
 
 	public static final String NAME = "PathCalculator";

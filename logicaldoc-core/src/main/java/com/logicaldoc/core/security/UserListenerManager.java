@@ -6,9 +6,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.plugin.PluginRegistry;
 
@@ -19,15 +22,18 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.1
  */
+@Component("UserListenerManager")
 public class UserListenerManager {
 	private static final String POSITION = "position";
 
 	protected static Logger log = LoggerFactory.getLogger(UserListenerManager.class);
 
-	private List<UserListener> listeners = null;
+	private List<UserListener> listeners = new ArrayList<>();
 
+	@PostConstruct
 	public void init() {
-		listeners = new ArrayList<>();
+		if (!listeners.isEmpty())
+			return;
 
 		// Acquire the 'UserListener' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();

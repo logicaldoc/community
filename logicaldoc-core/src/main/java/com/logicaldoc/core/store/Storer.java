@@ -7,6 +7,9 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import com.logicaldoc.core.document.Document;
 
 /**
@@ -262,11 +265,13 @@ public interface Storer extends Comparable<Storer> {
 	/**
 	 * Initialization method
 	 */
+	@PostConstruct
 	public void init();
 
 	/**
 	 * Destroy method
 	 */
+	@PreDestroy
 	public void destroy();
 
 	/**

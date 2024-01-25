@@ -6,6 +6,7 @@ import java.util.Locale;
 import javax.annotation.Resource;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
@@ -20,6 +21,7 @@ import com.logicaldoc.i18n.I18N;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
+@Component("DigestProcessor")
 public class DigestProcessor extends Task {
 	public static final String NAME = "DigestProcessor";
 

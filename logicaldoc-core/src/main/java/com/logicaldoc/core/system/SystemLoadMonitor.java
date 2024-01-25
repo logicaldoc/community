@@ -5,12 +5,15 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.management.MBeanServerConnection;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.config.ContextProperties;
 import com.sun.management.OperatingSystemMXBean;
@@ -21,6 +24,7 @@ import com.sun.management.OperatingSystemMXBean;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.7.1
  */
+@Component("SystemLoadMonitor")
 public class SystemLoadMonitor {
 
 	protected static Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);
@@ -79,7 +83,7 @@ public class SystemLoadMonitor {
 
 			OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc,
 					ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
-			
+
 			int loadPErcentage = (int) Math.ceil(osMBean.getCpuLoad() * 100D);
 			if (log.isTraceEnabled())
 				log.trace("Got CPU load {}%", loadPErcentage);
@@ -104,6 +108,15 @@ public class SystemLoadMonitor {
 			return averageCpuLoad > cpumax;
 	}
 
+	@PostConstruct
+	public void start() {
+		initSamples();
+		tracker.setPriority(Thread.MIN_PRIORITY);
+		tracker.start();
+		log.info("System load monitor started");
+	}
+
+	@PreDestroy
 	public void stop() {
 		if (tracker != null)
 			try {
@@ -111,13 +124,6 @@ public class SystemLoadMonitor {
 			} catch (Exception e) {
 				// Nothing to do
 			}
-	}
-
-	public void start() {
-		initSamples();
-		tracker.setPriority(Thread.MIN_PRIORITY);
-		tracker.start();
-		log.info("System load monitor started");
 	}
 
 	/*

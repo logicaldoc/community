@@ -16,17 +16,11 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
    
-   <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" />
-    
-   <bean id="SystemLoadMonitor" class="com.logicaldoc.core.system.SystemLoadMonitor" init-method="start" destroy-method="stop" />
-   
-   <bean id="ThreadPools" class="com.logicaldoc.core.threading.ThreadPools" destroy-method="shutdown" />
-   
-   <bean id="JobManager" class="com.logicaldoc.core.job.JobManager" />
-   
-   <bean id="Storer" class="${store}" init-method="init" destroy-method="destroy" />
+   <context:component-scan base-package="com.logicaldoc.core" />
+         
+   <bean id="Storer" class="${store}" />
       
-   <bean id="SearchEngine" class="${searchengine}" destroy-method="close" init-method="init" />
+   <bean id="SearchEngine" class="${searchengine}" />
    
    <!-- DAOs -->
    <bean id="SessionDAO" parent="ApplicationBaseTransactionProxy">
@@ -169,21 +163,7 @@
          <bean class="com.logicaldoc.core.searchengine.saved.HibernateSearchDAO" />
       </property>
    </bean>
-   
-   <!-- Managers -->   
-   <bean id="SecurityManager" class="com.logicaldoc.core.security.SecurityManagerImpl" />
-   <bean id="DocumentManager" class="com.logicaldoc.core.document.DocumentManagerImpl" />
-   <bean id="TaskManager" class="com.logicaldoc.core.task.TaskManager" />
-   <bean id="DocumentListenerManager" class="com.logicaldoc.core.document.DocumentListenerManager" init-method="init" />
-   <bean id="FolderListenerManager" class="com.logicaldoc.core.folder.FolderListenerManager" init-method="init" />
-   <bean id="UserListenerManager" class="com.logicaldoc.core.security.UserListenerManager" />
-   <bean id="ThumbnailManager" class="com.logicaldoc.core.document.thumbnail.ThumbnailManager" />
-   <bean id="FormatConverterManager" class="com.logicaldoc.core.conversion.FormatConverterManager" />
-   <bean id="LockManager" class="com.logicaldoc.core.lock.LockManager" />
-   <bean id="AuthenticationChain" class="com.logicaldoc.core.security.authentication.AuthenticationChain" />
-   <bean id="SessionManager" class="com.logicaldoc.core.security.SessionManager" destroy-method="destroy" />
-   
-   
+      
    <bean id="EMailSender" class="com.logicaldoc.core.communication.EMailSender" lazy-init="default">
       <property name="host" value="${default.smtp.host}" />
       <property name="port" value="${default.smtp.port}" />
@@ -195,9 +175,7 @@
       <property name="foldering" value="${default.smtp.save.foldering}" />
    </bean>
    
-   
    <!-- Tasks -->
-   <bean id="IndexOptimizer" class="com.logicaldoc.core.searchengine.IndexOptimizer" />
    <bean id="IndexOptimizerJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="IndexOptimizer" />
       <property name="targetMethod" value="run" />
@@ -207,7 +185,7 @@
       <property name="task" ref="IndexOptimizer" />
       <property name="jobDetail" ref="IndexOptimizerJob" />
    </bean>
-   <bean id="TagsProcessor" class="com.logicaldoc.core.document.TagsProcessor" />
+   
    <bean id="TagsProcessorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="TagsProcessor" />
       <property name="targetMethod" value="run" />
@@ -217,7 +195,7 @@
       <property name="task" ref="TagsProcessor" />
       <property name="jobDetail" ref="TagsProcessorJob" />
    </bean>
-   <bean id="IndexerTask" class="com.logicaldoc.core.searchengine.IndexerTask" />
+   
    <bean id="IndexerTaskJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="IndexerTask" />
       <property name="targetMethod" value="run" />
@@ -227,6 +205,7 @@
       <property name="task" ref="IndexerTask" />
       <property name="jobDetail" ref="IndexerTaskJob" />
    </bean>
+   
    <bean id="StatsCollector" class="${stat}" />
    <bean id="StatsCollectorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="StatsCollector" />
@@ -237,7 +216,7 @@
       <property name="task" ref="StatsCollector" />
       <property name="jobDetail" ref="StatsCollectorJob" />
    </bean>
-   <bean id="DigestProcessor" class="com.logicaldoc.core.document.DigestProcessor" />
+   
    <bean id="DigestProcessorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="DigestProcessor" />
       <property name="targetMethod" value="run" />
@@ -247,7 +226,7 @@
       <property name="task" ref="DigestProcessor" />
       <property name="jobDetail" ref="DigestProcessorJob" />
    </bean>
-   <bean id="PathCalculator" class="com.logicaldoc.core.folder.PathCalculator" />
+   
    <bean id="PathCalculatorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="PathCalculator" />
       <property name="targetMethod" value="run" />
@@ -256,7 +235,5 @@
    <bean id="PathCalculatorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
       <property name="task" ref="PathCalculator" />
       <property name="jobDetail" ref="PathCalculatorJob" />
-   </bean>   
-   
-   <bean id="DefaultAuthenticator" class="com.logicaldoc.core.security.authentication.DefaultAuthenticator" />
+   </bean>
 </beans>

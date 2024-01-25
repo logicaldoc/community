@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -22,6 +23,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Component("SecurityManager")
 public class SecurityManagerImpl implements SecurityManager {
 
 	protected static Logger log = LoggerFactory.getLogger(SecurityManagerImpl.class);
