@@ -214,40 +214,41 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 			setDoubleValue(null);
 			setDateValue(null);
 			setBooleanValue(null);
+			return;
+		}
+		
+		if (value instanceof String string) {
+			this.type = TYPE_STRING;
+			setStringValue(string);
+		} else if (value instanceof Integer integer) {
+			this.type = TYPE_INT;
+			setIntValue(Long.valueOf(integer));
+		} else if (value instanceof Long longVal) {
+			this.type = TYPE_INT;
+			setIntValue(longVal);
+		} else if (value instanceof Double doubleVal) {
+			this.type = TYPE_DOUBLE;
+			setDoubleValue(doubleVal);
+		} else if (value instanceof Date date) {
+			this.type = TYPE_DATE;
+			setDateValue(date);
+		} else if (value instanceof User user) {
+			this.type = TYPE_USER;
+			this.intValue = user.getId();
+			this.stringValue = user.getUsername();
+		} else if (value instanceof Folder folder) {
+			this.type = TYPE_FOLDER;
+			this.intValue = folder.getId();
+			this.stringValue = folder.getName();
+		} else if (value instanceof Document document) {
+			this.type = TYPE_DOCUMENT;
+			this.intValue = document.getId();
+			this.stringValue = document.getFileName();
+		} else if (value instanceof Boolean bool) {
+			this.type = TYPE_BOOLEAN;
+			this.intValue = bool.booleanValue() ? 1L : 0L;
 		} else {
-			if (value instanceof String string) {
-				this.type = TYPE_STRING;
-				setStringValue(string);
-			} else if (value instanceof Integer integer) {
-				this.type = TYPE_INT;
-				setIntValue(Long.valueOf(integer));
-			} else if (value instanceof Long longVal) {
-				this.type = TYPE_INT;
-				setIntValue(longVal);
-			} else if (value instanceof Double doubleVal) {
-				this.type = TYPE_DOUBLE;
-				setDoubleValue(doubleVal);
-			} else if (value instanceof Date date) {
-				this.type = TYPE_DATE;
-				setDateValue(date);
-			} else if (value instanceof User user) {
-				this.type = TYPE_USER;
-				this.intValue = user.getId();
-				this.stringValue = user.getUsername();
-			} else if (value instanceof Folder folder) {
-				this.type = TYPE_FOLDER;
-				this.intValue = folder.getId();
-				this.stringValue = folder.getName();
-			} else if (value instanceof Document document) {
-				this.type = TYPE_DOCUMENT;
-				this.intValue = document.getId();
-				this.stringValue = document.getFileName();
-			} else if (value instanceof Boolean bool) {
-				this.type = TYPE_BOOLEAN;
-				this.intValue = bool.booleanValue() ? 1L : 0L;
-			} else {
-				throw new IllegalArgumentException("Not a String, Long, Double, Date, Boolean, User, Folder value");
-			}
+			throw new IllegalArgumentException("Not a String, Long, Double, Date, Boolean, User, Folder value");
 		}
 	}
 

@@ -255,6 +255,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		version.setTgs(document.getTagsString());
 		version.setDocId(document.getId());
 		version.setLinks(document.getLinks());
+		version.setDocAttrs(document.getDocAttrs());
 
 		version.setPublished(document.getPublished());
 		version.setStartPublishing(document.getStartPublishing());

@@ -22,8 +22,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -124,7 +122,7 @@ public class DocumentsUploader extends Window {
 		zipItem.setTitle(I18N.message("importfromzip"));
 		zipItem.setValue(!zipImport);
 		zipItem.setTitleAlign(Alignment.LEFT);
-		zipItem.addChangedHandler((ChangedEvent event) -> {
+		zipItem.addChangedHandler(event -> {
 			if (Boolean.TRUE.equals(event.getValue()))
 				charset.show();
 			else
@@ -142,7 +140,7 @@ public class DocumentsUploader extends Window {
 			zipItem.setValue(false);
 		}
 
-		zipItem.addChangeHandler((ChangeEvent event) -> zipImport = !zipImport);
+		zipItem.addChangeHandler(event -> zipImport = !zipImport);
 
 		form.setItems(zipItem, charset, immediateIndexing, fileNameWaring);
 	}

@@ -148,7 +148,7 @@ public class Automation {
 		/*
 		 * Scan the classpath to add all the @AutomationDictionary classes
 		 */
-		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
+		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
 		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
 			String beanClassName = bd.getBeanClassName();

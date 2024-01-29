@@ -117,6 +117,11 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private int links = 0;
 
 	/**
+	 * Counter of extended attributes of type Document
+	 */
+	private int docAttrs = 0;
+
+	/**
 	 * Identifier of the Zonal OCR template to use to process this document
 	 */
 	private Long ocrTemplateId = null;
@@ -632,5 +637,17 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setTenantId(long tenantId) {
 		this.tenantId = tenantId;
+	}
+
+	public int getDocAttrs() {
+		if (docAttrs == 0 && getAttributes() != null && getAttributes().length > 0)
+			for (GUIAttribute att : getAttributes())
+				if (att.getType() == GUIAttribute.TYPE_DOCUMENT)
+					docAttrs++;
+		return docAttrs;
+	}
+
+	public void setDocAttrs(int docAttrs) {
+		this.docAttrs = docAttrs;
 	}
 }

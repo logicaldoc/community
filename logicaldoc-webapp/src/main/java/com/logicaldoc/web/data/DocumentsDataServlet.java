@@ -145,14 +145,15 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		 * Iterate over the documents printing the output
 		 */
 		for (Document document : documentsInCurrentPage) {
-			printDocument(writer, document, hiliteDoc, bookmarks, extendedAttributes, extendedAttributesValues);
+			printDocument(writer, document, hiliteDoc, bookmarks, extendedAttributes, extendedAttributesValues,
+					session.getTenantName());
 		}
 
 		writer.write("</list>");
 	}
 
 	private void printDocument(PrintWriter writer, Document document, Document hiliteDoc, List<Long> bookmarks,
-			List<String> extendedAttributes, final Map<String, Object> extendedAttributesValues) {
+			List<String> extendedAttributes, final Map<String, Object> extendedAttributesValues, String tenant) {
 
 		writer.print("<document>");
 		writer.print("<id>" + document.getId() + "</id>");
@@ -178,7 +179,11 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		writer.print("<bookmarked>" + (bookmarks.contains(document.getId()) || bookmarks.contains(document.getDocRef()))
 				+ "</bookmarked>");
 		writer.print("<language>" + document.getLanguage() + "</language>");
-		writer.print("<links>" + document.getLinks() + "</links>");
+		writer.print("<links>" + (document.getLinks()
+				+ (Context.get().getProperties().getBoolean(tenant + ".gui.showdocattrsaslinks", false)
+						? document.getDocAttrs()
+						: 0))
+				+ "</links>");
 		writer.print("<publisherId>" + document.getPublisherId() + "</publisherId>");
 		writer.print("<creatorId>" + document.getCreatorId() + "</creatorId>");
 		writer.print("<tenantId>" + document.getTenantId() + "</tenantId>");
@@ -372,7 +377,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 						+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
 						+ " A.startPublishing, A.stopPublishing, A.published, A.extResId,"
 						+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages, "
-						+ " A.workflowStatusDisplay, A.language, A.links, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId from Document as A left outer join A.template as B ");
+						+ " A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId from Document as A left outer join A.template as B ");
 		query.append(" where A.deleted = 0 and not A.status=" + AbstractDocument.DOC_ARCHIVED);
 		if (folderId != null)
 			query.append(" and A.folder.id=" + folderId);

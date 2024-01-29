@@ -35,9 +35,11 @@ public class LinksDS extends DataSource {
 		parent.setForeignKey("LinksDS.documentId");
 		parent.setRootValue("/");
 
-		setFields(linkId, parent, folderId, documentId, filename, icon, direction, type, folderId1, folderId2);
+		DataSourceTextField attribute = new DataSourceTextField("attribute");
+		
+		setFields(linkId, parent, folderId, documentId, filename, icon, direction, type, folderId1, folderId2,
+				attribute);
 		setClientOnly(true);
-
 		setDataURL("data/links.xml?docId=" + docId);
 		setClientOnly(false);
 	}

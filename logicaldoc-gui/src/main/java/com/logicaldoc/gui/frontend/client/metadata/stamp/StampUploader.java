@@ -9,6 +9,7 @@ import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -20,7 +21,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class StampUploader extends Window {
 
-	private IButton saveButton;
+	private IButton submit;
 
 	private Upload uploader;
 
@@ -34,24 +35,29 @@ public class StampUploader extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadstamp"));
-		setMinWidth(460);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		setAutoSize(true);
 		centerInPage();
 
-		saveButton = new IButton(I18N.message("save"));
-		saveButton.addClickHandler(event -> onSave());
+		submit = new IButton(I18N.message("submit"));
+		submit.addClickHandler(event -> onSubmit());
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
 		layout.setMargin(2);
 
-		uploader = new Upload(saveButton);
+		uploader = new Upload(submit);
 		uploader.setFileTypes("*.png");
+
+		Label spacer = new Label("&nbsp;");
+		spacer.setWidth(420);
+		spacer.setHeight(5);
+
+		layout.addMember(spacer);
 		layout.addMember(uploader);
-		layout.addMember(saveButton);
+		layout.addMember(submit);
 
 		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
@@ -69,7 +75,7 @@ public class StampUploader extends Window {
 		addItem(layout);
 	}
 
-	public void onSave() {
+	public void onSubmit() {
 		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;

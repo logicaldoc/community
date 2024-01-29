@@ -38,6 +38,7 @@
 		<property name="signed" type="int" column="ld_signed" not-null="true"/>
         <property name="stamped" type="int" column="ld_stamped" not-null="true"/>
         <property name="links" type="int" column="ld_links" not-null="true"/>
+        <property name="docAttrs" type="int" column="ld_docattrs" not-null="true"/>
 		<property name="digest" type="string" column="ld_digest" length="255" />
 		<property name="exportStatus" type="int" column="ld_exportstatus" not-null="true"/>
 		<property name="exportId" type="long" column="ld_exportid" />

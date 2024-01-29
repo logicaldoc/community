@@ -207,6 +207,11 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private int previewPages = -1;
 
 	private int links = 0;
+	
+	/**
+	 * Counter of extended attributes of type Document
+	 */
+	private int docAttrs = 0;
 
 	/**
 	 * Used for saving the external resource ID when editing online
@@ -1062,5 +1067,13 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 				log.warn("Cannot copy collections from document {}", docVO, e);
 			}
 		}
+	}
+
+	public int getDocAttrs() {
+		return docAttrs;
+	}
+
+	public void setDocAttrs(int docAttrs) {
+		this.docAttrs = docAttrs;
 	}
 }

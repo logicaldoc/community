@@ -829,6 +829,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		document.setIcon(FileUtil.getBaseName(doc.getIcon()));
 		document.setPasswordProtected(realDoc.isPasswordProtected());
 		document.setLinks(realDoc.getLinks());
+		document.setDocAttrs(realDoc.getDocAttrs());
 		document.setOcrd(realDoc.getOcrd());
 		document.setOcrTemplateId(realDoc.getOcrTemplateId());
 		document.setBarcoded(realDoc.getBarcoded());

@@ -21,7 +21,7 @@ create table ld_document (ld_id bigint not null, ld_lastmodified datetime not nu
                           ld_workflowstatus nvarchar(1000), ld_workflowstatusdisp nvarchar(1000),
                           ld_published int not null, ld_startpublishing datetime, ld_stoppublishing datetime null, ld_transactionid nvarchar(255), 
                           ld_extresid nvarchar(255), ld_tgs nvarchar(1000), ld_pages int not null, ld_previewpages int not null, ld_nature int not null,
-                          ld_formid bigint, ld_links int not null, ld_ocrtemplateid bigint, ld_ocrd int not null, 
+                          ld_formid bigint, ld_links int not null, ld_docattrs int not null, ld_ocrtemplateid bigint, ld_ocrd int not null, 
                           ld_barcodetemplateid bigint, ld_color varchar(255), primary key (ld_id));
 create table ld_document_ext (ld_docid bigint not null, ld_mandatory int not null, ld_type int not null, 
                               ld_editor int not null, ld_position int not null, ld_stringvalue nvarchar(4000), ld_stringvalues nvarchar(4000), 
@@ -139,7 +139,7 @@ create table ld_version (ld_id bigint not null, ld_lastmodified datetime not nul
                          ld_workflowstatus nvarchar(1000), ld_workflowstatusdisp nvarchar(1000), ld_published int not null, 
                          ld_startpublishing datetime, ld_stoppublishing datetime null, 
                          ld_transactionid nvarchar(255), ld_extresid nvarchar(255), ld_pages int not null, ld_previewpages int not null, ld_nature int not null,
-                         ld_formid bigint, ld_links int not null, ld_ocrtemplateid bigint, ld_ocrd int not null, 
+                         ld_formid bigint, ld_links int not null, ld_docattrs int not null, ld_ocrtemplateid bigint, ld_ocrd int not null, 
                          ld_barcodetemplateid bigint, ld_color varchar(255), primary key (ld_id));
 create table ld_version_ext (ld_versionid bigint not null, ld_mandatory int not null, ld_type int not null, ld_editor int not null, 
                              ld_position int not null, ld_stringvalue nvarchar(4000), ld_stringvalues nvarchar(4000), ld_intvalue bigint, ld_doublevalue float, 

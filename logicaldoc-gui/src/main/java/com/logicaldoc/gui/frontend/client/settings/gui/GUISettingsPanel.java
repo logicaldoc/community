@@ -143,10 +143,14 @@ public class GUISettingsPanel extends AdminPanel {
 		openPreviewPanel.setWrapTitle(false);
 		openPreviewPanel.setValue(yesNo(settings, "gui.preview.openpanel"));
 
+		RadioGroupItem showDocAttrsAsLinks = ItemFactory.newBooleanSelector("showdocattrsaslinks");
+		showDocAttrsAsLinks.setWrapTitle(false);
+		showDocAttrsAsLinks.setValue(yesNo(settings, "gui.showdocattrsaslinks"));
+
 		RadioGroupItem reactToRemoteEvents = ItemFactory.newBooleanSelector("reacttoremoteevents");
 		reactToRemoteEvents.setWrapTitle(false);
 		reactToRemoteEvents.setValue(yesNo(settings, "gui.serverpush"));
-		
+
 		RadioGroupItem showPushErrors = ItemFactory.newBooleanSelector("reacttoremoteeventsshowerrors");
 		showPushErrors.setWrapTitle(false);
 		showPushErrors.setValue(yesNo(settings, "gui.serverpush.showerror"));
@@ -334,7 +338,7 @@ public class GUISettingsPanel extends AdminPanel {
 		webstartMode.setValueMap("webstart", DOWNLOAD);
 		webstartMode.setValue(Util.getParameterValue(settings, "gui.webstart.mode"));
 
-		RadioGroupItem foldOpentree = ItemFactory.newBooleanSelector("foldopentree","openfolderstree");
+		RadioGroupItem foldOpentree = ItemFactory.newBooleanSelector("foldopentree", "openfolderstree");
 		foldOpentree.setWrapTitle(false);
 		foldOpentree.setValue(yesNo(settings, "gui.folder.opentree"));
 
@@ -350,7 +354,7 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem foldPagination = ItemFactory.newBooleanSelector("foldpagination");
 		foldPagination.setWrapTitle(false);
 		foldPagination.setValue(yesNo(settings, "gui.folder.pagination"));
-		
+
 		SpinnerItem foldPageSize = ItemFactory.newSpinnerItem("foldpagesize",
 				Integer.parseInt(Util.getParameterValue(settings, "gui.folder.maxchildren").trim()));
 		foldPageSize.setWrapTitle(false);
@@ -446,11 +450,11 @@ public class GUISettingsPanel extends AdminPanel {
 				showAvatarsInGrids, textExtensions, attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize,
 				emailMaxSize, wfDashletRows, ondoubleclick, docTab, foldSorting, securityOption,
 				securitySecurityOptionDefault, foldOpentree, foldOpenSelect, foldPagination, foldPageSize,
-				openPreviewPanel, maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled, allowNotesEditing,
-				webcontentFolders, downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout, sessionHeartbeat,
-				popupTimeout, charset, lockOnEditing, askVersionCommentOnSave, reactToRemoteEvents, showPushErrors, saveInputs,
-				showVersionAlertsInLogin, showLicenseAlertsInLogin, showQuotaAlertsInLogin, showUpdateAlertsInLogin,
-				showPatchAlertsInLogin, showLanguageInLogin, showLostPassword, save);
+				showDocAttrsAsLinks, openPreviewPanel, maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled,
+				allowNotesEditing, webcontentFolders, downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout,
+				sessionHeartbeat, popupTimeout, charset, lockOnEditing, askVersionCommentOnSave, reactToRemoteEvents,
+				showPushErrors, saveInputs, showVersionAlertsInLogin, showLicenseAlertsInLogin, showQuotaAlertsInLogin,
+				showUpdateAlertsInLogin, showPatchAlertsInLogin, showLanguageInLogin, showLostPassword, save);
 	}
 
 	private void onSave() {
@@ -555,6 +559,8 @@ public class GUISettingsPanel extends AdminPanel {
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.savelogin", trueFalse("savelogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.preview.openpanel",
 				trueFalse("openpreviewpanel")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.showdocattrsaslinks",
+				trueFalse("showdocattrsaslinks")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.opentree", trueFalse("foldopentree")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.openonselect",
 				trueFalse("foldopenselect")));
@@ -564,8 +570,8 @@ public class GUISettingsPanel extends AdminPanel {
 				trueFalse("autoclosefoldernodes")));
 		params.add(
 				new GUIParameter(Session.get().getTenantName() + ".gui.serverpush", trueFalse("reacttoremoteevents")));
-		params.add(
-				new GUIParameter(Session.get().getTenantName() + ".gui.serverpush.showerror", trueFalse("reacttoremoteeventsshowerrors")));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.serverpush.showerror",
+				trueFalse("reacttoremoteeventsshowerrors")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.license.showloginalerts",
 				trueFalse("showlicensealertsinlogin")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.quota.showloginalerts",

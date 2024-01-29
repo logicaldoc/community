@@ -78,34 +78,34 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private static final String STATUS = ".status=";
 
-	@Resource(name="DocumentHistoryDAO")
+	@Resource(name = "DocumentHistoryDAO")
 	private DocumentHistoryDAO documentHistoryDAO;
 
-	@Resource(name="VersionDAO")
+	@Resource(name = "VersionDAO")
 	private VersionDAO versionDAO;
 
-	@Resource(name="TenantDAO")
+	@Resource(name = "TenantDAO")
 	private TenantDAO tenantDAO;
 
-	@Resource(name="DocumentNoteDAO")
+	@Resource(name = "DocumentNoteDAO")
 	private DocumentNoteDAO noteDAO;
 
-	@Resource(name="FolderDAO")
+	@Resource(name = "FolderDAO")
 	private FolderDAO folderDAO;
 
-	@Resource(name="UserDAO")
+	@Resource(name = "UserDAO")
 	private UserDAO userDAO;
 
-	@Resource(name="DocumentLinkDAO")
+	@Resource(name = "DocumentLinkDAO")
 	private DocumentLinkDAO linkDAO;
 
-	@Resource(name="DocumentListenerManager")
+	@Resource(name = "DocumentListenerManager")
 	private DocumentListenerManager listenerManager;
 
-	@Resource(name="Storer")
+	@Resource(name = "Storer")
 	private Storer storer;
 
-	@Resource(name="ContextProperties")
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	private HibernateDocumentDAO() {
@@ -305,6 +305,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			setTags(doc);
 
 			setType(doc);
+
+			// Count those attributes that reference other documents
+			doc.setDocAttrs((int) doc.getAttributes().values().stream()
+					.filter(a -> a.getType() == Attribute.TYPE_DOCUMENT).count());
 
 			/*
 			 * Avoid documents inside folder alias
@@ -868,8 +872,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public long computeTotalSize(Long tenantId, Long userId, boolean computeDeleted) throws PersistenceException {
 		// Count all the versions of the documents related to file change
 		final String query = "select sum(ld_filesize) from ld_version where ld_version = ld_fileversion"
-				+ (computeDeleted ? "" : " and ld_deleted=0 ")
-				+ (userId != null ? " and ld_publisherid=" + userId : "")
+				+ (computeDeleted ? "" : " and ld_deleted=0 ") + (userId != null ? " and ld_publisherid=" + userId : "")
 				+ (tenantId != null ? AND_LD_TENANTID + tenantId : "");
 		return queryForLong(query);
 	}

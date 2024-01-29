@@ -634,7 +634,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		}
 	}
 
-	private void validateDocument(String itemName, String attributeName) {
+	protected void validateDocument(String itemName, String attributeName) {
 		DocumentSelector documentItem = (DocumentSelector) attributesForm.getItem(itemName);
 		GUIDocument selectedDocument = documentItem.getDocument();
 		if (selectedDocument != null) {

@@ -274,7 +274,8 @@ public class DocumentGridUtil {
 			rec.setAttribute(BOOKMARKED, doc.isBookmarked());
 			rec.setAttribute("extResId", doc.getExtResId());
 			rec.setAttribute("language", doc.getLanguage());
-			rec.setAttribute("links", doc.getLinks());
+			rec.setAttribute("links", doc.getLinks()
+					+ (Session.get().getConfigAsBoolean("gui.showdocattrsaslinks") ? doc.getDocAttrs() : 0));
 			rec.setAttribute("tags", doc.getTgs());
 
 			updateFolder(doc, rec);
