@@ -18,6 +18,7 @@ import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
@@ -308,8 +309,11 @@ public class ParametricForm extends VLayout {
 			fieldValue = ((UserSelector) condition.getValueFieldItem()).getUser().getId();
 		if (condition.getValueFieldItem() instanceof FolderSelector)
 			fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
+		if (condition.getValueFieldItem() instanceof DocumentSelector)
+			fieldValue = ((DocumentSelector) condition.getValueFieldItem()).getDocument().getId();
 
 		String fieldName = criterion.getField();
+
 		if (fieldName.endsWith(TYPE + GUIAttribute.TYPE_INT) || fieldName.endsWith(TYPE + GUIAttribute.TYPE_USER)
 				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)
 				|| fieldName.endsWith(TYPE + GUIAttribute.TYPE_DOCUMENT)) {
