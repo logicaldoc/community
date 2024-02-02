@@ -448,7 +448,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(sessionUser);
 			transaction.setSessionId(sid);
-			folderDao.applyRightToTree(folder.getId(), transaction);
+			folderDao.applySecurityToTree(folder.getId(), transaction);
 		}
 	}
 

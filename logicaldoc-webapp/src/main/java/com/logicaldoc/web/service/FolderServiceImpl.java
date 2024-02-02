@@ -2,7 +2,6 @@ package com.logicaldoc.web.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
@@ -103,13 +102,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					history.setSession(session);
 					history.setEvent(FolderEvent.PERMISSION.toString());
 					try {
-						fdao.applyRightToTree(folder.getId(), history);
+						fdao.applySecurityToTree(folder.getId(), history);
 					} catch (PersistenceException e) {
 						log.error(e.getMessage(), e);
 					}
 				}, session);
 			} else {
-				saveRules(session, f, folder.getRights());
+				saveRights(session, f, folder.getRights());
 			}
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -323,7 +322,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				guiFolder = fromFolder(folder, computePath);
 			}
 
-			setPermissions(session, folderId, guiFolder);
+			setAllowedPermissions(session, folderId, guiFolder);
 
 			Folder securityRef = folder;
 			if (test.getSecurityRef() != null)
@@ -380,15 +379,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		guiFolder.setRights(rights);
 	}
 
-	private static void setPermissions(Session session, long folderId, GUIFolder guiFolder)
+	private static void setAllowedPermissions(Session session, long folderId, GUIFolder guiFolder)
 			throws PersistenceException {
 		if (session != null) {
 			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Set<Permission> permissions = dao.getEnabledPermissions(folderId, session.getUserId());
-			List<String> permissionsList = new ArrayList<>();
-			for (Permission permission : permissions)
-				permissionsList.add(permission.toString());
-			guiFolder.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
+			guiFolder.setAllowedPermissions(new GUIRight(
+					permissions.stream().map(p -> p.name().toLowerCase()).toList().toArray(new String[0])));
 		}
 	}
 
@@ -744,7 +741,11 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	}
 
-	private boolean saveRules(Session session, Folder folder, GUIRight[] rights) throws PersistenceException {
+	private int booleanToInt(boolean bool) {
+		return bool ? 1 : 0;
+	}
+
+	private boolean saveRights(Session session, Folder folder, GUIRight[] rights) throws PersistenceException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		boolean sqlerrors = false;
@@ -754,38 +755,32 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		sqlerrors = false;
 		Set<FolderGroup> grps = new HashSet<>();
 		for (GUIRight right : rights) {
-			boolean isAdmin = right.getEntityId() == 1;
-			FolderGroup fg = null;
-			if (right.isRead()) {
-				fg = new FolderGroup();
-				fg.setGroupId(right.getEntityId());
-			}
-
-			if (fg == null)
-				continue;
+			FolderGroup fg = new FolderGroup();
+			fg.setGroupId(right.getEntityId());
 			grps.add(fg);
 
-			setPring(right, isAdmin, fg);
-			setWrite(right, isAdmin, fg);
-			setAdd(right, isAdmin, fg);
-			setSecurity(right, isAdmin, fg);
-			setImmutable(right, isAdmin, fg);
-			setDelete(right, isAdmin, fg);
-			setRename(right, isAdmin, fg);
-			setImport(right, isAdmin, fg);
-			setExport(right, isAdmin, fg);
-			setArchive(right, isAdmin, fg);
-			setWorkflow(right, isAdmin, fg);
-			setSign(right, isAdmin, fg);
-			setDownload(right, isAdmin, fg);
-			setCalendar(right, isAdmin, fg);
-			setSubscription(right, isAdmin, fg);
-			setPassword(right, isAdmin, fg);
-			setMove(right, isAdmin, fg);
-			setEmail(right, isAdmin, fg);
-			setAutomation(right, isAdmin, fg);
-			setStorage(right, isAdmin, fg);
-			setReadingreq(right, isAdmin, fg);
+			fg.setRead(booleanToInt(right.isRead()));
+			fg.setPrint(booleanToInt(right.isPrint()));
+			fg.setWrite(booleanToInt(right.isWrite()));
+			fg.setAdd(booleanToInt(right.isAdd()));
+			fg.setSecurity(booleanToInt(right.isSecurity()));
+			fg.setImmutable(booleanToInt(right.isImmutable()));
+			fg.setDelete(booleanToInt(right.isDelete()));
+			fg.setRename(booleanToInt(right.isRename()));
+			fg.setImport(booleanToInt(right.isImport()));
+			fg.setExport(booleanToInt(right.isExport()));
+			fg.setArchive(booleanToInt(right.isArchive()));
+			fg.setWorkflow(booleanToInt(right.isWorkflow()));
+			fg.setSign(booleanToInt(right.isSign()));
+			fg.setDownload(booleanToInt(right.isDownload()));
+			fg.setCalendar(booleanToInt(right.isCalendar()));
+			fg.setSubscription(booleanToInt(right.isSubscription()));
+			fg.setPassword(booleanToInt(right.isPassword()));
+			fg.setMove(booleanToInt(right.isMove()));
+			fg.setEmail(booleanToInt(right.isEmail()));
+			fg.setAutomation(booleanToInt(right.isAutomation()));
+			fg.setStorage(booleanToInt(right.isStorage()));
+			fg.setReadingreq(booleanToInt(right.isReadingreq()));
 		}
 
 		folder.getFolderGroups().clear();
@@ -798,153 +793,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		fdao.store(folder, history);
 
 		return !sqlerrors;
-	}
-
-	private void setReadingreq(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isReadingreq())
-			fg.setReadingreq(1);
-		else
-			fg.setReadingreq(0);
-	}
-
-	private void setStorage(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isStorage())
-			fg.setStorage(1);
-		else
-			fg.setStorage(0);
-	}
-
-	private void setAutomation(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isAutomation())
-			fg.setAutomation(1);
-		else
-			fg.setAutomation(0);
-	}
-
-	private void setEmail(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isEmail())
-			fg.setEmail(1);
-		else
-			fg.setEmail(0);
-	}
-
-	private void setMove(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isMove())
-			fg.setMove(1);
-		else
-			fg.setMove(0);
-	}
-
-	private void setPassword(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isPassword())
-			fg.setPassword(1);
-		else
-			fg.setPassword(0);
-	}
-
-	private void setSubscription(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isSubscription())
-			fg.setSubscription(1);
-		else
-			fg.setSubscription(0);
-	}
-
-	private void setCalendar(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isCalendar())
-			fg.setCalendar(1);
-		else
-			fg.setCalendar(0);
-	}
-
-	private void setDownload(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isDownload())
-			fg.setDownload(1);
-		else
-			fg.setDownload(0);
-	}
-
-	private void setSign(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isSign())
-			fg.setSign(1);
-		else
-			fg.setSign(0);
-	}
-
-	private void setWorkflow(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isWorkflow())
-			fg.setWorkflow(1);
-		else
-			fg.setWorkflow(0);
-	}
-
-	private void setArchive(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isArchive())
-			fg.setArchive(1);
-		else
-			fg.setArchive(0);
-	}
-
-	private void setExport(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isExport())
-			fg.setExport(1);
-		else
-			fg.setExport(0);
-	}
-
-	private void setImport(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isImport())
-			fg.setImport(1);
-		else
-			fg.setImport(0);
-	}
-
-	private void setRename(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isRename())
-			fg.setRename(1);
-		else
-			fg.setRename(0);
-	}
-
-	private void setDelete(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isDelete())
-			fg.setDelete(1);
-		else
-			fg.setDelete(0);
-	}
-
-	private void setImmutable(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isImmutable())
-			fg.setImmutable(1);
-		else
-			fg.setImmutable(0);
-	}
-
-	private void setSecurity(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isSecurity())
-			fg.setSecurity(1);
-		else
-			fg.setSecurity(0);
-	}
-
-	private void setAdd(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isAdd())
-			fg.setAdd(1);
-		else
-			fg.setAdd(0);
-	}
-
-	private void setWrite(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isWrite())
-			fg.setWrite(1);
-		else
-			fg.setWrite(0);
-	}
-
-	private void setPring(GUIRight right, boolean isAdmin, FolderGroup fg) {
-		if (isAdmin || right.isPrint())
-			fg.setPrint(1);
-		else
-			fg.setPrint(0);
 	}
 
 	@Override

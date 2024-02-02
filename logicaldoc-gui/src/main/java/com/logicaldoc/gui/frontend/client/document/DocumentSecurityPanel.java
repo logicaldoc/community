@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.folder;
+package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.data.RightsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -15,18 +15,11 @@ import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
-import com.logicaldoc.gui.frontend.client.services.FolderService;
+import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -42,12 +35,12 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
- * This panel shows the security policies.
+ * This panel shows the security policies of a document.
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 6.0
+ * @since 8.9.1
  */
-public class FolderSecurityPanel extends FolderDetailTab {
+public class DocumentSecurityPanel extends DocumentDetailTab {
 
 	private static final String ARCHIVE = "archive";
 
@@ -59,8 +52,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private static final String AUTOMATION = "automation";
 
-	private static final String STORAGE = "storage";
-
 	private static final String READINGREQ = "readingreq";
 
 	private static final String EMAIL = "email";
@@ -68,8 +59,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	private static final String PASSWORD = "password";
 
 	private static final String EXPORT = "export";
-
-	private static final String IMPORT = "import";
 
 	private static final String RENAME = "rename";
 
@@ -97,31 +86,25 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private VLayout container = new VLayout();
 
-	private HLayout inheritInfoPanel = new HLayout();
-
-	public FolderSecurityPanel(final GUIFolder folder) {
-		super(folder, null);
+	public DocumentSecurityPanel(final GUIDocument document) {
+		super(document, null);
 	}
 
 	@Override
 	protected void onDraw() {
 		container.setMembersMargin(3);
 		addMember(container);
-		refresh(folder);
+		refresh(document);
 	}
 
 	private String prepareHeaderLabel(String labelKey) {
 		return I18N.message(labelKey);
 	}
 
-	void refresh(GUIFolder folder) {
-		super.folder = folder;
+	void refresh(GUIDocument document) {
+		super.document = document;
 
 		container.removeMembers(container.getMembers());
-
-		if (folder.getSecurityRef() != null) {
-			displayInheritingPanel(folder);
-		}
 
 		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID);
 		entityId.setCanEdit(false);
@@ -149,10 +132,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 
-		ListGridField add = new ListGridField("add", prepareHeaderLabel("addfolder"));
-		add.setType(ListGridFieldType.BOOLEAN);
-		add.setCanEdit(true);
-
 		ListGridField security = new ListGridField(SECURITY, prepareHeaderLabel(SECURITY));
 		security.setType(ListGridFieldType.BOOLEAN);
 		security.setCanEdit(true);
@@ -168,14 +147,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		ListGridField rename = new ListGridField(RENAME, prepareHeaderLabel(RENAME));
 		rename.setType(ListGridFieldType.BOOLEAN);
 		rename.setCanEdit(true);
-
-		ListGridField iimport = new ListGridField(IMPORT, prepareHeaderLabel("iimport"));
-		iimport.setType(ListGridFieldType.BOOLEAN);
-		iimport.setCanEdit(true);
-
-		ListGridField export = new ListGridField(EXPORT, prepareHeaderLabel("eexport"));
-		export.setType(ListGridFieldType.BOOLEAN);
-		export.setCanEdit(true);
 
 		ListGridField password = new ListGridField(PASSWORD, prepareHeaderLabel(PASSWORD));
 		password.setType(ListGridFieldType.BOOLEAN);
@@ -196,8 +167,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		list.setAutoFetchData(true);
 		list.setRotateHeaderTitles(true);
 		list.setHeaderHeight(100);
-
-		dataSource = new RightsDS(folder.getId(), "folder");
+		dataSource = new RightsDS(document.getId(), "document");
 		list.setDataSource(dataSource);
 
 		List<ListGridField> fields = new ArrayList<>();
@@ -208,75 +178,27 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		fields.add(download);
 		fields.add(email);
 		fields.add(write);
-		fields.add(add);
 		fields.add(rename);
 		fields.add(delete);
 		fields.add(move);
 		fields.add(security);
 		fields.add(immutable);
 		fields.add(password);
-		fields.add(iimport);
-		fields.add(export);
 		addSign(fields);
 		addArchive(fields);
 		addWorkflow(fields);
 		addCalendar(fields);
 		addSubscription(fields);
 		addAutomation(fields);
-		addStorage(fields);
 		addReadingReq(fields);
 
 		list.setFields(fields.toArray(new ListGridField[0]));
 
 		container.addMember(list);
 
-		addCellContextClickHandler(folder);
+		addCellContextClickHandler(document);
 
-		addButtons(folder);
-	}
-
-	private void displayInheritingPanel(GUIFolder folder) {
-		FolderService.Instance.get().getFolder(folder.getSecurityRef().getId(), true, false, false,
-				new AsyncCallback<GUIFolder>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(final GUIFolder refFolder) {
-						inheritInfoPanel = new HLayout();
-						inheritInfoPanel.setMembersMargin(5);
-						inheritInfoPanel.setStyleName("warn");
-						inheritInfoPanel.setWidth100();
-						inheritInfoPanel.setHeight(20);
-
-						Label label = new Label(I18N.message("rightsinheritedfrom"));
-						label.setWrap(false);
-
-						Label path = new Label("<b><span style='text-decoration: underline'>"
-								+ refFolder.getPathExtended() + "</span></b>");
-						path.setWrap(false);
-						path.addClickHandler((ClickEvent event) -> FolderNavigator.get().openFolder(refFolder.getId()));
-
-						HTMLPane spacer = new HTMLPane();
-						spacer.setContents("<div>&nbsp;</div>");
-						spacer.setWidth("*");
-						spacer.setOverflow(Overflow.HIDDEN);
-
-						Img closeImage = ItemFactory.newImgIcon("delete.png");
-						closeImage.setHeight("16px");
-						closeImage.addClickHandler((ClickEvent event) -> inheritInfoPanel.setVisible(false));
-						closeImage.setCursor(Cursor.HAND);
-						closeImage.setTooltip(I18N.message("close"));
-						closeImage.setLayoutAlign(Alignment.RIGHT);
-						closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-						inheritInfoPanel.setMembers(label, path, spacer, closeImage);
-						container.addMember(inheritInfoPanel, 0);
-					}
-				});
+		addButtons(document);
 	}
 
 	private void addReadingReq(List<ListGridField> fields) {
@@ -286,16 +208,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			readingreq.setCanEdit(true);
 			readingreq.setAutoFitWidth(true);
 			fields.add(readingreq);
-		}
-	}
-
-	private void addStorage(List<ListGridField> fields) {
-		if (Feature.enabled(Feature.MULTI_STORAGE)) {
-			ListGridField storage = new ListGridField(STORAGE, prepareHeaderLabel(STORAGE));
-			storage.setType(ListGridFieldType.BOOLEAN);
-			storage.setCanEdit(true);
-			storage.setAutoFitWidth(true);
-			fields.add(storage);
 		}
 	}
 
@@ -355,7 +267,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		}
 	}
 
-	private void addButtons(GUIFolder folder) {
+	private void addButtons(GUIDocument document) {
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(4);
 		buttons.setWidth100();
@@ -364,58 +276,14 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 		Button save = new Button(I18N.message("save"));
 		save.setAutoFit(true);
+		save.addClickHandler(click -> onSave());
 		buttons.addMember(save);
-
-		Button applyRightsSubfolders = new Button(I18N.message("applytosubfolders"));
-		applyRightsSubfolders.setAutoFit(true);
-		buttons.addMember(applyRightsSubfolders);
-
-		save.addClickHandler((ClickEvent applyClick) -> onSave(false));
-
-		applyRightsSubfolders.addClickHandler((ClickEvent rightsClick) -> onSave(true));
-
-		Button inheritFromParent = new Button(I18N.message("inheritfromparent"));
-		inheritFromParent.setAutoFit(true);
-		buttons.addMember(inheritFromParent);
-		inheritFromParent.addClickHandler((ClickEvent event) -> FolderService.Instance.get()
-				.getFolder(folder.getParentId(), false, false, false, new AsyncCallback<GUIFolder>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIFolder parent) {
-						LD.ask(I18N.message("inheritrights"),
-								I18N.message("inheritrightsask", new String[] { folder.getName(), parent.getName() }),
-								(Boolean interitConfirmed) -> {
-									if (Boolean.TRUE.equals(interitConfirmed)) {
-										FolderService.Instance.get().inheritRights(folder.getId(), folder.getParentId(),
-												new AsyncCallback<GUIFolder>() {
-
-													@Override
-													public void onFailure(Throwable caught) {
-														GuiLog.serverError(caught);
-													}
-
-													@Override
-													public void onSuccess(GUIFolder arg) {
-														FolderSecurityPanel.this.refresh(arg);
-													}
-												});
-									}
-								});
-					}
-
-				}));
-
-		Button inheritRights = new Button(I18N.message("inherit"));
-		inheritRights.setAutoFit(true);
-		buttons.addMember(inheritRights);
-		inheritRights
-				.addClickHandler((ClickEvent inheritClick) -> new InheritRightsDialog(FolderSecurityPanel.this).show());
-
+		
+		Button copyParentFolderSecurity = new Button(I18N.message("copyfoldersecurity"));
+		copyParentFolderSecurity.setAutoFit(true);
+		copyParentFolderSecurity.addClickHandler(click -> onCopyParentFolderSecurity());
+		buttons.addMember(copyParentFolderSecurity);
+		
 		addGroupSelector(buttons);
 
 		addUserSelector(buttons);
@@ -428,7 +296,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
-		user.addChangedHandler((ChangedEvent userChangedEvent) -> {
+		user.addChangedHandler(userChangedEvent -> {
 			ListGridRecord selectedRecord = user.getSelectedRecord();
 			if (selectedRecord == null)
 				return;
@@ -502,8 +370,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		printButton.addClickHandler((ClickEvent printClick) -> GridUtil.print(list));
 	}
 
-	private void addCellContextClickHandler(GUIFolder folder) {
-		if (folder != null && folder.hasPermission(Constants.PERMISSION_SECURITY)) {
+	private void addCellContextClickHandler(GUIDocument document) {
+		if (document != null && document.hasPermission(Constants.PERMISSION_SECURITY)) {
 			list.addCellContextClickHandler((CellContextClickEvent contextClick) -> {
 				if (contextClick.getColNum() == 0) {
 					Menu contextMenu = setupContextMenu();
@@ -515,7 +383,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	}
 
 	/**
-	 * Creates an array of all the right
+	 * Creates an array of all the rights
 	 * 
 	 * @return the array of rights
 	 */
@@ -532,11 +400,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			right.setPrint(rec.getAttributeAsBoolean(PRINT));
 			right.setWrite(rec.getAttributeAsBoolean(WRITE));
 			right.setDelete(rec.getAttributeAsBoolean(DELETE));
-			right.setAdd(rec.getAttributeAsBoolean("add"));
 			right.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
 			right.setSign(rec.getAttributeAsBoolean("sign"));
-			right.setImport(rec.getAttributeAsBoolean(IMPORT));
-			right.setExport(rec.getAttributeAsBoolean(EXPORT));
 			right.setImmutable(rec.getAttributeAsBoolean(IMMUTABLE));
 			right.setRename(rec.getAttributeAsBoolean(RENAME));
 			right.setSecurity(rec.getAttributeAsBoolean(SECURITY));
@@ -548,7 +413,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			right.setMove(rec.getAttributeAsBoolean("move"));
 			right.setEmail(rec.getAttributeAsBoolean(EMAIL));
 			right.setAutomation(rec.getAttributeAsBoolean(AUTOMATION));
-			right.setStorage(rec.getAttributeAsBoolean(STORAGE));
 			right.setReadingreq(rec.getAttributeAsBoolean(READINGREQ));
 
 			tmp.add(right);
@@ -591,11 +455,11 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		});
 	}
 
-	public void onSave(final boolean recursive) {
+	public void onSave() {
 		// Apply all rights
-		folder.setRights(this.getRights());
+		document.setRights(this.getRights());
 
-		FolderService.Instance.get().applyRights(folder, recursive, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().applySecurity(document, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -604,13 +468,30 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 			@Override
 			public void onSuccess(Void result) {
-				if (!recursive)
-					GuiLog.info(I18N.message("appliedrights"), null);
-				else
-					GuiLog.info(I18N.message("appliedrightsonsubfolders"), null);
-				folder.setSecurityRef(null);
-				refresh(folder);
+				GuiLog.info(I18N.message("appliedrightsondoc"), null);
+				refresh(document);
 			}
 		});
+	}
+
+	public void onCopyParentFolderSecurity() {
+		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				DocumentService.Instance.get().applyParentFolderSecurity(document.getId(), new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						GuiLog.info(I18N.message("appliedrightsondoc"), null);
+						refresh(document);
+					}
+				});
+			}
+		});
+
 	}
 }

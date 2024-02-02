@@ -14,6 +14,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
+import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 
 /**
@@ -690,7 +691,6 @@ public interface DocumentService extends RemoteService {
 	 */
 	public GUIDocument merge(Long[] docIds, long targetFolderId, String fileName) throws ServerException;
 
-
 	/**
 	 * Counts the pages of a document and updates the DB.
 	 * 
@@ -701,6 +701,30 @@ public interface DocumentService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public int updatePages(long docId) throws ServerException;
+
+	/**
+	 * Gets the shared permissions on a set of documents in regards of the
+	 * current user
+	 */
+	public GUIRight getEnabledPermissions(Long[] docIds) throws ServerException;
+
+	/**
+	 * Applies all security settings to document
+	 * 
+	 * @param document The document that will contain the new security settings
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void applySecurity(GUIDocument document) throws ServerException;
+
+	/**
+	 * Applies all security settings from the folder to the document
+	 * 
+	 * @param document The document that will contain the new security settings
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void applyParentFolderSecurity(long docId) throws ServerException;
 
 	public static class Instance {
 		private static DocumentServiceAsync inst;

@@ -1233,7 +1233,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Folder folder = dao.findById(1200);
 		Assert.assertNull(folder.getSecurityRef());
 
-		dao.applyRightToTree(1200L, transaction);
+		dao.applySecurityToTree(1200L, transaction);
 
 		folder = dao.findById(1201);
 		Assert.assertEquals(1200L, folder.getSecurityRef().longValue());
@@ -1245,7 +1245,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		dao.initialize(folder);
 		folder.setSecurityRef(5L);
 		dao.store(folder);
-		dao.applyRightToTree(1200L, transaction);
+		dao.applySecurityToTree(1200L, transaction);
 
 		folder = dao.findById(1201);
 		Assert.assertEquals(5L, folder.getSecurityRef().longValue());
@@ -1289,7 +1289,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// The root defines it's own policies
 		Folder folder = dao.findById(1200);
 		Assert.assertNull(folder.getSecurityRef());
-		dao.applyRightToTree(1200, transaction);
+		dao.applySecurityToTree(1200, transaction);
 
 		folder = dao.findById(1201);
 		Assert.assertEquals(1200L, folder.getSecurityRef().longValue());

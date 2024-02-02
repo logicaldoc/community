@@ -1,5 +1,10 @@
 package com.logicaldoc.core.document;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.hibernate.LazyInitializationException;
+
 /**
  * Basic concrete implementation of <code>AbstractDocument</code>
  * 
@@ -9,9 +14,11 @@ package com.logicaldoc.core.document;
 public class Document extends AbstractDocument {
 	private static final long serialVersionUID = 1L;
 
+	private Set<DocumentGroup> documentGroups = new HashSet<>();
+
 	public Document() {
 	}
-	
+
 	public Document(Document source) {
 		copyAttributes(source);
 		setId(source.getId());
@@ -22,9 +29,26 @@ public class Document extends AbstractDocument {
 		setTemplate(source.getTemplate());
 		setTemplateId(source.getTemplateId());
 		setTemplateName(source.getTemplateName());
-		
+
 		if (source.getIndexed() != INDEX_INDEXED)
 			setIndexed(source.getIndexed());
 		setCustomId(null);
+
+		try {
+			setDocumentGroups(new HashSet<>());
+			for (DocumentGroup dg : source.getDocumentGroups()) {
+				getDocumentGroups().add(new DocumentGroup(dg));
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+	}
+
+	public Set<DocumentGroup> getDocumentGroups() {
+		return documentGroups;
+	}
+
+	public void setDocumentGroups(Set<DocumentGroup> documentGroups) {
+		this.documentGroups = documentGroups;
 	}
 }

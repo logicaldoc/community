@@ -235,6 +235,18 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 */
 	public boolean isWriteEnabled(long folderId, long userId) throws PersistenceException;
 
+	/**
+	 * Checks that the user has write access to the folder and all its sub-items
+	 * 
+	 * @param folder the folder
+	 * @param userId identifier of the document
+	 * 
+	 * @return if the user has write permission
+	 * 
+	 * @throws PersistenceException error at data layer 
+	 */
+	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException;
+	
 	public boolean isReadEnabled(long folderId, long userId) throws PersistenceException;
 
 	public boolean isPrintEnabled(long folderId, long userId) throws PersistenceException;
@@ -282,18 +294,6 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @throws PersistenceException error at data layer  
 	 */
 	public List<Long> findIdByUserId(long userId, long parentId) throws PersistenceException;
-
-	/**
-	 * Checks that the user has access to the folder and all its sub-items
-	 * 
-	 * @param folder the folder
-	 * @param userId identifier of the document
-	 * 
-	 * @return if the user has write permission
-	 * 
-	 * @throws PersistenceException error at data layer 
-	 */
-	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException;
 
 	/**
 	 * Finds all folders accessible by the passed group
@@ -658,7 +658,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public void applyRightToTree(long rootId, FolderHistory transaction) throws PersistenceException;
+	public void applySecurityToTree(long rootId, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Propagates the grid layout of a node to the whole sub-tree

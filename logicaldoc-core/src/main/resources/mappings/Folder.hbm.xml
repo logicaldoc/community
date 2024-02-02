@@ -45,6 +45,7 @@
 			<key column="ld_folderid" />
 			<composite-element class="com.logicaldoc.core.folder.FolderGroup">
 				<property name="groupId" type="long" column="ld_groupid" not-null="true" />
+				<property name="read" type="int" column="ld_read" not-null="true" />
 				<property name="write" type="int" column="ld_write" not-null="true" />
 				<property name="add" type="int" column="ld_add" not-null="true" />
 				<property name="security" type="int" column="ld_security" not-null="true" />

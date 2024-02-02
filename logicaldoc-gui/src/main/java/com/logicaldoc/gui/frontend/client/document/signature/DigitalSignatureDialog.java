@@ -104,9 +104,8 @@ public class DigitalSignatureDialog extends Window {
 			return;
 
 		if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
-			VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(docIds,
-					vm.getValueAsString(REASON));
-			dialog.show();
+			new VisualPositioningDigitalSignatureDialog(docIds,
+					vm.getValueAsString(REASON)).show();
 			destroy();
 		} else {
 			destroy();

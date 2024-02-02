@@ -55,6 +55,8 @@ public final class Constants {
 	public static final String PERMISSION_SECURITY = "security";
 
 	public static final String PERMISSION_WRITE = "write";
+	
+	public static final String PERMISSION_READ = "read";
 
 	public static final String PERMISSION_ADD = "add";
 

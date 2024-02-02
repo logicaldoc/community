@@ -29,7 +29,10 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	private String name;
 
-	private String[] permissions = new String[] {};
+	/**
+	 * Permissions allowed to the current user on this folder
+	 */
+	private GUIRight allowedPermissions = new GUIRight();
 
 	private GUIRight[] rights = new GUIRight[] {};
 
@@ -125,41 +128,36 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.id = id;
 	}
 
-	public String[] getPermissions() {
-		return permissions;
+	public GUIRight getAllowedPermissions() {
+		return allowedPermissions;
 	}
 
-	public void setPermissions(String[] permissions) {
-		this.permissions = permissions;
+	public void setAllowedPermissions(GUIRight permissions) {
+		this.allowedPermissions = permissions;
 	}
 
 	public boolean isWrite() {
-		return hasPermission(Constants.PERMISSION_WRITE);
+		return allowedPermissions.isWrite();
 	}
 
 	public boolean isDownload() {
-		return hasPermission(Constants.PERMISSION_DOWNLOAD);
+		return allowedPermissions.isDownload();
 	}
 
 	public boolean isMove() {
-		return hasPermission(Constants.PERMISSION_MOVE);
+		return allowedPermissions.isMove();
 	}
 
 	public boolean isDelete() {
-		return hasPermission(Constants.PERMISSION_DELETE);
+		return allowedPermissions.isDelete();
 	}
 
 	public boolean isRename() {
-		return hasPermission(Constants.PERMISSION_RENAME);
+		return allowedPermissions.isRename();
 	}
 
 	public boolean hasPermission(String permission) {
-		if (permissions == null)
-			return false;
-		for (String p : permissions)
-			if (p.equals(permission))
-				return true;
-		return false;
+		return allowedPermissions.isPermissionAllowed(permission);
 	}
 
 	public String getDescription() {

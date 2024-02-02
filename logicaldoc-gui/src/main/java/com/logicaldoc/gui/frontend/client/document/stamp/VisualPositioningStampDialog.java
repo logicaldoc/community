@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.frontend.client.document.stamp;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -18,7 +20,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ImageCropper;
-import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.HeaderControls;
@@ -53,12 +54,12 @@ public class VisualPositioningStampDialog extends Window {
 
 	private RadioGroupItem pageOption;
 
-	private DocumentsGrid sourceGrid;
-
 	private ImageCropper cropper;
 
-	public VisualPositioningStampDialog(DocumentsGrid sourceGrid, GUIStamp stamp) {
-		this.sourceGrid = sourceGrid;
+	private GUIDocument[] documents;
+
+	public VisualPositioningStampDialog(GUIDocument[] documents, GUIStamp stamp) {
+		this.documents = documents;
 		this.stamp = stamp;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -83,7 +84,7 @@ public class VisualPositioningStampDialog extends Window {
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					firstSelectedDoc = sourceGrid.getSelectedDocument();
+					firstSelectedDoc = documents[0];
 
 					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new AsyncCallback<GUIDocument>() {
 
@@ -117,8 +118,8 @@ public class VisualPositioningStampDialog extends Window {
 	}
 
 	private String getPageUrl(int page) {
-		return Util.contextPath() + "convertjpg?docId=" + sourceGrid.getSelectedDocument().getId() + "&page=" + page
-				+ "&random=" + new Date().getTime();
+		return Util.contextPath() + "convertjpg?docId=" + documents[0].getId() + "&page=" + page + "&random="
+				+ new Date().getTime();
 	}
 
 	public void onApply() {
@@ -129,8 +130,7 @@ public class VisualPositioningStampDialog extends Window {
 		stamp.setExprY("$PAGE_HEIGHT * "
 				+ (1 - ((double) cropper.getSelectionYCoordinate() / (double) cropper.getImageHeight())));
 		stamp.setExprW("$PAGE_WIDTH * " + (double) cropper.getSelectionWidth() / (double) cropper.getImageWidth());
-		stamp.setExprH(
-				"$PAGE_HEIGHT * " + ((double) cropper.getSelectionHeight() / (double) cropper.getImageHeight()));
+		stamp.setExprH("$PAGE_HEIGHT * " + ((double) cropper.getSelectionHeight() / (double) cropper.getImageHeight()));
 
 		if (("01" + CURRENTPAGE).equals(pageOption.getValue())) {
 			stamp.setPageOption(GUIStamp.PAGE_OPT_SEL);
@@ -142,37 +142,37 @@ public class VisualPositioningStampDialog extends Window {
 
 		LD.contactingServer();
 
-		StampService.Instance.get().applyStamp(sourceGrid.getSelectedIds(), stamp, new AsyncCallback<Void>() {
+		StampService.Instance.get().applyStamp(
+				Arrays.asList(documents).stream().map(d -> d.getId()).collect(Collectors.toList()).toArray(new Long[0]),
+				stamp, new AsyncCallback<Void>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						GuiLog.serverError(caught);
+					}
 
-			@Override
-			public void onSuccess(Void result) {
-				LD.clearPrompt();
-				GuiLog.info(I18N.message("event.stamped"), null);
-				GUIDocument[] docs = sourceGrid.getSelectedDocuments();
-				for (GUIDocument doc : docs) {
-					DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<GUIDocument>() {
+					@Override
+					public void onSuccess(Void result) {
+						LD.clearPrompt();
+						GuiLog.info(I18N.message("event.stamped"), null);
+						for (GUIDocument doc : documents) {
+							DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<GUIDocument>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(GUIDocument document) {
+									DocumentController.get().modified(document);
+								}
+							});
 						}
-
-						@Override
-						public void onSuccess(GUIDocument document) {
-							sourceGrid.updateDocument(document);
-							DocumentController.get().modified(document);
-						}
-					});
-				}
-				destroy();
-			}
-		});
+						destroy();
+					}
+				});
 	}
 
 	private void initGUI() {

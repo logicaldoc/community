@@ -1,5 +1,8 @@
 package com.logicaldoc.core.document.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -32,6 +35,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.lock.LockManager;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -754,5 +758,33 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(2, dao.queryForInt("select count(*) from ld_uniquetag"));
 		dao.cleanUnexistingUniqueTagsOneByOne();
 		Assert.assertEquals(0, dao.queryForInt("select count(*) from ld_uniquetag"));
+	}
+
+	@Test
+	public void getEnabledPermissions() throws PersistenceException {
+		assertTrue(dao.isReadEnabled(7L, 3L));
+		assertTrue(dao.isWriteEnabled(7L, 3L));
+		assertTrue(dao.isPrintEnabled(7L, 3L));
+
+		assertTrue(dao.getEnabledPermissions(7L, 3L).contains(Permission.SECURITY));
+		assertTrue(!dao.getEnabledPermissions(7L, 2L).contains(Permission.SECURITY));
+	}
+
+	@Test
+	public void testApplyParentFolderSecurity() throws PersistenceException {
+		Document doc = dao.findById(1L);
+		dao.initialize(doc);
+		assertTrue(doc.getDocumentGroups().isEmpty());
+
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUserId(1L);
+		transaction.setUsername("admin");
+		dao.applyParentFolderSecurity(1L, transaction);
+
+		doc = dao.findById(1L);
+		dao.initialize(doc);
+		folderDao.initialize(doc.getFolder());
+		assertTrue(!doc.getDocumentGroups().isEmpty());
+		assertEquals(doc.getFolder().getFolderGroups().size(), doc.getDocumentGroups().size());
 	}
 }

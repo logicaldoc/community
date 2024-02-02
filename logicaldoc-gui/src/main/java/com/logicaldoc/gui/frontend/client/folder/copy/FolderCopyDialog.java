@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder.copy;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -128,7 +129,7 @@ public class FolderCopyDialog extends Dialog {
 			@Override
 			public void onSuccess(GUIFolder sourceFolder) {
 				sourceFolder.setName(form.getValueAsString("name"));
-				sourceFolder.setPermissions(new String[] { "read", "write" });
+				sourceFolder.setAllowedPermissions(new GUIRight(GUIRight.PERMISSION_READ, GUIRight.PERMISSION_WRITE));
 
 				FolderCopyDetailsDialog dialog = new FolderCopyDetailsDialog(sourceFolder, tagetFolderId,
 						form.getValueAsString(SECURITY), "true".equals(form.getValueAsString(FOLDERS_ONLY)));

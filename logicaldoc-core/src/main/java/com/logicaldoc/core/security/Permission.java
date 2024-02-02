@@ -10,23 +10,23 @@ import java.util.Set;
  * Models a permission, that is the ability to do something <br>
  * 
  * <ul>
- * <li>READ: ability to read the folder and its documents</li>
- * <li>WRITE: ability to insert and delete folder's documents</li>
+ * <li>READ: ability to read</li>
+ * <li>WRITE: ability to modify</li>
  * <li>ADD: ability to add child elements</li>
  * <li>SECURITY: ability to change security rules</li>
  * <li>IMMUTABILE: ability to mark a document as immutable</li>
- * <li>DELETE: ability to delete the entity</li>
- * <li>RENAME: ability to rename the entity</li>
- * <li>IMPORT: ability to import documents</li>
- * <li>EXPORT: ability to export documents</li>
- * <li>SIGN: ability to digitally sign documents</li>
- * <li>ARCHIVE: ability to archive documents</li>
+ * <li>DELETE: ability to delete</li>
+ * <li>RENAME: ability to rename</li>
+ * <li>IMPORT: ability to import</li>
+ * <li>EXPORT: ability to export</li>
+ * <li>SIGN: ability to digitally sign</li>
+ * <li>ARCHIVE: ability to archive</li>
  * <li>WORKFLOW: ability to handle workflow</li>
  * <li>CALENDAR: ability to handle calendar events</li>
  * <li>SUBSCRIPTION: ability to handle events subscription</li>
  * <li>PRINT: ability to print</li>
- * <li>PASSWORD: ability to put a password in a document</li>
- * <li>MOVE: ability to move documents</li>
+ * <li>PASSWORD: ability to put a password</li>
+ * <li>MOVE: ability to move</li>
  * <li>EMAIL: ability to send emails</li>
  * <li>AUTOMATION: ability to handle the automation</li>
  * <li>STORAGE: ability to handle the storage</li>

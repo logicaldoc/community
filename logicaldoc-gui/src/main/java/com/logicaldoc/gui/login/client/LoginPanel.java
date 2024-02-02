@@ -486,6 +486,9 @@ public class LoginPanel extends VLayout {
 	}
 
 	protected void onSignin() {
+		// Reset any reference to past sessions
+		CookiesManager.removeLogin();
+
 		lockInput();
 
 		if (!credentialsForm.validate()) {

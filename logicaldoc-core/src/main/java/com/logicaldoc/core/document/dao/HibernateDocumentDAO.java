@@ -2,8 +2,10 @@ package com.logicaldoc.core.document.dao;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -51,6 +54,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.Group;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -838,6 +842,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		if (doc.getTags() != null)
 			log.trace("Initialized {} tags", doc.getTags().size());
+
+		if (doc.getDocumentGroups() != null)
+			log.trace("Initialized {} document groups", doc.getDocumentGroups().size());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1387,5 +1394,163 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		return query(digestQuery.toString(), (rs, rowNum) -> rs.getString(1), null);
 
+	}
+
+	@Override
+	public boolean isPrintEnabled(long id, long userId) throws PersistenceException {
+		return isPermissionEnabled(Permission.PRINT, id, userId);
+	}
+
+	@Override
+	public boolean isWriteEnabled(long id, long userId) throws PersistenceException {
+		return isPermissionEnabled(Permission.WRITE, id, userId);
+	}
+
+	@Override
+	public boolean isDownloadEnabled(long id, long userId) throws PersistenceException {
+		return isPermissionEnabled(Permission.DOWNLOAD, id, userId);
+	}
+
+	@Override
+	public boolean isMoveEnabled(long id, long userId) throws PersistenceException {
+		return isPermissionEnabled(Permission.MOVE, id, userId);
+	}
+
+	@Override
+	public boolean isReadEnabled(long docId, long userId) throws PersistenceException {
+		return isPermissionEnabled(Permission.READ, docId, userId);
+	}
+
+	@Override
+	public boolean isPermissionEnabled(Permission permission, long documentId, long userId)
+			throws PersistenceException {
+		Set<Permission> permissions = getEnabledPermissions(documentId, userId);
+		return permissions.contains(permission);
+	}
+
+	private User getExistingtUser(long userId) throws PersistenceException {
+		User user = userDAO.findById(userId);
+		if (user == null)
+			throw new PersistenceException("Unexisting user " + userId);
+		return user;
+	}
+
+	@Override
+	public Set<Permission> getEnabledPermissions(long docId, long userId) throws PersistenceException {
+		User user = getExistingtUser(userId);
+
+		// If the user is an administrator bypass all controls
+		if (user.isMemberOf(Group.GROUP_ADMIN)) {
+			return Permission.all();
+		}
+
+		Set<Permission> permissions = new HashSet<>();
+
+		boolean overridesFolderPermissions = queryForLong(
+				"select count(*) from ld_documentgroup where ld_docid = " + docId) > 0;
+		if (overridesFolderPermissions) {
+			Set<Group> userGroups = user.getGroups();
+			if (userGroups.isEmpty())
+				return permissions;
+
+			StringBuilder query = new StringBuilder(
+					"""
+							select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE,
+							ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,
+							ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
+							ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_readingreq LDREADINGREQ
+							from ld_documentgroup where
+							ld_docid=
+							""");
+			query.append(Long.toString(docId));
+			query.append(" and ld_groupid in (");
+			query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+			query.append(")");
+
+			Map<String, Permission> permissionColumn = new HashMap<>();
+			permissionColumn.put("LDDELETE", Permission.DELETE);
+			permissionColumn.put("LDIMMUTABLE", Permission.IMMUTABLE);
+			permissionColumn.put("LDSECURITY", Permission.SECURITY);
+			permissionColumn.put("LDRENAME", Permission.RENAME);
+			permissionColumn.put("LDWRITE", Permission.WRITE);
+			permissionColumn.put("LDREAD", Permission.READ);
+			permissionColumn.put("LDSIGN", Permission.SIGN);
+			permissionColumn.put("LDARCHIVE", Permission.ARCHIVE);
+			permissionColumn.put("LDWORKFLOW", Permission.WORKFLOW);
+			permissionColumn.put("LDDOWNLOAD", Permission.DOWNLOAD);
+			permissionColumn.put("LDCALENDAR", Permission.CALENDAR);
+			permissionColumn.put("LDSUBSCRIPTION", Permission.SUBSCRIPTION);
+			permissionColumn.put("LDPRINT", Permission.PRINT);
+			permissionColumn.put("LDPASSWORD", Permission.PASSWORD);
+			permissionColumn.put("LDMOVE", Permission.MOVE);
+			permissionColumn.put("LDEMAIL", Permission.EMAIL);
+			permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
+			permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
+
+			/**
+			 * IMPORTANT: the connection MUST be explicitly closed, otherwise it
+			 * is probable that the connection pool will leave open it
+			 * indefinitely.
+			 */
+			try (Connection con = getConnection();
+					Statement stmt = con.createStatement();
+					ResultSet rs = stmt.executeQuery(query.toString())) {
+				while (rs.next()) {
+					for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
+						String column = entry.getKey();
+						Permission permission = entry.getValue();
+						if (rs.getInt(column) == 1)
+							permissions.add(permission);
+					}
+				}
+			} catch (SQLException se) {
+				throw new PersistenceException(se.getMessage(), se);
+			}
+		} else {
+			// The document does not specify its own permissions so use the
+			// folder's ones
+			long folderId = queryForLong("select ld_folderid from ld_document where ld_id = " + docId);
+			permissions = folderDAO.getEnabledPermissions(folderId, userId);
+		}
+
+		return permissions;
+	}
+
+	@Override
+	public void applyParentFolderSecurity(long docId, DocumentHistory transaction) throws PersistenceException {
+
+		// Get the folder that owns the security policies
+		Folder folder = folderDAO.findById(queryForLong("select ld_folderid from ld_document where ld_id=" + docId));
+		while (folder.getSecurityRef() != null)
+			folder = folderDAO.findById(folder.getSecurityRef());
+
+		int count = jdbcUpdate("delete from ld_documentgroup where ld_docid=" + docId);
+		log.debug("Removed {} security policies of document {}", count, docId);
+
+		StringBuilder update = new StringBuilder("""
+				 insert into ld_documentgroup(ld_docId,ld_groupid,ld_read,ld_write,ld_security,
+				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
+				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
+				                              ld_print,ld_password,ld_move,ld_email,ld_automation,
+				                              ld_readingreq)
+				""");
+		update.append(" select ");
+		update.append(Long.toString(docId));
+		update.append("""
+				,ld_groupid,ld_read,ld_write,ld_security,
+				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
+				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
+				                              ld_print,ld_password,ld_move,ld_email,ld_automation,
+				                              ld_readingreq from ld_foldergroup where ld_folderid=
+				""");
+		update.append(Long.toString(folder.getId()));
+		count = jdbcUpdate(update.toString());
+		log.debug("Copied {} security policies of folder {} into document {}", count, folder.getId(), docId);
+
+		if (transaction != null) {
+			transaction.setEvent(DocumentEvent.PERMISSION.toString());
+			Document document = findById(docId);
+			saveDocumentHistory(document, transaction);
+		}
 	}
 }

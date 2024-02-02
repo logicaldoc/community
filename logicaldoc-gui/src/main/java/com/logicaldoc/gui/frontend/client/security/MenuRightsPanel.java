@@ -70,7 +70,7 @@ public class MenuRightsPanel extends VLayout {
 		rightsGrid.setCanFreezeFields(true);
 		rightsGrid.setSelectionType(SelectionStyle.MULTIPLE);
 		rightsGrid.setAutoFetchData(true);
-		rightsGrid.setDataSource(new RightsDS(menu.getId(), false));
+		rightsGrid.setDataSource(new RightsDS(menu.getId(), "menu"));
 		rightsGrid.setFields(entityId, entity);
 		rightsGrid.setCanEdit(true);
 		rightsGrid.setEditEvent(ListGridEditEvent.CLICK);

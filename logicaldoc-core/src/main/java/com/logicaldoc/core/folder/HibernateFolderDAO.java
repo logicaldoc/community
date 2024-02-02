@@ -513,7 +513,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return false;
 
 		StringBuilder query = new StringBuilder(
-				"select distinct(ld_folderid) from ld_foldergroup where ld_groupid in (");
+				"select distinct(ld_folderid) from ld_foldergroup where ld_read=1 and ld_groupid in (");
 		query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 		query.append(") and ld_folderid=" + id);
 
@@ -596,8 +596,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (!precoll.isEmpty()) {
 			StringBuilder query1 = new StringBuilder(
 					"select distinct(A.ld_folderid) from ld_foldergroup A, ld_folder B "
-							+ " where B.ld_deleted=0 and A.ld_folderid=B.ld_id AND (B.ld_parentid=" + parentId
-							+ " OR B.ld_id=" + parentId + ")" + AND_LDGROUPID_IN);
+							+ " where B.ld_deleted=0 and A.ld_folderid=B.ld_id AND A.ld_read=1 and (B.ld_parentid="
+							+ parentId + " OR B.ld_id=" + parentId + ")" + AND_LDGROUPID_IN);
 			boolean first = true;
 			while (iter.hasNext()) {
 				if (!first)
@@ -903,9 +903,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		User user = getExistingtUser(userId);
 
 		// If the user is an administrator bypass all controls
-		if (user.isMemberOf(Group.GROUP_ADMIN)) {
+		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return Permission.all();
-		}
 
 		Set<Group> userGroups = user.getGroups();
 		if (userGroups.isEmpty())
@@ -921,11 +920,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		StringBuilder query = new StringBuilder(
-				"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION, A.ld_storage LDSTORAGE, A.ld_readingreq LDREADINGREQ");
-		query.append(" from ld_foldergroup A");
+				"select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_storage LDSTORAGE, ld_readingreq LDREADINGREQ");
+		query.append(" from ld_foldergroup ");
 		query.append(WHERE);
-		query.append(" A.ld_folderid=" + id);
-		query.append(AND_LDGROUPID_IN);
+		query.append(" ld_folderid=" + id);
+		query.append(" and ld_groupid in (");
 		query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query.append(")");
 
@@ -938,6 +937,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		permissionColumn.put("LDSECURITY", Permission.SECURITY);
 		permissionColumn.put("LDRENAME", Permission.RENAME);
 		permissionColumn.put("LDWRITE", Permission.WRITE);
+		permissionColumn.put("LDREAD", Permission.READ);
 		permissionColumn.put("LDSIGN", Permission.SIGN);
 		permissionColumn.put("LDARCHIVE", Permission.ARCHIVE);
 		permissionColumn.put("LDWORKFLOW", Permission.WORKFLOW);
@@ -960,7 +960,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				Statement stmt = con.createStatement();
 				ResultSet rs = stmt.executeQuery(query.toString())) {
 			while (rs.next()) {
-				permissions.add(Permission.READ);
 				for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
 					String column = entry.getKey();
 					Permission permission = entry.getValue();
@@ -996,7 +995,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * restrict to the tree since a folder in the tree can reference another
 		 * folder outside.
 		 */
-		StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A where 1=1 ");
+		StringBuilder query1 = new StringBuilder(
+				"select distinct(A.ld_folderid) from ld_foldergroup A where A.ld_read=1 ");
 
 		List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).toList();
 		if (!groupIds.isEmpty()) {
@@ -1091,7 +1091,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * restrict to the tree since a folder in the tree can reference another
 		 * folder outside.
 		 */
-		StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A where 1=1 ");
+		StringBuilder query1 = new StringBuilder(
+				"select distinct(A.ld_folderid) from ld_foldergroup A where A.ld_read=1 ");
 		if (permission != Permission.READ)
 			query1.append(" and A.ld_" + permission.getName() + "=1 ");
 
@@ -1254,7 +1255,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public void applyRightToTree(long rootId, FolderHistory transaction) throws PersistenceException {
+	public void applySecurityToTree(long rootId, FolderHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
 		if (transaction.getSessionId() == null)
 			throw new PersistenceException("No session specified in transaction");
@@ -1563,7 +1564,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internalCopy(Folder source, Folder target, String newName, boolean foldersOnly,
 			String securityOption, FolderHistory transaction) throws PersistenceException {
-		target = internatlCopyValidation(source, target, securityOption, transaction);
+		target = internalCopyValidation(source, target, securityOption, transaction);
 
 		// Create the same folder in the target
 		Folder newFolder = null;
@@ -1629,7 +1630,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return newFolder;
 	}
 
-	private Folder internatlCopyValidation(Folder source, Folder target, String securityOption,
+	private Folder internalCopyValidation(Folder source, Folder target, String securityOption,
 			FolderHistory transaction) throws PersistenceException {
 		if (!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
 			throw new IllegalArgumentException("Invalid security option " + securityOption);

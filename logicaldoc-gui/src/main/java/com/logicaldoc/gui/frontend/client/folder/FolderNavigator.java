@@ -534,7 +534,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		MenuItem move = new MenuItem();
 		move.setTitle(I18N.message("move"));
 		move.addClickHandler(event -> new MoveDialog().show());
-		move.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
+		move.setEnabled(folder.hasPermission(Constants.PERMISSION_MOVE) && !folder.isDefaultWorkspace()
 				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
 		return move;
 	}

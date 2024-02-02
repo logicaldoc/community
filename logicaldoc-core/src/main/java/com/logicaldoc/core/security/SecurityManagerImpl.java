@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.dao.GroupDAO;
@@ -28,19 +27,19 @@ public class SecurityManagerImpl implements SecurityManager {
 
 	protected static Logger log = LoggerFactory.getLogger(SecurityManagerImpl.class);
 
-	@Resource(name="UserDAO")
+	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
 
-	@Resource(name="GroupDAO")
+	@Resource(name = "GroupDAO")
 	protected GroupDAO groupDAO;
 
-	@Resource(name="MenuDAO")
+	@Resource(name = "MenuDAO")
 	protected MenuDAO menuDAO;
 
-	@Resource(name="FolderDAO")
+	@Resource(name = "FolderDAO")
 	protected FolderDAO folderDAO;
 
-	@Resource(name="DocumentDAO")
+	@Resource(name = "DocumentDAO")
 	protected DocumentDAO documentDAO;
 
 	private SecurityManagerImpl() {
@@ -110,86 +109,32 @@ public class SecurityManagerImpl implements SecurityManager {
 
 	@Override
 	public boolean isWriteEnabled(long docId, long userId) throws PersistenceException {
-		Document doc = null;
-		try {
-			doc = documentDAO.findById(docId, true);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		if (doc == null)
-			return false;
-		else
-			return folderDAO.isWriteEnabled(doc.getFolder().getId(), userId);
+		return documentDAO.isWriteEnabled(docId, userId);
 	}
 
 	@Override
 	public boolean isReadEnabled(long docId, long userId) throws PersistenceException {
-		Document doc = null;
-		try {
-			doc = documentDAO.findById(docId, true);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		if (doc == null)
-			return false;
-		else
-			return folderDAO.isReadEnabled(doc.getFolder().getId(), userId);
+		return documentDAO.isReadEnabled(docId, userId);
 	}
 
 	@Override
 	public boolean isPrintEnabled(long docId, long userId) throws PersistenceException {
-		Document doc = null;
-		try {
-			doc = documentDAO.findById(docId, true);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		if (doc == null)
-			return false;
-		else
-			return folderDAO.isPrintEnabled(doc.getFolder().getId(), userId);
+		return documentDAO.isPrintEnabled(docId, userId);
 	}
 
 	@Override
 	public boolean isDownloadEnabled(long docId, long userId) throws PersistenceException {
-		Document doc = null;
-		try {
-			doc = documentDAO.findById(docId, true);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		if (doc == null)
-			return false;
-		else
-			return folderDAO.isDownloadEnabled(doc.getFolder().getId(), userId);
+		return documentDAO.isDownloadEnabled(docId, userId);
 	}
 
 	@Override
 	public boolean isPermissionEnabled(Permission permission, long docId, long userId) throws PersistenceException {
-		Document doc = null;
-		try {
-			doc = documentDAO.findById(docId, true);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		if (doc == null)
-			return false;
-		else
-			return folderDAO.isPermissionEnabled(permission, doc.getFolder().getId(), userId);
+		return documentDAO.isPermissionEnabled(permission, docId, userId);
 	}
 
 	@Override
 	public Set<Permission> getEnabledPermissions(long docId, long userId) throws PersistenceException {
-		Document doc = null;
-		try {
-			doc = documentDAO.findById(docId, true);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		if (doc == null)
-			return new HashSet<>();
-		else
-			return folderDAO.getEnabledPermissions(doc.getFolder().getId(), userId);
+		return documentDAO.getEnabledPermissions(docId, userId);
 	}
 
 	public void setFolderDAO(FolderDAO folderDAO) {

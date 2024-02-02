@@ -53,7 +53,8 @@ public enum DocumentEvent {
 	FORM_SUBMITTED("event.form.submitted"),
 	FORM_EDITED("event.form.edited"),
 	READING_CONFIRMED("event.reading.confirmed"),
-	READING_REQUESTRED("event.reading.requested");
+	READING_REQUESTRED("event.reading.requested"),
+	PERMISSION("event.permission");
 	
     private String event;
 

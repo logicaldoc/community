@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 import com.logicaldoc.gui.common.client.controllers.ReadingRequestController;
@@ -19,7 +18,6 @@ import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.MessageLabel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.gui.frontend.client.services.ReadingRequestService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ContentsType;
@@ -126,22 +124,21 @@ public class PreviewPanel extends VLayout {
 		} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
 			reloadMail();
 		} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-			FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-					new AsyncCallback<GUIFolder>() {
+			DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(GUIFolder folder) {
-							if (folder.isDownload())
-								reloadDICOM();
-							else
-								reloadPreview();
-						}
-					});
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					if (doc.isDownload())
+						reloadDICOM();
+					else
+						reloadPreview();
+				}
+			});
 		} else {
 			reloadPreview();
 		}
@@ -165,7 +162,8 @@ public class PreviewPanel extends VLayout {
 			media = null;
 			mail = null;
 			reload = null;
-		} else if (!redrawing && (!isWithinTolerance(width, getWidth(),10) || !isWithinTolerance(height, getHeight(),10))) {
+		} else if (!redrawing
+				&& (!isWithinTolerance(width, getWidth(), 10) || !isWithinTolerance(height, getHeight(), 10))) {
 			width = getWidth();
 			height = getHeight();
 			clearContent();

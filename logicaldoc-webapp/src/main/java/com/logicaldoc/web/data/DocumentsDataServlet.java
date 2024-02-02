@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -291,7 +292,6 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private void findDocumentsByIds(HttpServletRequest request, Session session, List<Document> documentsInCurrentPage)
 			throws PersistenceException {
-		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		String[] idsArray = request.getParameter("docIds").split(",");
@@ -302,8 +302,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			} catch (Exception t) {
 				// Nothing to do
 			}
-			if ((doc == null || doc.getDeleted() == 1)
-					|| (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId())))
+			if (doc == null || doc.getDeleted() == 1 || !dao.isReadEnabled(Long.parseLong(id), session.getUserId()))
 				continue;
 			documentsInCurrentPage.add(doc);
 		}
@@ -311,7 +310,6 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private void findDocumentsByStatus(Session session, int maxRecords, int page, Integer status,
 			List<Document> documentsInCurrentPage) throws PersistenceException {
-		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		List<Document> docs = dao.findByLockUserAndStatus(session.getUserId(), status);
@@ -319,7 +317,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		int end = Math.min(begin + maxRecords - 1, docs.size() - 1);
 		for (int i = begin; i <= end; i++) {
 			Document doc = docs.get(i);
-			if (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId()))
+			if (!dao.isReadEnabled(doc.getId(), session.getUserId()))
 				continue;
 			documentsInCurrentPage.add(doc);
 		}
@@ -332,8 +330,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		Context context = Context.get();
 		UserDAO udao = (UserDAO) context.getBean(UserDAO.class);
-		User user = udao.findById(session.getUserId());
-		udao.initialize(user);
+		User sessionUser = udao.findById(session.getUserId());
+		udao.initialize(sessionUser);
 
 		String sort = request.getParameter("sort");
 
@@ -355,8 +353,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		/*
 		 * Execute the Query
 		 */
-		List<Document> documents = exeucuteQuey(request, extendedAttributes, extendedAttributesValues, user, folderId,
-				formId, filename);
+		List<Document> documents = exeucuteQuey(request, extendedAttributes, extendedAttributesValues, sessionUser,
+				folderId, formId, filename);
 
 		// If a sorting is specified sort the collection of documents
 		sortDocuments(documents, sort);
@@ -371,16 +369,35 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 	private List<Document> exeucuteQuey(HttpServletRequest request, List<String> extendedAttributes,
 			final Map<String, Object> extendedAttributesValues, User user, Long folderId, Long formId, String filename)
 			throws PersistenceException {
+
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		StringBuilder query = new StringBuilder(
-				"select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher,"
-						+ " A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,"
-						+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
-						+ " A.startPublishing, A.stopPublishing, A.published, A.extResId,"
-						+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages, "
-						+ " A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId from Document as A left outer join A.template as B ");
-		query.append(" where A.deleted = 0 and not A.status=" + AbstractDocument.DOC_ARCHIVED);
-		if (folderId != null)
+				"""
+								select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher,
+								       A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,
+								       A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,
+								       A.startPublishing, A.stopPublishing, A.published, A.extResId,
+								       B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages,
+								       A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId,
+								       A.publisherId, A.color, A.folder.id, A.tenantId
+								  from Document as A
+								  left outer join A.template as B
+						         where A.deleted = 0
+						           and not A.status=
+						""");
+		query.append(AbstractDocument.DOC_ARCHIVED);
+		
+		if (folderId != null) {
 			query.append(" and A.folder.id=" + folderId);
+			
+			List<Long> forbiddenDocIds = getForbiddenDocumentIds(user, folderId);
+			if (!forbiddenDocIds.isEmpty()) {
+				query.append(" and A.id not in(");
+				query.append(forbiddenDocIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
+				query.append(") ");
+			}
+		}
+
 		if (formId != null)
 			query.append(" and A.formId=" + Long.toString(formId));
 		if (StringUtils.isNotEmpty(request.getParameter(INDEXED)))
@@ -392,13 +409,47 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			params.put("fileName", "%" + filename.toLowerCase() + "%");
 		}
 
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Object> records = new ArrayList<>();
 		if (folderId != null || filename != null || formId != null
 				|| StringUtils.isNotEmpty(request.getParameter(INDEXED)))
-			records = docDao.findByQuery(query.toString(), params, null);
+			records = dao.findByQuery(query.toString(), params, null);
 
 		return enrichRecords(records, extendedAttributes, extendedAttributesValues, user);
+	}
+
+	/**
+	 * Identifies those documents in the current folder where there is at least
+	 * one read revocation in regards to one of the user's groups
+	 * 
+	 * @param user the current user
+	 * @param folderId identifier of the folder
+	 * @return the list of forbidden Ids
+	 * 
+	 * @throws PersistenceException Error in the data layer
+	 */
+	private List<Long> getForbiddenDocumentIds(User user, long folderId) throws PersistenceException {
+		if (user.isMemberOf("admin"))
+			return new ArrayList<>();
+
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		String groupIdsString = user.getGroups().stream().map(g -> Long.toString(g.getId()))
+				.collect(Collectors.joining(","));
+
+		StringBuilder forbiddenDocsQuery = new StringBuilder("""
+							select ld_docid
+						      from ld_documentgroup, ld_document
+				             where ld_docid=ld_id
+				               and ld_deleted = 0
+				               and ld_read = 0
+				               and ld_groupId in(
+				""");
+		forbiddenDocsQuery.append(groupIdsString);
+		forbiddenDocsQuery.append(") and ld_folderid = ");
+		forbiddenDocsQuery.append(Long.toString(folderId));
+
+		@SuppressWarnings("unchecked")
+		List<Long> forbiddenDocIds = (List<Long>) docDao.queryForList(forbiddenDocsQuery.toString(), Long.class);
+		return forbiddenDocIds;
 	}
 
 	private List<Document> enrichRecords(List<Object> records, List<String> extendedAttributes,

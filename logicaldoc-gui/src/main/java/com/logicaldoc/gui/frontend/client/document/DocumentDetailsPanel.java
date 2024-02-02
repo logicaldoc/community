@@ -66,6 +66,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected Layout captureTabPanel;
 
+	protected Layout securityTabPanel;
+
 	protected StandardPropertiesPanel propertiesPanel;
 
 	protected DocumentExtendedPropertiesPanel extendedPropertiesPanel;
@@ -91,6 +93,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	protected PublishingPanel retentionPoliciesPanel;
 
 	protected DocumentCapturePanel capturePanel;
+
+	protected DocumentSecurityPanel securityPanel;
 
 	protected EditingTabSet tabSet;
 
@@ -119,6 +123,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	protected Tab subscriptionsTab;
 
 	protected Tab captureTab;
+
+	protected Tab securityTab;
 
 	public DocumentDetailsPanel() {
 		super();
@@ -220,6 +226,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		subscriptionsTabPanel.setWidth100();
 		subscriptionsTabPanel.setHeight100();
 		subscriptionsTab.setPane(subscriptionsTabPanel);
+
+		securityTab = new Tab(I18N.message("security"));
+		securityTabPanel = new HLayout();
+		securityTabPanel.setWidth100();
+		securityTabPanel.setHeight100();
+		securityTab.setPane(securityTabPanel);
 	}
 
 	protected void prepareTabset() {
@@ -290,6 +302,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		if (Menu.enabled(Menu.CAPTURE))
 			tabSet.addTab(captureTab);
 
+		tabSet.addTab(securityTab);
+
 		addMember(tabSet);
 	}
 
@@ -336,7 +350,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		/*
 		 * Prepare the links tab
 		 */
-		prepareLInksTab();
+		prepareLinksTab();
 
 		/*
 		 * Prepare the signature tab
@@ -362,6 +376,11 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		 * Prepare the subscriptions tab
 		 */
 		prepareSubscriptionsTab();
+
+		/*
+		 * Prepare the security tab
+		 */
+		prepareSecurityTab();
 	}
 
 	private void prepareSubscriptionsTab() {
@@ -372,7 +391,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					subscriptionsTabPanel.removeMember(subscriptionsPanel);
 			}
 
-			if (document.getFolder().hasPermission(Constants.PERMISSION_SUBSCRIPTION)) {
+			if (document.hasPermission(Constants.PERMISSION_SUBSCRIPTION)) {
 				try {
 					subscriptionsPanel = new DocumentSubscriptionsPanel(document);
 					subscriptionsTabPanel.addMember(subscriptionsPanel);
@@ -442,7 +461,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		}
 	}
 
-	private void prepareLInksTab() {
+	private void prepareLinksTab() {
 		if (linksPanel != null) {
 			linksPanel.destroy();
 			if (Boolean.TRUE.equals(linksTabPanel.contains(linksPanel)))
@@ -503,6 +522,24 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		} catch (Exception t) {
 			// Nothing to do
 		}
+	}
+
+	private void prepareSecurityTab() {
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
+				securityTabPanel.removeMember(securityPanel);
+		}
+
+		if (document.hasPermission(Constants.PERMISSION_SECURITY)) {
+			try {
+				securityPanel = new DocumentSecurityPanel(document);
+				securityTabPanel.addMember(securityPanel);
+			} catch (Exception t) {
+				// Nothing to do
+			}
+		} else
+			tabSet.removeTab(securityTab);
 	}
 
 	private void prepareCaptureTab(ChangedHandler changeHandler) {

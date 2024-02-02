@@ -59,6 +59,7 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentGroup;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentManager;
@@ -105,6 +106,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
+import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.i18n.I18N;
@@ -754,14 +756,16 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			guiDocument = fromDocument(document, folder, session != null ? session.getUser() : null);
 
+			setAllowedPermissions(session, docId, guiDocument);
+
 			if (session != null && folder != null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 				Set<Permission> permissions = fdao.getEnabledPermissions(document.getFolder().getId(),
 						session.getUserId());
 				List<String> permissionsList = new ArrayList<>();
 				for (Permission permission : permissions)
-					permissionsList.add(permission.toString());
-				folder.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
+					permissionsList.add(permission.name().toLowerCase());
+				folder.setAllowedPermissions(new GUIRight(permissionsList.toArray(new String[0])));
 			}
 		}
 
@@ -1221,6 +1225,16 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return (GUIDocument) throwServerException(session, log, e);
 		}
 
+	}
+
+	private static void setAllowedPermissions(Session session, long documentId, GUIDocument guiDocument)
+			throws PersistenceException {
+		if (session != null) {
+			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Set<Permission> permissions = dao.getEnabledPermissions(documentId, session.getUserId());
+			guiDocument.setAllowedPermissions(new GUIRight(
+					permissions.stream().map(p -> p.name().toLowerCase()).toList().toArray(new String[0])));
+		}
 	}
 
 	/**
@@ -3172,5 +3186,98 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	 */
 	static void setEmailSender(EMailSender emailSender) {
 		DocumentServiceImpl.emailSender = emailSender;
+	}
+
+	private int booleanToInt(boolean bool) {
+		return bool ? 1 : 0;
+	}
+
+	@Override
+	public void applySecurity(GUIDocument guiDocument) throws ServerException {
+		Session session = validateSession();
+
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		try {
+			Document document = docDao.findById(guiDocument.getId());
+			docDao.initialize(document);
+
+			log.info("Applying {} security policies to document {}",
+					(guiDocument.getRights() != null ? guiDocument.getRights().length : 0), guiDocument.getId());
+
+			Set<DocumentGroup> grps = new HashSet<>();
+			for (GUIRight right : guiDocument.getRights()) {
+				DocumentGroup dg = new DocumentGroup();
+				dg.setGroupId(right.getEntityId());
+				grps.add(dg);
+
+				dg.setRead(booleanToInt(right.isRead()));
+				dg.setPrint(booleanToInt(right.isPrint()));
+				dg.setWrite(booleanToInt(right.isWrite()));
+				dg.setSecurity(booleanToInt(right.isSecurity()));
+				dg.setImmutable(booleanToInt(right.isImmutable()));
+				dg.setDelete(booleanToInt(right.isDelete()));
+				dg.setRename(booleanToInt(right.isRename()));
+				dg.setArchive(booleanToInt(right.isArchive()));
+				dg.setWorkflow(booleanToInt(right.isWorkflow()));
+				dg.setSign(booleanToInt(right.isSign()));
+				dg.setDownload(booleanToInt(right.isDownload()));
+				dg.setCalendar(booleanToInt(right.isCalendar()));
+				dg.setSubscription(booleanToInt(right.isSubscription()));
+				dg.setPassword(booleanToInt(right.isPassword()));
+				dg.setMove(booleanToInt(right.isMove()));
+				dg.setEmail(booleanToInt(right.isEmail()));
+				dg.setAutomation(booleanToInt(right.isAutomation()));
+				dg.setReadingreq(booleanToInt(right.isReadingreq()));
+			}
+
+			document.getDocumentGroups().clear();
+			document.getDocumentGroups().addAll(grps);
+
+			// Add a folder history entry
+			DocumentHistory history = new DocumentHistory();
+			history.setEvent(DocumentEvent.PERMISSION.toString());
+			history.setSession(session);
+			docDao.store(document, history);
+		} catch (PersistenceException e) {
+			throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void applyParentFolderSecurity(long docId) throws ServerException {
+		Session session = validateSession();
+
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		try {
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+			docDao.applyParentFolderSecurity(docId, transaction);
+		} catch (PersistenceException e) {
+			throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public GUIRight getEnabledPermissions(Long[] docIds) throws ServerException {
+		Session session = validateSession();
+
+		try {
+			Set<Permission> commonPermissions = Permission.all();
+			if (!session.getUser().isMemberOf("admin")) {
+				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				for (long docId : docIds) {
+					Set<Permission> docPermissions = docDao.getEnabledPermissions(docId, session.getUserId());
+					for (Permission permission : Permission.all()) {
+						if (!docPermissions.contains(permission))
+							commonPermissions.remove(permission);
+					}
+				}
+			}
+
+			return new GUIRight(commonPermissions.stream().map(p -> p.name().toLowerCase()).collect(Collectors.toSet())
+					.toArray(new String[0]));
+		} catch (PersistenceException e) {
+			return (GUIRight) throwServerException(session, log, e);
+		}
 	}
 }

@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
+import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -133,261 +134,264 @@ public class ContextMenu extends Menu {
 
 	private Menu moreMenu;
 
-	public ContextMenu(final GUIFolder folder, final DocumentsGrid xxgrid) {
-		this.grid = xxgrid;
+	public ContextMenu(final GUIFolder folder, final DocumentsGrid docsGrid) {
+		this.grid = docsGrid;
 		final GUIDocument[] selection = grid.getSelectedDocuments();
 		final Long[] selectionIds = grid.getSelectedIds();
 
-		download = new MenuItem();
-		download.setTitle(I18N.message("download"));
-		download.addClickHandler(event -> onDownload(folder, selection));
+		DocumentService.Instance.get().getEnabledPermissions(selectionIds, new AsyncCallback<>() {
 
-		cut = prepareCutItem(selection);
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-		copy = prepareCopyItem(selection);
+			@Override
+			public void onSuccess(GUIRight enabledPermissions) {
+				download = new MenuItem();
+				download.setTitle(I18N.message("download"));
+				download.addClickHandler(event -> onDownload(folder, selection));
 
-		rename = prepareRenameItem(selection);
+				cut = prepareCutItem(selection);
 
-		delete = prepareDeleteItem(selection);
+				copy = prepareCopyItem(selection);
 
-		sendMail = new MenuItem();
-		sendMail.setTitle(I18N.message("sendmail"));
-		sendMail.addClickHandler(event -> new EmailDialog(grid.getSelectedIds(), selection[0].getFileName()).show());
+				rename = prepareRenameItem(selection);
 
-		links = prepareLinksItem(selection, selectionIds);
+				delete = prepareDeleteItem(selection);
 
-		immutable = prepareImmutableItem(selection, selectionIds);
+				sendMail = new MenuItem();
+				sendMail.setTitle(I18N.message("sendmail"));
+				sendMail.addClickHandler(
+						event -> new EmailDialog(grid.getSelectedIds(), selection[0].getFileName()).show());
 
-		setPassword = prepareSetPasswordItem(selection);
+				links = prepareLinksItem(selection, selectionIds);
 
-		unsetPassword = prepareUnsetPasswordItem(selection);
+				immutable = prepareImmutableItem(selection, selectionIds);
 
-		lock = prepareLockItem(selection, selectionIds);
+				setPassword = prepareSetPasswordItem(selection);
 
-		unlock = prepareUnlockItem(selection, selectionIds);
+				unsetPassword = prepareUnsetPasswordItem(selection);
 
-		checkout = prepareCheckoutItem(folder, selection, selectionIds);
+				lock = prepareLockItem(selection, selectionIds);
 
-		checkin = prepareCheckinItem(selection);
+				unlock = prepareUnlockItem(selection, selectionIds);
 
-		archive = prepareArchiveItem(selectionIds);
+				checkout = prepareCheckoutItem(folder, selection, selectionIds);
 
-		bookmark = prepareBookmarkItem(selection, selectionIds);
+				checkin = prepareCheckinItem(selection);
 
-		markUnindexable = prepareMarkUnindexableItem(selection, selectionIds);
+				archive = prepareArchiveItem(selectionIds);
 
-		markIndexable = prepareMarkIndexableItem(selection, selectionIds);
+				bookmark = prepareBookmarkItem(selection, selectionIds);
 
-		markIndexableMetadataOnly = markIndexableMetadataOnlyItem(selection, selectionIds);
+				markUnindexable = prepareMarkUnindexableItem(selection, selectionIds);
 
-		index = prepareIndexItem(selection, selectionIds);
+				markIndexable = prepareMarkIndexableItem(selection, selectionIds);
 
-		sign = new MenuItem();
-		sign.setTitle(I18N.message("sign"));
-		sign.addClickHandler(event -> new DigitalSignatureDialog(selectionIds).show());
+				markIndexableMetadataOnly = markIndexableMetadataOnlyItem(selection, selectionIds);
 
-		stamp = new MenuItem();
-		stamp.setTitle(I18N.message("stamp"));
-		stamp.addClickHandler(event -> new StampDialog(grid).show());
+				index = prepareIndexItem(selection, selectionIds);
 
-		office = new MenuItem(I18N.message("editwithoffice"));
-		office.addClickHandler(event -> Util.openEditWithOffice(selection[0].getId()));
+				sign = new MenuItem();
+				sign.setTitle(I18N.message("sign"));
+				sign.addClickHandler(event -> new DigitalSignatureDialog(selectionIds).show());
 
-		sendToExpArchive = new MenuItem(I18N.message("sendtoexparchive"));
-		sendToExpArchive.addClickHandler(event -> new SendToArchiveDialog(selectionIds, true).show());
+				stamp = new MenuItem();
+				stamp.setTitle(I18N.message("stamp"));
+				stamp.addClickHandler(event -> new StampDialog(selection).show());
 
-		workflow = new MenuItem(I18N.message("startworkflow"));
-		workflow.addClickHandler(event -> new StartWorkflowDialog(selectionIds).show());
+				office = new MenuItem(I18N.message("editwithoffice"));
+				office.addClickHandler(event -> Util.openEditWithOffice(selection[0].getId()));
 
-		automation = new MenuItem(I18N.message("executeautomation"));
-		automation.addClickHandler(event -> new AutomationDialog(folder.getId(), selectionIds).show());
+				sendToExpArchive = new MenuItem(I18N.message("sendtoexparchive"));
+				sendToExpArchive.addClickHandler(event -> new SendToArchiveDialog(selectionIds, true).show());
 
-		preview = preparePreview();
+				workflow = new MenuItem(I18N.message("startworkflow"));
+				workflow.addClickHandler(event -> new StartWorkflowDialog(selectionIds).show());
 
-		ticket = new MenuItem(I18N.message("ticket"));
-		ticket.addClickHandler(event -> new TicketDialog(selection[0]).show());
+				automation = new MenuItem(I18N.message("executeautomation"));
+				automation.addClickHandler(event -> new AutomationDialog(folder.getId(), selectionIds).show());
 
-		convert = new MenuItem(I18N.message("convert"));
-		convert.addClickHandler(event -> new ConversionDialog(selection[0]).show());
+				preview = preparePreview();
 
-		compare = prepareCompareItem(selection);
+				ticket = new MenuItem(I18N.message("ticket"));
+				ticket.addClickHandler(event -> new TicketDialog(selection[0]).show());
 
-		replaceAlias = prepareReplaceAlias();
+				convert = new MenuItem(I18N.message("convert"));
+				convert.addClickHandler(event -> new ConversionDialog(selection[0]).show());
 
-		split = new MenuItem(I18N.message("split"));
-		split.addClickHandler(event -> new SplitDialog(selection[0]).show());
+				compare = prepareCompareItem(selection);
 
-		merge = prepareMergeItem(folder, selectionIds);
+				replaceAlias = prepareReplaceAlias();
 
-		customActionsItem = prepareCustomActionsItem(folder.getId(), selectionIds);
+				split = new MenuItem(I18N.message("split"));
+				split.addClickHandler(event -> new SplitDialog(selection[0]).show());
 
-		readingRequest = new MenuItem();
-		readingRequest.setTitle(I18N.message("requestreading"));
-		readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
+				merge = prepareMergeItem(folder, selectionIds);
 
-		setItems(download, preview, cut, copy, rename, delete, bookmark, sendMail, links, office, checkout, checkin,
-				lock, unlock);
+				customActionsItem = prepareCustomActionsItem(folder.getId(), selectionIds);
 
-		more = new MenuItem(I18N.message("more"));
-		addItem(more);
+				readingRequest = new MenuItem();
+				readingRequest.setTitle(I18N.message("requestreading"));
+				readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
 
-		indexingMenu = new Menu();
-		indexingMenu.setItems(index, markIndexable, markIndexableMetadataOnly, markUnindexable);
+				setItems(download, preview, cut, copy, rename, delete, bookmark, sendMail, links, office, checkout,
+						checkin, lock, unlock);
 
-		indexing = new MenuItem(I18N.message("indexing"));
-		indexing.setSubmenu(indexingMenu);
+				more = new MenuItem(I18N.message("more"));
+				addItem(more);
 
-		moreMenu = new Menu();
-		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
+				indexingMenu = new Menu();
+				indexingMenu.setItems(index, markIndexable, markIndexableMetadataOnly, markUnindexable);
 
-		removeOfficeItem(office);
+				indexing = new MenuItem(I18N.message("indexing"));
+				indexing.setSubmenu(indexingMenu);
 
-		addArchiveItem(archive);
-		addCustomActionsItem(customActionsItem);
+				moreMenu = new Menu();
+				moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
 
-		addConversionItem(convert, moreMenu);
-		addCompareItem(compare, moreMenu);
-		addSignItem(sign, moreMenu);
-		addStampItem(stamp, moreMenu);
-		addSplitItem(split, moreMenu);
-		addReadingRequestItem(readingRequest, moreMenu);
+				removeOfficeItem(office);
 
-		moreMenu.addItem(merge);
+				addArchiveItem(archive);
+				addCustomActionsItem(customActionsItem);
 
-		addSendToArchiveItem(sendToExpArchive, moreMenu);
-		addWorkflowItem(workflow, moreMenu);
-		addAutomationItem(automation, moreMenu);
+				addConversionItem(convert, moreMenu);
+				addCompareItem(compare, moreMenu);
+				addSignItem(sign, moreMenu);
+				addStampItem(stamp, moreMenu);
+				addSplitItem(split, moreMenu);
+				addReadingRequestItem(readingRequest, moreMenu);
 
-		more.setSubmenu(moreMenu);
+				moreMenu.addItem(merge);
 
-		/**
-		 * Now implement the security policies
-		 */
-		boolean someSelection = selection != null && selection.length > 0;
-		boolean moreSelected = selection != null && selection.length > 1;
-		boolean justOneSelected = someSelection && selection.length == 1;
-		boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
+				addSendToArchiveItem(sendToExpArchive, moreMenu);
+				addWorkflowItem(workflow, moreMenu);
+				addAutomationItem(automation, moreMenu);
 
-		applySecurityPolicies(folder, selection, someSelection, moreSelected, justOneSelected, immutablesInSelection);
+				more.setSubmenu(moreMenu);
+
+				/**
+				 * Now implement the security policies
+				 */
+				boolean someSelection = selection != null && selection.length > 0;
+				boolean moreSelected = selection != null && selection.length > 1;
+				boolean justOneSelected = someSelection && selection.length == 1;
+				boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
+
+				applySecurityPolicies(enabledPermissions, selection, someSelection, moreSelected, justOneSelected,
+						immutablesInSelection);
+			}
+		});
 	}
 
-	private void applySecurityPolicies(final GUIFolder folder, final GUIDocument[] selection, boolean someSelection,
-			boolean moreSelected, boolean justOneSelected, boolean immutablesInSelection) {
+	private void applySecurityPolicies(GUIRight enabledPermissions, final GUIDocument[] selection,
+			boolean someSelection, boolean moreSelected, boolean justOneSelected, boolean immutablesInSelection) {
 		preview.setEnabled(someSelection
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 		cut.setEnabled(someSelection && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isMove());
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isMove());
 
-		applyLockingSecurity(folder, selection, someSelection, immutablesInSelection, justOneSelected);
+		applyLockingSecurity(enabledPermissions, selection, someSelection, immutablesInSelection, justOneSelected);
 
-		immutable.setEnabled(
-				someSelection && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-						&& folder.hasPermission(Constants.PERMISSION_IMMUTABLE));
-		applySignSecurity(folder, selection, someSelection, immutablesInSelection);
+		immutable.setEnabled(someSelection && !immutablesInSelection
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isImmutable());
+		applySignSecurity(enabledPermissions, selection, someSelection, immutablesInSelection);
 
 		stamp.setEnabled(
 				someSelection && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-						&& folder.isWrite() && Feature.enabled(Feature.STAMP));
+						&& enabledPermissions.isWrite() && Feature.enabled(Feature.STAMP));
 		delete.setEnabled(someSelection && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isDelete());
-		links.setEnabled(!Clipboard.getInstance().isEmpty() && folder.isWrite());
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isDelete());
+		links.setEnabled(!Clipboard.getInstance().isEmpty() && enabledPermissions.isWrite());
 
-		applyIndexableSecurity(folder, selection, someSelection, immutablesInSelection);
+		applyIndexableSecurity(enabledPermissions, selection, someSelection, immutablesInSelection);
 
 		applyIndexSecurity(selection, someSelection, immutablesInSelection);
 
-		applyPasswordSecurity(folder, selection, justOneSelected, immutablesInSelection);
+		applyPasswordSecurity(enabledPermissions, selection, justOneSelected, immutablesInSelection);
 
-		sendMail.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_EMAIL));
+		sendMail.setEnabled(someSelection && enabledPermissions.isEmail());
 
 		copy.setEnabled(someSelection);
-		rename.setEnabled(
-				justOneSelected && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-						&& folder.hasPermission(Constants.PERMISSION_RENAME));
+		rename.setEnabled(justOneSelected && !immutablesInSelection
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isRename());
 
-		applyDownloadSecurity(folder, someSelection, justOneSelected);
+		applyDownloadSecurity(enabledPermissions, someSelection, justOneSelected);
 
-		applyOfficeSecurity(folder, justOneSelected);
+		applyOfficeSecurity(enabledPermissions, justOneSelected);
 
 		convert.setEnabled(justOneSelected && Feature.enabled(Feature.FORMAT_CONVERSION));
-		archive.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_ARCHIVE)
-				&& Feature.enabled(Feature.ARCHIVING));
-		sendToExpArchive.setEnabled(
-				someSelection && folder.hasPermission(Constants.PERMISSION_EXPORT) && Feature.enabled(Feature.IMPEX));
-		workflow.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_WORKFLOW)
-				&& Feature.enabled(Feature.WORKFLOW));
-		replaceAlias.setEnabled(justOneSelected && folder.isWrite() && selection[0].getDocRef() != null);
-		readingRequest.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_READINGREQ)
-				&& Feature.enabled(Feature.READING_CONFIRMATION));
+		archive.setEnabled(someSelection && enabledPermissions.isArchive() && Feature.enabled(Feature.ARCHIVING));
+		sendToExpArchive.setEnabled(someSelection && enabledPermissions.isExport() && Feature.enabled(Feature.IMPEX));
+		workflow.setEnabled(someSelection && enabledPermissions.isWorkflow() && Feature.enabled(Feature.WORKFLOW));
+		replaceAlias.setEnabled(justOneSelected && enabledPermissions.isWrite() && selection[0].getDocRef() != null);
+		readingRequest.setEnabled(
+				someSelection && enabledPermissions.isReadingreq() && Feature.enabled(Feature.READING_CONFIRMATION));
 
-		applySplitSecurity(folder, selection, moreSelected, justOneSelected);
+		applySplitSecurity(enabledPermissions, selection, moreSelected, justOneSelected);
 
 		applyCompareSecurity(selection);
 
-		automation.setEnabled(
-				Feature.enabled(Feature.AUTOMATION) && folder.hasPermission(Constants.PERMISSION_AUTOMATION));
+		automation.setEnabled(Feature.enabled(Feature.AUTOMATION) && enabledPermissions.isAutomation());
 	}
 
-	private void applySplitSecurity(final GUIFolder folder, final GUIDocument[] selection, boolean moreSelected,
+	private void applySplitSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean moreSelected,
 			boolean justOneSelected) {
-		split.setEnabled(
-				justOneSelected && selection[0].getFileName().toLowerCase().endsWith(".pdf") && folder.isWrite());
-		merge.setEnabled(moreSelected && folder.isWrite());
+		split.setEnabled(justOneSelected && selection[0].getFileName().toLowerCase().endsWith(".pdf")
+				&& enabledPermissions.isWrite());
+		merge.setEnabled(moreSelected && enabledPermissions.isWrite());
 	}
 
-	private void applyOfficeSecurity(final GUIFolder folder, boolean justOneSelected) {
-		office.setEnabled(
-				justOneSelected && Feature.enabled(Feature.OFFICE) && folder.hasPermission(Constants.PERMISSION_WRITE)
-						&& folder.hasPermission(Constants.PERMISSION_DOWNLOAD)
-						&& Util.isOfficeFile(grid.getSelectedDocument().getFileName()));
+	private void applyOfficeSecurity(GUIRight enabledPermissions, boolean justOneSelected) {
+		office.setEnabled(justOneSelected && Feature.enabled(Feature.OFFICE) && enabledPermissions.isWrite()
+				&& enabledPermissions.isDownload() && Util.isOfficeFile(grid.getSelectedDocument().getFileName()));
 	}
 
-	private void applyDownloadSecurity(final GUIFolder folder, boolean someSelection, boolean justOneSelected) {
-		ticket.setEnabled(justOneSelected && folder.isDownload());
-		download.setEnabled(someSelection && folder.isDownload());
+	private void applyDownloadSecurity(GUIRight enabledPermissions, boolean someSelection, boolean justOneSelected) {
+		ticket.setEnabled(justOneSelected && enabledPermissions.isDownload());
+		download.setEnabled(someSelection && enabledPermissions.isDownload());
 	}
 
-	private void applyLockingSecurity(final GUIFolder folder, final GUIDocument[] selection, boolean someSelection,
+	private void applyLockingSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean someSelection,
 			boolean immutablesInSelection, boolean justOneSelected) {
 		unlock.setEnabled(
 				someSelection && !immutablesInSelection && (checkStatusInSelection(Constants.DOC_LOCKED, selection)
 						|| checkStatusInSelection(Constants.DOC_CHECKED_OUT, selection)));
-		lock.setEnabled(someSelection && !immutablesInSelection && folder.isWrite()
+		lock.setEnabled(someSelection && !immutablesInSelection && enabledPermissions.isWrite()
 				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
-		checkout.setEnabled(someSelection && !immutablesInSelection && folder.isDownload() && folder.isWrite()
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
-		checkin.setEnabled(justOneSelected && !immutablesInSelection && folder.isWrite()
+		checkout.setEnabled(someSelection && !immutablesInSelection && enabledPermissions.isDownload()
+				&& enabledPermissions.isWrite() && checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
+		checkin.setEnabled(justOneSelected && !immutablesInSelection && enabledPermissions.isWrite()
 				&& checkStatusInSelection(Constants.DOC_CHECKED_OUT, selection));
 	}
 
-	private void applyIndexableSecurity(final GUIFolder folder, final GUIDocument[] selection, boolean someSelection,
+	private void applyIndexableSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean someSelection,
 			boolean immutablesInSelection) {
 		markIndexable.setEnabled(someSelection && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isWrite());
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
 		markUnindexable.setEnabled(someSelection && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isWrite());
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
 	}
 
-	private void applyPasswordSecurity(final GUIFolder folder, final GUIDocument[] selection, boolean justOneSelected,
+	private void applyPasswordSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean justOneSelected,
 			boolean immutablesInSelection) {
 		setPassword.setEnabled(
 				justOneSelected && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-						&& folder.hasPermission(Constants.PERMISSION_PASSWORD) && !selection[0].isPasswordProtected());
+						&& enabledPermissions.isPassword() && !selection[0].isPasswordProtected());
 		unsetPassword.setEnabled(
 				justOneSelected && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-						&& folder.hasPermission(Constants.PERMISSION_PASSWORD) && selection[0].isPasswordProtected());
+						&& enabledPermissions.isPassword() && selection[0].isPasswordProtected());
 	}
 
-	private void applySignSecurity(final GUIFolder folder, final GUIDocument[] selection, boolean someSelection,
+	private void applySignSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean someSelection,
 			boolean immutablesInSelection) {
-		sign.setEnabled(
-				someSelection && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-						&& folder.hasPermission(Constants.PERMISSION_SIGN) && Feature.enabled(Feature.DIGITAL_SIGNATURE)
-						&& Session.get().getUser().getCertDN() != null);
+		sign.setEnabled(someSelection && !immutablesInSelection
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isSign()
+				&& Feature.enabled(Feature.DIGITAL_SIGNATURE) && Session.get().getUser().getCertDN() != null);
 	}
 
-	private void applyIndexSecurity(final GUIDocument[] selection, boolean someSelection,
-			boolean immutablesInSelection) {
+	private void applyIndexSecurity(GUIDocument[] selection, boolean someSelection, boolean immutablesInSelection) {
 		index.setEnabled(someSelection && !immutablesInSelection
 				&& (checkIndexedStatusInSelection(Constants.INDEX_INDEXED, selection)
 						|| checkIndexedStatusInSelection(Constants.INDEX_TO_INDEX, selection)
@@ -395,7 +399,7 @@ public class ContextMenu extends Menu {
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.INDEX));
 	}
 
-	private void applyCompareSecurity(final GUIDocument[] selection) {
+	private void applyCompareSecurity(GUIDocument[] selection) {
 		if ((selection != null && selection.length == 2) && Feature.enabled(Feature.COMPARISON)) {
 			String fileName1 = selection[0].getFileName().toLowerCase();
 			String fileName2 = selection[1].getFileName().toLowerCase();

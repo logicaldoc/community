@@ -149,6 +149,13 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	 */
 	private boolean bulkUpdate = false;
 
+	private GUIRight[] rights = new GUIRight[] {};
+
+	/**
+	 * Permissions granted to the current user on this document
+	 */
+	private GUIRight allowedPermissions = new GUIRight();
+
 	public String getCustomId() {
 		return customId;
 	}
@@ -642,12 +649,52 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	public int getDocAttrs() {
 		if (docAttrs == 0 && getAttributes() != null && getAttributes().length > 0)
 			for (GUIAttribute att : getAttributes())
-				if (att.getType() == GUIAttribute.TYPE_DOCUMENT)
+				if (att.getType() == GUIAttribute.TYPE_DOCUMENT && att.getIntValue() != null)
 					docAttrs++;
 		return docAttrs;
 	}
 
 	public void setDocAttrs(int docAttrs) {
 		this.docAttrs = docAttrs;
+	}
+
+	public GUIRight[] getRights() {
+		return rights;
+	}
+
+	public void setRights(GUIRight[] rights) {
+		this.rights = rights;
+	}
+
+	public GUIRight getAllowedPermissions() {
+		return allowedPermissions;
+	}
+
+	public void setAllowedPermissions(GUIRight permissions) {
+		this.allowedPermissions = permissions;
+	}
+
+	public boolean isWrite() {
+		return allowedPermissions.isWrite();
+	}
+
+	public boolean isDownload() {
+		return allowedPermissions.isDownload();
+	}
+
+	public boolean isMove() {
+		return allowedPermissions.isMove();
+	}
+
+	public boolean isDelete() {
+		return allowedPermissions.isDelete();
+	}
+
+	public boolean isRename() {
+		return allowedPermissions.isRename();
+	}
+
+	public boolean hasPermission(String permission) {
+		return allowedPermissions.isPermissionAllowed(permission);
 	}
 }

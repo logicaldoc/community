@@ -100,5 +100,31 @@
                <property name="dateValue" type="timestamp" column="ld_datevalue"/>
 		   </composite-element>
 		</map>
+		
+		<set name="documentGroups" table="ld_documentgroup" cascade="all" lazy="true">
+			<key column="ld_docid" />
+			
+			<composite-element class="com.logicaldoc.core.document.DocumentGroup">
+				<property name="groupId" type="long" column="ld_groupid" not-null="true" />
+				<property name="read" type="int" column="ld_read" not-null="true" />
+				<property name="write" type="int" column="ld_write" not-null="true" />
+				<property name="security" type="int" column="ld_security" not-null="true" />
+				<property name="immutable" type="int" column="ld_immutable" not-null="true" />
+				<property name="delete" type="int" column="ld_delete" not-null="true" />
+				<property name="rename" type="int" column="ld_rename" not-null="true" />
+				<property name="sign" type="int" column="ld_sign" not-null="true" />
+				<property name="archive" type="int" column="ld_archive" not-null="true" />
+				<property name="workflow" type="int" column="ld_workflow" not-null="true" />
+				<property name="download" type="int" column="ld_download" not-null="true" />
+				<property name="calendar" type="int" column="ld_calendar" not-null="true" />
+				<property name="subscription" type="int" column="ld_subscription" not-null="true" />
+				<property name="print" type="int" column="ld_print" not-null="true" />
+				<property name="password" type="int" column="ld_password" not-null="true" />
+				<property name="move" type="int" column="ld_move" not-null="true" />
+				<property name="email" type="int" column="ld_email" not-null="true" />
+				<property name="automation" type="int" column="ld_automation" not-null="true" />
+				<property name="readingreq" type="int" column="ld_readingreq" not-null="true" />
+			</composite-element>
+		</set>		
 	</class>
 </hibernate-mapping>

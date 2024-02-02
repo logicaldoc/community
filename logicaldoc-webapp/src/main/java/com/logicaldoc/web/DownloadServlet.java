@@ -21,8 +21,6 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
-import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.store.Storer;
@@ -206,8 +204,8 @@ public class DownloadServlet extends HttpServlet {
 	}
 
 	private void checkDownloadPermission(Session session, Document doc) throws PersistenceException, IOException {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!folderDao.isPermissionEnabled(Permission.DOWNLOAD, doc.getFolder().getId(), session.getUserId()))
+		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		if (!documentDao.isDownloadEnabled(doc.getId(), session.getUserId()))
 			throw new IOException("You don't have the DOWNLOAD permission");
 	}
 

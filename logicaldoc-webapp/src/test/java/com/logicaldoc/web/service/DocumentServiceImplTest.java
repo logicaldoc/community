@@ -56,6 +56,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
@@ -68,6 +69,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
+import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
@@ -1255,7 +1257,6 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testBulkUpdate() throws ParseException, PersistenceException, ServerException {
-
 		GUIDocument doc4 = service.getById(4L);
 		assertNull(doc4.getAttribute("attr1"));
 
@@ -1364,6 +1365,25 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}
+	}
+
+	@Test
+	public void testGetEnabledPermissions() throws ParseException, PersistenceException, ServerException {
+		GUIRight permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
+		for (Permission permission : Permission.all())
+			assertTrue("Does not allow " + permission.name(),
+					permissions.isPermissionAllowed(permission.name().toLowerCase()));
+
+		prepareSession("boss", "admin");
+		permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
+		assertFalse(permissions.isRead());
+
+		prepareSession("author", "admin");
+		permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
+		assertTrue(permissions.isRead());
+		assertTrue(permissions.isReadingreq());
+		assertTrue(permissions.isPrint());
+		assertEquals(3, permissions.getAllowedPermissions().size());
 	}
 
 	private void waiting() throws InterruptedException {

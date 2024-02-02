@@ -1,6 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Bean for rights assignments
@@ -14,53 +17,69 @@ public class GUIRight implements Serializable {
 
 	private long entityId = 0;
 
-	private boolean read = true;
-
-	private boolean print = true;
-
-	private boolean write = false;
-
-	private boolean delete = false;
-
-	private boolean add = false;
-
-	private boolean iimport = false;
-
-	private boolean workflow = false;
-
-	private boolean sign = false;
-
-	private boolean export = false;
-
-	private boolean immutable = false;
-
-	private boolean rename = false;
-
-	private boolean security = false;
-
-	private boolean archive = false;
-
-	private boolean download = true;
-
-	private boolean calendar = false;
-
-	private boolean subscription = false;
-
-	private boolean password = false;
-
-	private boolean move = false;
-
-	private boolean email = false;
-
-	private boolean automation = false;
-
-	private boolean storage = false;
-	
-	private boolean readingreq = false;
-
 	private String name;
 
 	private String label;
+
+	/*
+	 * A set of permissions, cannot use a map because of they are not supported
+	 * by default GWT serialization
+	 */
+	private ArrayList<GUIValue> permissions = new ArrayList<>();
+
+	public static final String PERMISSION_DELETE = "delete";
+
+	public static final String PERMISSION_IMMUTABLE = "immutable";
+
+	public static final String PERMISSION_SECURITY = "security";
+
+	public static final String PERMISSION_READ = "read";
+
+	public static final String PERMISSION_WRITE = "write";
+
+	public static final String PERMISSION_ADD = "add";
+
+	public static final String PERMISSION_RENAME = "rename";
+
+	public static final String PERMISSION_IMPORT = "import";
+
+	public static final String PERMISSION_EXPORT = "export";
+
+	public static final String PERMISSION_SIGN = "sign";
+
+	public static final String PERMISSION_ARCHIVE = "archive";
+
+	public static final String PERMISSION_WORKFLOW = "workflow";
+
+	public static final String PERMISSION_DOWNLOAD = "download";
+
+	public static final String PERMISSION_CALENDAR = "calendar";
+
+	public static final String PERMISSION_SUBSCRIPTION = "subscription";
+
+	public static final String PERMISSION_PASSWORD = "password";
+
+	public static final String PERMISSION_MOVE = "move";
+
+	public static final String PERMISSION_EMAIL = "email";
+
+	public static final String PERMISSION_AUTOMATION = "automation";
+
+	public static final String PERMISSION_STORAGE = "storage";
+
+	public static final String PERMISSION_READINGREQ = "readingreq";
+
+	public static final String PERMISSION_PRINT = "print";
+
+	public GUIRight() {
+	}
+
+	public GUIRight(String... allowedPermissions) {
+		permissions.clear();
+		for (String permission : allowedPermissions) {
+			permissions.add(new GUIValue(permission.toLowerCase(), "true"));
+		}
+	}
 
 	public long getEntityId() {
 		return entityId;
@@ -71,99 +90,205 @@ public class GUIRight implements Serializable {
 	}
 
 	public boolean isRead() {
-		return read;
+		return isPermissionAllowed(PERMISSION_READ);
+	}
+
+	private GUIValue getPermission(String permission) {
+		for (GUIValue guiValue : permissions)
+			if (guiValue.getCode().equalsIgnoreCase(permission))
+				return guiValue;
+		return null;
+	}
+
+	private void setPermissionValue(String permission, boolean value) {
+		GUIValue val = getPermission(permission);
+		if (val == null) {
+			val = new GUIValue(permission, Boolean.toString(value));
+			permissions.add(val);
+		} else {
+			val.setValue(Boolean.toString(value));
+		}
 	}
 
 	public void setRead(boolean read) {
-		this.read = read;
+		setPermissionValue(PERMISSION_READ, read);
 	}
 
 	public boolean isWrite() {
-		return write;
+		return isPermissionAllowed(PERMISSION_WRITE);
 	}
 
 	public void setWrite(boolean write) {
-		this.write = write;
+		setPermissionValue(PERMISSION_WRITE, write);
 	}
 
 	public boolean isDelete() {
-		return delete;
+		return isPermissionAllowed(PERMISSION_DELETE);
 	}
 
 	public void setDelete(boolean delete) {
-		this.delete = delete;
+		setPermissionValue(PERMISSION_DELETE, delete);
 	}
 
 	public boolean isAdd() {
-		return add;
+		return isPermissionAllowed(PERMISSION_ADD);
 	}
 
 	public void setAdd(boolean add) {
-		this.add = add;
+		setPermissionValue(PERMISSION_ADD, add);
 	}
 
 	public boolean isImport() {
-		return iimport;
+		return isPermissionAllowed(PERMISSION_IMPORT);
 	}
 
 	public void setImport(boolean iimport) {
-		this.iimport = iimport;
+		setPermissionValue(PERMISSION_IMPORT, iimport);
 	}
 
 	public boolean isWorkflow() {
-		return workflow;
+		return isPermissionAllowed(PERMISSION_WORKFLOW);
 	}
 
 	public void setWorkflow(boolean workflow) {
-		this.workflow = workflow;
+		setPermissionValue(PERMISSION_WORKFLOW, workflow);
 	}
 
 	public boolean isSign() {
-		return sign;
+		return isPermissionAllowed(PERMISSION_SIGN);
 	}
 
 	public void setSign(boolean sign) {
-		this.sign = sign;
+		setPermissionValue(PERMISSION_SIGN, sign);
 	}
 
 	public boolean isExport() {
-		return export;
+		return isPermissionAllowed(PERMISSION_EXPORT);
 	}
 
 	public void setExport(boolean export) {
-		this.export = export;
+		setPermissionValue(PERMISSION_EXPORT, export);
 	}
 
 	public boolean isImmutable() {
-		return immutable;
+		return isPermissionAllowed(PERMISSION_IMMUTABLE);
 	}
 
 	public void setImmutable(boolean immutable) {
-		this.immutable = immutable;
+		setPermissionValue(PERMISSION_IMMUTABLE, immutable);
 	}
 
 	public boolean isRename() {
-		return rename;
+		return isPermissionAllowed(PERMISSION_RENAME);
 	}
 
 	public void setRename(boolean rename) {
-		this.rename = rename;
+		setPermissionValue(PERMISSION_RENAME, rename);
 	}
 
 	public boolean isSecurity() {
-		return security;
+		return isPermissionAllowed(PERMISSION_SECURITY);
 	}
 
 	public void setSecurity(boolean security) {
-		this.security = security;
+		setPermissionValue(PERMISSION_SECURITY, security);
 	}
 
 	public boolean isArchive() {
-		return archive;
+		return isPermissionAllowed(PERMISSION_ARCHIVE);
 	}
 
 	public void setArchive(boolean archive) {
-		this.archive = archive;
+		setPermissionValue(PERMISSION_ARCHIVE, archive);
+	}
+
+	public boolean isDownload() {
+		return isPermissionAllowed(PERMISSION_DOWNLOAD);
+	}
+
+	public void setDownload(boolean download) {
+		setPermissionValue(PERMISSION_DOWNLOAD, download);
+	}
+
+	public boolean isCalendar() {
+		return isPermissionAllowed(PERMISSION_CALENDAR);
+	}
+
+	public void setCalendar(boolean calendar) {
+		setPermissionValue(PERMISSION_CALENDAR, calendar);
+	}
+
+	public boolean isSubscription() {
+		return isPermissionAllowed(PERMISSION_SUBSCRIPTION);
+	}
+
+	public void setSubscription(boolean subscription) {
+		setPermissionValue(PERMISSION_SUBSCRIPTION, subscription);
+	}
+
+	public boolean isPrint() {
+		return isPermissionAllowed(PERMISSION_PRINT);
+	}
+
+	public void setPrint(boolean print) {
+		setPermissionValue(PERMISSION_PRINT, print);
+	}
+
+	public boolean isPassword() {
+		return isPermissionAllowed(PERMISSION_PASSWORD);
+	}
+
+	public void setPassword(boolean password) {
+		setPermissionValue(PERMISSION_PASSWORD, password);
+	}
+
+	public boolean isMove() {
+		return isPermissionAllowed(PERMISSION_MOVE);
+	}
+
+	public void setMove(boolean move) {
+		setPermissionValue(PERMISSION_MOVE, move);
+	}
+
+	public boolean isEmail() {
+		return isPermissionAllowed(PERMISSION_EMAIL);
+	}
+
+	public void setEmail(boolean email) {
+		setPermissionValue(PERMISSION_EMAIL, email);
+	}
+
+	public boolean isAutomation() {
+		return isPermissionAllowed(PERMISSION_AUTOMATION);
+	}
+
+	public void setAutomation(boolean automation) {
+		setPermissionValue(PERMISSION_AUTOMATION, automation);
+	}
+
+	public boolean isStorage() {
+		return isPermissionAllowed(PERMISSION_STORAGE);
+	}
+
+	public void setStorage(boolean storage) {
+		setPermissionValue(PERMISSION_STORAGE, storage);
+	}
+
+	public boolean isReadingreq() {
+		return isPermissionAllowed(PERMISSION_READINGREQ);
+	}
+
+	public void setReadingreq(boolean readingreq) {
+		setPermissionValue(PERMISSION_READINGREQ, readingreq);
+	}
+
+	public boolean isPermissionAllowed(String permission) {
+		return getAllowedPermissions().contains(permission.toLowerCase());
+	}
+
+	public Set<String> getAllowedPermissions() {
+		return permissions.stream().filter(e -> "true".equals(e.getValue())).map(e -> e.getCode().toLowerCase())
+				.collect(Collectors.toSet());
 	}
 
 	public String getName() {
@@ -182,86 +307,6 @@ public class GUIRight implements Serializable {
 		this.label = label;
 	}
 
-	public boolean isDownload() {
-		return download;
-	}
-
-	public void setDownload(boolean download) {
-		this.download = download;
-	}
-
-	public boolean isCalendar() {
-		return calendar;
-	}
-
-	public void setCalendar(boolean calendar) {
-		this.calendar = calendar;
-	}
-
-	public boolean isSubscription() {
-		return subscription;
-	}
-
-	public void setSubscription(boolean subscription) {
-		this.subscription = subscription;
-	}
-
-	public boolean isPrint() {
-		return print;
-	}
-
-	public void setPrint(boolean print) {
-		this.print = print;
-	}
-
-	public boolean isPassword() {
-		return password;
-	}
-
-	public void setPassword(boolean password) {
-		this.password = password;
-	}
-
-	public boolean isMove() {
-		return move;
-	}
-
-	public void setMove(boolean move) {
-		this.move = move;
-	}
-
-	public boolean isEmail() {
-		return email;
-	}
-
-	public void setEmail(boolean email) {
-		this.email = email;
-	}
-
-	public boolean isAutomation() {
-		return automation;
-	}
-
-	public void setAutomation(boolean automation) {
-		this.automation = automation;
-	}
-
-	public boolean isStorage() {
-		return storage;
-	}
-
-	public void setStorage(boolean storage) {
-		this.storage = storage;
-	}
-
-	public boolean isReadingreq() {
-		return readingreq;
-	}
-
-	public void setReadingreq(boolean readingreq) {
-		this.readingreq = readingreq;
-	}
-	
 	@Override
 	public String toString() {
 		return getName();
