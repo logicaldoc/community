@@ -15,6 +15,7 @@ import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.util.Context;
@@ -83,7 +84,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		WSDocument[] wsDocs = new WSDocument[docs.size()];
 		for (int i = 0; i < docs.size(); i++) {
 			try {
-				checkReadEnable(user, docs.get(i).getFolder().getId());
+				checkDocumentPermission(Permission.READ, user, docs.get(i).getId());
 				checkPublished(user, docs.get(i));
 				checkNotArchived(docs.get(i));
 			} catch (Exception e) {
@@ -105,7 +106,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		WSFolder[] wsFolders = new WSFolder[folders.size()];
 		for (int i = 0; i < folders.size(); i++) {
 			try {
-				checkReadEnable(user, folders.get(i).getId());
+				checkFolderPermission(Permission.READ, user, folders.get(i).getId());
 			} catch (Exception e) {
 				continue;
 			}

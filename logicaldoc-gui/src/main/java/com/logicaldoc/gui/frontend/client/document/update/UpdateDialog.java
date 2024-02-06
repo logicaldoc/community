@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -82,65 +83,76 @@ public class UpdateDialog extends StickyWindow {
 	protected void onDraw() {
 		super.onDraw();
 
-		/*
-		 * Since the document is locked, temporarily alter the status to have
-		 * the editing enabled.
-		 */
-		int originalStatus = 0;
-		if (CHECKIN.equals(context) && metadata != null) {
-			originalStatus = metadata.getStatus();
-			metadata.setStatus(0);
-		}
+		DocumentService.Instance.get().getEnabledPermissions(ids, new AsyncCallback<GUIRight>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CHECKIN.equals(context));
-		bulkPanel.setWidth100();
-		bulkPanel.setHeight("*");
-		bulkPanel.setShowResizeBar(false);
+			@Override
+			public void onSuccess(GUIRight permissions) {
+				/*
+				 * Since the document is locked, temporarily alter the status to
+				 * have the editing enabled.
+				 */
+				int originalStatus = 0;
+				if (CHECKIN.equals(context) && metadata != null) {
+					originalStatus = metadata.getStatus();
+					metadata.setStatus(0);
+				}
 
-		if (CHECKIN.equals(context) && metadata != null)
-			metadata.setStatus(originalStatus);
+				bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CHECKIN.equals(context),
+						permissions.isSecurity());
+				bulkPanel.setWidth100();
+				bulkPanel.setHeight("*");
+				bulkPanel.setShowResizeBar(false);
 
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("60%");
-		spacer.setOverflow(Overflow.HIDDEN);
+				if (CHECKIN.equals(context) && metadata != null)
+					metadata.setStatus(originalStatus);
 
-		TextItem versionComment = ItemFactory.newTextItem(VERSIONCOMMENT, null);
-		versionComment.setWidth(350);
+				HTMLPane spacer = new HTMLPane();
+				spacer.setContents("<div>&nbsp;</div>");
+				spacer.setWidth("60%");
+				spacer.setOverflow(Overflow.HIDDEN);
 
-		CheckboxItem ignoreEmptyFields = ItemFactory.newCheckbox(IGNOREEMPTYFIELDS, IGNOREEMPTYFIELDS);
-		ignoreEmptyFields.setValue(true);
+				TextItem versionComment = ItemFactory.newTextItem(VERSIONCOMMENT, null);
+				versionComment.setWidth(350);
 
-		final DynamicForm saveForm = new DynamicForm();
-		saveForm.setMargin(3);
-		saveForm.setTitleOrientation(TitleOrientation.LEFT);
-		saveForm.setNumCols(4);
-		saveForm.setShowResizeBar(false);
-		if (BULKUPDATE.equals(context))
-			saveForm.setItems(versionComment, ignoreEmptyFields);
-		else
-			saveForm.setItems(versionComment);
+				CheckboxItem ignoreEmptyFields = ItemFactory.newCheckbox(IGNOREEMPTYFIELDS, IGNOREEMPTYFIELDS);
+				ignoreEmptyFields.setValue(true);
 
-		Button saveButton = prepareSaveButton(saveForm);
+				final DynamicForm saveForm = new DynamicForm();
+				saveForm.setMargin(3);
+				saveForm.setTitleOrientation(TitleOrientation.LEFT);
+				saveForm.setNumCols(4);
+				saveForm.setShowResizeBar(false);
+				if (BULKUPDATE.equals(context))
+					saveForm.setItems(versionComment, ignoreEmptyFields);
+				else
+					saveForm.setItems(versionComment);
 
-		HLayout savePanel = new HLayout();
-		savePanel.addMember(saveButton);
-		if (!CHECKIN.equals(context))
-			savePanel.addMember(saveForm);
-		savePanel.addMember(spacer);
-		savePanel.setWidth100();
-		savePanel.setHeight(30);
-		savePanel.setMargin(2);
-		savePanel.setMembersMargin(10);
+				Button saveButton = prepareSaveButton(saveForm);
 
-		VLayout content = new VLayout();
-		content.setTop(10);
-		content.setWidth100();
-		content.setHeight100();
-		content.setMembersMargin(3);
-		content.setMembers(bulkPanel, savePanel);
+				HLayout savePanel = new HLayout();
+				savePanel.addMember(saveButton);
+				if (!CHECKIN.equals(context))
+					savePanel.addMember(saveForm);
+				savePanel.addMember(spacer);
+				savePanel.setWidth100();
+				savePanel.setHeight(30);
+				savePanel.setMargin(2);
+				savePanel.setMembersMargin(10);
 
-		addItem(content);
+				VLayout content = new VLayout();
+				content.setTop(10);
+				content.setWidth100();
+				content.setHeight100();
+				content.setMembersMargin(3);
+				content.setMembers(bulkPanel, savePanel);
+
+				addItem(content);
+			}
+		});
 	}
 
 	private Button prepareSaveButton(final DynamicForm saveForm) {

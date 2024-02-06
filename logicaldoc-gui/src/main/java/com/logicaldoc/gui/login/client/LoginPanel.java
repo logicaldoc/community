@@ -487,7 +487,7 @@ public class LoginPanel extends VLayout {
 
 	protected void onSignin() {
 		// Reset any reference to past sessions
-		CookiesManager.removeLogin();
+		CookiesManager.removeSid();
 
 		lockInput();
 
@@ -596,7 +596,7 @@ public class LoginPanel extends VLayout {
 	}
 
 	protected void sendAuhtenticationRequest() {
-		CookiesManager.removeLogin();
+		CookiesManager.removeSid();
 
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
 				Util.contextPath() + "j_spring_security_check");

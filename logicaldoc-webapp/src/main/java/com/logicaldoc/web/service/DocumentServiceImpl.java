@@ -2090,8 +2090,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		for (long docId : ids) {
 			try {
 				GUIDocument buf = bulkUpdateDocument(docId, vo, ignoreEmptyFields, session);
-				if (buf != null)
-					updatedDocs.add(save(buf));
+				if (buf != null) {
+					GUIDocument document = save(buf); 
+					updatedDocs.add(document);
+					if(vo.getRights()!=null && vo.getRights().length>0) {
+						document.setRights(vo.getRights());
+						applySecurity(document);
+					}
+				}
 			} catch (ServerException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -2099,7 +2105,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return updatedDocs.toArray(new GUIDocument[0]);
 	}
 
-	private GUIDocument bulkUpdateDocument(long docId, GUIDocument guiDocument, boolean ignoreEmptyFields,
+	private GUIDocument bulkUpdateDocument(long docId, GUIDocument model, boolean ignoreEmptyFields,
 			Session session) throws ServerException {
 		GUIDocument document = getById(docId);
 
@@ -2116,34 +2122,34 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 
 		document.setComment(
-				HTMLSanitizer.sanitizeSimpleText(guiDocument.getComment() != null ? guiDocument.getComment() : ""));
+				HTMLSanitizer.sanitizeSimpleText(model.getComment() != null ? model.getComment() : ""));
 
-		if (guiDocument.getPublished() > -1)
-			document.setPublished(guiDocument.getPublished());
-		if (guiDocument.getStartPublishing() != null)
-			document.setStartPublishing(guiDocument.getStartPublishing());
-		if (guiDocument.getStopPublishing() != null)
-			document.setStopPublishing(guiDocument.getStopPublishing());
-		if (StringUtils.isNotEmpty(guiDocument.getLanguage()))
-			document.setLanguage(guiDocument.getLanguage());
-		if (guiDocument.getTags() != null && guiDocument.getTags().length > 0)
-			document.setTags(guiDocument.getTags());
+		if (model.getPublished() > -1)
+			document.setPublished(model.getPublished());
+		if (model.getStartPublishing() != null)
+			document.setStartPublishing(model.getStartPublishing());
+		if (model.getStopPublishing() != null)
+			document.setStopPublishing(model.getStopPublishing());
+		if (StringUtils.isNotEmpty(model.getLanguage()))
+			document.setLanguage(model.getLanguage());
+		if (model.getTags() != null && model.getTags().length > 0)
+			document.setTags(model.getTags());
 		else if (!ignoreEmptyFields)
 			document.setTags(null);
-		if (guiDocument.getTemplateId() != null)
-			document.setTemplateId(guiDocument.getTemplateId());
+		if (model.getTemplateId() != null)
+			document.setTemplateId(model.getTemplateId());
 
-		setOcrTemplate(guiDocument, document, ignoreEmptyFields);
+		setOcrTemplate(model, ignoreEmptyFields, document);
 
-		setBarcodeTemplate(guiDocument, ignoreEmptyFields, document);
+		setBarcodeTemplate(model, ignoreEmptyFields, document);
 
-		setExtendedAttributes(guiDocument, ignoreEmptyFields, document);
-
+		setExtendedAttributes(model, ignoreEmptyFields, document);
+		
 		return document;
 	}
 
-	private void setExtendedAttributes(GUIDocument guiDocument, boolean ignoreEmptyFields, GUIDocument document) {
-		if (guiDocument.getAttributes() == null || guiDocument.getAttributes().length < 1)
+	private void setExtendedAttributes(GUIDocument model, boolean ignoreEmptyFields, GUIDocument document) {
+		if (model.getAttributes() == null || model.getAttributes().length < 1)
 			return;
 
 		if (ignoreEmptyFields) {
@@ -2151,28 +2157,28 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			for (GUIAttribute att : document.getAttributes())
 				attributes.put(att.getName(), att);
 
-			for (GUIAttribute att : guiDocument.getAttributes()) {
+			for (GUIAttribute att : model.getAttributes()) {
 				if (att.getValue() != null && StringUtils.isNotEmpty(att.getValue().toString()))
 					attributes.put(att.getName(), att);
 			}
 			document.setAttributes(attributes.values().toArray(new GUIAttribute[0]));
 		} else {
-			document.setAttributes(guiDocument.getAttributes());
+			document.setAttributes(model.getAttributes());
 		}
 	}
 
-	private void setBarcodeTemplate(GUIDocument guiDocument, boolean ignoreEmptyFields, GUIDocument buf) {
-		if (guiDocument.getBarcodeTemplateId() != null)
-			buf.setBarcodeTemplateId(guiDocument.getBarcodeTemplateId());
+	private void setBarcodeTemplate(GUIDocument model, boolean ignoreEmptyFields, GUIDocument document) {
+		if (model.getBarcodeTemplateId() != null)
+			document.setBarcodeTemplateId(model.getBarcodeTemplateId());
 		else if (!ignoreEmptyFields)
-			buf.setBarcodeTemplateId(null);
+			document.setBarcodeTemplateId(null);
 	}
 
-	private void setOcrTemplate(GUIDocument guiDocument, GUIDocument buf, boolean ignoreEmptyFields) {
-		if (guiDocument.getOcrTemplateId() != null)
-			buf.setOcrTemplateId(guiDocument.getOcrTemplateId());
+	private void setOcrTemplate(GUIDocument model, boolean ignoreEmptyFields, GUIDocument document) {
+		if (model.getOcrTemplateId() != null)
+			document.setOcrTemplateId(model.getOcrTemplateId());
 		else if (!ignoreEmptyFields)
-			buf.setOcrTemplateId(null);
+			document.setOcrTemplateId(null);
 	}
 
 	protected static void checkPublished(User user, Document doc) throws PermissionException {

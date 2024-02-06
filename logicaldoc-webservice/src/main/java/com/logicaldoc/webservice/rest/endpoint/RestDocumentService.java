@@ -449,7 +449,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String sid = validateSession();
 		super.move(sid, docId, folderId);
 	}
-	
+
 	@Override
 	@PUT
 	@Path("/copy")
@@ -467,10 +467,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "If links must be copied too", required = true)
 	boolean links, @QueryParam("notes")
 	@Parameter(description = "If notes and annotations must be copied too", required = true)
-	boolean notes) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+	boolean notes, @QueryParam("security")
+	@Parameter(description = "If security settings must be copied too", required = true)
+	boolean security) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			IOException {
 		String sid = validateSession();
-		return super.copy(sid, docId, folderId, links, notes);
+		return super.copy(sid, docId, folderId, links, notes, security);
 	}
 
 	@Override
@@ -906,5 +908,82 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			super.createThumbnail(sid, doc.getId(), doc.getFileVersion(), type);
 			return super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
 		}
+	}
+
+	@Override
+	@PUT
+	@Path("/grantUser")
+	@Operation(summary = "Grants user permission to the document")
+	public void grantUser(@Parameter(description = "Document identifier (ID)", required = true)
+	@QueryParam("docId")
+	long docId, @Parameter(description = "User identifier (ID)", required = true)
+	@QueryParam("userId")
+	long userId,
+			@Parameter(description = "the permission integer representation. If '0', the user will be not granted to access the document", required = true)
+			@QueryParam("permissions")
+			int permissions)
+			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
+		String sid = validateSession();
+		super.grantUser(sid, docId, userId, permissions);
+	}
+
+	@Override
+	@PUT
+	@Path("/grantGroup")
+	@Operation(summary = "Grants group permission to the document")
+	public void grantGroup(@Parameter(description = "Document identifier (ID)", required = true)
+	@QueryParam("docId")
+	long docId, @Parameter(description = "Group identifier (ID)", required = true)
+	@QueryParam("groupId")
+	long groupId,
+			@Parameter(description = "the permission integer representation. If '0', the group will be not granted to access the document", required = true)
+			@QueryParam("permissions")
+			int permissions)
+			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
+		String sid = validateSession();
+		super.grantGroup(sid, docId, groupId, permissions);
+	}
+
+	@Override
+	@GET
+	@Path("/isRead")
+	@Operation(operationId = "isReadDocument", summary = "Tests if a document is readable")
+	public boolean isRead(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+		String sid = validateSession();
+		return super.isReadable(sid, docId);
+	}
+
+	@Override
+	@GET
+	@Path("/isDownload")
+	@Operation(operationId = "isDownloadDocument", summary = "Tests if a document is downloadable")
+	public boolean isDownload(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+		String sid = validateSession();
+		return super.isDownload(sid, docId);
+	}
+
+	@Override
+	@GET
+	@Path("/isWrite")
+	@Operation(operationId = "isWriteDocument", summary = "Tests if a document is writeable")
+	public boolean isWrite(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException {
+		String sid = validateSession();
+		return super.isWrite(sid, docId);
+	}
+
+	@Override
+	@GET
+	@Path("/isGranted")
+	@Operation(summary = "Tests user permission on a document", description = "Tests if the current user has a specific permission on a document")
+	public boolean isGranted(@Parameter(description = "Document identifier (ID)", required = true)
+	@QueryParam("docId")
+	long docId, @Parameter(description = "the permissions' integer representation", required = true)
+	@QueryParam("permission")
+	int permission) throws AuthenticationException, WebserviceException, PersistenceException {
+		String sid = validateSession();
+		return super.isGranted(sid, docId, permission);
 	}
 }

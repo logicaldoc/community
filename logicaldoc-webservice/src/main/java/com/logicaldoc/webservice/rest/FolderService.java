@@ -164,12 +164,14 @@ public interface FolderService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 */
 	@PUT
 	@Path("/move")
 	public void move(@QueryParam("folderId")
 	long folderId, @QueryParam("parentId")
-	long parentId) throws AuthenticationException, PersistenceException, WebserviceException;
+	long parentId) throws AuthenticationException, PersistenceException, WebserviceException, PermissionException;
 
 	/**
 	 * Creates a new folder alias
@@ -292,6 +294,8 @@ public interface FolderService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 */
 	@POST
 	@Path("/copy")
@@ -299,7 +303,8 @@ public interface FolderService {
 	long folderId, @FormParam("targetId")
 	long targetId, @FormParam("foldersOnly")
 	int foldersOnly, @FormParam("securityOption")
-	String securityOption) throws AuthenticationException, WebserviceException, PersistenceException;
+	String securityOption)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Grants user permission to the folder.

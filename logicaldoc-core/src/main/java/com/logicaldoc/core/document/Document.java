@@ -36,9 +36,8 @@ public class Document extends AbstractDocument {
 
 		try {
 			setDocumentGroups(new HashSet<>());
-			for (DocumentGroup dg : source.getDocumentGroups()) {
+			for (DocumentGroup dg : source.getDocumentGroups())
 				getDocumentGroups().add(new DocumentGroup(dg));
-			}
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
 		}
@@ -50,5 +49,26 @@ public class Document extends AbstractDocument {
 
 	public void setDocumentGroups(Set<DocumentGroup> documentGroups) {
 		this.documentGroups = documentGroups;
+	}
+
+	/**
+	 * Adds a new element, substituting an existing one with the same groupId.
+	 * 
+	 * @param dg the document group
+	 */
+	public void addDocumentGroup(DocumentGroup dg) {
+		DocumentGroup m = getDocumentGroup(dg.getGroupId());
+		if (m != null)
+			getDocumentGroups().remove(m);
+		if (dg.getRead() != 0)
+			getDocumentGroups().add(dg);
+	}
+
+	public DocumentGroup getDocumentGroup(long groupId) {
+		for (DocumentGroup dg : documentGroups) {
+			if (dg.getGroupId() == groupId)
+				return dg;
+		}
+		return null;
 	}
 }

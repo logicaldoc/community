@@ -30,6 +30,9 @@ public class Login implements EntryPoint {
 		if (RootPanel.get("loadingwrapper-login") == null)
 			return;
 
+		// Reset any reference to past sessions
+		CookiesManager.removeSid();
+		
 		GWT.setUncaughtExceptionHandler(caught -> SC.warn("Error", caught.getMessage()));
 
 		declareShowLostDialog(this);

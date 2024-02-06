@@ -38,7 +38,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="create")
+	@WebMethod(action = "create")
 	@WebResult(name = "folder")
 	@WSDoc(description = "Creates a new folder; returns the newly created folder")
 	public WSFolder create(@WSDoc(description = "identifier of the session", required = true)
@@ -62,7 +62,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="createAlias")
+	@WebMethod(action = "createAlias")
 	@WebResult(name = "folder")
 	@WSDoc(description = "creates a new folder alias; returns the newly created alias")
 	public WSFolder createAlias(@WSDoc(description = "identifier of the session", required = true)
@@ -85,7 +85,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="createFolder")
+	@WebMethod(action = "createFolder")
 	@WebResult(name = "folderId")
 	@WSDoc(description = "creates a new folder; returns the newly created folder")
 	public long createFolder(@WSDoc(description = "identifier of the session", required = true)
@@ -106,7 +106,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="delete")
+	@WebMethod(action = "delete")
 	@WSDoc(description = "deletes an existing folder")
 	public void delete(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -126,7 +126,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="rename")
+	@WebMethod(action = "rename")
 	@WSDoc(description = "renames an existing folder")
 	public void rename(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -148,7 +148,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="update")
+	@WebMethod(action = "update")
 	@WSDoc(description = "updates an existing folder; you need the RENAME permission")
 	public void update(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -165,15 +165,17 @@ public interface FolderService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
-	@WebMethod(action="move")
+	@WebMethod(action = "move")
 	@WSDoc(description = "moves an existing folder with the given identifier")
 	public void move(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WSDoc(description = "the new folder's parent")
 	@WebParam(name = "parentId")
-	long parentId) throws PersistenceException, AuthenticationException, WebserviceException;
+	long parentId) throws PersistenceException, AuthenticationException, WebserviceException, PermissionException;
 
 	/**
 	 * Merges the contents of folder into a target
@@ -188,7 +190,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="merge")
+	@WebMethod(action = "merge")
 	@WSDoc(description = "merges the contents of folder into a target")
 	public void merge(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -217,8 +219,10 @@ public interface FolderService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
-	@WebMethod(action="copy")
+	@WebMethod(action = "copy")
 	@WSDoc(description = "copies an existing folder into another location")
 	public void copy(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -230,7 +234,8 @@ public interface FolderService {
 	int foldersOnly,
 			@WSDoc(description = "<b>null</b> or </b>none</b> = no sec. policies are created, <b>inherit</b>: the new folder will point to the parent for the security policies, <b>replicate</b> = sec. policies are inherited from the new parent folder")
 			@WebParam(name = "securityOption")
-			String securityOption) throws AuthenticationException, WebserviceException, PersistenceException;
+			String securityOption)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Gets an existing folder
@@ -246,7 +251,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getFolder")
+	@WebMethod(action = "getFolder")
 	@WebResult(name = "folder")
 	@WSDoc(description = "gets an existing folder")
 	public WSFolder getFolder(@WSDoc(description = "identifier of the session", required = true)
@@ -265,7 +270,7 @@ public interface FolderService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="getRootFolder")
+	@WebMethod(action = "getRootFolder")
 	@WebResult(name = "folder")
 	@WSDoc(description = "gets the root folder")
 	public WSFolder getRootFolder(@WSDoc(description = "identifier of the session", required = true)
@@ -284,7 +289,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getDefaultWorkspace")
+	@WebMethod(action = "getDefaultWorkspace")
 	@WebResult(name = "workspace")
 	@WSDoc(description = "gets the default workspace")
 	public WSFolder getDefaultWorkspace(@WSDoc(description = "identifier of the session", required = true)
@@ -306,7 +311,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="listChildren")
+	@WebMethod(action = "listChildren")
 	@WebResult(name = "folder")
 	@WSDoc(description = "lists all direct children of a parent folder: readable only sub-folders are returned")
 	public WSFolder[] listChildren(@WSDoc(description = "identifier of the session", required = true)
@@ -327,7 +332,7 @@ public interface FolderService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="isReadable")
+	@WebMethod(action = "isReadable")
 	@WSDoc(description = "tests if a folder is readable")
 	public boolean isReadable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -345,7 +350,7 @@ public interface FolderService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="isWritable")
+	@WebMethod(action = "isWritable")
 	@WSDoc(description = "tests if a folder is writable")
 	public boolean isWritable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -366,7 +371,7 @@ public interface FolderService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="isGranted")
+	@WebMethod(action = "isGranted")
 	@WSDoc(description = "tests if the current user has a specific permission on a folder")
 	public boolean isGranted(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -389,7 +394,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="getPath")
+	@WebMethod(action = "getPath")
 	@WebResult(name = "folders")
 	@WSDoc(description = "computes the path from the root to the target folder; returns the array of folders, the first is the root")
 	public WSFolder[] getPath(@WSDoc(description = "identifier of the session", required = true)
@@ -414,7 +419,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="grantUser")
+	@WebMethod(action = "grantUser")
 	@WSDoc(description = "grants user permission to the folder")
 	public void grantUser(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -445,7 +450,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="grantGroup")
+	@WebMethod(action = "grantGroup")
 	@WSDoc(description = "grants group permission to the folder")
 	public void grantGroup(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -471,7 +476,7 @@ public interface FolderService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="getGrantedUsers")
+	@WebMethod(action = "getGrantedUsers")
 	@WSDoc(description = "retrieves the list of granted users for the given folder")
 	public WSRight[] getGrantedUsers(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -489,7 +494,7 @@ public interface FolderService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="getGrantedGroups")
+	@WebMethod(action = "getGrantedGroups")
 	@WSDoc(description = "retrieves the list of granted groups for the given folder")
 	public WSRight[] getGrantedGroups(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
@@ -512,7 +517,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="createPath")
+	@WebMethod(action = "createPath")
 	@WebResult(name = "folder")
 	@WSDoc(description = "creates the folder for the specified path; all unexisting nodes will be created")
 	public WSFolder createPath(@WSDoc(description = "identifier of the session", required = true)
@@ -536,7 +541,7 @@ public interface FolderService {
 	 * @throws PermissionException The user does not have the required
 	 *         permission
 	 */
-	@WebMethod(action="findByPath")
+	@WebMethod(action = "findByPath")
 	@WebResult(name = "folder")
 	@WSDoc(description = "finds the folder at the specified path")
 	public WSFolder findByPath(@WSDoc(description = "identifier of the session", required = true)
@@ -556,7 +561,7 @@ public interface FolderService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action="listWorkspaces")
+	@WebMethod(action = "listWorkspaces")
 	@WebResult(name = "workspaces")
 	@WSDoc(description = "retrieves the list of all workspaces")
 	public WSFolder[] listWorkspaces(@WSDoc(description = "identifier of the session", required = true)

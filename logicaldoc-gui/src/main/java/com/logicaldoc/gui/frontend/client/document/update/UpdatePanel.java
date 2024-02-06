@@ -8,8 +8,10 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.document.DocumentCapturePanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentExtendedPropertiesPanel;
+import com.logicaldoc.gui.frontend.client.document.DocumentSecurityPanel;
 import com.logicaldoc.gui.frontend.client.document.PublishingPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.Side;
@@ -41,6 +43,8 @@ public class UpdatePanel extends VLayout {
 
 	protected Layout notificationTabPanel;
 
+	protected Layout securityTabPanel;
+
 	protected UpdateStandardPropertiesPanel propertiesPanel;
 
 	protected DocumentExtendedPropertiesPanel extendedPropertiesPanel;
@@ -50,6 +54,8 @@ public class UpdatePanel extends VLayout {
 	protected UpdateNotificationPanel notificationPanel;
 
 	protected DocumentCapturePanel capturePanel;
+
+	protected DocumentSecurityPanel securityPanel;
 
 	protected TabSet tabSet = new TabSet();
 
@@ -63,7 +69,9 @@ public class UpdatePanel extends VLayout {
 
 	protected Tab captureTab;
 
-	public UpdatePanel(GUIDocument metadata, boolean showNotificationPanel) {
+	protected Tab securityTab;
+
+	public UpdatePanel(GUIDocument metadata, boolean showNotificationPanel, boolean showSecurityTab) {
 		super();
 
 		if (metadata != null)
@@ -83,7 +91,7 @@ public class UpdatePanel extends VLayout {
 		spacer.setOverflow(Overflow.HIDDEN);
 
 		prepareTabs();
-		prepareTabset(showNotificationPanel);
+		prepareTabset(showNotificationPanel, showSecurityTab);
 		refresh();
 	}
 
@@ -117,9 +125,15 @@ public class UpdatePanel extends VLayout {
 		notificationTabPanel.setWidth100();
 		notificationTabPanel.setHeight100();
 		notificationTab.setPane(notificationTabPanel);
+
+		securityTab = new Tab(I18N.message("security"));
+		securityTabPanel = new HLayout();
+		securityTabPanel.setWidth100();
+		securityTabPanel.setHeight100();
+		securityTab.setPane(securityTabPanel);
 	}
 
-	protected void prepareTabset(boolean showNotificationPanel) {
+	protected void prepareTabset(boolean showNotificationPanel, boolean showSecurityTab) {
 		tabSet = new TabSet();
 		tabSet.setTabBarPosition(Side.TOP);
 		tabSet.setTabBarAlign(Side.LEFT);
@@ -137,6 +151,9 @@ public class UpdatePanel extends VLayout {
 
 		if (showNotificationPanel)
 			tabSet.addTab(notificationTab);
+
+		if (showSecurityTab)
+			tabSet.addTab(securityTab);
 
 		addMember(tabSet);
 	}
@@ -207,6 +224,17 @@ public class UpdatePanel extends VLayout {
 		}
 		notificationPanel = new UpdateNotificationPanel(document);
 		notificationTabPanel.addMember(notificationPanel);
+
+		/*
+		 * Prepare the security tab
+		 */
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
+				securityTabPanel.removeMember(securityPanel);
+		}
+		securityPanel = new DocumentSecurityPanel(document);
+		securityTabPanel.addMember(securityPanel);
 	}
 
 	public GUIDocument getDocument() {
@@ -219,6 +247,7 @@ public class UpdatePanel extends VLayout {
 		boolean publishingValid = retentionPoliciesPanel.validate();
 		boolean captureValid = capturePanel.validate();
 		notificationPanel.validate();
+		securityPanel.validate();
 
 		if (!stdValid)
 			tabSet.selectTab(propertiesTab);

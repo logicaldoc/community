@@ -56,13 +56,13 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 
 	@Override
 	public void move(String sid, long folderId, long parentId)
-			throws AuthenticationException, PersistenceException, WebserviceException {
+			throws AuthenticationException, PersistenceException, WebserviceException, PermissionException {
 		client.move(sid, folderId, parentId);
 	}
 
 	@Override
 	public void copy(String sid, long folderId, long parentId, int foldersOnly, String securityOption)
-			throws AuthenticationException, WebserviceException, PersistenceException {
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		client.copy(sid, folderId, parentId, foldersOnly, securityOption);
 	}
 

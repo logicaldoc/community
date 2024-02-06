@@ -22,7 +22,6 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
-import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -53,8 +52,8 @@ public class CommentService extends AbstractService {
 		Long docId = Long.parseLong(docid);
 		Document document = ddao.findById(docId);
 
-		checkReadEnable(user, document.getFolder().getId());
-		boolean writeEnabled = isWriteEnabled(user, document.getFolder().getId());
+		checkDocumentPermission(Permission.READ, user, docId);
+		boolean writeEnabled = isWriteEnabled(user, docId);
 
 		DocumentNoteDAO dndao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 
@@ -84,10 +83,10 @@ public class CommentService extends AbstractService {
 		return Response.ok(comments).build();
 	}
 
-	private boolean isWriteEnabled(User user, long folderId) {
+	private boolean isWriteEnabled(User user, long docId) {
 		try {
-			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			if (dao.isPermissionEnabled(Permission.WRITE, folderId, user.getId())) {
+			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			if (dao.isPermissionEnabled(Permission.WRITE, docId, user.getId())) {
 				return true;
 			}
 		} catch (Exception e) {

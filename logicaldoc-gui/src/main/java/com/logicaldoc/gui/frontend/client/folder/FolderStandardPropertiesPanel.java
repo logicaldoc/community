@@ -16,7 +16,6 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
@@ -221,12 +220,10 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private LinkItem preparePathItem() {
 		String path = folder.getPathExtended() != null ? folder.getPathExtended()
 				: FolderNavigator.get().getPath(folder.getId());
-		LinkItem pathItem = ItemFactory.newLinkItem("path", Util.padLeft(path, 150), Util.padLeft(path, 150),
-				Util.displayURL(null, folder.getId()));
+		LinkItem pathItem = ItemFactory.newLinkItem("path", "path", Util.padLeft(path, 40),
+				Util.displayURL(null, folder.getId()), path);
 		pathItem.setTooltip(path);
-		pathItem.setTitle(I18N.message("path"));
-		pathItem.setWidth(400);
-		pathItem.setIcons(new CopyTextFormItemIcon(path));
+		pathItem.setWrap(false);
 		return pathItem;
 	}
 

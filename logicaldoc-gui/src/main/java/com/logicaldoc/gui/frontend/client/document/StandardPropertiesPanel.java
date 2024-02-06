@@ -195,7 +195,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 	private LinkItem prepareFolderItem() {
 		String path = document.getPathExtended();
-		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40),
+		LinkItem folder = ItemFactory.newLinkItem("folder", "folder", Util.padLeft(path, 40),
 				Util.displayURL(null, document.getFolder().getId()), path);
 		folder.setTitle(I18N.message("folder"));
 		folder.setTooltip(path);

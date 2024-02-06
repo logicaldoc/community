@@ -257,7 +257,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Operation(operationId = "moveFolder", summary = "Moves a folder", description = "Updates a folder by changing its parent. The folder is moved to the new parent folder")
 	public void move(@QueryParam("folderId")
 	long folderId, @QueryParam("parentId")
-	long parentId) throws AuthenticationException, PersistenceException, WebserviceException {
+	long parentId) throws AuthenticationException, PersistenceException, WebserviceException, PermissionException {
 		String sid = validateSession();
 		super.move(sid, folderId, parentId);
 	}
@@ -343,7 +343,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			int foldersOnly,
 			@Parameter(description = "<b>null</b> or </b>none</b> = no sec. policies are created, <b>inherit</b>: the new folder will point to the parent for the security policies, <b>replicate</b> = sec. policies are inherited from the new parent folder", required = false)
 			@FormParam("securityOption")
-			String securityOption) throws AuthenticationException, WebserviceException, PersistenceException {
+			String securityOption) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSession();
 		super.copy(sid, folderId, targetId, foldersOnly, securityOption);
 	}
@@ -409,5 +409,4 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 		String sid = validateSession();
 		return super.getGrantedUsers(sid, folderId);
 	}
-
 }

@@ -12,8 +12,7 @@
 			<directory>target/classes</directory>
 			<outputDirectory>/</outputDirectory>
 			<excludes>
-				<exclude>context.properties</exclude>
-				<exclude>context.xml</exclude>
+				<exclude>context*</exclude>
 				<exclude>ehcache.xml</exclude>
 				<exclude>log.xml</exclude>
 			</excludes>

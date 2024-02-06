@@ -213,7 +213,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		try {
 			storer.setUseDummyFile(true);
-			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, false, false);
+			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, false, false, true);
 			Assert.assertNotSame(doc.getId(), newDoc.getId());
 			Assert.assertEquals(newFolder, newDoc.getFolder());
 			Assert.assertTrue(documentLinkDao.findByDocId(newDoc.getId()).isEmpty());
@@ -224,7 +224,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		try {
 			storer.setUseDummyFile(true);
-			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, true, true);
+			Document newDoc = documentManager.copyToFolder(doc, newFolder, transaction, true, true, false);
 			Assert.assertNotSame(doc.getId(), newDoc.getId());
 			Assert.assertEquals(newFolder, newDoc.getFolder());
 

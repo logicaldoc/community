@@ -234,7 +234,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				FolderService.Instance.get().paste(ids, folderId, "cut", false, false, new AsyncCallback<Void>() {
+				FolderService.Instance.get().paste(ids, folderId, "cut", false, false, false, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -935,13 +935,17 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		copyNotes.setValue(true);
 		items.add(copyNotes);
 
+		CheckboxItem copySecuerity = ItemFactory.newCheckbox("copysecurity");
+		copySecuerity.setValue(true);
+		items.add(copySecuerity);
+
 		LD.askForValues(I18N.message("copyoptions"), null, items, null, new ValuesCallback() {
 
 			@Override
 			public void execute(Map<String, Object> values) {
 				FolderService.Instance.get().paste(docIds, folderId, Clipboard.getInstance().getLastAction(),
 						Boolean.TRUE.equals(values.get("copylinks")), Boolean.TRUE.equals(values.get("copynotes")),
-						new AsyncCallback<Void>() {
+						Boolean.TRUE.equals(values.get("copysecurity")), new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

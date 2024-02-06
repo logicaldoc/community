@@ -392,6 +392,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			}
 
 			if (document.hasPermission(Constants.PERMISSION_SUBSCRIPTION)) {
+				tabSet.showTab(subscriptionsTab);
 				try {
 					subscriptionsPanel = new DocumentSubscriptionsPanel(document);
 					subscriptionsTabPanel.addMember(subscriptionsPanel);
@@ -401,7 +402,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					// Nothing to do
 				}
 			} else
-				tabSet.removeTab(subscriptionsTab);
+				tabSet.hideTab(subscriptionsTab);
 		}
 	}
 
@@ -484,6 +485,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		}
 
 		if (document.getDocRef() == null && Menu.enabled(Menu.ALIASES)) {
+			tabSet.showTab(aliasesTab);
 			try {
 				aliasesPanel = new AliasesPanel(document);
 				aliasesTabPanel.addMember(aliasesPanel);
@@ -493,7 +495,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				// Nothing to do
 			}
 		} else
-			tabSet.removeTab(aliasesTab);
+			tabSet.hideTab(aliasesTab);
 	}
 
 	private void prepareHistoryTab() {
@@ -532,6 +534,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		}
 
 		if (document.hasPermission(Constants.PERMISSION_SECURITY)) {
+			tabSet.showTab(securityTab);
 			try {
 				securityPanel = new DocumentSecurityPanel(document);
 				securityTabPanel.addMember(securityPanel);
@@ -539,7 +542,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				// Nothing to do
 			}
 		} else
-			tabSet.removeTab(securityTab);
+			tabSet.hideTab(securityTab);
 	}
 
 	private void prepareCaptureTab(ChangedHandler changeHandler) {

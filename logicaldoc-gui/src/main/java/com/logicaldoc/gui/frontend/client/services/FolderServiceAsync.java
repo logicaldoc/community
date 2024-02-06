@@ -19,7 +19,8 @@ public interface FolderServiceAsync {
 
 	void rename(long folderId, String name, AsyncCallback<Void> callback);
 
-	void paste(long[] docIds, long folderId, String action, boolean links, boolean notes, AsyncCallback<Void> callback);
+	void paste(long[] docIds, long folderId, String action, boolean links, boolean notes, boolean security,
+			AsyncCallback<Void> callback);
 
 	void pasteAsAlias(long[] docIds, long folderId, String type, AsyncCallback<Void> callback);
 

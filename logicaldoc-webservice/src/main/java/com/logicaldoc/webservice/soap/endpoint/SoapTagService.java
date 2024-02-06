@@ -14,6 +14,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
@@ -57,8 +58,8 @@ public class SoapTagService extends AbstractService implements TagService {
 		if (doc == null)
 			return;
 
-		User user = validateSession(sid);
-		checkWriteEnable(user, doc.getFolderId());
+		checkDocumentPermission(Permission.WRITE, validateSession(sid), doc.getId());
+
 		doc.setTags(tags);
 		docService.update(sid, doc);
 	}
@@ -70,8 +71,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		if (doc == null)
 			return;
 
-		User user = validateSession(sid);
-		checkWriteEnable(user, doc.getFolderId());
+		checkDocumentPermission(Permission.WRITE, validateSession(sid), doc.getId());
 		for (String tag : tags)
 			doc.addTag(tag);
 		docService.update(sid, doc);
@@ -84,8 +84,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		if (doc == null)
 			return new String[0];
 
-		User user = validateSession(sid);
-		checkReadEnable(user, doc.getFolderId());
+		checkDocumentPermission(Permission.READ, validateSession(sid), doc.getId());
 		return doc.getTags() != null ? doc.getTags() : new String[0];
 	}
 
@@ -96,8 +95,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		if (folder == null)
 			return;
 
-		User user = validateSession(sid);
-		checkWriteEnable(user, folderId);
+		checkFolderPermission(Permission.WRITE, validateSession(sid), folderId);
 		folder.setTags(tags);
 		folderService.update(sid, folder);
 	}
@@ -109,8 +107,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		if (folder == null)
 			return;
 
-		User user = validateSession(sid);
-		checkWriteEnable(user, folderId);
+		checkFolderPermission(Permission.WRITE, validateSession(sid), folderId);
 		for (String tag : tags)
 			folder.addTag(tag);
 		folderService.update(sid, folder);
@@ -123,8 +120,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		if (folder == null)
 			return new String[0];
 
-		User user = validateSession(sid);
-		checkReadEnable(user, folderId);
+		checkFolderPermission(Permission.READ, validateSession(sid), folderId);
 		return folder.getTags() != null ? folder.getTags() : new String[0];
 	}
 

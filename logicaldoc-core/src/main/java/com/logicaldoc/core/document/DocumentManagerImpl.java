@@ -86,40 +86,40 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
 
-	@Resource(name="DocumentDAO")
+	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDAO;
 
-	@Resource(name="DocumentLinkDAO")
+	@Resource(name = "DocumentLinkDAO")
 	private DocumentLinkDAO documentLinkDAO;
 
-	@Resource(name="DocumentNoteDAO")
+	@Resource(name = "DocumentNoteDAO")
 	private DocumentNoteDAO documentNoteDAO;
 
-	@Resource(name="FolderDAO")
+	@Resource(name = "FolderDAO")
 	private FolderDAO folderDAO;
 
-	@Resource(name="TemplateDAO")
+	@Resource(name = "TemplateDAO")
 	private TemplateDAO templateDAO;
 
-	@Resource(name="DocumentListenerManager")
+	@Resource(name = "DocumentListenerManager")
 	private DocumentListenerManager listenerManager;
 
-	@Resource(name="VersionDAO")
+	@Resource(name = "VersionDAO")
 	private VersionDAO versionDAO;
 
-	@Resource(name="UserDAO")
+	@Resource(name = "UserDAO")
 	private UserDAO userDAO;
 
-	@Resource(name="TicketDAO")
+	@Resource(name = "TicketDAO")
 	private TicketDAO ticketDAO;
 
-	@Resource(name="SearchEngine")
+	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
 
-	@Resource(name="Storer")
+	@Resource(name = "Storer")
 	private Storer storer;
 
-	@Resource(name="ContextProperties")
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	public void setListenerManager(DocumentListenerManager listenerManager) {
@@ -1006,8 +1006,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction, boolean links, boolean notes)
-			throws PersistenceException, IOException {
+	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction, boolean links, boolean notes,
+			boolean security) throws PersistenceException, IOException {
 		validateTransaction(transaction);
 
 		// initialize the document
@@ -1032,6 +1032,10 @@ public class DocumentManagerImpl implements DocumentManager {
 			cloned.setLinks(0);
 			cloned.setOcrd(0);
 			cloned.setBarcoded(0);
+
+			if (!security)
+				cloned.getDocumentGroups().clear();
+
 			Document createdDocument = create(is, cloned, transaction);
 
 			// Save the event of the copy
@@ -1208,7 +1212,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		documentDAO.delete(aliasId, transaction);
 
 		try {
-			return copyToFolder(originalDoc, folder, new DocumentHistory(transaction), true, true);
+			return copyToFolder(originalDoc, folder, new DocumentHistory(transaction), true, true, true);
 		} catch (IOException e) {
 			throw new PersistenceException(e);
 		}

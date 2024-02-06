@@ -1438,6 +1438,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public Set<Permission> getEnabledPermissions(long docId, long userId) throws PersistenceException {
 		User user = getExistingtUser(userId);
+		userDAO.initialize(user);
 
 		// If the user is an administrator bypass all controls
 		if (user.isMemberOf(Group.GROUP_ADMIN)) {
@@ -1445,68 +1446,60 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 
 		Set<Permission> permissions = new HashSet<>();
+		StringBuilder query = new StringBuilder(
+				"""
+						select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE,
+						ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,
+						ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
+						ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_readingreq LDREADINGREQ
+						from ld_documentgroup where
+						ld_docid=
+						""");
+		query.append(Long.toString(docId));
+		query.append(" and ld_groupid in (");
+		query.append(user.getGroups().stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+		query.append(")");
 
-		boolean overridesFolderPermissions = queryForLong(
-				"select count(*) from ld_documentgroup where ld_docid = " + docId) > 0;
-		if (overridesFolderPermissions) {
-			Set<Group> userGroups = user.getGroups();
-			if (userGroups.isEmpty())
-				return permissions;
+		Map<String, Permission> permissionColumn = new HashMap<>();
+		permissionColumn.put("LDDELETE", Permission.DELETE);
+		permissionColumn.put("LDIMMUTABLE", Permission.IMMUTABLE);
+		permissionColumn.put("LDSECURITY", Permission.SECURITY);
+		permissionColumn.put("LDRENAME", Permission.RENAME);
+		permissionColumn.put("LDWRITE", Permission.WRITE);
+		permissionColumn.put("LDREAD", Permission.READ);
+		permissionColumn.put("LDSIGN", Permission.SIGN);
+		permissionColumn.put("LDARCHIVE", Permission.ARCHIVE);
+		permissionColumn.put("LDWORKFLOW", Permission.WORKFLOW);
+		permissionColumn.put("LDDOWNLOAD", Permission.DOWNLOAD);
+		permissionColumn.put("LDCALENDAR", Permission.CALENDAR);
+		permissionColumn.put("LDSUBSCRIPTION", Permission.SUBSCRIPTION);
+		permissionColumn.put("LDPRINT", Permission.PRINT);
+		permissionColumn.put("LDPASSWORD", Permission.PASSWORD);
+		permissionColumn.put("LDMOVE", Permission.MOVE);
+		permissionColumn.put("LDEMAIL", Permission.EMAIL);
+		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
+		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
 
-			StringBuilder query = new StringBuilder(
-					"""
-							select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE,
-							ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,
-							ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
-							ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_readingreq LDREADINGREQ
-							from ld_documentgroup where
-							ld_docid=
-							""");
-			query.append(Long.toString(docId));
-			query.append(" and ld_groupid in (");
-			query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
-			query.append(")");
-
-			Map<String, Permission> permissionColumn = new HashMap<>();
-			permissionColumn.put("LDDELETE", Permission.DELETE);
-			permissionColumn.put("LDIMMUTABLE", Permission.IMMUTABLE);
-			permissionColumn.put("LDSECURITY", Permission.SECURITY);
-			permissionColumn.put("LDRENAME", Permission.RENAME);
-			permissionColumn.put("LDWRITE", Permission.WRITE);
-			permissionColumn.put("LDREAD", Permission.READ);
-			permissionColumn.put("LDSIGN", Permission.SIGN);
-			permissionColumn.put("LDARCHIVE", Permission.ARCHIVE);
-			permissionColumn.put("LDWORKFLOW", Permission.WORKFLOW);
-			permissionColumn.put("LDDOWNLOAD", Permission.DOWNLOAD);
-			permissionColumn.put("LDCALENDAR", Permission.CALENDAR);
-			permissionColumn.put("LDSUBSCRIPTION", Permission.SUBSCRIPTION);
-			permissionColumn.put("LDPRINT", Permission.PRINT);
-			permissionColumn.put("LDPASSWORD", Permission.PASSWORD);
-			permissionColumn.put("LDMOVE", Permission.MOVE);
-			permissionColumn.put("LDEMAIL", Permission.EMAIL);
-			permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
-			permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
-
-			/**
-			 * IMPORTANT: the connection MUST be explicitly closed, otherwise it
-			 * is probable that the connection pool will leave open it
-			 * indefinitely.
-			 */
-			try (Connection con = getConnection();
-					Statement stmt = con.createStatement();
-					ResultSet rs = stmt.executeQuery(query.toString())) {
-				while (rs.next()) {
-					for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
-						String column = entry.getKey();
-						Permission permission = entry.getValue();
-						if (rs.getInt(column) == 1)
-							permissions.add(permission);
-					}
+		/**
+		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
+		 * probable that the connection pool will leave open it indefinitely.
+		 */
+		try (Connection con = getConnection();
+				Statement stmt = con.createStatement();
+				ResultSet rs = stmt.executeQuery(query.toString())) {
+			while (rs.next()) {
+				for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
+					String column = entry.getKey();
+					Permission permission = entry.getValue();
+					if (rs.getInt(column) == 1)
+						permissions.add(permission);
 				}
-			} catch (SQLException se) {
-				throw new PersistenceException(se.getMessage(), se);
 			}
-		} else {
+		} catch (SQLException se) {
+			throw new PersistenceException(se.getMessage(), se);
+		}
+
+		if (permissions.isEmpty()) {
 			// The document does not specify its own permissions so use the
 			// folder's ones
 			long folderId = queryForLong("select ld_folderid from ld_document where ld_id = " + docId);

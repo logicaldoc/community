@@ -3,6 +3,7 @@ package com.logicaldoc.core.searchengine;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -56,7 +57,6 @@ public class TagSearch extends Search {
 	 * @throws PersistenceException error at data layer
 	 */
 	private void prepareExpression() throws PersistenceException {
-
 		// Find all real documents
 		StringBuilder query = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
@@ -149,6 +149,16 @@ public class TagSearch extends Search {
 			query.append(" and A.ld_published = 1 ");
 			query.append(" and A.ld_startpublishing <= CURRENT_TIMESTAMP ");
 			query.append(" and ( A.ld_stoppublishing is null or A.ld_stoppublishing > CURRENT_TIMESTAMP )");
+		}
+
+		// Filter those docs with explicit read denial
+		if (!searchUser.isMemberOf(Group.GROUP_ADMIN)) {
+			query.append(
+					" and not exists (select ld_docid from ld_documentgroup where ld_read=0 and ld_docid = A.ld_id ");
+			query.append(" and ld_groupid in (");
+			query.append(searchUser.getGroups().stream().map(g -> Long.toString(g.getId()))
+					.collect(Collectors.joining(",")));
+			query.append("))");
 		}
 	}
 

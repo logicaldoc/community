@@ -57,17 +57,6 @@ public class CookiesManager {
 	}
 
 	/**
-	 * Removes the cookies used to handle the login
-	 */
-	public static void removeLogin() {
-		try {
-			removeSid();
-		} catch (Exception t) {
-			// Nothing to do
-		}
-	}
-
-	/**
 	 * Removes all the informations stored in the browser
 	 */
 	public static void removeAllCookies() {
@@ -127,7 +116,7 @@ public class CookiesManager {
 		}
 
 		try {
-			removeLogin();
+			removeSid();
 		} catch (Exception t) {
 			// Nothing to do
 		}

@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.data.RightsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -14,8 +15,10 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
@@ -24,7 +27,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -80,9 +82,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 
 	private static final String ENTITY_ID = "entityId";
 
-	private RightsDS dataSource;
-
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private VLayout container = new VLayout();
 
@@ -160,15 +160,15 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		email.setType(ListGridFieldType.BOOLEAN);
 		email.setCanEdit(true);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setAutoFetchData(true);
 		list.setRotateHeaderTitles(true);
 		list.setHeaderHeight(100);
-		dataSource = new RightsDS(document.getId(), "document");
-		list.setDataSource(dataSource);
+		if (document.getId() != 0L)
+			list.setDataSource(new RightsDS(document.getId(), "document"));
 
 		List<ListGridField> fields = new ArrayList<>();
 		fields.add(entityId);
@@ -277,18 +277,20 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		Button save = new Button(I18N.message("save"));
 		save.setAutoFit(true);
 		save.addClickHandler(click -> onSave());
-		buttons.addMember(save);
-		
+		if (document.getId() != 0L)
+			buttons.addMember(save);
+
 		Button copyParentFolderSecurity = new Button(I18N.message("copyfoldersecurity"));
 		copyParentFolderSecurity.setAutoFit(true);
 		copyParentFolderSecurity.addClickHandler(click -> onCopyParentFolderSecurity());
 		buttons.addMember(copyParentFolderSecurity);
-		
+
 		addGroupSelector(buttons);
 
 		addUserSelector(buttons);
 
-		addExportAndPrintButtons(buttons);
+		if (document.getId() != 0L)
+			addExportAndPrintButtons(buttons);
 	}
 
 	private void addUserSelector(HLayout buttons) {
@@ -421,13 +423,6 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		return tmp.toArray(new GUIRight[0]);
 	}
 
-	@Override
-	public void destroy() {
-		super.destroy();
-		if (dataSource != null)
-			dataSource.destroy();
-	}
-
 	/**
 	 * Prepares the context menu
 	 * 
@@ -455,10 +450,16 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		});
 	}
 
-	public void onSave() {
+	@Override
+	public boolean validate() {
 		// Apply all rights
 		document.setRights(this.getRights());
+		return true;
+	}
 
+	public void onSave() {
+		validate();
+		
 		DocumentService.Instance.get().applySecurity(document, new AsyncCallback<Void>() {
 
 			@Override
@@ -475,23 +476,18 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	}
 
 	public void onCopyParentFolderSecurity() {
-		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), choice -> {
-			if (Boolean.TRUE.equals(choice)) {
-				DocumentService.Instance.get().applyParentFolderSecurity(document.getId(), new AsyncCallback<Void>() {
-
+		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
+				new AsyncCallback<GUIFolder>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
 					}
 
 					@Override
-					public void onSuccess(Void result) {
-						GuiLog.info(I18N.message("appliedrightsondoc"), null);
-						refresh(document);
+					public void onSuccess(GUIFolder folder) {
+						document.setRights(folder.getRights());
+						list.refresh(new RightsDS(document.getFolder().getId(), "folder"));
 					}
 				});
-			}
-		});
-
 	}
 }

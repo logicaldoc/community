@@ -58,7 +58,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		if (parentFolder == null)
 			throw new WebserviceException(
 					String.format("A parent folder with id %s was not found.", wsFolder.getParentId()));
-		checkPermission(Permission.ADD, user, wsFolder.getParentId());
+		checkFolderPermission(Permission.ADD, user, wsFolder.getParentId());
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -114,7 +114,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		Folder parentFolder = folderDao.findFolder(parentId);
 		if (parentFolder == null)
 			throw new WebserviceException(String.format("A parent folder with id %s was not found.", parentId));
-		checkPermission(Permission.ADD, user, parentFolder.getId());
+		checkFolderPermission(Permission.ADD, user, parentFolder.getId());
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -147,7 +147,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		if (folderId == rootId)
 			throw new WebserviceException("Cannot delete root folder or Default workspace");
 
-		checkPermission(Permission.DELETE, user, folderId);
+		checkFolderPermission(Permission.DELETE, user, folderId);
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -161,7 +161,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public WSFolder getFolder(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		checkReadEnable(user, folderId);
+		checkFolderPermission(Permission.READ, user, folderId);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);
@@ -180,7 +180,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			return null;
 
 		folderDao.initialize(folder);
-		checkReadEnable(user, folder.getId());
+		checkFolderPermission(Permission.READ, user, folder.getId());
 		return WSFolder.fromFolder(folder);
 	}
 
@@ -189,7 +189,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		try {
-			checkReadEnable(user, folderId);
+			checkFolderPermission(Permission.READ, user, folderId);
 		} catch (Exception e) {
 			return false;
 		}
@@ -202,7 +202,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 
 		User user = validateSession(sid);
-		checkReadEnable(user, folderId);
+		checkFolderPermission(Permission.READ, user, folderId);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Folder> folders = folderDao.findChildren(folderId, user.getId());
@@ -219,7 +219,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 	@Override
 	public void move(String sid, long folderId, long parentId)
-			throws PersistenceException, AuthenticationException, WebserviceException {
+			throws PersistenceException, AuthenticationException, WebserviceException, PermissionException {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -250,9 +250,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throw new SecurityException("No rights to delete folder");
 
 		// Check add permission on destParentFolder
-		boolean addEnabled = folderDao.isPermissionEnabled(Permission.ADD, destParentFolder.getId(), user.getId());
-		if (!addEnabled)
-			throw new SecurityException("Add Rights not granted on the target folder");
+		checkFolderPermission(Permission.ADD, user, destParentFolder.getId());
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -264,7 +262,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 	@Override
 	public void copy(String sid, long folderId, long targetId, int foldersOnly, String securityOption)
-			throws AuthenticationException, WebserviceException, PersistenceException {
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -288,9 +286,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throw new SecurityException(NOT_ALLOWED);
 
 		// Check add permission on destParentFolder
-		boolean addEnabled = folderDao.isPermissionEnabled(Permission.ADD, destTargetFolder.getId(), user.getId());
-		if (!addEnabled)
-			throw new SecurityException("Add Child rights not granted on the target folder");
+		checkFolderPermission(Permission.ADD, user, destTargetFolder.getId());
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -359,12 +355,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public boolean isWritable(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		try {
-			checkWriteEnable(user, folderId);
-		} catch (Exception e) {
-			return false;
-		}
-		return true;
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		return folderDao.isWriteEnabled(folderId, user.getId());
 	}
 
 	@Override
@@ -372,7 +364,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		try {
-			checkPermission(Permission.valueOf(permission), user, folderId);
+			checkFolderPermission(Permission.valueOf(permission), user, folderId);
 		} catch (Exception e) {
 			return false;
 		}
@@ -384,7 +376,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		checkReadEnable(user, folderId);
+		checkFolderPermission(Permission.READ, user, folderId);
 
 		List<WSFolder> path = new ArrayList<>();
 
@@ -455,13 +447,19 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	@Override
 	public WSRight[] getGrantedUsers(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return getGranted(sid, folderId, true);
+		validateSession(sid);
+		return SoapFolderService.getGranted(folderId, true);
 	}
 
-	private WSRight[] getGranted(String sid, long folderId, boolean users)
+	@Override
+	public WSRight[] getGrantedGroups(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
+		return SoapFolderService.getGranted(folderId, false);
+	}
 
+	static WSRight[] getGranted(long folderId, boolean users)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		List<WSRight> rightsList = new ArrayList<>();
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
@@ -480,12 +478,6 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		}
 
 		return rightsList.toArray(new WSRight[rightsList.size()]);
-	}
-
-	@Override
-	public WSRight[] getGrantedGroups(String sid, long folderId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return getGranted(sid, folderId, false);
 	}
 
 	@Override
@@ -549,7 +541,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public WSFolder createPath(String sid, long parentId, String path)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		checkPermission(Permission.ADD, user, parentId);
+		checkFolderPermission(Permission.ADD, user, parentId);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder parent = folderDao.findById(parentId);
@@ -637,17 +629,10 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throw new SecurityException(NOT_ALLOWED);
 
 		// Check add permission on destParentFolder
-		boolean addEnabled = folderDao.isPermissionEnabled(Permission.ADD, destTargetFolder.getId(), user.getId());
-		if (!addEnabled)
-			throw new SecurityException("Add Child rights not granted on the target folder");
+		checkFolderPermission(Permission.ADD, user, destTargetFolder.getId());
+		checkFolderPermission(Permission.WRITE, user, destTargetFolder.getId());
 
-		boolean writeEnabled = folderDao.isPermissionEnabled(Permission.WRITE, destTargetFolder.getId(), user.getId());
-		if (!writeEnabled)
-			throw new SecurityException("Write rights not granted on the target folder");
-
-		boolean delEnabled = folderDao.isPermissionEnabled(Permission.DELETE, sourceId, user.getId());
-		if (!delEnabled)
-			throw new SecurityException("Delete rights not granted on the source folder");
+		checkFolderPermission(Permission.DELETE, user, sourceId);
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();

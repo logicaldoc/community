@@ -19,6 +19,7 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
+import com.logicaldoc.webservice.model.WSRight;
 
 /**
  * Document Web Service definition interface
@@ -195,7 +196,9 @@ public interface DocumentService {
 	@WebParam(name = "links")
 	boolean links, @WSDoc(description = "if the notes and annotations must be copied too")
 	@WebParam(name = "notes")
-	boolean notes)
+	boolean notes, @WSDoc(description = "if the security settings must be copied too")
+	@WebParam(name = "security")
+	boolean security)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException;
 
 	/**
@@ -1279,4 +1282,175 @@ public interface DocumentService {
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
 	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+
+	/**
+	 * Grants user permission to the document.
+	 * 
+	 * @param sid Session identifier
+	 * @param docId Document id
+	 * @param userId User Id
+	 * @param permissions the permission integer representation. If '0', the
+	 *        user will be not granted to access the document.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
+	 */
+	@WebMethod(action = "grantUser")
+	@WSDoc(description = "grants user permission to the document")
+	public void grantUser(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "docId")
+	long docId, @WebParam(name = "userId")
+	long userId,
+			@WSDoc(description = "the permission integer representation; if '0', the user will be not granted to access the document")
+			@WebParam(name = "permissions")
+			int permissions)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
+
+	/**
+	 * Grants group permission to the document
+	 * 
+	 * @param sid Session identifier
+	 * @param docId Document id
+	 * @param groupId Group Id
+	 * @param permissions the permission integer representation. If '0', the
+	 *        group will be not granted to access the document.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
+	 */
+	@WebMethod(action = "grantGroup")
+	@WSDoc(description = "grants group permission to the document")
+	public void grantGroup(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "folderId")
+	long docId, @WebParam(name = "groupId")
+	long groupId,
+			@WSDoc(description = "the permission integer representation; if '0', the group will be not granted to access the document")
+			@WebParam(name = "permissions")
+			int permissions)
+			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException;
+
+	/**
+	 * Retrieves the list of granted users for the given document.
+	 * 
+	 * @param sid Session identifier
+	 * @param docId Document id
+	 * 
+	 * @return 'error' if error occurred, the right objects collection.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@WebMethod(action = "getGrantedUsers")
+	@WSDoc(description = "retrieves the list of granted users for the given document")
+	public WSRight[] getGrantedUsers(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Retrieves the list of granted groups for the given document
+	 * 
+	 * @param sid Session identifier
+	 * @param docId Document id
+	 * @return 'error' if error occurred, the right objects collection
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@WebMethod(action = "getGrantedGroups")
+	@WSDoc(description = "retrieves the list of granted groups for the given folder")
+	public WSRight[] getGrantedGroups(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Tests if a document is readable.
+	 * 
+	 * @param sid Session identifier
+	 * @param docId The document id
+	 * 
+	 * @return True if the identifier denotes a readable document, otherwise
+	 *         false.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@WebMethod(action = "isRead")
+	@WSDoc(description = "tests if a document is readable")
+	public boolean isRead(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Tests if a document is writable
+	 * 
+	 * @param sid Session identifier
+	 * @param docId The document id
+	 * @return True if the identifier denotes a writable folder, otherwise false
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@WebMethod(action = "isWrite")
+	@WSDoc(description = "tests if a folder is writable")
+	public boolean isWrite(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+	
+	/**
+	 * Tests if a document is downloadable
+	 * 
+	 * @param sid Session identifier
+	 * @param docId The document id
+	 * @return True if the identifier denotes a writable folder, otherwise false
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@WebMethod(action = "isDownload")
+	@WSDoc(description = "tests if a folder is writable")
+	public boolean isDownload(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Tests if the current user has a specific permission on a document
+	 * 
+	 * @param sid Session identifier
+	 * @param docId The document id
+	 * @param permission The permission representation
+	 * 
+	 * @return True if the identifier denotes a granted permission, otherwise
+	 *         false
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@WebMethod(action = "isGranted")
+	@WSDoc(description = "tests if the current user has a specific permission on a document")
+	public boolean isGranted(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "docId")
+	long docId, @WSDoc(description = "the permissions' integer representation")
+	@WebParam(name = "permission")
+	int permission) throws AuthenticationException, WebserviceException, PersistenceException;
+
 }

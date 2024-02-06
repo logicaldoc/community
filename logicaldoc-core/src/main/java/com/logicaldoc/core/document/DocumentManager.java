@@ -259,14 +259,15 @@ public interface DocumentManager {
 	 * @param transaction entry to log the event (set the user)
 	 * @param links if links must be copied too
 	 * @param notes if notes and annotations must be copied too
+	 * @param notes if security settings must be copied too
 	 * 
 	 * @return The created document
 	 * 
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
-	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction, boolean links, boolean notes)
-			throws PersistenceException, IOException;
+	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction, boolean links, boolean notes,
+			boolean security) throws PersistenceException, IOException;
 
 	/**
 	 * Create an alias(shortcut) associated to the given doc to the specified

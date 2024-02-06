@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
@@ -137,7 +138,7 @@ public class AbstractService {
 		}
 	}
 
-	protected void checkPermission(Permission permission, User user, long folderId)
+	protected void checkFolderPermission(Permission permission, User user, long folderId)
 			throws PersistenceException, PermissionException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
@@ -148,6 +149,17 @@ public class AbstractService {
 		}
 	}
 
+	protected void checkDocumentPermission(Permission permission, User user, long docId)
+			throws PersistenceException, PermissionException {
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		if (!dao.isPermissionEnabled(permission, docId, user.getId())) {
+			String message = String.format("User %s doesn't have permission %s on document %s", user.getUsername(),
+					permission.getName(), docId);
+			log.error(message);
+			throw new PermissionException(user.getUsername(), "document " + docId, permission);
+		}
+	}
+
 	protected void checkMenu(User user, long menuId) throws PermissionException {
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, user.getId())) {
@@ -155,30 +167,6 @@ public class AbstractService {
 					menuId);
 			log.error(message);
 			throw new PermissionException(user.getUsername(), "menu " + menuId, Permission.READ);
-		}
-	}
-
-	protected void checkWriteEnable(User user, long folderId) throws PermissionException, PersistenceException {
-		checkPermission(Permission.WRITE, user, folderId);
-	}
-
-	protected void checkReadEnable(User user, long folderId) throws PersistenceException, PermissionException {
-		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!dao.isReadEnabled(folderId, user.getId())) {
-			String message = String.format("User %s doesn't have read permission on folder %s", user.getUsername(),
-					folderId);
-			log.error(message);
-			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.READ);
-		}
-	}
-
-	protected void checkDownloadEnable(User user, long folderId) throws PersistenceException, PermissionException {
-		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!dao.isPermissionEnabled(Permission.DOWNLOAD, folderId, user.getId())) {
-			String message = String.format("User %s doesn't have download permission on folder %s", user.getUsername(),
-					folderId);
-			log.error(message);
-			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.DOWNLOAD);
 		}
 	}
 

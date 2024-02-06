@@ -459,7 +459,8 @@ public interface DocumentService {
 	long docId, @QueryParam("folderId")
 	long folderId, @QueryParam("links")
 	boolean links, @QueryParam("notes")
-	boolean notes)
+	boolean notes, @QueryParam("security")
+	boolean security)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException;
 
 	/**
@@ -995,4 +996,116 @@ public interface DocumentService {
 	 */
 	public void unsetPassword(long docId, String currentPassword)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+
+	/**
+	 * Grants user permission to the document.
+	 * 
+	 * @param docId Document id
+	 * @param userId User Id
+	 * @param permissions the permission integer representation. If '0', the
+	 *        user will be not granted to access the document.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
+	 * @throws AuthenticationException Invalid credentials
+	 */
+	@PUT
+	@Path("/grantUser")
+	public void grantUser(@QueryParam("docId")
+	long docId, @QueryParam("userId")
+	long userId, @QueryParam("permissions")
+	int permissions) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
+
+	/**
+	 * Grants group permission to the document
+	 * 
+	 * @param folderId Document id
+	 * @param docId Group Id
+	 * @param permissions the permission integer representation. If '0', the
+	 *        group will be not granted to access the document.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
+	 * @throws AuthenticationException Invalid credentials
+	 */
+	@PUT
+	@Path("/grantGroup")
+	public void grantGroup(@QueryParam("docId")
+	long docId, @QueryParam("groupId")
+	long groupId, @QueryParam("permissions")
+	int permissions) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
+
+	/**
+	 * Tests if a document is readable.
+	 * 
+	 * @param docId The document id
+	 * 
+	 * @return True if the identifier denotes a readable document, otherwise
+	 *         false.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws AuthenticationException Invalid credentials
+	 */
+	@GET
+	@Path("/isRead")
+	public boolean isRead(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Tests if a document is downloadable.
+	 * 
+	 * @param docId The document id
+	 * 
+	 * @return True if the identifier denotes a downloadable document, otherwise
+	 *         false.
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws AuthenticationException Invalid credentials
+	 */
+	@GET
+	@Path("/isDownload")
+	public boolean isDownload(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Tests if a document is writable
+	 * 
+	 * @param docId The document id
+	 * 
+	 * @return True if the identifier denotes a writable document, otherwise
+	 *         false
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws AuthenticationException Invalid credentials
+	 */
+	@GET
+	@Path("/isWrite")
+	public boolean isWrite(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Tests if the current user has a specific permission on a document
+	 * 
+	 * @param docId The document id
+	 * @param permission The permission representation
+	 * 
+	 * @return True if the identifier denotes a granted permission, otherwise
+	 *         false
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws AuthenticationException Invalid credentials
+	 */
+	@GET
+	@Path("/isGranted")
+	public boolean isGranted(@QueryParam("docId")
+	long docId, @QueryParam("permission")
+	int permission) throws AuthenticationException, WebserviceException, PersistenceException;
 }

@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -130,12 +129,7 @@ public class FulltextSearch extends Search {
 		 */
 		StringBuilder query = prepareQuery(opt);
 
-		Collection<Long> accessibleFolderIds;
-		try {
-			accessibleFolderIds = getAccessibleFolderIds(opt);
-		} catch (PersistenceException e) {
-			throw new SearchException(e);
-		}
+		Collection<Long> accessibleFolderIds = getAccessibleFolderIds();
 
 		long tenantId = getTenant(opt);
 
@@ -260,7 +254,7 @@ public class FulltextSearch extends Search {
 		List<Hit> sortedHitsList = new ArrayList<>(hitsMap.values());
 		Collections.sort(sortedHitsList);
 
-		// Populate the hits list discarding unexisting documents
+		// Populate the hits list discarding unaccessible documents
 		propulateHits(opt, accessibleFolderIds, sortedHitsList);
 	}
 
@@ -278,29 +272,11 @@ public class FulltextSearch extends Search {
 		return hitsMap;
 	}
 
-	private Collection<Long> getAccessibleFolderIds(FulltextSearchOptions opt) throws PersistenceException {
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-		/*
-		 * We have to see what folders the user can access. But we need to
-		 * perform this check only if the search is not restricted to one folder
-		 * only.
-		 */
-		Collection<Long> accessibleFolderIds = new TreeSet<>();
-		boolean searchInSingleFolder = (opt.getFolderId() != null && !opt.isSearchInSubPath());
-		if (!searchInSingleFolder) {
-			log.debug("Folders search");
-			if (opt.getFolderId() != null)
-				accessibleFolderIds = fdao.findFolderIdByUserIdInPath(opt.getUserId(), opt.getFolderId());
-			else
-				accessibleFolderIds = fdao.findFolderIdByUserId(opt.getUserId(), null, true);
-			log.debug("End of Folders search");
-		}
-		return accessibleFolderIds;
-	}
-
 	private void propulateHits(FulltextSearchOptions opt, Collection<Long> accessibleFolderIds,
-			List<Hit> sortedHitsList) {
+			List<Hit> sortedHitsList) throws SearchException {
+
+		Set<Long> forbiddenDocs = getDeniedDocIds(sortedHitsList, accessibleFolderIds);
+
 		Iterator<Hit> iter = sortedHitsList.iterator();
 		while (iter.hasNext()) {
 			if (options.getMaxHits() > 0 && hits.size() >= options.getMaxHits()) {
@@ -309,10 +285,10 @@ public class FulltextSearch extends Search {
 				break;
 			}
 			Hit hit = iter.next();
-
 			if (StringUtils.isNotEmpty(hit.getFileName())
 					&& ((searchUser.isMemberOf(Group.GROUP_ADMIN) && opt.getFolderId() == null)
-							|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId()))))
+							|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId())))
+					&& !forbiddenDocs.contains(hit.getId()))
 				hits.add(hit);
 		}
 	}

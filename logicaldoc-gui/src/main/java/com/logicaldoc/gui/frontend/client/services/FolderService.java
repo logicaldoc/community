@@ -213,10 +213,11 @@ public interface FolderService extends RemoteService {
 	 *        {@link Clipboard#COPY})
 	 * @param links if the links must be copied too
 	 * @param notes if the notes and annotations must be copied too
+	 * @param security if the security settings must be copied too
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void paste(long[] docIds, long folderId, String action, boolean links, boolean notes) throws ServerException;
+	public void paste(long[] docIds, long folderId, String action, boolean links, boolean notes, boolean security) throws ServerException;
 
 	public void pasteAsAlias(long[] docIds, long folderId, String type) throws ServerException;
 

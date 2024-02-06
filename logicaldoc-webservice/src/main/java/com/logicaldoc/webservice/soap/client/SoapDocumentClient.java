@@ -20,6 +20,7 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
+import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.soap.DocumentService;
 
 /**
@@ -95,10 +96,10 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSDocument copy(String sid, long docId, long folderId, boolean links, boolean notes)
+	public WSDocument copy(String sid, long docId, long folderId, boolean links, boolean notes, boolean security)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			IOException {
-		return client.copy(sid, docId, folderId, links, notes);
+		return client.copy(sid, docId, folderId, links, notes, security);
 	}
 
 	@Override
@@ -385,5 +386,53 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	public WSDocument getVersion(String sid, long docId, String version)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.getVersion(sid, docId, version);
+	}
+
+	@Override
+	public void grantUser(String sid, long docId, long userId, int permissions)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
+		client.grantUser(sid, docId, userId, permissions);
+	}
+
+	@Override
+	public void grantGroup(String sid, long docId, long groupId, int permissions)
+			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException {
+		client.grantGroup(sid, docId, groupId, permissions);
+	}
+
+	@Override
+	public WSRight[] getGrantedUsers(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+return client.getGrantedUsers(sid, docId);
+	}
+
+	@Override
+	public WSRight[] getGrantedGroups(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+		return client.getGrantedGroups(sid, docId);
+	}
+
+	@Override
+	public boolean isRead(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+		return client.isRead(sid, docId);
+	}
+
+	@Override
+	public boolean isWrite(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+		return client.isWrite(sid, docId);
+	}
+
+	@Override
+	public boolean isDownload(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+		return client.isDownload(sid, docId);
+	}
+
+	@Override
+	public boolean isGranted(String sid, long docId, int permission)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+		return client.isGranted	(sid, docId, permission);
 	}
 }
