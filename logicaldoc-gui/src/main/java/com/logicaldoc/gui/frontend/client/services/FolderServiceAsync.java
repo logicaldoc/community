@@ -8,8 +8,6 @@ public interface FolderServiceAsync {
 
 	void save(GUIFolder folder, AsyncCallback<GUIFolder> callback);
 
-	void applyRights(GUIFolder folder, boolean subfolders, AsyncCallback<Void> callback);
-
 	void delete(long[] folderIds, AsyncCallback<Void> callback);
 
 	void getFolder(long folderId, boolean computePath, boolean computeDocs, boolean computeSubfolders,
@@ -39,7 +37,9 @@ public interface FolderServiceAsync {
 	void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, String securityOption, GUIFolder model,
 			AsyncCallback<Void> callback);
 
-	void inheritRights(long folderId, long rightsFolderId, AsyncCallback<GUIFolder> callback);
+	void saveACL(GUIFolder folder, boolean subfolders, AsyncCallback<Void> callback);
+
+	void inheritACL(long folderId, long rightsFolderId, AsyncCallback<GUIFolder> callback);
 
 	void deleteFromTrash(Long[] ids, AsyncCallback<Void> callback);
 

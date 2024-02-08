@@ -16,20 +16,22 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Group;
-import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.menu.Menu;
+import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.Context;
 
 /**
- * This servlet is responsible for rights data.
+ * This servlet is responsible retrieving the Access Control List for documents, folders, menus and templates
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class RightsDataServlet extends AbstractDataServlet {
+public class AclDataServlet extends AbstractDataServlet {
 
 	private static final String ENTITY = "<entity><![CDATA[";
 
@@ -45,13 +47,16 @@ public class RightsDataServlet extends AbstractDataServlet {
 		String type = request.getParameter("type");
 		switch (type) {
 		case "menu":
-			menuRights(response, id, session.getTenantId());
+			menuAcl(response, id, session.getTenantId());
 			break;
 		case "folder":
-			folderRights(response, id);
+			folderACL(response, id);
+			break;
+		case "template":
+			templateACL(response, id);
 			break;
 		default:
-			documentRights(response, id);
+			documentACL(response, id);
 		}
 
 	}
@@ -70,8 +75,60 @@ public class RightsDataServlet extends AbstractDataServlet {
 			users.put(set.getLong(1), set.getString(3) + " " + set.getString(4) + " (" + set.getString(2) + ")");
 		return users;
 	}
+	
+	private void templateACL(HttpServletResponse response, long templateId)
+			throws IOException, PersistenceException {
+		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		Template template = tDao.findById(templateId);
+		tDao.initialize(template);
 
-	private void documentRights(HttpServletResponse response, long documentId)
+		// Prepare a map of users
+		Map<Long, String> users = getUsers(template.getTenantId());
+
+		PrintWriter writer = response.getWriter();
+		writer.write("<list>");
+
+		// Prepare the query on the folder group in join with groups
+		StringBuilder query = new StringBuilder(
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_read from ld_template_acl as A, ld_group B where A.ld_templateid = ");
+		query.append("" + template.getId());
+		query.append(" and B.ld_tenantid = " + template.getTenantId());
+		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_name asc");
+
+		SqlRowSet set = tDao.queryForRowSet(query.toString(), null);
+
+		/*
+		 * Iterate over records composing the response XML document
+		 */
+		while (set.next()) {
+			long groupId = set.getLong(1);
+			String groupName = set.getString(2);
+			int groupType = set.getInt(3);
+			long userId = 0L;
+			if (groupType == Group.TYPE_USER && groupName != null)
+				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
+
+			writer.print("<ace>");
+			writer.print("<entityId>" + groupId + "</entityId>");
+
+			if (groupType == Group.TYPE_DEFAULT) {
+				writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
+				writer.print("<avatar>group</avatar>");
+			} else {
+				writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
+				writer.print("<avatar>" + userId + "</avatar>");
+			}
+			writer.print("<write>" + (set.getInt(4) == 1) + "</write>");
+			writer.print("<read>" + (set.getInt(5) == 1) + "</read>");
+			writer.print("<type>" + groupType + "</type>");
+			writer.print("</ace>");
+
+		}
+
+		writer.write("</list>");
+	}
+
+	private void documentACL(HttpServletResponse response, long documentId)
 			throws IOException, PersistenceException {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document document = docDao.findById(documentId);
@@ -83,14 +140,14 @@ public class RightsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		// Prepare the query on the folder group in join with groups
+		// Prepare the query on the ACL in join with groups
 		StringBuilder query = new StringBuilder(
 				"""
 						select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, 0, A.ld_security, A.ld_immutable, A.ld_delete,
 						       A.ld_rename, 0, 0, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
 						       A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
 						       0, A.ld_readingreq, A.ld_read
-						  from ld_documentgroup A, ld_group B 
+						  from ld_document_acl A, ld_group B 
 						 where A.ld_docid =
 						""");
 		query.append(Long.toString(documentId));
@@ -103,12 +160,12 @@ public class RightsDataServlet extends AbstractDataServlet {
 		 * Iterate over records composing the response XML document
 		 */
 		while (set.next())
-			printRight(writer, set, users);
+			printACE(writer, set, users);
 
 		writer.write("</list>");
 	}
 
-	private void folderRights(HttpServletResponse response, long folderId) throws IOException, PersistenceException {
+	private void folderACL(HttpServletResponse response, long folderId) throws IOException, PersistenceException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);
@@ -125,14 +182,14 @@ public class RightsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		// Prepare the query on the folder group in join with groups
+		// Prepare the query on the ACL in join with groups
 		StringBuilder query = new StringBuilder(
 				"""
 						select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_add, A.ld_security, A.ld_immutable, A.ld_delete,
 						       A.ld_rename, A.ld_import, A.ld_export, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
 						       A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
 						       A.ld_storage, A.ld_readingreq, A.ld_read
-						  from ld_foldergroup A, ld_group B 
+						  from ld_folder_acl A, ld_group B 
 						 where A.ld_folderid =
 						""");
 		query.append(Long.toString(ref.getId()));
@@ -145,12 +202,12 @@ public class RightsDataServlet extends AbstractDataServlet {
 		 * Iterate over records composing the response XML document
 		 */
 		while (set.next())
-			printRight(writer, set, users);
+			printACE(writer, set, users);
 
 		writer.write("</list>");
 	}
 
-	private void menuRights(HttpServletResponse response, long menuId, long tenantId)
+	private void menuAcl(HttpServletResponse response, long menuId, long tenantId)
 			throws IOException, PersistenceException {
 		MenuDAO menuDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		Menu menu = menuDao.findById(menuId);
@@ -162,9 +219,9 @@ public class RightsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		// Prepare the query on the folder group in join with groups
+		// Prepare the query on the menu ACL in join with groups
 		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type from ld_menugroup A, ld_group B where A.ld_menuid = ");
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read from ld_menu_acl A, ld_group B where A.ld_menuid = ");
 		query.append("" + menu.getId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + tenantId);
 		query.append(" order by B.ld_type asc, B.ld_name asc");
@@ -182,7 +239,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 			if (groupType == Group.TYPE_USER && groupName != null)
 				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
-			writer.print("<right>");
+			writer.print("<ace>");
 			writer.print("<entityId>" + groupId + "</entityId>");
 
 			if (groupType == Group.TYPE_DEFAULT) {
@@ -193,14 +250,15 @@ public class RightsDataServlet extends AbstractDataServlet {
 				writer.print("<avatar>" + userId + "</avatar>");
 			}
 
+			writer.print("<read>" + intToBoolean(set.getInt(4)) + "</read>");
 			writer.print("<type>" + groupType + "</type>");
-			writer.print("</right>");
+			writer.print("</ace>");
 		}
 
 		writer.write("</list>");
 	}
 
-	private void printRight(PrintWriter writer, SqlRowSet set, Map<Long, String> users) {
+	private void printACE(PrintWriter writer, SqlRowSet set, Map<Long, String> users) {
 		long groupId = set.getLong(1);
 		String groupName = set.getString(2);
 		int groupType = set.getInt(3);
@@ -208,7 +266,7 @@ public class RightsDataServlet extends AbstractDataServlet {
 		if (groupType == Group.TYPE_USER && groupName != null)
 			userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
-		writer.print("<right>");
+		writer.print("<ace>");
 		writer.print("<entityId>" + groupId + "</entityId>");
 
 		if (groupType == Group.TYPE_DEFAULT) {
@@ -241,9 +299,8 @@ public class RightsDataServlet extends AbstractDataServlet {
 		writer.print("<storage>" + intToBoolean(set.getInt(23)) + "</storage>");
 		writer.print("<readingreq>" + intToBoolean(set.getInt(24)) + "</readingreq>");
 		writer.print("<read>" + intToBoolean(set.getInt(25)) + "</read>");
-
 		writer.print("<type>" + groupType + "</type>");
-		writer.print("</right>");
+		writer.print("</ace>");
 	}
 
 	private boolean intToBoolean(int val) {

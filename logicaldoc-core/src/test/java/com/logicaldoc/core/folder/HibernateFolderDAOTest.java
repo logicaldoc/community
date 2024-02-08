@@ -26,6 +26,7 @@ import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
@@ -110,17 +111,17 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(folder);
 		folder = dao.findById(folder.getParentId());
 		Assert.assertEquals("Capo d'Orlando 05-35632", folder.getName());
-		
+
 		/*
 		 * Test a folder with a template
 		 */
-		folder =  new Folder();
+		folder = new Folder();
 		folder.setName("withTemplate");
 		folder.setTemplate(templateDao.findByName("email", Tenant.DEFAULT_ID));
 		folder.setValue("from", "test@acme.com");
 		folder.setParentId(dao.findDefaultWorkspace(Tenant.DEFAULT_ID).getId());
 		dao.store(folder);
-		
+
 		folder = dao.createPath(folder, "/A/B/C/D/E/F/G/H/I/L/M/N/O/P/Q/R/S/T/U/V/Z", false, null);
 		Assert.assertNotNull(folder);
 		f = dao.findByPathExtended("/Default/withTemplate/A/B/C/D/E/F/G/H/I/L/M/N/O/P", 1L);
@@ -136,6 +137,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertEquals(4, docCount);
 		assertEquals(7, docCountDelete);
 	}
+
 	@Test
 	public void testFind() throws PersistenceException {
 		Folder folder = dao.findByPathExtended("/test", 1L);
@@ -303,11 +305,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		folder = dao.findById(6L);
 		dao.initialize(folder);
-		Assert.assertEquals(3, folder.getFolderGroups().size());
+		Assert.assertEquals(3, folder.getAccessControlList().size());
 
 		newFolder = dao.copy(folder, dao.findById(1210L), null, false, "replicate", tr);
 		dao.initialize(newFolder);
-		Assert.assertEquals(3, newFolder.getFolderGroups().size());
+		Assert.assertEquals(3, newFolder.getAccessControlList().size());
 	}
 
 	@Test
@@ -525,7 +527,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Folder folder = new Folder();
 		folder.setName("text");
 		folder.setParentId(5);
-		folder.setFolderGroup(new long[] { 1, 2 });
+		folder.setAccessControlList(Set.of(new AccessControlEntry(1L), new AccessControlEntry(2L)));
 
 		folder.addTag("A");
 
@@ -545,16 +547,17 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Test updating the security rules
 		folder = dao.findById(folder.getId());
 		dao.initialize(folder);
-		Assert.assertEquals(2, folder.getFolderGroups().size());
-		FolderGroup fg = new FolderGroup();
-		fg.setGroupId(3L);
-		fg.setPermissions(5);
-		folder.addFolderGroup(fg);
+		Assert.assertEquals(2, folder.getAccessControlList().size());
+		AccessControlEntry ace = new AccessControlEntry();
+		ace.setGroupId(3L);
+		ace.grantPermissions(
+				Set.of(Permission.READ, Permission.WRITE, Permission.DELETE, Permission.MOVE, Permission.DOWNLOAD));
+		folder.addAccessControlEntry(ace);
 		dao.store(folder);
 		Assert.assertNotNull(folder);
 		folder = dao.findById(folder.getId());
 		dao.initialize(folder);
-		Assert.assertEquals(3, folder.getFolderGroups().size());
+		Assert.assertEquals(3, folder.getAccessControlList().size());
 
 		// Set a securityRef
 		folder.setSecurityRef(5L);
@@ -587,7 +590,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder = dao.findById(6);
 		dao.initialize(folder);
 		Assert.assertEquals("folder6", folder.getName());
-		Assert.assertEquals(3, folder.getFolderGroups().size());
+		Assert.assertEquals(3, folder.getAccessControlList().size());
 
 		// Load an existing folder and modify it
 		folder = dao.findById(6);
@@ -617,13 +620,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		folder = dao.findById(6);
 		dao.initialize(folder);
-		folder.getFolderGroups().remove(folder.getFolderGroup(2));
-		Assert.assertEquals(2, folder.getFolderGroups().size());
+		folder.getAccessControlList().remove(folder.getAccessControlEntry(2));
+		Assert.assertEquals(2, folder.getAccessControlList().size());
 		dao.store(folder);
 		Assert.assertNotNull(folder);
 		folder = dao.findById(Folder.ROOTID);
 		dao.initialize(folder);
-		Assert.assertEquals(4, folder.getFolderGroups().size());
+		Assert.assertEquals(4, folder.getAccessControlList().size());
 
 		folder = dao.findById(1200);
 		dao.initialize(folder);
@@ -748,7 +751,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(folder);
 		Assert.assertEquals(Folder.ROOTID, folder.getId());
 		Assert.assertEquals("/", folder.getName());
-		Assert.assertEquals(4, folder.getFolderGroups().size());
+		Assert.assertEquals(4, folder.getAccessControlList().size());
 
 		// Try with unexisting id
 		folder = dao.findById(99999);
@@ -1222,7 +1225,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testApplyRightsToTree() throws PersistenceException {
+	public void testApplySecurityToTree() throws PersistenceException {
 		FolderHistory transaction = new FolderHistory();
 		User user = new User();
 		user.setId(4);

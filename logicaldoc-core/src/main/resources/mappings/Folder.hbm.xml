@@ -41,9 +41,9 @@
 
 		<property name="tile" type="text" column="ld_tile" />
 		
-		<set name="folderGroups" table="ld_foldergroup" cascade="all" lazy="true">
+		<set name="accessControlList" table="ld_folder_acl" cascade="all" lazy="true">
 			<key column="ld_folderid" />
-			<composite-element class="com.logicaldoc.core.folder.FolderGroup">
+			<composite-element class="com.logicaldoc.core.security.AccessControlEntry">
 				<property name="groupId" type="long" column="ld_groupid" not-null="true" />
 				<property name="read" type="int" column="ld_read" not-null="true" />
 				<property name="write" type="int" column="ld_write" not-null="true" />

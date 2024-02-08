@@ -10,24 +10,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
-import com.logicaldoc.core.folder.FolderGroup;
 import com.logicaldoc.core.folder.FolderHistory;
-import com.logicaldoc.core.security.Group;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
-import com.logicaldoc.core.security.dao.GroupDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSFolder;
-import com.logicaldoc.webservice.model.WSRight;
+import com.logicaldoc.webservice.model.WSUtil;
 import com.logicaldoc.webservice.soap.FolderService;
 
 /**
@@ -360,7 +359,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public boolean isGranted(String sid, long folderId, int permission)
+	public boolean isGranted(String sid, long folderId, String permission)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		try {
@@ -403,81 +402,46 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public void grantUser(String sid, long folderId, long userId, int permissions, boolean recursive)
+	public void setAccessControlList(String sid, long folderId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-
-		User user = userDao.findById(userId);
-		grantGroup(sid, folderId, user.getUserGroup().getId(), permissions, recursive);
-	}
-
-	@Override
-	public void grantGroup(String sid, long folderId, long groupId, int permissions, boolean recursive)
-			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException {
 		User sessionUser = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		// Check if the session user has the Security Permission of this folder
+		// Check if the session user has the Security Permission of this
+		// folder
 		if (!folderDao.isPermissionEnabled(Permission.SECURITY, folderId, sessionUser.getId()))
-			throw new PermissionException(sessionUser.getUsername(), FOLDER + folderId, Permission.SECURITY);
+			throw new PermissionException(sessionUser.getUsername(), "Folder " + folderId, Permission.SECURITY);
 
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);
 		folder.setSecurityRef(null);
-
-		FolderGroup fg = new FolderGroup();
-		fg.setGroupId(groupId);
-		fg.setPermissions(permissions);
-		folder.addFolderGroup(fg);
+		folder.getAccessControlList().clear();
+		for (WSAccessControlEntry wsAcwe : acl)
+			folder.addAccessControlEntry(WSUtil.toAccessControlEntry(wsAcwe));
 
 		FolderHistory history = new FolderHistory();
-		history.setEvent(FolderEvent.PERMISSION.toString());
+		history.setEvent(DocumentEvent.PERMISSION.toString());
 		history.setSession(SessionManager.get().get(sid));
 		folderDao.store(folder, history);
 
-		if (recursive) {
-			folderDao.initialize(folder);
-			FolderHistory transaction = new FolderHistory();
-			transaction.setUser(sessionUser);
-			transaction.setSessionId(sid);
-			folderDao.applySecurityToTree(folder.getId(), transaction);
-		}
 	}
 
 	@Override
-	public WSRight[] getGrantedUsers(String sid, long folderId)
+	public WSAccessControlEntry[] getAccessControlList(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		return SoapFolderService.getGranted(folderId, true);
-	}
 
-	@Override
-	public WSRight[] getGrantedGroups(String sid, long folderId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		validateSession(sid);
-		return SoapFolderService.getGranted(folderId, false);
-	}
+		List<WSAccessControlEntry> acl = new ArrayList<>();
 
-	static WSRight[] getGranted(long folderId, boolean users)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		List<WSRight> rightsList = new ArrayList<>();
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		Folder folder = folderDao.findById(folderId);
 		if (folder.getSecurityRef() != null)
 			folder = folderDao.findById(folder.getSecurityRef());
 		folderDao.initialize(folder);
-		for (FolderGroup mg : folder.getFolderGroups()) {
-			Group group = groupDao.findById(mg.getGroupId());
-			if (group.getName().startsWith("_user_") && users) {
-				rightsList.add(
-						new WSRight(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)),
-								mg.getPermissions()));
-			} else if (!group.getName().startsWith("_user_") && !users)
-				rightsList.add(new WSRight(group.getId(), mg.getPermissions()));
-		}
 
-		return rightsList.toArray(new WSRight[rightsList.size()]);
+		for (AccessControlEntry ace : folder.getAccessControlList())
+			acl.add(WSUtil.toWSAccessControlEntry(ace));
+		return acl.toArray(new WSAccessControlEntry[0]);
 	}
 
 	@Override

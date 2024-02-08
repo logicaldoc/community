@@ -1,4 +1,4 @@
-package com.logicaldoc.core.security.dao;
+package com.logicaldoc.core.security.menu;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,11 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Group;
-import com.logicaldoc.core.security.Menu;
-import com.logicaldoc.core.security.MenuGroup;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -36,9 +37,9 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	private static final String AND_B_LD_SECURITYREF_IN = " and B.ld_securityref in (";
 
-	private static final String SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B = "select distinct(A.ld_menuid) from ld_menugroup A, ld_menu B ";
+	private static final String SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B = "select distinct(A.ld_menuid) from ld_menu_acl A, ld_menu B ";
 
-	private static final String MENU_GROUPS_AS_GROUP = ".menuGroups as _group ";
+	private static final String ACL_AS_GROUP = ".accessControlList as _group ";
 
 	private static final String WHERE = " where ";
 
@@ -84,13 +85,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public void store(Menu menu) throws PersistenceException {
-		try {
-			if (menu.getSecurityRef() != null)
-				menu.getMenuGroups().clear();
-			saveOrUpdate(menu);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
+		AccessControlUtil.removeForbiddenPermissionsForGuests(menu);
+		super.store(menu);
 	}
 
 	@Override
@@ -110,7 +106,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (!precoll.isEmpty()) {
 				// First of all collect all menus that define it's own policies
 				StringBuilder query = new StringBuilder("select distinct(_menu) from Menu _menu  ");
-				query.append(" left join _menu.menuGroups as _group ");
+				query.append(" left join _menu.accessControlList as _group ");
 				query.append(" where _menu.enabled=1 and _group.groupId in (");
 				query.append(precoll.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 				query.append(")");
@@ -162,7 +158,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return coll;
 			StringBuilder query1 = new StringBuilder();
 			query1.append(SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + " ");
-			query1.append(LEFT_JOIN + ENTITY + ".menuGroups as _group");
+			query1.append(LEFT_JOIN + ENTITY + ".accessControlList as _group");
 			query1.append(WHERE_GROUP_GROUP_ID_IN);
 			query1.append(
 					user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
@@ -183,7 +179,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 					+ ".deleted=0 and " + ENTITY + ENABLED_1_AND + ENTITY + ".parentId = :parentId ");
 			query2.append(AND + ENTITY + SECURITY_REF_IN);
 			query2.append("    select distinct(B.id) from Menu B ");
-			query2.append(" left join B.menuGroups as _group");
+			query2.append(" left join B.accessControlList as _group");
 			query2.append(WHERE_GROUP_GROUP_ID_IN);
 			query2.append(
 					user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
@@ -234,7 +230,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			 */
 			StringBuilder query1 = new StringBuilder(
 					SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + "  ");
-			query1.append(LEFT_JOIN + ENTITY + MENU_GROUPS_AS_GROUP);
+			query1.append(LEFT_JOIN + ENTITY + ACL_AS_GROUP);
 			query1.append(WHERE + ENTITY + ".enabled=1 and _group.groupId in (");
 
 			boolean first = true;
@@ -257,7 +253,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 					+ ".deleted=0 and " + ENTITY + ".parentId = :parentId ");
 			query2.append(AND + ENTITY + ENABLED_1_AND + ENTITY + SECURITY_REF_IN);
 			query2.append("    select distinct(B.id) from Menu B ");
-			query2.append(" left join B.menuGroups as _group");
+			query2.append(" left join B.accessControlList as _group");
 			query2.append(WHERE_GROUP_GROUP_ID_IN);
 
 			first = true;
@@ -316,18 +312,14 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return true;
 
-			long id = menuId;
-			Menu menu = findById(menuId);
-			if (menu.getSecurityRef() != null)
-				id = menu.getSecurityRef().longValue();
-
 			Set<Group> groups = user.getGroups();
 			if (groups.isEmpty())
 				return false;
 
 			StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + "  ");
-			query.append(LEFT_JOIN + ENTITY + MENU_GROUPS_AS_GROUP);
+			query.append(LEFT_JOIN + ENTITY + ACL_AS_GROUP);
 			query.append(WHERE);
+			query.append(" _group.read=1 and ");
 			if (write)
 				query.append(" _group.write=1 and ");
 			query.append(" _group.groupId in (");
@@ -335,9 +327,9 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query.append(CLOSE_BRACKET_AND + ENTITY + ".id = :id");
 
 			Map<String, Object> params = new HashMap<>();
-			params.put("id", Long.valueOf(id));
+			params.put("id", Long.valueOf(menuId));
 
-			List<MenuGroup> coll = findByQuery(query.toString(), params, null);
+			List<AccessControlEntry> coll = findByQuery(query.toString(), params, null);
 			result = CollectionUtils.isNotEmpty(coll);
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
@@ -375,7 +367,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	/**
-	 * @see com.logicaldoc.core.security.dao.MenuDAO#isMenuWriteable(long, long)
+	 * @see com.logicaldoc.core.security.menu.MenuDAO#isMenuWriteable(long,
+	 *      long)
 	 */
 	public int isMenuWriteable(long menuId, long userId) {
 		boolean writePrivilegeBool = isWriteEnable(menuId, userId);
@@ -418,8 +411,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			 * Search for menus that define its own security policies
 			 */
 			StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + "  ");
-			query.append(LEFT_JOIN + ENTITY + MENU_GROUPS_AS_GROUP);
-			query.append(WHERE + ENTITY + ".deleted=0 and _group.groupId =" + groupId);
+			query.append(LEFT_JOIN + ENTITY + ACL_AS_GROUP);
+			query.append(WHERE + ENTITY + ".deleted=0 and _group.read=1 and _group.groupId =" + groupId);
 
 			coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
@@ -430,13 +423,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				StringBuilder query2 = new StringBuilder(
 						SELECT + ENTITY + FROM_MENU + ENTITY + WHERE + ENTITY + ".deleted=0 ");
 				query2.append(AND + ENTITY + SECURITY_REF_IN);
-				boolean first = true;
-				for (Menu menu : coll) {
-					if (!first)
-						query2.append(",");
-					query2.append(Long.toString(menu.getId()));
-					first = false;
-				}
+				query2.append(coll.stream().map(m -> Long.toString(m.getId())).collect(Collectors.joining(",")));
 				query2.append(")");
 				List<Menu> coll2 = findByQuery(query2.toString(), (Map<String, Object>) null, null);
 				for (Menu menu : coll2) {
@@ -463,7 +450,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 			if (!user.getGroups().isEmpty()) {
 				StringBuilder query1 = new StringBuilder(SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B
-						+ " where B.ld_enabled=1 and B.ld_deleted=0 and A.ld_menuid=B.ld_id AND B.ld_parentid="
+						+ " where B.ld_enabled=1 and B.ld_deleted=0 and A.ld_menuid=B.ld_id and A.ld_read=1 AND B.ld_parentid="
 						+ parentId + " AND A.ld_groupid in (");
 				query1.append(
 						user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
@@ -618,8 +605,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 						+ " where A.ld_menuid=B.ld_id and B.ld_deleted=0 ");
 				if (enabledOnly)
 					query1.append(" and B.ld_enabled=1 ");
-				if (permission != Permission.READ)
-					query1.append(" and A.ld_" + permission.getName() + "=1 ");
+
+				query1.append(" and A.ld_" + permission.getName() + "=1 ");
 				query1.append(" and A.ld_groupid in (");
 				query1.append(
 						user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
@@ -665,34 +652,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		store(menu);
 	}
 
-	@Override
-	public boolean applyRightToTree(long id) {
-		boolean result = true;
-		try {
-			Menu parent = findById(id);
-			Long securityRef = id;
-			if (parent.getSecurityRef() != null)
-				securityRef = parent.getSecurityRef();
-
-			// Iterate over all children setting the security reference
-			List<Menu> children = findChildren(id, null);
-			for (Menu menu : children) {
-				if (!securityRef.equals(menu.getSecurityRef())) {
-					menu.setSecurityRef(securityRef);
-					menu.getMenuGroups().clear();
-					store(menu);
-				}
-				applyRightToTree(menu.getId());
-			}
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
-		}
-
-		return result;
-	}
-
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<Long> findIdByUserId(long userId, long parentId) {
@@ -709,7 +668,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (!precoll.isEmpty()) {
 				StringBuilder query1 = new StringBuilder(SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B
 						+ " where B.ld_deleted=0 and A.ld_menuid=B.ld_id AND B.ld_parentid=" + parentId
-						+ " AND A.ld_groupid in (");
+						+ " and A.ld_read=1 AND A.ld_groupid in (");
 				boolean first = true;
 				while (iter.hasNext()) {
 					if (!first)
@@ -759,7 +718,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 			List<Menu> childs = findByName(menu, name, false);
 			if (childs.isEmpty()) {
-				menu = createNewMenu(name, tenantId, type, menu, inheritSecurity);
+				menu = createNewMenu(name, tenantId, type, menu);
 			} else {
 				menu = childs.iterator().next();
 				initialize(menu);
@@ -769,20 +728,12 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		return menu;
 	}
 
-	private Menu createNewMenu(String name, long tenantId, int type, Menu parentMenu, boolean inheritSecurity)
-			throws PersistenceException {
+	private Menu createNewMenu(String name, long tenantId, int type, Menu parentMenu) throws PersistenceException {
 		Menu newMenu = new Menu();
 		newMenu.setName(name);
 		newMenu.setParentId(parentMenu.getId());
 		newMenu.setTenantId(tenantId);
 		newMenu.setType(type);
-
-		if (inheritSecurity) {
-			if (parentMenu.getSecurityRef() != null)
-				newMenu.setSecurityRef(parentMenu.getSecurityRef());
-			else
-				newMenu.setSecurityRef(parentMenu.getId());
-		}
 
 		store(newMenu);
 		flush();

@@ -20,7 +20,7 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
-import com.logicaldoc.webservice.model.WSRight;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.soap.DocumentService;
 
 /**
@@ -389,30 +389,6 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public void grantUser(String sid, long docId, long userId, int permissions)
-			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
-		client.grantUser(sid, docId, userId, permissions);
-	}
-
-	@Override
-	public void grantGroup(String sid, long docId, long groupId, int permissions)
-			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException {
-		client.grantGroup(sid, docId, groupId, permissions);
-	}
-
-	@Override
-	public WSRight[] getGrantedUsers(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-return client.getGrantedUsers(sid, docId);
-	}
-
-	@Override
-	public WSRight[] getGrantedGroups(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getGrantedGroups(sid, docId);
-	}
-
-	@Override
 	public boolean isRead(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.isRead(sid, docId);
@@ -431,8 +407,20 @@ return client.getGrantedUsers(sid, docId);
 	}
 
 	@Override
-	public boolean isGranted(String sid, long docId, int permission)
+	public boolean isGranted(String sid, long docId, String permission)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.isGranted	(sid, docId, permission);
+	}
+
+	@Override
+	public WSAccessControlEntry[] getAccessControlList(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		return client.getAccessControlList(sid, docId);
+	}
+
+	@Override
+	public void setAccessControlList(String sid, long docId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
+		client.setAccessControlList(sid, docId, acl);
 	}
 }

@@ -10,9 +10,9 @@ import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.doc.WSDoc;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
-import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
 
 @WSDoc(description = "handling of templates and attribute sets")
@@ -276,9 +276,9 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action = "isTemplateReadable")
+	@WebMethod(action = "isReadable")
 	@WSDoc(description = "tests if a template is readable")
-	public boolean isTemplateReadable(@WSDoc(description = "identifier of the session", required = true)
+	public boolean isReadable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
 	long templateId) throws AuthenticationException, WebserviceException, PersistenceException;
@@ -295,87 +295,38 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action = "isTemplateWritable")
+	@WebMethod(action = "isWritable")
 	@WSDoc(description = "tests if a template is writable")
-	public boolean isTemplateWritable(@WSDoc(description = "identifier of the session", required = true)
+	public boolean isWritable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
 	long templateId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
-	 * Grants user permission to the template.
+	 * Sets the Access Control List
 	 * 
 	 * @param sid Session identifier
 	 * @param templateId Template id
-	 * @param userId User Id
-	 * @param permissions the permission integer representation. If '0', the
-	 *        user will be not granted to access the template.
+	 * @param acl the complete Access Control List
 	 * 
-	 * @throws PermissionException The permission has not been granted
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
-	@WebMethod(action = "grantUserToTemplate")
-	@WSDoc(description = "grants user permission to the template")
-	public void grantUserToTemplate(@WSDoc(description = "identifier of the session", required = true)
+	@WebMethod(action = "setAccessControlList")
+	@WSDoc(description = "sets the Access Control List")
+	public void setAccessControlList(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
-	long templateId, @WebParam(name = "userId")
-	long userId,
-			@WSDoc(description = "the permission integer representation; if '0', the user will be not granted to access the template")
-			@WebParam(name = "permissions")
-			int permissions)
-			throws PersistenceException, AuthenticationException, WebserviceException, PermissionException;
+	long templateId, @WSDoc(description = "the complete Access Control List")
+	@WebParam(name = "acl")
+	WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
-	 * Grants group permission to the template.
-	 * 
-	 * @param sid Session identifier
-	 * @param templateId Template id
-	 * @param groupId Group Id
-	 * @param permissions the permission integer representation. If '0', the
-	 *        group will be not granted to access the template.
-	 * 
-	 * @throws PermissionException The permission has not been granted
-	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException Error in the webservice
-	 * @throws AuthenticationException Invalid session
-	 */
-	@WebMethod(action = "grantGroupToTemplate")
-	@WSDoc(description = "grants group permission to the template")
-	public void grantGroupToTemplate(@WSDoc(description = "identifier of the session", required = true)
-	@WebParam(name = "sid")
-	String sid, @WebParam(name = "templateId")
-	long templateId, @WebParam(name = "groupId")
-	long groupId,
-			@WSDoc(description = "the permission integer representation; if '0', the group will be not granted to access the template")
-			@WebParam(name = "permissions")
-			int permissions)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
-
-	/**
-	 * Retrieves the list of granted users for the given template.
-	 * 
-	 * @param sid Session identifier
-	 * @param templateId Template id
-	 * 
-	 * @return 'error' if error occurred, the right objects collection.
-	 * 
-	 * @throws PermissionException The permission has not been granted
-	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException Error in the webservice
-	 * @throws AuthenticationException Invalid session
-	 */
-	@WebMethod(action = "getGrantedUsers")
-	@WSDoc(description = "retrieves the list of granted users for the given folder")
-	public WSRight[] getGrantedUsers(@WSDoc(description = "identifier of the session", required = true)
-	@WebParam(name = "sid")
-	String sid, @WebParam(name = "templateId")
-	long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
-
-	/**
-	 * Retrieves the list of granted groups for the given template
+	 * Retrieves the access control list
 	 * 
 	 * @param sid Session identifier
 	 * @param templateId Template id
@@ -386,14 +337,13 @@ public interface DocumentMetadataService {
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
 	 */
-	@WebMethod(action = "getGrantedGroups")
-	@WSDoc(description = "retrieves the list of granted groups for the given folder")
-	public WSRight[] getGrantedGroups(@WSDoc(description = "identifier of the session", required = true)
+	@WebMethod(action = "getAccessControlList")
+	@WSDoc(description = "retrieves the access control list")
+	public WSAccessControlEntry[] getAccessControlList(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
 	long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
-	
 	/**
 	 * Add a new option for the given attribute
 	 * 
@@ -402,15 +352,15 @@ public interface DocumentMetadataService {
 	 * @param attribute Attribute name
 	 * @param option Attribute option
 	 *
-	 * @throws AuthenticationException Invalid session 
+	 * @throws AuthenticationException Invalid session
 	 * @throws WebserviceException Error in the webservice
 	 * @throws PersistenceException Error in the database
 	 */
 	@WebMethod(action = "addAttributeOption")
-	@WSDoc(description = "Adds a new option for the given attribute")	
-	public void addAttributeOption(
-			@WebParam(name = "sid") String sid, 
-			@WebParam(name = "setId") long setId, 
-			@WebParam(name = "attribute") String attribute, 
-			@WebParam(name = "option") WSAttributeOption option) throws AuthenticationException, WebserviceException, PersistenceException;
+	@WSDoc(description = "Adds a new option for the given attribute")
+	public void addAttributeOption(@WebParam(name = "sid")
+	String sid, @WebParam(name = "setId")
+	long setId, @WebParam(name = "attribute")
+	String attribute, @WebParam(name = "option")
+	WSAttributeOption option) throws AuthenticationException, WebserviceException, PersistenceException;
 }

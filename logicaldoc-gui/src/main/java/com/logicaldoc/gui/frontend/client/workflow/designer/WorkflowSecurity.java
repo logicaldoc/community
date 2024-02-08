@@ -3,9 +3,9 @@ package com.logicaldoc.gui.frontend.client.workflow.designer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
-import com.logicaldoc.gui.common.client.data.WorkflowRightsDS;
+import com.logicaldoc.gui.common.client.data.WorkflowAclDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -46,7 +46,7 @@ public class WorkflowSecurity extends Window {
 
 	private static final String ENTITY_ID = "entityId";
 
-	private WorkflowRightsDS dataSource;
+	private WorkflowAclDS dataSource;
 
 	private ListGrid list;
 
@@ -107,7 +107,7 @@ public class WorkflowSecurity extends Window {
 		list.setHeight100();
 		list.setMinHeight(200);
 		list.setMinWidth(300);
-		dataSource = new WorkflowRightsDS(Long.parseLong(workflow.getId()));
+		dataSource = new WorkflowAclDS(Long.parseLong(workflow.getId()));
 		list.setDataSource(dataSource);
 
 		List<ListGridField> fields = new ArrayList<>();
@@ -226,20 +226,20 @@ public class WorkflowSecurity extends Window {
 	}
 
 	/**
-	 * Creates an array of all the right
+	 * Creates an array of all the ACL
 	 * 
 	 * @return the array of rights
 	 */
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getACL() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIRight> tmp = new ArrayList<>();
+		List<GUIAccessControlEntry> tmp = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
 			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("read")))
 				continue;
 
-			GUIRight right = new GUIRight();
+			GUIAccessControlEntry right = new GUIAccessControlEntry();
 
 			right.setName(rec.getAttributeAsString(ENTITY));
 			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
@@ -248,7 +248,7 @@ public class WorkflowSecurity extends Window {
 			tmp.add(right);
 		}
 
-		return tmp.toArray(new GUIRight[0]);
+		return tmp.toArray(new GUIAccessControlEntry[0]);
 	}
 
 	@Override
@@ -288,7 +288,7 @@ public class WorkflowSecurity extends Window {
 
 	public void onSave() {
 		// Apply all rights
-		workflow.setRights(this.getRights());
+		workflow.setRights(this.getACL());
 		destroy();
 	}
 }

@@ -17,7 +17,7 @@ import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.dao.MenuDAO;
+import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 

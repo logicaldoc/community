@@ -4,8 +4,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSFolder;
-import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.soap.FolderService;
 
 /**
@@ -103,30 +103,6 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public WSRight[] getGrantedGroups(String sid, long folderId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getGrantedGroups(sid, folderId);
-	}
-
-	@Override
-	public WSRight[] getGrantedUsers(String sid, long folderId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getGrantedUsers(sid, folderId);
-	}
-
-	@Override
-	public void grantGroup(String sid, long folderId, long groupId, int permissions, boolean recursive)
-			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
-		client.grantGroup(sid, folderId, groupId, permissions, recursive);
-	}
-
-	@Override
-	public void grantUser(String sid, long folderId, long userId, int permissions, boolean recursive)
-			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
-		client.grantUser(sid, folderId, userId, permissions, recursive);
-	}
-
-	@Override
 	public void update(String sid, WSFolder folder)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.update(sid, folder);
@@ -151,7 +127,7 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public boolean isGranted(String sid, long folderId, int permission)
+	public boolean isGranted(String sid, long folderId, String permission)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.isGranted(sid, folderId, permission);
 	}
@@ -166,5 +142,17 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	public void merge(String sid, long sourceId, long targetId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.merge(sid, sourceId, targetId);
+	}
+
+	@Override
+	public WSAccessControlEntry[] getAccessControlList(String sid, long folderId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		return client.getAccessControlList(sid, folderId);
+	}
+
+	@Override
+	public void setAccessControlList(String sid, long folderId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
+		client.setAccessControlList(sid, folderId, acl);
 	}
 }

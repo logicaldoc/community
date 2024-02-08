@@ -154,7 +154,7 @@ public class TagSearch extends Search {
 		// Filter those docs with explicit read denial
 		if (!searchUser.isMemberOf(Group.GROUP_ADMIN)) {
 			query.append(
-					" and not exists (select ld_docid from ld_documentgroup where ld_read=0 and ld_docid = A.ld_id ");
+					" and not exists (select ld_docid from ld_document_acl where ld_read=0 and ld_docid = A.ld_id ");
 			query.append(" and ld_groupid in (");
 			query.append(searchUser.getGroups().stream().map(g -> Long.toString(g.getId()))
 					.collect(Collectors.joining(",")));

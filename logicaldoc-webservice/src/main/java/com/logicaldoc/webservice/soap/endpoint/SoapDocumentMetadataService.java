@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Attribute;
@@ -15,20 +17,18 @@ import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.metadata.TemplateGroup;
-import com.logicaldoc.core.security.Group;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
-import com.logicaldoc.core.security.dao.GroupDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
-import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.model.WSUtil;
 import com.logicaldoc.webservice.soap.DocumentMetadataService;
@@ -40,6 +40,8 @@ import com.logicaldoc.webservice.soap.DocumentMetadataService;
  * @since 6.1
  */
 public class SoapDocumentMetadataService extends AbstractService implements DocumentMetadataService {
+
+	protected static Logger log = LoggerFactory.getLogger(SoapDocumentMetadataService.class);
 
 	private static final String TEMPLATE = "template ";
 
@@ -135,7 +137,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			template.setName(wsTemplate.getName());
 			template.setDescription(wsTemplate.getDescription());
 
-			if (template.getReadonly() == 1 || !isTemplateWritable(sid, template.getId()))
+			if (template.getReadonly() == 1 || !isWritable(sid, template.getId()))
 				throw new PermissionException(user.getUsername(), TEMPLATE + wsTemplate.getName(), "read");
 		}
 
@@ -153,7 +155,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throw new WebserviceException("You cannot delete template with id " + templateId
 					+ " because some documents belongs to that template.");
 		Template templ = dao.findById(templateId);
-		if (templ.getReadonly() == 1 || !isTemplateWritable(sid, templateId))
+		if (templ.getReadonly() == 1 || !isWritable(sid, templateId))
 			throw new PermissionException(user.getUsername(), TEMPLATE + templ.getName(), "write");
 
 		dao.delete(templateId);
@@ -299,7 +301,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	}
 
 	@Override
-	public boolean isTemplateReadable(String sid, long templateId)
+	public boolean isReadable(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -307,7 +309,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	}
 
 	@Override
-	public boolean isTemplateWritable(String sid, long templateId)
+	public boolean isWritable(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -315,74 +317,39 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	}
 
 	@Override
-	public void grantUserToTemplate(String sid, long templateId, long userId, int permissions)
-			throws PersistenceException, AuthenticationException, WebserviceException, PermissionException {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = userDao.findById(userId);
-		grantGroupToTemplate(sid, templateId, user.getUserGroup().getId(), permissions);
+	public void setAccessControlList(String sid, long templateId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
+		User sessionUser = validateSession(sid);
+
+		TemplateDAO templateDAO = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		// Check if the session user has the Write Permission of this template
+		if (!templateDAO.isWriteEnable(templateId, sessionUser.getId()))
+			throw new PermissionException(sessionUser.getUsername(), "Template " + templateId, Permission.WRITE);
+
+		Template template = templateDAO.findById(templateId);
+		templateDAO.initialize(template);
+		template.getAccessControlList().clear();
+		for (WSAccessControlEntry wsAcwe : acl)
+			template.addAccessControlEntry(WSUtil.toAccessControlEntry(wsAcwe));
+		templateDAO.store(template);
+
 	}
 
 	@Override
-	public void grantGroupToTemplate(String sid, long templateId, long groupId, int permissions)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-		if (!isTemplateWritable(sid, templateId))
-			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "write");
-
-		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		Template templ = dao.findById(templateId);
-		if (templ == null || templ.getReadonly() == 1)
-			return;
-
-		TemplateGroup fg = new TemplateGroup();
-		fg.setGroupId(groupId);
-		fg.setPermissions(permissions);
-		templ.addTemplateGroup(fg);
-
-		dao.store(templ);
-	}
-
-	private WSRight[] getGranted(String sid, long templateId, boolean users)
+	public WSAccessControlEntry[] getAccessControlList(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
 
-		List<WSRight> rightsList = new ArrayList<>();
+		List<WSAccessControlEntry> acl = new ArrayList<>();
 		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 
 		Template template = templateDao.findById(templateId);
 		templateDao.initialize(template);
-		for (TemplateGroup tg : template.getTemplateGroups()) {
-			Group group = groupDao.findById(tg.getGroupId());
-			if (group.getName().startsWith("_user_") && users) {
-				rightsList.add(
-						new WSRight(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)),
-								tg.getPermissions()));
-			} else if (!group.getName().startsWith("_user_") && !users)
-				rightsList.add(new WSRight(group.getId(), tg.getPermissions()));
-		}
 
-		return rightsList.toArray(new WSRight[rightsList.size()]);
-	}
+		for (AccessControlEntry ace : template.getAccessControlList())
+			acl.add(WSUtil.toWSAccessControlEntry(ace));
 
-	@Override
-	public WSRight[] getGrantedUsers(String sid, long templateId)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-		if (!isTemplateReadable(sid, templateId))
-			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "read");
-
-		return getGranted(sid, templateId, true);
-	}
-
-	@Override
-	public WSRight[] getGrantedGroups(String sid, long templateId)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		User user = validateSession(sid);
-		if (!isTemplateReadable(sid, templateId))
-			throw new PermissionException(user.getUsername(), TEMPLATE + templateId, "read");
-
-		return getGranted(sid, templateId, false);
+		return acl.toArray(new WSAccessControlEntry[0]);
 	}
 
 	@Override

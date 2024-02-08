@@ -58,7 +58,7 @@ public class InheritRightsDialog extends Dialog {
 								folders.getSelectedRecord().getAttributeAsString("name") }),
 				confirm -> {
 					if (Boolean.TRUE.equals(confirm)) {
-						FolderService.Instance.get().inheritRights(panel.getFolder().getId(),
+						FolderService.Instance.get().inheritACL(panel.getFolder().getId(),
 								Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
 								new AsyncCallback<GUIFolder>() {
 

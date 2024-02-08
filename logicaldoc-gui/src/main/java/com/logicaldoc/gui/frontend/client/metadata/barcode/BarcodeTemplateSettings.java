@@ -48,7 +48,7 @@ public class BarcodeTemplateSettings extends Window {
 
 	private GUIBarcodeTemplate template;
 
-	private Upload uploader;
+	private Upload sampleUploader;
 
 	public BarcodeTemplateSettings(BarcodeTemplatesPanel panel, GUIBarcodeTemplate template) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -69,8 +69,11 @@ public class BarcodeTemplateSettings extends Window {
 		layout.setWidth100();
 
 		layout.addMember(form);
-		uploader = new Upload(save);
-		layout.addMember(uploader);
+
+		if (template.getId() == 0L || template.isZonal()) {
+			sampleUploader = new Upload(save);
+			layout.addMember(sampleUploader);
+		}
 
 		save = new IButton(I18N.message("save"));
 		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onSave());
@@ -133,7 +136,8 @@ public class BarcodeTemplateSettings extends Window {
 			type.setValue(template.isZonal() ? ZONAL : "positonal");
 		if (!Feature.enabled(Feature.ZONAL_BARCODE))
 			type.setValue("positonal");
-		type.addChangedHandler((ChangedEvent event) -> uploader.setVisible(ZONAL.equals(event.getValue().toString())));
+		type.addChangedHandler(
+				(ChangedEvent event) -> sampleUploader.setVisible(ZONAL.equals(event.getValue().toString())));
 
 		RadioGroupItem saveChangeEvent = ItemFactory.newBooleanSelector("savechangeevent");
 		saveChangeEvent.setWrapTitle(false);
@@ -173,7 +177,8 @@ public class BarcodeTemplateSettings extends Window {
 	}
 
 	public void onSave() {
-		if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L && uploader.getUploadedFile() == null) {
+		if (ZONAL.equals(vm.getValueAsString("type")) && template.getId() == 0L
+				&& sampleUploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}

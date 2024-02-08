@@ -32,9 +32,9 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	/**
 	 * Permissions allowed to the current user on this folder
 	 */
-	private GUIRight allowedPermissions = new GUIRight();
+	private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
 
-	private GUIRight[] rights = new GUIRight[] {};
+	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
 
 	private GUIFolder[] path = null;
 
@@ -128,11 +128,11 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.id = id;
 	}
 
-	public GUIRight getAllowedPermissions() {
+	public GUIAccessControlEntry getAllowedPermissions() {
 		return allowedPermissions;
 	}
 
-	public void setAllowedPermissions(GUIRight permissions) {
+	public void setAllowedPermissions(GUIAccessControlEntry permissions) {
 		this.allowedPermissions = permissions;
 	}
 
@@ -184,11 +184,11 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.pathExtended = pathExtended;
 	}
 
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getRights() {
 		return rights;
 	}
 
-	public void setRights(GUIRight[] rights) {
+	public void setRights(GUIAccessControlEntry[] rights) {
 		this.rights = rights;
 	}
 

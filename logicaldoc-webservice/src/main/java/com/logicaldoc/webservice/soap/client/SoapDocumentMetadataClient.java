@@ -4,9 +4,9 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
-import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.soap.DocumentMetadataService;
 
@@ -104,44 +104,33 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 	}
 
 	@Override
-	public boolean isTemplateReadable(String sid, long templateId)
+	public boolean isReadable(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.isTemplateReadable(sid, templateId);
+		return client.isReadable(sid, templateId);
 	}
 
 	@Override
-	public boolean isTemplateWritable(String sid, long templateId)
+	public boolean isWritable(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.isTemplateWritable(sid, templateId);
+		return client.isWritable(sid, templateId);
 	}
 
-	@Override
-	public void grantUserToTemplate(String sid, long templateId, long userId, int permissions)
-			throws AuthenticationException, PermissionException, PersistenceException, WebserviceException {
-		client.grantUserToTemplate(sid, templateId, userId, permissions);
-	}
-
-	@Override
-	public void grantGroupToTemplate(String sid, long templateId, long groupId, int permissions)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		client.grantGroupToTemplate(sid, templateId, groupId, permissions);
-	}
-
-	@Override
-	public WSRight[] getGrantedUsers(String sid, long groupId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		return client.getGrantedUsers(sid, groupId);
-	}
-
-	@Override
-	public WSRight[] getGrantedGroups(String sid, long groupId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		return client.getGrantedGroups(sid, groupId);
-	}
 
 	@Override
 	public void addAttributeOption(String sid, long setId, String attribute, WSAttributeOption wsoption)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		client.addAttributeOption(sid, setId, attribute, wsoption);
+	}
+
+	@Override
+	public WSAccessControlEntry[] getAccessControlList(String sid, long templateId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		return client.getAccessControlList(sid, templateId);
+	}
+
+	@Override
+	public void setAccessControlList(String sid, long templateId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
+		client.setAccessControlList(sid, templateId, acl);
 	}
 }

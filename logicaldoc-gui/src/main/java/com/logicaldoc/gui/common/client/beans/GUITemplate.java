@@ -35,7 +35,7 @@ public class GUITemplate implements Serializable {
 
 	private GUIAttribute[] attributes;
 
-	private GUIRight[] rights = new GUIRight[] {};
+	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
 
 	private String[] permissions = new String[] {};
 
@@ -136,11 +136,11 @@ public class GUITemplate implements Serializable {
 		this.type = type;
 	}
 
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getRights() {
 		return rights;
 	}
 
-	public void setRights(GUIRight[] rights) {
+	public void setRights(GUIAccessControlEntry[] rights) {
 		this.rights = rights;
 	}
 

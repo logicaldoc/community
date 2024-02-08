@@ -37,12 +37,11 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Geolocation;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.LoginThrottle;
-import com.logicaldoc.core.security.Menu;
-import com.logicaldoc.core.security.MenuGroup;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -56,9 +55,10 @@ import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.DeviceDAO;
 import com.logicaldoc.core.security.dao.GroupDAO;
-import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.menu.Menu;
+import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.sequence.Sequence;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.util.UserUtil;
@@ -69,7 +69,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.beans.GUISession;
@@ -1103,7 +1103,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		}
 	}
 
-	private boolean saveRules(Session session, Menu menu, GUIRight[] rights)
+	private boolean saveRules(Session session, Menu menu, GUIAccessControlEntry[] rights)
 			throws PermissionException, PersistenceException {
 		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!mdao.isReadEnable(Menu.SECURITY, session.getUserId()))
@@ -1114,32 +1114,29 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		boolean sqlerrors = false;
 
 		mdao.initialize(menu);
-		menu.setSecurityRef(null);
 
 		// Remove all current tenant rights
-		Set<MenuGroup> grps = new HashSet<>();
-		for (MenuGroup mg : menu.getMenuGroups()) {
+		Set<AccessControlEntry> grps = new HashSet<>();
+		for (AccessControlEntry mg : menu.getAccessControlList()) {
 			Group group = gdao.findById(mg.getGroupId());
 			if (group != null && group.getTenantId() != session.getTenantId())
 				grps.add(mg);
 		}
-		menu.getMenuGroups().clear();
+		menu.getAccessControlList().clear();
 
 		sqlerrors = false;
-		for (GUIRight right : rights) {
+		for (GUIAccessControlEntry right : rights) {
 			Group group = gdao.findById(right.getEntityId());
 			if (group == null || group.getTenantId() != session.getTenantId())
 				continue;
 
-			MenuGroup fg = null;
-			if (right.isRead()) {
-				fg = new MenuGroup();
-				fg.setGroupId(right.getEntityId());
-			}
-			grps.add(fg);
+			AccessControlEntry ace = new AccessControlEntry();
+			ace.setGroupId(right.getEntityId());
+			ace.setRead(right.isRead() ? 1 : 0);
+			grps.add(ace);
 		}
 
-		menu.setMenuGroups(grps);
+		menu.setAccessControlList(grps);
 		try {
 			mdao.store(menu);
 		} catch (PersistenceException e) {
@@ -1150,7 +1147,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public void applyRights(GUIMenu menu) throws ServerException {
+	public void saveACL(GUIMenu menu) throws ServerException {
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		try {
@@ -1209,13 +1206,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			menu.setPosition(guiMenu.getPosition());
 			menu.setParentId(guiMenu.getParentId());
 			menu.setRoutineId(guiMenu.getRoutineId());
-			menu.setSecurityRef(guiMenu.getSecurityRef());
 			menu.setType(guiMenu.getType());
 
-			menu.getMenuGroups().clear();
+			menu.getAccessControlList().clear();
 			if (guiMenu.getRights() != null && guiMenu.getRights().length > 0) {
-				for (GUIRight right : guiMenu.getRights())
-					menu.getMenuGroups().add(new MenuGroup(right.getEntityId()));
+				for (GUIAccessControlEntry right : guiMenu.getRights())
+					menu.getAccessControlList().add(new AccessControlEntry(right.getEntityId()));
 			}
 
 			dao.store(menu);
@@ -1265,13 +1261,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			GUIMenu f = toGUIMenu(menu, locale);
 
 			int i = 0;
-			GUIRight[] rights = new GUIRight[menu.getMenuGroups().size()];
-			for (MenuGroup fg : menu.getMenuGroups()) {
+			GUIAccessControlEntry[] rights = new GUIAccessControlEntry[menu.getAccessControlList().size()];
+			for (AccessControlEntry fg : menu.getAccessControlList()) {
 				Group group = gdao.findById(fg.getGroupId());
 				if (group == null || group.getTenantId() != session.getTenantId())
 					continue;
 
-				GUIRight right = new GUIRight();
+				GUIAccessControlEntry right = new GUIAccessControlEntry();
 				right.setEntityId(fg.getGroupId());
 				rights[i] = right;
 				i++;
@@ -1294,24 +1290,20 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		f.setRoutineId(menu.getRoutineId());
 		f.setPosition(menu.getPosition());
 		f.setDescription(menu.getDescription());
-		f.setSecurityRef(menu.getSecurityRef());
 		f.setParentId(menu.getParentId());
 		f.setType(menu.getType());
 
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		dao.initialize(menu);
 
-		List<GUIRight> rights = new ArrayList<>();
+		List<GUIAccessControlEntry> rights = new ArrayList<>();
 
-		if (menu.getMenuGroups() != null && !menu.getMenuGroups().isEmpty()) {
+		if (menu.getAccessControlList() != null && !menu.getAccessControlList().isEmpty()) {
 			GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
-			for (MenuGroup mg : menu.getMenuGroups()) {
-				GUIRight right = new GUIRight();
+			for (AccessControlEntry mg : menu.getAccessControlList()) {
+				GUIAccessControlEntry right = new GUIAccessControlEntry();
 				right.setEntityId(mg.getGroupId());
-				right.setDelete(mg.getDelete() == 1);
-				right.setSecurity(mg.getManageSecurity() == 1);
-				right.setRename(mg.getRename() == 1);
 				right.setWrite(mg.getWrite() == 1);
 
 				Group group = gdao.findById(mg.getGroupId());
@@ -1332,7 +1324,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			}
 		}
 
-		f.setRights(rights.toArray(new GUIRight[0]));
+		f.setRights(rights.toArray(new GUIAccessControlEntry[0]));
 
 		return f;
 	}

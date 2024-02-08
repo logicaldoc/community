@@ -1,9 +1,11 @@
-package com.logicaldoc.core.security;
+package com.logicaldoc.core.security.menu;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.SecurableObject;
 
 /**
  * This class represents the key concept of security. A Menu not only models
@@ -16,7 +18,7 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
-public class Menu extends PersistentObject implements Comparable<Menu> {
+public class Menu extends PersistentObject implements Comparable<Menu>, SecurableObject {
 
 	private static final long serialVersionUID = 1L;
 
@@ -67,7 +69,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	public static final long INTERFACE_DENSITY = 1535;
 
 	public static final long CUSTOM_ACTIONS = 1300;
-	
+
 	public static final int TYPE_DEFAULT = 1;
 
 	public static final int TYPE_CUSTOM_ACTION = 2;
@@ -77,8 +79,6 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	private String name = "";
 
 	private long parentId = 0;
-
-	private Long securityRef;
 
 	private String icon = "";
 
@@ -100,7 +100,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	 */
 	private String automation;
 
-	private Set<MenuGroup> menuGroups = new HashSet<>();
+	private Set<AccessControlEntry> acl = new HashSet<>();
 
 	public Menu() {
 		super();
@@ -123,14 +123,6 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 		return type;
 	}
 
-	public Set<MenuGroup> getMenuGroups() {
-		return menuGroups;
-	}
-
-	public void clearMenuGroups() {
-		menuGroups.clear();
-		menuGroups = new HashSet<>();
-	}
 
 	@Override
 	public void setId(long id) {
@@ -149,71 +141,12 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 		this.type = type;
 	}
 
-	public void setMenuGroups(Set<MenuGroup> mgroup) {
-		menuGroups = mgroup;
-	}
-
-	public long[] getMenuGroupIds() {
-		long[] idsArray = new long[menuGroups.size()];
-		int i = 0;
-		for (MenuGroup mg : menuGroups) {
-			idsArray[i++] = mg.getGroupId();
-		}
-		return idsArray;
-	}
-
-	/**
-	 * Adds MenuGroup object given in a String array to the ArrayList of
-	 * MenuGroups.
-	 * 
-	 * @param groups array of group ids
-	 */
-	public void setMenuGroup(long[] groups) {
-		menuGroups.clear();
-		for (int i = 0; i < groups.length; i++) {
-			MenuGroup mg = new MenuGroup();
-			mg.setGroupId(groups[i]);
-			mg.setWrite(1);
-			mg.setManageSecurity(1);
-			mg.setDelete(1);
-			mg.setRename(1);
-			menuGroups.add(mg);
-		}
-	}
-
-	/**
-	 * Adds a new element, substituting a previous one with the same groupId.
-	 * 
-	 * @param mg the menu group
-	 */
-	public void addMenuGroup(MenuGroup mg) {
-		MenuGroup m = getMenuGroup(mg.getGroupId());
-		getMenuGroups().remove(m);
-		getMenuGroups().add(mg);
-	}
-
-	public MenuGroup getMenuGroup(long groupId) {
-		for (MenuGroup mg : menuGroups) {
-			if (mg.getGroupId() == groupId)
-				return mg;
-		}
-		return null;
-	}
-
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public Long getSecurityRef() {
-		return securityRef;
-	}
-
-	public void setSecurityRef(Long securityRef) {
-		this.securityRef = securityRef;
 	}
 
 	@Override
@@ -270,5 +203,28 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	public void setAutomation(String automation) {
 		this.automation = automation;
+	}
+
+	@Override
+	public Set<AccessControlEntry> getAccessControlList() {
+		return acl;
+	}
+
+	@Override
+	public void setAccessControlList(Set<AccessControlEntry> acl) {
+		this.acl = acl;
+	}
+	
+	@Override
+	public AccessControlEntry getAccessControlEntry(long groupId) {
+		return acl.stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+
+	@Override
+	public void addAccessControlEntry(AccessControlEntry ace) {
+		if (!acl.add(ace)) {
+			acl.remove(ace);
+			acl.add(ace);
+		}
 	}
 }

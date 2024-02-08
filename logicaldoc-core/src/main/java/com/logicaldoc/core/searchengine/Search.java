@@ -262,7 +262,7 @@ public abstract class Search {
 		// Detect those hits with specific read prohibition for the search user.
 		try {
 			StringBuffer query = new StringBuffer(
-					"select ld_docid from ld_documentgroup where ld_read=0 and ld_docid in (");
+					"select ld_docid from ld_document_acl where ld_read=0 and ld_docid in (");
 			query.append(hits.stream().map(h -> Long.toString(h.getId())).collect(Collectors.joining(",")));
 			query.append(") and ld_groupid in (");
 			query.append(searchUser.getGroups().stream().map(g -> Long.toString(g.getId()))

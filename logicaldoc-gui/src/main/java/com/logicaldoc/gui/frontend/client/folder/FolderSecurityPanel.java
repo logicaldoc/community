@@ -7,8 +7,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
-import com.logicaldoc.gui.common.client.data.RightsDS;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.data.AccessControlListDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -91,7 +91,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private static final String ENTITY_ID = "entityId";
 
-	private RightsDS dataSource;
+	private AccessControlListDS aclDS;
 
 	private ListGrid list;
 
@@ -197,8 +197,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		list.setRotateHeaderTitles(true);
 		list.setHeaderHeight(100);
 
-		dataSource = new RightsDS(folder.getId(), "folder");
-		list.setDataSource(dataSource);
+		aclDS = new AccessControlListDS(folder.getId(), "folder");
+		list.setDataSource(aclDS);
 
 		List<ListGridField> fields = new ArrayList<>();
 		fields.add(entityId);
@@ -391,7 +391,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 								I18N.message("inheritrightsask", new String[] { folder.getName(), parent.getName() }),
 								(Boolean interitConfirmed) -> {
 									if (Boolean.TRUE.equals(interitConfirmed)) {
-										FolderService.Instance.get().inheritRights(folder.getId(), folder.getParentId(),
+										FolderService.Instance.get().inheritACL(folder.getId(), folder.getParentId(),
 												new AsyncCallback<GUIFolder>() {
 
 													@Override
@@ -515,17 +515,17 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	}
 
 	/**
-	 * Creates an array of all the right
+	 * Creates an array of all the ACL
 	 * 
 	 * @return the array of rights
 	 */
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getACL() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIRight> tmp = new ArrayList<>();
+		List<GUIAccessControlEntry> tmp = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
-			GUIRight right = new GUIRight();
+			GUIAccessControlEntry right = new GUIAccessControlEntry();
 			right.setName(rec.getAttributeAsString(ENTITY));
 			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
 			right.setRead(rec.getAttributeAsBoolean("read"));
@@ -554,14 +554,14 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			tmp.add(right);
 		}
 
-		return tmp.toArray(new GUIRight[0]);
+		return tmp.toArray(new GUIAccessControlEntry[0]);
 	}
 
 	@Override
 	public void destroy() {
 		super.destroy();
-		if (dataSource != null)
-			dataSource.destroy();
+		if (aclDS != null)
+			aclDS.destroy();
 	}
 
 	/**
@@ -593,9 +593,9 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	public void onSave(final boolean recursive) {
 		// Apply all rights
-		folder.setRights(this.getRights());
+		folder.setRights(this.getACL());
 
-		FolderService.Instance.get().applyRights(folder, recursive, new AsyncCallback<Void>() {
+		FolderService.Instance.get().saveACL(folder, recursive, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserHistoryDAO;
+import com.logicaldoc.core.security.menu.Menu;
+import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 

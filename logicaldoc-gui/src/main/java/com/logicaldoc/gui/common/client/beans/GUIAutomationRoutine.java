@@ -14,7 +14,7 @@ public class GUIAutomationRoutine extends GUIExtensibleObject implements Seriali
 
 	private String automation;
 
-	private GUIRight[] rights = new GUIRight[] {};
+	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
 
 	private String[] permissions = new String[] {};
 
@@ -50,11 +50,11 @@ public class GUIAutomationRoutine extends GUIExtensibleObject implements Seriali
 		this.automation = automation;
 	}
 
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getRights() {
 		return rights;
 	}
 
-	public void setRights(GUIRight[] rights) {
+	public void setRights(GUIAccessControlEntry[] rights) {
 		this.rights = rights;
 	}
 

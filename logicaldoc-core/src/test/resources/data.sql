@@ -23,7 +23,7 @@ values (-1,0,3,7,'multi', 'Multi', 0, -1, 0, 1, 0);
 insert into ld_template
 			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
 values (-1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'default','default',0,0,1,1);
-insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) values (-1, 3, 0);
+insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write) values (-1, 3, 1, 0);
 
 insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
 select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly from ld_attributeset_ext where ld_setid=-1;
@@ -91,23 +91,23 @@ insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (-103,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',-101,'administration.gif',3,1,1,1,1);
 insert into ld_menu
-           (ld_id,ld_securityref,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (-104,-103,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',-101,'administration.gif',3,1,1,1,1);
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (-104,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',-101,'administration.gif',3,1,1,1,1);
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (1041,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',-104,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_securityref,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (1000,-103,'2008-10-22 00:00:00','2008-10-22 00:00:00',1,'menu.admin.1000',2,'administration.gif',5,1,1,1,1);
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1000,'2008-10-22 00:00:00','2008-10-22 00:00:00',1,'menu.admin.1000',2,'administration.gif',5,1,1,1,1);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (1100,'2008-10-22 00:00:00','2008-10-22 00:00:00',1,'menu.admin.1100',1000,'administration.gif',5,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_securityref,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (1200,-103,'2009-10-19 00:00:00','2009-10-19 00:00:00',0,'test',2,'administration.gif',3,1,1,1,1);
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1200,'2009-10-19 00:00:00','2009-10-19 00:00:00',0,'test',2,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
@@ -122,9 +122,12 @@ insert into ld_menu
 values     (1203,'2009-10-19 00:00:00','2009-10-19 00:00:00',0,'qqqq',1201,'administration.gif',3,1,1,1,1);
 
 
-insert into ld_menugroup (ld_menuid, ld_groupid, ld_write) values (2000,3,1);
+insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (2000,3,1,1);
 
-insert into ld_menugroup (ld_menuid, ld_groupid, ld_write) values (-103,2,1);
+insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (-103,2,1,1);
+insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (-104,2,1,1);
+insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (1000,2,1,1);
+insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (1200,2,1,1);
 
 insert into ld_usergroup
            (ld_userid,ld_groupid)
@@ -178,13 +181,13 @@ values (1210,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'Elard',4,0,0,1,1,8,0);
 insert into ld_folder_storage (ld_folderid, ld_nodeid, ld_storageid) values (1210, 'saert536yy', 3);
 insert into ld_folder_storage (ld_folderid, ld_nodeid, ld_storageid) values (1210, 'unexisting', 1);
 
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (6,2,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (6,3,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (6,-3,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (1201,4,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0);
 
 
@@ -219,7 +222,7 @@ values     (6,8,'2010-04-01 00:00:00',1,0,'g','1.0','2006-12-19 00:00:00','2006-
 insert into ld_document
            (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
 values     (7,6,'2010-04-01 00:00:00',0,0,'h','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'XML',3,'en','context.xml',122345,1,0,'',1,0,2,0,1,1,1,5,0,0,0,0,1,0);
-insert into ld_documentgroup(ld_docid, ld_groupid, ld_read, ld_write, ld_security, ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_readingreq)
+insert into ld_document_acl(ld_docid, ld_groupid, ld_read, ld_write, ld_security, ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_readingreq)
 values (7,-3,1,1,1,0,1,1,0,0,0,0,0,1,1,0,1,1,0,0);
 
 

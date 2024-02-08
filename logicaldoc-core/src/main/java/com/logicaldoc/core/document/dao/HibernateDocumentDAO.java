@@ -53,6 +53,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -307,6 +308,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			setIndexed(doc, tenant);
 
 			setTags(doc);
+			
+			AccessControlUtil.removeForbiddenPermissionsForGuests(doc);
 
 			setType(doc);
 
@@ -373,7 +376,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		} catch (Exception e) {
 			handleStoreError(transaction, e);
 		}
-
 	}
 
 	private void setType(Document doc) {
@@ -843,8 +845,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (doc.getTags() != null)
 			log.trace("Initialized {} tags", doc.getTags().size());
 
-		if (doc.getDocumentGroups() != null)
-			log.trace("Initialized {} document groups", doc.getDocumentGroups().size());
+		if (doc.getAccessControlList() != null)
+			log.trace("Initialized {} aces", doc.getAccessControlList().size());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1452,7 +1454,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 						ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,
 						ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
 						ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_readingreq LDREADINGREQ
-						from ld_documentgroup where
+						from ld_document_acl where
 						ld_docid=
 						""");
 		query.append(Long.toString(docId));
@@ -1517,11 +1519,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		while (folder.getSecurityRef() != null)
 			folder = folderDAO.findById(folder.getSecurityRef());
 
-		int count = jdbcUpdate("delete from ld_documentgroup where ld_docid=" + docId);
+		int count = jdbcUpdate("delete from ld_document_acl where ld_docid=" + docId);
 		log.debug("Removed {} security policies of document {}", count, docId);
 
 		StringBuilder update = new StringBuilder("""
-				 insert into ld_documentgroup(ld_docId,ld_groupid,ld_read,ld_write,ld_security,
+				 insert into ld_document_acl(ld_docId,ld_groupid,ld_read,ld_write,ld_security,
 				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
 				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
 				                              ld_print,ld_password,ld_move,ld_email,ld_automation,
@@ -1534,7 +1536,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
 				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
 				                              ld_print,ld_password,ld_move,ld_email,ld_automation,
-				                              ld_readingreq from ld_foldergroup where ld_folderid=
+				                              ld_readingreq from ld_folder_acl where ld_folderid=
 				""");
 		update.append(Long.toString(folder.getId()));
 		count = jdbcUpdate(update.toString());

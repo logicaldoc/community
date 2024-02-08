@@ -13,8 +13,9 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.dao.GroupDAO;
-import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.menu.Menu;
+import com.logicaldoc.core.security.menu.MenuDAO;
 
 /**
  * Basic implementation of <code>SecurityManager</code>
@@ -62,10 +63,8 @@ public class SecurityManagerImpl implements SecurityManager {
 		Set<Group> groups = new HashSet<>();
 		try {
 			Menu menu = menuDAO.findById(menuId);
-			if (menu.getSecurityRef() != null)
-				menu = menuDAO.findById(menu.getSecurityRef());
 
-			for (MenuGroup mg : menu.getMenuGroups()) {
+			for (AccessControlEntry mg : menu.getAccessControlList()) {
 				Group group = groupDAO.findById(mg.getGroupId());
 				if (!groups.contains(group))
 					groups.add(groupDAO.findById(mg.getGroupId()));

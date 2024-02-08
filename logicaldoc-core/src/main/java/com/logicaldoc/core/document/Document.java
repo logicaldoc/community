@@ -5,16 +5,19 @@ import java.util.Set;
 
 import org.hibernate.LazyInitializationException;
 
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.SecurableObject;
+
 /**
  * Basic concrete implementation of <code>AbstractDocument</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 1.0
  */
-public class Document extends AbstractDocument {
+public class Document extends AbstractDocument implements SecurableObject {
 	private static final long serialVersionUID = 1L;
 
-	private Set<DocumentGroup> documentGroups = new HashSet<>();
+	private Set<AccessControlEntry> acl = new HashSet<>();
 
 	public Document() {
 	}
@@ -35,40 +38,33 @@ public class Document extends AbstractDocument {
 		setCustomId(null);
 
 		try {
-			setDocumentGroups(new HashSet<>());
-			for (DocumentGroup dg : source.getDocumentGroups())
-				getDocumentGroups().add(new DocumentGroup(dg));
+			for (AccessControlEntry ace : source.getAccessControlList())
+				acl.add(new AccessControlEntry(ace));
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
 		}
 	}
 
-	public Set<DocumentGroup> getDocumentGroups() {
-		return documentGroups;
+	@Override
+	public Set<AccessControlEntry> getAccessControlList() {
+		return acl;
 	}
 
-	public void setDocumentGroups(Set<DocumentGroup> documentGroups) {
-		this.documentGroups = documentGroups;
+	@Override
+	public void setAccessControlList(Set<AccessControlEntry> acl) {
+		this.acl = acl;
 	}
 
-	/**
-	 * Adds a new element, substituting an existing one with the same groupId.
-	 * 
-	 * @param dg the document group
-	 */
-	public void addDocumentGroup(DocumentGroup dg) {
-		DocumentGroup m = getDocumentGroup(dg.getGroupId());
-		if (m != null)
-			getDocumentGroups().remove(m);
-		if (dg.getRead() != 0)
-			getDocumentGroups().add(dg);
+	@Override
+	public AccessControlEntry getAccessControlEntry(long groupId) {
+		return acl.stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
 	}
 
-	public DocumentGroup getDocumentGroup(long groupId) {
-		for (DocumentGroup dg : documentGroups) {
-			if (dg.getGroupId() == groupId)
-				return dg;
+	@Override
+	public void addAccessControlEntry(AccessControlEntry ace) {
+		if (!acl.add(ace)) {
+			acl.remove(ace);
+			acl.add(ace);
 		}
-		return null;
 	}
 }

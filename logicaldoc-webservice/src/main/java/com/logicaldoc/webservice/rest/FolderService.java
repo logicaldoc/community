@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.rest;
 
+import javax.jws.WebParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -15,8 +16,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSFolder;
-import com.logicaldoc.webservice.model.WSRight;
 
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
@@ -259,7 +260,7 @@ public interface FolderService {
 	 * Tests if the current user has a specific permission on a folder
 	 * 
 	 * @param folderId The folder id
-	 * @param permission The permission representation
+	 * @param permission The permission to check (eg: 'read', 'write', ...)
 	 * 
 	 * @return True if the identifier denotes a granted permission, otherwise
 	 *         false
@@ -272,7 +273,7 @@ public interface FolderService {
 	@Path("/isGranted")
 	public boolean isGranted(@QueryParam("folderId")
 	long folderId, @QueryParam("permission")
-	int permission) throws AuthenticationException, WebserviceException, PersistenceException;
+	String permission) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Copies an existing folder with the given identifier.
@@ -306,82 +307,38 @@ public interface FolderService {
 	String securityOption)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
+	
 	/**
-	 * Grants user permission to the folder.
+	 * Sets the Access Control List
 	 * 
 	 * @param folderId Folder id
-	 * @param userId User Id
-	 * @param permissions the permission integer representation. If '0', the
-	 *        user will be not granted to access the folder.
-	 * @param recursive recursion option. If true, the grant operation is
-	 *        applied also to the subfolders.
+	 * @param acl the complete Access Control List
 	 * 
 	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough
-	 *         permissions
-	 * @throws AuthenticationException Invalid credentials
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@PUT
-	@Path("/grantUser")
-	public void grantUser(@QueryParam("folderId")
-	long folderId, @QueryParam("userId")
-	long userId, @QueryParam("permissions")
-	int permissions, @QueryParam("recursive")
-	boolean recursive) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
-
+	@Path("/setAccessControlList")
+	public void setAccessControlList(@WebParam(name = "folderId")
+	long folderId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
+	
 	/**
-	 * Grants group permission to the folder
-	 * 
-	 * @param folderId Folder id
-	 * @param groupId Group Id
-	 * @param permissions the permission integer representation. If '0', the
-	 *        group will be not granted to access the folder.
-	 * @param recursive recursion option. If true, the grant operation is
-	 *        applied also to the subfolders
-	 * 
-	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough
-	 *         permissions
-	 * @throws AuthenticationException Invalid credentials
-	 */
-	@PUT
-	@Path("/grantGroup")
-	public void grantGroup(@QueryParam("folderId")
-	long folderId, @QueryParam("groupId")
-	long groupId, @QueryParam("permissions")
-	int permissions, @QueryParam("recursive")
-	boolean recursive) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
-
-	/**
-	 * Retrieves the list of granted groups for the given folder
+	 * Retrieves the access control list
 	 * 
 	 * @param folderId Folder id
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
+	 * @throws PermissionException The permission has not been granted
 	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException A generic error in the WebService
-	 * @throws AuthenticationException Invalid credentials
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
-	@Path("/getGrantedGroups")
-	public WSRight[] getGrantedGroups(@QueryParam("folderId")
-	long folderId) throws AuthenticationException, WebserviceException, PersistenceException;
-
-	/**
-	 * Retrieves the list of granted users for the given folder.
-	 * 
-	 * @param folderId Folder id
-	 * 
-	 * @return 'error' if error occurred, the right objects collection.
-	 * 
-	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException A generic error in the WebService
-	 * @throws AuthenticationException Invalid credentials
-	 */
-	@GET
-	@Path("/getGrantedUsers")
-	public WSRight[] getGrantedUsers(@QueryParam("folderId")
-	long folderId) throws AuthenticationException, WebserviceException, PersistenceException;
+	@Path("/getAccessControlList")
+	public WSAccessControlEntry[] getAccessControlList(@WebParam(name = "folderId")
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 }

@@ -8,8 +8,8 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
-import com.logicaldoc.gui.common.client.data.RightsDS;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.data.AccessControlListDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -168,7 +168,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		list.setRotateHeaderTitles(true);
 		list.setHeaderHeight(100);
 		if (document.getId() != 0L)
-			list.setDataSource(new RightsDS(document.getId(), "document"));
+			list.setDataSource(new AccessControlListDS(document.getId(), "document"));
 
 		List<ListGridField> fields = new ArrayList<>();
 		fields.add(entityId);
@@ -385,17 +385,17 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	}
 
 	/**
-	 * Creates an array of all the rights
+	 * Creates an array of all the ACL
 	 * 
 	 * @return the array of rights
 	 */
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getACL() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIRight> tmp = new ArrayList<>();
+		List<GUIAccessControlEntry> tmp = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
-			GUIRight right = new GUIRight();
+			GUIAccessControlEntry right = new GUIAccessControlEntry();
 			right.setName(rec.getAttributeAsString(ENTITY));
 			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
 			right.setRead(rec.getAttributeAsBoolean("read"));
@@ -420,7 +420,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			tmp.add(right);
 		}
 
-		return tmp.toArray(new GUIRight[0]);
+		return tmp.toArray(new GUIAccessControlEntry[0]);
 	}
 
 	/**
@@ -453,14 +453,19 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	@Override
 	public boolean validate() {
 		// Apply all rights
-		document.setRights(this.getRights());
+		try {
+			if (list != null)
+				document.setRights(this.getACL());
+		} catch (Exception e) {
+			// Nothing to do
+		}
 		return true;
 	}
 
 	public void onSave() {
 		validate();
-		
-		DocumentService.Instance.get().applySecurity(document, new AsyncCallback<Void>() {
+
+		DocumentService.Instance.get().saveACL(document, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -486,7 +491,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						document.setRights(folder.getRights());
-						list.refresh(new RightsDS(document.getFolder().getId(), "folder"));
+						list.refresh(new AccessControlListDS(document.getFolder().getId(), "folder"));
 					}
 				});
 	}

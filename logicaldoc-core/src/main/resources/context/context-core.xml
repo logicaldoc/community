@@ -40,7 +40,7 @@
    </bean>   
    <bean id="MenuDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateMenuDAO" />
+         <bean class="com.logicaldoc.core.security.menu.HibernateMenuDAO" />
       </property>
    </bean>
    <bean id="FolderHistoryDAO" parent="ApplicationBaseTransactionProxy">

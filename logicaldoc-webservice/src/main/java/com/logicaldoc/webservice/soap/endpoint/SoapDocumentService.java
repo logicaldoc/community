@@ -28,7 +28,6 @@ import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.DocumentGroup;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentManager;
@@ -46,6 +45,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -53,8 +53,6 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
-import com.logicaldoc.core.security.dao.GroupDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
@@ -63,11 +61,11 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
-import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSUtil;
 import com.logicaldoc.webservice.soap.DocumentService;
 
@@ -1334,17 +1332,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public void grantUser(String sid, long docId, long userId, int permissions)
+	public void setAccessControlList(String sid, long docId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-
-		User user = userDao.findById(userId);
-		grantGroup(sid, docId, user.getUserGroup().getId(), permissions);
-	}
-
-	@Override
-	public void grantGroup(String sid, long docId, long groupId, int permissions)
-			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException {
 		User sessionUser = validateSession(sid);
 
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1355,79 +1344,54 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		Document document = documentDao.findById(docId);
 		documentDao.initialize(document);
-
-		DocumentGroup fg = new DocumentGroup();
-		fg.setGroupId(groupId);
-		fg.setPermissions(permissions);
-		document.addDocumentGroup(fg);
+		document.getAccessControlList().clear();
+		for (WSAccessControlEntry wsAcwe : acl)
+			document.addAccessControlEntry(WSUtil.toAccessControlEntry(wsAcwe));
 
 		DocumentHistory history = new DocumentHistory();
 		history.setEvent(DocumentEvent.PERMISSION.toString());
 		history.setSession(SessionManager.get().get(sid));
 		documentDao.store(document, history);
+
 	}
 
 	@Override
-	public WSRight[] getGrantedUsers(String sid, long docId)
+	public WSAccessControlEntry[] getAccessControlList(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		return getGranted(sid, docId, true);
-	}
 
-	@Override
-	public WSRight[] getGrantedGroups(String sid, long folderId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		validateSession(sid);
-		return getGranted(sid, folderId, false);
-	}
-
-	private WSRight[] getGranted(String sid, long docId, boolean users)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-
+		List<WSAccessControlEntry> acl = new ArrayList<>();
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+
 		Document document = documentDao.findById(docId);
 		documentDao.initialize(document);
 
-		if (document.getDocumentGroups().isEmpty())
-			return SoapFolderService.getGranted(document.getFolder().getId(), users);
+		for (AccessControlEntry ace : document.getAccessControlList())
+			acl.add(WSUtil.toWSAccessControlEntry(ace));
 
-		List<WSRight> rightsList = new ArrayList<>();
-		for (DocumentGroup mg : document.getDocumentGroups()) {
-			Group group = groupDao.findById(mg.getGroupId());
-			if (group.getName().startsWith("_user_") && users) {
-				rightsList.add(
-						new WSRight(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)),
-								mg.getPermissions()));
-			} else if (!group.getName().startsWith("_user_") && !users)
-				rightsList.add(new WSRight(group.getId(), mg.getPermissions()));
-		}
-		return rightsList.toArray(new WSRight[rightsList.size()]);
+		return acl.toArray(new WSAccessControlEntry[0]);
 	}
 
 	@Override
 	public boolean isRead(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		// TODO Auto-generated method stub
-		return false;
+		return isGranted(sid, docId, Permission.READ.getName());
 	}
 
 	@Override
 	public boolean isWrite(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		// TODO Auto-generated method stub
-		return false;
+		return isGranted(sid, docId, Permission.WRITE.getName());
 	}
 
 	@Override
 	public boolean isDownload(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		// TODO Auto-generated method stub
-		return false;
+		return isGranted(sid, docId, Permission.DOWNLOAD.getName());
 	}
 
 	@Override
-	public boolean isGranted(String sid, long docId, int permission)
+	public boolean isGranted(String sid, long docId, String permission)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		try {

@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.settings.gui;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.security.MenuRightsPanel;
+import com.logicaldoc.gui.frontend.client.security.MenuSecurityPanel;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
@@ -36,7 +36,7 @@ public class CustomActionEditor extends Window {
 
 	private TabSet tabs = new TabSet();
 
-	private MenuRightsPanel rightsPanel = null;
+	private MenuSecurityPanel rightsPanel = null;
 
 	public CustomActionEditor(GUIMenu action, CustomActionsPanel panel) {
 		this.action = action;
@@ -110,7 +110,7 @@ public class CustomActionEditor extends Window {
 		details.setPane(form);
 
 		Tab security = new Tab(I18N.message("security"));
-		rightsPanel = new MenuRightsPanel(action, false);
+		rightsPanel = new MenuSecurityPanel(action, false);
 		security.setPane(rightsPanel);
 
 		tabs.setTabs(details, security);
@@ -132,7 +132,7 @@ public class CustomActionEditor extends Window {
 
 			try {
 				if (rightsPanel != null)
-					action.setRights(rightsPanel.getRights());
+					action.setRights(rightsPanel.getACL());
 			} catch (Exception t) {
 				// Nothing to do
 			}

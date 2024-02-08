@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.dao.MenuDAO;
+import com.logicaldoc.core.security.menu.Menu;
+import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.Context;
 
 /**

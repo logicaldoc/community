@@ -23,8 +23,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSFolder;
-import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.rest.FolderService;
 import com.logicaldoc.webservice.soap.endpoint.SoapFolderService;
 
@@ -323,7 +323,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@QueryParam("folderId")
 	long folderId, @Parameter(description = "the permissions' integer representation", required = true)
 	@QueryParam("permission")
-	int permission) throws AuthenticationException, WebserviceException, PersistenceException {
+	String permission) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSession();
 		return super.isGranted(sid, folderId, permission);
 	}
@@ -343,70 +343,28 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			int foldersOnly,
 			@Parameter(description = "<b>null</b> or </b>none</b> = no sec. policies are created, <b>inherit</b>: the new folder will point to the parent for the security policies, <b>replicate</b> = sec. policies are inherited from the new parent folder", required = false)
 			@FormParam("securityOption")
-			String securityOption) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+			String securityOption)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSession();
 		super.copy(sid, folderId, targetId, foldersOnly, securityOption);
 	}
 
 	@Override
-	@PUT
-	@Path("/grantUser")
-	@Operation(summary = "Grants user permission to the folder")
-	public void grantUser(@Parameter(description = "Folder identifier (ID)", required = true)
-	@QueryParam("folderId")
-	long folderId, @Parameter(description = "User identifier (ID)", required = true)
-	@QueryParam("userId")
-	long userId,
-			@Parameter(description = "the permission integer representation. If '0', the user will be not granted to access the folder", required = true)
-			@QueryParam("permissions")
-			int permissions,
-			@Parameter(description = "recursion option. If true, the grant operation is applied also to the subfolders", required = true)
-			@QueryParam("recursive")
-			boolean recursive)
-			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
+	@GET
+	@Operation(operationId = "setAccessControlList", summary = "Assignsa the complete Access Control List")
+	public void setAccessControlList(@QueryParam("folderId")
+	long folderId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		String sid = validateSession();
-		super.grantUser(sid, folderId, userId, permissions, recursive);
+		super.setAccessControlList(sid, folderId, acl);
 	}
-
-	@Override
-	@PUT
-	@Path("/grantGroup")
-	@Operation(summary = "Grants group permission to the folde")
-	public void grantGroup(@Parameter(description = "Folder identifier (ID)", required = true)
-	@QueryParam("folderId")
-	long folderId, @Parameter(description = "Group identifier (ID)", required = true)
-	@QueryParam("groupId")
-	long groupId,
-			@Parameter(description = "the permission integer representation. If '0', the group will be not granted to access the folder", required = true)
-			@QueryParam("permissions")
-			int permissions,
-			@Parameter(description = "recursion option. If true, the grant operation is applied also to the subfolders", required = true)
-			@QueryParam("recursive")
-			boolean recursive)
-			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
-		String sid = validateSession();
-		super.grantGroup(sid, folderId, groupId, permissions, recursive);
-	}
-
+	
 	@Override
 	@GET
-	@Path("/getGrantedGroups")
-	@Operation(summary = "Retrieves the list of granted groups for the given folder")
-	public WSRight[] getGrantedGroups(@Parameter(description = "Folder identifier (ID)", required = true)
-	@QueryParam("folderId")
-	long folderId) throws AuthenticationException, WebserviceException, PersistenceException {
+	@Path("/getAccessControlList")
+	public WSAccessControlEntry[] getAccessControlList(@QueryParam("folderId")
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSession();
-		return super.getGrantedGroups(sid, folderId);
-	}
-
-	@Override
-	@GET
-	@Path("/getGrantedUsers")
-	@Operation(summary = "Retrieves the list of granted users for the given folder")
-	public WSRight[] getGrantedUsers(@Parameter(description = "Folder identifier (ID)", required = true)
-	@QueryParam("folderId")
-	long folderId) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
-		return super.getGrantedUsers(sid, folderId);
+		return super.getAccessControlList(sid, folderId);
 	}
 }

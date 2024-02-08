@@ -74,7 +74,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 
 		GUIFolder folder = service.getFolder(6, false, false, false);
 
-		service.applyRights(folder, true);
+		service.saveACL(folder, true);
 
 		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.DELETE, 1202, 1));
 		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.RENAME, 1202, 1));

@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -170,7 +170,7 @@ public class SearchToolbar extends ToolStrip {
 					metadata.setPublished(-1);
 					metadata.setLockUserId(Session.get().getUser().getId());
 					GUIFolder fld = new GUIFolder();
-					fld.setAllowedPermissions(new GUIRight(GUIRight.PERMISSION_READ, GUIRight.PERMISSION_WRITE));
+					fld.setAllowedPermissions(new GUIAccessControlEntry(GUIAccessControlEntry.PERMISSION_READ, GUIAccessControlEntry.PERMISSION_WRITE));
 					metadata.setFolder(fld);
 
 					UpdateDialog dialog = new UpdateDialog(hitsPanel.getGrid().getSelectedIds(), metadata,

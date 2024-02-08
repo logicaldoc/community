@@ -1,10 +1,14 @@
-package com.logicaldoc.core.security.dao;
+package com.logicaldoc.core.security.menu;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,9 +16,8 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.security.Menu;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
-import com.logicaldoc.core.security.User;
 
 import junit.framework.Assert;
 
@@ -43,14 +46,16 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 		Menu menu = new Menu();
 		menu.setName("text");
 		menu.setParentId(2);
-		menu.setMenuGroup(new long[] { 1, 2 });
+		menu.setAccessControlList(Set.of(new AccessControlEntry(1L), new AccessControlEntry(2L)));
+		assertNotNull(menu.getAccessControlEntry(1L));
+		assertNull(menu.getAccessControlEntry(3L));
 		dao.store(menu);
 		Assert.assertNotNull(menu);
 
 		menu = dao.findById(2000);
 		Assert.assertEquals("menu.adminxxx", menu.getName());
 
-		Assert.assertEquals(1, menu.getMenuGroups().size());
+		Assert.assertEquals(1, menu.getAccessControlList().size());
 
 		// Load an existing menu and modify it
 		menu = dao.findById(9);
@@ -99,7 +104,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(2, menu.getId());
 		Assert.assertEquals("administration", menu.getName());
 		Assert.assertEquals("menu.png", menu.getIcon());
-		Assert.assertEquals(1, menu.getMenuGroups().size());
+		Assert.assertEquals(1, menu.getAccessControlList().size());
 
 		// Try with unexisting id
 		menu = dao.findById(99999);
@@ -324,21 +329,6 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(dirs);
 		Assert.assertEquals(2, dirs.size());
 		Assert.assertTrue(dirs.contains(dao.findById(1200L)));
-	}
-
-	@Test
-	public void testApplyRightsToTree() throws PersistenceException {
-		User user = new User();
-		user.setId(4);
-
-		Menu menu = dao.findById(1041);
-		Assert.assertNull(menu.getSecurityRef());
-
-		Assert.assertTrue(dao.applyRightToTree(-101));
-		menu = dao.findById(-104);
-		Assert.assertEquals(Long.valueOf(-101L), menu.getSecurityRef());
-		menu = dao.findById(1041);
-		Assert.assertEquals(Long.valueOf(-101L), menu.getSecurityRef());
 	}
 
 	@Test

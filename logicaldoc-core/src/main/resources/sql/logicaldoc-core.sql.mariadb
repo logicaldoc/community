@@ -25,13 +25,12 @@ create table ld_document_ext (ld_docid bigint not null, ld_mandatory int not nul
                               ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
                               ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
                               ld_dependson varchar(255), primary key (ld_docid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-create table ld_documentgroup (ld_docid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
+create table ld_document_acl (ld_docid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
                              ld_security int not null, ld_immutable int not null, ld_delete int not null, 
                              ld_rename int not null, ld_sign int not null, 
                              ld_archive int not null, ld_workflow int not null, ld_download int not null, ld_calendar int not null,
                              ld_subscription int not null, ld_print int not null, ld_password int not null, ld_move int not null,  
-                             ld_email int not null, ld_automation int not null, ld_readingreq int not null, 
-                             constraint PK_LD_DOCUMENTGROUP primary key (ld_docid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                              
+                             ld_email int not null, ld_automation int not null, ld_readingreq int not null, primary key (ld_docid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                              
 create table ld_generic (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null, 
                          ld_deleted int not null, ld_tenantid bigint not null, ld_type varchar(255) not null, 
                          ld_subtype varchar(255) not null, ld_qualifier bigint null, ld_string1 varchar(4000), 
@@ -64,10 +63,10 @@ create table ld_link (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_docid2 bigint, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_menu (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null, 
                       ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255), 
-                      ld_parentid bigint not null, ld_securityref bigint, ld_icon varchar(255), 
+                      ld_parentid bigint not null, ld_icon varchar(255), 
                       ld_type int not null, ld_description varchar(4000), ld_position int not null, 
                       ld_enabled int not null, ld_routineid bigint, ld_automation varchar(4000), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-create table ld_menugroup (ld_menuid bigint not null, ld_groupid bigint not null, ld_write int not null, constraint PK_LD_MENUGROUP primary key (ld_menuid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+create table ld_menu_acl (ld_menuid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, primary key (ld_menuid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_recipient (ld_messageid bigint not null, ld_name varchar(255) not null, ld_address varchar(255) not null, ld_mode varchar(255) not null, ld_type int not null, ld_read int not null) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_systemmessage (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                                ld_deleted int not null, ld_tenantid bigint not null, 
@@ -85,7 +84,7 @@ create table ld_template_ext (ld_templateid bigint not null, ld_mandatory int no
                               ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint,
                               ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
                               ld_dependson varchar(255), primary key (ld_templateid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-create table ld_templategroup (ld_templateid bigint not null, ld_groupid bigint not null, ld_write int not null, 
+create table ld_template_acl (ld_templateid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
                                primary key (ld_templateid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                              
 create table ld_attributeset (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                               ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_label varchar(255),
@@ -172,13 +171,13 @@ create table ld_folder_history (ld_id bigint not null, ld_lastmodified datetime 
                                 ld_new int, ld_filename varchar(255), ld_userlogin varchar(255), ld_filenameold varchar(255), 
                                 ld_ip varchar(255), ld_geolocation varchar(255), ld_device varchar(255),
                                 ld_filesize bigint, ld_color varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-create table ld_foldergroup (ld_folderid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
+create table ld_folder_accl (ld_folderid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
                              ld_add int not null, ld_security int not null, ld_immutable int not null, ld_delete int not null, 
                              ld_rename int not null, ld_import int not null, ld_export int not null, ld_sign int not null, 
                              ld_archive int not null, ld_workflow int not null, ld_download int not null, ld_calendar int not null,
                              ld_subscription int not null, ld_print int not null, ld_password int not null, ld_move int not null,
                              ld_email int not null, ld_automation int not null, ld_storage int not null, ld_readingreq int not null,
-                             constraint PK_LD_FOLDERGROUP primary key (ld_folderid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+                             primary key (ld_folderid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_rating (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint not null, 
                         ld_userid bigint not null, ld_vote int not null, ld_username varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -250,30 +249,33 @@ create table hibernate_sequences (sequence_name varchar(40) NOT NULL, next_val b
 alter table ld_document add constraint FK75ED9C0276C86307 foreign key (ld_templateid) references ld_template(ld_id);
 alter table ld_document add constraint FK75ED9C027C565C60 foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_document_ext add constraint FK4E0884647C693DFD foreign key (ld_docid) references ld_document(ld_id);
-alter table ld_documentgroup add constraint FK_DGROUP_DOCUMENT foreign key (ld_docid) references ld_document(ld_id) on delete cascade;
+alter table ld_document_acl add constraint FK_DOCACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
+alter table ld_document_acl add constraint FK_DOCACL_DOCUMENT foreign key (ld_docid) references ld_document(ld_id) on delete cascade;
 alter table ld_generic_ext add constraint FK913AF772CF8376C7 foreign key (ld_genid) references ld_generic(ld_id);
 alter table ld_tag add constraint FK55BBDA227C693DFD foreign key (ld_docid) references ld_document(ld_id);
 alter table ld_link add constraint FK1330661CADD6217 foreign key (ld_docid2) references ld_document(ld_id);
 alter table ld_link add constraint FK1330661CADD6216 foreign key (ld_docid1) references ld_document(ld_id);
-alter table ld_usergroup add constraint FK2435438DB8B12CA9 foreign key (ld_userid) references ld_user(ld_id);
-alter table ld_usergroup add constraint FK2435438D76F11EA1 foreign key (ld_groupid) references ld_group(ld_id);
+alter table ld_usergroup add constraint FK2435438DB8B12CA9 foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
+alter table ld_usergroup add constraint FK2435438D76F11EA1 foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
 alter table ld_version add constraint FK9B3BD9118A053CE foreign key (ld_documentid) references ld_document(ld_id);
 alter table ld_version_ext add constraint FK78C3A1F3B90495EE foreign key (ld_versionid) references ld_version(ld_id);
 alter table ld_template_ext add constraint FK6BABB84376C86307 foreign key (ld_templateid) references ld_template(ld_id);
+alter table ld_template_acl add constraint FK_TEMPLACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
+alter table ld_template_acl add constraint FK_TEMPLACL_TEMPL foreign key (ld_templateid) references ld_template(ld_id) on delete cascade;
 alter table ld_recipient add constraint FK406A04126621DEBE foreign key (ld_messageid) references ld_systemmessage(ld_id);
 
 alter table ld_attributeset_ext add constraint FK_ATT_ATTSET foreign key (ld_attsetid) references ld_attributeset(ld_id);
 alter table ld_ticket add constraint FK_TICKET_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
-alter table ld_menugroup add constraint FK_MENUGROUP_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
 alter table ld_menu add constraint FK_MENU_PARENT foreign key (ld_parentid) references ld_menu(ld_id);
+alter table ld_menu_acl add constraint FK_MENUACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
+alter table ld_menu_acl add constraint FK_MENUACL_MENU foreign key (ld_menuid) references ld_menu(ld_id) on delete cascade;
 alter table ld_folder add constraint FK_FOLDER_PARENT foreign key (ld_parentid) references ld_folder(ld_id);
 alter table ld_folder add constraint FK_FOLDER_TEMPLATE foreign key (ld_templateid) references ld_template(ld_id);
 alter table ld_folder_ext add constraint FK_FOLDEREXT_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
-alter table ld_foldergroup add constraint FK_FGROUP_FOLDER foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
+alter table ld_folder_acl add constraint FK_FOLDACL_FOLDER foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
+alter table ld_folder_acl add constraint FK_FOLDACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade
 alter table ld_folder_storage add constraint FK_FOLDER_STORAGE foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
-alter table ld_menugroup add constraint FK_MGROUP_MENU foreign key (ld_menuid) references ld_menu(ld_id) on delete cascade;
 alter table ld_foldertag add constraint FK_TAG_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
-alter table ld_templategroup add constraint FK_TGROUP_TEMPLATE foreign key (ld_templateid) references ld_template(ld_id) on delete cascade;
 alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 
 create unique index AK_DOCUMENT on ld_document (ld_customid, ld_tenantid);
@@ -572,105 +574,105 @@ values     (-1010,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'_user_-1010','',1,1,1,'
 insert into ld_usergroup
 values (-1010,-1010);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (2,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (14,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (25,4,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (2,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (14,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (25,4,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (5,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (5,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (5,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (5,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (5,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (5,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (5,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (5,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1500,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1500,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1500,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1500,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1500,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1500,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1500,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1500,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1510,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1510,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1510,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1510,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1510,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1510,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1510,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1510,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1520,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1520,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1520,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1520,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1520,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1520,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1520,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1520,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1525,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1525,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1525,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1525,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1525,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1525,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1525,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1525,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1526,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1526,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1526,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1526,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1526,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1526,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1526,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1526,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1530,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1530,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1530,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1530,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1530,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1530,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1530,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1530,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1535,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1535,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1535,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1535,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1535,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1535,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1535,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1535,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (200,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (200,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (200,4,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (200,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (200,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (200,4,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1602,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1602,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1602,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1602,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1602,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1602,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1602,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1602,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1603,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1603,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1603,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1603,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1603,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1603,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1603,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1603,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1606,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1606,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1606,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1606,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1606,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1606,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1606,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1606,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1607,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1607,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1607,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1607,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1607,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1607,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1607,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1607,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1609,2,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1609,3,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1609,4,0);
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1609,-10000,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1609,2,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1609,3,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1609,4,1,0);
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1609,-10000,1,0);
 
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 10,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 11,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 12,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 40,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
-insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 1610,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 10,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 11,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 12,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 40,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 1610,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (5,CURRENT_TIMESTAMP,0,'/',5,1,CURRENT_TIMESTAMP,0,1,1,1,0,'/');
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (5,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (5,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (5,4,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (5,-10000,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1);
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation, ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (4,CURRENT_TIMESTAMP,0,'Default',5,1,CURRENT_TIMESTAMP,0,1,1,1,0,'/4');
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,2,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,3,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,4,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,-10000,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
 
 

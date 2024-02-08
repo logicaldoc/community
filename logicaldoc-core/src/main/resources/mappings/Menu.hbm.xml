@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping default-lazy="false">
-	<class name="com.logicaldoc.core.security.Menu" table="ld_menu" where="ld_deleted=0">
+	<class name="com.logicaldoc.core.security.menu.Menu" table="ld_menu" where="ld_deleted=0">
 		<cache usage="read-write" />
 		<id name="id" type="long" column="ld_id" unsaved-value="0">
 			<generator class="org.hibernate.id.enhanced.TableGenerator">
@@ -18,17 +18,17 @@
 		<property name="name" type="string" column="ld_name" length="255" />
 		<property name="position" type="int" column="ld_position" not-null="true" />
 		<property name="parentId" type="long" column="ld_parentid" not-null="true" />
-		<property name="securityRef" type="long" column="ld_securityref" />
 		<property name="icon" type="string" column="ld_icon" length="255" />
 		<property name="type" type="int" column="ld_type" not-null="true" />
 		<property name="enabled" type="int" column="ld_enabled" not-null="true" />
 		<property name="description" type="string" column="ld_description" length="4000" />
 		<property name="routineId" type="long" column="ld_routineid" />
 		<property name="automation" type="string" column="ld_automation" />
-		<set name="menuGroups" table="ld_menugroup" cascade="all">
+		<set name="accessControlList" table="ld_menu_acl" cascade="all">
 			<key column="ld_menuid" />
-			<composite-element class="com.logicaldoc.core.security.MenuGroup">
+			<composite-element class="com.logicaldoc.core.security.AccessControlEntry">
 				<property name="groupId" type="long" column="ld_groupid" not-null="true" />
+				<property name="read" type="int" column="ld_read" not-null="true" />
 				<property name="write" type="int" column="ld_write" not-null="true" />
 			</composite-element>
 		</set>

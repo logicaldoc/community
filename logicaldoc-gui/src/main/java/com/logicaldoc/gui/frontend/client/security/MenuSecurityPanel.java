@@ -2,8 +2,8 @@ package com.logicaldoc.gui.frontend.client.security;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
-import com.logicaldoc.gui.common.client.data.RightsDS;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.data.AccessControlListDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -33,7 +33,9 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class MenuRightsPanel extends VLayout {
+public class MenuSecurityPanel extends VLayout {
+
+	private static final String READ = "read";
 
 	private static final String AVATAR = "avatar";
 
@@ -41,15 +43,15 @@ public class MenuRightsPanel extends VLayout {
 
 	private static final String ENTITY_ID = "entityId";
 
-	private ListGrid rightsGrid;
+	private ListGrid aclGrid;
 
 	protected GUIMenu menu;
 
-	boolean withApplyButton = false;
+	boolean withSaveButton = false;
 
-	public MenuRightsPanel(final GUIMenu menu, boolean withApplyButton) {
+	public MenuSecurityPanel(final GUIMenu menu, boolean withSaveButton) {
 		this.menu = menu;
-		this.withApplyButton = withApplyButton;
+		this.withSaveButton = withSaveButton;
 	}
 
 	@Override
@@ -58,24 +60,24 @@ public class MenuRightsPanel extends VLayout {
 		container.setMembersMargin(3);
 		addMember(container);
 
-		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID, 50);
+		ListGridField entityId = new ListGridField(ENTITY_ID, I18N.message(ENTITY_ID.toLowerCase()), 50);
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 
 		ListGridField entity = new UserListGridField(ENTITY, AVATAR, ENTITY);
 		entity.setCanEdit(false);
 
-		rightsGrid = new ListGrid();
-		rightsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		rightsGrid.setCanFreezeFields(true);
-		rightsGrid.setSelectionType(SelectionStyle.MULTIPLE);
-		rightsGrid.setAutoFetchData(true);
-		rightsGrid.setDataSource(new RightsDS(menu.getId(), "menu"));
-		rightsGrid.setFields(entityId, entity);
-		rightsGrid.setCanEdit(true);
-		rightsGrid.setEditEvent(ListGridEditEvent.CLICK);
-		rightsGrid.setModalEditing(true);
-		rightsGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
+		aclGrid = new ListGrid();
+		aclGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		aclGrid.setCanFreezeFields(true);
+		aclGrid.setSelectionType(SelectionStyle.MULTIPLE);
+		aclGrid.setAutoFetchData(true);
+		aclGrid.setDataSource(new AccessControlListDS(menu.getId(), "menu"));
+		aclGrid.setFields(entityId, entity);
+		aclGrid.setCanEdit(true);
+		aclGrid.setEditEvent(ListGridEditEvent.CLICK);
+		aclGrid.setModalEditing(true);
+		aclGrid.addCellContextClickHandler((CellContextClickEvent event) -> {
 			if (event.getColNum() == 0) {
 				Menu contextMenu = setupContextMenu();
 				contextMenu.showContextMenu();
@@ -83,7 +85,7 @@ public class MenuRightsPanel extends VLayout {
 			event.cancel();
 		});
 
-		container.addMember(rightsGrid);
+		container.addMember(aclGrid);
 
 		HLayout buttons = prepareButtons();
 		container.addMember(buttons);
@@ -95,11 +97,11 @@ public class MenuRightsPanel extends VLayout {
 		buttons.setWidth100();
 		buttons.setHeight(20);
 
-		Button applyRights = new Button(I18N.message("applyrights"));
-		applyRights.setAutoFit(true);
-		applyRights.addClickHandler((ClickEvent event) -> onApply());
-		if (withApplyButton)
-			buttons.addMember(applyRights);
+		Button save = new Button(I18N.message("applyrights"));
+		save.setAutoFit(true);
+		save.addClickHandler((ClickEvent event) -> onSave());
+		if (withSaveButton)
+			buttons.addMember(save);
 
 		addGroupSelector(buttons);
 
@@ -120,7 +122,7 @@ public class MenuRightsPanel extends VLayout {
 
 			// Check if the selected user is already present in the rights
 			// table
-			ListGridRecord[] records = rightsGrid.getRecords();
+			ListGridRecord[] records = aclGrid.getRecords();
 			for (ListGridRecord test : records) {
 				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("usergroup"))) {
 					user.clearValue();
@@ -134,8 +136,8 @@ public class MenuRightsPanel extends VLayout {
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
-			rec.setAttribute("read", true);
-			rightsGrid.addData(rec);
+			rec.setAttribute(READ, true);
+			aclGrid.addData(rec);
 			user.clearValue();
 		});
 		buttons.addMember(userForm);
@@ -155,7 +157,7 @@ public class MenuRightsPanel extends VLayout {
 
 			// Check if the selected user is already present in the rights
 			// table
-			ListGridRecord[] records = rightsGrid.getRecords();
+			ListGridRecord[] records = aclGrid.getRecords();
 			for (ListGridRecord test : records) {
 				if (test.getAttribute(ENTITY_ID).equals(selectedRecord.getAttribute("id"))) {
 					group.clearValue();
@@ -168,8 +170,8 @@ public class MenuRightsPanel extends VLayout {
 			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute(AVATAR, "group");
-			rec.setAttribute("read", true);
-			rightsGrid.addData(rec);
+			rec.setAttribute(READ, selectedRecord.getAttribute(READ));
+			aclGrid.addData(rec);
 			group.clearValue();
 		});
 	}
@@ -179,19 +181,17 @@ public class MenuRightsPanel extends VLayout {
 	 * 
 	 * @return array of rights
 	 */
-	public GUIRight[] getRights() {
-		ListGridRecord[] records = rightsGrid.getRecords();
-		GUIRight[] tmp = new GUIRight[records.length];
+	public GUIAccessControlEntry[] getACL() {
+		ListGridRecord[] records = aclGrid.getRecords();
+		GUIAccessControlEntry[] tmp = new GUIAccessControlEntry[records.length];
 
 		int i = 0;
 		for (ListGridRecord rec : records) {
-			GUIRight right = new GUIRight();
-
+			GUIAccessControlEntry right = new GUIAccessControlEntry();
 			right.setName(rec.getAttributeAsString(ENTITY));
 			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-
-			tmp[i] = right;
-			i++;
+			right.setRead(rec.getAttributeAsBoolean(READ));
+			tmp[i++] = right;
 		}
 
 		return tmp;
@@ -208,15 +208,15 @@ public class MenuRightsPanel extends VLayout {
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
 		deleteItem.addClickHandler((MenuItemClickEvent event) -> {
-			ListGridRecord[] selection = rightsGrid.getSelectedRecords();
+			ListGridRecord[] selection = aclGrid.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 				if (Boolean.TRUE.equals(value)) {
-					rightsGrid.removeSelectedData();
-					if (!withApplyButton)
-						onApply();
+					aclGrid.removeSelectedData();
+					if (!withSaveButton)
+						onSave();
 				}
 			});
 		});
@@ -225,11 +225,11 @@ public class MenuRightsPanel extends VLayout {
 		return contextMenu;
 	}
 
-	public void onApply() {
+	public void onSave() {
 		// Apply all rights
-		menu.setRights(getRights());
+		menu.setRights(getACL());
 
-		SecurityService.Instance.get().applyRights(menu, new AsyncCallback<Void>() {
+		SecurityService.Instance.get().saveACL(menu, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

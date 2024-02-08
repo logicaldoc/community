@@ -59,7 +59,6 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.DocumentGroup;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentManager;
@@ -82,6 +81,7 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
 import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -98,6 +98,7 @@ import com.logicaldoc.gui.common.client.AccessDeniedException;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
@@ -106,7 +107,6 @@ import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.i18n.I18N;
@@ -765,7 +765,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				List<String> permissionsList = new ArrayList<>();
 				for (Permission permission : permissions)
 					permissionsList.add(permission.name().toLowerCase());
-				folder.setAllowedPermissions(new GUIRight(permissionsList.toArray(new String[0])));
+				folder.setAllowedPermissions(new GUIAccessControlEntry(permissionsList.toArray(new String[0])));
 			}
 		}
 
@@ -1232,7 +1232,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (session != null) {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Set<Permission> permissions = dao.getEnabledPermissions(documentId, session.getUserId());
-			guiDocument.setAllowedPermissions(new GUIRight(
+			guiDocument.setAllowedPermissions(new GUIAccessControlEntry(
 					permissions.stream().map(p -> p.name().toLowerCase()).toList().toArray(new String[0])));
 		}
 	}
@@ -2091,11 +2091,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			try {
 				GUIDocument buf = bulkUpdateDocument(docId, vo, ignoreEmptyFields, session);
 				if (buf != null) {
-					GUIDocument document = save(buf); 
+					GUIDocument document = save(buf);
 					updatedDocs.add(document);
-					if(vo.getRights()!=null && vo.getRights().length>0) {
+					if (vo.getRights() != null && vo.getRights().length > 0) {
 						document.setRights(vo.getRights());
-						applySecurity(document);
+						saveACL(document);
 					}
 				}
 			} catch (ServerException e) {
@@ -2105,8 +2105,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return updatedDocs.toArray(new GUIDocument[0]);
 	}
 
-	private GUIDocument bulkUpdateDocument(long docId, GUIDocument model, boolean ignoreEmptyFields,
-			Session session) throws ServerException {
+	private GUIDocument bulkUpdateDocument(long docId, GUIDocument model, boolean ignoreEmptyFields, Session session)
+			throws ServerException {
 		GUIDocument document = getById(docId);
 
 		if (document.getImmutable() == 1 || document.getStatus() != AbstractDocument.DOC_UNLOCKED) {
@@ -2121,8 +2121,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return null;
 		}
 
-		document.setComment(
-				HTMLSanitizer.sanitizeSimpleText(model.getComment() != null ? model.getComment() : ""));
+		document.setComment(HTMLSanitizer.sanitizeSimpleText(model.getComment() != null ? model.getComment() : ""));
 
 		if (model.getPublished() > -1)
 			document.setPublished(model.getPublished());
@@ -2144,7 +2143,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		setBarcodeTemplate(model, ignoreEmptyFields, document);
 
 		setExtendedAttributes(model, ignoreEmptyFields, document);
-		
+
 		return document;
 	}
 
@@ -3199,7 +3198,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void applySecurity(GUIDocument guiDocument) throws ServerException {
+	public void saveACL(GUIDocument guiDocument) throws ServerException {
 		Session session = validateSession();
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -3210,36 +3209,36 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			log.info("Applying {} security policies to document {}",
 					(guiDocument.getRights() != null ? guiDocument.getRights().length : 0), guiDocument.getId());
 
-			Set<DocumentGroup> grps = new HashSet<>();
-			for (GUIRight right : guiDocument.getRights()) {
-				DocumentGroup dg = new DocumentGroup();
-				dg.setGroupId(right.getEntityId());
-				grps.add(dg);
+			Set<AccessControlEntry> acl = new HashSet<>();
+			for (GUIAccessControlEntry guiAce : guiDocument.getRights()) {
+				AccessControlEntry ace = new AccessControlEntry();
+				ace.setGroupId(guiAce.getEntityId());
+				acl.add(ace);
 
-				dg.setRead(booleanToInt(right.isRead()));
-				dg.setPrint(booleanToInt(right.isPrint()));
-				dg.setWrite(booleanToInt(right.isWrite()));
-				dg.setSecurity(booleanToInt(right.isSecurity()));
-				dg.setImmutable(booleanToInt(right.isImmutable()));
-				dg.setDelete(booleanToInt(right.isDelete()));
-				dg.setRename(booleanToInt(right.isRename()));
-				dg.setArchive(booleanToInt(right.isArchive()));
-				dg.setWorkflow(booleanToInt(right.isWorkflow()));
-				dg.setSign(booleanToInt(right.isSign()));
-				dg.setDownload(booleanToInt(right.isDownload()));
-				dg.setCalendar(booleanToInt(right.isCalendar()));
-				dg.setSubscription(booleanToInt(right.isSubscription()));
-				dg.setPassword(booleanToInt(right.isPassword()));
-				dg.setMove(booleanToInt(right.isMove()));
-				dg.setEmail(booleanToInt(right.isEmail()));
-				dg.setAutomation(booleanToInt(right.isAutomation()));
-				dg.setReadingreq(booleanToInt(right.isReadingreq()));
+				ace.setRead(booleanToInt(guiAce.isRead()));
+				ace.setPrint(booleanToInt(guiAce.isPrint()));
+				ace.setWrite(booleanToInt(guiAce.isWrite()));
+				ace.setSecurity(booleanToInt(guiAce.isSecurity()));
+				ace.setImmutable(booleanToInt(guiAce.isImmutable()));
+				ace.setDelete(booleanToInt(guiAce.isDelete()));
+				ace.setRename(booleanToInt(guiAce.isRename()));
+				ace.setArchive(booleanToInt(guiAce.isArchive()));
+				ace.setWorkflow(booleanToInt(guiAce.isWorkflow()));
+				ace.setSign(booleanToInt(guiAce.isSign()));
+				ace.setDownload(booleanToInt(guiAce.isDownload()));
+				ace.setCalendar(booleanToInt(guiAce.isCalendar()));
+				ace.setSubscription(booleanToInt(guiAce.isSubscription()));
+				ace.setPassword(booleanToInt(guiAce.isPassword()));
+				ace.setMove(booleanToInt(guiAce.isMove()));
+				ace.setEmail(booleanToInt(guiAce.isEmail()));
+				ace.setAutomation(booleanToInt(guiAce.isAutomation()));
+				ace.setReadingreq(booleanToInt(guiAce.isReadingreq()));
 			}
 
-			document.getDocumentGroups().clear();
-			document.getDocumentGroups().addAll(grps);
+			document.getAccessControlList().clear();
+			document.getAccessControlList().addAll(acl);
 
-			// Add a folder history entry
+			// Add a document history entry
 			DocumentHistory history = new DocumentHistory();
 			history.setEvent(DocumentEvent.PERMISSION.toString());
 			history.setSession(session);
@@ -3264,7 +3263,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIRight getEnabledPermissions(Long[] docIds) throws ServerException {
+	public GUIAccessControlEntry getEnabledPermissions(Long[] docIds) throws ServerException {
 		Session session = validateSession();
 
 		try {
@@ -3280,10 +3279,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				}
 			}
 
-			return new GUIRight(commonPermissions.stream().map(p -> p.name().toLowerCase()).collect(Collectors.toSet())
-					.toArray(new String[0]));
+			return new GUIAccessControlEntry(commonPermissions.stream().map(p -> p.name().toLowerCase())
+					.collect(Collectors.toSet()).toArray(new String[0]));
 		} catch (PersistenceException e) {
-			return (GUIRight) throwServerException(session, log, e);
+			return (GUIAccessControlEntry) throwServerException(session, log, e);
 		}
 	}
 }

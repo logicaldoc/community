@@ -1034,7 +1034,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			cloned.setBarcoded(0);
 
 			if (!security)
-				cloned.getDocumentGroups().clear();
+				cloned.getAccessControlList().clear();
 
 			Document createdDocument = create(is, cloned, transaction);
 

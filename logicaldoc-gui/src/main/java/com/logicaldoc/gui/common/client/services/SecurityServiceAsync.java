@@ -43,7 +43,7 @@ public interface SecurityServiceAsync {
 
 	void saveAvatar(long userId, AsyncCallback<Void> callback);
 
-	void applyRights(GUIMenu menu, AsyncCallback<Void> callback);
+	void saveACL(GUIMenu menu, AsyncCallback<Void> callback);
 
 	void getMenu(long id, String locale, AsyncCallback<GUIMenu> callback);
 

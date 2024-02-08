@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 
 public interface DocumentServiceAsync {
@@ -146,9 +146,9 @@ public interface DocumentServiceAsync {
 
 	void validate(GUIDocument document, AsyncCallback<Void> callback);
 
-	void getEnabledPermissions(Long[] docIds, AsyncCallback<GUIRight> callback);
+	void getEnabledPermissions(Long[] docIds, AsyncCallback<GUIAccessControlEntry> callback);
 
-	void applySecurity(GUIDocument document, AsyncCallback<Void> callback);
+	void saveACL(GUIDocument document, AsyncCallback<Void> callback);
 
 	void applyParentFolderSecurity(long docId, AsyncCallback<Void> callback);
 }

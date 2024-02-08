@@ -149,12 +149,12 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	 */
 	private boolean bulkUpdate = false;
 
-	private GUIRight[] rights = new GUIRight[] {};
+	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
 
 	/**
 	 * Permissions granted to the current user on this document
 	 */
-	private GUIRight allowedPermissions = new GUIRight();
+	private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
 
 	public String getCustomId() {
 		return customId;
@@ -658,19 +658,19 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.docAttrs = docAttrs;
 	}
 
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getRights() {
 		return rights;
 	}
 
-	public void setRights(GUIRight[] rights) {
+	public void setRights(GUIAccessControlEntry[] rights) {
 		this.rights = rights;
 	}
 
-	public GUIRight getAllowedPermissions() {
+	public GUIAccessControlEntry getAllowedPermissions() {
 		return allowedPermissions;
 	}
 
-	public void setAllowedPermissions(GUIRight permissions) {
+	public void setAllowedPermissions(GUIAccessControlEntry permissions) {
 		this.allowedPermissions = permissions;
 	}
 

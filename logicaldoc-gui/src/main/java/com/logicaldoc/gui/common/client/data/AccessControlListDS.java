@@ -11,17 +11,17 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class RightsDS extends DataSource {
+public class AccessControlListDS extends DataSource {
 
 	/**
 	 * Constructor
 	 * 
 	 * @param id identifier of the object
-	 * @param objectType type of object(folder, menu, document)
+	 * @param objectType type of object(folder, menu, document, template)
 	 */
-	public RightsDS(long id, String objectType) {
+	public AccessControlListDS(long id, String objectType) {
 		setTitleField("entity");
-		setRecordXPath("/list/right");
+		setRecordXPath("/list/ace");
 		DataSourceTextField entity = new DataSourceTextField("entity");
 		DataSourceTextField entityId = new DataSourceTextField("entityId");
 		entityId.setPrimaryKey(true);
@@ -53,6 +53,6 @@ public class RightsDS extends DataSource {
 				immutable, security, password, archive, type, download, email, calendar, subscription, automation,
 				storage, readingreq);
 		setClientOnly(true);
-		setDataURL("data/rights.xml?id=" + id + "&type=" + objectType + "&locale=" + I18N.getLocale());
+		setDataURL("data/acl.xml?id=" + id + "&type=" + objectType + "&locale=" + I18N.getLocale());
 	}
 }

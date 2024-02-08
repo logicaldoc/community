@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.activation.DataHandler;
+import javax.jws.WebParam;
 import javax.mail.MessagingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -26,6 +27,7 @@ import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
@@ -998,46 +1000,38 @@ public interface DocumentService {
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
-	 * Grants user permission to the document.
+	 * Sets the Access Control List
 	 * 
 	 * @param docId Document id
-	 * @param userId User Id
-	 * @param permissions the permission integer representation. If '0', the
-	 *        user will be not granted to access the document.
+	 * @param acl the complete Access Control List
 	 * 
 	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough
-	 *         permissions
-	 * @throws AuthenticationException Invalid credentials
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@PUT
-	@Path("/grantUser")
-	public void grantUser(@QueryParam("docId")
-	long docId, @QueryParam("userId")
-	long userId, @QueryParam("permissions")
-	int permissions) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
+	@Path("/setAccessControlList")
+	public void setAccessControlList(@WebParam(name = "docId")
+	long docId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
-	 * Grants group permission to the document
+	 * Retrieves the access control list
 	 * 
-	 * @param folderId Document id
-	 * @param docId Group Id
-	 * @param permissions the permission integer representation. If '0', the
-	 *        group will be not granted to access the document.
+	 * @param docId Document id
+	 * @return 'error' if error occurred, the right objects collection
 	 * 
+	 * @throws PermissionException The permission has not been granted
 	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough
-	 *         permissions
-	 * @throws AuthenticationException Invalid credentials
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
-	@PUT
-	@Path("/grantGroup")
-	public void grantGroup(@QueryParam("docId")
-	long docId, @QueryParam("groupId")
-	long groupId, @QueryParam("permissions")
-	int permissions) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
+	@GET
+	@Path("/getAccessControlList")
+	public WSAccessControlEntry[] getAccessControlList(@WebParam(name = "docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Tests if a document is readable.
@@ -1094,7 +1088,7 @@ public interface DocumentService {
 	 * Tests if the current user has a specific permission on a document
 	 * 
 	 * @param docId The document id
-	 * @param permission The permission representation
+	 * @param permission The permission to check (eg: 'read', 'write', ...)
 	 * 
 	 * @return True if the identifier denotes a granted permission, otherwise
 	 *         false
@@ -1107,5 +1101,5 @@ public interface DocumentService {
 	@Path("/isGranted")
 	public boolean isGranted(@QueryParam("docId")
 	long docId, @QueryParam("permission")
-	int permission) throws AuthenticationException, WebserviceException, PersistenceException;
+	String permission) throws AuthenticationException, WebserviceException, PersistenceException;
 }

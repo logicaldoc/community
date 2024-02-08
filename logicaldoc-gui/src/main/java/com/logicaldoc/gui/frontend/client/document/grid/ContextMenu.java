@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -147,7 +147,7 @@ public class ContextMenu extends Menu {
 			}
 
 			@Override
-			public void onSuccess(GUIRight enabledPermissions) {
+			public void onSuccess(GUIAccessControlEntry enabledPermissions) {
 				download = new MenuItem();
 				download.setTitle(I18N.message("download"));
 				download.addClickHandler(event -> onDownload(folder, selection));
@@ -285,7 +285,7 @@ public class ContextMenu extends Menu {
 		});
 	}
 
-	private void applySecurityPolicies(GUIRight enabledPermissions, final GUIDocument[] selection,
+	private void applySecurityPolicies(GUIAccessControlEntry enabledPermissions, final GUIDocument[] selection,
 			boolean someSelection, boolean moreSelected, boolean justOneSelected, boolean immutablesInSelection) {
 		preview.setEnabled(someSelection
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
@@ -336,24 +336,24 @@ public class ContextMenu extends Menu {
 		automation.setEnabled(Feature.enabled(Feature.AUTOMATION) && enabledPermissions.isAutomation());
 	}
 
-	private void applySplitSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean moreSelected,
+	private void applySplitSecurity(GUIAccessControlEntry enabledPermissions, GUIDocument[] selection, boolean moreSelected,
 			boolean justOneSelected) {
 		split.setEnabled(justOneSelected && selection[0].getFileName().toLowerCase().endsWith(".pdf")
 				&& enabledPermissions.isWrite());
 		merge.setEnabled(moreSelected && enabledPermissions.isWrite());
 	}
 
-	private void applyOfficeSecurity(GUIRight enabledPermissions, boolean justOneSelected) {
+	private void applyOfficeSecurity(GUIAccessControlEntry enabledPermissions, boolean justOneSelected) {
 		office.setEnabled(justOneSelected && Feature.enabled(Feature.OFFICE) && enabledPermissions.isWrite()
 				&& enabledPermissions.isDownload() && Util.isOfficeFile(grid.getSelectedDocument().getFileName()));
 	}
 
-	private void applyDownloadSecurity(GUIRight enabledPermissions, boolean someSelection, boolean justOneSelected) {
+	private void applyDownloadSecurity(GUIAccessControlEntry enabledPermissions, boolean someSelection, boolean justOneSelected) {
 		ticket.setEnabled(justOneSelected && enabledPermissions.isDownload());
 		download.setEnabled(someSelection && enabledPermissions.isDownload());
 	}
 
-	private void applyLockingSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean someSelection,
+	private void applyLockingSecurity(GUIAccessControlEntry enabledPermissions, GUIDocument[] selection, boolean someSelection,
 			boolean immutablesInSelection, boolean justOneSelected) {
 		unlock.setEnabled(
 				someSelection && !immutablesInSelection && (checkStatusInSelection(Constants.DOC_LOCKED, selection)
@@ -366,7 +366,7 @@ public class ContextMenu extends Menu {
 				&& checkStatusInSelection(Constants.DOC_CHECKED_OUT, selection));
 	}
 
-	private void applyIndexableSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean someSelection,
+	private void applyIndexableSecurity(GUIAccessControlEntry enabledPermissions, GUIDocument[] selection, boolean someSelection,
 			boolean immutablesInSelection) {
 		markIndexable.setEnabled(someSelection && !immutablesInSelection
 				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
@@ -374,7 +374,7 @@ public class ContextMenu extends Menu {
 				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isWrite());
 	}
 
-	private void applyPasswordSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean justOneSelected,
+	private void applyPasswordSecurity(GUIAccessControlEntry enabledPermissions, GUIDocument[] selection, boolean justOneSelected,
 			boolean immutablesInSelection) {
 		setPassword.setEnabled(
 				justOneSelected && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
@@ -384,7 +384,7 @@ public class ContextMenu extends Menu {
 						&& enabledPermissions.isPassword() && selection[0].isPasswordProtected());
 	}
 
-	private void applySignSecurity(GUIRight enabledPermissions, GUIDocument[] selection, boolean someSelection,
+	private void applySignSecurity(GUIAccessControlEntry enabledPermissions, GUIDocument[] selection, boolean someSelection,
 			boolean immutablesInSelection) {
 		sign.setEnabled(someSelection && !immutablesInSelection
 				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isSign()

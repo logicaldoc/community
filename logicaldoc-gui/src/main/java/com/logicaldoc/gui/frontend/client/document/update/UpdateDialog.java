@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -83,14 +83,14 @@ public class UpdateDialog extends StickyWindow {
 	protected void onDraw() {
 		super.onDraw();
 
-		DocumentService.Instance.get().getEnabledPermissions(ids, new AsyncCallback<GUIRight>() {
+		DocumentService.Instance.get().getEnabledPermissions(ids, new AsyncCallback<GUIAccessControlEntry>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIRight permissions) {
+			public void onSuccess(GUIAccessControlEntry permissions) {
 				/*
 				 * Since the document is locked, temporarily alter the status to
 				 * have the editing enabled.

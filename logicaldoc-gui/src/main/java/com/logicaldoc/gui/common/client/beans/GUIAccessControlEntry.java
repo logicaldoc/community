@@ -1,17 +1,18 @@
 package com.logicaldoc.gui.common.client.beans;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Bean for rights assignments
+ * Bean to carry the security access settings for a given entity(user or group)
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class GUIRight implements Serializable {
+public class GUIAccessControlEntry implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -71,10 +72,10 @@ public class GUIRight implements Serializable {
 
 	public static final String PERMISSION_PRINT = "print";
 
-	public GUIRight() {
+	public GUIAccessControlEntry() {
 	}
 
-	public GUIRight(String... allowedPermissions) {
+	public GUIAccessControlEntry(String... allowedPermissions) {
 		permissions.clear();
 		for (String permission : allowedPermissions) {
 			permissions.add(new GUIValue(permission.toLowerCase(), "true"));

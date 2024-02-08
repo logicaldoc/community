@@ -257,8 +257,8 @@
     </servlet>
 
     <servlet>
-        <servlet-name>RightsData</servlet-name>
-        <servlet-class>com.logicaldoc.gui.common.server.MockRightsDataServlet</servlet-class>
+        <servlet-name>AclData</servlet-name>
+        <servlet-class>com.logicaldoc.gui.common.server.MockAclDataServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -547,8 +547,8 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>RightsData</servlet-name>
-        <url-pattern>/data/rights.xml</url-pattern>
+        <servlet-name>AclData</servlet-name>
+        <url-pattern>/data/acl.xml</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

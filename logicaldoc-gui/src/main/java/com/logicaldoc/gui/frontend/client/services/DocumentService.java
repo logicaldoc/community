@@ -14,7 +14,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 
 /**
@@ -706,7 +706,7 @@ public interface DocumentService extends RemoteService {
 	 * Gets the shared permissions on a set of documents in regards of the
 	 * current user
 	 */
-	public GUIRight getEnabledPermissions(Long[] docIds) throws ServerException;
+	public GUIAccessControlEntry getEnabledPermissions(Long[] docIds) throws ServerException;
 
 	/**
 	 * Applies all security settings to document
@@ -715,7 +715,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void applySecurity(GUIDocument document) throws ServerException;
+	public void saveACL(GUIDocument document) throws ServerException;
 
 	/**
 	 * Applies all security settings from the folder to the document

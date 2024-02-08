@@ -34,6 +34,7 @@ import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
@@ -911,40 +912,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	}
 
 	@Override
-	@PUT
-	@Path("/grantUser")
-	@Operation(summary = "Grants user permission to the document")
-	public void grantUser(@Parameter(description = "Document identifier (ID)", required = true)
-	@QueryParam("docId")
-	long docId, @Parameter(description = "User identifier (ID)", required = true)
-	@QueryParam("userId")
-	long userId,
-			@Parameter(description = "the permission integer representation. If '0', the user will be not granted to access the document", required = true)
-			@QueryParam("permissions")
-			int permissions)
-			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
-		String sid = validateSession();
-		super.grantUser(sid, docId, userId, permissions);
-	}
-
-	@Override
-	@PUT
-	@Path("/grantGroup")
-	@Operation(summary = "Grants group permission to the document")
-	public void grantGroup(@Parameter(description = "Document identifier (ID)", required = true)
-	@QueryParam("docId")
-	long docId, @Parameter(description = "Group identifier (ID)", required = true)
-	@QueryParam("groupId")
-	long groupId,
-			@Parameter(description = "the permission integer representation. If '0', the group will be not granted to access the document", required = true)
-			@QueryParam("permissions")
-			int permissions)
-			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
-		String sid = validateSession();
-		super.grantGroup(sid, docId, groupId, permissions);
-	}
-
-	@Override
 	@GET
 	@Path("/isRead")
 	@Operation(operationId = "isReadDocument", summary = "Tests if a document is readable")
@@ -982,8 +949,25 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@QueryParam("docId")
 	long docId, @Parameter(description = "the permissions' integer representation", required = true)
 	@QueryParam("permission")
-	int permission) throws AuthenticationException, WebserviceException, PersistenceException {
+	String permission) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSession();
 		return super.isGranted(sid, docId, permission);
+	}
+
+	@Override
+	@GET
+	@Operation(operationId = "setAccessControlList", summary = "Assignsa the complete Access Control List")
+	public void setAccessControlList(@QueryParam("docId")
+	long docId, WSAccessControlEntry[] acl)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
+		String sid = validateSession();
+		super.setAccessControlList(sid, docId, acl);
+	}
+
+	@Override
+	public WSAccessControlEntry[] getAccessControlList(long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		String sid = validateSession();
+		return super.getAccessControlList(sid, docId);
 	}
 }

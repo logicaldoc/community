@@ -130,7 +130,7 @@ public class MenusPanel extends VLayout {
 
 	public void showRights(GUIMenu menu) {
 		rightsContainer.removeMember(rights);
-		rights = new MenuRightsPanel(menu, true);
+		rights = new MenuSecurityPanel(menu, true);
 		rightsContainer.addMember(rights);
 	}
 }

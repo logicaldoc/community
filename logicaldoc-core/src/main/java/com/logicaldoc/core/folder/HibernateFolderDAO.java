@@ -41,6 +41,8 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -48,7 +50,6 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserGroup;
-import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
@@ -69,7 +70,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String PARENTID_EQUAL = ".parentId=";
 
-	private static final String FOLDER_GROUPS_AS_GROUP = ".folderGroups as _group ";
+	private static final String FOLDER_ACL_AS_GROUP = ".accessControlList as _group ";
 
 	private static final String SECURITY_REF_IN = ".securityRef in (";
 
@@ -151,7 +152,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			if (folder.getFoldRef() == null) {
 				if (folder.getSecurityRef() != null)
-					folder.getFolderGroups().clear();
+					folder.getAccessControlList().clear();
 
 				setCreator(folder, transaction);
 
@@ -160,7 +161,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			setTags(folder);
 
-			removeForbiddenPermissionsForGuests(folder);
+			AccessControlUtil.removeForbiddenPermissionsForGuests(folder);
 
 			if (folder.getTemplate() == null)
 				folder.setOcrTemplateId(null);
@@ -234,33 +235,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			throw new PersistenceException(e);
 	}
 
-	private void removeForbiddenPermissionsForGuests(Folder folder) throws PersistenceException {
-		// Remove the forbidden permissions for the guests
-		GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-		Iterator<FolderGroup> iter = folder.getFolderGroups().iterator();
-		while (iter.hasNext()) {
-			FolderGroup fg = iter.next();
-			Group group = gDao.findById(fg.getGroupId());
-			if (group != null && group.isGuest()) {
-				fg.setAdd(0);
-				fg.setArchive(0);
-				fg.setAutomation(0);
-				fg.setCalendar(0);
-				fg.setDelete(0);
-				fg.setExport(0);
-				fg.setImmutable(0);
-				fg.setImport(0);
-				fg.setMove(0);
-				fg.setPassword(0);
-				fg.setRename(0);
-				fg.setSecurity(0);
-				fg.setSign(0);
-				fg.setWorkflow(0);
-				fg.setWrite(0);
-			}
-		}
-	}
-
 	private void setTags(Folder folder) {
 		Set<Tag> src = folder.getTags();
 		if (src != null && !src.isEmpty()) {
@@ -299,7 +273,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			// First of all collect all folders that define it's own
 			// policies
 			StringBuilder query = new StringBuilder("select distinct(_folder) from Folder _folder  ");
-			query.append(" left join _folder.folderGroups as _group ");
+			query.append(" left join _folder" + FOLDER_ACL_AS_GROUP);
 			query.append(WHERE_GROUP_GROUPID_IN);
 			query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 			query.append(")");
@@ -351,7 +325,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return coll;
 
 		query1.append(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + " ");
-		query1.append(LEFT_JOIN + ENTITY + ".folderGroups as _group");
+		query1.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_GROUP);
 		query1.append(WHERE_GROUP_GROUPID_IN);
 		query1.append(precoll.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query1.append(") " + AND + ENTITY + ".parentId = :parentId and " + ENTITY + ".id != " + ENTITY + ".parentId");
@@ -367,7 +341,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				+ ".deleted=0 and " + ENTITY + ".parentId = :parentId ");
 		query2.append(AND + ENTITY + SECURITY_REF_IN);
 		query2.append("    select distinct(B.id) from Folder B ");
-		query2.append(" left join B.folderGroups as _group");
+		query2.append(" left join B.accessControlList as _group");
 		query2.append(WHERE_GROUP_GROUPID_IN);
 		query2.append(precoll.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query2.append("))");
@@ -411,7 +385,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Search for the folders that define its own policies
 		 */
 		StringBuilder query1 = new StringBuilder(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + "  ");
-		query1.append(LEFT_JOIN + ENTITY + FOLDER_GROUPS_AS_GROUP);
+		query1.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_GROUP);
 		query1.append(WHERE_GROUP_GROUPID_IN);
 		query1.append(groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query1.append(") " + AND + ENTITY + PARENTID_EQUAL + parent.getId());
@@ -426,7 +400,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				+ ".deleted=0 and " + ENTITY + ".parentId = :parentId ");
 		query2.append(AND + ENTITY + SECURITY_REF_IN);
 		query2.append("    select distinct(B.id) from Folder B ");
-		query2.append(" left join B.folderGroups as _group");
+		query2.append(" left join B.accessControlList as _group");
 		query2.append(WHERE_GROUP_GROUPID_IN);
 		query2.append(groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query2.append("))");
@@ -513,7 +487,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return false;
 
 		StringBuilder query = new StringBuilder(
-				"select distinct(ld_folderid) from ld_foldergroup where ld_read=1 and ld_groupid in (");
+				"select distinct(ld_folderid) from ld_folder_acl where ld_read=1 and ld_groupid in (");
 		query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 		query.append(") and ld_folderid=" + id);
 
@@ -551,7 +525,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Search for folders that define its own security policies
 		 */
 		StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + "  ");
-		query.append(LEFT_JOIN + ENTITY + FOLDER_GROUPS_AS_GROUP);
+		query.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_GROUP);
 		query.append(WHERE + ENTITY + ".deleted=0 and _group.groupId =" + groupId);
 
 		List<Folder> coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
@@ -594,10 +568,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Set<Group> precoll = user.getGroups();
 		Iterator<Group> iter = precoll.iterator();
 		if (!precoll.isEmpty()) {
-			StringBuilder query1 = new StringBuilder(
-					"select distinct(A.ld_folderid) from ld_foldergroup A, ld_folder B "
-							+ " where B.ld_deleted=0 and A.ld_folderid=B.ld_id AND A.ld_read=1 and (B.ld_parentid="
-							+ parentId + " OR B.ld_id=" + parentId + ")" + AND_LDGROUPID_IN);
+			StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_folder_acl A, ld_folder B "
+					+ " where B.ld_deleted=0 and A.ld_folderid=B.ld_id AND A.ld_read=1 and (B.ld_parentid=" + parentId
+					+ " OR B.ld_id=" + parentId + ")" + AND_LDGROUPID_IN);
 			boolean first = true;
 			while (iter.hasNext()) {
 				if (!first)
@@ -921,7 +894,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		StringBuilder query = new StringBuilder(
 				"select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_storage LDSTORAGE, ld_readingreq LDREADINGREQ");
-		query.append(" from ld_foldergroup ");
+		query.append(" from ld_folder_acl ");
 		query.append(WHERE);
 		query.append(" ld_folderid=" + id);
 		query.append(" and ld_groupid in (");
@@ -996,7 +969,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * folder outside.
 		 */
 		StringBuilder query1 = new StringBuilder(
-				"select distinct(A.ld_folderid) from ld_foldergroup A where A.ld_read=1 ");
+				"select distinct(A.ld_folderid) from ld_folder_acl A where A.ld_read=1 ");
 
 		List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).toList();
 		if (!groupIds.isEmpty()) {
@@ -1092,7 +1065,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * folder outside.
 		 */
 		StringBuilder query1 = new StringBuilder(
-				"select distinct(A.ld_folderid) from ld_foldergroup A where A.ld_read=1 ");
+				"select distinct(A.ld_folderid) from ld_folder_acl A where A.ld_read=1 ");
 		if (permission != Permission.READ)
 			query1.append(" and A.ld_" + permission.getName() + "=1 ");
 
@@ -1292,13 +1265,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		/*
 		 * Delete all the specific rights associated to the folders in the tree
 		 */
-		jdbcUpdate("delete from ld_foldergroup where not ld_folderid = :rootId and ld_folderid in " + treeIdsString,
+		jdbcUpdate("delete from ld_folder_acl where not ld_folderid = :rootId and ld_folderid in " + treeIdsString,
 				params);
 		log.warn("Removed {} specific rights in tree {}", records, rootId);
 
 		if (getSessionFactory().getCache() != null) {
 			getSessionFactory().getCache().evictEntityData(Folder.class);
-			getSessionFactory().getCache().evictCollectionData(Folder.class.getCanonicalName() + ".folderGroups");
+			getSessionFactory().getCache().evictCollectionData(Folder.class.getCanonicalName() + ".accessControlList");
 		}
 	}
 
@@ -1390,17 +1363,17 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			userDAO.initialize(user);
 			if (!user.isMemberOf(Group.GROUP_ADMIN)) {
 				Group userGroup = user.getUserGroup();
-				FolderGroup fg = new FolderGroup(userGroup.getId());
-				fg.setAdd(1);
-				fg.setDelete(1);
-				fg.setDownload(1);
-				fg.setEmail(1);
-				fg.setPermissions(1);
-				fg.setRead(1);
-				fg.setSecurity(1);
-				fg.setRename(1);
-				fg.setWrite(1);
-				folder.addFolderGroup(fg);
+				AccessControlEntry ace = new AccessControlEntry(userGroup.getId());
+				ace.setAdd(1);
+				ace.setDelete(1);
+				ace.setDownload(1);
+				ace.setEmail(1);
+				ace.setSecurity(1);
+				ace.setRead(1);
+				ace.setSecurity(1);
+				ace.setRename(1);
+				ace.setWrite(1);
+				folder.addAccessControlEntry(ace);
 			}
 		}
 
@@ -1659,10 +1632,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (source.getSecurityRef() != null) {
 				newFolder.setSecurityRef(source.getSecurityRef());
 			} else {
-				newFolder.getFolderGroups().clear();
-				for (FolderGroup fg : source.getFolderGroups()) {
-					newFolder.addFolderGroup(new FolderGroup(fg));
-				}
+				newFolder.getAccessControlList().clear();
+				for (AccessControlEntry ace : source.getAccessControlList())
+					newFolder.addAccessControlEntry(new AccessControlEntry(ace));
 			}
 			store(newFolder);
 		}
@@ -1947,8 +1919,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public void initialize(Folder folder) {
 		refresh(folder);
 
-		if (folder.getFolderGroups() != null)
-			log.trace("Initialized {} folder groups", folder.getFolderGroups().size());
+		if (folder.getAccessControlList() != null)
+			log.trace("Initialized {} aces", folder.getAccessControlList().size());
 
 		if (folder.getTags() != null)
 			log.trace("Initialized {} tags", folder.getTags().size());

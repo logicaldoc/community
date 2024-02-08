@@ -55,7 +55,7 @@ public class GUIWorkflow implements Serializable {
 
 	private boolean latestVersion = true;
 
-	private GUIRight[] rights = new GUIRight[] {};
+	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
 
 	private String[] permissions = new String[] {};
 
@@ -222,11 +222,11 @@ public class GUIWorkflow implements Serializable {
 		this.latestVersion = latestVersion;
 	}
 
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getRights() {
 		return rights;
 	}
 
-	public void setRights(GUIRight[] rights) {
+	public void setRights(GUIAccessControlEntry[] rights) {
 		this.rights = rights;
 	}
 

@@ -34,9 +34,7 @@ public class GUIMenu implements Serializable {
 
 	private int position = 0;
 
-	private GUIRight[] rights = new GUIRight[] {};
-
-	private Long securityRef;
+	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
 
 	private int type = 0;
 
@@ -56,11 +54,11 @@ public class GUIMenu implements Serializable {
 		this.name = name;
 	}
 
-	public GUIRight[] getRights() {
+	public GUIAccessControlEntry[] getRights() {
 		return rights;
 	}
 
-	public void setRights(GUIRight[] rights) {
+	public void setRights(GUIAccessControlEntry[] rights) {
 		this.rights = rights;
 	}
 
@@ -110,14 +108,6 @@ public class GUIMenu implements Serializable {
 
 	public void setParentId(long parentId) {
 		this.parentId = parentId;
-	}
-
-	public Long getSecurityRef() {
-		return securityRef;
-	}
-
-	public void setSecurityRef(Long securityRef) {
-		this.securityRef = securityRef;
 	}
 
 	public int getType() {

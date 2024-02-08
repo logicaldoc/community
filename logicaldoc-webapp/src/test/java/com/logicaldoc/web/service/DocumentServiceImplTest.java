@@ -69,7 +69,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
@@ -1369,7 +1369,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testGetEnabledPermissions() throws ParseException, PersistenceException, ServerException {
-		GUIRight permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
+		GUIAccessControlEntry permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
 		for (Permission permission : Permission.all())
 			assertTrue("Does not allow " + permission.name(),
 					permissions.isPermissionAllowed(permission.name().toLowerCase()));

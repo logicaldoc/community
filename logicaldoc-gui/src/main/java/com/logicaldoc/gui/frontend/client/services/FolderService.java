@@ -74,10 +74,10 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void applyRights(GUIFolder folder, boolean subfolders) throws ServerException;
+	public void saveACL(GUIFolder folder, boolean subfolders) throws ServerException;
 
 	/**
-	 * Inherits the rights of another folder
+	 * Inherits the ACL of another folder
 	 * 
 	 * @param folderId The folder that has to be updated
 	 * @param rightsFolderId the folder that defines the rights
@@ -86,7 +86,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIFolder inheritRights(long folderId, long rightsFolderId) throws ServerException;
+	public GUIFolder inheritACL(long folderId, long rightsFolderId) throws ServerException;
 
 	/**
 	 * Applies all extended attributes to a sub-tree

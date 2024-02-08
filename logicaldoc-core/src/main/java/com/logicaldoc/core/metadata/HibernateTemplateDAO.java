@@ -18,6 +18,8 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
@@ -111,11 +113,13 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		boolean isNew = template.getId() == 0L;
 		super.store(template);
 
+		AccessControlUtil.removeForbiddenPermissionsForGuests(template);
+		
 		if (isNew) {
 			flush();
-			storeSecurityAsync(template);
+			storeAclAsync(template);
 		} else {
-			storeSecurity(template);
+			storeAcl(template);
 		}
 	}
 
@@ -125,7 +129,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	 * 
 	 * @param template the template to save
 	 */
-	private void storeSecurityAsync(Template template) {
+	private void storeAclAsync(Template template) {
 		/*
 		 * Probably the document's record has not been written yet, we should
 		 * fork a thread to wait for it's write.
@@ -145,7 +149,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				if (count > 0) {
 					if (log.isDebugEnabled())
 						log.debug("Record of template {} has been written", template.getId());
-					storeSecurity(template);
+					storeAcl(template);
 				}
 			} catch (PersistenceException ex) {
 				log.error(ex.getMessage(), ex);
@@ -155,13 +159,12 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		}, "TemplateSecuritySave", 100L);
 	}
 
-	private void storeSecurity(Template template) throws PersistenceException {
-		jdbcUpdate("delete from ld_templategroup where ld_templateid=" + template.getId());
-		if (template.getTemplateGroups() != null)
-			for (TemplateGroup tg : template.getTemplateGroups()) {
-				jdbcUpdate("insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) values ("
-						+ template.getId() + ", " + tg.getGroupId() + ", " + tg.getWrite() + ")");
-			}
+	private void storeAcl(Template template) throws PersistenceException {
+		jdbcUpdate("delete from ld_template_acl where ld_templateid=" + template.getId());
+		for (AccessControlEntry ace : template.getAccessControlList()) {
+			jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_write, ld_read) values ("
+					+ template.getId() + ", " + ace.getGroupId() + ", " + ace.getWrite() + ", " + ace.getRead() + ")");
+		}
 
 		if (log.isDebugEnabled())
 			log.debug("Stored security settings of template {}", template.getId());
@@ -192,18 +195,21 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		try {
 			refresh(template);
 
-			if (template.getAttributes() != null)
-				log.trace("Initialized {} attributes", template.getAttributes().keySet().size());
+			log.trace("Initialized {} attributes", template.getAttributes().size());
 
-			// Manually initialize the collegtion of templateGroups
-			template.getTemplateGroups().clear();
-			SqlRowSet groupSet = queryForRowSet(
-					"select ld_groupid,ld_write from ld_templategroup where ld_templateid=" + template.getId(), null);
-			while (groupSet.next()) {
-				TemplateGroup tg = new TemplateGroup(groupSet.getLong(1));
-				tg.setWrite(groupSet.getInt(2));
-				template.getTemplateGroups().add(tg);
+			// Manually initialize the collegtion of ACEs
+			template.getAccessControlList().clear();
+			SqlRowSet aclSet = queryForRowSet(
+					"select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid=" + template.getId(),
+					null);
+			while (aclSet.next()) {
+				AccessControlEntry ace = new AccessControlEntry(aclSet.getLong(1));
+				ace.setWrite(aclSet.getInt(2));
+				ace.setRead(aclSet.getInt(3));
+				template.addAccessControlEntry(ace);
 			}
+
+			log.trace("Initialized {} aces", template.getAccessControlList().size());
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
@@ -256,7 +262,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				return permissions;
 
 			StringBuilder query = new StringBuilder("select ld_write as LDWRITE");
-			query.append(" from ld_templategroup ");
+			query.append(" from ld_template_acl ");
 			query.append(" where ");
 			query.append(" ld_templateid=" + templateId);
 			query.append(" and ld_groupid in (");
@@ -298,8 +304,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		clonedTemplate.setAttributes(originalTemplate.getAttributes().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		store(clonedTemplate);
-		jdbcUpdate("insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) select " + clonedTemplate.getId()
-				+ ", ld_groupid, ld_write from ld_templategroup where ld_templateid=" + id);
+		jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_write) select " + clonedTemplate.getId()
+				+ ", ld_groupid, ld_write from ld_template_acl where ld_templateid=" + id);
 		initialize(clonedTemplate);
 		return clonedTemplate;
 	}

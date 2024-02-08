@@ -261,7 +261,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void applyRights(GUIMenu menu) throws ServerException;
+	public void saveACL(GUIMenu menu) throws ServerException;
 
 	/**
 	 * Retrieves the specified menu

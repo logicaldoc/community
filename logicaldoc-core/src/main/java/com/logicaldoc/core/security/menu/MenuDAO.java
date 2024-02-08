@@ -1,10 +1,9 @@
-package com.logicaldoc.core.security.dao;
+package com.logicaldoc.core.security.menu;
 
 import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
-import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Permission;
 
 /**
@@ -233,13 +232,4 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 */
 	public Menu createPath(long parentId, long tenantId, int type, String path, boolean inheritSecurity)
 			throws PersistenceException;
-
-	/**
-	 * Propagates the security policies of a node to the whole subtree
-	 *
-	 * @param id identifier of a folder
-	 * 
-	 * @return true if all went correctly
-	 */
-	public boolean applyRightToTree(long id);
 }

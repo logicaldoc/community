@@ -14,6 +14,8 @@ import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.SecurableObject;
 import com.logicaldoc.util.Context;
 
 /**
@@ -28,7 +30,7 @@ import com.logicaldoc.util.Context;
  * @author Marco Meschieri - LogicalDOC
  * @version 6.0
  */
-public class Folder extends ExtensibleObject implements Comparable<Folder> {
+public class Folder extends ExtensibleObject implements Comparable<Folder>, SecurableObject {
 
 	private static final long serialVersionUID = 1L;
 
@@ -62,7 +64,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	private int hidden = 0;
 
-	private Set<FolderGroup> folderGroups = new HashSet<>();
+	private Set<AccessControlEntry> acl = new HashSet<>();
 
 	/**
 	 * If 1, the users cannot change the template of the contained documents
@@ -145,7 +147,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		this.creatorId = source.creatorId;
 		this.position = source.position;
 		this.hidden = source.hidden;
-		this.folderGroups = source.folderGroups;
 		this.templateLocked = source.templateLocked;
 		this.deleteUserId = source.deleteUserId;
 		this.deleteUser = source.deleteUser;
@@ -172,6 +173,13 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 		setTenantId(source.getTenantId());
 
+		try {
+			for (AccessControlEntry ace : source.getAccessControlList())
+				acl.add(new AccessControlEntry(ace));
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+
 		setAttributes(new HashMap<>());
 		try {
 			for (String attName : source.getAttributes().keySet()) {
@@ -185,14 +193,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 			setTags(new HashSet<>());
 			for (Tag tag : source.getTags()) {
 				getTags().add(tag);
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
-		try {
-			setFolderGroups(new HashSet<>());
-			for (FolderGroup fg : source.getFolderGroups()) {
-				getFolderGroups().add(new FolderGroup(fg));
 			}
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
@@ -220,71 +220,8 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		return parentId;
 	}
 
-	public Set<FolderGroup> getFolderGroups() {
-		return folderGroups;
-	}
-
-	public void clearFolderGroups() {
-		folderGroups.clear();
-		folderGroups = new HashSet<>();
-	}
-
 	public void setParentId(long parentId) {
 		this.parentId = parentId;
-	}
-
-	public void setFolderGroups(Set<FolderGroup> fgroup) {
-		folderGroups = fgroup;
-	}
-
-	public long[] getFolderGroupIds() {
-		long[] idsArray = new long[folderGroups.size()];
-		int i = 0;
-		for (FolderGroup mg : folderGroups) {
-			idsArray[i++] = mg.getGroupId();
-		}
-		return idsArray;
-	}
-
-	/**
-	 * Adds FolderGroup object given in a String array to the ArrayList of
-	 * FolderGroup.
-	 * 
-	 * @param groups array of group ids
-	 */
-	public void setFolderGroup(long[] groups) {
-		folderGroups.clear();
-		for (int i = 0; i < groups.length; i++) {
-			FolderGroup mg = new FolderGroup();
-			mg.setGroupId(groups[i]);
-			mg.setWrite(1);
-			mg.setAdd(1);
-			mg.setSecurity(1);
-			mg.setDelete(1);
-			mg.setRename(1);
-			folderGroups.add(mg);
-		}
-	}
-
-	/**
-	 * Adds a new element, substituting an existing one with the same groupId.
-	 * 
-	 * @param fg the folder group
-	 */
-	public void addFolderGroup(FolderGroup fg) {
-		FolderGroup m = getFolderGroup(fg.getGroupId());
-		if (m != null)
-			getFolderGroups().remove(m);
-		if (fg.getRead() != 0)
-			getFolderGroups().add(fg);
-	}
-
-	public FolderGroup getFolderGroup(long groupId) {
-		for (FolderGroup fg : folderGroups) {
-			if (fg.getGroupId() == groupId)
-				return fg;
-		}
-		return null;
 	}
 
 	@Override
@@ -643,5 +580,28 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public void setTile(String tile) {
 		this.tile = tile;
+	}
+
+	@Override
+	public Set<AccessControlEntry> getAccessControlList() {
+		return acl;
+	}
+
+	@Override
+	public void setAccessControlList(Set<AccessControlEntry> acl) {
+		this.acl = acl;
+	}
+
+	@Override
+	public AccessControlEntry getAccessControlEntry(long groupId) {
+		return acl.stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+
+	@Override
+	public void addAccessControlEntry(AccessControlEntry ace) {
+		if (!acl.add(ace)) {
+			acl.remove(ace);
+			acl.add(ace);
+		}
 	}
 }

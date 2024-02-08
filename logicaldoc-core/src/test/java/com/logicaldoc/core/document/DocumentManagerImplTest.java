@@ -169,7 +169,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 			User userWithourPermission = userDao.findByUsername("sebastian");
 			transaction.setUser(userWithourPermission);
 
-			userDao.jdbcUpdate("delete from ld_foldergroup where ld_folderid=" + doc.getFolder().getId());
+			userDao.jdbcUpdate("delete from ld_folder_acl where ld_folderid=" + doc.getFolder().getId());
 			userDao.jdbcUpdate("delete from ld_usergroup where ld_groupid=" + Group.GROUPID_ADMIN);
 
 			Assert.assertFalse(folderDao.isDownloadEnabled(doc.getFolder().getId(), userWithourPermission.getId()));

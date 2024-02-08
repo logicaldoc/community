@@ -774,7 +774,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	public void testApplyParentFolderSecurity() throws PersistenceException {
 		Document doc = dao.findById(1L);
 		dao.initialize(doc);
-		assertTrue(doc.getDocumentGroups().isEmpty());
+		assertTrue(doc.getAccessControlList().isEmpty());
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUserId(1L);
@@ -784,7 +784,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		doc = dao.findById(1L);
 		dao.initialize(doc);
 		folderDao.initialize(doc.getFolder());
-		assertTrue(!doc.getDocumentGroups().isEmpty());
-		assertEquals(doc.getFolder().getFolderGroups().size(), doc.getDocumentGroups().size());
+		assertTrue(!doc.getAccessControlList().isEmpty());
+		assertEquals(doc.getFolder().getAccessControlList().size(), doc.getAccessControlList().size());
 	}
 }

@@ -30,20 +30,20 @@ import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.metadata.TemplateGroup;
 import com.logicaldoc.core.metadata.initialization.Initializer;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIExtensibleObject;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.logicaldoc.util.Context;
@@ -114,7 +114,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			/*
 			 * Save the security settings
 			 */
-			saveSecuritySettings(template, guiTemplate, session, sessionUser);
+			saveACL(template, guiTemplate, session, sessionUser);
 
 			store(template);
 
@@ -224,44 +224,34 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			// At least the current user must have write permission to
 			// this
 			// template
-			TemplateGroup wg = new TemplateGroup(session.getUser().getUserGroup().getId());
-			wg.setWrite(1);
-			template.addTemplateGroup(wg);
+			AccessControlEntry ace = new AccessControlEntry(session.getUser().getUserGroup().getId());
+			ace.setWrite(1);
+			template.addAccessControlEntry(ace);
 
-			GUIRight r = new GUIRight();
-			r.setEntityId(wg.getGroupId());
+			GUIAccessControlEntry r = new GUIAccessControlEntry();
+			r.setEntityId(ace.getGroupId());
 			r.setWrite(true);
-			guiTemplate.setRights(new GUIRight[] { r });
+			guiTemplate.setRights(new GUIAccessControlEntry[] { r });
 		}
 		return template;
 	}
 
-	private void saveSecuritySettings(Template template, GUITemplate guiTemplate, Session session, User sessionUser) {
+	private void saveACL(Template template, GUITemplate guiTemplate, Session session, User sessionUser) {
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		if ((template.getReadonly() == 1 || !dao.isWriteEnable(template.getId(), session.getUserId()))
 				&& !sessionUser.isMemberOf(Group.GROUP_ADMIN))
 			return;
 
-		Set<TemplateGroup> grps = new HashSet<>();
-		for (GUIRight right : guiTemplate.getRights()) {
-			boolean isAdmin = right.getEntityId() == 1;
-			TemplateGroup wg = null;
-			if (right.isRead()) {
-				wg = new TemplateGroup();
-				wg.setGroupId(right.getEntityId());
-			}
-
-			if (wg == null)
-				continue;
-
-			grps.add(wg);
-			if (isAdmin || right.isWrite())
-				wg.setWrite(1);
-			else
-				wg.setWrite(0);
+		Set<AccessControlEntry> acl = new HashSet<>();
+		for (GUIAccessControlEntry guiAce : guiTemplate.getRights()) {
+			AccessControlEntry ace = new AccessControlEntry();
+			ace.setGroupId(guiAce.getEntityId());
+			ace.setRead(guiAce.isRead() ? 1 : 0);
+			ace.setWrite(guiAce.isWrite() ? 1 : 0);
+			acl.add(ace);
 		}
-		template.getTemplateGroups().clear();
-		template.getTemplateGroups().addAll(grps);
+		template.getAccessControlList().clear();
+		template.getAccessControlList().addAll(acl);
 	}
 
 	@Override
@@ -305,16 +295,16 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 		toGuiAttributes(template, guiTemplate, sets);
 
-		if (template.getTemplateGroups() != null && !template.getTemplateGroups().isEmpty()) {
-			List<GUIRight> rights = new ArrayList<>();
-			for (TemplateGroup tg : template.getTemplateGroups()) {
-				GUIRight right = new GUIRight();
+		if (template.getAccessControlList() != null && !template.getAccessControlList().isEmpty()) {
+			List<GUIAccessControlEntry> rights = new ArrayList<>();
+			for (AccessControlEntry tg : template.getAccessControlList()) {
+				GUIAccessControlEntry right = new GUIAccessControlEntry();
 				right.setEntityId(tg.getGroupId());
-				right.setRead(true);
+				right.setRead(tg.getRead() == 1);
 				right.setWrite(tg.getWrite() == 1);
 				rights.add(right);
 			}
-			guiTemplate.setRights(rights.toArray(new GUIRight[0]));
+			guiTemplate.setRights(rights.toArray(new GUIAccessControlEntry[0]));
 		}
 		return guiTemplate;
 	}

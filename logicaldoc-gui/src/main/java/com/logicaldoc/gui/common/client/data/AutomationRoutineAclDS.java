@@ -6,15 +6,15 @@ import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
- * Datasource to handle rights on a workflow. It is based on Xml parsing
+ * Datasource to handle the ACL of an automation routine. It is based on Xml parsing
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7
  */
-public class AutomationRoutineRightsDS extends DataSource {
-	public AutomationRoutineRightsDS(long routineId) {
+public class AutomationRoutineAclDS extends DataSource {
+	public AutomationRoutineAclDS(long routineId) {
 		setTitleField("entity");
-		setRecordXPath("/list/right");
+		setRecordXPath("/list/ace");
 		DataSourceTextField entity = new DataSourceTextField("entity");
 		DataSourceTextField entityId = new DataSourceTextField("entityId");
 		entityId.setPrimaryKey(true);
@@ -23,6 +23,6 @@ public class AutomationRoutineRightsDS extends DataSource {
 
 		setFields(entityId, entity, read, write);
 		setClientOnly(true);
-		setDataURL("data/automationroutinerights.xml?routineId=" + routineId + "&locale=" + I18N.getLocale());
+		setDataURL("data/automationroutineacl.xml?routineId=" + routineId + "&locale=" + I18N.getLocale());
 	}
 }

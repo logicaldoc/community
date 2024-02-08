@@ -250,8 +250,8 @@
         <servlet-class>com.logicaldoc.web.ExportZip</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RightsData</servlet-name>
-        <servlet-class>com.logicaldoc.web.data.RightsDataServlet</servlet-class>
+        <servlet-name>AclData</servlet-name>
+        <servlet-class>com.logicaldoc.web.data.AclDataServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>TasksData</servlet-name>
@@ -434,8 +434,8 @@
         <url-pattern>/data/messages.xml</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RightsData</servlet-name>
-        <url-pattern>/data/rights.xml</url-pattern>
+        <servlet-name>AclData</servlet-name>
+        <url-pattern>/data/acl.xml</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>TasksData</servlet-name>

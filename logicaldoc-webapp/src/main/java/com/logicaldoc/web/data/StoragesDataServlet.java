@@ -13,7 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.dao.MenuDAO;
+import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;

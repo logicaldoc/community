@@ -437,7 +437,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		StringBuilder forbiddenDocsQuery = new StringBuilder("""
 							select ld_docid
-						      from ld_documentgroup, ld_document
+						      from ld_document_acl, ld_document
 				             where ld_docid=ld_id
 				               and ld_deleted = 0
 				               and ld_read = 0

@@ -27,11 +27,11 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
-import com.logicaldoc.core.folder.FolderGroup;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -39,9 +39,9 @@ import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -65,7 +65,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	private static Logger log = LoggerFactory.getLogger(FolderServiceImpl.class);
 
 	@Override
-	public GUIFolder inheritRights(long folderId, long rightsFolderId) throws ServerException {
+	public GUIFolder inheritACL(long folderId, long rightsFolderId) throws ServerException {
 		Session session = validateSession();
 
 		/*
@@ -85,7 +85,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void applyRights(GUIFolder folder, boolean subtree) throws ServerException {
+	public void saveACL(GUIFolder folder, boolean subtree) throws ServerException {
 		Session session = validateSession();
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -108,7 +108,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					}
 				}, session);
 			} else {
-				saveRights(session, f, folder.getRights());
+				saveACL(session, f, folder.getRights());
 			}
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -329,7 +329,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				securityRef = dao.findById(test.getSecurityRef());
 			dao.initialize(securityRef);
 
-			setRights(securityRef, guiFolder);
+			setACL(securityRef, guiFolder);
 			return guiFolder;
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -344,36 +344,35 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			guiFolder.setSecurityRef(null);
 	}
 
-	private static void setRights(Folder securityRef, GUIFolder guiFolder) {
+	private static void setACL(Folder securityRef, GUIFolder guiFolder) {
 		int i = 0;
-		GUIRight[] rights = new GUIRight[(securityRef != null && securityRef.getFolderGroups() != null)
-				? securityRef.getFolderGroups().size()
-				: 0];
-		if (securityRef != null && securityRef.getFolderGroups() != null)
-			for (FolderGroup fg : securityRef.getFolderGroups()) {
-				GUIRight right = new GUIRight();
-				right.setEntityId(fg.getGroupId());
-				right.setAdd(fg.getAdd() == 1);
-				right.setWrite(fg.getWrite() == 1);
-				right.setSecurity(fg.getSecurity() == 1);
-				right.setImmutable(fg.getImmutable() == 1);
-				right.setDelete(fg.getDelete() == 1);
-				right.setRename(fg.getRename() == 1);
-				right.setImport(fg.getImport() == 1);
-				right.setExport(fg.getExport() == 1);
-				right.setSign(fg.getSign() == 1);
-				right.setArchive(fg.getArchive() == 1);
-				right.setWorkflow(fg.getWorkflow() == 1);
-				right.setDownload(fg.getDownload() == 1);
-				right.setCalendar(fg.getCalendar() == 1);
-				right.setSubscription(fg.getSubscription() == 1);
-				right.setPassword(fg.getPassword() == 1);
-				right.setMove(fg.getMove() == 1);
-				right.setEmail(fg.getEmail() == 1);
-				right.setAutomation(fg.getAutomation() == 1);
-				right.setStorage(fg.getStorage() == 1);
+		GUIAccessControlEntry[] rights = new GUIAccessControlEntry[(securityRef != null
+				&& securityRef.getAccessControlList() != null) ? securityRef.getAccessControlList().size() : 0];
+		if (securityRef != null && securityRef.getAccessControlList() != null)
+			for (AccessControlEntry ace : securityRef.getAccessControlList()) {
+				GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
+				guiAce.setEntityId(ace.getGroupId());
+				guiAce.setAdd(ace.getAdd() == 1);
+				guiAce.setWrite(ace.getWrite() == 1);
+				guiAce.setSecurity(ace.getSecurity() == 1);
+				guiAce.setImmutable(ace.getImmutable() == 1);
+				guiAce.setDelete(ace.getDelete() == 1);
+				guiAce.setRename(ace.getRename() == 1);
+				guiAce.setImport(ace.getImport() == 1);
+				guiAce.setExport(ace.getExport() == 1);
+				guiAce.setSign(ace.getSign() == 1);
+				guiAce.setArchive(ace.getArchive() == 1);
+				guiAce.setWorkflow(ace.getWorkflow() == 1);
+				guiAce.setDownload(ace.getDownload() == 1);
+				guiAce.setCalendar(ace.getCalendar() == 1);
+				guiAce.setSubscription(ace.getSubscription() == 1);
+				guiAce.setPassword(ace.getPassword() == 1);
+				guiAce.setMove(ace.getMove() == 1);
+				guiAce.setEmail(ace.getEmail() == 1);
+				guiAce.setAutomation(ace.getAutomation() == 1);
+				guiAce.setStorage(ace.getStorage() == 1);
 
-				rights[i] = right;
+				rights[i] = guiAce;
 				i++;
 			}
 		guiFolder.setRights(rights);
@@ -384,7 +383,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		if (session != null) {
 			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Set<Permission> permissions = dao.getEnabledPermissions(folderId, session.getUserId());
-			guiFolder.setAllowedPermissions(new GUIRight(
+			guiFolder.setAllowedPermissions(new GUIAccessControlEntry(
 					permissions.stream().map(p -> p.name().toLowerCase()).toList().toArray(new String[0])));
 		}
 	}
@@ -745,7 +744,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		return bool ? 1 : 0;
 	}
 
-	private boolean saveRights(Session session, Folder folder, GUIRight[] rights) throws PersistenceException {
+	private boolean saveACL(Session session, Folder folder, GUIAccessControlEntry[] rights)
+			throws PersistenceException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		boolean sqlerrors = false;
@@ -753,9 +753,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 		folder.setSecurityRef(null);
 		sqlerrors = false;
-		Set<FolderGroup> grps = new HashSet<>();
-		for (GUIRight right : rights) {
-			FolderGroup fg = new FolderGroup();
+		Set<AccessControlEntry> grps = new HashSet<>();
+		for (GUIAccessControlEntry right : rights) {
+			AccessControlEntry fg = new AccessControlEntry();
 			fg.setGroupId(right.getEntityId());
 			grps.add(fg);
 
@@ -783,8 +783,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			fg.setReadingreq(booleanToInt(right.isReadingreq()));
 		}
 
-		folder.getFolderGroups().clear();
-		folder.getFolderGroups().addAll(grps);
+		folder.getAccessControlList().clear();
+		folder.getAccessControlList().addAll(grps);
 
 		// Add a folder history entry
 		FolderHistory history = new FolderHistory();
