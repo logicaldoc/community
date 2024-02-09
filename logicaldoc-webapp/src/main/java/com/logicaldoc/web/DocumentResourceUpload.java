@@ -13,15 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
-import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.VersionDAO;
+import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServletUtil;
 

@@ -14,8 +14,8 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 

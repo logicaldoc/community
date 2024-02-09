@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.dao.GroupDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 

@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;

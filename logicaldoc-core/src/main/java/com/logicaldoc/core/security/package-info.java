@@ -1,5 +1,5 @@
 /**
- * Container of the security objects like {@link com.logicaldoc.core.security.User} and {@link com.logicaldoc.core.security.Group}
+ * Container of the security-related interfaces and classes
  *
  * @since 1.0
  */

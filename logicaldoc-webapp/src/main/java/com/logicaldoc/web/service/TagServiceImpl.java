@@ -7,8 +7,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.TagCloud;
-import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;

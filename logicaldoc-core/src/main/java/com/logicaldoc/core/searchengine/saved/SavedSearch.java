@@ -12,7 +12,7 @@ import java.util.Date;
 
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
-import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 

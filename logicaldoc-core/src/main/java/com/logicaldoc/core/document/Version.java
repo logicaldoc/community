@@ -8,7 +8,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**

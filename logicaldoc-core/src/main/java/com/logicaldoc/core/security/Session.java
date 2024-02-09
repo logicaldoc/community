@@ -20,9 +20,10 @@ import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
-import com.logicaldoc.core.security.dao.DeviceDAO;
-import com.logicaldoc.core.security.dao.TenantDAO;
-import com.logicaldoc.core.security.dao.UserHistoryDAO;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserEvent;
+import com.logicaldoc.core.security.user.UserHistory;
+import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 

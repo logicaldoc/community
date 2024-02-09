@@ -17,7 +17,7 @@ import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.metadata.Template;

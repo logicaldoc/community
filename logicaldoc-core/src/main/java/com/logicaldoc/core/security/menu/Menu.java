@@ -1,11 +1,6 @@
 package com.logicaldoc.core.security.menu;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.SecurableObject;
+import com.logicaldoc.core.security.SecurablePersistentObject;
 
 /**
  * This class represents the key concept of security. A Menu not only models
@@ -18,7 +13,7 @@ import com.logicaldoc.core.security.SecurableObject;
  * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
-public class Menu extends PersistentObject implements Comparable<Menu>, SecurableObject {
+public class Menu extends SecurablePersistentObject implements Comparable<Menu> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -100,8 +95,6 @@ public class Menu extends PersistentObject implements Comparable<Menu>, Securabl
 	 */
 	private String automation;
 
-	private Set<AccessControlEntry> acl = new HashSet<>();
-
 	public Menu() {
 		super();
 	}
@@ -122,7 +115,6 @@ public class Menu extends PersistentObject implements Comparable<Menu>, Securabl
 	public int getType() {
 		return type;
 	}
-
 
 	@Override
 	public void setId(long id) {
@@ -203,28 +195,5 @@ public class Menu extends PersistentObject implements Comparable<Menu>, Securabl
 
 	public void setAutomation(String automation) {
 		this.automation = automation;
-	}
-
-	@Override
-	public Set<AccessControlEntry> getAccessControlList() {
-		return acl;
-	}
-
-	@Override
-	public void setAccessControlList(Set<AccessControlEntry> acl) {
-		this.acl = acl;
-	}
-	
-	@Override
-	public AccessControlEntry getAccessControlEntry(long groupId) {
-		return acl.stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
-	}
-
-	@Override
-	public void addAccessControlEntry(AccessControlEntry ace) {
-		if (!acl.add(ace)) {
-			acl.remove(ace);
-			acl.add(ace);
-		}
 	}
 }

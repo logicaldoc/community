@@ -15,8 +15,8 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.i18n.I18N;
 
 /**

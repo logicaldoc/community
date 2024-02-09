@@ -16,7 +16,7 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.Metadata;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
 

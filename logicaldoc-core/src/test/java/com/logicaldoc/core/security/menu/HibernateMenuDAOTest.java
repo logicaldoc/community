@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 

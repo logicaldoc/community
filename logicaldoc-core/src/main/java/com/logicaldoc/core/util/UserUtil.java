@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.imaging.ImageUtil;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.TenantDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;

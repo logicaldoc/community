@@ -26,9 +26,9 @@ import org.springframework.stereotype.Component;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationChain;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
-import com.logicaldoc.core.security.dao.SessionDAO;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 

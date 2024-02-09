@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
-import com.logicaldoc.core.document.dao.DocumentDAO;
 
 public class DocumentComparatorTest extends AbstractCoreTestCase {
 

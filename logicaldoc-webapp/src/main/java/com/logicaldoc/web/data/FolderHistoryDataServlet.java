@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
+import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;

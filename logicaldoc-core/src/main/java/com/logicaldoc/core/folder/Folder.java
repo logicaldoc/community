@@ -13,9 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.document.Tag;
-import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.SecurableObject;
+import com.logicaldoc.core.security.SecurableExtensibleObject;
 import com.logicaldoc.util.Context;
 
 /**
@@ -30,7 +29,7 @@ import com.logicaldoc.util.Context;
  * @author Marco Meschieri - LogicalDOC
  * @version 6.0
  */
-public class Folder extends ExtensibleObject implements Comparable<Folder>, SecurableObject {
+public class Folder extends SecurableExtensibleObject implements Comparable<Folder> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -63,8 +62,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder>, Secu
 	private int position = 1;
 
 	private int hidden = 0;
-
-	private Set<AccessControlEntry> acl = new HashSet<>();
 
 	/**
 	 * If 1, the users cannot change the template of the contained documents
@@ -175,7 +172,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder>, Secu
 
 		try {
 			for (AccessControlEntry ace : source.getAccessControlList())
-				acl.add(new AccessControlEntry(ace));
+				getAccessControlList().add(new AccessControlEntry(ace));
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
 		}
@@ -580,28 +577,5 @@ public class Folder extends ExtensibleObject implements Comparable<Folder>, Secu
 
 	public void setTile(String tile) {
 		this.tile = tile;
-	}
-
-	@Override
-	public Set<AccessControlEntry> getAccessControlList() {
-		return acl;
-	}
-
-	@Override
-	public void setAccessControlList(Set<AccessControlEntry> acl) {
-		this.acl = acl;
-	}
-
-	@Override
-	public AccessControlEntry getAccessControlEntry(long groupId) {
-		return acl.stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
-	}
-
-	@Override
-	public void addAccessControlEntry(AccessControlEntry ace) {
-		if (!acl.add(ace)) {
-			acl.remove(ace);
-			acl.add(ace);
-		}
 	}
 }

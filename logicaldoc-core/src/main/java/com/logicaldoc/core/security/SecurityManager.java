@@ -3,6 +3,7 @@ package com.logicaldoc.core.security;
 import java.util.Set;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.user.Group;
 
 /**
  * Manager for security objects like users and groups

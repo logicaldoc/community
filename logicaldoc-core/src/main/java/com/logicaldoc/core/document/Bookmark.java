@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;

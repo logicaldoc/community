@@ -2,7 +2,7 @@ package com.logicaldoc.core.security.authentication;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.User;
 
 /**
  * Implementations of this interface must provide authentication of a user

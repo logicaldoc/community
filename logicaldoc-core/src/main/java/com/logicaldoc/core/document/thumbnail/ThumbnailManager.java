@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.Context;

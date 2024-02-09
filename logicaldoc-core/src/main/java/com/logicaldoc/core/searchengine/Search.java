@@ -21,13 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.security.Group;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.TenantDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;

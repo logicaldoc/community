@@ -1,7 +1,7 @@
 package com.logicaldoc.core.security.authentication;
 
 import com.logicaldoc.core.security.Client;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.User;
 
 /**
  * A place to put common methods of the authenticators

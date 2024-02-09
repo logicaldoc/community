@@ -13,11 +13,11 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.UserEvent;
-import com.logicaldoc.core.security.UserHistory;
-import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.core.security.dao.UserHistoryDAO;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserEvent;
+import com.logicaldoc.core.security.user.UserHistory;
+import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 

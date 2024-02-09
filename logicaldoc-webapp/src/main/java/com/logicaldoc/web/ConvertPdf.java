@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
-import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.VersionDAO;
+import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServletUtil;

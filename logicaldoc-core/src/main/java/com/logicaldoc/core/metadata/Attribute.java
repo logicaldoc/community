@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.User;
 
 /**
  * This class defines the value of an attribute associated to an extensible

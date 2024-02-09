@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
+import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;

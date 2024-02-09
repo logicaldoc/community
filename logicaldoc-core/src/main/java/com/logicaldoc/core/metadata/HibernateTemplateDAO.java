@@ -20,10 +20,10 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.AccessControlUtil;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.sql.SqlUtil;
 

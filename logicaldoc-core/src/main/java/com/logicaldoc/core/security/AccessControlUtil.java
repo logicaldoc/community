@@ -3,7 +3,8 @@ package com.logicaldoc.core.security;
 import java.util.Iterator;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.dao.GroupDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.util.Context;
 
 /**
@@ -18,7 +19,7 @@ public class AccessControlUtil {
 	private AccessControlUtil() {
 	}
 
-	public static void removeForbiddenPermissionsForGuests(SecurableObject securable) throws PersistenceException {
+	public static void removeForbiddenPermissionsForGuests(Securable securable) throws PersistenceException {
 		// Remove the forbidden permissions for the guests
 		GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		Iterator<AccessControlEntry> iter = securable.getAccessControlList().iterator();

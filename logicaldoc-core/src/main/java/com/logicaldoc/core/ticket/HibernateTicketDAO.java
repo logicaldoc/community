@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**

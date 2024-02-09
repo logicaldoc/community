@@ -1,5 +1,7 @@
 package com.logicaldoc.core.metadata;
 
+import com.logicaldoc.core.security.SecurableExtensibleObject;
+
 /**
  * A base class for attribute sets and templates
  * 
@@ -7,7 +9,7 @@ package com.logicaldoc.core.metadata;
  * 
  * @since 8.8.3
  */
-public class AbstractAttributeSet extends ExtensibleObject {
+public class AbstractAttributeSet extends SecurableExtensibleObject {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -16,7 +18,7 @@ public class AbstractAttributeSet extends ExtensibleObject {
 	public static final int TYPE_DEFAULT = 0;
 
 	private String name;
-	
+
 	private String label;
 
 	private String description;

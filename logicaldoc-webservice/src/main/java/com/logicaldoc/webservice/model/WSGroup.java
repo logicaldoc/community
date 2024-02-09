@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import com.logicaldoc.core.security.Group;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;

@@ -16,7 +16,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;

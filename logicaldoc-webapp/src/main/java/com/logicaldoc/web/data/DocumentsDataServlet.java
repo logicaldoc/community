@@ -26,14 +26,14 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentComparator;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
@@ -428,7 +428,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 	 * @throws PersistenceException Error in the data layer
 	 */
 	private List<Long> getForbiddenDocumentIds(User user, long folderId) throws PersistenceException {
-		if (user.isMemberOf("admin"))
+		if (user.isAdmin())
 			return new ArrayList<>();
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);

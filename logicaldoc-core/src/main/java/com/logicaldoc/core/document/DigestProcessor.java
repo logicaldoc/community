@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
-import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.i18n.I18N;

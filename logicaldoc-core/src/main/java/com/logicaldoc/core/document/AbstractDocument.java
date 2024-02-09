@@ -16,10 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.TransactionalObject;
-import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.security.SecurableExtensibleObject;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
@@ -47,7 +46,7 @@ import com.logicaldoc.util.io.FileUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
-public abstract class AbstractDocument extends ExtensibleObject implements TransactionalObject {
+public abstract class AbstractDocument extends SecurableExtensibleObject implements TransactionalObject {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractDocument.class);
 
@@ -207,7 +206,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private int previewPages = -1;
 
 	private int links = 0;
-	
+
 	/**
 	 * Counter of extended attributes of type Document
 	 */

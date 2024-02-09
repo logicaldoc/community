@@ -18,13 +18,13 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.util.Context;
 
 /**

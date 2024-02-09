@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.dbinit.PluginDbInit;
 import com.logicaldoc.core.searchengine.SearchEngine;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;

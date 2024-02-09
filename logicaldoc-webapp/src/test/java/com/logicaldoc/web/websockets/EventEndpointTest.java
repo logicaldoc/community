@@ -17,8 +17,8 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.security.UserEvent;
-import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.user.UserEvent;
+import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
 public class EventEndpointTest extends AbstractWebappTestCase {

@@ -57,21 +57,21 @@ import com.logicaldoc.core.contact.ContactDAO;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
+import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.document.DocumentLink;
+import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
+import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.document.Rating;
+import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.document.Version;
-import com.logicaldoc.core.document.dao.BookmarkDAO;
-import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
-import com.logicaldoc.core.document.dao.DocumentLinkDAO;
-import com.logicaldoc.core.document.dao.DocumentNoteDAO;
-import com.logicaldoc.core.document.dao.RatingDAO;
-import com.logicaldoc.core.document.dao.VersionDAO;
+import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -82,12 +82,12 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
 import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authorization.PermissionException;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
@@ -3268,7 +3268,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		try {
 			Set<Permission> commonPermissions = Permission.all();
-			if (!session.getUser().isMemberOf("admin")) {
+			if (!session.getUser().isAdmin()) {
 				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				for (long docId : docIds) {
 					Set<Permission> docPermissions = docDao.getEnabledPermissions(docId, session.getUserId());

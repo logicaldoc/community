@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
-import com.logicaldoc.core.document.dao.VersionDAO;
+import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.Context;
 
 /**

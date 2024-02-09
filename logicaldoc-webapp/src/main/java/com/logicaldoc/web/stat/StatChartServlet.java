@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;

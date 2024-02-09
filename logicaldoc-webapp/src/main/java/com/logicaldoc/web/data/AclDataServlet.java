@@ -13,16 +13,16 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 
 /**

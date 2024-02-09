@@ -15,7 +15,7 @@ import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;

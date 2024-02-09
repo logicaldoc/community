@@ -14,14 +14,14 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
-import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.VersionDAO;
+import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServletUtil;

@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.dao.SessionDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.SessionDAO;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServletUtil;
 

@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.logicaldoc.core.security.Device;
+import com.logicaldoc.core.security.DeviceDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.dao.DeviceDAO;
 import com.logicaldoc.util.Context;
 
 /**

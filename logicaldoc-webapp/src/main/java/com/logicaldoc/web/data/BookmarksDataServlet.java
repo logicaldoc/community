@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Bookmark;
-import com.logicaldoc.core.document.dao.BookmarkDAO;
+import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;

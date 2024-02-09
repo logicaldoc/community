@@ -25,17 +25,17 @@
    <!-- DAOs -->
    <bean id="SessionDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateSessionDAO" />
+         <bean class="com.logicaldoc.core.security.HibernateSessionDAO" />
       </property>
    </bean>   
    <bean id="UserDAO" abstract="false" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateUserDAO" />
+         <bean class="com.logicaldoc.core.security.user.HibernateUserDAO" />
       </property>
    </bean>
    <bean id="PasswordHistoryDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernatePasswordHistoryDAO" />
+         <bean class="com.logicaldoc.core.security.user.HibernatePasswordHistoryDAO" />
       </property>
    </bean>   
    <bean id="MenuDAO" parent="ApplicationBaseTransactionProxy">
@@ -55,7 +55,7 @@
    </bean>
    <bean id="GroupDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateGroupDAO" />
+         <bean class="com.logicaldoc.core.security.user.HibernateGroupDAO" />
       </property>
    </bean>
    <bean id="TicketDAO" parent="ApplicationBaseTransactionProxy">
@@ -65,17 +65,17 @@
    </bean>
    <bean id="DocumentHistoryDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateDocumentHistoryDAO" />
+         <bean class="com.logicaldoc.core.document.HibernateDocumentHistoryDAO" />
       </property>
    </bean>
    <bean id="VersionDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateVersionDAO" />
+         <bean class="com.logicaldoc.core.document.HibernateVersionDAO" />
       </property>
    </bean>
    <bean id="DocumentDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateDocumentDAO" />
+         <bean class="com.logicaldoc.core.document.HibernateDocumentDAO" />
       </property>
    </bean>
    <bean id="AttributeOptionDAO" parent="ApplicationBaseTransactionProxy">
@@ -105,7 +105,7 @@
    </bean>
    <bean id="DocumentLinkDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateDocumentLinkDAO" />
+         <bean class="com.logicaldoc.core.document.HibernateDocumentLinkDAO" />
       </property>
    </bean>
    <bean id="GenericDAO" parent="ApplicationBaseTransactionProxy">
@@ -120,22 +120,22 @@
    </bean>
    <bean id="UserHistoryDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateUserHistoryDAO" />
+         <bean class="com.logicaldoc.core.security.user.HibernateUserHistoryDAO" />
       </property>
    </bean>
    <bean id="BookmarkDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateBookmarkDAO" />
+         <bean class="com.logicaldoc.core.document.HibernateBookmarkDAO" />
       </property>
    </bean>
    <bean id="RatingDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateRatingDAO" />
+         <bean class="com.logicaldoc.core.document.HibernateRatingDAO" />
       </property>
    </bean>
    <bean id="DocumentNoteDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.document.dao.HibernateDocumentNoteDAO" />
+         <bean class="com.logicaldoc.core.document.HibernateDocumentNoteDAO" />
       </property>
    </bean>
    <bean id="ContactDAO" parent="ApplicationBaseTransactionProxy">
@@ -145,7 +145,7 @@
    </bean>
    <bean id="TenantDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateTenantDAO" />
+         <bean class="com.logicaldoc.core.security.HibernateTenantDAO" />
       </property>
    </bean>
    <bean id="DashletDAO" parent="ApplicationBaseTransactionProxy">
@@ -155,7 +155,7 @@
    </bean>
    <bean id="DeviceDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.dao.HibernateDeviceDAO" />
+         <bean class="com.logicaldoc.core.security.user.HibernateDeviceDAO" />
       </property>
    </bean>
    <bean id="SearchDAO" parent="ApplicationBaseTransactionProxy">
