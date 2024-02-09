@@ -58,6 +58,13 @@ public class MailUtilTest extends AbstractCoreTCase {
 	}
 
 	@Test
+	public void testMessageToMailX() throws Exception {
+			EMail mail = MailUtil.messageToMail(new File("src/test/resources/Zahlungsavis_vom_14_07_2023.eml"), true);
+			Assert.assertNotNull(mail);
+			Assert.assertEquals(1, mail.getAttachmentsCount());
+	}
+	
+	@Test
 	public void testMessageToMail() throws Exception {
 		{
 			EMail mail = MailUtil.messageToMail(new File("src/test/resources/abel.eml"), true);
