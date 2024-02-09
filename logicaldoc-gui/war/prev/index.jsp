@@ -10,7 +10,7 @@
   Long docId = null;
   String ticketId = request.getParameter("ticketId");
     
-  com.logicaldoc.core.document.dao.DocumentDAO docDao = (com.logicaldoc.core.document.dao.DocumentDAO)Context.get().getBean(com.logicaldoc.core.document.dao.DocumentDAO.class);
+  com.logicaldoc.core.document.DocumentDAO docDao = (com.logicaldoc.core.document.DocumentDAO)Context.get().getBean(com.logicaldoc.core.document.DocumentDAO.class);
   
   Long userId = null;
   Ticket ticket = null;
