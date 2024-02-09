@@ -67,7 +67,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		}
 	}
 
-	private List<WSUser> collectUsers(String group, User user) {
+	private List<WSUser> collectUsers(String group, User user) throws PersistenceException {
 		List<WSUser> users = new ArrayList<>();
 		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 		if (StringUtils.isEmpty(group)) {

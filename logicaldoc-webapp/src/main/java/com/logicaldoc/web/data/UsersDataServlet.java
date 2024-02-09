@@ -46,7 +46,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 	}
 
 	private void printUsers(List<User> users, boolean required, boolean skipdisabled, HttpServletResponse response)
-			throws IOException {
+			throws IOException, PersistenceException {
 		PrintWriter writer = response.getWriter();
 		writer.print("<list>");
 		if (!required)
@@ -68,7 +68,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		writer.print("</list>");
 	}
 
-	private void printUser(PrintWriter writer, User user) {
+	private void printUser(PrintWriter writer, User user) throws PersistenceException {
 		DateFormat df = getDateFormat();
 
 		writer.print("<user>");

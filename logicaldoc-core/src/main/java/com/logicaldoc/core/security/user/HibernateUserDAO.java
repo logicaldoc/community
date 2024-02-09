@@ -362,7 +362,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	private void enforceReadOnlyUserGroups(User user) {
+	private void enforceReadOnlyUserGroups(User user) throws PersistenceException {
 		if (user.isReadonly()) {
 			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			Group guestGroup = gDao.findByName("guest", user.getTenantId());

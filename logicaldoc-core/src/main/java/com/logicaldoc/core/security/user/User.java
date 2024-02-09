@@ -10,6 +10,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
@@ -505,8 +506,10 @@ public class User extends PersistentObject implements Serializable {
 	 * Retrieves this user's group
 	 * 
 	 * @return the group
+	 * 
+	 * @throws PersistenceException Error in the data layer
 	 */
-	public Group getUserGroup() {
+	public Group getUserGroup() throws PersistenceException {
 		if (getGroups() != null)
 			for (Group grp : getGroups()) {
 				if (grp.getName().equals(getUserGroupName()))

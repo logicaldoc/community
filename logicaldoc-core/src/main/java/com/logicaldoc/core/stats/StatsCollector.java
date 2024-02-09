@@ -55,22 +55,22 @@ public class StatsCollector extends Task {
 
 	public static final String NAME = "StatsCollector";
 
-	@Resource(name="DocumentDAO")
+	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDAO;
 
-	@Resource(name="FolderDAO")
+	@Resource(name = "FolderDAO")
 	private FolderDAO folderDAO;
 
-	@Resource(name="GroupDAO")
+	@Resource(name = "GroupDAO")
 	private GroupDAO groupDAO;
 
-	@Resource(name="GenericDAO")
+	@Resource(name = "GenericDAO")
 	protected GenericDAO genericDAO;
 
-	@Resource(name="TenantDAO")
+	@Resource(name = "TenantDAO")
 	protected TenantDAO tenantDAO;
 
-	@Resource(name="SequenceDAO")
+	@Resource(name = "SequenceDAO")
 	private SequenceDAO sequenceDAO;
 
 	private static String userno = "community";
@@ -138,7 +138,12 @@ public class StatsCollector extends Task {
 		 */
 		int users = userDao.count(null);
 		int guests = userDao.countGuests(null);
-		int groups = groupDAO.count();
+		int groups = 0;
+		try {
+			groups = groupDAO.count();
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		log.debug("Collected users data");
 
 		long userdir = calculateUserDirSize();

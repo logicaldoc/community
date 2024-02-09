@@ -2,6 +2,7 @@ package com.logicaldoc.core.security.user;
 
 import java.util.Collection;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 public interface GroupDAO extends PersistentObjectDAO<Group> {
@@ -11,9 +12,10 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	 * 
 	 * @param group Group which should be stored in a database.
 	 * @param parentGroupId ID of the group this group inherits ACLs from
-	 * @return True if successful stored in a database.
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public boolean insert(Group group, long parentGroupId);
+	public void insert(Group group, long parentGroupId) throws PersistenceException;
 
 	/**
 	 * This method replicates all ACLs of the parent group to another group.
@@ -22,8 +24,10 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	 * 
 	 * @param group The group to be altered.
 	 * @param parentGroupId The group whose ACLs will be inherited.
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void inheritACLs(Group group, long parentGroupId);
+	public void inheritACLs(Group group, long parentGroupId) throws PersistenceException;
 
 	/**
 	 * Finds a group by name.
@@ -32,8 +36,9 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	 * @param tenantId ID of the owning tenant
 	 * 
 	 * @return Wanted group or null.
+	 * @throws PersistenceException Error in the database
 	 */
-	public Group findByName(String name, long tenantId);
+	public Group findByName(String name, long tenantId) throws PersistenceException;
 
 	/**
 	 * This method selects all group names
@@ -51,20 +56,22 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	 * @param tenantId ID of the owning tenant
 	 * 
 	 * @return Collection of selected groups.
+	 * @throws PersistenceException Error in the database
 	 */
-	public Collection<Group> findByLikeName(String name, long tenantId);
+	public Collection<Group> findByLikeName(String name, long tenantId) throws PersistenceException;
 
 	/**
 	 * Counts the total number of groups
 	 * 
 	 * @return total number of groups
+	 * @throws PersistenceException Error in the database
 	 */
-	public int count();
+	public int count() throws PersistenceException;
 
 	/**
-	 * Initialize the group collections
+	 * Initializes the group collections
 	 */
 	public void initialize(Group group);
-	
-	public void fixGuestPermissions(Group group);
+
+	public void fixGuestPermissions(Group group) throws PersistenceException;
 }

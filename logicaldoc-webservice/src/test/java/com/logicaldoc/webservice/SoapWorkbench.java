@@ -149,16 +149,6 @@ public class SoapWorkbench {
 			// System.out.println("**************************************");
 			// }
 
-			// folderClient.grantGroup(sid, 13, 2, 4091, true);
-			// folderClient.grantGroup(sid, 13, 3, 4091, true);
-			// folderClient.grantGroup(sid, 13, -20, 0, true);
-			// folderClient.grantUser(sid, 13, 2, 0, false);
-			// WSRight[] rights = folderClient.getGrantedUsers(sid, 14);
-			// System.out.println("--- " + rights.length);
-			// for (WSRight right : rights) {
-			// System.out.println("+++ " + right.getId());
-			// }
-
 		} finally {
 			auth.logout(sid);
 		}

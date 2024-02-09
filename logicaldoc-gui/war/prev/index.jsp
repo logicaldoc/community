@@ -10,7 +10,7 @@
   Long docId = null;
   String ticketId = request.getParameter("ticketId");
     
-  com.logicaldoc.core.security.SecurityManager security = (com.logicaldoc.core.security.SecurityManager)Context.get().getBean(com.logicaldoc.core.security.SecurityManager.class);
+  com.logicaldoc.core.document.dao.DocumentDAO docDao = (com.logicaldoc.core.document.dao.DocumentDAO)Context.get().getBean(com.logicaldoc.core.document.dao.DocumentDAO.class);
   
   Long userId = null;
   Ticket ticket = null;
@@ -27,18 +27,17 @@
     userId = ldSession.getUserId();
   }  
  
-  if(ticket == null && !security.isReadEnabled(docId, userId))
+  if(ticket == null && !docDao.isReadEnabled(docId, userId))
       throw new Exception("Permission Denied");
   
-  boolean print = ticket !=null ? !ticket.isTicketExpired() : security.isPrintEnabled(docId, userId);
-  boolean download = ticket !=null ? !ticket.isTicketExpired() : security.isDownloadEnabled(docId, userId);
+  boolean print = ticket !=null ? !ticket.isTicketExpired() : docDao.isPrintEnabled(docId, userId);
+  boolean download = ticket !=null ? !ticket.isTicketExpired() : docDao.isDownloadEnabled(docId, userId);
   
   /*
    * Prepares an hash so the servlet could check that this request comes from a real preview panel.
    * Also store a session attribute containing the docId as additional information used by the servlet
    * to prevent a user without download permission to download the file being previewed.
    */ 
-  com.logicaldoc.core.document.dao.DocumentDAO docDao = (com.logicaldoc.core.document.dao.DocumentDAO)Context.get().getBean(com.logicaldoc.core.document.dao.DocumentDAO.class);
   com.logicaldoc.core.document.Document doc = docDao.findById(docId);
   Integer previewCheck=null;
   if(doc!=null) {

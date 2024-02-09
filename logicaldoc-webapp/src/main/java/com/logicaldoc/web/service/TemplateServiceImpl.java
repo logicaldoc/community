@@ -216,7 +216,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		return template;
 	}
 
-	private Template newTemplate(GUITemplate guiTemplate, Session session, User sessionUser) {
+	private Template newTemplate(GUITemplate guiTemplate, Session session, User sessionUser) throws PersistenceException {
 		Template template;
 		template = new Template();
 		if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)

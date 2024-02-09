@@ -559,7 +559,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if (!source.getName().equals(document.getFileName())) {
 			boolean renameEnabled = parentFolder.isRenameEnabled();
 			if (!renameEnabled)
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Permission not granted to this user");
 
 			// we are doing a file rename
 			try {
@@ -572,12 +572,12 @@ public class ResourceServiceImpl implements ResourceService {
 			// verify the addchild permission on destination folder
 			boolean addchildEnabled = destination.isAddChildEnabled();
 			if (!addchildEnabled)
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Permission not granted to this user");
 
 			// verify the MOVE permission on parent folder
 			boolean moveEnabled = parentFolder.isMoveEnabled();
 			if (!moveEnabled)
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Delete Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Delete Permission not granted to this user");
 
 			try {
 				Folder folder = folderDAO.findById(Long.parseLong(destination.getID()));
@@ -611,7 +611,7 @@ public class ResourceServiceImpl implements ResourceService {
 			// folders
 			boolean addchildEnabled = destination.isAddChildEnabled();
 			if (!addchildEnabled)
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Permission not granted to this user");
 
 			assertResourceIsDeletable(source);
 
@@ -627,7 +627,7 @@ public class ResourceServiceImpl implements ResourceService {
 			return this.marshallFolder(currentFolder, session);
 		} else {
 			if (!source.isRenameEnabled())
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Permission not granted to this user");
 
 			User user = (User) session.getObject("user");
 
