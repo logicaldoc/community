@@ -456,7 +456,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
 
-		folder.setTags(tagItem.getValues());
+		folder.setTags(Arrays.asList(tagItem.getValues()));
 		folder.setDescription(vm.getValueAsString("description"));
 		if (vm.getValueAsString("name") != null)
 			folder.setName(vm.getValueAsString("name").replace("/", ""));

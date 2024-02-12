@@ -2,8 +2,8 @@ package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gwt.i18n.client.NumberFormat;
 
@@ -22,7 +22,7 @@ public class GUIExtensibleObject implements Serializable {
 
 	private Long templateId;
 
-	private GUIAttribute[] attributes = new GUIAttribute[0];
+	private List<GUIAttribute> attributes = new ArrayList<>();
 
 	public GUIExtensibleObject(long id) {
 		super();
@@ -49,19 +49,15 @@ public class GUIExtensibleObject implements Serializable {
 		this.templateId = templateId;
 	}
 
-	public GUIAttribute[] getAttributes() {
+	public List<GUIAttribute> getAttributes() {
 		return attributes;
 	}
 
-	public String[] getAttributeNames() {
-		List<String> names = new ArrayList<>();
-		if (attributes != null)
-			for (GUIAttribute guiAttribute : attributes)
-				names.add(guiAttribute.getName());
-		return names.toArray(new String[0]);
+	public List<String> getAttributeNames() {
+		return attributes.stream().map(att -> att.getName()).collect(Collectors.toList());
 	}
 
-	public void setAttributes(GUIAttribute[] attributes) {
+	public void setAttributes(List<GUIAttribute> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -74,11 +70,10 @@ public class GUIExtensibleObject implements Serializable {
 	}
 
 	public GUIAttribute getAttribute(String attributeName) {
-		if (attributes != null)
-			for (GUIAttribute att : attributes) {
-				if (att.getName().equals(attributeName))
-					return att;
-			}
+		for (GUIAttribute att : attributes) {
+			if (att.getName().equals(attributeName))
+				return att;
+		}
 		return null;
 	}
 
@@ -106,11 +101,10 @@ public class GUIExtensibleObject implements Serializable {
 	public List<GUIAttribute> getValues(String name) {
 		List<GUIAttribute> values = new ArrayList<>();
 
-		if (getAttributes() != null)
-			for (GUIAttribute att : getAttributes()) {
-				if (att.getName().equals(name) || name.equals(att.getParent()))
-					values.add(att);
-			}
+		for (GUIAttribute att : getAttributes()) {
+			if (att.getName().equals(name) || name.equals(att.getParent()))
+				values.add(att);
+		}
 
 		values.sort((guiAttr1, guiAttr2) -> guiAttr1.getName().compareTo(guiAttr2.getName()));
 
@@ -142,7 +136,7 @@ public class GUIExtensibleObject implements Serializable {
 
 	public void putAttributeAfter(String name, GUIAttribute att) {
 		ArrayList<GUIAttribute> attrs = new ArrayList<>();
-		attrs.addAll(Arrays.asList(attributes));
+		attrs.addAll(attributes);
 		int index = attrs.indexOf(getAttribute(name));
 		if (index < 0 || index == attrs.size() - 1)
 			attrs.add(att);
@@ -150,41 +144,31 @@ public class GUIExtensibleObject implements Serializable {
 			attrs.add(index + 1, att);
 
 		// Save back
-		attributes = attrs.toArray(new GUIAttribute[0]);
+		attributes = attrs;
 	}
 
 	public void addAttribute(GUIAttribute att) {
-		ArrayList<GUIAttribute> attrs = new ArrayList<>();
-		if (attributes != null && attributes.length > 0)
-			attrs.addAll(Arrays.asList(attributes));
-		attrs.add(att);
-
-		// Save back
-		attributes = attrs.toArray(new GUIAttribute[0]);
+		attributes.add(att);
 	}
 
 	public void sortAttributes() {
-		if (attributes == null || attributes.length < 1)
-			return;
-		ArrayList<GUIAttribute> attrs = new ArrayList<>();
-		attrs.addAll(Arrays.asList(attributes));
-		attrs.sort(null);
+		attributes.sort(null);
 	}
 
 	public void removeAttribute(String name) {
-		if (attributes == null || attributes.length < 1)
+		if (attributes.isEmpty())
 			return;
 
 		GUIAttribute attribute = getAttribute(name);
 		ArrayList<GUIAttribute> attrs = new ArrayList<>();
-		attrs.addAll(Arrays.asList(attributes));
+		attrs.addAll(attributes);
 		int index = attrs.indexOf(attribute);
 		if (index >= 0 && index < attrs.size())
 			attrs.remove(index);
 		else
 			return;
 
-		attributes = attrs.toArray(new GUIAttribute[0]);
+		attributes = attrs;
 
 		// Fix the name of multiple values
 		if (attribute.getParent() != null) {
@@ -197,7 +181,7 @@ public class GUIExtensibleObject implements Serializable {
 			}
 		}
 
-		attributes = attrs.toArray(new GUIAttribute[0]);
+		attributes = attrs;
 
 		// Now reorder
 		int i = 0;
@@ -209,7 +193,7 @@ public class GUIExtensibleObject implements Serializable {
 		}
 
 		// And save back
-		attributes = attrs.toArray(new GUIAttribute[0]);
+		attributes = attrs;
 	}
 
 	/**

@@ -328,24 +328,24 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * @param template The template to consider
 	 * @param extensibleObject The GUI object to consider
 	 * 
-	 * @return The array of attributes
+	 * @return The list of attributes
 	 */
-	protected GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
+	protected List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
 
 		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
-			return new GUIAttribute[0];
+			return new ArrayList<GUIAttribute>();
 		try {
 			for (String attrName : template.getAttributeNames())
 				attributes.add(prepareGUIAttribute(attrName, template, attributes, extensibleObject));
 
 			Collections.sort(attributes);
-			return attributes.toArray(new GUIAttribute[0]);
+			return attributes;
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			return new GUIAttribute[0];
+			return new ArrayList<GUIAttribute>();
 		}
 	}
 
@@ -369,7 +369,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		att.setBooleanValue(templateExtAttr.getBooleanValue());
 		att.setDoubleValue(templateExtAttr.getDoubleValue());
 		att.setDateValue(templateExtAttr.getDateValue());
-		att.setOptions(new String[] { templateExtAttr.getStringValue() });
+		att.setOptions(List.of(templateExtAttr.getStringValue()));
 
 		if (extensibleObject != null) {
 			Attribute attribute = extensibleObject.getAttribute(attrName);

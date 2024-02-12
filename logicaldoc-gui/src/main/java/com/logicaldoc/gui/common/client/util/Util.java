@@ -1197,15 +1197,14 @@ public abstract class Util {
 	 * 
 	 * @return the HTML content
 	 */
-	public static String getTagsHTML(String[] tags) {
+	public static String getTagsHTML(List<String> tags) {
 		StringBuilder buf = new StringBuilder(
 				"<div style='display: grid; grid-gap: 2px; padding: 1px; grid-auto-flow: row dense; grid-template-columns: auto auto auto; grid-template-rows: auto auto;'>");
-		if (tags != null)
-			for (String tag : tags) {
-				buf.append("<span class='button' style='white-space: nowrap;'>");
-				buf.append(tag);
-				buf.append("</span>");
-			}
+		for (String tag : tags) {
+			buf.append("<span class='button' style='white-space: nowrap;'>");
+			buf.append(tag);
+			buf.append("</span>");
+		}
 		buf.append(END_DIV);
 		return buf.toString();
 	}

@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This class defines the value of an attribute associated to an extensible
@@ -13,8 +15,8 @@ import java.util.Date;
  */
 public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
-	private static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation",
-			"creator", "version", "fileVersion", "published", "publisher", "name", "description" };
+	private static final List<String> FORBIDDEN_NAMES = Arrays.asList("date", "fileName", "fileSize", "creation",
+			"creator", "version", "fileVersion", "published", "publisher", "name", "description");
 
 	private static final long serialVersionUID = 1L;
 
@@ -86,7 +88,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	private Long setId;
 
 	// Optional array of possible values
-	private String[] options;
+	private List<String> options;
 
 	private String stringValues;
 
@@ -320,11 +322,11 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		this.editor = editor;
 	}
 
-	public String[] getOptions() {
+	public List<String> getOptions() {
 		return options;
 	}
 
-	public void setOptions(String[] options) {
+	public void setOptions(List<String> options) {
 		this.options = options;
 	}
 
@@ -428,7 +430,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		return getName() + "=" + getValue();
 	}
 
-	public static String[] getForbiddenNames() {
+	public static List<String> getForbiddenNames() {
 		return FORBIDDEN_NAMES;
 	}
 }

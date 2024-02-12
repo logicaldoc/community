@@ -6,9 +6,9 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.data.AccessControlListDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -387,40 +387,40 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	/**
 	 * Creates an array of all the ACL
 	 * 
-	 * @return the array of rights
+	 * @return all the ACEs
 	 */
-	public GUIAccessControlEntry[] getACL() {
+	public List<GUIAccessControlEntry> getACL() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIAccessControlEntry> tmp = new ArrayList<>();
+		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
-			GUIAccessControlEntry right = new GUIAccessControlEntry();
-			right.setName(rec.getAttributeAsString(ENTITY));
-			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			right.setRead(rec.getAttributeAsBoolean("read"));
-			right.setPrint(rec.getAttributeAsBoolean(PRINT));
-			right.setWrite(rec.getAttributeAsBoolean(WRITE));
-			right.setDelete(rec.getAttributeAsBoolean(DELETE));
-			right.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
-			right.setSign(rec.getAttributeAsBoolean("sign"));
-			right.setImmutable(rec.getAttributeAsBoolean(IMMUTABLE));
-			right.setRename(rec.getAttributeAsBoolean(RENAME));
-			right.setSecurity(rec.getAttributeAsBoolean(SECURITY));
-			right.setArchive(rec.getAttributeAsBoolean(ARCHIVE));
-			right.setDownload(rec.getAttributeAsBoolean(DOWNLOAD));
-			right.setCalendar(rec.getAttributeAsBoolean(CALENDAR));
-			right.setSubscription(rec.getAttributeAsBoolean(SUBSCRIPTION));
-			right.setPassword(rec.getAttributeAsBoolean(PASSWORD));
-			right.setMove(rec.getAttributeAsBoolean("move"));
-			right.setEmail(rec.getAttributeAsBoolean(EMAIL));
-			right.setAutomation(rec.getAttributeAsBoolean(AUTOMATION));
-			right.setReadingreq(rec.getAttributeAsBoolean(READINGREQ));
+			GUIAccessControlEntry ace = new GUIAccessControlEntry();
+			ace.setName(rec.getAttributeAsString(ENTITY));
+			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+			ace.setRead(rec.getAttributeAsBoolean("read"));
+			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
+			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
+			ace.setDelete(rec.getAttributeAsBoolean(DELETE));
+			ace.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
+			ace.setSign(rec.getAttributeAsBoolean("sign"));
+			ace.setImmutable(rec.getAttributeAsBoolean(IMMUTABLE));
+			ace.setRename(rec.getAttributeAsBoolean(RENAME));
+			ace.setSecurity(rec.getAttributeAsBoolean(SECURITY));
+			ace.setArchive(rec.getAttributeAsBoolean(ARCHIVE));
+			ace.setDownload(rec.getAttributeAsBoolean(DOWNLOAD));
+			ace.setCalendar(rec.getAttributeAsBoolean(CALENDAR));
+			ace.setSubscription(rec.getAttributeAsBoolean(SUBSCRIPTION));
+			ace.setPassword(rec.getAttributeAsBoolean(PASSWORD));
+			ace.setMove(rec.getAttributeAsBoolean("move"));
+			ace.setEmail(rec.getAttributeAsBoolean(EMAIL));
+			ace.setAutomation(rec.getAttributeAsBoolean(AUTOMATION));
+			ace.setReadingreq(rec.getAttributeAsBoolean(READINGREQ));
 
-			tmp.add(right);
+			acl.add(ace);
 		}
 
-		return tmp.toArray(new GUIAccessControlEntry[0]);
+		return acl;
 	}
 
 	/**
@@ -455,7 +455,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		// Apply all rights
 		try {
 			if (list != null)
-				document.setRights(this.getACL());
+				document.setAccessControlList(this.getACL());
 		} catch (Exception e) {
 			// Nothing to do
 		}
@@ -490,7 +490,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 
 					@Override
 					public void onSuccess(GUIFolder folder) {
-						document.setRights(folder.getRights());
+						document.setAccessControlList(folder.getAccessControlList());
 						list.refresh(new AccessControlListDS(document.getFolder().getId(), "folder"));
 					}
 				});

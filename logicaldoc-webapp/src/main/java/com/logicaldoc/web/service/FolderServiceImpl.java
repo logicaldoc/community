@@ -2,6 +2,7 @@ package com.logicaldoc.web.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
@@ -108,7 +109,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					}
 				}, session);
 			} else {
-				saveACL(session, f, folder.getRights());
+				saveACL(session, f, folder.getAccessControlList());
 			}
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -178,7 +179,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		guiFolder.setTile(folder.getTile());
 		guiFolder.setGrid(folder.getGrid());
 		guiFolder.setQuotaThreshold(folder.getQuotaThreshold());
-		guiFolder.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList().toArray(new String[0]));
+		guiFolder.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList());
 		guiFolder.setOcrTemplateId(folder.getOcrTemplateId());
 		guiFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 		if (computePath)
@@ -202,15 +203,10 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			guiFolder.setTemplateId(folder.getTemplate().getId());
 			guiFolder.setTemplate(folder.getTemplate().getName());
 			guiFolder.setTemplateLocked(folder.getTemplateLocked());
-			GUIAttribute[] attributes = prepareGUIAttributes(folder.getTemplate(), folder);
-			guiFolder.setAttributes(attributes);
+			guiFolder.setAttributes(prepareGUIAttributes(folder.getTemplate(), folder));
 		}
 
-		if (folder.getTags() != null && !folder.getTags().isEmpty())
-			guiFolder.setTags(folder.getTagsAsWords().toArray(new String[folder.getTags().size()]));
-		else
-			guiFolder.setTags(new String[0]);
-
+		guiFolder.setTags(new ArrayList<String>(folder.getTagsAsWords()));
 		guiFolder.setColor(folder.getColor());
 		return guiFolder;
 	}
@@ -345,9 +341,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private static void setACL(Folder securityRef, GUIFolder guiFolder) {
-		int i = 0;
-		GUIAccessControlEntry[] rights = new GUIAccessControlEntry[(securityRef != null
-				&& securityRef.getAccessControlList() != null) ? securityRef.getAccessControlList().size() : 0];
+		List<GUIAccessControlEntry> acl = new ArrayList<>();
 		if (securityRef != null && securityRef.getAccessControlList() != null)
 			for (AccessControlEntry ace : securityRef.getAccessControlList()) {
 				GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
@@ -372,10 +366,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				guiAce.setAutomation(ace.getAutomation() == 1);
 				guiAce.setStorage(ace.getStorage() == 1);
 
-				rights[i] = guiAce;
-				i++;
+				acl.add(guiAce);
 			}
-		guiFolder.setRights(rights);
+		guiFolder.setAccessControlList(acl);
 	}
 
 	private static void setAllowedPermissions(Session session, long folderId, GUIFolder guiFolder)
@@ -410,21 +403,19 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		}
 	}
 
-	private GUIFolder[] computePath(long folderId, long tenantId, boolean computeSubfolders)
+	private List<GUIFolder> computePath(long folderId, long tenantId, boolean computeSubfolders)
 			throws PersistenceException, ServerException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		String pathExtended = dao.computePathExtended(folderId);
 
 		StringTokenizer st = new StringTokenizer(pathExtended, "/", false);
-		int elements = st.countTokens();
-		GUIFolder[] path = new GUIFolder[elements];
+		List<GUIFolder> path = new ArrayList<>();
 		Folder parent = dao.findRoot(tenantId);
-		int j = 0;
 		while (st.hasMoreTokens()) {
 			String text = st.nextToken();
 			List<Folder> list = dao.findByName(parent, text, null, true);
 			if (list.isEmpty())
-				return new GUIFolder[0];
+				return path;
 
 			if (parent.getId() == Folder.ROOTID || parent.getId() == parent.getParentId()) {
 				GUIFolder f = new GUIFolder(parent.getId());
@@ -432,11 +423,11 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				f.setParentId(parent.getId());
 				if (computeSubfolders)
 					f.setSubfolderCount(countDirectSubfolders(f.getId()));
-				path[j] = f;
-			} else
-				path[j] = getFolder(parent.getId(), false, false, computeSubfolders);
+				path.add(f);
+			} else {
+				path.add(getFolder(parent.getId(), false, false, computeSubfolders));
+			}
 			parent = list.get(0);
-			j++;
 		}
 
 		return path;
@@ -653,8 +644,8 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 			updateExtendedAttributes(folder, guiFolder);
 
-			if (guiFolder.getTags() != null && guiFolder.getTags().length > 0)
-				folder.setTagsFromWords(new HashSet<>(Arrays.asList(guiFolder.getTags())));
+			if (!guiFolder.getTags().isEmpty())
+				folder.setTagsFromWords(new HashSet<>(guiFolder.getTags()));
 			else
 				folder.getTags().clear();
 
@@ -744,43 +735,40 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		return bool ? 1 : 0;
 	}
 
-	private boolean saveACL(Session session, Folder folder, GUIAccessControlEntry[] rights)
-			throws PersistenceException {
+	private void saveACL(Session session, Folder folder, List<GUIAccessControlEntry> acl) throws PersistenceException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-		boolean sqlerrors = false;
-		log.info("Applying {} rights to folder {}", (rights != null ? rights.length : 0), folder.getId());
+		log.info("Applying {} aces to folder {}", acl.size(), folder.getId());
 
 		folder.setSecurityRef(null);
-		sqlerrors = false;
 		Set<AccessControlEntry> grps = new HashSet<>();
-		for (GUIAccessControlEntry right : rights) {
+		for (GUIAccessControlEntry ace : acl) {
 			AccessControlEntry fg = new AccessControlEntry();
-			fg.setGroupId(right.getEntityId());
+			fg.setGroupId(ace.getEntityId());
 			grps.add(fg);
 
-			fg.setRead(booleanToInt(right.isRead()));
-			fg.setPrint(booleanToInt(right.isPrint()));
-			fg.setWrite(booleanToInt(right.isWrite()));
-			fg.setAdd(booleanToInt(right.isAdd()));
-			fg.setSecurity(booleanToInt(right.isSecurity()));
-			fg.setImmutable(booleanToInt(right.isImmutable()));
-			fg.setDelete(booleanToInt(right.isDelete()));
-			fg.setRename(booleanToInt(right.isRename()));
-			fg.setImport(booleanToInt(right.isImport()));
-			fg.setExport(booleanToInt(right.isExport()));
-			fg.setArchive(booleanToInt(right.isArchive()));
-			fg.setWorkflow(booleanToInt(right.isWorkflow()));
-			fg.setSign(booleanToInt(right.isSign()));
-			fg.setDownload(booleanToInt(right.isDownload()));
-			fg.setCalendar(booleanToInt(right.isCalendar()));
-			fg.setSubscription(booleanToInt(right.isSubscription()));
-			fg.setPassword(booleanToInt(right.isPassword()));
-			fg.setMove(booleanToInt(right.isMove()));
-			fg.setEmail(booleanToInt(right.isEmail()));
-			fg.setAutomation(booleanToInt(right.isAutomation()));
-			fg.setStorage(booleanToInt(right.isStorage()));
-			fg.setReadingreq(booleanToInt(right.isReadingreq()));
+			fg.setRead(booleanToInt(ace.isRead()));
+			fg.setPrint(booleanToInt(ace.isPrint()));
+			fg.setWrite(booleanToInt(ace.isWrite()));
+			fg.setAdd(booleanToInt(ace.isAdd()));
+			fg.setSecurity(booleanToInt(ace.isSecurity()));
+			fg.setImmutable(booleanToInt(ace.isImmutable()));
+			fg.setDelete(booleanToInt(ace.isDelete()));
+			fg.setRename(booleanToInt(ace.isRename()));
+			fg.setImport(booleanToInt(ace.isImport()));
+			fg.setExport(booleanToInt(ace.isExport()));
+			fg.setArchive(booleanToInt(ace.isArchive()));
+			fg.setWorkflow(booleanToInt(ace.isWorkflow()));
+			fg.setSign(booleanToInt(ace.isSign()));
+			fg.setDownload(booleanToInt(ace.isDownload()));
+			fg.setCalendar(booleanToInt(ace.isCalendar()));
+			fg.setSubscription(booleanToInt(ace.isSubscription()));
+			fg.setPassword(booleanToInt(ace.isPassword()));
+			fg.setMove(booleanToInt(ace.isMove()));
+			fg.setEmail(booleanToInt(ace.isEmail()));
+			fg.setAutomation(booleanToInt(ace.isAutomation()));
+			fg.setStorage(booleanToInt(ace.isStorage()));
+			fg.setReadingreq(booleanToInt(ace.isReadingreq()));
 		}
 
 		folder.getAccessControlList().clear();
@@ -791,8 +779,6 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		history.setEvent(FolderEvent.PERMISSION.toString());
 		history.setSession(session);
 		fdao.store(folder, history);
-
-		return !sqlerrors;
 	}
 
 	@Override
@@ -972,24 +958,22 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		folder.setTemplateLocked(f.getTemplateLocked());
 		folder.getAttributes().clear();
 
-		if (f.getAttributes() != null && f.getAttributes().length > 0) {
-			for (GUIAttribute guiAttribute : f.getAttributes()) {
-				Attribute templateAttribute = template.getAttributes()
-						.get(guiAttribute.getParent() != null ? guiAttribute.getParent() : guiAttribute.getName());
-				// This control is necessary because, changing
-				// the template, the values of the old template
-				// attributes keys remains on the form value
-				// manager,
-				// so the GUIFolder contains also the old
-				// template attributes keys that must be
-				// skipped.
-				if (templateAttribute == null)
-					continue;
+		for (GUIAttribute guiAttribute : f.getAttributes()) {
+			Attribute templateAttribute = template.getAttributes()
+					.get(guiAttribute.getParent() != null ? guiAttribute.getParent() : guiAttribute.getName());
+			// This control is necessary because, changing
+			// the template, the values of the old template
+			// attributes keys remains on the form value
+			// manager,
+			// so the GUIFolder contains also the old
+			// template attributes keys that must be
+			// skipped.
+			if (templateAttribute == null)
+				continue;
 
-				Attribute extAttr = newAttribute(guiAttribute, templateAttribute);
+			Attribute extAttr = newAttribute(guiAttribute, templateAttribute);
 
-				folder.getAttributes().put(guiAttribute.getName(), extAttr);
-			}
+			folder.getAttributes().put(guiAttribute.getName(), extAttr);
 		}
 	}
 

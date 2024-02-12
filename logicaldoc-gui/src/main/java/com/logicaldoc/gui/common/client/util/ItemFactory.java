@@ -449,7 +449,7 @@ public class ItemFactory {
 			item.setTitle(I18N.message(title));
 		return item;
 	}
-	
+
 	public static SelectItem newUserSelectorForAttribute(String name, String title, String groupIdOrName,
 			List<FormItemIcon> additionalIcons) {
 		return new UserSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), title, groupIdOrName, false, true,
@@ -458,12 +458,13 @@ public class ItemFactory {
 
 	public static StaticTextItem newDocumentSelectorForAttribute(String name, String title,
 			List<FormItemIcon> additionalIcons) {
-		final StaticTextItem item = new DocumentSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), additionalIcons);
+		final StaticTextItem item = new DocumentSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER),
+				additionalIcons);
 		if (title != null)
 			item.setTitle(I18N.message(title));
 		return item;
 	}
-	
+
 	public static SelectItem newRecipientTypeSelector(String name) {
 		SelectItem selector = new SelectItem();
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
@@ -976,15 +977,15 @@ public class ItemFactory {
 		closeButton.setIconOrientation("body");
 		item.setButtonProperties(closeButton);
 
-		if (values != null) {
+		if (values != null)
 			item.setValue(values);
-		}
 
 		return item;
 	}
 
-	public static MultiComboBoxItem newTagsComboBoxItem(String name, String title, TagsDS options, Object[] tags) {
-		MultiComboBoxItem item = newMultiComboBoxItem(name, title, options, tags);
+	public static MultiComboBoxItem newTagsComboBoxItem(String name, String title, TagsDS options, List<String> tags) {
+		MultiComboBoxItem item = newMultiComboBoxItem(name, title, options,
+				tags != null ? tags.toArray(new String[0]) : null);
 		item.setPrompt(I18N.message("typeatag"));
 		item.setValueField("word");
 		item.setDisplayField("word");

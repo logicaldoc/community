@@ -356,7 +356,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private void notifyUsersInNewThread(List<Document> docs, final GUIDocument metadata, final String templateName,
 			final Session session) {
-		if (metadata.getNotifyUsers() != null && metadata.getNotifyUsers().length > 0) {
+		if (!metadata.getNotifyUsers().isEmpty()) {
 			Thread notifier = new Thread(() -> notifyDocuments(docs, templateName, metadata.getNotifyMessage(),
 					metadata.getNotifyUsers(), session));
 			notifier.start();
@@ -411,7 +411,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private void notifyDocuments(List<Document> docs, String messageTemplate, String notificationMessage,
-			long[] recipientIds, Session session) {
+			List<Long> recipientIds, Session session) {
 
 		// Prepare the tile of the first uploaded file, by default we use a
 		// single transparent pixel
@@ -495,12 +495,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return dao.findDocument(docId);
 	}
 
-	private void prepareRecipients(long[] notifyUserids, Map<Locale, Set<Recipient>> emailRecipientsMap,
+	private void prepareRecipients(List<Long> notifyUserids, Map<Locale, Set<Recipient>> emailRecipientsMap,
 			Map<Locale, Set<Recipient>> systemRecipientsMap) throws PersistenceException {
-		if (notifyUserids == null || notifyUserids.length < 1)
-			return;
-
-		String idsString = StringUtils.join(Arrays.stream(notifyUserids).boxed().toArray(Long[]::new), ",");
+		String idsString = notifyUserids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		List<User> users = uDao.findByWhere("_entity.id in (" + idsString + ")", null, null);
 
@@ -780,96 +777,93 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		Document realDoc = doc;
 
-		GUIDocument document = new GUIDocument();
-		document.setId(doc.getId());
-		document.setDocRef(doc.getDocRef());
-		document.setTenantId(doc.getTenantId());
+		GUIDocument guiDocument = new GUIDocument();
+		guiDocument.setId(doc.getId());
+		guiDocument.setDocRef(doc.getDocRef());
+		guiDocument.setTenantId(doc.getTenantId());
 
 		if (!isFolder && doc.getDocRef() != null && doc.getDocRef().longValue() != 0) {
 			realDoc = docDao.findById(doc.getDocRef());
 			docDao.initialize(realDoc);
-			document.setDocRef(doc.getDocRef());
-			document.setDocRefType(doc.getDocRefType());
+			guiDocument.setDocRef(doc.getDocRef());
+			guiDocument.setDocRefType(doc.getDocRefType());
 		}
 
-		document.setCustomId(realDoc.getCustomId());
-		if (!realDoc.getTags().isEmpty())
-			document.setTags(realDoc.getTagsAsWords().toArray(new String[realDoc.getTags().size()]));
-		else
-			document.setTags(new String[0]);
-		document.setType(doc.getType());
-		document.setFileName(doc.getFileName());
-		document.setColor(doc.getColor());
-		document.setVersion(realDoc.getVersion());
-		document.setCreation(realDoc.getCreation());
-		document.setCreator(realDoc.getCreator());
-		document.setCreatorId(realDoc.getCreatorId());
-		document.setDate(realDoc.getDate());
-		document.setPublisher(realDoc.getPublisher());
-		document.setPublisherId(realDoc.getPublisherId());
-		document.setFileVersion(realDoc.getFileVersion());
-		document.setLanguage(realDoc.getLanguage());
-		document.setTemplateId(realDoc.getTemplateId());
-		document.setLastModified(realDoc.getLastModified());
-		document.setLockUserId(realDoc.getLockUserId());
-		document.setLockUser(realDoc.getLockUser());
-		document.setComment(realDoc.getComment());
-		document.setStatus(realDoc.getStatus());
-		document.setWorkflowStatus(realDoc.getWorkflowStatus());
-		document.setWorkflowStatusDisplay(realDoc.getWorkflowStatusDisplay());
-		document.setImmutable(realDoc.getImmutable());
-		document.setFileSize(realDoc.getFileSize());
-		document.setStartPublishing(realDoc.getStartPublishing());
-		document.setStopPublishing(realDoc.getStopPublishing());
-		document.setPublished(realDoc.getPublished());
-		document.setSigned(realDoc.getSigned());
-		document.setStamped(realDoc.getStamped());
-		document.setIndexed(realDoc.getIndexed());
-		document.setExtResId(realDoc.getExtResId());
-		document.setPages(realDoc.getPages());
-		document.setPreviewPages(realDoc.getPreviewPages());
-		document.setNature(realDoc.getNature());
-		document.setFormId(realDoc.getFormId());
-		document.setIcon(FileUtil.getBaseName(doc.getIcon()));
-		document.setPasswordProtected(realDoc.isPasswordProtected());
-		document.setLinks(realDoc.getLinks());
-		document.setDocAttrs(realDoc.getDocAttrs());
-		document.setOcrd(realDoc.getOcrd());
-		document.setOcrTemplateId(realDoc.getOcrTemplateId());
-		document.setBarcoded(realDoc.getBarcoded());
-		document.setBarcodeTemplateId(realDoc.getBarcodeTemplateId());
+		guiDocument.setCustomId(realDoc.getCustomId());
+		guiDocument.setTags(new ArrayList<String>(realDoc.getTagsAsWords()));
+		guiDocument.setType(doc.getType());
+		guiDocument.setFileName(doc.getFileName());
+		guiDocument.setColor(doc.getColor());
+		guiDocument.setVersion(realDoc.getVersion());
+		guiDocument.setCreation(realDoc.getCreation());
+		guiDocument.setCreator(realDoc.getCreator());
+		guiDocument.setCreatorId(realDoc.getCreatorId());
+		guiDocument.setDate(realDoc.getDate());
+		guiDocument.setPublisher(realDoc.getPublisher());
+		guiDocument.setPublisherId(realDoc.getPublisherId());
+		guiDocument.setFileVersion(realDoc.getFileVersion());
+		guiDocument.setLanguage(realDoc.getLanguage());
+		guiDocument.setTemplateId(realDoc.getTemplateId());
+		guiDocument.setLastModified(realDoc.getLastModified());
+		guiDocument.setLockUserId(realDoc.getLockUserId());
+		guiDocument.setLockUser(realDoc.getLockUser());
+		guiDocument.setComment(realDoc.getComment());
+		guiDocument.setStatus(realDoc.getStatus());
+		guiDocument.setWorkflowStatus(realDoc.getWorkflowStatus());
+		guiDocument.setWorkflowStatusDisplay(realDoc.getWorkflowStatusDisplay());
+		guiDocument.setImmutable(realDoc.getImmutable());
+		guiDocument.setFileSize(realDoc.getFileSize());
+		guiDocument.setStartPublishing(realDoc.getStartPublishing());
+		guiDocument.setStopPublishing(realDoc.getStopPublishing());
+		guiDocument.setPublished(realDoc.getPublished());
+		guiDocument.setSigned(realDoc.getSigned());
+		guiDocument.setStamped(realDoc.getStamped());
+		guiDocument.setIndexed(realDoc.getIndexed());
+		guiDocument.setExtResId(realDoc.getExtResId());
+		guiDocument.setPages(realDoc.getPages());
+		guiDocument.setPreviewPages(realDoc.getPreviewPages());
+		guiDocument.setNature(realDoc.getNature());
+		guiDocument.setFormId(realDoc.getFormId());
+		guiDocument.setIcon(FileUtil.getBaseName(doc.getIcon()));
+		guiDocument.setPasswordProtected(realDoc.isPasswordProtected());
+		guiDocument.setLinks(realDoc.getLinks());
+		guiDocument.setDocAttrs(realDoc.getDocAttrs());
+		guiDocument.setOcrd(realDoc.getOcrd());
+		guiDocument.setOcrTemplateId(realDoc.getOcrTemplateId());
+		guiDocument.setBarcoded(realDoc.getBarcoded());
+		guiDocument.setBarcodeTemplateId(realDoc.getBarcodeTemplateId());
 
 		if (realDoc.getRating() != null)
-			document.setRating(realDoc.getRating());
+			guiDocument.setRating(realDoc.getRating());
 
 		if (realDoc.getCustomId() != null)
-			document.setCustomId(realDoc.getCustomId());
+			guiDocument.setCustomId(realDoc.getCustomId());
 		else
-			document.setCustomId("");
+			guiDocument.setCustomId("");
 
 		if (realDoc.getTemplate() != null) {
-			document.setTemplate(realDoc.getTemplate().getName());
-			document.setTemplateId(realDoc.getTemplate().getId());
+			guiDocument.setTemplate(realDoc.getTemplate().getName());
+			guiDocument.setTemplateId(realDoc.getTemplate().getId());
 		}
 
-		setBookmarked(document, isFolder, sessionUser);
+		setBookmarked(guiDocument, isFolder, sessionUser);
 
 		GUIAttribute[] attributes = new TemplateServiceImpl().prepareGUIAttributes(realDoc.getTemplate(), realDoc,
 				sessionUser);
-		document.setAttributes(attributes);
+		guiDocument.setAttributes(Arrays.asList(attributes));
 
 		if (folder != null) {
-			document.setFolder(folder);
+			guiDocument.setFolder(folder);
 		} else {
 			GUIFolder f = new GUIFolder(doc.getFolder().getId());
 			f.setName(doc.getFolder().getName());
-			document.setFolder(f);
+			guiDocument.setFolder(f);
 		}
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		document.setPathExtended(fdao.computePathExtended(document.getFolder().getId()));
+		guiDocument.setPathExtended(fdao.computePathExtended(guiDocument.getFolder().getId()));
 
-		return document;
+		return guiDocument;
 	}
 
 	private void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) {
@@ -1199,18 +1193,17 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			docVO.setTenantId(session.getTenantId());
 
 			// Fix the name of multiple attributes
-			if (guiDocument.getAttributes() != null)
-				for (GUIAttribute att : guiDocument.getAttributes()) {
-					if (att.isMultiple()) {
-						NumberFormat nf = new DecimalFormat("0000");
-						List<GUIAttribute> values = guiDocument.getValues(att.getName());
-						values.remove(0);
-						int index = 1;
-						for (GUIAttribute val : values) {
-							val.setName(att.getName() + "-" + nf.format(index++));
-						}
-					}
+			for (GUIAttribute att : guiDocument.getAttributes().stream().filter(att -> att.isMultiple()).toList()) {
+				NumberFormat nf = new DecimalFormat("0000");
+				List<GUIAttribute> values = guiDocument.getValues(att.getName());
+				int index = 0;
+				for (GUIAttribute val : values) {
+					// Skip first element
+					if (index > 0)
+						val.setName(att.getName() + "-" + nf.format(index));
+					index++;
 				}
+			}
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
@@ -1248,9 +1241,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	 */
 	public static Document toDocument(GUIDocument guiDocument) throws PersistenceException {
 		Document docVO = new Document();
-		if (guiDocument.getTags() != null && guiDocument.getTags().length > 0)
-			docVO.setTagsFromWords(new HashSet<>(Arrays.asList(guiDocument.getTags())));
-
+		docVO.setTagsFromWords(new HashSet<>(guiDocument.getTags()));
 		docVO.setCustomId(HTMLSanitizer.sanitizeSimpleText(guiDocument.getCustomId()));
 		docVO.setFileName(HTMLSanitizer.sanitizeSimpleText(guiDocument.getFileName()));
 		docVO.setVersion(guiDocument.getVersion());
@@ -1286,9 +1277,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			templateDao.initialize(template);
 			docVO.setTemplate(template);
 
-			if (guiDocument.getAttributes() != null && guiDocument.getAttributes().length > 0) {
+			if (!guiDocument.getAttributes().isEmpty())
 				toAttributes(guiDocument, docVO, template);
-			}
 		}
 
 		docVO.setStatus(guiDocument.getStatus());
@@ -2093,10 +2083,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				if (buf != null) {
 					GUIDocument document = save(buf);
 					updatedDocs.add(document);
-					if (vo.getRights() != null && vo.getRights().length > 0) {
-						document.setRights(vo.getRights());
-						saveACL(document);
-					}
+					document.setAccessControlList(vo.getAccessControlList());
+					saveACL(document);
 				}
 			} catch (ServerException e) {
 				log.error(e.getMessage(), e);
@@ -2131,10 +2119,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			document.setStopPublishing(model.getStopPublishing());
 		if (StringUtils.isNotEmpty(model.getLanguage()))
 			document.setLanguage(model.getLanguage());
-		if (model.getTags() != null && model.getTags().length > 0)
-			document.setTags(model.getTags());
-		else if (!ignoreEmptyFields)
-			document.setTags(null);
+		document.setTags(model.getTags());
 		if (model.getTemplateId() != null)
 			document.setTemplateId(model.getTemplateId());
 
@@ -2148,7 +2133,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private void setExtendedAttributes(GUIDocument model, boolean ignoreEmptyFields, GUIDocument document) {
-		if (model.getAttributes() == null || model.getAttributes().length < 1)
+		if (model.getAttributes().isEmpty())
 			return;
 
 		if (ignoreEmptyFields) {
@@ -2160,7 +2145,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				if (att.getValue() != null && StringUtils.isNotEmpty(att.getValue().toString()))
 					attributes.put(att.getName(), att);
 			}
-			document.setAttributes(attributes.values().toArray(new GUIAttribute[0]));
+			document.setAttributes(attributes.values().stream().toList());
 		} else {
 			document.setAttributes(model.getAttributes());
 		}
@@ -3206,15 +3191,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			Document document = docDao.findById(guiDocument.getId());
 			docDao.initialize(document);
 
-			log.info("Applying {} security policies to document {}",
-					(guiDocument.getRights() != null ? guiDocument.getRights().length : 0), guiDocument.getId());
+			log.info("Applying {} security policies to document {}", guiDocument.getAccessControlList().size(),
+					guiDocument.getId());
 
 			Set<AccessControlEntry> acl = new HashSet<>();
-			for (GUIAccessControlEntry guiAce : guiDocument.getRights()) {
+			for (GUIAccessControlEntry guiAce : guiDocument.getAccessControlList()) {
 				AccessControlEntry ace = new AccessControlEntry();
 				ace.setGroupId(guiAce.getEntityId());
-				acl.add(ace);
-
 				ace.setRead(booleanToInt(guiAce.isRead()));
 				ace.setPrint(booleanToInt(guiAce.isPrint()));
 				ace.setWrite(booleanToInt(guiAce.isWrite()));
@@ -3233,6 +3216,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				ace.setEmail(booleanToInt(guiAce.isEmail()));
 				ace.setAutomation(booleanToInt(guiAce.isAutomation()));
 				ace.setReadingreq(booleanToInt(guiAce.isReadingreq()));
+				acl.add(ace);
 			}
 
 			document.getAccessControlList().clear();

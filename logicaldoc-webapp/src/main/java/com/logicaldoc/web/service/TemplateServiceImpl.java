@@ -216,7 +216,8 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		return template;
 	}
 
-	private Template newTemplate(GUITemplate guiTemplate, Session session, User sessionUser) throws PersistenceException {
+	private Template newTemplate(GUITemplate guiTemplate, Session session, User sessionUser)
+			throws PersistenceException {
 		Template template;
 		template = new Template();
 		if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)
@@ -543,7 +544,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				list.add(buf.trim());
 			guiAttribute.setStringValue(buf);
 		}
-		guiAttribute.setOptions(list.toArray(new String[0]));
+		guiAttribute.setOptions(list);
 	}
 
 	private void addMultipleGuiAttributes(GUIAttribute guiAttribute, ExtensibleObject extensibleObject,

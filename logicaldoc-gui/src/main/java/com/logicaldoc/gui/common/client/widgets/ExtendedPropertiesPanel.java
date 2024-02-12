@@ -176,12 +176,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 	private void handleTemplateChangedSelection(ChangedEvent event) {
 		Object templateValue = templateItem.getValue();
 		if (templateValue != null && !"".equals(templateValue.toString())) {
-			object.setAttributes(new GUIAttribute[0]);
+			object.setAttributes(new ArrayList<GUIAttribute>());
 			long templateId = Long.parseLong(templateValue.toString());
 			prepareExtendedAttributes(templateId);
 			object.setTemplateId(templateId);
 		} else {
-			object.setAttributes(new GUIAttribute[0]);
+			object.setAttributes(new ArrayList<GUIAttribute>());
 			prepareExtendedAttributes(null);
 			object.setTemplateId(null);
 		}
@@ -209,7 +209,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		attributesForm.clearValues();
 		attributesForm.clear();
 
-		if (object.getAttributes() != null && object.getAttributes().length > 0 && extendedItems != null)
+		if (object.getAttributes().size() > 0 && extendedItems != null)
 			attributesForm.setItems(extendedItems.toArray(new FormItem[0]));
 
 		updateDependantAttributes();
@@ -364,7 +364,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	protected FormItem prepareUserItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
 		FormItem item;
 		item = ItemFactory.newUserSelectorForAttribute(att.getName(), att.getLabel(),
-				(att.getOptions() != null && att.getOptions().length > 0) ? att.getOptions()[0] : null, multiValIcons);
+				att.getOptions().size() > 0 ? att.getOptions().get(0) : null, multiValIcons);
 		if (object.getValue(att.getName()) != null)
 			item.setValue((object.getValue(att.getName()).toString()));
 		return item;

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.common.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
@@ -78,7 +80,7 @@ public interface SecurityServiceAsync {
 
 	void resetAvatar(long userId, AsyncCallback<Void> callback);
 
-	void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds, AsyncCallback<Void> callback);
+	void cloneWorkTimes(long srcUserId, List<Long> userIds, long[] groupIds, AsyncCallback<Void> callback);
 
 	void changeStatus(long userId, boolean enabled, AsyncCallback<Void> callback);
 

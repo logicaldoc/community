@@ -106,8 +106,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	}
 
 	@Override
-	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters)
-			throws ServerException {
+	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters) throws ServerException {
 		final Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
@@ -171,14 +170,11 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	}
 
 	@Override
-	public void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException {
+	public void shareContacts(long[] contactIds, List<Long> userIds, long[] groupIds) throws ServerException {
 		validateSession();
 		HashSet<Long> users = new HashSet<>();
-		if (userIds != null)
-			for (Long uId : userIds) {
-				if (!users.contains(uId))
-					users.add(uId);
-			}
+		for (Long uId : userIds)
+			users.add(uId);
 
 		appendUserIdsFromGroups(groupIds, users);
 

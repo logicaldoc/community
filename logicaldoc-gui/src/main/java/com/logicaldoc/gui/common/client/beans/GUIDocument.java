@@ -1,7 +1,10 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Representation of a single document handled by the GUI
@@ -24,7 +27,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String customId;
 
-	private String[] tags = null;
+	private List<String> tags = new ArrayList<>();
 
 	private String tagsString;
 
@@ -107,7 +110,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private Long formId = null;
 
 	// Users to be notified of the upload
-	private long[] notifyUsers;
+	private List<Long> notifyUsers=new ArrayList<>();
 
 	// Optional message to send to users
 	private String notifyMessage;
@@ -149,7 +152,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	 */
 	private boolean bulkUpdate = false;
 
-	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
+	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
 
 	/**
 	 * Permissions granted to the current user on this document
@@ -180,74 +183,36 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.version = version;
 	}
 
-	public String[] getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 
-	public void setTags(String[] tags) {
+	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
 
 	public void clearTags() {
-		this.tags = new String[] {};
+		tags.clear();
 	}
 
 	public void addTag(String tag) {
-		String[] tmp = null;
-		if (tags != null) {
-			tmp = new String[tags.length + 1];
-
-			int i = 0;
-			for (String tg : tags) {
-				// Skip if the tag already exists
-				if (tg.equals(tag))
-					return;
-				tmp[i++] = tg;
-			}
-			tmp[i] = tag;
-			tags = tmp;
-		} else
-			tags = new String[] { tag };
+		if (!tags.contains(tag))
+			tags.add(tag);
 	}
 
 	public void removeTag(String tag) {
-		if (tags == null || tags.length == 0)
-			return;
-
-		String[] tmp = new String[tags.length - 1];
-		int i = 0;
-		for (String tg : tags) {
-			if (!tg.equals(tag) && tmp.length > 0)
-				tmp[i++] = tg;
-		}
-		tags = tmp;
+		tags.remove(tag);
 	}
 
 	public String getTgs() {
-		if (getTags() == null || getTags().length < 1)
-			return "";
-		else {
-			StringBuilder buf = new StringBuilder();
-			for (String tag : getTags()) {
-				if (buf.length() > 0)
-					buf.append(",");
-				buf.append(tag);
-			}
-			return buf.toString();
-		}
+		return tags.stream().collect(Collectors.joining(","));
 	}
 
 	public String getTagsString() {
 		if (tagsString != null && !tagsString.isEmpty())
 			return tagsString;
-		else {
-			StringBuilder buf = new StringBuilder();
-			for (String tag : getTags()) {
-				buf.append(tag);
-				buf.append(" ");
-			}
-			return buf.toString();
-		}
+		else
+			return tags.stream().collect(Collectors.joining(" "));
 	}
 
 	public String getCreator() {
@@ -534,11 +499,11 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.lockUser = lockUser;
 	}
 
-	public long[] getNotifyUsers() {
+	public List<Long> getNotifyUsers() {
 		return notifyUsers;
 	}
 
-	public void setNotifyUsers(long[] notifyUsers) {
+	public void setNotifyUsers(List<Long> notifyUsers) {
 		this.notifyUsers = notifyUsers;
 	}
 
@@ -647,7 +612,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	}
 
 	public int getDocAttrs() {
-		if (docAttrs == 0 && getAttributes() != null && getAttributes().length > 0)
+		if (docAttrs == 0 && getAttributes().size() > 0)
 			for (GUIAttribute att : getAttributes())
 				if (att.getType() == GUIAttribute.TYPE_DOCUMENT && att.getIntValue() != null)
 					docAttrs++;
@@ -656,14 +621,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setDocAttrs(int docAttrs) {
 		this.docAttrs = docAttrs;
-	}
-
-	public GUIAccessControlEntry[] getRights() {
-		return rights;
-	}
-
-	public void setRights(GUIAccessControlEntry[] rights) {
-		this.rights = rights;
 	}
 
 	public GUIAccessControlEntry getAllowedPermissions() {
@@ -696,5 +653,13 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public boolean hasPermission(String permission) {
 		return allowedPermissions.isPermissionAllowed(permission);
+	}
+
+	public List<GUIAccessControlEntry> getAccessControlList() {
+		return accessControlList;
+	}
+
+	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
 	}
 }

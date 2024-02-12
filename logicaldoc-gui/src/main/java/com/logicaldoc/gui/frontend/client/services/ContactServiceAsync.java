@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIParseContactsParameters;
@@ -14,5 +16,5 @@ public interface ContactServiceAsync {
 
 	void parseContacts(boolean preview, GUIParseContactsParameters parameters, AsyncCallback<GUIContact[]> callback);
 
-	void shareContacts(long[] contactIds, long[] userIds, long[] groupIds, AsyncCallback<Void> callback);
+	void shareContacts(long[] contactIds, List<Long> userIds, long[] groupIds, AsyncCallback<Void> callback);
 }

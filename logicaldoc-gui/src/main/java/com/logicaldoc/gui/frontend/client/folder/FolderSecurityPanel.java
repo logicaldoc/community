@@ -6,8 +6,8 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.AccessControlListDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -515,46 +515,45 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	}
 
 	/**
-	 * Creates an array of all the ACL
+	 * Creates the collection of all the ACL
 	 * 
-	 * @return the array of rights
+	 * @return the list of ACEs
 	 */
-	public GUIAccessControlEntry[] getACL() {
+	public List<GUIAccessControlEntry> getACL() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIAccessControlEntry> tmp = new ArrayList<>();
+		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
-			GUIAccessControlEntry right = new GUIAccessControlEntry();
-			right.setName(rec.getAttributeAsString(ENTITY));
-			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			right.setRead(rec.getAttributeAsBoolean("read"));
-			right.setPrint(rec.getAttributeAsBoolean(PRINT));
-			right.setWrite(rec.getAttributeAsBoolean(WRITE));
-			right.setDelete(rec.getAttributeAsBoolean(DELETE));
-			right.setAdd(rec.getAttributeAsBoolean("add"));
-			right.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
-			right.setSign(rec.getAttributeAsBoolean("sign"));
-			right.setImport(rec.getAttributeAsBoolean(IMPORT));
-			right.setExport(rec.getAttributeAsBoolean(EXPORT));
-			right.setImmutable(rec.getAttributeAsBoolean(IMMUTABLE));
-			right.setRename(rec.getAttributeAsBoolean(RENAME));
-			right.setSecurity(rec.getAttributeAsBoolean(SECURITY));
-			right.setArchive(rec.getAttributeAsBoolean(ARCHIVE));
-			right.setDownload(rec.getAttributeAsBoolean(DOWNLOAD));
-			right.setCalendar(rec.getAttributeAsBoolean(CALENDAR));
-			right.setSubscription(rec.getAttributeAsBoolean(SUBSCRIPTION));
-			right.setPassword(rec.getAttributeAsBoolean(PASSWORD));
-			right.setMove(rec.getAttributeAsBoolean("move"));
-			right.setEmail(rec.getAttributeAsBoolean(EMAIL));
-			right.setAutomation(rec.getAttributeAsBoolean(AUTOMATION));
-			right.setStorage(rec.getAttributeAsBoolean(STORAGE));
-			right.setReadingreq(rec.getAttributeAsBoolean(READINGREQ));
+			GUIAccessControlEntry ace = new GUIAccessControlEntry();
+			ace.setName(rec.getAttributeAsString(ENTITY));
+			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+			ace.setRead(rec.getAttributeAsBoolean("read"));
+			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
+			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
+			ace.setDelete(rec.getAttributeAsBoolean(DELETE));
+			ace.setAdd(rec.getAttributeAsBoolean("add"));
+			ace.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
+			ace.setSign(rec.getAttributeAsBoolean("sign"));
+			ace.setImport(rec.getAttributeAsBoolean(IMPORT));
+			ace.setExport(rec.getAttributeAsBoolean(EXPORT));
+			ace.setImmutable(rec.getAttributeAsBoolean(IMMUTABLE));
+			ace.setRename(rec.getAttributeAsBoolean(RENAME));
+			ace.setSecurity(rec.getAttributeAsBoolean(SECURITY));
+			ace.setArchive(rec.getAttributeAsBoolean(ARCHIVE));
+			ace.setDownload(rec.getAttributeAsBoolean(DOWNLOAD));
+			ace.setCalendar(rec.getAttributeAsBoolean(CALENDAR));
+			ace.setSubscription(rec.getAttributeAsBoolean(SUBSCRIPTION));
+			ace.setPassword(rec.getAttributeAsBoolean(PASSWORD));
+			ace.setMove(rec.getAttributeAsBoolean("move"));
+			ace.setEmail(rec.getAttributeAsBoolean(EMAIL));
+			ace.setAutomation(rec.getAttributeAsBoolean(AUTOMATION));
+			ace.setStorage(rec.getAttributeAsBoolean(STORAGE));
+			ace.setReadingreq(rec.getAttributeAsBoolean(READINGREQ));
 
-			tmp.add(right);
+			acl.add(ace);
 		}
-
-		return tmp.toArray(new GUIAccessControlEntry[0]);
+		return acl;
 	}
 
 	@Override
@@ -593,7 +592,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	public void onSave(final boolean recursive) {
 		// Apply all rights
-		folder.setRights(this.getACL());
+		folder.setAccessControlList(this.getACL());
 
 		FolderService.Instance.get().saveACL(folder, recursive, new AsyncCallback<Void>() {
 

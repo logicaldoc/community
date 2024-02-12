@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -57,8 +59,7 @@ public interface ContactService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters)
-			throws ServerException;
+	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters) throws ServerException;
 
 	/**
 	 * Shares contacts among a set of users and groups
@@ -69,7 +70,7 @@ public interface ContactService extends RemoteService {
 	 * 
 	 * @throws ServerException share the search to
 	 */
-	void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException;
+	void shareContacts(long[] contactIds, List<Long> userIds, long[] groupIds) throws ServerException;
 
 	public static class Instance {
 		private static ContactServiceAsync inst;

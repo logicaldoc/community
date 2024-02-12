@@ -1,5 +1,9 @@
 package com.logicaldoc.gui.common.client.widgets;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -30,17 +34,14 @@ public class UserSelectorCombo extends MultiComboBoxItem {
 		setHintStyle("hint");
 
 		setEmptyDisplayValue(I18N.message("selectuser"));
-		
+
 		setWidth("*");
 
 		setValueFormatter(new AvatarFormItemValueFormatter());
 	}
 
-	public long[] getUserIds() {
-		long[] ids = new long[getValues().length];
-		for (int i = 0; i < ids.length; i++)
-			ids[i] = Long.parseLong(getValues()[i]);
-		return ids;
+	public List<Long> getUserIds() {
+		return Arrays.asList(getValues()).stream().map(id -> Long.parseLong(id)).collect(Collectors.toList());
 	}
 
 	public GUIUser getUser() {

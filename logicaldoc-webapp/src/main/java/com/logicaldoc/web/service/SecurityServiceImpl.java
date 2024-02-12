@@ -65,11 +65,11 @@ import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
-import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.beans.GUISession;
@@ -1588,20 +1588,17 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds) throws ServerException {
+	public void cloneWorkTimes(long srcUserId, List<Long> userIds, long[] groupIds) throws ServerException {
 		Session session = validateSession();
 
-		Set<Long> uniqueUserIds = Arrays.stream(userIds).boxed().distinct().collect(Collectors.toSet());
+		Set<Long> uniqueUserIds = userIds.stream().distinct().collect(Collectors.toSet());
 
 		if (groupIds != null) {
 			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
-
 			Arrays.stream(groupIds).forEach(gId -> {
 				Set<User> usrs = gDao.findByGroup(gId);
-				for (User user : usrs) {
-					if (!uniqueUserIds.contains(user.getId()))
-						uniqueUserIds.add(user.getId());
-				}
+				for (User user : usrs)
+					uniqueUserIds.add(user.getId());
 			});
 		}
 

@@ -305,7 +305,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 				list.add(buf.trim());
 			att.setStringValue(buf);
 		}
-		att.setOptions(list.toArray(new String[0]));
+		att.setOptions(list);
 	}
 
 	private boolean intToBoolean(int val) {

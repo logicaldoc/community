@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.common.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -431,7 +433,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException generic error
 	 */
-	void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds) throws ServerException;
+	void cloneWorkTimes(long srcUserId, List<Long> userIds, long[] groupIds) throws ServerException;
 
 	public static class Instance {
 		private static SecurityServiceAsync inst;

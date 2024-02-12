@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -400,7 +401,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 			document.setFileName((String) values.get("filename"));
 			document.setLanguage((String) values.get("language"));
 			document.setColor((String) values.get(COLOR));
-			document.setTags(tagItem.getValues());
+			document.setTags(Arrays.asList(tagItem.getValues()));
 		}
 		return !vm.hasErrors();
 	}

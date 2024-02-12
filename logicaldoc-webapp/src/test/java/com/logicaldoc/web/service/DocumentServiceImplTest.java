@@ -62,6 +62,7 @@ import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
@@ -69,7 +70,6 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
-import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
@@ -526,7 +526,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc.setId(0L);
 		doc.setCustomId(null);
 		doc.setIndexed(0);
-		doc.setNotifyUsers(new long[] { 2, 3 });
+		doc.setNotifyUsers(List.of(2L, 3L));
 
 		GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 		assertEquals(4, createdDocs.length);
@@ -1272,17 +1272,16 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		vo.setStartPublishing(date1);
 		vo.setStopPublishing(date2);
 		vo.setLanguage("en");
-		vo.setTags(new String[] { "Maroon", "Anti-Hero", "Karma" });
+		vo.setTags(List.of("Maroon", "Anti-Hero", "Karma"));
 		vo.setTemplateId(5L);
 
 		// set attributes
-		GUIAttribute[] attributes = new GUIAttribute[1];
+		List<GUIAttribute> attributes = new ArrayList<>();
 		GUIAttribute gat = new GUIAttribute();
 		gat.setName("attr1");
 		gat.setType(0);
 		gat.setStringValue("Snow on the Beach");
-
-		attributes[0] = gat;
+		attributes.add(gat);
 		vo.setAttributes(attributes);
 
 		try {
@@ -1290,7 +1289,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			assertNotNull(gdocs);
 			assertTrue(gdocs.length > 0);
 			assertNotNull(gdocs[0].getTags());
-			assertEquals(3, gdocs[0].getTags().length);
+			assertEquals(3, gdocs[0].getTags().size());
 
 			GUIAttribute gatX = gdocs[0].getAttribute("attr1");
 			assertNotNull(gatX);

@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.update;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -100,7 +101,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			String mode = Session.get().getConfig("tag.mode");
 			final DataSource ds = new TagsDS(null, true, document.getId(), null);
 
-			tagItem = ItemFactory.newMultiComboBoxItem("tag", "tag", ds, document.getTags());
+			tagItem = ItemFactory.newMultiComboBoxItem("tag", "tag", ds, document.getTags().toArray(new String[0]));
 			tagItem.setPrompt(I18N.message("typeatag"));
 			tagItem.setValueField("word");
 			tagItem.setDisplayField("word");
@@ -147,8 +148,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		newTagItem.setRequired(false);
 		newTagItem.addKeyPressHandler((KeyPressEvent newTagKeyPress) -> {
 			if (Boolean.FALSE.equals(newTagItem.validate()) || newTagItem.getValue() == null
-					|| newTagKeyPress.getKeyName() == null
-					|| !"enter".equalsIgnoreCase(newTagKeyPress.getKeyName()))
+					|| newTagKeyPress.getKeyName() == null || !"enter".equalsIgnoreCase(newTagKeyPress.getKeyName()))
 				return;
 
 			String input = newTagItem.getValueAsString().trim();
@@ -207,7 +207,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			document.setLanguage((String) values.get(LANGUAGE));
 			document.setColor((String) values.get("color"));
-			document.setTags(tagItem.getValues());
+			document.setTags(Arrays.asList(tagItem.getValues()));
 		}
 		return !vm.hasErrors();
 	}

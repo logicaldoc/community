@@ -135,7 +135,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				ext.setUsername(ext.getStringValue());
 			extList.add(ext);
 		}
-		guiHit.setAttributes(extList.toArray(new GUIAttribute[0]));
+		guiHit.setAttributes(extList);
 	}
 
 	private List<Hit> doSearch(GUISearchOptions options, Session session, GUIResult result) {
@@ -316,7 +316,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	}
 
 	@Override
-	public void shareSearch(String name, long[] userIds, long[] groupIds) throws ServerException {
+	public void shareSearch(String name, List<Long> userIds, long[] groupIds) throws ServerException {
 		Session session = validateSession();
 
 		try {
@@ -324,13 +324,11 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			if (search == null)
 				return;
 
-			HashSet<Long> users = prepareUsersSet(userIds);
-
+			HashSet<Long> users = new HashSet<Long>(userIds);
 			addUsersFromGroups(groupIds, users);
 
-			for (Long userId : users) {
+			for (Long userId : users)
 				store(search, userId);
-			}
 		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
@@ -348,7 +346,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		}
 	}
 
-	private void addUsersFromGroups(long[] groupIds, HashSet<Long> users) {
+	private void addUsersFromGroups(long[] groupIds, Set<Long> users) {
 		if (groupIds != null) {
 			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			for (Long gId : groupIds) {
@@ -359,16 +357,6 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				}
 			}
 		}
-	}
-
-	private HashSet<Long> prepareUsersSet(long[] userIds) {
-		HashSet<Long> users = new HashSet<>();
-		if (userIds != null)
-			for (Long uId : userIds) {
-				if (!users.contains(uId))
-					users.add(uId);
-			}
-		return users;
 	}
 
 	private com.logicaldoc.core.searchengine.saved.SavedSearch loadSavedSearch(String name, Session session)
