@@ -162,7 +162,7 @@ public class I18N {
 	public static void init(GUIInfo info) {
 		setLanguages(info.getSupportedLanguages());
 		setGuiLanguages(info.getSupportedGUILanguages());
-		initBundle(Arrays.asList(info.getBundle()));
+		initBundle(info.getBundle());
 
 		/*
 		 * Prepare the date formatters

@@ -68,7 +68,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 		try {
 			info = getInfo(tenantName);
-			info.setBundle(getBundle(locale, tenantName).toArray(new GUIValue[0]));
+			info.setBundle(getBundle(locale, tenantName));
 
 			Locale withLocale = LocaleUtil.toLocale(locale);
 

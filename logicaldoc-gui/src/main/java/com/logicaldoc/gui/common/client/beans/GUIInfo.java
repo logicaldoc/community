@@ -45,7 +45,7 @@ public class GUIInfo implements Serializable {
 
 	private List<GUIValue> supportedGUILanguages = new ArrayList<>();
 
-	private GUIValue[] bundle = new GUIValue[0];
+	private List<GUIValue> bundle = new ArrayList<>();
 
 	private GUIValue[] config = new GUIValue[0];
 
@@ -94,11 +94,11 @@ public class GUIInfo implements Serializable {
 		this.supportedLanguages = supportedLanguages;
 	}
 
-	public GUIValue[] getBundle() {
+	public List<GUIValue> getBundle() {
 		return bundle;
 	}
 
-	public void setBundle(GUIValue[] bundle) {
+	public void setBundle(List<GUIValue> bundle) {
 		this.bundle = bundle;
 	}
 
