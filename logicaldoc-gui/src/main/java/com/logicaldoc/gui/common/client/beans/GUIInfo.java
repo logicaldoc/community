@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -37,7 +39,7 @@ public class GUIInfo implements Serializable {
 	private GUITenant tenant = null;
 
 	// Optional list of messages to be shown to the user
-	private GUIMessage[] alerts = new GUIMessage[0];
+	private List<GUIMessage> alerts = new ArrayList<>();
 
 	private GUIValue[] supportedLanguages = new GUIValue[0];
 
@@ -46,7 +48,7 @@ public class GUIInfo implements Serializable {
 	private GUIValue[] bundle = new GUIValue[0];
 
 	private GUIValue[] config = new GUIValue[0];
-	
+
 	private GUIReadingRequest[] unconfirmedReagings = new GUIReadingRequest[0];
 
 	// The definitions of attributes
@@ -59,7 +61,7 @@ public class GUIInfo implements Serializable {
 	private GUIAttributeSet defaultAttributeSet;
 
 	private GUIBranding branding = new GUIBranding();
-	
+
 	public String getRelease() {
 		return release;
 	}
@@ -76,11 +78,11 @@ public class GUIInfo implements Serializable {
 		this.year = year;
 	}
 
-	public GUIMessage[] getAlerts() {
+	public List<GUIMessage> getAlerts() {
 		return alerts;
 	}
 
-	public void setAlerts(GUIMessage[] alerts) {
+	public void setAlerts(List<GUIMessage> alerts) {
 		this.alerts = alerts;
 	}
 

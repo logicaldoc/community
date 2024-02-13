@@ -109,7 +109,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				checkRestrartRequired(info, locale, alerts);
 			}
 
-			info.setAlerts(alerts.toArray(new GUIMessage[0]));
+			info.setAlerts(alerts);
 
 			setAttributes(info, tenantName);
 
