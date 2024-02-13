@@ -49,7 +49,7 @@ public class GUISearchOptions implements Serializable {
 
 	private Long folder = null;
 
-	private String[] fields = Constants.getFulltextDefaultFields();
+	private List<String> fields = Constants.getFulltextDefaultFields();
 
 	private String language = null;
 
@@ -111,7 +111,7 @@ public class GUISearchOptions implements Serializable {
 		return userId;
 	}
 
-	public String[] getFields() {
+	public List<String> getFields() {
 		return fields;
 	}
 
@@ -127,12 +127,12 @@ public class GUISearchOptions implements Serializable {
 		this.userId = userId;
 	}
 
-	public void setFields(String[] flds) {
+	public void setFields(List<String> flds) {
 		fields = flds;
 	}
 
 	public void addField(String s) {
-		fields[fields.length] = s;
+		fields.add(s);
 	}
 
 	public String getLanguage() {

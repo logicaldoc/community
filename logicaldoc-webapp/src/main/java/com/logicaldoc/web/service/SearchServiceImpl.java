@@ -282,7 +282,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			op.setCreationFrom(((FulltextSearchOptions) searchOptions).getCreationFrom());
 			op.setCreationTo(((FulltextSearchOptions) searchOptions).getCreationTo());
 			op.setExpressionLanguage(((FulltextSearchOptions) searchOptions).getExpressionLanguage());
-			op.setFields(((FulltextSearchOptions) searchOptions).getFields());
+			op.setFields(new ArrayList<>(((FulltextSearchOptions) searchOptions).getFields()));
 			op.setFormat(((FulltextSearchOptions) searchOptions).getFormat());
 			op.setLanguage(((FulltextSearchOptions) searchOptions).getLanguage());
 			op.setSizeMax(((FulltextSearchOptions) searchOptions).getSizeMax());
@@ -389,7 +389,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			((FulltextSearchOptions) searchOptions).setCreationFrom(convertToJavaDate(options.getCreationFrom()));
 			((FulltextSearchOptions) searchOptions).setCreationTo(convertToJavaDate(options.getCreationTo()));
 			((FulltextSearchOptions) searchOptions).setExpressionLanguage(options.getExpressionLanguage());
-			((FulltextSearchOptions) searchOptions).setFields(options.getFields());
+			((FulltextSearchOptions) searchOptions).setFields(new HashSet<>(options.getFields()));
 			((FulltextSearchOptions) searchOptions).setFormat(options.getFormat());
 			((FulltextSearchOptions) searchOptions).setLanguage(options.getLanguage());
 			((FulltextSearchOptions) searchOptions).setSizeMax(options.getSizeMax());

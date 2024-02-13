@@ -1,7 +1,9 @@
 package com.logicaldoc.core.searchengine;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Search options specialization for the Full text search.
@@ -23,7 +25,7 @@ public class FulltextSearchOptions extends SearchOptions {
 
 	private String format = "";
 
-	private String[] fields = null;
+	private Set<String> fields = new HashSet<>();
 
 	private String language = null;
 
@@ -43,7 +45,7 @@ public class FulltextSearchOptions extends SearchOptions {
 		return format;
 	}
 
-	public String[] getFields() {
+	public Set<String> getFields() {
 		return fields;
 	}
 
@@ -51,12 +53,12 @@ public class FulltextSearchOptions extends SearchOptions {
 		format = form;
 	}
 
-	public void setFields(String[] flds) {
+	public void setFields(Set<String> flds) {
 		fields = flds;
 	}
 
 	public void addField(String s) {
-		fields[fields.length] = s;
+		fields.add(s);
 	}
 
 	public Date getDateTo() {

@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.subscription;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -17,7 +18,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -129,8 +129,8 @@ public class SubscriptionDialog extends Window {
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler((ClickEvent event) -> {
-			String[] events = null;
+		save.addClickHandler(event -> {
+			List<String> events = new ArrayList<>();
 			final String eventsStr;
 			final String folderOption = form.getValueAsString(OPTION);
 			if (SELECTION.equals(form.getValueAsString(NOTIFYON))) {
@@ -138,7 +138,7 @@ public class SubscriptionDialog extends Window {
 				buf = buf.replace('[', ' ');
 				buf = buf.replace(']', ' ');
 				eventsStr = buf.replace(" ", "");
-				events = eventsStr.split(",");
+				events.addAll(Arrays.asList(eventsStr.split(",")));
 			} else
 				eventsStr = null;
 
@@ -148,8 +148,8 @@ public class SubscriptionDialog extends Window {
 		return save;
 	}
 
-	private void doUpdateSubscriptions(ListGrid grid, List<Long> selectedIds, String[] events, final String eventsStr,
-			final String folderOption) {
+	private void doUpdateSubscriptions(ListGrid grid, List<Long> selectedIds, List<String> events,
+			final String eventsStr, final String folderOption) {
 		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events,
 				new AsyncCallback<Void>() {
 					@Override
@@ -234,15 +234,15 @@ public class SubscriptionDialog extends Window {
 		ButtonItem subscribe = new ButtonItem();
 		subscribe.setTitle(I18N.message("subscribe"));
 		subscribe.setAutoFit(true);
-		subscribe.addClickHandler((ClickEvent event) -> {
-			String[] events = null;
+		subscribe.addClickHandler(event -> {
+			List<String> events = new ArrayList<>();
 			final String eventsStr;
 			if (SELECTION.equals(form.getValueAsString(NOTIFYON))) {
 				String buf = form.getValues().get(EVENT).toString().trim().toLowerCase();
 				buf = buf.replace('[', ' ');
 				buf = buf.replace(']', ' ');
 				eventsStr = buf.replace(" ", "");
-				events = eventsStr.split(",");
+				events.addAll(Arrays.asList(eventsStr.split(",")));
 			} else
 				eventsStr = null;
 

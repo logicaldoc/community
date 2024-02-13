@@ -6,12 +6,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface AuditServiceAsync {
 
-	void subscribeFolder(long folderId, boolean currentOnly, String[] events, Long user, Long group,
+	void subscribeFolder(long folderId, boolean currentOnly, List<String> events, Long user, Long group,
 			AsyncCallback<Void> callback);
 
-	void subscribeDocuments(List<Long> docIds, String[] events, Long user, Long group, AsyncCallback<Void> callback);
+	void subscribeDocuments(List<Long> docIds, List<String> events, Long user, Long group, AsyncCallback<Void> callback);
 
 	void deleteSubscriptions(long[] ids, AsyncCallback<Void> callback);
 
-	void update(List<Long> ids, boolean currentOnly, String[] events, AsyncCallback<Void> callback);
+	void update(List<Long> ids, boolean currentOnly, List<String> events, AsyncCallback<Void> callback);
 }

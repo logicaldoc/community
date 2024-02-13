@@ -1540,7 +1540,7 @@ public class LDRepository {
 		// Now detect if the search must be applied to specific fields
 		final String ldocPrefix = "ldoc:";
 		if (whereExpression.contains("cmis:") || whereExpression.contains(ldocPrefix)) {
-			List<String> fields = new ArrayList<>();
+			Set<String> fields = new HashSet<>();
 			Pattern p = Pattern.compile("[(cmis),(ldoc)]+:\\w+");
 			Matcher m = p.matcher(whereExpression);
 			while (m.find()) {
@@ -1551,8 +1551,7 @@ public class LDRepository {
 				log.debug("field: {}", field);
 				fields.add(field);
 			}
-
-			opt.setFields(fields.toArray(new String[0]));
+			opt.setFields(fields);
 		}
 
 		// Execute the search

@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.common.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 public final class Constants {
 
 	private Constants() {
@@ -122,8 +125,8 @@ public final class Constants {
 
 	public static final String DOC_ID = "docId";
 
-	private static final String[] AUDIT_DEFAULT_EVENTS = new String[] { "event.stored", EVENT_CHANGED,
-			EVENT_CHECKEDIN };
+	private static final List<String> AUDIT_DEFAULT_EVENTS = Arrays.asList("event.stored", EVENT_CHANGED,
+			EVENT_CHECKEDIN);
 
 	public static final String FULLTEXT_FIELD_TITLE = "title";
 
@@ -147,14 +150,14 @@ public final class Constants {
 
 	public static final String TWOFA_DUO = "duo";
 
-	private static final String[] FULLTEXT_DEFAULT_FIELDS = new String[] { FULLTEXT_FIELD_FILENAME,
-			FULLTEXT_FIELD_CONTENT, FULLTEXT_FIELD_TAGS };
+	private static final List<String> FULLTEXT_DEFAULT_FIELDS = Arrays.asList(FULLTEXT_FIELD_FILENAME,
+			FULLTEXT_FIELD_CONTENT, FULLTEXT_FIELD_TAGS);
 
-	public static String[] getAuditDefaultEvents() {
+	public static List<String> getAuditDefaultEvents() {
 		return AUDIT_DEFAULT_EVENTS;
 	}
 
-	public static String[] getFulltextDefaultFields() {
+	public static List<String> getFulltextDefaultFields() {
 		return FULLTEXT_DEFAULT_FIELDS;
 	}
 }

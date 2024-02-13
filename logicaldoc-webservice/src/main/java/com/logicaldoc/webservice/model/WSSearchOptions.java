@@ -1,6 +1,7 @@
 package com.logicaldoc.webservice.model;
 
 import java.util.Locale;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -268,7 +269,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 			wopt.setDateTo(DateUtil.format(((FulltextSearchOptions) opt).getDateTo()));
 			wopt.setExpressionLanguage(((FulltextSearchOptions) opt).getExpressionLanguage());
 			wopt.setLanguage(((FulltextSearchOptions) opt).getLanguage());
-			wopt.setFields(((FulltextSearchOptions) opt).getFields());
+			wopt.setFields(((FulltextSearchOptions) opt).getFields().toArray(new String[0]));
 			wopt.setFormat(((FulltextSearchOptions) opt).getFormat());
 			wopt.setSizeMax(((FulltextSearchOptions) opt).getSizeMax());
 			wopt.setSizeMin(((FulltextSearchOptions) opt).getSizeMin());
@@ -303,7 +304,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 			((FulltextSearchOptions) so).setDateFrom(WSUtil.convertStringToDate(dateFrom));
 			((FulltextSearchOptions) so).setDateTo(WSUtil.convertStringToDate(dateTo));
 			((FulltextSearchOptions) so).setExpressionLanguage(expressionLanguage);
-			((FulltextSearchOptions) so).setFields(fields);
+			((FulltextSearchOptions) so).setFields(Set.of(fields));
 			((FulltextSearchOptions) so).setFormat(format);
 			((FulltextSearchOptions) so).setLanguage(language);
 			((FulltextSearchOptions) so).setSizeMax(sizeMax);

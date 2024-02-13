@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -112,7 +113,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 		opt.setLanguage("en");
 		opt.setExpression("document");
-		opt.setFields(new String[] { "content", "title" });
+		opt.setFields(Set.of("content", "title"));
 		opt.setExpressionLanguage("en");
 		opt.setType(SearchOptions.TYPE_FULLTEXT);
 		opt.setUserId(1);
@@ -132,7 +133,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		opt = new FulltextSearchOptions();
 		opt.setLanguage("en");
 		opt.setExpression("CH8900761016116097873");
-		opt.setFields(new String[] { "content", "title" });
+		opt.setFields(Set.of("content", "title"));
 		opt.setExpressionLanguage("en");
 		opt.setType(SearchOptions.TYPE_FULLTEXT);
 		opt.setUserId(1);
@@ -159,7 +160,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 		opt.setLanguage("en");
 		opt.setExpression("document");
-		opt.setFields(new String[] { "content", "title" });
+		opt.setFields(Set.of("content", "title"));
 		opt.setExpressionLanguage("en");
 		opt.setType(SearchOptions.TYPE_FULLTEXT);
 		opt.setUserId(1);

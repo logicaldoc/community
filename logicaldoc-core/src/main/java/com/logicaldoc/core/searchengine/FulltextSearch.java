@@ -4,9 +4,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -371,10 +373,9 @@ public class FulltextSearch extends Search {
 	}
 
 	private void setDefaultFields(FulltextSearchOptions opt) {
-		if (opt.getFields() == null) {
-			String[] fields = new String[] { HitField.FILENAME.toString(), HitField.TITLE.toString(),
-					HitField.TAGS.toString(), HitField.CONTENT.toString() };
-			opt.setFields(fields);
+		if (opt.getFields().isEmpty()) {
+			opt.setFields(new HashSet<>(Arrays.asList(HitField.FILENAME.toString(), HitField.TITLE.toString(),
+					HitField.TAGS.toString(), HitField.CONTENT.toString())));
 		}
 	}
 }

@@ -197,7 +197,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		if (fields.contains(Constants.FULLTEXT_FIELD_TITLE) && !fields.contains(Constants.FULLTEXT_FIELD_FILENAME))
 			fields.add(Constants.FULLTEXT_FIELD_FILENAME);
 
-		options.setFields(fields.toArray(new String[0]));
+		options.setFields(fields);
 
 		options.setFolder(folder.getFolderId());
 		options.setFolderName(folder.getFolderName());
